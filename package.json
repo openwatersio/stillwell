@@ -1,0 +1,28 @@
+{
+  "name": "water-levels",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "fetch": "node scripts/fetch.ts",
+    "evaluate:bsh": "node scripts/evaluate-bsh.ts",
+    "evaluate:rws": "node scripts/evaluate-rws.ts",
+    "test": "node --test 'test/**/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@duckdb/node-api": "^2.0.0-r.1",
+    "@slackwater/engine": "^1.0.0-beta.8",
+    "astronomy-engine": "^2.1.19",
+    "ml-matrix": "^6.15.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  }
+}
