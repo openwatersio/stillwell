@@ -18,6 +18,9 @@ concurrency: lake
 
 jobs:
   ingest:
+    # The lake environment only deploys from main; this stops a run from another
+    # branch before it waits on that rule.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     # A station refresh takes about an hour, mostly CO-OPS, so 180 minutes stops a
     # stuck run without holding the lake for six hours. Long backfills raise it.
@@ -27,10 +30,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .mise.toml
           cache: npm
       - run: npm ci
       # The arguments come through the environment, never into the script text.

@@ -1,5 +1,11 @@
 {
   "name": "water-levels",
+  "description": "Observed and predicted water levels from tide and river gauges, as Parquet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openwatersio/water-levels.git"
+  },
   "private": true,
   "type": "module",
   "engines": {
@@ -13,7 +19,8 @@
     "test": "node --test 'test/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.0-r.1",
