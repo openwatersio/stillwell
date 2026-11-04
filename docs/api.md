@@ -4,7 +4,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 
 ## Conventions
 
-- **Stations** are addressed as `/stations/{source}/{id}`, as in the tides API: `/stations/coops/9447130`, `/stations/rws/hoekvanholland`, `/stations/pegelonline/5990020`. A station is one gauge's series from one source. The same physical gauge relayed by two sources is two stations linked by `same_as`.
+- **Stations** are addressed as `/stations/{source}/{id}`, as in the tides API: `/stations/coops/9447130`, `/stations/rws/hoekvanholland`, `/stations/pegelonline/5990020`. A station is one source's series at one place; a gauge is the instrument, and `same_as` links stations that share one, such as a gauge whose observations come from one source and predictions from another. Some stations, such as BSH's predictions derived from a neighboring gauge, have no gauge of their own.
 - **Times** are ISO 8601 in UTC with a `Z` suffix, in requests and responses.
 - **Levels** are meters, rounded to the millimeter, positive up, or feet with `units=feet`.
 - **Datums.** Every level is in one datum, named in the response as `datum`. The `datum` parameter accepts:
@@ -191,7 +191,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  published predicted high a
 bulk/<YYYY-Qn>/<source>.parquet                quarterly snapshots, with a DOI
 ```
 
-Levels in these files are in each station's own datum; `stations.parquet` has the offsets.
+Levels in these files are in each station's own datum; `stations.parquet` has the offsets. [data.md](data.md) has example queries.
 
 ```sql
 SELECT time, level_m

@@ -42,6 +42,8 @@ Merge the last hours from every live station into the recent window:
 node scripts/ingest.ts recent pegelonline --hours 3
 ```
 
+The public lake is at `https://water-levels.openwaters.io/`; [docs/data.md](docs/data.md) explains its files, with example queries and their output.
+
 The lake is `data/` unless `WATER_LEVELS_LAKE` names another directory or an `s3://` URL. For R2, set `S3_ENDPOINT`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`, as crowd-depth does:
 
 ```
