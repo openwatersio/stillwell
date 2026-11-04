@@ -1,95 +1,68 @@
 # water-levels
 
-Observed and predicted water levels from tide and river gauges, in one shape, for [Open Waters](https://github.com/openwatersio). This is the water-level lake described in Open Waters' planning evaluation: one adapter per source, Parquet out, read with DuckDB. [docs/plan.md](docs/plan.md) has the plan and [docs/api.md](docs/api.md) the API design.
+Observed and predicted water levels from tide, river and lake gauges around the world, in one shape. Every station has its datum and its license, and the data is free to download as Parquet. [Open Waters](https://openwaters.io) builds it for reducing crowdsourced soundings to chart datum, for showing in [Slackwater](https://slackwater.xyz) how far the water is from the prediction, and for anyone else who needs gauge data without writing an adapter for each agency.
 
-It has adapters for three sources so far:
+Each agency publishes in its own format, with its own limits, datums and quirks. This project fetches from each one, checks quality, and writes everything to one layout:
 
-| Source                                                               | What                                                                                                                                                                                              | License                                                                                                                                                                                                                                                                                                               |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Rijkswaterstaat](https://rijkswaterstaatdata.nl/waterdata/) (`rws`) | Observed levels and extremes, and RWS's astronomical tide and its extremes, at about 690 locations in the Netherlands and the Caribbean Netherlands, with multi-year histories at the tide gauges | CC0                                                                                                                                                                                                                                                                                                                   |
-| [BSH tide service](https://gezeiten.bsh.de/) (`bsh`)                 | Predicted high and low waters and 10-minute curves at 172 German gauges, for the current year and the next                                                                                        | Free including commercial use, with BSH's source notice (Anlage 4 of the [fee schedule](https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf)); see [slackwater-database#335](https://github.com/openwatersio/slackwater-database/issues/335) |
-| [PEGELONLINE](https://www.pegelonline.wsv.de/) (`pegelonline`)       | Observed levels at German federal gauges, including the BSH gauges, for the last 31 days                                                                                                          | DL-DE/Zero-2.0                                                                                                                                                                                                                                                                                                        |
+- **One schema.** Times are UTC and levels are meters. Quality flags run from 0, good, to 4, bad, whatever scale the source used.
+- **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes.
+- **Licenses.** Every station carries its source's license and attribution, and the public data includes only sources that allow commercial use.
+- **Links between sources.** When two sources cover the same gauge, such as BSH's predictions and PEGELONLINE's observations at Cuxhaven, their stations link to each other.
 
-It also has an implementation of the harmonic representation of inequalities (HRoI), the method BSH uses for German tide predictions, and an evaluation of it against the harmonic method Slackwater uses. See [docs/hroi-evaluation.md](docs/hroi-evaluation.md).
+## Sources
 
-## Usage
+| Source                                                               | Coverage                                                                                                                                                                                                     | Datum                                                 | License                                                                                                                                                                                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Rijkswaterstaat](https://rijkswaterstaatdata.nl/waterdata/) (`rws`) | Observed levels and high and low waters, and RWS's astronomical tide and its extremes, at about 690 locations in the Netherlands and the Caribbean Netherlands, with multi-year histories at the tide gauges | NAP, or MSL at 14 stations, mostly offshore platforms | [CC0](https://rijkswaterstaatdata.nl/waterdata/)                                                                                                                                                                  |
+| [BSH tide service](https://gezeiten.bsh.de/) (`bsh`)                 | Predicted high and low waters and 10-minute curves at 172 German gauges, for the current year and the next                                                                                                   | Gauge zero (PNP), or chart datum (SKN) at 10 gauges   | Free, including commercial use, with BSH's source notice ([fee schedule, Anlage 4](https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf)) |
+| [PEGELONLINE](https://www.pegelonline.wsv.de/) (`pegelonline`)       | Observed levels at German federal gauges on the coast and the rivers, including the BSH gauges, for the last 31 days                                                                                         | Gauge zero (PNP), or NN at 67 gauges                  | [DL-DE/Zero-2.0](https://www.pegelonline.wsv.de/gast/nutzungsbedingungen)                                                                                                                                         |
 
-Requires Node 24 or later.
+[`stations.parquet`](https://water-levels.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://water-levels.openwaters.io/sources.json) gives each source's license and the attribution it asks for.
 
-```bash
-npm install
+US federal sources come next, for coastal and Great Lakes levels and for river stage on the Mississippi and Ohio: NOAA CO-OPS, USGS and the USACE. More European agencies follow after that, including the UK Environment Agency, Kartverket, SMHI, DMI, the Irish Marine Institute and REFMAR. [docs/plan.md](docs/plan.md) has the order. Sources that bar commercial use, such as IOC's sea level monitoring facility, parts of GESLA and the Canadian Hydrographic Service, aren't in the public data.
+
+## Getting the data
+
+Everything is Parquet at `https://water-levels.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. For example, with the [DuckDB CLI](https://duckdb.org/docs/installation/):
+
+```sql
+SET TimeZone = 'UTC';
+SELECT time, level_m, flag, datum
+FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2
+ORDER BY time LIMIT 5;
 ```
 
-Refresh the station lists in `stations/` and write `stations.parquet` and `sources.json` to the lake:
-
-```bash
-node scripts/ingest.ts stations
-```
-
-Backfill a station's observations, extremes and predictions, by year (end exclusive):
-
-```bash
-node scripts/ingest.ts backfill rws hoekvanholland 2016 2025
-```
-
-```bash
-node scripts/ingest.ts backfill bsh 506P 2026 2028
-```
-
-Merge the last hours from every live station into the recent window:
-
-```bash
-node scripts/ingest.ts recent pegelonline --hours 3
-```
-
-The public lake is at `https://water-levels.openwaters.io/`; [docs/data.md](docs/data.md) explains its files, with example queries and their output.
-
-The lake is `data/` unless `WATER_LEVELS_LAKE` names another directory or an `s3://` URL. For R2, set `S3_ENDPOINT`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`, as crowd-depth does:
+Files are laid out by product, source, station and year:
 
 ```
-stations.parquet                                      one row per series
+stations.parquet                                      one row per station
 sources.json                                          license and attribution per source
-recent/<source>.parquet                               station, time, level_m, flag, received
-obs/<source>/<station>/<year>.parquet                 time, level_m, flag, received, datum
-extremes/<source>/<station>/<year>.parquet            time, level_m, type, flag, datum
-predictions/<source>/<station>/<year>.parquet         time, level_m, flag, received, datum
-predicted-extremes/<source>/<station>/<year>.parquet  time, level_m, type, flag[, transit, event], datum
+recent/<source>.parquet                               the last 7 days for every station of a source
+obs/<source>/<station>/<year>.parquet                 observed levels
+extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters
+predictions/<source>/<station>/<year>.parquet         the source's predicted curve
+predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
 ```
 
-`time` is UTC. `level_m` is in the station's own datum, named in each series file's `datum` column and in `stations.parquet` (NAP for most RWS stations and MSL for the 14 that only report against it, mostly offshore platforms, gauge zero PNP for most PEGELONLINE gauges and BSH, except 10 BSH gauges predicted against chart datum SKN), and `stations.parquet` gives offsets to other datums where the source publishes them. `flag` is 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. `received` is when ingest first saw a value arrive, and is empty for backfilled history.
+Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. [docs/data.md](docs/data.md) describes every column and has more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 
-Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. A station keeps one datum for its whole record, and adapters refuse values in any other. If a source starts reporting a station in another datum, `ingest stations` marks it inactive, prints it and exits nonzero, so a person can decide whether to convert its files or start over; `backfill … all` skips inactive stations. Each series file records its datum, and backfill refuses to write into a file in another, so a station brought back in a new datum can't mix the two. A station whose license bars commercial use writes its series to `WATER_LEVELS_RESTRICTED_LAKE`, a private lake separate from the public one, since the public bucket serves everything in it, and ingest refuses to write one without it.
+The lake is new. So far it holds the station lists for all three sources and one year of observations, Hoek van Holland in 2024. Scheduled ingest will fill in the rest.
 
-Responses are cached in `.cache/`, so re-running a historical fetch doesn't hit the upstream service again. Each source's README in `src/sources/` covers its quirks.
+An API at `api.openwaters.io/water-levels` is planned, with live levels for a station, and an archive series that can include Slackwater's prediction and the residual alongside the observations. [docs/api.md](docs/api.md) has the design.
 
-## TICON replacement
+## Not for navigation
 
-```bash
-npm run ticon:inventory
-```
+Recent values are usually preliminary. Sources revise them later, and a gauge can fail without warning. Check the `flag` column, and don't rely on this data alone for navigation or safety.
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+## Also here
 
-## Evaluations
+An implementation of the harmonic representation of inequalities (HRoI), the method BSH uses for German tide predictions, with an evaluation of it against a harmonic curve fit at German and Dutch gauges. See [docs/hroi-evaluation.md](docs/hroi-evaluation.md).
 
-```bash
-npm run evaluate:bsh
-```
+## Contributing
 
-```bash
-npm run evaluate:rws
-```
-
-Each writes `docs/results/<source>.json` and prints a Markdown table. The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
-
-## Development
-
-[CONTRIBUTING.md](CONTRIBUTING.md) covers the layout, the checks and how to add a source.
-
-```bash
-npm run check
-```
+[CONTRIBUTING.md](CONTRIBUTING.md) covers running ingest, the checks, and adding a source.
 
 ## License
 
-The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `stations/`, `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in the lake's `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
+The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `stations/`, `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
