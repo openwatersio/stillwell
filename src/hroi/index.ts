@@ -10,7 +10,7 @@ import { LUNAR_DAY_MS, type Transit, transits as findTransits } from "./transits
  * Each high and low water belongs to a lunar transit at Greenwich and has one of
  * four event indices (HW or LW, after an upper or a lower transit). For each
  * index, the lunitidal interval (time after the transit) and the height are
- * modelled as a mean plus long-period harmonics of the transit number:
+ * modeled as a mean plus long-period harmonics of the transit number:
  *
  *   y(n) = a0 + Σ a_l cos(ω_l n) + b_l sin(ω_l n)
  *
@@ -261,7 +261,7 @@ export function canonicalExtremes(
       // Skip windows at the edge of the record or with a gap at the extreme.
       if (!best || i >= samples.length || samples[i]!.time - (center - half) > HOUR_MS) continue;
       if (j >= samples.length || center + half - samples[j - 1]!.time > HOUR_MS) continue;
-      // Centre plateaus: average the times within a centimeter of the extreme.
+      // Center plateaus: average the times within a centimeter of the extreme.
       const near = samples
         .slice(i, j)
         .filter((s) => sign * (best!.level - s.level) <= 0.01)

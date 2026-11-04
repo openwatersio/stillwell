@@ -11,7 +11,7 @@ import type { Extreme, Sample, Station } from "../types.ts";
  */
 const BASE = "https://ddapi20-waterwebservices.rijkswaterstaat.nl";
 const OBSERVATIONS = `${BASE}/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen`;
-const CATALOGUE = `${BASE}/METADATASERVICES/OphalenCatalogus`;
+const CATALOG = `${BASE}/METADATASERVICES/OphalenCatalogus`;
 
 // The service refuses requests over 160,000 values. A year of 10-minute data is
 // 52,560, so yearly chunks stay well inside it.
@@ -50,7 +50,7 @@ interface Response {
   WaarnemingenLijst?: Series[];
 }
 
-interface CatalogueLocation {
+interface CatalogLocation {
   Locatie_MessageID: number;
   Code: string;
   Naam: string;
@@ -58,7 +58,7 @@ interface CatalogueLocation {
   Lon: number;
 }
 
-interface Catalogue {
+interface Catalog {
   AquoMetadataLijst: {
     AquoMetadata_MessageID: number;
     Grootheid: { Code: string };
@@ -69,12 +69,12 @@ interface Catalogue {
     AquoMetaData_MessageID: number;
     Locatie_MessageID: number;
   }[];
-  LocatieLijst: CatalogueLocation[];
+  LocatieLijst: CatalogLocation[];
 }
 
 /** Locations with a water-level series against `datum` (NAP by default). */
 export async function stations(datum = "NAP"): Promise<Station[]> {
-  const catalogue = await cachedJson<Catalogue>(CATALOGUE, {
+  const catalog = await cachedJson<Catalog>(CATALOG, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -82,16 +82,16 @@ export async function stations(datum = "NAP"): Promise<Station[]> {
     }),
   });
   const heightIds = new Set(
-    catalogue.AquoMetadataLijst.filter(
+    catalog.AquoMetadataLijst.filter(
       (m) => m.Grootheid.Code === "WATHTE" && m.Hoedanigheid.Code === datum && !m.Groepering?.Code,
     ).map((m) => m.AquoMetadata_MessageID),
   );
   const locationIds = new Set(
-    catalogue.AquoMetadataLocatieLijst.filter((l) => heightIds.has(l.AquoMetaData_MessageID)).map(
+    catalog.AquoMetadataLocatieLijst.filter((l) => heightIds.has(l.AquoMetaData_MessageID)).map(
       (l) => l.Locatie_MessageID,
     ),
   );
-  return catalogue.LocatieLijst.filter((l) => locationIds.has(l.Locatie_MessageID))
+  return catalog.LocatieLijst.filter((l) => locationIds.has(l.Locatie_MessageID))
     .map((l) => ({
       id: `rws:${l.Code}`,
       name: l.Naam,

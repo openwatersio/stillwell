@@ -14,7 +14,7 @@ An evaluation of the harmonic representation of inequalities (HRoI), the method 
 
 ## Method
 
-HRoI predicts high and low waters directly, not a curve. Each high and low water is assigned to a lunar transit at Greenwich and given one of four event indices: high or low water, after an upper or a lower transit. For each index, the lunitidal interval (time after the transit) and the height are each modelled as a mean plus long-period harmonics of the transit number,
+HRoI predicts high and low waters directly, not a curve. Each high and low water is assigned to a lunar transit at Greenwich and given one of four event indices: high or low water, after an upper or a lower transit. For each index, the lunitidal interval (time after the transit) and the height are each modeled as a mean plus long-period harmonics of the transit number,
 
 ```
 y(n) = a0 + Σ a_l cos(ω_l n) + b_l sin(ω_l n)
@@ -79,7 +79,7 @@ Errors against observed 2024 extremes, as HRoI / harmonic (canonical) / harmonic
 | delfzijl            | 16.8 / 20.3 / 20.2 / 16.5 | 14.1 / 15.8 / 15.7 / 14.6 | 31.9 / 32.9 / 32.9 / 33.5 | 39.2 / 37.7 / 37.7 / 37.2 | 0 / 2 / 0 / 0      | 1415 / 1413 / 1415 / 1415 | 33.6 / 32.2 / 33.4                    |
 
 - **Times.** HRoI has the lowest RMS time error for both high and low water at every gauge except Den Helder high water, where every method is around 50 minutes, and Delfzijl high water, where RWS is 0.3 minutes better. Its biases are small (under 5 minutes, apart from Hoek van Holland low water), while RWS's astronomical high waters run 8–16 minutes late at Vlissingen, Harlingen and Hoek van Holland.
-- **Ambiguous extremes.** Hoek van Holland's double low water and Den Helder's flat high water make the observed event time itself uncertain, and every method is 50–74 minutes RMS there. RWS's observed record has about 250 fewer extremes at Hoek van Holland in 2024 than one high and one low water per cycle would give. Reporting every turning point (Slackwater's current behaviour) gives 2,050 events at Hoek van Holland and 1,770 at Den Helder, against 1,414 from HRoI.
+- **Ambiguous extremes.** Hoek van Holland's double low water and Den Helder's flat high water make the observed event time itself uncertain, and every method is 50–74 minutes RMS there. RWS's observed record has about 250 fewer extremes at Hoek van Holland in 2024 than one high and one low water per cycle would give. Reporting every turning point (Slackwater's current behavior) gives 2,050 events at Hoek van Holland and 1,770 at Den Helder, against 1,414 from HRoI.
 - **Heights** are within a few centimeters across methods. HRoI is better for high waters in the Western Scheldt (22–23 cm against 25–31 cm) and slightly worse for low waters at Hoek van Holland and Harlingen.
 - **Curves.** The harmonic curve is as good as HRoI's mean-curve construction or up to 5 cm better, except at Bath.
 
