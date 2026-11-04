@@ -577,6 +577,37 @@ describe("coops", () => {
     );
   });
 
+  it("counts a datums answer with an error body as a failure", async () => {
+    const ids = ["1", "2", "3", "4", "5"];
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: ids.map((id) => station({ id })) })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({ id: "1" })] })],
+      [/datums/, JSON.stringify({ error: { message: "Internal error" } })],
+    ]);
+    await assert.rejects(coops.stations(), /datums failed for 5 stations.*Internal error/);
+  });
+
+  it("fills in the hour before a 6-minute record that starts an hour into the month", async () => {
+    serve([
+      [
+        /product=water_level/,
+        JSON.stringify({ data: [{ t: "1995-06-01 01:00", v: "1.5", f: "0,0,0,0", q: "v" }] }),
+      ],
+      [
+        /product=hourly_height/,
+        JSON.stringify({ data: [{ t: "1995-06-01 00:00", v: "1.4", f: "0,0" }] }),
+      ],
+    ]);
+    const levels = await coops.levels("8518751", new Date("1995-06-01Z"), new Date("1995-07-01Z"), {
+      established: "1899-01-01T00:00:00Z",
+      removed: null,
+    });
+    assert.deepEqual(
+      levels.map((l) => l.level),
+      [1.4, 1.5],
+    );
+  });
+
   it("gives up as soon as several stations' datums fail in a row", async () => {
     const ids = ["1", "2", "3", "4", "5", "6"];
     serve([

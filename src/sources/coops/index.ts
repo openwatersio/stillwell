@@ -51,6 +51,7 @@ interface ApiStation {
 }
 
 interface ApiDatums {
+  error?: { message?: string };
   datums: { name: string; value: number }[] | null;
   LAT?: number | null;
   HAT?: number | null;
@@ -121,6 +122,8 @@ const DATUM_NAMES: Record<string, string> = {
 async function datums(id: string): Promise<Record<string, number>> {
   // Fresh, so a new tidal epoch's datums reach the next refresh.
   const d = await metadataOf<ApiDatums>(`stations/${id}/datums.json?units=metric`, true);
+  // CO-OPS answers some failures with 200 and an error body; that's a failure, not "no datums".
+  if (d.error) throw new Error(`CO-OPS datums ${id}: ${d.error.message ?? "error"}`);
   const heights: Record<string, number> = {};
   for (const { name, value } of d.datums ?? [])
     if (DATUM_NAMES[name] && typeof value === "number") heights[DATUM_NAMES[name]] = value;
@@ -256,7 +259,7 @@ export async function levels(
     // an outage or a gap, and hourly heights would replace the lake's 6-minute
     // values for that month.
     const hourly =
-      from.getTime() < SIX_MINUTE_ERA && firstSixMinute - from.getTime() > HOUR_MS
+      from.getTime() < SIX_MINUTE_ERA && firstSixMinute > from.getTime()
         ? (await rowsOf("hourly_height", id, from, to)).filter((r) => timeOf(r.t) < firstSixMinute)
         : [];
     for (const r of [...hourly, ...sixMinute]) {
@@ -411,7 +414,6 @@ function stamp(date: Date): string {
 /** CO-OPS's 6-minute record starts between 1994 and 1996, depending on the station. */
 const SIX_MINUTE_ERA = Date.UTC(1997, 0, 1);
 const MINUTE_MS = 60_000;
-const HOUR_MS = 3_600_000;
 const DAY_MS = 86_400_000;
 
 /** [start, end) split at UTC calendar months or years. */

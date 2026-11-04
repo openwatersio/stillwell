@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readdirSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
@@ -32,5 +33,16 @@ describe("cachedText", () => {
     answer('{"error": {"message": "No data was found."}}');
     await cachedText("https://example.test/error");
     assert.equal(cached().length, before);
+  });
+
+  it("fetches again rather than replay an error body an older build cached", async () => {
+    const url = "https://example.test/old-error";
+    const key = createHash("sha256")
+      .update(JSON.stringify([url, null]))
+      .digest("hex");
+    mkdirSync(join(dir, key.slice(0, 2)), { recursive: true });
+    writeFileSync(join(dir, key.slice(0, 2), key), '{"error": {"message": "No data was found."}}');
+    answer('{"data": []}');
+    assert.equal(await cachedText(url), '{"data": []}');
   });
 });

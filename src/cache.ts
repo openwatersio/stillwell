@@ -18,7 +18,9 @@ export async function cachedText(url: string, options: RequestOptions = {}): Pro
   const path = join(CACHE_DIR, key.slice(0, 2), key);
   if (!options.fresh) {
     try {
-      return await readFile(path, "utf8");
+      const cached = await readFile(path, "utf8");
+      // An error body an older build cached is fetched again, not replayed.
+      if (!isError(cached)) return cached;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }
@@ -27,11 +29,15 @@ export async function cachedText(url: string, options: RequestOptions = {}): Pro
   const text = await fetchText(url, options);
   // Some APIs, CO-OPS among them, answer a failure with 200 and an error body;
   // caching it would replay the failure on every later run.
-  if (options.fresh || /^\s*\{\s*"error"\s*:/.test(text)) return text;
+  if (options.fresh || isError(text)) return text;
   await mkdir(join(CACHE_DIR, key.slice(0, 2)), { recursive: true });
   await writeFile(`${path}.tmp`, text);
   await rename(`${path}.tmp`, path);
   return text;
+}
+
+function isError(text: string): boolean {
+  return /^\s*\{\s*"error"\s*:/.test(text);
 }
 
 /** Route every adapter request through the disk cache. */
