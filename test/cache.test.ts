@@ -45,4 +45,35 @@ describe("cachedText", () => {
     answer('{"data": []}');
     assert.equal(await cachedText(url), '{"data": []}');
   });
+
+  it("doesn't keep an answer its request turns down, but still reads the cache", async () => {
+    const before = cached().length;
+    answer('{"approval_status": "Provisional"}');
+    const keep = (text: string) => !text.includes("Provisional");
+    await cachedText("https://example.test/provisional", { keep });
+    assert.equal(cached().length, before);
+    answer('{"approval_status": "Approved"}');
+    await cachedText("https://example.test/provisional", { keep });
+    answer("changed");
+    assert.equal(
+      await cachedText("https://example.test/provisional", { keep }),
+      '{"approval_status": "Approved"}',
+    );
+  });
+});
+
+describe("fetchText", () => {
+  it("hands a long Retry-After to the caller rather than retrying at once", async () => {
+    const { fetchText } = await import("../src/http.ts");
+    let calls = 0;
+    globalThis.fetch = async () => {
+      calls++;
+      return new Response("", { status: 429, headers: { "retry-after": "721" } });
+    };
+    await assert.rejects(
+      fetchText("https://example.test/limited"),
+      /returned 429 \(retry after 721 s\)/,
+    );
+    assert.equal(calls, 1);
+  });
 });
