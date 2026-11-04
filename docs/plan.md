@@ -8,7 +8,7 @@ It also replaces GESLA and TICON as tide-database's source of observations. TICO
 
 - Adapters for Rijkswaterstaat, BSH and PEGELONLINE that write Parquet to local `data/`, with a response cache.
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](hroi-evaluation.md)).
-- CI for lint, typecheck and tests. Nothing runs on a schedule, nothing is on R2, and there is no API.
+- CI for lint, typecheck and tests. Nothing runs on a schedule yet, and there is no API.
 
 What the existing Open Waters pieces give us, and don't:
 
@@ -129,7 +129,7 @@ The planning evaluation describes a smaller system than this plan, so bring it i
 - [x] `src/lake/`: Parquet reader and writer for a directory or `s3://` URL, path helpers, and range merging that keeps first arrival times.
 - [x] `scripts/ingest.ts` with `stations`, `recent` and `backfill <source> <stations> <start> <end>`; idempotent, so a rerun writes nothing.
 - [x] `stations/<source>.json` committed (691 RWS, 691 PEGELONLINE, 172 BSH); `stations.parquet` built from them, with `same_as` links made two-way.
-- [ ] R2: the `water-levels` bucket exists; still to do are the `water-levels.openwaters.io` domain, a token scoped to the bucket, and the `S3_*` repo secrets. The `s3://` path hasn't run against R2 yet.
+- [x] R2: the `water-levels` bucket, public at `water-levels.openwaters.io`, with a bucket-scoped token in the `lake` environment, which only runs on main. The manual Ingest workflow runs any ingest command against it; Hoek van Holland's 2024 backfill on R2 matches a local run row for row and reads back over HTTPS.
 - [x] QC v1 (`src/qc.ts`): drop repeated times; `bad` beyond 20 m of the series' median; `suspect` for flatlines of 6 hours or more, spikes from the two-sided neighbor median beyond max(0.25 m, 8·MAD of those residuals), and outliers beyond max(10·MAD, 1 m). On RWS 2024 at six tide gauges it adds 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year.
 - [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 
