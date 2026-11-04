@@ -9,7 +9,9 @@
  * writes stations.parquet and sources.json to the lake. `backfill` writes every
  * product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
- * so a rerun gives the same files. `recent` fetches the last hours for every
+ * so a rerun gives the same files. A calendar month the fetch returned nothing
+ * for keeps what it had, so an outage never deletes stored values; a value the
+ * source withdraws stays until its month is fetched again with others. `recent` fetches the last hours for every
  * live station and merges them into recent/<source>.parquet.
  *
  * Files carry no datum of their own, so a station the source now reports in
@@ -27,7 +29,7 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
-import { mergeRange, sameRows } from "../src/lake/merge.ts";
+import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   readExtremes,
   readDatums,
@@ -43,7 +45,14 @@ import {
 import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
-import type { Observation, Product, PublishedExtreme, Source, Station } from "../src/schema.ts";
+import type {
+  ListedStation,
+  Observation,
+  Product,
+  PublishedExtreme,
+  Source,
+  Station,
+} from "../src/schema.ts";
 import { sourceOf, sources } from "../src/sources/index.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
@@ -105,11 +114,41 @@ switch (command) {
 
 async function refreshStations(ids: string[]): Promise<void> {
   for (const id of ids) {
-    const fetched = await sourceOf(id).stations();
+    let fetched;
+    try {
+      fetched = await sourceOf(id).stations();
+    } catch (error) {
+      // One source failing keeps its committed list and doesn't stop the others.
+      console.error(
+        `${id}: ${error instanceof Error ? error.message : error}; keeping the committed list`,
+      );
+      process.exitCode = 1;
+      continue;
+    }
     const previous = await committedStations(id);
     // An empty list is a broken response, not every station retiring at once.
-    if (!fetched.length && previous.length) throw new Error(`${id} listed no stations`);
-    const { stations, changed } = mergeStationList(previous, fetched);
+    if (!fetched.length && previous.length) {
+      console.error(`${id}: listed no stations; keeping the committed list`);
+      process.exitCode = 1;
+      continue;
+    }
+    const shrunk = shrankSharply(previous, fetched);
+    if (shrunk) {
+      console.error(`${id}: ${shrunk}; keeping the committed list`);
+      process.exitCode = 1;
+      continue;
+    }
+    let merged;
+    try {
+      merged = mergeStationList(previous, fetched);
+    } catch (error) {
+      console.error(
+        `${id}: ${error instanceof Error ? error.message : error}; keeping the committed list`,
+      );
+      process.exitCode = 1;
+      continue;
+    }
+    const { stations, changed } = merged;
     await writeFile(`${STATIONS_DIR}/${id}.json`, JSON.stringify(stations, null, 2) + "\n");
     const active = stations.filter((s) => s.status === "active").length;
     console.log(`${id}: ${active} active, ${stations.length - active} inactive`);
@@ -134,6 +173,21 @@ async function refreshStations(ids: string[]): Promise<void> {
     })),
   );
   console.log(`${stationsPath(LAKE)}: ${all.length} stations`);
+}
+
+/**
+ * A list that suddenly lists fewer than half the active or live stations it
+ * did is a truncated response, not half the network retiring; taken at its
+ * word, it would end those stations' feeds and backfills.
+ */
+function shrankSharply(previous: Station[], fetched: ListedStation[]): string | null {
+  const active = previous.filter((s) => s.status === "active");
+  for (const [what, before, now] of [
+    ["stations", active.length, fetched.length],
+    ["live stations", active.filter((s) => s.live).length, fetched.filter((s) => s.live).length],
+  ] as const)
+    if (before >= 20 && now < before / 2) return `lists ${now} ${what}, down from ${before}`;
+  return null;
 }
 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
@@ -184,11 +238,6 @@ async function backfillYear(
     from.getUTCFullYear(),
   );
   const range = [from.getTime(), to.getTime()] as const;
-  // Adapters return values in the station's datum; this keeps a file from
-  // gaining them when it already holds another, whatever the station list says.
-  const held = (await readDatums(path)).filter((d) => d !== station.datum);
-  if (held.length)
-    throw new Error(`${path} holds ${held.join(", ")}, not ${station.datum}; resolve by hand`);
   if (product === "levels" || product === "predictions") {
     const get = product === "levels" ? source.observations : source.predictions;
     if (!get) return undefined;
@@ -196,9 +245,10 @@ async function backfillYear(
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
+    await refuseOtherDatum(path, station);
     if (product === "levels") rows = qc(rows);
     const existing = await readObservations(path);
-    const merged = mergeRange(existing, rows, ...range);
+    const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
     await writeObservations(path, merged, station.datum);
     return merged.length;
@@ -207,11 +257,23 @@ async function backfillYear(
   if (!get) return undefined;
   const rows = await get(station, from, to);
   if (!rows.length) return undefined;
+  await refuseOtherDatum(path, station);
   const existing = await readExtremes(path);
-  const merged = mergeRange<PublishedExtreme>(existing, rows, ...range);
+  const merged = mergeFetched<PublishedExtreme>(existing, rows, ...range);
   if (!merged.length || sameRows(existing, merged)) return undefined;
   await writeExtremes(path, merged, station.datum);
   return merged.length;
+}
+
+/**
+ * Adapters return values in the station's datum; this keeps a file from gaining
+ * them when it already holds another, whatever the station list says. It runs
+ * once there's something to write, so empty years cost no lake read.
+ */
+async function refuseOtherDatum(path: string, station: Station): Promise<void> {
+  const held = (await readDatums(path)).filter((d) => d !== station.datum);
+  if (held.length)
+    throw new Error(`${path} holds ${held.join(", ")}, not ${station.datum}; resolve by hand`);
 }
 
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
@@ -239,7 +301,7 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
       const fetched = await source.observations!(station, since, new Date(now));
       // QC the whole window, so spikes and flatlines are judged against their neighbors.
       // Nothing new keeps what we had, rather than clearing the last hours.
-      if (fetched.length) merged = qc(mergeRange(old, fetched, since.getTime(), now, now));
+      if (fetched.length) merged = qc(mergeFetched(old, fetched, since.getTime(), now, now));
     } catch (error) {
       // Keep what we had; a failed fetch mustn't empty the window.
       failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);

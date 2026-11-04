@@ -78,6 +78,14 @@ describe("mergeStationList", () => {
     );
   });
 
+  it("keeps committed offsets when the source sends none this time", () => {
+    const { stations } = mergeStationList(
+      [station("a", { datums: { MLLW: -2.4 } })],
+      [station("a", { datums: {} })],
+    );
+    assert.deepEqual(stations[0]!.datums, { MLLW: -2.4 });
+  });
+
   it("refuses an ID that isn't <source>/<source_id>", () => {
     assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })]), /rws:a/);
   });

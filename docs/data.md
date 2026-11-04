@@ -4,7 +4,7 @@ Every public series in the lake is Parquet at `https://water-levels.openwaters.i
 
 Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every source here allows commercial use.
 
-So far the bucket holds the station list for RWS, PEGELONLINE and BSH, and one year of data, Hoek van Holland in 2024. Scheduled ingest fills in the rest (phase 4 of [plan.md](plan.md)).
+So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest fills in the rest (phase 4 of [plan.md](plan.md)).
 
 ## Layout
 
@@ -31,7 +31,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 
 `stations.parquet` has one row per station. Besides `id`, `name`, `lat` and `lon`, these columns matter most:
 
-- **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero) or `SKN` (chart datum).
+- **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum) or `STND` (CO-OPS station datum).
 - **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes.
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.

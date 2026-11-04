@@ -15,8 +15,11 @@ export interface DatumChange {
  * A series' files carry no datum of their own, so a station never changes
  * datum here. One the source now reports in another datum keeps its committed
  * record, inactive, and comes back in `changed` for a person to resolve. A
- * station the source listed without a datum keeps the committed one, and a new
- * station without one isn't listed until the source names it.
+ * station the source listed without a datum, or without any offsets, keeps the
+ * committed ones, and a new station without a datum isn't listed until the
+ * source names it. A source that sends no offsets at all keeps the committed
+ * ones, so a refresh that loses them doesn't erase them; one that sends some
+ * replaces them all.
  */
 export function mergeStationList(
   previous: Station[],
@@ -37,10 +40,12 @@ export function mergeStationList(
       merged.push({ ...old, status: "inactive" });
       continue;
     }
+    // Offsets the source left out this time are kept, rather than erased.
+    const omitted = s.datum === null || (!Object.keys(s.datums).length && old);
     merged.push({
       ...s,
       datum: s.datum ?? old!.datum,
-      datums: s.datum === null ? old!.datums : s.datums,
+      datums: omitted && old ? old.datums : s.datums,
       first: s.first ?? old?.first ?? null,
       last: s.last ?? old?.last ?? null,
       tide_station: s.tide_station ?? old?.tide_station ?? null,

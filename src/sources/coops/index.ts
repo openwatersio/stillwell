@@ -1,0 +1,487 @@
+import { getJson } from "../../http.ts";
+import {
+  Flag,
+  stationDefaults,
+  type ListedStation,
+  type Observation,
+  type PublishedExtreme,
+  type Source,
+  type SourceMetadata,
+  type Station,
+} from "../../schema.ts";
+
+/**
+ * NOAA CO-OPS, the US National Water Level Observation Network and the
+ * historical stations before it, through the metadata API (mdapi) and the data
+ * API (datagetter).
+ *
+ * Levels are in station datum (STND), the gauge's own fixed zero, rather than
+ * MLLW: MLLW moves against the gauge with each new tidal epoch, and a file must
+ * stay in one datum. `datums` gives MLLW, MSL, NAVD88 and the rest from STND. On
+ * the Great Lakes STND is IGLD 1985.
+ */
+const MDAPI = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi";
+const DATA = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
+
+export const metadata: SourceMetadata = {
+  id: "coops",
+  name: "NOAA Center for Operational Oceanographic Products and Services (CO-OPS)",
+  url: "https://tidesandcurrents.noaa.gov/",
+  license: {
+    id: "US-Government-Works",
+    name: "U.S. Government work, public domain",
+    url: "https://tidesandcurrents.noaa.gov/disclaimers.html",
+    commercial_use: true,
+  },
+  attribution: "NOAA National Ocean Service, CO-OPS",
+  terms: "Preliminary data are unverified and may change once CO-OPS verifies them.",
+};
+
+const DATUM = "STND";
+
+interface ApiStation {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  state: string | null;
+  tidal: boolean;
+  greatlakes: boolean;
+  details?: { established?: string; removed?: string };
+}
+
+interface ApiDatums {
+  datums: { name: string; value: number }[] | null;
+  LAT?: number | null;
+  HAT?: number | null;
+}
+
+/**
+ * Every station with water levels, current or historical. Stations on the
+ * current network are live; the rest are listed for their history.
+ */
+export async function stations(): Promise<ListedStation[]> {
+  const all = await metadataOf<{ stations: ApiStation[] }>(
+    "stations.json?type=historicwl&expand=details",
+    true,
+  );
+  const current = await metadataOf<{ stations: ApiStation[] }>(
+    "stations.json?type=waterlevels",
+    true,
+  );
+  // An empty list is a broken response; taken at its word, it would end every live feed.
+  if (!current.stations?.length || !all.stations?.length)
+    throw new Error("CO-OPS listed no water-level stations");
+  const live = new Set(current.stations.map((s) => s.id));
+  const listed = new Map(all.stations.map((s) => [s.id, s]));
+  // A few current stations aren't on the historical list yet.
+  for (const s of current.stations) if (!listed.has(s.id)) listed.set(s.id, s);
+  const stations: ListedStation[] = [];
+  const failed: string[] = [];
+  let inARow = 0;
+  // A slow API that never quite fails mustn't run past the job's timeout.
+  const deadline = Date.now() + pacing.refreshBudgetMs;
+  for (const s of listed.values()) {
+    if (Date.now() > deadline)
+      throw new Error(`CO-OPS datums took longer than ${pacing.refreshBudgetMs / 60_000} minutes`);
+    let heights: Record<string, number> | null = null;
+    try {
+      heights = await datums(s.id);
+      inARow = 0;
+    } catch (error) {
+      // No offsets this time; the station keeps its committed ones.
+      failed.push(`${s.id}: ${error instanceof Error ? error.message : error}`);
+      // A few stations failing is the station's problem; several in a row, or
+      // many in all, means the API is, and waiting out each one would take hours.
+      if (++inARow >= 5 || failed.length > Math.max(10, listed.size / 10))
+        throw new Error(`CO-OPS datums failed for ${failed.length} stations, e.g. ${failed[0]}`);
+    }
+    stations.push(toStation(s, live.has(s.id), heights));
+  }
+  for (const f of failed) console.error(`  coops ${f}`);
+  return stations.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+/** CO-OPS datum names, as they're kept in `datums`. */
+const DATUM_NAMES: Record<string, string> = {
+  MHHW: "MHHW",
+  MHW: "MHW",
+  DTL: "DTL",
+  MTL: "MTL",
+  MSL: "MSL",
+  MLW: "MLW",
+  MLLW: "MLLW",
+  NAVD88: "NAVD88",
+  NGVD29: "NGVD29",
+  IGLD: "IGLD",
+  GL_LWD: "LWD",
+};
+
+/** Heights above STND, in meters, for the datums CO-OPS publishes at a station. */
+async function datums(id: string): Promise<Record<string, number>> {
+  // Fresh, so a new tidal epoch's datums reach the next refresh.
+  const d = await metadataOf<ApiDatums>(`stations/${id}/datums.json?units=metric`, true);
+  const heights: Record<string, number> = {};
+  for (const { name, value } of d.datums ?? [])
+    if (DATUM_NAMES[name] && typeof value === "number") heights[DATUM_NAMES[name]] = value;
+  if (typeof d.LAT === "number") heights.LAT = d.LAT;
+  if (typeof d.HAT === "number") heights.HAT = d.HAT;
+  return heights;
+}
+
+/**
+ * A CO-OPS station as listed, with the dates it was established and removed, so
+ * a backfill can skip years it wasn't there. They're kept in the committed list
+ * only; `stations.parquet` doesn't carry them.
+ */
+export type CoopsStation = ListedStation & { established: string | null; removed: string | null };
+
+/** `heights` is null when the datums request failed, so the station keeps its committed offsets. */
+function toStation(
+  s: ApiStation,
+  live: boolean,
+  heights: Record<string, number> | null,
+): CoopsStation {
+  // On the Great Lakes, STND is IGLD 1985. A failed or empty answer adds
+  // nothing, so the station keeps its committed offsets rather than IGLD alone.
+  heights = heights === null || !Object.keys(heights).length ? {} : heights;
+  if (s.greatlakes && Object.keys(heights).length) heights = { IGLD: 0, ...heights };
+  const datums: Record<string, number> = {};
+  for (const [name, height] of Object.entries(heights))
+    datums[name] = Math.round(-height * 1000) / 1000 + 0; // + 0 turns -0 into 0
+  return {
+    ...stationDefaults(metadata),
+    id: `coops/${s.id}`,
+    source_id: s.id,
+    name: s.name,
+    lat: s.lat,
+    lon: s.lng,
+    country_code: countryOf(s.state),
+    kind: s.greatlakes ? "lake" : s.tidal ? "coastal" : null,
+    // Current stations report every 6 minutes; historical ones may have only hourly heights.
+    interval_s: live ? 360 : null,
+    datum: DATUM,
+    datums,
+    // Great Lakes stations have no tide, so no high and low waters.
+    products: s.tidal ? ["levels", "extremes"] : ["levels"],
+    first: null,
+    last: null,
+    tide_station: null,
+    same_as: [],
+    status: "active",
+    live,
+    min_interval_s: 360,
+    source_url: `https://tidesandcurrents.noaa.gov/stationhome.html?id=${s.id}`,
+    established: s.details?.established ? isoOf(s.details.established) : null,
+    removed: s.details?.removed ? isoOf(s.details.removed) : null,
+  };
+}
+
+/** US states and the District of Columbia, which CO-OPS gives as `state`. */
+const STATES = new Set(
+  "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(
+    " ",
+  ),
+);
+
+/** Codes CO-OPS gives as `state` that are their own country code, and names Intl spells differently. */
+const COUNTRIES: Record<string, string> = {
+  PR: "PR",
+  VI: "VI",
+  GU: "GU",
+  AS: "AS",
+  MP: "MP",
+  FM: "FM",
+  MH: "MH",
+  PW: "PW",
+  UM: "UM",
+  "United States of America": "US",
+};
+
+/** Country names to ISO codes, from Intl, skipping retired codes such as DD for Germany. */
+const NAMED = (() => {
+  const names = new Intl.DisplayNames(["en"], { type: "region" });
+  const byName = new Map<string, string>();
+  for (let a = 65; a <= 90; a++)
+    for (let b = 65; b <= 90; b++) {
+      const code = String.fromCharCode(a, b);
+      const name = names.of(code);
+      if (!name || name === code) continue;
+      // A retired or alias code canonicalizes to another, e.g. und-DD to und-DE.
+      if (Intl.getCanonicalLocales(`und-${code}`)[0] !== `und-${code}`) continue;
+      byName.set(plain(name), code);
+    }
+  return byName;
+})();
+
+function plain(name: string): string {
+  return name.replace(/&/g, "and").toLowerCase();
+}
+
+/** ISO country code from CO-OPS's `state`: a US state, a territory, or a country's name. */
+export function countryOf(state: string | null): string | null {
+  if (!state) return null;
+  if (STATES.has(state)) return "US";
+  return COUNTRIES[state] ?? NAMED.get(plain(state)) ?? null;
+}
+
+interface Row {
+  t: string;
+  v: string;
+  f?: string;
+  q?: string;
+  ty?: string;
+}
+
+/**
+ * Observed levels in meters above STND over [start, end), a calendar month per
+ * request: 6-minute values, plus hourly heights for any part of the month before
+ * the 6-minute record starts (everything before about 1996).
+ */
+export async function levels(
+  id: string,
+  start: Date,
+  end: Date,
+  station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
+): Promise<Observation[]> {
+  const window = await operated(id, end, station);
+  const out: Observation[] = [];
+  for (const [from, to] of chunks(start, end, "month")) {
+    if (!overlaps(window, from, to)) continue;
+    const sixMinute = await rowsOf("water_level", id, from, to);
+    const first = sixMinute.find((r) => r.v !== "" && Number.isFinite(Number(r.v)));
+    const firstSixMinute = first ? timeOf(first.t) : to.getTime();
+    // Hourly heights fill in only what the 6-minute record doesn't reach.
+    // Only before the 6-minute era: later, a month with no 6-minute values is
+    // an outage or a gap, and hourly heights would replace the lake's 6-minute
+    // values for that month.
+    const hourly =
+      from.getTime() < SIX_MINUTE_ERA && firstSixMinute - from.getTime() > HOUR_MS
+        ? (await rowsOf("hourly_height", id, from, to)).filter((r) => timeOf(r.t) < firstSixMinute)
+        : [];
+    for (const r of [...hourly, ...sixMinute]) {
+      const level = Number(r.v);
+      if (r.v === "" || !Number.isFinite(level)) continue;
+      out.push({ time: timeOf(r.t), level, flag: flagOf(r) });
+    }
+  }
+  return within(dedupe(out), start, end);
+}
+
+/** CO-OPS's verified high and low waters over [start, end), in meters above STND, a calendar year per request. */
+export async function extremes(
+  id: string,
+  start: Date,
+  end: Date,
+  station: Partial<Pick<CoopsStation, "live" | "established" | "removed">> = {},
+): Promise<PublishedExtreme[]> {
+  const window = await operated(id, end, station);
+  const out: PublishedExtreme[] = [];
+  for (const [from, to] of chunks(start, end, "year")) {
+    if (!overlaps(window, from, to)) continue;
+    for (const r of await rowsOf("high_low", id, from, to)) {
+      const level = Number(r.v);
+      if (r.v === "" || !Number.isFinite(level) || !r.ty) continue;
+      out.push({
+        time: timeOf(r.t),
+        level,
+        type: r.ty.trim().startsWith("H") ? "high" : "low",
+        flag: flagOf(r),
+      });
+    }
+  }
+  return within(dedupe(out), start, end);
+}
+
+/**
+ * Flags from the row. `q` is `v` once verified and `p` while preliminary;
+ * hourly heights and high and low waters are verified products and carry no
+ * `q`. `f` is a list of 0/1 flags: for 6-minute values, too many outliers (O),
+ * flat (F), rate of change (R) and limit (L); for hourly heights and extremes,
+ * inferred (I) and limit (L). O counts rejected samples rather than flagging
+ * the value, so it's left out.
+ */
+export function flagOf(row: Pick<Row, "f" | "q">): Flag {
+  const f = (row.f ?? "").split(",").map(Number);
+  let flag: Flag = row.q === "p" ? Flag.preliminary : Flag.good;
+  if (f.length === 4) {
+    if (f[1] || f[2] || f[3]) flag = Flag.suspect;
+  } else if (f.length === 2) {
+    if (f[1]) flag = Flag.suspect;
+    else if (f[0]) flag = Math.max(flag, Flag.interpolated) as Flag;
+  }
+  return flag;
+}
+
+async function rowsOf(product: string, id: string, from: Date, to: Date): Promise<Row[]> {
+  const params = new URLSearchParams({
+    product,
+    station: id,
+    datum: DATUM,
+    units: "metric",
+    time_zone: "gmt",
+    format: "json",
+    application: "openwaters",
+    begin_date: stamp(from),
+    // end_date is inclusive and to the minute: the last whole minute before `to`.
+    end_date: stamp(new Date(Math.ceil(to.getTime() / MINUTE_MS) * MINUTE_MS - MINUTE_MS)),
+  });
+  const body = await getJson<{ data?: Row[]; error?: { message: string } }>(`${DATA}?${params}`, {
+    fresh: fresh(to),
+  });
+  if (body.error) {
+    if (/No data was found/i.test(body.error.message)) return [];
+    throw new Error(`CO-OPS ${product} ${id}: ${body.error.message.trim()}`);
+  }
+  return body.data ?? [];
+}
+
+// When the station operated, so a backfill doesn't ask for decades it wasn't
+// there: from the committed list when it has the dates, else from the
+// station's details. A live station's last month needs neither.
+const windows = new Map<string, Promise<[number, number]>>();
+
+function operated(
+  id: string,
+  end: Date,
+  { live, established, removed }: Partial<Pick<CoopsStation, "live" | "established" | "removed">>,
+): Promise<[number, number]> {
+  if (live && end.getTime() > Date.now() - 31 * DAY_MS)
+    return Promise.resolve([-Infinity, Infinity]);
+  // A live station is running, whatever an old removed date says.
+  const open = ([from, to]: [number, number]): [number, number] => [from, live ? Infinity : to];
+  // Only dates the list actually gave count; a missing one is looked up.
+  if (typeof established === "string" || typeof removed === "string")
+    return Promise.resolve(open(windowOf(established ?? null, removed ?? null, id)));
+  let window = windows.get(id);
+  if (!window) {
+    window = metadataOf<{ established?: string; removed?: string }>(
+      `stations/${id}/details.json`,
+      true,
+    ).then((d) =>
+      windowOf(
+        d.established ? isoOf(d.established) : null,
+        d.removed ? isoOf(d.removed) : null,
+        id,
+      ),
+    );
+    // A failed lookup is tried again next time rather than remembered.
+    window.catch(() => windows.delete(id));
+    windows.set(id, window);
+  }
+  return window.then(open);
+}
+
+/** The [established, removed] window, refusing a date that doesn't parse rather than skipping every year. */
+function windowOf(
+  established: string | null,
+  removed: string | null,
+  id: string,
+): [number, number] {
+  const from = established ? Date.parse(established) : -Infinity;
+  const to = removed ? Date.parse(removed) : Infinity;
+  if (Number.isNaN(from) || Number.isNaN(to))
+    throw new Error(
+      `CO-OPS ${id} has unreadable dates: established ${established}, removed ${removed}`,
+    );
+  // Removed before it was established means it was reinstalled; don't skip anything.
+  return from <= to ? [from, to] : [-Infinity, Infinity];
+}
+
+function overlaps([from, to]: [number, number], start: Date, end: Date): boolean {
+  return from < end.getTime() && to >= start.getTime();
+}
+
+/** A CO-OPS GMT time, `YYYY-MM-DD HH:MM[:SS]`, as an epoch; NaN if it isn't one. */
+function timeOf(t: string): number {
+  return Date.parse(isoOf(t));
+}
+
+/** A CO-OPS GMT time as ISO 8601 UTC. */
+function isoOf(t: string): string {
+  const match = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})(:\d{2})?/.exec(t.trim());
+  return match ? `${match[1]}T${match[2]}${match[3] ?? ":00"}Z` : t;
+}
+
+function stamp(date: Date): string {
+  const iso = date.toISOString();
+  return `${iso.slice(0, 4)}${iso.slice(5, 7)}${iso.slice(8, 10)} ${iso.slice(11, 16)}`;
+}
+
+/** CO-OPS's 6-minute record starts between 1994 and 1996, depending on the station. */
+const SIX_MINUTE_ERA = Date.UTC(1997, 0, 1);
+const MINUTE_MS = 60_000;
+const HOUR_MS = 3_600_000;
+const DAY_MS = 86_400_000;
+
+/** [start, end) split at UTC calendar months or years. */
+function* chunks(start: Date, end: Date, unit: "month" | "year"): Generator<[Date, Date]> {
+  for (let t = start.getTime(); t < end.getTime();) {
+    const d = new Date(t);
+    const next =
+      unit === "month"
+        ? Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1)
+        : Date.UTC(d.getUTCFullYear() + 1, 0, 1);
+    yield [new Date(t), new Date(Math.min(next, end.getTime()))];
+    t = next;
+  }
+}
+
+function dedupe<T extends { time: number }>(rows: T[]): T[] {
+  rows.sort((a, b) => a.time - b.time);
+  return rows.filter((r, i) => i === 0 || r.time !== rows[i - 1]!.time);
+}
+
+function within<T extends { time: number }>(rows: T[], start: Date, end: Date): T[] {
+  return rows.filter((r) => r.time >= start.getTime() && r.time < end.getTime());
+}
+
+/** Recent values change as CO-OPS verifies them, so they're never cached. */
+function fresh(end: Date): boolean {
+  return end.getTime() > Date.now() - 120 * DAY_MS;
+}
+
+/**
+ * The metadata API blocks a client for a few minutes once it passes a rate
+ * limit, answering 403 ForbiddenException from its AWS gateway. So its requests
+ * start at least a second apart, and a 403 waits for the block to lift before
+ * trying again. The data API has shown no such limit. Tests shrink the waits.
+ */
+export const pacing = { metadataMs: 1000, blockedMs: 150_000, refreshBudgetMs: 120 * 60_000 };
+let metadataQueue: Promise<unknown> = Promise.resolve();
+let lastMetadata = 0;
+
+function metadataOf<T>(path: string, fresh = false): Promise<T> {
+  const next = metadataQueue.then(async () => {
+    for (let attempt = 1; ; attempt++) {
+      await sleep(lastMetadata + pacing.metadataMs - Date.now());
+      lastMetadata = Date.now();
+      try {
+        return await getJson<T>(`${MDAPI}/${path}`, { fresh });
+      } catch (error) {
+        if (attempt >= 3 || !String(error).includes("returned 403")) throw error;
+        await sleep(pacing.blockedMs * attempt);
+      }
+    }
+  });
+  metadataQueue = next.catch(() => undefined);
+  return next as Promise<T>;
+}
+
+function sleep(ms: number): Promise<void> {
+  return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
+}
+
+/** Every request is in STND, so a station committed in any other datum is refused. */
+function checked(station: Station): string {
+  if (station.datum !== DATUM)
+    throw new Error(`${station.id} is in ${station.datum}; CO-OPS levels come in ${DATUM}`);
+  return station.source_id;
+}
+
+export const source: Source = {
+  metadata,
+  stations,
+  observations: (s: Station, start, end) => levels(checked(s), start, end, s as CoopsStation),
+  extremes: (s: Station, start, end) => extremes(checked(s), start, end, s as CoopsStation),
+};

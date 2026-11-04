@@ -9,12 +9,19 @@ on:
         description: "ingest.ts arguments"
         required: true
         default: "stations"
+      timeout:
+        description: "Minutes before the job is stopped (up to 360)"
+        required: true
+        default: "180"
 
 concurrency: lake
 
 jobs:
   ingest:
     runs-on: ubuntu-latest
+    # A station refresh takes about an hour, mostly CO-OPS, so 180 minutes stops a
+    # stuck run without holding the lake for six hours. Long backfills raise it.
+    timeout-minutes: ${{ fromJSON(inputs.timeout) }}
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
     permissions:

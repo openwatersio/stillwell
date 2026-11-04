@@ -6,8 +6,8 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | All listed | Meaning |
 | --- | --- | --- | --- |
-| ready | 217 | 403 | An adapter exists and the record matched one of its stations |
-| planned | 682 | 1525 | Cleared source, adapter in the plan |
+| ready | 284 | 1092 | An adapter exists and the record matched one of its stations |
+| planned | 615 | 836 | Cleared source, adapter in the plan |
 | to_match | 89 | 297 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
 | license | 1131 | 2066 | The source's terms need confirming first |
 | unmatched | 17 | 39 | An adapter exists, but no station matched, or two matched equally; check by hand |
@@ -31,7 +31,7 @@ Accepted records only, in the order to build adapters: most records first.
 | cmems | 80 | restricted 80 | cmems |
 | cdec | 75 | license 75 | cdwr |
 | smhi | 70 | planned 62, to_match 8 | cmems, smhi |
-| coops | 67 | planned 67 | noaa, uhslc_rq |
+| coops | 67 | ready 67 | noaa, uhslc_rq |
 | redmar | 55 | license 55 | cmems, ieo |
 | bodc | 54 | restricted 54 | bodc, cmems, noc |
 | dmi | 44 | planned 1, to_match 43 | cmems, dmi |
