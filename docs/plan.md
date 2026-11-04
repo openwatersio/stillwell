@@ -130,7 +130,7 @@ The planning evaluation describes a smaller system than this plan, so bring it i
 - [x] `scripts/ingest.ts` with `stations`, `recent` and `backfill <source> <stations> <start> <end>`; idempotent, so a rerun writes nothing.
 - [x] `stations/<source>.json` committed (691 RWS, 691 PEGELONLINE, 172 BSH); `stations.parquet` built from them, with `same_as` links made two-way.
 - [x] R2: the `water-levels` bucket, public at `water-levels.openwaters.io`, with a bucket-scoped token in the `lake` environment, which only runs on main. The manual Ingest workflow runs any ingest command against it; Hoek van Holland's 2024 backfill on R2 matches a local run row for row and reads back over HTTPS.
-- [x] QC v1 (`src/qc.ts`): drop repeated times; `bad` beyond 20 m of the series' median; `suspect` for flatlines of 6 hours or more, spikes from the two-sided neighbor median beyond max(0.25 m, 8·MAD of those residuals), and outliers beyond max(10·MAD, 1 m). On RWS 2024 at six tide gauges it adds 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year.
+- [x] QC v1 (`src/qc.ts`): drop repeated times; `bad` beyond 20 m of the series' median; `suspect` for flatlines of 6 hours or more, spikes from the two-sided neighbor median beyond max(0.25 m, 8·MAD of those residuals), and outliers beyond max(10·MAD, 1 m) (a source can turn the outlier rule off, as USACE does for its pools). On RWS 2024 at six tide gauges it adds 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year.
 - [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 
 Done when `node scripts/ingest.ts backfill rws hoekvanholland 2024 2025` writes the same files locally and to R2, and DuckDB reads them over `https://water-levels.openwaters.io/`.
@@ -147,9 +147,11 @@ tide-database ships 4,838 TICON records from 46 GESLA contributors. All are list
 
 - [x] **CO-OPS** (`coops`): the historical and current station lists and each station's datums from the metadata API; 6-minute `water_level`, with `application=openwaters`, and `hourly_height` for months without it (before about 1996); verified `high_low` extremes. Levels are in station datum (STND) rather than MLLW, since MLLW moves against the gauge with each tidal epoch; `datums` gives MLLW, MSL, NAVD88 and the rest from it. Verified data replaces preliminary when it appears; the monthly job in phase 4 will re-fetch the last 3 months. See [the adapter's README](../src/sources/coops/README.md).
 - [ ] **USGS** (`usgs`): OGC API v1 (`api.waterdata.usgs.gov/ogcapi/v1`) `continuous` for parameter `00065` (gage height, feet, with `approval_status` Approved or Provisional and a `qualifier`, paged by cursor), `time-series-metadata` for which sites have it, and `monitoring-locations` for the gage datum's `altitude` and `vertical_datum`; never the legacy waterservices (retired 2027-02-22). At Abercorn Creek (02198820) `continuous` starts in 2014, when the series began; check how far back it reaches at older sites, and whether older history is only in `daily`. Measure whether `recent` can query all sites with one time filter and paging; if not, shard by state. Get an api.data.gov key for the backfill, since keyless clients are rate limited.
-- [ ] **USACE CWMS** (`usace`): `Stage.Inst` series, starting with the Mississippi, Ohio, Missouri and tributary offices (MVS, MVK, MVM, MVN, LRL, LRP, LRH, LRN, LRC). Record each series' vertical datum (NGVD29, MVD, LWRP); LWRP matters on the lower Mississippi.
+- [x] **USACE CWMS** (`usace`): `Stage.Inst` series from the Mississippi, Ohio, Missouri and tributary offices (MVS, MVK, MVM, MVN, LRL, LRP, LRH, LRN, LRC), one observed series per location (about 1,350), in meters above gauge zero (`GZ`). `datums` gives the gauge zero in NGVD29 or NAVD88 where the location has an elevation. CWMS has no MVD datum for stage (`MVDhist` is a version name, the Mississippi Valley Division's daily history) and gives LWRP only in prose for 12 MVN gauges, so LWRP offsets are still to do. About 40 gauges had their zero reset partway through their record, which CWMS notes only in prose; their files mix two zeros until that is resolved. See [the adapter's README](../src/sources/usace/README.md).
 - [ ] Backfill: CO-OPS (2,930 stations; about 90,600 monthly requests for the 302 current stations' 6-minute records, plus hourly heights for months before 1996 and a `high_low` request per year, bounded by each station's established and removed dates) and USGS and USACE river history for the crowd-depth basins, as a GitHub Actions matrix sharded by station range. Resumable: skip years whose files exist.
-- [ ] Confirm USACE terms and request limits (sources.md open question 4).
+- [x] Confirm USACE terms and request limits (sources.md open question 4): public domain as a federal work, and 33 U.S.C. § 2342 has the Corps publish its water data; no published limit, none seen in 40 requests in a row. Details in [the adapter's README](../src/sources/usace/README.md).
+- [ ] USACE gauges whose zero moved partway through the record (about 40, most in MVN, noted only in the location descriptions): decide whether to split, correct or limit them, so each file keeps one zero.
+- [ ] LWRP offsets for the lower-Mississippi gauges: check the 12 MVN location descriptions that give them in prose (signs, and adjustments that apply only after a date) against the Corps' published LWRP tables, then add them to `datums`.
 
 Done when crowd-depth can read observed stage and coastal levels for its Mississippi, Ohio and US coastal soundings from the lake, and the 1,166 NOAA and USGS TICON records have their originator series.
 
@@ -265,7 +267,7 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, G
 ## Open questions
 
 - BSH's answer on the 1 August rule.
-- USACE CWMS terms and limits; ECCC datamart license; FMI sea-level license.
+- ECCC datamart license; FMI sea-level license.
 - Whether USGS's OGC `continuous` collection serves a bulk "everything since T" query.
 - STOFS-2D station count and file sizes.
 - UHSLC and PSMSL replies on commercial redistribution (PSMSL request sent 2026-11-01). UHSLC now matters most: it covers 968 TICON records.
