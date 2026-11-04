@@ -47,7 +47,10 @@ export interface Station {
   /** Meters to add to a level in `datum` to refer it to each other datum. */
   datums: Record<string, number>;
   products: Product[];
-  /** First and last observation in the lake, as ISO times; null until known. */
+  /**
+   * First and last observation in the lake, as ISO times; null until a lake
+   * job fills them in. Derived from the lake, never committed.
+   */
   first: string | null;
   last: string | null;
   license: string;

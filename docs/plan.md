@@ -65,7 +65,7 @@ src/
 scripts/
   ingest.ts <source> recent|backfill|stations
   compact.ts, snapshot.ts, report.ts
-stations/<source>/     one committed YAML file per station (reviewable monthly diffs)
+stations/<source>/     one YAML file per station: source and curated metadata only, so only refreshes change them
 worker/                the API: wrangler.jsonc, src/, test/
 .github/workflows/     ci, ingest-hourly, compact-daily, monthly, snapshot-quarterly, canary
 ```
@@ -106,7 +106,7 @@ models/gtsm/<point>.parquet                      surge reanalysis at coastal poi
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year
 ```
 
-`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask).
+`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` come from the lake, filled in by compaction when it writes `stations.parquet`; every other column comes from the committed station files, which hold only what the source says or a person decides, so scheduled jobs never rewrite them.
 
 Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
 

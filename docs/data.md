@@ -240,7 +240,7 @@ SET VARIABLE files = (
 SELECT count(*) AS n FROM read_parquet(getvariable('files'));
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once the scheduled jobs fill them in.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once compaction derives them from the lake; until then they're empty.
 
 ## Python
 

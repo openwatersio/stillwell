@@ -36,17 +36,30 @@ const station = (id: string, fields: Partial<Station> = {}): Station => ({
 });
 
 describe("mergeStationList", () => {
-  it("keeps stations the source dropped, inactive, and fields the lake filled in", () => {
-    const previous = [
-      station("a", { first: "2000-01-01T00:00:00Z", tide_station: "ticon/a" }),
-      station("b"),
-    ];
+  it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
+    const previous = [station("a", { tide_station: "ticon/a" }), station("b")];
     const { stations } = mergeStationList(previous, [station("a")]);
     assert.deepEqual(
-      stations.map((s) => [s.id, s.status, s.first, s.tide_station]),
+      stations.map((s) => [s.id, s.status, s.tide_station]),
       [
-        ["rws/a", "active", "2000-01-01T00:00:00Z", "ticon/a"],
-        ["rws/b", "inactive", null, null],
+        ["rws/a", "active", "ticon/a"],
+        ["rws/b", "inactive", null],
+      ],
+    );
+  });
+
+  it("leaves first and last to the lake", () => {
+    const filled = { first: "2000-01-01T00:00:00Z", last: "2026-01-01T00:00:00Z" };
+    const { stations } = mergeStationList(
+      [station("a", filled), station("b", filled), station("c", filled)],
+      [station("a", filled), station("b", { datum: "MSL" })],
+    );
+    assert.deepEqual(
+      stations.map((s) => [s.id, s.first, s.last]),
+      [
+        ["rws/a", null, null],
+        ["rws/b", null, null],
+        ["rws/c", null, null],
       ],
     );
   });

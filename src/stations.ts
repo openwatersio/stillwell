@@ -8,9 +8,10 @@ export interface DatumChange {
 }
 
 /**
- * Merge a source's fresh station list into the committed one. Fields the lake
- * fills in later survive, and a station the source stopped listing stays,
- * marked inactive, so its ID is never reused.
+ * Merge a source's fresh station list into the committed one. A station the
+ * source stopped listing stays, marked inactive, so its ID is never reused.
+ * What the lake can answer (`first`, `last`) is never committed, so it comes
+ * out null here and scheduled jobs never touch the station files.
  *
  * A series' files carry no datum of their own, so a station never changes
  * datum here. One the source now reports in another datum keeps its committed
@@ -37,7 +38,7 @@ export function mergeStationList(
     listed.add(s.id);
     if (old && s.datum !== null && s.datum !== old.datum) {
       changed.push({ id: s.id, from: old.datum, to: s.datum });
-      merged.push({ ...old, status: "inactive" });
+      merged.push({ ...old, first: null, last: null, status: "inactive" });
       continue;
     }
     // Offsets the source left out this time are kept, rather than erased.
@@ -46,8 +47,8 @@ export function mergeStationList(
       ...s,
       datum: s.datum ?? old!.datum,
       datums: omitted && old ? old.datums : s.datums,
-      first: s.first ?? old?.first ?? null,
-      last: s.last ?? old?.last ?? null,
+      first: null,
+      last: null,
       tide_station: s.tide_station ?? old?.tide_station ?? null,
     });
   }
@@ -55,7 +56,7 @@ export function mergeStationList(
     ...merged,
     ...previous
       .filter((s) => !listed.has(s.id))
-      .map((s) => ({ ...s, status: "inactive" as const })),
+      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const })),
   ].sort((a, b) => a.id.localeCompare(b.id));
   return { stations, changed };
 }
