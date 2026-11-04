@@ -5,9 +5,10 @@
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *
- * `stations` refreshes the committed lists in stations/<source>.json, then
- * writes stations.parquet and sources.json to the lake. `backfill` writes every
- * product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
+ * `stations` refreshes the committed station files,
+ * stations/<source>/<source_id>.yml, rewriting only the ones whose fields
+ * changed, then writes stations.parquet and sources.json to the lake.
+ * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
@@ -25,7 +26,6 @@
  * its series to WATER_LEVELS_RESTRICTED_LAKE instead, which must be a separate
  * lake, and ingest refuses to write one without it.
  */
-import { readdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
@@ -44,6 +44,12 @@ import {
 } from "../src/lake/parquet.ts";
 import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
+import {
+  checkStationFiles,
+  readStationFiles,
+  stationSources,
+  writeStationFiles,
+} from "../src/station-files.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 import type {
   ListedStation,
@@ -113,6 +119,7 @@ switch (command) {
 }
 
 async function refreshStations(ids: string[]): Promise<void> {
+  const partial: string[] = [];
   for (const id of ids) {
     let fetched;
     try {
@@ -125,7 +132,15 @@ async function refreshStations(ids: string[]): Promise<void> {
       process.exitCode = 1;
       continue;
     }
-    const previous = await committedStations(id);
+    let previous;
+    try {
+      previous = await committedStations(id);
+    } catch (error) {
+      // A file a person broke stops this source's refresh, not the others'.
+      console.error(`${id}: ${error instanceof Error ? error.message : error}`);
+      process.exitCode = 1;
+      continue;
+    }
     // An empty list is a broken response, not every station retiring at once.
     if (!fetched.length && previous.length) {
       console.error(`${id}: listed no stations; keeping the committed list`);
@@ -141,6 +156,7 @@ async function refreshStations(ids: string[]): Promise<void> {
     let merged;
     try {
       merged = mergeStationList(previous, fetched);
+      checkStationFiles(STATIONS_DIR, id, merged.stations);
     } catch (error) {
       console.error(
         `${id}: ${error instanceof Error ? error.message : error}; keeping the committed list`,
@@ -149,9 +165,22 @@ async function refreshStations(ids: string[]): Promise<void> {
       continue;
     }
     const { stations, changed } = merged;
-    await writeFile(`${STATIONS_DIR}/${id}.json`, JSON.stringify(stations, null, 2) + "\n");
+    let written;
+    try {
+      written = await writeStationFiles(STATIONS_DIR, id, stations);
+    } catch (error) {
+      // Past the checks, a failure is the disk's, and may leave some files written.
+      console.error(
+        `${id}: ${error instanceof Error ? error.message : error}; its files may be partly written`,
+      );
+      partial.push(id);
+      process.exitCode = 1;
+      continue;
+    }
     const active = stations.filter((s) => s.status === "active").length;
-    console.log(`${id}: ${active} active, ${stations.length - active} inactive`);
+    console.log(
+      `${id}: ${active} active, ${stations.length - active} inactive, ${written} files written`,
+    );
     // The station's files are all in its committed datum, so a person decides
     // whether to convert them or start over; until then it stays inactive.
     for (const c of changed) {
@@ -160,9 +189,27 @@ async function refreshStations(ids: string[]): Promise<void> {
     }
   }
 
+  // A list mixing old and new files isn't one to publish.
+  if (partial.length) {
+    console.error(`stations.parquet not written: fix ${partial.join(", ")} and refresh again`);
+    return;
+  }
   let all: Station[] = [];
-  for (const file of (await readdir(STATIONS_DIR)).filter((f) => f.endsWith(".json")).sort())
-    all.push(...(await committedStations(file.replace(/\.json$/, ""))));
+  const unreadable: string[] = [];
+  for (const source of await stationSources(STATIONS_DIR)) {
+    try {
+      all.push(...(await committedStations(source)));
+    } catch (error) {
+      console.error(`${source}: ${error instanceof Error ? error.message : error}`);
+      unreadable.push(source);
+    }
+  }
+  // Publishing without a source would drop its stations from the list.
+  if (unreadable.length) {
+    console.error(`stations.parquet not written: fix ${unreadable.join(", ")} and refresh again`);
+    process.exitCode = 1;
+    return;
+  }
   all = linkBothWays(all);
   await writeStations(stationsPath(LAKE), all);
   await writeJsonArray(
@@ -193,8 +240,7 @@ function shrankSharply(previous: Station[], fetched: ListedStation[]): string | 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
   const list = await committedStations(sourceId);
-  if (!list.length)
-    throw new Error(`No stations/${sourceId}.json; run \`stations ${sourceId}\` first`);
+  if (!list.length) throw new Error(`No stations/${sourceId}/; run \`stations ${sourceId}\` first`);
   const wanted =
     ids === "all"
       ? list.filter((s) => s.status === "active")
@@ -323,19 +369,14 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   if (stations.length && failed.length === stations.length) process.exit(1);
 }
 
-async function committedStations(sourceId: string): Promise<Station[]> {
-  try {
-    return JSON.parse(await readFile(`${STATIONS_DIR}/${sourceId}.json`, "utf8")) as Station[];
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw error;
-  }
+function committedStations(sourceId: string): Promise<Station[]> {
+  return readStationFiles(STATIONS_DIR, sourceId);
 }
 
 /** A station by its ID or its source's own code. */
 function find(list: Station[], sourceId: string, id: string): Station {
   const station = list.find((s) => s.id === id || s.id === `${sourceId}/${id}`);
-  if (!station) throw new Error(`No station ${id} in stations/${sourceId}.json`);
+  if (!station) throw new Error(`No station ${id} in stations/${sourceId}/`);
   return station;
 }
 

@@ -1,7 +1,7 @@
 /**
  * Inventory tide-database's TICON records and the lake source that can replace
  * each one. Reads a tide-database checkout (TIDE_DATABASE, default
- * ../slackwater-database) and this repo's stations/*.json, and writes
+ * ../slackwater-database) and this repo's station files, and writes
  * docs/ticon-replacement.csv (one row per record) and docs/ticon-replacement.md
  * (the summary).
  *
@@ -13,6 +13,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parse } from "yaml";
 import type { Station } from "../src/schema.ts";
+import { readStationFiles, stationSources } from "../src/station-files.ts";
 import {
   adoptSiblings,
   parseId,
@@ -82,8 +83,8 @@ if (missing.length)
 
 const lists: Record<string, Station[]> = {};
 const stationsDir = join(ROOT, "stations");
-for (const file of (await readdir(stationsDir)).filter((f) => f.endsWith(".json")))
-  lists[file.replace(/\.json$/, "")] = JSON.parse(await readFile(join(stationsDir, file), "utf8"));
+for (const source of await stationSources(stationsDir))
+  lists[source] = await readStationFiles(stationsDir, source);
 
 const rows = adoptSiblings(
   records.map((record) => ({ record, replacement: replacement(record, lists) })),
