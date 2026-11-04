@@ -1,5 +1,14 @@
-import { cachedJson, cachedText } from "../cache.ts";
-import type { Extreme, Sample, Station } from "../types.ts";
+import { getJson, getText } from "../../http.ts";
+import {
+  Flag,
+  stationDefaults,
+  type Observation,
+  type Product,
+  type PublishedExtreme,
+  type Source,
+  type SourceMetadata,
+  type Station,
+} from "../../schema.ts";
 
 /**
  * Rijkswaterstaat Waterwebservices (DDAPI 2.0). Data is CC0 unless a component
@@ -12,6 +21,20 @@ import type { Extreme, Sample, Station } from "../types.ts";
 const BASE = "https://ddapi20-waterwebservices.rijkswaterstaat.nl";
 const OBSERVATIONS = `${BASE}/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen`;
 const CATALOG = `${BASE}/METADATASERVICES/OphalenCatalogus`;
+
+export const metadata: SourceMetadata = {
+  id: "rws",
+  name: "Rijkswaterstaat",
+  url: "https://rijkswaterstaatdata.nl/waterdata/",
+  license: {
+    id: "CC0-1.0",
+    name: "CC0 1.0",
+    url: "https://rijkswaterstaatdata.nl/waterdata/",
+    commercial_use: true,
+  },
+  attribution: "Rijkswaterstaat",
+  terms: "No uptime guarantee; fair use, at most 160,000 values per request.",
+};
 
 // The service refuses requests over 160,000 values. A year of 10-minute data is
 // 52,560, so yearly chunks stay well inside it.
@@ -74,34 +97,59 @@ interface Catalog {
 
 /** Locations with a water-level series against `datum` (NAP by default). */
 export async function stations(datum = "NAP"): Promise<Station[]> {
-  const catalog = await cachedJson<Catalog>(CATALOG, {
+  const catalog = await getJson<Catalog>(CATALOG, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       CatalogusFilter: { Grootheden: true, Hoedanigheden: true, Groeperingen: true },
     }),
   });
-  const heightIds = new Set(
-    catalog.AquoMetadataLijst.filter(
-      (m) => m.Grootheid.Code === "WATHTE" && m.Hoedanigheid.Code === datum && !m.Groepering?.Code,
-    ).map((m) => m.AquoMetadata_MessageID),
-  );
-  const locationIds = new Set(
-    catalog.AquoMetadataLocatieLijst.filter((l) => heightIds.has(l.AquoMetaData_MessageID)).map(
-      (l) => l.Locatie_MessageID,
-    ),
-  );
-  return catalog.LocatieLijst.filter((l) => locationIds.has(l.Locatie_MessageID))
-    .map((l) => ({
+  // What each metadata entry gives a location: a height series or a set of extremes.
+  const productsOf = new Map<number, Product[]>();
+  for (const m of catalog.AquoMetadataLijst) {
+    const grouping = m.Groepering?.Code;
+    if (!grouping && m.Grootheid.Code === "WATHTE" && m.Hoedanigheid.Code === datum)
+      productsOf.set(m.AquoMetadata_MessageID, ["levels"]);
+    else if (grouping === EXTREME_GROUPING.meting)
+      productsOf.set(m.AquoMetadata_MessageID, ["extremes"]);
+    else if (grouping === EXTREME_GROUPING.astronomisch)
+      productsOf.set(m.AquoMetadata_MessageID, ["predictions", "predicted_extremes"]);
+  }
+  const products = new Map<number, Set<Product>>();
+  for (const link of catalog.AquoMetadataLocatieLijst) {
+    const found = productsOf.get(link.AquoMetaData_MessageID);
+    if (!found) continue;
+    const set = products.get(link.Locatie_MessageID) ?? new Set();
+    for (const p of found) set.add(p);
+    products.set(link.Locatie_MessageID, set);
+  }
+  return catalog.LocatieLijst.filter((l) => products.get(l.Locatie_MessageID)?.has("levels"))
+    .map((l): Station => ({
+      ...stationDefaults(metadata),
       id: `rws:${l.Code}`,
+      source_id: l.Code,
       name: l.Naam,
       lat: l.Lat,
       lon: l.Lon,
+      country_code: "NL",
+      kind: null,
+      interval_s: 600,
       datum,
+      datums: {},
+      products: ORDER.filter((p) => products.get(l.Locatie_MessageID)!.has(p)),
+      first: null,
+      last: null,
+      tide_station: null,
+      same_as: [],
+      status: "active",
+      live: true,
+      min_interval_s: 300,
       source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
     }))
     .sort((a, b) => a.id.localeCompare(b.id));
 }
+
+const ORDER: Product[] = ["levels", "extremes", "predictions", "predicted_extremes"];
 
 export interface LevelsOptions {
   process?: ProcessType;
@@ -116,8 +164,8 @@ export async function levels(
   start: Date,
   end: Date,
   { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
-): Promise<Sample[]> {
-  const samples: Sample[] = [];
+): Promise<Observation[]> {
+  const samples: Observation[] = [];
   for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
@@ -134,7 +182,7 @@ export async function levels(
       const value = m.Meetwaarde.Waarde_Numeriek;
       // RWS marks missing values with large sentinels (e.g. 999999999).
       if (value === undefined || Math.abs(value) > 10_000) continue;
-      samples.push({ time: Date.parse(m.Tijdstip), level: value / 100 });
+      samples.push({ time: Date.parse(m.Tijdstip), level: value / 100, flag: flagOf(m, process) });
     }
   }
   return dedupe(samples).filter((s) => s.time >= start.getTime() && s.time < end.getTime());
@@ -146,10 +194,10 @@ export async function extremes(
   start: Date,
   end: Date,
   { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
-): Promise<Extreme[]> {
+): Promise<PublishedExtreme[]> {
   const grouping = EXTREME_GROUPING[process];
   if (!grouping) throw new Error(`RWS publishes no extremes for ${process}`);
-  const result: Extreme[] = [];
+  const result: PublishedExtreme[] = [];
   for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
@@ -174,10 +222,28 @@ export async function extremes(
       const value = m.Meetwaarde.Waarde_Numeriek;
       if (value === undefined || Math.abs(value) > 10_000) continue;
       if (kind !== "hoogwater" && kind !== "laagwater") continue;
-      result.push({ time, level: value / 100, type: kind === "hoogwater" ? "high" : "low" });
+      result.push({
+        time,
+        level: value / 100,
+        type: kind === "hoogwater" ? "high" : "low",
+        flag: flagOf(m, process),
+      });
     }
   }
   return dedupe(result).filter((s) => s.time >= start.getTime() && s.time < end.getTime());
+}
+
+/**
+ * Checked (`Gecontroleerd`) values are good and unchecked ones preliminary.
+ * Quality code `00` is a normal value. What `25` means isn't documented where
+ * we've looked, so it and any other code count as suspect until it is.
+ */
+function flagOf(m: Measurement, process: ProcessType): Flag {
+  if (process === "astronomisch") return Flag.good;
+  const status = m.WaarnemingMetadata.Statuswaarde;
+  const code = m.WaarnemingMetadata.Kwaliteitswaardecode;
+  const flag = status === "Gecontroleerd" || status === "Definitief" ? Flag.good : Flag.preliminary;
+  return code === "00" || code === undefined ? flag : Flag.suspect;
 }
 
 async function request(
@@ -195,7 +261,7 @@ async function request(
       Einddatumtijd: end.toISOString().replace("Z", "+00:00"),
     },
   });
-  const text = await cachedText(OBSERVATIONS, {
+  const text = await getText(OBSERVATIONS, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body,
@@ -224,7 +290,23 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 }
 
 // Chunk boundaries are inclusive on both ends, so the shared sample repeats.
-function dedupe<T extends Sample>(samples: T[]): T[] {
+function dedupe<T extends { time: number }>(samples: T[]): T[] {
   samples.sort((a, b) => a.time - b.time);
   return samples.filter((s, i) => i === 0 || s.time !== samples[i - 1]!.time);
 }
+
+/** Ranges that reach within a day of now aren't final yet, so skip the cache. */
+function fresh(end: Date): boolean {
+  return end.getTime() > Date.now() - 86_400_000;
+}
+
+export const source: Source = {
+  metadata,
+  stations: () => stations(),
+  observations: (s, start, end) => levels(s.source_id, start, end, { fresh: fresh(end) }),
+  extremes: (s, start, end) => extremes(s.source_id, start, end, { fresh: fresh(end) }),
+  predictions: (s, start, end) =>
+    levels(s.source_id, start, end, { process: "astronomisch", fresh: fresh(end) }),
+  predictedExtremes: (s, start, end) =>
+    extremes(s.source_id, start, end, { process: "astronomisch", fresh: fresh(end) }),
+};

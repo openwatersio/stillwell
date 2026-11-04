@@ -50,13 +50,14 @@ Recommended answers. The plan below assumes them; each can change without reshap
 9. **Live levels are fetched on request, not polled into R2.** For the last 96 h of one station, the Worker calls the originator and caches the answer for the source's minimum interval (5 minutes for most, 15 for UK EA). Polling every linked gauge into per-station R2 objects every 10 minutes would be about 13 million writes a month (about $58), against $4 for the whole archive, and would mostly refresh stations nobody is looking at. The scheduled jobs build the archive; the same fetch code serves both.
 10. **Apps compute residuals themselves.** The API returns observed levels in the bundled prediction's frame, and Slackwater computes the residual against the constants it ships, as slackwater-ios#705 plans, so the number always matches the curve on screen. The API's own residual is for the website, alerts and API customers, and names the database version it used.
 11. **Observations keep their arrival time** (`received`) wherever we saw them arrive, because forecast correction needs to know what was available when, not just when it was measured.
+12. **Decided: TypeScript for adapters, the lake, QC and the API; Python only for NetCDF model extraction** (Brandon, 2026-11-03). Adapters must run in the Worker for live levels, and predictions come from `@slackwater/engine`, so one language serves ingest, live and the API. Model output (GTSM, STOFS) is NetCDF, which Node handles poorly, so phase 11 may use a small Python step that writes the same Parquet layout. Analysis in any language reads the lake directly.
 
 ## Repo shape
 
 ```
 src/
   schema.ts            Station, Observation, flag codes, source metadata types
-  sources/<source>/    one adapter per source: index.ts, README.md, metadata.yaml, test/
+  sources/<source>/    one adapter per source: index.ts (with its metadata) and README.md
   lake/                write and read the R2 layout (DuckDB for writes, paths, compaction)
   qc.ts                flags: duplicates, flatlines, spikes, clock checks
   datums.ts            offsets to MSL, LAT, NAVD88; joins to tide-database
@@ -73,16 +74,16 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  id: string; // "coops"
-  metadata: SourceMetadata; // name, license, commercial_use, attribution, terms, url
+  metadata: SourceMetadata; // id, name, url, license, attribution, terms, window_days
   stations(): Promise<Station[]>;
-  observations(station: Station, start: Date, end: Date): AsyncIterable<Observation>;
-  recent?(since: Date): AsyncIterable<[stationId: string, Observation]>; // bulk "latest" endpoints
-  live(station: Station, since: Date): Promise<Observation[]>; // one station, small and fast, runs in the Worker
-  predictions?(station: Station, start: Date, end: Date): AsyncIterable<Observation>; // RWS astronomisch, BSH
-  extremes?(...): AsyncIterable<Extreme>;
+  observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
+  extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed
+  predictions?(station: Station, start: Date, end: Date): Promise<Observation[]>; // RWS astronomisch, BSH
+  predictedExtremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
 }
 ```
+
+`src/schema.ts` defines these. Live levels (phase 9) call `observations` for a short window; a bulk "latest" method for sources that offer one can come with phase 4 if per-station fetching is too slow.
 
 The writer takes a URL, so `data/` locally and `s3://water-levels/` in Actions run the same code, through DuckDB's `httpfs` with an R2 secret.
 
@@ -96,18 +97,19 @@ Bucket `water-levels`, public read at `data.openwaters.io/water-levels/` (that h
 stations.parquet                                 one row per series
 sources.json                                     license and attribution per source
 recent/<source>.parquet                          last 7 days, every station, sorted by station then time
-obs/<source>/<station>/<year>.parquet            time, level_m, flag
-predictions/<source>/<station>/<year>.parquet    published predictions (RWS, BSH), same columns
-extremes/<source>/<station>/<year>.parquet       time, level_m, type, flag[, transit, event]
+obs/<source>/<station>/<year>.parquet            time, level_m, flag, received
+extremes/<source>/<station>/<year>.parquet       the source's observed high and low waters: time, level_m, type, flag
+predictions/<source>/<station>/<year>.parquet    published predictions (RWS, BSH), same columns as obs
+predicted-extremes/<source>/<station>/<year>.parquet  published predicted extremes, plus transit and event for BSH
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast
 models/gtsm/<point>.parquet                      surge reanalysis at coastal points
 restricted/...                                   same layout, non-commercial sources
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year
 ```
 
-`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `to_msl_m`, `to_lat_m`, `to_navd88_m`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `source_url`, plus `status` (active, inactive), `updated`, `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask).
+`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask).
 
-Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT: 0 good, 1 preliminary, 2 suspect, 3 bad, 4 interpolated), and `received` (TIMESTAMPTZ, null for backfilled history). Source flags fold into these; QC can only make a flag worse. The current files lack `flag` and use `<year>-extremes.parquet` names, so phase 1 migrates them.
+Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), and `received` (TIMESTAMPTZ, null for backfilled history). Source flags fold into these; QC can only make a flag worse.
 
 ## Phases
 
@@ -123,14 +125,14 @@ The planning evaluation describes a smaller system than this plan, so bring it i
 
 ### Phase 1: Foundations (4 days)
 
-- [ ] `src/schema.ts` with the station and observation types above; migrate `Station.offsets` to `to_msl_m` / `to_lat_m` / `to_navd88_m` and add `license`, `commercial_use`, `attribution`, `kind`, `interval_s`, `first`, `last`.
-- [ ] The `Source` interface; port `rws`, `bsh` and `pegelonline` into `src/sources/<source>/` with `metadata.yaml` and a README each, following tide-database's source conventions.
-- [ ] `src/lake/`: Parquet writer to a file or `s3://` URL, path helpers, and a reader for tests. Add `flag`.
-- [ ] `scripts/ingest.ts` with `stations`, `recent` and `backfill <station> <start> <end>`; idempotent, so a rerun rewrites the same files.
-- [ ] `stations/<source>.json` committed; `stations.parquet` built from them.
-- [ ] Create the R2 bucket, the `data.openwaters.io` route and a scoped API token; add `R2_*` secrets to the repo.
-- [ ] QC v1: drop exact duplicates, flag flatlines (unchanged for more than N samples), spikes beyond a per-station robust range (median ± k·MAD over 30 days), and values outside the source's physical limits.
-- [ ] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB.
+- [x] `src/schema.ts` with the station and observation types above, the `datums` map in place of `offsets`, and per-station license, commercial use and attribution.
+- [x] The `Source` interface; `rws`, `bsh` and `pegelonline` in `src/sources/<source>/` with typed metadata and a README each. Adapters fetch through `src/http.ts`, so they run in a Worker; scripts swap in the disk cache.
+- [x] `src/lake/`: Parquet reader and writer for a directory or `s3://` URL, path helpers, and range merging that keeps first arrival times.
+- [x] `scripts/ingest.ts` with `stations`, `recent` and `backfill <source> <stations> <start> <end>`; idempotent, so a rerun writes nothing.
+- [x] `stations/<source>.json` committed (677 RWS, 691 PEGELONLINE, 172 BSH); `stations.parquet` built from them, with `same_as` links made two-way.
+- [ ] Create the R2 bucket, the `data.openwaters.io` route and a scoped API token; add the `S3_*` secrets to the repo. Needs Cloudflare account access; the `s3://` path is written but not yet run against R2.
+- [x] QC v1 (`src/qc.ts`): drop repeated times; `bad` beyond 20 m of the series' median; `suspect` for flatlines of 6 hours or more, spikes from the two-sided neighbor median beyond max(0.25 m, 8·MAD of those residuals), and outliers beyond max(10·MAD, 1 m). On RWS 2024 at six tide gauges it adds 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year.
+- [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 
 Done when `node scripts/ingest.ts rws backfill hoekvanholland 2024-01-01 2025-01-01` writes the same files locally and to R2, and DuckDB reads them over `https://data.openwaters.io/water-levels/`.
 

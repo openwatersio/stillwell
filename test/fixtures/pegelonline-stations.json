@@ -1,0 +1,73 @@
+[
+ {
+  "uuid": "aad49293-242a-43ad-a8b1-e91d7792c4b2",
+  "number": "5990020",
+  "shortname": "CUXHAVEN STEUBENHÖFT",
+  "longname": "CUXHAVEN STEUBENHÖFT",
+  "km": 724.0,
+  "agency": "STANDORT CUXHAVEN",
+  "longitude": 8.717425,
+  "latitude": 53.867686,
+  "voiceServiceNumber": "+49 228 286527 133",
+  "water": {
+   "shortname": "ELBE",
+   "longname": "ELBE"
+  },
+  "timeseries": [
+   {
+    "shortname": "W",
+    "longname": "WASSERSTAND ROHDATEN",
+    "unit": "cm",
+    "equidistance": 1,
+    "gaugeZero": {
+     "unit": "m. ü. NHN",
+     "value": -5.033,
+     "validFrom": "2019-11-01"
+    }
+   }
+  ]
+ },
+ {
+  "uuid": "facc5c16-f700-4248-9893-a395bffaf2e4",
+  "number": "27800090",
+  "shortname": "WALTROP",
+  "longname": "WALTROP",
+  "km": 2.144,
+  "agency": "RHEINE",
+  "longitude": 7.380201,
+  "latitude": 51.639741,
+  "voiceServiceNumber": "+49 228 286527 012",
+  "water": {
+   "shortname": "DHK",
+   "longname": "DATTELN-HAMM-KANAL"
+  },
+  "timeseries": [
+   {
+    "shortname": "W",
+    "longname": "WASSERSTAND ROHDATEN",
+    "unit": "m+NN",
+    "equidistance": 1
+   }
+  ]
+ },
+ {
+  "uuid": "6c6f84c2-b7ea-4720-8ecd-a83c100c6291",
+  "number": "123456785",
+  "shortname": "DORDRECHT",
+  "longname": "DORDRECHT",
+  "km": 975.0,
+  "agency": "RIJKSWATERSTAAT",
+  "water": {
+   "shortname": "ALTE_MAAS",
+   "longname": "ALTE MAAS"
+  },
+  "timeseries": [
+   {
+    "shortname": "W",
+    "longname": "WASSERSTAND ROHDATEN",
+    "unit": "cm",
+    "equidistance": 10
+   }
+  ]
+ }
+]

@@ -5,7 +5,7 @@ import * as hroi from "../src/hroi/index.ts";
 import { PARTIAL_TIDES, SET_2, SET_3, resolvable } from "../src/hroi/constituents.ts";
 import { LUNAR_DAY_MS, transits } from "../src/hroi/transits.ts";
 import { compareExtremes } from "../src/metrics.ts";
-import { parse } from "../src/sources/bsh.ts";
+import { parse } from "../src/sources/bsh/index.ts";
 import type { TransitExtreme } from "../src/types.ts";
 
 // January and February 2026 at Cuxhaven, from BSH's published predictions.

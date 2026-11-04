@@ -1,0 +1,107 @@
+import type { Extreme, Sample, TransitExtreme } from "./types.ts";
+
+/**
+ * Quality flags, ordered from best to worst so that combining two flags is
+ * `Math.max`. Source flags fold into these, and QC can only make a flag worse.
+ */
+export const Flag = {
+  good: 0,
+  interpolated: 1,
+  preliminary: 2,
+  suspect: 3,
+  bad: 4,
+} as const;
+
+export type Flag = (typeof Flag)[keyof typeof Flag];
+
+export const FLAG_NAMES = Object.keys(Flag) as (keyof typeof Flag)[];
+
+/** One value in a series. `received` is when we first saw it, if we saw it arrive. */
+export interface Observation extends Sample {
+  flag: Flag;
+  received?: number;
+}
+
+/** A high or low water a source publishes, observed or predicted. */
+export type PublishedExtreme = (Extreme | TransitExtreme) & { flag: Flag };
+
+export type Kind = "coastal" | "estuary" | "lake" | "river";
+
+/** What a station has in the lake. */
+export type Product = "levels" | "extremes" | "predictions" | "predicted_extremes";
+
+export interface Station {
+  /** `<source>:<source_id>`, e.g. `rws:hoekvanholland`. */
+  id: string;
+  source: string;
+  source_id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  country_code: string | null;
+  kind: Kind | null;
+  /** Native sampling interval of the observed series, in seconds. */
+  interval_s: number | null;
+  /** What levels are measured from, e.g. `NAP`, `PNP`, `MLLW`. */
+  datum: string;
+  /** Meters to add to a level in `datum` to refer it to each other datum. */
+  datums: Record<string, number>;
+  products: Product[];
+  /** First and last observation in the lake, as ISO times; null until known. */
+  first: string | null;
+  last: string | null;
+  license: string;
+  commercial_use: boolean;
+  attribution: string;
+  /** tide-database station (`source/id`) for the same gauge. */
+  tide_station: string | null;
+  /** Other lake series from the same physical gauge. */
+  same_as: string[];
+  status: "active" | "inactive";
+  /** Whether the live endpoint serves this station. */
+  live: boolean;
+  /** How often the source lets us ask for this station, in seconds. */
+  min_interval_s: number | null;
+  source_url: string | null;
+}
+
+export interface SourceMetadata {
+  id: string;
+  name: string;
+  url: string;
+  license: { id: string; name: string; url: string; commercial_use: boolean };
+  attribution: string;
+  /** Anything a user of the data should know about the terms. */
+  terms?: string;
+  /** How far back `observations` reaches, in days, when the source keeps a rolling window. */
+  window_days?: number;
+}
+
+/**
+ * One upstream source. Adapters use only `fetch` (through `src/http.ts`) so the
+ * same code runs in Node for ingest and in the Worker for live levels.
+ */
+export interface Source {
+  metadata: SourceMetadata;
+  stations(): Promise<Station[]>;
+  /** Observed levels over [start, end). */
+  observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
+  /** High and low waters the source selects from its observations. */
+  extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
+  /** The source's own predicted curve over [start, end). */
+  predictions?(station: Station, start: Date, end: Date): Promise<Observation[]>;
+  /** The source's own predicted high and low waters over [start, end). */
+  predictedExtremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
+}
+
+/** Fields every station from a source shares. */
+export function stationDefaults(
+  metadata: SourceMetadata,
+): Pick<Station, "source" | "license" | "commercial_use" | "attribution"> {
+  return {
+    source: metadata.id,
+    license: metadata.license.id,
+    commercial_use: metadata.license.commercial_use,
+    attribution: metadata.attribution,
+  };
+}

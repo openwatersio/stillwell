@@ -1,5 +1,14 @@
-import { cachedJson, cachedText } from "../cache.ts";
-import type { EventIndex, Sample, Station, TransitExtreme } from "../types.ts";
+import { getJson, getText } from "../../http.ts";
+import {
+  Flag,
+  stationDefaults,
+  type Observation,
+  type Source,
+  type SourceMetadata,
+  type Station,
+} from "../../schema.ts";
+import type { EventIndex, TransitExtreme } from "../../types.ts";
+import * as pegelonline from "../pegelonline/index.ts";
 
 /**
  * BSH tide predictions (https://gezeiten.bsh.de/) for German gauges.
@@ -10,14 +19,28 @@ import type { EventIndex, Sample, Station, TransitExtreme } from "../types.ts";
  * next from about August. Use is free, including commercially, under Anlage 4 of
  * BSH's fee schedule; see openwatersio/slackwater-database#335 for the terms.
  *
- * Observed levels at these gauges come from PEGELONLINE, linked by
- * `pegelonline_uuid`.
+ * Observed levels at these gauges come from PEGELONLINE, linked by `same_as`.
  */
 const SITE = "https://gezeiten.bsh.de";
 const FILES = "https://filebox.bsh.de/index.php/s/SbJ3z5NBkpOZloY/download";
 
 export const ATTRIBUTION =
   "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie";
+
+export const metadata: SourceMetadata = {
+  id: "bsh",
+  name: "Bundesamt für Seeschifffahrt und Hydrographie (BSH)",
+  url: "https://gezeiten.bsh.de/",
+  license: {
+    id: "BSH-Anlage-4",
+    name: "BSH Entgeltverzeichnis digitale Daten, Anlage 4",
+    url: "https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf",
+    commercial_use: true,
+  },
+  attribution: ATTRIBUTION,
+  terms:
+    "A calendar year's predictions may be published online only from 1 August of the year before.",
+};
 
 interface OverviewGauge {
   station_name: string;
@@ -52,42 +75,80 @@ export interface Gauge extends Station {
 }
 
 export async function gauges(): Promise<OverviewGauge[]> {
-  const overview = await cachedJson<{ gauges: OverviewGauge[] }>(
-    `${SITE}/data/tides_overview.json`,
-  );
+  const overview = await getJson<{ gauges: OverviewGauge[] }>(`${SITE}/data/tides_overview.json`, {
+    fresh: true,
+  });
   return overview.gauges;
 }
 
 /** Metadata for one gauge, with datum offsets from the latest published year. */
 export async function gauge(bshnr: string): Promise<Gauge> {
-  const detail = await cachedJson<
+  const detail = await getJson<
     OverviewGauge & { pegelonline_uuid?: string; years: Record<string, GaugeYear>[] }
   >(`${SITE}/data/DE_${bshnr.padStart(5, "_")}_tides.json`);
   const years = Object.assign({}, ...detail.years) as Record<string, GaugeYear>;
   const numbers = Object.keys(years).map(Number).sort();
   const latest = years[String(numbers.at(-1))] ?? {};
-  const offsets: Record<string, number> = {};
-  // BSH gives these in centimeters, as depths below NHN or a height above PNP.
-  if (latest["PNP (unter NHN)"] !== undefined) offsets.NHN = latest["PNP (unter NHN)"] / 100;
-  if (latest["SKN (ueber PNP)"] !== undefined) offsets.SKN = -latest["SKN (ueber PNP)"] / 100;
+  const datums: Record<string, number> = {};
+  // BSH gives PNP as a height relative to NHN (−500 is 5 m below), and SKN as a
+  // height above PNP, both in centimeters.
+  if (latest["PNP (unter NHN)"] !== undefined) datums.NHN = latest["PNP (unter NHN)"] / 100;
+  if (latest["SKN (ueber PNP)"] !== undefined) datums.SKN = -latest["SKN (ueber PNP)"] / 100;
   return {
+    ...stationDefaults(metadata),
     id: `bsh:${detail.bshnr}`,
+    source_id: detail.bshnr,
     bshnr: detail.bshnr,
     name: detail.station_name,
     lat: detail.latitude,
     lon: detail.longitude,
+    country_code: "DE",
+    kind: null,
+    interval_s: null,
     datum: latest.level_tidalvalues ?? "PNP",
-    offsets,
+    datums,
+    products: ["predictions", "predicted_extremes"],
+    first: null,
+    last: null,
+    tide_station: null,
+    same_as: [],
+    status: "active",
+    live: false,
+    min_interval_s: null,
+    source_url: `${SITE}/${detail.seo_id}`,
     pegelonline_uuid: detail.pegelonline_uuid,
     years: numbers,
     mhwi: hours(latest.MHWI),
     mlwi: hours(latest.MNWI),
-    source_url: `${SITE}/${detail.seo_id}`,
   };
 }
 
+/** Every gauge, linked to its PEGELONLINE series where BSH names one. */
+export async function stations(): Promise<Station[]> {
+  const numberOf = new Map(
+    (await pegelonline.list()).map((s) => [s.uuid, `pegelonline:${s.number}`]),
+  );
+  const list: Station[] = [];
+  for (const g of await gauges()) {
+    const {
+      bshnr: _,
+      pegelonline_uuid,
+      years: __,
+      mhwi: ___,
+      mlwi: ____,
+      ...station
+    } = await gauge(g.bshnr);
+    const linked = pegelonline_uuid && numberOf.get(pegelonline_uuid);
+    list.push({ ...station, same_as: linked ? [linked] : [] });
+  }
+  return list.sort((a, b) => a.id.localeCompare(b.id));
+}
+
 /** Predicted high and low waters for one year, with transit numbers. */
-export async function extremes(bshnr: string, year: number): Promise<TransitExtreme[]> {
+export async function extremes(
+  bshnr: string,
+  year: number,
+): Promise<(TransitExtreme & { flag: Flag })[]> {
   const rows = await rowsOf(bshnr, year, "vb_hwnw");
   return rows
     .filter((r) => r.kind === "H" || r.kind === "N")
@@ -97,13 +158,16 @@ export async function extremes(bshnr: string, year: number): Promise<TransitExtr
       type: r.kind === "H" ? ("high" as const) : ("low" as const),
       transit: r.transit,
       event: r.event as EventIndex,
+      flag: Flag.good,
     }));
 }
 
 /** The predicted 10-minute curve for one year. */
-export async function curve(bshnr: string, year: number): Promise<Sample[]> {
+export async function curve(bshnr: string, year: number): Promise<Observation[]> {
   const rows = await rowsOf(bshnr, year, "vb_kurv");
-  return rows.filter((r) => r.kind === "K").map((r) => ({ time: r.time, level: r.level }));
+  return rows
+    .filter((r) => r.kind === "K")
+    .map((r) => ({ time: r.time, level: r.level, flag: Flag.good }));
 }
 
 interface Row {
@@ -114,10 +178,17 @@ interface Row {
   event: number;
 }
 
+/** A year's rows, or none when BSH hasn't published that year. */
 async function rowsOf(bshnr: string, year: number, path: string): Promise<Row[]> {
   const file = `DE_${bshnr.padStart(5, "_")}${year}.txt`;
   const url = `${FILES}?path=/${path}/deu${year}&files=${file}`;
-  const text = await cachedText(url);
+  let text: string;
+  try {
+    text = await getText(url);
+  } catch (error) {
+    if (error instanceof Error && error.message.endsWith("returned 404")) return [];
+    throw error;
+  }
   if (!text.startsWith("I_E#")) throw new Error(`BSH ${file} is not a prediction file`);
   const unit = /C05#[^#]*#\s*([^#\s]+)/.exec(text)?.[1];
   if (unit !== "m") throw new Error(`BSH ${file} height unit is ${unit}, not m`);
@@ -151,3 +222,26 @@ function hours(hhmm: string | undefined): number | undefined {
   const match = hhmm && /^(\d+):(\d+)$/.exec(hhmm);
   return match ? Number(match[1]) + Number(match[2]) / 60 : undefined;
 }
+
+/** Calls `get` for each calendar year [start, end) touches, keeping rows inside it. */
+async function byYear<T extends { time: number }>(
+  start: Date,
+  end: Date,
+  get: (year: number) => Promise<T[]>,
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (
+    let year = start.getUTCFullYear();
+    year <= new Date(end.getTime() - 1).getUTCFullYear();
+    year++
+  )
+    rows.push(...(await get(year)));
+  return rows.filter((r) => r.time >= start.getTime() && r.time < end.getTime());
+}
+
+export const source: Source = {
+  metadata,
+  stations,
+  predictions: (s, start, end) => byYear(start, end, (year) => curve(s.source_id, year)),
+  predictedExtremes: (s, start, end) => byYear(start, end, (year) => extremes(s.source_id, year)),
+};

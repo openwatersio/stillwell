@@ -17,12 +17,15 @@
  * Usage: node scripts/evaluate-bsh.ts [bshnr...]
  */
 import { mkdir, writeFile } from "node:fs/promises";
+import { useDiskCache } from "../src/cache.ts";
 import * as harmonic from "../src/harmonic.ts";
 import * as hroi from "../src/hroi/index.ts";
 import { SET_3 } from "../src/hroi/constituents.ts";
 import { transits } from "../src/hroi/transits.ts";
 import { compareExtremes, curveErrors, type ExtremeComparison } from "../src/metrics.ts";
-import * as bsh from "../src/sources/bsh.ts";
+import * as bsh from "../src/sources/bsh/index.ts";
+
+useDiskCache();
 
 // prettier-ignore
 const GAUGES = [

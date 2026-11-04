@@ -181,6 +181,7 @@ sources.json
 obs/<source>/<station>/<year>.parquet          time, level_m, flag, received
 extremes/<source>/<station>/<year>.parquet     time, level_m, type, flag
 predictions/<source>/<station>/<year>.parquet  published predictions (RWS, BSH)
+predicted-extremes/<source>/<station>/<year>.parquet  published predicted high and low waters
 bulk/<YYYY-Qn>/<source>.parquet                quarterly snapshots, with a DOI
 ```
 

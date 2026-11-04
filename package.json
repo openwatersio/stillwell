@@ -6,7 +6,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "fetch": "node scripts/fetch.ts",
+    "ingest": "node scripts/ingest.ts",
     "evaluate:bsh": "node scripts/evaluate-bsh.ts",
     "evaluate:rws": "node scripts/evaluate-rws.ts",
     "test": "node --test 'test/**/*.test.ts'",

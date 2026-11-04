@@ -1,0 +1,5538 @@
+[
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:101P",
+    "source_id": "101P",
+    "name": "Borkum, Fischerbalje",
+    "lat": 53.5575,
+    "lon": 6.74778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.22
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9340020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/borkum_fischerbalje"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:103P",
+    "source_id": "103P",
+    "name": "Bremerhaven, Weser, Alter Leuchtturm",
+    "lat": 53.545,
+    "lon": 8.56806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.36
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4990010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremerhaven_alter_leuchtturm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:111P",
+    "source_id": "111P",
+    "name": "Norderney, Riffgat",
+    "lat": 53.69639,
+    "lon": 7.15778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.16
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9360010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/norderney_riffgat"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:3015P",
+    "source_id": "3015P",
+    "name": "Kalkgrund, Leuchtturm, Ostsee",
+    "lat": 54.82472,
+    "lon": 9.88806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.99,
+      "SKN": -4.99
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/kalkgrund_leuchtturm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:3020P",
+    "source_id": "3020P",
+    "name": "Kiel, Holtenau, Ostsee",
+    "lat": 54.37222,
+    "lon": 10.15694,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9610066"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/kiel_holtenau"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:3040P",
+    "source_id": "3040P",
+    "name": "Travemünde, Ostsee",
+    "lat": 53.95806,
+    "lon": 10.87222,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -5.03
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9620085"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/travemuende"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:3060P",
+    "source_id": "3060P",
+    "name": "Warnemünde, Ostsee",
+    "lat": 54.16972,
+    "lon": 12.10333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.98,
+      "SKN": -4.98
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9640015"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/warnemuende"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:502P",
+    "source_id": "502P",
+    "name": "Bremen, Oslebshausen, Weser",
+    "lat": 53.11972,
+    "lon": 8.71222,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.91
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4910060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_oslebshausen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:504B",
+    "source_id": "504B",
+    "name": "Brunsbüttel, Elbe, Ost",
+    "lat": 53.88778,
+    "lon": 9.14861,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970094"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/brunsbuettel_ost"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:505P",
+    "source_id": "505P",
+    "name": "Büsum, Schleuse",
+    "lat": 54.12222,
+    "lon": 8.85917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.8
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9510095"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/buesum_schleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:506P",
+    "source_id": "506P",
+    "name": "Cuxhaven, Steubenhöft, Elbe",
+    "lat": 53.86778,
+    "lon": 8.7175,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5990020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/cuxhaven_steubenhoeft"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:507P",
+    "source_id": "507P",
+    "name": "Emden, Ems, Große Seeschleuse",
+    "lat": 53.33667,
+    "lon": 7.18639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.62
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3970010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/emden_grosse_seeschleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:508P",
+    "source_id": "508P",
+    "name": "Hamburg, St. Pauli, Elbe",
+    "lat": 53.54556,
+    "lon": 9.97,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5952050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_st-pauli"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:509A",
+    "source_id": "509A",
+    "name": "Helgoland, Binnenhafen",
+    "lat": 54.17889,
+    "lon": 7.89,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.2
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9510070"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/helgoland_binnenhafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:510P",
+    "source_id": "510P",
+    "name": "Husum, Schleuse",
+    "lat": 54.47222,
+    "lon": 9.02472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.54
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9530020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/husum_schleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:512P",
+    "source_id": "512P",
+    "name": "Wilhelmshaven, Alter Vorhafen",
+    "lat": 53.51444,
+    "lon": 8.145,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.4
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9440020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wilhelmshaven_alter_vorhafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:606P",
+    "source_id": "606P",
+    "name": "Fino 3",
+    "lat": 55.195,
+    "lon": 7.15806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0.93
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/fino3"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:610P",
+    "source_id": "610P",
+    "name": "Fino 1",
+    "lat": 54.01472,
+    "lon": 6.58778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 1.37
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/fino1"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:616P",
+    "source_id": "616P",
+    "name": "List, Sylt, West",
+    "lat": 55.05417,
+    "lon": 8.4,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.65
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/list_west"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:617P",
+    "source_id": "617P",
+    "name": "List, Sylt, Hafen",
+    "lat": 55.01667,
+    "lon": 8.44056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.99,
+      "SKN": -3.55
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9570070"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/list_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:618P",
+    "source_id": "618P",
+    "name": "Munkmarsch, Sylt",
+    "lat": 54.92111,
+    "lon": 8.36333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.56
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/munkmarsch"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:620P",
+    "source_id": "620P",
+    "name": "Westerland, Sylt",
+    "lat": 54.90861,
+    "lon": 8.27111,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -3.51
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/westerland"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:622P",
+    "source_id": "622P",
+    "name": "Amrum Odde, Amrum",
+    "lat": 54.70667,
+    "lon": 8.33972,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.43
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/amrum_odde"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:623A",
+    "source_id": "623A",
+    "name": "Rantumdamm, Sylt",
+    "lat": 54.86,
+    "lon": 8.31333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -3.57
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/rantumdamm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:624A",
+    "source_id": "624A",
+    "name": "Hörnum, Sylt, West",
+    "lat": 54.75806,
+    "lon": 8.27444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hoernum_west"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:624P",
+    "source_id": "624P",
+    "name": "Hörnum, Sylt, Hafen",
+    "lat": 54.75806,
+    "lon": 8.29611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.43
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9570050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hoernum_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:628A",
+    "source_id": "628A",
+    "name": "Osterley",
+    "lat": 54.84944,
+    "lon": 8.55583,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.99,
+      "SKN": -3.25
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/osterley"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:629B",
+    "source_id": "629B",
+    "name": "Föhrer Ley, Nord",
+    "lat": 54.79639,
+    "lon": 8.56,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.26
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/foehrer_ley_nord"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:631P",
+    "source_id": "631P",
+    "name": "Wittdün, Amrum, Hafen",
+    "lat": 54.63167,
+    "lon": 8.38389,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9570010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wittduen_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:632D",
+    "source_id": "632D",
+    "name": "Langeness, Hilligenley",
+    "lat": 54.61861,
+    "lon": 8.54722,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/langeness_hilligenley"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:632F",
+    "source_id": "632F",
+    "name": "Langeness, Nord",
+    "lat": 54.66556,
+    "lon": 8.63139,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.82
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/langeness_nord"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:632P",
+    "source_id": "632P",
+    "name": "Wyk, Föhr",
+    "lat": 54.69333,
+    "lon": 8.57639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.88
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wyk"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:634P",
+    "source_id": "634P",
+    "name": "Südwesthörn",
+    "lat": 54.79639,
+    "lon": 8.65972,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/suedwesthoern"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:635P",
+    "source_id": "635P",
+    "name": "Dagebüll",
+    "lat": 54.73056,
+    "lon": 8.68694,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.73
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9570040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/dagebuell"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:636F",
+    "source_id": "636F",
+    "name": "Hooge, Anleger",
+    "lat": 54.57861,
+    "lon": 8.55639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.89
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hooge_anleger"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:637A",
+    "source_id": "637A",
+    "name": "Der Strand, Hamburger Hallig",
+    "lat": 54.60528,
+    "lon": 8.78722,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.62
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/der_strand_hamburger_hallig"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:637P",
+    "source_id": "637P",
+    "name": "Gröde, Anleger",
+    "lat": 54.62944,
+    "lon": 8.72917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.83
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/groede_anleger"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:638P",
+    "source_id": "638P",
+    "name": "Schlüttsiel",
+    "lat": 54.6825,
+    "lon": 8.755,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.73
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/schluettsiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:642C",
+    "source_id": "642C",
+    "name": "Rummelloch, West",
+    "lat": 54.48667,
+    "lon": 8.55278,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.9
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/rummelloch_west"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:642E",
+    "source_id": "642E",
+    "name": "Pellworm, Hoogerfähre",
+    "lat": 54.53556,
+    "lon": 8.59778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.88
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/pellworm_hoogerfaehre"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:645P",
+    "source_id": "645P",
+    "name": "Süderoogsand",
+    "lat": 54.42,
+    "lon": 8.51917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/suederoogsand"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:647A",
+    "source_id": "647A",
+    "name": "Pellworm, Anleger",
+    "lat": 54.50083,
+    "lon": 8.70194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.63
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9550021"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/pellworm_anleger"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:649A",
+    "source_id": "649A",
+    "name": "Nordstrandischmoor",
+    "lat": 54.54972,
+    "lon": 8.79778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.61
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/nordstrandischmoor"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:649B",
+    "source_id": "649B",
+    "name": "Holmer Siel",
+    "lat": 54.52833,
+    "lon": 8.86917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.61
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/holmer_siel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:649P",
+    "source_id": "649P",
+    "name": "Strucklahnungshörn, Nordstrand, AP",
+    "lat": 54.49889,
+    "lon": 8.80639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.6
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/strucklahnungshoern"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:653P",
+    "source_id": "653P",
+    "name": "Südfall, Fahrwasserkante",
+    "lat": 54.44722,
+    "lon": 8.7525,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.63
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/suedfall_fahrwasserkante"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:654E",
+    "source_id": "654E",
+    "name": "Everschopsiel",
+    "lat": 54.40861,
+    "lon": 8.82778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.82
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/everschopsiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:657P",
+    "source_id": "657P",
+    "name": "St. Peter-Ording, Bad",
+    "lat": 54.30889,
+    "lon": 8.57806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.83
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/st-peter-ording_bad"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:664P",
+    "source_id": "664P",
+    "name": "Eider-Sperrwerk, Außenpegel",
+    "lat": 54.26583,
+    "lon": 8.84194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9530010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/eider-sperrwerk_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:666P",
+    "source_id": "666P",
+    "name": "Blauort, Norderpiep",
+    "lat": 54.16861,
+    "lon": 8.675,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/blauort_norderpiep"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:667B",
+    "source_id": "667B",
+    "name": "Meldorf, Sperrwerk, Außenpegel",
+    "lat": 54.09222,
+    "lon": 8.94917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.82
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/meldorf_sperrwerk_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:671D",
+    "source_id": "671D",
+    "name": "Friedrichskoog, Spitze",
+    "lat": 54.03444,
+    "lon": 8.84056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/friedrichskoog_spitze"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:673P",
+    "source_id": "673P",
+    "name": "Trischen, West",
+    "lat": 54.06417,
+    "lon": 8.65917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/trischen_west"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:675C",
+    "source_id": "675C",
+    "name": "Mittelplate",
+    "lat": 54.01222,
+    "lon": 8.73972,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/mittelplate"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:675P",
+    "source_id": "675P",
+    "name": "Friedrichskoog, Hafen, Außenpegel",
+    "lat": 53.99944,
+    "lon": 8.87611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.95
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/friedrichskoog_hafen_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:676P",
+    "source_id": "676P",
+    "name": "Zehnerloch",
+    "lat": 53.95556,
+    "lon": 8.65833,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.98
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9510010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/zehnerloch"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:677B",
+    "source_id": "677B",
+    "name": "Sahlenburg",
+    "lat": 53.86389,
+    "lon": 8.59444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/sahlenburg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:677C",
+    "source_id": "677C",
+    "name": "Scharhörnriff, Bake A",
+    "lat": 53.98444,
+    "lon": 8.31528,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.09,
+      "SKN": -2.96
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9510063"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/scharhoernriff_bake_a"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:677P",
+    "source_id": "677P",
+    "name": "Scharhörn, Bake C",
+    "lat": 53.97,
+    "lon": 8.46806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.84
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9510060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/scharhoern_bake_c"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:678W",
+    "source_id": "678W",
+    "name": "Neuwerk, Anleger",
+    "lat": 53.91778,
+    "lon": 8.48639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.9
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/neuwerk_anleger"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:680P",
+    "source_id": "680P",
+    "name": "Kaiser-Wilhelm-Koog, Elbe",
+    "lat": 53.91667,
+    "lon": 8.91667,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/kaiser_wilhelm_koog"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:681A",
+    "source_id": "681A",
+    "name": "Neufeld, Hafen",
+    "lat": 53.90722,
+    "lon": 9.0225,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/neufeld_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:681P",
+    "source_id": "681P",
+    "name": "Otterndorf, Elbe",
+    "lat": 53.83528,
+    "lon": 8.87083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.05
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5990011"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/otterndorf"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:682P",
+    "source_id": "682P",
+    "name": "Osteriff, Elbe",
+    "lat": 53.85639,
+    "lon": 9.03167,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970096"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/osteriff"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:683B",
+    "source_id": "683B",
+    "name": "Oberndorf, Oste",
+    "lat": 53.75444,
+    "lon": 9.14694,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/oberndorf"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:683P",
+    "source_id": "683P",
+    "name": "Belum, Oste",
+    "lat": 53.82278,
+    "lon": 9.03722,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.13
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5980060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/belum"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:685P",
+    "source_id": "685P",
+    "name": "Hechthausen, Oste",
+    "lat": 53.64056,
+    "lon": 9.25278,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5980030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hechthausen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:687P",
+    "source_id": "687P",
+    "name": "Bremervörde, Oste",
+    "lat": 53.48417,
+    "lon": 9.15472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.98,
+      "SKN": -4.98
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5980010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremervoerde"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:688P",
+    "source_id": "688P",
+    "name": "Brokdorf, Elbe",
+    "lat": 53.86278,
+    "lon": 9.31611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/brokdorf"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:690P",
+    "source_id": "690P",
+    "name": "Stör-Sperrwerk, Außenpegel",
+    "lat": 53.82583,
+    "lon": 9.40111,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.11
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970041"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/stoer-sperrwerk_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:691R",
+    "source_id": "691R",
+    "name": "Kasenort, Stör",
+    "lat": 53.91167,
+    "lon": 9.40944,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/kasenort"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:692A",
+    "source_id": "692A",
+    "name": "Itzehoe, Stör, Hafen",
+    "lat": 53.92444,
+    "lon": 9.50056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970042"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/itzehoe_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:693P",
+    "source_id": "693P",
+    "name": "Breitenberg, Stör",
+    "lat": 53.92778,
+    "lon": 9.63222,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970038"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/breitenberg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:694P",
+    "source_id": "694P",
+    "name": "Grönhude, Stör",
+    "lat": 53.93583,
+    "lon": 9.69083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970037"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/groenhude"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:695P",
+    "source_id": "695P",
+    "name": "Glückstadt, Elbe",
+    "lat": 53.78444,
+    "lon": 9.40944,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970035"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/glueckstadt"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:696P",
+    "source_id": "696P",
+    "name": "Wischhafen, Elbe, Sperrwerk",
+    "lat": 53.785,
+    "lon": 9.34111,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wischhafen_sperrwerk"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:697P",
+    "source_id": "697P",
+    "name": "Krautsand, Elbe, Reede",
+    "lat": 53.75472,
+    "lon": 9.39167,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970031"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/krautsand"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:698P",
+    "source_id": "698P",
+    "name": "Kollmar, Kamperreihe, Elbe",
+    "lat": 53.73194,
+    "lon": 9.46083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.11
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970025"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/kollmar_kamperreihe"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:700R",
+    "source_id": "700R",
+    "name": "Krückau-Sperrwerk, Binnenpegel",
+    "lat": 53.71639,
+    "lon": 9.52611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -5.03
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970023"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/krueckau-sperrwerk_binnenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:702A",
+    "source_id": "702A",
+    "name": "Elmshorn, Hafen, Krückau",
+    "lat": 53.75222,
+    "lon": 9.65389,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -5.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970022"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/elmshorn_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:703P",
+    "source_id": "703P",
+    "name": "Grauerort, Elbe, Reede",
+    "lat": 53.67917,
+    "lon": 9.49472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970026"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/grauerort"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:704R",
+    "source_id": "704R",
+    "name": "Pinnau-Sperrwerk, Binnenpegel",
+    "lat": 53.67111,
+    "lon": 9.55806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -5.03
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970018"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/pinnau-sperrwerk_binnenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:706P",
+    "source_id": "706P",
+    "name": "Uetersen, Pinnau",
+    "lat": 53.67833,
+    "lon": 9.67722,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -5.04
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970016"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/uetersen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:709P",
+    "source_id": "709P",
+    "name": "Stadersand, Schwinge",
+    "lat": 53.62972,
+    "lon": 9.52667,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.05,
+      "SKN": -3.13
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970013"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/stadersand"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:710P",
+    "source_id": "710P",
+    "name": "Stade, Schwinge",
+    "lat": 53.59778,
+    "lon": 9.48,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/stade"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:711P",
+    "source_id": "711P",
+    "name": "Hetlingen, Elbe",
+    "lat": 53.60944,
+    "lon": 9.58444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.11
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5970010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hetlingen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:712P",
+    "source_id": "712P",
+    "name": "Lühort, Lühe",
+    "lat": 53.57139,
+    "lon": 9.63361,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.11
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5960010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/luehort"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:713P",
+    "source_id": "713P",
+    "name": "Horneburg, Lühe",
+    "lat": 53.51222,
+    "lon": 9.59083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -5.03
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5960020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/horneburg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:714P",
+    "source_id": "714P",
+    "name": "Schulau, Elbe",
+    "lat": 53.56861,
+    "lon": 9.70333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.11
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5950090"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/schulau"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:715P",
+    "source_id": "715P",
+    "name": "Hamburg, Blankenese, Elbe, Unterfeuer",
+    "lat": 53.55778,
+    "lon": 9.79583,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5952065"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_blankenese"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:717P",
+    "source_id": "717P",
+    "name": "Hamburg, Cranz, Este-Sperrwerk, AP",
+    "lat": 53.53583,
+    "lon": 9.79167,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.05,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5950070"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_cranz"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:718P",
+    "source_id": "718P",
+    "name": "Buxtehude, Este",
+    "lat": 53.48056,
+    "lon": 9.70333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -5.04
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5950080"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/buxtehude"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:720P",
+    "source_id": "720P",
+    "name": "Hamburg, Seemannshöft, Elbe",
+    "lat": 53.54,
+    "lon": 9.88083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5952060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_seemannshoeft"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:724P",
+    "source_id": "724P",
+    "name": "Hamburg, Harburg, Elbe, Schleuse",
+    "lat": 53.47278,
+    "lon": 9.99194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5952025"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_harburg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:726A",
+    "source_id": "726A",
+    "name": "Hamburg, Peute, Elbe",
+    "lat": 53.52778,
+    "lon": 10.03333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_peute"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:727P",
+    "source_id": "727P",
+    "name": "Hamburg, Dove-Elbe, Elbe, Einfahrt",
+    "lat": 53.50833,
+    "lon": 10.06167,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_dove-elbe_einfahrt"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:729P",
+    "source_id": "729P",
+    "name": "Hamburg, Bunthaus, Elbe",
+    "lat": 53.46139,
+    "lon": 10.06389,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5952020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_bunthaus"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:730A",
+    "source_id": "730A",
+    "name": "Ilmenau-Sperrwerk, Außenpegel",
+    "lat": 53.39472,
+    "lon": 10.17972,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.78
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5940080"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/ilmenau-sperrwerk_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:730C",
+    "source_id": "730C",
+    "name": "Fahrenholz, Ilmenau",
+    "lat": 53.36028,
+    "lon": 10.31556,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5940060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/fahrenholz"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:730P",
+    "source_id": "730P",
+    "name": "Over, Elbe",
+    "lat": 53.42861,
+    "lon": 10.10111,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.1,
+      "SKN": -3.37
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/over"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:731P",
+    "source_id": "731P",
+    "name": "Hamburg, Zollenspieker, Elbe",
+    "lat": 53.39861,
+    "lon": 10.18528,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.81
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5930090"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_zollenspieker"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:732A",
+    "source_id": "732A",
+    "name": "Hamburg, Altengamme, Elbe",
+    "lat": 53.43111,
+    "lon": 10.2975,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -4.17
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5930070"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hamburg_altengamme"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:732D",
+    "source_id": "732D",
+    "name": "Geesthacht, Elbe, Wehr, Unterpegel",
+    "lat": 53.42333,
+    "lon": 10.33472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -4.21
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:5930060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/geesthacht_wehr_unterpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:734P",
+    "source_id": "734P",
+    "name": "Alte Weser, Leuchtturm",
+    "lat": 53.86333,
+    "lon": 8.1275,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.98,
+      "SKN": -2.87
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9460040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/alte_weser_leuchtturm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:735A",
+    "source_id": "735A",
+    "name": "Spieka Neufeld",
+    "lat": 53.78806,
+    "lon": 8.55306,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.73
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/spieka_neufeld"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:735B",
+    "source_id": "735B",
+    "name": "Wremertief",
+    "lat": 53.64861,
+    "lon": 8.49472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wremertief"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:737P",
+    "source_id": "737P",
+    "name": "Dwarsgat, Unterfeuer",
+    "lat": 53.71861,
+    "lon": 8.3075,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.98,
+      "SKN": -2.56
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9460020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/dwarsgat"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:737S",
+    "source_id": "737S",
+    "name": "Robbensüdsteert",
+    "lat": 53.63917,
+    "lon": 8.44528,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.49
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9460010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/robbensuedsteert"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:738P",
+    "source_id": "738P",
+    "name": "Fedderwardersiel, Fedderwarder Priel",
+    "lat": 53.59639,
+    "lon": 8.35444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.54
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/fedderwardersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:741A",
+    "source_id": "741A",
+    "name": "Nordenham, Weser, Unterfeuer",
+    "lat": 53.46444,
+    "lon": 8.48806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.38
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4970040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/nordenham"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:741B",
+    "source_id": "741B",
+    "name": "Rechtenfleth, Weser",
+    "lat": 53.38111,
+    "lon": 8.50056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.55
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4970030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/rechtenfleth"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:743P",
+    "source_id": "743P",
+    "name": "Brake, Weser",
+    "lat": 53.31611,
+    "lon": 8.48667,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.68
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4970020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/brake"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:744A",
+    "source_id": "744A",
+    "name": "Elsfleth Ohrt, Hunte",
+    "lat": 53.22111,
+    "lon": 8.46,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960080"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/elsfleth_ohrt"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:744P",
+    "source_id": "744P",
+    "name": "Elsfleth, Weser",
+    "lat": 53.26389,
+    "lon": 8.48139,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.08,
+      "SKN": -2.84
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4970010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/elsfleth"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:745A",
+    "source_id": "745A",
+    "name": "Buttelerhörne, Hunte",
+    "lat": 53.18,
+    "lon": 8.4125,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.95
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960060"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/buttelerhoerne"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:745P",
+    "source_id": "745P",
+    "name": "Huntebrück, Hunte",
+    "lat": 53.2,
+    "lon": 8.44639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.25
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960070"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/huntebrueck"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:746P",
+    "source_id": "746P",
+    "name": "Hollersiel, Hunte",
+    "lat": 53.16806,
+    "lon": 8.37861,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -4.03
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hollersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:747P",
+    "source_id": "747P",
+    "name": "Reithörne, Hunte",
+    "lat": 53.16111,
+    "lon": 8.3225,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -4.16
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/reithoerne"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:748P",
+    "source_id": "748P",
+    "name": "Oldenburg, Drielake, Hunte",
+    "lat": 53.14028,
+    "lon": 8.23417,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -4.16
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4960030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/oldenburg_drielake"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:749P",
+    "source_id": "749P",
+    "name": "Bremen, Farge, Weser",
+    "lat": 53.20472,
+    "lon": 8.51028,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.91
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4950020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_farge"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750A",
+    "source_id": "750A",
+    "name": "Bremen, Wasserhorst, Lesum",
+    "lat": 53.16278,
+    "lon": 8.71833,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4930010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_wasserhorst"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750B",
+    "source_id": "750B",
+    "name": "Ritterhude, Hamme",
+    "lat": 53.18194,
+    "lon": 8.76333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -5.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4940030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/ritterhude"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750C",
+    "source_id": "750C",
+    "name": "Bremen, Niederblockland, Wümme",
+    "lat": 53.16139,
+    "lon": 8.82639,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -5.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4940020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_niederblockland"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750D",
+    "source_id": "750D",
+    "name": "Bremen, Borgfeld, Wümme",
+    "lat": 53.13389,
+    "lon": 8.89444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -5.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4940010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_borgfeld"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750G",
+    "source_id": "750G",
+    "name": "Ochtum, Sperrwerk, Außenpegel",
+    "lat": 53.12306,
+    "lon": 8.64889,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -2.9
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/ochtum-sperrwerk_aussenpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:750P",
+    "source_id": "750P",
+    "name": "Bremen, Vegesack, Weser",
+    "lat": 53.16944,
+    "lon": 8.61944,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.9
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4950010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_vegesack"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:751P",
+    "source_id": "751P",
+    "name": "Bremen, Wilhelm-Kaisen-Brücke, Weser",
+    "lat": 53.07306,
+    "lon": 8.80361,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.9
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4910050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_wilhelm-kaisen-bruecke"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:752P",
+    "source_id": "752P",
+    "name": "Bremen, Weserwehr, Weser",
+    "lat": 53.06028,
+    "lon": 8.85472,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.91
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:4910040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bremen_weserwehr"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:754P",
+    "source_id": "754P",
+    "name": "Wangerooge, Langes Riff, Nord",
+    "lat": 53.80639,
+    "lon": 7.92917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.96
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9420030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wangerooge_nord"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:756P",
+    "source_id": "756P",
+    "name": "Wangerooge, Ost",
+    "lat": 53.76722,
+    "lon": 7.985,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.01,
+      "SKN": -2.88
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9420020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wangerooge_ost"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:760P",
+    "source_id": "760P",
+    "name": "Mellumplate, Leuchtturm",
+    "lat": 53.77167,
+    "lon": 8.0925,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.79
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9420010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/mellumplate_leuchtturm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:761P",
+    "source_id": "761P",
+    "name": "Schillig",
+    "lat": 53.69889,
+    "lon": 8.04694,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.66
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9430030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/schillig"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:763P",
+    "source_id": "763P",
+    "name": "Wangertief, Horumersiel",
+    "lat": 53.68417,
+    "lon": 8.02333,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wangertief_horumersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:764B",
+    "source_id": "764B",
+    "name": "Hooksielplate",
+    "lat": 53.66917,
+    "lon": 8.14861,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.55
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9430020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hooksielplate"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:765P",
+    "source_id": "765P",
+    "name": "Hooksiel",
+    "lat": 53.64194,
+    "lon": 8.08194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/hooksiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:768P",
+    "source_id": "768P",
+    "name": "Jade-Weser-Port",
+    "lat": 53.60167,
+    "lon": 8.14889,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.56
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9430050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/jade-weser-port"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:770P",
+    "source_id": "770P",
+    "name": "Wilhelmshaven, Neuer Vorhafen, Seeschleuse",
+    "lat": 53.53028,
+    "lon": 8.16083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.38
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9440030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wilhelmshaven_neuer_vorhafen_seeschleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:771P",
+    "source_id": "771P",
+    "name": "Eckwarderhörne",
+    "lat": 53.52056,
+    "lon": 8.225,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/eckwarderhoerne"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:773P",
+    "source_id": "773P",
+    "name": "Arngast, Leuchtturm",
+    "lat": 53.48167,
+    "lon": 8.1925,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.31
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/arngast_leuchtturm"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:776P",
+    "source_id": "776P",
+    "name": "Vareler Schleuse",
+    "lat": 53.41028,
+    "lon": 8.18833,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -2.31
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/vareler_schleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:777P",
+    "source_id": "777P",
+    "name": "Wangerooge, Hafen",
+    "lat": 53.77639,
+    "lon": 7.86806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.05,
+      "SKN": -2.97
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9420040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/wangerooge_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:778P",
+    "source_id": "778P",
+    "name": "Harlesiel, Hafen",
+    "lat": 53.70694,
+    "lon": 7.80861,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -2.99
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/harlesiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:779P",
+    "source_id": "779P",
+    "name": "Spiekeroog, ehem. Landungsbrücke",
+    "lat": 53.74917,
+    "lon": 7.68194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.08,
+      "SKN": -3.14
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9410010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/spiekeroog"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:780P",
+    "source_id": "780P",
+    "name": "Neuharlingersiel",
+    "lat": 53.70167,
+    "lon": 7.70417,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.05
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/neuharlingersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:781P",
+    "source_id": "781P",
+    "name": "Langeoog, Hafeneinfahrt",
+    "lat": 53.72333,
+    "lon": 7.50167,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.17
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9390010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/langeoog_hafeneinfahrt"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:782P",
+    "source_id": "782P",
+    "name": "Bensersiel",
+    "lat": 53.67472,
+    "lon": 7.575,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.12
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/bensersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:783P",
+    "source_id": "783P",
+    "name": "Dornumer-Accumersiel",
+    "lat": 53.68111,
+    "lon": 7.48833,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/dornumer-accumersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:784P",
+    "source_id": "784P",
+    "name": "Baltrum, Westende",
+    "lat": 53.72278,
+    "lon": 7.36444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -4.98,
+      "SKN": -3.14
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/baltrum_westende"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:785P",
+    "source_id": "785P",
+    "name": "Neßmersiel",
+    "lat": 53.68889,
+    "lon": 7.36083,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/nessmersiel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:790A",
+    "source_id": "790A",
+    "name": "Norddeich, Westerriede",
+    "lat": 53.64361,
+    "lon": 7.14806,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.16
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/norddeich_westerriede"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:793P",
+    "source_id": "793P",
+    "name": "Juist, Seeseite",
+    "lat": 53.68333,
+    "lon": 7,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "SKN",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/juist_seeseite"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:794P",
+    "source_id": "794P",
+    "name": "Juist, Hafen",
+    "lat": 53.6725,
+    "lon": 6.99583,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.15
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/juist_hafen"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:796C",
+    "source_id": "796C",
+    "name": "Leyhörn, Leybucht",
+    "lat": 53.54917,
+    "lon": 7.03611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -3.15
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/leyhoern_leybucht"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:798P",
+    "source_id": "798P",
+    "name": "Borkum, Südstrand",
+    "lat": 53.57694,
+    "lon": 6.66139,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.23
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9340030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/borkum_suedstrand"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:799G",
+    "source_id": "799G",
+    "name": "Dukegat",
+    "lat": 53.43361,
+    "lon": 6.92611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.07,
+      "SKN": -3.01
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3990020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/dukegat"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:799P",
+    "source_id": "799P",
+    "name": "Emshörn",
+    "lat": 53.49361,
+    "lon": 6.84111,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.1,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:9340010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/emshoern"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:802P",
+    "source_id": "802P",
+    "name": "Knock, Ems",
+    "lat": 53.32722,
+    "lon": 7.03056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.11,
+      "SKN": -2.85
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3990010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/knock"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:803P",
+    "source_id": "803P",
+    "name": "Pogum, Ems",
+    "lat": 53.32083,
+    "lon": 7.25917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.05,
+      "SKN": -2.62
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3950020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/pogum"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:805P",
+    "source_id": "805P",
+    "name": "Terborg, Ems",
+    "lat": 53.29278,
+    "lon": 7.39611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.05,
+      "SKN": -2.7
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3910020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/terborg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:806P",
+    "source_id": "806P",
+    "name": "Leerort, Ems",
+    "lat": 53.21528,
+    "lon": 7.42611,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -2.77
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3910010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/leerort"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:808A",
+    "source_id": "808A",
+    "name": "Leda-Sperrwerk, Unterpegel",
+    "lat": 53.21417,
+    "lon": 7.47444,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -3.05
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3880050"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/leda-sperrwerk_unterpegel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:808P",
+    "source_id": "808P",
+    "name": "Leer, Leda, Schleuse",
+    "lat": 53.21583,
+    "lon": 7.44861,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/leer_schleuse"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:810A",
+    "source_id": "810A",
+    "name": "Nortmoor, Altarm Jümme",
+    "lat": 53.225,
+    "lon": 7.57583,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/nortmoor"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:810B",
+    "source_id": "810B",
+    "name": "Detern, Jümme",
+    "lat": 53.205,
+    "lon": 7.67278,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/detern"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:810D",
+    "source_id": "810D",
+    "name": "Augustfehn, Aper Tief",
+    "lat": 53.21,
+    "lon": 7.7575,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -5.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/augustfehn"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:810P",
+    "source_id": "810P",
+    "name": "Westringaburg, Leda",
+    "lat": 53.20333,
+    "lon": 7.57139,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5,
+      "SKN": -5
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/westringaburg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:812P",
+    "source_id": "812P",
+    "name": "Dreyschloot, Leda",
+    "lat": 53.17806,
+    "lon": 7.66917,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.02,
+      "SKN": -5.02
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3880010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/dreyschloot"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:813P",
+    "source_id": "813P",
+    "name": "Weener, Ems",
+    "lat": 53.16111,
+    "lon": 7.37194,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.06,
+      "SKN": -2.76
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3790020"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/weener"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:814B",
+    "source_id": "814B",
+    "name": "Rhede, Ems",
+    "lat": 53.07389,
+    "lon": 7.28778,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.03,
+      "SKN": -3.1
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3770040"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/rhede"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:814P",
+    "source_id": "814P",
+    "name": "Papenburg, Ems",
+    "lat": 53.10833,
+    "lon": 7.36556,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.06,
+      "SKN": -2.77
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3790010"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/papenburg"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:816B",
+    "source_id": "816B",
+    "name": "Barßel, Soeste",
+    "lat": 53.16917,
+    "lon": 7.74056,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": 0,
+      "SKN": 0
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/barssel"
+  },
+  {
+    "source": "bsh",
+    "license": "BSH-Anlage-4",
+    "commercial_use": true,
+    "attribution": "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie",
+    "id": "bsh:816P",
+    "source_id": "816P",
+    "name": "Herbrum, Ems, Hafendamm",
+    "lat": 53.04278,
+    "lon": 7.31833,
+    "country_code": "DE",
+    "kind": null,
+    "interval_s": null,
+    "datum": "PNP",
+    "datums": {
+      "NHN": -5.04,
+      "SKN": -3.7
+    },
+    "products": [
+      "predictions",
+      "predicted_extremes"
+    ],
+    "first": null,
+    "last": null,
+    "tide_station": null,
+    "same_as": [
+      "pegelonline:3770030"
+    ],
+    "status": "active",
+    "live": false,
+    "min_interval_s": null,
+    "source_url": "https://gezeiten.bsh.de/herbrum_hafendamm"
+  }
+]

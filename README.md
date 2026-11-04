@@ -1,6 +1,6 @@
 # water-levels
 
-Observed and predicted water levels from tide and river gauges, in one shape, for [Open Waters](https://github.com/openwatersio). This is the start of the water-level lake described in the [planning evaluation](https://github.com/openwatersio/planning/tree/main/water-levels): one adapter per source, Parquet out, read with DuckDB.
+Observed and predicted water levels from tide and river gauges, in one shape, for [Open Waters](https://github.com/openwatersio). This is the water-level lake described in the [planning evaluation](https://github.com/openwatersio/planning/tree/main/water-levels): one adapter per source, Parquet out, read with DuckDB. [docs/plan.md](docs/plan.md) has the plan and [docs/api.md](docs/api.md) the API design.
 
 It has adapters for three sources so far:
 
@@ -20,31 +20,43 @@ Requires Node 24 or later.
 npm install
 ```
 
-```bash
-node scripts/fetch.ts stations
-```
+Refresh the station lists in `stations/` and write `stations.parquet` and `sources.json` to the lake:
 
 ```bash
-node scripts/fetch.ts rws hoekvanholland 2024 2025
+node scripts/ingest.ts stations
+```
+
+Backfill a station's observations, extremes and predictions, by year (end exclusive):
+
+```bash
+node scripts/ingest.ts backfill rws hoekvanholland 2016 2025
 ```
 
 ```bash
-node scripts/fetch.ts bsh 506P
+node scripts/ingest.ts backfill bsh 506P 2026 2028
 ```
 
-Output goes to `data/`:
+Merge the last hours from every live station into the recent window:
 
-```
-data/stations/<source>.json
-data/obs/<source>/<station>/<year>.parquet                 time, level_m
-data/obs/<source>/<station>/<year>-extremes.parquet        time, level_m, type
-data/predictions/<source>/<station>/<year>.parquet         time, level_m
-data/predictions/<source>/<station>/<year>-extremes.parquet time, level_m, type[, transit, event]
+```bash
+node scripts/ingest.ts recent pegelonline --hours 3
 ```
 
-`time` is UTC. `level_m` is in the station's own datum (NAP for RWS, gauge zero PNP for BSH and PEGELONLINE); `data/stations/*.json` gives offsets to other datums where the source publishes them. PEGELONLINE files are named for the days they cover, since the service only keeps 31 days.
+The lake is `data/` unless `WATER_LEVELS_LAKE` names another directory or an `s3://` URL. For R2, set `S3_ENDPOINT`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`, as crowd-depth does:
 
-Responses are cached in `.cache/`, so re-running a historical fetch doesn't hit the upstream service again.
+```
+stations.parquet                                      one row per series
+sources.json                                          license and attribution per source
+recent/<source>.parquet                               station, time, level_m, flag, received
+obs/<source>/<station>/<year>.parquet                 time, level_m, flag, received
+extremes/<source>/<station>/<year>.parquet            time, level_m, type, flag
+predictions/<source>/<station>/<year>.parquet         time, level_m, flag, received
+predicted-extremes/<source>/<station>/<year>.parquet  time, level_m, type, flag[, transit, event]
+```
+
+`time` is UTC. `level_m` is in the station's own datum (NAP for RWS, gauge zero PNP for BSH and most PEGELONLINE gauges), and `stations.parquet` gives offsets to other datums where the source publishes them. `flag` is 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. `received` is when ingest first saw a value arrive, and is empty for backfilled history.
+
+Responses are cached in `.cache/`, so re-running a historical fetch doesn't hit the upstream service again. Each source's README in `src/sources/` covers its quirks.
 
 ## Evaluations
 
