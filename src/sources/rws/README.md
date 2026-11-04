@@ -1,10 +1,10 @@
 # Rijkswaterstaat (`rws`)
 
-Observed water levels, observed high and low waters, and RWS's astronomical tide and its high and low waters, for about 680 Dutch locations, from the [Waterwebservices](https://rijkswaterstaatdata.nl/waterdata/) (DDAPI 2.0).
+Observed water levels, observed high and low waters, and RWS's astronomical tide and its high and low waters, for about 690 locations in the Netherlands and the Caribbean Netherlands, from the [Waterwebservices](https://rijkswaterstaatdata.nl/waterdata/) (DDAPI 2.0).
 
 - **License:** CC0. Attribution "Rijkswaterstaat" is optional but carried.
-- **Stations:** every catalog location with a `WATHTE` series against NAP. Products come from the catalog: `extremes` where the location has the `GETETM2` grouping, `predictions` and `predicted_extremes` where it has `GETETBRKD2`.
-- **Levels:** 10-minute, integer centimeters, relative to NAP. Values above 10,000 cm are RWS's missing-value sentinels and are dropped.
+- **Stations:** every catalog location with a `WATHTE` series against NAP, or against MSL where that's all it has: 14 locations, mostly offshore platforms (A12, D15, J6, K13a and others), plus Ameland Westgat and Kralendijk on Bonaire. Products come from the catalog: `extremes` where the location has the `GETETM2` grouping, `predictions` and `predicted_extremes` where it has `GETETBRKD2`. Those groupings are against NAP even at the platforms, so a station whose levels are against MSL lists levels only, and every request asks for the station's datum so one file never mixes two. If RWS changes a station's datum, the refresh marks it inactive for a person to resolve rather than relabeling its files (see `src/stations.ts`). RWS lists Ameland Westgat twice, as `ameland.westgat` and `amelandwestgat`, a few meters apart; `TWINS` links checked pairs like that with `same_as`. Distance alone doesn't, since the two sides of a lock can be meters apart.
+- **Levels:** 10-minute, integer centimeters, relative to the station's datum: NAP, or MSL at those 14. Values above 10,000 cm are RWS's missing-value sentinels and are dropped.
 - **Flags:** `Gecontroleerd` (checked) is `good` and `Ongecontroleerd` (unchecked) is `preliminary`. Quality code `00` is a normal value. We haven't found what code `25` means, so it and any other code are `suspect` until we do. The astronomical tide is always `good`.
 - **Limits:** at most 160,000 values per request, so requests go a year at a time. Fair use, no uptime guarantee. An empty range comes back as an empty body.
 - **History:** back to about 1990 at the tide gauges. Observed extremes for the latest year appear months later.

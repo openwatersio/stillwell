@@ -1,0 +1,256 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import type { Station } from "../src/schema.ts";
+import {
+  adoptSiblings,
+  parseId,
+  replacement,
+  sharesWord,
+  usgsSite,
+  type TiconRecord,
+} from "../src/ticon.ts";
+
+function record(id: string, fields: Partial<TiconRecord> = {}): TiconRecord {
+  return {
+    id,
+    name: "",
+    country: "",
+    lat: 0,
+    lon: 0,
+    ...parseId(id),
+    commercial_use: true,
+    epoch: { start: "2000-01-01", end: "2020-12-31" },
+    published: true,
+    accepted: true,
+    ...fields,
+  };
+}
+
+function station(id: string, name: string, lat: number, lon: number): Station {
+  return {
+    id,
+    source: id.split("/")[0]!,
+    source_id: id.split("/")[1]!,
+    name,
+    lat,
+    lon,
+    country_code: null,
+    kind: null,
+    interval_s: null,
+    datum: "NAP",
+    datums: {},
+    products: ["levels"],
+    first: null,
+    last: null,
+    license: "CC0-1.0",
+    commercial_use: true,
+    attribution: "",
+    tide_station: null,
+    same_as: [],
+    status: "active",
+    live: true,
+    min_interval_s: null,
+    source_url: null,
+  };
+}
+
+describe("TICON replacements", () => {
+  it("reads the originator's code from the id", () => {
+    assert.deepEqual(parseId("seattle-9447130-usa-noaa"), {
+      code: "9447130",
+      iso3: "usa",
+      contributor: "noaa",
+    });
+    assert.equal(replacement(record("seattle-9447130-usa-noaa"), {}).id, "coops/9447130");
+  });
+
+  it("sends a UHSLC relay to the originator tide-database's provenance declares", () => {
+    const relay = record("honolulu-057a-usa-uhslc_rq", { declared: "noaa/1612340" });
+    assert.deepEqual(replacement(relay, {}), {
+      source: "coops",
+      id: "coops/1612340",
+      status: "planned",
+      note: "UHSLC relay of noaa/1612340",
+    });
+    assert.equal(replacement(record("abashiri-347a-jpn-uhslc_rq"), {}).id, "uhslc/347a");
+  });
+
+  it("matches WSV records by PEGELONLINE number", () => {
+    const lists = { pegelonline: [station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3)] };
+    const match = replacement(
+      record("altengamme-5930070-deu-wsv", { lat: 53.43, lon: 10.29 }),
+      lists,
+    );
+    assert.equal(match.id, "pegelonline/5930070");
+    assert.equal(match.status, "ready");
+  });
+
+  it("matches RWS and CMEMS records by position, with a name check beyond 1 km", () => {
+    const lists = {
+      rws: [
+        station("rws/a12", "A12 platform", 55.4, 3.84),
+        station("rws/hollandsdiep.noordwest2", "Hollandsdiep noordwest 2", 51.7, 4.4),
+      ],
+    };
+    const a12 = record("a121tg-a12-nld-cmems", { name: "A121TG", lat: 55.4, lon: 3.81 });
+    assert.equal(replacement(a12, lists).id, "rws/a12");
+    // Sharing only "noord" isn't enough to match 1.8 km away.
+    const rak = record("rak_noord-raknd-nld-rws_hist", {
+      name: "Rak_noord",
+      lat: 51.7,
+      lon: 4.426,
+    });
+    assert.equal(replacement(rak, lists).status, "unmatched");
+  });
+
+  it("pads USGS site numbers TICON shortened", () => {
+    assert.equal(
+      replacement(record("abercorn_creek_at_mouth-2198820-usa-usgs"), {}).id,
+      "usgs/02198820",
+    );
+    assert.equal(replacement(record("x-394118122051301-usa-usgs"), {}).id, "usgs/394118122051301");
+  });
+
+  it("restores USGS site numbers to 8, 10 or 15 digits", () => {
+    assert.deepEqual(["2198820", "158540095", "39411812205130", "12345678"].map(usgsSite), [
+      "02198820",
+      "0158540095",
+      "039411812205130",
+      "12345678",
+    ]);
+  });
+
+  it("holds CMEMS copies back until they match a station of the national feed", () => {
+    const match = replacement(record("goteborgtg-got-swe-cmems"), {});
+    assert.deepEqual([match.source, match.status], ["smhi", "to_match"]);
+    // Without the national list to match against, even a source with an adapter isn't ready.
+    const dutch = replacement(record("x-y-nld-cmems"), {});
+    assert.deepEqual([dutch.status, dutch.id], ["to_match", null]);
+  });
+
+  it("doesn't count an inactive PEGELONLINE station as ready", () => {
+    const gone = {
+      ...station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3),
+      status: "inactive" as const,
+    };
+    const match = replacement(record("altengamme-5930070-deu-wsv", { lat: 53.43, lon: 10.3 }), {
+      pegelonline: [gone],
+    });
+    assert.equal(match.status, "unmatched");
+  });
+
+  it("tells an outer harbor from an inner one, and won't guess between them", () => {
+    const lists = {
+      rws: [
+        station(
+          "rws/kornwerderzand.ijsselmeer.binnenhaven",
+          "Kornwerderzand, IJsselmeer, binnenhaven",
+          53.0727,
+          5.3365,
+        ),
+        station(
+          "rws/kornwerderzand.waddenzee.buitenhaven",
+          "Kornwerderzand, Waddenzee, buitenhaven",
+          53.0759,
+          5.3324,
+        ),
+      ],
+    };
+    const at = { lat: 53.0742, lon: 5.3362 };
+    const outer = replacement(
+      record("kornwerderzand_buiten-kornwdzbtn-nld-rws_hist", {
+        name: "Kornwerderzand_buiten",
+        ...at,
+      }),
+      lists,
+    );
+    assert.equal(outer.id, "rws/kornwerderzand.waddenzee.buitenhaven");
+    const either = replacement(
+      record("kornwerderzandtg-kor-nld-cmems", { name: "KornwerderzandTG", ...at }),
+      lists,
+    );
+    assert.equal(either.status, "unmatched");
+    assert.match(either.note!, /Ambiguous/);
+    // A station at the record's own position wins outright.
+    const exact = replacement(
+      record("kornwerderzandtg-kor-nld-cmems", {
+        name: "KornwerderzandTG",
+        lat: 53.0727,
+        lon: 5.3365,
+      }),
+      lists,
+    );
+    assert.equal(exact.id, "rws/kornwerderzand.ijsselmeer.binnenhaven");
+  });
+
+  it("prefers a station sharing the place name over a nearer one sharing only common words", () => {
+    const lists = {
+      rws: [
+        station("rws/x.haven.buiten", "X haven buiten", 53.0, 5.0),
+        station("rws/harlingen", "Harlingen", 53.0, 5.05),
+      ],
+    };
+    const match = replacement(
+      record("harlingen_haven_buiten-h-nld-rws", {
+        name: "Harlingen haven buiten",
+        lat: 53.0,
+        lon: 5.012,
+      }),
+      lists,
+    );
+    assert.equal(match.id, "rws/harlingen");
+  });
+
+  it("sends a JODC relay of a NOAA gauge to CO-OPS as planned", () => {
+    const relay = record("x-hd01-jpn-jodc_jcg", { declared: "noaa/1234567" });
+    assert.deepEqual(
+      [replacement(relay, {}).id, replacement(relay, {}).status],
+      ["coops/1234567", "planned"],
+    );
+  });
+
+  it("treats a UK gauge the same whether CMEMS or BODC relays it", () => {
+    const cmems = replacement(record("aberdeen-abe-gbr-cmems"), {});
+    const bodc = replacement(record("aberdeen-abe-gbr-bodc"), {});
+    assert.deepEqual([cmems.source, cmems.status], [bodc.source, bodc.status]);
+  });
+
+  it("matches an unmatched record through its tide-database station", () => {
+    const rows = adoptSiblings([
+      {
+        record: record("a-1-nld-rws", { station: "nl/a" }),
+        replacement: { source: "rws", id: "rws/a", status: "ready" as const },
+      },
+      {
+        record: record("atg-a-nld-cmems", { station: "nl/a" }),
+        replacement: { source: "rws", id: null, status: "unmatched" as const, note: "why" },
+      },
+      {
+        record: record("btg-b-nld-cmems", { station: "nl/b" }),
+        replacement: { source: "rws", id: null, status: "unmatched" as const },
+      },
+    ]);
+    assert.equal(rows[1]!.replacement.id, "rws/a");
+    assert.match(rows[1]!.replacement.note!, /^Same tide-database station as a-1-nld-rws; why/);
+    assert.equal(rows[2]!.replacement.status, "unmatched");
+  });
+
+  it("keeps restricted contributors on TICON", () => {
+    assert.equal(replacement(record("victoria-07120-can-meds"), {}).status, "restricted");
+  });
+});
+
+describe("sharesWord", () => {
+  it("finds a word inside a run-together name", () => {
+    assert.ok(sharesWord("KielHoltenauTG", "KIEL-HOLTENAU"));
+  });
+
+  it("matches German transliterations", () => {
+    assert.ok(sharesWord("WarnemuendeTG", "WARNEMÜNDE"));
+  });
+
+  it("ignores directions and harbor words", () => {
+    assert.ok(!sharesWord("Rak noord", "Hollandsdiep noordwest"));
+    assert.ok(!sharesWord("Oude haven", "Nieuwe haven"));
+  });
+});

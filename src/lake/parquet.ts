@@ -41,9 +41,17 @@ function connection(): Promise<DuckDBConnection> {
   return connecting;
 }
 
-/** Observations: `time`, `level_m`, `flag`, `received`, sorted by time. */
-export async function writeObservations(path: string, rows: Observation[]): Promise<void> {
-  await copyRows(path, rows, "time, level_m, flag, received", (r) => [
+/**
+ * Observations: `time`, `level_m`, `flag`, `received`, `datum`, sorted by time.
+ * `datum` is the same on every row; it lets a reader, and the next write, check
+ * that a file holds one datum.
+ */
+export async function writeObservations(
+  path: string,
+  rows: Observation[],
+  datum: string,
+): Promise<void> {
+  await copyRows(path, rows, "time, level_m, flag, received, datum", datum, (r) => [
     r.time,
     r.level,
     r.flag,
@@ -67,13 +75,21 @@ export async function readObservations(path: string): Promise<Observation[]> {
   });
 }
 
-/** Extremes: `time`, `level_m`, `type`, `flag`, plus `transit` and `event` when the source gives them. */
-export async function writeExtremes(path: string, rows: PublishedExtreme[]): Promise<void> {
+/**
+ * Extremes: `time`, `level_m`, `type`, `flag`, plus `transit` and `event` when
+ * the source gives them, and `datum` as for observations.
+ */
+export async function writeExtremes(
+  path: string,
+  rows: PublishedExtreme[],
+  datum: string,
+): Promise<void> {
   const transit = rows.some((r) => "transit" in r);
   await copyRows(
     path,
     rows,
-    `time, level_m, type, flag${transit ? ", transit, event" : ""}`,
+    `time, level_m, type, flag${transit ? ", transit, event" : ""}, datum`,
+    datum,
     (r) => [
       r.time,
       r.level,
@@ -88,7 +104,7 @@ export async function writeExtremes(path: string, rows: PublishedExtreme[]): Pro
 }
 
 export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
-  const rows = await read(path, "SELECT epoch_ms(time) AS time, * EXCLUDE (time)");
+  const rows = await read(path, "SELECT epoch_ms(time) AS time, * EXCLUDE (time, datum)");
   return rows.map((r) => {
     const e = {
       time: Number(r.time),
@@ -102,6 +118,12 @@ export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
   });
 }
 
+/** The datums a series file holds: one, or none when the file doesn't exist. */
+export async function readDatums(path: string): Promise<string[]> {
+  const rows = await read(path, "SELECT DISTINCT datum", "datum");
+  return rows.map((r) => String(r.datum));
+}
+
 export type StationObservation = Observation & { station: string };
 
 /** The recent window for a source: `station`, then the observation columns, sorted by station and time. */
@@ -110,6 +132,7 @@ export async function writeRecent(path: string, rows: StationObservation[]): Pro
     path,
     rows,
     "station, time, level_m, flag, received",
+    undefined,
     (r) => [r.time, r.level, r.flag, r.received ?? null, null, r.station, null, null],
     "station, time_ms",
   );
@@ -189,16 +212,18 @@ function copyRows<T>(
   path: string,
   rows: T[],
   columns: string,
+  datum: string | undefined,
   cells: (row: T) => Cell[],
   order = "time_ms",
 ): Promise<void> {
-  return serial(() => copyRowsNow(path, rows, columns, cells, order));
+  return serial(() => copyRowsNow(path, rows, columns, datum, cells, order));
 }
 
 async function copyRowsNow<T>(
   path: string,
   rows: T[],
   columns: string,
+  datum: string | undefined,
   cells: (row: T) => Cell[],
   order: string,
 ): Promise<void> {
@@ -230,7 +255,9 @@ async function copyRowsNow<T>(
           ? "epoch_ms(time_ms::BIGINT)::TIMESTAMPTZ AS time"
           : c === "received"
             ? "epoch_ms(received_ms::BIGINT)::TIMESTAMPTZ AS received"
-            : c,
+            : c === "datum"
+              ? `${quote(datum!)} AS datum`
+              : c,
       )
       .join(", ");
     await db.run(

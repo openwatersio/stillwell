@@ -12,14 +12,25 @@
  * so a rerun gives the same files. `recent` fetches the last hours for every
  * live station and merges them into recent/<source>.parquet.
  *
+ * Files carry no datum of their own, so a station the source now reports in
+ * another datum is marked inactive, and `stations` lists it and exits nonzero
+ * for a person to resolve. `backfill all` skips inactive stations; naming one
+ * still works, adapters refuse values in any datum but the station's, and
+ * backfill refuses a file whose `datum` column names another.
+ *
  * The lake is WATER_LEVELS_LAKE: a directory (default `data`) or an `s3://` URL.
+ * Its bucket is public, so a station whose license bars commercial use writes
+ * its series to WATER_LEVELS_RESTRICTED_LAKE instead, which must be a separate
+ * lake, and ingest refuses to write one without it.
  */
 import { readdir, readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeRange, sameRows } from "../src/lake/merge.ts";
 import {
   readExtremes,
+  readDatums,
   readObservations,
   readRecent,
   writeExtremes,
@@ -31,10 +42,32 @@ import {
 } from "../src/lake/parquet.ts";
 import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
+import { linkBothWays, mergeStationList } from "../src/stations.ts";
 import type { Observation, Product, PublishedExtreme, Source, Station } from "../src/schema.ts";
 import { sourceOf, sources } from "../src/sources/index.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
+
+/** Where a station's series go: the public lake, or the private one when its license is restricted. */
+function lakeFor(station: Station): string {
+  if (station.commercial_use) return LAKE;
+  const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
+  if (!restricted)
+    throw new Error(
+      `${station.id} bars commercial use; set WATER_LEVELS_RESTRICTED_LAKE to a private lake`,
+    );
+  if (overlaps(restricted, LAKE))
+    throw new Error("WATER_LEVELS_RESTRICTED_LAKE must be a separate bucket or directory");
+  return restricted;
+}
+
+/** Whether two lakes share a bucket, or one directory holds the other. */
+function overlaps(a: string, b: string): boolean {
+  const bucket = (lake: string) => /^s3:\/\/([^/]+)/.exec(lake)?.[1];
+  if (bucket(a) || bucket(b)) return bucket(a) === bucket(b);
+  const [x, y] = [resolve(a), resolve(b)];
+  return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
+}
 const STATIONS_DIR = "stations";
 const DAY_MS = 86_400_000;
 
@@ -74,40 +107,24 @@ async function refreshStations(ids: string[]): Promise<void> {
   for (const id of ids) {
     const fetched = await sourceOf(id).stations();
     const previous = await committedStations(id);
-    const fresh = new Set(fetched.map((s) => s.id));
-    const before = new Map(previous.map((s) => [s.id, s]));
-    const merged = [
-      // Fields the lake fills in later survive a refresh.
-      ...fetched.map((s) => {
-        const old = before.get(s.id);
-        return {
-          ...s,
-          first: s.first ?? old?.first ?? null,
-          last: s.last ?? old?.last ?? null,
-          tide_station: s.tide_station ?? old?.tide_station ?? null,
-        };
-      }),
-      // A station the source stopped listing stays, marked inactive, so its ID is never reused.
-      ...previous
-        .filter((s) => !fresh.has(s.id))
-        .map((s) => ({ ...s, status: "inactive" as const })),
-    ].sort((a, b) => a.id.localeCompare(b.id));
-    await writeFile(`${STATIONS_DIR}/${id}.json`, JSON.stringify(merged, null, 2) + "\n");
-    const inactive = merged.length - fetched.length;
-    console.log(`${id}: ${fetched.length} active, ${inactive} inactive`);
+    // An empty list is a broken response, not every station retiring at once.
+    if (!fetched.length && previous.length) throw new Error(`${id} listed no stations`);
+    const { stations, changed } = mergeStationList(previous, fetched);
+    await writeFile(`${STATIONS_DIR}/${id}.json`, JSON.stringify(stations, null, 2) + "\n");
+    const active = stations.filter((s) => s.status === "active").length;
+    console.log(`${id}: ${active} active, ${stations.length - active} inactive`);
+    // The station's files are all in its committed datum, so a person decides
+    // whether to convert them or start over; until then it stays inactive.
+    for (const c of changed) {
+      console.error(`  ${c.id}: now reported in ${c.to}, not ${c.from}; marked inactive`);
+      process.exitCode = 1;
+    }
   }
 
-  const all: Station[] = [];
+  let all: Station[] = [];
   for (const file of (await readdir(STATIONS_DIR)).filter((f) => f.endsWith(".json")).sort())
     all.push(...(await committedStations(file.replace(/\.json$/, ""))));
-  // Links run both ways in the lake, whichever list recorded them.
-  const links = new Map<string, Set<string>>();
-  for (const s of all)
-    for (const other of s.same_as) {
-      links.set(s.id, (links.get(s.id) ?? new Set()).add(other));
-      links.set(other, (links.get(other) ?? new Set()).add(s.id));
-    }
-  for (const s of all) s.same_as = [...(links.get(s.id) ?? [])].sort();
+  all = linkBothWays(all);
   await writeStations(stationsPath(LAKE), all);
   await writeJsonArray(
     sourcesPath(LAKE),
@@ -124,20 +141,31 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const list = await committedStations(sourceId);
   if (!list.length)
     throw new Error(`No stations/${sourceId}.json; run \`stations ${sourceId}\` first`);
-  const wanted = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
+  const wanted =
+    ids === "all"
+      ? list.filter((s) => s.status === "active")
+      : ids.split(",").map((id) => find(list, sourceId, id));
   // Sources with a rolling window can't reach further back than it.
   const window = source.metadata.window_days;
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
 
+  const failed: string[] = [];
   await pool(wanted, async (station) => {
     for (const product of station.products) {
       for (const [from, to] of years(start, end)) {
-        const written = await backfillYear(source, station, product, from, to);
-        if (written !== undefined)
-          console.log(`${station.id} ${product} ${from.getUTCFullYear()}: ${written} rows`);
+        const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
+        try {
+          const written = await backfillYear(source, station, product, from, to);
+          if (written !== undefined) console.log(`${label}: ${written} rows`);
+        } catch (error) {
+          // A failed year writes nothing, so its file keeps what it had.
+          failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+        }
       }
     }
   });
+  for (const f of failed) console.error(`  ${f}`);
+  if (failed.length) process.exitCode = 1;
 }
 
 /** Returns how many rows the year's file now holds, or undefined when nothing changed. */
@@ -148,26 +176,41 @@ async function backfillYear(
   from: Date,
   to: Date,
 ): Promise<number | undefined> {
-  const path = seriesPath(LAKE, product, station.source, station.source_id, from.getUTCFullYear());
+  const path = seriesPath(
+    lakeFor(station),
+    product,
+    station.source,
+    station.source_id,
+    from.getUTCFullYear(),
+  );
   const range = [from.getTime(), to.getTime()] as const;
+  // Adapters return values in the station's datum; this keeps a file from
+  // gaining them when it already holds another, whatever the station list says.
+  const held = (await readDatums(path)).filter((d) => d !== station.datum);
+  if (held.length)
+    throw new Error(`${path} holds ${held.join(", ")}, not ${station.datum}; resolve by hand`);
   if (product === "levels" || product === "predictions") {
     const get = product === "levels" ? source.observations : source.predictions;
     if (!get) return undefined;
     let rows = await get(station, from, to);
+    // An empty fetch is an outage, a year the source no longer publishes, or a
+    // datum it no longer serves; it never empties a file.
+    if (!rows.length) return undefined;
     if (product === "levels") rows = qc(rows);
     const existing = await readObservations(path);
     const merged = mergeRange(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
-    await writeObservations(path, merged);
+    await writeObservations(path, merged, station.datum);
     return merged.length;
   }
   const get = product === "extremes" ? source.extremes : source.predictedExtremes;
   if (!get) return undefined;
   const rows = await get(station, from, to);
+  if (!rows.length) return undefined;
   const existing = await readExtremes(path);
   const merged = mergeRange<PublishedExtreme>(existing, rows, ...range);
   if (!merged.length || sameRows(existing, merged)) return undefined;
-  await writeExtremes(path, merged);
+  await writeExtremes(path, merged, station.datum);
   return merged.length;
 }
 
@@ -180,8 +223,12 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   const now = Date.now();
   const since = new Date(now - hours * 3_600_000);
   const keepFrom = now - keepDays * DAY_MS;
-  const path = recentPath(LAKE, sourceId);
-  const previous = Map.groupBy(await readRecent(path), (r) => r.station);
+  // Restricted stations' recent values go to the private lake, like their series.
+  const paths = [...new Set(stations.map((s) => recentPath(lakeFor(s), sourceId)))];
+  const previous = new Map<string, StationObservation[]>();
+  for (const path of paths)
+    for (const [id, rows] of Map.groupBy(await readRecent(path), (r) => r.station))
+      previous.set(id, rows);
   const rows: StationObservation[] = [];
   const failed: string[] = [];
 
@@ -191,7 +238,8 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
     try {
       const fetched = await source.observations!(station, since, new Date(now));
       // QC the whole window, so spikes and flatlines are judged against their neighbors.
-      merged = qc(mergeRange(old, fetched, since.getTime(), now, now));
+      // Nothing new keeps what we had, rather than clearing the last hours.
+      if (fetched.length) merged = qc(mergeRange(old, fetched, since.getTime(), now, now));
     } catch (error) {
       // Keep what we had; a failed fetch mustn't empty the window.
       failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
@@ -199,10 +247,15 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
     for (const r of merged) rows.push({ ...r, station: station.id });
   });
 
-  await writeRecent(path, rows);
+  const lakeOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), sourceId)]));
+  for (const path of paths)
+    await writeRecent(
+      path,
+      rows.filter((r) => lakeOf.get(r.station) === path),
+    );
   const reporting = new Set(rows.filter((r) => r.received === now).map((r) => r.station)).size;
   console.log(
-    `${path}: ${rows.length} rows, ${reporting} of ${stations.length} stations sent new values, ${failed.length} failed`,
+    `${paths.join(", ")}: ${rows.length} rows, ${reporting} of ${stations.length} stations sent new values, ${failed.length} failed`,
   );
   for (const f of failed.slice(0, 20)) console.log(`  ${f}`);
   if (stations.length && failed.length === stations.length) process.exit(1);
@@ -217,10 +270,9 @@ async function committedStations(sourceId: string): Promise<Station[]> {
   }
 }
 
+/** A station by its ID or its source's own code. */
 function find(list: Station[], sourceId: string, id: string): Station {
-  const station = list.find(
-    (s) => s.source_id === id || s.id === id || s.id === `${sourceId}:${id}`,
-  );
+  const station = list.find((s) => s.id === id || s.id === `${sourceId}/${id}`);
   if (!station) throw new Error(`No station ${id} in stations/${sourceId}.json`);
   return station;
 }

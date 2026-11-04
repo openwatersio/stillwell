@@ -31,7 +31,7 @@ export type Kind = "coastal" | "estuary" | "lake" | "river";
 export type Product = "levels" | "extremes" | "predictions" | "predicted_extremes";
 
 export interface Station {
-  /** `<source>:<source_id>`, e.g. `rws:hoekvanholland`. */
+  /** `<source>/<source_id>`, e.g. `rws/hoekvanholland`. */
   id: string;
   source: string;
   source_id: string;
@@ -65,6 +65,9 @@ export interface Station {
   source_url: string | null;
 }
 
+/** A station as a source lists it, with `datum` null when the source didn't say this time. */
+export type ListedStation = Omit<Station, "datum"> & { datum: string | null };
+
 export interface SourceMetadata {
   id: string;
   name: string;
@@ -83,8 +86,11 @@ export interface SourceMetadata {
  */
 export interface Source {
   metadata: SourceMetadata;
-  stations(): Promise<Station[]>;
-  /** Observed levels over [start, end). */
+  stations(): Promise<ListedStation[]>;
+  /**
+   * Observed levels over [start, end). Every product comes in `station.datum`,
+   * and throws rather than return values in another, so a file never mixes two.
+   */
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;

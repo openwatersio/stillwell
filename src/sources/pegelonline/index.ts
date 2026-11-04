@@ -3,10 +3,10 @@ import {
   Flag,
   stationDefaults,
   type Kind,
+  type ListedStation,
   type Observation,
   type Source,
   type SourceMetadata,
-  type Station,
 } from "../../schema.ts";
 
 /**
@@ -53,19 +53,29 @@ export async function list(): Promise<ApiStation[]> {
     `${API}/stations.json?includeTimeseries=true&timeseries=W`,
     { fresh: true },
   );
+  // Without a position there's nothing to place.
   return stations.filter((s) => s.latitude !== undefined);
 }
 
-export async function stations(): Promise<Station[]> {
+export async function stations(): Promise<ListedStation[]> {
   return (await list()).map(toStation).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 /**
  * Water levels in meters over [start, end), within the last 31 days, in the
  * series' own datum (see `UNITS`). `station` is a PEGELONLINE number or UUID.
+ * With `datum`, throws if the series is now in another.
  */
-export async function levels(station: string, start: Date, end: Date): Promise<Observation[]> {
-  const { scale } = parseUnit(await unitOf(station), station);
+export async function levels(
+  station: string,
+  start: Date,
+  end: Date,
+  datum?: string,
+): Promise<Observation[]> {
+  const unit = parseUnit(await unitOf(station), station);
+  if (datum && unit.datum !== datum)
+    throw new Error(`PEGELONLINE ${station} is now in ${unit.datum}, not ${datum}`);
+  const { scale } = unit;
   const params = new URLSearchParams({ start: start.toISOString(), end: end.toISOString() });
   const values = await getJson<{ timestamp: string; value: number }[]>(
     `${API}/stations/${encodeURIComponent(station)}/W/measurements.json?${params}`,
@@ -89,7 +99,9 @@ function parseUnit(unit: string, station: string): { datum: string; scale: numbe
   return known;
 }
 
-// The measurements endpoint doesn't say its unit, so ask the series once per station.
+// The measurements endpoint doesn't say its unit, so ask the series once per
+// station and process. A unit that moves the series to another datum also marks
+// the station inactive at the next station refresh.
 const units = new Map<string, Promise<string>>();
 
 function unitOf(station: string): Promise<string> {
@@ -106,9 +118,10 @@ function unitOf(station: string): Promise<string> {
 // The open sea; everything else in PEGELONLINE is a river, canal or lake.
 const SEA = new Set(["NORDSEE", "OSTSEE"]);
 
-function toStation(s: ApiStation): Station {
+/** A station missing its W series this time lists no datum, so it keeps the committed one. */
+function toStation(s: ApiStation): ListedStation {
   const series = s.timeseries?.find((t) => t.shortname === "W");
-  const { datum: levelDatum } = parseUnit(series?.unit ?? "cm", s.number);
+  const levelDatum = series ? parseUnit(series.unit, s.number).datum : null;
   const zero = series?.gaugeZero;
   const datums: Record<string, number> = {};
   // Gauge zero is given as a height in another datum, e.g. "m. ü. NHN".
@@ -117,7 +130,7 @@ function toStation(s: ApiStation): Station {
   const kind: Kind | null = SEA.has(s.water.shortname) ? "coastal" : null;
   return {
     ...stationDefaults(metadata),
-    id: `pegelonline:${s.number}`,
+    id: `pegelonline/${s.number}`,
     source_id: s.number,
     name: s.longname,
     lat: s.latitude!,
@@ -142,5 +155,5 @@ function toStation(s: ApiStation): Station {
 export const source: Source = {
   metadata,
   stations,
-  observations: (s, start, end) => levels(s.source_id, start, end),
+  observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
 };

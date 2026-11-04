@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { mergeRange, sameRows } from "../src/lake/merge.ts";
 import {
+  readDatums,
   readExtremes,
   readObservations,
   readRecent,
@@ -29,12 +30,14 @@ describe("lake files", () => {
     ];
     const path = seriesPath(root, "levels", "test", "a/b", 2026);
     assert.match(path, /obs\/test\/a%2Fb\/2026\.parquet$/);
-    await writeObservations(path, rows);
+    await writeObservations(path, rows, "NAP");
     assert.deepEqual(await readObservations(path), [rows[1], rows[0]]);
+    assert.deepEqual(await readDatums(path), ["NAP"]);
   });
 
-  it("reads a missing file as an empty series", async () => {
+  it("reads a missing file as an empty series, in no datum", async () => {
     assert.deepEqual(await readObservations(join(root, "missing.parquet")), []);
+    assert.deepEqual(await readDatums(join(root, "missing.parquet")), []);
   });
 
   it("round-trips extremes with BSH's transit and event", async () => {
@@ -49,8 +52,9 @@ describe("lake files", () => {
         event: 1 as const,
       },
     ];
-    await writeExtremes(path, rows);
+    await writeExtremes(path, rows, "PNP");
     assert.deepEqual(await readExtremes(path), rows);
+    assert.deepEqual(await readDatums(path), ["PNP"]);
   });
 
   it("keeps the recent window sorted by station, then time", async () => {

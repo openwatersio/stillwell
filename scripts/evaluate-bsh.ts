@@ -70,11 +70,13 @@ type Result = Awaited<ReturnType<typeof evaluate>>;
 
 async function evaluate(bshnr: string) {
   const gauge = await bsh.gauge(bshnr);
+  // Both years in one datum, so a datum step isn't scored as model error.
+  const datum = gauge.datum ?? undefined;
   const [train, test, trainCurve, testCurve] = await Promise.all([
-    bsh.extremes(bshnr, 2026),
-    bsh.extremes(bshnr, 2027),
-    bsh.curve(bshnr, 2026),
-    bsh.curve(bshnr, 2027),
+    bsh.extremes(bshnr, 2026, datum),
+    bsh.extremes(bshnr, 2027, datum),
+    bsh.curve(bshnr, 2026, datum),
+    bsh.curve(bshnr, 2027, datum),
   ]);
   const testTimes = testCurve.map((s) => s.time);
 

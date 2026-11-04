@@ -95,8 +95,11 @@ interface Catalog {
   LocatieLijst: CatalogLocation[];
 }
 
-/** Locations with a water-level series against `datum` (NAP by default). */
-export async function stations(datum = "NAP"): Promise<Station[]> {
+/**
+ * Locations with a water-level series against NAP, or against MSL where that's
+ * all a location has (the offshore platforms).
+ */
+export async function stations(): Promise<Station[]> {
   const catalog = await getJson<Catalog>(CATALOG, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -106,48 +109,95 @@ export async function stations(datum = "NAP"): Promise<Station[]> {
   });
   // What each metadata entry gives a location: a height series or a set of extremes.
   const productsOf = new Map<number, Product[]>();
+  const datumOf = new Map<number, string>();
   for (const m of catalog.AquoMetadataLijst) {
     const grouping = m.Groepering?.Code;
-    if (!grouping && m.Grootheid.Code === "WATHTE" && m.Hoedanigheid.Code === datum)
+    if (!grouping && m.Grootheid.Code === "WATHTE" && DATUMS.includes(m.Hoedanigheid.Code)) {
       productsOf.set(m.AquoMetadata_MessageID, ["levels"]);
-    else if (grouping === EXTREME_GROUPING.meting)
+      datumOf.set(m.AquoMetadata_MessageID, m.Hoedanigheid.Code);
+    } else if (grouping === EXTREME_GROUPING.meting)
       productsOf.set(m.AquoMetadata_MessageID, ["extremes"]);
     else if (grouping === EXTREME_GROUPING.astronomisch)
       productsOf.set(m.AquoMetadata_MessageID, ["predictions", "predicted_extremes"]);
   }
   const products = new Map<number, Set<Product>>();
+  const datums = new Map<number, Set<string>>();
   for (const link of catalog.AquoMetadataLocatieLijst) {
+    const datum = datumOf.get(link.AquoMetaData_MessageID);
+    if (datum)
+      datums.set(
+        link.Locatie_MessageID,
+        (datums.get(link.Locatie_MessageID) ?? new Set()).add(datum),
+      );
     const found = productsOf.get(link.AquoMetaData_MessageID);
     if (!found) continue;
     const set = products.get(link.Locatie_MessageID) ?? new Set();
     for (const p of found) set.add(p);
     products.set(link.Locatie_MessageID, set);
   }
-  return catalog.LocatieLijst.filter((l) => products.get(l.Locatie_MessageID)?.has("levels"))
-    .map((l): Station => ({
-      ...stationDefaults(metadata),
-      id: `rws:${l.Code}`,
-      source_id: l.Code,
-      name: l.Naam,
-      lat: l.Lat,
-      lon: l.Lon,
-      country_code: "NL",
-      kind: null,
-      interval_s: 600,
-      datum,
-      datums: {},
-      products: ORDER.filter((p) => products.get(l.Locatie_MessageID)!.has(p)),
-      first: null,
-      last: null,
-      tide_station: null,
-      same_as: [],
-      status: "active",
-      live: true,
-      min_interval_s: 300,
-      source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
-    }))
-    .sort((a, b) => a.id.localeCompare(b.id));
+  return linkTwins(
+    catalog.LocatieLijst.filter((l) => products.get(l.Locatie_MessageID)?.has("levels"))
+      .map((l): Station => ({
+        ...stationDefaults(metadata),
+        id: `rws/${l.Code}`,
+        source_id: l.Code,
+        name: l.Naam,
+        lat: l.Lat,
+        lon: l.Lon,
+        // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
+        country_code: l.Lon < -30 ? "BQ" : "NL",
+        kind: null,
+        interval_s: 600,
+        datum: DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
+        datums: {},
+        products: productsFor(
+          products.get(l.Locatie_MessageID)!,
+          DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
+        ),
+        first: null,
+        last: null,
+        tide_station: null,
+        same_as: [],
+        status: "active",
+        live: true,
+        min_interval_s: 300,
+        source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id)),
+  );
 }
+
+/**
+ * Codes RWS lists for the same gauge, a few meters apart. Checked by hand:
+ * nearness alone isn't enough, since the two sides of a lock sit meters apart
+ * at different levels.
+ */
+const TWINS = [["ameland.westgat", "amelandwestgat"]];
+
+function linkTwins(stations: Station[]): Station[] {
+  const byCode = new Map(stations.map((s) => [s.source_id, s]));
+  for (const pair of TWINS)
+    for (const code of pair) {
+      const station = byCode.get(code);
+      if (!station) continue;
+      const others = pair.filter((c) => c !== code && byCode.has(c)).map((c) => `rws/${c}`);
+      station.same_as = [...new Set([...station.same_as, ...others])].sort();
+    }
+  return stations;
+}
+
+/**
+ * The groupings RWS publishes extremes and the astronomical tide under are
+ * against NAP, even at the offshore platforms whose levels are only against
+ * MSL. A station's files are all in its one datum, so an MSL station lists
+ * levels only.
+ */
+function productsFor(available: Set<Product>, datum: string): Product[] {
+  return ORDER.filter((p) => available.has(p) && (datum === "NAP" || p === "levels"));
+}
+
+/** Preferred first: NAP on land and in estuaries, MSL offshore. */
+const DATUMS = ["NAP", "MSL"];
 
 const ORDER: Product[] = ["levels", "extremes", "predictions", "predicted_extremes"];
 
@@ -207,10 +257,13 @@ export async function extremes(
       fresh,
     );
     const types = series.find((s) => s.AquoMetadata.Typering?.Code === "GETETTPE");
-    const heights = series.find(
-      (s) =>
-        s.AquoMetadata.Grootheid.Code === "WATHTE" && s.AquoMetadata.Hoedanigheid.Code === datum,
-    );
+    const all = series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE");
+    const heights = all.find((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
+    // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
+    if (types && all.length && !heights)
+      throw new Error(
+        `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
+      );
     if (!types || !heights) continue;
     assertCentimeters(heights, datum);
     const typeAt = new Map(
@@ -303,10 +356,17 @@ function fresh(end: Date): boolean {
 export const source: Source = {
   metadata,
   stations: () => stations(),
-  observations: (s, start, end) => levels(s.source_id, start, end, { fresh: fresh(end) }),
-  extremes: (s, start, end) => extremes(s.source_id, start, end, { fresh: fresh(end) }),
+  observations: (s, start, end) =>
+    levels(s.source_id, start, end, { datum: s.datum, fresh: fresh(end) }),
+  // Every product asks for the station's datum, so a file never mixes two.
+  extremes: (s, start, end) =>
+    extremes(s.source_id, start, end, { datum: s.datum, fresh: fresh(end) }),
   predictions: (s, start, end) =>
-    levels(s.source_id, start, end, { process: "astronomisch", fresh: fresh(end) }),
+    levels(s.source_id, start, end, { process: "astronomisch", datum: s.datum, fresh: fresh(end) }),
   predictedExtremes: (s, start, end) =>
-    extremes(s.source_id, start, end, { process: "astronomisch", fresh: fresh(end) }),
+    extremes(s.source_id, start, end, {
+      process: "astronomisch",
+      datum: s.datum,
+      fresh: fresh(end),
+    }),
 };

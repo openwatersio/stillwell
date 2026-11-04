@@ -4,11 +4,11 @@ Observed and predicted water levels from tide and river gauges, in one shape, fo
 
 It has adapters for three sources so far:
 
-| Source                                                               | What                                                                                                                                                   | License                                                                                                                                                                                                                                                                                                               |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Rijkswaterstaat](https://rijkswaterstaatdata.nl/waterdata/) (`rws`) | Observed levels and extremes, and RWS's astronomical tide and its extremes, at about 680 Dutch locations, with multi-year histories at the tide gauges | CC0                                                                                                                                                                                                                                                                                                                   |
-| [BSH tide service](https://gezeiten.bsh.de/) (`bsh`)                 | Predicted high and low waters and 10-minute curves at 172 German gauges, for the current year and the next                                             | Free including commercial use, with BSH's source notice (Anlage 4 of the [fee schedule](https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf)); see [slackwater-database#335](https://github.com/openwatersio/slackwater-database/issues/335) |
-| [PEGELONLINE](https://www.pegelonline.wsv.de/) (`pegelonline`)       | Observed levels at German federal gauges, including the BSH gauges, for the last 31 days                                                               | DL-DE/Zero-2.0                                                                                                                                                                                                                                                                                                        |
+| Source                                                               | What                                                                                                                                                                                              | License                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Rijkswaterstaat](https://rijkswaterstaatdata.nl/waterdata/) (`rws`) | Observed levels and extremes, and RWS's astronomical tide and its extremes, at about 690 locations in the Netherlands and the Caribbean Netherlands, with multi-year histories at the tide gauges | CC0                                                                                                                                                                                                                                                                                                                   |
+| [BSH tide service](https://gezeiten.bsh.de/) (`bsh`)                 | Predicted high and low waters and 10-minute curves at 172 German gauges, for the current year and the next                                                                                        | Free including commercial use, with BSH's source notice (Anlage 4 of the [fee schedule](https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf)); see [slackwater-database#335](https://github.com/openwatersio/slackwater-database/issues/335) |
+| [PEGELONLINE](https://www.pegelonline.wsv.de/) (`pegelonline`)       | Observed levels at German federal gauges, including the BSH gauges, for the last 31 days                                                                                                          | DL-DE/Zero-2.0                                                                                                                                                                                                                                                                                                        |
 
 It also has an implementation of the harmonic representation of inequalities (HRoI), the method BSH uses for German tide predictions, and an evaluation of it against the harmonic method Slackwater uses. See [docs/hroi-evaluation.md](docs/hroi-evaluation.md).
 
@@ -48,15 +48,25 @@ The lake is `data/` unless `WATER_LEVELS_LAKE` names another directory or an `s3
 stations.parquet                                      one row per series
 sources.json                                          license and attribution per source
 recent/<source>.parquet                               station, time, level_m, flag, received
-obs/<source>/<station>/<year>.parquet                 time, level_m, flag, received
-extremes/<source>/<station>/<year>.parquet            time, level_m, type, flag
-predictions/<source>/<station>/<year>.parquet         time, level_m, flag, received
-predicted-extremes/<source>/<station>/<year>.parquet  time, level_m, type, flag[, transit, event]
+obs/<source>/<station>/<year>.parquet                 time, level_m, flag, received, datum
+extremes/<source>/<station>/<year>.parquet            time, level_m, type, flag, datum
+predictions/<source>/<station>/<year>.parquet         time, level_m, flag, received, datum
+predicted-extremes/<source>/<station>/<year>.parquet  time, level_m, type, flag[, transit, event], datum
 ```
 
-`time` is UTC. `level_m` is in the station's own datum (NAP for RWS, gauge zero PNP for BSH and most PEGELONLINE gauges), and `stations.parquet` gives offsets to other datums where the source publishes them. `flag` is 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. `received` is when ingest first saw a value arrive, and is empty for backfilled history.
+`time` is UTC. `level_m` is in the station's own datum, named in each series file's `datum` column and in `stations.parquet` (NAP for most RWS stations and MSL for the 14 that only report against it, mostly offshore platforms, gauge zero PNP for most PEGELONLINE gauges and BSH, except 10 BSH gauges predicted against chart datum SKN), and `stations.parquet` gives offsets to other datums where the source publishes them. `flag` is 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. `received` is when ingest first saw a value arrive, and is empty for backfilled history.
+
+Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. A station keeps one datum for its whole record, and adapters refuse values in any other. If a source starts reporting a station in another datum, `ingest stations` marks it inactive, prints it and exits nonzero, so a person can decide whether to convert its files or start over; `backfill … all` skips inactive stations. Each series file records its datum, and backfill refuses to write into a file in another, so a station brought back in a new datum can't mix the two. A station whose license bars commercial use writes its series to `WATER_LEVELS_RESTRICTED_LAKE`, a private lake separate from the public one, since the public bucket serves everything in it, and ingest refuses to write one without it.
 
 Responses are cached in `.cache/`, so re-running a historical fetch doesn't hit the upstream service again. Each source's README in `src/sources/` covers its quirks.
+
+## TICON replacement
+
+```bash
+npm run ticon:inventory
+```
+
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
 
 ## Evaluations
 

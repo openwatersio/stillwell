@@ -1,0 +1,131 @@
+{
+  "Succesvol": true,
+  "AquoMetadataLijst": [
+    {
+      "AquoMetadata_MessageID": 1,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "NAP"
+      }
+    },
+    {
+      "AquoMetadata_MessageID": 2,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "MSL"
+      }
+    },
+    {
+      "AquoMetadata_MessageID": 3,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "NAP"
+      },
+      "Groepering": {
+        "Code": "GETETM2"
+      }
+    },
+    {
+      "AquoMetadata_MessageID": 4,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "NAP"
+      },
+      "Groepering": {
+        "Code": "GETETBRKD2"
+      }
+    },
+    {
+      "AquoMetadata_MessageID": 5,
+      "Grootheid": {
+        "Code": "T"
+      },
+      "Hoedanigheid": {
+        "Code": "NVT"
+      }
+    }
+  ],
+  "AquoMetadataLocatieLijst": [
+    {
+      "AquoMetaData_MessageID": 1,
+      "Locatie_MessageID": 10
+    },
+    {
+      "AquoMetaData_MessageID": 2,
+      "Locatie_MessageID": 10
+    },
+    {
+      "AquoMetaData_MessageID": 3,
+      "Locatie_MessageID": 10
+    },
+    {
+      "AquoMetaData_MessageID": 4,
+      "Locatie_MessageID": 10
+    },
+    {
+      "AquoMetaData_MessageID": 2,
+      "Locatie_MessageID": 20
+    },
+    {
+      "AquoMetaData_MessageID": 3,
+      "Locatie_MessageID": 20
+    },
+    {
+      "AquoMetaData_MessageID": 1,
+      "Locatie_MessageID": 30
+    },
+    {
+      "AquoMetaData_MessageID": 5,
+      "Locatie_MessageID": 40
+    },
+    {
+      "AquoMetaData_MessageID": 1,
+      "Locatie_MessageID": 50
+    }
+  ],
+  "LocatieLijst": [
+    {
+      "Locatie_MessageID": 10,
+      "Code": "hoekvanholland",
+      "Naam": "Hoek van Holland",
+      "Lat": 51.98,
+      "Lon": 4.12
+    },
+    {
+      "Locatie_MessageID": 20,
+      "Code": "k13a",
+      "Naam": "K13a platform",
+      "Lat": 53.22,
+      "Lon": 3.22
+    },
+    {
+      "Locatie_MessageID": 30,
+      "Code": "kralendijk",
+      "Naam": "Kralendijk",
+      "Lat": 12.15,
+      "Lon": -68.28
+    },
+    {
+      "Locatie_MessageID": 40,
+      "Code": "thermometer",
+      "Naam": "No levels here",
+      "Lat": 52,
+      "Lon": 5
+    },
+    {
+      "Locatie_MessageID": 50,
+      "Code": "hoekvanholland.2",
+      "Naam": "Hoek van Holland 2",
+      "Lat": 51.98001,
+      "Lon": 4.12001
+    }
+  ]
+}

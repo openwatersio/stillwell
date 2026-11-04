@@ -11,7 +11,8 @@ import type { Product } from "../schema.ts";
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
  *   predicted-extremes/<source>/<station>/<year>.parquet the source's predicted high and low waters
  *
- * `<station>` is the station's source ID.
+ * `<station>` is the station's `source_id`, URL-encoded. Every file is in the
+ * station's one datum, named in `stations.parquet`.
  */
 export const DATASET: Record<Product, string> = {
   levels: "obs",

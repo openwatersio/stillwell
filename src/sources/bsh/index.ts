@@ -2,10 +2,10 @@ import { getJson, getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
+  type ListedStation,
   type Observation,
   type Source,
   type SourceMetadata,
-  type Station,
 } from "../../schema.ts";
 import type { EventIndex, TransitExtreme } from "../../types.ts";
 import * as pegelonline from "../pegelonline/index.ts";
@@ -51,20 +51,20 @@ interface OverviewGauge {
   seo_id: string;
 }
 
-interface GaugeYear {
+export interface GaugeYear {
   level_tidalvalues?: string;
   MHW?: number;
   MNW?: number;
   MHWI?: string;
   MNWI?: string;
-  "PNP (unter NHN)"?: number;
-  "SKN (unter NHN)"?: number;
-  "SKN (ueber PNP)"?: number;
+  "PNP (unter NHN)"?: number | null;
+  "SKN (unter NHN)"?: number | null;
+  "SKN (ueber PNP)"?: number | null;
   has_height?: boolean;
   has_curve?: boolean;
 }
 
-export interface Gauge extends Station {
+export interface Gauge extends ListedStation {
   bshnr: string;
   pegelonline_uuid?: string;
   /** Years with published predictions. */
@@ -81,22 +81,22 @@ export async function gauges(): Promise<OverviewGauge[]> {
   return overview.gauges;
 }
 
-/** Metadata for one gauge, with datum offsets from the latest published year. */
+/**
+ * Metadata for one gauge. Its datum and offsets come from the latest year that
+ * names a datum, or the latest year when none does.
+ */
 export async function gauge(bshnr: string): Promise<Gauge> {
   const detail = await getJson<
     OverviewGauge & { pegelonline_uuid?: string; years: Record<string, GaugeYear>[] }
   >(`${SITE}/data/DE_${bshnr.padStart(5, "_")}_tides.json`);
   const years = Object.assign({}, ...detail.years) as Record<string, GaugeYear>;
   const numbers = Object.keys(years).map(Number).sort();
-  const latest = years[String(numbers.at(-1))] ?? {};
-  const datums: Record<string, number> = {};
-  // BSH gives PNP as a height relative to NHN (−500 is 5 m below), and SKN as a
-  // height above PNP, both in centimeters.
-  if (latest["PNP (unter NHN)"] !== undefined) datums.NHN = latest["PNP (unter NHN)"] / 100;
-  if (latest["SKN (ueber PNP)"] !== undefined) datums.SKN = -latest["SKN (ueber PNP)"] / 100;
+  const named = numbers.toReversed().find((y) => years[String(y)]?.level_tidalvalues);
+  const year = years[String(named ?? numbers.at(-1))] ?? {};
+  const datum = year.level_tidalvalues ?? null;
   return {
     ...stationDefaults(metadata),
-    id: `bsh:${detail.bshnr}`,
+    id: `bsh/${detail.bshnr}`,
     source_id: detail.bshnr,
     bshnr: detail.bshnr,
     name: detail.station_name,
@@ -105,8 +105,8 @@ export async function gauge(bshnr: string): Promise<Gauge> {
     country_code: "DE",
     kind: null,
     interval_s: null,
-    datum: latest.level_tidalvalues ?? "PNP",
-    datums,
+    datum,
+    datums: datum ? offsets(year, datum) : {},
     products: ["predictions", "predicted_extremes"],
     first: null,
     last: null,
@@ -118,17 +118,38 @@ export async function gauge(bshnr: string): Promise<Gauge> {
     source_url: `${SITE}/${detail.seo_id}`,
     pegelonline_uuid: detail.pegelonline_uuid,
     years: numbers,
-    mhwi: hours(latest.MHWI),
-    mlwi: hours(latest.MNWI),
+    mhwi: hours(year.MHWI),
+    mlwi: hours(year.MNWI),
   };
 }
 
+/**
+ * Meters to add to a level in `datum` for each other datum. BSH gives PNP and
+ * SKN as heights relative to NHN in centimeters (−500 is 5 m below), or SKN as
+ * a height above PNP, and leaves the ones it doesn't know null.
+ */
+export function offsets(year: GaugeYear, datum: string): Record<string, number> {
+  const cm = (v: number | null | undefined) => (typeof v === "number" ? v : undefined);
+  const pnp = cm(year["PNP (unter NHN)"]);
+  const sknAbovePnp = cm(year["SKN (ueber PNP)"]);
+  const skn =
+    cm(year["SKN (unter NHN)"]) ??
+    (pnp !== undefined && sknAbovePnp !== undefined ? pnp + sknAbovePnp : undefined);
+  const heights: Record<string, number | undefined> = { NHN: 0, PNP: pnp, SKN: skn };
+  const own = heights[datum];
+  const datums: Record<string, number> = {};
+  if (own === undefined) return datums;
+  for (const [name, height] of Object.entries(heights))
+    if (name !== datum && height !== undefined) datums[name] = Math.round(own - height) / 100;
+  return datums;
+}
+
 /** Every gauge, linked to its PEGELONLINE series where BSH names one. */
-export async function stations(): Promise<Station[]> {
+export async function stations(): Promise<ListedStation[]> {
   const numberOf = new Map(
-    (await pegelonline.list()).map((s) => [s.uuid, `pegelonline:${s.number}`]),
+    (await pegelonline.list()).map((s) => [s.uuid, `pegelonline/${s.number}`]),
   );
-  const list: Station[] = [];
+  const list: ListedStation[] = [];
   for (const g of await gauges()) {
     const {
       bshnr: _,
@@ -144,12 +165,16 @@ export async function stations(): Promise<Station[]> {
   return list.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** Predicted high and low waters for one year, with transit numbers. */
+/**
+ * Predicted high and low waters for one year, with transit numbers. With
+ * `datum`, throws if the year's file is in another.
+ */
 export async function extremes(
   bshnr: string,
   year: number,
+  datum?: string,
 ): Promise<(TransitExtreme & { flag: Flag })[]> {
-  const rows = await rowsOf(bshnr, year, "vb_hwnw");
+  const rows = await rowsOf(bshnr, year, "vb_hwnw", datum);
   return rows
     .filter((r) => r.kind === "H" || r.kind === "N")
     .map((r) => ({
@@ -162,9 +187,9 @@ export async function extremes(
     }));
 }
 
-/** The predicted 10-minute curve for one year. */
-export async function curve(bshnr: string, year: number): Promise<Observation[]> {
-  const rows = await rowsOf(bshnr, year, "vb_kurv");
+/** The predicted 10-minute curve for one year, checked against `datum` like `extremes`. */
+export async function curve(bshnr: string, year: number, datum?: string): Promise<Observation[]> {
+  const rows = await rowsOf(bshnr, year, "vb_kurv", datum);
   return rows
     .filter((r) => r.kind === "K")
     .map((r) => ({ time: r.time, level: r.level, flag: Flag.good }));
@@ -179,7 +204,12 @@ interface Row {
 }
 
 /** A year's rows, or none when BSH hasn't published that year. */
-async function rowsOf(bshnr: string, year: number, path: string): Promise<Row[]> {
+async function rowsOf(
+  bshnr: string,
+  year: number,
+  path: string,
+  datum: string | undefined,
+): Promise<Row[]> {
   const file = `DE_${bshnr.padStart(5, "_")}${year}.txt`;
   const url = `${FILES}?path=/${path}/deu${year}&files=${file}`;
   let text: string;
@@ -192,6 +222,10 @@ async function rowsOf(bshnr: string, year: number, path: string): Promise<Row[]>
   if (!text.startsWith("I_E#")) throw new Error(`BSH ${file} is not a prediction file`);
   const unit = /C05#[^#]*#\s*([^#\s]+)/.exec(text)?.[1];
   if (unit !== "m") throw new Error(`BSH ${file} height unit is ${unit}, not m`);
+  // BSH names each year's datum, and a gauge can move from PNP to SKN between years.
+  const level = /C03#[^#]*#\s*([^#\s]+)/.exec(text)?.[1];
+  if (datum && level !== datum)
+    throw new Error(`BSH ${file} heights are in ${level}, not ${datum}`);
   return parse(text);
 }
 
@@ -242,6 +276,7 @@ async function byYear<T extends { time: number }>(
 export const source: Source = {
   metadata,
   stations,
-  predictions: (s, start, end) => byYear(start, end, (year) => curve(s.source_id, year)),
-  predictedExtremes: (s, start, end) => byYear(start, end, (year) => extremes(s.source_id, year)),
+  predictions: (s, start, end) => byYear(start, end, (year) => curve(s.source_id, year, s.datum)),
+  predictedExtremes: (s, start, end) =>
+    byYear(start, end, (year) => extremes(s.source_id, year, s.datum)),
 };
