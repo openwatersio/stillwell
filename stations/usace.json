@@ -24161,7 +24161,8 @@
     "live": false,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Steele%20Bayou.Stage.Inst.1Hour.0.DCP-rev",
-    "series": "Steele Bayou.Stage.Inst.1Hour.0.DCP-rev"
+    "series": "Steele Bayou.Stage.Inst.1Hour.0.DCP-rev",
+    "zero_since": "2019-04-01"
   },
   {
     "source": "usace",
@@ -24189,7 +24190,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Steele%20Bayou-RS.Stage.Inst.1Hour.0.DCP-rev",
-    "series": "Steele Bayou-RS.Stage.Inst.1Hour.0.DCP-rev"
+    "series": "Steele Bayou-RS.Stage.Inst.1Hour.0.DCP-rev",
+    "zero_since": "2019-04-01"
   },
   {
     "source": "usace",
@@ -28197,7 +28199,8 @@
     "live": false,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Algiers_Lock.Stage.Inst.1Hour.0.rev",
-    "series": "Algiers_Lock.Stage.Inst.1Hour.0.rev"
+    "series": "Algiers_Lock.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2007-09-20"
   },
   {
     "source": "usace",
@@ -28225,7 +28228,8 @@
     "live": false,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Algiers_Lock_GIWW.Stage.Inst.1Hour.0.rev",
-    "series": "Algiers_Lock_GIWW.Stage.Inst.1Hour.0.rev"
+    "series": "Algiers_Lock_GIWW.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2007-09-20"
   },
   {
     "source": "usace",
@@ -28253,7 +28257,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Alliance.Stage.Inst.1Hour.0.rev",
-    "series": "Alliance.Stage.Inst.1Hour.0.rev"
+    "series": "Alliance.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2013-10-10"
   },
   {
     "source": "usace",
@@ -28533,7 +28538,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Barataria_Bay_WW.Stage.Inst.15Minutes.0.rev",
-    "series": "Barataria_Bay_WW.Stage.Inst.15Minutes.0.rev"
+    "series": "Barataria_Bay_WW.Stage.Inst.15Minutes.0.rev",
+    "zero_since": "2021-11-23"
   },
   {
     "source": "usace",
@@ -28785,7 +28791,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_Boeuf-Kraemer.Stage.Inst.1Hour.0.rev",
-    "series": "Bayou_Boeuf-Kraemer.Stage.Inst.1Hour.0.rev"
+    "series": "Bayou_Boeuf-Kraemer.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2016-03-17"
   },
   {
     "source": "usace",
@@ -29429,7 +29436,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Boomtown.Stage.Inst.1Hour.0.rev",
-    "series": "Boomtown.Stage.Inst.1Hour.0.rev"
+    "series": "Boomtown.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2021-11-01"
   },
   {
     "source": "usace",
@@ -29681,7 +29689,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Cameron.Stage.Inst.1Hour.0.rev",
-    "series": "Cameron.Stage.Inst.1Hour.0.rev"
+    "series": "Cameron.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2013-11-23"
   },
   {
     "source": "usace",
@@ -29709,7 +29718,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=CatfishPoint_Nth.Stage.Inst.1Hour.0.rev",
-    "series": "CatfishPoint_Nth.Stage.Inst.1Hour.0.rev"
+    "series": "CatfishPoint_Nth.Stage.Inst.1Hour.0.rev",
+    "zero_since": "1998-02-19"
   },
   {
     "source": "usace",
@@ -29737,7 +29747,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=CatfishPoint_Sth.Stage.Inst.1Hour.0.rev",
-    "series": "CatfishPoint_Sth.Stage.Inst.1Hour.0.rev"
+    "series": "CatfishPoint_Sth.Stage.Inst.1Hour.0.rev",
+    "zero_since": "1998-02-19"
   },
   {
     "source": "usace",
@@ -29933,7 +29944,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Cocodrie.Stage.Inst.1Hour.0.rev",
-    "series": "Cocodrie.Stage.Inst.1Hour.0.rev"
+    "series": "Cocodrie.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2011-10-12"
   },
   {
     "source": "usace",
@@ -30129,7 +30141,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Donaldsonville.Stage.Inst.1Hour.0.rev",
-    "series": "Donaldsonville.Stage.Inst.1Hour.0.rev"
+    "series": "Donaldsonville.Stage.Inst.1Hour.0.rev",
+    "zero_since": "1988-06-15"
   },
   {
     "source": "usace",
@@ -30213,7 +30226,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Empire.Stage.Inst.1Hour.0.rev",
-    "series": "Empire.Stage.Inst.1Hour.0.rev"
+    "series": "Empire.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2015-07-02"
   },
   {
     "source": "usace",
@@ -30241,7 +30255,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Empire_FloodGate-Landside.Stage.Inst.15Minutes.0.rev",
-    "series": "Empire_FloodGate-Landside.Stage.Inst.15Minutes.0.rev"
+    "series": "Empire_FloodGate-Landside.Stage.Inst.15Minutes.0.rev",
+    "zero_since": "2022-04-19"
   },
   {
     "source": "usace",
@@ -30269,7 +30284,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Empire_FloodGate-WaterSide.Stage.Inst.15Minutes.0.rev",
-    "series": "Empire_FloodGate-WaterSide.Stage.Inst.15Minutes.0.rev"
+    "series": "Empire_FloodGate-WaterSide.Stage.Inst.15Minutes.0.rev",
+    "zero_since": "2022-04-19"
   },
   {
     "source": "usace",
@@ -30661,7 +30677,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Harvey_Canal_Lap.Stage.Inst.15Minutes.0.rev",
-    "series": "Harvey_Canal_Lap.Stage.Inst.15Minutes.0.rev"
+    "series": "Harvey_Canal_Lap.Stage.Inst.15Minutes.0.rev",
+    "zero_since": "2007-07-10"
   },
   {
     "source": "usace",
@@ -30859,7 +30876,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=IHNC_Lock.Stage.Inst.1Hour.0.rev",
-    "series": "IHNC_Lock.Stage.Inst.1Hour.0.rev"
+    "series": "IHNC_Lock.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2008-10-16"
   },
   {
     "source": "usace",
@@ -30887,7 +30905,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=IHNC_NewOrleans.Stage.Inst.1Hour.0.rev",
-    "series": "IHNC_NewOrleans.Stage.Inst.1Hour.0.rev"
+    "series": "IHNC_NewOrleans.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2008-10-31"
   },
   {
     "source": "usace",
@@ -30915,7 +30934,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=IHNC_S_Seabrook.Stage.Inst.1Hour.0.rev",
-    "series": "IHNC_S_Seabrook.Stage.Inst.1Hour.0.rev"
+    "series": "IHNC_S_Seabrook.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2010-06-03"
   },
   {
     "source": "usace",
@@ -31167,7 +31187,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Lake_Charles.Stage.Inst.1Hour.0.rev",
-    "series": "Lake_Charles.Stage.Inst.1Hour.0.rev"
+    "series": "Lake_Charles.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2014-01-01"
   },
   {
     "source": "usace",
@@ -32569,7 +32590,8 @@
     "live": false,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Rigolets.Stage.Inst.1Hour.0.rev",
-    "series": "Rigolets.Stage.Inst.1Hour.0.rev"
+    "series": "Rigolets.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2007-02-13"
   },
   {
     "source": "usace",
@@ -32625,7 +32647,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=S_Pass_PortEads.Stage.Inst.1Hour.0.rev",
-    "series": "S_Pass_PortEads.Stage.Inst.1Hour.0.rev"
+    "series": "S_Pass_PortEads.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2011-02-10"
   },
   {
     "source": "usace",
@@ -32989,7 +33012,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=St_Francisville.Stage.Inst.1Hour.0.rev",
-    "series": "St_Francisville.Stage.Inst.1Hour.0.rev"
+    "series": "St_Francisville.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2010-08-25"
   },
   {
     "source": "usace",
@@ -33017,7 +33041,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=SWPass_BHP.Stage.Inst.1Hour.0.rev",
-    "series": "SWPass_BHP.Stage.Inst.1Hour.0.rev"
+    "series": "SWPass_BHP.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2011-01-01"
   },
   {
     "source": "usace",
@@ -33353,7 +33378,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Venice.Stage.Inst.1Hour.0.rev",
-    "series": "Venice.Stage.Inst.1Hour.0.rev"
+    "series": "Venice.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2015-06-29"
   },
   {
     "source": "usace",
@@ -33549,7 +33575,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=West_Bay.Stage.Inst.1Hour.0.rev",
-    "series": "West_Bay.Stage.Inst.1Hour.0.rev"
+    "series": "West_Bay.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2009-01-31"
   },
   {
     "source": "usace",
@@ -33633,7 +33660,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=West_Pointe.Stage.Inst.1Hour.0.rev",
-    "series": "West_Pointe.Stage.Inst.1Hour.0.rev"
+    "series": "West_Pointe.Stage.Inst.1Hour.0.rev",
+    "zero_since": "2015-07-02"
   },
   {
     "source": "usace",
@@ -34461,7 +34489,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Cape%20Girardeau-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev",
-    "series": "Cape Girardeau-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev"
+    "series": "Cape Girardeau-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev",
+    "zero_since": "1976-11-01"
   },
   {
     "source": "usace",
@@ -36949,7 +36978,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Louisiana-Mississippi.Stage.Inst.15Minutes.0.lrgsShef-rev",
-    "series": "Louisiana-Mississippi.Stage.Inst.15Minutes.0.lrgsShef-rev"
+    "series": "Louisiana-Mississippi.Stage.Inst.15Minutes.0.lrgsShef-rev",
+    "zero_since": "1950-01-24"
   },
   {
     "source": "usace",
@@ -37967,7 +37997,8 @@
     "live": false,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Paris-Mid%20Fork%20Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
-    "series": "Paris-Mid Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev"
+    "series": "Paris-Mid Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
+    "zero_since": "1968-07-24"
   },
   {
     "source": "usace",
@@ -38741,7 +38772,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Santa%20Fe-S%20Fork%20Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
-    "series": "Santa Fe-S Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev"
+    "series": "Santa Fe-S Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
+    "zero_since": "1986-10-01"
   },
   {
     "source": "usace",
@@ -38771,7 +38803,8 @@
     "live": true,
     "min_interval_s": null,
     "source_url": "https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Shelbina-N%20Fork%20Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
-    "series": "Shelbina-N Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev"
+    "series": "Shelbina-N Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev",
+    "zero_since": "1970-01-01"
   },
   {
     "source": "usace",

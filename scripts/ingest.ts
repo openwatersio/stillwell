@@ -149,11 +149,13 @@ async function refreshStations(ids: string[]): Promise<void> {
       continue;
     }
     const { stations, changed } = merged;
-    // A station the source itself lists as inactive, such as a USACE gauge
-    // whose series CWMS withdrew, waits on a person, as a datum change does,
-    // and fails every refresh until it's resolved.
+    // A station the source itself newly lists as inactive, such as a USACE
+    // gauge whose series CWMS withdrew, fails the refresh that marks it, so a
+    // person sees it in the commit. Left inactive, it's retired; a person who
+    // moves it to another series brings it back.
+    const wasActive = new Set(previous.filter((s) => s.status === "active").map((s) => s.id));
     for (const s of fetched)
-      if (s.status === "inactive") {
+      if (s.status === "inactive" && wasActive.has(s.id)) {
         console.error(`  ${s.id}: listed inactive by the source; see its log above`);
         process.exitCode = 1;
       }

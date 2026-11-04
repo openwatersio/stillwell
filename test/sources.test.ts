@@ -8,6 +8,7 @@ import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
+import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -937,8 +938,15 @@ describe("usace", () => {
       ],
       [/catalog\/LOCATIONS/, fixture("usace-locations.json")],
     ]);
-    const listed = (await usace.stations()) as usace.UsaceStation[];
+    const previous = [{ id: "usace/LRC.Reserve", zero_since: "2001-01-01" } as unknown as Station];
+    const listed = (await usace.stations(previous)) as usace.UsaceStation[];
     assert.equal(listed.length, 9 * 4);
+    // Donaldsonville's zero moved in 1988, per ZERO_SINCE; a date only the
+    // committed list has is kept too.
+    const since = (id: string) => listed.find((s) => s.id === id)!.zero_since;
+    assert.equal(since("usace/MVN.Donaldsonville"), "1988-06-15");
+    assert.equal(since("usace/LRC.Reserve"), "2001-01-01");
+    assert.equal(since("usace/MVN.Reserve"), undefined);
     assert.deepEqual(
       listed.filter((s) => s.id.startsWith("usace/LRC.")).map((s) => s.series),
       [
@@ -1001,6 +1009,62 @@ describe("usace", () => {
       stations.map((s) => s.id),
       ["usace/MVS.Grafton"],
     );
+  });
+
+  it("never fetches levels from before a station's gauge zero moved", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      return JSON.stringify({ units: "m", values: [[Date.parse("2015-07-01T00:00:00Z"), 1.2, 3]] });
+    });
+    // As read from stations.parquet: no series, no zero_since.
+    const venice = {
+      id: "usace/MVN.Venice",
+      source_id: "MVN.Venice",
+      datum: "GZ",
+      source_url: `https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=${encodeURIComponent("Venice.Stage.Inst.1Hour.0.rev")}`,
+    } as Station;
+    const observe = (start: string, end: string) =>
+      usace.source.observations!(venice, new Date(start), new Date(end));
+    assert.deepEqual(await observe("2014-01-01Z", "2015-06-01Z"), []);
+    assert.equal(requests.length, 0);
+    assert.equal((await observe("2015-01-01Z", "2016-01-01Z")).length, 1);
+    assert.equal(new URL(requests[0]!).searchParams.get("begin"), "2015-06-29T06:00:00.000Z");
+    // A later date on the station wins over the table's.
+    assert.equal(
+      usace.zeroSince({ source_id: "MVN.Venice", zero_since: "2016-01-01" }),
+      Date.parse("2016-01-01T06:00:00Z"),
+    );
+    assert.equal(usace.zeroSince({ source_id: "MVN.Reserve" }), -Infinity);
+    assert.throws(
+      () => usace.zeroSince({ source_id: "MVN.Reserve", zero_since: "June 2015" }),
+      /unreadable/,
+    );
+  });
+
+  it("keeps every hand-entered zero date in the committed station list", () => {
+    const committed = new Map(
+      (
+        JSON.parse(
+          readFileSync(new URL("../stations/usace.json", import.meta.url), "utf8"),
+        ) as usace.UsaceStation[]
+      ).map((s) => [s.source_id, s]),
+    );
+    for (const [id, { since }] of Object.entries(ZERO_SINCE)) {
+      assert.match(since, /^\d{4}-\d{2}-\d{2}$/, id);
+      assert.ok(Number.isFinite(Date.parse(since)), id);
+      const station = committed.get(id);
+      assert.ok(station, `${id} isn't in stations/usace.json`);
+      assert.ok(
+        station.zero_since && station.zero_since >= since,
+        `${id} zero_since ${station.zero_since}`,
+      );
+    }
+    // And the other way: a date only the committed list has would bound
+    // backfills but not a station read from stations.parquet.
+    for (const [id, station] of committed)
+      if (station.zero_since)
+        assert.ok(ZERO_SINCE[id], `${id} has zero_since but no ZERO_SINCE entry`);
   });
 
   it("maps CWMS quality codes to flags", () => {

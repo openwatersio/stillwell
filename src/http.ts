@@ -39,6 +39,13 @@ export async function fetchText(
   });
 }
 
+/** The socket or DNS error behind a failed fetch, such as `: ECONNRESET`. */
+function causeOf(error: TypeError): string {
+  const cause = error.cause as { code?: string; message?: string } | undefined;
+  const reason = cause?.code ?? cause?.message;
+  return reason ? `: ${reason}` : "";
+}
+
 async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Promise<string> {
   for (let attempt = 1; ; attempt++) {
     let status: number | string;
@@ -49,10 +56,11 @@ async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Pro
       status = response.status;
     } catch (error) {
       if (error instanceof Error && error.name === "TimeoutError") status = "timeout";
-      // A dropped connection is a TypeError carrying the socket error as its
-      // cause ("fetch failed", or "terminated" mid-body); a bad URL has none.
-      else if (error instanceof TypeError && error.cause !== undefined)
-        status = `a network error (${error.message})`;
+      // Node's fetch reports a failed or dropped connection as a TypeError,
+      // "fetch failed", or "terminated" when it drops mid-body. Others, such as
+      // "Failed to parse URL", won't go better on a retry.
+      else if (error instanceof TypeError && /^(fetch failed|terminated)$/.test(error.message))
+        status = `a network error (${error.message}${causeOf(error)})`;
       else throw error;
     }
     // RWS throttles with 429 and 503; back off and try again.

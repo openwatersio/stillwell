@@ -8,6 +8,7 @@ import {
   type SourceMetadata,
   type Station,
 } from "../../schema.ts";
+import { ZERO_SINCE } from "./zeros.ts";
 
 /**
  * US Army Corps of Engineers river stage, from the Corps Water Management
@@ -71,10 +72,12 @@ export interface CatalogLocation {
 }
 
 /**
- * A USACE station as listed, with the CWMS series its levels come from. The
- * series is kept in the committed list only; `stations.parquet` doesn't carry it.
+ * A USACE station as listed, with the CWMS series its levels come from and,
+ * where the gauge zero moved partway through it, the first day on the zero in
+ * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the committed
+ * list only; `stations.parquet` doesn't carry them.
  */
-export type UsaceStation = ListedStation & { series: string };
+export type UsaceStation = ListedStation & { series: string; zero_since?: string };
 
 /**
  * Every location in the offices with an observed stage series, one series
@@ -83,14 +86,22 @@ export type UsaceStation = ListedStation & { series: string };
  */
 export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const committed = new Map<string, string>();
+  const committedSince = new Map<string, string>();
   for (const s of previous) {
-    const { series } = s as Partial<UsaceStation>;
+    const { series, zero_since } = s as Partial<UsaceStation>;
     if (series) committed.set(s.id, series);
+    if (zero_since) committedSince.set(s.id, zero_since);
   }
   const out: UsaceStation[] = [];
   for (const office of OFFICES) {
     const { series, locations } = await catalogsOf(office);
     out.push(...toStations(office, series, locations, committed));
+  }
+  for (const s of out) {
+    // The later of the code's date and the committed one, so neither can be
+    // dropped on its own and let a backfill reach back past the reset.
+    const since = latest(ZERO_SINCE[s.source_id]?.since, committedSince.get(s.id));
+    if (since) s.zero_since = since;
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -423,6 +434,28 @@ function* years(start: Date, end: Date): Generator<[Date, Date]> {
   }
 }
 
+/** The later of two `YYYY-MM-DD` dates, either of which may be missing. */
+function latest(a: string | undefined, b: string | undefined): string | undefined {
+  return a && b ? (a > b ? a : b) : (a ?? b);
+}
+
+/**
+ * Where a station's levels may start: 06:00 UTC on the first day on its
+ * current gauge zero, which is local midnight or later at all nine offices
+ * (Central and Eastern, standard or daylight time), or -Infinity for a station whose zero never moved. Takes the later of
+ * `ZERO_SINCE` and the station's own `zero_since`. A station read from
+ * `stations.parquet`, which doesn't carry `zero_since`, is bounded by
+ * `ZERO_SINCE` alone; a test checks the committed date is never earlier.
+ */
+export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: string }): number {
+  const since = latest(ZERO_SINCE[station.source_id]?.since, station.zero_since);
+  if (!since) return -Infinity;
+  const time = Date.parse(`${since}T06:00:00Z`);
+  if (Number.isNaN(time))
+    throw new Error(`usace/${station.source_id} has an unreadable zero_since ${since}`);
+  return time;
+}
+
 /**
  * The office and series a station's levels come from. Every request is stage
  * above gauge zero, so a station committed in another datum is refused. A
@@ -443,5 +476,10 @@ function seriesOf(station: Station): [string, string] {
 export const source: Source = {
   metadata,
   stations,
-  observations: async (s: Station, start, end) => levels(...seriesOf(s), start, end),
+  observations: async (s: Station, start, end) => {
+    const [office, series] = seriesOf(s);
+    // Nothing from before the gauge zero moved, so the station's files keep one zero.
+    const from = Math.max(start.getTime(), zeroSince(s));
+    return from < end.getTime() ? levels(office, series, new Date(from), end) : [];
+  },
 };

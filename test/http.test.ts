@@ -27,9 +27,12 @@ describe("fetchText", () => {
     let calls = 0;
     globalThis.fetch = (async () => {
       calls++;
-      throw new TypeError("Invalid URL");
+      // As Node's fetch rejects an unparseable URL.
+      throw new TypeError("Failed to parse URL from not a url", {
+        cause: new TypeError("Invalid URL"),
+      });
     }) as typeof fetch;
-    await assert.rejects(fetchText("https://example.test/"), /Invalid URL/);
+    await assert.rejects(fetchText("https://example.test/"), /Failed to parse URL/);
     assert.equal(calls, 1);
   });
 
