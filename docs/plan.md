@@ -133,7 +133,7 @@ The planning evaluation describes a smaller system than this plan, so bring it i
 - [x] QC v1 (`src/qc.ts`): drop repeated times; `bad` beyond 20 m of the series' median; `suspect` for flatlines of 6 hours or more, spikes from the two-sided neighbor median beyond max(0.25 m, 8·MAD of those residuals), and outliers beyond max(10·MAD, 1 m). On RWS 2024 at six tide gauges it adds 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year.
 - [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 
-Done when `node scripts/ingest.ts rws backfill hoekvanholland 2024-01-01 2025-01-01` writes the same files locally and to R2, and DuckDB reads them over `https://water-levels.openwaters.io/`.
+Done when `node scripts/ingest.ts backfill rws hoekvanholland 2024 2025` writes the same files locally and to R2, and DuckDB reads them over `https://water-levels.openwaters.io/`.
 
 ### Phase 2: TICON inventory (2 days)
 

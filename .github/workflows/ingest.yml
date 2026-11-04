@@ -1,0 +1,38 @@
+name: Ingest
+
+# Run any ingest command against the R2 lake by hand, e.g.
+# `backfill rws hoekvanholland 2024 2025`. Scheduled jobs come later.
+on:
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "ingest.ts arguments"
+        required: true
+        default: "stations"
+
+concurrency: lake
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    # The environment holds the R2 credentials and only runs on main.
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # The arguments come through the environment, never into the script text.
+      - run: |
+          set -f
+          node scripts/ingest.ts $ARGS
+        env:
+          ARGS: ${{ inputs.args }}
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
