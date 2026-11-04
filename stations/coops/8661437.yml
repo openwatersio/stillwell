@@ -1,0 +1,26 @@
+name: GARDEN CITY PIER, MURRELLS INLET
+lat: 33.575
+lon: -78.9967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.398
+  MHW: -2.277
+  DTL: -1.544
+  MTL: -1.513
+  MSL: -1.518
+  MLW: -0.749
+  MLLW: -0.691
+  LAT: -0.287
+  HAT: -2.904
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661437
+established: 1974-09-19T00:00:00Z
+removed: 1977-03-16T23:59:00Z

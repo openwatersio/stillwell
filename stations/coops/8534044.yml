@@ -1,0 +1,24 @@
+name: LONG POINT, LITTLE EGG HARBOR
+lat: 39.6133
+lon: -74.2633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.888
+  MHW: -1.812
+  DTL: -1.536
+  MTL: -1.511
+  MSL: -1.504
+  MLW: -1.21
+  MLLW: -1.184
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534044
+established: 1976-09-27T00:00:00Z
+removed: 1977-11-15T23:59:00Z

@@ -1,0 +1,26 @@
+name: Eugene Island, North of, Atchafalaya Bay
+lat: 29.3675
+lon: -91.3839
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.312
+  MHW: -4.27
+  DTL: -4.028
+  MTL: -4.068
+  MSL: -4.057
+  MLW: -3.866
+  MLLW: -3.745
+  LAT: -3.337
+  HAT: -4.525
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8764314
+established: 2014-11-15T00:00:00Z

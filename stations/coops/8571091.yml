@@ -1,0 +1,27 @@
+name: CRISFIELD
+lat: 37.9767
+lon: -75.8633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.179
+  MHW: -2.128
+  DTL: -1.851
+  MTL: -1.844
+  MSL: -1.828
+  MLW: -1.56
+  MLLW: -1.523
+  NAVD88: -1.876
+  LAT: -1.426
+  HAT: -2.317
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571091
+established: 1977-04-23T00:00:00Z
+removed: 1981-10-20T23:59:00Z

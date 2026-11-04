@@ -1,0 +1,27 @@
+name: Gloucester Point
+lat: 37.2467
+lon: -76.5
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.319
+  MHW: -1.26
+  DTL: -0.91
+  MTL: -0.897
+  MSL: -0.894
+  MLW: -0.535
+  MLLW: -0.5
+  NAVD88: -0.987
+  LAT: -0.26
+  HAT: -1.588
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8637624
+established: 1950-05-16T00:00:00Z
+removed: 2003-09-18T23:59:00Z

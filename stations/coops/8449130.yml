@@ -1,0 +1,26 @@
+name: Nantucket Island
+lat: 41.285
+lon: -70.0967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.004
+  MHW: -1.9
+  DTL: -1.459
+  MTL: -1.438
+  MSL: -1.454
+  MLW: -0.976
+  MLLW: -0.915
+  LAT: -0.645
+  HAT: -2.278
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8449130
+established: 1963-10-04T00:00:00Z

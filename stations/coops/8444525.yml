@@ -1,0 +1,26 @@
+name: Nut Island
+lat: 42.28
+lon: -70.9533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.665
+  MHW: -7.528
+  DTL: -6.108
+  MTL: -6.092
+  MSL: -6.126
+  MLW: -4.656
+  MLLW: -4.552
+  LAT: -3.906
+  HAT: -8.31
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8444525
+established: 2000-08-24T00:00:00Z
+removed: 2001-11-05T23:59:00Z

@@ -1,0 +1,15 @@
+name: Richardson Hammock, St. Joseph Bay
+lat: 29.69
+lon: -85.3633
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728949
+established: 1976-05-19T00:00:00Z

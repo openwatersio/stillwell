@@ -1,0 +1,25 @@
+name: FORT STEVENS
+lat: 46.2067
+lon: -123.95
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.141
+  MHW: -4.927
+  DTL: -3.829
+  MTL: -3.918
+  MSL: -3.902
+  MLW: -2.908
+  MLLW: -2.517
+  NAVD88: -2.571
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9439008
+established: 1926-07-12T00:00:00Z
+removed: 1981-12-10T23:59:00Z

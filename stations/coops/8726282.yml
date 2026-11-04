@@ -1,0 +1,25 @@
+name: ANNA MARIA, CITY PIER
+lat: 27.5333
+lon: -82.73
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.065
+  MHW: -0.987
+  DTL: -0.735
+  MTL: -0.752
+  MSL: -0.76
+  MLW: -0.517
+  MLLW: -0.405
+  NAVD88: -0.898
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726282
+established: 1976-03-24T00:00:00Z
+removed: 1976-10-04T23:59:00Z

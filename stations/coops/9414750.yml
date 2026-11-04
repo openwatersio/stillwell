@@ -1,0 +1,27 @@
+name: Alameda
+lat: 37.771954
+lon: -122.30026
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.027
+  MHW: -2.838
+  DTL: -2.022
+  MTL: -2.099
+  MSL: -2.067
+  MLW: -1.361
+  MLLW: -1.016
+  NAVD88: -1.086
+  LAT: -0.437
+  HAT: -3.441
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414750
+established: 1939-03-08T00:00:00Z

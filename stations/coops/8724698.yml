@@ -1,0 +1,26 @@
+name: Loggerhead Key
+lat: 24.6317
+lon: -82.92
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.356
+  MHW: -1.27
+  DTL: -1.101
+  MTL: -1.1
+  MSL: -1.099
+  MLW: -0.93
+  MLLW: -0.847
+  LAT: -0.595
+  HAT: -1.604
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724698
+established: 1960-05-01T00:00:00Z
+removed: 2005-02-14T23:59:00Z

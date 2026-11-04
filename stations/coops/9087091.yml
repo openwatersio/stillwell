@@ -1,0 +1,19 @@
+name: Anderson Point
+lat: 45.61861
+lon: -86.65945
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087091
+established: 2018-05-01T00:00:00Z
+removed: 2018-10-09T20:00:00Z

@@ -1,0 +1,25 @@
+name: OCEAN REEF HARBOR, KEY LARGO
+lat: 25.3083
+lon: -80.2767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.486
+  MHW: -1.477
+  DTL: -1.1
+  MTL: -1.127
+  MSL: -1.136
+  MLW: -0.778
+  MLLW: -0.714
+  NAVD88: -1.402
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723519
+established: 1970-11-19T00:00:00Z
+removed: 1975-08-25T23:59:00Z

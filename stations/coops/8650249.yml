@@ -1,0 +1,18 @@
+name: South Shore Knotts Island
+lat: 36.48336
+lon: -75.92694
+country_code: US
+datum: STND
+datums:
+  MSL: -7.052
+  NAVD88: -7.092
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8650249
+established: 2021-10-24T00:00:00Z
+removed: 2022-05-23T14:24:00Z

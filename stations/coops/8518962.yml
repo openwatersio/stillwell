@@ -1,0 +1,26 @@
+name: Turkey Point Hudson River NERRS
+lat: 42.0139
+lon: -73.9392
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.95
+  MHW: -8.84
+  DTL: -8.289
+  MTL: -8.266
+  MSL: -8.298
+  MLW: -7.693
+  MLLW: -7.629
+  LAT: -7.392
+  HAT: -9.263
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518962
+established: 2017-06-20T00:00:00Z

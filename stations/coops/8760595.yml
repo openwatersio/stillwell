@@ -1,0 +1,24 @@
+name: BRETON ISLAND
+lat: 29.4933
+lon: -89.1733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.372
+  MHW: -1.372
+  DTL: -1.164
+  MTL: -1.165
+  MSL: -1.173
+  MLW: -0.956
+  MLLW: -0.955
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8760595
+established: 1980-03-17T00:00:00Z
+removed: 1982-01-18T23:59:00Z

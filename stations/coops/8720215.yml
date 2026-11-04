@@ -1,0 +1,24 @@
+name: Navy Fuel Depot
+lat: 30.4
+lon: -81.6267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.419
+  MHW: -2.379
+  DTL: -1.992
+  MTL: -1.984
+  MSL: -1.985
+  MLW: -1.588
+  MLLW: -1.565
+  NAVD88: -2.083
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720215
+established: 1977-08-26T00:00:00Z

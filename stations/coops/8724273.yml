@@ -1,0 +1,24 @@
+name: WATER KEYS SOUTH END
+lat: 24.7467
+lon: -81.45
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.645
+  MHW: -1.565
+  DTL: -1.255
+  MTL: -1.251
+  MSL: -1.226
+  MLW: -0.936
+  MLLW: -0.864
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724273
+established: 1973-10-23T00:00:00Z
+removed: 1974-03-12T23:59:00Z

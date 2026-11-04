@@ -1,0 +1,26 @@
+name: OYSTER POINT MARINA, SAN FRANCISCO BAY
+lat: 37.665
+lon: -122.377
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.749
+  MHW: -2.555
+  DTL: -1.655
+  MTL: -1.732
+  MSL: -1.711
+  MLW: -0.909
+  MLLW: -0.561
+  LAT: 0.109
+  HAT: -3.187
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414392
+established: 1974-10-01T00:00:00Z
+removed: 1983-05-09T23:59:00Z

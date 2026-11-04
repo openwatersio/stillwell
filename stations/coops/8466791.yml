@@ -1,0 +1,24 @@
+name: SNIFFENS POINT, HOUSATONIC RIVER
+lat: 41.1867
+lon: -73.1133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.335
+  MHW: -4.235
+  DTL: -3.268
+  MTL: -3.254
+  MSL: -3.244
+  MLW: -2.274
+  MLLW: -2.201
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8466791
+established: 1993-05-12T00:00:00Z
+removed: 1993-10-05T23:59:00Z

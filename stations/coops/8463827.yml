@@ -1,0 +1,24 @@
+name: MAROMAS, CONNECTICUT RIVER
+lat: 41.5417
+lon: -72.5517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.191
+  MHW: -3.117
+  DTL: -2.771
+  MTL: -2.75
+  MSL: -2.755
+  MLW: -2.382
+  MLLW: -2.351
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8463827
+established: 1987-05-20T00:00:00Z
+removed: 1987-10-07T23:59:00Z

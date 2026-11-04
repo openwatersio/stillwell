@@ -1,0 +1,24 @@
+name: UNAVIKSHAK ISLAND
+lat: 56.4917
+lon: -157.74
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.76
+  MHW: -2.503
+  DTL: -1.377
+  MTL: -1.458
+  MSL: -1.428
+  MLW: -0.412
+  MLLW: 0.007
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9458762
+established: 1997-07-09T00:00:00Z
+removed: 1997-08-27T23:00:00Z

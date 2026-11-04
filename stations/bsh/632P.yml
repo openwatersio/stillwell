@@ -1,0 +1,15 @@
+name: Wyk, Föhr
+lat: 54.69333
+lon: 8.57639
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -2.88
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/wyk

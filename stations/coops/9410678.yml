@@ -1,0 +1,26 @@
+name: Long Beach Fire Boat Pier
+lat: 33.7478
+lon: -118.2158
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.972
+  MHW: -7.749
+  DTL: -7.134
+  MTL: -7.164
+  MSL: -7.159
+  MLW: -6.58
+  MLLW: -6.296
+  NAVD88: -6.411
+  LAT: -5.714
+  HAT: -8.53
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410678

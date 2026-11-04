@@ -1,0 +1,16 @@
+name: SCOTT CREEK, EDISTO ISLAND
+lat: 32.5017
+lon: -80.3183
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667623
+established: 1975-11-05T00:00:00Z
+removed: 1976-12-08T23:59:00Z

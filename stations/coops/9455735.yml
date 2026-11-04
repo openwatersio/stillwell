@@ -1,0 +1,26 @@
+name: CHINULNA POINT, COOK INLET
+lat: 60.5033
+lon: -151.283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.55
+  MHW: -4.322
+  DTL: -1.372
+  MTL: -1.581
+  MSL: -1.671
+  MLW: 1.159
+  MLLW: 1.804
+  LAT: 3.609
+  HAT: -6.3
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455735
+established: 1974-08-22T00:00:00Z
+removed: 1995-07-21T23:00:00Z

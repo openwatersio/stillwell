@@ -1,0 +1,17 @@
+name: TAVERNIER (INSIDE), FLORIDA BAY
+lat: 25.015
+lon: -80.515
+country_code: US
+datum: STND
+datums:
+  MSL: -0.958
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723741
+established: 1970-11-19T00:00:00Z
+removed: 1975-08-28T23:59:00Z

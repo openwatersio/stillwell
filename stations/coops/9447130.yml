@@ -1,0 +1,27 @@
+name: Seattle
+lat: 47.60264
+lon: -122.3393
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.882
+  MHW: -5.618
+  DTL: -4.151
+  MTL: -4.451
+  MSL: -4.443
+  MLW: -3.284
+  MLLW: -2.419
+  NAVD88: -3.134
+  LAT: -1.109
+  HAT: -6.454
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9447130
+established: 1899-01-01T00:00:00Z

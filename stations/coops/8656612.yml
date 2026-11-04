@@ -1,0 +1,25 @@
+name: CALICO JACKS MARINA, HARKER'S ISLAND
+lat: 34.6867
+lon: -76.5333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.899
+  MHW: -1.838
+  DTL: -1.592
+  MTL: -1.576
+  MSL: -1.581
+  MLW: -1.315
+  MLLW: -1.286
+  NAVD88: -1.674
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8656612
+established: 1973-08-26T00:00:00Z
+removed: 1978-10-02T23:59:00Z

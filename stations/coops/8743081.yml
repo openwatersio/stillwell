@@ -1,0 +1,26 @@
+name: HOLLINGSWORTH POINT, DAVIS BAYOU
+lat: 30.3867
+lon: -88.7733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.221
+  MHW: -1.189
+  DTL: -0.946
+  MTL: -0.947
+  MSL: -0.948
+  MLW: -0.705
+  MLLW: -0.671
+  LAT: -0.275
+  HAT: -1.5
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8743081
+established: 1979-06-29T00:00:00Z
+removed: 1980-12-17T23:59:00Z

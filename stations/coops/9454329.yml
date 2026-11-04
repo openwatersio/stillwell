@@ -1,0 +1,26 @@
+name: Cape Hichinbrook
+lat: 60.2383
+lon: -146.648
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.385
+  MHW: -3.108
+  DTL: -1.672
+  MTL: -1.759
+  MSL: -1.771
+  MLW: -0.409
+  MLLW: 0.042
+  LAT: 1.354
+  HAT: -4.724
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454329
+established: 1979-06-14T00:00:00Z
+removed: 2003-06-12T23:59:00Z

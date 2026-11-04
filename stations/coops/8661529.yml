@@ -1,0 +1,25 @@
+name: CAPT. ALEX'S MARINA, MURRELLS
+lat: 33.5517
+lon: -79.0367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.031
+  MHW: -4.904
+  DTL: -4.293
+  MTL: -4.249
+  MSL: -4.258
+  MLW: -3.594
+  MLLW: -3.555
+  NAVD88: -4.377
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661529
+established: 1974-09-22T00:00:00Z
+removed: 1975-01-10T23:59:00Z

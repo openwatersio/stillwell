@@ -1,0 +1,24 @@
+name: SHELL ISLAND, ST. ANDREWS BAY
+lat: 30.095
+lon: -85.685
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.373
+  MHW: -1.362
+  DTL: -1.173
+  MTL: -1.176
+  MSL: -1.166
+  MLW: -0.99
+  MLLW: -0.973
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729119
+established: 1976-10-27T00:00:00Z
+removed: 1977-03-16T23:59:00Z

@@ -1,0 +1,27 @@
+name: Coast Guard Sector Mobile
+lat: 30.6495
+lon: -88.05811
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.243
+  MHW: -9.219
+  DTL: -8.984
+  MTL: -8.986
+  MSL: -8.983
+  MLW: -8.753
+  MLLW: -8.726
+  NAVD88: -8.888
+  LAT: -8.358
+  HAT: -9.482
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8736897
+established: 2007-08-03T00:00:00Z

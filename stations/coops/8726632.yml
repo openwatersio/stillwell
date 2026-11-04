@@ -1,0 +1,25 @@
+name: ARCHIE CREEK
+lat: 27.8817
+lon: -82.3967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.012
+  MHW: -0.951
+  DTL: -0.692
+  MTL: -0.692
+  MSL: -0.678
+  MLW: -0.432
+  MLLW: -0.372
+  NAVD88: -0.712
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726632
+established: 1976-12-09T00:00:00Z
+removed: 1977-05-02T23:59:00Z

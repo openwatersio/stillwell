@@ -1,0 +1,24 @@
+name: INVERNESS, TOMALES BAY
+lat: 38.1133
+lon: -122.868
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.811
+  MHW: -3.586
+  DTL: -2.949
+  MTL: -2.994
+  MSL: -2.98
+  MLW: -2.402
+  MLLW: -2.086
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415228
+established: 1979-04-25T00:00:00Z
+removed: 1994-02-17T23:59:00Z

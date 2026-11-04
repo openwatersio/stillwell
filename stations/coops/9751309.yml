@@ -1,0 +1,26 @@
+name: Leinster Point, Leinster Bay, St. John's
+lat: 18.36761
+lon: -64.720726
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.914
+  MHW: -8.846
+  DTL: -8.743
+  MTL: -8.728
+  MSL: -8.731
+  MLW: -8.609
+  MLLW: -8.572
+  LAT: -8.442
+  HAT: -9.09
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751309
+established: 2010-11-03T00:00:00Z
+removed: 2011-04-09T23:59:00Z

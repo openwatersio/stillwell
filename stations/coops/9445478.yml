@@ -1,0 +1,27 @@
+name: UNION, HOOD CANAL
+lat: 47.3583
+lon: -123.098
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.107
+  MHW: -3.806
+  DTL: -2.3
+  MTL: -2.609
+  MSL: -2.616
+  MLW: -1.411
+  MLLW: -0.494
+  NAVD88: -1.359
+  LAT: 0.901
+  HAT: -4.834
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445478
+established: 1973-02-28T00:00:00Z
+removed: 1978-03-30T23:59:00Z

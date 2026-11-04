@@ -1,0 +1,25 @@
+name: HAYDEN ROBERTS BAY
+lat: 27.2917
+lon: -82.5417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.542
+  MHW: -1.461
+  DTL: -1.232
+  MTL: -1.237
+  MSL: -1.24
+  MLW: -1.012
+  MLLW: -0.921
+  NAVD88: -1.366
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726045
+established: 1977-04-26T00:00:00Z
+removed: 1977-11-07T23:59:00Z

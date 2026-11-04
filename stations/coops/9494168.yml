@@ -1,0 +1,17 @@
+name: Wainwright Inlet
+lat: 70.5983
+lon: -160.108
+country_code: US
+datum: STND
+datums:
+  MSL: -0.082
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9494168
+established: 1948-08-27T00:00:00Z
+removed: 2008-10-04T23:59:00Z

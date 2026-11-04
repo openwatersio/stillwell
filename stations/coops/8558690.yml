@@ -1,0 +1,26 @@
+name: INDIAN RIVER INLET
+lat: 38.61
+lon: -75.07
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.797
+  MHW: -1.715
+  DTL: -1.349
+  MTL: -1.332
+  MSL: -1.354
+  MLW: -0.949
+  MLLW: -0.902
+  LAT: -0.63
+  HAT: -2.047
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8558690
+established: 1972-02-15T00:00:00Z
+removed: 1986-09-25T23:59:00Z

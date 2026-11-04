@@ -1,0 +1,16 @@
+name: Wangerooge, Ost
+lat: 53.76722
+lon: 7.985
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -2.88
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9420020]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/wangerooge_ost

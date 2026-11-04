@@ -1,0 +1,26 @@
+name: STEELMANVILLE, PATCONG RIVER
+lat: 39.335
+lon: -74.5967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.861
+  MHW: -1.753
+  DTL: -1.219
+  MTL: -1.189
+  MSL: -1.213
+  MLW: -0.626
+  MLLW: -0.577
+  LAT: -0.414
+  HAT: -2.19
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534778
+established: 1979-07-31T00:00:00Z
+removed: 1979-11-08T23:59:00Z

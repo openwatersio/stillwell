@@ -1,0 +1,26 @@
+name: Mekoryuk, Mekoryuk River Entrance
+lat: 60.4167
+lon: -166.167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -18.674
+  MHW: -18.5
+  DTL: -17.513
+  MTL: -17.524
+  MSL: -17.528
+  MLW: -16.547
+  MLLW: -16.351
+  LAT: -15.723
+  HAT: -19.206
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466217
+established: 1951-06-24T00:00:00Z
+removed: 2010-10-08T23:59:00Z

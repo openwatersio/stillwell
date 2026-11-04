@@ -1,0 +1,16 @@
+name: BACON ISLAND,MIDDLE RIVER
+lat: 38.0033
+lon: -121.523
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415027
+established: 1979-08-28T00:00:00Z
+removed: 1992-03-27T23:59:00Z

@@ -1,0 +1,14 @@
+name: Rilland, Bathse Spuikanaal, inloop
+lat: 51.46291
+lon: 4.22577
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/rilland.bathsespuikanaal.inloop/details

@@ -1,0 +1,26 @@
+name: AGUCHIK ISLAND, KUKAK BAY
+lat: 58.29
+lon: -154.27
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.771
+  MHW: -3.522
+  DTL: -1.674
+  MTL: -1.793
+  MSL: -1.779
+  MLW: -0.064
+  MLLW: 0.422
+  LAT: 1.749
+  HAT: -4.977
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9456901
+established: 2000-05-23T00:00:00Z
+removed: 2000-06-26T23:59:00Z

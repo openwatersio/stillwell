@@ -1,0 +1,27 @@
+name: San Martin Lake Channel
+lat: 26.0018
+lon: -97.2986
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.443
+  MHW: -9.42
+  DTL: -9.235
+  MTL: -9.252
+  MSL: -9.271
+  MLW: -9.083
+  MLLW: -9.028
+  NAVD88: -9.303
+  LAT: -8.725
+  HAT: -9.709
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8779911
+established: 2019-09-20T00:00:00Z
+removed: 2020-06-16T17:12:00Z

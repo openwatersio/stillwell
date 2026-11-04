@@ -1,0 +1,26 @@
+name: San Juan, La Puntilla, San Juan Bay
+lat: 18.458944
+lon: -66.11642
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.512
+  MHW: -1.432
+  DTL: -1.272
+  MTL: -1.264
+  MSL: -1.266
+  MLW: -1.095
+  MLLW: -1.032
+  LAT: -0.861
+  HAT: -1.71
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9755371
+established: 1962-03-04T00:00:00Z

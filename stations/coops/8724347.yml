@@ -1,0 +1,24 @@
+name: SUGARLOAF KEY EAST SIDE
+lat: 24.6717
+lon: -81.5333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.336
+  MHW: -1.253
+  DTL: -1.059
+  MTL: -1.043
+  MSL: -1.039
+  MLW: -0.833
+  MLLW: -0.782
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724347
+established: 1974-04-25T00:00:00Z
+removed: 1974-06-14T23:59:00Z

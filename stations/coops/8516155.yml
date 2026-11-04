@@ -1,0 +1,26 @@
+name: GREEN ISLAND
+lat: 40.6233
+lon: -73.5017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -19.087
+  MHW: -19.012
+  DTL: -18.551
+  MTL: -18.539
+  MSL: -18.551
+  MLW: -18.065
+  MLLW: -18.014
+  LAT: -17.798
+  HAT: -19.331
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516155
+established: 2013-12-14T00:00:00Z
+removed: 2014-03-03T00:00:00Z

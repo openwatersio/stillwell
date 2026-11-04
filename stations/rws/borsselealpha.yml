@@ -1,0 +1,14 @@
+name: Borssele Windpark Alpha platform
+lat: 51.699921
+lon: 3.056707
+country_code: NL
+datum: MSL
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/borsselealpha/details

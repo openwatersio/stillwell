@@ -1,0 +1,27 @@
+name: BAYPORT
+lat: 28.5333
+lon: -82.65
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.461
+  MHW: -1.344
+  DTL: -0.98
+  MTL: -0.99
+  MSL: -0.978
+  MLW: -0.635
+  MLLW: -0.498
+  NAVD88: -1.059
+  LAT: -0.141
+  HAT: -1.746
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727151
+established: 1978-05-18T00:00:00Z
+removed: 1979-04-02T23:59:00Z

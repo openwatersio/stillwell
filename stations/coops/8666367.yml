@@ -1,0 +1,25 @@
+name: WILLTOWN BLUFF
+lat: 32.6817
+lon: -80.4167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.058
+  MHW: -1.971
+  DTL: -1.117
+  MTL: -1.107
+  MSL: -1.23
+  MLW: -0.243
+  MLLW: -0.176
+  NAVD88: -1.075
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666367
+established: 1977-03-31T00:00:00Z
+removed: 1979-03-09T23:59:00Z

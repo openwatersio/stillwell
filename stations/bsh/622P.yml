@@ -1,0 +1,15 @@
+name: Amrum Odde, Amrum
+lat: 54.70667
+lon: 8.33972
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -3.43
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/amrum_odde

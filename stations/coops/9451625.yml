@@ -1,0 +1,26 @@
+name: Baranof,  Warm Spring Bay
+lat: 57.088333
+lon: -134.825
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.701
+  MHW: -5.428
+  DTL: -3.601
+  MTL: -3.7
+  MSL: -3.713
+  MLW: -1.971
+  MLLW: -1.501
+  LAT: -0.24
+  HAT: -6.736
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451625
+established: 1926-06-24T00:00:00Z
+removed: 2007-09-17T23:59:00Z

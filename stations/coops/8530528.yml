@@ -1,0 +1,24 @@
+name: CARLSTADT, HACKENSACK RIVER
+lat: 40.8067
+lon: -74.06
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.618
+  MHW: -2.52
+  DTL: -1.659
+  MTL: -1.651
+  MSL: -1.717
+  MLW: -0.781
+  MLLW: -0.7
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530528
+established: 1976-06-23T00:00:00Z
+removed: 1994-11-12T23:59:00Z

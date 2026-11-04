@@ -1,0 +1,27 @@
+name: SEWALL POINT. ST. LUCIE RIVER
+lat: 27.175
+lon: -80.1883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 0.08
+  MHW: 0.127
+  DTL: 0.334
+  MTL: 0.334
+  MSL: 0.332
+  MLW: 0.541
+  MLLW: 0.588
+  NAVD88: -0.01
+  LAT: 0.681
+  HAT: -0.017
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722371
+established: 1969-05-13T00:00:00Z
+removed: 2022-09-01T00:00:00Z

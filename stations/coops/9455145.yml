@@ -1,0 +1,26 @@
+name: AIALIK BAY, NORTH END
+lat: 59.9533
+lon: -149.715
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -15.852
+  MHW: -15.577
+  DTL: -14.233
+  MTL: -14.301
+  MSL: -14.3
+  MLW: -13.025
+  MLLW: -12.615
+  LAT: -11.543
+  HAT: -16.841
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455145
+established: 2000-06-29T00:00:00Z
+removed: 2000-08-26T23:59:00Z

@@ -1,0 +1,25 @@
+name: COMBINATION BRIDGE
+lat: 33.7133
+lon: -78.9217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.857
+  MHW: -1.81
+  DTL: -1.547
+  MTL: -1.55
+  MSL: -1.549
+  MLW: -1.289
+  MLLW: -1.237
+  NAVD88: -1.314
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660854
+established: 1976-09-27T00:00:00Z
+removed: 1978-04-06T23:59:00Z

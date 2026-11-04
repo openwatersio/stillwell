@@ -1,0 +1,26 @@
+name: Pascagoula Point
+lat: 30.34
+lon: -88.5333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.286
+  MHW: -1.261
+  DTL: -1.053
+  MTL: -1.053
+  MSL: -1.052
+  MLW: -0.845
+  MLLW: -0.819
+  LAT: -0.596
+  HAT: -1.511
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8741196
+established: 1980-03-24T00:00:00Z
+removed: 2005-08-11T23:59:00Z

@@ -1,0 +1,27 @@
+name: Army Depot
+lat: 32.91
+lon: -79.9517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.5
+  MHW: -2.398
+  DTL: -1.596
+  MTL: -1.574
+  MSL: -1.648
+  MLW: -0.75
+  MLLW: -0.691
+  NAVD88: -1.662
+  LAT: -0.351
+  HAT: -2.988
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664662
+established: 1976-09-21T00:00:00Z
+removed: 1999-10-15T23:59:00Z

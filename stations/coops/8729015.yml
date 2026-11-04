@@ -1,0 +1,25 @@
+name: ALLANTON, EAST BAY
+lat: 30.03
+lon: -85.465
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.234
+  MHW: -1.199
+  DTL: -1.001
+  MTL: -1
+  MSL: -0.999
+  MLW: -0.801
+  MLLW: -0.768
+  NAVD88: -0.96
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729015
+established: 1976-01-13T00:00:00Z
+removed: 1991-10-29T23:59:00Z

@@ -1,0 +1,27 @@
+name: Freeport
+lat: 28.943306
+lon: -95.3025
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.923
+  MHW: -8.88
+  DTL: -8.672
+  MTL: -8.69
+  MSL: -8.695
+  MLW: -8.499
+  MLLW: -8.421
+  NAVD88: -8.605
+  LAT: -8.017
+  HAT: -9.185
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8772447
+established: 2006-09-20T00:00:00Z
+removed: 2020-05-24T18:45:00Z

@@ -1,0 +1,27 @@
+name: Aransas Wildlife Refuge
+lat: 28.2283
+lon: -96.795
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.926
+  MHW: -8.925
+  DTL: -8.876
+  MTL: -8.875
+  MSL: -8.876
+  MLW: -8.825
+  MLLW: -8.825
+  NAVD88: -8.535
+  LAT: -8.66
+  HAT: -9.078
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8774230
+established: 2012-10-09T00:00:00Z

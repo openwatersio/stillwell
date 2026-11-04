@@ -1,0 +1,27 @@
+name: Richmond Hill, Ogeechee River
+lat: 31.943
+lon: -81.2898
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.765
+  MHW: -8.707
+  DTL: -7.97
+  MTL: -7.992
+  MSL: -8.111
+  MLW: -7.277
+  MLLW: -7.176
+  NAVD88: -7.906
+  LAT: -6.955
+  HAT: -9.213
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8671489
+established: 2022-02-13T00:00:00Z
+removed: 2022-06-26T13:20:00Z

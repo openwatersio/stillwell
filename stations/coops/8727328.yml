@@ -1,0 +1,27 @@
+name: OZELLO NORTH
+lat: 28.8633
+lon: -82.6667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.676
+  MHW: -1.575
+  DTL: -1.368
+  MTL: -1.345
+  MSL: -1.316
+  MLW: -1.115
+  MLLW: -1.06
+  NAVD88: -1.336
+  LAT: -0.901
+  HAT: -1.818
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727328
+established: 1978-05-22T00:00:00Z
+removed: 1979-01-10T23:59:00Z

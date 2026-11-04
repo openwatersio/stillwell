@@ -1,0 +1,26 @@
+name: MENDICANT ISLAND, BARATARIA BAY
+lat: 29.3183
+lon: -89.98
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.276
+  MHW: -1.274
+  DTL: -1.124
+  MTL: -1.124
+  MSL: -1.126
+  MLW: -0.974
+  MLLW: -0.971
+  LAT: -0.704
+  HAT: -1.48
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761742
+established: 1985-07-19T00:00:00Z
+removed: 1986-09-04T23:59:00Z

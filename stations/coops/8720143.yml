@@ -1,0 +1,24 @@
+name: SAWPIT CREEK
+lat: 30.5033
+lon: -81.4717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.853
+  MHW: -2.749
+  DTL: -2.005
+  MTL: -1.975
+  MSL: -1.985
+  MLW: -1.201
+  MLLW: -1.157
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720143
+established: 1978-02-06T00:00:00Z
+removed: 1978-08-18T23:59:00Z

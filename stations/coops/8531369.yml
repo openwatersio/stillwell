@@ -1,0 +1,26 @@
+name: NORTH OLD BRIDGE, SOUTH RIVER
+lat: 40.4167
+lon: -74.3633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.083
+  MHW: -1.982
+  DTL: -1.149
+  MTL: -1.132
+  MSL: -1.164
+  MLW: -0.282
+  MLLW: -0.216
+  LAT: 0.247
+  HAT: -2.525
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531369
+established: 1975-12-12T00:00:00Z
+removed: 1977-05-27T23:59:00Z

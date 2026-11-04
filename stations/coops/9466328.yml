@@ -1,0 +1,26 @@
+name: Lomavik
+lat: 60.5543
+lon: -162.2971
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.962
+  MHW: -9.48
+  DTL: -8.755
+  MTL: -8.62
+  MSL: -8.73
+  MLW: -7.76
+  MLLW: -7.547
+  LAT: -7.467
+  HAT: -10.797
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466328
+established: 2010-06-01T00:00:00Z
+removed: 2010-09-11T23:59:00Z

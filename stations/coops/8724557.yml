@@ -1,0 +1,25 @@
+name: KEY WEST, WHITE STREET PIER
+lat: 24.545
+lon: -81.7833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.221
+  MHW: -1.129
+  DTL: -0.927
+  MTL: -0.914
+  MSL: -0.921
+  MLW: -0.699
+  MLLW: -0.633
+  NAVD88: -1.185
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724557
+established: 1974-08-23T00:00:00Z
+removed: 1974-10-03T23:59:00Z

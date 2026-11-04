@@ -1,0 +1,24 @@
+name: EAST LAKE, ANACOSTIA RIVER
+lat: 38.91
+lon: -76.955
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.724
+  MHW: -7.653
+  DTL: -7.22
+  MTL: -7.206
+  MSL: -7.194
+  MLW: -6.758
+  MLLW: -6.716
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8593909
+established: 1995-07-20T00:00:00Z
+removed: 1996-04-26T23:00:00Z

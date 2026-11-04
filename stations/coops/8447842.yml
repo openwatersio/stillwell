@@ -1,0 +1,26 @@
+name: ROUND HILL POINT
+lat: 41.5383
+lon: -70.9283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.782
+  MHW: -1.7
+  DTL: -1.197
+  MTL: -1.177
+  MSL: -1.123
+  MLW: -0.654
+  MLLW: -0.613
+  LAT: -0.078
+  HAT: -2.311
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447842
+established: 1976-04-23T00:00:00Z
+removed: 1976-11-03T23:59:00Z

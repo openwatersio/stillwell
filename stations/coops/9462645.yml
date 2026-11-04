@@ -1,0 +1,26 @@
+name: Biorka Village, Biverly Inlet
+lat: 53.82892
+lon: -166.21625
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.188
+  MHW: -2.056
+  DTL: -1.411
+  MTL: -1.521
+  MSL: -1.511
+  MLW: -0.986
+  MLLW: -0.634
+  LAT: 0.011
+  HAT: -2.572
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462645
+established: 1934-10-08T00:00:00Z
+removed: 2007-08-11T00:00:00Z

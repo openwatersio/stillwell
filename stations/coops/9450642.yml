@@ -1,0 +1,26 @@
+name: Northern Carroll Inlet GPS Tide Buoy
+lat: 55.628887
+lon: -131.3627
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 1.395
+  MHW: 1.671
+  DTL: 3.769
+  MTL: 3.663
+  MSL: 3.658
+  MLW: 5.655
+  MLLW: 6.143
+  LAT: 7.493
+  HAT: 0.121
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450642
+established: 2016-05-11T00:00:00Z
+removed: 2016-06-18T23:59:00Z

@@ -1,0 +1,24 @@
+name: POINT PLEASANT BEACH, MANASQUAN RIVER
+lat: 40.105
+lon: -74.055
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.178
+  MHW: -2.08
+  DTL: -1.511
+  MTL: -1.486
+  MSL: -1.495
+  MLW: -0.892
+  MLLW: -0.843
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8532585
+established: 1976-02-25T00:00:00Z
+removed: 1977-05-06T23:59:00Z

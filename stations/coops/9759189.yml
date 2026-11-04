@@ -1,0 +1,26 @@
+name: Puerto Real
+lat: 18.074806
+lon: -67.188774
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.131
+  MHW: -9.106
+  DTL: -9.008
+  MTL: -9.01
+  MSL: -9.014
+  MLW: -8.914
+  MLLW: -8.884
+  LAT: -8.786
+  HAT: -9.249
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9759189
+established: 2011-04-21T00:00:00Z
+removed: 2011-09-09T23:59:00Z

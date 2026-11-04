@@ -1,0 +1,26 @@
+name: Tidal Creek, Elkhorn Slough
+lat: 36.8333
+lon: -121.745
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.289
+  MHW: -9.073
+  DTL: -8.472
+  MTL: -8.527
+  MSL: -8.53
+  MLW: -7.981
+  MLLW: -7.656
+  LAT: -7.134
+  HAT: -9.774
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9413643
+established: 2008-02-26T00:00:00Z
+removed: 2008-10-14T23:59:00Z

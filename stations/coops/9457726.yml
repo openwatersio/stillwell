@@ -1,0 +1,26 @@
+name: Geese Island GPS Tide Buoy
+lat: 56.594696
+lon: -153.99603
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -14.829
+  MHW: -14.642
+  DTL: -13.494
+  MTL: -13.588
+  MSL: -13.564
+  MLW: -12.534
+  MLLW: -12.159
+  LAT: -11.319
+  HAT: -15.452
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457726
+established: 2016-06-24T00:00:00Z
+removed: 2016-07-31T23:59:00Z

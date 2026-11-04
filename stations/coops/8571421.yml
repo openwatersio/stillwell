@@ -1,0 +1,27 @@
+name: Bishops Head
+lat: 38.22
+lon: -76.0383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.453
+  MHW: -9.404
+  DTL: -9.139
+  MTL: -9.135
+  MSL: -9.135
+  MLW: -8.866
+  MLLW: -8.824
+  NAVD88: -9.194
+  LAT: -8.626
+  HAT: -9.653
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571421
+established: 2005-03-22T00:00:00Z

@@ -1,0 +1,26 @@
+name: GARNET POINT, HERSEY NECK
+lat: 44.9233
+lon: -67.13
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.71
+  MHW: -6.548
+  DTL: -3.639
+  MTL: -3.627
+  MSL: -3.662
+  MLW: -0.705
+  MLLW: -0.568
+  LAT: 0.575
+  HAT: -7.85
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8410715
+established: 1985-07-01T00:00:00Z
+removed: 1985-11-04T23:59:00Z

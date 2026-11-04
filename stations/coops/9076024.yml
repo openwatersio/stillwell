@@ -1,0 +1,19 @@
+name: Rock Cut
+lat: 46.264805
+lon: -84.19119
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176.03
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9076024
+established: 2001-10-26T00:00:00Z

@@ -1,0 +1,24 @@
+name: SIMILAR SOUND
+lat: 24.6
+lon: -81.6217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.732
+  MHW: -0.663
+  DTL: -0.614
+  MTL: -0.586
+  MSL: -0.593
+  MLW: -0.509
+  MLLW: -0.495
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724422
+established: 1974-03-07T00:00:00Z
+removed: 1974-06-17T23:59:00Z

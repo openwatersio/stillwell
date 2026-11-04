@@ -1,0 +1,24 @@
+name: WACCASASSA RIVER
+lat: 29.165
+lon: -82.8083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.446
+  MHW: -1.345
+  DTL: -0.878
+  MTL: -0.901
+  MSL: -0.88
+  MLW: -0.457
+  MLLW: -0.311
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727471
+established: 1978-06-20T00:00:00Z
+removed: 1979-01-29T23:59:00Z

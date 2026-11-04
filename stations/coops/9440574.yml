@@ -1,0 +1,25 @@
+name: NORTH JETTY
+lat: 46.2733
+lon: -124.072
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.471
+  MHW: -3.266
+  DTL: -2.29
+  MTL: -2.375
+  MSL: -2.356
+  MLW: -1.484
+  MLLW: -1.11
+  NAVD88: -1.187
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440574
+established: 1982-05-11T00:00:00Z
+removed: 1983-11-30T23:59:00Z

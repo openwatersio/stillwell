@@ -1,0 +1,26 @@
+name: KEASBEY, RARITAN RIVER
+lat: 40.5083
+lon: -74.3117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.176
+  MHW: -2.074
+  DTL: -1.301
+  MTL: -1.279
+  MSL: -1.297
+  MLW: -0.485
+  MLLW: -0.427
+  LAT: 0.058
+  HAT: -2.629
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531262
+established: 1975-12-12T00:00:00Z
+removed: 1977-02-02T23:59:00Z

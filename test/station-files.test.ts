@@ -246,3 +246,12 @@ attribution: Rijkswaterstaat
     assert.deepEqual(await readStationFiles(dir, "bsh"), []);
   });
 });
+
+describe("the committed station files", () => {
+  // Hand edits are checked here, before they reach an hourly run.
+  it("all read as stations", async () => {
+    const dir = join(import.meta.dirname, "../stations");
+    for (const source of await stationSources(dir))
+      assert.ok((await readStationFiles(dir, source)).length, source);
+  });
+});

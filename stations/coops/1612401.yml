@@ -1,0 +1,26 @@
+name: Pearl Harbor
+lat: 21.3675
+lon: -157.9639
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.673
+  MHW: -7.532
+  DTL: -7.375
+  MTL: -7.331
+  MSL: -7.338
+  MLW: -7.129
+  MLLW: -7.078
+  LAT: -6.942
+  HAT: -7.92
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1612401
+established: 2023-05-31T00:00:00Z

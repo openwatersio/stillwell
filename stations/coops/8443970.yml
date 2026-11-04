@@ -1,0 +1,27 @@
+name: Boston
+lat: 42.35389
+lon: -71.05028
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.205
+  MHW: -4.071
+  DTL: -2.64
+  MTL: -2.624
+  MSL: -2.66
+  MLW: -1.178
+  MLLW: -1.074
+  NAVD88: -2.752
+  LAT: -0.428
+  HAT: -4.831
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8443970
+established: 1921-05-03T00:00:00Z

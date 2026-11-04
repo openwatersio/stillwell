@@ -1,0 +1,26 @@
+name: Point Erlington, Erlington Island
+lat: 59.9383
+lon: -148.227
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.084
+  MHW: -2.79
+  DTL: -1.434
+  MTL: -1.504
+  MSL: -1.518
+  MLW: -0.218
+  MLLW: 0.215
+  LAT: 1.197
+  HAT: -3.988
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454814
+established: 2000-09-21T00:00:00Z
+removed: 2002-09-11T23:59:00Z

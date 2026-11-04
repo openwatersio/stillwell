@@ -1,0 +1,16 @@
+name: BRIDGEBORO, RANCOCAS CREEK
+lat: 40.0283
+lon: -74.9317
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538921
+established: 1980-08-01T00:00:00Z
+removed: 1980-08-25T23:59:00Z

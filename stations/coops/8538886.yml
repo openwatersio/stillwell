@@ -1,0 +1,26 @@
+name: Tacony-Palmyra Bridge
+lat: 40.0119
+lon: -75.043
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.474
+  MHW: -7.361
+  DTL: -6.385
+  MTL: -6.357
+  MSL: -6.404
+  MLW: -5.353
+  MLLW: -5.295
+  LAT: -5.023
+  HAT: -7.854
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538886
+established: 2002-05-07T00:00:00Z
+removed: 2013-11-11T00:01:00Z

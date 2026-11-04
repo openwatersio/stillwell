@@ -1,0 +1,24 @@
+name: SANDY POINT, LUMMI BAY
+lat: 48.79
+lon: -122.708
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.414
+  MHW: -4.166
+  DTL: -3.039
+  MTL: -3.31
+  MSL: -3.251
+  MLW: -2.454
+  MLLW: -1.665
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449292
+established: 1974-04-09T00:00:00Z
+removed: 1975-04-11T23:59:00Z

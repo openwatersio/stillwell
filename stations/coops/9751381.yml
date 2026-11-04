@@ -1,0 +1,26 @@
+name: Lameshur Bay, St John
+lat: 18.31825
+lon: -64.72422
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.059
+  MHW: -9.044
+  DTL: -8.933
+  MTL: -8.934
+  MSL: -8.927
+  MLW: -8.824
+  MLLW: -8.807
+  LAT: -8.671
+  HAT: -9.201
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751381
+established: 1983-02-21T00:00:00Z

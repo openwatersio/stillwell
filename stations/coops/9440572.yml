@@ -1,0 +1,24 @@
+name: JETTY A, COLUMBIA RIVER
+lat: 46.2683
+lon: -124.037
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.839
+  MHW: -3.611
+  DTL: -2.546
+  MTL: -2.65
+  MSL: -2.65
+  MLW: -1.689
+  MLLW: -1.254
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440572
+established: 1981-04-27T00:00:00Z
+removed: 1997-04-11T23:00:00Z

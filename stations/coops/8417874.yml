@@ -1,0 +1,16 @@
+name: DOYLE POINT, CASCO BAY
+lat: 43.7517
+lon: -70.14
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8417874
+established: 1979-09-15T00:00:00Z
+removed: 1979-10-25T23:59:00Z

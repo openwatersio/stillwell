@@ -1,0 +1,25 @@
+name: Bayview, Pamlico River
+lat: 35.427776
+lon: -76.74
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.827
+  MHW: -8.786
+  DTL: -8.714
+  MTL: -8.709
+  MSL: -8.713
+  MLW: -8.631
+  MLLW: -8.6
+  NAVD88: -8.81
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8653717
+established: 2021-11-06T00:00:00Z
+removed: 2022-04-27T12:12:00Z

@@ -1,0 +1,27 @@
+name: Old Port Tampa
+lat: 27.8578
+lon: -82.5528
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.372
+  MHW: -9.276
+  DTL: -8.994
+  MTL: -9.014
+  MSL: -9.012
+  MLW: -8.751
+  MLLW: -8.617
+  NAVD88: -9.133
+  LAT: -8.266
+  HAT: -9.627
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726607
+established: 1991-07-17T00:00:00Z

@@ -1,0 +1,26 @@
+name: South point, St Lucie Inlet
+lat: 27.1583
+lon: -80.1567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 0.016
+  MHW: 0.069
+  DTL: 0.371
+  MTL: 0.371
+  MSL: 0.36
+  MLW: 0.674
+  MLLW: 0.726
+  NAVD88: -0.001
+  LAT: 0.902
+  HAT: -0.153
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722375
+established: 1999-01-26T00:00:00Z

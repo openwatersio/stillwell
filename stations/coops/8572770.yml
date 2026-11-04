@@ -1,0 +1,27 @@
+name: Matapeake
+lat: 38.9567
+lon: -76.355
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.699
+  MHW: -1.622
+  DTL: -1.473
+  MTL: -1.466
+  MSL: -1.471
+  MLW: -1.31
+  MLLW: -1.247
+  NAVD88: -1.519
+  LAT: -1.075
+  HAT: -1.834
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8572770
+established: 1972-07-13T00:00:00Z
+removed: 1984-08-24T23:59:00Z

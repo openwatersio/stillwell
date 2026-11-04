@@ -1,0 +1,26 @@
+name: Pungo River NC 45
+lat: 35.5852
+lon: -76.4856
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.067
+  MHW: -0.031
+  DTL: 0.055
+  MTL: 0.053
+  MSL: 0.045
+  MLW: 0.138
+  MLLW: 0.179
+  NAVD88: 0.026
+  LAT: 0.123
+  HAT: -0.033
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8653244
+established: 2023-10-18T00:00:00Z

@@ -1,0 +1,16 @@
+name: List, Sylt, Hafen
+lat: 55.01667
+lon: 8.44056
+country_code: DE
+datum: PNP
+datums:
+  NHN: -4.99
+  SKN: -3.55
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9570070]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/list_hafen

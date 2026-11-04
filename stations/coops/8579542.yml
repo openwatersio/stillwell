@@ -1,0 +1,26 @@
+name: Lower Marlboro
+lat: 38.655
+lon: -76.683334
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.207
+  MHW: -3.165
+  DTL: -2.881
+  MTL: -2.887
+  MSL: -2.897
+  MLW: -2.609
+  MLLW: -2.556
+  LAT: -2.523
+  HAT: -3.273
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8579542
+established: 1972-07-10T00:00:00Z
+removed: 2010-12-16T23:59:00Z

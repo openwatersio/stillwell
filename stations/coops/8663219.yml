@@ -1,0 +1,27 @@
+name: S. SANTEE R.,IWW(4 MI. CANAL CR)
+lat: 33.1542
+lon: -79.3544
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.526
+  MHW: -9.444
+  DTL: -8.875
+  MTL: -8.862
+  MSL: -8.88
+  MLW: -8.279
+  MLLW: -8.224
+  NAVD88: -8.871
+  LAT: -7.924
+  HAT: -9.957
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8663219
+established: 1975-05-28T00:00:00Z
+removed: 2022-07-22T19:00:00Z

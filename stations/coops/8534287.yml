@@ -1,0 +1,24 @@
+name: LITTLE SHEEPSHEAD CREEK
+lat: 39.5217
+lon: -74.32
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.119
+  MHW: -2.009
+  DTL: -1.572
+  MTL: -1.537
+  MSL: -1.528
+  MLW: -1.064
+  MLLW: -1.025
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534287
+established: 1976-09-30T00:00:00Z
+removed: 1978-01-11T23:59:00Z

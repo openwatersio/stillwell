@@ -1,0 +1,25 @@
+name: WATCH HILL POINT
+lat: 41.305
+lon: -71.86
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.663
+  MHW: -1.58
+  DTL: -1.206
+  MTL: -1.187
+  MSL: -1.206
+  MLW: -0.794
+  MLLW: -0.749
+  NAVD88: -1.302
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8458694
+established: 1961-05-04T00:00:00Z
+removed: 1962-09-10T23:59:00Z

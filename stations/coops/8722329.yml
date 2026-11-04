@@ -1,0 +1,27 @@
+name: Jensen Beach Causeway Park
+lat: 27.2517
+lon: -80.2183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 0.088
+  MHW: 0.135
+  DTL: 0.331
+  MTL: 0.335
+  MSL: 0.339
+  MLW: 0.534
+  MLLW: 0.574
+  NAVD88: 0.008
+  LAT: 0.655
+  HAT: 0.002
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722329
+established: 1998-11-18T00:00:00Z
+removed: 2022-09-01T00:00:00Z

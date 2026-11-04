@@ -1,0 +1,19 @@
+name: CEDARVILLE
+lat: 45.995834
+lon: -84.361664
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9075092
+established: 2019-03-04T00:00:00Z
+removed: 2019-10-04T15:00:00Z

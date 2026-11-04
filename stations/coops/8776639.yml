@@ -1,0 +1,19 @@
+name: RIVIERA BEACH, BAFFIN BAY
+lat: 27.288305
+lon: -97.6617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MSL: -1.149
+  NAVD88: -0.97
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8776639
+established: 1990-07-24T00:00:00Z
+removed: 2020-03-20T14:06:00Z

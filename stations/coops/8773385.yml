@@ -1,0 +1,20 @@
+name: Matagorda Peninsula
+lat: 28.612072
+lon: -95.97544
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.959
+  MHW: -8.938
+  NAVD88: -8.637
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8773385
+established: 2019-09-20T00:00:00Z
+removed: 2020-06-24T13:18:00Z

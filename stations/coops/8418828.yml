@@ -1,0 +1,26 @@
+name: BIDDEFORD, SACO RIVER
+lat: 43.4917
+lon: -70.4467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.976
+  MHW: -2.84
+  DTL: -1.476
+  MTL: -1.46
+  MSL: -1.496
+  MLW: -0.08
+  MLLW: 0.022
+  LAT: 1.384
+  HAT: -3.937
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8418828
+established: 1991-06-01T00:00:00Z
+removed: 1991-10-24T23:59:00Z

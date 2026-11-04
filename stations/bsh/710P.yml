@@ -1,0 +1,14 @@
+name: Stade, Schwinge
+lat: 53.59778
+lon: 9.48
+country_code: DE
+datum: SKN
+datums:
+  NHN: 0
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/stade

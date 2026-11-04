@@ -1,0 +1,25 @@
+name: CANOVA
+lat: 28.1383
+lon: -80.5783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.449
+  MHW: -1.322
+  DTL: -0.842
+  MTL: -0.81
+  MSL: -0.815
+  MLW: -0.297
+  MLLW: -0.235
+  NAVD88: -1.13
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721804
+established: 1970-02-01T00:00:00Z
+removed: 1971-04-22T23:59:00Z

@@ -1,0 +1,26 @@
+name: Shaktoolik
+lat: 64.38022
+lon: -161.23514
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.873
+  MHW: -7.666
+  DTL: -7.311
+  MTL: -7.295
+  MSL: -7.244
+  MLW: -6.925
+  MLLW: -6.735
+  LAT: -6.201
+  HAT: -8.473
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468691
+established: 2010-07-14T00:00:00Z
+removed: 2010-08-23T23:59:00Z

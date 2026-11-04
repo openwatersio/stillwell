@@ -1,0 +1,25 @@
+name: BAILEYS BLUFF INSIDE
+lat: 28.2017
+lon: -82.78
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.593
+  MHW: -1.48
+  DTL: -1.126
+  MTL: -1.147
+  MSL: -1.149
+  MLW: -0.814
+  MLLW: -0.659
+  NAVD88: -1.247
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726976
+established: 1976-01-28T00:00:00Z
+removed: 1976-04-13T23:59:00Z

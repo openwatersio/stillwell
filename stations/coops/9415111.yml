@@ -1,0 +1,25 @@
+name: BENICIA, CARQUINEZ STRAIT
+lat: 38.0433
+lon: -122.13
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.378
+  MHW: -10.217
+  DTL: -9.566
+  MTL: -9.619
+  MSL: -9.621
+  MLW: -9.02
+  MLLW: -8.755
+  NAVD88: -8.56
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415111
+established: 1976-09-27T00:00:00Z
+removed: 1989-12-08T23:59:00Z

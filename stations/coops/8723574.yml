@@ -1,0 +1,18 @@
+name: MANATEE CREEK, BARNES SOUND
+lat: 25.235
+lon: -80.435
+country_code: US
+datum: STND
+datums:
+  MSL: -1.114
+  NAVD88: -1.41
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723574
+established: 1970-04-28T00:00:00Z
+removed: 1975-08-26T23:59:00Z

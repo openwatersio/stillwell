@@ -1,0 +1,26 @@
+name: Valdez
+lat: 61.125
+lon: -146.362
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.758
+  MHW: -5.473
+  DTL: -3.907
+  MTL: -3.994
+  MSL: -4.035
+  MLW: -2.516
+  MLLW: -2.056
+  LAT: -0.857
+  HAT: -6.823
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454240
+established: 1964-08-15T00:00:00Z

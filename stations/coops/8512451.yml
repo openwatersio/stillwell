@@ -1,0 +1,27 @@
+name: PONQUOGUE POINT
+lat: 40.85
+lon: -72.5033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.396
+  MHW: -2.318
+  DTL: -1.911
+  MTL: -1.891
+  MSL: -1.889
+  MLW: -1.465
+  MLLW: -1.426
+  NAVD88: -1.98
+  LAT: -1.164
+  HAT: -2.681
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8512451
+established: 1989-06-27T00:00:00Z
+removed: 2014-03-01T00:00:00Z

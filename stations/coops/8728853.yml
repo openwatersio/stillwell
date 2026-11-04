@@ -1,0 +1,27 @@
+name: White City, ICWW
+lat: 29.8807
+lon: -85.2214
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.11
+  MHW: -1.09
+  DTL: -0.956
+  MTL: -0.959
+  MSL: -0.96
+  MLW: -0.828
+  MLLW: -0.802
+  NAVD88: -0.824
+  LAT: -0.604
+  HAT: -1.262
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728853
+established: 1977-11-15T00:00:00Z
+removed: 2011-03-10T17:27:00Z

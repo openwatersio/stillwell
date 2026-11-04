@@ -1,0 +1,15 @@
+name: Arngast, Leuchtturm
+lat: 53.48167
+lon: 8.1925
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.31
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/arngast_leuchtturm

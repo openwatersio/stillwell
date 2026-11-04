@@ -1,0 +1,25 @@
+name: SHELTON, HOUSATONIC RIVER
+lat: 41.3017
+lon: -73.0717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.784
+  MHW: -2.676
+  DTL: -1.625
+  MTL: -1.607
+  MSL: -1.554
+  MLW: -0.538
+  MLLW: -0.467
+  NAVD88: -1.576
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8466573
+established: 1993-06-30T00:00:00Z
+removed: 1993-10-08T23:59:00Z

@@ -1,0 +1,27 @@
+name: Kipnuk, Kugkaktlik River
+lat: 59.9432
+lon: -164.0434
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.416
+  MHW: -8.989
+  DTL: -8.154
+  MTL: -8.069
+  MSL: -8.133
+  MLW: -7.149
+  MLLW: -6.891
+  NAVD88: -7.054
+  LAT: -6.522
+  HAT: -10.112
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465951
+established: 2021-06-02T00:00:00Z
+removed: 2021-10-07T00:00:00Z

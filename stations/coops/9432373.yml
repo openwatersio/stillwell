@@ -1,0 +1,25 @@
+name: BANDON, COQUILLE RIVER
+lat: 43.12
+lon: -124.413
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.986
+  MHW: -1.767
+  DTL: -0.904
+  MTL: -0.977
+  MSL: -0.968
+  MLW: -0.187
+  MLLW: 0.176
+  NAVD88: 0.144
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9432373
+established: 1916-05-22T00:00:00Z
+removed: 1977-11-29T23:59:00Z

@@ -1,0 +1,27 @@
+name: Southbank Riverwalk, St Johns River
+lat: 30.32
+lon: -81.6583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.196
+  MHW: -0.176
+  DTL: 0.101
+  MTL: 0.096
+  MSL: 0.075
+  MLW: 0.37
+  MLLW: 0.399
+  NAVD88: 0.002
+  LAT: 0.616
+  HAT: -0.525
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720226
+established: 1995-04-26T00:00:00Z

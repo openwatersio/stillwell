@@ -1,0 +1,24 @@
+name: GREAT DIAMOND IS., CASCO BAY
+lat: 43.67
+lon: -70.2
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.505
+  MHW: -3.374
+  DTL: -2.002
+  MTL: -1.99
+  MSL: -2.001
+  MLW: -0.606
+  MLLW: -0.499
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8417988
+established: 1979-08-17T00:00:00Z
+removed: 1979-10-02T23:59:00Z

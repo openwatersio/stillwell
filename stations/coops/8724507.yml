@@ -1,0 +1,24 @@
+name: CHANNEL KEY
+lat: 24.6033
+lon: -81.725
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.424
+  MHW: -1.332
+  DTL: -1.219
+  MTL: -1.197
+  MSL: -1.197
+  MLW: -1.062
+  MLLW: -1.013
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724507
+established: 1973-12-06T00:00:00Z
+removed: 1974-05-15T23:59:00Z

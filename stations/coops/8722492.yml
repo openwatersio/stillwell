@@ -1,0 +1,25 @@
+name: JUPITER WEST
+lat: 26.9467
+lon: -80.09
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.181
+  MHW: -1.135
+  DTL: -0.836
+  MTL: -0.836
+  MSL: -0.828
+  MLW: -0.536
+  MLLW: -0.491
+  NAVD88: -1.172
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722492
+established: 1973-01-19T00:00:00Z
+removed: 1973-11-06T23:59:00Z

@@ -1,0 +1,26 @@
+name: TOWN POINT WHARF
+lat: 39.5033
+lon: -75.9167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.701
+  MHW: -1.605
+  DTL: -1.293
+  MTL: -1.274
+  MSL: -1.267
+  MLW: -0.943
+  MLLW: -0.884
+  LAT: -0.74
+  HAT: -1.822
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8573903
+established: 1972-10-17T00:00:00Z
+removed: 1994-06-24T23:59:00Z

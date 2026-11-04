@@ -1,0 +1,25 @@
+name: Cape Corwin GPS Tide Buoy
+lat: 60.00464
+lon: -165.59097
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.437
+  MHW: -12.294
+  DTL: -11.345
+  MTL: -11.387
+  MSL: -11.39
+  MLW: -10.481
+  MLLW: -10.254
+  LAT: -9.803
+  HAT: -12.961
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465988
+removed: 2019-09-28T00:00:00Z

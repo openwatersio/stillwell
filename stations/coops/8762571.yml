@@ -1,0 +1,16 @@
+name: PT. AU CHIEN WMA, ST LOUIS CANAL
+lat: 29.4567
+lon: -90.4717
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762571
+established: 1986-10-07T00:00:00Z
+removed: 1988-03-02T23:59:00Z

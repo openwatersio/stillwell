@@ -1,0 +1,26 @@
+name: BAYVILLE BRIDGE, OYSTER BAY
+lat: 40.9033
+lon: -73.55
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.68
+  MHW: -3.57
+  DTL: -2.459
+  MTL: -2.443
+  MSL: -2.438
+  MLW: -1.316
+  MLLW: -1.238
+  LAT: -0.69
+  HAT: -4.254
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516299
+established: 1990-05-28T00:00:00Z
+removed: 1993-06-24T23:59:00Z

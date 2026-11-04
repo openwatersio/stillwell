@@ -1,0 +1,25 @@
+name: BLUFF POINT, WADMALAW RIVER
+lat: 32.6467
+lon: -80.2567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.584
+  MHW: -3.476
+  DTL: -2.564
+  MTL: -2.542
+  MSL: -2.66
+  MLW: -1.608
+  MLLW: -1.543
+  NAVD88: -2.706
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666699
+established: 1977-01-17T00:00:00Z
+removed: 1983-03-23T23:59:00Z

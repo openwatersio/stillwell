@@ -1,0 +1,25 @@
+name: BATTERY CREEK
+lat: 32.4133
+lon: -80.7
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.001
+  MHW: -2.88
+  DTL: -1.746
+  MTL: -1.716
+  MSL: -1.82
+  MLW: -0.551
+  MLLW: -0.49
+  NAVD88: -1.851
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8668092
+established: 1978-01-30T00:00:00Z
+removed: 1979-09-05T23:59:00Z

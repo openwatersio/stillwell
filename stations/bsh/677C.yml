@@ -1,0 +1,16 @@
+name: Scharhörnriff, Bake A
+lat: 53.98444
+lon: 8.31528
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.09
+  SKN: -2.96
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9510063]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/scharhoernriff_bake_a

@@ -1,0 +1,26 @@
+name: Bayou Faleau
+lat: 29.470388
+lon: -90.342224
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.403
+  MHW: -9.404
+  DTL: -9.294
+  MTL: -9.295
+  MSL: -9.285
+  MLW: -9.186
+  MLLW: -9.184
+  LAT: -8.995
+  HAT: -9.536
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762329
+established: 2024-01-31T00:00:00Z
+removed: 2024-05-04T13:36:00Z

@@ -1,0 +1,16 @@
+name: Krautsand, Elbe, Reede
+lat: 53.75472
+lon: 9.39167
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -3.12
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970031]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/krautsand

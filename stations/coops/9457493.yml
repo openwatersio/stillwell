@@ -1,0 +1,26 @@
+name: SW Terror Bay
+lat: 57.744026
+lon: -153.19547
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.789
+  MHW: -3.514
+  DTL: -1.632
+  MTL: -1.746
+  MSL: -1.729
+  MLW: 0.021
+  MLLW: 0.524
+  LAT: 1.937
+  HAT: -5.078
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457493
+established: 2014-08-29T00:00:00Z
+removed: 2014-10-17T00:00:00Z

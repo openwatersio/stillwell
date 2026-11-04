@@ -1,0 +1,25 @@
+name: YAMATO
+lat: 26.4033
+lon: -80.07
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.432
+  MHW: -1.395
+  DTL: -1.031
+  MTL: -1.037
+  MSL: -1.019
+  MLW: -0.679
+  MLLW: -0.63
+  NAVD88: -1.286
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722784
+established: 1973-03-28T00:00:00Z
+removed: 1973-05-08T23:59:00Z

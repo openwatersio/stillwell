@@ -1,0 +1,27 @@
+name: MERMENTAU RIVER, GRAND CHENIER
+lat: 29.775
+lon: -93.0083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.58
+  MHW: -1.541
+  DTL: -1.301
+  MTL: -1.344
+  MSL: -1.339
+  MLW: -1.148
+  MLLW: -1.021
+  NAVD88: -1.435
+  LAT: -0.567
+  HAT: -1.848
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8767403
+established: 1989-10-20T00:00:00Z
+removed: 2020-07-07T23:54:00Z

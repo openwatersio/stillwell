@@ -1,0 +1,27 @@
+name: Lewes
+lat: 38.782833
+lon: -75.11928
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.266
+  MHW: -2.138
+  DTL: -1.557
+  MTL: -1.517
+  MSL: -1.528
+  MLW: -0.896
+  MLLW: -0.848
+  NAVD88: -1.649
+  LAT: -0.485
+  HAT: -2.628
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8557380
+established: 1919-01-14T00:00:00Z

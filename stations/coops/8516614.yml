@@ -1,0 +1,27 @@
+name: GLEN COVE YACHT CLUB, LONG ISLAND
+lat: 40.8633
+lon: -73.655
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.061
+  MHW: -2.95
+  DTL: -1.862
+  MTL: -1.842
+  MSL: -1.844
+  MLW: -0.734
+  MLLW: -0.663
+  NAVD88: -1.928
+  LAT: -0.092
+  HAT: -3.649
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516614
+established: 1990-05-30T00:00:00Z
+removed: 1990-09-10T23:59:00Z

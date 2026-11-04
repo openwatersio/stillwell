@@ -1,0 +1,26 @@
+name: Oriental, Neuse River
+lat: 35.0246
+lon: -76.6918
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.032
+  MHW: -0.014
+  DTL: 0.074
+  MTL: 0.066
+  MSL: 0.072
+  MLW: 0.146
+  MLLW: 0.181
+  NAVD88: 0.006
+  LAT: 0.174
+  HAT: -0.058
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8655133
+established: 2022-06-07T00:00:00Z

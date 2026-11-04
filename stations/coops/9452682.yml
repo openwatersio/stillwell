@@ -1,0 +1,16 @@
+name: Composite Island, Glacier Bay
+lat: 58.8883
+lon: -136.573
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452682
+established: 1959-07-27T00:00:00Z
+removed: 2009-11-06T23:59:00Z

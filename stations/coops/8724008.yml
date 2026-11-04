@@ -1,0 +1,25 @@
+name: KNIGHT KEY CHANNEL
+lat: 24.7067
+lon: -81.125
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.93
+  MHW: -1.858
+  DTL: -1.769
+  MTL: -1.749
+  MSL: -1.753
+  MLW: -1.64
+  MLLW: -1.608
+  NAVD88: -2.057
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724008
+established: 1975-01-22T00:00:00Z
+removed: 1975-04-11T23:59:00Z

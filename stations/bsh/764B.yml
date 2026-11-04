@@ -1,0 +1,16 @@
+name: Hooksielplate
+lat: 53.66917
+lon: 8.14861
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+  SKN: -2.55
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9430020]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/hooksielplate

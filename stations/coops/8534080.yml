@@ -1,0 +1,24 @@
+name: TUCKERTON, TUCKERTONCREEK
+lat: 39.6017
+lon: -74.3417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.468
+  MHW: -1.387
+  DTL: -1.093
+  MTL: -1.066
+  MSL: -1.059
+  MLW: -0.745
+  MLLW: -0.718
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534080
+established: 1976-09-14T00:00:00Z
+removed: 1977-11-15T23:59:00Z

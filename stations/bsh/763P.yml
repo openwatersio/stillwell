@@ -1,0 +1,14 @@
+name: Wangertief, Horumersiel
+lat: 53.68417
+lon: 8.02333
+country_code: DE
+datum: SKN
+datums:
+  NHN: -2.38
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/wangertief_horumersiel

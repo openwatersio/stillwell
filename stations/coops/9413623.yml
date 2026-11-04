@@ -1,0 +1,24 @@
+name: ELKHORN SLOUGH, ENTRANCE BRIDGE
+lat: 36.81
+lon: -121.785
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.999
+  MHW: -6.789
+  DTL: -6.194
+  MTL: -6.252
+  MSL: -6.227
+  MLW: -5.715
+  MLLW: -5.39
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9413623
+established: 1976-04-16T00:00:00Z
+removed: 1978-01-17T23:59:00Z

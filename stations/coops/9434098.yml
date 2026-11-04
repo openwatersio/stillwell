@@ -1,0 +1,26 @@
+name: Florence USCG Pier, Siuslaw River
+lat: 44.0021
+lon: -124.123
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.415
+  MHW: -8.22
+  DTL: -7.286
+  MTL: -7.378
+  MSL: -7.376
+  MLW: -6.536
+  MLLW: -6.157
+  LAT: -5.403
+  HAT: -9.027
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9434098
+established: 2013-05-09T00:00:00Z
+removed: 2013-10-14T23:59:00Z

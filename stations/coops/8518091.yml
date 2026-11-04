@@ -1,0 +1,27 @@
+name: RYE BEACH, AMUSEMENT PARK
+lat: 40.9617
+lon: -73.6717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.494
+  MHW: -3.384
+  DTL: -2.291
+  MTL: -2.273
+  MSL: -2.278
+  MLW: -1.162
+  MLLW: -1.089
+  NAVD88: -2.349
+  LAT: -0.617
+  HAT: -4.035
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518091
+established: 1988-03-18T00:00:00Z
+removed: 1994-10-03T23:59:00Z

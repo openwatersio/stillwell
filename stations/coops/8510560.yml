@@ -1,0 +1,27 @@
+name: Montauk
+lat: 41.048332
+lon: -71.95944
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.947
+  MHW: -1.86
+  DTL: -1.562
+  MTL: -1.545
+  MSL: -1.554
+  MLW: -1.229
+  MLLW: -1.177
+  NAVD88: -1.655
+  LAT: -0.959
+  HAT: -2.185
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8510560
+established: 1947-09-05T00:00:00Z

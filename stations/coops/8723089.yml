@@ -1,0 +1,25 @@
+name: BISCAYNE CREEK, INTRACOASTAL WATERWAY
+lat: 25.88
+lon: -80.1633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.687
+  MHW: -1.666
+  DTL: -1.328
+  MTL: -1.338
+  MSL: -1.335
+  MLW: -1.01
+  MLLW: -0.969
+  NAVD88: -1.613
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723089
+established: 1970-04-21T00:00:00Z
+removed: 1973-09-06T23:59:00Z

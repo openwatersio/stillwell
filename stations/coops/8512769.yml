@@ -1,0 +1,26 @@
+name: SHINNECOCK YACHT CLUB, PENNIMAN CREEK
+lat: 40.818554
+lon: -72.58661
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.548
+  MHW: -2.47
+  DTL: -2.106
+  MTL: -2.083
+  MSL: -2.066
+  MLW: -1.696
+  MLLW: -1.663
+  LAT: -1.472
+  HAT: -2.769
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8512769
+established: 1989-06-28T00:00:00Z
+removed: 1990-11-02T23:59:00Z

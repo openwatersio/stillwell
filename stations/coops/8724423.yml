@@ -1,0 +1,25 @@
+name: SADDLEBUNCH CHANNEL NO. 5
+lat: 24.6117
+lon: -81.6233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.576
+  MHW: -1.494
+  DTL: -1.382
+  MTL: -1.381
+  MSL: -1.385
+  MLW: -1.268
+  MLLW: -1.188
+  NAVD88: -1.48
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724423
+established: 1975-01-15T00:00:00Z
+removed: 1975-03-07T23:59:00Z

@@ -1,0 +1,26 @@
+name: SANDY ISLAND, THOROUGHFARE CREEK
+lat: 33.5067
+lon: -79.145
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.112
+  MHW: -2.06
+  DTL: -1.551
+  MTL: -1.551
+  MSL: -1.604
+  MLW: -1.042
+  MLLW: -0.99
+  LAT: -0.828
+  HAT: -2.378
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661703
+established: 1974-07-24T00:00:00Z
+removed: 1976-02-06T23:59:00Z

@@ -1,0 +1,25 @@
+name: QUINBY BRIDGE, QUINBY CREEK
+lat: 33.095
+lon: -79.8083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.811
+  MHW: -1.751
+  DTL: -1.32
+  MTL: -1.332
+  MSL: -1.392
+  MLW: -0.912
+  MLLW: -0.83
+  NAVD88: -1.012
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8663535
+established: 1976-08-11T00:00:00Z
+removed: 1977-01-20T23:59:00Z

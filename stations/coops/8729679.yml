@@ -1,0 +1,25 @@
+name: SANTA ROSA SOUND, EAST END
+lat: 30.385
+lon: -86.8633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.572
+  MHW: -1.551
+  DTL: -1.361
+  MTL: -1.354
+  MSL: -1.356
+  MLW: -1.158
+  MLLW: -1.15
+  NAVD88: -1.268
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729679
+established: 1977-04-06T00:00:00Z
+removed: 1986-05-13T23:59:00Z

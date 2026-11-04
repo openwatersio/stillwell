@@ -1,0 +1,27 @@
+name: BOWEN POINT, SHALLOTTE INLET
+lat: 33.915
+lon: -78.3733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.737
+  MHW: -8.631
+  DTL: -8.011
+  MTL: -7.981
+  MSL: -7.975
+  MLW: -7.331
+  MLLW: -7.285
+  NAVD88: -8.159
+  LAT: -6.822
+  HAT: -9.162
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8659665
+established: 2021-12-15T00:00:00Z
+removed: 2022-06-07T15:50:00Z

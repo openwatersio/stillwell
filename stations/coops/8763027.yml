@@ -1,0 +1,16 @@
+name: LA HIGHWAY 57, BAYOU DULAC
+lat: 29.3733
+lon: -90.7117
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8763027
+established: 1986-10-25T00:00:00Z
+removed: 1987-11-03T23:59:00Z

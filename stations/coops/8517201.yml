@@ -1,0 +1,27 @@
+name: North Channel
+lat: 40.645
+lon: -73.8367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.451
+  MHW: -7.341
+  DTL: -6.514
+  MTL: -6.493
+  MSL: -6.502
+  MLW: -5.645
+  MLLW: -5.577
+  NAVD88: -6.621
+  LAT: -5.171
+  HAT: -7.85
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8517201
+established: 2015-03-16T00:00:00Z
+removed: 2015-09-23T00:00:00Z

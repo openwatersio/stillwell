@@ -1,0 +1,27 @@
+name: Cape Hatteras Fishing Pier
+lat: 35.2233
+lon: -75.635
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.017
+  MHW: -1.908
+  DTL: -1.489
+  MTL: -1.452
+  MSL: -1.453
+  MLW: -0.997
+  MLLW: -0.961
+  NAVD88: -1.588
+  LAT: -0.649
+  HAT: -2.393
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8654400
+established: 1973-05-24T00:00:00Z
+removed: 2018-09-19T23:59:00Z

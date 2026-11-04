@@ -1,0 +1,25 @@
+name: JUPITER SOUND, SOUTH END
+lat: 26.9517
+lon: -80.08
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.524
+  MHW: -1.473
+  DTL: -1.175
+  MTL: -1.177
+  MSL: -1.179
+  MLW: -0.88
+  MLLW: -0.825
+  NAVD88: -1.468
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722491
+established: 1972-10-24T00:00:00Z
+removed: 1973-01-22T23:59:00Z

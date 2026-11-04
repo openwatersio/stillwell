@@ -1,0 +1,26 @@
+name: Central Aguirre
+lat: 17.95
+lon: -66.2264
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.947
+  MHW: -7.943
+  DTL: -7.84
+  MTL: -7.839
+  MSL: -7.833
+  MLW: -7.735
+  MLLW: -7.733
+  LAT: -7.602
+  HAT: -8.054
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9755971
+established: 2020-11-23T00:00:00Z
+removed: 2021-04-03T13:30:00Z

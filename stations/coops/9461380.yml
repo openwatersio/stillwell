@@ -1,0 +1,27 @@
+name: Adak Island
+lat: 51.860638
+lon: -176.63759
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.034
+  MHW: -1.958
+  DTL: -1.468
+  MTL: -1.516
+  MSL: -1.553
+  MLW: -1.075
+  MLLW: -0.903
+  NAVD88: -1.181
+  LAT: -0.299
+  HAT: -2.612
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9461380
+established: 1943-08-21T00:00:00Z

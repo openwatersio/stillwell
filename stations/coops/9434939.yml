@@ -1,0 +1,27 @@
+name: Waldport
+lat: 44.43436
+lon: -124.05808
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.407
+  MHW: -7.19
+  DTL: -6.251
+  MTL: -6.333
+  MSL: -6.339
+  MLW: -5.475
+  MLLW: -5.094
+  NAVD88: -5.106
+  LAT: -4.467
+  HAT: -7.944
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9434939
+established: 1933-03-14T00:00:00Z
+removed: 2013-10-13T23:59:00Z

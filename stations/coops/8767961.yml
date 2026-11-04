@@ -1,0 +1,27 @@
+name: Bulk Terminal
+lat: 30.1903
+lon: -93.3007
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.448
+  MHW: -7.42
+  DTL: -7.244
+  MTL: -7.264
+  MSL: -7.268
+  MLW: -7.109
+  MLLW: -7.039
+  NAVD88: -7.233
+  LAT: -6.743
+  HAT: -7.57
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8767961
+established: 2009-02-10T00:00:00Z

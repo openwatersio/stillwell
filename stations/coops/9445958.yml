@@ -1,0 +1,26 @@
+name: Bremerton
+lat: 47.5617
+lon: -122.623
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.041
+  MHW: -6.768
+  DTL: -5.256
+  MTL: -5.554
+  MSL: -5.547
+  MLW: -4.34
+  MLLW: -3.47
+  LAT: -2.064
+  HAT: -7.764
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445958
+established: 1977-04-06T00:00:00Z

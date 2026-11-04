@@ -1,0 +1,16 @@
+name: PORT ARANSAS (SPECIAL PROJECT)
+lat: 27.8383
+lon: -97.0517
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8775238
+established: 1989-10-27T00:00:00Z
+removed: 1991-03-01T23:59:00Z

@@ -1,0 +1,14 @@
+name: Oudemirdum, IJsselmeer, noordoost, meetpaal 09
+lat: 52.810189
+lon: 5.48847
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/oudemirdum.ijsselmeer.noordoost.meetpaal9/details

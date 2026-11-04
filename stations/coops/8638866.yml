@@ -1,0 +1,16 @@
+name: CHES BAY BR TEST FAC (BACKUP)
+lat: 36.9667
+lon: -76.1133
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638866
+established: 1976-03-18T00:00:00Z
+removed: 1995-02-27T23:59:00Z

@@ -1,0 +1,25 @@
+name: FORT MATANZAS
+lat: 29.715
+lon: -81.2383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.146
+  MHW: -2.051
+  DTL: -1.483
+  MTL: -1.464
+  MSL: -1.487
+  MLW: -0.876
+  MLLW: -0.82
+  NAVD88: -1.627
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720686
+established: 1973-12-01T00:00:00Z
+removed: 1979-03-22T23:59:00Z

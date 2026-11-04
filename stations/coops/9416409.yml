@@ -1,0 +1,26 @@
+name: Green Cove
+lat: 38.704334
+lon: -123.44939
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.588
+  MHW: -5.384
+  DTL: -4.791
+  MTL: -4.831
+  MSL: -4.806
+  MLW: -4.278
+  MLLW: -3.993
+  LAT: -3.301
+  HAT: -6.124
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9416409
+established: 2012-10-31T00:00:00Z
+removed: 2013-03-07T23:59:00Z

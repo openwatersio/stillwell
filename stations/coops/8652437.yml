@@ -1,0 +1,26 @@
+name: Oyster Creek
+lat: 35.845
+lon: -75.655
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.741
+  MHW: -0.715
+  DTL: -0.65
+  MTL: -0.652
+  MSL: -0.651
+  MLW: -0.589
+  MLLW: -0.558
+  LAT: -0.532
+  HAT: -0.779
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8652437
+established: 2002-04-10T00:00:00Z
+removed: 2002-10-10T23:59:00Z

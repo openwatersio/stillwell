@@ -1,0 +1,24 @@
+name: FORD'S TERROR, STEPHEN'S PASS
+lat: 57.6876
+lon: -133.1425
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.669
+  MHW: -10.373
+  DTL: -8.688
+  MTL: -8.661
+  MSL: -8.587
+  MLW: -6.948
+  MLLW: -6.706
+  NAVD88: -6.778
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452017
+removed: 2025-08-30T00:00:00Z

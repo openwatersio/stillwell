@@ -1,0 +1,19 @@
+name: New Baltimore, Lake St. Clair
+lat: 42.677776
+lon: -82.73389
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -174.4
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9034057
+established: 2008-06-11T00:00:00Z
+removed: 2018-10-23T21:00:00Z

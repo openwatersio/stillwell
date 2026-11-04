@@ -1,0 +1,16 @@
+name: MONTEZUMA SLOUGH BRIDGE
+lat: 38.1867
+lon: -121.98
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415402
+established: 1977-04-20T00:00:00Z
+removed: 1989-07-10T23:59:00Z

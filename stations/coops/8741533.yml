@@ -1,0 +1,27 @@
+name: Pascagoula NOAA Lab
+lat: 30.367777
+lon: -88.56306
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.136
+  MHW: -7.108
+  DTL: -6.903
+  MTL: -6.902
+  MSL: -6.9
+  MLW: -6.695
+  MLLW: -6.669
+  NAVD88: -6.869
+  LAT: -6.295
+  HAT: -7.39
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8741533
+established: 2005-09-13T00:00:00Z

@@ -1,0 +1,25 @@
+name: MANGROVE POINT INSIDE
+lat: 27.7417
+lon: -82.4667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.451
+  MHW: -1.364
+  DTL: -1.069
+  MTL: -1.088
+  MSL: -1.097
+  MLW: -0.813
+  MLLW: -0.688
+  NAVD88: -1.19
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726492
+established: 1977-03-14T00:00:00Z
+removed: 1977-10-26T23:59:00Z

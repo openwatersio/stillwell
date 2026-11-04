@@ -1,0 +1,24 @@
+name: COW ISLAND, CASCO BAY
+lat: 43.69
+lon: -70.19
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.686
+  MHW: -2.554
+  DTL: -1.179
+  MTL: -1.165
+  MSL: -1.172
+  MLW: 0.223
+  MLLW: 0.326
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8418009
+established: 1979-09-21T00:00:00Z
+removed: 1979-11-05T23:59:00Z

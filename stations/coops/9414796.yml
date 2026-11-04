@@ -1,0 +1,14 @@
+name: GPS Buoy, San Francisco Bay
+lat: 37.8333
+lon: -122.397
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414796

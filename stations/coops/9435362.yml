@@ -1,0 +1,24 @@
+name: TOLEDO
+lat: 44.6167
+lon: -123.937
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.31
+  MHW: -3.103
+  DTL: -1.965
+  MTL: -2.055
+  MSL: -2.051
+  MLW: -1.008
+  MLLW: -0.62
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9435362
+established: 1933-08-16T00:00:00Z
+removed: 1982-12-08T23:59:00Z

@@ -1,0 +1,26 @@
+name: Ship Island, Mississippi Sound
+lat: 30.2133
+lon: -88.9717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.649
+  MHW: -1.641
+  DTL: -1.404
+  MTL: -1.414
+  MSL: -1.402
+  MLW: -1.187
+  MLLW: -1.16
+  LAT: -0.807
+  HAT: -1.901
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8744756
+established: 1979-08-17T00:00:00Z
+removed: 2011-11-30T23:59:00Z

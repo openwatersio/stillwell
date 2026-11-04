@@ -1,0 +1,24 @@
+name: FAKAHATCHEE RIVER ENTRANCE
+lat: 25.89
+lon: -81.4767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.507
+  MHW: -1.418
+  DTL: -1.035
+  MTL: -1.051
+  MSL: -1.023
+  MLW: -0.683
+  MLLW: -0.563
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724962
+established: 1977-12-21T00:00:00Z
+removed: 1978-06-27T23:59:00Z

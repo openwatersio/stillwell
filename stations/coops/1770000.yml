@@ -1,0 +1,26 @@
+name: Pago Pago, American Samoa
+lat: -14.28
+lon: -170.69
+country_code: AS
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.861
+  MHW: -1.82
+  DTL: -1.437
+  MTL: -1.425
+  MSL: -1.426
+  MLW: -1.031
+  MLLW: -1.013
+  LAT: -0.802
+  HAT: -2.103
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1770000
+established: 1948-09-06T00:00:00Z

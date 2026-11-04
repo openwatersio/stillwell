@@ -1,0 +1,16 @@
+name: INDIAN KEY, HAWK CHANNEL
+lat: 24.8767
+lon: -80.6767
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723843
+established: 1975-05-22T00:00:00Z
+removed: 1975-07-08T23:59:00Z

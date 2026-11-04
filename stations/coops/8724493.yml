@@ -1,0 +1,27 @@
+name: BOCA CHICA MARINA
+lat: 24.575
+lon: -81.7083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.157
+  MHW: -4.081
+  DTL: -3.967
+  MTL: -3.954
+  MSL: -3.976
+  MLW: -3.828
+  MLLW: -3.776
+  NAVD88: -4.214
+  LAT: -3.675
+  HAT: -4.321
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724493
+established: 2000-02-02T00:00:00Z
+removed: 2000-06-22T23:59:00Z

@@ -1,0 +1,16 @@
+name: MOSSDALE,SAN JOAQUIN RIVER
+lat: 37.7867
+lon: -121.313
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414768
+established: 1977-12-16T00:00:00Z
+removed: 1980-01-03T23:59:00Z

@@ -1,0 +1,25 @@
+name: EDISTO BEACH, EDISTO ISLAND
+lat: 32.5017
+lon: -80.2967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.795
+  MHW: -2.676
+  DTL: -1.828
+  MTL: -1.8
+  MSL: -1.824
+  MLW: -0.925
+  MLLW: -0.861
+  NAVD88: -1.92
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667630
+established: 1973-01-24T00:00:00Z
+removed: 1982-10-06T23:59:00Z

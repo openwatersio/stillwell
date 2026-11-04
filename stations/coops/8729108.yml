@@ -1,0 +1,27 @@
+name: Panama City
+lat: 30.149723
+lon: -85.664444
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.428
+  MHW: -1.414
+  DTL: -1.224
+  MTL: -1.224
+  MSL: -1.222
+  MLW: -1.033
+  MLLW: -1.019
+  NAVD88: -1.189
+  LAT: -0.661
+  HAT: -1.676
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729108
+established: 1973-02-11T00:00:00Z

@@ -1,0 +1,27 @@
+name: Tulare Beach, Port Susan
+lat: 48.106804
+lon: -122.347275
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.656
+  MHW: -9.396
+  DTL: -7.968
+  MTL: -8.255
+  MSL: -8.248
+  MLW: -7.115
+  MLLW: -6.28
+  NAVD88: -6.899
+  LAT: -4.915
+  HAT: -10.319
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9448043
+established: 2013-05-20T00:00:00Z
+removed: 2013-09-05T23:59:00Z

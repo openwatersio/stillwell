@@ -1,0 +1,26 @@
+name: Quinhagak (Kwinak), Kushkokwin River
+lat: 59.750553
+lon: -161.91544
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -16.38
+  MHW: -15.698
+  DTL: -14.563
+  MTL: -14.322
+  MSL: -14.405
+  MLW: -12.947
+  MLLW: -12.744
+  LAT: -12.085
+  HAT: -17.332
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465831
+established: 2010-05-27T00:00:00Z
+removed: 2011-10-04T23:59:00Z

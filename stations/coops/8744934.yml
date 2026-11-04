@@ -1,0 +1,26 @@
+name: BILOXI RIVER, LOWER END
+lat: 30.435
+lon: -89.0083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.007
+  MHW: -0.922
+  DTL: -0.69
+  MTL: -0.682
+  MSL: -0.698
+  MLW: -0.441
+  MLLW: -0.372
+  LAT: -0.198
+  HAT: -1.221
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8744934
+established: 1979-07-31T00:00:00Z
+removed: 1979-11-01T23:59:00Z

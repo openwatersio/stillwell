@@ -1,0 +1,26 @@
+name: Lester Manor
+lat: 37.5833
+lon: -76.99
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.428
+  MHW: -0.375
+  DTL: 0.075
+  MTL: 0.086
+  MSL: 0.051
+  MLW: 0.547
+  MLLW: 0.578
+  LAT: 0.715
+  HAT: -0.578
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8636653
+established: 1912-07-30T00:00:00Z
+removed: 2007-03-13T23:59:00Z

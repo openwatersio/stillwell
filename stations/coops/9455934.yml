@@ -1,0 +1,26 @@
+name: Port Mackenzie
+lat: 61.2683
+lon: -149.917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -11.318
+  MHW: -11.097
+  DTL: -6.883
+  MTL: -7.112
+  MSL: -7.4
+  MLW: -3.128
+  MLLW: -2.448
+  LAT: -0.475
+  HAT: -13.184
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455934
+established: 2001-05-22T00:00:00Z
+removed: 2002-08-23T00:00:00Z

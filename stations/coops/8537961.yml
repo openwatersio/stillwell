@@ -1,0 +1,16 @@
+name: SINNICKSON LANDING, SALEM R.
+lat: 39.57
+lon: -75.4983
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8537961
+established: 1977-08-22T00:00:00Z
+removed: 1983-10-14T23:59:00Z

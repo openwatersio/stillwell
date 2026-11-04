@@ -1,0 +1,16 @@
+name: Geesthacht, Elbe, Wehr, Unterpegel
+lat: 53.42333
+lon: 10.33472
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -4.21
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5930060]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/geesthacht_wehr_unterpegel

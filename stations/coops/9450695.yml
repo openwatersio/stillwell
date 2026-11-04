@@ -1,0 +1,25 @@
+name: HUT POINT, BEHM CANAL
+lat: 55.7127
+lon: -130.9041
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.84
+  MHW: -5.561
+  DTL: -3.39
+  MTL: -3.491
+  MSL: -3.486
+  MLW: -1.421
+  MLLW: -0.94
+  NAVD88: -2.052
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450695
+established: 1984-04-27T00:00:00Z
+removed: 2025-09-26T00:00:00Z

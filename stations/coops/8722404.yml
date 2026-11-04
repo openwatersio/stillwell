@@ -1,0 +1,25 @@
+name: PECK LAKE, ST. LUCIE INLET
+lat: 27.1133
+lon: -80.145
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.436
+  MHW: -1.401
+  DTL: -1.206
+  MTL: -1.208
+  MSL: -1.214
+  MLW: -1.016
+  MLLW: -0.976
+  NAVD88: -1.521
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722404
+established: 1972-09-20T00:00:00Z
+removed: 1973-01-22T23:59:00Z

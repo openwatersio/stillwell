@@ -1,0 +1,27 @@
+name: WEST BAY CREEK  WEST BAY
+lat: 30.2933
+lon: -85.8583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.11
+  MHW: -5.088
+  DTL: -4.882
+  MTL: -4.884
+  MSL: -4.882
+  MLW: -4.68
+  MLLW: -4.654
+  NAVD88: -4.822
+  LAT: -4.334
+  HAT: -5.351
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729197
+established: 1975-11-21T00:00:00Z
+removed: 2021-08-19T10:00:00Z

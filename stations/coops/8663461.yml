@@ -1,0 +1,24 @@
+name: CASINO CREEK
+lat: 33.1083
+lon: -79.3933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.735
+  MHW: -2.628
+  DTL: -1.965
+  MTL: -1.934
+  MSL: -1.943
+  MLW: -1.241
+  MLLW: -1.195
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8663461
+established: 1977-04-28T00:00:00Z
+removed: 1979-03-03T23:59:00Z

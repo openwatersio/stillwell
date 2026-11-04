@@ -1,0 +1,24 @@
+name: EAST END, PASS MANCHAC
+lat: 30.2967
+lon: -90.3117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.417
+  MHW: -1.416
+  DTL: -1.34
+  MTL: -1.34
+  MSL: -1.342
+  MLW: -1.263
+  MLLW: -1.263
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762273
+established: 1982-11-23T00:00:00Z
+removed: 1988-06-07T23:59:00Z

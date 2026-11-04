@@ -1,0 +1,26 @@
+name: Newbold
+lat: 40.137333
+lon: -74.75183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.921
+  MHW: -6.813
+  DTL: -5.643
+  MTL: -5.618
+  MSL: -5.682
+  MLW: -4.423
+  MLLW: -4.364
+  LAT: -4.102
+  HAT: -7.317
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8548989
+established: 2001-10-27T00:00:00Z

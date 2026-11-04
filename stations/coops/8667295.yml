@@ -1,0 +1,25 @@
+name: White House Woods, Mosquito Creek
+lat: 32.5587
+lon: -80.4544
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.491
+  MHW: -8.406
+  DTL: -7.518
+  MTL: -7.507
+  MSL: -7.597
+  MLW: -6.608
+  MLLW: -6.545
+  NAVD88: -7.638
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667295
+established: 2021-09-27T00:00:00Z
+removed: 2022-02-16T00:00:00Z

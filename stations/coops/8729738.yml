@@ -1,0 +1,16 @@
+name: UPPER BLACKWATER RIVER
+lat: 30.6583
+lon: -86.9883
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729738
+established: 1977-06-21T00:00:00Z
+removed: 1978-01-17T23:59:00Z

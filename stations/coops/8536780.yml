@@ -1,0 +1,16 @@
+name: EAST POINT
+lat: 39.2
+lon: -75.02
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8536780
+established: 1975-05-16T00:00:00Z
+removed: 1975-10-23T23:59:00Z

@@ -1,0 +1,24 @@
+name: CAPE ARAGO LIGHTHOUSE
+lat: 43.3417
+lon: -124.367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.863
+  MHW: -2.654
+  DTL: -1.7
+  MTL: -1.768
+  MSL: -1.722
+  MLW: -0.882
+  MLLW: -0.538
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9432771
+established: 1972-04-16T00:00:00Z
+removed: 1977-01-03T23:59:00Z

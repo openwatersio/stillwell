@@ -1,0 +1,27 @@
+name: Gulf State Park Pier
+lat: 30.2483
+lon: -87.6683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.145
+  MHW: -7.137
+  DTL: -6.932
+  MTL: -6.93
+  MSL: -6.921
+  MLW: -6.723
+  MLLW: -6.719
+  NAVD88: -6.93
+  LAT: -6.409
+  HAT: -7.403
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8731269
+established: 1980-03-28T00:00:00Z
+removed: 2021-08-12T14:00:00Z

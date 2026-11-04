@@ -1,0 +1,24 @@
+name: WADING RIVER
+lat: 39.6183
+lon: -74.4967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.065
+  MHW: -1.99
+  DTL: -1.55
+  MTL: -1.536
+  MSL: -1.588
+  MLW: -1.082
+  MLLW: -1.035
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534043
+established: 1977-05-13T00:00:00Z
+removed: 1978-07-11T23:59:00Z

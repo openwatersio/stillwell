@@ -1,0 +1,24 @@
+name: BLIGH ISLAND, T-16
+lat: 60.8067
+lon: -146.798
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.982
+  MHW: -2.704
+  DTL: -1.138
+  MTL: -1.227
+  MSL: -1.252
+  MLW: 0.249
+  MLLW: 0.706
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454381
+established: 1977-06-06T00:00:00Z
+removed: 1977-08-08T23:59:00Z

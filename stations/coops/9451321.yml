@@ -1,0 +1,27 @@
+name: Castle Islands, Duncan Canal
+lat: 56.643307
+lon: -133.152
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.652
+  MHW: -9.382
+  DTL: -7.24
+  MTL: -7.336
+  MSL: -7.269
+  MLW: -5.29
+  MLLW: -4.828
+  NAVD88: -5.803
+  LAT: -3.381
+  HAT: -10.971
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451321
+established: 1972-10-05T00:00:00Z
+removed: 2024-08-31T00:00:00Z

@@ -1,0 +1,26 @@
+name: Dumbarton Bridge
+lat: 37.5067
+lon: -122.115
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.283
+  MHW: -6.095
+  DTL: -4.97
+  MTL: -5.068
+  MSL: -5.085
+  MLW: -4.041
+  MLLW: -3.658
+  LAT: -3.047
+  HAT: -6.749
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414509
+established: 1974-05-03T00:00:00Z
+removed: 2011-07-14T23:59:00Z

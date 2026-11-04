@@ -1,0 +1,18 @@
+name: Knik River
+lat: 61.50414
+lon: -149.03264
+country_code: US
+datum: STND
+datums:
+  MSL: -3.695
+  NAVD88: 10.278
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455983
+established: 2022-05-15T00:00:00Z
+removed: 2022-09-28T18:12:00Z

@@ -1,0 +1,24 @@
+name: Big Pine Key NE
+lat: 24.7283
+lon: -81.3867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.412
+  MHW: -1.357
+  DTL: -1.183
+  MTL: -1.195
+  MSL: -1.195
+  MLW: -1.033
+  MLLW: -0.954
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724226
+established: 1974-09-24T00:00:00Z
+removed: 1974-11-19T23:59:00Z

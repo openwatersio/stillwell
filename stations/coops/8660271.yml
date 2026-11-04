@@ -1,0 +1,20 @@
+name: North Myrtle Beach
+lat: 33.832527
+lon: -78.68745
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.466
+  MHW: -7.376
+  NAVD88: -5.784
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660271
+established: 2022-11-14T00:00:00Z
+removed: 2023-04-23T22:00:00Z

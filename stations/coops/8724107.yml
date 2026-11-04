@@ -1,0 +1,25 @@
+name: MISSOURI-OHIO CHANNEL
+lat: 24.6733
+lon: -81.2433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.176
+  MHW: -1.104
+  DTL: -0.962
+  MTL: -0.946
+  MSL: -0.952
+  MLW: -0.788
+  MLLW: -0.748
+  NAVD88: -1.221
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724107
+established: 1975-02-28T00:00:00Z
+removed: 1975-04-04T23:59:00Z

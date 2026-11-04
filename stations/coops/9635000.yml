@@ -1,0 +1,16 @@
+name: Puerto Quetzal (San Jose)
+lat: 13.9167
+lon: -90.83
+country_code: GT
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9635000
+established: 1949-10-01T00:00:00Z
+removed: 2002-09-12T23:59:00Z

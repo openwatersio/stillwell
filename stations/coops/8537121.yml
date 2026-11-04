@@ -1,0 +1,26 @@
+name: Ship John Shoal
+lat: 39.30539
+lon: -75.37668
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.451
+  MHW: -7.316
+  DTL: -6.505
+  MTL: -6.467
+  MSL: -6.486
+  MLW: -5.618
+  MLLW: -5.559
+  LAT: -5.162
+  HAT: -7.803
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8537121
+established: 1997-10-30T00:00:00Z

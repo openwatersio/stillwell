@@ -1,0 +1,26 @@
+name: Kickamuit River
+lat: 41.7078
+lon: -71.2417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.397
+  MHW: -9.323
+  DTL: -8.678
+  MTL: -8.668
+  MSL: -8.627
+  MLW: -8.012
+  MLLW: -7.958
+  LAT: -7.661
+  HAT: -9.765
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8455137
+established: 2015-01-30T00:00:00Z
+removed: 2015-09-15T23:59:00Z

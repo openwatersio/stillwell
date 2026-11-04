@@ -1,0 +1,25 @@
+name: PIGEON KEY (INSIDE)
+lat: 24.705
+lon: -81.1567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.187
+  MHW: -1.108
+  DTL: -1.038
+  MTL: -1.019
+  MSL: -1.032
+  MLW: -0.93
+  MLLW: -0.889
+  NAVD88: -1.283
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724033
+established: 1973-10-18T00:00:00Z
+removed: 1974-01-21T23:59:00Z

@@ -1,0 +1,16 @@
+name: SPUYTEN DUYVIL CK, ENT., HUDSON R,
+lat: 40.8783
+lon: -73.925
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518903
+established: 1981-03-17T00:00:00Z
+removed: 1981-05-16T23:59:00Z

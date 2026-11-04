@@ -1,0 +1,27 @@
+name: Pensacola
+lat: 30.4044
+lon: -87.2112
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.952
+  MHW: -2.943
+  DTL: -2.761
+  MTL: -2.76
+  MSL: -2.757
+  MLW: -2.578
+  MLLW: -2.569
+  NAVD88: -2.667
+  LAT: -2.211
+  HAT: -3.231
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729840
+established: 1923-04-30T00:00:00Z

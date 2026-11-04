@@ -1,0 +1,25 @@
+name: FORT PIERCE, SOUTH JETTY
+lat: 27.47
+lon: -80.2883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.846
+  MHW: -1.78
+  DTL: -1.392
+  MTL: -1.389
+  MSL: -1.403
+  MLW: -0.999
+  MLLW: -0.938
+  NAVD88: -1.762
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722212
+established: 1972-05-18T00:00:00Z
+removed: 1973-01-24T23:59:00Z

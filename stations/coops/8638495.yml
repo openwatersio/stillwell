@@ -1,0 +1,26 @@
+name: Richmond River Locks, James River
+lat: 37.525
+lon: -77.42
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.874
+  MHW: -0.807
+  DTL: -0.313
+  MTL: -0.302
+  MSL: -0.339
+  MLW: 0.202
+  MLLW: 0.248
+  LAT: 0.447
+  HAT: -1.186
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638495
+established: 1971-02-21T00:00:00Z
+removed: 2010-09-14T23:59:00Z

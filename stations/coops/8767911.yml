@@ -1,0 +1,27 @@
+name: East Calcasieu Lake
+lat: 29.9939
+lon: -93.2705
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.83
+  MHW: -8.805
+  DTL: -8.646
+  MTL: -8.665
+  MSL: -8.668
+  MLW: -8.525
+  MLLW: -8.463
+  NAVD88: -8.729
+  LAT: -8.129
+  HAT: -8.97
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8767911
+established: 2019-09-17T00:00:00Z
+removed: 2020-06-26T16:24:00Z

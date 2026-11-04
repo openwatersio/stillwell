@@ -1,0 +1,27 @@
+name: Texas Point, Sabine Pass
+lat: 29.6893
+lon: -93.8418
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.558
+  MHW: -1.521
+  DTL: -1.263
+  MTL: -1.319
+  MSL: -1.321
+  MLW: -1.117
+  MLLW: -0.969
+  NAVD88: -1.309
+  LAT: -0.464
+  HAT: -1.817
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770822
+established: 2011-06-28T00:00:00Z

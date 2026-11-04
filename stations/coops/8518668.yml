@@ -1,0 +1,26 @@
+name: Horns Hook
+lat: 40.7767
+lon: -73.9417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.01
+  MHW: -2.915
+  DTL: -2.22
+  MTL: -2.202
+  MSL: -2.202
+  MLW: -1.488
+  MLLW: -1.43
+  LAT: -1.048
+  HAT: -3.501
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518668
+established: 1979-10-03T00:00:00Z
+removed: 2005-10-14T23:59:00Z

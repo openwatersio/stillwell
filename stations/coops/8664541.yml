@@ -1,0 +1,25 @@
+name: YEAMANS HALL, GOOSE CREEK
+lat: 32.925
+lon: -79.9867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.904
+  MHW: -2.818
+  DTL: -2.038
+  MTL: -2.035
+  MSL: -2.196
+  MLW: -1.251
+  MLLW: -1.171
+  NAVD88: -2.066
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664541
+established: 1978-08-30T00:00:00Z
+removed: 1980-02-05T23:59:00Z

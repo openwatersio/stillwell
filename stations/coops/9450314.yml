@@ -1,0 +1,26 @@
+name: Metlakatla, Port Chester, AK
+lat: 55.1283
+lon: -131.567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.515
+  MHW: -7.244
+  DTL: -5.249
+  MTL: -5.35
+  MSL: -5.346
+  MLW: -3.456
+  MLLW: -2.983
+  LAT: -1.612
+  HAT: -8.735
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450314
+established: 1883-08-11T00:00:00Z
+removed: 2009-12-17T23:59:00Z

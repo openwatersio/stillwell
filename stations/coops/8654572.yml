@@ -1,0 +1,24 @@
+name: Ocracoke Island
+lat: 35.171333
+lon: -75.817444
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.667
+  MHW: -9.644
+  DTL: -9.594
+  MTL: -9.59
+  MSL: -9.593
+  MLW: -9.535
+  MLLW: -9.522
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8654572
+established: 2012-02-13T00:00:00Z
+removed: 2012-08-12T23:59:00Z

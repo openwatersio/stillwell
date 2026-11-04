@@ -1,0 +1,26 @@
+name: PAULSBORO, MANTUA CREEK
+lat: 39.835
+lon: -75.2383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.604
+  MHW: -2.494
+  DTL: -1.662
+  MTL: -1.635
+  MSL: -1.713
+  MLW: -0.775
+  MLLW: -0.719
+  LAT: -0.354
+  HAT: -2.986
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538512
+established: 1977-06-21T00:00:00Z
+removed: 1981-07-29T23:59:00Z

@@ -1,0 +1,25 @@
+name: GANDY BRIDGE,  OLD TAMPA BAY
+lat: 27.8933
+lon: -82.5383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.44
+  MHW: -1.339
+  DTL: -1.051
+  MTL: -1.072
+  MSL: -1.071
+  MLW: -0.806
+  MLLW: -0.662
+  NAVD88: -1.157
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726641
+established: 1975-10-01T00:00:00Z
+removed: 1991-06-04T23:59:00Z

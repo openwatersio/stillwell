@@ -1,0 +1,18 @@
+name: Kasegaluk Lagoon
+lat: 69.73258
+lon: -163.02881
+country_code: US
+datum: STND
+datums:
+  MSL: -4.201
+  NAVD88: -3.118
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9493291
+established: 2021-07-01T00:00:00Z
+removed: 2021-09-27T00:00:00Z

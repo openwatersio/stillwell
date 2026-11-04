@@ -1,0 +1,27 @@
+name: Key Colony Beach
+lat: 24.7183
+lon: -81.0167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.683
+  MHW: -1.617
+  DTL: -1.367
+  MTL: -1.364
+  MSL: -1.371
+  MLW: -1.111
+  MLLW: -1.051
+  NAVD88: -1.675
+  LAT: -0.787
+  HAT: -1.966
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723962
+established: 1976-06-16T00:00:00Z
+removed: 2005-10-24T23:59:00Z

@@ -1,0 +1,24 @@
+name: KEYDASH, ISLE OF WIGHT BAY
+lat: 38.3417
+lon: -75.085
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.825
+  MHW: -1.772
+  DTL: -1.546
+  MTL: -1.539
+  MSL: -1.551
+  MLW: -1.307
+  MLLW: -1.267
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8570255
+established: 1977-05-20T00:00:00Z
+removed: 1979-07-06T23:59:00Z

@@ -1,0 +1,26 @@
+name: Martha's Vineyard GPS Buoy
+lat: 41.32622
+lon: -70.59033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 28.614
+  MHW: 28.682
+  DTL: 29.09
+  MTL: 29.106
+  MSL: 29.126
+  MLW: 29.529
+  MLLW: 29.565
+  LAT: 29.803
+  HAT: 28.33
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448875
+established: 2015-06-09T00:00:00Z
+removed: 2015-07-26T00:00:00Z

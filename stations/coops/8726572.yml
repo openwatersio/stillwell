@@ -1,0 +1,25 @@
+name: THE KITCHEN
+lat: 27.82
+lon: -82.3867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.492
+  MHW: -1.406
+  DTL: -1.124
+  MTL: -1.132
+  MSL: -1.131
+  MLW: -0.858
+  MLLW: -0.756
+  NAVD88: -1.215
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726572
+established: 1977-03-07T00:00:00Z
+removed: 1979-04-18T23:59:00Z

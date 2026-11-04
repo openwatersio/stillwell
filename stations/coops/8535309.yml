@@ -1,0 +1,24 @@
+name: TOWNSEND SOUND
+lat: 39.1467
+lon: -74.75
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.798
+  MHW: -1.678
+  DTL: -1.161
+  MTL: -1.116
+  MSL: -1.125
+  MLW: -0.554
+  MLLW: -0.523
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535309
+established: 1977-07-27T00:00:00Z
+removed: 1978-01-14T23:59:00Z

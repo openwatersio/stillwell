@@ -1,0 +1,16 @@
+name: JERSEY ISLAND, FALSE RIVER
+lat: 38.055
+lon: -121.657
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415145
+established: 1977-08-19T00:00:00Z
+removed: 1992-03-27T23:59:00Z

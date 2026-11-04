@@ -1,0 +1,16 @@
+name: LIEPE OP
+lat: 52.848971
+lon: 13.953465
+country_code: DE
+datum: PNP
+datums:
+  NHN: 0.676
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=693230

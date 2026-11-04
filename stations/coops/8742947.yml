@@ -1,0 +1,24 @@
+name: EASTERN OLD FORT BAYOU
+lat: 30.44
+lon: -88.7267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.366
+  MHW: -1.276
+  DTL: -1.053
+  MTL: -1.05
+  MSL: -1.068
+  MLW: -0.824
+  MLLW: -0.739
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8742947
+established: 1980-01-31T00:00:00Z
+removed: 1980-05-01T23:59:00Z

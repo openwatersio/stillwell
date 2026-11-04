@@ -1,0 +1,16 @@
+name: COYOTE CREEK, TRIBUTARY 2, S. F. BAY
+lat: 37.46
+lon: -121.953
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414589
+established: 1976-10-30T00:00:00Z
+removed: 1978-05-03T23:59:00Z

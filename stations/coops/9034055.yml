@@ -1,0 +1,19 @@
+name: Point Huron
+lat: 42.59325
+lon: -82.772446
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -174.4
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9034055
+established: 2018-03-27T00:00:00Z
+removed: 2018-10-25T16:00:00Z

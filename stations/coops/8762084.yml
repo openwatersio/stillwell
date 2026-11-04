@@ -1,0 +1,26 @@
+name: LEEVILLE, BAYOU LAFOURCHE
+lat: 29.2483
+lon: -90.2117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.33
+  MHW: -1.326
+  DTL: -1.195
+  MTL: -1.196
+  MSL: -1.204
+  MLW: -1.066
+  MLLW: -1.061
+  LAT: -0.81
+  HAT: -1.506
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762084
+established: 1934-04-23T00:00:00Z
+removed: 1991-01-08T23:59:00Z

@@ -1,0 +1,16 @@
+name: Easter Island
+lat: -27.15
+lon: -109.448
+country_code: CL
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9962420
+established: 1991-07-21T00:00:00Z
+removed: 2002-09-05T23:59:00Z

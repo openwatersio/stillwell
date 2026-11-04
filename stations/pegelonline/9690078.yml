@@ -1,0 +1,17 @@
+name: GREIFSWALD OIE
+lat: 54.241313
+lon: 13.907208
+country_code: DE
+kind: coastal
+datum: PNP
+datums:
+  NHN: -4.968
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=9690078

@@ -1,0 +1,16 @@
+name: NAGLEE BRIDGE,OLD RIVER
+lat: 37.8033
+lon: -121.448
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414778
+established: 1979-04-12T00:00:00Z
+removed: 1979-10-02T23:59:00Z

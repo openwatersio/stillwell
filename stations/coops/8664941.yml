@@ -1,0 +1,26 @@
+name: South Capers Island
+lat: 32.8567
+lon: -79.7067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.569
+  MHW: -2.451
+  DTL: -1.756
+  MTL: -1.723
+  MSL: -1.73
+  MLW: -0.995
+  MLLW: -0.944
+  LAT: -0.488
+  HAT: -3.027
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664941
+established: 1975-08-21T00:00:00Z
+removed: 2008-03-09T23:59:00Z

@@ -1,0 +1,27 @@
+name: RIVERSIDE, MERRIMACK RIVER
+lat: 42.76389
+lon: -71.03403
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.988
+  MHW: -2.847
+  DTL: -2.027
+  MTL: -1.975
+  MSL: -1.914
+  MLW: -1.104
+  MLLW: -1.067
+  NAVD88: -1.487
+  LAT: -0.787
+  HAT: -3.277
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8440889
+established: 1989-05-25T00:00:00Z
+removed: 1989-10-24T23:59:00Z

@@ -1,0 +1,16 @@
+name: GRÜTZ OP
+lat: 52.667155
+lon: 12.259671
+country_code: DE
+datum: PNP
+datums:
+  NHN: 23.812
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580700

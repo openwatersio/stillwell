@@ -1,0 +1,25 @@
+name: SHIRED ISLAND
+lat: 29.3983
+lon: -83.2067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.473
+  MHW: -1.388
+  DTL: -0.943
+  MTL: -0.981
+  MSL: -0.979
+  MLW: -0.575
+  MLLW: -0.414
+  NAVD88: -1.015
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727604
+established: 1978-06-26T00:00:00Z
+removed: 1979-01-15T23:59:00Z

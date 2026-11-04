@@ -1,0 +1,26 @@
+name: SAYREVILLE, RARITAN RIVER
+lat: 40.4783
+lon: -74.3567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.5
+  MHW: -2.4
+  DTL: -1.587
+  MTL: -1.572
+  MSL: -1.602
+  MLW: -0.744
+  MLLW: -0.673
+  LAT: -0.178
+  HAT: -2.94
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531390
+established: 1976-02-17T00:00:00Z
+removed: 1977-05-27T23:59:00Z

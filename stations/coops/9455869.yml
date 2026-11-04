@@ -1,0 +1,26 @@
+name: North Foreland
+lat: 61.043304
+lon: -151.163
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.285
+  MHW: -9.076
+  DTL: -6.091
+  MTL: -6.316
+  MSL: -6.404
+  MLW: -3.557
+  MLLW: -2.898
+  LAT: -1.379
+  HAT: -10.682
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455869
+established: 1977-06-02T00:00:00Z
+removed: 2008-09-14T23:59:00Z

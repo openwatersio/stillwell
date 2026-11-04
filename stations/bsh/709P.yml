@@ -1,0 +1,16 @@
+name: Stadersand, Schwinge
+lat: 53.62972
+lon: 9.52667
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.05
+  SKN: -3.13
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970013]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/stadersand

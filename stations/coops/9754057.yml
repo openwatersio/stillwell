@@ -1,0 +1,26 @@
+name: Palmas del Mar
+lat: 18.0781
+lon: -65.7956
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.67
+  MHW: -8.672
+  DTL: -8.561
+  MTL: -8.56
+  MSL: -8.561
+  MLW: -8.448
+  MLLW: -8.451
+  LAT: -8.316
+  HAT: -8.78
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9754057
+established: 2020-11-20T00:00:00Z
+removed: 2021-04-04T18:00:00Z

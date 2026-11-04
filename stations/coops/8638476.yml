@@ -1,0 +1,24 @@
+name: Jordan Point, James River
+lat: 37.3133
+lon: -77.2233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.716
+  MHW: -9.639
+  DTL: -9.3
+  MTL: -9.279
+  MSL: -9.3
+  MLW: -8.919
+  MLLW: -8.884
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638476
+established: 1948-09-30T00:00:00Z
+removed: 2012-05-03T23:59:00Z

@@ -1,0 +1,25 @@
+name: DAVIS ISLAND, HILLSBOROUGH BAY
+lat: 27.9083
+lon: -82.4517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.404
+  MHW: -1.303
+  DTL: -1.004
+  MTL: -1.025
+  MSL: -1.035
+  MLW: -0.747
+  MLLW: -0.604
+  NAVD88: -1.127
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726657
+established: 1976-11-30T00:00:00Z
+removed: 1991-09-03T23:59:00Z

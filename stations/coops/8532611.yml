@@ -1,0 +1,16 @@
+name: RIVIERA BEACH, MANASQUAN RIVER
+lat: 40.0967
+lon: -74.0867
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8532611
+established: 1976-03-12T00:00:00Z
+removed: 1977-06-15T23:59:00Z

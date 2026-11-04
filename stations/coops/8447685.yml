@@ -1,0 +1,26 @@
+name: Chappaquoit Point
+lat: 41.605
+lon: -70.6517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.472
+  MHW: -2.392
+  DTL: -1.825
+  MTL: -1.809
+  MSL: -1.74
+  MLW: -1.226
+  MLLW: -1.177
+  LAT: -0.856
+  HAT: -2.839
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447685
+established: 1976-06-04T00:00:00Z
+removed: 2000-10-13T23:59:00Z

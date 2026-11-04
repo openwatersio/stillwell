@@ -1,0 +1,16 @@
+name: ZIEGELHAUSEN AMS
+lat: 49.416607
+lon: 8.761896
+country_code: DE
+datum: PNP
+datums:
+  NHN: 105.83
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=23800745

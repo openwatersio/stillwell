@@ -1,0 +1,25 @@
+name: MINIM CREEK
+lat: 33.195
+lon: -79.275
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.498
+  MHW: -6.396
+  DTL: -5.812
+  MTL: -5.789
+  MSL: -5.8
+  MLW: -5.181
+  MLLW: -5.126
+  NAVD88: -5.808
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662796
+established: 1975-05-29T00:00:00Z
+removed: 1975-10-09T23:59:00Z

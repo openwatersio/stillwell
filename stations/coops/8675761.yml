@@ -1,0 +1,26 @@
+name: "Daymark #185, Rockdedundy River Entrance"
+lat: 31.373861
+lon: -81.33395
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.384
+  MHW: -3.272
+  DTL: -2.238
+  MTL: -2.216
+  MSL: -2.263
+  MLW: -1.159
+  MLLW: -1.093
+  LAT: -0.599
+  HAT: -4.059
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8675761
+established: 1980-04-09T00:00:00Z
+removed: 2012-05-22T15:58:00Z

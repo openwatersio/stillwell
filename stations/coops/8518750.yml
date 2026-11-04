@@ -1,0 +1,27 @@
+name: The Battery
+lat: 40.700554
+lon: -74.01417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.543
+  MHW: -2.445
+  DTL: -1.773
+  MTL: -1.755
+  MSL: -1.785
+  MLW: -1.065
+  MLLW: -1.002
+  NAVD88: -1.848
+  LAT: -0.537
+  HAT: -2.978
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518750
+established: 1920-05-24T00:00:00Z

@@ -1,0 +1,24 @@
+name: Hollis Anchorage, Kasaan Bay
+lat: 55.48
+lon: -132.645
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.408
+  MHW: -5.132
+  DTL: -2.988
+  MTL: -3.093
+  MSL: -3.09
+  MLW: -1.053
+  MLLW: -0.568
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450544
+established: 1905-08-02T00:00:00Z
+removed: 2003-09-02T23:59:00Z

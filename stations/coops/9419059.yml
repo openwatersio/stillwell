@@ -1,0 +1,25 @@
+name: TRINIDAD HARBOR
+lat: 41.0567
+lon: -124.147
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.568
+  MHW: -3.361
+  DTL: -2.543
+  MTL: -2.624
+  MSL: -2.617
+  MLW: -1.888
+  MLLW: -1.517
+  NAVD88: -1.594
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9419059
+established: 1972-04-14T00:00:00Z
+removed: 1987-09-30T23:59:00Z

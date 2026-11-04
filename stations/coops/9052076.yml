@@ -1,0 +1,19 @@
+name: Olcott
+lat: 43.33839
+lon: -78.72733
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -74.2
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9052076
+established: 1967-01-01T00:00:00Z

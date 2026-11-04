@@ -1,0 +1,27 @@
+name: Wells
+lat: 43.32
+lon: -70.5633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.415
+  MHW: -7.284
+  DTL: -5.958
+  MTL: -5.945
+  MSL: -5.956
+  MLW: -4.606
+  MLLW: -4.502
+  NAVD88: -6.068
+  LAT: -3.863
+  HAT: -8.021
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8419317
+established: 1999-06-10T00:00:00Z
+removed: 2022-08-03T00:00:00Z

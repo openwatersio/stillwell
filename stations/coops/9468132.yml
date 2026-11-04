@@ -1,0 +1,24 @@
+name: ST. MICHAEL, NORTON SOUND
+lat: 63.475
+lon: -162.027
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.613
+  MHW: -9.511
+  DTL: -9.02
+  MTL: -9.012
+  MSL: -8.984
+  MLW: -8.514
+  MLLW: -8.427
+  NAVD88: -8.023
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468132
+removed: 2025-10-11T10:00:00Z

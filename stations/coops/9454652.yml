@@ -1,0 +1,26 @@
+name: SOUTH ARM, KNIGHT ISLAND, BAY OF ISLES
+lat: 60.3667
+lon: -147.7
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.46
+  MHW: -2.18
+  DTL: -0.649
+  MTL: -0.743
+  MSL: -0.78
+  MLW: 0.693
+  MLLW: 1.16
+  LAT: 2.341
+  HAT: -3.554
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454652
+established: 1998-08-06T00:00:00Z
+removed: 1998-10-22T23:59:00Z

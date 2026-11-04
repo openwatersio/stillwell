@@ -1,0 +1,26 @@
+name: Elfin Cove
+lat: 58.19472
+lon: -136.34694
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.209
+  MHW: -5.939
+  DTL: -4.532
+  MTL: -4.62
+  MSL: -4.602
+  MLW: -3.3
+  MLLW: -2.855
+  LAT: -1.831
+  HAT: -7.188
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452634
+established: 1938-05-13T00:00:00Z

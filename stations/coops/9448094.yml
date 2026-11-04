@@ -1,0 +1,16 @@
+name: KAYAK PT, PORT SUSAN
+lat: 48.1367
+lon: -122.367
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9448094
+established: 1977-02-02T00:00:00Z
+removed: 1977-04-11T23:59:00Z

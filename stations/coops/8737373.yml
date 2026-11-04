@@ -1,0 +1,26 @@
+name: Lower Bryant Landing
+lat: 30.9783
+lon: -87.8733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.657
+  MHW: -6.632
+  DTL: -6.389
+  MTL: -6.388
+  MSL: -6.403
+  MLW: -6.143
+  MLLW: -6.121
+  LAT: -5.868
+  HAT: -6.914
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8737373
+established: 2004-06-22T00:00:00Z
+removed: 2007-08-20T23:59:00Z

@@ -1,0 +1,24 @@
+name: MATAWAN CREEK RARITAN BAY
+lat: 40.4333
+lon: -74.2183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.203
+  MHW: -2.099
+  DTL: -1.343
+  MTL: -1.328
+  MSL: -1.357
+  MLW: -0.557
+  MLLW: -0.483
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531526
+established: 1976-11-18T00:00:00Z
+removed: 1977-04-13T23:59:00Z

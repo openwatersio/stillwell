@@ -1,0 +1,25 @@
+name: BAY ARISTOCRAT VILLAGE, OLD TAMPA BAY
+lat: 27.9417
+lon: -82.72
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.457
+  MHW: -1.352
+  DTL: -1.03
+  MTL: -1.055
+  MSL: -1.055
+  MLW: -0.759
+  MLLW: -0.602
+  NAVD88: -1.14
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726689
+established: 1975-10-30T00:00:00Z
+removed: 1991-09-03T23:59:00Z

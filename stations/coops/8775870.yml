@@ -1,0 +1,26 @@
+name: Bob Hall Pier, Corpus Christi
+lat: 27.58
+lon: -97.2167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.841
+  MHW: -6.812
+  DTL: -6.592
+  MTL: -6.611
+  MSL: -6.626
+  MLW: -6.411
+  MLLW: -6.342
+  NAVD88: -6.495
+  LAT: -5.957
+  HAT: -7.142
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8775870
+established: 1983-05-09T00:00:00Z

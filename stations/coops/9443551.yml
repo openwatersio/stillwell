@@ -1,0 +1,26 @@
+name: Jim Creek
+lat: 48.1872
+lon: -124.0625
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.205
+  MHW: -5.999
+  DTL: -5.111
+  MTL: -5.25
+  MSL: -5.255
+  MLW: -4.502
+  MLLW: -4.016
+  LAT: -3.077
+  HAT: -6.976
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9443551
+established: 2016-05-05T00:00:00Z
+removed: 2016-09-04T10:00:00Z

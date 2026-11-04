@@ -1,0 +1,27 @@
+name: Clearwater Beach
+lat: 27.9783
+lon: -82.8317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.363
+  MHW: -1.26
+  DTL: -0.945
+  MTL: -0.971
+  MSL: -0.977
+  MLW: -0.683
+  MLLW: -0.527
+  NAVD88: -1.073
+  LAT: -0.103
+  HAT: -1.654
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726724
+established: 1973-04-19T00:00:00Z

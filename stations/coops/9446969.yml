@@ -1,0 +1,25 @@
+name: OLYMPIA, BUD INLET, PUGET SOUND
+lat: 47.06
+lon: -122.903
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.172
+  MHW: -3.864
+  DTL: -1.953
+  MTL: -2.267
+  MSL: -2.281
+  MLW: -0.67
+  MLLW: 0.265
+  NAVD88: -0.962
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9446969
+established: 1977-03-30T00:00:00Z
+removed: 1978-04-06T23:59:00Z

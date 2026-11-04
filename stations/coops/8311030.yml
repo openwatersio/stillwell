@@ -1,0 +1,19 @@
+name: Ogdensburg
+lat: 44.702778
+lon: -75.494446
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -73.88
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8311030
+established: 1900-09-01T00:00:00Z

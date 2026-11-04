@@ -1,0 +1,16 @@
+name: Ponta Delgada, Azores
+lat: 37.735
+lon: -25.6733
+country_code: PT
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=2627000
+established: 1992-06-27T00:00:00Z
+removed: 1999-02-26T23:59:00Z

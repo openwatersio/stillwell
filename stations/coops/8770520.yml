@@ -1,0 +1,27 @@
+name: Rainbow Bridge
+lat: 29.98
+lon: -93.8817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.469
+  MHW: -1.454
+  DTL: -1.32
+  MTL: -1.331
+  MSL: -1.339
+  MLW: -1.207
+  MLLW: -1.17
+  NAVD88: -1.3
+  LAT: -0.885
+  HAT: -1.645
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770520
+established: 1993-08-04T00:00:00Z

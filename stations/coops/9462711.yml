@@ -1,0 +1,26 @@
+name: Surf Bay, Akutan Bay
+lat: 54.150833
+lon: -165.615
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -18.463
+  MHW: -18.374
+  DTL: -17.89
+  MTL: -17.997
+  MSL: -17.983
+  MLW: -17.62
+  MLLW: -17.316
+  LAT: -16.712
+  HAT: -18.913
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462711
+established: 2008-07-15T00:00:00Z
+removed: 2011-09-18T23:59:00Z

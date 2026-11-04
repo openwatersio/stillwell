@@ -1,0 +1,26 @@
+name: Mitrofania Island
+lat: 55.89
+lon: -158.82
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.86
+  MHW: -8.625
+  DTL: -7.682
+  MTL: -7.77
+  MSL: -7.752
+  MLW: -6.914
+  MLLW: -6.504
+  LAT: -5.645
+  HAT: -9.503
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9459016
+established: 2004-04-20T00:00:00Z
+removed: 2006-07-29T23:59:00Z

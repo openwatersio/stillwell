@@ -1,0 +1,26 @@
+name: Beach Channel (bridge)
+lat: 40.5883
+lon: -73.82
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.229
+  MHW: -7.121
+  DTL: -6.313
+  MTL: -6.292
+  MSL: -6.29
+  MLW: -5.464
+  MLLW: -5.398
+  LAT: -4.964
+  HAT: -7.641
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8517137
+established: 2015-03-18T00:00:00Z
+removed: 2015-09-23T00:00:00Z

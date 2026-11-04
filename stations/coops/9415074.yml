@@ -1,0 +1,24 @@
+name: HERCULES WHARF
+lat: 38.0233
+lon: -122.292
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.709
+  MHW: -2.528
+  DTL: -1.782
+  MTL: -1.839
+  MSL: -1.836
+  MLW: -1.15
+  MLLW: -0.855
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415074
+established: 1976-09-27T00:00:00Z
+removed: 1987-02-05T23:59:00Z

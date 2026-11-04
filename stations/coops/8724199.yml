@@ -1,0 +1,24 @@
+name: CRAWL KEY, BIG SPANISH CHANNEL
+lat: 24.7567
+lon: -81.3583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.17
+  MHW: -1.103
+  DTL: -0.83
+  MTL: -0.844
+  MSL: -0.818
+  MLW: -0.585
+  MLLW: -0.49
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724199
+established: 1974-07-18T00:00:00Z
+removed: 1974-09-10T23:59:00Z

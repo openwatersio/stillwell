@@ -1,0 +1,26 @@
+name: SOUTH POINT, SINEPUXENT NECK, CHINC. BAY
+lat: 38.215
+lon: -75.1917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.219
+  MHW: -1.194
+  DTL: -1.12
+  MTL: -1.123
+  MSL: -1.126
+  MLW: -1.053
+  MLLW: -1.021
+  LAT: -0.924
+  HAT: -1.327
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8570536
+established: 1985-07-13T00:00:00Z
+removed: 1985-11-05T23:59:00Z

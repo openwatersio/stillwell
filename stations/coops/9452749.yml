@@ -1,0 +1,26 @@
+name: Tarr Inlet, Glacier Bay
+lat: 58.96478
+lon: -136.87758
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.256
+  MHW: -2.972
+  DTL: -0.702
+  MTL: -0.824
+  MSL: -0.824
+  MLW: 1.324
+  MLLW: 1.852
+  LAT: 3.335
+  HAT: -4.604
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452749
+established: 2009-10-08T00:00:00Z
+removed: 2009-11-08T23:59:00Z

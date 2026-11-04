@@ -1,0 +1,26 @@
+name: Eatons Neck
+lat: 40.9533
+lon: -73.4
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.832
+  MHW: -8.726
+  DTL: -7.653
+  MTL: -7.636
+  MSL: -7.639
+  MLW: -6.547
+  MLLW: -6.474
+  LAT: -5.988
+  HAT: -9.355
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8515786
+established: 2002-07-10T00:00:00Z
+removed: 2007-05-02T23:59:00Z

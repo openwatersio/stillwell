@@ -1,0 +1,25 @@
+name: BELLINGHAM
+lat: 48.745
+lon: -122.495
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.482
+  MHW: -7.263
+  DTL: -6.185
+  MTL: -6.434
+  MSL: -6.398
+  MLW: -5.606
+  MLLW: -4.888
+  NAVD88: -5.035
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449211
+established: 1973-03-30T00:00:00Z
+removed: 1975-07-21T23:59:00Z

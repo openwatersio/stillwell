@@ -1,0 +1,16 @@
+name: Husum, Schleuse
+lat: 54.47222
+lon: 9.02472
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.54
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9530020]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/husum_schleuse

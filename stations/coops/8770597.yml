@@ -1,0 +1,25 @@
+name: Orange
+lat: 30.0983
+lon: -93.7217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.54
+  MHW: -1.524
+  MTL: -1.42
+  MSL: -1.433
+  MLW: -1.317
+  MLLW: -1.285
+  LAT: -1.172
+  HAT: -1.599
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770597
+established: 1988-11-01T00:00:00Z
+removed: 2003-01-02T23:59:00Z

@@ -1,0 +1,16 @@
+name: Uyak
+lat: 57.635
+lon: -154.007
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457728
+established: 1923-05-17T00:00:00Z
+removed: 2000-07-20T23:59:00Z

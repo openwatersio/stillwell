@@ -1,0 +1,16 @@
+name: Weener, Ems
+lat: 53.16111
+lon: 7.37194
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.06
+  SKN: -2.76
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/3790020]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/weener

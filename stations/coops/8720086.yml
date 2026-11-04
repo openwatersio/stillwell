@@ -1,0 +1,25 @@
+name: AMELIA CITY, SOUTH AMELIA RIVER
+lat: 30.5867
+lon: -81.4633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.271
+  MHW: -2.166
+  DTL: -1.372
+  MTL: -1.345
+  MSL: -1.354
+  MLW: -0.524
+  MLLW: -0.473
+  NAVD88: -1.476
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720086
+established: 1973-10-31T00:00:00Z
+removed: 1979-04-17T23:59:00Z

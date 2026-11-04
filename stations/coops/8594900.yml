@@ -1,0 +1,27 @@
+name: Washington
+lat: 38.873333
+lon: -77.02167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.353
+  MHW: -2.284
+  DTL: -1.87
+  MTL: -1.859
+  MSL: -1.859
+  MLW: -1.434
+  MLLW: -1.387
+  NAVD88: -1.812
+  LAT: -1.2
+  HAT: -2.549
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8594900
+established: 1924-11-10T00:00:00Z

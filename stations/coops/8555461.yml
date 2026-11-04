@@ -1,0 +1,16 @@
+name: FOURTEEN FOOT BANK LIGHT
+lat: 39.0483
+lon: -75.1833
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8555461
+established: 1983-04-03T00:00:00Z
+removed: 1984-11-12T23:59:00Z

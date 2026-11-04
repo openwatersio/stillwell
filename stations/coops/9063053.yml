@@ -1,0 +1,19 @@
+name: Fairport
+lat: 41.75975
+lon: -81.28106
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -173.5
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9063053
+established: 1935-05-04T00:00:00Z

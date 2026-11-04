@@ -1,0 +1,26 @@
+name: COFFIN POINT, COFFIN NECK
+lat: 44.87
+lon: -67.1083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.672
+  MHW: -6.506
+  DTL: -3.904
+  MTL: -3.875
+  MSL: -3.892
+  MLW: -1.243
+  MLLW: -1.136
+  LAT: -0.205
+  HAT: -7.616
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8410714
+established: 1985-07-06T00:00:00Z
+removed: 1985-11-04T23:59:00Z

@@ -1,0 +1,26 @@
+name: Beacon Rock State Park
+lat: 45.6203
+lon: -122.0203
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.71
+  MHW: -10.59
+  DTL: -10.445
+  MTL: -10.434
+  MSL: -10.418
+  MLW: -10.278
+  MLLW: -10.18
+  LAT: -10.064
+  HAT: -10.804
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440079
+established: 2016-07-28T00:00:00Z
+removed: 2016-11-06T00:00:00Z

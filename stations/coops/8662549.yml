@@ -1,0 +1,25 @@
+name: SOUTH ISLAND FERRY, WINYAH BAY
+lat: 33.2517
+lon: -79.2683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.036
+  MHW: -1.948
+  DTL: -1.408
+  MTL: -1.386
+  MSL: -1.393
+  MLW: -0.824
+  MLLW: -0.78
+  NAVD88: -1.442
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662549
+established: 1976-12-14T00:00:00Z
+removed: 1978-02-03T23:59:00Z

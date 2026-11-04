@@ -1,0 +1,24 @@
+name: ARIPEKA
+lat: 28.4333
+lon: -82.6683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.879
+  MHW: -1.763
+  DTL: -1.395
+  MTL: -1.396
+  MSL: -1.368
+  MLW: -1.029
+  MLLW: -0.912
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727097
+established: 1977-02-15T00:00:00Z
+removed: 1979-04-02T23:59:00Z

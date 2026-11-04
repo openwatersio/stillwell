@@ -1,0 +1,24 @@
+name: BERRYS CREEK, FISH CREEK
+lat: 40.7933
+lon: -74.0917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.988
+  MHW: -1.898
+  DTL: -1.103
+  MTL: -1.09
+  MSL: -1.123
+  MLW: -0.281
+  MLLW: -0.217
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530586
+established: 1976-08-31T00:00:00Z
+removed: 1977-10-20T23:59:00Z

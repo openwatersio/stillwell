@@ -1,0 +1,26 @@
+name: Wooded Island
+lat: 59.875
+lon: -147.403
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.595
+  MHW: -5.32
+  DTL: -4.034
+  MTL: -4.116
+  MSL: -4.119
+  MLW: -2.912
+  MLLW: -2.474
+  LAT: -1.45
+  HAT: -6.431
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454562
+established: 2003-07-30T00:00:00Z
+removed: 2003-10-04T23:59:00Z

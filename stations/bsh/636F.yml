@@ -1,0 +1,15 @@
+name: Hooge, Anleger
+lat: 54.57861
+lon: 8.55639
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.89
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/hooge_anleger

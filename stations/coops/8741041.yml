@@ -1,0 +1,26 @@
+name: Dock E, Port of Pascagoula
+lat: 30.347778
+lon: -88.50584
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.065
+  MHW: -7.036
+  DTL: -6.83
+  MTL: -6.829
+  MSL: -6.825
+  MLW: -6.621
+  MLLW: -6.594
+  LAT: -6.204
+  HAT: -7.336
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8741041
+established: 2008-01-22T00:00:00Z
+removed: 2018-02-13T00:00:00Z

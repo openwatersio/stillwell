@@ -1,0 +1,27 @@
+name: Bivalve, Maurice River
+lat: 39.2325
+lon: -75.0328
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.86
+  MHW: -0.729
+  DTL: 0.096
+  MTL: 0.132
+  MSL: 0.098
+  MLW: 0.995
+  MLLW: 1.053
+  NAVD88: 0.013
+  LAT: 1.371
+  HAT: -1.204
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535055
+established: 2017-01-01T00:00:00Z
+removed: 2024-03-13T23:59:00Z

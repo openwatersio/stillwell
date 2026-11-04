@@ -1,0 +1,25 @@
+name: IMPERIAL BEACH, PACIFIC OCEAN
+lat: 32.5783
+lon: -117.135
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.493
+  MHW: -2.27
+  DTL: -1.674
+  MTL: -1.7
+  MSL: -1.695
+  MLW: -1.13
+  MLLW: -0.856
+  NAVD88: -0.93
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410120
+established: 1976-05-01T00:00:00Z
+removed: 1979-12-10T23:59:00Z

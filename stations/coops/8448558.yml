@@ -1,0 +1,26 @@
+name: Edgartown
+lat: 41.3883
+lon: -70.5117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.251
+  MHW: -2.154
+  DTL: -1.843
+  MTL: -1.829
+  MSL: -1.87
+  MLW: -1.504
+  MLLW: -1.435
+  LAT: -1.297
+  HAT: -2.398
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448558
+established: 2004-08-04T00:00:00Z
+removed: 2004-09-28T23:59:00Z

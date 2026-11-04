@@ -1,0 +1,25 @@
+name: LONGBOAT KEY
+lat: 27.34
+lon: -82.59
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.328
+  MHW: -1.214
+  DTL: -1.013
+  MTL: -1.02
+  MSL: -1.021
+  MLW: -0.826
+  MLLW: -0.698
+  NAVD88: -1.154
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726089
+established: 1973-04-24T00:00:00Z
+removed: 1977-12-07T23:59:00Z

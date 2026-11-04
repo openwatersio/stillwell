@@ -1,0 +1,27 @@
+name: Bay Pomme D'or
+lat: 29.3506
+lon: -89.5399
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.613
+  MHW: -9.608
+  DTL: -9.412
+  MTL: -9.419
+  MSL: -9.418
+  MLW: -9.23
+  MLLW: -9.21
+  NAVD88: -9.438
+  LAT: -8.891
+  HAT: -9.956
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761115
+established: 2024-01-24T00:00:00Z
+removed: 2024-05-02T17:30:00Z

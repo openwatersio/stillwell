@@ -1,0 +1,26 @@
+name: Seaview Ferry Dock
+lat: 40.64925
+lon: -73.15061
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.35
+  MHW: -9.307
+  DTL: -9.129
+  MTL: -9.128
+  MSL: -9.123
+  MLW: -8.949
+  MLLW: -8.908
+  LAT: -8.779
+  HAT: -9.48
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8514779
+established: 2013-09-19T00:00:00Z
+removed: 2014-09-08T23:59:00Z

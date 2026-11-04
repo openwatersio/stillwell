@@ -1,0 +1,26 @@
+name: Greenhead Slough
+lat: 46.3722
+lon: -123.9503
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.963
+  MHW: -7.733
+  DTL: -6.333
+  MTL: -6.398
+  MSL: -6.497
+  MLW: -5.062
+  MLLW: -4.703
+  LAT: -3.956
+  HAT: -8.704
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440650
+established: 2016-04-06T00:00:00Z
+removed: 2016-08-04T00:00:00Z

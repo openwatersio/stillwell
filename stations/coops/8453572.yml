@@ -1,0 +1,24 @@
+name: WARWICK POINT
+lat: 41.6667
+lon: -71.3783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.899
+  MHW: -1.819
+  DTL: -1.238
+  MTL: -1.221
+  MSL: -1.179
+  MLW: -0.623
+  MLLW: -0.577
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8453572
+established: 1977-08-31T00:00:00Z
+removed: 1977-11-14T23:59:00Z

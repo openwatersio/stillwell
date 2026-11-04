@@ -1,0 +1,14 @@
+name: Hollandse kust, noord , deelgebied
+lat: 52.754793
+lon: 4.602027
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/hollandsekust.noord.deelgebied/details

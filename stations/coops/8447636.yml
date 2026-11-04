@@ -1,0 +1,26 @@
+name: New Bedford Harbor
+lat: 41.6212
+lon: -70.9137
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.301
+  MHW: -7.227
+  DTL: -6.693
+  MTL: -6.678
+  MSL: -6.624
+  MLW: -6.13
+  MLLW: -6.084
+  LAT: -5.787
+  HAT: -7.707
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447636
+established: 2022-11-10T00:00:00Z

@@ -1,0 +1,27 @@
+name: Windmill Point
+lat: 37.6155
+lon: -76.28978
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.098
+  MHW: -1.058
+  DTL: -0.886
+  MTL: -0.881
+  MSL: -0.887
+  MLW: -0.705
+  MLLW: -0.675
+  NAVD88: -1.033
+  LAT: -0.495
+  HAT: -1.283
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8636580
+established: 1970-06-24T00:00:00Z

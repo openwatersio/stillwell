@@ -1,0 +1,27 @@
+name: Buffalo Bayou
+lat: 29.7619
+lon: -95.3443
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.891
+  MHW: -8.849
+  DTL: -8.637
+  MTL: -8.651
+  MSL: -8.656
+  MLW: -8.452
+  MLLW: -8.383
+  NAVD88: -8.3
+  LAT: -7.95
+  HAT: -9.081
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770542
+established: 2019-09-20T00:00:00Z
+removed: 2020-11-12T23:59:00Z

@@ -1,0 +1,26 @@
+name: Northeast Cape, St. Lawrence Island
+lat: 63.3167
+lon: -168.967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.625
+  MHW: -9.555
+  DTL: -9.25
+  MTL: -9.248
+  MSL: -9.258
+  MLW: -8.941
+  MLLW: -8.875
+  LAT: -8.729
+  HAT: -9.849
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468039
+established: 1951-07-12T00:00:00Z
+removed: 2011-10-05T23:59:00Z

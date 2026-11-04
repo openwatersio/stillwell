@@ -1,0 +1,27 @@
+name: DEPOE BAY
+lat: 44.81
+lon: -124.058
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.547
+  MHW: -3.331
+  DTL: -2.291
+  MTL: -2.392
+  MSL: -2.382
+  MLW: -1.454
+  MLLW: -1.036
+  NAVD88: -1.229
+  LAT: -0.094
+  HAT: -4.282
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9435827
+established: 1952-04-01T00:00:00Z
+removed: 1984-09-12T23:59:00Z

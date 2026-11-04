@@ -1,0 +1,26 @@
+name: Barter Island
+lat: 70.1286
+lon: -143.611
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.816
+  MHW: -0.783
+  DTL: -0.724
+  MTL: -0.712
+  MSL: -0.717
+  MLW: -0.641
+  MLLW: -0.632
+  LAT: -0.597
+  HAT: -0.864
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9499176
+established: 1948-07-16T00:00:00Z
+removed: 2008-10-26T00:00:00Z

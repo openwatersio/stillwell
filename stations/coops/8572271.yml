@@ -1,0 +1,26 @@
+name: Poplar Island
+lat: 38.758335
+lon: -76.375
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.549
+  MHW: -0.482
+  DTL: -0.315
+  MTL: -0.313
+  MSL: -0.316
+  MLW: -0.145
+  MLLW: -0.08
+  LAT: 0.115
+  HAT: -0.691
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8572271
+established: 2006-10-01T00:00:00Z
+removed: 2010-03-31T23:59:00Z

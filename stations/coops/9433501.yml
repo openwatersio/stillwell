@@ -1,0 +1,27 @@
+name: REEDSPORT
+lat: 43.7083
+lon: -124.098
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.538
+  MHW: -6.338
+  DTL: -5.407
+  MTL: -5.477
+  MSL: -5.48
+  MLW: -4.616
+  MLLW: -4.276
+  NAVD88: -4.254
+  LAT: -3.636
+  HAT: -7.037
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9433501
+established: 1934-01-30T00:00:00Z
+removed: 2017-10-17T12:00:00Z

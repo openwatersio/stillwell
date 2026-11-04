@@ -1,0 +1,26 @@
+name: Magueyes Island
+lat: 17.970112
+lon: -67.04639
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.294
+  MHW: -1.292
+  DTL: -1.192
+  MTL: -1.193
+  MSL: -1.191
+  MLW: -1.094
+  MLLW: -1.091
+  LAT: -0.959
+  HAT: -1.405
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9759110
+established: 1954-12-01T00:00:00Z

@@ -1,0 +1,27 @@
+name: Aberdeen
+lat: 46.9683
+lon: -123.853
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.227
+  MHW: -5.015
+  DTL: -3.686
+  MTL: -3.805
+  MSL: -3.854
+  MLW: -2.595
+  MLLW: -2.146
+  NAVD88: -2.646
+  LAT: -1.311
+  HAT: -5.931
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9441187
+established: 1982-05-27T00:00:00Z
+removed: 2005-12-15T23:59:00Z

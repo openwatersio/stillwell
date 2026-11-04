@@ -1,0 +1,25 @@
+name: STATION CREEK
+lat: 32.325
+lon: -80.6017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.94
+  MHW: -2.817
+  DTL: -1.803
+  MTL: -1.775
+  MSL: -1.813
+  MLW: -0.733
+  MLLW: -0.666
+  NAVD88: -1.893
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8668601
+established: 1977-09-13T00:00:00Z
+removed: 1979-06-04T23:59:00Z

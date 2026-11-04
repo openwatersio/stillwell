@@ -1,0 +1,16 @@
+name: PATRICK AIR FORCE BASE
+lat: 28.245
+lon: -80.6
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721727
+established: 1959-10-12T00:00:00Z
+removed: 1962-02-12T23:59:00Z

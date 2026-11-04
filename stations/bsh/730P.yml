@@ -1,0 +1,15 @@
+name: Over, Elbe
+lat: 53.42861
+lon: 10.10111
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.1
+  SKN: -3.37
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/over

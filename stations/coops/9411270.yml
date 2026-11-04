@@ -1,0 +1,27 @@
+name: RINCON ISLAND, PACIFIC OCEAN
+lat: 34.3483
+lon: -119.443
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.981
+  MHW: -2.751
+  DTL: -2.149
+  MTL: -2.185
+  MSL: -2.178
+  MLW: -1.618
+  MLLW: -1.317
+  NAVD88: -1.347
+  LAT: -0.7
+  HAT: -3.528
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9411270
+established: 1962-03-08T00:00:00Z
+removed: 1990-12-01T23:59:00Z

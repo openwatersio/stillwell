@@ -1,0 +1,26 @@
+name: Bings Landing, Matanzas River
+lat: 29.615
+lon: -81.205
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.201
+  MHW: -0.157
+  DTL: 0.066
+  MTL: 0.066
+  MSL: 0.05
+  MLW: 0.29
+  MLLW: 0.334
+  NAVD88: 0
+  LAT: 0.561
+  HAT: -0.577
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720757
+established: 1998-12-16T00:00:00Z

@@ -1,0 +1,25 @@
+name: LOXAHATCHEE RIVER
+lat: 26.97
+lon: -80.1267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.742
+  MHW: -0.697
+  DTL: -0.402
+  MTL: -0.403
+  MSL: -0.402
+  MLW: -0.109
+  MLLW: -0.062
+  NAVD88: -0.774
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722481
+established: 1972-11-22T00:00:00Z
+removed: 1973-02-21T23:59:00Z

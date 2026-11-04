@@ -1,0 +1,24 @@
+name: BORDEN HIGHWAY BRIDGE, MIDDLE RIVER
+lat: 37.8917
+lon: -121.488
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.718
+  MHW: -5.597
+  DTL: -5.204
+  MTL: -5.214
+  MSL: -5.224
+  MLW: -4.832
+  MLLW: -4.691
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414835
+established: 1977-04-06T00:00:00Z
+removed: 1979-12-18T23:59:00Z

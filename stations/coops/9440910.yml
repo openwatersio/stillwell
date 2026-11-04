@@ -1,0 +1,27 @@
+name: Toke Point
+lat: 46.7075
+lon: -123.96694
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.097
+  MHW: -3.871
+  DTL: -2.737
+  MTL: -2.833
+  MSL: -2.836
+  MLW: -1.795
+  MLLW: -1.378
+  NAVD88: -1.627
+  LAT: -0.447
+  HAT: -4.834
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440910
+established: 1922-02-20T00:00:00Z

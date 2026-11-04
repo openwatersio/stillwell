@@ -1,0 +1,25 @@
+name: BELLEVILLE, PASSAIC RIVER
+lat: 40.7867
+lon: -74.1467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.597
+  MHW: -2.493
+  DTL: -1.654
+  MTL: -1.64
+  MSL: -1.649
+  MLW: -0.787
+  MLLW: -0.711
+  NAVD88: -1.663
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530591
+established: 1976-06-18T00:00:00Z
+removed: 1994-11-08T23:59:00Z

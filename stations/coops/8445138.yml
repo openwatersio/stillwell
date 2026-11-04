@@ -1,0 +1,26 @@
+name: SCITUATE, SCITUATE HARBOR
+lat: 42.2017
+lon: -70.7267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.873
+  MHW: -3.737
+  DTL: -2.388
+  MTL: -2.374
+  MSL: -2.394
+  MLW: -1.011
+  MLLW: -0.903
+  LAT: -0.319
+  HAT: -4.472
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8445138
+established: 1990-05-23T00:00:00Z
+removed: 1990-09-14T23:59:00Z

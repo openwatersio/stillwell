@@ -1,0 +1,27 @@
+name: GRAVINA RIVER
+lat: 60.7667
+lon: -146.0846
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.042
+  MHW: -8.762
+  DTL: -7.207
+  MTL: -7.296
+  MSL: -7.334
+  MLW: -5.83
+  MLLW: -5.373
+  NAVD88: -5.618
+  LAT: -4.248
+  HAT: -10.109
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454153
+established: 1976-06-23T00:00:00Z
+removed: 2022-08-12T15:30:00Z

@@ -1,0 +1,25 @@
+name: CAPE SAN BLAS
+lat: 29.6683
+lon: -85.36
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.347
+  MHW: -1.331
+  DTL: -1.128
+  MTL: -1.135
+  MSL: -1.136
+  MLW: -0.938
+  MLLW: -0.909
+  NAVD88: -1.142
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728942
+established: 1977-09-27T00:00:00Z
+removed: 1978-10-26T23:59:00Z

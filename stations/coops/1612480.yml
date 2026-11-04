@@ -1,0 +1,26 @@
+name: Mokuoloe
+lat: 21.433056
+lon: -157.79
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.536
+  MHW: -1.437
+  DTL: -1.213
+  MTL: -1.211
+  MSL: -1.21
+  MLW: -0.985
+  MLLW: -0.89
+  LAT: -0.639
+  HAT: -1.778
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1612480
+established: 1957-05-03T00:00:00Z

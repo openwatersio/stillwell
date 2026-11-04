@@ -1,0 +1,26 @@
+name: Wilcox Wharf
+lat: 37.315
+lon: -77.0983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.995
+  MHW: -1.923
+  DTL: -1.612
+  MTL: -1.601
+  MSL: -1.626
+  MLW: -1.278
+  MLLW: -1.229
+  LAT: -1.147
+  HAT: -2.183
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638464
+established: 1971-07-01T00:00:00Z
+removed: 2010-10-26T23:59:00Z

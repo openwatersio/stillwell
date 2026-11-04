@@ -1,0 +1,26 @@
+name: Culebra
+lat: 18.300861
+lon: -65.302475
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.706
+  MHW: -8.643
+  DTL: -8.535
+  MTL: -8.528
+  MSL: -8.528
+  MLW: -8.413
+  MLLW: -8.363
+  LAT: -8.218
+  HAT: -8.859
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9752235
+established: 2005-08-19T00:00:00Z

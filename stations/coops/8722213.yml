@@ -1,0 +1,26 @@
+name: Binney Dock
+lat: 27.4683
+lon: -80.3
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.232
+  MHW: -1.179
+  DTL: -0.872
+  MTL: -0.871
+  MSL: -0.888
+  MLW: -0.563
+  MLLW: -0.512
+  NAVD88: -1.222
+  LAT: -0.369
+  HAT: -1.413
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722213
+established: 1969-06-17T00:00:00Z

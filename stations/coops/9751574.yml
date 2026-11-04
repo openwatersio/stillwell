@@ -1,0 +1,26 @@
+name: Jersey Bay
+lat: 18.3181
+lon: -64.8595
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.872
+  MHW: -8.868
+  DTL: -8.753
+  MTL: -8.753
+  MSL: -8.745
+  MLW: -8.638
+  MLLW: -8.633
+  LAT: -8.485
+  HAT: -9.003
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751574
+established: 2020-11-23T00:00:00Z
+removed: 2021-04-04T18:00:00Z

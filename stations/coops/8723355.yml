@@ -1,0 +1,26 @@
+name: RAGGED KEY NO. 5, BISCAYNE BAY
+lat: 25.5233
+lon: -80.175
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.505
+  MHW: -1.504
+  DTL: -1.25
+  MTL: -1.271
+  MSL: -1.266
+  MLW: -1.038
+  MLLW: -0.994
+  LAT: -0.813
+  HAT: -1.747
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723355
+established: 1930-11-03T00:00:00Z
+removed: 1988-01-15T23:59:00Z

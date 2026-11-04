@@ -1,0 +1,24 @@
+name: Shinnecock Bay
+lat: 40.82
+lon: -72.5617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.434
+  MHW: -1.357
+  DTL: -1.018
+  MTL: -0.99
+  MSL: -0.976
+  MLW: -0.623
+  MLLW: -0.603
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8512671
+established: 1977-08-27T00:00:00Z
+removed: 1979-11-05T23:59:00Z

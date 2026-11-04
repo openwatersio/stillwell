@@ -1,0 +1,26 @@
+name: Cape Chunak, AK
+lat: 55.064278
+lon: -163.53416
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -43.6
+  MHW: -43.425
+  DTL: -42.464
+  MTL: -42.651
+  MSL: -42.636
+  MLW: -41.877
+  MLLW: -41.327
+  LAT: -40.463
+  HAT: -44.185
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462941
+established: 2014-05-18T00:00:00Z
+removed: 2014-09-06T00:00:00Z

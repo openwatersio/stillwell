@@ -1,0 +1,19 @@
+name: Gibraltar
+lat: 42.090862
+lon: -83.186
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -173.58
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9044020
+established: 1989-11-08T00:00:00Z

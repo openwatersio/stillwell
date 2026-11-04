@@ -1,0 +1,16 @@
+name: WINTRICH OP
+lat: 49.881801
+lon: 6.955301
+country_code: DE
+datum: PNP
+datums:
+  NHN: 104.518
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=26700380

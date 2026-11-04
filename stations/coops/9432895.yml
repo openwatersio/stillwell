@@ -1,0 +1,25 @@
+name: NORTH BEND, COOS BAY
+lat: 43.41
+lon: -124.218
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.299
+  MHW: -5.101
+  DTL: -4.015
+  MTL: -4.118
+  MSL: -4.155
+  MLW: -3.135
+  MLLW: -2.731
+  NAVD88: -3.026
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9432895
+established: 1865-08-01T00:00:00Z
+removed: 1982-10-13T23:59:00Z

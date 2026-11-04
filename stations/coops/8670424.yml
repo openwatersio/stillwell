@@ -1,0 +1,27 @@
+name: Port Wentworth
+lat: 32.143307
+lon: -81.14169
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.024
+  MHW: -2.932
+  DTL: -1.706
+  MTL: -1.692
+  MSL: -1.813
+  MLW: -0.452
+  MLLW: -0.389
+  NAVD88: -1.786
+  LAT: 0.198
+  HAT: -3.777
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8670424
+established: 2002-04-09T00:00:00Z
+removed: 2023-05-11T00:00:00Z

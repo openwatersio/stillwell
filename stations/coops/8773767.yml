@@ -1,0 +1,27 @@
+name: Matagorda Bay Entrance Channel
+lat: 28.4269
+lon: -96.3301
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.113
+  MHW: -8.105
+  DTL: -7.925
+  MTL: -7.938
+  MSL: -7.961
+  MLW: -7.77
+  MLLW: -7.736
+  NAVD88: -7.85
+  LAT: -7.399
+  HAT: -8.381
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8773767
+established: 2014-09-18T00:00:00Z

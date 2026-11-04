@@ -1,0 +1,26 @@
+name: Christiansted Harbor, St Croix
+lat: 17.747694
+lon: -64.69839
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.479
+  MHW: -8.472
+  DTL: -8.365
+  MTL: -8.367
+  MSL: -8.367
+  MLW: -8.263
+  MLLW: -8.252
+  LAT: -8.103
+  HAT: -8.585
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751364
+established: 1981-02-10T00:00:00Z

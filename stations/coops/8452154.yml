@@ -1,0 +1,27 @@
+name: Bristol Highlands
+lat: 41.6967
+lon: -71.2933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.021
+  MHW: -2.948
+  DTL: -2.331
+  MTL: -2.32
+  MSL: -2.274
+  MLW: -1.691
+  MLLW: -1.64
+  NAVD88: -2.356
+  LAT: -1.305
+  HAT: -3.424
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8452154
+established: 1977-10-19T00:00:00Z
+removed: 2015-09-15T20:00:00Z

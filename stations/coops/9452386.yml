@@ -1,0 +1,27 @@
+name: TENAKEE
+lat: 57.779305
+lon: -135.21947
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.193
+  MHW: -2.907
+  DTL: -0.894
+  MTL: -0.991
+  MSL: -1.019
+  MLW: 0.925
+  MLLW: 1.405
+  NAVD88: 0.537
+  LAT: 2.832
+  HAT: -4.493
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452386
+established: 1980-04-09T00:00:00Z
+removed: 2024-09-06T00:00:00Z

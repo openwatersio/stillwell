@@ -1,0 +1,25 @@
+name: INDIAN BLUFF ISLAND
+lat: 28.1033
+lon: -82.7783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.484
+  MHW: -1.378
+  DTL: -1.019
+  MTL: -1.05
+  MSL: -1.059
+  MLW: -0.722
+  MLLW: -0.554
+  NAVD88: -1.137
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726853
+established: 1975-10-31T00:00:00Z
+removed: 1975-12-03T23:59:00Z

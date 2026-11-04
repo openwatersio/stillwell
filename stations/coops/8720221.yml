@@ -1,0 +1,25 @@
+name: FULTON, ST. JOHNS RIVER
+lat: 30.39
+lon: -81.5067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.565
+  MHW: -2.503
+  DTL: -1.968
+  MTL: -1.952
+  MSL: -1.96
+  MLW: -1.402
+  MLLW: -1.372
+  NAVD88: -2.091
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720221
+established: 1977-08-31T00:00:00Z
+removed: 1978-03-06T23:59:00Z

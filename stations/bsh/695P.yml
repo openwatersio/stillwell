@@ -1,0 +1,16 @@
+name: Glückstadt, Elbe
+lat: 53.78444
+lon: 9.40944
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970035]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/glueckstadt

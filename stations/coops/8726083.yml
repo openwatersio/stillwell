@@ -1,0 +1,25 @@
+name: SARASOTA
+lat: 27.3317
+lon: -82.545
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.405
+  MHW: -1.332
+  DTL: -1.108
+  MTL: -1.142
+  MSL: -1.135
+  MLW: -0.952
+  MLLW: -0.81
+  NAVD88: -1.285
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726083
+established: 1977-04-25T00:00:00Z
+removed: 1977-11-03T23:59:00Z

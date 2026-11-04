@@ -1,0 +1,26 @@
+name: Popokamute (Kokokamute), Kuskokwim River
+lat: 60.12328
+lon: -162.50037
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.504
+  MHW: -8.863
+  DTL: -7.825
+  MTL: -7.598
+  MSL: -7.684
+  MLW: -6.332
+  MLLW: -6.145
+  LAT: -5.836
+  HAT: -10.578
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466057
+established: 2010-06-24T00:00:00Z
+removed: 2011-09-24T23:59:00Z

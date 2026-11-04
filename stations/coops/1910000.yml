@@ -1,0 +1,26 @@
+name: SUVA, SUVA HARBOR
+lat: -18.1333
+lon: 178.425
+country_code: FJ
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.263
+  MHW: -12.196
+  DTL: -11.612
+  MTL: -11.616
+  MSL: -11.617
+  MLW: -11.035
+  MLLW: -10.961
+  LAT: -10.601
+  HAT: -12.603
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1910000
+established: 1989-02-27T00:00:00Z
+removed: 1997-11-14T23:59:00Z

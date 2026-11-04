@@ -1,0 +1,25 @@
+name: SOUTH END, LAKE RUDEE
+lat: 36.825
+lon: -75.9817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.941
+  MHW: -1.838
+  DTL: -1.35
+  MTL: -1.322
+  MSL: -1.328
+  MLW: -0.805
+  MLLW: -0.759
+  NAVD88: -1.47
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8639219
+established: 1984-02-29T00:00:00Z
+removed: 1984-07-10T23:59:00Z

@@ -1,0 +1,27 @@
+name: LEVELOCK, KVICHAK RIVER
+lat: 59.1133
+lon: -156.832
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.208
+  MHW: -8.747
+  DTL: -7.502
+  MTL: -7.353
+  MSL: -7.084
+  MLW: -5.959
+  MLLW: -5.796
+  NAVD88: -4.353
+  LAT: -5.379
+  HAT: -9.473
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465419
+established: 1947-06-26T00:00:00Z
+removed: 2019-10-19T00:00:00Z

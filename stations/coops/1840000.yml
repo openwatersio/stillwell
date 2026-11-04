@@ -1,0 +1,26 @@
+name: CHUUK, MOEN ISLAND, E. CAROLINE ISLANDS
+lat: 7.44667
+lon: 151.847
+country_code: FM
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.424
+  MHW: -1.333
+  DTL: -1.135
+  MTL: -1.111
+  MSL: -1.108
+  MLW: -0.888
+  MLLW: -0.846
+  LAT: -0.607
+  HAT: -1.679
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1840000
+established: 1947-10-02T00:00:00Z
+removed: 1995-07-26T23:00:00Z

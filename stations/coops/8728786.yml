@@ -1,0 +1,27 @@
+name: ELEVEN MILE, ST. VINCENT SOUND
+lat: 29.7067
+lon: -85.1533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.46
+  MHW: -1.419
+  DTL: -1.206
+  MTL: -1.248
+  MSL: -1.225
+  MLW: -1.077
+  MLLW: -0.951
+  NAVD88: -1.23
+  LAT: -0.621
+  HAT: -1.561
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728786
+established: 1977-11-17T00:00:00Z
+removed: 1978-06-06T23:59:00Z

@@ -1,0 +1,26 @@
+name: VILLAGE POINT, LUMMI ISLAND
+lat: 48.7167
+lon: -122.708
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.129
+  MHW: -3.885
+  DTL: -2.811
+  MTL: -3.077
+  MSL: -3.016
+  MLW: -2.269
+  MLLW: -1.492
+  LAT: -0.17
+  HAT: -4.805
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449161
+established: 1972-04-19T00:00:00Z
+removed: 1975-06-14T23:59:00Z

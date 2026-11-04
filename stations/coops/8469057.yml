@@ -1,0 +1,27 @@
+name: Mianus
+lat: 41.039196
+lon: -73.592026
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.446
+  MHW: -7.335
+  DTL: -6.258
+  MTL: -6.239
+  MSL: -6.245
+  MLW: -5.143
+  MLLW: -5.07
+  NAVD88: -6.301
+  LAT: -4.569
+  HAT: -7.945
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8469057
+established: 2015-03-20T00:00:00Z
+removed: 2016-01-09T15:00:00Z

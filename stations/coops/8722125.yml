@@ -1,0 +1,27 @@
+name: Vero Beach
+lat: 27.6317
+lon: -80.3717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.049
+  MHW: -1.024
+  DTL: -0.913
+  MTL: -0.91
+  MSL: -0.908
+  MLW: -0.796
+  MLLW: -0.777
+  NAVD88: -1.186
+  LAT: -0.737
+  HAT: -1.092
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722125
+established: 1972-05-09T00:00:00Z
+removed: 1999-07-26T23:59:00Z

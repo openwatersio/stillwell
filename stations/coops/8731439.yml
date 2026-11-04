@@ -1,0 +1,26 @@
+name: Gulf Shores, ICWW
+lat: 30.279888
+lon: -87.68428
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.977
+  MHW: -8.962
+  DTL: -8.791
+  MTL: -8.796
+  MSL: -8.788
+  MLW: -8.629
+  MLLW: -8.606
+  LAT: -8.362
+  HAT: -9.162
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8731439
+established: 2008-10-17T00:00:00Z
+removed: 2011-03-17T12:00:00Z

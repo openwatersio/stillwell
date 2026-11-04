@@ -1,0 +1,16 @@
+name: Vixen Harbor, Earnest Sound
+lat: 55.79977
+lon: -132.16597
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450761
+established: 2009-05-25T00:00:00Z
+removed: 2009-06-02T23:59:00Z

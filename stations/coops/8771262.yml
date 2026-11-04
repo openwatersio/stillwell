@@ -1,0 +1,27 @@
+name: Texas City
+lat: 29.3906
+lon: -94.8849
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.584
+  MHW: -8.569
+  DTL: -8.418
+  MTL: -8.421
+  MSL: -8.435
+  MLW: -8.273
+  MLLW: -8.253
+  NAVD88: -8.268
+  LAT: -7.968
+  HAT: -8.778
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771262
+established: 2019-09-20T00:00:00Z
+removed: 2020-03-28T23:59:00Z

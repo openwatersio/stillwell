@@ -1,0 +1,24 @@
+name: FORT POINT, YORK HARBOR
+lat: 43.13
+lon: -70.6383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.037
+  MHW: -3.91
+  DTL: -2.601
+  MTL: -2.586
+  MSL: -2.604
+  MLW: -1.262
+  MLLW: -1.165
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8419528
+established: 1976-08-29T00:00:00Z
+removed: 1976-10-03T23:59:00Z

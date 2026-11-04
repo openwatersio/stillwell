@@ -1,0 +1,18 @@
+name: KAUMALAPAU HARBOR, LANAI ISLAND
+lat: 20.79
+lon: -156.995
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MSL: -1.884
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1614465
+established: 2007-07-11T00:00:00Z
+removed: 2015-03-23T23:59:00Z

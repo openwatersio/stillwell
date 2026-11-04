@@ -1,0 +1,27 @@
+name: Thomas Bay
+lat: 56.996693
+lon: -132.785
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.891
+  MHW: -8.607
+  DTL: -6.511
+  MTL: -6.607
+  MSL: -6.638
+  MLW: -4.607
+  MLLW: -4.131
+  NAVD88: -5.065
+  LAT: -2.687
+  HAT: -10.214
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451561
+established: 1923-10-10T00:00:00Z
+removed: 2024-09-21T00:00:00Z

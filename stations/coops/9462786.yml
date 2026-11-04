@@ -1,0 +1,26 @@
+name: SE Tigalda Island, Pacific Ocean
+lat: 54.101807
+lon: -164.94159
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.174
+  MHW: -7.994
+  DTL: -7.367
+  MTL: -7.479
+  MSL: -7.461
+  MLW: -6.963
+  MLLW: -6.56
+  LAT: -5.889
+  HAT: -8.781
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462786
+established: 2013-05-22T00:00:00Z
+removed: 2013-08-16T23:59:00Z

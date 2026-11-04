@@ -1,0 +1,26 @@
+name: Trocadero Bay
+lat: 55.351665
+lon: -132.93805
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.259
+  MHW: -3.011
+  DTL: -1.723
+  MTL: -1.805
+  MSL: -1.798
+  MLW: -0.599
+  MLLW: -0.186
+  LAT: 0.73
+  HAT: -4
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450463
+established: 2009-04-24T00:00:00Z
+removed: 2009-06-09T23:59:00Z

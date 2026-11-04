@@ -1,0 +1,25 @@
+name: WEST LAKE, SOUTH END
+lat: 26.0333
+lon: -80.1233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.447
+  MHW: -1.423
+  DTL: -1.111
+  MTL: -1.122
+  MSL: -1.124
+  MLW: -0.821
+  MLLW: -0.775
+  NAVD88: -1.405
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722982
+established: 1973-07-16T00:00:00Z
+removed: 1973-09-05T23:59:00Z

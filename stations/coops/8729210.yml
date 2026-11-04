@@ -1,0 +1,27 @@
+name: Panama City Beach
+lat: 30.21375
+lon: -85.878586
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.656
+  MHW: -8.633
+  DTL: -8.444
+  MTL: -8.442
+  MSL: -8.434
+  MLW: -8.251
+  MLLW: -8.231
+  NAVD88: -8.393
+  LAT: -7.919
+  HAT: -8.934
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729210
+established: 1989-09-20T00:00:00Z

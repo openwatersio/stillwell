@@ -1,0 +1,26 @@
+name: RUMFORD, SEEKONK RIVER
+lat: 41.84
+lon: -71.3733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.616
+  MHW: -2.542
+  DTL: -1.841
+  MTL: -1.832
+  MSL: -1.788
+  MLW: -1.122
+  MLLW: -1.066
+  LAT: -0.717
+  HAT: -2.965
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8453433
+established: 1994-05-10T00:00:00Z
+removed: 1994-09-30T23:59:00Z

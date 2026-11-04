@@ -1,0 +1,25 @@
+name: WHITFIELD ESTATES, SARASOTA BAY
+lat: 27.4083
+lon: -82.58
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.299
+  MHW: -1.214
+  DTL: -0.978
+  MTL: -1.016
+  MSL: -1.02
+  MLW: -0.818
+  MLLW: -0.657
+  NAVD88: -1.173
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726159
+established: 1977-04-25T00:00:00Z
+removed: 1977-11-09T23:59:00Z

@@ -1,0 +1,25 @@
+name: WILMINGTON BEACH
+lat: 34.0317
+lon: -77.8933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.96
+  MHW: -2.856
+  DTL: -2.244
+  MTL: -2.215
+  MSL: -2.213
+  MLW: -1.574
+  MLLW: -1.527
+  NAVD88: -2.429
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8658559
+established: 1977-01-28T00:00:00Z
+removed: 1979-12-20T23:59:00Z

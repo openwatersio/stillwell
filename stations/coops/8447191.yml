@@ -1,0 +1,26 @@
+name: Bournedale, Cape Cod Canal (Sta. 200)
+lat: 41.77
+lon: -70.5617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.702
+  MHW: -2.591
+  DTL: -1.662
+  MTL: -1.649
+  MSL: -1.693
+  MLW: -0.706
+  MLLW: -0.623
+  LAT: -0.222
+  HAT: -3.136
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447191
+established: 1982-09-16T00:00:00Z
+removed: 2001-10-16T00:00:00Z

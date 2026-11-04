@@ -1,0 +1,19 @@
+name: St. Clair State Police
+lat: 42.81222
+lon: -82.48556
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -175.08
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014080
+established: 1971-01-01T00:00:00Z

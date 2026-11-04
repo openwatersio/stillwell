@@ -1,0 +1,27 @@
+name: TEMCO Kalama Terminal
+lat: 45.9867
+lon: -122.8367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.504
+  MHW: -3.36
+  DTL: -2.945
+  MTL: -2.917
+  MSL: -2.904
+  MLW: -2.474
+  MLLW: -2.387
+  NAVD88: -0.727
+  LAT: -2.079
+  HAT: -3.877
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440357
+established: 2016-07-19T00:00:00Z

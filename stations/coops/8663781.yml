@@ -1,0 +1,25 @@
+name: FRENCH QUARTER CREEK
+lat: 33.055
+lon: -79.88
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.455
+  MHW: -1.392
+  DTL: -0.961
+  MTL: -0.967
+  MSL: -1.012
+  MLW: -0.543
+  MLLW: -0.468
+  NAVD88: -0.677
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8663781
+established: 1976-06-16T00:00:00Z
+removed: 1977-02-09T23:59:00Z

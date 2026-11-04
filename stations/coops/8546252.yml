@@ -1,0 +1,26 @@
+name: Bridesburg
+lat: 39.979683
+lon: -75.079315
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.076
+  MHW: -7.958
+  DTL: -7.014
+  MTL: -6.984
+  MSL: -7.046
+  MLW: -6.01
+  MLLW: -5.952
+  LAT: -5.751
+  HAT: -8.376
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8546252
+established: 1979-07-23T00:00:00Z

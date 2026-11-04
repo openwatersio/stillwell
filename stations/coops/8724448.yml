@@ -1,0 +1,24 @@
+name: WALTZ KEY
+lat: 24.6467
+lon: -81.6533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.979
+  MHW: -1.892
+  DTL: -1.699
+  MTL: -1.688
+  MSL: -1.692
+  MLW: -1.484
+  MLLW: -1.419
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724448
+established: 1974-12-09T00:00:00Z
+removed: 1975-02-04T23:59:00Z

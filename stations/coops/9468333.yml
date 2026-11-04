@@ -1,0 +1,27 @@
+name: Unalakleet
+lat: 63.875
+lon: -160.788
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.587
+  MHW: -1.467
+  DTL: -1.061
+  MTL: -1.045
+  MSL: -1.009
+  MLW: -0.623
+  MLLW: -0.536
+  NAVD88: 0.17
+  LAT: -0.222
+  HAT: -2.118
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468333
+established: 1977-06-30T00:00:00Z

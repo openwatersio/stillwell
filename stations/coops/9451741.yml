@@ -1,0 +1,26 @@
+name: WHITESTONE NARROWS, Neva Strait
+lat: 57.25
+lon: -135.567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.043
+  MHW: -9.804
+  DTL: -8.514
+  MTL: -8.619
+  MSL: -8.608
+  MLW: -7.434
+  MLLW: -6.986
+  LAT: -5.998
+  HAT: -10.947
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451741
+established: 2013-05-01T00:00:00Z
+removed: 2013-06-20T00:00:00Z

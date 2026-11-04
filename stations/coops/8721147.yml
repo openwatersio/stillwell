@@ -1,0 +1,26 @@
+name: Ponce De Leon Inlet South
+lat: 29.063334
+lon: -80.91583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.324
+  MHW: -0.236
+  DTL: 0.195
+  MTL: 0.216
+  MSL: 0.215
+  MLW: 0.67
+  MLLW: 0.714
+  NAVD88: 0.013
+  LAT: 1.026
+  HAT: -0.737
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721147
+established: 1973-12-12T00:00:00Z

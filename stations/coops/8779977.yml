@@ -1,0 +1,24 @@
+name: Brownsville
+lat: 25.9517
+lon: -97.4017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.77
+  MHW: -1.749
+  DTL: -1.541
+  MTL: -1.564
+  MSL: -1.583
+  MLW: -1.379
+  MLLW: -1.312
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8779977
+established: 2002-06-19T00:00:00Z
+removed: 2003-01-02T23:59:00Z

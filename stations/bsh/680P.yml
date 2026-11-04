@@ -1,0 +1,15 @@
+name: Kaiser-Wilhelm-Koog, Elbe
+lat: 53.91667
+lon: 8.91667
+country_code: DE
+datum: PNP
+datums:
+  NHN: 0
+  SKN: 0
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/kaiser_wilhelm_koog

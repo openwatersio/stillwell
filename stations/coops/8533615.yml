@@ -1,0 +1,27 @@
+name: BARNEGAT INLET (INSIDE)
+lat: 39.7617
+lon: -74.1117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.831
+  MHW: -1.76
+  DTL: -1.448
+  MTL: -1.432
+  MSL: -1.421
+  MLW: -1.103
+  MLLW: -1.066
+  NAVD88: -1.426
+  LAT: -0.805
+  HAT: -2.084
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8533615
+established: 1976-06-23T00:00:00Z
+removed: 2013-12-11T23:59:00Z

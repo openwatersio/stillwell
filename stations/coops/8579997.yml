@@ -1,0 +1,26 @@
+name: BLADENSBURG, ANACOSTIA RIVER
+lat: 38.9333
+lon: -76.9383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.834
+  MHW: -0.765
+  DTL: -0.324
+  MTL: -0.315
+  MSL: -0.31
+  MLW: 0.134
+  MLLW: 0.185
+  LAT: 0.354
+  HAT: -1.006
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8579997
+established: 1932-11-25T00:00:00Z
+removed: 1996-08-13T23:59:00Z

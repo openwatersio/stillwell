@@ -1,0 +1,16 @@
+name: TINICUM 4, DARBY CREEK
+lat: 39.8783
+lon: -75.2767
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8542885
+established: 1977-10-22T00:00:00Z
+removed: 1978-12-12T23:59:00Z

@@ -1,0 +1,26 @@
+name: Havre De Grace
+lat: 39.5367
+lon: -76.09
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.671
+  MHW: -2.567
+  DTL: -2.298
+  MTL: -2.278
+  MSL: -2.286
+  MLW: -1.989
+  MLLW: -1.925
+  LAT: -1.754
+  HAT: -2.883
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8574070
+established: 1972-11-17T00:00:00Z
+removed: 2005-09-07T23:59:00Z

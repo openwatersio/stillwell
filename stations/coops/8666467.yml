@@ -1,0 +1,25 @@
+name: FOLLY RIVER, NORTH
+lat: 32.67
+lon: -79.9167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.51
+  MHW: -2.393
+  DTL: -1.604
+  MTL: -1.573
+  MSL: -1.616
+  MLW: -0.753
+  MLLW: -0.697
+  NAVD88: -1.702
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666467
+established: 1976-11-18T00:00:00Z
+removed: 1978-02-10T23:59:00Z

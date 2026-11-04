@@ -1,0 +1,19 @@
+name: Big Salt Lake
+lat: 55.6
+lon: -132.95
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.408
+  MHW: -1.188
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450623
+established: 2008-05-16T00:00:00Z
+removed: 2008-06-15T23:59:00Z

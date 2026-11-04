@@ -1,0 +1,27 @@
+name: South Padre Island, Brazos Santiago Pass
+lat: 26.0683
+lon: -97.1567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.029
+  MHW: -1.012
+  DTL: -0.805
+  MTL: -0.821
+  MSL: -0.846
+  MLW: -0.63
+  MLLW: -0.58
+  NAVD88: -0.854
+  LAT: -0.131
+  HAT: -1.32
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8779750
+established: 1958-06-01T00:00:00Z
+removed: 1994-05-05T23:59:00Z

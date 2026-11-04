@@ -1,0 +1,27 @@
+name: PACKWOOD PLACE
+lat: 28.94
+lon: -80.87
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.09
+  MHW: -1.04
+  DTL: -0.9
+  MTL: -0.878
+  MSL: -0.876
+  MLW: -0.716
+  MLLW: -0.709
+  NAVD88: -1.027
+  LAT: -0.649
+  HAT: -1.163
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721222
+established: 1979-01-18T00:00:00Z
+removed: 1979-04-24T23:59:00Z

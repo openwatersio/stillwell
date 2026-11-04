@@ -1,0 +1,26 @@
+name: Scraggy Island
+lat: 57.34
+lon: -135.707
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.001
+  MHW: -2.743
+  DTL: -1.482
+  MTL: -1.582
+  MSL: -1.573
+  MLW: -0.421
+  MLLW: 0.036
+  LAT: 1.044
+  HAT: -3.894
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451805
+established: 2002-04-02T00:00:00Z
+removed: 2004-06-10T23:59:00Z

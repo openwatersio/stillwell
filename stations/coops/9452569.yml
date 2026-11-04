@@ -1,0 +1,16 @@
+name: LEMESURIER ISLAND (BACKUP)
+lat: 58.3133
+lon: -136.037
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452569
+established: 1990-03-28T00:00:00Z
+removed: 1990-10-25T23:59:00Z

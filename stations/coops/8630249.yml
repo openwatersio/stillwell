@@ -1,0 +1,27 @@
+name: CHINCOTEAGUE, USCG STATION
+lat: 37.9317
+lon: -75.3833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.681
+  MHW: -1.631
+  DTL: -1.401
+  MTL: -1.39
+  MSL: -1.389
+  MLW: -1.148
+  MLLW: -1.12
+  NAVD88: -1.442
+  LAT: -0.903
+  HAT: -1.906
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8630249
+established: 1976-08-06T00:00:00Z
+removed: 1982-12-07T23:59:00Z

@@ -1,0 +1,26 @@
+name: Kotzebue
+lat: 66.9017
+lon: -162.582
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.257
+  MHW: -1.236
+  DTL: -1.149
+  MTL: -1.158
+  MSL: -1.143
+  MLW: -1.08
+  MLLW: -1.04
+  LAT: -0.997
+  HAT: -1.312
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490424
+established: 1950-07-19T00:00:00Z
+removed: 2015-10-03T23:59:00Z

@@ -1,0 +1,25 @@
+name: MIDDLE PITHLACHASCOTEE RIVER
+lat: 28.2483
+lon: -82.7233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.605
+  MHW: -1.487
+  DTL: -1.097
+  MTL: -1.119
+  MSL: -1.113
+  MLW: -0.751
+  MLLW: -0.589
+  NAVD88: -1.198
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727001
+established: 1976-02-13T00:00:00Z
+removed: 1976-04-22T23:59:00Z

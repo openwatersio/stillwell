@@ -1,0 +1,16 @@
+name: HOWE KEY (OFF SOUTH END)
+lat: 24.725
+lon: -81.4067
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724243
+established: 1973-10-23T00:00:00Z
+removed: 1974-03-12T23:59:00Z

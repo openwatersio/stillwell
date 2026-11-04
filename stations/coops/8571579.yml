@@ -1,0 +1,27 @@
+name: Barren Island
+lat: 38.3417
+lon: -76.265
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.306
+  MHW: -9.254
+  DTL: -9.07
+  MTL: -9.068
+  MSL: -9.074
+  MLW: -8.881
+  MLLW: -8.834
+  NAVD88: -9.204
+  LAT: -8.661
+  HAT: -9.425
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571579
+established: 2001-12-13T00:00:00Z
+removed: 2003-04-22T23:59:00Z

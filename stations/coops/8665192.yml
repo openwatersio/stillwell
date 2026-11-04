@@ -1,0 +1,25 @@
+name: WANDO RIVER ENTRANCE, HOBCAW POINT
+lat: 32.8217
+lon: -79.9
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.899
+  MHW: -2.79
+  DTL: -1.996
+  MTL: -1.97
+  MSL: -2.011
+  MLW: -1.149
+  MLLW: -1.093
+  NAVD88: -2.064
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665192
+established: 1976-07-28T00:00:00Z
+removed: 1978-05-12T23:59:00Z

@@ -1,0 +1,25 @@
+name: EDISTO MARINA, BIG BAY CREEK
+lat: 32.4933
+lon: -80.34
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.413
+  MHW: -2.302
+  DTL: -1.42
+  MTL: -1.394
+  MSL: -1.435
+  MLW: -0.486
+  MLLW: -0.426
+  NAVD88: -1.533
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667676
+established: 1975-10-22T00:00:00Z
+removed: 1977-02-07T23:59:00Z

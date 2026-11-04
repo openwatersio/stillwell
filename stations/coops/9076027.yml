@@ -1,0 +1,19 @@
+name: West Neebish Island
+lat: 46.28469
+lon: -84.20981
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176.11
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9076027
+established: 2006-10-19T00:00:00Z

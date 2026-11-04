@@ -1,0 +1,27 @@
+name: CRANDALL, ST. MARYS RIVER
+lat: 30.7217
+lon: -81.6217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.181
+  MHW: -2.101
+  DTL: -1.375
+  MTL: -1.364
+  MSL: -1.426
+  MLW: -0.626
+  MLLW: -0.568
+  NAVD88: -1.43
+  LAT: -0.237
+  HAT: -2.679
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720004
+established: 1977-11-22T00:00:00Z
+removed: 1978-06-06T23:59:00Z

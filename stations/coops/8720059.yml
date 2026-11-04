@@ -1,0 +1,26 @@
+name: Vaughns Landing
+lat: 30.63
+lon: -81.5767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.527
+  MHW: -9.496
+  DTL: -9.07
+  MTL: -9.096
+  MSL: -9.17
+  MLW: -8.696
+  MLLW: -8.612
+  LAT: -8.562
+  HAT: -9.636
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720059
+established: 2008-02-25T00:00:00Z
+removed: 2011-07-29T10:04:00Z

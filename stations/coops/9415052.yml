@@ -1,0 +1,24 @@
+name: GALLINAS, GALLINAS CREEK
+lat: 38.015
+lon: -122.503
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.619
+  MHW: -2.435
+  DTL: -1.718
+  MTL: -1.779
+  MSL: -1.771
+  MLW: -1.124
+  MLLW: -0.816
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415052
+established: 1979-06-28T00:00:00Z
+removed: 1979-11-21T23:59:00Z

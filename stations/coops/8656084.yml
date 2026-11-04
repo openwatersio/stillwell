@@ -1,0 +1,26 @@
+name: CORE CREEK BRIDGE
+lat: 34.825
+lon: -76.69
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.107
+  MHW: -1.036
+  DTL: -0.728
+  MTL: -0.706
+  MSL: -0.69
+  MLW: -0.376
+  MLLW: -0.349
+  LAT: -0.123
+  HAT: -1.413
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8656084
+established: 1973-08-28T00:00:00Z
+removed: 1996-09-08T23:59:00Z

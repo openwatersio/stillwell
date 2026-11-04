@@ -1,0 +1,27 @@
+name: CARRABELLE RIVER, ST. GEORGE SOUND
+lat: 29.85
+lon: -84.665
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.441
+  MHW: -1.384
+  DTL: -1.084
+  MTL: -1.142
+  MSL: -1.129
+  MLW: -0.899
+  MLLW: -0.727
+  NAVD88: -1.142
+  LAT: -0.378
+  HAT: -1.635
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728464
+established: 1977-10-27T00:00:00Z
+removed: 1978-03-27T23:59:00Z

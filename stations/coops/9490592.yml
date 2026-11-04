@@ -1,0 +1,18 @@
+name: North Hotham Inlet
+lat: 67.04364
+lon: -161.79236
+country_code: US
+datum: STND
+datums:
+  MSL: -8.293
+  NAVD88: -7.051
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490592
+established: 2022-06-01T00:00:00Z
+removed: 2022-10-02T02:30:00Z

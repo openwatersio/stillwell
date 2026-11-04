@@ -1,0 +1,26 @@
+name: Sunbury, Sunbury Channel
+lat: 31.7667
+lon: -81.2783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.971
+  MHW: -2.864
+  DTL: -1.773
+  MTL: -1.754
+  MSL: -1.869
+  MLW: -0.643
+  MLLW: -0.575
+  LAT: -0.083
+  HAT: -3.637
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8672875
+established: 1977-03-09T00:00:00Z
+removed: 2012-05-21T11:28:00Z

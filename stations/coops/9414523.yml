@@ -1,0 +1,27 @@
+name: Redwood City
+lat: 37.506813
+lon: -122.21191
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.554
+  MHW: -4.361
+  DTL: -3.304
+  MTL: -3.39
+  MSL: -3.396
+  MLW: -2.419
+  MLLW: -2.054
+  NAVD88: -2.414
+  LAT: -1.41
+  HAT: -5.014
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414523
+established: 1974-10-09T00:00:00Z

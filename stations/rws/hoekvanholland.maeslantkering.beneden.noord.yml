@@ -1,0 +1,14 @@
+name: Hoek van Holland, Maeslantkering, Beneden, noord
+lat: 51.958239
+lon: 4.161443
+country_code: NL
+datum: NAP
+products: [levels, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/hoekvanholland.maeslantkering.beneden.noord/details

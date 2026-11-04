@@ -1,0 +1,26 @@
+name: POINT HARRINGTON, CLARENCE STRAIT
+lat: 56.1783
+lon: -132.697
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.162
+  MHW: -3.89
+  DTL: -1.73
+  MTL: -1.825
+  MSL: -1.815
+  MLW: 0.239
+  MLLW: 0.701
+  LAT: 2.146
+  HAT: -5.405
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451005
+established: 1976-10-16T00:00:00Z
+removed: 2000-05-10T23:59:00Z

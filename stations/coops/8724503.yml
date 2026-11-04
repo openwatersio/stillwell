@@ -1,0 +1,25 @@
+name: STOCK ISLAND
+lat: 24.5767
+lon: -81.7217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.37
+  MHW: -1.285
+  DTL: -1.198
+  MTL: -1.179
+  MSL: -1.174
+  MLW: -1.073
+  MLLW: -1.026
+  NAVD88: -1.42
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724503
+established: 1973-12-07T00:00:00Z
+removed: 1974-04-05T23:59:00Z

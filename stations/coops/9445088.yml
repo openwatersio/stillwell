@@ -1,0 +1,24 @@
+name: LOFALL
+lat: 47.815
+lon: -122.657
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.473
+  MHW: -3.201
+  DTL: -1.842
+  MTL: -2.141
+  MSL: -2.124
+  MLW: -1.081
+  MLLW: -0.21
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445088
+established: 1978-01-24T00:00:00Z
+removed: 1983-03-23T23:59:00Z

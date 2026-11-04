@@ -1,0 +1,26 @@
+name: OCEAN RIDGE
+lat: 26.5267
+lon: -80.0533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.288
+  MHW: -1.24
+  DTL: -0.863
+  MTL: -0.863
+  MSL: -0.842
+  MLW: -0.487
+  MLLW: -0.439
+  LAT: -0.253
+  HAT: -1.472
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722718
+established: 1973-03-23T00:00:00Z
+removed: 1973-05-08T23:59:00Z

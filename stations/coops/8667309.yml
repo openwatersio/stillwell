@@ -1,0 +1,24 @@
+name: FENWICK ISLAND, SOUTH EDISTO RIVER
+lat: 32.56
+lon: -80.4183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.215
+  MHW: -3.11
+  DTL: -2.185
+  MTL: -2.166
+  MSL: -2.252
+  MLW: -1.222
+  MLLW: -1.155
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667309
+established: 1979-02-28T00:00:00Z
+removed: 1979-09-12T23:59:00Z

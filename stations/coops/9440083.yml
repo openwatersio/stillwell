@@ -1,0 +1,26 @@
+name: Vancouver
+lat: 45.631172
+lon: -122.69577
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.472
+  MHW: -1.309
+  DTL: -0.988
+  MTL: -0.94
+  MSL: -0.911
+  MLW: -0.571
+  MLLW: -0.504
+  LAT: -0.303
+  HAT: -1.671
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440083
+established: 1938-09-14T00:00:00Z

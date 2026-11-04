@@ -1,0 +1,26 @@
+name: Delaware City
+lat: 39.582195
+lon: -75.588974
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.656
+  MHW: -8.54
+  DTL: -7.742
+  MTL: -7.711
+  MSL: -7.728
+  MLW: -6.881
+  MLLW: -6.827
+  LAT: -6.54
+  HAT: -8.999
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8551762
+established: 2001-10-08T00:00:00Z

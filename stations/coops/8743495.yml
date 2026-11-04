@@ -1,0 +1,26 @@
+name: OCEAN SPRINGS, OLD FORT BAYOU
+lat: 30.42
+lon: -88.8283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.012
+  MHW: -0.975
+  DTL: -0.731
+  MTL: -0.731
+  MSL: -0.734
+  MLW: -0.487
+  MLLW: -0.45
+  LAT: -0.086
+  HAT: -1.242
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8743495
+established: 1979-06-29T00:00:00Z
+removed: 1980-12-17T23:59:00Z

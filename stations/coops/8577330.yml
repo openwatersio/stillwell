@@ -1,0 +1,27 @@
+name: Solomons Island
+lat: 38.3167
+lon: -76.4517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.584
+  MHW: -1.54
+  DTL: -1.36
+  MTL: -1.361
+  MSL: -1.366
+  MLW: -1.183
+  MLLW: -1.135
+  NAVD88: -1.394
+  LAT: -0.975
+  HAT: -1.705
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8577330
+established: 1937-11-05T00:00:00Z

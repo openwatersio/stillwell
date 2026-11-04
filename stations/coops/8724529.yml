@@ -1,0 +1,25 @@
+name: RIVERIA CANAL, KEY WEST
+lat: 24.565
+lon: -81.7517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.269
+  MHW: -1.182
+  DTL: -1.075
+  MTL: -1.054
+  MSL: -1.063
+  MLW: -0.926
+  MLLW: -0.881
+  NAVD88: -1.301
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724529
+established: 1974-10-16T00:00:00Z
+removed: 1975-01-07T23:59:00Z

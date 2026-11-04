@@ -1,0 +1,19 @@
+name: Port Huron, North of Blue Water Bridge
+lat: 43.00211
+lon: -82.42289
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -175.74
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014095
+established: 2023-01-06T00:00:00Z
+removed: 2024-06-29T18:30:00Z

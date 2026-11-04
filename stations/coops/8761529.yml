@@ -1,0 +1,26 @@
+name: MARTELLO CASTLE, LAKE BORGNE
+lat: 29.945
+lon: -89.835
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -19.695
+  MHW: -19.658
+  DTL: -19.486
+  MTL: -19.474
+  MSL: -19.483
+  MLW: -19.291
+  MLLW: -19.276
+  LAT: -19.131
+  HAT: -19.851
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761529
+established: 1982-11-23T00:00:00Z
+removed: 2007-06-06T23:59:00Z

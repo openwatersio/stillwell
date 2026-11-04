@@ -1,0 +1,16 @@
+name: BURNETTE INLET, ETOLIN ISLAND
+lat: 56.0733
+lon: -132.478
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450949
+established: 1973-09-13T00:00:00Z
+removed: 2000-05-10T23:59:00Z

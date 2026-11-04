@@ -1,0 +1,25 @@
+name: ELLIOTT CUT ENTRANCE, STONO RIVER
+lat: 32.7633
+lon: -80.0017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.503
+  MHW: -2.405
+  DTL: -1.637
+  MTL: -1.621
+  MSL: -1.708
+  MLW: -0.837
+  MLLW: -0.77
+  NAVD88: -1.727
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665641
+established: 1974-04-17T00:00:00Z
+removed: 1975-10-31T23:59:00Z

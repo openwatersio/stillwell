@@ -1,0 +1,27 @@
+name: Bridgeport
+lat: 41.17582
+lon: -73.18397
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.835
+  MHW: -2.733
+  DTL: -1.719
+  MTL: -1.705
+  MSL: -1.708
+  MLW: -0.678
+  MLLW: -0.604
+  NAVD88: -1.775
+  LAT: -0.175
+  HAT: -3.292
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8467150
+established: 1932-06-10T00:00:00Z

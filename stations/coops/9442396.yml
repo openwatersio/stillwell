@@ -1,0 +1,27 @@
+name: La Push, Quillayute River
+lat: 47.912838
+lon: -124.63574
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.174
+  MHW: -3.958
+  DTL: -2.875
+  MTL: -2.977
+  MSL: -2.971
+  MLW: -1.995
+  MLLW: -1.577
+  NAVD88: -2.017
+  LAT: -0.596
+  HAT: -4.962
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9442396
+established: 1924-12-19T00:00:00Z

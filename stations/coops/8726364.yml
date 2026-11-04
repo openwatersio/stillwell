@@ -1,0 +1,27 @@
+name: MULLET KEY, TAMPA BAY
+lat: 27.615
+lon: -82.7267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.01
+  MHW: -0.932
+  DTL: -0.693
+  MTL: -0.707
+  MSL: -0.714
+  MLW: -0.482
+  MLLW: -0.376
+  NAVD88: -0.84
+  LAT: -0.089
+  HAT: -1.231
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726364
+established: 1976-03-24T00:00:00Z
+removed: 1991-09-03T23:59:00Z

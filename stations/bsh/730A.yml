@@ -1,0 +1,16 @@
+name: Ilmenau-Sperrwerk, Außenpegel
+lat: 53.39472
+lon: 10.17972
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.78
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5940080]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/ilmenau-sperrwerk_aussenpegel

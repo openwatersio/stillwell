@@ -1,0 +1,24 @@
+name: M.V. PETROLEUM DOCK, BAYOU ST DENIS
+lat: 29.4967
+lon: -90.025
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.036
+  MHW: -1.036
+  DTL: -0.922
+  MTL: -0.923
+  MSL: -0.924
+  MLW: -0.81
+  MLLW: -0.808
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761799
+established: 1985-07-17T00:00:00Z
+removed: 1986-09-04T23:59:00Z

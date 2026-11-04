@@ -1,0 +1,26 @@
+name: BOWMAN BAY, FIDALGO ISLAND
+lat: 48.415
+lon: -122.652
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.602
+  MHW: -3.404
+  DTL: -2.426
+  MTL: -2.7
+  MSL: -2.66
+  MLW: -1.996
+  MLLW: -1.25
+  LAT: -0.049
+  HAT: -4.037
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9448614
+established: 1973-10-26T00:00:00Z
+removed: 1976-07-20T23:59:00Z

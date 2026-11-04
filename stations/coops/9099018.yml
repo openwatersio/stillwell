@@ -1,0 +1,19 @@
+name: Marquette C.G.
+lat: 46.545555
+lon: -87.37861
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -183.2
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9099018
+established: 1991-09-23T18:31:40Z

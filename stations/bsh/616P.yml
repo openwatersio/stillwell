@@ -1,0 +1,15 @@
+name: List, Sylt, West
+lat: 55.05417
+lon: 8.4
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -3.65
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/list_west

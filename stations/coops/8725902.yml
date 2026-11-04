@@ -1,0 +1,25 @@
+name: SHAKETT CREEK
+lat: 27.1267
+lon: -82.4467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.247
+  MHW: -1.163
+  DTL: -0.98
+  MTL: -0.978
+  MSL: -0.988
+  MLW: -0.792
+  MLLW: -0.712
+  NAVD88: -1.108
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725902
+established: 1977-05-19T00:00:00Z
+removed: 1978-01-09T23:59:00Z

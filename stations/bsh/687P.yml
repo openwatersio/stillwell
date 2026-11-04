@@ -1,0 +1,16 @@
+name: Bremervörde, Oste
+lat: 53.48417
+lon: 9.15472
+country_code: DE
+datum: PNP
+datums:
+  NHN: -4.98
+  SKN: -4.98
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5980010]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/bremervoerde

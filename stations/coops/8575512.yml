@@ -1,0 +1,27 @@
+name: Annapolis
+lat: 38.983883
+lon: -76.480034
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.815
+  MHW: -1.741
+  DTL: -1.596
+  MTL: -1.592
+  MSL: -1.596
+  MLW: -1.444
+  MLLW: -1.377
+  NAVD88: -1.612
+  LAT: -1.159
+  HAT: -1.961
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8575512
+established: 1978-09-14T00:00:00Z

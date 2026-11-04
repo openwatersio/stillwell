@@ -1,0 +1,26 @@
+name: SHINNECOCK INLET OPEN COAST
+lat: 40.8367
+lon: -72.48
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.588
+  MHW: -6.509
+  DTL: -6.06
+  MTL: -6.04
+  MSL: -6.024
+  MLW: -5.571
+  MLLW: -5.532
+  LAT: -5.259
+  HAT: -6.863
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8512354
+established: 1977-08-04T00:00:00Z
+removed: 2014-03-01T00:00:00Z

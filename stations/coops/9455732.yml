@@ -1,0 +1,26 @@
+name: KALIGAN ISLAND (NORTH END),  COOK INLET
+lat: 60.5117
+lon: -151.952
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.993
+  MHW: -4.761
+  DTL: -2.14
+  MTL: -2.326
+  MSL: -2.387
+  MLW: 0.109
+  MLLW: 0.714
+  LAT: 2.598
+  HAT: -6.58
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455732
+established: 1911-06-23T00:00:00Z
+removed: 1999-08-21T23:59:00Z

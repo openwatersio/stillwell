@@ -1,0 +1,27 @@
+name: Port San Luis
+lat: 35.168888
+lon: -120.754166
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.919
+  MHW: -2.704
+  DTL: -2.108
+  MTL: -2.159
+  MSL: -2.149
+  MLW: -1.613
+  MLLW: -1.296
+  NAVD88: -1.32
+  LAT: -0.694
+  HAT: -3.463
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9412110
+established: 1933-10-01T00:00:00Z

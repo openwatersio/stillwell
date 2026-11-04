@@ -1,0 +1,27 @@
+name: Freshwater Bayou
+lat: 29.6554
+lon: -92.2507
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.721
+  MHW: -9.704
+  DTL: -9.592
+  MTL: -9.599
+  MSL: -9.6
+  MLW: -9.495
+  MLLW: -9.463
+  NAVD88: -9.592
+  LAT: -9.352
+  HAT: -9.766
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8765969
+established: 2019-09-16T00:00:00Z
+removed: 2020-07-09T14:00:00Z

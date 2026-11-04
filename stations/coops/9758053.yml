@@ -1,0 +1,26 @@
+name: Penuelas (Punta Guayanilla)
+lat: 17.972528
+lon: -66.76178
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.943
+  MHW: -9.94
+  DTL: -9.837
+  MTL: -9.838
+  MSL: -9.836
+  MLW: -9.737
+  MLLW: -9.731
+  LAT: -9.605
+  HAT: -10.074
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9758053
+established: 2001-03-26T00:00:00Z
+removed: 2013-06-04T00:00:00Z

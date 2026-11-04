@@ -1,0 +1,27 @@
+name: Port Aransas
+lat: 27.8397
+lon: -97.0725
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.723
+  MHW: -1.713
+  DTL: -1.564
+  MTL: -1.578
+  MSL: -1.602
+  MLW: -1.442
+  MLLW: -1.405
+  NAVD88: -1.45
+  LAT: -1.099
+  HAT: -1.955
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8775237
+established: 1990-05-25T00:00:00Z

@@ -1,0 +1,27 @@
+name: HALLS RIVER BRIDGE, HALLS RIVER
+lat: 28.8
+lon: -82.6033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.681
+  MHW: -0.634
+  DTL: -0.577
+  MTL: -0.566
+  MSL: -0.574
+  MLW: -0.497
+  MLLW: -0.473
+  NAVD88: -0.616
+  LAT: -0.427
+  HAT: -0.774
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727293
+established: 1978-05-26T00:00:00Z
+removed: 1979-01-11T23:59:00Z

@@ -1,0 +1,16 @@
+name: ROCKY CR.,LITTLE PINE IS. BAY,
+lat: 28.4867
+lon: -82.6617
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727122
+established: 1975-05-28T00:00:00Z
+removed: 1976-10-01T23:59:00Z

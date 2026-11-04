@@ -1,0 +1,26 @@
+name: Kings Bay MSF Pier
+lat: 30.7781
+lon: -81.4914
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.583
+  MHW: -4.475
+  DTL: -3.529
+  MTL: -3.504
+  MSL: -3.539
+  MLW: -2.533
+  MLLW: -2.475
+  LAT: -1.994
+  HAT: -5.093
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8679598
+established: 1978-11-01T00:00:00Z

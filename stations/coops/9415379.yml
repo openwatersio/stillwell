@@ -1,0 +1,24 @@
+name: JOICE ISLAND, SUISUN SLOUGH
+lat: 38.18
+lon: -122.045
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.905
+  MHW: -5.754
+  DTL: -5.111
+  MTL: -5.149
+  MSL: -5.149
+  MLW: -4.543
+  MLLW: -4.318
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415379
+established: 1977-10-19T00:00:00Z
+removed: 1989-07-17T23:59:00Z

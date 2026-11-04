@@ -1,0 +1,26 @@
+name: Dall Point
+lat: 61.5317
+lon: -166.148
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -14.079
+  MHW: -13.864
+  DTL: -13.401
+  MTL: -13.349
+  MSL: -13.282
+  MLW: -12.834
+  MLLW: -12.721
+  LAT: -12.197
+  HAT: -14.426
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466931
+established: 2007-06-06T00:00:00Z
+removed: 2007-09-09T23:59:00Z

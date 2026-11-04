@@ -1,0 +1,26 @@
+name: Kivalina
+lat: 67.7267
+lon: -164.592
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.47
+  MHW: -1.429
+  DTL: -1.333
+  MTL: -1.327
+  MSL: -1.329
+  MLW: -1.224
+  MLLW: -1.195
+  LAT: -1.106
+  HAT: -1.549
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9491253
+established: 1950-07-21T00:00:00Z
+removed: 2003-10-05T23:59:00Z

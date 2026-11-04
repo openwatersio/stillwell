@@ -1,0 +1,24 @@
+name: Port Chalmers
+lat: 60.2418
+lon: -147.249
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.697
+  MHW: -3.416
+  DTL: -1.882
+  MTL: -1.964
+  MSL: -1.996
+  MLW: -0.512
+  MLLW: -0.067
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454511
+established: 1998-09-24T00:00:00Z
+removed: 1999-10-20T23:59:00Z

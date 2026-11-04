@@ -1,0 +1,26 @@
+name: SALISBURY POINT, MERRIMACK RIVER
+lat: 42.8383
+lon: -70.9083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.624
+  MHW: -3.486
+  DTL: -2.362
+  MTL: -2.322
+  MSL: -2.326
+  MLW: -1.157
+  MLLW: -1.099
+  LAT: -0.673
+  HAT: -4.04
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8440273
+established: 1989-05-18T00:00:00Z
+removed: 1989-10-23T23:59:00Z

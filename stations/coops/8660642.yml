@@ -1,0 +1,25 @@
+name: NORTH MYRTLE BEACH
+lat: 33.7667
+lon: -78.815
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.959
+  MHW: -1.893
+  DTL: -1.631
+  MTL: -1.622
+  MSL: -1.604
+  MLW: -1.351
+  MLLW: -1.302
+  NAVD88: -1.406
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660642
+established: 1977-03-10T00:00:00Z
+removed: 1977-08-23T23:59:00Z

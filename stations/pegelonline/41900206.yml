@@ -1,0 +1,16 @@
+name: LETZTER HELLER
+lat: 51.415651
+lon: 9.678081
+country_code: DE
+datum: PNP
+datums:
+  NN: 117.4
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=41900206

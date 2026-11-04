@@ -1,0 +1,27 @@
+name: MIAMI, BISCAYNE BAY
+lat: 25.7783
+lon: -80.185
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.623
+  MHW: -1.603
+  DTL: -1.261
+  MTL: -1.271
+  MSL: -1.271
+  MLW: -0.94
+  MLLW: -0.9
+  NAVD88: -1.543
+  LAT: -0.652
+  HAT: -1.921
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723165
+established: 1971-10-27T00:00:00Z
+removed: 1986-10-31T23:59:00Z

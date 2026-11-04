@@ -1,0 +1,27 @@
+name: Arena Cove
+lat: 38.914555
+lon: -123.71108
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.607
+  MHW: -10.402
+  DTL: -9.712
+  MTL: -9.786
+  MSL: -9.775
+  MLW: -9.17
+  MLLW: -8.818
+  NAVD88: -8.86
+  LAT: -8.146
+  HAT: -11.14
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9416841
+established: 1978-04-09T00:00:00Z

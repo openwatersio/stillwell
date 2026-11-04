@@ -1,0 +1,26 @@
+name: Point Clear, Mobile Bay
+lat: 30.486639
+lon: -87.934525
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.04
+  MHW: -9.046
+  DTL: -8.812
+  MTL: -8.817
+  MSL: -8.821
+  MLW: -8.588
+  MLLW: -8.583
+  LAT: -8.267
+  HAT: -9.327
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8733821
+established: 2010-11-01T00:00:00Z
+removed: 2011-02-05T23:59:00Z

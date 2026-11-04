@@ -1,0 +1,16 @@
+name: ROTHENBURG OP
+lat: 51.653861
+lon: 11.752179
+country_code: DE
+datum: PNP
+datums:
+  NHN: 64.141
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=570850

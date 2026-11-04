@@ -1,0 +1,24 @@
+name: SABINE PASS
+lat: 29.705
+lon: -93.8533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.037
+  MHW: -2.005
+  DTL: -1.754
+  MTL: -1.796
+  MSL: -1.81
+  MLW: -1.587
+  MLLW: -1.471
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770590
+established: 1958-05-07T00:00:00Z
+removed: 1985-11-23T23:59:00Z

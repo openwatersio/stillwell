@@ -1,0 +1,27 @@
+name: Bayou La Batre Bridge
+lat: 30.4057
+lon: -88.2477
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.659
+  MHW: -8.611
+  DTL: -8.406
+  MTL: -8.403
+  MSL: -8.404
+  MLW: -8.195
+  MLLW: -8.153
+  NAVD88: -8.375
+  LAT: -7.799
+  HAT: -8.932
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8739803
+established: 2011-04-22T00:00:00Z

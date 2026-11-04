@@ -1,0 +1,26 @@
+name: Moss Landing
+lat: 36.8017
+lon: -121.79
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.489
+  MHW: -3.276
+  DTL: -2.694
+  MTL: -2.745
+  MSL: -2.732
+  MLW: -2.215
+  MLLW: -1.899
+  LAT: -1.291
+  HAT: -4.057
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9413616
+established: 1976-05-09T00:00:00Z
+removed: 1978-01-31T23:59:00Z

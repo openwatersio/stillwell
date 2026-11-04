@@ -1,0 +1,27 @@
+name: Vaca Key, Florida Bay
+lat: 24.711
+lon: -81.1065
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.072
+  MHW: -1.04
+  DTL: -0.924
+  MTL: -0.931
+  MSL: -0.931
+  MLW: -0.822
+  MLLW: -0.775
+  NAVD88: -1.182
+  LAT: -0.592
+  HAT: -1.267
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723970
+established: 1970-12-04T00:00:00Z

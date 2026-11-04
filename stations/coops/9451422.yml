@@ -1,0 +1,26 @@
+name: LECONTE BAY
+lat: 56.7883
+lon: -132.502
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.606
+  MHW: -3.312
+  DTL: -1.166
+  MTL: -1.259
+  MSL: -1.296
+  MLW: 0.794
+  MLLW: 1.274
+  LAT: 2.626
+  HAT: -4.759
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451422
+established: 1997-05-19T00:00:00Z
+removed: 1997-06-29T23:59:00Z

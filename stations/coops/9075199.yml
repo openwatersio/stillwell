@@ -1,0 +1,15 @@
+name: Point Aux Frenes
+lat: 46.086082
+lon: -84.06022
+country_code: US
+datum: STND
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9075199
+established: 2019-03-04T00:00:00Z
+removed: 2019-10-03T14:00:00Z

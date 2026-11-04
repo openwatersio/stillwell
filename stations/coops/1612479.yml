@@ -1,0 +1,16 @@
+name: MOKUOLOE, KANEONE BAY, OAHU IS. (BACKUP)
+lat: 21.435
+lon: -157.792
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1612479
+established: 1983-08-15T00:00:00Z
+removed: 1991-01-29T23:59:00Z

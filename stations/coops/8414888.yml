@@ -1,0 +1,26 @@
+name: PULPIT HARBOR, PENOBSCOT BAY
+lat: 44.1567
+lon: -68.8867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.982
+  MHW: -3.851
+  DTL: -2.36
+  MTL: -2.351
+  MSL: -2.373
+  MLW: -0.85
+  MLLW: -0.737
+  LAT: -0.014
+  HAT: -4.732
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8414888
+established: 1983-05-22T00:00:00Z
+removed: 1985-07-22T23:59:00Z

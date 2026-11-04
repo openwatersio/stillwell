@@ -1,0 +1,27 @@
+name: Dahlgren
+lat: 38.31975
+lon: -77.0366
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.512
+  MHW: -5.46
+  DTL: -5.22
+  MTL: -5.217
+  MSL: -5.216
+  MLW: -4.973
+  MLLW: -4.928
+  NAVD88: -5.246
+  LAT: -4.746
+  HAT: -5.688
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8635027
+established: 1970-04-09T00:00:00Z

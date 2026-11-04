@@ -1,0 +1,27 @@
+name: Alakanuk, Yukon River
+lat: 62.6872
+lon: -164.6669
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.886
+  MHW: -8.687
+  DTL: -8.526
+  MTL: -8.451
+  MSL: -8.444
+  MLW: -8.213
+  MLLW: -8.166
+  NAVD88: -6.372
+  LAT: -7.96
+  HAT: -9.138
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9467645
+established: 2021-06-18T00:00:00Z
+removed: 2021-09-25T23:59:00Z

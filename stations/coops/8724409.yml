@@ -1,0 +1,24 @@
+name: INNER NARROWS
+lat: 24.6583
+lon: -81.6083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.643
+  MHW: -1.57
+  DTL: -1.311
+  MTL: -1.306
+  MSL: -1.275
+  MLW: -1.041
+  MLLW: -0.979
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724409
+established: 1974-08-29T00:00:00Z
+removed: 1974-11-26T23:59:00Z

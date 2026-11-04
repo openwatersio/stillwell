@@ -1,0 +1,24 @@
+name: LITTLE GASPARILLA ISLAND
+lat: 26.8267
+lon: -82.285
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.486
+  MHW: -1.411
+  DTL: -1.254
+  MTL: -1.273
+  MSL: -1.28
+  MLW: -1.135
+  MLLW: -1.022
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725665
+established: 1977-08-30T00:00:00Z
+removed: 1978-04-04T23:59:00Z

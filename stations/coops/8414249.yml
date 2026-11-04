@@ -1,0 +1,26 @@
+name: Oceanville, Deer Isle
+lat: 44.192307
+lon: -68.62093
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.163
+  MHW: -9.035
+  DTL: -7.542
+  MTL: -7.533
+  MSL: -7.535
+  MLW: -6.03
+  MLLW: -5.921
+  LAT: -5.218
+  HAT: -9.831
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8414249
+established: 2010-03-13T00:00:00Z
+removed: 2010-08-11T23:59:00Z

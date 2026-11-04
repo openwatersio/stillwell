@@ -1,0 +1,16 @@
+name: FISH CREEK
+lat: 48.4633
+lon: -122.967
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449896
+established: 1974-09-01T00:00:00Z
+removed: 1974-10-31T23:59:00Z

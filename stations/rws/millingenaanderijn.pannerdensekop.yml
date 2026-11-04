@@ -1,0 +1,14 @@
+name: Millingen a/d Rijn Pannerdense Kop
+lat: 51.872
+lon: 6.0417
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/millingenaanderijn.pannerdensekop/details

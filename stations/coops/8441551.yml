@@ -1,0 +1,26 @@
+name: ROCKPORT HARBOR
+lat: 42.6583
+lon: -70.615
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.891
+  MHW: -3.76
+  DTL: -2.45
+  MTL: -2.434
+  MSL: -2.444
+  MLW: -1.107
+  MLLW: -1.008
+  LAT: -0.383
+  HAT: -4.516
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8441551
+established: 1992-06-11T00:00:00Z
+removed: 1992-10-09T23:59:00Z

@@ -1,0 +1,24 @@
+name: CHRISTMAS BAY
+lat: 29.0417
+lon: -95.175
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.439
+  MHW: -1.426
+  DTL: -1.314
+  MTL: -1.318
+  MSL: -1.324
+  MLW: -1.21
+  MLLW: -1.19
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8772132
+established: 1990-10-04T00:00:00Z
+removed: 1995-08-22T23:59:00Z

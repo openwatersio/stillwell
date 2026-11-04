@@ -1,0 +1,16 @@
+name: FORT MACON
+lat: 34.6983
+lon: -76.6817
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8656571
+established: 1976-02-20T00:00:00Z
+removed: 1978-10-02T23:59:00Z

@@ -1,0 +1,24 @@
+name: LONG BRANCH, INSIDE
+lat: 40.325
+lon: -73.9967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.324
+  MHW: -1.249
+  DTL: -0.872
+  MTL: -0.853
+  MSL: -0.849
+  MLW: -0.457
+  MLLW: -0.419
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531942
+established: 1976-03-23T00:00:00Z
+removed: 1977-06-16T23:59:00Z

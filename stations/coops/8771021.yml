@@ -1,0 +1,16 @@
+name: TRINITY RIVER CHANNEL PLATFORM
+lat: 29.515
+lon: -94.8483
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771021
+established: 1995-05-08T00:00:00Z
+removed: 1995-08-16T23:00:00Z

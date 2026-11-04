@@ -1,0 +1,26 @@
+name: Burlington, Delaware River
+lat: 40.0817
+lon: -74.8697
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.526
+  MHW: -7.417
+  DTL: -6.33
+  MTL: -6.305
+  MSL: -6.35
+  MLW: -5.192
+  MLLW: -5.133
+  LAT: -4.945
+  HAT: -7.887
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8539094
+established: 1977-02-21T00:00:00Z

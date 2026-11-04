@@ -1,0 +1,14 @@
+name: HOYA
+lat: 52.800984
+lon: 9.146924
+country_code: DE
+datum: PNP
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+license: DL-DE-ZERO-2.0
+commercial_use: true
+attribution: Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=47900129

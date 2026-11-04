@@ -1,0 +1,26 @@
+name: Fieldwood WC-289 Platform
+lat: 29.347
+lon: -93.635
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 11.149
+  MHW: 11.21
+  DTL: 11.487
+  MTL: 11.441
+  MSL: 11.451
+  MLW: 11.672
+  MLLW: 11.825
+  NAVD88: 11.545
+  LAT: 12.274
+  HAT: 10.973
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771074
+established: 2020-01-01T00:00:00Z

@@ -1,0 +1,27 @@
+name: PETALUMA RIVER ENTRANCE
+lat: 38.115307
+lon: -122.50567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.851
+  MHW: -2.687
+  DTL: -1.935
+  MTL: -1.996
+  MSL: -2.003
+  MLW: -1.305
+  MLLW: -1.019
+  NAVD88: -0.93
+  LAT: -0.434
+  HAT: -3.347
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415252
+established: 1977-05-10T00:00:00Z
+removed: 2014-07-10T23:59:00Z

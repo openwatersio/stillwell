@@ -1,0 +1,26 @@
+name: Mayaguez
+lat: 18.218834
+lon: -67.162445
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.468
+  MHW: -1.404
+  DTL: -1.26
+  MTL: -1.246
+  MSL: -1.243
+  MLW: -1.088
+  MLLW: -1.052
+  LAT: -0.932
+  HAT: -1.614
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9759394
+established: 1975-12-09T00:00:00Z

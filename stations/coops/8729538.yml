@@ -1,0 +1,25 @@
+name: GARNIER BAYOU, SHALIMAR
+lat: 30.435
+lon: -86.5867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.646
+  MHW: -1.641
+  DTL: -1.584
+  MTL: -1.586
+  MSL: -1.581
+  MLW: -1.53
+  MLLW: -1.522
+  NAVD88: -1.462
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729538
+established: 1973-02-07T00:00:00Z
+removed: 1992-11-13T23:59:00Z

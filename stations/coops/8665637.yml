@@ -1,0 +1,25 @@
+name: THE COVE, FT MOULTRIE, CHARLESTON HARBOR
+lat: 32.7633
+lon: -79.8567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.042
+  MHW: -1.931
+  DTL: -1.185
+  MTL: -1.157
+  MSL: -1.184
+  MLW: -0.384
+  MLLW: -0.328
+  NAVD88: -1.278
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665637
+established: 1977-03-23T00:00:00Z
+removed: 1977-08-09T23:59:00Z

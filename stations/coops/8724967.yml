@@ -1,0 +1,27 @@
+name: MARCO ISLAND, CAXAMBAS PASS
+lat: 25.9083
+lon: -81.7283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.291
+  MHW: -1.215
+  DTL: -0.825
+  MTL: -0.878
+  MSL: -0.872
+  MLW: -0.54
+  MLLW: -0.359
+  NAVD88: -1.08
+  LAT: -0.028
+  HAT: -1.531
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724967
+established: 1976-01-15T00:00:00Z
+removed: 1981-02-26T23:59:00Z

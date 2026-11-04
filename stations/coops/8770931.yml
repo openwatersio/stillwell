@@ -1,0 +1,27 @@
+name: SMITH POINT, GALVESTON BAY
+lat: 29.535
+lon: -94.7817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.181
+  MHW: -9.16
+  DTL: -8.987
+  MTL: -8.992
+  MSL: -9.004
+  MLW: -8.824
+  MLLW: -8.793
+  NAVD88: -8.831
+  LAT: -8.401
+  HAT: -9.421
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770931
+established: 1995-05-09T00:00:00Z
+removed: 2020-06-16T23:59:00Z

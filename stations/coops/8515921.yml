@@ -1,0 +1,26 @@
+name: LLOYD HARBOR LIGHTHOUSE
+lat: 40.91
+lon: -73.4317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.525
+  MHW: -3.416
+  DTL: -2.366
+  MTL: -2.344
+  MSL: -2.35
+  MLW: -1.272
+  MLLW: -1.207
+  LAT: -0.721
+  HAT: -4.019
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8515921
+established: 1990-06-01T00:00:00Z
+removed: 1990-09-11T23:59:00Z

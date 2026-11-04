@@ -1,0 +1,14 @@
+name: Sint Annaland, Haven Steiger
+lat: 51.603596
+lon: 4.109586
+country_code: NL
+datum: NAP
+products: [levels, extremes, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+license: CC0-1.0
+commercial_use: true
+attribution: Rijkswaterstaat
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/sintannaland.havensteiger/details

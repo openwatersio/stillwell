@@ -1,0 +1,26 @@
+name: Cold Bay
+lat: 55.2083
+lon: -162.698
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.452
+  MHW: -2.238
+  DTL: -1.321
+  MTL: -1.418
+  MSL: -1.406
+  MLW: -0.598
+  MLLW: -0.19
+  LAT: 0.67
+  HAT: -3.161
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9459949
+established: 1969-06-19T00:00:00Z
+removed: 2013-09-25T23:59:00Z

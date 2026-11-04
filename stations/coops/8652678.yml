@@ -1,0 +1,27 @@
+name: USCG LIFEBOAT STATION, OREGON INLET
+lat: 35.7683
+lon: -75.5267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.705
+  MHW: -1.642
+  DTL: -1.372
+  MTL: -1.355
+  MSL: -1.35
+  MLW: -1.068
+  MLLW: -1.039
+  NAVD88: -1.474
+  LAT: -0.825
+  HAT: -1.994
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8652678
+established: 1975-04-02T00:00:00Z
+removed: 1994-07-31T23:59:00Z

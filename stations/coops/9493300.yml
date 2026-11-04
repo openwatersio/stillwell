@@ -1,0 +1,17 @@
+name: Point Lay, AK
+lat: 69.74472
+lon: -163.06416
+country_code: US
+datum: STND
+datums:
+  MSL: -11.597
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9493300
+established: 2008-07-17T00:00:00Z
+removed: 2008-11-17T00:00:00Z

@@ -1,0 +1,27 @@
+name: Port Orford
+lat: 42.739
+lon: -124.4983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.263
+  MHW: -9.048
+  DTL: -8.154
+  MTL: -8.253
+  MSL: -8.242
+  MLW: -7.458
+  MLLW: -7.044
+  NAVD88: -7.168
+  LAT: -6.221
+  HAT: -9.888
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9431647
+established: 1924-08-07T00:00:00Z

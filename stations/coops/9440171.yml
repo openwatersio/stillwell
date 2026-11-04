@@ -1,0 +1,27 @@
+name: KNAPP(THORNES)LNDG, WILLOW BAR
+lat: 45.7417
+lon: -122.755
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.582
+  MHW: -4.42
+  DTL: -4.103
+  MTL: -4.063
+  MSL: -4.038
+  MLW: -3.705
+  MLLW: -3.623
+  NAVD88: -1.498
+  LAT: -3.405
+  HAT: -4.84
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440171
+established: 1938-07-21T00:00:00Z
+removed: 2016-11-04T12:00:00Z

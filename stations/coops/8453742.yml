@@ -1,0 +1,26 @@
+name: WEST JAMESTOWN
+lat: 41.4967
+lon: -71.3867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.812
+  MHW: -3.74
+  DTL: -3.228
+  MTL: -3.214
+  MSL: -3.173
+  MLW: -2.688
+  MLLW: -2.644
+  LAT: -2.39
+  HAT: -4.155
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8453742
+established: 1977-08-19T00:00:00Z
+removed: 1977-10-05T23:59:00Z

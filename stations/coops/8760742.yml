@@ -1,0 +1,24 @@
+name: COMFORT ISLAND
+lat: 29.8233
+lon: -89.27
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.17
+  MHW: -1.157
+  DTL: -0.931
+  MTL: -0.936
+  MSL: -0.941
+  MLW: -0.714
+  MLLW: -0.692
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8760742
+established: 1980-03-18T00:00:00Z
+removed: 1982-03-03T23:59:00Z

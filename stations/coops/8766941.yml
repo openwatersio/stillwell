@@ -1,0 +1,27 @@
+name: Joseph Harbor
+lat: 29.6375
+lon: -92.7672
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.226
+  MHW: -9.172
+  DTL: -8.892
+  MTL: -8.941
+  MSL: -8.935
+  MLW: -8.711
+  MLLW: -8.557
+  NAVD88: -9.064
+  LAT: -8.106
+  HAT: -9.467
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8766941
+established: 2019-09-17T00:00:00Z
+removed: 2020-08-27T00:00:00Z

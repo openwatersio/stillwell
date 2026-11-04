@@ -1,0 +1,27 @@
+name: Santa Barbara
+lat: 34.40459
+lon: -119.6925
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.599
+  MHW: -2.37
+  DTL: -1.778
+  MTL: -1.812
+  MSL: -1.805
+  MLW: -1.253
+  MLLW: -0.956
+  NAVD88: -0.998
+  LAT: -0.331
+  HAT: -3.162
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9411340
+established: 1974-02-26T00:00:00Z

@@ -1,0 +1,25 @@
+name: NEW HAVEN
+lat: 41.2933
+lon: -72.9167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.438
+  MHW: -2.339
+  DTL: -1.405
+  MTL: -1.394
+  MSL: -1.393
+  MLW: -0.448
+  MLLW: -0.372
+  NAVD88: -1.469
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8465748
+established: 1988-05-20T00:00:00Z
+removed: 1988-10-13T23:59:00Z

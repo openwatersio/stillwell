@@ -1,0 +1,25 @@
+name: LOWER MATECUMBE KEY, FLA. BAY
+lat: 24.865
+lon: -80.7167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.109
+  MHW: -1.067
+  DTL: -0.96
+  MTL: -0.952
+  MSL: -0.949
+  MLW: -0.837
+  MLLW: -0.81
+  NAVD88: -1.206
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723852
+established: 1970-12-03T00:00:00Z
+removed: 1975-08-21T23:59:00Z

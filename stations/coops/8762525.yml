@@ -1,0 +1,26 @@
+name: Pointe Au Chien, Cut Off Canal
+lat: 29.4167
+lon: -90.4467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.201
+  MHW: -1.203
+  DTL: -1.134
+  MTL: -1.135
+  MSL: -1.141
+  MLW: -1.067
+  MLLW: -1.067
+  LAT: -0.889
+  HAT: -1.347
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762525
+established: 1987-04-30T00:00:00Z
+removed: 1988-08-02T23:59:00Z

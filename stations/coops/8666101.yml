@@ -1,0 +1,25 @@
+name: JOHNS ISLAND, CHURCH CREEK
+lat: 32.7067
+lon: -80.1567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.704
+  MHW: -3.597
+  DTL: -2.574
+  MTL: -2.553
+  MSL: -2.776
+  MLW: -1.51
+  MLLW: -1.444
+  NAVD88: -2.769
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666101
+established: 1977-01-12T00:00:00Z
+removed: 1978-04-03T23:59:00Z

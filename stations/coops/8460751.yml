@@ -1,0 +1,27 @@
+name: West Mystic River
+lat: 41.3433
+lon: -71.975
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.63
+  MHW: -9.541
+  DTL: -9.176
+  MTL: -9.16
+  MSL: -9.171
+  MLW: -8.779
+  MLLW: -8.721
+  NAVD88: -9.286
+  LAT: -8.491
+  HAT: -9.883
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8460751
+established: 2015-03-22T00:00:00Z
+removed: 2015-09-17T23:59:00Z

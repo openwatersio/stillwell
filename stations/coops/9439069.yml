@@ -1,0 +1,24 @@
+name: KNAPPA
+lat: 46.1867
+lon: -123.588
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.412
+  MHW: -3.205
+  DTL: -2.14
+  MTL: -2.189
+  MSL: -2.199
+  MLW: -1.172
+  MLLW: -0.869
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9439069
+established: 1935-05-20T00:00:00Z
+removed: 1981-12-09T23:59:00Z

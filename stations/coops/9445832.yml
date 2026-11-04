@@ -1,0 +1,24 @@
+name: BROWNSVILLE
+lat: 47.6517
+lon: -122.615
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.526
+  MHW: -3.258
+  DTL: -1.722
+  MTL: -2.034
+  MSL: -2.029
+  MLW: -0.81
+  MLLW: 0.081
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445832
+established: 1980-01-24T00:00:00Z
+removed: 1980-03-17T23:59:00Z

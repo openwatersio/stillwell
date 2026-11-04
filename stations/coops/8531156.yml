@@ -1,0 +1,24 @@
+name: "WOODBRIDGE CREEK  #1"
+lat: 40.545
+lon: -74.265
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.114
+  MHW: -2.022
+  DTL: -1.246
+  MTL: -1.228
+  MSL: -1.264
+  MLW: -0.435
+  MLLW: -0.378
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531156
+established: 1975-12-11T00:00:00Z
+removed: 1977-02-02T23:59:00Z

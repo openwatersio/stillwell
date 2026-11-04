@@ -1,0 +1,25 @@
+name: WINEA PLANTATION, BLACK RIVER
+lat: 33.535
+lon: -79.3883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.391
+  MHW: -1.357
+  DTL: -0.989
+  MTL: -0.996
+  MSL: -1.046
+  MLW: -0.636
+  MLLW: -0.588
+  NAVD88: -0.914
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661593
+established: 1982-02-23T00:00:00Z
+removed: 1983-05-25T23:59:00Z

@@ -1,0 +1,27 @@
+name: Anchorage
+lat: 61.2375
+lon: -149.8904
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.8
+  MHW: -10.578
+  DTL: -6.356
+  MTL: -6.587
+  MSL: -6.931
+  MLW: -2.596
+  MLLW: -1.911
+  NAVD88: -5.195
+  LAT: -0.375
+  HAT: -12.208
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455920
+established: 1964-04-24T00:00:00Z

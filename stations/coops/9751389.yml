@@ -1,0 +1,26 @@
+name: Salt River Bay
+lat: 17.7753
+lon: -64.7623
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.356
+  MHW: -9.351
+  DTL: -9.248
+  MTL: -9.249
+  MSL: -9.249
+  MLW: -9.148
+  MLLW: -9.139
+  LAT: -8.996
+  HAT: -9.466
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751389
+established: 2020-12-28T00:00:00Z
+removed: 2021-04-13T19:00:00Z

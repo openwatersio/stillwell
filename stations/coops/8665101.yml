@@ -1,0 +1,25 @@
+name: COSGROVE BRIDGE, ASHLEY RIVER
+lat: 32.835
+lon: -79.9867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.588
+  MHW: -2.483
+  DTL: -1.656
+  MTL: -1.634
+  MSL: -1.697
+  MLW: -0.784
+  MLLW: -0.724
+  NAVD88: -1.767
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665101
+established: 1976-03-19T00:00:00Z
+removed: 1976-11-19T23:59:00Z

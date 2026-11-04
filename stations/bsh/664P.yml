@@ -1,0 +1,16 @@
+name: Eider-Sperrwerk, Außenpegel
+lat: 54.26583
+lon: 8.84194
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9530010]
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/eider-sperrwerk_aussenpegel

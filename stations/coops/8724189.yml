@@ -1,0 +1,24 @@
+name: WATER KEY, BIG SPANISH CHANNEL
+lat: 24.74
+lon: -81.3417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.103
+  MHW: -1.031
+  DTL: -0.881
+  MTL: -0.882
+  MSL: -0.881
+  MLW: -0.733
+  MLLW: -0.659
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724189
+established: 1974-07-25T00:00:00Z
+removed: 1974-09-11T23:59:00Z

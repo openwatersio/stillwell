@@ -1,0 +1,19 @@
+name: Little Rapids
+lat: 46.485832
+lon: -84.30167
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176.3
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9076033
+established: 2008-12-17T00:00:00Z

@@ -1,0 +1,16 @@
+name: CONANICUT POINT
+lat: 41.5733
+lon: -71.3717
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8453465
+established: 1977-07-21T00:00:00Z
+removed: 1977-11-09T23:59:00Z

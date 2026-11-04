@@ -1,0 +1,24 @@
+name: CLOUTER CREEK, NORTH
+lat: 32.9067
+lon: -79.935
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.288
+  MHW: -3.185
+  DTL: -2.379
+  MTL: -2.357
+  MSL: -2.449
+  MLW: -1.528
+  MLLW: -1.47
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664688
+established: 1977-11-01T00:00:00Z
+removed: 1978-05-11T23:59:00Z

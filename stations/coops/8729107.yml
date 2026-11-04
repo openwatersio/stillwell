@@ -1,0 +1,25 @@
+name: MASSALINA BAYOU, ST. ANDREW BAY
+lat: 30.1517
+lon: -85.66
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.287
+  MHW: -1.263
+  DTL: -1.087
+  MTL: -1.079
+  MSL: -1.079
+  MLW: -0.895
+  MLLW: -0.887
+  NAVD88: -1.037
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729107
+established: 1976-09-16T00:00:00Z
+removed: 1977-02-04T23:59:00Z

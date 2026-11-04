@@ -1,0 +1,26 @@
+name: LORA POINT, ESCAMBIA BAY
+lat: 30.515
+lon: -87.1617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.395
+  MHW: -1.377
+  DTL: -1.181
+  MTL: -1.179
+  MSL: -1.177
+  MLW: -0.982
+  MLLW: -0.966
+  LAT: -0.626
+  HAT: -1.633
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729816
+established: 1977-03-16T00:00:00Z
+removed: 1993-11-03T23:59:00Z

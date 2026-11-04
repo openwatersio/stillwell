@@ -1,0 +1,27 @@
+name: Skamokawa
+lat: 46.270306
+lon: -123.4565
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.371
+  MHW: -2.181
+  DTL: -1.251
+  MTL: -1.271
+  MSL: -1.247
+  MLW: -0.362
+  MLLW: -0.13
+  NAVD88: 0.398
+  LAT: 0.411
+  HAT: -2.963
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440569
+established: 1981-07-01T00:00:00Z

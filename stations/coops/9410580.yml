@@ -1,0 +1,27 @@
+name: NEWPORT BEACH, NEWPORT BAY ENTRANCE
+lat: 33.6033
+lon: -117.883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.665
+  MHW: -2.44
+  DTL: -1.841
+  MTL: -1.868
+  MSL: -1.861
+  MLW: -1.295
+  MLLW: -1.016
+  NAVD88: -1.071
+  LAT: -0.419
+  HAT: -3.21
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410580
+established: 1955-08-02T00:00:00Z
+removed: 1994-01-27T23:59:00Z

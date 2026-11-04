@@ -1,0 +1,24 @@
+name: DRIFT CREEK, ALSEA RIVER
+lat: 44.4133
+lon: -123.99
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.385
+  MHW: -3.175
+  DTL: -2.402
+  MTL: -2.399
+  MSL: -2.321
+  MLW: -1.622
+  MLLW: -1.419
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9434938
+established: 1976-10-13T00:00:00Z
+removed: 1978-02-06T23:59:00Z

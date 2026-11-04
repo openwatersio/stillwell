@@ -1,0 +1,26 @@
+name: Sergius Narrows
+lat: 57.41
+lon: -135.627
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.288
+  MHW: -3.024
+  DTL: -1.302
+  MTL: -1.405
+  MSL: -1.437
+  MLW: 0.214
+  MLLW: 0.685
+  LAT: 1.909
+  HAT: -4.359
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451853
+established: 1976-05-21T00:00:00Z
+removed: 2002-05-26T23:59:00Z

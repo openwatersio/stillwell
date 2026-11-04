@@ -1,0 +1,26 @@
+name: Kahului, Kahului Harbor
+lat: 20.894945
+lon: -156.469
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.422
+  MHW: -1.313
+  DTL: -1.079
+  MTL: -1.074
+  MSL: -1.075
+  MLW: -0.835
+  MLLW: -0.736
+  LAT: -0.495
+  HAT: -1.684
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1615680
+established: 1946-12-19T00:00:00Z

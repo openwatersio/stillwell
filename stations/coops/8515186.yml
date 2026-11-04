@@ -1,0 +1,26 @@
+name: Fire Island
+lat: 40.6267
+lon: -73.26
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.707
+  MHW: -2.65
+  DTL: -2.369
+  MTL: -2.362
+  MSL: -2.368
+  MLW: -2.075
+  MLLW: -2.032
+  LAT: -1.853
+  HAT: -2.885
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8515186
+established: 1989-07-26T00:00:00Z
+removed: 2014-01-25T00:00:00Z

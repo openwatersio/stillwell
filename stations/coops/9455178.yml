@@ -1,0 +1,16 @@
+name: Northwest Passage
+lat: 59.7483
+lon: -149.9
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455178
+established: 2000-07-10T00:00:00Z
+removed: 2000-11-14T23:59:00Z

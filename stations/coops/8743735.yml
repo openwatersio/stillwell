@@ -1,0 +1,27 @@
+name: Biloxi (Cadet Point)
+lat: 30.39
+lon: -88.8567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.364
+  MHW: -1.332
+  DTL: -1.096
+  MTL: -1.096
+  MSL: -1.097
+  MLW: -0.86
+  MLLW: -0.827
+  NAVD88: -0.942
+  LAT: -0.448
+  HAT: -1.652
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8743735
+established: 1979-06-11T00:00:00Z
+removed: 1989-11-10T23:59:00Z

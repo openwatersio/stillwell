@@ -1,0 +1,15 @@
+name: Hamburg, Dove-Elbe, Elbe, Einfahrt
+lat: 53.50833
+lon: 10.06167
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+license: BSH-Anlage-4
+commercial_use: true
+attribution: "Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie"
+source_url: https://gezeiten.bsh.de/hamburg_dove-elbe_einfahrt

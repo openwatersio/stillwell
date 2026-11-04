@@ -1,0 +1,26 @@
+name: Bird Island, Shumagin Bank
+lat: 54.83522
+lon: -159.75955
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.541
+  MHW: -2.321
+  DTL: -1.467
+  MTL: -1.566
+  MSL: -1.551
+  MLW: -0.81
+  MLLW: -0.393
+  LAT: 0.486
+  HAT: -3.224
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9459251
+established: 2013-07-10T00:00:00Z
+removed: 2013-09-11T23:59:00Z

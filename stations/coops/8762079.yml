@@ -1,0 +1,16 @@
+name: FOURCHON (LUMCON)
+lat: 29.1133
+lon: -90.185
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762079
+established: 1986-10-10T00:00:00Z
+removed: 1988-06-06T23:59:00Z

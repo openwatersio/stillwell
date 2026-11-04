@@ -1,0 +1,27 @@
+name: East Greenwich
+lat: 41.665
+lon: -71.445
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.75
+  MHW: -2.675
+  DTL: -2.068
+  MTL: -2.056
+  MSL: -2.014
+  MLW: -1.438
+  MLLW: -1.386
+  NAVD88: -2.111
+  LAT: -1.059
+  HAT: -3.149
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8454578
+established: 2015-03-24T00:00:00Z
+removed: 2015-09-16T23:59:00Z

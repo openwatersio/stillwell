@@ -1,0 +1,16 @@
+name: DUNN SOUND, LITTLE RIVER
+lat: 33.8583
+lon: -78.57
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660148
+established: 1974-09-24T00:00:00Z
+removed: 1975-05-13T23:59:00Z

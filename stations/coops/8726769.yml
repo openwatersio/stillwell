@@ -1,0 +1,25 @@
+name: MOBBLY BAYOU
+lat: 28.0217
+lon: -82.655
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.541
+  MHW: -1.434
+  DTL: -1.272
+  MTL: -1.245
+  MSL: -1.23
+  MLW: -1.056
+  MLLW: -1.003
+  NAVD88: -1.227
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: NOAA National Ocean Service, CO-OPS
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726769
+established: 1976-10-18T00:00:00Z
+removed: 1990-09-06T23:59:00Z
