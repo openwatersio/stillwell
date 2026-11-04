@@ -64,6 +64,17 @@ describe("TICON replacements", () => {
     assert.equal(replacement(record("seattle-9447130-usa-noaa"), {}).id, "coops/9447130");
   });
 
+  it("counts a NOAA record ready once CO-OPS lists its station", () => {
+    const lists = { coops: [station("coops/9447130", "Seattle", 47.6, -122.34)] };
+    const seattle = replacement(
+      record("seattle-9447130-usa-noaa", { lat: 47.6, lon: -122.34 }),
+      lists,
+    );
+    assert.deepEqual([seattle.id, seattle.status], ["coops/9447130", "ready"]);
+    const missing = replacement(record("x-1234567-usa-noaa"), lists);
+    assert.deepEqual([missing.id, missing.status], [null, "unmatched"]);
+  });
+
   it("sends a UHSLC relay to the originator tide-database's provenance declares", () => {
     const relay = record("honolulu-057a-usa-uhslc_rq", { declared: "noaa/1612340" });
     assert.deepEqual(replacement(relay, {}), {

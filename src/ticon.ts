@@ -127,7 +127,7 @@ const PEGELONLINE_NOTE = "PEGELONLINE keeps 31 days; history needs WSV's archive
  */
 export function replacement(record: TiconRecord, lists: Record<string, Station[]>): Replacement {
   const { contributor, code, iso3 } = record;
-  if (contributor === "noaa") return { source: "coops", id: `coops/${code}`, status: "planned" };
+  if (contributor === "noaa") return byCode(record, "coops", code, "planned", lists);
   if (contributor === "usgs")
     return { source: "usgs", id: `usgs/${usgsSite(code)}`, status: "planned" };
 
@@ -157,12 +157,9 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     const relay = contributor.startsWith("uhslc") ? "UHSLC" : "JODC";
     if (declared && id) {
       const sourceId = declared.source === "kartverket" ? id.toUpperCase() : id;
-      return {
-        source: declared.source,
-        id: `${declared.source}/${sourceId}`,
-        status: declared.status,
-        note: `${relay} relay of ${record.declared}`,
-      };
+      const match = byCode(record, declared.source, sourceId, declared.status, lists);
+      const note = `${relay} relay of ${record.declared}`;
+      return { ...match, note: match.note ? `${note}; ${match.note}` : note };
     }
     if (relay === "UHSLC")
       return {
@@ -200,6 +197,26 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   const direct = DIRECT[contributor];
   if (direct) return { source: direct.source, id: null, status: direct.status, note: direct.note };
   return { source: contributor, id: null, status: "license", note: "Terms not reviewed" };
+}
+
+/**
+ * A record whose originator code names the station directly. Once the source's
+ * list is loaded, the record is ready if the station is there, and unmatched if
+ * it isn't; until then it has the status the source's plan gives it.
+ */
+function byCode(
+  record: TiconRecord,
+  source: string,
+  sourceId: string,
+  status: Status,
+  lists: Record<string, Station[]>,
+): Replacement {
+  const list = lists[source];
+  if (!list) return { source, id: `${source}/${sourceId}`, status };
+  const station = list.find((s) => s.source_id === sourceId && usable(s));
+  if (!station)
+    return { source, id: null, status: "unmatched", note: `No ${source}/${sourceId} in the list` };
+  return { source, id: station.id, status: "ready", distance_km: round(km(record, station)) };
 }
 
 /** A station that still reports levels. */

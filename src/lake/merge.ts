@@ -25,6 +25,33 @@ export function mergeRange<T extends { time: number; received?: number }>(
   return merged.filter((r, i) => i === 0 || r.time !== merged[i - 1]!.time);
 }
 
+/**
+ * `mergeRange`, except that a calendar month (UTC) with no incoming rows keeps
+ * the rows it had. Sources that fetch a month per request, or answer a month
+ * with "no data" during an outage, shouldn't delete what the lake already holds;
+ * a value is only replaced by a fetch that covered its month.
+ */
+export function mergeFetched<T extends { time: number; received?: number }>(
+  existing: T[],
+  incoming: T[],
+  start: number,
+  end: number,
+  receivedAt?: number,
+): T[] {
+  const fetched = new Set(incoming.map((r) => monthOf(r.time)));
+  const kept = existing.filter(
+    (r) => r.time >= start && r.time < end && !fetched.has(monthOf(r.time)),
+  );
+  const merged = [...mergeRange(existing, incoming, start, end, receivedAt), ...kept];
+  merged.sort((a, b) => a.time - b.time);
+  return merged.filter((r, i) => i === 0 || r.time !== merged[i - 1]!.time);
+}
+
+function monthOf(time: number): number {
+  const d = new Date(time);
+  return d.getUTCFullYear() * 12 + d.getUTCMonth();
+}
+
 /** Whether two sorted series hold the same values. */
 export function sameRows<T extends object>(a: T[], b: T[]): boolean {
   return a.length === b.length && a.every((row, i) => canonical(row) === canonical(b[i]!));

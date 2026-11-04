@@ -3,7 +3,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { mergeRange, sameRows } from "../src/lake/merge.ts";
+import { mergeFetched, mergeRange, sameRows } from "../src/lake/merge.ts";
 import {
   readDatums,
   readExtremes,
@@ -171,6 +171,26 @@ describe("qc", () => {
         [0, 1, Flag.good],
         [MIN, 1, Flag.suspect],
       ],
+    );
+  });
+});
+
+describe("mergeFetched", () => {
+  it("keeps a stored month the fetch returned nothing for", () => {
+    const jan = Date.UTC(2024, 0, 15);
+    const feb = Date.UTC(2024, 1, 15);
+    const mar = Date.UTC(2024, 2, 15);
+    const row = (time: number, level: number) => ({ time, level, flag: Flag.good });
+    const merged = mergeFetched(
+      [row(jan, 1), row(feb, 2), row(mar, 3)],
+      // February came back "No data"; January and March were re-fetched.
+      [row(jan, 1.1), row(mar, 3.3)],
+      Date.UTC(2024, 0, 1),
+      Date.UTC(2025, 0, 1),
+    );
+    assert.deepEqual(
+      merged.map((r) => r.level),
+      [1.1, 2, 3.3],
     );
   });
 });
