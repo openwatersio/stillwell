@@ -5,16 +5,32 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
+      - run: npm run check
+
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+      - name: Check the lockfile regenerates from package.json
+        run: |
+          git ls-files --error-unmatch package-lock.json
+          npm install --package-lock-only --ignore-scripts
+          git diff --exit-code -- package-lock.json
+      - name: Check every package resolves from the npm registry
+        run: npx -y lockfile-lint@5.1.0 --path package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names

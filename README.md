@@ -1,6 +1,6 @@
 # water-levels
 
-Observed and predicted water levels from tide and river gauges, in one shape, for [Open Waters](https://github.com/openwatersio). This is the water-level lake described in the [planning evaluation](https://github.com/openwatersio/planning/tree/main/water-levels): one adapter per source, Parquet out, read with DuckDB. [docs/plan.md](docs/plan.md) has the plan and [docs/api.md](docs/api.md) the API design.
+Observed and predicted water levels from tide and river gauges, in one shape, for [Open Waters](https://github.com/openwatersio). This is the water-level lake described in Open Waters' planning evaluation: one adapter per source, Parquet out, read with DuckDB. [docs/plan.md](docs/plan.md) has the plan and [docs/api.md](docs/api.md) the API design.
 
 It has adapters for three sources so far:
 
@@ -84,10 +84,12 @@ Each writes `docs/results/<source>.json` and prints a Markdown table. The RWS on
 
 ## Development
 
-```bash
-npm test
-```
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the layout, the checks and how to add a source.
 
 ```bash
-npm run typecheck
+npm run check
 ```
+
+## License
+
+The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `stations/`, `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in the lake's `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
