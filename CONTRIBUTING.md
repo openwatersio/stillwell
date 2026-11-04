@@ -10,7 +10,7 @@ src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station files, harmonics
 scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
-stations/              each source's committed station list, refreshed by `ingest stations`
+stations/<source>/     one YAML file per station, refreshed by `ingest stations`
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
 .github/workflows/     CI (ci.yml) and the manual ingest against R2 (ingest.yml)
@@ -46,7 +46,7 @@ CI also checks that `package-lock.json` regenerates from `package.json` and that
 
 ## Running ingest
 
-`scripts/ingest.ts` has three commands. Refresh the station lists in `stations/`, and write `stations.parquet` and `sources.json` to the lake, for every source or the ones named:
+`scripts/ingest.ts` has three commands. Refresh the station files in `stations/<source>/<source_id>.yml`, and write `stations.parquet` and `sources.json` to the lake, for every source or the ones named. A refresh rewrites only the files whose fields changed, and a station the source stops listing keeps its file, marked inactive. Comments in a file survive the refresh, so a station resolved by hand can say why. A file holds only what the source says or a person decides: it leaves out the fields its path gives (`id`, `source`, `source_id`), `first` and `last`, which come from the lake, and fields that are null or empty.
 
 ```bash
 node scripts/ingest.ts stations
