@@ -12,7 +12,7 @@ src/                   shared pieces: HTTP and the response cache, the schema, Q
 scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml and compact-daily.yml
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml and bucket-check.yml (a weekly read of the public bucket)
 ```
 
 ## Getting started
