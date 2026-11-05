@@ -45,7 +45,11 @@ obs/<source>/<station>/<year>.parquet                 observed levels
 extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters
 predictions/<source>/<station>/<year>.parquet         the source's predicted curve
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
+stations/<source>.parquet                             one source's station list, as ingest keeps it
+history/stations/<source>/                            each station refresh's previous list and report
 ```
+
+A station whose source moved it to another datum reference has later files under an epoch number, such as `obs/<source>/<station>/2/<year>.parquet`; `stations.parquet` lists each station's epochs.
 
 Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. [docs/data.md](docs/data.md) describes every column and has more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 

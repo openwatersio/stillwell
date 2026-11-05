@@ -157,7 +157,7 @@ export async function readRecent(path: string): Promise<StationObservation[]> {
     rows = await read(path, `${select}, epoch`, "station, time");
   } catch (error) {
     // A file written before epochs has none, and every row in it is epoch 1.
-    if (!/epoch/i.test(String(error))) throw error;
+    if (!/column "epoch"/i.test(String(error))) throw error;
     rows = await read(path, `${select}, 1 AS epoch`, "station, time");
   }
   return rows.map((r) => {
@@ -262,11 +262,12 @@ export async function readStationList(path: string): Promise<LakeStation[] | nul
 
 /** Whether any file matches `pattern`, a path or a glob, local or remote. */
 export async function exists(pattern: string): Promise<boolean> {
-  if (!isRemote(pattern) && !/[*?[]/.test(pattern)) return existsSync(pattern);
-  // HTTPS can't list files, so a URL is checked by reading it. `read` gives
-  // no rows for "not found", and throws any other failure for the caller.
-  if (/^https?:/.test(pattern))
-    return (await read(pattern, "SELECT count(*) AS n", "n")).length > 0;
+  const literal = !/[*?[]/.test(pattern);
+  if (!isRemote(pattern) && literal) return existsSync(pattern);
+  // A remote path is checked by reading it: HTTPS can't list files, and an S3
+  // glob of a path with no wildcard echoes it back whether or not it exists.
+  // `read` gives no rows for "not found", and throws any other failure.
+  if (literal) return (await read(pattern, "SELECT count(*) AS n", "n")).length > 0;
   return serial(async () => {
     const db = await connection();
     const reader = await db.runAndReadAll(`SELECT count(*) AS n FROM glob(${quote(pattern)})`);

@@ -226,7 +226,7 @@ async function publish(lake: string): Promise<void> {
   if ("count" in result) console.log(`${stationsPath(lake)}: ${result.count} stations`);
   else {
     console.error(
-      `${stationsPath(lake)} not written: ${result.missing.join(", ") || "no source"} has no list in the lake yet`,
+      `${stationsPath(lake)} not written: no list in the lake yet for ${result.missing.join(", ") || "any source"}`,
     );
     process.exitCode = 1;
   }
@@ -245,6 +245,7 @@ async function seedStations(ids: string[]): Promise<void> {
         metadata,
         await readStationFiles(STATIONS_DIR, metadata),
         now,
+        backupLake(),
       );
       lakes.add(lake);
       console.log(`${id}: seeded ${stations.length} stations`);

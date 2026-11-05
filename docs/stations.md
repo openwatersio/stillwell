@@ -134,7 +134,7 @@ history/stations/<source>/<time>.json        what that refresh changed
 ```
 
 - **`stations/<source>.parquet`** has the `stations.parquet` columns except `first`/`last`, plus `epochs` and an `extra` JSON column for the source's own fields (USACE `series`, CO-OPS `established`/`removed`). Reading a list spreads `extra` back onto each station, so adapters, `backfill` and `recent` see those fields as they do today. USACE's `zero_since` becomes the current epoch's `since`.
-- **`stations.parquet`** is rebuilt from the per-source lists and bounds. All the state is in those, so the published file can always be rebuilt. Each of them is written only by jobs in its source's group: the refresh, a restore and the seed write the list, and compaction writes the bounds.
+- **`stations.parquet`** and `sources.json` are rebuilt from the per-source lists and bounds; a source joins `sources.json` with its first list. All the state is in those, so the published file can always be rebuilt. Each of them is written only by jobs in its source's group: the refresh, a restore and the seed write the list, and compaction writes the bounds.
 - **`<time>`** is the refresh's start time to the second, so a re-run never overwrites an earlier snapshot.
 - **Restricted sources.** A source's terms decide which lake holds its list, history and series. A source that mixes open and restricted stations is split into two source IDs, as GESLA's contributors would be, and a refresh refuses a list holding a station whose `commercial_use` differs from its source's. A restricted lake keeps its own `stations.parquet`. Whether the public one should also list restricted stations, metadata only, as [plan.md](plan.md) decision 1 expects, is settled with the first restricted source.
 

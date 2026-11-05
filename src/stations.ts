@@ -54,7 +54,7 @@ export function mergeStationList(
     if (old) {
       const next = nextEpochs(
         old.epochs,
-        { datum: s.datum, datums, reference },
+        { datum: s.datum, datums, sent: s.datums, reference },
         { ...options, station: s.id },
       );
       epochs = next.epochs;

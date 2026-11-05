@@ -124,6 +124,27 @@ describe("mergeStationList", () => {
     assert.deepEqual(stations[0]!.epochs[0]!.datums, { NN: 5.2 });
   });
 
+  it("gives a moved zero under the same label only the offsets sent with it", () => {
+    const { stations } = mergeStationList(
+      [held("a", { datum: "GZ", datums: { NGVD29: 10 } })].map((s) => ({
+        ...s,
+        epochs: s.epochs.map((e) => ({ ...e, reference: "2001-01-01" })),
+      })),
+      [
+        {
+          ...station("a", { datum: "GZ", datums: {} }),
+          reference: { id: "2026-01-01", since: "2026-01-01" },
+        },
+      ],
+      options,
+    );
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => e.datums),
+      [{ NGVD29: 10 }, {}],
+    );
+    assert.deepEqual(stations[0]!.datums, {});
+  });
+
   it("starts a new station's epoch where its source says the reference does", () => {
     const { stations } = mergeStationList(
       [],

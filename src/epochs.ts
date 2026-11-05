@@ -56,8 +56,10 @@ const dayBefore = (date: string) => iso(Date.parse(`${date}T00:00:00Z`) - DAY_MS
 export interface Fetched {
   /** The label the source gave, or null when it didn't say. */
   datum: string | null;
-  /** The station's offsets after the merge. */
+  /** The station's offsets after the merge, which keeps old ones the source left out. */
   datums: Record<string, number>;
+  /** What the source sent this time, for a new epoch, which never takes the old one's. */
+  sent?: Record<string, number>;
   reference?: { id: string; since: string | null } | null;
 }
 
@@ -70,7 +72,7 @@ export interface EpochOptions {
   nextId?: number;
 }
 
-export type EpochEvent = "opened" | "held" | "waiting" | "rejected" | "confirmed";
+export type EpochEvent = "opened" | "held" | "waiting" | "ignored" | "rejected" | "confirmed";
 
 /**
  * A new station's epochs: one, open, starting where its reference does if the
@@ -126,11 +128,14 @@ export function nextEpochs(
     if (rejected) {
       // A person said this change never happened, so the station carries on in
       // its current epoch; a reference that only looked new still brings its
-      // offsets under the same label.
+      // offsets under the same label. It's reported, not failed, in case the
+      // change has since become real and needs a new decision.
       if (!labelChanged) {
         current.seen = options.now;
         current.datums = fetched.datums;
       }
+      event = "ignored";
+      reason = "a person rejected this change";
     } else if (
       ref?.since &&
       refChanged &&
@@ -169,7 +174,7 @@ export function nextEpochs(
         until: iso(Math.min(until, since)),
         seen: fetched.datum !== null ? options.now : null,
         reference: ref?.id ?? null,
-        datums: fetched.datums,
+        datums: fetched.sent ?? fetched.datums,
         to_current: 0,
         state: "open",
       };

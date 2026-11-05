@@ -168,7 +168,7 @@ describe("nextEpochs", () => {
       { datum: "NN", datums: {} },
       options({ decisions: { [key]: { reject: true, note: "" } } }),
     );
-    assert.deepEqual([after.event, after.epochs.length], [null, 2]);
+    assert.deepEqual([after.event, after.epochs.length], ["ignored", 2]);
   });
 
   it("reads a rejected epoch's files as the one before it", () => {

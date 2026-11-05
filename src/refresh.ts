@@ -67,6 +67,8 @@ export async function refreshSource(
 
   const fetched = await source.stations(previous);
   if (!fetched.length && previous.length) throw new Refused("listed no stations");
+  const stray = fetched.find((s) => s.source !== id || !s.source_id);
+  if (stray) throw new Refused(`${stray.id} isn't a ${id} station with a code`);
   const shrunk = shrankSharply(previous, fetched);
   if (shrunk) throw new Refused(shrunk);
   refuseMixedTerms(source.metadata, fetched);
@@ -131,9 +133,11 @@ export async function seedSource(
   metadata: SourceMetadata,
   committed: Station[],
   now: string,
+  backup?: string,
 ): Promise<LakeStation[]> {
   const path = stationListPath(lake, metadata.id);
   if (await exists(path)) throw new Refused(`${path} already exists`);
+  refuseMixedTerms(metadata, committed);
   const offsets = metadata.utc_offsets ?? ([0, 0] as [number, number]);
   const stations = committed.map((s) => {
     // USACE's zero dates are where its current epoch starts.
@@ -151,7 +155,8 @@ export async function seedSource(
   });
   await writeStationList(path, stations);
   // Seeding counts as the first refresh, so a list lost later is refused, not rebuilt.
-  await writeStationList(historyPath(lake, metadata.id, now, "parquet"), stations);
+  for (const root of [lake, backup].filter((r): r is string => !!r))
+    await writeStationList(historyPath(root, metadata.id, now, "parquet"), stations);
   return stations;
 }
 
@@ -229,7 +234,7 @@ export function shrankSharply(previous: Station[], fetched: ListedStation[]): st
 }
 
 /** A source's list lives in one lake, so every station in it shares the source's terms. */
-function refuseMixedTerms(metadata: SourceMetadata, fetched: ListedStation[]): void {
+function refuseMixedTerms(metadata: SourceMetadata, fetched: (ListedStation | Station)[]): void {
   const other = fetched.find((s) => s.commercial_use !== metadata.license.commercial_use);
   if (other)
     throw new Refused(

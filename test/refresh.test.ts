@@ -119,6 +119,13 @@ describe("refreshSource", () => {
     await assert.rejects(refreshSource(lake, sourceOf([]), { now: LATER }), /listed no stations/);
   });
 
+  it("refuses a station from another source", async () => {
+    await assert.rejects(
+      refreshSource(lake, sourceOf([listed("a", { source: "rws", id: "rws/a" })]), { now: NOW }),
+      /rws\/a isn't a test station/,
+    );
+  });
+
   it("refuses a station whose terms differ from its source's", async () => {
     await assert.rejects(
       refreshSource(lake, sourceOf([listed("a", { commercial_use: false })]), { now: NOW }),
