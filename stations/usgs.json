@@ -4031,10 +4031,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4043,11 +4041,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01480065/",
-    "time_series_id": "0cc09a6b58cc412c8980edfb914f74b2",
-    "parameter_code": "00065"
+    "time_series_id": "90656719a99d41fbba84b9b891928039",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4062,10 +4060,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4074,11 +4070,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01480120/",
-    "time_series_id": "4f26391566d64c05b04fac4c1216adb2",
-    "parameter_code": "00065"
+    "time_series_id": "e7a1e639b3c9409c91d024536a0be386",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4517,10 +4513,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4529,11 +4523,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01484540/",
-    "time_series_id": "b93db2447d8144b99b78c3cc1e4051cd",
-    "parameter_code": "00065"
+    "time_series_id": "a14d93589c864b75becdcc5c6528dd1f",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4577,10 +4571,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4589,11 +4581,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01484670/",
-    "time_series_id": "22dd4ec442b54476ad7c729d4accedd7",
-    "parameter_code": "00065"
+    "time_series_id": "c4b143a112cc49a58316482933edeef1",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4608,10 +4600,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4620,11 +4610,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01484683/",
-    "time_series_id": "7f2c18a6d5494f7d87177c56e26cc211",
-    "parameter_code": "00065"
+    "time_series_id": "844d432f79dd493c86f3e56aeff7e2f1",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4726,10 +4716,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4738,11 +4726,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01484701/",
-    "time_series_id": "d53281e4fac645de8bc4641b0aed2a75",
-    "parameter_code": "00065"
+    "time_series_id": "44bbff91beac40e4917c4802ac439a5d",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -4962,10 +4950,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -4974,11 +4960,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01488110/",
-    "time_series_id": "6ba0b8e3b8f34b3095ee1f4a279620b8",
-    "parameter_code": "00065"
+    "time_series_id": "010c2e09687547ff80c48fc807a7c82a",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -5537,10 +5523,8 @@
     "country_code": "US",
     "kind": "estuary",
     "interval_s": null,
-    "datum": "GAGE",
-    "datums": {
-      "NAVD88": 0
-    },
+    "datum": "NAVD88",
+    "datums": {},
     "products": [
       "levels"
     ],
@@ -5549,11 +5533,11 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-01655480/",
-    "time_series_id": "7c901b7d556e41dc878976ec86f65d15",
-    "parameter_code": "00065"
+    "time_series_id": "c9cd354fe3e14ac8a3591712af463f9e",
+    "parameter_code": "62620"
   },
   {
     "source": "usgs",
@@ -26160,10 +26144,10 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-03144000/",
-    "time_series_id": "54829e62264d4916b360e3491b38b0b1",
+    "time_series_id": "a5554839de7148fd83a698b0f2b29851",
     "parameter_code": "00065"
   },
   {
@@ -101454,7 +101438,7 @@
     "tide_station": null,
     "same_as": [],
     "status": "active",
-    "live": false,
+    "live": true,
     "min_interval_s": 900,
     "source_url": "https://waterdata.usgs.gov/monitoring-location/USGS-410204081363200/",
     "time_series_id": "840bce309f8f4784860455bd9e247f42",

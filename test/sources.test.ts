@@ -1393,6 +1393,33 @@ describe("usgs", () => {
       [/monitoring-locations/, collection([location("02198820", -81.15, 32.25, {})])],
     ]);
     await assert.rejects(usgs.stations(), /no monitoring location for 1 sites, e.g. USGS-07010000/);
+    // A site a short answer left out is asked for again.
+    let asked = 0;
+    setTransport(async (url) => {
+      if (/statistic_id=00021/.test(url)) return collection([tidal]);
+      if (/parameter_code=/.test(url))
+        return collection([series("02198820", "00065"), series("07010000", "00065")]);
+      return collection(
+        ++asked === 1
+          ? [location("02198820", -81.15, 32.25, { site_type_code: "ES" })]
+          : [location("07010000", -90.18, 38.63, { hydrologic_unit_code: "07140101" })],
+      );
+    });
+    assert.deepEqual(
+      (await usgs.stations()).map((s) => s.source_id),
+      ["02198820", "07010000"],
+    );
+  });
+
+  it("takes a series that still reports over a preferred one that stopped years ago", () => {
+    const stopped = series("01646500", "00065", { end: "2019-03-01T00:00:00+00:00" }).properties;
+    const live = series("01646500", "62620").properties;
+    assert.equal(usgs.choose([stopped, live]).get("USGS-01646500")!.parameter_code, "62620");
+    // An outage of months doesn't.
+    const paused = series("01646500", "00065", {
+      end: new Date(Date.now() - 90 * 86_400_000).toISOString(),
+    }).properties;
+    assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
   });
 
   it("notices a station's series or gage zero changing under the same datum name", () => {
@@ -1418,6 +1445,13 @@ describe("usgs", () => {
       usgs.seriesChanged(committed, listed({ datums: { NAVD88: 84.774, NGVD29: 85 } })),
       null,
     );
+    // But a gage datum given only against another vertical datum may have moved.
+    assert.match(
+      usgs.seriesChanged(committed, listed({ datums: { NGVD29: 85 } }))!,
+      /now given against NGVD29, not NAVD88/,
+    );
+    // A site that lists no altitude keeps its offsets.
+    assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
   });
 
   it("caches a page only when every value on it is approved", () => {
@@ -1611,6 +1645,31 @@ describe("usgs", () => {
       ),
       /returned no values/,
     );
+  });
+
+  it("holds back a request already waiting for its slot when a 429 starts a block", async () => {
+    const times: number[] = [];
+    let calls = 0;
+    setTransport(async (url, options) => {
+      await options.pace?.();
+      times.push(Date.now());
+      if (++calls === 1) throw new Error(`GET ${url} returned 429`);
+      return collection([]);
+    });
+    usgs.pacing.requestMs = 20;
+    usgs.pacing.blockedMs = 200;
+    try {
+      const started = Date.now();
+      const year = (y: number) =>
+        usgs.levels("x", new Date(Date.UTC(y, 0)), new Date(Date.UTC(y, 1)));
+      await Promise.all([year(2020), year(2021)]);
+      // The second request took its slot before the 429 but waited out the block.
+      assert.equal(times.length, 3);
+      assert.ok(times[1]! - started >= 190, `second request ${times[1]! - started} ms in`);
+    } finally {
+      usgs.pacing.requestMs = 0;
+      usgs.pacing.blockedMs = 0;
+    }
   });
 
   it("waits out a 429 and tries again", async () => {

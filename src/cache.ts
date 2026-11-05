@@ -20,8 +20,9 @@ export async function cachedText(url: string, options: RequestOptions = {}): Pro
   if (!options.fresh) {
     try {
       const cached = await readFile(path, "utf8");
-      // An error body an older build cached is fetched again, not replayed.
-      if (!isError(cached)) return cached;
+      // An error body an older build cached is fetched again, not replayed,
+      // and so is an answer its request's `keep` now turns down.
+      if (!isError(cached) && options.keep?.(cached) !== false) return cached;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }

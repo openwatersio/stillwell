@@ -159,7 +159,7 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 
 - [ ] `ingest-hourly.yml`: a matrix over sources, each with its own concurrency group. Each run merges the fetch into the existing `recent/<source>.parquet` (so sources with short windows don't lose data), trims to 7 days and writes it back. Values first seen in this run get `received` set to the fetch time; compaction carries it into the year files.
 - [ ] `compact-daily.yml`: fold yesterday from `recent/` into each station's current-year file, at about 30,000 rewrites a day. Year files are written whole, so a failed run leaves the previous file.
-- [ ] `monthly.yml`: refresh station lists, datums and license pages; re-fetch verified CO-OPS months and USGS years that still hold provisional values (USGS approves months to years later); commit `stations/*.json` through a PR, as tide-database does. The commit keeps scheduled workflows alive on a public repo.
+- [ ] `monthly.yml`: refresh station lists, datums and license pages; re-fetch verified CO-OPS months and USGS years that still hold provisional values (USGS approves months to years later), and now and then approved ones too, since the disk cache keeps an approved page for good and USGS still fills gaps and revises values after approval; commit `stations/*.json` through a PR, as tide-database does. The commit keeps scheduled workflows alive on a public repo.
 - [ ] A run summary per job (stations updated, stale, failed, values written), and an issue opened automatically when a source fails twice in a row.
 - [ ] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps.
 

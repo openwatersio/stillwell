@@ -147,26 +147,28 @@ export async function stations(): Promise<UsgsStation[]> {
   const chosen = choose(series);
 
   const locations = new Map<string, Collection<ApiLocation>["features"][number]>();
-  const ids = [...chosen.keys()];
-  for (let i = 0; i < ids.length; i += LOCATION_BATCH) {
-    const batch = ids.slice(i, i + LOCATION_BATCH);
-    const filter = `id IN (${batch.map((id) => `'${id}'`).join(",")})`;
-    const params = new URLSearchParams({
-      properties:
-        "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,vertical_datum",
-      filter,
-      "filter-lang": "cql-text",
-    });
-    for (const f of await features<ApiLocation>("monitoring-locations", params, { fresh: true }))
-      locations.set(f.properties.id, f);
-    // A short answer would quietly retire the stations it left out. A site or
-    // two can lack a location; more than a tenth of a batch is a broken answer.
-    const missing = batch.filter((id) => !locations.has(id));
-    if (missing.length > batch.length / 10)
-      throw new Error(
-        `USGS has no monitoring location for ${missing.length} sites, e.g. ${missing[0]}`,
-      );
-  }
+  const fetchLocations = async (ids: string[]) => {
+    for (let i = 0; i < ids.length; i += LOCATION_BATCH) {
+      const batch = ids.slice(i, i + LOCATION_BATCH);
+      const params = new URLSearchParams({
+        properties:
+          "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,vertical_datum",
+        filter: `id IN (${batch.map((id) => `'${id}'`).join(",")})`,
+        "filter-lang": "cql-text",
+      });
+      for (const f of await features<ApiLocation>("monitoring-locations", params, { fresh: true }))
+        locations.set(f.properties.id, f);
+    }
+  };
+  await fetchLocations([...chosen.keys()]);
+  // A short answer would quietly retire the stations it left out, so the
+  // sites it missed are asked for again, and any still missing fail the list.
+  await fetchLocations([...chosen.keys()].filter((id) => !locations.has(id)));
+  const missing = [...chosen.keys()].filter((id) => !locations.has(id));
+  if (missing.length)
+    throw new Error(
+      `USGS has no monitoring location for ${missing.length} sites, e.g. ${missing[0]}`,
+    );
 
   const out: UsgsStation[] = [];
   for (const [id, s] of chosen) {
@@ -191,13 +193,16 @@ const LOCATION_BATCH = 200;
 export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
   const order = PARAMETERS.map(([code]) => code);
   const rank = (s: ApiSeries) => [
+    // A preferred parameter that stopped more than a year ago doesn't keep a
+    // site off the live feed when another of its series still reports.
+    recentYear(s) ? 0 : 1,
     order.indexOf(s.parameter_code),
     s.primary === "Primary" ? 0 : 1,
     s.sublocation_identifier ? 1 : 0,
     reporting(s) ? 0 : 1,
     // Within the last year counts as current, so an outage of weeks or months
     // doesn't hand the site to an older series and flag a change that isn't one.
-    s.end ? Math.max(0, Date.now() - 365 * DAY_MS - Date.parse(s.end)) : Infinity,
+    recentYear(s) ? 0 : Date.now() - Date.parse(s.end ?? "1900-01-01"),
     s.begin ? Date.parse(s.begin) : Infinity,
   ];
   const chosen = new Map<string, ApiSeries>();
@@ -210,6 +215,11 @@ export function choose(series: ApiSeries[]): Map<string, ApiSeries> {
     if (!best || before(rank(s), rank(best))) chosen.set(s.monitoring_location_id, s);
   }
   return chosen;
+}
+
+/** A series that reported in the last year. */
+function recentYear(s: ApiSeries): boolean {
+  return s.end !== null && Date.parse(s.end) >= Date.now() - 365 * DAY_MS;
 }
 
 /** A series that reported in the last week; it's on the live feed. */
@@ -431,11 +441,17 @@ export function seriesChanged(committed: Station, listed: ListedStation): string
   if (was!.time_series_id && now!.time_series_id && was!.time_series_id !== now!.time_series_id)
     return `series ${was!.time_series_id} is now ${now!.time_series_id}`;
   if (committed.datum !== GAGE) return null;
-  for (const [name, height] of Object.entries(committed.datums)) {
-    const next = listed.datums[name];
+  const [before, after] = [Object.keys(committed.datums), Object.keys(listed.datums)];
+  for (const name of before) {
+    const [height, next] = [committed.datums[name]!, listed.datums[name]];
     if (next !== undefined && Math.abs(next - height) > 0.0005)
       return `gage datum is now ${next} m above ${name}, not ${height}`;
   }
+  // A gage datum referenced to another vertical datum may have moved too, and
+  // nothing says by how much. A site that lists no altitude at all is more
+  // likely a gap in the answer, and keeps its offsets.
+  if (before.length && after.length && !before.some((name) => name in listed.datums))
+    return `gage datum is now given against ${after.join(", ")}, not ${before.join(", ")}`;
   return null;
 }
 
@@ -567,13 +583,20 @@ const PAGE = 50_000;
  */
 export const pacing = { requestMs: 3700, blockedMs: 15 * 60_000 };
 let nextSlot = 0;
+let blockedUntil = 0;
 
-/** Holds each request that goes out to its slot, `requestMs` after the last one's. */
-function pace(): Promise<void> {
-  const now = Date.now();
-  const slot = Math.max(now, nextSlot);
-  nextSlot = slot + pacing.requestMs;
-  return sleep(slot - now);
+/**
+ * Holds each request that goes out to its slot, `requestMs` after the last
+ * one's. One that wakes inside a block a 429 started since it took its slot
+ * takes a new slot after the block.
+ */
+async function pace(): Promise<void> {
+  do {
+    const now = Date.now();
+    const slot = Math.max(now, nextSlot, blockedUntil);
+    nextSlot = slot + pacing.requestMs;
+    await sleep(slot - now);
+  } while (Date.now() < blockedUntil);
 }
 
 async function request<T>(url: string, options: RequestOptions): Promise<T> {
@@ -587,7 +610,7 @@ async function request<T>(url: string, options: RequestOptions): Promise<T> {
       // Wait as long as the API asks, and hold every other request back too.
       const asked = /retry after (\d+) s/.exec(String(error))?.[1];
       const wait = asked ? Math.min(Number(asked) * 1000 + 5000, 3_700_000) : pacing.blockedMs;
-      nextSlot = Math.max(nextSlot, Date.now() + wait);
+      blockedUntil = Math.max(blockedUntil, Date.now() + wait);
       await sleep(wait);
     }
   }

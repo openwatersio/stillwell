@@ -60,6 +60,18 @@ describe("cachedText", () => {
       '{"approval_status": "Approved"}',
     );
   });
+
+  it("fetches again rather than replay an answer an older build cached that keep turns down", async () => {
+    const url = "https://example.test/old-provisional";
+    const key = createHash("sha256")
+      .update(JSON.stringify([url, null]))
+      .digest("hex");
+    mkdirSync(join(dir, key.slice(0, 2)), { recursive: true });
+    writeFileSync(join(dir, key.slice(0, 2), key), '{"approval_status": "Provisional"}');
+    answer('{"approval_status": "Approved"}');
+    const keep = (text: string) => !text.includes("Provisional");
+    assert.equal(await cachedText(url, { keep }), '{"approval_status": "Approved"}');
+  });
 });
 
 describe("fetchText", () => {

@@ -294,7 +294,7 @@ async function refuseOtherDatum(path: string, station: Station): Promise<void> {
 
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
   const source = sourceOf(sourceId);
-  if (!source.observations) throw new Error(`${sourceId} has no observations`);
+  if (!source.observations && !source.recent) throw new Error(`${sourceId} has no observations`);
   const stations = (await committedStations(sourceId)).filter(
     (s) => s.live && s.status === "active" && s.products.includes("levels"),
   );
