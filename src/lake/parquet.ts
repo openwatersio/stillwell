@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,35 +22,73 @@ import type { EventIndex } from "../types.ts";
  * Times are stored as TIMESTAMPTZ in UTC and levels as FLOAT (float32), so
  * levels read back rounded to a tenth of a millimeter.
  */
-let connecting: Promise<DuckDBConnection> | undefined;
-let queue: Promise<unknown> = Promise.resolve();
+let instance: Promise<DuckDBInstance> | undefined;
+const lanes: { queue: Promise<unknown>; pending: number; db: Promise<DuckDBConnection> }[] = [];
+let laneCount = 1;
+const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
-/** Run DuckDB work one call at a time, since callers share one connection. */
+/**
+ * How many DuckDB connections run lake work at once, 1 by default. Compaction
+ * raises it, since each year file on R2 is mostly waiting on the network.
+ */
+export function setConnections(count: number): void {
+  laneCount = Math.max(1, Math.floor(count));
+}
+
+/**
+ * Run DuckDB work one call at a time on a connection: the least busy of
+ * `setConnections` of them. Connections share one in-memory database, so work
+ * on one table can span calls that land on different connections.
+ */
 function serial<T>(work: () => Promise<T>): Promise<T> {
-  const next = queue.then(work, work);
-  queue = next.catch(() => undefined);
+  while (lanes.length < laneCount) {
+    const db = connect();
+    // A lane no work reaches yet mustn't end the process if its setup fails;
+    // the work that does reach it gets the error.
+    db.catch(() => undefined);
+    lanes.push({ queue: Promise.resolve(), pending: 0, db });
+  }
+  const lane = lanes.slice(0, laneCount).reduce((a, b) => (b.pending < a.pending ? b : a));
+  lane.pending++;
+  const run = () => current.run(lane.db, work);
+  const next = lane.queue.then(run, run).finally(() => lane.pending--);
+  lane.queue = next.catch(() => undefined);
   return next;
 }
 
 function connection(): Promise<DuckDBConnection> {
-  connecting ??= (async () => {
-    const instance = await DuckDBInstance.create(":memory:");
-    const db = await instance.connect();
-    await db.run("SET TimeZone = 'UTC'");
-    const endpoint = process.env.S3_ENDPOINT;
-    if (endpoint) {
-      await db.run("INSTALL httpfs; LOAD httpfs;");
-      await db.run(
-        `CREATE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path')`,
-      );
-    }
-    return db;
-  })();
-  return connecting;
+  const db = current.getStore();
+  if (!db) throw new Error("DuckDB work must run through serial()");
+  return db;
 }
 
 /**
- * Observations: `time`, `level_m`, `flag`, `received`, `datum`, sorted by time.
+ * A connection to the one in-memory instance. The instance loads httpfs and
+ * creates the lake's S3 secret once, when it starts: secrets belong to the
+ * instance, and connections creating one at the same moment conflict in its
+ * catalog, which failed most of a 16-connection compaction's reads.
+ */
+async function connect(): Promise<DuckDBConnection> {
+  instance ??= (async () => {
+    const created = await DuckDBInstance.create(":memory:");
+    const endpoint = process.env.S3_ENDPOINT;
+    if (endpoint) {
+      const setup = await created.connect();
+      await setup.run("INSTALL httpfs; LOAD httpfs;");
+      await setup.run(
+        `CREATE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
+      );
+    }
+    return created;
+  })();
+  const db = await (await instance).connect();
+  await db.run("SET TimeZone = 'UTC'");
+  return db;
+}
+
+/**
+ * Observations: `time`, `level_m`, `flag`, `source_flag`, `received`, `datum`,
+ * sorted by time.
  * `datum` is the same on every row; it lets a reader, and the next write, check
  * that a file holds one datum.
  */
@@ -58,7 +97,7 @@ export async function writeObservations(
   rows: Observation[],
   datum: string,
 ): Promise<void> {
-  await copyRows(path, rows, "time, level_m, flag, received, datum", datum, (r) => [
+  await copyRows(path, rows, "time, level_m, flag, source_flag, received, datum", datum, (r) => [
     r.time,
     r.level,
     r.flag,
@@ -67,19 +106,29 @@ export async function writeObservations(
     null,
     null,
     null,
+    null,
+    r.source_flag ?? null,
   ]);
 }
 
 export async function readObservations(path: string): Promise<Observation[]> {
-  const rows = await read(
-    path,
-    "SELECT epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received",
-  );
-  return rows.map((r) => {
-    const o: Observation = { time: Number(r.time), level: level(r.level_m), flag: r.flag as Flag };
-    if (r.received !== null) o.received = Number(r.received);
-    return o;
-  });
+  return (await readObservationFile(path)).rows;
+}
+
+/** A series file's observations and the datums it holds, in one read. */
+export async function readObservationFile(
+  path: string,
+): Promise<{ rows: Observation[]; datums: string[] }> {
+  // Every column, since a file written before `source_flag` was kept has none.
+  const rows = await read(path, OBSERVATION_COLUMNS);
+  const datums = new Set<string>();
+  return {
+    rows: rows.map((r) => {
+      datums.add(String(r.datum));
+      return observation(r);
+    }),
+    datums: [...datums],
+  };
 }
 
 /**
@@ -198,7 +247,7 @@ export async function writeRecent(
       copyOut(
         path,
         table,
-        "station, time, level_m, flag, received, epoch",
+        "station, time, level_m, flag, source_flag, received, epoch",
         undefined,
         "station, time_ms",
       ),
@@ -218,14 +267,31 @@ const recentCells = (r: StationObservation): Cell[] => [
   null,
   null,
   r.epoch,
+  r.source_flag ?? null,
 ];
+
+const OBSERVATION_COLUMNS =
+  "SELECT * REPLACE (epoch_ms(time) AS time, epoch_ms(received) AS received)";
+
+function observation(r: Record<string, unknown>): Observation {
+  const o: Observation = { time: Number(r.time), level: level(r.level_m), flag: r.flag as Flag };
+  if (r.source_flag != null) o.source_flag = r.source_flag as Flag;
+  if (r.received !== null) o.received = Number(r.received);
+  return o;
+}
 
 /**
  * Decode every value of a recent window without keeping any, so a file that
  * can't be read in full fails now. A missing file passes.
  */
 export async function checkRecent(path: string): Promise<void> {
-  await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
+  await read(path, "SELECT sum(hash(r)) AS h", "h", "r");
+}
+
+/** The stations a recent window holds values for; none when the file doesn't exist. */
+export async function recentStations(path: string): Promise<string[]> {
+  const rows = await read(path, "SELECT DISTINCT station", "station");
+  return rows.map((r) => String(r.station));
 }
 
 /** The highest epoch each station has rows for in a recent window; none for a file from before epochs. */
@@ -249,31 +315,19 @@ export async function recentEpochs(path: string): Promise<Map<string, number>> {
 /** The recent window, or just the named stations' part of it. */
 export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];
-  const select =
-    "SELECT station, epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received";
   // The file is sorted by station, so the range lets DuckDB skip the row groups outside it.
   const where = stations
     ? `WHERE station BETWEEN ${quote(stations.reduce((a, b) => (a < b ? a : b)))} AND ${quote(stations.reduce((a, b) => (a > b ? a : b)))} AND station IN (${stations.map(quote).join(", ")})`
     : "";
-  let rows;
-  try {
-    rows = await read(path, `${select}, epoch`, "station, time", "", where);
-  } catch (error) {
-    // A file written before epochs has none, and every row in it is epoch 1.
-    if (!/column "epoch"/i.test(String(error))) throw error;
-    rows = await read(path, `${select}, 1 AS epoch`, "station, time", "", where);
-  }
-  return rows.map((r) => {
-    const o: StationObservation = {
-      station: String(r.station),
-      time: Number(r.time),
-      level: level(r.level_m),
-      flag: r.flag as Flag,
-      epoch: Number(r.epoch),
-    };
-    if (r.received !== null) o.received = Number(r.received);
-    return o;
-  });
+  // Every column, since older files lack some: one written before epochs has
+  // no `epoch`, and every row in it is epoch 1; one written before
+  // `source_flag` was kept has none.
+  const rows = await read(path, OBSERVATION_COLUMNS, "station, time", "", where);
+  return rows.map((r) => ({
+    station: String(r.station),
+    ...observation(r),
+    epoch: r.epoch == null ? 1 : Number(r.epoch),
+  }));
 }
 
 const STATION_COLUMNS: Record<keyof Station, string> = {
@@ -458,7 +512,8 @@ type Cell = number | string | null;
 
 /**
  * Append rows to a scratch table with columns (time_ms, level_m, flag,
- * received_ms, type, station, transit, event) and copy the named columns out.
+ * received_ms, type, station, transit, event, epoch, source_flag) and copy the
+ * named columns out.
  */
 function copyRows<T>(
   path: string,
@@ -492,7 +547,7 @@ async function createTable(): Promise<string> {
   const db = await connection();
   const table = `rows_${Math.random().toString(36).slice(2)}`;
   await db.run(
-    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER)`,
+    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER, source_flag UTINYINT)`,
   );
   return table;
 }
@@ -501,7 +556,18 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
   const db = await connection();
   const appender = await db.createAppender(table);
   for (const row of rows) {
-    const [time, level, flag, received, type, station, transit, event, epoch = null] = cells(row);
+    const [
+      time,
+      level,
+      flag,
+      received,
+      type,
+      station,
+      transit,
+      event,
+      epoch = null,
+      sourceFlag = null,
+    ] = cells(row);
     appender.appendDouble(time as number);
     appender.appendFloat(level as number);
     appender.appendUTinyInt(flag as number);
@@ -511,6 +577,7 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
     transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
     event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
     epoch === null ? appender.appendNull() : appender.appendInteger(epoch as number);
+    sourceFlag === null ? appender.appendNull() : appender.appendUTinyInt(sourceFlag as number);
     appender.endRow();
   }
   appender.closeSync();
@@ -590,12 +657,22 @@ async function readNow(
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {
-    // A missing remote file is an empty series, not a failure. Quoted paths are
-    // left out first, since a station ID can hold "404".
-    const message = String(error).replace(/'[^']*'|"[^"]*"/g, "''");
-    if (isRemote(path) && /\b404\b|No files found|does not exist/i.test(message)) return [];
+    // A missing remote file is an empty series, not a failure.
+    if (isRemote(path) && isMissing(error)) return [];
     throw error;
   }
+}
+
+/**
+ * Whether a remote read failed because the object doesn't exist. DuckDB's
+ * message quotes the object's path, and station IDs such as CO-OPS 1612404
+ * hold "404", so only DuckDB's own wording for a 404 counts; any other error
+ * fails the read rather than pass for an empty file that a write would replace.
+ */
+export function isMissing(error: unknown): boolean {
+  return /\(HTTP 404 Not Found\)|returned HTTP 404 for|No files found that match/.test(
+    String(error),
+  );
 }
 
 async function prepare(path: string): Promise<void> {

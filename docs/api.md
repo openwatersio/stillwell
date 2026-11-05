@@ -184,7 +184,7 @@ Everything the API serves, as Parquet, at `https://water-levels.openwaters.io/`,
 ```
 stations.parquet
 sources.json
-obs/<source>/<station>/<year>.parquet          time, level_m, flag, received, datum
+obs/<source>/<station>/<year>.parquet          time, level_m, flag, source_flag, received, datum
 extremes/<source>/<station>/<year>.parquet     time, level_m, type, flag, datum
 predictions/<source>/<station>/<year>.parquet  published predictions (RWS, BSH)
 predicted-extremes/<source>/<station>/<year>.parquet  published predicted high and low waters

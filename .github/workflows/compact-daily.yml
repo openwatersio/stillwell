@@ -1,0 +1,62 @@
+name: Compact daily
+
+# Fold the whole days in recent/<source>.parquet into each station's year file
+# under obs/ on R2. Each year file is read, merged and written whole, so a
+# failed run leaves the file it had, and a rerun writes nothing new.
+on:
+  schedule:
+    # Between hourly runs; the fold covers six days, so a late hourly run, or
+    # a missed compaction, is caught up the next night.
+    - cron: "45 0 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Whole UTC days to fold, ending yesterday (up to 6)"
+        required: true
+        default: "6"
+
+permissions:
+  contents: read
+
+jobs:
+  compact:
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [coops, pegelonline, rws, usace, usgs]
+    # The source's one group for every job that writes its files, manual
+    # Ingest runs included, so a compaction never reads recent/ while the hourly
+    # run replaces it, or rewrites a year file a backfill is writing.
+    concurrency:
+      group: lake-${{ matrix.source }}
+      cancel-in-progress: false
+    # The lake environment only deploys from main; this stops a run from another
+    # branch before it waits on that rule.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    # The environment holds the R2 credentials and only runs on main.
+    environment: lake
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # Every whole day the window holds, not just yesterday, so late values,
+      # QC flags the window revised and missed runs still reach the year file.
+      # It costs no extra writes: a station's days share one year file except
+      # in the first week of January, and a file the fold doesn't change isn't
+      # written.
+      - run: node scripts/ingest.ts compact "$SOURCE" --days "$DAYS" --concurrency 16
+        env:
+          SOURCE: ${{ matrix.source }}
+          DAYS: ${{ inputs.days || '6' }}
+          # Sixteen full-year 1-minute files merge at once, which peaked near
+          # 2.5 GB of heap; the runner has 16 GB.
+          NODE_OPTIONS: --max-old-space-size=8192
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}

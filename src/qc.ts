@@ -23,6 +23,15 @@ export interface QcOptions {
   outliers?: boolean;
 }
 
+/**
+ * Rows as a source sent them, with `source_flag` set to their flag before QC
+ * can make it worse. Only freshly fetched rows get this: a stored row's flag
+ * may already hold QC's marks.
+ */
+export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
+  return rows.map((r) => ({ ...r, source_flag: r.flag }));
+}
+
 /** Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and outliers. */
 export function qc<T extends Observation>(
   rows: T[],

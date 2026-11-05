@@ -20,7 +20,7 @@ import {
   writeStations,
 } from "../src/lake/parquet.ts";
 import { seriesPath } from "../src/lake/paths.ts";
-import { qc } from "../src/qc.ts";
+import { qc, withSourceFlag } from "../src/qc.ts";
 import { Flag, type LakeStation, type Observation, type Station } from "../src/schema.ts";
 
 const root = mkdtempSync(join(tmpdir(), "water-levels-test-"));
@@ -70,13 +70,22 @@ describe("lake files", () => {
   it("round-trips observations, with and without arrival times", async () => {
     const rows: Observation[] = [
       { time: T + 10 * MIN, level: 1.234, flag: Flag.preliminary, received: T + 12 * MIN },
-      { time: T, level: -0.5, flag: Flag.good },
+      { time: T, level: -0.5, flag: Flag.suspect, source_flag: Flag.good },
     ];
     const path = seriesPath(root, "levels", "test", "a/b", 2026);
     assert.match(path, /obs\/test\/a%2Fb\/2026\.parquet$/);
     await writeObservations(path, rows, "NAP");
     assert.deepEqual(await readObservations(path), [rows[1], rows[0]]);
     assert.deepEqual(await readDatums(path), ["NAP"]);
+  });
+
+  it("reads a series file written before source flags were kept", async () => {
+    const path = join(root, "obs-old.parquet");
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT TIMESTAMPTZ '2026-01-01 00:00:00+00' AS time, 1.5::FLOAT AS level_m, 0::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum) TO '${path}' (FORMAT parquet)`,
+    );
+    assert.deepEqual(await readObservations(path), [{ time: T, level: 1.5, flag: Flag.good }]);
   });
 
   it("reads a missing file as an empty series, in no datum", async () => {
@@ -105,7 +114,14 @@ describe("lake files", () => {
     const path = join(root, "recent.parquet");
     await writeRecent(path, [
       [
-        { station: "b", time: T, level: 1, flag: Flag.preliminary, epoch: 2 },
+        {
+          station: "b",
+          time: T,
+          level: 1,
+          flag: Flag.suspect,
+          source_flag: Flag.preliminary,
+          epoch: 2,
+        },
         {
           station: "a",
           time: T + MIN,
@@ -121,6 +137,8 @@ describe("lake files", () => {
       (await readRecent(path)).map((r) => `${r.station}${r.time - T}@${r.epoch}`),
       ["a0@1", `a${MIN}@1`, "b0@2"],
     );
+    const b = (await readRecent(path, ["b"]))[0]!;
+    assert.deepEqual([b.flag, b.source_flag], [Flag.suspect, Flag.preliminary]);
   });
 
   it("reads a recent window written before epochs as epoch 1", async () => {
@@ -304,6 +322,15 @@ describe("qc", () => {
     const flags = qc(rows).map((r) => r.flag);
     assert.equal(flags[0], Flag.good);
     assert.equal(flags[50], Flag.bad);
+  });
+
+  it("keeps the flag a source sent apart from QC's marks", () => {
+    const rows = withSourceFlag(tide(200));
+    rows[100]!.level += 0.6;
+    const marked = qc(rows);
+    assert.deepEqual([marked[100]!.flag, marked[100]!.source_flag], [Flag.suspect, Flag.good]);
+    // A stored row's flag may hold QC's marks, so QC never takes it for the source's.
+    assert.equal(qc(tide(10))[0]!.source_flag, undefined);
   });
 
   it("sorts, drops repeated times, and never improves a flag", () => {

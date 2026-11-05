@@ -17,9 +17,15 @@ export type Flag = (typeof Flag)[keyof typeof Flag];
 
 export const FLAG_NAMES = Object.keys(Flag) as (keyof typeof Flag)[];
 
-/** One value in a series. `received` is when we first saw it, if we saw it arrive. */
+/**
+ * One value in a series. `received` is when we first saw it, if we saw it
+ * arrive. `flag` is the worse of the source's flag and QC's; `source_flag` is
+ * the source's alone, kept so that whether the source finalized a value isn't
+ * lost when QC marks it. Values written before it was kept have none.
+ */
 export interface Observation extends Sample {
   flag: Flag;
+  source_flag?: Flag;
   received?: number;
 }
 

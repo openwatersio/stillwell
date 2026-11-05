@@ -12,7 +12,7 @@ src/                   shared pieces: HTTP and the response cache, the schema, Q
 scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml) and the manual ingest against R2 (ingest.yml)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml and compact-daily.yml
 ```
 
 ## Getting started
@@ -37,7 +37,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.       |
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                        |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill` and `recent`, described below.                     |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill`, `recent` and `compact`, described below.          |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                 |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data. |
 
@@ -45,7 +45,7 @@ CI also checks that `package-lock.json` regenerates from `package.json` and that
 
 ## Running ingest
 
-`scripts/ingest.ts` has three commands. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`; it changes no file in the repo. Before writing a list it copies the previous one to `history/stations/<source>/`, with a report of the stations added, retired and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs` after checking them). A station the source stops listing stays, marked inactive. A new source's first refresh starts its list; a source with series in the lake but no list or history is refused rather than started over. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
+`scripts/ingest.ts` has four commands: `stations`, `backfill`, `recent` and `compact`. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`; it changes no file in the repo. Before writing a list it copies the previous one to `history/stations/<source>/`, with a report of the stations added, retired and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs` after checking them). A station the source stops listing stays, marked inactive. A new source's first refresh starts its list; a source with series in the lake but no list or history is refused rather than started over. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
 
 ```bash
 node scripts/ingest.ts stations
@@ -71,11 +71,19 @@ node scripts/ingest.ts backfill usgs all 2007 2026 --skip-written --first docs/t
 
 `--shard 2/8` takes the second of eight sets of stations, split by a hash of their IDs so a station's shard never changes, for separate jobs. The Ingest workflow runs one job at a time (`concurrency: lake` keeps one pending and cancels the rest), so there dispatch each shard after the last one finishes. That's how the current year gets backfilled: both modes fetch a year still under way in full on every run, so a run over it never resumes, and it has to be split into shards that each fit in one run, such as `backfill usgs all 2026 2027 --shard 1/3`, then `2/3` and `3/3`, each dispatched with `timeout` at 360 minutes, since one stopped partway starts over on its next run. Shards running at once need a matrix workflow, which doesn't exist yet.
 
-Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`):
+Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`). A value seen for the first time gets `received` set to the time of the fetch, and a station whose fetch fails or brings nothing keeps what it had:
 
 ```bash
 node scripts/ingest.ts recent pegelonline --hours 3
 ```
+
+Fold the last whole UTC days of the recent window (`--days`, 1 by default, which is yesterday, and at most 6) into each station's year files under `obs/`, each row into its datum epoch's files, carrying `received`. Each year file is read, merged and written whole, so a failed run leaves the file it had, and a file the fold doesn't change isn't written. The window's level and flag win over the file's, except that a value the source hasn't finalized never replaces one it has, such as a verified backfill. Both are judged by the source's own flag, kept as `source_flag`, so QC marking a verified value suspect doesn't unfinalize it:
+
+```bash
+node scripts/ingest.ts compact pegelonline --days 6
+```
+
+Both print a summary (stations updated, stale, failed and waiting on a held datum change, and values written), and add it to the workflow run's page in Actions.
 
 These environment variables choose where it writes:
 
@@ -85,6 +93,8 @@ These environment variables choose where it writes:
 | `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for stations whose license bars commercial use. Ingest refuses to write one without it, and refuses one that is the public lake. |
 | `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                         |
 | `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                  |
+
+Write to R2 only through the Ingest workflow. A run from your own machine shares no concurrency group with the scheduled jobs, so it and Ingest hourly or Compact daily can each rewrite a file the other just read, and one's values are lost.
 
 If a source starts reporting a station in another datum, `ingest stations` opens a datum epoch for it and reports it. A change it holds for a person (soon after the last one, or back to an earlier reference) fails the run on every refresh until the source's `overrides` decide, and `backfill` and `recent` skip that station meanwhile. `backfill … all` skips inactive stations.
 
@@ -114,7 +124,7 @@ Each source is a directory in `src/sources/` that exports a `Source` (defined in
 
 ## Ingest on R2
 
-The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Nothing runs on a schedule yet.
+The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Two workflows run on a schedule from the same environment, each source a job of its own: Ingest hourly runs `recent --hours 12` at 17 minutes past each hour, and Compact daily runs `compact --days 6` at 00:45 UTC, so late values, revised flags and a missed night still reach the year files. Both can also be started by hand. Every job that writes one source's files, a manual `backfill`, `recent` or `compact` included, runs in that source's `lake-<source>` concurrency group, so no two rewrite one file at once. `stations` runs in the `lake` group whatever its sources, since every run rebuilds `stations.parquet` from all the lists. It can run beside a source's jobs: one that read the list before a refresh opened an epoch writes the new epoch's rows into the old epoch's files, past its `until`, where readers ignore them, and the next run puts them in the new epoch's files. A run waiting in a group is cancelled when the next one arrives, so while a long backfill holds a source, its hourly runs skip until it's done, and the next one's 12 hours, plus the window's 6 days for compaction, catch up. That goes for a manual run too: one started while the source's scheduled job is running can be cancelled by the next hourly run, so start it when the group is free, and check that it started rather than show as cancelled.
 
 ## Gotchas
 
