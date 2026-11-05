@@ -569,8 +569,11 @@ const PAGE = 50_000;
  * answers 429 with a Retry-After of up to an hour, until the oldest request in
  * the window ages out. So requests that go out start `requestMs` apart (cache
  * hits don't wait), a little over 3.6 seconds to leave a margin, which keeps
- * one keyless run under the limit, and a 429
- * waits `blockedMs`, twice, before giving up. A key in USGS_API_KEY gives the
+ * one keyless run under the limit. A 429 holds every request for as long as
+ * it waits: `fetchText` retries one with a Retry-After of a minute or less, or
+ * none, after a backoff, up to three times; past those, or for a longer
+ * Retry-After, `request` waits as long as it asks (`blockedMs` without one)
+ * and starts over, up to three rounds in all. A key in USGS_API_KEY gives the
  * run a budget of its own; it goes in a header, never the URL, so it stays out
  * of logs and cache keys. Tests shrink the waits.
  */
@@ -605,7 +608,8 @@ async function request<T>(url: string, options: RequestOptions): Promise<T> {
       });
     } catch (error) {
       if (attempt >= 3 || !String(error).includes("returned 429")) throw error;
-      // Wait as long as the API asks, and hold every other request back too.
+      // fetchText's own retries are spent, or the API asked for more than a
+      // minute: wait as long as it asks, and hold every other request back too.
       const asked = /retry after (\d+) s/.exec(String(error))?.[1];
       const wait = asked ? Math.min(Number(asked) * 1000 + 5000, 3_700_000) : pacing.blockedMs;
       hold(wait / 1000);

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -8,6 +8,7 @@ import {
   readDatums,
   readExtremes,
   readObservations,
+  checkRecent,
   readRecent,
   writeExtremes,
   writeObservations,
@@ -87,6 +88,15 @@ describe("lake files", () => {
     );
     assert.equal((await readRecent(path)).length, 2);
     assert.deepEqual(await readRecent(path, []), []);
+  });
+
+  it("checks a whole recent window can be read, and passes a missing one", async () => {
+    const path = join(root, "recent-check.parquet");
+    await checkRecent(path);
+    await writeRecent(path, [[{ station: "a", time: T, level: 1, flag: Flag.good }]]);
+    await checkRecent(path);
+    writeFileSync(path, "not parquet");
+    await assert.rejects(checkRecent(path));
   });
 
   it("writes stations with datums, products and links", async () => {

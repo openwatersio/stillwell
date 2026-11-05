@@ -34,6 +34,7 @@ import {
   readExtremes,
   readDatums,
   readObservations,
+  checkRecent,
   readRecent,
   writeExtremes,
   writeJsonArray,
@@ -312,8 +313,7 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   // fails the run here, before the sweep spends a source's request budget. A
   // station read only from its own lake's file starts empty in the other lake
   // when its license changes, rather than carry rows across.
-  for (const path of paths)
-    await readRecent(path, [stations.find((s) => lakeOf.get(s.id) === path)!.id]);
+  for (const path of paths) await checkRecent(path);
 
   // A source that can sweep every station at once does; a failed sweep fails
   // every station, which keeps what each had.

@@ -155,6 +155,14 @@ const recentCells = (r: StationObservation): Cell[] => [
   null,
 ];
 
+/**
+ * Decode every value of a recent window without keeping any, so a file that
+ * can't be read in full fails now. A missing file passes.
+ */
+export async function checkRecent(path: string): Promise<void> {
+  await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
+}
+
 /** The recent window, or just the named stations' part of it. */
 export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];
