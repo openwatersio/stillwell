@@ -127,8 +127,16 @@ describe("nextEpochs", () => {
       datums: {},
       reference: { id: "2027-07-01", since: "2027-07-02" },
     };
-    const early = nextEpochs([epoch()], fetched, options());
-    assert.deepEqual([early.event, early.epochs[0]!.reference], [null, null]);
+    const early = nextEpochs(
+      [epoch({ datums: { NN: 5.2 } })],
+      { ...fetched, datums: { NN: 4.9 } },
+      options(),
+    );
+    // Nor its offsets, which may already be the new zero's.
+    assert.deepEqual(
+      [early.event, early.epochs[0]!.reference, early.epochs[0]!.datums],
+      [null, null, { NN: 5.2 }],
+    );
     // Once its day has come, it's a change for a person to place.
     const later = nextEpochs(early.epochs, fetched, options({ now: "2027-07-03T00:00:00Z" }));
     assert.equal(later.event, "held");

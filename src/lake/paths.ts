@@ -27,6 +27,9 @@ export const DATASET: Record<Product, string> = {
   predicted_extremes: "predicted-extremes",
 };
 
+/** Every product a station can have files for. */
+export const PRODUCTS = Object.keys(DATASET) as Product[];
+
 export function seriesPath(
   root: string,
   product: Product,

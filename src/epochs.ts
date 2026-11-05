@@ -145,7 +145,8 @@ export function nextEpochs(
       if (ref.since) current.reference_since = iso(dayStart(ref.since, options.offsets));
     }
     if (fetched.datum !== null) current.seen = options.now;
-    if (!isHeld(epochs)) current.datums = fetched.datums;
+    // Offsets sent with a reference dated ahead may already be the new zero's.
+    if (!isHeld(epochs) && !ahead) current.datums = fetched.datums;
   } else if (!isHeld(epochs)) {
     const datum = fetched.datum ?? current.datum;
     const rejected = epochs.some(

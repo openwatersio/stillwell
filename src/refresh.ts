@@ -24,6 +24,7 @@ import {
   stationListPath,
   stationsPath,
   sourcesPath,
+  PRODUCTS,
 } from "./lake/paths.ts";
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
 import { linkBothWays, mergeStationList, type EpochChange } from "./stations.ts";
@@ -81,6 +82,8 @@ export async function refreshSource(
     seriesChanged: source.seriesChanged?.bind(source),
   };
   const { stations, changes } = mergeStationList(previous, fetched, options_);
+  // A fetch whose stations all lack a datum merges to nothing for a new source.
+  if (!stations.length) throw new Refused("listed no stations with a datum");
   await renumberAboveFiles(lake, stations, previous);
   const opened = changes.filter((c) => c.event === "opened" || c.event === "held");
   // A station already waiting on a person isn't a new change.
@@ -121,13 +124,14 @@ async function renumberAboveFiles(
     return s.epochs.some((e) => !known?.has(e.id));
   });
   if (!changed.length) return;
-  // A source's first refresh has every station new, and one listing per
-  // product beats one per station; a few stations are cheaper one by one.
-  const products = [...new Set(changed.flatMap((s) => s.products))];
+  // Every product, not only the ones a station lists now: one it dropped may
+  // still have files under an epoch id. A source's first refresh has every
+  // station new, and one listing per product beats one per station; a few
+  // stations are cheaper one by one.
   const patterns =
     changed.length > 50
-      ? products.map((p) => sourceEpochDirs(lake, p, changed[0]!.source))
-      : changed.flatMap((s) => s.products.map((p) => epochDirs(lake, p, s.source, s.source_id)));
+      ? PRODUCTS.map((p) => sourceEpochDirs(lake, p, changed[0]!.source))
+      : changed.flatMap((s) => PRODUCTS.map((p) => epochDirs(lake, p, s.source, s.source_id)));
   const onDiskOf = await highestEpochs(patterns);
   const inRecent = await recentEpochs(recentPath(lake, changed[0]!.source));
   for (const station of changed) {
@@ -135,7 +139,7 @@ async function renumberAboveFiles(
     const fresh = station.epochs.filter((e) => !known.has(e.id));
     const onDisk = Math.max(
       inRecent.get(station.id) ?? 1,
-      ...station.products.map(
+      ...PRODUCTS.map(
         (p) => onDiskOf.get(stationDir(lake, p, station.source, station.source_id)) ?? 1,
       ),
     );

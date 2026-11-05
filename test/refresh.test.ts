@@ -132,6 +132,14 @@ describe("refreshSource", () => {
     // A new source's first fetch can't be empty either.
     const other = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
     await assert.rejects(refreshSource(lake, other, { now: NOW }), /listed no stations/);
+    // Nor one whose stations all lack the datum a new station needs.
+    const nameless = {
+      ...sourceOf([
+        listed("a", { id: "other/a", source: "other", datum: null as unknown as string }),
+      ]),
+      metadata: { ...metadata, id: "other" },
+    };
+    await assert.rejects(refreshSource(lake, nameless, { now: NOW }), /no stations with a datum/);
   });
 
   it("refuses a station from another source", async () => {
@@ -189,6 +197,22 @@ describe("refreshSource", () => {
       now: LATER,
     });
     assert.deepEqual([report.retired, report.withdrawn], [["test/a", "test/b"], ["test/a"]]);
+  });
+
+  it("numbers a new epoch above files for a product the station no longer lists", async () => {
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await writeObservations(
+      seriesPath(lake, "predictions", "test", "a", 2026, 2),
+      [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
+      "NAP",
+    );
+    const { stations } = await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), {
+      now: LATER,
+    });
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => e.id),
+      [1, 3],
+    );
   });
 
   it("numbers a new epoch above an epoch only the recent window still has", async () => {
