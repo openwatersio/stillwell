@@ -392,6 +392,24 @@ export async function exists(pattern: string): Promise<boolean> {
   });
 }
 
+/** Whether any file matches any of `patterns`, which must hold a wildcard. */
+export async function anyFile(patterns: string[]): Promise<boolean> {
+  return serial(async () => {
+    const db = await connection();
+    for (const pattern of patterns) {
+      const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(pattern)}) LIMIT 1`);
+      if (reader.getRowObjects().length) return true;
+    }
+    return false;
+  });
+}
+
+/** The sources a published `stations.parquet` lists; none when there's no file. */
+export async function publishedSources(path: string): Promise<string[]> {
+  const rows = await read(path, "SELECT DISTINCT source", "source");
+  return rows.map((r) => String(r.source));
+}
+
 /**
  * The highest epoch directory each station has among the files `patterns`
  * match, by the station's directory (`epochDirs` without its last two parts).

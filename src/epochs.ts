@@ -195,7 +195,7 @@ export function nextEpochs(
           e.state !== "rejected" &&
           (labelChanged ? e.datum === datum : e.reference !== null && e.reference === ref?.id),
       );
-      // A seeded epoch with no start still knows where its reference starts, if the source said.
+      // A first epoch with no start still knows where its reference starts, if the source said.
       const start = current.since ?? current.reference_since;
       const soon = start !== null && since - Date.parse(start) < HOLD_WITHIN_MS;
       const backwards = start !== null && since <= Date.parse(start);
