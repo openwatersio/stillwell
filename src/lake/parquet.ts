@@ -3,7 +3,14 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DuckDBInstance, type DuckDBConnection } from "@duckdb/node-api";
-import type { Flag, Observation, PublishedExtreme, Station } from "../schema.ts";
+import type {
+  Epoch,
+  Flag,
+  LakeStation,
+  Observation,
+  PublishedExtreme,
+  Station,
+} from "../schema.ts";
 import type { EventIndex } from "../types.ts";
 
 /**
@@ -124,32 +131,42 @@ export async function readDatums(path: string): Promise<string[]> {
   return rows.map((r) => String(r.datum));
 }
 
-export type StationObservation = Observation & { station: string };
+/** A recent value, with the station and the datum epoch it was fetched in. */
+export type StationObservation = Observation & { station: string; epoch: number };
 
-/** The recent window for a source: `station`, then the observation columns, sorted by station and time. */
+/**
+ * The recent window for a source: `station`, then the observation columns and
+ * `epoch`, sorted by station and time.
+ */
 export async function writeRecent(path: string, rows: StationObservation[]): Promise<void> {
   await copyRows(
     path,
     rows,
-    "station, time, level_m, flag, received",
+    "station, time, level_m, flag, received, epoch",
     undefined,
-    (r) => [r.time, r.level, r.flag, r.received ?? null, null, r.station, null, null],
+    (r) => [r.time, r.level, r.flag, r.received ?? null, null, r.station, null, null, r.epoch],
     "station, time_ms",
   );
 }
 
 export async function readRecent(path: string): Promise<StationObservation[]> {
-  const rows = await read(
-    path,
-    "SELECT station, epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received",
-    "station, time",
-  );
+  const select =
+    "SELECT station, epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received";
+  let rows;
+  try {
+    rows = await read(path, `${select}, epoch`, "station, time");
+  } catch (error) {
+    // A file written before epochs has none, and every row in it is epoch 1.
+    if (!/epoch/i.test(String(error))) throw error;
+    rows = await read(path, `${select}, 1 AS epoch`, "station, time");
+  }
   return rows.map((r) => {
     const o: StationObservation = {
       station: String(r.station),
       time: Number(r.time),
       level: level(r.level_m),
       flag: r.flag as Flag,
+      epoch: Number(r.epoch),
     };
     if (r.received !== null) o.received = Number(r.received);
     return o;
@@ -182,19 +199,104 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   source_url: "VARCHAR",
 };
 
-/** `stations.parquet`: one row per series, sorted by ID. */
-export async function writeStations(path: string, stations: Station[]): Promise<void> {
+const EPOCHS =
+  "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
+
+/** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
+export async function writeStations(path: string, stations: LakeStation[]): Promise<void> {
+  const columns = { ...STATION_COLUMNS, epochs: EPOCHS };
   await viaJson(
     path,
     stations,
-    `SELECT ${Object.keys(STATION_COLUMNS).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(STATION_COLUMNS)}) ORDER BY id`,
+    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
     "FORMAT parquet, COMPRESSION zstd",
   );
 }
 
+/** What a source's list holds besides the shared columns, kept as JSON in `extra`. */
+const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
+  Object.entries(STATION_COLUMNS).filter(([key]) => key !== "first" && key !== "last"),
+);
+
 /**
- * Each station's `first` and `last` in a published `stations.parquet`, which
- * the lake fills in; none when the file doesn't exist yet.
+ * A source's list, `stations/<source>.parquet`: the shared columns except
+ * `first` and `last`, its epochs, and the source's own fields as JSON in `extra`.
+ */
+export async function writeStationList(path: string, stations: LakeStation[]): Promise<void> {
+  const rows = stations.map((s) => {
+    const extra = Object.fromEntries(
+      Object.entries(s).filter(([key]) => !(key in STATION_COLUMNS) && key !== "epochs"),
+    );
+    return { ...s, extra: JSON.stringify(extra) };
+  });
+  const columns = { ...LIST_COLUMNS, epochs: EPOCHS, extra: "VARCHAR" };
+  await viaJson(
+    path,
+    rows,
+    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
+    "FORMAT parquet, COMPRESSION zstd",
+  );
+}
+
+/** A source's list, or null when the lake has none. */
+export async function readStationList(path: string): Promise<LakeStation[] | null> {
+  if (!(await exists(path))) return null;
+  const rows = await read(path, "SELECT to_json(t)::VARCHAR AS row", "id", "t");
+  return rows.map((r) => {
+    const { extra, epochs, ...fields } = JSON.parse(String(r.row)) as Record<string, unknown>;
+    return {
+      ...fields,
+      ...(JSON.parse(String(extra ?? "{}")) as object),
+      first: null,
+      last: null,
+      epochs: (epochs as Epoch[]).map((e) => ({
+        ...e,
+        since: isoOf(e.since),
+        until: isoOf(e.until),
+        seen: isoOf(e.seen),
+        datums: e.datums ?? {},
+      })),
+    } as LakeStation;
+  });
+}
+
+/** Whether any file matches `pattern`, a path or a glob, local or remote. */
+export async function exists(pattern: string): Promise<boolean> {
+  if (!isRemote(pattern) && !/[*?[]/.test(pattern)) return existsSync(pattern);
+  return serial(async () => {
+    const db = await connection();
+    const reader = await db.runAndReadAll(`SELECT count(*) AS n FROM glob(${quote(pattern)})`);
+    return Number(reader.getRowObjects()[0]!.n) > 0;
+  });
+}
+
+/** The highest epoch directory under any of `patterns`, or 1 when there's none. */
+export async function highestEpoch(patterns: string[]): Promise<number> {
+  return serial(async () => {
+    const db = await connection();
+    let highest = 1;
+    for (const pattern of patterns) {
+      const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(pattern)})`);
+      for (const { file } of reader.getRowObjects()) {
+        const epoch = /\/(\d+)\/\d{4}\.parquet$/.exec(String(file))?.[1];
+        if (epoch) highest = Math.max(highest, Number(epoch));
+      }
+    }
+    return highest;
+  });
+}
+
+/** DuckDB's JSON timestamps (`2020-01-01 06:00:00+00`) as ISO strings. */
+function isoOf(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const time = Date.parse(String(value).replace(" ", "T").replace(/\+00$/, "Z"));
+  if (Number.isNaN(time)) throw new Error(`Not a time: ${value}`);
+  return new Date(time).toISOString().replace(".000Z", "Z");
+}
+
+/**
+ * Each station's `first` and `last` from a file with `id`, `first` and
+ * `last`, such as a source's bounds; none when the file doesn't exist yet.
  */
 export async function readStationBounds(
   path: string,
@@ -251,12 +353,12 @@ async function copyRowsNow<T>(
   await prepare(path);
   const table = `rows_${Math.random().toString(36).slice(2)}`;
   await db.run(
-    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT)`,
+    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER)`,
   );
   try {
     const appender = await db.createAppender(table);
     for (const row of rows) {
-      const [time, level, flag, received, type, station, transit, event] = cells(row);
+      const [time, level, flag, received, type, station, transit, event, epoch = null] = cells(row);
       appender.appendDouble(time as number);
       appender.appendFloat(level as number);
       appender.appendUTinyInt(flag as number);
@@ -265,6 +367,7 @@ async function copyRowsNow<T>(
       station === null ? appender.appendNull() : appender.appendVarchar(station as string);
       transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
       event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
+      epoch === null ? appender.appendNull() : appender.appendInteger(epoch as number);
       appender.endRow();
     }
     appender.closeSync();
@@ -306,20 +409,26 @@ async function viaJsonNow(path: string, rows: object[], select: string, format: 
   }
 }
 
-function read(path: string, select: string, order = "time"): Promise<Record<string, unknown>[]> {
-  return serial(() => readNow(path, select, order));
+function read(
+  path: string,
+  select: string,
+  order = "time",
+  alias = "",
+): Promise<Record<string, unknown>[]> {
+  return serial(() => readNow(path, select, order, alias));
 }
 
 async function readNow(
   path: string,
   select: string,
   order: string,
+  alias: string,
 ): Promise<Record<string, unknown>[]> {
   if (!isRemote(path) && !existsSync(path)) return [];
   const db = await connection();
   try {
     const reader = await db.runAndReadAll(
-      `${select} FROM read_parquet(${quote(path)}) ORDER BY ${order}`,
+      `${select} FROM read_parquet(${quote(path)}) ${alias} ORDER BY ${order}`,
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {

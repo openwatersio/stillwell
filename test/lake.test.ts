@@ -3,6 +3,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
+import { DuckDBInstance } from "@duckdb/node-api";
 import { mergeFetched, mergeRange, sameRows } from "../src/lake/merge.ts";
 import {
   readDatums,
@@ -13,13 +14,53 @@ import {
   writeObservations,
   writeRecent,
   readStationBounds,
+  readStationList,
+  writeStationList,
   writeStations,
 } from "../src/lake/parquet.ts";
 import { seriesPath } from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
-import { Flag, type Observation, type Station } from "../src/schema.ts";
+import { Flag, type LakeStation, type Observation, type Station } from "../src/schema.ts";
 
 const root = mkdtempSync(join(tmpdir(), "water-levels-test-"));
+
+const epoch = {
+  id: 1,
+  datum: "NAP",
+  since: null,
+  until: null,
+  seen: "2026-01-01T00:00:00Z",
+  reference: null,
+  datums: { MSL: 0.1 },
+  to_current: 0,
+  state: "open" as const,
+};
+
+const listed: Station = {
+  id: "test/1",
+  source: "test",
+  source_id: "1",
+  name: "One",
+  lat: 1,
+  lon: 2,
+  country_code: "NL",
+  kind: null,
+  interval_s: 600,
+  datum: "NAP",
+  datums: { MSL: 0.1 },
+  products: ["levels"],
+  first: null,
+  last: null,
+  license: "CC0-1.0",
+  commercial_use: true,
+  attribution: "Test",
+  tide_station: null,
+  same_as: [],
+  status: "active",
+  live: true,
+  min_interval_s: 300,
+  source_url: null,
+};
 const T = Date.UTC(2026, 0, 1);
 const MIN = 60_000;
 
@@ -61,18 +102,36 @@ describe("lake files", () => {
   it("keeps the recent window sorted by station, then time", async () => {
     const path = join(root, "recent.parquet");
     await writeRecent(path, [
-      { station: "b", time: T, level: 1, flag: Flag.preliminary },
-      { station: "a", time: T + MIN, level: 2, flag: Flag.preliminary, received: T + 2 * MIN },
-      { station: "a", time: T, level: 3, flag: Flag.preliminary },
+      { station: "b", time: T, level: 1, flag: Flag.preliminary, epoch: 2 },
+      {
+        station: "a",
+        time: T + MIN,
+        level: 2,
+        flag: Flag.preliminary,
+        received: T + 2 * MIN,
+        epoch: 1,
+      },
+      { station: "a", time: T, level: 3, flag: Flag.preliminary, epoch: 1 },
     ]);
     assert.deepEqual(
-      (await readRecent(path)).map((r) => `${r.station}${r.time - T}`),
-      ["a0", `a${MIN}`, "b0"],
+      (await readRecent(path)).map((r) => `${r.station}${r.time - T}@${r.epoch}`),
+      ["a0@1", `a${MIN}@1`, "b0@2"],
     );
   });
 
-  it("writes stations with datums, products and links", async () => {
-    const station: Station = {
+  it("reads a recent window written before epochs as epoch 1", async () => {
+    const path = join(root, "recent-old.parquet");
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT 'a' AS station, TIMESTAMPTZ '2026-01-01 00:00:00+00' AS time, 1.5::FLOAT AS level_m, 2::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received) TO '${path}' (FORMAT parquet)`,
+    );
+    assert.deepEqual(await readRecent(path), [
+      { station: "a", time: T, level: 1.5, flag: Flag.preliminary, epoch: 1 },
+    ]);
+  });
+
+  it("writes stations with datums, products, links and epochs", async () => {
+    const station: LakeStation = {
       id: "test:1",
       source: "test",
       source_id: "1",
@@ -96,8 +155,32 @@ describe("lake files", () => {
       live: true,
       min_interval_s: 300,
       source_url: null,
+      epochs: [epoch],
     };
     await writeStations(join(root, "stations.parquet"), [station]);
+  });
+
+  it("round-trips a source's list, with its own fields and epochs", async () => {
+    const path = join(root, "stations/test.parquet");
+    assert.equal(await readStationList(path), null);
+    const station = {
+      ...listed,
+      series: "Venice.Stage.Inst.1Hour.0.rev",
+      established: "1899-01-01T00:00:00Z",
+      epochs: [
+        { ...epoch, state: "closed", until: "2015-06-28T04:00:00Z", to_current: null },
+        {
+          ...epoch,
+          id: 2,
+          since: "2015-06-29T04:00:00Z",
+          seen: "2026-11-04T00:00:00Z",
+          reference: "2015-06-29",
+          datums: { NGVD29: 1.2 },
+        },
+      ],
+    } as LakeStation;
+    await writeStationList(path, [station]);
+    assert.deepEqual(await readStationList(path), [station]);
   });
 
   it("reads back the first and last the lake filled in", async () => {
@@ -109,7 +192,8 @@ describe("lake files", () => {
       source_id: "1",
       first: "2001-02-03T04:05:06Z",
       last: null,
-    } as unknown as Station;
+      epochs: [],
+    } as unknown as LakeStation;
     await writeStations(path, [station, { ...station, id: "test:2", first: null }]);
     assert.deepEqual(
       await readStationBounds(path),

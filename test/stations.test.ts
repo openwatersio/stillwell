@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { Station } from "../src/schema.ts";
+import type { LakeStation, Station } from "../src/schema.ts";
 import { seriesPath } from "../src/lake/paths.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 
@@ -35,10 +35,38 @@ const station = (id: string, fields: Partial<Station> = {}): Station => ({
   ...fields,
 });
 
+/** A station as the lake holds it, with one open epoch in its datum. */
+const held = (id: string, fields: Partial<LakeStation> = {}): LakeStation => {
+  const s = station(id, fields);
+  return {
+    ...s,
+    epochs: [
+      {
+        id: 1,
+        datum: s.datum,
+        since: null,
+        until: null,
+        seen: "2026-01-01T00:00:00Z",
+        reference: null,
+        datums: s.datums,
+        to_current: 0,
+        state: "open",
+      },
+    ],
+    ...fields,
+  };
+};
+
+const options = {
+  now: "2026-06-01T00:00:00Z",
+  offsets: [0, 0] as [number, number],
+  decisions: {},
+};
+
 describe("mergeStationList", () => {
   it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
-    const previous = [station("a", { tide_station: "ticon/a" }), station("b")];
-    const { stations } = mergeStationList(previous, [station("a")]);
+    const previous = [held("a", { tide_station: "ticon/a" }), held("b")];
+    const { stations } = mergeStationList(previous, [station("a")], options);
     assert.deepEqual(
       stations.map((s) => [s.id, s.status, s.tide_station]),
       [
@@ -51,8 +79,9 @@ describe("mergeStationList", () => {
   it("leaves first and last to the lake", () => {
     const filled = { first: "2000-01-01T00:00:00Z", last: "2026-01-01T00:00:00Z" };
     const { stations } = mergeStationList(
-      [station("a", filled), station("b", filled), station("c", filled)],
+      [held("a", filled), held("b", filled), held("c", filled)],
       [station("a", filled), station("b", { datum: "MSL" })],
+      options,
     );
     assert.deepEqual(
       stations.map((s) => [s.id, s.first, s.last]),
@@ -64,27 +93,47 @@ describe("mergeStationList", () => {
     );
   });
 
-  it("marks a station inactive when its datum changes, and brings it back when it returns", () => {
-    const previous = [station("a", { datums: { LAT: -1.2 } })];
-    const moved = mergeStationList(previous, [station("a", { datum: "MSL", datums: {} })]);
-    assert.deepEqual(moved.changed, [{ id: "rws/a", from: "NAP", to: "MSL" }]);
-    assert.deepEqual(
-      moved.stations.map((s) => [s.id, s.datum, s.datums, s.status]),
-      [["rws/a", "NAP", { LAT: -1.2 }, "inactive"]],
+  it("keeps a station active in a new epoch when its datum changes", () => {
+    const previous = [held("a", { datums: { LAT: -1.2 } })];
+    const moved = mergeStationList(
+      previous,
+      [station("a", { datum: "MSL", datums: { LAT: -1.5 } })],
+      options,
     );
-    const back = mergeStationList(moved.stations, [station("a")]);
-    assert.deepEqual([back.stations[0]!.status, back.changed], ["active", []]);
+    assert.deepEqual(moved.changes, [
+      { id: "rws/a", event: "opened", from: "NAP", to: "MSL", reason: undefined },
+    ]);
+    const [a] = moved.stations;
+    assert.deepEqual([a!.datum, a!.datums, a!.status], ["MSL", { LAT: -1.5 }, "active"]);
+    assert.deepEqual(
+      a!.epochs.map((e) => [e.id, e.datum, e.datums, e.state]),
+      [
+        [1, "NAP", { LAT: -1.2 }, "closed"],
+        [2, "MSL", { LAT: -1.5 }, "open"],
+      ],
+    );
+  });
+
+  it("starts a new station's epoch where its source says the reference does", () => {
+    const { stations } = mergeStationList(
+      [],
+      [{ ...station("a"), reference: { id: "2019-11-01", since: "2019-11-02" } }],
+      options,
+    );
+    assert.equal(stations[0]!.epochs[0]!.since, "2019-11-02T00:00:00Z");
+    assert.equal("reference" in stations[0]!, false);
   });
 
   it("keeps the committed datum when the source leaves it out, and skips new stations without one", () => {
-    const { stations, changed } = mergeStationList(
-      [station("a", { datum: "SKN", datums: { NHN: -5 } })],
+    const { stations, changes } = mergeStationList(
+      [held("a", { datum: "SKN", datums: { NHN: -5 } })],
       [
         { ...station("a"), datum: null, datums: {} },
         { ...station("b"), datum: null },
       ],
+      options,
     );
-    assert.deepEqual(changed, []);
+    assert.deepEqual(changes, []);
     assert.deepEqual(
       stations.map((s) => [s.id, s.datum, s.datums, s.status]),
       [["rws/a", "SKN", { NHN: -5 }, "active"]],
@@ -93,14 +142,15 @@ describe("mergeStationList", () => {
 
   it("keeps committed offsets when the source sends none this time", () => {
     const { stations } = mergeStationList(
-      [station("a", { datums: { MLLW: -2.4 } })],
+      [held("a", { datums: { MLLW: -2.4 } })],
       [station("a", { datums: {} })],
+      options,
     );
     assert.deepEqual(stations[0]!.datums, { MLLW: -2.4 });
   });
 
   it("refuses an ID that isn't <source>/<source_id>", () => {
-    assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })]), /rws:a/);
+    assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })], options), /rws:a/);
   });
 });
 
