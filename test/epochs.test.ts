@@ -7,6 +7,7 @@ import {
   firstEpochs,
   localDay,
   nextEpochs,
+  recentWindow,
   type EpochOptions,
 } from "../src/epochs.ts";
 import type { Epoch } from "../src/schema.ts";
@@ -395,5 +396,35 @@ describe("convert", () => {
     assert.equal(convert(epoch({ datums: { NHN: 1 } }), epoch({ datums: { NHN: 2 } })), null);
     // NN and NHN are different height systems.
     assert.equal(convert(epoch({ datums: { NHN: 5 } }), epoch({ datum: "NN" })), null);
+  });
+});
+
+describe("recentWindow", () => {
+  it("keeps other epochs' rows apart, and never reaches before the current epoch", () => {
+    const epochs = [
+      epoch({ state: "closed", until: "2027-05-30T00:00:00Z" }),
+      epoch({ id: 2, since: "2027-05-31T00:00:00Z" }),
+    ];
+    const at = (iso: string, e: number) => ({ time: Date.parse(iso), epoch: e });
+    const rows = [
+      at("2027-05-20T00:00:00Z", 1), // older than the window keeps
+      at("2027-05-29T00:00:00Z", 1),
+      at("2027-05-30T12:00:00Z", 2), // tagged epoch 2, but before it began
+      at("2027-05-31T06:00:00Z", 2),
+    ];
+    const window = recentWindow(
+      epochs,
+      rows,
+      Date.parse("2027-05-25T00:00:00Z"),
+      Date.parse("2027-05-30T00:00:00Z"),
+    );
+    assert.deepEqual(window, {
+      epoch: 2,
+      from: Date.parse("2027-05-31T00:00:00Z"),
+      other: [rows[1]],
+      current: [rows[3]],
+    });
+    // With no known start, fetching starts where the run asks.
+    assert.equal(recentWindow([epoch()], [], 0, 5).from, 5);
   });
 });

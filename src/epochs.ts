@@ -327,3 +327,26 @@ export function convert(from: Epoch, to: Epoch): number | null {
 }
 
 const round = (m: number) => Math.round(m * 1e6) / 1e6;
+
+/**
+ * A station's part of the recent window, split for a run: rows from other
+ * epochs, kept as they are for compaction to fold into their own files; the
+ * current epoch's rows from its start, which new values merge into; and where
+ * fetching starts, never before the current epoch does.
+ */
+export function recentWindow<T extends { time: number; epoch: number }>(
+  epochs: Epoch[],
+  rows: T[],
+  keepFrom: number,
+  start: number,
+): { epoch: number; from: number; other: T[]; current: T[] } {
+  const { id: epoch, since } = currentEpoch(epochs);
+  const begins = since === null ? -Infinity : Date.parse(since);
+  const kept = rows.filter((r) => r.time >= keepFrom);
+  return {
+    epoch,
+    from: Math.max(start, begins),
+    other: kept.filter((r) => r.epoch !== epoch),
+    current: kept.filter((r) => r.epoch === epoch && r.time >= begins),
+  };
+}

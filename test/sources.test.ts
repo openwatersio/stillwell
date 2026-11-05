@@ -1715,6 +1715,31 @@ describe("usgs", () => {
     }
   });
 
+  it("holds every request while one waits out a short Retry-After", async () => {
+    const times: number[] = [];
+    let calls = 0;
+    setTransport(async (url, options) => {
+      await options.pace?.();
+      times.push(Date.now());
+      // As fetchText does on a 429 it retries itself.
+      if (++calls === 1) {
+        options.throttled?.(0.2);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+      return collection([]);
+    });
+    usgs.pacing.requestMs = 20;
+    try {
+      const started = Date.now();
+      const year = (y: number) =>
+        usgs.levels("x", new Date(Date.UTC(y, 0)), new Date(Date.UTC(y, 1)));
+      await Promise.all([year(2020), year(2021)]);
+      assert.ok(times[1]! - started >= 190, `second request ${times[1]! - started} ms in`);
+    } finally {
+      usgs.pacing.requestMs = 0;
+    }
+  });
+
   it("waits out a 429 and tries again", async () => {
     let calls = 0;
     setTransport(async (url) => {
