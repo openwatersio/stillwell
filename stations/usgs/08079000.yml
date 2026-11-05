@@ -1,0 +1,15 @@
+name: Oyster Ck nr Angleton, TX
+lat: 29.1585773468721
+lon: -95.4757753221734
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: -0.399
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08079000/
+parameter_code: "00065"
+time_series_id: b11643c1daf549f69fa826c9812eed97

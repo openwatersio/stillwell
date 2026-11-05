@@ -1,0 +1,16 @@
+name: Leon Rv nr Belton, TX
+lat: 31.0701794678661
+lon: -97.4413967426605
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 145.277
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08102500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d60ce371181a475baba493491cd0d6b7

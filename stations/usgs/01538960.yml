@@ -1,0 +1,16 @@
+name: Huntington Creek at Jonestown, PA
+lat: 41.128750000000004
+lon: -76.30347222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 205.679
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01538960/
+parameter_code: "00065"
+series_begin: 2020-05-27T15:30:00+00:00
+time_series_id: 06b87ec337c64818a453f79f4a9d8b92

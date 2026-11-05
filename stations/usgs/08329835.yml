@@ -1,0 +1,17 @@
+name: N. FLOODWAY CHANNEL AT ALBUQUERQUE, NM
+lat: 35.1175
+lon: -106.61166666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1549.353
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08329835/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2025-12-09T23:00:00+00:00
+time_series_id: b73d79854c5141888ea81f9f4c017b2e

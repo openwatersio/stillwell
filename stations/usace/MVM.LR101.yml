@@ -1,0 +1,14 @@
+name: Little River Ditch 1 @ Cotton Plant
+lat: 36.090258
+lon: -90.080816
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 67.358
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LR101.Stage.Inst.1Hour.0.opendcs-rev
+series: LR101.Stage.Inst.1Hour.0.opendcs-rev

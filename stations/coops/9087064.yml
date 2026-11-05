@@ -1,0 +1,16 @@
+name: Manitowoc
+lat: 44.089344
+lon: -87.64825
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087064
+established: 2014-04-01T00:00:00Z
+removed: 2014-10-21T11:00:00Z

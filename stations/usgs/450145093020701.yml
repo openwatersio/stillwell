@@ -1,0 +1,15 @@
+name: HAZELWOOD ST. IN MAPLEWOOD,MN - 1/5 MI. NO. OF BEA
+lat: 45.02914683922826
+lon: -93.03548598370567
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.454
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-450145093020701/
+parameter_code: "00065"
+time_series_id: 0d9e84a7bc5a47c3820e4ba304d6b824

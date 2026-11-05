@@ -1,0 +1,17 @@
+name: Fox River at Bloomfield, IA
+lat: 40.7694656302155
+lon: -92.4187964020941
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 230.298
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05494300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2021-10-20T12:00:00+00:00
+time_series_id: dcd43f86d4e34c49a3294ded8a400021

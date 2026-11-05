@@ -1,0 +1,16 @@
+name: Salt Fk Brazos Rv nr Aspermont, TX
+lat: 33.3339801163345
+lon: -100.238162215723
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 484.416
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08082000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e5efcae919ab4d168ca3ac2cdb512575

@@ -1,0 +1,24 @@
+name: Dyckman Street
+lat: 40.8683
+lon: -73.9333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.739
+  MHW: -2.66
+  DTL: -2.067
+  MTL: -2.054
+  MSL: -2.098
+  MLW: -1.448
+  MLLW: -1.396
+  NAVD88: -2.127
+  LAT: -1.06
+  HAT: -3.09
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518902
+established: 2014-04-12T00:00:00Z
+removed: 2014-08-10T00:00:00Z

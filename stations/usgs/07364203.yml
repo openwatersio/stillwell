@@ -1,0 +1,16 @@
+name: Bayou Bartholomew NW of Jones, LA
+lat: 32.9847222222222
+lon: -91.6986111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 24.378
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07364203/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 771afbbb4b7e41fd8c6f57d935e902f1

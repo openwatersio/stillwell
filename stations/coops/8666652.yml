@@ -1,0 +1,22 @@
+name: FOLLY RIVER BRIDGE, FOLLY RIVER
+lat: 32.6617
+lon: -79.945
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.07
+  MHW: -1.954
+  DTL: -1.181
+  MTL: -1.151
+  MSL: -1.193
+  MLW: -0.348
+  MLLW: -0.292
+  NAVD88: -1.278
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666652
+established: 1976-10-27T00:00:00Z
+removed: 1978-02-10T23:59:00Z

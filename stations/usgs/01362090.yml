@@ -1,0 +1,17 @@
+name: CATSKILL CREEK NEAR CATSKILL NY
+lat: 42.22325
+lon: -73.8854166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1.207
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01362090/
+parameter_code: "00065"
+series_begin: 2011-03-01T05:00:00+00:00
+series_end: 2015-04-01T04:45:00+00:00
+time_series_id: e65b0cb971fd459784dbab5edfb4f177

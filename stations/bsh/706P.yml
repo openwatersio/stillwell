@@ -1,0 +1,13 @@
+name: Uetersen, Pinnau
+lat: 53.67833
+lon: 9.67722
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+  SKN: -5.04
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970016]
+source_url: https://gezeiten.bsh.de/uetersen

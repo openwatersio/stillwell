@@ -1,0 +1,16 @@
+name: COKER CREEK NEAR MYAKKA CITY FL
+lat: 27.4097648263685
+lon: -82.1750892809014
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -3.441
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02298530/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d1f996ee881c4f1fbe260a586c99985a

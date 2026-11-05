@@ -1,0 +1,14 @@
+name: Mt. Vernon
+lat: 40.405780212601
+lon: -82.499780103874
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 299.058
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=MtVernon.Stage.Inst.15Minutes.0.OBS
+series: MtVernon.Stage.Inst.15Minutes.0.OBS

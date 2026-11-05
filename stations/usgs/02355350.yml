@@ -1,0 +1,16 @@
+name: ICHAWAYNOCHAWAY CREEK BELOW NEWTON, GA
+lat: 31.2168055555556
+lon: -84.4701666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 30.075
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02355350/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2406cf7b7b494a2cb5f5f81c90115b6b

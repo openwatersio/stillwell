@@ -1,0 +1,16 @@
+name: FOUNTAIN CREEK NEAR PINON, CO
+lat: 38.4294444444444
+lon: -104.598055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1520.952
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07106300/
+parameter_code: "00065"
+series_begin: 2020-10-16T18:45:00+00:00
+time_series_id: 8e37593776ea423cb3df6bda32bdd5e4

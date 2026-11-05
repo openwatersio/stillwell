@@ -1,0 +1,21 @@
+name: YAUHANNAH BRIDGE, PEE DEE RIVER
+lat: 33.66
+lon: -79.155
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.512
+  MHW: -1.481
+  DTL: -1.223
+  MTL: -1.227
+  MSL: -1.26
+  MLW: -0.974
+  MLLW: -0.934
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661093
+established: 1981-10-15T00:00:00Z
+removed: 1983-04-05T23:59:00Z

@@ -1,0 +1,16 @@
+name: CANADA DEL ORO BLW INA ROAD, NEAR TUCSON, AZ.
+lat: 32.336210015111895
+lon: -111.04207456947708
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 679.299
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09486350/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 8f34e59138654e6281b5bb3456b0c81e

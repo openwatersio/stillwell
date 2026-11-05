@@ -1,0 +1,16 @@
+name: NORTH SANTIAM RIVER AT MEHAMA, OR
+lat: 44.789249999999996
+lon: -122.61880555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 184.642
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14183000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 47a7c19e758b4ef48493a202a497d282

@@ -1,0 +1,16 @@
+name: CRABTREE CREEK AT ANDERSON DRIVE AT RALEIGH, NC
+lat: 35.8211111111111
+lon: -78.6341666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 56.836
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208731190/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1784fba94f444e28aec2645b7a263d95

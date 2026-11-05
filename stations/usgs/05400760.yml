@@ -1,0 +1,16 @@
+name: WISCONSIN RIVER AT WISCONSIN RAPIDS, WI
+lat: 44.3921593004551
+lon: -89.8271246479885
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 297.869
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05400760/
+parameter_code: "00065"
+series_begin: 2019-10-01T06:00:00+00:00
+time_series_id: 60f5931b2fd44673890bd0040351123c

@@ -1,0 +1,13 @@
+name: LITTEL NECK CREEK AT VA BEACH, VA
+lat: 36.8555555555556
+lon: -75.9836111111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-365120075590100/
+parameter_code: "62620"
+time_series_id: 6f7740bb1598424aa199a46df19bd5f4

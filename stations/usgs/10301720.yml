@@ -1,0 +1,16 @@
+name: WALKER RV AT PT SITE BLW WEBER RES NR SCHURZ, NV
+lat: 39.033889
+lon: -118.861389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1271.016
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10301720/
+parameter_code: "00065"
+series_begin: 2013-09-13T07:00:00+00:00
+time_series_id: fdecb11a4f6849b9bd52bde0f669dbae

@@ -1,0 +1,17 @@
+name: Sand Draw at 430th Av nr Ainsworth, Nebr.
+lat: 42.6316666666667
+lon: -99.8727777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 735.787
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-423754099522201/
+parameter_code: "00065"
+series_begin: 2018-07-11T21:25:14+00:00
+series_end: 2018-10-02T19:10:37+00:00
+time_series_id: c9e70348155a4c3d8afeb8438123fe29

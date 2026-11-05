@@ -1,0 +1,16 @@
+name: CLEAR CREEK ABV WEST FORK CLEAR CREEK NR EMPIRE CO
+lat: 39.751944
+lon: -105.661389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2518.081
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06715000/
+parameter_code: "00065"
+series_begin: 2020-10-14T15:30:00+00:00
+time_series_id: 0d01539deef94510ba26f75cde05e2a0

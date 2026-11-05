@@ -1,0 +1,16 @@
+name: Paasasikwana Naokwaide bl Bruno Ck
+lat: 44.2908333333333
+lon: -114.471666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1743.118
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13297355/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 266ca41849ce425984e6a81b13a08c9b

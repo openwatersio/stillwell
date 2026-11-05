@@ -1,0 +1,17 @@
+name: RIO FELIX AT OLD HWY BRD NR HAGERMAN, NM
+lat: 33.1251075327009
+lon: -104.344963406513
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1040.541
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08394500/
+parameter_code: "00065"
+series_begin: 2014-10-01T07:00:00+00:00
+series_end: 2024-10-20T05:15:00+00:00
+time_series_id: 28cdf0bda3fa4584a1d6889f65332d7b

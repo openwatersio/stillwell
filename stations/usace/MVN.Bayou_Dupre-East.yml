@@ -1,0 +1,11 @@
+name: Bayou Dupre Sector Gate - East (76010)
+lat: 29.9351805
+lon: -89.8365972
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_Dupre-East.Stage.Inst.15Minutes.0.rev
+series: Bayou_Dupre-East.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,23 @@
+name: PETIT BOIS ISLAND, MISS. SOUND
+lat: 30.2033
+lon: -88.4417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.072
+  MHW: -1.055
+  DTL: -0.848
+  MTL: -0.847
+  MSL: -0.841
+  MLW: -0.64
+  MLLW: -0.625
+  LAT: -0.398
+  HAT: -1.301
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8740405
+established: 1980-03-25T00:00:00Z
+removed: 1980-12-18T23:59:00Z

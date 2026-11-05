@@ -1,0 +1,11 @@
+name: Fountain Cr - Fountain Heights
+lat: 35.518056
+lon: -86.941944
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=FNHT1-FountainCr-nrFountainHeightsTN.Stage.Inst.15Minutes.0.dcp-rev
+series: FNHT1-FountainCr-nrFountainHeightsTN.Stage.Inst.15Minutes.0.dcp-rev

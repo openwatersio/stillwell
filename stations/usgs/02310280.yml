@@ -1,0 +1,16 @@
+name: PITHLACHASCOTEE RIVER NEAR FIVAY JUNCTION FL
+lat: 28.3291720253546
+lon: -82.5367636043976
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310280/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 454c4285b8fe45238334b528168e9cbc

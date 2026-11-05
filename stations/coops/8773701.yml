@@ -1,0 +1,24 @@
+name: Port O'Connor
+lat: 28.4517
+lon: -96.3883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.698
+  MHW: -3.694
+  DTL: -3.589
+  MTL: -3.589
+  MSL: -3.601
+  MLW: -3.485
+  MLLW: -3.479
+  NAVD88: -3.362
+  LAT: -3.193
+  HAT: -3.924
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8773701
+established: 1989-01-28T00:00:00Z

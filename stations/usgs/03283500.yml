@@ -1,0 +1,16 @@
+name: RED RIVER AT CLAY CITY, KY
+lat: 37.8648032941158
+lon: -83.9335328151932
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.819
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03283500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c041378b00a244ab822db970a25da6b6

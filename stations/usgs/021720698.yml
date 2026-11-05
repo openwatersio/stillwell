@@ -1,0 +1,16 @@
+name: WANDO RIVER ABOVE MT PLEASANT, SC
+lat: 32.8590638088736
+lon: -79.8961963068426
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -5.538
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720698/
+parameter_code: "00065"
+series_begin: 1992-07-29T15:30:00+00:00
+time_series_id: a9edf2256c4f42f1978916b7814e7c21

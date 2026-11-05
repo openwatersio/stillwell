@@ -1,0 +1,16 @@
+name: POTOMAC RIVER AT PAW PAW, WV
+lat: 39.5388611111111
+lon: -78.4556111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 148.502
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01610000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 866fb530bca84ac98d9681f54ca65468

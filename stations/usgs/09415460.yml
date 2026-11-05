@@ -1,0 +1,17 @@
+name: WHITE RV NR RED MTN NR PRESTON, NV
+lat: 38.935215588037
+lon: -115.298358178294
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2097.024
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09415460/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2016-10-19T06:45:00+00:00
+time_series_id: 06e921192d3148179b35b15cef96c64e

@@ -1,0 +1,12 @@
+name: Morgan City/USGS
+lat: 29.6926112
+lon: -91.2118333
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=MRGL1.Stage.Inst.15Minutes.0.rev
+series: MRGL1.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,16 @@
+name: BLACKWATER RIVER AT ROUTE 620 NEAR ZUNI, VA
+lat: 36.906538678484
+lon: -76.8199593904323
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02047783/
+parameter_code: "00065"
+series_begin: 2013-04-25T16:45:00+00:00
+time_series_id: 89c5477a311b4d58a0f01f6abc48da7d

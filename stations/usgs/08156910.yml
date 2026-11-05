@@ -1,0 +1,16 @@
+name: Waller Ck at Koenig Lane, Austin, TX
+lat: 30.3227777777778
+lon: -97.7227777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.474
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08156910/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: deabaa2af4de40a8a465b74a3475db0a

@@ -1,0 +1,17 @@
+name: TINKER CREEK UPPER AT COLUMBIA ST AT ROANOKE, VA
+lat: 37.314056
+lon: -79.932444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 291.084
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02055379/
+parameter_code: "00065"
+series_begin: 2019-09-13T00:00:00+00:00
+series_end: 2024-10-08T14:55:00+00:00
+time_series_id: 872746e956374d60a91e730af5772a05

@@ -1,0 +1,15 @@
+name: KICKAPOO RIVER AT STATE HIGHWAY 33 AT ONTARIO, WI
+lat: 43.7216666666667
+lon: -90.5875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 259.059
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05407470/
+parameter_code: "00065"
+time_series_id: 7e03eaff66bc452498a3752d362d9ce0

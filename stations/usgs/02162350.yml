@@ -1,0 +1,16 @@
+name: MIDDLE SALUDA RIVER NEAR CLEVELAND, SC
+lat: 35.120342
+lon: -82.537578
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 328.791
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02162350/
+parameter_code: "00065"
+series_begin: 2012-07-18T05:00:00+00:00
+time_series_id: fcd18118e60b49b79c58aea3d2f96a48

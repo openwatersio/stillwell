@@ -1,0 +1,23 @@
+name: TURTLE BAY
+lat: 26.7967
+lon: -82.1833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.415
+  MHW: -1.359
+  DTL: -1.178
+  MTL: -1.204
+  MSL: -1.205
+  MLW: -1.05
+  MLLW: -0.941
+  LAT: -0.687
+  HAT: -1.644
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725649
+established: 1977-08-30T00:00:00Z
+removed: 1978-02-01T23:59:00Z

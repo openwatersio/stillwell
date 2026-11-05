@@ -1,0 +1,23 @@
+name: Wiscasset
+lat: 44
+lon: -69.6667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.27
+  MHW: -9.14
+  DTL: -7.711
+  MTL: -7.695
+  MSL: -7.692
+  MLW: -6.25
+  MLLW: -6.151
+  LAT: -5.422
+  HAT: -9.996
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8416921
+established: 2015-03-30T00:00:00Z
+removed: 2015-09-09T00:00:00Z

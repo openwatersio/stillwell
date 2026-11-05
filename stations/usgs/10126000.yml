@@ -1,0 +1,16 @@
+name: BEAR RIVER NEAR CORINNE, UT
+lat: 41.5763213241835
+lon: -112.100781995508
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1282.227
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10126000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 666ddaa03c63412bbf221f998ed44124

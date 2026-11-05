@@ -1,0 +1,17 @@
+name: Snake R blw Cedar Draw
+lat: 42.65992222222222
+lon: -114.6707638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 879.964
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13093670/
+parameter_code: "00065"
+series_begin: 2019-12-18T22:30:00+00:00
+series_end: 2023-11-09T15:45:00+00:00
+time_series_id: df105e0a243646a185ba75d2776467f3

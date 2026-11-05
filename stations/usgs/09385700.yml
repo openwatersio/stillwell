@@ -1,0 +1,16 @@
+name: LITTLE COLORADO RIVER BELOW SALADO SPRINGS, AZ
+lat: 34.4505935285436
+lon: -109.362319865397
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1763.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09385700/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 504c69a1935b4ec29279ce695a7b3d0d

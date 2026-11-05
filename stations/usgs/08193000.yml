@@ -1,0 +1,16 @@
+name: Nueces Rv nr Asherton, TX
+lat: 28.5002631324022
+lon: -99.6819934612521
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 143.418
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08193000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 690651bd002248d092e0a135d74fcdc5

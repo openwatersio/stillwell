@@ -1,0 +1,23 @@
+name: PERRY ISLAND (SOUTH BAY)
+lat: 60.6717
+lon: -147.932
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.238
+  MHW: -2.948
+  DTL: -1.416
+  MTL: -1.497
+  MSL: -1.533
+  MLW: -0.045
+  MLLW: 0.405
+  LAT: 1.594
+  HAT: -4.338
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454721
+established: 1966-06-06T00:00:00Z
+removed: 1995-11-02T23:00:00Z

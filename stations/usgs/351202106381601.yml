@@ -1,0 +1,17 @@
+name: T11N.R03E.09.113b (projected) aedsw
+lat: 35.2004833333333
+lon: -106.637697222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1522.781
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-351202106381601/
+parameter_code: "00065"
+series_begin: 2009-02-18T07:00:00+00:00
+series_end: 2011-10-14T05:00:00+00:00
+time_series_id: 49618b38287b4108877b85cdff2baa0e

@@ -1,0 +1,16 @@
+name: COOPER R AT MOBAY NR N CHARLESTON, SC
+lat: 32.9835057955866
+lon: -79.9228611528434
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -2.219
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02172053/
+parameter_code: "00065"
+series_begin: 1986-10-01T08:15:00+00:00
+time_series_id: 4004223d496b4d0d909ceb065d387eb9

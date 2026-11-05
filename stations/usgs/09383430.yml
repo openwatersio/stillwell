@@ -1,0 +1,17 @@
+name: LITTLE COLORADO RIVER AT SPRINGERVILLE, AZ
+lat: 34.1327777777778
+lon: -109.295277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2118.36
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09383430/
+parameter_code: "00065"
+series_begin: 2008-06-21T07:00:00+00:00
+series_end: 2013-10-24T06:45:00+00:00
+time_series_id: 112798fa952a494ea3196501fc651bd2

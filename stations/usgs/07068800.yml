@@ -1,0 +1,16 @@
+name: CURRENT RIVER NEAR REYNO, AR
+lat: 36.37006513342794
+lon: -90.77832986927152
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 79.858
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07068800/
+parameter_code: "00065"
+series_begin: 2025-04-06T20:15:00+00:00
+time_series_id: 7a6133989a2c4650ab3ebf958a06d837

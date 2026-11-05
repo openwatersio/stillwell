@@ -1,0 +1,16 @@
+name: CHEAT RIVER BELOW SALTLICK CREEK AT ROWLESBURG, WV
+lat: 39.3497638888889
+lon: -79.6679194444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 416.296
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0307020015/
+parameter_code: "00065"
+series_begin: 2019-10-23T20:05:00+00:00
+time_series_id: 98e563c4ce464cbd9130800c9d36ba44

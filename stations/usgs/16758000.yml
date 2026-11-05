@@ -1,0 +1,16 @@
+name: Waikoloa Str at Marine Dam nr Kamuela, HI
+lat: 20.04363449901287
+lon: -155.66397699249157
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 1054.608
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16758000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: d68bd8aafb59410e9ce257005ed17dab

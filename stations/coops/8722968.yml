@@ -1,0 +1,21 @@
+name: PORT LAUDANIA
+lat: 26.06
+lon: -80.13
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.604
+  MHW: -1.574
+  DTL: -1.221
+  MTL: -1.232
+  MSL: -1.233
+  MLW: -0.89
+  MLLW: -0.838
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722968
+established: 1973-07-17T00:00:00Z
+removed: 1973-09-06T23:59:00Z

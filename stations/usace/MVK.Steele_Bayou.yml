@@ -1,0 +1,12 @@
+name: Steele Bayou Drainage Structure
+lat: 32.456967
+lon: -90.890594
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Steele%20Bayou.Stage.Inst.1Hour.0.DCP-rev
+series: Steele Bayou.Stage.Inst.1Hour.0.DCP-rev
+zero_since: 2019-04-01

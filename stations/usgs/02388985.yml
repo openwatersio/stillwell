@@ -1,0 +1,16 @@
+name: RUSSELL CRK 0.3 MI DS HEAD LAKE NR DAWSONVILLE, GA
+lat: 34.3986111111111
+lon: -84.0566666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 334.061
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02388985/
+parameter_code: "00065"
+series_begin: 2018-07-11T20:45:00+00:00
+time_series_id: b61612e7e9be46b69e53328110d85e05

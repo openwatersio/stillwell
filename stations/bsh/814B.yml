@@ -1,0 +1,13 @@
+name: Rhede, Ems
+lat: 53.07389
+lon: 7.28778
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/3770040]
+source_url: https://gezeiten.bsh.de/rhede

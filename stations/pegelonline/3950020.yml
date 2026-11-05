@@ -1,0 +1,13 @@
+name: POGUM
+lat: 53.321351
+lon: 7.259801
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.05
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=3950020

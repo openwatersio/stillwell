@@ -1,0 +1,15 @@
+name: UNNAMED TRIB. TO MILL CREEK, WELLFLEET, MA
+lat: 41.9323583333333
+lon: -70.0553055555555
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-415556070031901/
+parameter_code: "62620"
+series_begin: 2019-08-08T14:15:00+00:00
+series_end: 2022-07-20T19:00:00+00:00
+time_series_id: ce34381769f543e2abac30dce80029c1

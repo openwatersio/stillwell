@@ -1,0 +1,12 @@
+name: Ivanhoe
+lat: 36.834865000443
+lon: -80.952289998852
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Ivanhoe.Stage.Inst.15Minutes.0.OBS
+series: Ivanhoe.Stage.Inst.15Minutes.0.OBS

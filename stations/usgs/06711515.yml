@@ -1,0 +1,17 @@
+name: LITTLE DRY CREEK NR ARAPAHOE RD AT CENTENNIAL, CO
+lat: 39.59373611111111
+lon: -104.90650000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1704.332
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06711515/
+parameter_code: "00065"
+series_begin: 2020-10-01T07:00:00+00:00
+series_end: 2026-10-01T07:05:00+00:00
+time_series_id: f81301beebe146b7bbe9a7d347b0b1fc

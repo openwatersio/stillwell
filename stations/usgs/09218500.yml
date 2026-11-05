@@ -1,0 +1,17 @@
+name: BLACKS FORK NEAR MILLBURNE, WY
+lat: 41.0315978659376
+lon: -110.579364747715
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2594.54
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09218500/
+parameter_code: "00065"
+series_begin: 2013-04-01T06:00:00+00:00
+series_end: 2026-10-01T06:45:00+00:00
+time_series_id: aa83d40c5a0e498a9eba2616ba467310

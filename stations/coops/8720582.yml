@@ -1,0 +1,24 @@
+name: State Road 312, Matanzas River
+lat: 29.8667
+lon: -81.3067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.605
+  MHW: -0.504
+  DTL: 0.126
+  MTL: 0.148
+  MSL: 0.133
+  MLW: 0.801
+  MLLW: 0.859
+  NAVD88: 0.002
+  LAT: 1.127
+  HAT: -0.931
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720582
+established: 1998-11-07T00:00:00Z
+removed: 2008-08-18T23:59:00Z

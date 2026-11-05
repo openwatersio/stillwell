@@ -1,0 +1,17 @@
+name: WAXHAW CREEK AT SR1103 NEAR JACKSON, NC
+lat: 34.83694444444445
+lon: -80.79166666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 146.405
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02147126/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2015-10-01T04:45:00+00:00
+time_series_id: 3d69404be79e4ed88240838192f637f0

@@ -1,0 +1,24 @@
+name: Kodiak Island
+lat: 57.7317
+lon: -152.512
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.377
+  MHW: -10.102
+  DTL: -9.046
+  MTL: -9.069
+  MSL: -9.074
+  MLW: -8.037
+  MLLW: -7.702
+  NAVD88: -7.97
+  LAT: -6.885
+  HAT: -11.209
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457292
+established: 1984-07-10T00:00:00Z

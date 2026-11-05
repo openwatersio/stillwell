@@ -1,0 +1,11 @@
+name: Larto Lake @ Larto Lake, LA
+lat: 31.359708
+lon: -91.938556
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Larto%20Lake.Stage.Inst.1Hour.0.DCP-rev
+series: Larto Lake.Stage.Inst.1Hour.0.DCP-rev

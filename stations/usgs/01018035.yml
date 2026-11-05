@@ -1,0 +1,16 @@
+name: Meduxnekeag River at Lowery Rd. nr Houlton, Maine
+lat: 46.1811111111111
+lon: -67.8038888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 86.929
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01018035/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c43bd9d161b647b48fa45e406e6696e1

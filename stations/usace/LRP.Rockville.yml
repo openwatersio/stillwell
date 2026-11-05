@@ -1,0 +1,13 @@
+name: Rockville,WV
+lat: 39.6217
+lon: -79.705
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 399.157
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Rockville.Stage.Inst.15Minutes.0.OBS
+series: Rockville.Stage.Inst.15Minutes.0.OBS

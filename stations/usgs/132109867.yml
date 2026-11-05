@@ -1,0 +1,16 @@
+name: EAST HARTLEY ABV BACKWATER NR CALDWELL, ID
+lat: 43.700306
+lon: -116.673178
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 719.151
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-132109867/
+parameter_code: "00065"
+series_begin: 2016-11-29T23:30:00+00:00
+time_series_id: d1e4f8e27bfb499090a2d6909c4d7132

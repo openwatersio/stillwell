@@ -1,0 +1,16 @@
+name: WINOOSKI RIVER AT LOWER CABOT, VT
+lat: 44.390525
+lon: -72.33070277777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 277.011
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04282886/
+parameter_code: "00065"
+series_begin: 2025-11-24T18:15:00+00:00
+time_series_id: 44571b01004e4a8885d638f10e3521d9

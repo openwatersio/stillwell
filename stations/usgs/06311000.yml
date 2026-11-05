@@ -1,0 +1,15 @@
+name: NORTH FORK POWDER RIVER NEAR HAZELTON, WY
+lat: 44.0277422816407
+lon: -107.080895453889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2493.264
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06311000/
+parameter_code: "00065"
+time_series_id: 0765c58d5f474d7c85107cfc68660db6

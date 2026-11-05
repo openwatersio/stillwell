@@ -1,0 +1,21 @@
+name: CHEVRON STATION 289, PELICAN ISLAND
+lat: 29.2667
+lon: -89.5983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.092
+  MHW: -1.09
+  DTL: -0.922
+  MTL: -0.923
+  MSL: -0.925
+  MLW: -0.756
+  MLLW: -0.752
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761198
+established: 1985-07-09T00:00:00Z
+removed: 1986-09-03T23:59:00Z

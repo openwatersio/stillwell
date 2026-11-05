@@ -1,0 +1,22 @@
+name: BOCA CIEGA BAY
+lat: 27.8083
+lon: -82.795
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.429
+  MHW: -1.341
+  DTL: -1.061
+  MTL: -1.085
+  MSL: -1.089
+  MLW: -0.829
+  MLLW: -0.693
+  NAVD88: -1.191
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726574
+established: 1976-06-30T00:00:00Z
+removed: 1990-09-11T23:59:00Z

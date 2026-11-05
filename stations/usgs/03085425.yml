@@ -1,0 +1,15 @@
+name: McLaughlin Run, McLaughlin Run Rd, Bridgeville PA
+lat: 40.35572222222223
+lon: -80.10658333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03085425/
+parameter_code: "00065"
+time_series_id: 56752a31c47f462595418c8664d3439d

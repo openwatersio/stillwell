@@ -1,0 +1,16 @@
+name: Prickly Pear Creek near Clancy MT
+lat: 46.51909722222222
+lon: -111.94678611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1240.627
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06061500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 13df807516ce4ba88bea09d0027fd62b

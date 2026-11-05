@@ -1,0 +1,14 @@
+name: INDIAN PRAIRIE CANAL AB PUMP STA NR OKEECHOBEE, FL
+lat: 27.1543805555556
+lon: -81.0699805555555
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02258800/
+parameter_code: "00065"
+series_begin: 2017-02-02T14:45:00+00:00
+time_series_id: 54eac9cd6cab48b588c6ccea7eb7397c

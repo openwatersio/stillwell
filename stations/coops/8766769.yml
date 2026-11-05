@@ -1,0 +1,16 @@
+name: Lake Arthur
+lat: 30.0735
+lon: -92.6768
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MSL: -8.25
+  NAVD88: -8.292
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8766769
+established: 2019-09-17T00:00:00Z
+removed: 2020-06-27T21:12:00Z

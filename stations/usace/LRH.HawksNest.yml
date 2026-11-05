@@ -1,0 +1,13 @@
+name: Hawks Nest
+lat: 38.113611
+lon: -81.1425
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 224.013
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=HawksNest.Stage.Inst.15Minutes.0.OBS
+series: HawksNest.Stage.Inst.15Minutes.0.OBS

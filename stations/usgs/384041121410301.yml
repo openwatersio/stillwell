@@ -1,0 +1,16 @@
+name: CACHE C SETTLING BASIN SITE B NR WOODLAND CA
+lat: 38.677936
+lon: -121.685206
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.204
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384041121410301/
+parameter_code: "00065"
+series_begin: 2009-03-04T08:00:00+00:00
+time_series_id: 92180157040c42158ffeaa725dbaaae7

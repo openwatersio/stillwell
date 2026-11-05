@@ -1,0 +1,15 @@
+name: LONG BRANCH ABOVE GUINEA ROAD NR FAIRFAX, VA
+lat: 38.82101666666667
+lon: -77.26278055555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 83.79
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01654197/
+parameter_code: "00065"
+time_series_id: 97d6f9d544254bc4aefecb6cab383181

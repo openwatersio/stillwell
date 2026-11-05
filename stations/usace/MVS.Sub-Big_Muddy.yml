@@ -1,0 +1,14 @@
+name: Sub
+lat: 38.176072
+lon: -89.006394
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 121.822
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Sub-Big%20Muddy.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Sub-Big Muddy.Stage.Inst.30Minutes.0.lrgsShef-rev

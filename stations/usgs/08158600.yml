@@ -1,0 +1,16 @@
+name: Walnut Ck at Webberville Rd, Austin, TX
+lat: 30.2832642262557
+lon: -97.6550030500381
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.915
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08158600/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2eea77b813b94f3f972d32104bd9a275

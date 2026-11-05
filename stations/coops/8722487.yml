@@ -1,0 +1,22 @@
+name: TEQUESTA, NORTH
+lat: 26.9517
+lon: -80.1017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.619
+  MHW: -1.573
+  DTL: -1.309
+  MTL: -1.305
+  MSL: -1.304
+  MLW: -1.037
+  MLLW: -0.999
+  NAVD88: -1.578
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722487
+established: 1973-01-19T00:00:00Z
+removed: 1973-03-13T23:59:00Z

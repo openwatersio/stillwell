@@ -1,0 +1,16 @@
+name: PANOCHE C A I-5 NR SILVER CREEK CA
+lat: 36.6524514538809
+lon: -120.632118615897
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 135.011
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11255575/
+parameter_code: "00065"
+series_begin: 2007-12-01T08:00:00+00:00
+time_series_id: 232a3f3b958949bc8f267231ba5f1315

@@ -1,0 +1,15 @@
+name: MAPLE RIVER AT STATE ROUTE 10 NR MAPLETON, ND
+lat: 46.8761638888889
+lon: -97.0823222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-465234097045600/
+parameter_code: "00065"
+time_series_id: aa61f2d25355467a95d5a05ca51418dc

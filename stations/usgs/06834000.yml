@@ -1,0 +1,16 @@
+name: Frenchman Creek at Palisade, Nebr.
+lat: 40.35183055555556
+lon: -101.12335833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 836.56
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06834000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4c503b074ccf49aea6191b79c3430b89

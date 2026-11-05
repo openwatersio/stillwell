@@ -1,0 +1,16 @@
+name: TURKEY CREEK AT MISSION, KS
+lat: 39.04408333333333
+lon: -94.65601388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 255.118
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06892900/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: 6264010da1b744498cb258ca37cce2db

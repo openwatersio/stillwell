@@ -1,0 +1,24 @@
+name: Twin Rivers Marina
+lat: 28.905
+lon: -82.6383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.514
+  MHW: -1.414
+  DTL: -1.128
+  MTL: -1.124
+  MSL: -1.118
+  MLW: -0.834
+  MLLW: -0.741
+  NAVD88: -1.145
+  LAT: -0.534
+  HAT: -1.726
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727348
+established: 1973-05-10T00:00:00Z
+removed: 1979-02-05T23:59:00Z

@@ -1,0 +1,14 @@
+name: HAMPTON RIVER AT ROUTE 351 AT HAMPTON, VA
+lat: 37.0323888888889
+lon: -76.33675
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204289985/
+parameter_code: "62620"
+series_begin: 2015-03-28T04:00:00+00:00
+time_series_id: 246870e45f7343be8f12d0f0011c0235

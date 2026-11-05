@@ -1,0 +1,16 @@
+name: Pecos Rv nr Sheffield, TX
+lat: 30.659613734246
+lon: -101.770124404123
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 617.708
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08447000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 545e6b4ed9ae4246a913f1945b535049

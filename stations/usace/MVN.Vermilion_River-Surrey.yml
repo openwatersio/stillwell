@@ -1,0 +1,12 @@
+name: Vermilion River at Surrey St
+lat: 30.2174229
+lon: -91.9928975
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Vermilion_River-Surrey.Stage.Inst.~15Minutes.0.rev
+series: Vermilion_River-Surrey.Stage.Inst.~15Minutes.0.rev

@@ -1,0 +1,16 @@
+name: COLGAN C NR SANTA ROSA CA
+lat: 38.40209687220955
+lon: -122.73300571436901
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.771
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11465690/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e8e8d021b6864be2b0cc28c87b373b85

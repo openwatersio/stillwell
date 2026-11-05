@@ -1,0 +1,16 @@
+name: BURNT CORN CREEK AT STATE HWY 41 NEAR BREWTON, AL.
+lat: 31.1298991308209
+lon: -87.0871927578407
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 21.153
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02374745/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 378fc9616ce64a12aec174c6018c47c3

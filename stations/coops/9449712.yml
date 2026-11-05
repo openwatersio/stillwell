@@ -1,0 +1,13 @@
+name: ECHO BAY, SUCIA ISLANDS
+lat: 48.7567
+lon: -122.897
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449712
+established: 1975-03-01T00:00:00Z
+removed: 1975-03-31T23:59:00Z

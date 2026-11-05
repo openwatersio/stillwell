@@ -1,0 +1,13 @@
+name: "CARTERS POINT #1"
+lat: 36.905
+lon: -76.0367
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638942
+established: 1977-11-30T00:00:00Z
+removed: 1978-01-11T23:59:00Z

@@ -1,0 +1,15 @@
+name: BELLE FOURCHE R BL RATTLESNAKE C, NR PINEY, WY
+lat: 43.984382967293
+lon: -105.388399813366
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1382.268
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06425720/
+parameter_code: "00065"
+time_series_id: 539eeea8f7b5415eab8b6e37958b2118

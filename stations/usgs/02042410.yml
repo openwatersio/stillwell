@@ -1,0 +1,16 @@
+name: UPHAM BROOK AT SPRING PK AT RT 161 AT RICHMOND, VA
+lat: 37.598933
+lon: -77.465492
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.088
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02042410/
+parameter_code: "00065"
+series_begin: 2025-06-10T18:10:00+00:00
+time_series_id: 34c5acf68049471e8ffd88a554f6cb58

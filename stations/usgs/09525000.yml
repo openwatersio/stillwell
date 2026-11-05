@@ -1,0 +1,16 @@
+name: YUMA MAIN CANAL WASTEWAY AT YUMA, AZ
+lat: 32.7333801210804
+lon: -114.623008085699
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 37.341
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09525000/
+parameter_code: "00065"
+series_begin: 2011-03-30T19:15:00+00:00
+time_series_id: 34cf92caa4304c919a471751a5f3a4b1

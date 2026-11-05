@@ -1,0 +1,16 @@
+name: MILL RIVER AT SPRING STREET AT TAUNTON, MA
+lat: 41.899698645747534
+lon: -71.08946631945064
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 4.325
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01108410/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: df09b91d133b4faeb953e5bec6a53015

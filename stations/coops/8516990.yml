@@ -1,0 +1,24 @@
+name: Willets Point
+lat: 40.7933
+lon: -73.7817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.943
+  MHW: -3.832
+  DTL: -2.756
+  MTL: -2.744
+  MSL: -2.752
+  MLW: -1.654
+  MLLW: -1.57
+  NAVD88: -2.81
+  LAT: -1.103
+  HAT: -4.449
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516990
+established: 1931-07-11T00:00:00Z
+removed: 2000-11-14T23:59:00Z

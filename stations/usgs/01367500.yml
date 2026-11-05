@@ -1,0 +1,16 @@
+name: RONDOUT CREEK AT ROSENDALE NY
+lat: 41.8430833333333
+lon: -74.0861111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.735
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01367500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f70d46698c2c407d903f4b57d4e1a733

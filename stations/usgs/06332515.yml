@@ -1,0 +1,16 @@
+name: BEAR DEN CREEK NEAR MANDAREE, ND
+lat: 47.787222
+lon: -102.768056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 594.098
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06332515/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 892c6857ea2d4f81be731b230fed5a63

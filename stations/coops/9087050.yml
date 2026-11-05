@@ -1,0 +1,16 @@
+name: WAUKEGAN
+lat: 42.360832
+lon: -87.82333
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087050
+established: 2017-05-11T00:00:00Z
+removed: 2017-10-07T09:00:00Z

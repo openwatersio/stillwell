@@ -1,0 +1,21 @@
+name: LA CONNER, SWINOMISH SLOUGH
+lat: 48.3917
+lon: -122.497
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.526
+  MHW: -4.246
+  DTL: -2.949
+  MTL: -3.22
+  MSL: -3.189
+  MLW: -2.194
+  MLLW: -1.372
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9448558
+established: 1935-06-25T00:00:00Z
+removed: 1973-02-01T23:59:00Z

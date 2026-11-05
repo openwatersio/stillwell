@@ -1,0 +1,16 @@
+name: NF CACHE C NR CLEARLAKE OAKS CA
+lat: 39.07542006219957
+lon: -122.53412163909738
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 388.391
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11451300/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 719beae2b10c4bbabefedc7a7e7f108c

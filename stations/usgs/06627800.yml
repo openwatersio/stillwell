@@ -1,0 +1,15 @@
+name: JACK CREEK ABOVE COYOTE DRAW, NEAR SARATOGA, WY
+lat: 41.4391264872223
+lon: -106.971714565394
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2148.84
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06627800/
+parameter_code: "00065"
+time_series_id: 021e79c26a5742e4b3dc06e51e8f0317

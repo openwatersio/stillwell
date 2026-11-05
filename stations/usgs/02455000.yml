@@ -1,0 +1,16 @@
+name: LOCUST FORK NEAR CLEVELAND, AL.
+lat: 34.0245423495475
+lon: -86.5741572754426
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 163.696
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02455000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6399a842cae140278c8fb929a4f53c93

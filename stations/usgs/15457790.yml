@@ -1,0 +1,16 @@
+name: GOLDSTREAM C BL ALABAM C NR LIVENGOOD AK
+lat: 65.574
+lon: -148.38785555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 331.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15457790/
+parameter_code: "00065"
+series_begin: 2010-10-01T09:00:00+00:00
+time_series_id: 04546c2ab9524362912ee4b51c7480ef

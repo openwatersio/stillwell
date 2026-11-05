@@ -1,0 +1,23 @@
+name: Bear Cove, Kachemak Bay
+lat: 59.725
+lon: -151.023
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.597
+  MHW: -1.346
+  DTL: 1.245
+  MTL: 1.118
+  MSL: 1.088
+  MLW: 3.582
+  MLLW: 4.087
+  LAT: 6.003
+  HAT: -3.159
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455595
+established: 1980-05-05T00:00:00Z
+removed: 2009-09-18T23:59:00Z

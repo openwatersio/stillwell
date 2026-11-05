@@ -1,0 +1,16 @@
+name: Sugar Creek at Strasburg OH
+lat: 40.5875624019881
+lon: -81.52317506874
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 272.427
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03124500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d89faa6500ea4bd2b013fed6fd1c0d8f

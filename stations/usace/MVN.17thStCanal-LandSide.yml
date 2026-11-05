@@ -1,0 +1,11 @@
+name: 17th Street Canal 1-ICS Lake-s
+lat: 30.014083
+lon: -90.122056
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=17thStCanal-LandSide.Stage.Inst.15Minutes.0.rev
+series: 17thStCanal-LandSide.Stage.Inst.15Minutes.0.rev

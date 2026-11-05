@@ -1,0 +1,16 @@
+name: NORTH PLATTE RIVER AT ORIN, WY
+lat: 42.65247577819583
+lon: -105.15921232724101
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1420.298
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06652000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 681270637c4c4215b96b3509efe19d6d

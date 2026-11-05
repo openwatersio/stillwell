@@ -1,0 +1,16 @@
+name: Navidad Rv at Strane Pk nr Edna, TX
+lat: 29.0655356834179
+lon: -96.6741434002721
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 12.853
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08164390/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 83a9c94a79494425a4754de080dc3ec5

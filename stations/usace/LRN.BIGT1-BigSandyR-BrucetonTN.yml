@@ -1,0 +1,13 @@
+name: Big Sandy River - Bruceton TN
+lat: 36.036944
+lon: -88.228889
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 116.001
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=BIGT1-BigSandyR-BrucetonTN.Stage.Inst.15Minutes.0.dcp-rev
+series: BIGT1-BigSandyR-BrucetonTN.Stage.Inst.15Minutes.0.dcp-rev

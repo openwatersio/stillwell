@@ -1,0 +1,16 @@
+name: Mountain Ck at Grand Prairie, TX
+lat: 32.7498611111111
+lon: -96.9261111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.304
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08050100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7719521fb6af40e5b94d137b2f212622

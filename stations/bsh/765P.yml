@@ -1,0 +1,11 @@
+name: Hooksiel
+lat: 53.64194
+lon: 8.08194
+country_code: DE
+datum: SKN
+datums:
+  NHN: -2.46
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/hooksiel

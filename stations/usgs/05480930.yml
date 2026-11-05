@@ -1,0 +1,16 @@
+name: White Fox Creek at Clarion, IA
+lat: 42.731917
+lon: -93.707436
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 327.386
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05480930/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: 230f013257f64a989aa1d1b16be78335

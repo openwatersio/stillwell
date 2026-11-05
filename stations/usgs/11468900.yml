@@ -1,0 +1,16 @@
+name: MATTOLE R NR ETTERSBURG CA
+lat: 40.13927803234239
+lon: -123.99139867013933
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.461
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11468900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5e868297e8434362ae9a4eb1fdc6abd4

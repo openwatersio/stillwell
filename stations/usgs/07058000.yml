@@ -1,0 +1,16 @@
+name: Bryant Creek near Tecumseh, MO
+lat: 36.6272222222222
+lon: -92.3060555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.821
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07058000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a050aa1bfdbf42db843c8cc0604389ef

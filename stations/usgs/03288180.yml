@@ -1,0 +1,16 @@
+name: CANE RUN CREEK AT CITATION BLVD NR LEXINGTON, KY
+lat: 38.0916666666667
+lon: -84.5013888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 270.931
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03288180/
+parameter_code: "00065"
+series_begin: 2012-06-14T15:10:00+00:00
+time_series_id: b59139da1d8646d4b074a6b9e4f14b11

@@ -1,0 +1,16 @@
+name: Williams Brook at Phair, Maine
+lat: 46.6280555555556
+lon: -67.9530555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.486
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01017550/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 12540cc9db9647e6adf451bd4ac78627

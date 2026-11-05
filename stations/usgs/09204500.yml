@@ -1,0 +1,16 @@
+name: East Fork at New Fork, WY
+lat: 42.696111
+lon: -109.714444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2108.302
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09204500/
+parameter_code: "00065"
+series_begin: 2025-08-20T21:00:00+00:00
+time_series_id: 4b7bab1099f14919944606d78f30f528

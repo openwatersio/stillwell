@@ -1,0 +1,16 @@
+name: STATE DITCH AT MARS HILL, IN
+lat: 39.71636111111111
+lon: -86.23375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 208.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03353626/
+parameter_code: "00065"
+series_begin: 2023-11-03T16:30:00+00:00
+time_series_id: 6d0c1076409e450b8874c2bb905c9047

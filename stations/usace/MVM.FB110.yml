@@ -1,0 +1,14 @@
+name: Fifteen Mile Bayou @ Greasy Corner
+lat: 35.04938
+lon: -90.40174
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 45.72
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=FB110.Stage.Inst.1Hour.0.opendcs-rev
+series: FB110.Stage.Inst.1Hour.0.opendcs-rev

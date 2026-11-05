@@ -1,0 +1,16 @@
+name: MOJAVE R NR HODGE CA
+lat: 34.83551666666667
+lon: -117.19167777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 685.602
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10262000/
+parameter_code: "00065"
+series_begin: 2022-10-20T19:45:00+00:00
+time_series_id: 5d8b99a9b19a4534b585d8eccf611f7a

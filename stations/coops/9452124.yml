@@ -1,0 +1,17 @@
+name: TAKU POINT
+lat: 58.40867
+lon: -134.00613
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.177
+  MHW: -8.137
+  NAVD88: -4.016
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452124
+established: 1937-04-15T00:00:00Z
+removed: 2024-09-04T00:00:00Z

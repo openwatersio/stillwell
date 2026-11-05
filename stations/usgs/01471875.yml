@@ -1,0 +1,16 @@
+name: Manatawny Creek near Spangsville, PA
+lat: 40.339538021205
+lon: -75.7421358651117
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 80.772
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01471875/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cb44de3383d546e8b85a45e887ffa1cb

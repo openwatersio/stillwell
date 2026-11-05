@@ -1,0 +1,24 @@
+name: Ocean City Inlet
+lat: 38.32833
+lon: -75.09167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.205
+  MHW: -3.143
+  DTL: -2.831
+  MTL: -2.823
+  MSL: -2.843
+  MLW: -2.503
+  MLLW: -2.456
+  NAVD88: -2.984
+  LAT: -2.182
+  HAT: -3.447
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8570283
+established: 1978-06-05T00:00:00Z

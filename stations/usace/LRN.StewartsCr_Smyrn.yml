@@ -1,0 +1,13 @@
+name: Stewarts Creek at Smyrna, TN
+lat: 35.974261898027
+lon: -86.502480311994
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 151.79
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=StewartsCr%20Smyrn.Stage.Inst.15Minutes.0.GOES-Rev
+series: StewartsCr Smyrn.Stage.Inst.15Minutes.0.GOES-Rev

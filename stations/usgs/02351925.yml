@@ -1,0 +1,16 @@
+name: MUCKALEE CREEK AT FORRESTER PKWY NEAR LEESBURG, GA
+lat: 31.657916666666665
+lon: -84.10580555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 54.257
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02351925/
+parameter_code: "00065"
+series_begin: 2021-10-07T14:45:00+00:00
+time_series_id: e256be58198740318ed1e0db37cc34df

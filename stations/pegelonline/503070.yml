@@ -1,0 +1,13 @@
+name: MÜGGENDORF
+lat: 53.007901
+lon: 11.656213
+country_code: DE
+datum: PNP
+datums:
+  NHN: 15.138
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=503070

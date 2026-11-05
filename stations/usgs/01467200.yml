@@ -1,0 +1,14 @@
+name: Delaware River at Penn's Landing, Philadelphia, PA
+lat: 39.94640203854653
+lon: -75.1393603265817
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01467200/
+parameter_code: "00065"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: f995487e664d4a1fb160aca41e52778f

@@ -1,0 +1,13 @@
+name: Mississippi River at Donaldsonville (01220)
+lat: 30.101054
+lon: -90.9597167
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Donaldsonville.Stage.Inst.1Hour.0.rev
+series: Donaldsonville.Stage.Inst.1Hour.0.rev
+zero_since: 1988-06-15

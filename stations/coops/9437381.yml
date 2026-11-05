@@ -1,0 +1,23 @@
+name: Dick Point
+lat: 45.4817
+lon: -123.902
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.415
+  MHW: -8.202
+  DTL: -7.356
+  MTL: -7.358
+  MSL: -7.305
+  MLW: -6.514
+  MLLW: -6.297
+  LAT: -5.846
+  HAT: -8.979
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9437381
+established: 1957-09-12T00:00:00Z
+removed: 2013-10-09T23:59:00Z

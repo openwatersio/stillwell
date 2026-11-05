@@ -1,0 +1,13 @@
+name: APALACHICOLA RIVER, NORTH
+lat: 29.8417
+lon: -85.0283
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728715
+established: 1974-09-25T00:00:00Z
+removed: 1974-11-18T23:59:00Z

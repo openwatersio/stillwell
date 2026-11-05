@@ -1,0 +1,13 @@
+name: WHITTIER (BACKUP)
+lat: 60.7783
+lon: -148.665
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454948
+established: 1992-08-15T00:00:00Z
+removed: 1992-10-29T23:59:00Z

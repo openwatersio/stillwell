@@ -1,0 +1,16 @@
+name: MEHERRIN RIVER NEAR LAWRENCEVILLE, VA
+lat: 36.7168139534379
+lon: -77.8316582203549
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 41.27
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02051500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c2aa986bc9ca49c9ac809cc3cc6f27fc

@@ -1,0 +1,13 @@
+name: ELFIN COVE, PORT ALTHORP (BACKUP)
+lat: 58.1933
+lon: -136.343
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452635
+established: 1991-04-01T00:00:00Z
+removed: 1992-04-30T23:59:00Z

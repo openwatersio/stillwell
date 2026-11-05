@@ -1,0 +1,16 @@
+name: L MULBERRY R AT OLD THOMPSON MILL, NR HOSCHTON, GA
+lat: 34.062053
+lon: -83.785453
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 233.782
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02217293/
+parameter_code: "00065"
+series_begin: 2026-09-16T16:45:00+00:00
+time_series_id: 67a9051728cb406199f1a110713c0fbe

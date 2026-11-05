@@ -1,0 +1,16 @@
+name: NOXUBEE RIVER AT MACON, MS
+lat: 33.0723611111111
+lon: -88.5587777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 41.727
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02448000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c6956c3f52bc41779ed58cd10e643d21

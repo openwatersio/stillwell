@@ -1,0 +1,16 @@
+name: North Blackbird Creek at Hwy 75 at Macy, Nebr.
+lat: 42.110128
+lon: -96.344425
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 322.344
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06601085/
+parameter_code: "00065"
+series_begin: 2026-05-07T17:55:00+00:00
+time_series_id: 7bf4aed380d746afb179a7409105b5a5

@@ -1,0 +1,12 @@
+name: Fino 1
+lat: 54.01472
+lon: 6.58778
+country_code: DE
+datum: PNP
+datums:
+  NHN: 0
+  SKN: 1.37
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/fino1

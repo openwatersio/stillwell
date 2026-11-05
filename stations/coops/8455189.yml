@@ -1,0 +1,24 @@
+name: Westerly Pawcatuck
+lat: 41.3817
+lon: -71.8317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.846
+  MHW: -6.756
+  DTL: -6.359
+  MTL: -6.345
+  MSL: -6.347
+  MLW: -5.934
+  MLLW: -5.873
+  NAVD88: -6.445
+  LAT: -5.655
+  HAT: -7.074
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8455189
+established: 1961-08-16T00:00:00Z
+removed: 2015-09-17T23:59:00Z

@@ -1,0 +1,16 @@
+name: Diamond River near Wentworth Location, NH
+lat: 44.8775
+lon: -71.0575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 383.694
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01052500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: eca5ee2b2bf64d28ab49f84dcd570952

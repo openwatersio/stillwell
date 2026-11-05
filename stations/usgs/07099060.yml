@@ -1,0 +1,16 @@
+name: BEAVER CREEK ABOVE HIGHWAY 115 NEAR PENROSE, CO
+lat: 38.4891658179933
+lon: -104.997483163205
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1725.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07099060/
+parameter_code: "00065"
+series_begin: 2020-06-10T14:30:00+00:00
+time_series_id: c868bae164d04c1e83ce9f0bb3883c1a

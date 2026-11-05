@@ -1,0 +1,16 @@
+name: Peach Ck nr Cleveland, TX
+lat: 30.3271611111111
+lon: -95.22665
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08070900/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: ab0d2496120a4e83877f7100c5f7adea

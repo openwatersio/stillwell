@@ -1,0 +1,13 @@
+name: Port Allegany, PA
+lat: 41.8186111
+lon: -78.2933
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 443.447
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=PortAllegany.Stage.Inst.15Minutes.0.OBS
+series: PortAllegany.Stage.Inst.15Minutes.0.OBS

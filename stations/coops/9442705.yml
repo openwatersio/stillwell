@@ -1,0 +1,23 @@
+name: Tskawahyah Island, Cape Alava
+lat: 48.1711
+lon: -124.7369
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.425
+  MHW: -9.199
+  DTL: -8.097
+  MTL: -8.206
+  MSL: -8.192
+  MLW: -7.214
+  MLLW: -6.77
+  LAT: -5.849
+  HAT: -10.169
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9442705
+established: 2016-05-03T00:00:00Z
+removed: 2016-09-02T10:00:00Z

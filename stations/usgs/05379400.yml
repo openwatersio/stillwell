@@ -1,0 +1,16 @@
+name: TREMPEALEAU RIVER AT ARCADIA, WI
+lat: 44.2544444444444
+lon: -91.5052777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 219.313
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05379400/
+parameter_code: "00065"
+series_begin: 2019-03-26T06:00:00+00:00
+time_series_id: f533bcf82e1a45c8a400cd85fb7ee064

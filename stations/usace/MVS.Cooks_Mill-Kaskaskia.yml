@@ -1,0 +1,14 @@
+name: Cooks Mill
+lat: 39.583417
+lon: -88.413711
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 188.043
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Cooks%20Mill-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Cooks Mill-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev

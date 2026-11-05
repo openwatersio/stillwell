@@ -1,0 +1,16 @@
+name: Mill Ck at CR 1903 nr Fruitvale, TX
+lat: 32.7295277777778
+lon: -95.8105277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 108.747
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08017605/
+parameter_code: "00065"
+series_begin: 2022-12-15T21:00:00+00:00
+time_series_id: 32a1d09dfd4e428e97c69c44c6c460e0

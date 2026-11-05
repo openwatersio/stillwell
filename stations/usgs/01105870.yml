@@ -1,0 +1,16 @@
+name: JONES RIVER AT KINGSTON, MA
+lat: 41.990807290427945
+lon: -70.73362069718256
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 1.201
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01105870/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3b7dbab1ee654d378ef4db9be83833c6

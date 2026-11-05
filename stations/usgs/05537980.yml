@@ -1,0 +1,16 @@
+name: DES PLAINES RIVER AT ROUTE 53 AT JOLIET, IL
+lat: 41.5364722222222
+lon: -88.0836944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.085
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05537980/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: eb74d4ea4b7a42f7b69c51483821280f

@@ -1,0 +1,16 @@
+name: Anacoco lk nr Leesville, LA
+lat: 31.094666666666665
+lon: -93.38858333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 57.936
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08027700/
+parameter_code: "00065"
+series_begin: 2023-11-16T17:30:00+00:00
+time_series_id: 8330bf3a45b949b6969daed5485de5e2

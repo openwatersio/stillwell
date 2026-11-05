@@ -1,0 +1,13 @@
+name: GREEN RIVER NEAR CAMPBELLSVILLE,
+lat: 37.2403413
+lon: -85.3471848
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 152.4
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Campbellsville.Stage.Inst.15Minutes.0.LRGS-rev
+series: Campbellsville.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,15 @@
+name: LOST R DIVERSION AT TINGLEY LN NR KLAMATH FALLS,OR
+lat: 42.1676458952687
+lon: -121.776391028672
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1242.554
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11486990/
+parameter_code: "00065"
+time_series_id: b4e6bb78d02e4ebdaac4164d4774b903

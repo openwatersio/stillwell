@@ -1,0 +1,21 @@
+name: COCHRANE BAY, PR. WILLIAM SOUND
+lat: 60.6633
+lon: -148.357
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.214
+  MHW: -2.94
+  DTL: -1.348
+  MTL: -1.441
+  MSL: -1.485
+  MLW: 0.057
+  MLLW: 0.517
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454851
+established: 1995-08-22T00:00:00Z
+removed: 1995-10-21T23:00:00Z

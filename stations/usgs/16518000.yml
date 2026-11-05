@@ -1,0 +1,16 @@
+name: West Wailuaiki Stream near Keanae, Maui, HI
+lat: 20.81435690113104
+lon: -156.142977122411
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 472.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16518000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 6017a33aa92e4b38816e842e26c5f637

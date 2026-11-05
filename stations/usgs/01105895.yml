@@ -1,0 +1,14 @@
+name: WEWEANTIC RIVER AT SOUTH WAREHAM, MA
+lat: 41.76997601027893
+lon: -70.75445657912273
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01105895/
+parameter_code: "00065"
+series_begin: 2025-07-01T05:00:00+00:00
+time_series_id: 6e31738f799f4eb5bc8b73a3bc5c3152

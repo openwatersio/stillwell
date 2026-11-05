@@ -1,0 +1,13 @@
+name: TALLAHOMA CREEK TRIBUTARY AT LAKE COMO, MS
+lat: 31.9619444444444
+lon: -89.2052777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02473850/
+parameter_code: "00065"
+time_series_id: 88b46f6f6de047018a8a47c55b7aa7f0

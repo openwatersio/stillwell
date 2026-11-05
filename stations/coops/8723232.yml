@@ -1,0 +1,21 @@
+name: KEY BISCAYNE YACHT CLUB
+lat: 25.6983
+lon: -80.17
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.917
+  MHW: -1.905
+  DTL: -1.59
+  MTL: -1.605
+  MSL: -1.603
+  MLW: -1.304
+  MLLW: -1.263
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723232
+established: 1980-12-01T00:00:00Z
+removed: 1993-09-23T23:59:00Z

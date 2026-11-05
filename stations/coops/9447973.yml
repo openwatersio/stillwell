@@ -1,0 +1,24 @@
+name: NAS Whidbey Island
+lat: 48.3428
+lon: -122.6858
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.715
+  MHW: -12.525
+  DTL: -11.581
+  MTL: -11.82
+  MSL: -11.801
+  MLW: -11.115
+  MLLW: -10.448
+  NAVD88: -10.548
+  LAT: -9.377
+  HAT: -13.187
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9447973
+established: 2016-05-03T00:00:00Z
+removed: 2016-09-14T00:00:00Z

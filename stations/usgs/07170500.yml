@@ -1,0 +1,16 @@
+name: VERDIGRIS R AT INDEPENDENCE, KS
+lat: 37.2236801381794
+lon: -95.6777572588346
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 218.6
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07170500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: aa65b3be5ba04efda64f9bc8d2ad4dab

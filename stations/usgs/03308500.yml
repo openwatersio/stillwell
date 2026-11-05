@@ -1,0 +1,16 @@
+name: GREEN RIVER AT MUNFORDVILLE, KY
+lat: 37.2694444444444
+lon: -85.8880555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 137.547
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03308500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0cebb26c892a4efbb26f759e3a963459

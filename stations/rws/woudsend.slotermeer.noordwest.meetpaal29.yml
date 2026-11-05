@@ -1,0 +1,11 @@
+name: Woudsend, Slotermeer, noordwest, meetpaal 29
+lat: 52.923313
+lon: 5.647254
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/woudsend.slotermeer.noordwest.meetpaal29/details

@@ -1,0 +1,16 @@
+name: Black Lake Bayou north of Castor, La
+lat: 32.29722222222222
+lon: -93.18833333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.688
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07352470/
+parameter_code: "00065"
+series_begin: 2023-07-20T14:30:00+00:00
+time_series_id: 9c2b6ce06b5644a2896a3b64d0f9cfd3

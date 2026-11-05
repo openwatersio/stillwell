@@ -1,0 +1,24 @@
+name: Catfish Point
+lat: 29.8629
+lon: -92.8489
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.356
+  MHW: -9.324
+  DTL: -9.149
+  MTL: -9.168
+  MSL: -9.164
+  MLW: -9.011
+  MLLW: -8.941
+  NAVD88: -9.259
+  LAT: -8.733
+  HAT: -9.474
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8767095
+established: 2019-09-17T00:00:00Z
+removed: 2020-07-02T12:00:00Z

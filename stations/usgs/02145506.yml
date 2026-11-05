@@ -1,0 +1,16 @@
+name: CATAWBA CREEK AT BOOGERTOWN, NC
+lat: 35.239025
+lon: -81.170517
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 210.196
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02145506/
+parameter_code: "00065"
+series_begin: 2026-07-22T14:50:00+00:00
+time_series_id: b8c082284a134d419f67c0518ff62ce8

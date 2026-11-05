@@ -1,0 +1,17 @@
+name: LITTLE SANDY CREEK AT CAMP HILL, AL
+lat: 32.78545277777778
+lon: -85.64283888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.769
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02416360/
+parameter_code: "00065"
+series_begin: 2021-10-15T13:45:00+00:00
+series_end: 2024-07-30T17:30:00+00:00
+time_series_id: fe6981934770499d9c66de37d88b0c65

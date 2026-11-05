@@ -1,0 +1,16 @@
+name: Kettle Creek near Westport, PA
+lat: 41.3194509847916
+lon: -77.87385866636578
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 221.782
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01545000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e7fa831d6c494dc2b0f14ce0554c7d40

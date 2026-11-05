@@ -1,0 +1,11 @@
+name: Dalem
+lat: 51.822
+lon: 5.016527
+country_code: NL
+datum: NAP
+products: [levels, extremes, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/dalem/details

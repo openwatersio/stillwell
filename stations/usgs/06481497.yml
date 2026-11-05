@@ -1,0 +1,16 @@
+name: WILLOW CREEK NEAR CROOKS, SD
+lat: 43.630833
+lon: -96.826944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 449.742
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06481497/
+parameter_code: "00065"
+series_begin: 2018-09-20T21:30:00+00:00
+time_series_id: f148de50f3ed432a825cc65a3344809c

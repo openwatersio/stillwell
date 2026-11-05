@@ -1,0 +1,16 @@
+name: N Fk DMF Brazos Rv at Loop 289 nr Lubbock, TX
+lat: 33.5547777777778
+lon: -101.788138888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 944.414
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08079510/
+parameter_code: "00065"
+series_begin: 2016-09-19T14:15:00+00:00
+time_series_id: e7e9b8a5273f42ceaae90daae8cdd7c0

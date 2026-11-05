@@ -1,0 +1,17 @@
+name: Lopatcong Creek at Strykers Road at Port Warren NJ
+lat: 40.69
+lon: -75.1472222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.137
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01455090/
+parameter_code: "00065"
+series_begin: 2011-03-06T05:00:00+00:00
+series_end: 2014-04-01T03:45:00+00:00
+time_series_id: 14bd0369a7284641a8b7217c6fc7c637

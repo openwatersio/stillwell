@@ -1,0 +1,11 @@
+name: Breskens, Handelshaven
+lat: 51.396709
+lon: 3.565798
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/breskens.handelshaven/details

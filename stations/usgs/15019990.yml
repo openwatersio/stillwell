@@ -1,0 +1,17 @@
+name: TYEE LK OUTLET NR WRANGELL AK
+lat: 56.1996415375529
+lon: -131.508362165607
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 411.48
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15019990/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+series_end: 2026-10-05T07:15:00+00:00
+time_series_id: 6d21d74ad93d4d1ca5d4aeb79c08c2c1

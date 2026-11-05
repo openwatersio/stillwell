@@ -1,0 +1,16 @@
+name: Meramec River at Cook Station, MO
+lat: 37.8291472222222
+lon: -91.4374833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 263.551
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07010350/
+parameter_code: "00065"
+series_begin: 2008-03-08T06:00:00+00:00
+time_series_id: 6b96aff0d5e54d3691cee13f0aaf7995

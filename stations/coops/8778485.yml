@@ -1,0 +1,24 @@
+name: Padre Island, Port Mansfield Channel Ent
+lat: 26.5642
+lon: -97.2765
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.653
+  MHW: -7.635
+  DTL: -7.434
+  MTL: -7.45
+  MSL: -7.472
+  MLW: -7.265
+  MLLW: -7.215
+  NAVD88: -7.507
+  LAT: -6.856
+  HAT: -7.941
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8778485
+established: 2019-09-20T00:00:00Z
+removed: 2020-06-18T12:54:00Z

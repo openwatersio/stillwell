@@ -1,0 +1,23 @@
+name: Ballast Point
+lat: 32.6867
+lon: -117.233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.03
+  MHW: -3.81
+  DTL: -3.194
+  MTL: -3.219
+  MSL: -3.213
+  MLW: -2.627
+  MLLW: -2.358
+  LAT: -1.743
+  HAT: -4.613
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410155
+established: 1983-08-15T00:00:00Z
+removed: 1983-09-29T23:59:00Z

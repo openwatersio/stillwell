@@ -1,0 +1,24 @@
+name: Mare Island
+lat: 38.07
+lon: -122.25
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.647
+  MHW: -2.475
+  DTL: -1.77
+  MTL: -1.829
+  MSL: -1.828
+  MLW: -1.184
+  MLLW: -0.892
+  NAVD88: -0.782
+  LAT: -0.461
+  HAT: -2.971
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415218
+established: 1976-09-29T00:00:00Z
+removed: 2012-10-28T23:59:00Z

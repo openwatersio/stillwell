@@ -1,0 +1,16 @@
+name: CHINLE CREEK NEAR MEXICAN WATER, AZ
+lat: 36.94388757198408
+lon: -109.71068654999594
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1442.393
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09379200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3716b00d85644ab8ab18222256e843fd

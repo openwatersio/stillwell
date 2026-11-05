@@ -1,0 +1,13 @@
+name: Red River @ Grand Ecore, LA
+lat: 31.825115
+lon: -93.083928
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 22.887
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Grand%20Ecore.Stage.Inst.1Hour.0.DCP-rev
+series: Grand Ecore.Stage.Inst.1Hour.0.DCP-rev

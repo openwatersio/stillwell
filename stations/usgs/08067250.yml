@@ -1,0 +1,16 @@
+name: Trinity Rv at IH 10 nr Wallisville, TX
+lat: 29.8370777777778
+lon: -94.7635944444445
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067250/
+parameter_code: "00065"
+series_begin: 2020-02-21T18:00:00+00:00
+time_series_id: d66790b1e5494350b5d36e75eb1568b6

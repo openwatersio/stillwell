@@ -1,0 +1,17 @@
+name: LONG LAKE NEAR PLAINFIELD, WI
+lat: 44.2075
+lon: -89.4608333333333
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 331.305
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05401065/
+parameter_code: "00065"
+series_begin: 2018-05-17T23:45:00+00:00
+series_end: 2025-11-19T16:45:00+00:00
+time_series_id: 62795dbe95214e479bd2d414e82e3129

@@ -1,0 +1,13 @@
+name: Rudyerd Bay
+lat: 55.6417
+lon: -130.645
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450651
+established: 1931-08-17T00:00:00Z
+removed: 2004-11-03T23:59:00Z

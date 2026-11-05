@@ -1,0 +1,23 @@
+name: Coquille River
+lat: 43.1579
+lon: -124.1818
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.175
+  MHW: -5.958
+  DTL: -5.38
+  MTL: -5.351
+  MSL: -5.344
+  MLW: -4.744
+  MLLW: -4.585
+  LAT: -4.193
+  HAT: -6.616
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9432436
+established: 2017-06-14T00:00:00Z
+removed: 2017-10-18T11:00:00Z

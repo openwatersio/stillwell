@@ -1,0 +1,15 @@
+name: Lagoon at 165 West
+lat: 66.4617
+lon: -165.055
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MSL: -0.928
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469982
+established: 2003-09-14T00:00:00Z
+removed: 2003-09-21T23:59:00Z

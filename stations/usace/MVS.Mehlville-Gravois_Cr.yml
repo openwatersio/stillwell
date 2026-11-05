@@ -1,0 +1,13 @@
+name: Gravois Cr at Mehlville
+lat: 38.527
+lon: -90.3
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 128.671
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Mehlville-Gravois%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Mehlville-Gravois Cr.Stage.Inst.5Minutes.0.Usgs-raw

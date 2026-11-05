@@ -1,0 +1,16 @@
+name: SAR SUPP GAGE NR MENTONE CA
+lat: 34.1083448906988
+lon: -117.100591145032
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 596.231
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11051502/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 0df2dc3aa01b4f65aca02807c75a5185

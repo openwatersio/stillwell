@@ -1,0 +1,13 @@
+name: HAVELBERG STADT
+lat: 52.823201
+lon: 12.076562
+country_code: DE
+datum: PNP
+datums:
+  NHN: 21.561
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580790

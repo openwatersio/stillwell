@@ -1,0 +1,16 @@
+name: INDIAN-KENTUCK CREEK NEAR CANAAN, IN
+lat: 38.87810217884249
+lon: -85.25716164431839
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.344
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03291780/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9e9f5ed6e9bf4bc29d0dd654d1aec28b

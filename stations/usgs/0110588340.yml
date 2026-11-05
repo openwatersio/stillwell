@@ -1,0 +1,15 @@
+name: SANTUIT RIVER AT OLD KINGS ROAD AT SANTUIT, MA
+lat: 41.627475875469905
+lon: -70.45055911386709
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0110588340/
+parameter_code: "00065"
+series_begin: 2020-10-05T18:30:00+00:00
+series_end: 2024-10-17T16:15:00+00:00
+time_series_id: 5dfdcb802e92446c87d5c0c037b18c24

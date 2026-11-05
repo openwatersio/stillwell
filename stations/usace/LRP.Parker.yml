@@ -1,0 +1,13 @@
+name: Parker, PA
+lat: 41.1006
+lon: -79.6814
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 257.599
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Parker.Stage.Inst.15Minutes.0.OBS
+series: Parker.Stage.Inst.15Minutes.0.OBS

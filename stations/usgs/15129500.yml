@@ -1,0 +1,16 @@
+name: SITUK R NR YAKUTAT AK
+lat: 59.58622986996109
+lon: -139.49437433424535
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 27.127
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15129500/
+parameter_code: "00065"
+series_begin: 2011-07-22T15:45:00+00:00
+time_series_id: 9612fe822f1543b78d7f075e5bf7fad3

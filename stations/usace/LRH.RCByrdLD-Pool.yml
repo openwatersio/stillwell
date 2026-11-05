@@ -1,0 +1,14 @@
+name: R.C. Byrd L&D Pool
+lat: 38.6822853
+lon: -82.188445
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 160.206
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=RCByrdLD-Pool.Stage.Inst.15Minutes.0.OBS
+series: RCByrdLD-Pool.Stage.Inst.15Minutes.0.OBS

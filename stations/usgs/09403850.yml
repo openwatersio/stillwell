@@ -1,0 +1,16 @@
+name: KANAB CREEK ABOVE THE MOUTH NEAR SUPAI, AZ
+lat: 36.394381
+lon: -112.632522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 576.831
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09403850/
+parameter_code: "00065"
+series_begin: 2018-04-18T07:00:00+00:00
+time_series_id: 3ca0cf9713994cab93f1acd66db985a5

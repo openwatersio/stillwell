@@ -1,0 +1,16 @@
+name: Tenmile Creek near Helena MT
+lat: 46.6050055555556
+lon: -112.088263888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1204.938
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06063000/
+parameter_code: "00065"
+series_begin: 2012-08-29T20:45:00+00:00
+time_series_id: d6d99e8dbe7d436099d6c99097634b58

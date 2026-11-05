@@ -1,0 +1,16 @@
+name: CLYDE RIVER (ERIE CANAL) AT CLYDE NY
+lat: 43.0825833333333
+lon: -76.8775277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.776
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0423527080/
+parameter_code: "00065"
+series_begin: 2021-11-22T20:15:00+00:00
+time_series_id: 84665a5f08be491aa9ddaf183869c373

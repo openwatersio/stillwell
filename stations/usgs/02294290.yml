@@ -1,0 +1,16 @@
+name: SADDLE CREEK AT STATE HWY 570 NEAR EATON PARK FL
+lat: 28.0100499131397
+lon: -81.8531920583214
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 26.447
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02294290/
+parameter_code: "00065"
+series_begin: 2009-02-05T05:00:00+00:00
+time_series_id: 2cff6ef274654e48b2a323f0b898dad3

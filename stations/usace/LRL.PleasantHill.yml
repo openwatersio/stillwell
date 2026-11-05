@@ -1,0 +1,11 @@
+name: Stillwater River at Pleasant Hil
+lat: 40.05782925
+lon: -84.3560589
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=PleasantHill.Stage.Inst.15Minutes.0.LRGS-rev
+series: PleasantHill.Stage.Inst.15Minutes.0.LRGS-rev

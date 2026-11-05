@@ -1,0 +1,15 @@
+name: SUMMIT CONDUIT AT SUMMIT, IL
+lat: 41.7991666666667
+lon: -87.8177777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-414757087490401/
+parameter_code: "00065"
+series_begin: 2010-09-24T06:00:00+00:00
+series_end: 2013-03-01T05:50:00+00:00
+time_series_id: 7169990c16d446dd9d4f57785710e4fd

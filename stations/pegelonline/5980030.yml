@@ -1,0 +1,11 @@
+name: HECHTHAUSEN
+lat: 53.640526
+lon: 9.25277
+country_code: DE
+datum: PNP
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=5980030

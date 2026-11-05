@@ -1,0 +1,16 @@
+name: BLUE SPRINGS CREEK NEAR BLOUNTSVILLE, AL.
+lat: 34.07985725109417
+lon: -86.60776172802078
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.882
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02449882/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0757af4c16ad406e9ca60b67ec41240e

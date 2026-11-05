@@ -1,0 +1,16 @@
+name: Gravois Creek near Mehlville, MO
+lat: 38.527
+lon: -90.2998888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 128.54
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07010180/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e851c593cc7345d4b01f1d90e6c4965b

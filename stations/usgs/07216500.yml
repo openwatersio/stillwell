@@ -1,0 +1,16 @@
+name: MORA RIVER NEAR GOLONDRINAS, NM
+lat: 35.8908722222222
+lon: -105.163619444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2057.4
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07216500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 09763583c4db4f5aa143e3cd3dbbd334

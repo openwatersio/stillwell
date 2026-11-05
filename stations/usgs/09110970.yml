@@ -1,0 +1,17 @@
+name: COAL CREEK ABOVE ELK CREEK NEAR CRESTED BUTTE, CO
+lat: 38.85566666666667
+lon: -107.07291666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2949.976
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09110970/
+parameter_code: "00065"
+series_begin: 2024-05-15T23:30:00+00:00
+series_end: 2025-10-01T07:00:00+00:00
+time_series_id: a803503c6366413583ef8d5b52b91b71

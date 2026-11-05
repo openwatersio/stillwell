@@ -1,0 +1,23 @@
+name: Port Lions, AK
+lat: 57.873474
+lon: -152.86711
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.504
+  MHW: -9.227
+  DTL: -8.077
+  MTL: -8.113
+  MSL: -8.112
+  MLW: -7
+  MLLW: -6.65
+  LAT: -5.729
+  HAT: -10.373
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457391
+established: 2009-07-04T00:00:00Z
+removed: 2009-08-08T23:59:00Z

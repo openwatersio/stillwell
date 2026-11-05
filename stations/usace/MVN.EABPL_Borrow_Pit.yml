@@ -1,0 +1,12 @@
+name: EABPL Borrow Pit (FWS) nr Ramah, La (49542)
+lat: 30.3692917
+lon: -91.5196528
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=EABPL_Borrow_Pit.Stage.Inst.1Hour.0.rev
+series: EABPL_Borrow_Pit.Stage.Inst.1Hour.0.rev

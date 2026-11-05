@@ -1,0 +1,16 @@
+name: Sun River near Vaughn MT
+lat: 47.5257777777778
+lon: -111.511036111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1018.038
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06089000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e0f4805164044825946058a628cbdf1b

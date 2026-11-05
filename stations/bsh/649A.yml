@@ -1,0 +1,12 @@
+name: Nordstrandischmoor
+lat: 54.54972
+lon: 8.79778
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.61
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/nordstrandischmoor

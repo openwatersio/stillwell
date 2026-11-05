@@ -1,0 +1,16 @@
+name: FLETT CREEK AT TACOMA, WA
+lat: 47.18885833333333
+lon: -122.52010277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 58.723
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12091100/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 79bab94e0d9c4dc6bd96c0649e3fce9e

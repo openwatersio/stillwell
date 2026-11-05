@@ -1,0 +1,13 @@
+name: Helgoland, Binnenhafen
+lat: 54.17889
+lon: 7.89
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.2
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9510070]
+source_url: https://gezeiten.bsh.de/helgoland_binnenhafen

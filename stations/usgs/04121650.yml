@@ -1,0 +1,15 @@
+name: MUSKEGON RIVER AT BIG RAPIDS, MI
+lat: 43.6936340402002
+lon: -85.4675441578132
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 270.053
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04121650/
+parameter_code: "00065"
+time_series_id: 9cbac1c77b4e4e0cabf55b5f60945772

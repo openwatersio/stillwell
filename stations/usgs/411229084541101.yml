@@ -1,0 +1,16 @@
+name: OVERLAND FLOW EAST OF BULL RAPIDS RD NR HARLAN, IN
+lat: 41.2081388888889
+lon: -84.9031666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 240.329
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-411229084541101/
+parameter_code: "00065"
+series_begin: 2015-09-29T19:28:00+00:00
+time_series_id: f0be848929fa49d596b59e013f95d690

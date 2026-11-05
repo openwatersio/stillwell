@@ -1,0 +1,24 @@
+name: BAYSIDE, COPANO BAY
+lat: 28.0683
+lon: -97.1956
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.915
+  MHW: -6.913
+  DTL: -6.852
+  MTL: -6.853
+  MSL: -6.858
+  MLW: -6.794
+  MLLW: -6.789
+  NAVD88: -6.614
+  LAT: -6.74
+  HAT: -6.952
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8774652
+established: 1992-09-13T00:00:00Z
+removed: 2020-03-22T17:30:00Z

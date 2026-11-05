@@ -1,0 +1,24 @@
+name: COAL POINT
+lat: 59.6014
+lon: -151.4106
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.316
+  MHW: -6.06
+  DTL: -3.507
+  MTL: -3.632
+  MSL: -3.665
+  MLW: -1.203
+  MLLW: -0.698
+  NAVD88: -2.251
+  LAT: 1.197
+  HAT: -7.939
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455558
+established: 1979-08-03T00:00:00Z
+removed: 2018-12-11T23:59:00Z

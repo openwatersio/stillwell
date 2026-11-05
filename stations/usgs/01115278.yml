@@ -1,0 +1,16 @@
+name: SWAMP BROOK AT PONAGANSETT ROAD NR CLAYVILLE, RI
+lat: 41.7968
+lon: -71.669431
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 93.177
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115278/
+parameter_code: "00065"
+series_begin: 2020-10-09T20:15:00+00:00
+time_series_id: 9fd896b6aa834236bf3d00a87a99a26b

@@ -1,0 +1,13 @@
+name: Mckenzie Inlet
+lat: 55.3583
+lon: -132.368
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450466
+established: 2003-08-18T00:00:00Z
+removed: 2003-08-27T23:59:00Z

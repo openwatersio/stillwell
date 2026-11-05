@@ -1,0 +1,16 @@
+name: GEORGES RUN NEAR BECKLEYSVILLE, MD
+lat: 39.62569444444444
+lon: -76.7726111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.578
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01581870/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9f3ba055c92540859ed008d274f16080

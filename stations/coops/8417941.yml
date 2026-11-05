@@ -1,0 +1,21 @@
+name: LONG ISLAND, CASCO BAY
+lat: 43.69
+lon: -70.17
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.41
+  MHW: -3.278
+  DTL: -1.907
+  MTL: -1.893
+  MSL: -1.906
+  MLW: -0.508
+  MLLW: -0.404
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8417941
+established: 1979-08-15T00:00:00Z
+removed: 1979-10-25T23:59:00Z

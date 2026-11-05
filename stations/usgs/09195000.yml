@@ -1,0 +1,16 @@
+name: Lake Creek below Willow Lake, nr Cora, WY
+lat: 42.99311111111111
+lon: -109.90941388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2346.35
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09195000/
+parameter_code: "00065"
+series_begin: 2023-11-01T07:00:00+00:00
+time_series_id: 2e7ec052d3384411b0bfe70ee7b5a1f4

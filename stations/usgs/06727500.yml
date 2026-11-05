@@ -1,0 +1,17 @@
+name: FOURMILE CREEK AT ORODELL, CO
+lat: 40.0186666666667
+lon: -105.32625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1752.6
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06727500/
+parameter_code: "00065"
+series_begin: 2021-04-01T05:55:00+00:00
+series_end: 2026-10-01T07:05:00+00:00
+time_series_id: bcd78959585548debd2dcfaedb37b945

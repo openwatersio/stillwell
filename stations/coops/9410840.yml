@@ -1,0 +1,24 @@
+name: Santa Monica
+lat: 34.0083
+lon: -118.5
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.398
+  MHW: -2.173
+  DTL: -1.572
+  MTL: -1.6
+  MSL: -1.594
+  MLW: -1.028
+  MLLW: -0.745
+  NAVD88: -0.802
+  LAT: -0.125
+  HAT: -2.976
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410840
+established: 1932-10-01T00:00:00Z

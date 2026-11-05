@@ -1,0 +1,16 @@
+name: CROOKED CREEK NEAR NORCROSS, GA
+lat: 33.965
+lon: -84.2647222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 265.146
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02335350/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 04ab987b69b641e5a889b2da36788cb1

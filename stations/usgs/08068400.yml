@@ -1,0 +1,16 @@
+name: Panther Br at Gosling Rd, The Woodlands, TX
+lat: 30.1921589980736
+lon: -95.4838288214225
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08068400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2897ea4745fe44688bf8cdaf7097d5cf

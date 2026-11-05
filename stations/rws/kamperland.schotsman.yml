@@ -1,0 +1,11 @@
+name: Kamperland, Schotsman
+lat: 51.581616
+lon: 3.643279
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/kamperland.schotsman/details

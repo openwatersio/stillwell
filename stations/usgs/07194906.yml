@@ -1,0 +1,17 @@
+name: Spring Creek at Sanders Ave at Springdale, AR
+lat: 36.19566666666666
+lon: -94.1358888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 384.307
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07194906/
+parameter_code: "00065"
+series_begin: 2011-10-06T16:15:00+00:00
+series_end: 2025-01-14T18:05:00+00:00
+time_series_id: 32b413ec8ebf468ea365ee41841d9cd5

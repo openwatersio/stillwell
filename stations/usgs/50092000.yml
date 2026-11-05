@@ -1,0 +1,16 @@
+name: RIO GRANDE DE PATILLAS NR PATILLAS, PR
+lat: 18.034167
+lon: -66.0325
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 69.29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50092000/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 67990d565abb4057983697d1b8b5ade0

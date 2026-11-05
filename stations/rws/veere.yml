@@ -1,0 +1,11 @@
+name: Veere
+lat: 51.542099
+lon: 3.667385
+country_code: NL
+datum: NAP
+products: [levels, extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/veere/details

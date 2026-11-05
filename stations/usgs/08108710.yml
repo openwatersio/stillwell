@@ -1,0 +1,16 @@
+name: Walnut Ck at FM 46 nr Bremond, TX
+lat: 31.12148611111111
+lon: -96.61724166666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08108710/
+parameter_code: "00065"
+series_begin: 2021-08-25T17:50:00+00:00
+time_series_id: f39fc13b381f489baf4d2eeae539ffe6

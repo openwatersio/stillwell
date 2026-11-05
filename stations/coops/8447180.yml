@@ -1,0 +1,23 @@
+name: Sandwich
+lat: 41.7717
+lon: -70.5067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.047
+  MHW: -2.899
+  DTL: -1.607
+  MTL: -1.567
+  MSL: -1.601
+  MLW: -0.236
+  MLLW: -0.167
+  LAT: 0.511
+  HAT: -3.681
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447180
+established: 1955-07-29T00:00:00Z
+removed: 2001-10-13T00:00:00Z

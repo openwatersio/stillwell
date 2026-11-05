@@ -1,0 +1,16 @@
+name: MUD RIVER AT PALERMO, WV
+lat: 38.165
+lon: -82.0586111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 213.104
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03204250/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 423770c023324792b99355a22927e9fd

@@ -1,0 +1,16 @@
+name: Willow Chute Bayou at Swan Lake Rd nr Bossier City
+lat: 32.5652777777778
+lon: -93.6811111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 47.988
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07349898/
+parameter_code: "00065"
+series_begin: 2009-10-03T05:00:00+00:00
+time_series_id: 5e790d5c4fdf4af3b844213d558b7cd4

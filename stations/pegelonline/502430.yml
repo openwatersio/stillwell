@@ -1,0 +1,13 @@
+name: SANDAU
+lat: 52.78477
+lon: 12.031305
+country_code: DE
+datum: PNP
+datums:
+  NHN: 22.454
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=502430

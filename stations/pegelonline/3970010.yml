@@ -1,0 +1,13 @@
+name: EMDEN NEUE SEESCHLEUSE
+lat: 53.336781
+lon: 7.186348
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=3970010

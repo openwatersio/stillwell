@@ -1,0 +1,16 @@
+name: SHEYENNE R BL DEVILS LK STATE OUTLET NR BREMEN, ND
+lat: 47.821389
+lon: -99.276111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 426.674
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05055400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b329ee21fe0c4638ba4a19960dbb1bd7

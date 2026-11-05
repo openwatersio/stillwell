@@ -1,0 +1,14 @@
+name: West Jefferson
+lat: 39.9506
+lon: -83.2675
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 267.907
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=WeJefferson.Stage.Inst.15Minutes.0.OBS
+series: WeJefferson.Stage.Inst.15Minutes.0.OBS

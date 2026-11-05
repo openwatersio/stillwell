@@ -1,0 +1,16 @@
+name: Bois D'Arc Ck at FM 100 nr Honey Grove, TX
+lat: 33.7587361111111
+lon: -95.9159472222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 133.868
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07332655/
+parameter_code: "00065"
+series_begin: 2019-03-07T21:00:00+00:00
+time_series_id: e74011c01c5044269a652bfeb8acea42

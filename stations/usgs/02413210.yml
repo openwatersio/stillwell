@@ -1,0 +1,16 @@
+name: LITTLE TALLAPOOSA R AT GA 100, NEAR BOWDON, GA
+lat: 33.4926944444444
+lon: -85.2793055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.368
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02413210/
+parameter_code: "00065"
+series_begin: 2008-04-08T05:00:00+00:00
+time_series_id: 43a42cb98e6244b9b39495e18167efab

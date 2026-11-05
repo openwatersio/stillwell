@@ -1,0 +1,16 @@
+name: TALLAPOOSA RIVER NEAR HEFLIN, AL
+lat: 33.6228850282822
+lon: -85.5132893843182
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.521
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02412000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 24ad12fb6a27405ea5002478b2fe92f5

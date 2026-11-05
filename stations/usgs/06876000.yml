@@ -1,0 +1,16 @@
+name: SOLOMON R AT BELOIT, KS
+lat: 39.454509567538
+lon: -98.109898523823
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 408.377
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06876000/
+parameter_code: "00065"
+series_begin: 2012-07-17T13:00:00+00:00
+time_series_id: f29f6f2bc9cf4eca91ef0a946bde7532

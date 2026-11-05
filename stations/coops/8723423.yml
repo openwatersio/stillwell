@@ -1,0 +1,24 @@
+name: TURKEY POINT, BISCAYNE BAY
+lat: 25.4367
+lon: -80.33
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.081
+  MHW: -1.063
+  DTL: -0.809
+  MTL: -0.817
+  MSL: -0.809
+  MLW: -0.571
+  MLLW: -0.538
+  NAVD88: -1.074
+  LAT: -0.376
+  HAT: -1.287
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723423
+established: 1970-04-23T00:00:00Z
+removed: 1993-09-07T23:59:00Z

@@ -1,0 +1,16 @@
+name: BLACK RIVER NEAR PLANTERSVILLE, SC
+lat: 33.48025
+lon: -79.2720833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -3.676
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136300/
+parameter_code: "00065"
+series_begin: 2023-05-23T16:45:00+00:00
+time_series_id: bfc2d5e81b7f4b83b4f5beaa8715517a

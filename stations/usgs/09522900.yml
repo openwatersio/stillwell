@@ -1,0 +1,16 @@
+name: UNIT B CANAL NEAR YUMA, AZ
+lat: 32.6180361111111
+lon: -114.630430555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 57.961
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09522900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 8a7a3e1ec46e40ea9aeb35f474a1258f

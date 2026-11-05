@@ -1,0 +1,14 @@
+name: Cape May Harbor at Cape May NJ
+lat: 38.9483333333333
+lon: -74.8888888888889
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01411390/
+parameter_code: "72279"
+series_begin: 2000-05-29T14:30:00+00:00
+time_series_id: 4450bf44999d44cf888dd8e623da9497

@@ -1,0 +1,22 @@
+name: North Palm Beach
+lat: 26.8267
+lon: -80.055
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.199
+  MHW: -1.139
+  DTL: -0.713
+  MTL: -0.711
+  MSL: -0.717
+  MLW: -0.283
+  MLLW: -0.227
+  NAVD88: -1.031
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722557
+established: 1970-04-16T00:00:00Z
+removed: 1973-11-05T23:59:00Z

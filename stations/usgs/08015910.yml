@@ -1,0 +1,16 @@
+name: Calcasieu River at Hwy 171 at Moss Bluff, LA
+lat: 30.28611111111111
+lon: -93.18891666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.532
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08015910/
+parameter_code: "00065"
+series_begin: 2023-09-27T17:15:00+00:00
+time_series_id: fc14435940a546c4833eefd375360074

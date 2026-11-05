@@ -1,0 +1,13 @@
+name: Cumberland River at Williamsburg, KY
+lat: 36.743611
+lon: -84.156389
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 271.751
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=WLBK2-CumberlandR-WilliamsburgKY.Stage.Inst.15Minutes.0.dcp-rev
+series: WLBK2-CumberlandR-WilliamsburgKY.Stage.Inst.15Minutes.0.dcp-rev

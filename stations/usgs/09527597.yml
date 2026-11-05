@@ -1,0 +1,16 @@
+name: COACHELLA CANAL NEAR DESERT BEACH, CA
+lat: 33.5380810940634
+lon: -115.918608306208
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 21.336
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09527597/
+parameter_code: "00065"
+series_begin: 2009-10-24T07:00:00+00:00
+time_series_id: ff67dedfeb024cc2b1a268f872946e70

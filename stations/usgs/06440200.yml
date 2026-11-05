@@ -1,0 +1,16 @@
+name: SOUTH FORK BAD RIVER NEAR COTTONWOOD, SD
+lat: 43.96902800000001
+lon: -101.766806
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 684.151
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06440200/
+parameter_code: "00065"
+series_begin: 2018-05-01T07:00:00+00:00
+time_series_id: 95ab046643534bcda5888fab75b61b85

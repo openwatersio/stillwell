@@ -1,0 +1,16 @@
+name: Sabine Rv nr Hawkins, TX
+lat: 32.5598636898524
+lon: -95.2066140014346
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 81.369
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08019200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e7ae62db1c294af2aa01949f75b67e77

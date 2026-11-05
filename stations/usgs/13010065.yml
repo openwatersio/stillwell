@@ -1,0 +1,16 @@
+name: SNAKE RIVER AB JACKSON LAKE AT FLAGG RANCH WY
+lat: 44.0988888888889
+lon: -110.6675
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2073.131
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13010065/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 23109959f51342dd84df9e52c7a2a728

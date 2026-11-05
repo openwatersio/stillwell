@@ -1,0 +1,12 @@
+name: Esperanza, Antarctica
+lat: -63.395
+lon: -56.995
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1495000
+established: 1993-02-15T00:00:00Z
+removed: 1999-02-26T23:59:00Z

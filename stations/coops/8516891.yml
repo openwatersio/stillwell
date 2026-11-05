@@ -1,0 +1,23 @@
+name: NORTON POINT, HOOK CREEK, NEW YORK
+lat: 40.635
+lon: -73.7467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.229
+  MHW: -8.125
+  DTL: -7.286
+  MTL: -7.266
+  MSL: -7.274
+  MLW: -6.406
+  MLLW: -6.342
+  LAT: -5.949
+  HAT: -8.676
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516891
+established: 2013-08-25T00:00:00Z
+removed: 2014-01-20T00:00:00Z

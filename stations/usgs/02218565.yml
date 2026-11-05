@@ -1,0 +1,16 @@
+name: APALACHEE RIVER AT FENCE ROAD, NEAR DACULA, GA
+lat: 34.0102777777778
+lon: -83.8941666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.522
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02218565/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 489125aefb6f435d8e38296433b11dc3

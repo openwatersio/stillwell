@@ -1,0 +1,16 @@
+name: WEST BRANCH DELAWARE RIVER AT HOBART NY
+lat: 42.371417
+lon: -74.668833
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 494.349
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01421610/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c243b6aba5a74329b416817ad955ad06

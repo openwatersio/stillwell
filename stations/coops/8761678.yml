@@ -1,0 +1,21 @@
+name: MICHOUD SUBSTATION, ICWW
+lat: 30.0067
+lon: -89.9367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.32
+  MHW: -1.298
+  DTL: -1.109
+  MTL: -1.11
+  MSL: -1.11
+  MLW: -0.922
+  MLLW: -0.898
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761678
+established: 1982-11-25T00:00:00Z
+removed: 1997-06-01T23:59:00Z

@@ -1,0 +1,12 @@
+name: Pellworm, Hoogerfähre
+lat: 54.53556
+lon: 8.59778
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.88
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/pellworm_hoogerfaehre

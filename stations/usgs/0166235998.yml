@@ -1,0 +1,13 @@
+name: PINEY RIVER 420 M ABV TRIB 3 NEAR WASHINGTON, VA
+lat: 38.7425
+lon: -78.28547222222223
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0166235998/
+parameter_code: "00065"
+time_series_id: ab4d30165bcf4ebab9a1f89a3027bb23

@@ -1,0 +1,24 @@
+name: Cainhoy, Wando River
+lat: 32.9267
+lon: -79.83
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.271
+  MHW: -2.166
+  DTL: -1.272
+  MTL: -1.249
+  MSL: -1.352
+  MLW: -0.332
+  MLLW: -0.273
+  NAVD88: -1.365
+  LAT: 0.181
+  HAT: -2.667
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664545
+established: 1976-08-23T00:00:00Z
+removed: 1998-06-18T23:59:00Z

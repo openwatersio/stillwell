@@ -1,0 +1,12 @@
+name: Bayou Teche at East Calumet Floodgate (64700)
+lat: 29.7021028
+lon: -91.368275
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=East_Calumet_FG.Stage.Inst.~15Minutes.0.rev
+series: East_Calumet_FG.Stage.Inst.~15Minutes.0.rev

@@ -1,0 +1,23 @@
+name: Vienna
+lat: 38.48333
+lon: -75.81834
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.277
+  MHW: -7.229
+  DTL: -6.902
+  MTL: -6.906
+  MSL: -6.933
+  MLW: -6.582
+  MLLW: -6.527
+  LAT: -6.5
+  HAT: -7.357
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571773
+established: 1972-07-24T00:00:00Z
+removed: 2010-12-08T23:59:00Z

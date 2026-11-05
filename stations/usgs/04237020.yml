@@ -1,0 +1,16 @@
+name: SENECA R (BARGE CANAL) AT CROSS LAKE NR JORDAN NY
+lat: 43.1001388888889
+lon: -76.4981666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 110.52
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04237020/
+parameter_code: "00065"
+series_begin: 2018-08-23T14:15:00+00:00
+time_series_id: 56df1d374a154492bf54003999c15b39

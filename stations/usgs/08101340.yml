@@ -1,0 +1,16 @@
+name: House Ck at W Range Rd nr Ft Hood, TX
+lat: 31.185530555555555
+lon: -97.80871666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.99
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08101340/
+parameter_code: "00065"
+series_begin: 2017-04-11T05:00:00+00:00
+time_series_id: 3c61f7a94b0047c49f3ef020d245110a

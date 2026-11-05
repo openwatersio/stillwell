@@ -1,0 +1,16 @@
+name: FLATROCK RIVER NR RUSHVILLE, IN
+lat: 39.60416666666667
+lon: -85.44416666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 285.034
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03363400/
+parameter_code: "00065"
+series_begin: 2012-06-01T05:00:00+00:00
+time_series_id: 382e7c5688894cad8f2a5afc5280f497

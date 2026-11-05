@@ -1,0 +1,17 @@
+name: Little Pony Creek at Council Bluffs, IA
+lat: 41.2287833333333
+lon: -95.8187333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 304.907
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06610657/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2009-10-01T04:45:00+00:00
+time_series_id: aac6924baa4d478897edf4f6e32274d3

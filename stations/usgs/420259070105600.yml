@@ -1,0 +1,16 @@
+name: PROVINCETOWN TIDE GAGE, PROVINCETOWN, MA
+lat: 42.04972222222222
+lon: -70.18222222222222
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-420259070105600/
+parameter_code: "00065"
+series_begin: 2023-11-04T22:00:00+00:00
+time_series_id: 5a8911f1ef0b473dbbb3e5f0ea5618b5

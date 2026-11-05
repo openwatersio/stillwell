@@ -1,0 +1,15 @@
+name: GREEN LAKE AT COUNTY TRUNK HWY A NR GREEN LAKE, WI
+lat: 43.8244444444444
+lon: -88.9266666666667
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 240.765
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-434928088553601/
+parameter_code: "00065"
+time_series_id: 051380eb83f84453a4957b29d9b07ab9

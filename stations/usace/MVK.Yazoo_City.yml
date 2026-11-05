@@ -1,0 +1,13 @@
+name: Yazoo River @ Yazoo City, MS
+lat: 32.857777777778
+lon: -90.436666666667
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 20.635
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Yazoo%20City.Stage.Inst.1Hour.0.DCP-rev
+series: Yazoo City.Stage.Inst.1Hour.0.DCP-rev

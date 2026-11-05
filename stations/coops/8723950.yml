@@ -1,0 +1,22 @@
+name: MARTHON SHORES KEY, VACA CUT
+lat: 24.73
+lon: -81.03
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.673
+  MHW: -1.612
+  DTL: -1.414
+  MTL: -1.412
+  MSL: -1.42
+  MLW: -1.211
+  MLLW: -1.154
+  NAVD88: -1.724
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723950
+established: 1966-02-16T00:00:00Z
+removed: 1977-08-18T23:59:00Z

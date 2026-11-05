@@ -1,0 +1,15 @@
+name: Blue River at Red Bridge Road, Kansas City, Mo
+lat: 38.9252777777778
+lon: -94.5711111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 220.535
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06893195/
+parameter_code: "00065"
+time_series_id: c2243dd198fa431888936b0d043a5519

@@ -1,0 +1,16 @@
+name: SPRAGUE CREEK NEAR SPRAGUE, MANITOBA, CANADA
+lat: 48.992599
+lon: -95.662148
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 317.044
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05106000/
+parameter_code: "00065"
+series_begin: 2015-07-08T14:45:00+00:00
+time_series_id: e9abcf795f374d60b2e7c7b0bb70656e

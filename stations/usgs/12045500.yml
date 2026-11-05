@@ -1,0 +1,16 @@
+name: ELWHA RIVER AT MCDONALD BR NEAR PORT ANGELES, WA
+lat: 48.05478017852923
+lon: -123.58321362238982
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 62.213
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12045500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: fa19056d17c147c2ae9c73002727eec0

@@ -1,0 +1,16 @@
+name: Turkey River above French Hollow Cr at Elkader, IA
+lat: 42.8434851705994
+lon: -91.4012767402577
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 211.729
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05412020/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 066c0e1211e54e77b92fa8e27b2157d2

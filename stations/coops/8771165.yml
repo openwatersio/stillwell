@@ -1,0 +1,24 @@
+name: Goat Island
+lat: 29.4311
+lon: -94.7104
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.94
+  MHW: -8.917
+  DTL: -8.764
+  MTL: -8.763
+  MSL: -8.787
+  MLW: -8.609
+  MLLW: -8.587
+  NAVD88: -8.716
+  LAT: -8.218
+  HAT: -9.172
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771165
+established: 2019-09-20T00:00:00Z
+removed: 2020-03-26T00:00:00Z

@@ -1,0 +1,16 @@
+name: Symmes Creek at Aid OH
+lat: 38.5961912552477
+lon: -82.4951570262351
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 170.505
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03205470/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7b0f46f4fd944dbebf6cf5d619a6b787

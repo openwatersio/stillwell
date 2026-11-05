@@ -1,0 +1,23 @@
+name: WALPOLE, DAMARISCOTTA RIVER
+lat: 43.9333
+lon: -69.58
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.115
+  MHW: -3.981
+  DTL: -2.568
+  MTL: -2.556
+  MSL: -2.561
+  MLW: -1.131
+  MLLW: -1.021
+  LAT: -0.419
+  HAT: -4.723
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8416731
+established: 1976-11-11T00:00:00Z
+removed: 1981-09-11T23:59:00Z

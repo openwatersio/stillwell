@@ -1,0 +1,24 @@
+name: Shinn Point
+lat: 34.2179
+lon: -77.8123
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.622
+  MHW: -8.518
+  DTL: -7.953
+  MTL: -7.925
+  MSL: -7.937
+  MLW: -7.332
+  MLLW: -7.284
+  NAVD88: -8.107
+  LAT: -6.866
+  HAT: -9.036
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8658145
+established: 2021-12-11T00:00:00Z
+removed: 2022-06-08T18:30:00Z

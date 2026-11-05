@@ -1,0 +1,16 @@
+name: Cedar Creek near Pleasant View, MO
+lat: 37.8340555555556
+lon: -93.8754722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 225.631
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06919500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 9b21934fa8114e9f8513a8980c670c9d

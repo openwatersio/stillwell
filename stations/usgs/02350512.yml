@@ -1,0 +1,16 @@
+name: FLINT RIVER AT GA 32, NEAR OAKFIELD, GA
+lat: 31.724999999999998
+lon: -84.01861111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 56.476
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02350512/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6fbc0d200c57478492dd7c4af3fc88fe

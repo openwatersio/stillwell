@@ -1,0 +1,16 @@
+name: North Fork Red River blw Altus Dam nr Lugert, OK
+lat: 34.8895047862681
+lon: -99.3070279889466
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 448.809
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07303000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d813102d3d6a482fb2430f5c506f3711

@@ -1,0 +1,16 @@
+name: GILA RIVER NEAR DOME, AZ
+lat: 32.7608789271333
+lon: -114.42050186581
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 43.096
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09520500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 9d43fb7937f84acc9c3916931d252128

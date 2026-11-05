@@ -1,0 +1,14 @@
+name: PUMPKIN RIVER NEAR GOODLAND, FL
+lat: 25.926
+lon: -81.5443055555556
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255534081324000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0a91dd31be784f939f39c6ee0ddaab58

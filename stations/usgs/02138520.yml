@@ -1,0 +1,16 @@
+name: CATAWBA R AT SR1223 BL LK JAMES NR BRIDGEWATER, NC
+lat: 35.74125
+lon: -81.83525277777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 322.076
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02138520/
+parameter_code: "00065"
+series_begin: 2008-12-10T05:00:00+00:00
+time_series_id: ac3242da97e64fed890ae8007242b15c

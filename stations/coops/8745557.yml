@@ -1,0 +1,24 @@
+name: Gulfport Harbor
+lat: 30.36
+lon: -89.0817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.248
+  MHW: -1.22
+  DTL: -0.985
+  MTL: -0.986
+  MSL: -0.988
+  MLW: -0.751
+  MLLW: -0.721
+  NAVD88: -0.948
+  LAT: -0.35
+  HAT: -1.518
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8745557
+established: 1979-07-31T00:00:00Z
+removed: 2011-03-18T12:00:00Z

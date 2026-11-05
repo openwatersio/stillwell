@@ -1,0 +1,23 @@
+name: Isla Palominos
+lat: 18.344973
+lon: -65.5695
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.754
+  MHW: -6.682
+  DTL: -6.528
+  MTL: -6.516
+  MSL: -6.517
+  MLW: -6.35
+  MLLW: -6.301
+  LAT: -6.105
+  HAT: -6.953
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9752962
+established: 2011-04-21T00:00:00Z
+removed: 2011-09-08T23:59:00Z

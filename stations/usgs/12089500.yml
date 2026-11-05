@@ -1,0 +1,16 @@
+name: NISQUALLY RIVER AT MCKENNA, WA
+lat: 46.93340268261331
+lon: -122.56093447083404
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 88.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12089500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e8c45f4b87444ddbb42ebba88b962a25

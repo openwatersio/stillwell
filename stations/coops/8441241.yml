@@ -1,0 +1,23 @@
+name: Plum Island South
+lat: 42.71014
+lon: -70.78861
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.429
+  MHW: -3.306
+  DTL: -1.983
+  MTL: -1.969
+  MSL: -1.966
+  MLW: -0.632
+  MLLW: -0.537
+  LAT: -0.005
+  HAT: -4.01
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8441241
+established: 2010-03-09T00:00:00Z
+removed: 2010-08-10T23:59:00Z

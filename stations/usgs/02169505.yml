@@ -1,0 +1,16 @@
+name: ROCKY BRANCH AT PICKENS ST AT COLUMBIA, SC
+lat: 33.9948774268641
+lon: -81.0237029442897
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 59.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02169505/
+parameter_code: "00065"
+series_begin: 2011-05-31T05:00:00+00:00
+time_series_id: 0e3d808bd3f0456e9b8ff98eb7857125

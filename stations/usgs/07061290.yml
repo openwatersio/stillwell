@@ -1,0 +1,16 @@
+name: E. Fk. Black R. bl Lower Taum Sauk Reservoir
+lat: 37.4936111111111
+lon: -90.8383333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 214.021
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07061290/
+parameter_code: "00065"
+series_begin: 2008-03-14T05:00:00+00:00
+time_series_id: 59d69a79be1f4678afdbcc7ce67f1ee5

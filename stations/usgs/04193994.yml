@@ -1,0 +1,15 @@
+name: Ai Creek near Swanton OH
+lat: 41.5825
+lon: -83.8611111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.123
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04193994/
+parameter_code: "00065"
+time_series_id: ed2ec2b66afb44f99373156eb76f869c

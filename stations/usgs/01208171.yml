@@ -1,0 +1,16 @@
+name: NAUGATUCK RIVER AT WATERBURY, CT
+lat: 41.55693252059429
+lon: -73.05425495470887
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 75.069
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01208171/
+parameter_code: "00065"
+series_begin: 2020-07-01T05:00:00+00:00
+time_series_id: d852dd273e2c4a4fb3aa6735ec154d1c

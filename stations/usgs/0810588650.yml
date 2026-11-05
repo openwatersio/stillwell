@@ -1,0 +1,16 @@
+name: UBC Dam 101 at O'Connor Blvd nr Round Rock, TX
+lat: 30.484136111111113
+lon: -97.7200388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0810588650/
+parameter_code: "00065"
+series_begin: 2014-12-19T06:00:00+00:00
+time_series_id: 1116ce9c867e4de49b9a9e3d617a310a

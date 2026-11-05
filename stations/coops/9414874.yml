@@ -1,0 +1,23 @@
+name: CORTE MADERA CREEK
+lat: 37.9433
+lon: -122.513
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.623
+  MHW: -4.44
+  DTL: -3.739
+  MTL: -3.812
+  MSL: -3.801
+  MLW: -3.184
+  MLLW: -2.855
+  LAT: -2.322
+  HAT: -5.058
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414874
+established: 1977-05-11T00:00:00Z
+removed: 1978-12-11T23:59:00Z

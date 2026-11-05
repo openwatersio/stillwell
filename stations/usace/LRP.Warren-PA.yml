@@ -1,0 +1,13 @@
+name: Warren, PA
+lat: 41.844
+lon: -79.149
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 356.323
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Warren-PA.Stage.Inst.15Minutes.0.OBS
+series: Warren-PA.Stage.Inst.15Minutes.0.OBS

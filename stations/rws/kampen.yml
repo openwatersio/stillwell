@@ -1,0 +1,11 @@
+name: Kampen
+lat: 52.558966
+lon: 5.917924
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/kampen/details

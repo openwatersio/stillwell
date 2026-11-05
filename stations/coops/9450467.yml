@@ -1,0 +1,13 @@
+name: Polk Inlet
+lat: 55.3583
+lon: -132.485
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450467
+established: 1959-04-24T00:00:00Z
+removed: 2003-08-17T23:59:00Z

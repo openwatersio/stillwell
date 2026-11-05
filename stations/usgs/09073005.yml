@@ -1,0 +1,16 @@
+name: LINCOLN CREEK BELOW GRIZZLY RESERVOIR NR ASPEN, CO
+lat: 39.0802361111111
+lon: -106.616583333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3196.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09073005/
+parameter_code: "00065"
+series_begin: 2020-10-06T17:30:00+00:00
+time_series_id: 187d28a5940b45cfad70a64bf23a636e

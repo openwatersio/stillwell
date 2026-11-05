@@ -1,0 +1,21 @@
+name: Quick's Hole
+lat: 41.4483
+lon: -70.8567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.214
+  MHW: -3.143
+  DTL: -2.708
+  MTL: -2.684
+  MSL: -2.645
+  MLW: -2.225
+  MLLW: -2.202
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448251
+established: 1976-07-22T00:00:00Z
+removed: 2004-09-30T23:59:00Z

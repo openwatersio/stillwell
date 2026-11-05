@@ -1,0 +1,14 @@
+name: ALLEY CREEK NEAR OAKLAND GARDENS NY
+lat: 40.756417
+lon: -73.746417
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01302050/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: eca47f5aae244ee49df13665e68e9d29

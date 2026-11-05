@@ -1,0 +1,15 @@
+name: INDIAN C AT COLLEGE BLVD, JOHNSON CO, KS
+lat: 38.9272222222222
+lon: -94.6969444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 274.32
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-385520094420000/
+parameter_code: "00065"
+time_series_id: cc3b41e24497487bb1360808ac913555

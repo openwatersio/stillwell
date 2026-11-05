@@ -1,0 +1,16 @@
+name: TOWN CREEK NEAR OLDTOWN, MD
+lat: 39.5532222222222
+lon: -78.555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.817
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01609000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b25f98fbe0dd42379ea3f1e4cdaa5281

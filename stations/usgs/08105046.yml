@@ -1,0 +1,16 @@
+name: Berry Ck at FM 970 nr Florence, TX
+lat: 30.8106
+lon: -97.826
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 286.238
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08105046/
+parameter_code: "00065"
+series_begin: 2024-03-06T17:10:00+00:00
+time_series_id: 4e224e171d4144ef99f0e6f46dc83132

@@ -1,0 +1,17 @@
+name: (B- 8- 3)13ddd   Bear River Refuge Unit 5 drain
+lat: 41.422944
+lon: -112.127528
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1280.16
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412523112073901/
+parameter_code: "00065"
+series_begin: 2011-04-06T18:45:00+00:00
+series_end: 2013-04-03T15:15:00+00:00
+time_series_id: d8f6d9ecc4904787aade704c9a085ccc

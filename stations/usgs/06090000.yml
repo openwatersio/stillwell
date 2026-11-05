@@ -1,0 +1,17 @@
+name: Missouri River at Great Falls MT
+lat: 47.5069021286236
+lon: -111.314141153462
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1005.84
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06090000/
+parameter_code: "00065"
+series_begin: 2014-05-21T06:00:00+00:00
+series_end: 2022-04-20T13:15:00+00:00
+time_series_id: b4df4fef68dc44928243bb860bd97750

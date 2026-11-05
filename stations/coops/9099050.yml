@@ -1,0 +1,16 @@
+name: Ashland
+lat: 46.595554
+lon: -90.888336
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -183.2
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9099050
+established: 2018-03-12T00:00:00Z
+removed: 2018-10-04T19:00:00Z

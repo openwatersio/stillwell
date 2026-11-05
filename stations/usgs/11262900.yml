@@ -1,0 +1,16 @@
+name: MUD SLOUGH NR GUSTINE CA
+lat: 37.26241266971287
+lon: -120.90655359167344
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 18.517
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11262900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2087b306e45a472ca22edeafd7268e17

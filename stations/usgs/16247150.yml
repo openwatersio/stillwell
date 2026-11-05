@@ -1,0 +1,15 @@
+name: Makiki Stream at Archie Baker Park, Oahu, HI
+lat: 21.308718085222832
+lon: -157.83042195529288
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 42.672
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16247150/
+parameter_code: "00065"
+time_series_id: 472cb7df20ad41bb908d6c85f7a31e77

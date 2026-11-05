@@ -1,0 +1,11 @@
+name: HUNDSMÜHLEN
+lat: 53.108847
+lon: 8.17307
+country_code: DE
+datum: PNP
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=4960020

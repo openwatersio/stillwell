@@ -1,0 +1,17 @@
+name: TURKEY CREEK NEAR TUSCALOOSA
+lat: 33.4134482437766
+lon: -87.5105601010659
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 82.296
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02464146/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2018-10-10T16:45:00+00:00
+time_series_id: acf4a7a4ba6b4c9285d45e5054a27887

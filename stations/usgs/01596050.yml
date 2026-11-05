@@ -1,0 +1,17 @@
+name: SAVAGE RIVER NEAR AVILTON, MD
+lat: 39.6431944444444
+lon: -79.0200277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 686.224
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01596050/
+parameter_code: "00065"
+series_begin: 2013-07-22T05:00:00+00:00
+series_end: 2016-07-01T05:00:00+00:00
+time_series_id: e350623dec3a4e488f80cab5364cfc2e

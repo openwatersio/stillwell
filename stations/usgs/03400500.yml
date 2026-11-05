@@ -1,0 +1,16 @@
+name: POOR FORK AT CUMBERLAND, KY
+lat: 36.9739805867453
+lon: -82.9929400382231
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 429.683
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03400500/
+parameter_code: "00065"
+series_begin: 2009-06-30T16:00:00+00:00
+time_series_id: 137161f108ec472e9b5f0d14e601d609

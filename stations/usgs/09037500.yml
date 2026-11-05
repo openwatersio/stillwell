@@ -1,0 +1,16 @@
+name: WILLIAMS FORK NEAR PARSHALL, CO
+lat: 40.0002
+lon: -106.180367
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2380.823
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09037500/
+parameter_code: "00065"
+series_begin: 2020-11-23T22:30:00+00:00
+time_series_id: 67ccb927987041078c88c6030fd9c7a1

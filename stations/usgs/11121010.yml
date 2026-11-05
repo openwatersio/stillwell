@@ -1,0 +1,15 @@
+name: JAMESON LK RELEASE WEIR A JAMESON LAKE CA
+lat: 34.4922149037655
+lon: -119.507902003711
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11121010/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2013-10-22T07:00:00+00:00
+time_series_id: 5d6a7e330d354a508167cc07ffb40f71

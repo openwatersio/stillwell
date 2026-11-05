@@ -1,0 +1,17 @@
+name: LITTLE DOUBLE BRIDGES CREEK NR ENTERPRISE, AL.
+lat: 31.272222000000003
+lon: -85.958333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.814
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02362240/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2024-03-13T18:00:00+00:00
+time_series_id: 6b0dd7b5bce04856b6a9ab59876f2e2c

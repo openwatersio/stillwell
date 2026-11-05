@@ -1,0 +1,17 @@
+name: MINER SLOUGH A HWY 84 BRIDGE
+lat: 38.2916666666667
+lon: -121.630833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11455165/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2020-12-11T16:45:00+00:00
+time_series_id: 9f31d85bbada49498d9e1839e5359cc5

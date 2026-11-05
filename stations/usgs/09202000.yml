@@ -1,0 +1,16 @@
+name: Boulder Creek bl Boulder Lake, nr Boulder, WY
+lat: 42.8193643222708
+lon: -109.717136903877
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2186.635
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09202000/
+parameter_code: "00065"
+series_begin: 2023-12-13T07:15:00+00:00
+time_series_id: 6dc471265c0b49c08770b7454a51d0da

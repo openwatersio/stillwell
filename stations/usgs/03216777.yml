@@ -1,0 +1,16 @@
+name: TYGARTS CREEK AT LAWTON RD AT OLIVE HILL,KY
+lat: 38.29038097552623
+lon: -83.189560302962
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 227.945
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03216777/
+parameter_code: "00065"
+series_begin: 2020-10-09T01:05:00+00:00
+time_series_id: eb6df41b53034806a01e1f3ee414248e

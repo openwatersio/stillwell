@@ -1,0 +1,16 @@
+name: STONE MOUNTAIN CREEK AT GA 124, NEAR LITHONIA, GA
+lat: 33.7732777777778
+lon: -84.0771666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 223.156
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02207160/
+parameter_code: "00065"
+series_begin: 2013-07-31T04:00:00+00:00
+time_series_id: e1eae9bc468444898cb12376f253d068

@@ -1,0 +1,15 @@
+name: CLEAR CREEK NEAR ARVADA, WY
+lat: 44.8715977148895
+lon: -106.082876879451
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1068.784
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06324000/
+parameter_code: "00065"
+time_series_id: 4a18f7ddb9c34dd791394dc1672450e5

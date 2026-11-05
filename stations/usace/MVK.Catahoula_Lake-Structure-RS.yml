@@ -1,0 +1,11 @@
+name: Catahoula Structure Riverside
+lat: 31.4794
+lon: -92.1133
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Catahoula%20Lake-Structure-RS.Stage.Inst.30Minutes.0.DCP-rev
+series: Catahoula Lake-Structure-RS.Stage.Inst.30Minutes.0.DCP-rev

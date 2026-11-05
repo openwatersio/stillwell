@@ -1,0 +1,17 @@
+name: MILL CREEK NEAR ANTIOCH, TN
+lat: 36.081598273374
+lon: -86.6807332865856
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 144.052
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03431000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:12:00+00:00
+series_end: 2019-10-03T15:00:00+00:00
+time_series_id: 75480d84eb624010b9085617d823343f

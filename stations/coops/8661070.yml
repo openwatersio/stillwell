@@ -1,0 +1,24 @@
+name: Springmaid Pier
+lat: 33.655
+lon: -78.9183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.635
+  MHW: -10.516
+  DTL: -9.782
+  MTL: -9.751
+  MSL: -9.754
+  MLW: -8.985
+  MLLW: -8.928
+  NAVD88: -9.89
+  LAT: -8.459
+  HAT: -11.158
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661070
+established: 1976-09-28T00:00:00Z

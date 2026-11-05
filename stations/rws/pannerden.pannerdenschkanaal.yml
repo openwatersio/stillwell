@@ -1,0 +1,11 @@
+name: Pannerden, Pannerdensch kanaal
+lat: 51.87475
+lon: 6.03778
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/pannerden.pannerdenschkanaal/details

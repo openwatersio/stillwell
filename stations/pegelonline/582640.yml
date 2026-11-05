@@ -1,0 +1,13 @@
+name: FÜRSTENWALDE OP
+lat: 52.35426
+lon: 14.066528
+country_code: DE
+datum: PNP
+datums:
+  NHN: 36.374
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=582640

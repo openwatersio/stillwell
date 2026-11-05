@@ -1,0 +1,16 @@
+name: SKAGIT RIVER NEAR CONCRETE, WA
+lat: 48.5242805851056
+lon: -121.770974074114
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.831
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12194000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: caa29b73017846e4b3262ae44592214e

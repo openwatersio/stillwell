@@ -1,0 +1,16 @@
+name: WALNUT CREEK AT SOUTH STATE STREET AT RALEIGH, NC
+lat: 35.7578888888889
+lon: -78.6238333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 63.703
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208735460/
+parameter_code: "00065"
+series_begin: 2018-08-14T14:15:00+00:00
+time_series_id: fbca25a385174f08b2b4b4bcb80d5756

@@ -1,0 +1,16 @@
+name: N.F. PEACHTREE CREEK, BUFORD HWY, NEAR ATLANTA, GA
+lat: 33.8315555555556
+lon: -84.3427777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 245.958
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02336120/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6ff56a3e2b644e4493a5fa2f9d71f022

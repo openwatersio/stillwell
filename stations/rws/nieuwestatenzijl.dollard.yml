@@ -1,0 +1,11 @@
+name: Nieuwe Statenzijl, Dollard
+lat: 53.231562
+lon: 7.207423
+country_code: NL
+datum: NAP
+products: [levels, extremes, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/nieuwestatenzijl.dollard/details

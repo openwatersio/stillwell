@@ -1,0 +1,15 @@
+name: SOUTH PINEY CREEK AT WILLOW PARK, WY
+lat: 44.4663158505857
+lon: -107.034848122439
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2602.992
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06320500/
+parameter_code: "00065"
+time_series_id: b6937f96f9aa4eaaab413151ec5a7a90

@@ -1,0 +1,11 @@
+name: Lierop, sluis 10, boven
+lat: 51.415639
+lon: 5.713889
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/lierop.sluis10.boven/details

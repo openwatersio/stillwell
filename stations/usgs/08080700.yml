@@ -1,0 +1,16 @@
+name: Running Water Draw at Plainview, TX
+lat: 34.1789604828062
+lon: -101.7026747676
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1018.803
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08080700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2027fa9ad40d41b5a64ce463c87a24d1

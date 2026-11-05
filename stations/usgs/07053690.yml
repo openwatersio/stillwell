@@ -1,0 +1,16 @@
+name: Turkey Creek near Hollister, MO
+lat: 36.5827777777778
+lon: -93.2102777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 237.811
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07053690/
+parameter_code: "00065"
+series_begin: 2020-06-09T22:10:00+00:00
+time_series_id: 01651e67ef7a4d09b56f3ffce4452c4c

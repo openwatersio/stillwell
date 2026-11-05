@@ -1,0 +1,14 @@
+name: PAMUNKEY CREEK AT RT 651 NEAR LAHORE, VA
+lat: 38.1545801347356
+lon: -77.9502746708539
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01670200/
+parameter_code: "00065"
+series_begin: 2023-05-16T19:15:00+00:00
+time_series_id: 570d6d6eb5f94dab87193ec86ac0d4ca

@@ -1,0 +1,16 @@
+name: KENAI R AT COOPER LANDING AK
+lat: 60.49220087247861
+lon: -149.8099462828012
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.845
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15258000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: f38df00bf30c48a69d0449d5303d3fe5

@@ -1,0 +1,17 @@
+name: LITTLE BLITZEN RIVER NR RIDDLE RANCH
+lat: 42.66755
+lon: -118.76015
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1546.86
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-424003118453700/
+parameter_code: "00065"
+series_begin: 2020-06-18T17:25:00+00:00
+series_end: 2021-10-27T15:00:00+00:00
+time_series_id: 45bc20140def4934aae5b71ed21b00c4

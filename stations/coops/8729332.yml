@@ -1,0 +1,21 @@
+name: JOLLY BAY, CHOCTAWHATCHEE BAY
+lat: 30.4283
+lon: -86.1367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.673
+  MHW: -0.671
+  DTL: -0.594
+  MTL: -0.592
+  MSL: -0.589
+  MLW: -0.512
+  MLLW: -0.503
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729332
+established: 1977-04-06T00:00:00Z
+removed: 1993-04-30T23:59:00Z

@@ -1,0 +1,16 @@
+name: QUONOPAUG BK AT RT 116 NR NORTH SCITUATE, RI
+lat: 41.7975996623848
+lon: -71.5847856520176
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 95.006
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115183/
+parameter_code: "00065"
+series_begin: 2009-02-06T05:00:00+00:00
+time_series_id: d361e5db92024208b297b87e89af6551

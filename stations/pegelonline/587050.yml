@@ -1,0 +1,13 @@
+name: SCHÖNWALDE OP
+lat: 52.607862
+lon: 13.088864
+country_code: DE
+datum: PNP
+datums:
+  NHN: 27.987
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=587050

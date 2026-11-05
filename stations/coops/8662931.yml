@@ -1,0 +1,24 @@
+name: WACCAMAW RIVER ENTRANCE
+lat: 33.3667
+lon: -79.255
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.157
+  MHW: -3.078
+  DTL: -2.553
+  MTL: -2.529
+  MSL: -2.554
+  MLW: -1.98
+  MLLW: -1.948
+  NAVD88: -2.5
+  LAT: -1.658
+  HAT: -3.398
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662931
+established: 1977-07-26T00:00:00Z
+removed: 1978-11-15T23:59:00Z

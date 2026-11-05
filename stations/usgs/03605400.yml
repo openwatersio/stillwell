@@ -1,0 +1,17 @@
+name: TRACE CREEK AT U S HIGHWAY 70, AT WAVERLY, TN
+lat: 36.08287092453729
+lon: -87.77557535944918
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 163.678
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03605400/
+parameter_code: "00065"
+series_begin: 2025-04-04T19:45:00+00:00
+series_end: 2025-04-11T15:00:00+00:00
+time_series_id: 3f41c07a1c4747cebfeba354df0eca2a

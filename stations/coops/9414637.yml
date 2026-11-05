@@ -1,0 +1,13 @@
+name: SAN MATEO BRIDGE,EAST END
+lat: 37.6083
+lon: -122.182
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414637
+established: 1976-12-16T00:00:00Z
+removed: 1977-04-14T23:59:00Z

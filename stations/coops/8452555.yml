@@ -1,0 +1,21 @@
+name: NAVY PIER, PRUDENCE ISLAND
+lat: 41.58
+lon: -71.3217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.574
+  MHW: -2.501
+  DTL: -1.945
+  MTL: -1.932
+  MSL: -1.884
+  MLW: -1.362
+  MLLW: -1.315
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8452555
+established: 1977-08-23T00:00:00Z
+removed: 1977-11-12T23:59:00Z

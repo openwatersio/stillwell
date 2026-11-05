@@ -1,0 +1,17 @@
+name: Blue River West of Fittstown, OK
+lat: 34.593056
+lon: -96.705833
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 330.995
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07332305/
+parameter_code: "00065"
+series_begin: 2019-12-20T22:00:00+00:00
+series_end: 2023-08-03T05:00:00+00:00
+time_series_id: 31274d92cbe2447b81037eaa64152031

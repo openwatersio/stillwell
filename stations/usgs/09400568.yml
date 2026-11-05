@@ -1,0 +1,17 @@
+name: POLACCA WASH NEAR SECOND MESA, AZ
+lat: 35.654805555555555
+lon: -110.563
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1597.152
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09400568/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2020-10-09T06:45:00+00:00
+time_series_id: 9ee0795081464e28a2bf21c107bbc778

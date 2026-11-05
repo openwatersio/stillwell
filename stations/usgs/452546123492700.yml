@@ -1,0 +1,17 @@
+name: TRASK RIVER AT HIGHWAY 101, NEAR TILLAMOOK, OR
+lat: 45.4295027777778
+lon: -123.824105555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-452546123492700/
+parameter_code: "00065"
+series_begin: 2018-11-08T22:30:00+00:00
+series_end: 2023-05-24T19:45:00+00:00
+time_series_id: 45e9a1260d4d474e9ef95f9256ffae9f

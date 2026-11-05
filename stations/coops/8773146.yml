@@ -1,0 +1,24 @@
+name: Matagorda City
+lat: 28.71
+lon: -95.9139
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.546
+  MHW: -9.545
+  DTL: -9.474
+  MTL: -9.475
+  MSL: -9.486
+  MLW: -9.405
+  MLLW: -9.403
+  NAVD88: -9.236
+  LAT: -9.186
+  HAT: -9.745
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8773146
+established: 2012-10-11T00:00:00Z

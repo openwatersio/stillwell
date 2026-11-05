@@ -1,0 +1,15 @@
+name: Loon Creek near Orleans, IA
+lat: 43.52109228724639
+lon: -95.10166231964422
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 427.634
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06603920/
+parameter_code: "00065"
+time_series_id: dc53fd1871ee4f42baf0a3c71370f203

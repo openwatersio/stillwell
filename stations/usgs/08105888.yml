@@ -1,0 +1,16 @@
+name: Brushy Ck at Kenney Fort Blvd at Round Rock, TX
+lat: 30.5123944444444
+lon: -97.6366722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 194.572
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08105888/
+parameter_code: "00065"
+series_begin: 2014-10-25T05:00:00+00:00
+time_series_id: ad10c08813284308b5d5c2935cc9f0e4

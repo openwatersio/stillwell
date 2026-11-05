@@ -1,0 +1,16 @@
+name: WILLIAM LOCK DITCH NEAR DURBIN, IN
+lat: 40.07364280095176
+lon: -85.92496025651579
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.001
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03350660/
+parameter_code: "00065"
+series_begin: 2008-09-24T16:15:00+00:00
+time_series_id: 58bf3bfa514740d9b9d7ac6d9139339f

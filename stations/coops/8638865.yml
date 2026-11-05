@@ -1,0 +1,13 @@
+name: CHES. BAY TEST FACILITY
+lat: 36.9667
+lon: -76.1133
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638865
+established: 1976-03-19T00:00:00Z
+removed: 1981-03-03T23:59:00Z

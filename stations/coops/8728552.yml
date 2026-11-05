@@ -1,0 +1,13 @@
+name: ST. GEORGE IS.,RATTLESNAKE COVE
+lat: 29.6917
+lon: -84.7917
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728552
+established: 1972-05-26T00:00:00Z
+removed: 2023-11-11T00:00:00Z

@@ -1,0 +1,11 @@
+name: Drainage Canal at Pointe Coupee (40700)
+lat: 30.726
+lon: -91.7389695
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Pointe_Coupee.Stage.Inst.1Hour.0.rev
+series: Pointe_Coupee.Stage.Inst.1Hour.0.rev

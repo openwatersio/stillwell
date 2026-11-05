@@ -1,0 +1,16 @@
+name: GENESEE RIVER NEAR MOUNT MORRIS NY
+lat: 42.7666666666667
+lon: -77.8388888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.461
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04227500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 20b9f6214e074f40af8edcfcdd45cd52

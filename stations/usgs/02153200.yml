@@ -1,0 +1,16 @@
+name: BROAD RIVER NEAR BLACKSBURG, SC
+lat: 35.1240172843836
+lon: -81.5878719883229
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.317
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02153200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2f9ad9f910f24b41baded7688a994b37

@@ -1,0 +1,14 @@
+name: TI-9 IN WATER CONSERVATION AREA 3-B
+lat: 25.8376944444444
+lon: -80.5993333333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255014080355801/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1114afd548e240ce972a6a900cb6e17f

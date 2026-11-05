@@ -1,0 +1,14 @@
+name: Marietta
+lat: 39.4094
+lon: -81.4577
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 172.709
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Marietta.Stage.Inst.15Minutes.0.OBS
+series: Marietta.Stage.Inst.15Minutes.0.OBS

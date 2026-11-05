@@ -1,0 +1,16 @@
+name: Leon Ck at IH 35, San Antonio, TX
+lat: 29.3299583668677
+lon: -98.5841856078531
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 175.034
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08181480/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 222e29195eeb44f8bc988a8d4100c8a0

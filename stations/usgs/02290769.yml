@@ -1,0 +1,14 @@
+name: CANAL 111 AT S-18-C NEAR FLORIDA CITY, FL
+lat: 25.3272222222222
+lon: -80.5248333333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02290769/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8b70fba4dfb441098be5817a72494525

@@ -1,0 +1,13 @@
+name: STEELMANVILLE 2, PATCONG RIVER
+lat: 39.3367
+lon: -74.595
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534779
+established: 1979-07-31T00:00:00Z
+removed: 1979-11-08T23:59:00Z

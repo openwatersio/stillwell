@@ -1,0 +1,17 @@
+name: West Cache Creek at Faxon, Ok
+lat: 34.4630555555556
+lon: -98.5713888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 320.522
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07311230/
+parameter_code: "00065"
+series_begin: 2014-12-11T06:00:00+00:00
+series_end: 2018-06-05T12:00:00+00:00
+time_series_id: af986c436b2f44a19f13ac988c719f4c

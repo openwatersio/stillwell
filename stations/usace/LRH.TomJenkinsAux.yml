@@ -1,0 +1,14 @@
+name: Tom Jenkins Aux Gage
+lat: 39.525121
+lon: -82.071671
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 207.13
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=TomJenkinsAux.Stage.Inst.15Minutes.0.OBS
+series: TomJenkinsAux.Stage.Inst.15Minutes.0.OBS

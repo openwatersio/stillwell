@@ -1,0 +1,23 @@
+name: Nunam Iqua (Sheldon Point)
+lat: 62.532944
+lon: -164.84528
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.399
+  MHW: -9.195
+  DTL: -8.997
+  MTL: -8.92
+  MSL: -8.915
+  MLW: -8.645
+  MLLW: -8.595
+  LAT: -8.355
+  HAT: -9.698
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9467551
+established: 2011-06-07T00:00:00Z
+removed: 2011-10-02T23:59:00Z

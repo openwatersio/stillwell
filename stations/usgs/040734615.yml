@@ -1,0 +1,15 @@
+name: HILL CREEK NR MOUTH NEAR GREEN LAKE, WI
+lat: 43.8147039501645
+lon: -88.9476128247736
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-040734615/
+parameter_code: "00065"
+series_begin: 2017-12-12T17:00:00+00:00
+series_end: 2021-01-04T17:00:00+00:00
+time_series_id: 00db3f721091418c84b7008d2f033bda

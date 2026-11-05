@@ -1,0 +1,23 @@
+name: Luquillo, PR
+lat: 18.3817
+lon: -65.7365
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.417
+  MHW: -9.355
+  DTL: -9.187
+  MTL: -9.185
+  MSL: -9.183
+  MLW: -9.014
+  MLLW: -8.958
+  LAT: -8.795
+  HAT: -9.606
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9753766
+established: 2020-11-19T00:00:00Z
+removed: 2021-04-01T12:00:00Z

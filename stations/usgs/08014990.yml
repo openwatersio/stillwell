@@ -1,0 +1,15 @@
+name: Bundick Creek north of Dry Creek, LA
+lat: 30.68475
+lon: -93.04366666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08014990/
+parameter_code: "00065"
+series_begin: 2023-10-17T17:15:00+00:00
+series_end: 2026-09-16T15:15:00+00:00
+time_series_id: e5eaaf9aa5f642a19f74a3ae4e5f9212

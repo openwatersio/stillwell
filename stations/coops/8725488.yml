@@ -1,0 +1,23 @@
+name: NORTH CAPTIVA ISLAND
+lat: 26.605
+lon: -82.2183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.968
+  MHW: -0.907
+  DTL: -0.661
+  MTL: -0.672
+  MSL: -0.672
+  MLW: -0.436
+  MLLW: -0.353
+  LAT: -0.062
+  HAT: -1.181
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725488
+established: 1977-12-30T00:00:00Z
+removed: 1989-09-09T23:59:00Z

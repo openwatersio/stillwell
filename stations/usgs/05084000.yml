@@ -1,0 +1,16 @@
+name: FOREST RIVER NEAR FORDVILLE, ND
+lat: 48.197222
+lon: -97.730278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.861
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05084000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: dbd51ee01f2d4ff697d2402145797a9a

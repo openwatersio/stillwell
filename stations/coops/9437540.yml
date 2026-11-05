@@ -1,0 +1,23 @@
+name: Garibaldi
+lat: 45.55453
+lon: -123.918945
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.751
+  MHW: -3.535
+  DTL: -2.483
+  MTL: -2.584
+  MSL: -2.589
+  MLW: -1.633
+  MLLW: -1.215
+  LAT: -0.426
+  HAT: -4.394
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9437540
+established: 1866-08-11T00:00:00Z

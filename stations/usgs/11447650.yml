@@ -1,0 +1,14 @@
+name: SACRAMENTO R A FREEPORT CA
+lat: 38.4556638888889
+lon: -121.501616666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11447650/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 37732a1d42d8413382a350ecaef0be45

@@ -1,0 +1,16 @@
+name: SALMON R NR HYDER AK
+lat: 56.026111
+lon: -130.065278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.173
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15008000/
+parameter_code: "00065"
+series_begin: 2009-10-20T01:00:00+00:00
+time_series_id: 0d876b40d1744522b7b9fef475590d52

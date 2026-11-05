@@ -1,0 +1,12 @@
+name: Norddeich, Westerriede
+lat: 53.64361
+lon: 7.14806
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.16
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/norddeich_westerriede

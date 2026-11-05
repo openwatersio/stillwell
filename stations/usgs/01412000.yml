@@ -1,0 +1,17 @@
+name: Menantico Creek near Millville NJ
+lat: 39.4191666666667
+lon: -74.9658333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.589
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01412000/
+parameter_code: "00065"
+series_begin: 2019-09-24T18:00:00+00:00
+series_end: 2024-11-06T17:15:00+00:00
+time_series_id: 6f4de7304071429d9c2f66859aeb16f0

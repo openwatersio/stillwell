@@ -1,0 +1,16 @@
+name: Spring River at La Russell, MO
+lat: 37.1502777777778
+lon: -94.0613888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 309.293
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07185700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d5a456f38568404d87fb697b4e0ab51a

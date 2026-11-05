@@ -1,0 +1,16 @@
+name: Joes Ck at Willowbrook Rd, Dallas, TX
+lat: 32.861694444444446
+lon: -96.88288888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 125.767
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08055605/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: f024cd8005e3412098132a727a18af14

@@ -1,0 +1,13 @@
+name: CALLAWASSIE ISLAND BRIDGE
+lat: 32.3417
+lon: -80.8567
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8668511
+established: 1978-03-20T00:00:00Z
+removed: 1979-04-18T23:59:00Z

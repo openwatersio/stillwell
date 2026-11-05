@@ -1,0 +1,21 @@
+name: TAIYASANKA HARBOR
+lat: 59.3017
+lon: -135.428
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.884
+  MHW: -4.591
+  DTL: -2.333
+  MTL: -2.432
+  MSL: -2.487
+  MLW: -0.274
+  MLLW: 0.219
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452434
+established: 1998-04-21T00:00:00Z
+removed: 1998-05-28T23:59:00Z

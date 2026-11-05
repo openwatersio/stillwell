@@ -1,0 +1,16 @@
+name: NORTH FLOODWAY CHANNEL NEAR ALAMEDA, NM
+lat: 35.198055555555555
+lon: -106.59972222222221
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1529.648
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08329900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 14bb531bba1c402e9876e1b138b053e5

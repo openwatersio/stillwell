@@ -1,0 +1,13 @@
+name: CLAM BAY
+lat: 47.5733
+lon: -122.543
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445938
+established: 1974-04-26T00:00:00Z
+removed: 1977-11-10T23:59:00Z

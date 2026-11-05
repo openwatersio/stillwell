@@ -1,0 +1,17 @@
+name: BENT CANYON CREEK AT MOUTH NEAR TIMPAS, CO
+lat: 37.589167
+lon: -103.647778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1341.73
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07126480/
+parameter_code: "00065"
+series_begin: 2020-08-29T01:15:00+00:00
+series_end: 2020-08-29T10:15:00+00:00
+time_series_id: f551f32c9b10425c9adaf7a563dd1ebe

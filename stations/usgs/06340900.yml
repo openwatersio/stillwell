@@ -1,0 +1,16 @@
+name: MISSOURI RIVER NEAR HENSLER, ND
+lat: 47.280278
+lon: -101.185278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 500.226
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06340900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d93bd60108b040bc8aff0ac3389a5360

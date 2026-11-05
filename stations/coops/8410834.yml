@@ -1,0 +1,23 @@
+name: Pettegrove Point, Dochet Island
+lat: 45.128445
+lon: -67.14467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.658
+  MHW: -8.51
+  DTL: -5.532
+  MTL: -5.527
+  MSL: -5.535
+  MLW: -2.544
+  MLLW: -2.406
+  LAT: -1.351
+  HAT: -9.763
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8410834
+established: 2010-03-21T00:00:00Z
+removed: 2010-11-05T23:59:00Z

@@ -1,0 +1,16 @@
+name: Clark Fork ab Little Blackfoot R nr Garrison MT
+lat: 46.5109111111111
+lon: -112.789686111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1325.88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12324400/
+parameter_code: "00065"
+series_begin: 2009-03-01T07:00:00+00:00
+time_series_id: cf74fc1dd5284f8dacaf16fe3e9bf456

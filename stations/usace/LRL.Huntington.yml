@@ -1,0 +1,13 @@
+name: WABASH RIVER AT HUNTINGTON, IN
+lat: 40.85325
+lon: -85.4897778
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 213.372
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Huntington.Stage.Inst.15Minutes.0.USGS-rev
+series: Huntington.Stage.Inst.15Minutes.0.USGS-rev

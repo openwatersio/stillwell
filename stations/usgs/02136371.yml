@@ -1,0 +1,14 @@
+name: SAMPIT RIVER BELOW US 17 NEAR GEORGETOWN, SC
+lat: 33.359861111111115
+lon: -79.28802777777777
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136371/
+parameter_code: "00065"
+series_begin: 2024-10-01T08:30:00+00:00
+time_series_id: 4060c2805cfe478b98974d1a776c6f46

@@ -1,0 +1,16 @@
+name: CHICKASAWHAY RIVER AT QUITMAN, MS
+lat: 32.04240686469598
+lon: -88.74421422047071
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.529
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02477045/
+parameter_code: "00065"
+series_begin: 2021-10-06T15:15:00+00:00
+time_series_id: 21081ea28f79445aa07754d994c1b565

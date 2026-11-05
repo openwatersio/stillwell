@@ -1,0 +1,16 @@
+name: GALLINAS R NR COLONIAS, NM
+lat: 35.1819611111111
+lon: -104.900266666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1505.712
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08382500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: f5e35d94a2e64564bb724046c18b5935

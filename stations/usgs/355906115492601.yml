@@ -1,0 +1,17 @@
+name: 162  S23 E55 05BAAB1    STUMP SPRING
+lat: 35.98375
+lon: -115.825278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 849.258
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-355906115492601/
+parameter_code: "00065"
+series_begin: 2013-12-03T19:00:00+00:00
+series_end: 2023-12-18T19:10:00+00:00
+time_series_id: e18a06a3432240f2b66f6e353f9fc460

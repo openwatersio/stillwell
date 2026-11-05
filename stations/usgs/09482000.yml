@@ -1,0 +1,16 @@
+name: SANTA CRUZ RIVER AT CONTINENTAL, AZ
+lat: 31.87150113508573
+lon: -110.98012499833213
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 855.577
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09482000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: a1223eb37841465baf7dab547bc39618

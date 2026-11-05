@@ -1,0 +1,13 @@
+name: Little Miami River near Spring V
+lat: 39.58339358
+lon: -84.030211
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 222.288
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=SpringValley.Stage.Inst.15Minutes.0.LRGS-rev
+series: SpringValley.Stage.Inst.15Minutes.0.LRGS-rev

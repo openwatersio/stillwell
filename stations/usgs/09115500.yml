@@ -1,0 +1,16 @@
+name: TOMICHI CREEK AT SARGENTS, CO
+lat: 38.395028
+lon: -106.422625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2565.011
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09115500/
+parameter_code: "00065"
+series_begin: 2020-10-05T22:00:00+00:00
+time_series_id: 1d5558d168764306a8f5a4b25dd2605f

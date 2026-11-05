@@ -1,0 +1,16 @@
+name: MILL C AT JOHNSON DRIVE, SHAWNEE, KS
+lat: 39.0291666666667
+lon: -94.8172222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 213.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06892513/
+parameter_code: "00065"
+series_begin: 2007-10-23T05:00:00+00:00
+time_series_id: a53c4220b2594639a639c1c5b888aae7

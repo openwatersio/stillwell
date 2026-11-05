@@ -1,0 +1,24 @@
+name: San Luis Pass
+lat: 29.095
+lon: -95.1133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.591
+  MHW: -1.573
+  DTL: -1.413
+  MTL: -1.436
+  MSL: -1.444
+  MLW: -1.3
+  MLLW: -1.235
+  NAVD88: -1.312
+  LAT: -0.819
+  HAT: -1.854
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771972
+established: 1998-01-29T00:00:00Z

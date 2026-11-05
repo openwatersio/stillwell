@@ -1,0 +1,24 @@
+name: Kiptopeke
+lat: 37.1652
+lon: -75.9884
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.001
+  MHW: -1.932
+  DTL: -1.553
+  MTL: -1.535
+  MSL: -1.539
+  MLW: -1.139
+  MLLW: -1.105
+  NAVD88: -1.685
+  LAT: -0.825
+  HAT: -2.304
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8632200
+established: 1951-08-22T00:00:00Z

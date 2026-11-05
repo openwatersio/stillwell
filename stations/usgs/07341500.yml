@@ -1,0 +1,16 @@
+name: Red River at Fulton, AR
+lat: 33.6073428501977
+lon: -93.813794170572
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 68.565
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07341500/
+parameter_code: "00065"
+series_begin: 2017-10-13T03:00:00+00:00
+time_series_id: 06bb68b673734549aa6aa31994ac500c

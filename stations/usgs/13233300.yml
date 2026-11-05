@@ -1,0 +1,16 @@
+name: MALHEUR RIVER BELOW NEVADA DAM NEAR VALE OR
+lat: 43.987500000000004
+lon: -117.21888888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 673.821
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13233300/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3a475b16940b4df28ad49a18a9f2b403

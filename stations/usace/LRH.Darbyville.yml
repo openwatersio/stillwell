@@ -1,0 +1,13 @@
+name: Darbyville
+lat: 39.7005
+lon: -83.1108
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 217.533
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Darbyville.Stage.Inst.15Minutes.0.OBS
+series: Darbyville.Stage.Inst.15Minutes.0.OBS

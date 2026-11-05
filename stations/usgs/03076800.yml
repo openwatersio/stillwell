@@ -1,0 +1,17 @@
+name: MILL RUN AT MINERAL SPRING, MD
+lat: 39.7089444444444
+lon: -79.3643611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 469.145
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03076800/
+parameter_code: "00065"
+series_begin: 2013-07-25T14:15:00+00:00
+series_end: 2016-07-01T05:00:00+00:00
+time_series_id: 027973f083ba4950911d5d53a442b0dc

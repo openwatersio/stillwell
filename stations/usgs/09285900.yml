@@ -1,0 +1,16 @@
+name: STRAWBERRY RIVER AT PINNACLES NEAR FRUITLAND, UT
+lat: 40.1271783030172
+lon: -110.741824212577
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1844.634
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09285900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 77629a5dcdd3452d8087f8d4f7032a0f

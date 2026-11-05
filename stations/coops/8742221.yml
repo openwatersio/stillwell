@@ -1,0 +1,23 @@
+name: Horn Island
+lat: 30.2383
+lon: -88.6667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.446
+  MHW: -1.414
+  DTL: -1.202
+  MTL: -1.205
+  MSL: -1.203
+  MLW: -0.995
+  MLLW: -0.958
+  LAT: -0.719
+  HAT: -1.714
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8742221
+established: 1980-04-16T00:00:00Z
+removed: 2005-08-29T23:59:00Z

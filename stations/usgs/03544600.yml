@@ -1,0 +1,16 @@
+name: Richland Creek at Dayton, TN
+lat: 35.490517
+lon: -85.016011
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 206.654
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03544600/
+parameter_code: "00065"
+series_begin: 2024-05-13T20:30:00+00:00
+time_series_id: 48f626d7c2f34c3fbc1a0dbe9db62973

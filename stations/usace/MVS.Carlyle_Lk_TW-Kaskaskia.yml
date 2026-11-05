@@ -1,0 +1,13 @@
+name: Carlyle Lk TW
+lat: 38.617775
+lon: -89.353661
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 123.328
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Carlyle%20Lk%20TW-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Carlyle Lk TW-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev

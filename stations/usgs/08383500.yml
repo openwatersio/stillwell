@@ -1,0 +1,16 @@
+name: PECOS RIVER NEAR PUERTO DE LUNA, NM
+lat: 34.7300833333333
+lon: -104.524911111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1314.096
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08383500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e339efcd4bb04346acbe124a002d40d0

@@ -1,0 +1,13 @@
+name: Osteriff, Elbe
+lat: 53.85639
+lon: 9.03167
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970096]
+source_url: https://gezeiten.bsh.de/osteriff

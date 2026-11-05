@@ -1,0 +1,13 @@
+name: Sand Run, WV (FWS)
+lat: 38.9633
+lon: -80.1533
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 466.161
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=SandRun.Stage.Inst.30Minutes.0.OBS
+series: SandRun.Stage.Inst.30Minutes.0.OBS

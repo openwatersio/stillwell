@@ -1,0 +1,16 @@
+name: WARD C BL CONFLUENCE NR TAHOE CITY CA
+lat: 39.14071737549866
+lon: -120.21211650039614
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2023.625
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10336674/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2cbbc26ee85e4fba9e3ce2336c6c521f

@@ -11,7 +11,9 @@ So far the bucket holds the station lists that have been published to it and one
 ```
 stations.parquet                                      one row per station
 sources.json                                          license and attribution per source
-recent/<source>.parquet                               last 7 days: station, time, level_m, flag, received
+stations/<source>.parquet                             one source's list, as ingest keeps it
+history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
+recent/<source>.parquet                               last 7 days: station, time, level_m, flag, received, epoch
 obs/<source>/<station>/<year>.parquet                 observed levels: time, level_m, flag, received, datum
 extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters: time, level_m, type, flag, datum
 predictions/<source>/<station>/<year>.parquet         the source's predicted curve: time, level_m, flag, received, datum
@@ -19,8 +21,9 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 ```
 
 - **`<station>`** is the station's `source_id` from `stations.parquet`, URL-encoded. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
+- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch; [Datum epochs](#datum-epochs) below shows how to read across them.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
-- **`level_m`** is meters in the file's `datum`, which is the same on every row and matches the station's `datum` in `stations.parquet`.
+- **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
 - **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only makes a flag worse. `flag <= 2` keeps everything not flagged as a problem.
 - **`received`** is when ingest first saw a value arrive. It's empty for backfilled history.
 - **`type`** is `high` or `low`. BSH's predicted extremes also carry its `transit` number and `event` index.
@@ -32,7 +35,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 `stations.parquet` has one row per station. Besides `id`, `name`, `lat` and `lon`, these columns matter most:
 
 - **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum), `STND` (CO-OPS station datum), `GZ` (USACE gauge zero) or `GAGE` (USGS gage datum).
-- **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes.
+- **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.
 - **`status`**: `active` or `inactive`.
@@ -240,7 +243,33 @@ SET VARIABLE files = (
 SELECT count(*) AS n FROM read_parquet(getvariable('files'));
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once the scheduled jobs fill them in.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once compaction derives them from the lake; until then they're empty.
+
+## Datum epochs
+
+`stations.parquet`'s `epochs` lists each span over which a station's levels share one reference: `id`, `datum`, `since` and `until` (UTC, either null when open-ended), `seen` (the last refresh that confirmed it), `reference` (the source's own name for it, where it has one), `reference_since` (where the source says that starts), `datums` (its offsets), `to_current` and `state`. `to_current` is the meters to add to that epoch's levels to put them in the station's current `datum`, and null when they can't be converted, such as across a gauge zero reset nobody has measured. Rows in an epoch's files outside its `since` and `until` aren't part of the series; they're the uncertain stretch around a change. A station's whole record in its current datum:
+
+```sql
+SET TimeZone = 'UTC';
+SET VARIABLE base = 'https://water-levels.openwaters.io/obs/pegelonline/5990020';
+WITH e AS (
+  SELECT unnest(epochs, recursive := true)
+  FROM 'https://water-levels.openwaters.io/stations.parquet' WHERE id = 'pegelonline/5990020'
+),
+o AS (
+  -- epoch 1's files; add a read_parquet per later epoch from its directory
+  SELECT 1 AS epoch, * FROM read_parquet(getvariable('base') || '/2024.parquet')
+)
+SELECT o.time, o.level_m + e.to_current AS level_m, o.flag
+FROM o JOIN e ON o.epoch = e.id
+  AND (e.since IS NULL OR o.time >= e.since) AND (e.until IS NULL OR o.time < e.until)
+WHERE e.to_current IS NOT NULL
+-- after a rejected epoch, its files and the epoch before it can share a time; the latter wins
+QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 1
+ORDER BY o.time;
+```
+
+[stations.md](stations.md) has the rules for when an epoch opens and how epochs convert.
 
 ## Python
 

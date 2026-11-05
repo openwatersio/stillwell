@@ -1,0 +1,23 @@
+name: Fort McHenry Marsh
+lat: 39.2617
+lon: -76.585
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.762
+  MHW: -1.67
+  DTL: -1.509
+  MTL: -1.496
+  MSL: -1.499
+  MLW: -1.323
+  MLLW: -1.257
+  LAT: -1.063
+  HAT: -1.944
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8574683
+established: 2004-03-15T00:00:00Z
+removed: 2005-05-16T23:59:00Z

@@ -1,0 +1,16 @@
+name: CANISTEO RIVER BELOW CANACADEA CREEK AT HORNELL NY
+lat: 42.3134722222222
+lon: -77.6510833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 344.692
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01524500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1f2efe4d6cd443e18557710a3b9e55a1

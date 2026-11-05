@@ -1,0 +1,16 @@
+name: Cedar Creek near Bussey, IA
+lat: 41.2191111111111
+lon: -92.9088333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 207.743
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05489000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 12cfaeb8b4364fe8bded4640c740edf8

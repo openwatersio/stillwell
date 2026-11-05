@@ -1,0 +1,13 @@
+name: Meta
+lat: 37.5669
+lon: -82.4581
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 218.133
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Meta.Stage.Inst.15Minutes.0.OBS
+series: Meta.Stage.Inst.15Minutes.0.OBS

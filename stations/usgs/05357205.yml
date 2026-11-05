@@ -1,0 +1,17 @@
+name: ALLEQUASH CREEK NEAR SAYNER, WI
+lat: 46.0308444444444
+lon: -89.5993944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 496.013
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05357205/
+parameter_code: "00065"
+series_begin: 2018-10-26T17:00:00+00:00
+series_end: 2021-11-04T05:45:00+00:00
+time_series_id: 28bf44fd149e421fbd8087f50de6f3f3

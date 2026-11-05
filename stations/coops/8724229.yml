@@ -1,0 +1,21 @@
+name: ANNETTE KEY
+lat: 24.7583
+lon: -81.39
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.471
+  MHW: -1.401
+  DTL: -1.104
+  MTL: -1.115
+  MSL: -1.083
+  MLW: -0.829
+  MLLW: -0.737
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724229
+established: 1974-07-25T00:00:00Z
+removed: 1974-09-10T23:59:00Z

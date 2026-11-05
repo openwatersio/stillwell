@@ -1,0 +1,16 @@
+name: VILLAGE CREEK AT AVENUE W AT ENSLEY, AL
+lat: 33.517648095757096
+lon: -86.87915888903166
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 154.015
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02458450/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0e80347184cd43a8a08e9d5905d32849

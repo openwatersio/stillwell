@@ -1,0 +1,15 @@
+name: HAMILTON C US OF CULVERT NR ANZA CA
+lat: 33.563275
+lon: -116.628022222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1266.874
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-333348116374101/
+parameter_code: "00065"
+time_series_id: 55b9cef584e04900bd8ee63e7c50f360

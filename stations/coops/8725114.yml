@@ -1,0 +1,24 @@
+name: Naples Bay, North
+lat: 26.1367
+lon: -81.7883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.407
+  MHW: -1.332
+  DTL: -0.987
+  MTL: -1.031
+  MSL: -1.045
+  MLW: -0.73
+  MLLW: -0.567
+  NAVD88: -1.197
+  LAT: -0.149
+  HAT: -1.682
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725114
+established: 1978-03-13T00:00:00Z

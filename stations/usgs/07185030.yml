@@ -1,0 +1,17 @@
+name: Elm Creek near Commerce, OK
+lat: 36.9216666666667
+lon: -94.9183333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 230.407
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07185030/
+parameter_code: "00065"
+series_begin: 2016-10-05T19:30:00+00:00
+series_end: 2026-10-12T20:50:00+00:00
+time_series_id: 754f3449ac1645ac8ed20cdee16cc3cf

@@ -1,0 +1,15 @@
+name: St. Louis River at Oliver, WI.
+lat: 46.656666666666666
+lon: -92.20111111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.49
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0402403250/
+parameter_code: "00065"
+time_series_id: 8239fb08b03b4fce8c4b63bc96f01e94

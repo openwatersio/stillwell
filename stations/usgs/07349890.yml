@@ -1,0 +1,16 @@
+name: Red Chute Bayou near Elm Grove, LA.
+lat: 32.3626552961112
+lon: -93.5029523094535
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 34.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07349890/
+parameter_code: "00065"
+series_begin: 2015-11-16T17:15:00+00:00
+time_series_id: d51572de91e949469b3ed1e6627cd9eb

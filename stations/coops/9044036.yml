@@ -1,0 +1,16 @@
+name: Fort Wayne
+lat: 42.298912
+lon: -83.092636
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -174.08
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9044036
+established: 1970-01-01T00:00:00Z

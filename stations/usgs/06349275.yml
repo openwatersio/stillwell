@@ -1,0 +1,17 @@
+name: LONG LAKE CR BELOW LONG LAKE NR MOFFIT, ND
+lat: 46.6916561487812
+lon: -100.286501182027
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 522.732
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06349275/
+parameter_code: "00065"
+series_begin: 2010-09-28T05:00:00+00:00
+series_end: 2011-11-09T05:45:00+00:00
+time_series_id: f7f6b84e73fa46b38c2dcf596fecd2bd

@@ -1,0 +1,16 @@
+name: SAN TIMOTEO C NR LOMA LINDA CA
+lat: 34.0614024063326
+lon: -117.267541860661
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.904
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11057500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: d843a408abdb4a84b743c8bf9d585cc3

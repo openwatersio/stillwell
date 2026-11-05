@@ -1,0 +1,15 @@
+name: PASS CREEK NEAR ELK MOUNTAIN, WY
+lat: 41.5860604677011
+lon: -106.610914797301
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2203.704
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06628900/
+parameter_code: "00065"
+time_series_id: 668f200711f644aeb5f7efc5a1c0d882

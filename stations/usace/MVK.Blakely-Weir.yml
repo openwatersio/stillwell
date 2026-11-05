@@ -1,0 +1,11 @@
+name: Blakely Weir
+lat: 34.572824
+lon: -93.194685
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Blakely-Weir.Stage.Inst.1Hour.0.DCP-raw
+series: Blakely-Weir.Stage.Inst.1Hour.0.DCP-raw

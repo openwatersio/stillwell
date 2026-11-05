@@ -1,0 +1,13 @@
+name: Tensas River @ Clayton, LA
+lat: 31.724589
+lon: -91.544311
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 0.088
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Clayton.Stage.Inst.1Hour.0.DCP-rev
+series: Clayton.Stage.Inst.1Hour.0.DCP-rev

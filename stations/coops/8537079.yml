@@ -1,0 +1,13 @@
+name: NEWPORT LDG., NANTUXENT CREEK
+lat: 39.2917
+lon: -75.1983
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8537079
+established: 1977-07-14T00:00:00Z
+removed: 1978-11-16T23:59:00Z

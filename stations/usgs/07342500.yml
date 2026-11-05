@@ -1,0 +1,16 @@
+name: S Sulphur Rv nr Cooper, TX
+lat: 33.3564990201147
+lon: -95.5949562370559
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.73
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07342500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4a90df7b578e4a539b6a578d8f5d3dcb

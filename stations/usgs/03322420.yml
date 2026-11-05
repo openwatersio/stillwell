@@ -1,0 +1,16 @@
+name: OHIO RIVER AT UNIONTOWN DAM, KY
+lat: 37.7971555584685
+lon: -87.9983356426059
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 94.778
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03322420/
+parameter_code: "00065"
+series_begin: 2014-10-02T16:45:00+00:00
+time_series_id: 7bba0d02875245f1bb21bc3bded4f32e

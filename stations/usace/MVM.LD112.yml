@@ -1,0 +1,13 @@
+name: Little River Diversion @ Dutchtown
+lat: 37.2319
+lon: -89.6585
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 94.086
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LD112.Stage.Inst.1Hour.0.opendcs-rev
+series: LD112.Stage.Inst.1Hour.0.opendcs-rev

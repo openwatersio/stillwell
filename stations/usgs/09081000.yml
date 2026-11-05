@@ -1,0 +1,16 @@
+name: ROARING FORK RIVER NEAR EMMA, CO
+lat: 39.3733172900037
+lon: -107.083936724902
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1971.696
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09081000/
+parameter_code: "00065"
+series_begin: 2020-10-05T21:45:00+00:00
+time_series_id: 49a87eb96f2746da941266c3792065eb

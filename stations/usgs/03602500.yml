@@ -1,0 +1,16 @@
+name: PINEY RIVER AT VERNON, TN
+lat: 35.871294483184
+lon: -87.50140015202294
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 140.626
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03602500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b955a46b4f9b48b383f0c9376a49c1a1

@@ -1,0 +1,16 @@
+name: Rathbun Lake near Rathbun, IA
+lat: 40.8235
+lon: -92.8944166666667
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06903880/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c65366f5c7ef4bc8b570377810a05d06

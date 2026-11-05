@@ -1,0 +1,16 @@
+name: CHICKAHOMINY RIVER NEAR PROVIDENCE FORGE, VA
+lat: 37.4362576491275
+lon: -77.0608027101883
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.454
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02042500/
+parameter_code: "00065"
+series_begin: 1990-10-01T04:57:24+00:00
+time_series_id: 81aa3b709b4f4656b15b67b75156bbcb

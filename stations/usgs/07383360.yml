@@ -1,0 +1,16 @@
+name: Little River at Boggy Bayou Rd e of Marksville, LA
+lat: 31.141916666666667
+lon: -92.00947222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.046
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07383360/
+parameter_code: "00065"
+series_begin: 2024-02-29T11:45:00+00:00
+time_series_id: 0ef6c1e5e4fe49ee862b15b7fcd0f64b

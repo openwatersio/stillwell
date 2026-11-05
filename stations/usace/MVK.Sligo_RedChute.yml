@@ -1,0 +1,13 @@
+name: Red Chute @ Sligo, LA
+lat: 32.447222223258
+lon: -93.594444445609
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 36.533
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Sligo_RedChute.Stage.Inst.15Minutes.0.DCP-rev
+series: Sligo_RedChute.Stage.Inst.15Minutes.0.DCP-rev

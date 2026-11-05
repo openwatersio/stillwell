@@ -1,0 +1,23 @@
+name: Dunbar Inlet GPS Tide Buoy
+lat: 55.08789
+lon: -132.81583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 1.821
+  MHW: 2.085
+  DTL: 3.81
+  MTL: 3.706
+  MSL: 3.707
+  MLW: 5.328
+  MLLW: 5.798
+  LAT: 6.933
+  HAT: 0.784
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450286
+established: 2016-05-05T00:00:00Z
+removed: 2016-06-10T23:59:00Z

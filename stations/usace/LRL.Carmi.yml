@@ -1,0 +1,13 @@
+name: LITTLE WABASH RIVER AT MAIN ST A
+lat: 38.09226857
+lon: -88.1561487
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 103.605
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Carmi.Stage.Inst.15Minutes.0.LRGS-rev
+series: Carmi.Stage.Inst.15Minutes.0.LRGS-rev

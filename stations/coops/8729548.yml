@@ -1,0 +1,21 @@
+name: CAMP PINCHOT
+lat: 30.47
+lon: -86.59331
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.661
+  MHW: -1.661
+  DTL: -1.594
+  MTL: -1.596
+  MSL: -1.592
+  MLW: -1.531
+  MLLW: -1.527
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729548
+established: 1977-04-28T00:00:00Z
+removed: 2024-10-14T00:00:00Z

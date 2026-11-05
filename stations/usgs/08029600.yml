@@ -1,0 +1,17 @@
+name: Simms Branch nr Call, TX
+lat: 30.5249777777778
+lon: -93.741475
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08029600/
+parameter_code: "00065"
+series_begin: 2018-11-14T19:00:00+00:00
+series_end: 2026-06-20T06:15:00+00:00
+time_series_id: 81588e5dc85b4f24b305f99b2a9f508d

@@ -1,0 +1,14 @@
+name: APOPKA-BEAUCLAIR CANAL NEAR ASTATULA, FL
+lat: 28.722494436461
+lon: -81.6847976456863
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02237700/
+parameter_code: "00065"
+series_begin: 2007-10-04T05:00:00+00:00
+time_series_id: f49a16d4502248349a37387d81556d50

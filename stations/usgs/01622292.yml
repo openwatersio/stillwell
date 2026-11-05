@@ -1,0 +1,17 @@
+name: EIDSON CREEK AT GREY GABLES FARM NEAR SWOOPE, VA
+lat: 38.14186111111111
+lon: -79.16069444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 472.745
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01622292/
+parameter_code: "00065"
+series_begin: 2021-05-26T19:00:00+00:00
+series_end: 2021-11-08T18:05:00+00:00
+time_series_id: 5814a17152984fafba68ba199705d7fc

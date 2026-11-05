@@ -1,0 +1,16 @@
+name: FIRESTEEL CREEK NEAR MOUNT VERNON, SD
+lat: 43.776417
+lon: -98.245306
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 395.49
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06477500/
+parameter_code: "00065"
+series_begin: 2018-03-19T20:15:00+00:00
+time_series_id: 74e6d37908c74c858f59827abdb12728

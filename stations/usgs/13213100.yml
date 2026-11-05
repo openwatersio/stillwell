@@ -1,0 +1,16 @@
+name: SNAKE RIVER AT NYSSA OR
+lat: 43.8761111111111
+lon: -116.9825
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 658.53
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13213100/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 35c252ac5d054cd289c4e1a6f61e9215

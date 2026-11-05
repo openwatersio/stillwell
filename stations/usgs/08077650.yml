@@ -1,0 +1,14 @@
+name: Moses Lk-Galveston Bay nr Texas City, TX
+lat: 29.4474540312221
+lon: -94.920201577493
+country_code: US
+kind: estuary
+datum: NGVD29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08077650/
+parameter_code: "62619"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 110c0cd108724234a3d340fc71b58551

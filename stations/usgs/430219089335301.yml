@@ -1,0 +1,16 @@
+name: Channel at Blue Harvest Ln at Madison WI
+lat: 43.03861111111111
+lon: -89.56472222222222
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 315.163
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430219089335301/
+parameter_code: "00065"
+series_begin: 2026-07-14T23:15:33+00:00
+time_series_id: 6c2cd754d53d4a39a19f42c2cb1beb60

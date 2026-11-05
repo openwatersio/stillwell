@@ -1,0 +1,16 @@
+name: Sabine Rv nr Gladewater, TX
+lat: 32.5270890927262
+lon: -94.9602175083032
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.213
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08020000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: abbd9ea301ec45ba8147a9c6c48edd32

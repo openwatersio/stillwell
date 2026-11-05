@@ -1,0 +1,16 @@
+name: RIO PUEBLO NR PENASCO, NM
+lat: 36.1684666666667
+lon: -105.602788888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2365.248
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08277470/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 601b798014eb4568b1734922bd8a2ec7

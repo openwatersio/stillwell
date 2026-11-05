@@ -1,0 +1,24 @@
+name: Jamestown
+lat: 37.2201
+lon: -76.7914
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.36
+  MHW: -0.306
+  DTL: -0.019
+  MTL: -0.012
+  MSL: -0.015
+  MLW: 0.281
+  MLLW: 0.321
+  NAVD88: -0.054
+  LAT: 0.517
+  HAT: -0.548
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8637712
+established: 2010-06-23T00:00:00Z
+removed: 2024-03-13T23:59:00Z

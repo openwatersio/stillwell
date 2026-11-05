@@ -1,0 +1,16 @@
+name: Millstone River at Weston NJ
+lat: 40.5297222222222
+lon: -74.5883333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.352
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01402540/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f2bf0cfaa9e341cf9c591d29db637d94

@@ -1,0 +1,23 @@
+name: Elkhorn Slough at Elkhorn
+lat: 36.8183
+lon: -121.747
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.542
+  MHW: -3.326
+  DTL: -2.724
+  MTL: -2.773
+  MSL: -2.771
+  MLW: -2.219
+  MLLW: -1.906
+  LAT: -1.368
+  HAT: -3.95
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9413631
+established: 1976-05-09T00:00:00Z
+removed: 2007-10-16T23:59:00Z

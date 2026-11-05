@@ -1,0 +1,14 @@
+name: CHELAN RIVER AT CHELAN, WA
+lat: 47.83528716191022
+lon: -120.00963809283702
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12452500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: aba94cd5690a48e7be81e3175a7006e0

@@ -1,0 +1,16 @@
+name: SANTEE RIVER NEAR PINEVILLE, SC
+lat: 33.4537777777778
+lon: -80.1413611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.693
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02171500/
+parameter_code: "00065"
+series_begin: 2014-10-31T14:45:00+00:00
+time_series_id: 2ac8733e99c94239a1d4e8a37345c65f

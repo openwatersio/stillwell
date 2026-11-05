@@ -1,0 +1,22 @@
+name: STEINHATCHEE
+lat: 29.6717
+lon: -83.39
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.353
+  MHW: -1.269
+  DTL: -0.77
+  MTL: -0.832
+  MSL: -0.827
+  MLW: -0.395
+  MLLW: -0.187
+  NAVD88: -0.851
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727695
+established: 1973-05-01T00:00:00Z
+removed: 1979-04-12T23:59:00Z

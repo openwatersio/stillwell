@@ -1,0 +1,11 @@
+name: Big Colewa Bayou @ Oak Grove, LA
+lat: 32.7989
+lon: -91.4989
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Oak%20Grove.Stage.Inst.1Hour.0.DCP-rev
+series: Oak Grove.Stage.Inst.1Hour.0.DCP-rev

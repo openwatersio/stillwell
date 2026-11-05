@@ -1,0 +1,24 @@
+name: Oregon Inlet Marina
+lat: 35.795696
+lon: -75.548195
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.148
+  MHW: -1.105
+  DTL: -0.968
+  MTL: -0.966
+  MSL: -0.965
+  MLW: -0.828
+  MLLW: -0.788
+  NAVD88: -1.003
+  LAT: -0.707
+  HAT: -1.288
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8652587
+established: 1974-08-14T00:00:00Z

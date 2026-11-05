@@ -1,0 +1,24 @@
+name: Port Arthur
+lat: 29.8667
+lon: -93.93
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.721
+  MHW: -1.706
+  DTL: -1.562
+  MTL: -1.577
+  MSL: -1.587
+  MLW: -1.448
+  MLLW: -1.404
+  NAVD88: -1.517
+  LAT: -1.065
+  HAT: -1.884
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770475
+established: 1996-04-01T00:00:00Z

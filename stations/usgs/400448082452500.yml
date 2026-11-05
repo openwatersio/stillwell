@@ -1,0 +1,15 @@
+name: Flume at SR 161 nr Beech Road nr New Albany OH
+lat: 40.08
+lon: -82.7569444444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-400448082452500/
+parameter_code: "00065"
+series_begin: 2018-03-16T14:55:00+00:00
+series_end: 2020-11-03T12:01:00+00:00
+time_series_id: 35369a3faf614c87b95d95d69e6f1de3

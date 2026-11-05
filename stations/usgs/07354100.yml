@@ -1,0 +1,17 @@
+name: Kisatchie Bayou at Lotus, LA
+lat: 31.48462775839668
+lon: -93.13878680042644
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 37.518
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07354100/
+parameter_code: "00065"
+series_begin: 2023-06-05T17:45:00+00:00
+series_end: 2026-09-02T18:00:00+00:00
+time_series_id: fb84c3969a734e89bba2301c6a285e25

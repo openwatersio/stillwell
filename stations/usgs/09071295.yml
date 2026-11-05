@@ -1,0 +1,16 @@
+name: GRIZZLY CREEK NR GRIZZLY LAKE NR GLENWOOD SPGS, CO
+lat: 39.71762777777778
+lon: -107.31771944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3198.184
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09071295/
+parameter_code: "00065"
+series_begin: 2022-09-08T23:30:00+00:00
+time_series_id: a9acdc041d884fb3a0d8ea9aa83006b4

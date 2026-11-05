@@ -1,0 +1,16 @@
+name: MYAKKA RIVER AT NORTH PORT CHARLOTTE FL
+lat: 27.0451962493106
+lon: -82.2930655260639
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.027
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299230/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 364d5c22bb4040a1b80eea916bf6ae9e

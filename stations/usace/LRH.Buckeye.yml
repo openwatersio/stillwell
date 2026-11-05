@@ -1,0 +1,13 @@
+name: Buckeye
+lat: 38.1858
+lon: -80.1308
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 635.697
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Buckeye.Stage.Inst.15Minutes.0.OBS
+series: Buckeye.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: BLACK CREEK NEAR HARLAN, IN
+lat: 41.18308333333333
+lon: -84.86969444444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 220.511
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04183038/
+parameter_code: "00065"
+series_begin: 2015-09-30T17:15:00+00:00
+time_series_id: 6551b165ea614722a40ea903c79b85b6

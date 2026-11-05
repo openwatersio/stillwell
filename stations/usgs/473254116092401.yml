@@ -1,0 +1,17 @@
+name: SF COEUR D ALENE R IN CHANNEL SEEP
+lat: 47.5484027777778
+lon: -116.156630555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 692.201
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-473254116092401/
+parameter_code: "00065"
+series_begin: 2019-04-05T19:45:00+00:00
+series_end: 2019-09-05T14:30:00+00:00
+time_series_id: e6c7b886026b4eb5ab0572138db1d681

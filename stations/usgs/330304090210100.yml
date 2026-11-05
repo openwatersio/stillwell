@@ -1,0 +1,15 @@
+name: BEE LAKE TRIBUTARY NO 1 NR THORNTON, MS
+lat: 33.0511111111111
+lon: -90.3502777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 29.261
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-330304090210100/
+parameter_code: "00065"
+time_series_id: b655f50c84504ee096ba2b1fa38cc718

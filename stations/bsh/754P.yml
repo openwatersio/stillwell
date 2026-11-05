@@ -1,0 +1,13 @@
+name: Wangerooge, Langes Riff, Nord
+lat: 53.80639
+lon: 7.92917
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+  SKN: -2.96
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9420030]
+source_url: https://gezeiten.bsh.de/wangerooge_nord

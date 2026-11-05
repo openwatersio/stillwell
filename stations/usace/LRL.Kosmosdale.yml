@@ -1,0 +1,13 @@
+name: OHIO RIVER AT KOSMOSDALE, KY
+lat: 38.0347932
+lon: -85.9141301
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 113.614
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Kosmosdale.Stage.Inst.15Minutes.0.LRGS-rev
+series: Kosmosdale.Stage.Inst.15Minutes.0.LRGS-rev

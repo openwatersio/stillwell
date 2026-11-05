@@ -1,0 +1,14 @@
+name: HIDDEN RIVER NEAR HOMOSASSA FL
+lat: 28.766650753647
+lon: -82.5887104801261
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310675/
+parameter_code: "00065"
+series_begin: 2020-12-01T15:00:00+00:00
+time_series_id: bcf73df8a7214bd6b4059e7ac5b5897c

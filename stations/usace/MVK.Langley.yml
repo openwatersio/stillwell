@@ -1,0 +1,13 @@
+name: Ltl Missouri Riv @ Langley, AR
+lat: 34.31166667
+lon: -93.8997222
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 221.59
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Langley.Stage.Inst.15Minutes.0.DCP-rev
+series: Langley.Stage.Inst.15Minutes.0.DCP-rev

@@ -1,0 +1,16 @@
+name: OAK GROVE FORK ABOVE POWERPLANT INTAKE, OR.
+lat: 45.07123193808
+lon: -121.94063451724
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 640.08
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14209000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 6beade5ef3ad44a492ab2a985ff64dd5

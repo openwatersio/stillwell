@@ -1,0 +1,13 @@
+name: Little River Near Rochelle, LA
+lat: 31.754644445618
+lon: -92.345130556502
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 7.556
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Rochelle.Stage.Inst.15Minutes.0.DCP-rev
+series: Rochelle.Stage.Inst.15Minutes.0.DCP-rev

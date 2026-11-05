@@ -1,0 +1,16 @@
+name: SANDY RIVER NEAR MARMOT, OR
+lat: 45.3995642184899
+lon: -122.137306772233
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14137000/
+parameter_code: "00065"
+series_begin: 2008-10-01T07:00:00+00:00
+time_series_id: c25b81810c3846b4bbf126dba8fd93e8

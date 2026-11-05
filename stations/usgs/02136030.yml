@@ -1,0 +1,16 @@
+name: BLACK RIVER NEAR ANDREWS, SC
+lat: 33.490444673816
+lon: -79.5456181904439
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -5.252
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136030/
+parameter_code: "00065"
+series_begin: 2017-05-23T18:00:00+00:00
+time_series_id: f453d361ff9e413081b3ded02d895cfa

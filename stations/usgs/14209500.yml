@@ -1,0 +1,16 @@
+name: CLACKAMAS RIVER ABOVE THREE LYNX CREEK, OR
+lat: 45.1248432050366
+lon: -122.073413673786
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 332.747
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14209500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2e09f982b8da477dbab84b74338d34cd

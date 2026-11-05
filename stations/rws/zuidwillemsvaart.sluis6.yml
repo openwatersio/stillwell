@@ -1,0 +1,11 @@
+name: Zuid-Willemsvaart, sluis 6
+lat: 51.539578
+lon: 5.631089
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/zuidwillemsvaart.sluis6/details

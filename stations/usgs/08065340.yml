@@ -1,0 +1,16 @@
+name: Hurricane Bayou at US-287 nr Crockett, TX
+lat: 31.344669444444442
+lon: -95.47257777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08065340/
+parameter_code: "00065"
+series_begin: 2021-08-18T20:10:00+00:00
+time_series_id: 1d6223587cb44c5aac5ecc35cba9fcf4

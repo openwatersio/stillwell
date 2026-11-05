@@ -1,0 +1,15 @@
+name: San Bernard Rv Ups of GIWW nr Freeport, TX
+lat: 28.875529286473
+lon: -95.4504998304846
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08117730/
+parameter_code: "00065"
+time_series_id: f473a83dee85455da21c61bc260c02d5

@@ -1,0 +1,17 @@
+name: MYAKKA R AT EL JOBEAN FL
+lat: 26.9581163603421
+lon: -82.2125921257541
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299496/
+parameter_code: "00065"
+series_begin: 2012-12-18T05:00:00+00:00
+series_end: 2014-10-10T03:45:00+00:00
+time_series_id: 40bd541ff6484f73afb353077ed165b9

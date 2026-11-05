@@ -1,0 +1,16 @@
+name: UNNAMED TRIB TO WARM SPR RUN NR BERKELEY SPR, WV
+lat: 39.6058333333333
+lon: -78.2291666666667
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 210.291
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01613020/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 769a787541dd4312804b7fbac55164b8

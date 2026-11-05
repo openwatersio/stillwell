@@ -1,0 +1,16 @@
+name: GRAND LAKE OUTLET BLW CHIPMUNK LN AT GRAND LK, CO
+lat: 40.2461111111111
+lon: -105.828833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2549.652
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09014050/
+parameter_code: "00065"
+series_begin: 2021-02-01T06:50:00+00:00
+time_series_id: b2f2eaf9867d4d5e9763d605fdd7af64

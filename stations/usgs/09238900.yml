@@ -1,0 +1,16 @@
+name: FISH CR AT UPPER STA NR STEAMBOAT SPRINGS, CO
+lat: 40.475
+lon: -106.78638900000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2182.883
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09238900/
+parameter_code: "00065"
+series_begin: 2020-07-15T16:30:00+00:00
+time_series_id: 82c36eb91d8a4d8fbb2ce84a20979def

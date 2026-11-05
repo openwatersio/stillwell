@@ -1,0 +1,17 @@
+name: ROCK CREEK NEAR MAPLE VALLEY, WA
+lat: 47.37979693163967
+lon: -122.01731720381447
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 121.92
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12118500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2021-10-01T08:00:00+00:00
+time_series_id: 02995248caa544b296362fcb2a7bc1c4

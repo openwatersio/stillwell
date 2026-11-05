@@ -1,0 +1,24 @@
+name: Port Isabel
+lat: 26.061167
+lon: -97.21553
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.594
+  MHW: -1.576
+  DTL: -1.385
+  MTL: -1.4
+  MSL: -1.423
+  MLW: -1.224
+  MLLW: -1.175
+  NAVD88: -1.435
+  LAT: -0.859
+  HAT: -1.847
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8779770
+established: 1944-03-31T00:00:00Z

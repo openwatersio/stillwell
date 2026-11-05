@@ -1,0 +1,16 @@
+name: TROUT CREEK NEAR SULPHUR SPRINGS FL
+lat: 28.134722222222223
+lon: -82.36194444444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.229
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02303350/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6b79727bd60c474c8797b693ba84e888

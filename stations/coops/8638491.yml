@@ -1,0 +1,21 @@
+name: Chester, James River
+lat: 37.3833
+lon: -77.3783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.55
+  MHW: -2.475
+  DTL: -2.055
+  MTL: -2.036
+  MSL: -2.062
+  MLW: -1.597
+  MLLW: -1.56
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638491
+established: 1971-06-03T00:00:00Z
+removed: 2012-05-14T23:59:00Z

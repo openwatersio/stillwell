@@ -1,0 +1,17 @@
+name: Great Miami River bl Indian Lake at Russells Pt OH
+lat: 40.4672222222222
+lon: -83.8755555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 298.439
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03260502/
+parameter_code: "00065"
+series_begin: 2017-11-02T15:00:00+00:00
+series_end: 2019-12-20T15:15:00+00:00
+time_series_id: b8a5490ca5ee47a68fb798010473ee43

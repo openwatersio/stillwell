@@ -1,0 +1,11 @@
+name: Fisk
+lat: 36.8486111
+lon: -90.2102777
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Fisk-Mingo%20Ditch.Stage.Inst.1Hour.0.lrgsShef-rev
+series: Fisk-Mingo Ditch.Stage.Inst.1Hour.0.lrgsShef-rev

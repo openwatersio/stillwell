@@ -1,0 +1,14 @@
+name: NORTHWEST RIVER AT RT 168 NEAR NORTHWEST, VA
+lat: 36.5668186107208
+lon: -76.1985466146935
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02043390/
+parameter_code: "62620"
+series_begin: 2015-04-15T04:00:00+00:00
+time_series_id: a947511fab8d4ba480ce48e4f83fb061

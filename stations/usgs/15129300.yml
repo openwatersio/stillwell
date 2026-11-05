@@ -1,0 +1,17 @@
+name: DANGEROUS R AT HARLEQUIN LK OUTLET NR YAKUTAT AK
+lat: 59.417066661348024
+lon: -139.019352666301
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 27.737
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15129300/
+parameter_code: "00065"
+series_begin: 2018-07-19T09:00:00+00:00
+series_end: 2024-02-17T13:00:00+00:00
+time_series_id: 17bec3835ae647dca5728dc7ba4577cb

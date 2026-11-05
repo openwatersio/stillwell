@@ -1,0 +1,15 @@
+name: FAKA UNION BOUNDARY AT CHANNEL MARKER 6 FL
+lat: 25.8565
+lon: -81.5370555555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255123081321300/
+parameter_code: "00065"
+series_begin: 2010-07-10T05:00:00+00:00
+series_end: 2012-05-01T04:45:00+00:00
+time_series_id: 36c4f0ee639e4852a91ac4e6ebc9f77a

@@ -1,0 +1,23 @@
+name: Dog Island, St. Thomas
+lat: 18.297138
+lon: -64.81775
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.182
+  MHW: -6.156
+  DTL: -6.059
+  MTL: -6.06
+  MSL: -6.051
+  MLW: -5.964
+  MLLW: -5.937
+  LAT: -5.818
+  HAT: -6.327
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751494
+established: 2011-04-20T00:00:00Z
+removed: 2011-08-30T23:59:00Z

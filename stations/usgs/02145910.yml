@@ -1,0 +1,16 @@
+name: CATAWBA RIVER BL LAKE WYLIE DAM FEWELL ISLAND, SC
+lat: 35.0164194444444
+lon: -81.0015638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 148.514
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02145910/
+parameter_code: "00065"
+series_begin: 2018-03-08T19:00:00+00:00
+time_series_id: e1d7c1d288f84409b29be742e49dbeeb

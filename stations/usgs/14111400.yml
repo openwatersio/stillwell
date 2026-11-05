@@ -1,0 +1,17 @@
+name: KLICKITAT RIVER BL SUMMIT CREEK NEAR GLENWOOD, WA
+lat: 45.9623449974215
+lon: -121.102295033616
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 274.32
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14111400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2026-03-31T16:15:00+00:00
+time_series_id: dfcf23fbbbf34364bc28fc1a271e363a

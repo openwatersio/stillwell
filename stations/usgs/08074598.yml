@@ -1,0 +1,16 @@
+name: Whiteoak Bayou at Main St, Houston, TX
+lat: 29.766616755796
+lon: -95.3585490328528
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08074598/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 800988b7341943258bcef82abd78a6d0

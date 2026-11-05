@@ -1,0 +1,17 @@
+name: Yount Creek near Martindale, AR
+lat: 34.88972222222222
+lon: -92.64666666666668
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.782
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-072632971/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2026-07-24T17:00:00+00:00
+time_series_id: b91c88402d4049b7a564f227d1eecd95

@@ -1,0 +1,16 @@
+name: GREEN RIVER AT LOCK 4 AT WOODBURY, KY
+lat: 37.1822681382008
+lon: -86.6299882923549
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 115.434
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03315500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 72da44bfad4e4d9e86239052d641e13c

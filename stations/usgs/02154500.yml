@@ -1,0 +1,16 @@
+name: NORTH PACOLET RIVER AT FINGERVILLE, SC
+lat: 35.120461
+lon: -81.987283
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 218.026
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02154500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c6fa5b986dd5454b9f1d8ff3f1bdae99

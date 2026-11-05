@@ -1,0 +1,17 @@
+name: WITHLACOOCHEE RIVER NR MADISON FLA
+lat: 30.482448454410317
+lon: -83.24294223216845
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02319300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2018-10-01T04:45:00+00:00
+time_series_id: 216898ff8943487da5586cfbf20720d3

@@ -1,0 +1,16 @@
+name: TOPPENISH CREEK NEAR FORT SIMCOE, WA
+lat: 46.3109589419962
+lon: -120.788125044116
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 398.069
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12506000/
+parameter_code: "00065"
+series_begin: 2011-03-21T20:30:00+00:00
+time_series_id: 9c93e35ab1ed443bac3ba49a9c20b507

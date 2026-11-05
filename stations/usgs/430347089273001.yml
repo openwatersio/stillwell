@@ -1,0 +1,16 @@
+name: SOUTH SEGOE RD STORM SEWER AT MADISON, WI
+lat: 43.0630555555556
+lon: -89.4583333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 282.245
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430347089273001/
+parameter_code: "00065"
+series_begin: 2023-02-13T18:00:00+00:00
+time_series_id: 97927626505f47a5bec7e4d783f723da

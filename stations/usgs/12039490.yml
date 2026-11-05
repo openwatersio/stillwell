@@ -1,0 +1,16 @@
+name: LAKE QUINAULT NR OLD WA 9 RD NR QUINAULT, WA
+lat: 47.45608611111111
+lon: -123.87037222222222
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 55.12
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12039490/
+parameter_code: "00065"
+series_begin: 2025-01-07T23:45:00+00:00
+time_series_id: 257ac23c9505462ba0546895b40d21d8

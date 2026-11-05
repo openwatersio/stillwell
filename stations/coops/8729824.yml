@@ -1,0 +1,24 @@
+name: FLORIDATOWN, ESCAMBIA BAY
+lat: 30.5817
+lon: -87.18
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.229
+  MHW: -1.21
+  DTL: -1.008
+  MTL: -1.014
+  MSL: -1.004
+  MLW: -0.817
+  MLLW: -0.787
+  NAVD88: -0.903
+  LAT: -0.445
+  HAT: -1.493
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729824
+established: 1977-03-17T00:00:00Z
+removed: 1977-08-02T23:59:00Z

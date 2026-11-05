@@ -1,0 +1,16 @@
+name: JANE GREEN CREEK NEAR DEER PARK, FL
+lat: 28.0744620121648
+lon: -80.8881154592003
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 5.654
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02231600/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: dba2f9e885f04dda90753697dbfb1e7a

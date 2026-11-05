@@ -1,0 +1,23 @@
+name: Pascagoula, South Side
+lat: 30.3222
+lon: -88.508
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.362
+  MHW: -8.334
+  DTL: -8.1
+  MTL: -8.098
+  MSL: -8.083
+  MLW: -7.861
+  MLLW: -7.837
+  NAVD88: -8.082
+  LAT: -7.391
+  HAT: -8.636
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8740993
+removed: 2022-07-31T19:37:00Z

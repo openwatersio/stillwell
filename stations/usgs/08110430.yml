@@ -1,0 +1,16 @@
+name: Big Ck nr Freestone, TX
+lat: 31.506843847100306
+lon: -96.32471252735013
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 110.575
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08110430/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f7f894120c664ffcbc3e1eb6c3d86eaa

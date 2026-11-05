@@ -1,0 +1,15 @@
+name: WF Beaver Cr bl Otayachinas Cr, nr Rocky Boy, MT
+lat: 48.166389
+lon: -109.656389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1459.992
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-480959109392301/
+parameter_code: "00065"
+time_series_id: 8378006c7fa04a77a0ff354e5ace28df

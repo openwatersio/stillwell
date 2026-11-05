@@ -1,0 +1,16 @@
+name: Missouri River at Napoleon, MO
+lat: 39.1336111111111
+lon: -94.0638888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 207.307
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06894650/
+parameter_code: "00065"
+series_begin: 2009-03-18T05:00:00+00:00
+time_series_id: 4e521381ab1344a0aaf2891aaa23f620

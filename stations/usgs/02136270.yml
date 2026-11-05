@@ -1,0 +1,16 @@
+name: BLACK RIVER NEAR DUNBAR, SC
+lat: 33.54858333333333
+lon: -79.36033333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -4.572
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136270/
+parameter_code: "00065"
+series_begin: 2022-07-28T17:00:00+00:00
+time_series_id: e97e2944b1914864a55b9e1588fc72c3

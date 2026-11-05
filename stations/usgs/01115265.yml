@@ -1,0 +1,16 @@
+name: HEMLOCK BROOK AT KING ROAD NR FOSTER, RI
+lat: 41.7906548375248
+lon: -71.6986785331483
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.712
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115265/
+parameter_code: "00065"
+series_begin: 2009-02-05T19:15:00+00:00
+time_series_id: b89cdd2926db48b0a6886a77bbde38d3

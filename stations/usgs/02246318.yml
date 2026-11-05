@@ -1,0 +1,14 @@
+name: ORTEGA RIVER AT KIRWIN ROAD NEAR JACKSONVILLE,FL
+lat: 30.1963508734531
+lon: -81.7684315399529
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02246318/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: def700ae54f042cebacf3fb0c1afb2c6

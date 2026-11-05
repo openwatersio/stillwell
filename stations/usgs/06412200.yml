@@ -1,0 +1,17 @@
+name: RAPID CREEK ABV VICTORIA CREEK NR RAPID CITY, SD
+lat: 44.046611
+lon: -103.351111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1081.534
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06412200/
+parameter_code: "00065"
+series_begin: 2018-06-24T06:15:00+00:00
+series_end: 2026-10-08T19:45:00+00:00
+time_series_id: eb4a288871cf46c898ea72f86a244028

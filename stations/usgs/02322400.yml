@@ -1,0 +1,14 @@
+name: GINNIE SPRING NR HIGH SPRINGS FLA
+lat: 29.836078090338322
+lon: -82.70014952949528
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02322400/
+parameter_code: "00065"
+series_begin: 2018-11-08T23:45:00+00:00
+time_series_id: 4e827753cab6489098245d045872af44

@@ -1,0 +1,16 @@
+name: BIG LOST RIVER BL MACKAY RES NR MACKAY ID
+lat: 43.9391666666667
+lon: -113.648333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1813.737
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13127000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 6a24d3ab01524df78996f06426d5cb6b

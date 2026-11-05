@@ -1,0 +1,16 @@
+name: NORTH BRANCH POTOMAC RIVER AT KITZMILLER, MD
+lat: 39.39388888888889
+lon: -79.18169444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 479.063
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01595500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c68d2cc801974f508b3701e72a4445df

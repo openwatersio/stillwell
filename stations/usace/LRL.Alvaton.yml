@@ -1,0 +1,13 @@
+name: DRAKES CREEK NEAR ALVATON, KY
+lat: 36.895319444444
+lon: -86.380547222222
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 135.048
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Alvaton.Stage.Inst.15Minutes.0.LRGS-rev
+series: Alvaton.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,24 @@
+name: Deer Point Lake
+lat: 30.2696
+lon: -85.6079
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.854
+  MHW: -6.824
+  DTL: -6.611
+  MTL: -6.613
+  MSL: -6.607
+  MLW: -6.403
+  MLLW: -6.368
+  NAVD88: -6.542
+  LAT: -6.012
+  HAT: -7.123
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729082
+established: 2021-11-26T00:00:00Z
+removed: 2022-06-15T18:34:00Z

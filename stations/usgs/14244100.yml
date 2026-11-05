@@ -1,0 +1,15 @@
+name: COWLITZ RIVER NEAR LEXINGTON, WA
+lat: 46.176789536773796
+lon: -122.90638617824744
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14244100/
+parameter_code: "63160"
+series_begin: 2024-09-18T15:45:00+00:00
+series_end: 2026-09-27T00:00:00+00:00
+time_series_id: d9ce5b0ed2ac48e7bbb8c7a48cc2cfb0

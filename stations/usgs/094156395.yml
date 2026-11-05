@@ -1,0 +1,17 @@
+name: ASH SPGS DIV DITCH BLW HWY 93 AT ASH SPGS, NV
+lat: 37.459722
+lon: -115.194167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1091.108
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-094156395/
+parameter_code: "00065"
+series_begin: 2011-07-13T00:00:00+00:00
+series_end: 2020-10-19T21:45:00+00:00
+time_series_id: f5de1ec8590d4935bcebeadeb8e502d7

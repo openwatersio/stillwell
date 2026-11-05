@@ -1,0 +1,13 @@
+name: Pearl River @ Jackson, MS
+lat: 32.28138889
+lon: -90.1788889
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 71.137
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Jackson.Stage.Inst.15Minutes.0.DCP-rev
+series: Jackson.Stage.Inst.15Minutes.0.DCP-rev

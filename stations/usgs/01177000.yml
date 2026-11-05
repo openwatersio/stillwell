@@ -1,0 +1,16 @@
+name: CHICOPEE RIVER AT INDIAN ORCHARD, MA
+lat: 42.1606490630186
+lon: -72.5139756339428
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 37.89
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01177000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 37ce961f7b9b4a71b0e1455a5a878c4a

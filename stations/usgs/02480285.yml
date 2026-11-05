@@ -1,0 +1,17 @@
+name: WEST PASCAGOULA RIVER AT HWY 90 AT GAUTIER, MS
+lat: 30.3826944444444
+lon: -88.6084444444444
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02480285/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2023-07-11T21:45:00+00:00
+time_series_id: 7ba04a3fb2ce42cbbacf94ac45a919a0

@@ -1,0 +1,23 @@
+name: PENIKESE ISLAND
+lat: 41.45
+lon: -70.9217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.033
+  MHW: -1.958
+  DTL: -1.455
+  MTL: -1.438
+  MSL: -1.389
+  MLW: -0.917
+  MLLW: -0.876
+  LAT: -0.569
+  HAT: -2.415
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448248
+established: 1976-05-09T00:00:00Z
+removed: 1994-10-05T23:59:00Z

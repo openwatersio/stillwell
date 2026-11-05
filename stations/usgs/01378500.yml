@@ -1,0 +1,16 @@
+name: Hackensack River at New Milford NJ
+lat: 40.9483333333333
+lon: -74.0266666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.573
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01378500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1487ab078be6479aa33b0e259331b67c

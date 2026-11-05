@@ -1,0 +1,24 @@
+name: OAKS CREEK, UPPER END, MURRELLS INLET
+lat: 33.5117
+lon: -79.0683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.416
+  MHW: -2.292
+  DTL: -1.661
+  MTL: -1.629
+  MSL: -1.67
+  MLW: -0.966
+  MLLW: -0.906
+  NAVD88: -1.736
+  LAT: -0.746
+  HAT: -2.689
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661684
+established: 1974-09-20T00:00:00Z
+removed: 1976-02-19T23:59:00Z

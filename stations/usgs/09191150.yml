@@ -1,0 +1,16 @@
+name: North Cottonwood Cr bl Halverson Cr, nr Daniel, WY
+lat: 42.80509722222222
+lon: -110.47583333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2405.177
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09191150/
+parameter_code: "00065"
+series_begin: 2025-05-20T22:45:00+00:00
+time_series_id: 65e8f5bcaa5a442cb7dbd1951fbeb66f

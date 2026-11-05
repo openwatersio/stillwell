@@ -1,0 +1,16 @@
+name: Inner Harbor Navigation Canal nr Seabrook bridge
+lat: 30.0301388888889
+lon: -90.0341666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073802332/
+parameter_code: "00065"
+series_begin: 2017-03-07T15:45:00+00:00
+time_series_id: 4b29ed0189d4488eaae17fe63195f327

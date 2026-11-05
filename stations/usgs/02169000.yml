@@ -1,0 +1,16 @@
+name: SALUDA RIVER NEAR COLUMBIA, SC
+lat: 34.0140416153712
+lon: -81.0878716970082
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 45.327
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02169000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1fe20b964add438999791fc22bf6b3d9

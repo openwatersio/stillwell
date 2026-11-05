@@ -1,0 +1,24 @@
+name: SOUTH BEND
+lat: 46.6633
+lon: -123.798
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.386
+  MHW: -4.168
+  DTL: -2.89
+  MTL: -3.001
+  MSL: -3.046
+  MLW: -1.834
+  MLLW: -1.394
+  NAVD88: -1.821
+  LAT: -0.461
+  HAT: -5.119
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9440875
+established: 1982-05-14T00:00:00Z
+removed: 1982-07-20T23:59:00Z

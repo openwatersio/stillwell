@@ -1,0 +1,17 @@
+name: Snake R above Crystal Springs Hatchery
+lat: 42.656905555555554
+lon: -114.63760277777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 882.646
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13093385/
+parameter_code: "00065"
+series_begin: 2021-04-06T18:30:00+00:00
+series_end: 2023-11-08T19:00:00+00:00
+time_series_id: 60686225823749beb3d20247ac1b3113

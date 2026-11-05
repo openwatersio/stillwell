@@ -1,0 +1,23 @@
+name: Akun Cove, Akun Island
+lat: 54.2333
+lon: -165.533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.889
+  MHW: -1.829
+  DTL: -1.419
+  MTL: -1.464
+  MSL: -1.472
+  MLW: -1.099
+  MLLW: -0.949
+  LAT: -0.362
+  HAT: -2.333
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462719
+established: 2009-04-10T00:00:00Z
+removed: 2011-09-21T23:59:00Z

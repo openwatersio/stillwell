@@ -1,0 +1,16 @@
+name: Frog Bayou at Rudy, AR
+lat: 35.5258333333333
+lon: -94.2713888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 144.905
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07251500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e16cd4f79333489a8e4cfdcb026170bf

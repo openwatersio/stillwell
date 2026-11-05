@@ -1,0 +1,16 @@
+name: LICK CREEK NEAR CHATHAM, IL
+lat: 39.69916666666666
+lon: -89.76166666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 167.704
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05576090/
+parameter_code: "00065"
+series_begin: 2021-12-15T19:00:00+00:00
+time_series_id: 11c8d2009ecf4ef4872b8ddd2dcd4de4

@@ -1,0 +1,16 @@
+name: BEAR RIVER NEAR SMITHFIELD, UT
+lat: 41.84000833333334
+lon: -111.8815861111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1342.345
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10102250/
+parameter_code: "00065"
+series_begin: 2025-04-10T21:15:00+00:00
+time_series_id: a33c1d997d49453f90cf8e6e32deab68

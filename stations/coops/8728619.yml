@@ -1,0 +1,24 @@
+name: CAT POINT, APALACHICOLA BAY
+lat: 29.7233
+lon: -84.8867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.264
+  MHW: -0.22
+  DTL: 0.042
+  MTL: -0.01
+  MSL: 0.001
+  MLW: 0.199
+  MLLW: 0.349
+  NAVD88: 0.006
+  LAT: 0.731
+  HAT: -0.48
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728619
+established: 1977-03-24T00:00:00Z
+removed: 2021-09-28T23:59:00Z

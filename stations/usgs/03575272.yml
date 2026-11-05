@@ -1,0 +1,17 @@
+name: PEEVEY CREEK NEAR GURLEY, ALA
+lat: 34.68206610237638
+lon: -86.44831230371958
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.929
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03575272/
+parameter_code: "00065"
+series_begin: 2008-06-02T23:05:00+00:00
+series_end: 2026-08-21T05:50:00+00:00
+time_series_id: 513b936e3f594a0e873b270b3a681072

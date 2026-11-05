@@ -1,0 +1,16 @@
+name: Fish River near Fort Kent, Maine
+lat: 47.2375
+lon: -68.5827777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 155.643
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01013500/
+parameter_code: "00065"
+series_begin: 2012-01-01T05:00:00+00:00
+time_series_id: 516a829d65f04d7c9500707a84f70593

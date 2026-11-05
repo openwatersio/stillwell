@@ -1,0 +1,15 @@
+name: W FORK KICKAPOO R AT PEACEFUL VALLEY RD NR CASHTON
+lat: 43.6995
+lon: -90.78775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 330.708
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05408480/
+parameter_code: "00065"
+time_series_id: b84c63cb49e84259ba3ab02f834967db

@@ -1,0 +1,16 @@
+name: PRIEST LAKE AT OUTLET NR COOLIN ID
+lat: 48.5075
+lon: -116.886944444444
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 743.233
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12393000/
+parameter_code: "00065"
+series_begin: 2013-10-17T07:00:00+00:00
+time_series_id: dcefda4fd80f4cf2a474bc5fa2e5a4e0

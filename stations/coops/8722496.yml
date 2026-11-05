@@ -1,0 +1,22 @@
+name: LOXAHATCHEE RIVER LOCK
+lat: 26.935
+lon: -80.1433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.943
+  MHW: -0.898
+  DTL: -0.605
+  MTL: -0.607
+  MSL: -0.607
+  MLW: -0.316
+  MLLW: -0.266
+  NAVD88: -0.906
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722496
+established: 1972-11-29T00:00:00Z
+removed: 1973-02-21T23:59:00Z

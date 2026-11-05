@@ -1,0 +1,11 @@
+name: Chicot Pump Riverside
+lat: 33.431817
+lon: -91.240049
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Chicot%20Pump-RS.Stage.Inst.1Hour.0.DCP-rev
+series: Chicot Pump-RS.Stage.Inst.1Hour.0.DCP-rev

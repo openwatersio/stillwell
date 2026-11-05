@@ -1,0 +1,13 @@
+name: MOTT LAKE AT PLANK ROAD NEAR FAYETTEVILLE, NC
+lat: 35.0515222222222
+lon: -79.2078083333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-350305079122895/
+parameter_code: "00065"
+time_series_id: b34f5dc2df8f4ba88749fbbb0840906d

@@ -1,5 +1,6 @@
 import { qc, type QcOptions } from "../qc.ts";
-import type { Observation, Source, Station } from "../schema.ts";
+import { isHeld, recentWindow } from "../epochs.ts";
+import type { LakeStation, Observation, Source, Station } from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import {
   checkRecent,
@@ -44,8 +45,8 @@ export interface RunSummary {
 
 interface RunOptions {
   source: Source;
-  /** The source's stations; each job picks the ones it covers. */
-  stations: Station[];
+  /** The source's list from the lake; each job picks the stations it covers. */
+  stations: LakeStation[];
   /** The lake a station's files go to, public or restricted. */
   lakeFor: (station: Station) => string;
   /** How many stations to fetch, or files to merge, at once. */
@@ -60,6 +61,12 @@ interface RunOptions {
  * window of its own never loses values to an outage. A station fetched on its
  * own looks back at least two of its intervals, so a daily gauge that
  * publishes hours late still gets each value.
+ *
+ * Each row carries the datum epoch it belongs to. A station's rows from
+ * before its current epoch stay as they are, for compaction to fold into
+ * their own epoch's files, and fetching never reaches back before the current
+ * epoch's start. A station whose new epoch waits on a person isn't fetched,
+ * but keeps what it had.
  *
  * A station is stale when its newest value is older than three of its
  * intervals, and at least `staleHours`.
@@ -81,12 +88,11 @@ export async function updateRecent({
 }): Promise<RunSummary> {
   const id = source.metadata.id;
   if (!source.observations && !source.recent) throw new Error(`${id} has no observations`);
-  const stations = all.filter(
-    (s) => s.live && s.status === "active" && s.products.includes("levels"),
-  );
+  const live = all.filter((s) => s.live && s.status === "active" && s.products.includes("levels"));
+  const stations = live.filter((s) => !isHeld(s.epochs));
   const keepFrom = now - keepDays * DAY_MS;
   // Restricted stations' recent values go to the private lake, like their series.
-  const pathOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), id)]));
+  const pathOf = new Map(live.map((s) => [s.id, recentPath(lakeFor(s), id)]));
   const lakeOf = (s: Station): string | undefined => {
     try {
       return recentPath(lakeFor(s), id);
@@ -118,9 +124,8 @@ export async function updateRecent({
     });
     if (ids.length) carried.set(path, ids);
   }
-  const paths = [...candidates].filter(
-    (path) => carried.has(path) || [...pathOf.values()].includes(path),
-  );
+  const fetched = new Set(pathOf.values());
+  const paths = [...candidates].filter((path) => carried.has(path) || fetched.has(path));
 
   // A source that can sweep every station at once does; a failed sweep fails
   // every station, which keeps what each had.
@@ -133,36 +138,52 @@ export async function updateRecent({
   async function* batches(path: string): AsyncGenerator<StationObservation[]> {
     for (const ids of chunks(carried.get(path) ?? [], BATCH))
       yield (await readRecent(path, ids)).filter((r) => r.time >= keepFrom);
-    const here = stations.filter((s) => pathOf.get(s.id) === path);
-    for (let i = 0; i < here.length; i += BATCH) {
-      const batch = here.slice(i, i + BATCH);
+    for (const batch of chunks(
+      live.filter((s) => pathOf.get(s.id) === path),
+      BATCH,
+    )) {
       const ids = batch.map((s) => s.id);
       const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
       const rows: StationObservation[] = [];
       await pool(batch, concurrency, async (station) => {
-        const old = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
-        let merged: Observation[] = old;
+        const lookback = swept
+          ? since.getTime()
+          : Math.min(since.getTime(), now - 2 * (station.interval_s ?? 0) * 1000);
+        const window = recentWindow(
+          station.epochs,
+          previous.get(station.id) ?? [],
+          keepFrom,
+          lookback,
+        );
+        // Rows from other epochs are in another reference, and stay as they are.
+        rows.push(...window.other);
+        if (isHeld(station.epochs)) {
+          rows.push(...window.current);
+          return;
+        }
+        let merged: Observation[] = window.current;
         let failed = false;
         try {
           if (swept instanceof Error) throw swept;
           const answer = swept ? swept.get(station.id) : undefined;
           if (answer instanceof Error) throw answer;
-          const from = swept
-            ? since.getTime()
-            : Math.min(since.getTime(), now - 2 * (station.interval_s ?? 0) * 1000);
-          const fetched = swept
-            ? (answer ?? [])
-            : await source.observations!(station, new Date(from), new Date(now));
+          // A sweep covers the whole window, so values from before the current epoch are left out.
+          const got = swept
+            ? (answer ?? []).filter((o) => o.time >= window.from)
+            : await source.observations!(station, new Date(window.from), new Date(now));
           // QC the whole window, so spikes and flatlines are judged against their neighbors.
           // Nothing new keeps what we had, rather than clearing the last hours.
-          if (fetched.length)
-            merged = qc(mergeFetched(old, fetched, from, now, now), qcFor(source, station));
+          if (got.length)
+            merged = qc(
+              mergeFetched(window.current, got, window.from, now, now),
+              qcFor(source, station),
+            );
         } catch (error) {
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
           failed = true;
         }
-        for (const r of merged) rows.push({ ...r, station: station.id });
+        for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
         const fresh = merged.filter((r) => r.received === now).length;
         if (fresh) reporting.add(station.id);
         summary.values += fresh;
@@ -184,11 +205,12 @@ export async function updateRecent({
 
 /**
  * Fold the recent window's values in [start, end) into each station's year
- * files, carrying `received`, as `upsert` merges them. A year file is read,
- * merged and written whole, so a failed run leaves the file it had; one the
- * fold doesn't change isn't written. Inactive stations are folded too, so the
- * last values of a station retired since they arrived still reach its files.
- * A live, active station with no values in the range is stale.
+ * files, each row into its own datum epoch's, carrying `received`, as `upsert`
+ * merges them. A year file is read, merged and written whole, so a failed run
+ * leaves the file it had; one the fold doesn't change isn't written. Inactive
+ * stations are folded too, so the last values of a station retired since they
+ * arrived still reach its files. A live, active station with no values in the
+ * range is stale.
  */
 export async function compactRecent({
   source,
@@ -213,9 +235,10 @@ export async function compactRecent({
   summary.stations = stations.length + summary.failed.length;
 
   for (const path of new Set(pathOf.values())) {
-    const here = stations.filter((s) => pathOf.get(s.id) === path);
-    for (let i = 0; i < here.length; i += BATCH) {
-      const batch = here.slice(i, i + BATCH);
+    for (const batch of chunks(
+      stations.filter((s) => pathOf.get(s.id) === path),
+      BATCH,
+    )) {
       const window = Map.groupBy(
         (
           await readRecent(
@@ -233,15 +256,30 @@ export async function compactRecent({
           return;
         }
         let changed = false;
-        for (const [year, values] of Map.groupBy(rows, (r) => new Date(r.time).getUTCFullYear())) {
-          const file = seriesPath(lakeFor(station), "levels", id, station.source_id, year);
+        const parts = Map.groupBy(rows, (r) => `${r.epoch} ${new Date(r.time).getUTCFullYear()}`);
+        for (const [key, values] of parts) {
+          const [epochId, year] = key.split(" ").map(Number) as [number, number];
+          const label =
+            epochId === 1 ? `${station.id} ${year}` : `${station.id} epoch ${epochId} ${year}`;
           try {
+            // Rows of an epoch the list doesn't have, such as after a restore,
+            // have no datum to be written in.
+            const epoch = station.epochs.find((e) => e.id === epochId);
+            if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
+            const file = seriesPath(
+              lakeFor(station),
+              "levels",
+              id,
+              station.source_id,
+              year,
+              epochId,
+            );
             const existing = await readObservationFile(file);
-            await refuseOtherDatum(file, station, existing.datums);
-            const incoming = values.map(({ station: _, ...r }) => r as Observation);
+            await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
+            const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
             const merged = upsert(existing.rows, incoming);
             if (sameRows(existing.rows, merged)) continue;
-            await writeObservations(file, merged, station.datum);
+            await writeObservations(file, merged, epoch.datum);
             summary.files++;
             const had = new Map(existing.rows.map((r) => [r.time, r]));
             summary.values += merged.filter((r) => {
@@ -250,7 +288,7 @@ export async function compactRecent({
             }).length;
             changed = true;
           } catch (error) {
-            summary.failed.push(`${station.id} ${year}: ${message(error)}`);
+            summary.failed.push(`${label}: ${message(error)}`);
           }
         }
         if (changed) summary.updated++;

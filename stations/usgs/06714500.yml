@@ -1,0 +1,16 @@
+name: S CLEAR CR ABV LWR CABIN CR RES SPILWY NR GEORGTWN
+lat: 39.6631
+lon: -105.706327777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3035.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06714500/
+parameter_code: "00065"
+series_begin: 2020-02-18T17:55:00+00:00
+time_series_id: 555e8f1becf844819f8226703a4083b6

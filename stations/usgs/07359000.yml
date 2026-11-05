@@ -1,0 +1,16 @@
+name: Lake Catherine at Jones Mill, AR
+lat: 34.429503
+lon: -92.892978
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 95.271
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07359000/
+parameter_code: "00065"
+series_begin: 2015-10-28T18:00:00+00:00
+time_series_id: 7ab2acf5189e4acbaef19244ed56f9f9

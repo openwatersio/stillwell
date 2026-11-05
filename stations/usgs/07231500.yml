@@ -1,0 +1,16 @@
+name: Canadian River at Calvin, OK
+lat: 34.9778669804321
+lon: -96.2436171502063
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 208.227
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07231500/
+parameter_code: "00065"
+series_begin: 2008-02-01T06:00:00+00:00
+time_series_id: 00225fdcddfa424faff0654ed9762ba9

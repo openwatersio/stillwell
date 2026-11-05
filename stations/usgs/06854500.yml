@@ -1,0 +1,16 @@
+name: REPUBLICAN R AT SCANDIA, KS
+lat: 39.7987299956312
+lon: -97.7931265949022
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 433.965
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06854500/
+parameter_code: "00065"
+series_begin: 2014-06-05T21:30:00+00:00
+time_series_id: ed5571d53c984482abaaef7dbbc134f1

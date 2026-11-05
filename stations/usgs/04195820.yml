@@ -1,0 +1,16 @@
+name: Portage River near Elmore OH
+lat: 41.4911617757326
+lon: -83.2246454166872
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.638
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04195820/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b2e89a0576f44a0c82d4bfde6ca56546

@@ -1,0 +1,16 @@
+name: Johnson Ck nr Ingram, TX
+lat: 30.100207070479
+lon: -99.2831005597255
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 524.713
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08166000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7056a894ba9341f7af4c56334224db81

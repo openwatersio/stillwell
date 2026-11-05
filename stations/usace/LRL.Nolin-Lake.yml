@@ -1,0 +1,13 @@
+name: Nolin-Lake
+lat: 37.276666700434
+lon: -86.24527779983
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 149.352
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Nolin-Lake.Stage.Inst.5Minutes.0.USGS-rev
+series: Nolin-Lake.Stage.Inst.5Minutes.0.USGS-rev

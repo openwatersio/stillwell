@@ -1,0 +1,16 @@
+name: E.Branch Starkweather Crk, Cmrcl Ave at Madison,WI
+lat: 43.11083333333333
+lon: -89.31583333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 259.385
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430639089185701/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:12:36+00:00
+time_series_id: 35f209ba5505428d94ab842b666cfdd7

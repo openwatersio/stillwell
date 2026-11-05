@@ -1,0 +1,16 @@
+name: West Branch Lackawaxen River at Prompton, PA
+lat: 41.587218525563046
+lon: -75.32682899575173
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 330.141
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01429000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d6c27c0f05de4f7e881ac700ba5aa6f3

@@ -1,0 +1,15 @@
+name: MUD CREEK AT MOUTH NR HOMESTEAD, FL
+lat: 25.203303
+lon: -80.584111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-251209080350100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-11-18T19:45:00+00:00
+time_series_id: 6dc94a42e3764856b8e332f3782b6531

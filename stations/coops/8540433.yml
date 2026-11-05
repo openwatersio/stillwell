@@ -1,0 +1,24 @@
+name: Marcus Hook
+lat: 39.811806
+lon: -75.4095
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.479
+  MHW: -8.365
+  DTL: -7.539
+  MTL: -7.509
+  MSL: -7.556
+  MLW: -6.653
+  MLLW: -6.598
+  NAVD88: -7.506
+  LAT: -6.348
+  HAT: -8.832
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8540433
+established: 1981-09-10T00:00:00Z

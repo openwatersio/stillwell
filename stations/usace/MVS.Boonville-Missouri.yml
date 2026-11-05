@@ -1,0 +1,14 @@
+name: Boonville
+lat: 38.9783333
+lon: -92.7536111
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 172.34
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Boonville-Missouri.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Boonville-Missouri.Stage.Inst.15Minutes.0.lrgsShef-rev

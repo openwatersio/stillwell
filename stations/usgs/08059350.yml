@@ -1,0 +1,16 @@
+name: Indian Ck at SH 78 nr Farmersville, TX
+lat: 33.225
+lon: -96.3730555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 150.58
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08059350/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7e49a291b4184f978f322ffd51483fc0

@@ -1,0 +1,17 @@
+name: COOPER RIVER AT CUSTOMS HOUSE AT CHARLESTON, SC
+lat: 32.780722222222224
+lon: -79.92375
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -5.517
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720711/
+parameter_code: "00065"
+series_begin: 1989-03-03T07:30:00+00:00
+series_end: 2025-05-27T14:00:00+00:00
+time_series_id: 09dd2eb73a094ada9e9b0ad7f0ff4f29

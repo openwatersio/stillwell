@@ -1,0 +1,14 @@
+name: 10B REEDY CREEK BELOW S-46 NR VINELAND FLA
+lat: 28.4041734521049
+lon: -81.6114630911918
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02266026/
+parameter_code: "00065"
+series_begin: 2007-10-05T05:00:00+00:00
+time_series_id: bde10e3764e94ace9547a09a84167cdb

@@ -1,0 +1,16 @@
+name: OHIO RIVER AT PADUCAH, KY
+lat: 37.0895004017067
+lon: -88.5944919796501
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.008
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03611000/
+parameter_code: "00065"
+series_begin: 2014-08-18T18:30:00+00:00
+time_series_id: 9704faadc3724121a788bf964e953680

@@ -1,0 +1,16 @@
+name: Dry Ck nr Rosenberg, TX
+lat: 29.5119059310135
+lon: -95.7468941659777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08116400/
+parameter_code: "00065"
+series_begin: 2007-12-13T06:00:00+00:00
+time_series_id: 8eeaf9e043d2439fb0f6f0ebce0ec3f8

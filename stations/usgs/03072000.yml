@@ -1,0 +1,16 @@
+name: Dunkard Creek at Shannopin, PA
+lat: 39.7592449323831
+lon: -79.9706152008925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 246.522
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03072000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 47c92a688c7d4cabae9e15d2ad975ae6

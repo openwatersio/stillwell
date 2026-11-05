@@ -1,0 +1,13 @@
+name: Flaggy Meadow, WV
+lat: 39.562778
+lon: -80.021944
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 252.451
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=FlaggyMeadow.Stage.Inst.15Minutes.0.OBS
+series: FlaggyMeadow.Stage.Inst.15Minutes.0.OBS

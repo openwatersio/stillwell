@@ -1,0 +1,16 @@
+name: NF Wailua Riv abv N Wailua Ditch Int, Kauai, HI
+lat: 22.06363766301824
+lon: -159.47060289774151
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 350.52
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16060950/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: 3e5f981201a74737bc428e12e7bbbea7

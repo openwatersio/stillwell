@@ -1,0 +1,16 @@
+name: RED RIVER NEAR QUESTA, NM
+lat: 36.70331111111111
+lon: -105.56843055555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2272.711
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08265000/
+parameter_code: "00065"
+series_begin: 2011-02-10T07:00:00+00:00
+time_series_id: 91b785c480e146f6b32b8008d305399f

@@ -1,0 +1,23 @@
+name: MACKEREL COVE, SWANS ISLAND
+lat: 44.17
+lon: -68.435
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.606
+  MHW: -3.48
+  DTL: -1.941
+  MTL: -1.934
+  MSL: -1.941
+  MLW: -0.388
+  MLLW: -0.276
+  LAT: 0.504
+  HAT: -4.395
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8413825
+established: 1994-08-29T00:00:00Z
+removed: 1994-10-14T23:59:00Z

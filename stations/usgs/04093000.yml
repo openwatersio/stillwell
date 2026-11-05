@@ -1,0 +1,16 @@
+name: DEEP RIVER AT LAKE GEORGE OUTLET AT HOBART, IN
+lat: 41.53612812637506
+lon: -87.25694844332124
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.161
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04093000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 22c450c06092465cb5a0d386a2154af6

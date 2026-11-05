@@ -1,0 +1,20 @@
+name: TAKLI ISLAND, SHELIKOF STRAIT
+lat: 58.0633
+lon: -154.477
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.886
+  MHW: -4.599
+  DTL: -2.815
+  MTL: -2.931
+  MLW: -1.263
+  MLLW: -0.744
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9456992
+established: 1980-05-21T00:00:00Z
+removed: 1981-08-24T23:59:00Z

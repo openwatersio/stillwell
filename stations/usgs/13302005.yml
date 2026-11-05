@@ -1,0 +1,16 @@
+name: PAHSIMEROI RIVER AT ELLIS ID
+lat: 44.6916666666667
+lon: -114.046944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1413.918
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13302005/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: dd657917010747e184486d1310cdb756

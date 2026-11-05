@@ -1,0 +1,24 @@
+name: ELIM, NORTON BAY
+lat: 64.6167
+lon: -162.248
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.26
+  MHW: -1.18
+  DTL: -0.861
+  MTL: -0.903
+  MSL: -0.85
+  MLW: -0.626
+  MLLW: -0.461
+  NAVD88: 0.321
+  LAT: 0.189
+  HAT: -2.097
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468863
+established: 1984-08-23T00:00:00Z
+removed: 2012-10-10T00:00:00Z

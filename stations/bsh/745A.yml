@@ -1,0 +1,13 @@
+name: Buttelerhörne, Hunte
+lat: 53.18
+lon: 8.4125
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.95
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/4960060]
+source_url: https://gezeiten.bsh.de/buttelerhoerne

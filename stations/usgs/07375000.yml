@@ -1,0 +1,16 @@
+name: Tchefuncte River near Folsom, LA
+lat: 30.6160223107296
+lon: -90.248695449432
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 18.632
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07375000/
+parameter_code: "00065"
+series_begin: 2007-10-12T05:00:00+00:00
+time_series_id: eda4a519cdb0479ea3d0bf4fb18b7389

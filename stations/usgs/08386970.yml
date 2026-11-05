@@ -1,0 +1,16 @@
+name: GAVILAN CANYON AT SKUNK CANYON NR HOLLYWOOD, NM
+lat: 33.344880555555555
+lon: -105.64391111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2037.512
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08386970/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: b7c0476e922046808f42d2ee6a519118

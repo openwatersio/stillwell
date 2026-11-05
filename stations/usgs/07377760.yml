@@ -1,0 +1,16 @@
+name: Comite River at Comite Dr near Baton Rouge, LA
+lat: 30.5582712572197
+lon: -91.0982721603174
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.104
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07377760/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f57fde118b6d47e1a709d414d8912381

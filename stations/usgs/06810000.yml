@@ -1,0 +1,16 @@
+name: Nishnabotna River above Hamburg, IA
+lat: 40.6011944444444
+lon: -95.6445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.976
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06810000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 870a4312f96945ffa167fd8587dcba5e

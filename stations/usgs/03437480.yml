@@ -1,0 +1,16 @@
+name: S FK LITTLE RIVER AT HWY 68-80 NR HOPKINSVILLE, KY
+lat: 36.84980132134966
+lon: -87.35222895086622
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 167.835
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03437480/
+parameter_code: "00065"
+series_begin: 2009-10-01T06:00:00+00:00
+time_series_id: a8acd13acd8b4cf382b628eb6dbbf79c

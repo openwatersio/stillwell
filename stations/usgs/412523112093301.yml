@@ -1,0 +1,17 @@
+name: (B- 8- 3)14ccc   Bear River Refuge Whistler Canal
+lat: 41.422944
+lon: -112.159111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1280.16
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412523112093301/
+parameter_code: "00065"
+series_begin: 2011-03-31T20:45:00+00:00
+series_end: 2013-04-01T20:00:00+00:00
+time_series_id: a9f6a52b4b43435ba193579e22764e86

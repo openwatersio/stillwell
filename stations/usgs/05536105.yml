@@ -1,0 +1,17 @@
+name: NB CHICAGO RIVER AT ALBANY AVENUE AT CHICAGO, IL
+lat: 41.9741666666667
+lon: -87.7058333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 176.988
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05536105/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2018-04-19T17:00:00+00:00
+time_series_id: 63b7da65d6d7401db36fca0f5dd016a5

@@ -1,0 +1,16 @@
+name: Little Sac River near Morrisville, MO
+lat: 37.4828611111111
+lon: -93.4856388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 268.322
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06918740/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2be895bcd26840a4b7f274f1a9ca98c9

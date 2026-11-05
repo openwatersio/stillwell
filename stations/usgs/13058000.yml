@@ -1,0 +1,16 @@
+name: WILLOW CREEK NR RIRIE ID
+lat: 43.5833333333333
+lon: -111.746111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1508.224
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13058000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e9b817c3886e4272be579897047a9d4f

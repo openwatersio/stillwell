@@ -1,0 +1,16 @@
+name: KANSAS R AT LAWRENCE, KS
+lat: 38.9732777777778
+lon: -95.2321111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 243.834
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06891080/
+parameter_code: "00065"
+series_begin: 2012-09-14T16:00:00+00:00
+time_series_id: 04ba8e46e3644a92b9d3f6ca9cd86d4a

@@ -1,0 +1,24 @@
+name: Galveston Railroad Bridge
+lat: 29.3026
+lon: -94.8971
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.315
+  MHW: -6.291
+  DTL: -6.122
+  MTL: -6.141
+  MSL: -6.157
+  MLW: -5.991
+  MLLW: -5.929
+  NAVD88: -6.035
+  LAT: -5.575
+  HAT: -6.567
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771486
+established: 2012-09-01T00:00:00Z

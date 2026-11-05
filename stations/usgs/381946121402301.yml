@@ -1,0 +1,17 @@
+name: LIBERTY ISLAND WILDLANDS TIDAL MARSH NR FIVE POINT
+lat: 38.329525
+lon: -121.673155555556
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -6.029
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-381946121402301/
+parameter_code: "00065"
+series_begin: 2018-04-06T20:00:00+00:00
+series_end: 2018-07-03T17:45:00+00:00
+time_series_id: c737a341ee7e490cbc25ca7322483fc2

@@ -1,0 +1,16 @@
+name: MCELMO CREEK ABOVE TRAIL CANYON NEAR CORTEZ, CO
+lat: 37.3266639617581
+lon: -108.70066067683722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1721.446
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09371520/
+parameter_code: "00065"
+series_begin: 2020-10-29T19:15:00+00:00
+time_series_id: 3d1438fbe24d4787b9a471339a63d82f

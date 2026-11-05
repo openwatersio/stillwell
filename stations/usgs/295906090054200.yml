@@ -1,0 +1,15 @@
+name: City Park South Lagoon at New Orleans, LA
+lat: 29.985
+lon: -90.095
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-295906090054200/
+parameter_code: "00065"
+series_begin: 2011-07-01T05:00:00+00:00
+series_end: 2015-07-28T04:45:00+00:00
+time_series_id: ad9590b2e37d4221870540d59b4bec9e

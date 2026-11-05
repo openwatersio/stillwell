@@ -1,0 +1,17 @@
+name: Huckleberry Creek nr Augsburg, AR
+lat: 35.393055555555556
+lon: -93.22055555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 152.4
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07257693/
+parameter_code: "00065"
+series_begin: 2009-08-05T20:30:00+00:00
+series_end: 2023-10-11T17:30:00+00:00
+time_series_id: 83f54dedd1354334bcc4f6bbe5a8c4b2

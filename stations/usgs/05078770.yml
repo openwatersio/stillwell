@@ -1,0 +1,17 @@
+name: Judicial Ditch 66 Near Marcoux Corners, MN (SW6)
+lat: 47.7819444444444
+lon: -96.3313888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 316.242
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05078770/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2015-09-30T04:45:00+00:00
+time_series_id: 09dc4be0aac246558bb901e08cea5685

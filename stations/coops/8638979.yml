@@ -1,0 +1,13 @@
+name: Chesapeake Light
+lat: 36.905
+lon: -75.6967
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638979
+established: 1998-05-29T00:00:00Z
+removed: 2004-02-16T23:59:00Z

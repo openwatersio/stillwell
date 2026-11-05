@@ -1,0 +1,16 @@
+name: PVID C CANAL SPILL NEAR BLYTHE, CA
+lat: 33.4283305555556
+lon: -114.673336111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 69.01
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09429200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: ad3e79dff0ff470080ffc5b3317de1f1

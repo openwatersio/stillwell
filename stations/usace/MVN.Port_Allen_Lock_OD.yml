@@ -1,0 +1,12 @@
+name: Port Allen Lock (52415)
+lat: 30.432016666667
+lon: -91.210213833333
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Port_Allen_Lock_OD.Stage.Inst.1Hour.0.rev
+series: Port_Allen_Lock_OD.Stage.Inst.1Hour.0.rev

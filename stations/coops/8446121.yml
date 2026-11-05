@@ -1,0 +1,23 @@
+name: Provincetown
+lat: 42.04959
+lon: -70.18216
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.297
+  MHW: -4.158
+  DTL: -2.761
+  MTL: -2.742
+  MSL: -2.758
+  MLW: -1.325
+  MLLW: -1.225
+  LAT: -0.587
+  HAT: -4.902
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8446121
+established: 2010-03-05T00:00:00Z
+removed: 2010-08-16T23:59:00Z

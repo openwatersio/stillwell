@@ -1,0 +1,13 @@
+name: N ELKHORN CR AT MAN O WAR BLVD NR CADENTOWN, KY
+lat: 38.0284111757515
+lon: -84.4018797533195
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03287580/
+parameter_code: "00065"
+time_series_id: c84748100f764d5a87e22152e6b294a4

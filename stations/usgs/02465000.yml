@@ -1,0 +1,16 @@
+name: BLACK WARRIOR RIVER AT NORTHPORT AL
+lat: 33.2092852799585
+lon: -87.590007409604
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02465000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cebc07c56e334f8ea8d01a8f0971fba1

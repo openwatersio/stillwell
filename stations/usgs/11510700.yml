@@ -1,0 +1,16 @@
+name: KLAMATH RIVER BLW JOHN C.BOYLE PWRPLNT, NR KENO,OR
+lat: 42.0845877081179
+lon: -122.073345266467
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 998.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11510700/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: c795d0829fb343f09b43a89656046297

@@ -1,0 +1,16 @@
+name: COLORADO RIVER AT LEES FERRY, AZ
+lat: 36.864333333333335
+lon: -111.58787222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 947.663
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09380000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c1d72c8390d144f78b51568a3755a5ad

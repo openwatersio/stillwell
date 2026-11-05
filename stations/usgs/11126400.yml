@@ -1,0 +1,16 @@
+name: SANTA YNEZ R A HWY 154 NR SANTA YNEZ CA
+lat: 34.59011111111111
+lon: -120.02536111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 151.739
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11126400/
+parameter_code: "00065"
+series_begin: 2022-10-01T08:00:00+00:00
+time_series_id: 8a8808b94f2b4b1ab9b28fa42736e65c

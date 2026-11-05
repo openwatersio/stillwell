@@ -1,0 +1,15 @@
+name: HOG CREEK AT FLOWOOD DRIVE AT LUCKNEY, MS
+lat: 32.3333333333333
+lon: -90.0838888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 79.714
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02485730/
+parameter_code: "00065"
+time_series_id: ddd74819ba68493e9380e81ae598f5ab

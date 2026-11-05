@@ -1,0 +1,16 @@
+name: N F SOUTH BRANCH POTOMAC RIVER AT CABINS, WV
+lat: 38.9845546059531
+lon: -79.2336508348988
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 319.827
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01606000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 03a545ad6a5b40db9bc622666a3eddd3

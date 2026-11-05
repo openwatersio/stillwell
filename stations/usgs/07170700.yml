@@ -1,0 +1,16 @@
+name: BIG HILL C NR CHERRYVALE, KS
+lat: 37.2667325099512
+lon: -95.4691440233485
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 242.743
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07170700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 57907d0c8f5a4b65ae3ef09df92ca21f

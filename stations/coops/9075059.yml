@@ -1,0 +1,16 @@
+name: HARRISVILLE
+lat: 44.6593
+lon: -83.2863
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9075059
+established: 1961-10-01T00:00:00Z
+removed: 2008-11-05T23:59:00Z

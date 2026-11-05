@@ -1,0 +1,11 @@
+name: LÜNEBURG UW
+lat: 53.293428
+lon: 10.488563
+country_code: DE
+datum: NN
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=90100120

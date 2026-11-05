@@ -1,0 +1,13 @@
+name: OCCOHANNOCK CREEK AT ROUTE 178 AT BELLE HAVEN, VA
+lat: 37.5570888888889
+lon: -75.8410083333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-373326075502800/
+parameter_code: "62620"
+time_series_id: 7440458cf06c4e68900124fb66aa2c3d

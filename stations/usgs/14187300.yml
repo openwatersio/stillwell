@@ -1,0 +1,13 @@
+name: S SANTIAM R AT NORTHSIDE PARK, AT SWEET HOME, OR
+lat: 44.40208888888889
+lon: -122.73292222222223
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14187300/
+parameter_code: "63160"
+time_series_id: 330aa263e68f4048b406926b0c3bdcfe

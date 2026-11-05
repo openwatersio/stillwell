@@ -1,0 +1,11 @@
+name: Markerwadden, oost, meetpaal 44
+lat: 52.577701
+lon: 5.41817
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/markerwadden.oost.meetpaal44/details

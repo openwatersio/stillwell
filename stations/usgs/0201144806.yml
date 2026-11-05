@@ -1,0 +1,17 @@
+name: WARWICK RUN BELOW LICK DRAFT NEAR MILL GAP, VA
+lat: 38.2995
+lon: -79.7726944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 745.151
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0201144806/
+parameter_code: "00065"
+series_begin: 2017-11-15T16:40:00+00:00
+series_end: 2021-04-06T16:00:00+00:00
+time_series_id: dc1ba9774cb54cb5ae64f2dc06d9da91

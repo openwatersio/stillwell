@@ -1,0 +1,15 @@
+name: MONUMENT CREEK AT PALMER LAKE, CO
+lat: 39.1025555555556
+lon: -104.892277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2118.36
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103747/
+parameter_code: "00065"
+time_series_id: d817b3ca4d1f4a64893b6fae2d4c3582

@@ -1,0 +1,16 @@
+name: EEL R A SCOTIA CA
+lat: 40.49149394275497
+lon: -124.09974068101218
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.707
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11477000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 530f1902f43147ac8ed4879409b8cd78

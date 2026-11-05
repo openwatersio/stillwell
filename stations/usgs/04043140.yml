@@ -1,0 +1,16 @@
+name: GOMANCHE CREEK AT INDIAN ROAD NEAR L'ANSE, MI
+lat: 46.751111
+lon: -88.361667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 289.56
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04043140/
+parameter_code: "00065"
+series_begin: 2013-10-01T04:00:00+00:00
+time_series_id: de967b7b429d4be3b4473135714e8e49

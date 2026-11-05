@@ -1,0 +1,16 @@
+name: PINAL CREEK AT INSPIRATION DAM, NR GLOBE, AZ.
+lat: 33.573106812473
+lon: -110.901225130494
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 835.152
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09498400/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 9c32c26bd8574e9b8f246dd8d298f38e

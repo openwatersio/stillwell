@@ -1,0 +1,12 @@
+name: Bayou Courtableau Above Drainage Str (58400 )
+lat: 30.5342222
+lon: -91.8594443
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Courtableau_Abve.Stage.Inst.1Hour.0.rev
+series: Courtableau_Abve.Stage.Inst.1Hour.0.rev

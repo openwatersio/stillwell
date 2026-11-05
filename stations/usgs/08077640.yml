@@ -1,0 +1,16 @@
+name: Dickinson Bayou at FM 517 nr Alvin, TX
+lat: 29.436075
+lon: -95.1701305555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08077640/
+parameter_code: "00065"
+series_begin: 2022-05-17T18:50:00+00:00
+time_series_id: 76e44a2f931a4268afca50f0ba9a7a3c

@@ -1,0 +1,14 @@
+name: POTOMAC RIVER AT INDIAN HEAD, MD
+lat: 38.6009518547536
+lon: -77.1819243635655
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01655480/
+parameter_code: "62620"
+series_begin: 2022-03-22T18:24:00+00:00
+time_series_id: c9cd354fe3e14ac8a3591712af463f9e

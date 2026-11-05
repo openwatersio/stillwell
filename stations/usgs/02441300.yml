@@ -1,0 +1,17 @@
+name: CATALPA CREEK AT MAYHEW, MS
+lat: 33.4813888888889
+lon: -88.6286111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 52.736
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02441300/
+parameter_code: "00065"
+series_begin: 2014-09-11T16:30:00+00:00
+series_end: 2024-03-02T18:00:00+00:00
+time_series_id: 9a908e5e79d648ca97c6d0a7700465c0

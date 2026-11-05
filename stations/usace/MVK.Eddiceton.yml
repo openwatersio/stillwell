@@ -1,0 +1,13 @@
+name: Homochitto River at Eddiceton, MS
+lat: 31.50306
+lon: -90.7775
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 64.523
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Eddiceton.Stage.Inst.15Minutes.0.DCP-raw
+series: Eddiceton.Stage.Inst.15Minutes.0.DCP-raw

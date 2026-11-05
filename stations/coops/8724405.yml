@@ -1,0 +1,22 @@
+name: SADDLEBUNCH CHANNEL NO. 3
+lat: 24.6233
+lon: -81.6033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.118
+  MHW: -1.038
+  DTL: -0.979
+  MTL: -0.946
+  MSL: -0.927
+  MLW: -0.854
+  MLLW: -0.84
+  NAVD88: -1.06
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724405
+established: 1975-01-14T00:00:00Z
+removed: 1975-03-07T23:59:00Z

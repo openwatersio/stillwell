@@ -1,0 +1,13 @@
+name: KNOCK
+lat: 53.327173
+lon: 7.030674
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.11
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=3990010

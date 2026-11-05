@@ -1,0 +1,13 @@
+name: Alte Weser, Leuchtturm
+lat: 53.86333
+lon: 8.1275
+country_code: DE
+datum: PNP
+datums:
+  NHN: -4.98
+  SKN: -2.87
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9460040]
+source_url: https://gezeiten.bsh.de/alte_weser_leuchtturm

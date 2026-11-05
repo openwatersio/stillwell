@@ -1,0 +1,13 @@
+name: Grantsville, MD
+lat: 39.7022
+lon: -79.1367
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 636.593
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Grantsville.Stage.Inst.15Minutes.0.OBS
+series: Grantsville.Stage.Inst.15Minutes.0.OBS

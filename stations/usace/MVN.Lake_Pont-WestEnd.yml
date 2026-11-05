@@ -1,0 +1,11 @@
+name: Lake Pontchartrain at West End (85625)
+lat: 30.0221638
+lon: -90.1156444
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Lake_Pont-WestEnd.Stage.Inst.1Hour.0.rev
+series: Lake_Pont-WestEnd.Stage.Inst.1Hour.0.rev

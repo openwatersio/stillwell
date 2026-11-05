@@ -1,0 +1,14 @@
+name: Harmon Ck nr Riverside, TX
+lat: 30.860786111111114
+lon: -95.43355277777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08065980/
+parameter_code: "00065"
+series_begin: 2025-02-07T16:00:00+00:00
+time_series_id: 637770cb433540eb9f52fc5435108060

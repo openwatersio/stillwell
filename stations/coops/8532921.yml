@@ -1,0 +1,13 @@
+name: SILVER BAY
+lat: 39.9967
+lon: -74.1483
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8532921
+established: 1976-03-08T00:00:00Z
+removed: 1977-07-20T23:59:00Z

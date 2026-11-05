@@ -1,0 +1,14 @@
+name: Grafton
+lat: 38.967964
+lon: -90.42895
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 122.898
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Grafton-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Grafton-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

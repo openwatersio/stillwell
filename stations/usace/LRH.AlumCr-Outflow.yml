@@ -1,0 +1,14 @@
+name: Alum Creek Outflow
+lat: 40.182279695066
+lon: -82.961492711639
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 250.546
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=AlumCr-Outflow.Stage.Inst.15Minutes.0.OBS
+series: AlumCr-Outflow.Stage.Inst.15Minutes.0.OBS

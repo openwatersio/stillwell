@@ -1,0 +1,16 @@
+name: Flathead River at Flathead British Columbia
+lat: 49.001242
+lon: -114.475664
+country_code: CA
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1209.495
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12355000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b68442e1e0034aa8b16537541b90a120

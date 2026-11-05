@@ -1,0 +1,16 @@
+name: MARAIS DES CYGNES R AT MELVERN, KS
+lat: 38.51611111111111
+lon: -95.69611111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 289.944
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06911000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e83fa6fc54634313ae8f25420342a1d8

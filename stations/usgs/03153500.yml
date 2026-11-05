@@ -1,0 +1,16 @@
+name: LITTLE KANAWHA RIVER AT GRANTSVILLE, WV
+lat: 38.921730731305
+lon: -81.0947567002251
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 198.794
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03153500/
+parameter_code: "00065"
+series_begin: 2010-10-01T05:00:00+00:00
+time_series_id: ed9fca5f9b774130b63bfa0b92e187aa

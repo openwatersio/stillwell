@@ -1,0 +1,24 @@
+name: Morgans Point, Barbours Cut
+lat: 29.681667
+lon: -94.985
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.97
+  MHW: -1.948
+  DTL: -1.767
+  MTL: -1.775
+  MSL: -1.786
+  MLW: -1.602
+  MLLW: -1.564
+  NAVD88: -1.56
+  LAT: -1.188
+  HAT: -2.173
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770613
+established: 1973-06-18T00:00:00Z

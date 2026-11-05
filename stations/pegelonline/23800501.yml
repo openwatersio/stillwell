@@ -1,0 +1,13 @@
+name: LAUFFEN SCHLEUSE UP
+lat: 49.073941
+lon: 9.160596
+country_code: DE
+datum: PNP
+datums:
+  NHN: 159.37
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=23800501

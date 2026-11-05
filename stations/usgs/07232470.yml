@@ -1,0 +1,16 @@
+name: Beaver River near Goodwell, OK
+lat: 36.7058583137777
+lon: -101.636827358377
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 941.521
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07232470/
+parameter_code: "00065"
+series_begin: 2009-07-21T12:00:00+00:00
+time_series_id: 0bf04ce9fea040aaaec8cd86b6fb11ac

@@ -1,0 +1,12 @@
+name: Kalkgrund, Leuchtturm, Ostsee
+lat: 54.82472
+lon: 9.88806
+country_code: DE
+datum: PNP
+datums:
+  NHN: -4.99
+  SKN: -4.99
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/kalkgrund_leuchtturm

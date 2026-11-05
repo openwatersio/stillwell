@@ -1,0 +1,16 @@
+name: LITTLE WHITE RIVER BELOW WHITE RIVER, SD
+lat: 43.601389
+lon: -100.749444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 583.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06450500/
+parameter_code: "00065"
+series_begin: 2017-07-12T19:45:00+00:00
+time_series_id: b514b312fa534c9dbf4b9922007b6e0c

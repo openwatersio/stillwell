@@ -1,0 +1,16 @@
+name: Brushy Ck at Cedar Park, TX
+lat: 30.5251805555556
+lon: -97.7499916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 233.221
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08105872/
+parameter_code: "00065"
+series_begin: 2014-09-01T05:00:00+00:00
+time_series_id: 5fb5f2713a0240cea3150d6fe1e0794f

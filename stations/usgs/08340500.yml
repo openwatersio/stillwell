@@ -1,0 +1,17 @@
+name: ARROYO CHICO NR GUADALUPE, NM
+lat: 35.59225
+lon: -107.189444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1804.721
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08340500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2021-01-13T16:15:00+00:00
+time_series_id: 37ecb2a7230b41979dcf1851cbf69982

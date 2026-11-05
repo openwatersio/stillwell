@@ -1,0 +1,13 @@
+name: Sugar Creek at Kirkwood
+lat: 38.576583333333
+lon: -90.464333333333
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 128.26
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Kirkwood-Sugar%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Kirkwood-Sugar Cr.Stage.Inst.5Minutes.0.Usgs-raw

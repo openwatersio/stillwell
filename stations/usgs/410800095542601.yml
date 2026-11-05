@@ -1,0 +1,17 @@
+name: Offutt Ditch (Bellevue Drain) at Clay St, Nebr.
+lat: 41.13331111111111
+lon: -95.90570277777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 321.149
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-410800095542601/
+parameter_code: "00065"
+series_begin: 2023-08-16T17:30:00+00:00
+series_end: 2024-11-01T05:55:00+00:00
+time_series_id: 3b67002b0f014578b76f3adecb3db09f

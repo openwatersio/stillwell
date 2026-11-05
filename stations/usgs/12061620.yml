@@ -1,0 +1,17 @@
+name: SKOKOMISH RIVER BYPASS AT HWY101 NR POTLATCH, WA
+lat: 47.312725
+lon: -123.17525833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.363
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12061620/
+parameter_code: "00065"
+series_begin: 2021-10-01T08:00:00+00:00
+series_end: 2022-05-01T07:45:00+00:00
+time_series_id: 40892b84bb734f3283890b4800b3cd35

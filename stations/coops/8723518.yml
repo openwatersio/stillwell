@@ -1,0 +1,22 @@
+name: WEDNESDAY POINT, KEY LARGO
+lat: 25.31
+lon: -80.2983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.163
+  MHW: -1.152
+  DTL: -1.032
+  MTL: -1.038
+  MSL: -1.03
+  MLW: -0.924
+  MLLW: -0.9
+  NAVD88: -1.282
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723518
+established: 1971-10-28T00:00:00Z
+removed: 1972-04-12T23:59:00Z

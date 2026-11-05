@@ -1,0 +1,12 @@
+name: Atchafalaya River at Butte La Rose (03120)
+lat: 30.2828017
+lon: -91.6879383
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Butte_LaRose.Stage.Inst.15Minutes.0.rev
+series: Butte_LaRose.Stage.Inst.15Minutes.0.rev

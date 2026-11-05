@@ -1,0 +1,16 @@
+name: BRULE RIVER AT US HIGHWAY 2 NEAR FLORENCE, WI
+lat: 45.9607873727225
+lon: -88.3159663404691
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 374.892
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04060993/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e76a3f1b885d49c39cc001a5af8a447b

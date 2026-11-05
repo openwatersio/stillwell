@@ -1,0 +1,16 @@
+name: SPRING CREEK NEAR SPRING CREEK, FL
+lat: 30.0727048506709
+lon: -84.3273972043793
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02327031/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3934ac7a7c0f42028862fa3b515591a1

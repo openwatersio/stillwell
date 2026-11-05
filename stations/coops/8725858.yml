@@ -1,0 +1,24 @@
+name: VENICE
+lat: 27.0717
+lon: -82.4533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.982
+  MHW: -0.9
+  DTL: -0.646
+  MTL: -0.662
+  MSL: -0.668
+  MLW: -0.424
+  MLLW: -0.311
+  NAVD88: -0.808
+  LAT: 0.01
+  HAT: -1.235
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725858
+established: 1977-05-10T00:00:00Z
+removed: 1990-11-01T23:59:00Z

@@ -1,0 +1,16 @@
+name: Pine Creek bl L Pine Creek near Waterville, PA
+lat: 41.2736165726697
+lon: -77.32411856859873
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.73
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01549700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ac895d32317346d38b133914af165287

@@ -1,0 +1,21 @@
+name: SEABECK, HOOD CANAL
+lat: 47.6417
+lon: -122.828
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.082
+  MHW: -3.792
+  DTL: -2.33
+  MTL: -2.641
+  MSL: -2.636
+  MLW: -1.49
+  MLLW: -0.578
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445296
+established: 1935-03-15T00:00:00Z
+removed: 1978-03-02T23:59:00Z

@@ -1,0 +1,24 @@
+name: Westport
+lat: 46.90431
+lon: -124.10508
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.701
+  MHW: -3.475
+  DTL: -2.307
+  MTL: -2.407
+  MSL: -2.398
+  MLW: -1.34
+  MLLW: -0.914
+  NAVD88: -1.257
+  LAT: -0.066
+  HAT: -4.373
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9441102
+established: 1982-06-07T00:00:00Z

@@ -1,0 +1,23 @@
+name: Fareham Bay
+lat: 17.71
+lon: -64.6828
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.486
+  MHW: -8.485
+  DTL: -8.374
+  MTL: -8.374
+  MSL: -8.373
+  MLW: -8.263
+  MLLW: -8.262
+  LAT: -8.121
+  HAT: -8.608
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751219
+established: 2020-11-20T00:00:00Z
+removed: 2021-04-11T15:00:00Z

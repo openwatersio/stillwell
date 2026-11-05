@@ -1,0 +1,22 @@
+name: Swanquarter
+lat: 35.401943
+lon: -76.32806
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.123
+  MHW: -7.105
+  DTL: -7.049
+  MTL: -7.051
+  MSL: -7.055
+  MLW: -6.996
+  MLLW: -6.974
+  NAVD88: -7.145
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8653795
+established: 2021-11-05T00:00:00Z
+removed: 2022-04-30T17:24:00Z

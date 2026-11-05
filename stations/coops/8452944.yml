@@ -1,0 +1,23 @@
+name: Conimicut Light
+lat: 41.7167
+lon: -71.3433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.048
+  MHW: -6.972
+  DTL: -6.349
+  MTL: -6.337
+  MSL: -6.292
+  MLW: -5.702
+  MLLW: -5.65
+  LAT: -5.336
+  HAT: -7.466
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8452944
+established: 1999-09-28T00:00:00Z

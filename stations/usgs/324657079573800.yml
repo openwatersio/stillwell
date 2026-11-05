@@ -1,0 +1,13 @@
+name: ASHLEY RIVER AT US17 NEAR ST ANDREWS,SC
+lat: 32.7825
+lon: -79.9605555555556
+country_code: US
+kind: coastal
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-324657079573800/
+parameter_code: "62620"
+time_series_id: acfab660d16243049a779f49f86a1b4a

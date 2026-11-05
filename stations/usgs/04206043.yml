@@ -1,0 +1,15 @@
+name: Mud Brook at Cuyahoga Falls OH
+lat: 41.1528337192218
+lon: -81.5087263786207
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 290.712
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04206043/
+parameter_code: "00065"
+time_series_id: fd8073ec1a8a4133b125cfc48fd23876

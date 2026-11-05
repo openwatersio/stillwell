@@ -1,0 +1,13 @@
+name: Creve Coeur Cr at Chesterfield
+lat: 38.646
+lon: -90.527
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 150.937
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Chesterfield-Creve%20Coeur%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Chesterfield-Creve Coeur Cr.Stage.Inst.5Minutes.0.Usgs-raw

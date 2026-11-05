@@ -1,0 +1,15 @@
+name: SWIFT POWERPLANT NO 2 TAILWATER NEAR COUGAR, WA
+lat: 46.0581659837766
+lon: -122.260929308924
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14218030/
+parameter_code: "00065"
+series_begin: 2022-10-01T08:00:00+00:00
+series_end: 2026-10-20T17:15:00+00:00
+time_series_id: 943fd263f29247a78c505754f35118c1

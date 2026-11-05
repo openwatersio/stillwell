@@ -1,0 +1,16 @@
+name: FRENCH BROAD RIVER AT ASHEVILLE, NC
+lat: 35.6088888888889
+lon: -82.5780555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 594.339
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03451500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ace6cac9d0464163b5acecbda4979855

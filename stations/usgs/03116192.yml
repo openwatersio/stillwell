@@ -1,0 +1,16 @@
+name: Unnamed Tributary to Styx River at Rittman OH
+lat: 40.9788888888889
+lon: -81.78
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 290.819
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03116192/
+parameter_code: "00065"
+series_begin: 2019-09-23T14:45:00+00:00
+time_series_id: ba2b7129d17a4d95b7bb34a33fa8c2f3

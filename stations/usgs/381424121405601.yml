@@ -1,0 +1,17 @@
+name: PROSPECT SLOUGH NR FIVE POINTS CA
+lat: 38.2398916666667
+lon: -121.682155555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.415
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-381424121405601/
+parameter_code: "00065"
+series_begin: 2018-08-09T01:15:00+00:00
+series_end: 2018-11-07T15:45:00+00:00
+time_series_id: da5d8fe55cb14b4880286929c1ca3907

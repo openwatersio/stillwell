@@ -1,0 +1,22 @@
+name: BLOODY POINT, NEW RIVER
+lat: 32.0817
+lon: -80.8783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.622
+  MHW: -2.51
+  DTL: -1.503
+  MTL: -1.478
+  MSL: -1.519
+  MLW: -0.446
+  MLLW: -0.384
+  NAVD88: -1.624
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8669801
+established: 1980-09-18T00:00:00Z
+removed: 1981-08-06T23:59:00Z

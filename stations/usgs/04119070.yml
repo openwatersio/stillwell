@@ -1,0 +1,16 @@
+name: GRAND RIVER AT STATE HWY M-11 AT GRANDVILLE, MI
+lat: 42.9153038189744
+lon: -85.7672554784226
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.781
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04119070/
+parameter_code: "00065"
+series_begin: 2019-06-20T13:45:42+00:00
+time_series_id: c696e64a0b8b4f568e4286b76eceb4f6

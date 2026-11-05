@@ -1,0 +1,22 @@
+name: ALLIGATOR BAYOU, PANAMA CITY
+lat: 30.17
+lon: -85.755
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.627
+  MHW: -1.608
+  DTL: -1.419
+  MTL: -1.417
+  MSL: -1.42
+  MLW: -1.226
+  MLLW: -1.21
+  NAVD88: -1.369
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729152
+established: 1956-03-21T00:00:00Z
+removed: 1991-10-31T23:59:00Z

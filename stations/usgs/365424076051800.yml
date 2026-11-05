@@ -1,0 +1,13 @@
+name: LYNHAVEN RIVER ABV RT 60 NR VIRGINIA BEACH, VA
+lat: 36.9066666666667
+lon: -76.0883333333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-365424076051800/
+parameter_code: "62620"
+time_series_id: ca6eefc14b5347d1bc146af8719b892a

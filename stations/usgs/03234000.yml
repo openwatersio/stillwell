@@ -1,0 +1,16 @@
+name: Paint Creek near Bourneville OH
+lat: 39.2636763083722
+lon: -83.1668520840776
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.713
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03234000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4f1d58265e5f475d95c3d5254f8297d1

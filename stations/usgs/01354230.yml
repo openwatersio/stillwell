@@ -1,0 +1,14 @@
+name: MOHAWK RIVER AT LOCK 9 AT ROTTERDAM JUNCTION NY
+lat: 42.8782777777778
+lon: -74.04075
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01354230/
+parameter_code: "00065"
+series_begin: 2019-12-11T16:40:00+00:00
+time_series_id: 7ced9e50d6d045aab473874bd9b55ed0

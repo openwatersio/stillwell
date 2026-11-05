@@ -1,0 +1,13 @@
+name: ROTENBURG
+lat: 51.003768
+lon: 9.72045
+country_code: DE
+datum: PNP
+datums:
+  NHN: 179.523
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=42700100

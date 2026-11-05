@@ -1,0 +1,16 @@
+name: WILLOWEMOC CREEK NR LIVINGSTON MANOR NY
+lat: 41.903527777777775
+lon: -74.81275
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 436.821
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01419500/
+parameter_code: "00065"
+series_begin: 2018-08-30T14:00:00+00:00
+time_series_id: eb35382f2cb84b55acead692769d0c94

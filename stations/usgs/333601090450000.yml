@@ -1,0 +1,15 @@
+name: PORTER BAYOU NEAR SHAW, MS
+lat: 33.6005277777778
+lon: -90.7500833333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-333601090450000/
+parameter_code: "00065"
+series_begin: 2014-03-26T14:15:00+00:00
+series_end: 2026-05-06T03:00:00+00:00
+time_series_id: 63e18910ae464eccbbe5156c75a5241d

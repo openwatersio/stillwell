@@ -1,0 +1,16 @@
+name: SKYKOMISH RIVER NEAR GOLD BAR, WA
+lat: 47.837325459015
+lon: -121.666780945994
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 64.895
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12134500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e5eaa3195d8440138b3e2d99a20a8375

@@ -1,0 +1,16 @@
+name: COAL CREEK NEAR CEDAR CITY, UT
+lat: 37.6721992391503
+lon: -113.034670204819
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1823.621
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10242000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 6b5f45031d564acb8c16053ccf601b4d

@@ -1,0 +1,14 @@
+name: WB ELIZABETH RIVER AT ROUTE 17 NEAR PORTSMOUTH, VA
+lat: 36.8437222222222
+lon: -76.3648611111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02042893/
+parameter_code: "62620"
+series_begin: 2015-04-16T04:00:00+00:00
+time_series_id: 9a6e8b1cdcdb45ea840c9149697caaab

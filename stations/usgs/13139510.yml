@@ -1,0 +1,16 @@
+name: BIG WOOD RIVER AT HAILEY ID TOTAL FLOW
+lat: 43.5172222222222
+lon: -114.321666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1615.053
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13139510/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 58055559a284474180a92981d08096e8

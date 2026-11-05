@@ -1,0 +1,17 @@
+name: SHEYENNE RIVER ON 32ND AVE E AT WEST FARGO, ND
+lat: 46.833781
+lon: -96.904519
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 261.354
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05059460/
+parameter_code: "00065"
+series_begin: 2023-04-16T16:30:00+00:00
+series_end: 2023-10-01T05:45:00+00:00
+time_series_id: 44e6e725a62d48b58713c4324fb25767

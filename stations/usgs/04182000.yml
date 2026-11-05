@@ -1,0 +1,16 @@
+name: ST. MARYS RIVER NEAR FORT WAYNE, IN
+lat: 40.98779929951321
+lon: -85.11187715322208
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.115
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04182000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7b30aa8c2f604eadb8888a0e86c4c10f

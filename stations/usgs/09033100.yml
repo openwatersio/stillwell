@@ -1,0 +1,17 @@
+name: RANCH CREEK BLW MEADOW CR NR TABERNASH, CO
+lat: 39.9990861111111
+lon: -105.826558333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2542.946
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09033100/
+parameter_code: "00065"
+series_begin: 2020-09-16T23:00:00+00:00
+series_end: 2026-10-01T07:15:00+00:00
+time_series_id: f968a80295214f3bb8a3e803f72dbc29

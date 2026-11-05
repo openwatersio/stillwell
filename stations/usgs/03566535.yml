@@ -1,0 +1,16 @@
+name: NORTH CHICKAMAUGA CR AT MILE STRAIGHT, TN
+lat: 35.211180618375
+lon: -85.2152353373924
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.93
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03566535/
+parameter_code: "00065"
+series_begin: 2016-05-04T17:00:00+00:00
+time_series_id: 814dadd3a69546ebb37a50107b13da37

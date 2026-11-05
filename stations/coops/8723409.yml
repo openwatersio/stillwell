@@ -1,0 +1,23 @@
+name: ELLIOTT KEY HARBOR, ELLIOTT KEY
+lat: 25.4533
+lon: -80.1967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.543
+  MHW: -1.518
+  DTL: -1.29
+  MTL: -1.293
+  MSL: -1.284
+  MLW: -1.068
+  MLLW: -1.037
+  LAT: -0.875
+  HAT: -1.744
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723409
+established: 1974-06-25T00:00:00Z
+removed: 1988-01-15T23:59:00Z

@@ -1,0 +1,13 @@
+name: WILLIAM HENRY BAY
+lat: 58.7133
+lon: -135.232
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452391
+established: 1922-04-26T00:00:00Z
+removed: 1984-06-20T23:59:00Z

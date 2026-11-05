@@ -1,0 +1,16 @@
+name: Des Moines River at Humboldt, IA
+lat: 42.7194444444444
+lon: -94.2202777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 321.177
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05476750/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c9b6b602ba0b448190be2ed2ddbbadac

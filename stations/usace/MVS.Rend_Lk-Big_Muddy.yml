@@ -1,0 +1,14 @@
+name: Rend Pool
+lat: 38.037619
+lon: -88.961594
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 106.512
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Rend%20Lk-Big%20Muddy.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Rend Lk-Big Muddy.Stage.Inst.30Minutes.0.lrgsShef-rev

@@ -1,0 +1,16 @@
+name: ROARING FORK RIVER AT GLENWOOD SPRINGS, CO.
+lat: 39.54666666666667
+lon: -107.33083333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1743.471
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09085000/
+parameter_code: "00065"
+series_begin: 2020-10-02T13:30:00+00:00
+time_series_id: 2d5d06ca38ae4a0584fe8c28a308a829

@@ -1,0 +1,13 @@
+name: Bremen, Niederblockland, Wümme
+lat: 53.16139
+lon: 8.82639
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -5.02
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/4940020]
+source_url: https://gezeiten.bsh.de/bremen_niederblockland

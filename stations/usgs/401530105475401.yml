@@ -1,0 +1,17 @@
+name: NORTH INLET BLW SUMMERLAND PARK AT RMNP
+lat: 40.2575
+lon: -105.799722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2586.076
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-401530105475401/
+parameter_code: "00065"
+series_begin: 2021-04-23T18:00:00+00:00
+series_end: 2024-10-22T19:50:00+00:00
+time_series_id: 6d1456d7a33b4f1ea3a7897145c021f2

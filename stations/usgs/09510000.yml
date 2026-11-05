@@ -1,0 +1,16 @@
+name: VERDE RIVER BELOW BARTLETT DAM, AZ
+lat: 33.808289
+lon: -111.661911
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 479.149
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09510000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: dfa1c6cc154e4216874f118d7a82e15a

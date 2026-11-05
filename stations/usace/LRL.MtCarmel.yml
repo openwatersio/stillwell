@@ -1,0 +1,13 @@
+name: WABASH RIVER AT MT. CARMEL, IL
+lat: 38.3983333
+lon: -87.75638889
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 112.465
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=MtCarmel.Stage.Inst.15Minutes.0.USGS-rev
+series: MtCarmel.Stage.Inst.15Minutes.0.USGS-rev

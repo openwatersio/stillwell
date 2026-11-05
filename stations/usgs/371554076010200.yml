@@ -1,0 +1,13 @@
+name: CAPE CHARLES HARBOR AT CAPE CHARLES, VA
+lat: 37.2649555555556
+lon: -76.017325
+country_code: US
+kind: coastal
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-371554076010200/
+parameter_code: "62620"
+time_series_id: 465bf9d377b3446c9913d6842614db76

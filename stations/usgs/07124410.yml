@@ -1,0 +1,16 @@
+name: PURGATOIRE RIVER BELOW TRINIDAD LAKE, CO.
+lat: 37.143908456393
+lon: -104.54776442243
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1851.245
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07124410/
+parameter_code: "00065"
+series_begin: 2019-11-08T20:30:00+00:00
+time_series_id: 07ddf8cd6c73403bac23be1f451e6b68

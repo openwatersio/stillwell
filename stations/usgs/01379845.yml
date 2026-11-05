@@ -1,0 +1,16 @@
+name: Rockaway River at Warren Street at Dover NJ
+lat: 40.8861111111111
+lon: -74.56
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 170.95
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01379845/
+parameter_code: "00065"
+series_begin: 2012-02-02T17:30:00+00:00
+time_series_id: ac4f9128a89d4ae8a024c091e989c43f

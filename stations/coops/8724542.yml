@@ -1,0 +1,22 @@
+name: SIGSBEE PARK, GARRISON BIGHT CHANNEL
+lat: 24.585
+lon: -81.775
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.608
+  MHW: -1.525
+  DTL: -1.381
+  MTL: -1.371
+  MSL: -1.375
+  MLW: -1.217
+  MLLW: -1.154
+  NAVD88: -1.594
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724542
+established: 1974-08-27T00:00:00Z
+removed: 1974-10-04T23:59:00Z

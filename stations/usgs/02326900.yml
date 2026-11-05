@@ -1,0 +1,16 @@
+name: ST. MARKS RIVER NEAR NEWPORT, FLA.
+lat: 30.2714310995673
+lon: -84.1482508309003
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1.076
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02326900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 921cb3be42bb459d970cf2721982b1b2

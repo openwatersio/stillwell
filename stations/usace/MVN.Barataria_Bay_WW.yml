@@ -1,0 +1,13 @@
+name: Barataria Waterway at Lafitte (82875)
+lat: 29.6694445
+lon: -90.1105555
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Barataria_Bay_WW.Stage.Inst.15Minutes.0.rev
+series: Barataria_Bay_WW.Stage.Inst.15Minutes.0.rev
+zero_since: 2021-11-23

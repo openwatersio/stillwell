@@ -1,0 +1,16 @@
+name: JEMEZ RIVER OUTLET BELOW JEMEZ CANYON DAM, NM
+lat: 35.3947588428333
+lon: -106.545305048332
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1573.378
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08328950/
+parameter_code: "00065"
+series_begin: 2009-10-01T07:00:00+00:00
+time_series_id: 82692f5e60634763ac4f7661005caeb2

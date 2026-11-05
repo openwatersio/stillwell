@@ -1,0 +1,16 @@
+name: Birch Creek at Bullhead Bridge, nr Valier, MT
+lat: 48.3911027777778
+lon: -112.319661111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1067.714
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06098120/
+parameter_code: "00065"
+series_begin: 2020-08-25T22:45:00+00:00
+time_series_id: d604687a50b34f0aa0b5dd9a0481145d

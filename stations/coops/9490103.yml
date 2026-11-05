@@ -1,0 +1,15 @@
+name: Selawik
+lat: 66.60111
+lon: -160.00206
+country_code: US
+datum: STND
+datums:
+  MSL: -6.924
+  NAVD88: -5.504
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490103
+established: 2024-06-18T00:00:00Z
+removed: 2024-10-04T00:00:00Z

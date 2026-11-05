@@ -1,0 +1,13 @@
+name: Mississippi River @ Cape Girardeau, MO
+lat: 37.30188889
+lon: -89.518
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 92.741
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Cape%20Girardeau.Stage.Inst.30Minutes.0.DCP-rev
+series: Cape Girardeau.Stage.Inst.30Minutes.0.DCP-rev

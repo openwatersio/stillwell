@@ -1,0 +1,17 @@
+name: Mill Cr at Mouth of 3Mile Cr near Mill Cr , OK
+lat: 34.388836
+lon: -96.845761
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 291.962
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07331205/
+parameter_code: "00065"
+series_begin: 2019-09-05T14:00:00+00:00
+series_end: 2024-12-18T22:00:00+00:00
+time_series_id: b363c50331d746cc98a728a6507fe16f

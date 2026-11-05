@@ -1,0 +1,17 @@
+name: RIO GRANDE DE MANATI AT HWY 2 NR MANATI, PR
+lat: 18.4289720121124
+lon: -66.52647469933
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  LMSL: 4.267
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50038100/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+series_end: 2025-05-12T19:50:00+00:00
+time_series_id: e36413369e0242a7b7dc3075e04a973c

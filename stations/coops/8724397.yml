@@ -1,0 +1,21 @@
+name: JOHNSTON KEY
+lat: 24.71
+lon: -81.5933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.611
+  MHW: -1.52
+  DTL: -1.309
+  MTL: -1.282
+  MSL: -1.251
+  MLW: -1.045
+  MLLW: -1.007
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724397
+established: 1973-11-16T00:00:00Z
+removed: 1974-03-22T23:59:00Z

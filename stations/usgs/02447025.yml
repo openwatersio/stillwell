@@ -1,0 +1,16 @@
+name: TOMBIGBEE R AT HEFLIN L&D NR GAINESVILLE, AL
+lat: 32.848185622038
+lon: -88.1561363375684
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 43.416
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02447025/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 028ca669ff824d648fe5c0bb31afde9b

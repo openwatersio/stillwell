@@ -1,0 +1,16 @@
+name: NOTTOWAY RIVER NEAR STONY CREEK, VA
+lat: 36.9001497842232
+lon: -77.3996996057775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 17.496
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02045500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 50679c89717846a1aad4ae0832ddfad7

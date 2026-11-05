@@ -1,0 +1,23 @@
+name: Half Moon Bay
+lat: 43.675
+lon: -124.192
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.742
+  MHW: -5.544
+  DTL: -4.654
+  MTL: -4.738
+  MSL: -4.726
+  MLW: -3.932
+  MLLW: -3.565
+  LAT: -2.811
+  HAT: -6.332
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9433445
+established: 1972-08-24T00:00:00Z
+removed: 2013-10-13T23:59:00Z

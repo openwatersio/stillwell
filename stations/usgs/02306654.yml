@@ -1,0 +1,17 @@
+name: HENRY STREET CANAL NEAR TAMPA FL
+lat: 28.0004860409363
+lon: -82.5563160406736
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02306654/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2016-09-22T03:45:00+00:00
+time_series_id: 88e8a501ab3c4c0fbaf7bc46b82a4919

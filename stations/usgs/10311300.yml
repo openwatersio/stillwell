@@ -1,0 +1,16 @@
+name: EAGLE VALLEY CK AT CARSON CITY, NV
+lat: 39.165275
+lon: -119.722225
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1408.176
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10311300/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 04735553f7fd44c9b1ab8123ec0f04dd

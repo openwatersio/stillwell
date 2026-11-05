@@ -1,0 +1,24 @@
+name: Woods Hole
+lat: 41.523613
+lon: -70.67111
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.469
+  MHW: -1.385
+  DTL: -1.133
+  MTL: -1.112
+  MSL: -1.096
+  MLW: -0.839
+  MLLW: -0.797
+  NAVD88: -1.212
+  LAT: -0.572
+  HAT: -1.76
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447930
+established: 1932-07-16T00:00:00Z

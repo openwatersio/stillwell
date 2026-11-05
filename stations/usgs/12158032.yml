@@ -1,0 +1,16 @@
+name: EAST FORK TULALIP CREEK NEAR MOUTH NR TULALIP, WA
+lat: 48.09479441064421
+lon: -122.27817513067384
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 43.364
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12158032/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2e88b7f691dd4e76b2b39745c697dc7b

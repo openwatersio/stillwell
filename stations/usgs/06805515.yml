@@ -1,0 +1,16 @@
+name: Buffalo Creek at S 168th St nr Springfield, Nebr.
+lat: 41.063208
+lon: -96.176883
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 311.606
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06805515/
+parameter_code: "00065"
+series_begin: 2026-03-04T15:25:00+00:00
+time_series_id: 819632f7030645bf8699567c70daaa43

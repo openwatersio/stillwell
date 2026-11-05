@@ -1,0 +1,16 @@
+name: ELK R NR ELK CITY, KS
+lat: 37.2636991479257
+lon: -95.90182123698607
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 242.621
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07170000/
+parameter_code: "00065"
+series_begin: 2025-03-12T21:00:00+00:00
+time_series_id: 702b883e36b1432d86b602b2ce86f1ca

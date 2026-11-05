@@ -7,6 +7,7 @@ import { fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/lake/merge.ts";
 import { isMissing } from "../src/lake/parquet.ts";
 import {
+  readDatums,
   readObservations,
   readRecent,
   setConnections,
@@ -15,7 +16,14 @@ import {
 } from "../src/lake/parquet.ts";
 import { recentPath, seriesPath } from "../src/lake/paths.ts";
 import { compactRecent, formatSummary, lastDays, updateRecent } from "../src/lake/recent.ts";
-import { Flag, type Observation, type Source, type Station } from "../src/schema.ts";
+import {
+  Flag,
+  type Epoch,
+  type LakeStation,
+  type Observation,
+  type Source,
+  type Station,
+} from "../src/schema.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
 const HOUR = 3_600_000;
@@ -31,8 +39,10 @@ function lake(): string {
   return mkdtempSync(join(tmpdir(), "water-levels-recent-"));
 }
 
-function station(id: string, extra: Partial<Station> = {}): Station {
+function station(id: string, extra: Partial<LakeStation> = {}): LakeStation {
+  const datum = extra.datum ?? "NAP";
   return {
+    epochs: [epoch(1, datum)],
     id: `test/${id}`,
     source: "test",
     source_id: id,
@@ -44,7 +54,7 @@ function station(id: string, extra: Partial<Station> = {}): Station {
     kind: "coastal",
     commercial_use: true,
     ...extra,
-  } as Station;
+  } as LakeStation;
 }
 
 /** A source whose per-station answers come from `answers`, by station ID. */
@@ -63,6 +73,22 @@ function source(answers: Record<string, Observation[] | Error>): Source & { aske
   };
 }
 
+function epoch(id: number, datum: string, extra: Partial<Epoch> = {}): Epoch {
+  return {
+    id,
+    datum,
+    since: null,
+    until: null,
+    seen: null,
+    reference: null,
+    reference_since: null,
+    datums: {},
+    to_current: 0,
+    state: "open",
+    ...extra,
+  };
+}
+
 const at = (time: number, level: number, received?: number): Observation =>
   received === undefined
     ? { time, level, flag: Flag.preliminary }
@@ -75,8 +101,8 @@ describe("updateRecent", () => {
     const a = station("a");
     await writeRecent(path, [
       [
-        { ...at(NOW - 8 * DAY, 0.1, NOW - 8 * DAY), station: a.id }, // past the 7 days
-        { ...at(NOW - 3 * HOUR, 0.2, NOW - 3 * HOUR), station: a.id }, // seen before
+        { ...at(NOW - 8 * DAY, 0.1, NOW - 8 * DAY), station: a.id, epoch: 1 }, // past the 7 days
+        { ...at(NOW - 3 * HOUR, 0.2, NOW - 3 * HOUR), station: a.id, epoch: 1 }, // seen before
       ],
     ]);
     const summary = await updateRecent({
@@ -104,7 +130,11 @@ describe("updateRecent", () => {
     const root = lake();
     const path = recentPath(root, "test");
     const [ok, broken, quiet] = [station("ok"), station("broken"), station("quiet")];
-    const old = (s: Station) => ({ ...at(NOW - 10 * HOUR, 1, NOW - 10 * HOUR), station: s.id });
+    const old = (s: Station) => ({
+      ...at(NOW - 10 * HOUR, 1, NOW - 10 * HOUR),
+      station: s.id,
+      epoch: 1,
+    });
     await writeRecent(path, [[old(broken), old(quiet)]]);
     const src = source({ [ok.id]: [at(NOW - HOUR, 2)], [broken.id]: new Error("timed out") });
     const summary = await updateRecent({
@@ -140,7 +170,7 @@ describe("updateRecent", () => {
     const root = lake();
     const daily = station("daily", { interval_s: 86_400 });
     await writeRecent(recentPath(root, "test"), [
-      [{ ...at(NOW - 2 * DAY, 1, NOW - 2 * DAY), station: daily.id }],
+      [{ ...at(NOW - 2 * DAY, 1, NOW - 2 * DAY), station: daily.id, epoch: 1 }],
     ]);
     const summary = await updateRecent({
       source: source({}),
@@ -162,7 +192,11 @@ describe("updateRecent", () => {
       station("gone"),
       station("moved", { live: false, commercial_use: false }),
     ];
-    const row = (s: Station, ago: number) => ({ ...at(NOW - ago, 1, NOW - ago), station: s.id });
+    const row = (s: Station, ago: number) => ({
+      ...at(NOW - ago, 1, NOW - ago),
+      station: s.id,
+      epoch: 1,
+    });
     await writeRecent(path, [
       [
         row(retired, 2 * HOUR),
@@ -186,6 +220,64 @@ describe("updateRecent", () => {
         ["test/live", 1],
         ["test/quiet", 3],
         ["test/retired", 2],
+      ],
+    );
+  });
+
+  it("tags rows with their epoch, and fetches only from the current epoch's start", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    const since = NOW - 3 * HOUR;
+    const moved = station("moved", {
+      datum: "NHN",
+      epochs: [
+        epoch(1, "PNP", { state: "closed", until: new Date(since).toISOString() }),
+        epoch(2, "NHN", { since: new Date(since).toISOString() }),
+      ],
+    });
+    const held = station("held", {
+      epochs: [
+        epoch(1, "NAP"),
+        epoch(2, "MSL", { state: "held", since: new Date(since).toISOString() }),
+      ],
+    });
+    await writeRecent(path, [
+      [
+        { ...at(NOW - 5 * HOUR, 1, NOW - 5 * HOUR), station: moved.id, epoch: 1 },
+        // Fetched in the new reference before the epoch opened: it moves into it.
+        { ...at(NOW - 2 * HOUR, 2, NOW - 2 * HOUR), station: moved.id, epoch: 1 },
+        { ...at(NOW - 2 * HOUR, 3, NOW - 2 * HOUR), station: held.id, epoch: 1 },
+      ],
+    ]);
+    const asked: [string, number][] = [];
+    const src = source({ [moved.id]: [at(NOW - 2 * HOUR, 2), at(NOW - HOUR, 4)] });
+    const observations = src.observations!;
+    src.observations = (s, from, to) => {
+      asked.push([s.id, (NOW - from.getTime()) / HOUR]);
+      return observations(s, from, to);
+    };
+    const summary = await updateRecent({
+      source: src,
+      stations: [moved, held],
+      lakeFor: () => root,
+      since: new Date(NOW - 12 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(asked, [["test/moved", 3]]);
+    assert.equal(summary.stations, 1);
+    assert.deepEqual(
+      (await readRecent(path)).map((r) => [
+        r.station,
+        (NOW - r.time) / HOUR,
+        r.epoch,
+        (NOW - r.received!) / HOUR,
+      ]),
+      [
+        ["test/held", 2, 1, 2],
+        ["test/moved", 5, 1, 5],
+        // It keeps its first arrival in its new epoch.
+        ["test/moved", 2, 2, 2],
+        ["test/moved", 1, 2, 0],
       ],
     );
   });
@@ -224,7 +316,11 @@ describe("updateRecent", () => {
     const path = recentPath(root, "test");
     const stations = Array.from({ length: 1001 }, (_, i) => station(String(i).padStart(4, "0")));
     // Before the fetched hours, so the merge keeps it.
-    const old = (s: Station) => ({ ...at(NOW - 8 * HOUR, 1, NOW - 8 * HOUR), station: s.id });
+    const old = (s: Station) => ({
+      ...at(NOW - 8 * HOUR, 1, NOW - 8 * HOUR),
+      station: s.id,
+      epoch: 1,
+    });
     await writeRecent(path, [stations.map(old)]);
     const summary = await updateRecent({
       source: source(Object.fromEntries(stations.map((s) => [s.id, [at(NOW - HOUR, 2)]]))),
@@ -249,7 +345,9 @@ describe("updateRecent", () => {
     const root = lake();
     const path = recentPath(root, "test");
     const stations = Array.from({ length: 600 }, (_, i) => station(String(i).padStart(4, "0")));
-    await writeRecent(path, [[{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: "test/0000" }]]);
+    await writeRecent(path, [
+      [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: "test/0000", epoch: 1 }],
+    ]);
     // A sweep whose second batch breaks after the first was merged.
     class Breaking extends Map<string, Observation[]> {
       override delete(id: string): boolean {
@@ -323,7 +421,7 @@ describe("updateRecent", () => {
     const path = recentPath(root, "test");
     const [a, b] = [station("a"), station("b")];
     await writeRecent(path, [
-      [a, b].map((s) => ({ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: s.id })),
+      [a, b].map((s) => ({ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: s.id, epoch: 1 })),
     ]);
     const summary = await updateRecent({
       source: {
@@ -421,7 +519,7 @@ describe("updateRecent", () => {
       ...({ time_series_id: "a-00065", parameter_code: "00065" } as object),
     });
     await writeRecent(recentPath(root, "usgs"), [
-      [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: a.id }],
+      [{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: a.id, epoch: 1 }],
     ]);
     const summary = await updateRecent({
       source: usgs.source,
@@ -462,10 +560,10 @@ describe("compactRecent", () => {
     );
     await writeRecent(recentPath(root, "test"), [
       [
-        { ...at(start - HOUR, 9, start), station: a.id }, // the day before: not folded
-        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id },
-        { ...at(start + 3 * HOUR, 0.8, start + 4 * HOUR), station: a.id },
-        { ...at(end, 9, end), station: a.id }, // today: not folded
+        { ...at(start - HOUR, 9, start), station: a.id, epoch: 1 }, // the day before: not folded
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        { ...at(start + 3 * HOUR, 0.8, start + 4 * HOUR), station: a.id, epoch: 1 },
+        { ...at(end, 9, end), station: a.id, epoch: 1 }, // today: not folded
       ],
     ]);
     const run = () =>
@@ -499,8 +597,8 @@ describe("compactRecent", () => {
     const newYear = Date.UTC(2026, 0, 1);
     await writeRecent(recentPath(root, "test"), [
       [
-        { ...at(newYear - HOUR, 1, newYear), station: a.id },
-        { ...at(newYear + HOUR, 2, newYear + 2 * HOUR), station: a.id },
+        { ...at(newYear - HOUR, 1, newYear), station: a.id, epoch: 1 },
+        { ...at(newYear + HOUR, 2, newYear + 2 * HOUR), station: a.id, epoch: 1 },
       ],
     ]);
     const summary = await compactRecent({
@@ -521,11 +619,49 @@ describe("compactRecent", () => {
     );
   });
 
+  it("folds each row into its own epoch's files, in that epoch's datum", async () => {
+    const root = lake();
+    const moved = station("moved", {
+      datum: "NHN",
+      epochs: [epoch(1, "PNP", { state: "closed" }), epoch(2, "NHN")],
+    });
+    const lost = station("lost");
+    await writeRecent(recentPath(root, "test"), [
+      [
+        { ...at(start + HOUR, 1, start + HOUR), station: lost.id, epoch: 3 },
+        { ...at(start + HOUR, 1, start + HOUR), station: moved.id, epoch: 1 },
+        { ...at(start + 2 * HOUR, 2, start + 2 * HOUR), station: moved.id, epoch: 2 },
+      ],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [moved, lost],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    const first = seriesPath(root, "levels", "test", "moved", 2026);
+    const second = seriesPath(root, "levels", "test", "moved", 2026, 2);
+    assert.match(second, /obs\/test\/moved\/2\/2026\.parquet$/);
+    assert.deepEqual(
+      (await readObservations(first)).map((r) => r.level),
+      [1],
+    );
+    assert.deepEqual(
+      (await readObservations(second)).map((r) => r.level),
+      [2],
+    );
+    assert.deepEqual(await readDatums(first), ["PNP"]);
+    assert.deepEqual(await readDatums(second), ["NHN"]);
+    // An epoch the list doesn't know has no datum to write in.
+    assert.deepEqual(summary.failed, ["test/lost epoch 3 2026: the list has no epoch 3"]);
+  });
+
   it("folds a station retired since its values arrived", async () => {
     const root = lake();
     const retired = station("retired", { status: "inactive", live: false });
     await writeRecent(recentPath(root, "test"), [
-      [{ ...at(start + HOUR, 1, start + HOUR), station: retired.id }],
+      [{ ...at(start + HOUR, 1, start + HOUR), station: retired.id, epoch: 1 }],
     ]);
     const summary = await compactRecent({
       source: source({}),
@@ -554,7 +690,7 @@ describe("compactRecent", () => {
     const file = seriesPath(root, "levels", "test", "a", 2026);
     await writeObservations(file, [at(start - DAY, 0.5)], "MSL");
     await writeRecent(recentPath(root, "test"), [
-      [{ ...at(start + HOUR, 1, start + HOUR), station: a.id }],
+      [{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }],
     ]);
     const summary = await compactRecent({
       source: source({}),

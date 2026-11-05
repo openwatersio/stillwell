@@ -1,0 +1,23 @@
+name: LYNN, LYNN HARBOR
+lat: 42.4583
+lon: -70.9433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.04
+  MHW: -3.905
+  DTL: -2.525
+  MTL: -2.509
+  MSL: -2.532
+  MLW: -1.113
+  MLLW: -1.01
+  LAT: -0.276
+  HAT: -4.726
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8443187
+established: 1992-06-02T00:00:00Z
+removed: 1992-10-06T23:59:00Z

@@ -1,0 +1,16 @@
+name: ABERCORN CREEK AT MOUTH NEAR SAVANNAH, GA
+lat: 32.2491666666667
+lon: -81.1536111111111
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02198820/
+parameter_code: "00065"
+series_begin: 2014-06-04T04:00:00+00:00
+time_series_id: 58253edd773d4933bbce1e9f8bd98825

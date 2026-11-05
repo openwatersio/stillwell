@@ -1,0 +1,23 @@
+name: Sitkalidak Island GPS Tide Buoy
+lat: 56.96572
+lon: -153.2522
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -15.492
+  MHW: -15.306
+  DTL: -14.246
+  MTL: -14.325
+  MSL: -14.324
+  MLW: -13.344
+  MLLW: -12.999
+  LAT: -12.212
+  HAT: -16.115
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457512
+established: 2016-06-24T00:00:00Z
+removed: 2016-07-28T23:59:00Z

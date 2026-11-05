@@ -1,0 +1,16 @@
+name: ROCK CREEK NR HIDDEN TIMBER, SD
+lat: 43.20164444444445
+lon: -100.44773055555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 743.712
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06463990/
+parameter_code: "00065"
+series_begin: 2025-09-17T19:15:00+00:00
+time_series_id: e4a69170751042e8bfdf3c6c5b3a2160

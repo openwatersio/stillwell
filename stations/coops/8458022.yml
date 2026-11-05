@@ -1,0 +1,23 @@
+name: WEEKAPAUG POINT, BLOCK ISLAND SOUND
+lat: 41.3283
+lon: -71.7617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.074
+  MHW: -1.008
+  DTL: -0.636
+  MTL: -0.623
+  MSL: -0.616
+  MLW: -0.238
+  MLLW: -0.198
+  LAT: -0.031
+  HAT: -1.318
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8458022
+established: 1997-10-03T00:00:00Z
+removed: 1997-12-11T23:59:00Z

@@ -1,0 +1,14 @@
+name: SITE 71 IN CONSERVATION AREA 3B NR COOPERTOWN, FL.
+lat: 25.8840833333333
+lon: -80.55675
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255250080335001/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8f00f0f90cec4bd493b7c7abdf386b1f

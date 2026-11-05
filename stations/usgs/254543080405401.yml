@@ -1,0 +1,14 @@
+name: TAMIAMI CANAL AT S-12-D NEAR MIAMI, FL
+lat: 25.7620472222222
+lon: -80.6820444444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254543080405401/
+parameter_code: "00065"
+series_begin: 2011-07-25T06:00:00+00:00
+time_series_id: d4869696ec3148adba974d0c26be05dc

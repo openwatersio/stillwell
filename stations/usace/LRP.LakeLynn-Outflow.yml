@@ -1,0 +1,13 @@
+name: Lake Lynn Outflow, PA
+lat: 39.721378
+lon: -79.857497
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 236.717
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=LakeLynn-Outflow.Stage.Inst.15Minutes.0.OBS
+series: LakeLynn-Outflow.Stage.Inst.15Minutes.0.OBS

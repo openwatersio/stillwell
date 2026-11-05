@@ -1,0 +1,24 @@
+name: COCOA BEACH, ATLANTIC OCEAN
+lat: 28.3683
+lon: -80.6
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.186
+  MHW: -5.078
+  DTL: -4.58
+  MTL: -4.55
+  MSL: -4.55
+  MLW: -4.023
+  MLLW: -3.975
+  NAVD88: -4.831
+  LAT: -3.628
+  HAT: -5.617
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721649
+established: 1994-10-06T00:00:00Z
+removed: 1997-02-18T23:59:00Z

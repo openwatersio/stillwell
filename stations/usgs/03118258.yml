@@ -1,0 +1,16 @@
+name: Zimber Ditch at North Canton OH
+lat: 40.8702777777778
+lon: -81.4163888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 319.385
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03118258/
+parameter_code: "00065"
+series_begin: 2017-08-28T15:15:00+00:00
+time_series_id: 7ace0b65d53c45b49132b2d66e62e8c2

@@ -1,0 +1,22 @@
+name: RUDEE HEIGHTS, LAKE WESLEY
+lat: 36.825
+lon: -75.975
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.957
+  MHW: -1.854
+  DTL: -1.377
+  MTL: -1.347
+  MSL: -1.353
+  MLW: -0.84
+  MLLW: -0.796
+  NAVD88: -1.487
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8639214
+established: 1984-02-29T00:00:00Z
+removed: 1984-07-10T23:59:00Z

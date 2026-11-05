@@ -1,0 +1,15 @@
+name: SINKING CREEK ALONG ROUTE 604 NEAR NEWPORT, VA
+lat: 37.31322222222222
+lon: -80.50888888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0317154954/
+parameter_code: "00065"
+series_begin: 2018-01-19T20:50:00+00:00
+series_end: 2025-05-06T20:10:00+00:00
+time_series_id: 5b8bd424ccb9466f8341da1f354b4db3

@@ -1,0 +1,13 @@
+name: Camden on Gauley
+lat: 38.3658
+lon: -80.6011
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 610.764
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=CamdenOnGauley.Stage.Inst.15Minutes.0.OBS
+series: CamdenOnGauley.Stage.Inst.15Minutes.0.OBS

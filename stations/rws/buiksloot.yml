@@ -1,0 +1,11 @@
+name: Buiksloot
+lat: 52.383478
+lon: 4.907352
+country_code: NL
+datum: NAP
+products: [levels, extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/buiksloot/details

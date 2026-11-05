@@ -1,0 +1,21 @@
+name: ORTON POINT, CAPE FEAR RIVER
+lat: 34.0567
+lon: -77.94
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.065
+  MHW: -1.975
+  DTL: -1.361
+  MTL: -1.34
+  MSL: -1.357
+  MLW: -0.705
+  MLLW: -0.658
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8658501
+established: 1976-01-16T00:00:00Z
+removed: 1976-06-10T23:59:00Z

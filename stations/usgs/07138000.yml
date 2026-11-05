@@ -1,0 +1,16 @@
+name: ARKANSAS R AT SYRACUSE, KS
+lat: 37.96613037629703
+lon: -101.75684669579807
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 978.566
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07138000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 3cb31db448204e59a3c52eab94d6e51b

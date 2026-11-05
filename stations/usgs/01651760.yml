@@ -1,0 +1,16 @@
+name: ANACOSTIA RIVER AT KENILWORTH AT WASHINGTON, DC
+lat: 38.909166666666664
+lon: -76.95527777777778
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01651760/
+parameter_code: "00065"
+series_begin: 2024-07-03T17:25:00+00:00
+time_series_id: 91df8ea7b9a74625b65a81f48cab20a9

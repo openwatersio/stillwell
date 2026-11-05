@@ -1,0 +1,17 @@
+name: Twelvemile Bayou nr Mooringsport, LA
+lat: 32.70015015868701
+lon: -93.910756318439
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.012
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07347950/
+parameter_code: "00065"
+series_begin: 2023-04-17T23:30:00+00:00
+series_end: 2026-06-03T16:00:00+00:00
+time_series_id: 9210ca61187b4e4ca9f7e4c0f8c943e0

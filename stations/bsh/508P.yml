@@ -1,0 +1,13 @@
+name: Hamburg, St. Pauli, Elbe
+lat: 53.54556
+lon: 9.97
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5952050]
+source_url: https://gezeiten.bsh.de/hamburg_st-pauli

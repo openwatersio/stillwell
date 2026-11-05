@@ -1,0 +1,17 @@
+name: NORTH CRESTONE CREEK AT BACA NWR NEAR CRESTONE, CO
+lat: 37.97925
+lon: -105.72461111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2343.607
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08227510/
+parameter_code: "00065"
+series_begin: 2024-04-15T04:10:00+00:00
+series_end: 2024-10-01T06:55:00+00:00
+time_series_id: de97727d550642cbb5d9b747f7ba5217

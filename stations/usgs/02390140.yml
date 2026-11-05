@@ -1,0 +1,16 @@
+name: SETTINGDOWN CREEK NEAR BALL GROUND, GA
+lat: 34.2931666666667
+lon: -84.2635555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 323.088
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02390140/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 92cfc5b25ecf4a489279c14a3064ca2d

@@ -1,0 +1,23 @@
+name: Dog River Bridge
+lat: 30.5652
+lon: -88.088
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.32
+  MHW: -9.294
+  DTL: -9.07
+  MTL: -9.072
+  MSL: -9.066
+  MLW: -8.849
+  MLLW: -8.82
+  LAT: -8.458
+  HAT: -9.571
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8735391
+established: 2010-09-08T00:00:00Z

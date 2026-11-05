@@ -1,0 +1,16 @@
+name: Petite Saline Creek at Hwy U nr Boonville, M0
+lat: 38.9172222222222
+lon: -92.7041666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 178.009
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06909950/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 959549fd51cf4a3fb682217042a1cd33

@@ -1,0 +1,14 @@
+name: STEINHATCHEE RIVER AT STEINHATCHEE, FL.
+lat: 29.6682821098423
+lon: -83.3773598941555
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02324170/
+parameter_code: "00065"
+series_begin: 2021-02-24T19:30:00+00:00
+time_series_id: 8ab672a917cb4f04bc75cf84838fb64b

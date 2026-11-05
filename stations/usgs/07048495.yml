@@ -1,0 +1,17 @@
+name: Town Branch at Armstrong St. at Fayetteville, AR
+lat: 36.0432583333333
+lon: -94.1360222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 356.549
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07048495/
+parameter_code: "00065"
+series_begin: 2015-06-17T15:30:00+00:00
+series_end: 2023-04-25T13:00:00+00:00
+time_series_id: 7a256eaa590941168f796e70acd60bc0

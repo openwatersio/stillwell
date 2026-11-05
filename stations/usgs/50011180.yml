@@ -1,0 +1,16 @@
+name: CANAL DE AGUADILLA ABV LAGO RAMEY, AGUADILLA PR
+lat: 18.474639
+lon: -67.115686
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 82.247
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50011180/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 14bfff77861d4f3c80d9c135fddbd13c

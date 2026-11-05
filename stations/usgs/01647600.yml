@@ -1,0 +1,16 @@
+name: POTOMAC RIVER AT WISCONSIN AVE, WASHINGTON, DC
+lat: 38.9033611111111
+lon: -77.0676666666667
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01647600/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: 4e8991815cf8473b9823dfa1bbdd701b

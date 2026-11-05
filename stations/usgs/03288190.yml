@@ -1,0 +1,16 @@
+name: TRIB TO CANE RUN CR AT NEWTOWN PK NR LEXINGTON, KY
+lat: 38.1136111111111
+lon: -84.4827777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 270.973
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03288190/
+parameter_code: "00065"
+series_begin: 2012-06-11T18:35:00+00:00
+time_series_id: 4863e018a0104a1d90f016b1dec6d1b5

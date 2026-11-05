@@ -1,0 +1,16 @@
+name: Barton Ck at Lost Ck Blvd nr Austin, TX
+lat: 30.27409788001121
+lon: -97.8447523458303
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08155240/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 71ef1fdec1c64f038197b79835afcb07

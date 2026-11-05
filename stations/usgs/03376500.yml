@@ -1,0 +1,16 @@
+name: PATOKA RIVER NEAR PRINCETON, IN
+lat: 38.39033185328524
+lon: -87.54890205186422
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 118.799
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03376500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b0c6cab0b144441a9d1032b22cc85e76

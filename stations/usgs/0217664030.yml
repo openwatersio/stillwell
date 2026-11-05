@@ -1,0 +1,16 @@
+name: BALLAST CREEK AT CUBA ST. PARRIS ISLAND, SC
+lat: 32.334611111111116
+lon: -80.67188888888889
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0217664030/
+parameter_code: "00065"
+series_begin: 2023-12-20T20:15:00+00:00
+time_series_id: 156a0ca720a24eb69e405890e44c2d03

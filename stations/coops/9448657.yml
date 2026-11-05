@@ -1,0 +1,23 @@
+name: Turner Bay
+lat: 48.445
+lon: -122.555
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.007
+  MHW: -3.743
+  DTL: -2.431
+  MTL: -2.68
+  MSL: -2.667
+  MLW: -1.616
+  MLLW: -0.855
+  LAT: 0.41
+  HAT: -4.592
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9448657
+established: 2000-05-03T00:00:00Z
+removed: 2000-08-29T23:59:00Z

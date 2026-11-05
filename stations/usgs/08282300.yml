@@ -1,0 +1,16 @@
+name: RIO BRAZOS AT FISHTAIL ROAD NR TIERRA AMARILLA, NM
+lat: 36.7379333333333
+lon: -106.470772222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2357.628
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08282300/
+parameter_code: "00065"
+series_begin: 2014-06-11T22:30:00+00:00
+time_series_id: ba774169b3e542cdb9c02e8d705b4d0f

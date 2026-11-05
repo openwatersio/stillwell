@@ -1,0 +1,16 @@
+name: OAK CREEK NEAR RATTLESNAKE BUTTE NEAR WAKPALA, SD
+lat: 45.728428
+lon: -100.596275
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 523.284
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06354881/
+parameter_code: "00065"
+series_begin: 2018-05-01T07:00:00+00:00
+time_series_id: a81c93259fc2413eb02d8887e822e4de

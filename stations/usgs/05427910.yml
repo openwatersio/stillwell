@@ -1,0 +1,16 @@
+name: SIXMILE CREEK @ COUNTY TRNK HGHWY M NR WAUNAKEE,WI
+lat: 43.1468333333333
+lon: -89.4368333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 256.017
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05427910/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: 7c2fefd7e7914aab8029764bc85d47d5

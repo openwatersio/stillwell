@@ -1,0 +1,11 @@
+name: Veghel, sluis 4, boven
+lat: 51.60825
+lon: 5.5323
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/veghel.sluis4.boven/details

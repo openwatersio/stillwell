@@ -1,0 +1,23 @@
+name: Carter Bay, Kuskokwim Bay
+lat: 59.378017
+lon: -162.02933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.171
+  MHW: -6.457
+  DTL: -5.544
+  MTL: -5.288
+  MSL: -5.348
+  MLW: -4.118
+  MLLW: -3.916
+  LAT: -3.146
+  HAT: -7.943
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465601
+established: 2011-05-27T00:00:00Z
+removed: 2011-10-05T23:59:00Z

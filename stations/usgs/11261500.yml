@@ -1,0 +1,16 @@
+name: SAN JOAQUIN R A FREMONT FORD BRIDGE CA
+lat: 37.309911502700444
+lon: -120.93099930031353
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.149
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11261500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 12e49093aa9c404293b8ffa13d4f917e

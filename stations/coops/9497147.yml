@@ -1,0 +1,13 @@
+name: OLIKTOK, BEAUFORT SEA
+lat: 70.5117
+lon: -149.867
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9497147
+established: 1981-08-24T00:00:00Z
+removed: 1987-09-07T23:59:00Z

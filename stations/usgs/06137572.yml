@@ -1,0 +1,16 @@
+name: Boxelder Cr bl Boneau Reservoir, nr Rocky Boy, MT
+lat: 48.298541666666665
+lon: -109.86311944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 948.94
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06137572/
+parameter_code: "00065"
+series_begin: 2024-11-15T18:15:00+00:00
+time_series_id: 0de88eb5923947a19ab32e254a2f5f38

@@ -1,0 +1,17 @@
+name: RITO DE LOS FRIJOLES IN BANDELIER NAT MON, NM
+lat: 35.7763888888889
+lon: -106.268333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1871.472
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08313350/
+parameter_code: "00065"
+series_begin: 2011-08-21T15:00:00+00:00
+series_end: 2016-10-31T05:55:00+00:00
+time_series_id: bec5bae087994188bd796eada0a42bf2

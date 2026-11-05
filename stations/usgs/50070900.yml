@@ -1,0 +1,16 @@
+name: RIO FAJARDO AT PARAISO NR FAJARDO, PR
+lat: 18.282814
+lon: -65.701067
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 59.451
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50070900/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 0a665510521742a0bc54235127aef75b

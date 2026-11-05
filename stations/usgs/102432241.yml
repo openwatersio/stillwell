@@ -1,0 +1,17 @@
+name: BIG SPGS CK NORTH CHANNEL NR BAKER, NV
+lat: 38.6993966046292
+lon: -114.131932039646
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1694.651
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-102432241/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2020-09-19T22:30:00+00:00
+time_series_id: eb97bf9b61f64e50890a5db487f3ed4c

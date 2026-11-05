@@ -1,0 +1,24 @@
+name: Fort Point
+lat: 43.0717
+lon: -70.7117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.689
+  MHW: -3.559
+  DTL: -2.258
+  MTL: -2.244
+  MSL: -2.255
+  MLW: -0.929
+  MLLW: -0.826
+  NAVD88: -2.35
+  LAT: -0.173
+  HAT: -4.342
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8423898
+established: 1976-08-12T00:00:00Z
+removed: 2020-04-13T00:00:00Z

@@ -1,0 +1,14 @@
+name: MARSH TE3 BLW S-152 IN WCA3B NR COOPERTOWN,FL
+lat: 25.770052777777778
+lon: -80.61603888888888
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254612080365801/
+parameter_code: "00065"
+series_begin: 2023-11-13T19:15:00+00:00
+time_series_id: 3931e9fd070544349193337fe85eb831

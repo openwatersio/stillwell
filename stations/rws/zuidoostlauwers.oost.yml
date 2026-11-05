@@ -1,0 +1,11 @@
+name: Zuid Oost Lauwers, oost
+lat: 53.449146
+lon: 6.51349
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/zuidoostlauwers.oost/details

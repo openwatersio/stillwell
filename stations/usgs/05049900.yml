@@ -1,0 +1,16 @@
+name: MUD LAKE NORTH OF 670TH STREET NEAR WHEATON, MN
+lat: 45.83605555555556
+lon: -96.57294444444445
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 297.18
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05049900/
+parameter_code: "00065"
+series_begin: 2021-10-14T22:45:00+00:00
+time_series_id: 2df9ba1714c8427895e70e6956b40a61

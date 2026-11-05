@@ -1,0 +1,24 @@
+name: Apalachicola
+lat: 29.724445
+lon: -84.98055
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.799
+  MHW: -1.767
+  DTL: -1.553
+  MTL: -1.598
+  MSL: -1.584
+  MLW: -1.429
+  MLLW: -1.307
+  NAVD88: -1.539
+  LAT: -0.953
+  HAT: -2.002
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728690
+established: 1967-05-01T00:00:00Z

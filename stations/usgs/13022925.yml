@@ -1,0 +1,15 @@
+name: Grey's River blw slide nr Bedford, WY
+lat: 43.0321666666667
+lon: -110.813
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1907.438
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13022925/
+parameter_code: "00065"
+time_series_id: cf44e9c92d1e473889f1bf300c77e37b

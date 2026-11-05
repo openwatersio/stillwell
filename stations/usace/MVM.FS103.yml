@@ -1,0 +1,13 @@
+name: Forked Deer River @ Bells
+lat: 35.693278
+lon: -89.110111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 88.054
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=FS103.Stage.Inst.1Hour.0.opendcs-rev
+series: FS103.Stage.Inst.1Hour.0.opendcs-rev

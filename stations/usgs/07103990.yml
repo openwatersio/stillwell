@@ -1,0 +1,16 @@
+name: COTTONWOOD CREEK AT MOUTH AT PIKEVIEW, CO
+lat: 38.927222
+lon: -104.814167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1900.748
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103990/
+parameter_code: "00065"
+series_begin: 2020-11-10T16:55:00+00:00
+time_series_id: ce23441d52674ec4a91f84e7a98bf253

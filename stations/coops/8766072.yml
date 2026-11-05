@@ -1,0 +1,24 @@
+name: Freshwater Canal Locks
+lat: 29.551695
+lon: -92.30519
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.039
+  MHW: -6.993
+  DTL: -6.721
+  MTL: -6.775
+  MSL: -6.768
+  MLW: -6.557
+  MLLW: -6.403
+  NAVD88: -6.775
+  LAT: -5.946
+  HAT: -7.241
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8766072
+established: 2005-08-03T00:00:00Z

@@ -1,0 +1,16 @@
+name: Eagle Harbor
+lat: 47.45861
+lon: -88.14917
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -183.2
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9099039
+established: 2018-03-20T00:00:00Z
+removed: 2018-10-05T21:00:00Z

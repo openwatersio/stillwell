@@ -1,0 +1,11 @@
+name: Beneluxhaven
+lat: 51.943169
+lon: 4.127935
+country_code: NL
+datum: NAP
+products: [levels, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/beneluxhaven/details

@@ -1,0 +1,16 @@
+name: SAN LORENZO C AB DON CASTRO RES NR CASTRO V CA
+lat: 37.69517202116603
+lon: -122.04492230364212
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 71.899
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11180825/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e53fc89b70e747b9973d4cd452aeb92a

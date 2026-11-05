@@ -1,0 +1,16 @@
+name: COLORADO RIVER BELOW BAKER GULCH NR GRAND LAKE, CO
+lat: 40.325833
+lon: -105.856111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2668.85
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09010500/
+parameter_code: "00065"
+series_begin: 2020-10-21T15:45:00+00:00
+time_series_id: 4bf3ad3d68994d81b09c554163f269c7

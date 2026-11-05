@@ -1,0 +1,21 @@
+name: FORE RIVER, PORTLAND
+lat: 43.6417
+lon: -70.285
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.839
+  MHW: -3.704
+  DTL: -2.322
+  MTL: -2.308
+  MSL: -2.315
+  MLW: -0.911
+  MLLW: -0.805
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8418268
+established: 1979-08-14T00:00:00Z
+removed: 1979-11-08T23:59:00Z

@@ -1,0 +1,14 @@
+name: MYSTIC R AT AMELIA EARHART DAM NR SOMERVILLE, MA
+lat: 42.39552779758564
+lon: -71.07501722269384
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01103050/
+parameter_code: "00065"
+series_begin: 2007-12-05T05:00:00+00:00
+time_series_id: 0995f9aa4864418fb41c36851203ab1b

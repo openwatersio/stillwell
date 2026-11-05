@@ -1,0 +1,16 @@
+name: Lindley Creek near Polk, MO
+lat: 37.7504722222222
+lon: -93.2661944444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.635
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06921200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e1afc385e87245e09543279c2da12834

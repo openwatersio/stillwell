@@ -1,0 +1,16 @@
+name: COLORADO RIVER BELOW GLENWOOD SPRINGS, CO
+lat: 39.5549819124002
+lon: -107.337553984799
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1739.012
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09085100/
+parameter_code: "00065"
+series_begin: 2020-10-01T23:00:00+00:00
+time_series_id: 6dd65d94aa024c57b89ce1c32ee011aa

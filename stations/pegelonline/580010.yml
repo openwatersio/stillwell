@@ -1,0 +1,13 @@
+name: VOSSWINKEL UP
+lat: 53.32054
+lon: 13.031542
+country_code: DE
+datum: PNP
+datums:
+  NHN: 55.55
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580010

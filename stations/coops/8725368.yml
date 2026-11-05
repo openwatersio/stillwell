@@ -1,0 +1,21 @@
+name: HURRICANE BAY, SAN CARLOS ISLAND
+lat: 26.46
+lon: -81.94
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.319
+  MHW: -1.231
+  DTL: -0.922
+  MTL: -0.955
+  MSL: -0.966
+  MLW: -0.679
+  MLLW: -0.525
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725368
+established: 1973-05-29T00:00:00Z
+removed: 1973-07-11T23:59:00Z

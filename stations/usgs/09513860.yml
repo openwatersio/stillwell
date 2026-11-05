@@ -1,0 +1,16 @@
+name: SKUNK CREEK NEAR PHOENIX, AZ
+lat: 33.729933333333335
+lon: -112.11964722222221
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 449.132
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09513860/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 0161929b385a4d008d97c3c7ec169fdf

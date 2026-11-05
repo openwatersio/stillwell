@@ -1,0 +1,16 @@
+name: TRAIL CREEK NEAR TABERNASH, CO
+lat: 40.0284166666667
+lon: -105.780638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2913.278
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09032400/
+parameter_code: "00065"
+series_begin: 2019-06-13T20:00:00+00:00
+time_series_id: 51e95de6b6e844e4a34b36a842a66b03

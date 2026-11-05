@@ -1,0 +1,14 @@
+name: LATERAL 101 AT S-101, NEAR LAKE BUENA VISTA, FL
+lat: 28.3711194683887
+lon: -81.5289618610686
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02264060/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 14613a45b4bc450ea19df5c31ad503b9

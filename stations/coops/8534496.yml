@@ -1,0 +1,21 @@
+name: BRIGANTINE CHANNEL
+lat: 39.435
+lon: -74.3633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.729
+  MHW: -1.618
+  DTL: -1.098
+  MTL: -1.066
+  MSL: -1.077
+  MLW: -0.513
+  MLLW: -0.467
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534496
+established: 1977-08-10T00:00:00Z
+removed: 1979-01-04T23:59:00Z

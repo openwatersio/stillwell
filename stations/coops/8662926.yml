@@ -1,0 +1,24 @@
+name: GEORGETOWN, SAMPIT RIVER ENT.
+lat: 33.3617
+lon: -79.28
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.434
+  MHW: -7.362
+  DTL: -6.789
+  MTL: -6.78
+  MSL: -6.811
+  MLW: -6.197
+  MLLW: -6.144
+  NAVD88: -6.813
+  LAT: -5.88
+  HAT: -7.802
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662926
+established: 1982-02-11T00:00:00Z
+removed: 2022-07-23T18:30:00Z

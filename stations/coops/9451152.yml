@@ -1,0 +1,23 @@
+name: Madan Bay
+lat: 56.3922
+lon: -132.169
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.757
+  MHW: -3.48
+  DTL: -1.283
+  MTL: -1.376
+  MSL: -1.372
+  MLW: 0.729
+  MLLW: 1.19
+  LAT: 2.649
+  HAT: -5.021
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451152
+established: 2005-03-15T00:00:00Z
+removed: 2005-04-25T23:59:00Z

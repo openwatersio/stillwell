@@ -1,0 +1,16 @@
+name: Miami and Erie Canal at Minster OH
+lat: 40.38444444444444
+lon: -84.38361111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 286.195
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-402304084230100/
+parameter_code: "00065"
+series_begin: 2024-03-12T15:15:00+00:00
+time_series_id: 5568851cb5b74216a44105ef74018477

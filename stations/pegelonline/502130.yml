@@ -1,0 +1,13 @@
+name: SCHÖNEBECK
+lat: 52.024534
+lon: 11.738802
+country_code: DE
+datum: PNP
+datums:
+  NHN: 42.713
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=502130

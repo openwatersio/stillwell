@@ -1,0 +1,13 @@
+name: PATOKA RIVER NEAR PRINCETON, IN
+lat: 38.39032397
+lon: -87.5489109
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 118.433
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Princeton.Stage.Inst.15Minutes.0.USGS-rev
+series: Princeton.Stage.Inst.15Minutes.0.USGS-rev

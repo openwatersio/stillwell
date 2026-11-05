@@ -1,0 +1,16 @@
+name: MORRISON LAKE NEAR WEBSTER, ND
+lat: 48.259722
+lon: -98.846667
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 427.116
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05056222/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e30653136abf4dffa3637f00d86417e3

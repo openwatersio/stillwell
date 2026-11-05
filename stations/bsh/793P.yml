@@ -1,0 +1,11 @@
+name: Juist, Seeseite
+lat: 53.68333
+lon: 7
+country_code: DE
+datum: SKN
+datums:
+  NHN: -1.76
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/juist_seeseite

@@ -1,0 +1,21 @@
+name: Cove Point
+lat: 58.7517
+lon: -135.028
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.615
+  MHW: -4.322
+  DTL: -2.151
+  MTL: -2.249
+  MSL: -2.288
+  MLW: -0.176
+  MLLW: 0.312
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452346
+established: 1998-04-20T00:00:00Z
+removed: 1999-05-25T23:59:00Z

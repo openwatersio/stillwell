@@ -1,0 +1,22 @@
+name: CORSON INLET
+lat: 39.215
+lon: -74.6483
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.131
+  MHW: -2.013
+  DTL: -1.468
+  MTL: -1.434
+  MSL: -1.441
+  MLW: -0.856
+  MLLW: -0.806
+  NAVD88: -1.529
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535101
+established: 1977-06-13T00:00:00Z
+removed: 1978-11-07T23:59:00Z

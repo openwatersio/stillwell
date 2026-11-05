@@ -1,0 +1,15 @@
+name: BIG BRANCH CREEK BLW UNNAMED TRIB NEAR LA VETA, CO
+lat: 37.4074722222222
+lon: -105.100605555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2686.812
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-372427105060201/
+parameter_code: "00065"
+time_series_id: b481ff08e5d5405ca0ff72ecc9decfd2

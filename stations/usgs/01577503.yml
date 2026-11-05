@@ -1,0 +1,15 @@
+name: Susquehanna River on Forsythe at Drumore, PA
+lat: 39.79216944444444
+lon: -76.28178055555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01577503/
+parameter_code: "00065"
+series_begin: 2025-09-03T15:45:00+00:00
+series_end: 2026-09-30T12:00:00+00:00
+time_series_id: 1858de6ed3fc40b68c44b77fbd1aef9d

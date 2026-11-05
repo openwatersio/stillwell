@@ -1,0 +1,13 @@
+name: Little Diomede Island
+lat: 65.75706
+lon: -168.94954
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469541
+established: 2010-07-27T00:00:00Z
+removed: 2010-08-29T23:59:00Z

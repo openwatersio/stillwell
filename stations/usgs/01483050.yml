@@ -1,0 +1,14 @@
+name: Alloway Creek at Hancocks Bridge NJ
+lat: 39.508611
+lon: -75.460556
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01483050/
+parameter_code: "72279"
+series_begin: 2018-10-13T05:00:00+00:00
+time_series_id: 82d326d8324f45eda261cd7a91bf131f

@@ -1,0 +1,16 @@
+name: Rochester
+lat: 43.26903
+lon: -77.62575
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -74.2
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9052058
+established: 1860-01-01T00:00:00Z

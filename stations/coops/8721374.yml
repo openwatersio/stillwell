@@ -1,0 +1,15 @@
+name: ALLENHURST,HAULOVER CANAL
+lat: 28.7333
+lon: -80.7567
+country_code: US
+datum: STND
+datums:
+  MSL: -0.786
+  NAVD88: -0.959
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721374
+established: 1966-02-11T00:00:00Z
+removed: 1983-05-21T23:59:00Z

@@ -1,0 +1,11 @@
+name: 17th Street Canal 6 at I-10
+lat: 29.9835528
+lon: -90.1167822
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=17thStCanal-I10.Stage.Inst.15Minutes.0.rev
+series: 17thStCanal-I10.Stage.Inst.15Minutes.0.rev

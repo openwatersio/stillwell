@@ -1,0 +1,13 @@
+name: BIG RACCOON CREEK NEAR FINCASTLE
+lat: 39.8125446
+lon: -86.9538988
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 209.102
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Fincastle.Stage.Inst.15Minutes.0.USGS-rev
+series: Fincastle.Stage.Inst.15Minutes.0.USGS-rev

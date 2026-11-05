@@ -1,0 +1,16 @@
+name: PROVO RIV AT RIV ROAD BRIDGE NR HEBER CITY, UT
+lat: 40.5543980519593
+lon: -111.433242586696
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1734.797
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10155200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 7b6561f5826646c489ede5227ac3a286

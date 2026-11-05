@@ -1,0 +1,23 @@
+name: Lynchburg Landing (TCOON)
+lat: 29.765
+lon: -95.0783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.843
+  MHW: -1.814
+  DTL: -1.617
+  MTL: -1.629
+  MSL: -1.636
+  MLW: -1.444
+  MLLW: -1.39
+  NAVD88: -1.379
+  LAT: -0.951
+  HAT: -2.088
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770733
+established: 1983-10-18T00:00:00Z

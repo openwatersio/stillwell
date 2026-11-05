@@ -1,0 +1,16 @@
+name: GUNNISON RIVER AT CNTY RD 32 BELOW GUNNISON, CO
+lat: 38.5172555555556
+lon: -106.99545
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2306.041
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-383103106594200/
+parameter_code: "00065"
+series_begin: 2020-11-17T20:30:00+00:00
+time_series_id: b54436ad7a2745a48d5689ecfd94142e

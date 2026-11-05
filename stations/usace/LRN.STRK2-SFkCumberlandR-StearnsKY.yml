@@ -1,0 +1,13 @@
+name: South Fork Cumberland River near Stearns, KY
+lat: 36.626944
+lon: -84.533333
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 232.825
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=STRK2-SFkCumberlandR-StearnsKY.Stage.Inst.15Minutes.0.dcp-rev
+series: STRK2-SFkCumberlandR-StearnsKY.Stage.Inst.15Minutes.0.dcp-rev

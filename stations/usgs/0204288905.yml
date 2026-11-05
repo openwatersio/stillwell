@@ -1,0 +1,14 @@
+name: BAILEY CREEK AT DOCK LANDING RD AT CHESAPEAKE, VA
+lat: 36.80575
+lon: -76.4087222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204288905/
+parameter_code: "62620"
+series_begin: 2015-04-14T04:00:00+00:00
+time_series_id: e93430b024114560bd4e8544053bf316

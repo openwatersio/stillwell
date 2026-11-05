@@ -1,0 +1,16 @@
+name: LITTLE COLORADO RIVER ABV MOUTH NR DESERT VIEW, AZ
+lat: 36.191097
+lon: -111.788522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 832.589
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09402300/
+parameter_code: "00065"
+series_begin: 2014-05-15T19:30:00+00:00
+time_series_id: 6fd06fb76a27456da42e996fdfed6b70

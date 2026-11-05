@@ -1,0 +1,16 @@
+name: East Branch White Clay Creek at Avondale, PA
+lat: 39.8284429359803
+lon: -75.7807730724949
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 80.665
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01478120/
+parameter_code: "00065"
+series_begin: 2007-10-05T18:30:00+00:00
+time_series_id: b2f747550b044daf82332e1905374919

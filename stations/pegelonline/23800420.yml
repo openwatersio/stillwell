@@ -1,0 +1,13 @@
+name: HESSIGHEIM SCHLEUSE UP
+lat: 48.993138
+lon: 9.192174
+country_code: DE
+datum: PNP
+datums:
+  NHN: 174.06
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=23800420

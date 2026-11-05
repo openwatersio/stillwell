@@ -1,0 +1,11 @@
+name: K14
+lat: 53.266667
+lon: 3.633333
+country_code: NL
+datum: MSL
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/k14/details

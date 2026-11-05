@@ -1,0 +1,13 @@
+name: THREE MILE SLOUGH,SACRAMENTO R.
+lat: 38.1067
+lon: -121.7
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415236
+established: 1977-06-02T00:00:00Z
+removed: 1992-12-18T23:59:00Z

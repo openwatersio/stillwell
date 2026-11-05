@@ -1,0 +1,13 @@
+name: Valparaiso
+lat: -33.0267
+lon: -71.625
+country_code: CL
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9963950
+established: 1991-07-12T00:00:00Z
+removed: 1999-01-01T23:59:00Z

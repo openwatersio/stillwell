@@ -1,0 +1,16 @@
+name: BLACKBIRD CREEK AT BLACKBIRD, DE
+lat: 39.36627777777778
+lon: -75.66938888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01483200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f8a45b6ec4484d80b821133562467f85

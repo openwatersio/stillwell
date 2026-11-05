@@ -1,0 +1,16 @@
+name: Cimarron River near Waynoka, OK
+lat: 36.5172564447136
+lon: -98.8795365917143
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 416.957
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07158000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: eb26b712e6fc4c1c95d4a70ef813b3a3

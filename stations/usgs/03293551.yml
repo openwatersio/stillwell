@@ -1,0 +1,16 @@
+name: OHIO R US OF MCALPINE DAM @ RRB AT LOUISVILLE, KY
+lat: 38.2659037628604
+lon: -85.7688518284703
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.956
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03293551/
+parameter_code: "00065"
+series_begin: 2008-03-03T17:58:00+00:00
+time_series_id: cdb896693a044f64bc575bc71da3dd96

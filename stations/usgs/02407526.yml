@@ -1,0 +1,16 @@
+name: COOSA RIVER AT GASTON STEAM PLANT NR WILSONVILLE
+lat: 33.2412251864124
+lon: -86.458313207812
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 116.559
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02407526/
+parameter_code: "00065"
+series_begin: 2007-10-03T05:00:00+00:00
+time_series_id: 5419468881734b19a6e34b296d02e703

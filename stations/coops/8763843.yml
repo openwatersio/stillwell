@@ -1,0 +1,24 @@
+name: Fourleague Bay
+lat: 29.3418
+lon: -91.1355
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.736
+  MHW: -9.683
+  DTL: -9.428
+  MTL: -9.462
+  MSL: -9.453
+  MLW: -9.242
+  MLLW: -9.12
+  NAVD88: -9.56
+  LAT: -8.849
+  HAT: -9.84
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8763843
+established: 2019-09-16T00:00:00Z
+removed: 2020-07-11T08:30:00Z

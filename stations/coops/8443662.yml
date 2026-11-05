@@ -1,0 +1,23 @@
+name: AMELIA EARHART DAM, MYSTIC RIVER
+lat: 42.395
+lon: -71.0767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.377
+  MHW: -4.243
+  DTL: -2.802
+  MTL: -2.786
+  MSL: -2.825
+  MLW: -1.329
+  MLLW: -1.227
+  LAT: -0.574
+  HAT: -5.034
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8443662
+established: 1994-05-03T00:00:00Z
+removed: 1994-10-21T23:59:00Z

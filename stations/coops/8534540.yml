@@ -1,0 +1,22 @@
+name: ABSECON, ABSECON CREEK
+lat: 39.4233
+lon: -74.5
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.006
+  MHW: -1.895
+  DTL: -1.337
+  MTL: -1.306
+  MSL: -1.345
+  MLW: -0.717
+  MLLW: -0.669
+  NAVD88: -1.401
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534540
+established: 1977-05-19T00:00:00Z
+removed: 1978-12-12T23:59:00Z

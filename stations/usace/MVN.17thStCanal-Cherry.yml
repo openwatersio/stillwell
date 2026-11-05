@@ -1,0 +1,11 @@
+name: 17th Street Canal 5-Cherry St.
+lat: 30.0000758
+lon: -90.1167755
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=17thStCanal-Cherry.Stage.Inst.15Minutes.0.rev
+series: 17thStCanal-Cherry.Stage.Inst.15Minutes.0.rev

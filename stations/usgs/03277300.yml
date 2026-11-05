@@ -1,0 +1,16 @@
+name: NORTH FORK KENTUCKY RIVER AT WHITESBURG, KY
+lat: 37.1175984937923
+lon: -82.8246042909181
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 343.632
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03277300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ae6c9cd4df6b4c88b35a2320a2744136

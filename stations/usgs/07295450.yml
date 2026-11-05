@@ -1,0 +1,17 @@
+name: Tierra Blanca Ck nr FM 1259 at Hereford, TX
+lat: 34.81293611111111
+lon: -102.38989722222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1149.096
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07295450/
+parameter_code: "00065"
+series_begin: 2013-05-21T06:00:00+00:00
+series_end: 2025-11-25T18:16:00+00:00
+time_series_id: 4e595b79c3db4963be9a864caa459ed2

@@ -1,0 +1,16 @@
+name: DOG RIVER AT NORTHFIELD FALLS, VT
+lat: 44.1825606411042
+lon: -72.6406654951298
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.618
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04287000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3ee5c51f7807440089b5a934cf2172fc

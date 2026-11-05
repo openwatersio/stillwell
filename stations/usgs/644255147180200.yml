@@ -1,0 +1,15 @@
+name: TANANA R UNNAMD SL AT MOOSE C DAM NR NORTH POLE AK
+lat: 64.7148541675928
+lon: -147.302961758367
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 152.4
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-644255147180200/
+parameter_code: "00065"
+time_series_id: c6dba41a3cf24e4d866bd0dd5b952d60

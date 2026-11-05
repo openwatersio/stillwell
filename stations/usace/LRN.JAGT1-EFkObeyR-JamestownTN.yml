@@ -1,0 +1,13 @@
+name: East Fork Obey River near Jamestown, TN
+lat: 36.415833
+lon: -85.026111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 207.355
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=JAGT1-EFkObeyR-JamestownTN.Stage.Inst.30Minutes.0.dcp-rev
+series: JAGT1-EFkObeyR-JamestownTN.Stage.Inst.30Minutes.0.dcp-rev

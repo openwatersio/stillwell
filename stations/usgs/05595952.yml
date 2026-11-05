@@ -1,0 +1,14 @@
+name: BIG MUDDY RIVER BELOW REND LAKE NR BENTON, IL
+lat: 38.027027777777775
+lon: -88.96055555555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05595952/
+parameter_code: "00065"
+series_begin: 2023-12-16T20:30:00+00:00
+time_series_id: e6c6f5f63bc54243bc534e1b5d8f0f47

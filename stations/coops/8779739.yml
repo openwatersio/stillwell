@@ -1,0 +1,22 @@
+name: W QUEEN ISABELLA CAUSEWAY, PORT ISABEL
+lat: 26.0717
+lon: -97.1917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.51
+  MHW: -1.497
+  DTL: -1.329
+  MTL: -1.337
+  MSL: -1.343
+  MLW: -1.178
+  MLLW: -1.148
+  NAVD88: -1.373
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8779739
+established: 1973-10-02T00:00:00Z
+removed: 1978-05-02T23:59:00Z

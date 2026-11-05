@@ -1,0 +1,16 @@
+name: FISH CREEK AT WILSON, WY
+lat: 43.5007600531178
+lon: -110.871599998594
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1872.99
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13016450/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b2ff1db2bd74475bb2292c9388662106

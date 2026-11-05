@@ -1,0 +1,14 @@
+name: CAVE RUN LAKE NEAR FARMERS, KY
+lat: 38.1176928653763
+lon: -83.5318816205151
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03249498/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 2f11d66e10114770bc840ac553a412fe

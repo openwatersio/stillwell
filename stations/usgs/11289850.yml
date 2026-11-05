@@ -1,0 +1,16 @@
+name: DRY C A CRABTREE RD NR LA GRANGE CA
+lat: 37.7114416666667
+lon: -120.609802777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 55.096
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11289850/
+parameter_code: "00065"
+series_begin: 2020-01-22T23:15:00+00:00
+time_series_id: 7ff641336b7d44158a42cc9d3fce1798

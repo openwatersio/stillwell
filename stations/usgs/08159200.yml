@@ -1,0 +1,16 @@
+name: Colorado Rv at Bastrop, TX
+lat: 30.1046615358058
+lon: -97.3194368228814
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 93.699
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08159200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 46d48d68597f42a58d807cfc06c7ea75

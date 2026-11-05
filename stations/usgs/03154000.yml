@@ -1,0 +1,16 @@
+name: WEST FORK LITTLE KANAWHA RIVER AT ROCKSDALE, WV
+lat: 38.8445555555556
+lon: -81.2233888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 200.193
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03154000/
+parameter_code: "00065"
+series_begin: 2022-09-15T19:15:15+00:00
+time_series_id: dc38e7f4c9544866a75cd1ca0de3654e

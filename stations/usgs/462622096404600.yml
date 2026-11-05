@@ -1,0 +1,17 @@
+name: WHISKEY CREEK AT HWY 75 NR KENT, MN
+lat: 46.4394444444444
+lon: -96.6794444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.95
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-462622096404600/
+parameter_code: "00065"
+series_begin: 2011-03-22T05:00:00+00:00
+series_end: 2013-05-26T04:45:00+00:00
+time_series_id: 6a57344fcc3f4c2bb6176862dd076c82

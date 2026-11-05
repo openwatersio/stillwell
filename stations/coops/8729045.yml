@@ -1,0 +1,21 @@
+name: LAIRD BAYOU, EAST BAY
+lat: 30.1217
+lon: -85.5283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.484
+  MHW: -1.459
+  DTL: -1.26
+  MTL: -1.264
+  MSL: -1.262
+  MLW: -1.069
+  MLLW: -1.036
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729045
+established: 1976-07-13T00:00:00Z
+removed: 1991-10-29T23:59:00Z

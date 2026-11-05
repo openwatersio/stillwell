@@ -1,0 +1,13 @@
+name: Mississippi River @ New Madrid, MO
+lat: 36.5809
+lon: -89.547454
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 77.87
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=New%20Madrid.Stage.Inst.1Hour.0.DCP-rev
+series: New Madrid.Stage.Inst.1Hour.0.DCP-rev

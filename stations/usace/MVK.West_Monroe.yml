@@ -1,0 +1,13 @@
+name: Ouachita River @ West Monroe, LA
+lat: 32.505666667715
+lon: -92.125116667576
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 9.39
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=West%20Monroe.Stage.Inst.15Minutes.0.DCP-rev
+series: West Monroe.Stage.Inst.15Minutes.0.DCP-rev

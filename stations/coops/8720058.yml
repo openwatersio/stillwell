@@ -1,0 +1,22 @@
+name: KINGSLEY CREEK, SEABOARD R.R.
+lat: 30.6317
+lon: -81.4767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.465
+  MHW: -2.358
+  DTL: -1.473
+  MTL: -1.448
+  MSL: -1.475
+  MLW: -0.537
+  MLLW: -0.48
+  NAVD88: -1.622
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720058
+established: 1978-01-06T00:00:00Z
+removed: 1982-10-01T23:59:00Z

@@ -1,0 +1,16 @@
+name: Taylor-Alligator Bayou Pump Sta nr Port Arthur, TX
+lat: 29.8621594759455
+lon: -93.9826717411066
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042522/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: fefb4aac7904402d9104b6ec6c64aced

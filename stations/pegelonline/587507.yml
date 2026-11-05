@@ -1,0 +1,13 @@
+name: BURG
+lat: 52.276738
+lon: 11.832027
+country_code: DE
+datum: PNP
+datums:
+  NHN: 34.412
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=587507

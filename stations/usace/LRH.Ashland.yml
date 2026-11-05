@@ -1,0 +1,14 @@
+name: Ashland
+lat: 38.4814
+lon: -82.6375
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 146.429
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Ashland.Stage.Inst.15Minutes.0.OBS
+series: Ashland.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: Ouiska Chitto Creek Near Oberlin, LA
+lat: 30.69875
+lon: -92.8931944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 14.094
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08014500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 190c2599008341af91cba5bf4cb275b3

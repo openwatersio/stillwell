@@ -1,0 +1,17 @@
+name: South Alum Creek nr Jessieville, AR
+lat: 34.79555555555555
+lon: -93.00694444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 312.115
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07362579/
+parameter_code: "00065"
+series_begin: 2009-05-16T05:00:00+00:00
+series_end: 2026-08-12T21:45:00+00:00
+time_series_id: d997d5cb11c348a38fc7fbac58f05d38

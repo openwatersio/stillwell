@@ -1,0 +1,13 @@
+name: Diversion Channel Control Structure (HW)
+lat: 35.992556
+lon: -90.121111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 67.056
+products: [levels]
+interval_s: 86400
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=BL110.Stage.Inst.1Day.0.MVM-PUB
+series: BL110.Stage.Inst.1Day.0.MVM-PUB

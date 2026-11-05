@@ -1,0 +1,21 @@
+name: HAWKINS POINT, PATAPSCO RIVER
+lat: 39.2083
+lon: -76.5333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.168
+  MHW: -4.069
+  DTL: -3.906
+  MTL: -3.888
+  MSL: -3.894
+  MLW: -3.707
+  MLLW: -3.644
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8574821
+established: 1975-08-18T00:00:00Z
+removed: 1976-11-17T23:59:00Z

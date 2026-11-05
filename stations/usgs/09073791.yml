@@ -1,0 +1,17 @@
+name: MIDWAY CREEK CONDUIT BYPASS NEAR ASPEN, CO
+lat: 39.1910277777778
+lon: -106.6859
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3103.449
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09073791/
+parameter_code: "00065"
+series_begin: 2021-04-27T19:30:00+00:00
+series_end: 2026-08-04T20:45:00+00:00
+time_series_id: 08869c21a9804df3a88d6a406f0c3b3b

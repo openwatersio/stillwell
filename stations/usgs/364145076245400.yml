@@ -1,0 +1,17 @@
+name: JUNIPER DCH 150 YDS BL HARDWOOD DCH NR DEEP CR, VA
+lat: 36.6958333333333
+lon: -76.415
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-364145076245400/
+parameter_code: "00065"
+series_begin: 2014-12-05T05:00:00+00:00
+series_end: 2020-10-01T04:45:00+00:00
+time_series_id: 224f466f37d44db69de7f9c3e0f368e6

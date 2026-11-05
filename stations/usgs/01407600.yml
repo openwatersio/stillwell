@@ -1,0 +1,14 @@
+name: Shrewsbury River at Sea Bright NJ
+lat: 40.3655555555556
+lon: -73.9747222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01407600/
+parameter_code: "72279"
+series_begin: 2000-01-17T18:12:00+00:00
+time_series_id: 43e81c94d2054cccabea9d19267527bb

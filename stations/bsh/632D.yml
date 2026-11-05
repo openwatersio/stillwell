@@ -1,0 +1,11 @@
+name: Langeness, Hilligenley
+lat: 54.61861
+lon: 8.54722
+country_code: DE
+datum: SKN
+datums:
+  NHN: -2.12
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/langeness_hilligenley

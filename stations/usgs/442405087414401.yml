@@ -1,0 +1,16 @@
+name: DISCOVERY FARMS WATERWAY KD1 NEAR KEWAUNEE, WI
+lat: 44.4012777777778
+lon: -87.6955555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 243.535
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-442405087414401/
+parameter_code: "00065"
+series_begin: 2018-10-25T23:15:00+00:00
+time_series_id: db5ed35576d1488dbec0e89c181b3b72

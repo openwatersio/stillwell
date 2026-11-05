@@ -1,0 +1,16 @@
+name: ESCAMBIA RIVER NR MOLINO, FLA.
+lat: 30.6701917020841
+lon: -87.2669178727149
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02376033/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 162bbd176cc74cec87018ee48342ab86

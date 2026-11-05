@@ -1,0 +1,16 @@
+name: HUMBOLDT RV NR ELKO, NV
+lat: 40.9365555555556
+lon: -115.624166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1567.379
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10318500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 51dea3c87de84db7ae8258bc7705d8de

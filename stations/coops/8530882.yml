@@ -1,0 +1,23 @@
+name: PORT ELIZABETH, NEWARK BAY
+lat: 40.6733
+lon: -74.14
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.216
+  MHW: -2.112
+  DTL: -1.364
+  MTL: -1.343
+  MSL: -1.368
+  MLW: -0.574
+  MLLW: -0.512
+  LAT: -0.059
+  HAT: -2.638
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530882
+established: 1976-02-19T00:00:00Z
+removed: 1982-06-15T23:59:00Z

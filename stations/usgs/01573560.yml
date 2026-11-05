@@ -1,0 +1,16 @@
+name: Swatara Creek near Hershey, PA
+lat: 40.298425
+lon: -76.667747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 99.136
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01573560/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1ed56fac60a3425cacee416e88621fb5

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
+import { readStationFiles } from "../src/station-files.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -137,6 +139,8 @@ describe("pegelonline", () => {
     assert.equal(cuxhaven.id, "pegelonline/5990020");
     assert.equal(cuxhaven.datum, "PNP");
     assert.deepEqual(cuxhaven.datums, { NHN: -5.033 });
+    // Its gauge zero is valid from 2019-11-01, a day left out of both epochs if it moves.
+    assert.deepEqual(cuxhaven.reference, { id: "2019-11-01", since: "2019-11-02" });
     assert.equal(cuxhaven.interval_s, 60);
     assert.equal(cuxhaven.commercial_use, true);
     const inland = stations.find((s) => s.source_id !== "5990020")!;
@@ -175,6 +179,12 @@ describe("pegelonline", () => {
     serve([[/stations\.json/, JSON.stringify([{ ...first, timeseries: [] }])]]);
     const [listed] = await pegelonline.stations();
     assert.equal(listed!.datum, null);
+  });
+
+  it("leaves out a station with half a position", async () => {
+    const [first] = JSON.parse(fixture("pegelonline-stations.json"));
+    serve([[/stations\.json/, JSON.stringify([{ ...first, longitude: undefined }])]]);
+    assert.deepEqual(await pegelonline.stations(), []);
   });
 });
 
@@ -948,6 +958,13 @@ describe("usace", () => {
     assert.equal(since("usace/MVN.Donaldsonville"), "1988-06-15");
     assert.equal(since("usace/LRC.Reserve"), "2001-01-01");
     assert.equal(since("usace/MVN.Reserve"), undefined);
+    // Each zero date names the reference, so a new one opens a datum epoch.
+    const reference = (id: string) => listed.find((s) => s.id === id)!.reference;
+    assert.deepEqual(reference("usace/MVN.Donaldsonville"), {
+      id: "1988-06-15",
+      since: "1988-06-15",
+    });
+    assert.deepEqual(reference("usace/MVN.Reserve"), { id: "original", since: null });
     assert.deepEqual(
       listed.filter((s) => s.id.startsWith("usace/LRC.")).map((s) => s.series),
       [
@@ -1043,19 +1060,20 @@ describe("usace", () => {
     );
   });
 
-  it("keeps every hand-entered zero date in the committed station list", () => {
+  it("keeps every hand-entered zero date in the committed station files", async () => {
     const committed = new Map(
       (
-        JSON.parse(
-          readFileSync(new URL("../stations/usace.json", import.meta.url), "utf8"),
-        ) as usace.UsaceStation[]
+        (await readStationFiles(
+          join(import.meta.dirname, "../stations"),
+          usace.source.metadata,
+        )) as usace.UsaceStation[]
       ).map((s) => [s.source_id, s]),
     );
     for (const [id, { since }] of Object.entries(ZERO_SINCE)) {
       assert.match(since, /^\d{4}-\d{2}-\d{2}$/, id);
       assert.ok(Number.isFinite(Date.parse(since)), id);
       const station = committed.get(id);
-      assert.ok(station, `${id} isn't in stations/usace.json`);
+      assert.ok(station, `${id} isn't in stations/usace/`);
       assert.ok(
         station.zero_since && station.zero_since >= since,
         `${id} zero_since ${station.zero_since}`,

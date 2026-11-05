@@ -1,0 +1,17 @@
+name: CASEY FORK SUBIMPOUNDMENT NEAR BONNIE, IL
+lat: 38.1875
+lon: -88.92722222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 121.758
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05595860/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2023-10-24T18:00:00+00:00
+time_series_id: b10febf690bf44699c0830c06b223941

@@ -1,0 +1,16 @@
+name: SILVER CREEK AT ROUTE 161 NR MASCOUTAH, IL
+lat: 38.525444444444446
+lon: -89.82454722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 121.487
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05594600/
+parameter_code: "00065"
+series_begin: 2024-12-11T22:00:00+00:00
+time_series_id: 557ff03f10a24815a7478fba86ec637e

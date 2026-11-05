@@ -1,0 +1,16 @@
+name: MUDDY RV NR MOAPA, NV
+lat: 36.7110817078374
+lon: -114.695271473242
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 521.208
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09416000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 39b66e7889a84dc587632ea6bd5dc68e

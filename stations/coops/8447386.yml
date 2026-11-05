@@ -1,0 +1,24 @@
+name: Fall River
+lat: 41.7043
+lon: -71.1641
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.816
+  MHW: -7.743
+  DTL: -7.088
+  MTL: -7.078
+  MSL: -7.033
+  MLW: -6.412
+  MLLW: -6.361
+  NAVD88: -7.102
+  LAT: -6.026
+  HAT: -8.248
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447386
+established: 1955-10-28T00:00:00Z

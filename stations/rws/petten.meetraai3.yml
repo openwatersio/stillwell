@@ -1,0 +1,11 @@
+name: Petten, meetraai 03
+lat: 52.772884
+lon: 4.649758
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/petten.meetraai3/details

@@ -1,0 +1,16 @@
+name: BLUE RIVER NEAR CLIFTON, AZ.
+lat: 33.2908945642372
+lon: -109.196183174992
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1267.968
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09444200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 617648b0b27745bda6eb76771004eb2c

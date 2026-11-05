@@ -1,0 +1,16 @@
+name: WEST CANADA CREEK NEAR WILMURT NY
+lat: 43.366055555555555
+lon: -74.95744444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 383.316
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01343060/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 894b07487d2f488f85d210472e195358

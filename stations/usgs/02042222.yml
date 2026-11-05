@@ -1,0 +1,15 @@
+name: JAMES RIVER ABV WEYANOKE POINT NR CHARLES CITY, VA
+lat: 37.2923611111111
+lon: -77.0787222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02042222/
+parameter_code: "62620"
+series_begin: 2014-07-03T04:00:00+00:00
+series_end: 2017-10-11T10:54:00+00:00
+time_series_id: e7c15663c4334317b2617636dfd1105c

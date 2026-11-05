@@ -1,0 +1,16 @@
+name: W BRANCH LITTLE R ABV BINGHAM FALLS NEAR STOWE, VT
+lat: 44.5233855562742
+lon: -72.7717885324146
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 413.9
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04288225/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 48f2463ba5724b6fb177f86c136d23a4

@@ -1,0 +1,23 @@
+name: Provorotni Island
+lat: 57.515
+lon: -135.555
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.236
+  MHW: -3.938
+  DTL: -1.928
+  MTL: -2.01
+  MSL: -2.04
+  MLW: -0.082
+  MLLW: 0.378
+  LAT: 1.723
+  HAT: -5.431
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451936
+established: 1952-05-15T00:00:00Z
+removed: 2002-05-22T23:59:00Z

@@ -1,0 +1,16 @@
+name: OYSTER RIVER NEAR DURHAM, NH
+lat: 43.1486955206422
+lon: -70.9650603094044
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 19.684
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01073000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ad848f0b4ad9459da58b976b26d393c1

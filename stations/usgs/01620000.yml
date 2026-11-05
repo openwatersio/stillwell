@@ -1,0 +1,16 @@
+name: POTOMAC RIVER AT HARPERS FERRY, WV
+lat: 39.323750000000004
+lon: -77.72819444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.652
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01620000/
+parameter_code: "00065"
+series_begin: 2024-12-20T17:15:00+00:00
+time_series_id: 7ebdf8f930c842cb93a3731e7b536ab0

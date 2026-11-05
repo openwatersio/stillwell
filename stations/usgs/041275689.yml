@@ -1,0 +1,17 @@
+name: SPENCER CREEK AT COY ST AT ALDEN, MI
+lat: 44.880886
+lon: -85.277014
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.143
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-041275689/
+parameter_code: "00065"
+series_begin: 2024-04-24T17:45:00+00:00
+series_end: 2026-05-02T05:00:00+00:00
+time_series_id: eae19b8f69494db4b9a23c9931a113c6

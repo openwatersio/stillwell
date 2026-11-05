@@ -1,0 +1,15 @@
+name: CLOSED BASIN PROJECT CANAL ABV HWY 150 NR MOSCA CO
+lat: 37.6631111111111
+lon: -105.703111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2292.096
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-373947105421101/
+parameter_code: "00065"
+time_series_id: c8d0d5e2e65240d4a357ff6b66f81dfa

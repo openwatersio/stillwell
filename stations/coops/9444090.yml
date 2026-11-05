@@ -1,0 +1,24 @@
+name: Port Angeles
+lat: 48.125
+lon: -123.44
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -11.393
+  MHW: -11.227
+  DTL: -10.316
+  MTL: -10.526
+  MSL: -10.534
+  MLW: -9.826
+  MLLW: -9.24
+  NAVD88: -9.369
+  LAT: -8.125
+  HAT: -12.034
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9444090
+established: 1975-08-30T00:00:00Z

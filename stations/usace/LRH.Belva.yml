@@ -1,0 +1,13 @@
+name: Belva
+lat: 38.2325
+lon: -81.1861
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 203.911
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Belva.Stage.Inst.15Minutes.0.OBS
+series: Belva.Stage.Inst.15Minutes.0.OBS

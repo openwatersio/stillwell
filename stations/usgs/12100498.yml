@@ -1,0 +1,14 @@
+name: WHITE RIVER AT PACIFIC, WA
+lat: 47.2601007807951
+lon: -122.238453045271
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12100498/
+parameter_code: "00065"
+series_begin: 2012-10-01T08:00:00+00:00
+time_series_id: 1a180c93fc374543978a25291712fe9b

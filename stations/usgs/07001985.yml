@@ -1,0 +1,17 @@
+name: Watkins Creek at Bellefontaine Neighbors, MO
+lat: 38.7622777777778
+lon: -90.1969166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 131.655
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07001985/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2020-10-22T14:25:00+00:00
+time_series_id: 5ddda850de584fbc9636b3bf82af354f

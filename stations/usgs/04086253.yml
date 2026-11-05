@@ -1,0 +1,15 @@
+name: MILWAUKEE RIVER AT QUAAS CK PARK AT WEST BEND, WI
+lat: 43.419911
+lon: -88.146019
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 263.957
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04086253/
+parameter_code: "00065"
+time_series_id: 9e1afcf98f0a4f99a7452fbf04e91f47

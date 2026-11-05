@@ -1,0 +1,22 @@
+name: CRAMERS BOATYARD, MULLICA RIVER
+lat: 39.5483
+lon: -74.4617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.971
+  MHW: -1.89
+  DTL: -1.459
+  MTL: -1.442
+  MSL: -1.477
+  MLW: -0.994
+  MLLW: -0.947
+  NAVD88: -1.469
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534212
+established: 1977-04-29T00:00:00Z
+removed: 1978-11-14T23:59:00Z

@@ -1,0 +1,16 @@
+name: SUWANNEE RIVER AT DOWLING PARK, FLORIDA
+lat: 30.244722000000003
+lon: -83.249722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02319800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f951b0943ea24043a7908cb587cfab13

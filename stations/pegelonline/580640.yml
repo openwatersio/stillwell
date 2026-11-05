@@ -1,0 +1,13 @@
+name: RATHENOW OP
+lat: 52.60049
+lon: 12.313837
+country_code: DE
+datum: PNP
+datums:
+  NHN: 24.515
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580640

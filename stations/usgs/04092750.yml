@@ -1,0 +1,16 @@
+name: INDIANA HARBOR CANAL AT EAST CHICAGO, IN
+lat: 41.64918268974166
+lon: -87.46862222131166
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.702
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04092750/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 608c80a8fc1f475db38da86c915ec455

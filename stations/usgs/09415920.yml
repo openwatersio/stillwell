@@ -1,0 +1,16 @@
+name: WARM SPGS W NR MOAPA, NV
+lat: 36.7111833333333
+lon: -114.713663888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 539.801
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09415920/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: dd9799449c5442ce8a9d7227b1ac38a4

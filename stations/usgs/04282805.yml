@@ -1,0 +1,17 @@
+name: BARTLETT BROOK AT SOUTH BURLINGTON, VT
+lat: 44.4261111111111
+lon: -73.215
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 35.052
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04282805/
+parameter_code: "00065"
+series_begin: 2010-07-28T19:50:00+00:00
+series_end: 2011-10-01T05:00:00+00:00
+time_series_id: c73b536409154f62abaeedcd75942d4a

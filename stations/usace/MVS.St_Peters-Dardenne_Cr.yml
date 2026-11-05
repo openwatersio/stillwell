@@ -1,0 +1,14 @@
+name: St Peters
+lat: 38.8033992
+lon: -90.6344642
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 130.64
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=St%20Peters-Dardenne%20Cr.Stage.Inst.5Minutes.0.lrgsShef-rev
+series: St Peters-Dardenne Cr.Stage.Inst.5Minutes.0.lrgsShef-rev

@@ -1,0 +1,16 @@
+name: PEE DEE R AT PEE DEE REFUGE NR ANSONVILLE, NC
+lat: 35.1032166666667
+lon: -80.0459333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 53.532
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02126375/
+parameter_code: "00065"
+series_begin: 2011-08-05T04:00:00+00:00
+time_series_id: 6d2a307ee64a40f8a6bf4695917013c7

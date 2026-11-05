@@ -1,0 +1,23 @@
+name: Alabama Point
+lat: 30.27861
+lon: -87.555
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.1
+  MHW: -1.088
+  DTL: -0.969
+  MTL: -0.967
+  MSL: -0.964
+  MLW: -0.845
+  MLLW: -0.838
+  LAT: -0.691
+  HAT: -1.26
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8730667
+established: 1993-11-18T00:00:00Z
+removed: 2007-03-26T23:59:00Z

@@ -1,0 +1,17 @@
+name: Sebasticook River near Pittsfield, Maine
+lat: 44.7166666666667
+lon: -69.4138888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 40.825
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01049000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2013-10-01T04:00:00+00:00
+time_series_id: 48e25f86534047ceacc0ffea8a1498b8
