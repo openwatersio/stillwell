@@ -38,8 +38,19 @@ export function seriesPath(
   year: number,
   epoch = 1,
 ): string {
-  const dir = `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
-  return epoch === 1 ? `${dir}/${year}.parquet` : `${dir}/${epoch}/${year}.parquet`;
+  return `${seriesDir(root, product, source, sourceId, epoch)}/${year}.parquet`;
+}
+
+/** The directory that holds one epoch's yearly files: the station's own for epoch 1, its numbered subdirectory for a later one. */
+export function seriesDir(
+  root: string,
+  product: Product,
+  source: string,
+  sourceId: string,
+  epoch = 1,
+): string {
+  const dir = stationDir(root, product, source, sourceId);
+  return epoch === 1 ? dir : `${dir}/${epoch}`;
 }
 
 /** A station's directory for one product, which holds epoch 1's years and later epochs' directories. */

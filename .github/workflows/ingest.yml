@@ -31,13 +31,14 @@ jobs:
         run: |
           set -f
           # The command and sources are the words that aren't an option or
-          # its value; every ingest option takes a value but --accept-epochs.
+          # its value; every ingest option takes a value but --accept-epochs, --refetch and
+          # --skip-written.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --*=*) ;;
+              --accept-epochs | --refetch | --skip-written | --*=*) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac

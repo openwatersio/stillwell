@@ -3,6 +3,7 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs]
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
+ *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1]
  *
@@ -14,8 +15,17 @@
  * exclusive) into its yearly files, replacing that range and keeping the rest,
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
- * source withdraws stays until its month is fetched again with others. `recent` fetches the last hours for every
- * live station and merges them into recent/<source>.parquet. `compact` folds
+ * source withdraws stays until its month is fetched again with others.
+ * Backfill skips a year whose file is already complete (see `yearDone` in
+ * src/backfill.ts), so a run cut short doesn't fetch those again; `--refetch`
+ * fetches every year anyway, and `--skip-written` skips every ended year that
+ * has a file, complete or not (from 2026 on, see `COMPACTED_SINCE`), so a long campaign of runs doesn't fetch
+ * provisional years again each time. `--first` names a file of station IDs to
+ * run before the rest, and `--shard 2/8` takes the second of eight sets of
+ * stations, split by a hash of their IDs, so separate jobs can split them.
+ * Skipping looks only at the current epoch's files, so a new epoch starts its
+ * years over. `recent` fetches the last hours for every live station and merges them into
+ * recent/<source>.parquet. `compact` folds
  * the last `--days` whole UTC days of that window into each station's year
  * files, each row into its datum epoch's. Both print a summary, and add it to
  * the workflow run's page.
@@ -34,6 +44,13 @@
  */
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import {
+  orderStations,
+  parseShard,
+  parseStationList,
+  shard,
+  yearsToFetch,
+} from "../src/backfill.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
@@ -46,7 +63,7 @@ import {
   updateRecent,
   type RunSummary,
 } from "../src/lake/recent.ts";
-import { appendFile } from "node:fs/promises";
+import { appendFile, readFile } from "node:fs/promises";
 import { isHeld } from "../src/epochs.ts";
 import {
   readExtremes,
@@ -56,7 +73,7 @@ import {
   publishedSources,
   writeObservations,
 } from "../src/lake/parquet.ts";
-import { seriesPath, stationsPath } from "../src/lake/paths.ts";
+import { seriesDir, seriesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc, withSourceFlag } from "../src/qc.ts";
 import {
   describeReport,
@@ -116,6 +133,10 @@ const { positionals, values } = parseArgs({
     days: { type: "string", default: "1" },
     concurrency: { type: "string", default: "4" },
     "accept-epochs": { type: "boolean", default: false },
+    first: { type: "string" },
+    shard: { type: "string" },
+    refetch: { type: "boolean", default: false },
+    "skip-written": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -222,21 +243,60 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       ? list.filter((s) => s.status === "active")
       : ids.split(",").map((id) => find(list, sourceId, id));
   // A station whose new epoch waits on a person gets nothing, in either datum.
-  const wanted = named.filter((s) => {
+  let wanted = named.filter((s) => {
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
     return !isHeld(s.epochs);
   });
+  if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
+  if (values.shard) wanted = shard(wanted, ...parseShard(values.shard));
+  if (values["skip-written"] && values.refetch)
+    throw new Error("--skip-written and --refetch contradict each other");
+  if (values.first) {
+    const text = await readFile(values.first, "utf8");
+    const first = parseStationList(text, sourceId, /\.csv$/i.test(values.first));
+    wanted = orderStations(wanted, first);
+    // Stations in another shard, inactive or misspelled don't run first here.
+    // Unsharded, a file that matches nothing is a mistake, not an order.
+    const here = new Set(wanted.map((s) => s.id));
+    const matched = first.filter((id) => here.has(id)).length;
+    if (!matched && !values.shard)
+      throw new Error(`${values.first} names none of the ${sourceId} stations here`);
+    console.log(
+      `${values.first}: ${matched} of its ${first.length} ${sourceId} stations run first`,
+    );
+  }
   // Sources with a rolling window can't reach further back than it.
   const window = source.metadata.window_days;
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
+  const now = Date.now();
+  const mode = values["skip-written"] ? "written" : values.refetch ? "none" : "complete";
+  console.log(`${sourceId}: backfilling ${wanted.length} stations`);
 
   const failed: string[] = [];
+  let skipped = 0;
   await pool(wanted, positive("concurrency"), async (station) => {
     // Nothing from before the current epoch: those values are in another reference.
     const since = Date.parse(currentSince(station) ?? "");
     const from_ = Number.isNaN(since) ? start : new Date(Math.max(start.getTime(), since));
     for (const product of station.products) {
-      for (const [from, to] of years(from_, end)) {
+      // One read per series tells which years are done, rather than one per year;
+      // --skip-written needs a listing, and a read of years from 2026 on.
+      let plan;
+      try {
+        const dir = seriesDir(
+          lakeFor(station),
+          product,
+          station.source,
+          station.source_id,
+          epochOf(station),
+        );
+        plan = await yearsToFetch(dir, from_, end, mode, now);
+      } catch (error) {
+        failed.push(`${station.id} ${product}: ${error instanceof Error ? error.message : error}`);
+        continue;
+      }
+      skipped += plan.skipped;
+      for (const [from, to] of plan.fetch) {
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
         try {
           const written = await backfillYear(source, station, product, from, to);
@@ -248,6 +308,9 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       }
     }
   });
+  const why = { written: "already written", complete: "already complete", none: "" }[mode];
+  if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
+  console.log(`${sourceId}: ${failed.length} failed`);
   for (const f of failed) console.error(`  ${f}`);
   if (failed.length) process.exitCode = 1;
 }
@@ -382,15 +445,6 @@ function find(list: LakeStation[], sourceId: string, id: string): LakeStation {
   return station;
 }
 
-/** [start, end) split at UTC year boundaries. */
-function* years(start: Date, end: Date): Generator<[Date, Date]> {
-  for (let t = start.getTime(); t < end.getTime();) {
-    const next = Date.UTC(new Date(t).getUTCFullYear() + 1, 0, 1);
-    yield [new Date(t), new Date(Math.min(next, end.getTime()))];
-    t = next;
-  }
-}
-
 function parseDate(value: string): Date {
   const date = new Date(/^\d{4}$/.test(value) ? `${value}-01-01T00:00:00Z` : value);
   if (Number.isNaN(date.getTime())) throw new Error(`Not a date: ${value}`);
@@ -399,7 +453,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
   );
   process.exit(1);
 }
