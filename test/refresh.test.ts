@@ -258,6 +258,10 @@ describe("seedSource", () => {
     );
     assert.deepEqual(report.changed, []);
     await assert.rejects(seedSource(lake, usace, committed, NOW), /already exists/);
+    await assert.rejects(
+      seedSource(lake, { ...usace, id: "other" }, [], NOW),
+      /no committed stations/,
+    );
     // Nor over a list that went missing: that's a restore from history.
     await rm(stationListPath(lake, "test"));
     await assert.rejects(seedSource(lake, usace, committed, NOW), /history for test but no list/);

@@ -121,6 +121,19 @@ describe("nextEpochs", () => {
     );
   });
 
+  it("doesn't take a reference first seen with a date ahead as epoch 1's own", () => {
+    const fetched = {
+      datum: "PNP",
+      datums: {},
+      reference: { id: "2027-07-01", since: "2027-07-02" },
+    };
+    const early = nextEpochs([epoch()], fetched, options());
+    assert.deepEqual([early.event, early.epochs[0]!.reference], [null, null]);
+    // Once its day has come, it's a change for a person to place.
+    const later = nextEpochs(early.epochs, fetched, options({ now: "2027-07-03T00:00:00Z" }));
+    assert.equal(later.event, "held");
+  });
+
   it("holds a reference first seen with a recent date, for a person to place", () => {
     const fetched = {
       datum: "PNP",
@@ -400,7 +413,7 @@ describe("convert", () => {
 });
 
 describe("recentWindow", () => {
-  it("keeps other epochs' rows apart, and never reaches before the current epoch", () => {
+  it("splits rows by the current epoch's start, and never reaches before it", () => {
     const epochs = [
       epoch({ state: "closed", until: "2027-05-30T00:00:00Z" }),
       epoch({ id: 2, since: "2027-05-31T00:00:00Z" }),
@@ -411,6 +424,7 @@ describe("recentWindow", () => {
       at("2027-05-29T00:00:00Z", 1),
       at("2027-05-30T12:00:00Z", 2), // tagged epoch 2, but before it began
       at("2027-05-31T06:00:00Z", 2),
+      at("2027-05-31T07:00:00Z", 1), // fetched before epoch 2 opened, back to its start
     ];
     const window = recentWindow(
       epochs,
@@ -421,8 +435,8 @@ describe("recentWindow", () => {
     assert.deepEqual(window, {
       epoch: 2,
       from: Date.parse("2027-05-31T00:00:00Z"),
-      other: [rows[1]],
-      current: [rows[3]],
+      other: [rows[1], rows[2]],
+      current: [rows[3], { ...rows[4]!, epoch: 2 }],
     });
     // With no known start, fetching starts where the run asks.
     assert.equal(recentWindow([epoch()], [], 0, 5).from, 5);

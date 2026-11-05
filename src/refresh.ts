@@ -90,11 +90,16 @@ export async function refreshSource(
 
   const listedInactive = new Set(fetched.filter((s) => s.status === "inactive").map((s) => s.id));
   const report = reportOf(id, options.now, previous, stations, changes, listedInactive);
-  // A new source's snapshot is its empty list, so a list lost after its first
-  // refresh is refused too, rather than rebuilt from scratch.
-  await writeStationList(historyPath(lake, id, options.now, "parquet"), previous);
-  await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
+  // The list it read goes to history before it's replaced. A new source's
+  // snapshot, its empty list, goes after its first list instead, so a run cut
+  // short between the two can't leave history with no list to refuse on.
+  const snapshot = async () => {
+    await writeStationList(historyPath(lake, id, options.now, "parquet"), previous);
+    await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
+  };
+  if (stored) await snapshot();
   await writeStationList(listPath, stations);
+  if (!stored) await snapshot();
   return { stations, report };
 }
 
@@ -152,6 +157,9 @@ export async function seedSource(
   // Seeding over a lost list would bring back the committed files' stale
   // epochs, and new values would go into files from another reference.
   if (await hasHistory(lake, metadata.id)) throw new Refused(lostList(lake, metadata.id));
+  // No committed stations means a wrong directory or a missing source, and an
+  // empty seed would block the real one.
+  if (!committed.length) throw new Refused(`no committed stations for ${metadata.id}`);
   refuseMixedTerms(metadata, committed);
   const offsets = metadata.utc_offsets ?? ([0, 0] as [number, number]);
   const stations = committed.map((s) => {

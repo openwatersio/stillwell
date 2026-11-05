@@ -38,7 +38,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.       |
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                        |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill` and `recent`, described below.                     |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `seed-stations`, `backfill` and `recent`, described below.    |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                 |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data. |
 
@@ -85,7 +85,7 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 npm run ticon:inventory
 ```
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source seeded), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
 
 ## Evaluations
 

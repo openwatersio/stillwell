@@ -135,9 +135,12 @@ export function nextEpochs(
     fresh ||
     (!!ref && current.reference !== null && ref.id !== current.reference);
 
+  // A reference first seen with a date ahead isn't recorded until its day, so it opens an epoch then.
+  const ahead = refStart !== null && refStart > Date.parse(options.now);
+
   if (!labelChanged && !refChanged) {
     // The first refresh to see a reference records it, rather than call it a change.
-    if (ref && current.reference === null) {
+    if (ref && current.reference === null && !ahead) {
       current.reference = ref.id;
       if (ref.since) current.reference_since = iso(dayStart(ref.since, options.offsets));
     }
@@ -329,24 +332,26 @@ export function convert(from: Epoch, to: Epoch): number | null {
 const round = (m: number) => Math.round(m * 1e6) / 1e6;
 
 /**
- * A station's part of the recent window, split for a run: rows from other
- * epochs, kept as they are for compaction to fold into their own files; the
- * current epoch's rows from its start, which new values merge into; and where
- * fetching starts, never before the current epoch does.
+ * A station's part of the recent window, split for a run: rows from before
+ * the current epoch, kept as they are for compaction to fold into their own
+ * files; the rows from its start, which new values merge into; and where
+ * fetching starts, never before the current epoch does. A row goes by its time,
+ * not the epoch it was written in: an epoch opened with a start in the past
+ * takes the values fetched since then, which were already in its reference.
  */
 export function recentWindow<T extends { time: number; epoch: number }>(
   epochs: Epoch[],
   rows: T[],
   keepFrom: number,
   start: number,
-): { epoch: number; from: number; other: T[]; current: T[] } {
+): { epoch: number; from: number; other: T[]; current: (T & { epoch: number })[] } {
   const { id: epoch, since } = currentEpoch(epochs);
   const begins = since === null ? -Infinity : Date.parse(since);
   const kept = rows.filter((r) => r.time >= keepFrom);
   return {
     epoch,
     from: Math.max(start, begins),
-    other: kept.filter((r) => r.epoch !== epoch),
-    current: kept.filter((r) => r.epoch === epoch && r.time >= begins),
+    other: kept.filter((r) => r.time < begins),
+    current: kept.filter((r) => r.time >= begins).map((r) => ({ ...r, epoch })),
   };
 }

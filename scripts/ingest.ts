@@ -30,6 +30,7 @@
  * separate lake, and ingest refuses to write one without it.
  */
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
@@ -104,7 +105,8 @@ function overlaps(a: string, b: string): boolean {
   const [x, y] = [resolve(a), resolve(b)];
   return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
 }
-const STATIONS_DIR = "stations";
+// The repo's, wherever ingest runs from.
+const STATIONS_DIR = fileURLToPath(new URL("../stations", import.meta.url));
 const DAY_MS = 86_400_000;
 
 useDiskCache();
