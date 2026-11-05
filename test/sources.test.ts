@@ -287,7 +287,7 @@ describe("pegelonline", () => {
     assert.equal(asked, 1);
   });
 
-  it("stops asking for history_since after five failures in a row", async () => {
+  it("stops asking for history_since after five failures", async () => {
     const [first] = JSON.parse(fixture("pegelonline-stations.json"));
     const many = Array.from({ length: 8 }, (_, i) => ({ ...first, number: String(i) }));
     let asked = 0;

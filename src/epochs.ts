@@ -94,7 +94,12 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
     {
       id: Math.max(1, options.nextId ?? 1),
       datum: fetched.datum,
-      since: options.archive === "current" ? null : since,
+      // A zero dated ahead isn't today's yet, so the values until then are on another.
+      since:
+        options.archive === "current" &&
+        (since === null || Date.parse(since) <= Date.parse(options.now))
+          ? null
+          : since,
       until: null,
       seen: options.now,
       reference: fetched.reference?.id ?? null,

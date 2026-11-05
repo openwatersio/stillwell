@@ -111,7 +111,11 @@ export async function stations(previous: Station[] = []): Promise<PegelonlineSta
 export async function historySince(uuid: string): Promise<string | null> {
   let html: string;
   try {
-    html = await getText(`${SITE}/gast/download/modal?uuid=${uuid}&parameter=W`, { fresh: true });
+    html = await getText(`${SITE}/gast/download/modal?uuid=${uuid}&parameter=W`, {
+      fresh: true,
+      // A small page; a site that hangs shouldn't hold a refresh for minutes a station.
+      timeout: 30,
+    });
   } catch (error) {
     // A gauge without a download answers 400.
     if (/returned 400$/.test((error as Error).message)) return null;
@@ -349,6 +353,6 @@ async function observations(s: Station, start: Date, end: Date): Promise<Observa
   // Not the REST API's last 30 days either: backfill replaces whole months, so
   // a month it only half covers would lose the rows before.
   if (since === null) return [];
-  const from = since ? Math.max(start.getTime(), Date.parse(since) - DAY_MS) : start.getTime();
+  const from = Math.max(start.getTime(), Date.parse(since) - DAY_MS);
   return from < end.getTime() ? history(s.source_id, new Date(from), end, s.datum) : [];
 }
