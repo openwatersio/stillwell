@@ -57,7 +57,7 @@ import {
   writeObservations,
 } from "../src/lake/parquet.ts";
 import { seriesPath, stationsPath } from "../src/lake/paths.ts";
-import { qc } from "../src/qc.ts";
+import { qc, withSourceFlag } from "../src/qc.ts";
 import {
   describeReport,
   hasHistory,
@@ -277,7 +277,7 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(rows, qcFor(source, station));
+    if (product === "levels") rows = qc(withSourceFlag(rows), qcFor(source, station));
     const existing = await readObservations(path);
     const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;

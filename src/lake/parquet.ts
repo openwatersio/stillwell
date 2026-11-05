@@ -87,7 +87,8 @@ async function connect(): Promise<DuckDBConnection> {
 }
 
 /**
- * Observations: `time`, `level_m`, `flag`, `received`, `datum`, sorted by time.
+ * Observations: `time`, `level_m`, `flag`, `source_flag`, `received`, `datum`,
+ * sorted by time.
  * `datum` is the same on every row; it lets a reader, and the next write, check
  * that a file holds one datum.
  */
@@ -96,7 +97,7 @@ export async function writeObservations(
   rows: Observation[],
   datum: string,
 ): Promise<void> {
-  await copyRows(path, rows, "time, level_m, flag, received, datum", datum, (r) => [
+  await copyRows(path, rows, "time, level_m, flag, source_flag, received, datum", datum, (r) => [
     r.time,
     r.level,
     r.flag,
@@ -105,6 +106,8 @@ export async function writeObservations(
     null,
     null,
     null,
+    null,
+    r.source_flag ?? null,
   ]);
 }
 
@@ -116,21 +119,13 @@ export async function readObservations(path: string): Promise<Observation[]> {
 export async function readObservationFile(
   path: string,
 ): Promise<{ rows: Observation[]; datums: string[] }> {
-  const rows = await read(
-    path,
-    "SELECT epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received, datum",
-  );
+  // Every column, since a file written before `source_flag` was kept has none.
+  const rows = await read(path, OBSERVATION_COLUMNS);
   const datums = new Set<string>();
   return {
     rows: rows.map((r) => {
       datums.add(String(r.datum));
-      const o: Observation = {
-        time: Number(r.time),
-        level: level(r.level_m),
-        flag: r.flag as Flag,
-      };
-      if (r.received !== null) o.received = Number(r.received);
-      return o;
+      return observation(r);
     }),
     datums: [...datums],
   };
@@ -205,7 +200,7 @@ export async function writeRecent(
       copyOut(
         path,
         table,
-        "station, time, level_m, flag, received, epoch",
+        "station, time, level_m, flag, source_flag, received, epoch",
         undefined,
         "station, time_ms",
       ),
@@ -225,14 +220,25 @@ const recentCells = (r: StationObservation): Cell[] => [
   null,
   null,
   r.epoch,
+  r.source_flag ?? null,
 ];
+
+const OBSERVATION_COLUMNS =
+  "SELECT * REPLACE (epoch_ms(time) AS time, epoch_ms(received) AS received)";
+
+function observation(r: Record<string, unknown>): Observation {
+  const o: Observation = { time: Number(r.time), level: level(r.level_m), flag: r.flag as Flag };
+  if (r.source_flag != null) o.source_flag = r.source_flag as Flag;
+  if (r.received !== null) o.received = Number(r.received);
+  return o;
+}
 
 /**
  * Decode every value of a recent window without keeping any, so a file that
  * can't be read in full fails now. A missing file passes.
  */
 export async function checkRecent(path: string): Promise<void> {
-  await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
+  await read(path, "SELECT sum(hash(r)) AS h", "h", "r");
 }
 
 /** The stations a recent window holds values for; none when the file doesn't exist. */
@@ -262,31 +268,19 @@ export async function recentEpochs(path: string): Promise<Map<string, number>> {
 /** The recent window, or just the named stations' part of it. */
 export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];
-  const select =
-    "SELECT station, epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received";
   // The file is sorted by station, so the range lets DuckDB skip the row groups outside it.
   const where = stations
     ? `WHERE station BETWEEN ${quote(stations.reduce((a, b) => (a < b ? a : b)))} AND ${quote(stations.reduce((a, b) => (a > b ? a : b)))} AND station IN (${stations.map(quote).join(", ")})`
     : "";
-  let rows;
-  try {
-    rows = await read(path, `${select}, epoch`, "station, time", "", where);
-  } catch (error) {
-    // A file written before epochs has none, and every row in it is epoch 1.
-    if (!/column "epoch"/i.test(String(error))) throw error;
-    rows = await read(path, `${select}, 1 AS epoch`, "station, time", "", where);
-  }
-  return rows.map((r) => {
-    const o: StationObservation = {
-      station: String(r.station),
-      time: Number(r.time),
-      level: level(r.level_m),
-      flag: r.flag as Flag,
-      epoch: Number(r.epoch),
-    };
-    if (r.received !== null) o.received = Number(r.received);
-    return o;
-  });
+  // Every column, since older files lack some: one written before epochs has
+  // no `epoch`, and every row in it is epoch 1; one written before
+  // `source_flag` was kept has none.
+  const rows = await read(path, OBSERVATION_COLUMNS, "station, time", "", where);
+  return rows.map((r) => ({
+    station: String(r.station),
+    ...observation(r),
+    epoch: r.epoch == null ? 1 : Number(r.epoch),
+  }));
 }
 
 const STATION_COLUMNS: Record<keyof Station, string> = {
@@ -471,7 +465,8 @@ type Cell = number | string | null;
 
 /**
  * Append rows to a scratch table with columns (time_ms, level_m, flag,
- * received_ms, type, station, transit, event) and copy the named columns out.
+ * received_ms, type, station, transit, event, epoch, source_flag) and copy the
+ * named columns out.
  */
 function copyRows<T>(
   path: string,
@@ -505,7 +500,7 @@ async function createTable(): Promise<string> {
   const db = await connection();
   const table = `rows_${Math.random().toString(36).slice(2)}`;
   await db.run(
-    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER)`,
+    `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT, epoch INTEGER, source_flag UTINYINT)`,
   );
   return table;
 }
@@ -514,7 +509,18 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
   const db = await connection();
   const appender = await db.createAppender(table);
   for (const row of rows) {
-    const [time, level, flag, received, type, station, transit, event, epoch = null] = cells(row);
+    const [
+      time,
+      level,
+      flag,
+      received,
+      type,
+      station,
+      transit,
+      event,
+      epoch = null,
+      sourceFlag = null,
+    ] = cells(row);
     appender.appendDouble(time as number);
     appender.appendFloat(level as number);
     appender.appendUTinyInt(flag as number);
@@ -524,6 +530,7 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
     transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
     event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
     epoch === null ? appender.appendNull() : appender.appendInteger(epoch as number);
+    sourceFlag === null ? appender.appendNull() : appender.appendUTinyInt(sourceFlag as number);
     appender.endRow();
   }
   appender.closeSync();

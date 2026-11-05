@@ -102,6 +102,13 @@ describe("updateRecent", () => {
     await writeRecent(path, [
       [
         { ...at(NOW - 8 * DAY, 0.1, NOW - 8 * DAY), station: a.id, epoch: 1 }, // past the 7 days
+        // Before the fetch, with a flag QC may have marked.
+        {
+          ...at(NOW - 10 * HOUR, 0.15, NOW - 10 * HOUR),
+          flag: Flag.suspect,
+          station: a.id,
+          epoch: 1,
+        },
         { ...at(NOW - 3 * HOUR, 0.2, NOW - 3 * HOUR), station: a.id, epoch: 1 }, // seen before
       ],
     ]);
@@ -113,11 +120,18 @@ describe("updateRecent", () => {
       now: NOW,
     });
     assert.deepEqual(
-      (await readRecent(path)).map((r) => [r.time - NOW, r.level, r.received! - NOW]),
+      (await readRecent(path)).map((r) => [
+        r.time - NOW,
+        r.level,
+        r.received! - NOW,
+        r.source_flag,
+      ]),
       [
+        // Only fetched values carry the source's flag.
+        [-10 * HOUR, 0.15, -10 * HOUR, undefined],
         // A revised value takes the new level and keeps its first arrival.
-        [-3 * HOUR, 0.25, -3 * HOUR],
-        [-HOUR, 0.3, 0],
+        [-3 * HOUR, 0.25, -3 * HOUR, Flag.preliminary],
+        [-HOUR, 0.3, 0, Flag.preliminary],
       ],
     );
     assert.deepEqual(
@@ -753,6 +767,43 @@ describe("compactRecent", () => {
     );
   });
 
+  it("keeps a verified value QC marked suspect over the window's preliminary one", async () => {
+    const root = lake();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    const verified: Observation = {
+      time: start + HOUR,
+      level: 0.5,
+      flag: Flag.suspect,
+      source_flag: Flag.good,
+    };
+    await writeObservations(file, [verified], "NAP");
+    await writeRecent(recentPath(root, "test"), [
+      [
+        {
+          ...at(start + HOUR, 1, start + HOUR),
+          source_flag: Flag.preliminary,
+          station: a.id,
+          epoch: 1,
+        },
+        {
+          ...at(start + 2 * HOUR, 2, start + 2 * HOUR),
+          source_flag: Flag.preliminary,
+          station: a.id,
+          epoch: 1,
+        },
+      ],
+    ]);
+    await compactRecent({ source: source({}), stations: [a], lakeFor: () => root, start, end });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => [r.level, r.flag, r.source_flag]),
+      [
+        [0.5, Flag.suspect, Flag.good],
+        [2, Flag.preliminary, Flag.preliminary],
+      ],
+    );
+  });
+
   it("leaves a file in another datum as it was, and counts silent stations stale", async () => {
     const root = lake();
     const [a, quiet, archive] = [
@@ -791,14 +842,33 @@ describe("upsert", () => {
     assert.deepEqual(upsert([at(1, 1, 5)], [at(1, 1, 10)]), [at(1, 1, 5)]);
   });
 
-  it("keeps a finalized value over any unfinalized one, whatever QC made of it", () => {
-    const verified: Observation = { time: 1, level: 1, flag: Flag.good };
-    assert.deepEqual(upsert([verified], [at(1, 1.2, 5)]), [verified]);
-    const suspect: Observation = { time: 1, level: 1.3, flag: Flag.suspect, received: 5 };
-    assert.deepEqual(upsert([verified], [suspect]), [verified]);
+  it("keeps a value the source finalized over one it hasn't, whatever QC made of either", () => {
+    const verified: Observation = { time: 1, level: 1, flag: Flag.good, source_flag: Flag.good };
+    const unchecked = (flag: Flag, source_flag: Flag): Observation => ({
+      time: 1,
+      level: 1.2,
+      flag,
+      source_flag,
+      received: 5,
+    });
+    assert.deepEqual(upsert([verified], [unchecked(Flag.preliminary, Flag.preliminary)]), [
+      verified,
+    ]);
+    assert.deepEqual(upsert([verified], [unchecked(Flag.suspect, Flag.preliminary)]), [verified]);
+    // An unchecked value the source flagged, such as RWS with a quality code.
+    assert.deepEqual(upsert([verified], [unchecked(Flag.suspect, Flag.suspect)]), [verified]);
+    // QC's mark on a verified value doesn't make it unfinalized.
+    const marked: Observation = { ...verified, flag: Flag.suspect };
+    assert.deepEqual(upsert([marked], [unchecked(Flag.preliminary, Flag.preliminary)]), [marked]);
     // A finalized value replaces another, keeping the file's unknown arrival.
-    const reverified: Observation = { time: 1, level: 1.1, flag: Flag.good, received: 5 };
-    assert.deepEqual(upsert([verified], [reverified]), [{ time: 1, level: 1.1, flag: Flag.good }]);
+    const reverified: Observation = { ...verified, level: 1.1, received: 5 };
+    assert.deepEqual(upsert([verified], [reverified]), [{ ...verified, level: 1.1 }]);
+  });
+
+  it("judges a row from before source flags were kept by its flag", () => {
+    const old: Observation = { time: 1, level: 1, flag: Flag.good };
+    assert.deepEqual(upsert([old], [at(1, 1.2, 5)]), [old]);
+    assert.deepEqual(upsert([{ ...old, flag: Flag.suspect }], [at(1, 1.2, 5)]), [at(1, 1.2)]);
   });
 });
 

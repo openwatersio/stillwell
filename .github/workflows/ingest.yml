@@ -17,9 +17,9 @@ on:
 
 jobs:
   # A command for one source shares that source's group with the scheduled
-  # jobs, so a backfill and a compaction never rewrite one year file at once,
-  # and a refresh never changes a list while they read it. `stations` for
-  # several sources, or all, takes the `lake` group.
+  # jobs, so a backfill and a compaction never rewrite one year file at once.
+  # `stations` takes the `lake` group whatever its sources, since every run
+  # rebuilds stations.parquet from all the lists.
   group:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -43,8 +43,7 @@ jobs:
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact) group="lake-${words[1]:-}" ;;
-            stations) [ "${#words[@]}" -eq 2 ] && group="lake-${words[1]}" || group=lake ;;
+            backfill | recent | compact) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
             *) group=lake ;;
           esac
           echo "name=$group" >> "$GITHUB_OUTPUT"

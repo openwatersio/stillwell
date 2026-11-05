@@ -67,16 +67,19 @@ function canonical(row: object): string {
  * Every row of both series, so folding the recent window into a year file
  * never drops a value the file had. Where both have a time, `incoming` wins on
  * level and flag, except that a value the source hasn't finalized never
- * replaces one it has (good or interpolated), such as a verified backfill,
- * whatever QC made of the unfinalized one. The
- * row keeps the file's `received`, earlier or unknown: a value backfilled
- * before the window saw it arrive has no first arrival on record, not the
- * window's.
+ * replaces one it has (good or interpolated), such as a verified backfill.
+ * Both are judged by the source's flag, not QC's, so a verified value QC
+ * marked suspect is still finalized. Adapters fold "not yet checked" and "the
+ * source flagged it" into one flag, so a source's suspect or bad doesn't say
+ * whether it checked the value; a revision of a finalized value arrives
+ * through backfill, which replaces what it fetched. A row from before
+ * `source_flag` was kept is judged by `flag`. The row keeps the file's
+ * `received`, earlier or unknown: a value backfilled before the window saw it
+ * arrive has no first arrival on record, not the window's.
  */
-export function upsert<T extends { time: number; flag: number; received?: number }>(
-  existing: T[],
-  incoming: T[],
-): T[] {
+export function upsert<
+  T extends { time: number; flag: number; source_flag?: number; received?: number },
+>(existing: T[], incoming: T[]): T[] {
   const byTime = new Map(existing.map((r) => [r.time, r]));
   for (const row of incoming) {
     const before = byTime.get(row.time);
@@ -84,7 +87,9 @@ export function upsert<T extends { time: number; flag: number; received?: number
       byTime.set(row.time, row);
       continue;
     }
-    const finalized = before.flag <= Flag.interpolated && row.flag > Flag.interpolated;
+    const finalized =
+      (before.source_flag ?? before.flag) <= Flag.interpolated &&
+      (row.source_flag ?? row.flag) > Flag.interpolated;
     const next = { ...(finalized ? before : row) };
     const received =
       before.received === undefined

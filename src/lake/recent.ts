@@ -1,4 +1,4 @@
-import { qc, type QcOptions } from "../qc.ts";
+import { qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import { isHeld, recentWindow } from "../epochs.ts";
 import type { Epoch, LakeStation, Observation, Source, Station } from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
@@ -187,7 +187,7 @@ export async function updateRecent({
           // Nothing new keeps what we had, rather than clearing the last hours.
           if (got.length)
             merged = qc(
-              mergeFetched(window.current, got, window.from, now, now),
+              mergeFetched(window.current, withSourceFlag(got), window.from, now, now),
               qcFor(source, station),
             );
         } catch (error) {
