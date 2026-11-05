@@ -9,7 +9,6 @@ import {
   type SourceMetadata,
   type Station,
 } from "../../schema.ts";
-import { TIDAL_SITES } from "./tidal-sites.ts";
 
 /**
  * USGS water data through the OGC API (api.waterdata.usgs.gov/ogcapi/v1), which
@@ -66,13 +65,6 @@ const VERTICAL_DATUMS: Record<string, string> = {
   LMSL: "LMSL",
 };
 
-/**
- * HUC regions of the Mississippi and Ohio basins whose river stage crowd-depth
- * reduces soundings with: the Ohio (05), Tennessee (06), Upper (07) and Lower
- * (08) Mississippi.
- */
-const RIVER_REGIONS = new Set(["05", "06", "07", "08"]);
-
 const FEET = 0.3048;
 const DAY_MS = 86_400_000;
 
@@ -109,12 +101,16 @@ interface Collection<T> {
  * A USGS station as listed, with the series its levels come from. They're kept
  * in the committed list only; `stations.parquet` doesn't carry them.
  */
-export type UsgsStation = ListedStation & { time_series_id: string; parameter_code: string };
+export type UsgsStation = ListedStation & {
+  time_series_id: string;
+  parameter_code: string;
+  /** When the series began, so backfill doesn't ask for years before it. */
+  series_begin: string | null;
+  /** When a series that stopped reporting ended; null while it's live, so the list doesn't change with every refresh. */
+  series_end: string | null;
+};
 
-/**
- * Tidal and estuary sites, low-lying streams and river stage in the Mississippi
- * and Ohio basins, each with its preferred water-level series.
- */
+/** Every USGS-run site with a water-level series, each with its preferred one. */
 export async function stations(): Promise<UsgsStation[]> {
   const series: ApiSeries[] = [];
   for (const [parameter] of PARAMETERS) {
@@ -174,8 +170,8 @@ export async function stations(): Promise<UsgsStation[]> {
   for (const [id, s] of chosen) {
     const location = locations.get(id);
     if (!location?.geometry || location.properties.agency_code !== "USGS") continue;
-    const kind = kindOf(location.properties, tidal.has(id) || TIDAL_SITES.has(id));
-    if (kind) out.push(toStation(location.properties, location.geometry.coordinates, s, kind));
+    const kind = kindOf(location.properties, tidal.has(id));
+    out.push(toStation(location.properties, location.geometry.coordinates, s, kind));
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -233,36 +229,19 @@ function before(a: number[], b: number[]): boolean {
 }
 
 /**
- * Which sites are water-level stations, and what kind: coastal and estuary
- * sites, sites USGS treats as tidal, streams whose gage datum is below sea
- * level, and river stage in the Mississippi and Ohio basins. Null for the rest.
+ * A station's kind, from what USGS itself says about the site: its site type,
+ * and whether it measures a tidal-only parameter or computes daily tidal highs
+ * and lows there. Whether a stream is tidal is otherwise left to whoever reads
+ * the levels; a guess here would set QC's flatline rule on a hunch.
  */
-export function kindOf(
-  location: Pick<
-    ApiLocation,
-    "site_type_code" | "hydrologic_unit_code" | "altitude" | "vertical_datum"
-  >,
-  tidal: boolean,
-): Kind | null {
+export function kindOf(location: Pick<ApiLocation, "site_type_code">, tidal: boolean): Kind {
   const type = location.site_type_code ?? "";
-  const huc = location.hydrologic_unit_code ?? "";
   if (type === "OC" || type === "OC-CO") return "coastal";
   if (type === "ES" || type === "ST-TS" || tidal) return "estuary";
-  if (!type.startsWith("ST")) return null;
-  // A gage datum below sea level is a reach the tide can reach, except in the
-  // closed Salton Sea basin (HUC 1810). An altitude of exactly 0 isn't a sign:
-  // it's where USGS sets the gage datum to NAVD88 itself, inland too.
-  const belowSeaLevel =
-    location.altitude !== null &&
-    location.vertical_datum !== null &&
-    location.vertical_datum in VERTICAL_DATUMS &&
-    location.altitude < 0 &&
-    !huc.startsWith("1810");
-  // The Lower Mississippi-Lake Maurepas subregion (0809) is Louisiana's coast,
-  // where gages sit in tidal bayous, canals and sector gates.
-  if (belowSeaLevel || huc.startsWith("0809")) return "estuary";
-  if (type === "ST" && RIVER_REGIONS.has(huc.slice(0, 2))) return "river";
-  return null;
+  // Lakes, reservoirs and impoundments, and wetlands, whose water sits still.
+  if (type === "LK" || type === "WE") return "lake";
+  // Streams, canals, ditches, springs and facilities such as diversions.
+  return "river";
 }
 
 /** US territories `monitoring-locations` lists under the United States. */
@@ -311,7 +290,20 @@ function toStation(
     source_url: `https://waterdata.usgs.gov/monitoring-location/${location.id}/`,
     time_series_id: series.id,
     parameter_code: series.parameter_code,
+    series_begin: series.begin,
+    series_end: live ? null : series.end,
   };
+}
+
+/** The part of [start, end) the station's series covers, or null when it covers none of it. */
+export function within(station: Station, start: Date, end: Date): [Date, Date] | null {
+  const s = station as Station & Partial<UsgsStation>;
+  const from = s.series_begin
+    ? Math.max(start.getTime(), Date.parse(s.series_begin))
+    : start.getTime();
+  // The end is inclusive, so a value stamped at it is kept.
+  const to = s.series_end ? Math.min(end.getTime(), Date.parse(s.series_end) + 1) : end.getTime();
+  return from < to ? [new Date(from), new Date(to)] : null;
 }
 
 interface Value {
@@ -512,7 +504,8 @@ function* years(start: Date, end: Date): Generator<[Date, Date]> {
  * isn't either: values can arrive late, and an outage can answer with none.
  */
 export function approved(text: string): boolean {
-  return /"approval_status"\s*:\s*"Approved"/.test(text) && !text.includes('"Provisional"');
+  const statuses = [...text.matchAll(/"approval_status"\s*:\s*("[^"]*"|null)/g)].map((m) => m[1]);
+  return statuses.length > 0 && statuses.every((status) => status === '"Approved"');
 }
 
 /** Every item of a collection, following `next` links. */
@@ -635,6 +628,10 @@ export const source: Source = {
   metadata,
   stations,
   seriesChanged,
-  observations: (s: Station, start, end) => levels(checked(s), start, end),
+  observations: async (s: Station, start, end) => {
+    const id = checked(s);
+    const range = within(s, start, end);
+    return range ? levels(id, ...range) : [];
+  },
   recent,
 };

@@ -354,12 +354,15 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
 }
 
 /**
- * Pooled rivers hold one stage, to the hundredth of a foot, for a day or more,
- * so river stations get two days before a flatline counts as suspect. Tidal
- * reaches are estuary stations, and tide gauges never sit still that long.
+ * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
+ * or more, so they get two days before a flatline counts as suspect. And they
+ * sit nearly flat for months and then rise meters in a flood, so a level far
+ * outside their own range isn't suspect for that alone. Tide gauges never sit
+ * still that long, and keep the defaults.
  */
 function qcFor(source: Source, station: Station): QcOptions {
-  return { ...source.metadata.qc, ...(station.kind === "river" ? { flatline_s: 48 * 3600 } : {}) };
+  const still = station.kind === "river" || station.kind === "lake";
+  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
 }
 
 async function committedStations(sourceId: string): Promise<Station[]> {

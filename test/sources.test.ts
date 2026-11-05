@@ -1224,7 +1224,7 @@ describe("usgs", () => {
       links: next ? [{ rel: "next", type: "application/geo+json", href: next }] : [],
     });
 
-  it("lists tidal sites and Mississippi and Ohio river stage, in gage datum where there's gage height", async () => {
+  it("lists every site with a water-level series, in gage datum where there's gage height", async () => {
     serve([
       [
         /parameter_code=00065/,
@@ -1290,7 +1290,7 @@ describe("usgs", () => {
             altitude: 270,
             vertical_datum: "NGVD29",
           }),
-          // The Missouri at Hermann is outside the basins crowd-depth needs.
+          // The Missouri at Hermann, outside the Mississippi and Ohio basins, is listed too.
           location("06934500", -91.44, 38.71, {
             hydrologic_unit_code: "10300200",
             altitude: 481.6,
@@ -1313,6 +1313,8 @@ describe("usgs", () => {
         // Gage height is preferred to an elevation series at the same site.
         ["usgs/02198820", "estuary", "GAGE", { NAVD88: 0 }, "02198820-00065", true, "US"],
         ["usgs/03612600", "river", "GAGE", { NGVD29: 82.296 }, "head", true, "US"],
+        // Its gage height ended in 2001; a station still, just not live.
+        ["usgs/06934500", "river", "GAGE", { NAVD88: 146.792 }, "06934500-00065", false, "US"],
         ["usgs/07010000", "river", "GAGE", { NAVD88: 115.696 }, "07010000-00065", true, "US"],
         ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
         ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
@@ -1324,27 +1326,16 @@ describe("usgs", () => {
     );
   });
 
-  it("takes a gage datum below sea level as tidal, but not one set at NAVD88 itself", () => {
-    const at = (
-      altitude: number | null,
-      hydrologic_unit_code = "03060109",
-      site_type_code = "ST",
-    ) =>
-      usgs.kindOf(
-        { site_type_code, hydrologic_unit_code, altitude, vertical_datum: "NAVD88" },
-        false,
-      );
+  it("takes a station's kind from USGS's own site type and tidal series, not from its basin or altitude", () => {
+    const kind = (site_type_code: string, tidal = false) => usgs.kindOf({ site_type_code }, tidal);
     assert.deepEqual(
-      [
-        at(-2.5),
-        at(0),
-        at(0, "08020204"),
-        at(0, "08090203"),
-        at(-30, "18100200"),
-        at(5, "03060109", "LK"),
-      ],
-      // Coastal Louisiana (0809) is tidal; the Salton Sea basin (1810) is below sea level but closed to the tide.
-      ["estuary", null, "river", "estuary", null, null],
+      [kind("OC"), kind("OC-CO"), kind("ES"), kind("ST-TS"), kind("ST", true)],
+      ["coastal", "coastal", "estuary", "estuary", "estuary"],
+    );
+    assert.deepEqual([kind("LK"), kind("WE")], ["lake", "lake"]);
+    assert.deepEqual(
+      [kind("ST"), kind("ST-CA"), kind("ST-DCH"), kind("SP"), kind("FA-DV")],
+      ["river", "river", "river", "river", "river"],
     );
   });
 
@@ -1454,16 +1445,50 @@ describe("usgs", () => {
     assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
   });
 
+  it("asks only for the years a station's series covers", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(new URL(url).searchParams.get("datetime")!);
+      return collection([]);
+    });
+    const station = {
+      id: "usgs/06934500",
+      datum: "GAGE",
+      time_series_id: "x",
+      parameter_code: "00065",
+      series_begin: "2014-06-04T04:00:00+00:00",
+      series_end: "2016-03-01T00:00:00+00:00",
+    } as never;
+    const fetch = (from: number, to: number) =>
+      usgs.source.observations!(station, new Date(Date.UTC(from, 0)), new Date(Date.UTC(to, 0)));
+    await fetch(2007, 2027);
+    assert.deepEqual(asked, [
+      "2014-06-04T04:00:00.000Z/2015-01-01T00:00:00.000Z",
+      "2015-01-01T00:00:00.000Z/2016-01-01T00:00:00.000Z",
+      "2016-01-01T00:00:00.000Z/2016-03-01T00:00:00.001Z",
+    ]);
+    asked.length = 0;
+    await fetch(2020, 2021);
+    assert.deepEqual(asked, []);
+  });
+
   it("caches a page only when every value on it is approved", () => {
-    const page = (statuses: string[]) =>
+    const page = (statuses: (string | null)[]) =>
       JSON.stringify(
         { features: statuses.map((approval_status) => ({ properties: { approval_status } })) },
         null,
         2,
       );
     assert.deepEqual(
-      [page(["Approved"]), page(["Approved", "Provisional"]), page([])].map(usgs.approved),
-      [true, false, false],
+      [
+        page(["Approved"]),
+        page(["Approved", "Provisional"]),
+        page([]),
+        // A value with no status, or one USGS adds later, isn't approved either.
+        page(["Approved", null]),
+        page(["Approved", "Working"]),
+      ].map(usgs.approved),
+      [true, false, false, false, false],
     );
   });
 
