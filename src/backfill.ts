@@ -1,4 +1,4 @@
-import type { YearFile } from "./lake/parquet.ts";
+import { listYears, readYearFiles, type YearFile } from "./lake/parquet.ts";
 import type { Station } from "./schema.ts";
 
 const DAY_MS = 86_400_000;
@@ -80,12 +80,20 @@ export function parseStationList(text: string, sourceId: string, csv: boolean): 
   return [...new Set(ids)];
 }
 
-/** A CSV line's fields, with quoted fields unquoted. */
+/** A CSV line's fields, with quoted fields unquoted and empty fields kept. */
 function csvFields(line: string): string[] {
-  return [...line.matchAll(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g)].map((m) => {
-    const field = m[1]!;
-    return field.startsWith('"') ? field.slice(1, -1).replaceAll('""', '"') : field;
-  });
+  const fields = [""];
+  let quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i]!;
+    if (quoted && c === '"' && line[i + 1] === '"') {
+      fields[fields.length - 1] += '"';
+      i++;
+    } else if (c === '"') quoted = !quoted;
+    else if (c === "," && !quoted) fields.push("");
+    else fields[fields.length - 1] += c;
+  }
+  return fields;
 }
 
 /** The stations named in `first`, in its order, then the rest in theirs. */
@@ -126,4 +134,40 @@ export function parseShard(value: string): [number, number] {
   const match = /^(\d+)\/(\d+)$/.exec(value);
   if (!match) throw new Error(`--shard takes INDEX/COUNT, such as 2/8, not ${value}`);
   return [Number(match[1]), Number(match[2])];
+}
+
+/**
+ * Which years of one station's series backfill fetches over [start, end), and
+ * how many it skips: `complete` skips what `yearDone` calls done, from one read
+ * of the series directory; `written` skips what `yearWritten` does, from a
+ * listing alone; `none` fetches every year. A failed read throws, so the
+ * caller fails the series rather than fetch every year again.
+ */
+export async function yearsToFetch(
+  dir: string,
+  start: Date,
+  end: Date,
+  mode: "complete" | "written" | "none",
+  now: number,
+): Promise<{ fetch: [Date, Date][]; skipped: number }> {
+  let done: (from: Date, to: Date) => boolean = () => false;
+  if (mode === "written") {
+    const listed = await listYears(dir);
+    done = (from, to) => yearWritten(listed, from, to, now);
+  } else if (mode === "complete") {
+    const files = await readYearFiles(dir);
+    done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
+  }
+  const all = [...years(start, end)];
+  const fetch = all.filter(([from, to]) => !done(from, to));
+  return { fetch, skipped: all.length - fetch.length };
+}
+
+/** [start, end) split at UTC year boundaries. */
+export function* years(start: Date, end: Date): Generator<[Date, Date]> {
+  for (let t = start.getTime(); t < end.getTime();) {
+    const next = Date.UTC(new Date(t).getUTCFullYear() + 1, 0, 1);
+    yield [new Date(t), new Date(Math.min(next, end.getTime()))];
+    t = next;
+  }
 }

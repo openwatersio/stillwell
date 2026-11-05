@@ -19,8 +19,9 @@
  * has a file, complete or not, so a long campaign of runs doesn't fetch
  * provisional years again each time. `--first` names a file of station IDs to
  * run before the rest, and `--shard 2/8` takes the second of eight sets of
- * stations, split by a hash of their IDs, so separate jobs can split them. `recent` fetches the last hours for every live station
- * and merges them into recent/<source>.parquet.
+ * stations, split by a hash of their IDs, so separate jobs can split them.
+ * `recent` fetches the last hours for every live station and merges them into
+ * recent/<source>.parquet.
  *
  * Files carry no datum of their own, so a station the source now reports in
  * another datum is marked inactive, and `stations` lists it and exits nonzero
@@ -41,16 +42,13 @@ import {
   parseShard,
   parseStationList,
   shard,
-  yearDone,
-  yearWritten,
+  yearsToFetch,
 } from "../src/backfill.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   readExtremes,
   readDatums,
-  readYearFiles,
-  listYears,
   readObservations,
   checkRecent,
   readRecent,
@@ -259,6 +257,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const window = source.metadata.window_days;
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
   const now = Date.now();
+  const mode = values["skip-written"] ? "written" : values.refetch ? "none" : "complete";
   console.log(`${sourceId}: backfilling ${wanted.length} stations`);
 
   const failed: string[] = [];
@@ -267,25 +266,16 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     for (const product of station.products) {
       // One read per series tells which years are done, rather than one per year;
       // --skip-written needs only a listing.
-      let done: (from: Date, to: Date) => boolean = () => false;
+      let plan;
       try {
         const dir = seriesDir(lakeFor(station), product, station.source, station.source_id);
-        if (values["skip-written"]) {
-          const listed = await listYears(dir);
-          done = (from, to) => yearWritten(listed, from, to, now);
-        } else if (!values.refetch) {
-          const files = await readYearFiles(dir);
-          done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
-        }
+        plan = await yearsToFetch(dir, start, end, mode, now);
       } catch (error) {
         failed.push(`${station.id} ${product}: ${error instanceof Error ? error.message : error}`);
         continue;
       }
-      for (const [from, to] of years(start, end)) {
-        if (done(from, to)) {
-          skipped++;
-          continue;
-        }
+      skipped += plan.skipped;
+      for (const [from, to] of plan.fetch) {
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
         try {
           const written = await backfillYear(source, station, product, from, to);
@@ -297,8 +287,9 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       }
     }
   });
-  const why = values["skip-written"] ? "already written" : "already complete";
-  console.log(`${sourceId}: skipped ${skipped} years ${why}, ${failed.length} failed`);
+  const why = { written: "already written", complete: "already complete", none: "" }[mode];
+  if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
+  console.log(`${sourceId}: ${failed.length} failed`);
   for (const f of failed) console.error(`  ${f}`);
   if (failed.length) process.exitCode = 1;
 }
@@ -461,15 +452,6 @@ function find(list: Station[], sourceId: string, id: string): Station {
   const station = list.find((s) => s.id === id || s.id === `${sourceId}/${id}`);
   if (!station) throw new Error(`No station ${id} in stations/${sourceId}.json`);
   return station;
-}
-
-/** [start, end) split at UTC year boundaries. */
-function* years(start: Date, end: Date): Generator<[Date, Date]> {
-  for (let t = start.getTime(); t < end.getTime();) {
-    const next = Date.UTC(new Date(t).getUTCFullYear() + 1, 0, 1);
-    yield [new Date(t), new Date(Math.min(next, end.getTime()))];
-    t = next;
-  }
 }
 
 function parseDate(value: string): Date {

@@ -70,7 +70,7 @@ Backfill skips a year whose file is already complete: a past year, asked for who
 node scripts/ingest.ts backfill usgs all 2007 2026 --skip-written --first docs/ticon-replacement.csv
 ```
 
-`--shard 2/8` takes the second of eight sets of stations, split by a hash of their IDs so a station's shard never changes, for separate jobs. The Ingest workflow runs one job at a time (`concurrency: lake` keeps one pending and cancels the rest), so there a shard gains nothing over one resumed run; shards are for jobs that can run at once, such as a matrix workflow, which doesn't exist yet.
+`--shard 2/8` takes the second of eight sets of stations, split by a hash of their IDs so a station's shard never changes, for separate jobs. The Ingest workflow runs one job at a time (`concurrency: lake` keeps one pending and cancels the rest), so there dispatch each shard after the last one finishes. That's how the current year gets backfilled: both modes fetch a year still under way in full on every run, so a run over it never resumes, and it has to be split into shards that each fit in one run, such as `backfill usgs all 2026 2027 --shard 1/3`, then `2/3` and `3/3`. Shards running at once need a matrix workflow, which doesn't exist yet.
 
 Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`):
 

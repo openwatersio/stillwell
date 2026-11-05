@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -10,6 +10,7 @@ import {
   shard,
   yearDone,
   yearWritten,
+  yearsToFetch,
 } from "../src/backfill.ts";
 import { listYears, readYearFiles, writeObservations } from "../src/lake/parquet.ts";
 import { seriesDir, seriesPath } from "../src/lake/paths.ts";
@@ -117,6 +118,53 @@ describe("readYearFiles", () => {
   });
 });
 
+describe("yearsToFetch", () => {
+  const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+  const dir = seriesDir(root, "levels", "usgs", "07010000");
+  const y2023 = new Date(Date.UTC(2023, 0, 1));
+  const y2027 = new Date(Date.UTC(2027, 0, 1));
+  const year = ([from]: [Date, Date]) => from.getUTCFullYear();
+  // A whole 2023, December 2024 alone, and part of 2026 (the current year).
+  const monthly = (y: number, months: number[], flag: Flag) =>
+    months.map((m) => ({ time: Date.UTC(y, m, 28, 12), level: 1, flag }));
+
+  it("fetches only the years that aren't complete, or with --skip-written, not written", async () => {
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", "07010000", 2023),
+      [...monthly(2023, [...Array(12).keys()], Flag.good)],
+      "GAGE",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", "07010000", 2024),
+      monthly(2024, [11], Flag.good),
+      "GAGE",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", "07010000", 2026),
+      monthly(2026, [0, 1, 2], Flag.preliminary),
+      "GAGE",
+    );
+    const complete = await yearsToFetch(dir, y2023, y2027, "complete", NOW);
+    assert.deepEqual(complete.fetch.map(year), [2024, 2025, 2026]);
+    assert.equal(complete.skipped, 1);
+    const written = await yearsToFetch(dir, y2023, y2027, "written", NOW);
+    assert.deepEqual(written.fetch.map(year), [2025, 2026]);
+    assert.equal(written.skipped, 2);
+    const none = await yearsToFetch(dir, y2023, y2027, "none", NOW);
+    assert.deepEqual(none.fetch.map(year), [2023, 2024, 2025, 2026]);
+    assert.equal(none.skipped, 0);
+  });
+
+  it("throws on an unreadable file, rather than fetch every year again", async () => {
+    const bad = seriesDir(root, "levels", "usgs", "broken");
+    mkdirSync(bad, { recursive: true });
+    writeFileSync(join(bad, "2023.parquet"), "not parquet");
+    await assert.rejects(yearsToFetch(bad, y2023, y2027, "complete", NOW));
+    // A listing doesn't open the files.
+    assert.equal((await yearsToFetch(bad, y2023, y2027, "written", NOW)).skipped, 1);
+  });
+});
+
 describe("parseStationList", () => {
   it("reads a plain list, bare or with the source, skipping comments and other sources", () => {
     const text = "# TICON first\n07010000\nusgs/02198820  # Abercorn\n\ncoops/8761724\n07010000\n";
@@ -142,6 +190,11 @@ describe("parseStationList", () => {
     );
     assert.ok(ids.length > 400);
     assert.ok(ids.every((id) => /^usgs\/\d+$/.test(id)));
+  });
+
+  it("keeps an empty first field, so the columns after it stay in place", () => {
+    const text = "ticon_id,name,replacement_id\n,Name,usgs/02198820\n,,usgs/01410600";
+    assert.deepEqual(parseStationList(text, "usgs", true), ["usgs/02198820", "usgs/01410600"]);
   });
 
   it("refuses a CSV with no station column", () => {
