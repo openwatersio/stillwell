@@ -13,6 +13,8 @@ export interface RequestOptions extends RequestInit {
   pace?: () => Promise<void>;
   /** Told how many seconds a throttled request will wait before its retry, so the source can hold its other requests as long. */
   throttled?: (seconds: number) => void;
+  /** Return the body as base64, for a binary file such as a zip. */
+  base64?: boolean;
 }
 
 export type Transport = (url: string, options: RequestOptions) => Promise<string>;
@@ -37,13 +39,14 @@ export async function getJson<T>(url: string, options?: RequestOptions): Promise
  */
 export async function fetchText(
   url: string,
-  { fresh: _, keep: __, pace, throttled, ...init }: RequestOptions = {},
+  { fresh: _, keep: __, pace, throttled, base64, ...init }: RequestOptions = {},
 ): Promise<string> {
   return fetchWithRetry(
     url,
     { ...init, headers: { "user-agent": USER_AGENT, ...init.headers } },
     pace,
     throttled,
+    base64,
   );
 }
 
@@ -59,6 +62,7 @@ async function fetchWithRetry(
   init: RequestInit,
   pace?: () => Promise<void>,
   throttled?: (seconds: number) => void,
+  base64 = false,
   attempts = 4,
 ): Promise<string> {
   for (let attempt = 1; ; attempt++) {
@@ -68,6 +72,9 @@ async function fetchWithRetry(
     try {
       // A year of RWS data is about 15 MB and can take a minute.
       const response = await fetch(url, { ...init, signal: AbortSignal.timeout(300_000) });
+      // Node's Buffer; Uint8Array.toBase64 arrives after Node 24.
+      if (response.ok && base64)
+        return Buffer.from(await response.arrayBuffer()).toString("base64");
       if (response.ok) return await response.text();
       status = response.status;
       retryAfter = Number(response.headers.get("retry-after")) || 0;
