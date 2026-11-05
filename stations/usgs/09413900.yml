@@ -1,0 +1,17 @@
+name: BEAVER DAM WASH NEAR ENTERPRISE, UT
+lat: 37.46996127348364
+lon: -114.04664830779222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1444.914
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09413900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2024-10-18T18:30:00+00:00
+time_series_id: 2c03779ed4d443c3bd4062d4e8173914

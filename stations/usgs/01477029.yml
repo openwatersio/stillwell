@@ -1,0 +1,13 @@
+name: Chester Creek near mouth at Chester, PA
+lat: 39.8447222222222
+lon: -75.3597222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01477029/
+parameter_code: "62620"
+time_series_id: 0f86477f960046749d7c1a9e91d52ab6

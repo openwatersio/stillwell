@@ -1,0 +1,16 @@
+name: N FK CACHE LA POUDRE R BLW HALLIGAN RES NR VA DALE
+lat: 40.878333
+lon: -105.3375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1912.836
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06751150/
+parameter_code: "00065"
+series_begin: 2020-10-16T22:15:00+00:00
+time_series_id: 9151b86994da4945be1239fd1357db2f

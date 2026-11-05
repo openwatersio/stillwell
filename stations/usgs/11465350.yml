@@ -1,0 +1,16 @@
+name: DRY C NR MOUTH NR HEALDSBURG CA
+lat: 38.587370093074306
+lon: -122.8621784486693
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 17.282
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11465350/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: c7f514638d0a475986e03f4048b36ce9

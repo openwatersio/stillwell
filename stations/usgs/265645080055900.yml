@@ -1,0 +1,13 @@
+name: LOXAHATCHEE RIVER AT POMPANO DRIVE NR JUPITER FL
+lat: 26.9461686871973
+lon: -80.0994866765817
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-265645080055900/
+parameter_code: "00065"
+time_series_id: dba518e75a5b447f945a633a58f79e2f

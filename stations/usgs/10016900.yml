@@ -1,0 +1,16 @@
+name: BEAR RIVER AT EVANSTON, WY
+lat: 41.2698611111111
+lon: -110.963694444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2051.304
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10016900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 310fb79fced94dbe8a65e71ca4e34995

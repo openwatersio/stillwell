@@ -1,0 +1,16 @@
+name: Trinity Rv at Dallas, TX
+lat: 32.7748517183903
+lon: -96.8219463868768
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.118
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08057000/
+parameter_code: "00065"
+series_begin: 2014-10-31T05:00:00+00:00
+time_series_id: 0946ad249b03418295fcd99645e7c803

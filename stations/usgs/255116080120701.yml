@@ -1,0 +1,15 @@
+name: EL PORTAL TRAIL AT NW 2ND AVE NR EL PORTAL, FL
+lat: 25.854667
+lon: -80.202111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255116080120701/
+parameter_code: "00065"
+series_begin: 2024-11-07T23:15:00+00:00
+series_end: 2026-10-13T22:15:00+00:00
+time_series_id: 31f37bbe35534459969a0a94bb0b06a2

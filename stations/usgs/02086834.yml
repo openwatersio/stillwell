@@ -1,0 +1,15 @@
+name: ELLERBE CR 0.51 MILE BELOW SR1669 NEAR WEAVER, NC
+lat: 36.0344805555556
+lon: -78.8607472222222
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02086834/
+parameter_code: "63160"
+series_begin: 2017-12-01T21:00:00+00:00
+series_end: 2018-03-29T19:45:00+00:00
+time_series_id: 60e09806a088408090aad7f70d7f0efe

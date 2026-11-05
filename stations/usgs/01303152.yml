@@ -1,0 +1,14 @@
+name: WEST HARBOR AT OYSTER BAY NWR AT BAYVILLE NY
+lat: 40.903555555555556
+lon: -73.54336111111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01303152/
+parameter_code: "62620"
+series_begin: 2023-07-10T18:12:00+00:00
+time_series_id: c1c24848e0d24f309d99f7b0e8c34000

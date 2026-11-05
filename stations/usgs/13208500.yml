@@ -1,0 +1,15 @@
+name: BOISE RIVER N CHANNEL NR EAGLE ID
+lat: 43.6919444444444
+lon: -116.373888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 774.192
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13208500/
+parameter_code: "00065"
+time_series_id: 3c8d708c88e64c4db51cbaea4d910770

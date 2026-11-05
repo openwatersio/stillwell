@@ -1,0 +1,16 @@
+name: Waihanau Stream nr Kalaupapa, Molokai, HI
+lat: 21.15670418520919
+lon: -156.95815786932826
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 685.8
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16409000/
+parameter_code: "00065"
+series_begin: 2018-11-08T21:45:00+00:00
+time_series_id: b8300db49c244451a227ad06c4791626

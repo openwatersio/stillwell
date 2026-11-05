@@ -1,0 +1,17 @@
+name: Bayou Penchant S of Morgan City, LA
+lat: 29.5855555555556
+lon: -91.1552777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.457
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073816503/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2022-12-07T14:30:00+00:00
+time_series_id: 3ff44dc8b02543f6b196130a3e8b2f50

@@ -1,0 +1,16 @@
+name: ROARING FORK RIVER ABV LOST MAN CR NEAR ASPEN, CO
+lat: 39.1193611111111
+lon: -106.623916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3215.698
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09072550/
+parameter_code: "00065"
+series_begin: 2020-10-01T07:00:00+00:00
+time_series_id: 50aaf58234dd45eb9172e7edbba8b6d7

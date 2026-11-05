@@ -1,0 +1,16 @@
+name: FOURMILE CK AT GRAYS CROSSING AT SILVER GROVE, KY
+lat: 39.0212509724328
+lon: -84.3812115209703
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 146.194
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03238785/
+parameter_code: "00065"
+series_begin: 2017-02-23T14:30:00+00:00
+time_series_id: 7507c7d0cf9b480195bfda477c81241a

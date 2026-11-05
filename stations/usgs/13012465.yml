@@ -1,0 +1,17 @@
+name: Leidy Creek at mouth, near Moran, WY
+lat: 43.7331083333333
+lon: -110.314561111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2425.598
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13012465/
+parameter_code: "00065"
+series_begin: 2018-09-20T16:45:00+00:00
+series_end: 2022-10-13T17:15:00+00:00
+time_series_id: fc67e48e17b34b98810a1c26c8f23a02

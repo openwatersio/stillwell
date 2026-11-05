@@ -1,0 +1,17 @@
+name: Saline River near Warren, AR
+lat: 33.606797279404596
+lon: -92.01070180815468
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 26.185
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07364000/
+parameter_code: "00065"
+series_begin: 2014-10-01T06:00:00+00:00
+series_end: 2024-10-01T05:45:00+00:00
+time_series_id: 9e606acdc9654996b1d7eacd6f5bb567

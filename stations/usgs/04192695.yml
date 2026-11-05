@@ -1,0 +1,15 @@
+name: Bad Creek near Delta OH
+lat: 41.5966666666667
+lon: -84.0230555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.255
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04192695/
+parameter_code: "00065"
+time_series_id: 8f9530e93dc84da0b5777c4050a453a8

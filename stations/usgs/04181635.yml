@@ -1,0 +1,17 @@
+name: GERKE DITCH NEAR DECATUR, IN
+lat: 40.8745
+lon: -84.91916666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 237.064
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04181635/
+parameter_code: "00065"
+series_begin: 2018-08-30T19:15:00+00:00
+series_end: 2023-02-01T15:30:00+00:00
+time_series_id: 22c5b61af8cc409383ddedbdfc82bdc4

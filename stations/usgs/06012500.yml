@@ -1,0 +1,16 @@
+name: Red Rock R bl Lima Reservoir nr Monida MT
+lat: 44.6558805555556
+lon: -112.371222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1990.344
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06012500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 2589d778676d4c0f8e5390682713a40b

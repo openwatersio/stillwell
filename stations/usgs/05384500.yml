@@ -1,0 +1,16 @@
+name: RUSH CREEK NEAR RUSHFORD, MN
+lat: 43.832416
+lon: -91.776658
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 223.87
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05384500/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 646208e9d1b6435881ac62a1046993f8

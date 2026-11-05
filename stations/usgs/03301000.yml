@@ -1,0 +1,16 @@
+name: BEECH FORK AT BARDSTOWN, KY
+lat: 37.7970056865544
+lon: -85.4807919081358
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 133.704
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03301000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 767ad4bc2f66487fb18506a9515e0d2f

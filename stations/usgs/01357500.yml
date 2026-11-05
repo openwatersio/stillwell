@@ -1,0 +1,16 @@
+name: MOHAWK RIVER AT COHOES NY
+lat: 42.7853888888889
+lon: -73.7077777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 14.774
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01357500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e7a26ecdc44344e68b968a99ac79dff6

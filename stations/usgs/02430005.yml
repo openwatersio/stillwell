@@ -1,0 +1,14 @@
+name: TENN-TOM WW BELOW JAMIE WHITTEN L&D NR DENNIS, MS
+lat: 34.52
+lon: -88.3236111111111
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02430005/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: 9a169289a37c479290f9943fcbef6233

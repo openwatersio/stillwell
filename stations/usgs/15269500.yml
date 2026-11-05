@@ -1,0 +1,15 @@
+name: GRANITE C NR PORTAGE AK
+lat: 60.7272095107987
+lon: -149.285477884186
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15269500/
+parameter_code: "00065"
+series_begin: 2018-05-12T21:00:00+00:00
+series_end: 2025-06-21T21:00:00+00:00
+time_series_id: a92db0350cf742e1bd2e043dda724b1a

@@ -1,0 +1,15 @@
+name: EAST PASS TO CHOCTAWHATCHEE BAY AT DESTIN FL
+lat: 30.39484722222222
+lon: -86.51557222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-302341086305600/
+parameter_code: "62620"
+series_begin: 2017-10-06T13:36:00+00:00
+series_end: 2022-10-04T05:55:00+00:00
+time_series_id: d6698afdea1f443f925ebd1c48ebba53

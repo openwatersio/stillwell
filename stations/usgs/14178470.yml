@@ -1,0 +1,17 @@
+name: DEVILS CR ABV CASCADE CR NR BREITENBUSH HOT SPG OR
+lat: 44.74447222222222
+lon: -121.93477777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 911.657
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14178470/
+parameter_code: "00065"
+series_begin: 2023-08-15T18:15:00+00:00
+series_end: 2024-10-25T17:30:00+00:00
+time_series_id: 15093ba0b9db4386bdc5bcb4b25f4ce6

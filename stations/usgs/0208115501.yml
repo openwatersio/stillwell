@@ -1,0 +1,15 @@
+name: ALBEMARLE SOUND AT NC HWY 32/94 LEONARDS POINT, NC
+lat: 35.9604027777778
+lon: -76.4899361111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208115501/
+parameter_code: "62620"
+series_begin: 2016-10-05T18:54:00+00:00
+series_end: 2019-09-11T13:54:00+00:00
+time_series_id: 77c9ca481cd0445c8406de583099f720

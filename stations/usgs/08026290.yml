@@ -1,0 +1,17 @@
+name: Sabine Rv at CR 2082 nr Burkeville, TX
+lat: 30.9694916666667
+lon: -93.5721777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08026290/
+parameter_code: "00065"
+series_begin: 2020-02-17T03:00:00+00:00
+series_end: 2026-06-18T10:45:00+00:00
+time_series_id: 8fe6856d7e074ea5b56dbcd7c60b9bf5

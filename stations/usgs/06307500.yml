@@ -1,0 +1,16 @@
+name: Tongue River at Tongue R Dam nr Decker MT
+lat: 45.141275
+lon: -106.771356
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1017.038
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06307500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: a16c80ddfda84254a8f4bf4653600284

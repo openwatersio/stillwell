@@ -1,0 +1,16 @@
+name: TUOLUMNE R A GRAND CYN OF TUOLUMNE AB HETCH HETCHY
+lat: 37.916576977700345
+lon: -119.6598627218911
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1162.401
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11274790/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4e77b1e7b1144d9c8de29a89800253dc

@@ -1,0 +1,16 @@
+name: Clarks Fork Yellowstone River nr Belfry MT
+lat: 45.0099111111111
+lon: -109.065366666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1215.006
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06207500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 51ade2a1323a45b184e7d5e1b22a9f57

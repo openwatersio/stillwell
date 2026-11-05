@@ -1,0 +1,16 @@
+name: ALLEGHENY RIVER AT RED HOUSE NY
+lat: 42.1145277777778
+lon: -78.8035555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 403.174
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03011500/
+parameter_code: "00065"
+series_begin: 2023-06-29T18:30:00+00:00
+time_series_id: 988f8f082aee4f6db5e474babc35eb4d

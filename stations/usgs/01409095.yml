@@ -1,0 +1,17 @@
+name: Oyster Creek near Brookville NJ
+lat: 39.7983333333333
+lon: -74.2502777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 7.541
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01409095/
+parameter_code: "00065"
+series_begin: 2011-10-01T04:00:00+00:00
+series_end: 2014-10-01T03:45:00+00:00
+time_series_id: d4f1d72560d74e2eb32fcde31975f546

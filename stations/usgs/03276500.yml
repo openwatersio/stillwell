@@ -1,0 +1,16 @@
+name: WHITEWATER RIVER AT BROOKVILLE, IN
+lat: 39.40747222222222
+lon: -85.0128888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.319
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03276500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: bce5f2bd26d94adc9697277834da1106

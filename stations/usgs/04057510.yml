@@ -1,0 +1,16 @@
+name: STURGEON RIVER NEAR NAHMA JUNCTION, MI
+lat: 45.9430235451153
+lon: -86.7056996594668
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 186.236
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04057510/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: 89da3f3785454c85bb9d7a1b176458da

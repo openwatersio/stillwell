@@ -1,0 +1,16 @@
+name: Pennypack Creek at Pine Road, at Philadelphia, PA
+lat: 40.08973339892317
+lon: -75.06905170053962
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 24.232
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01467042/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: aacc1b3828eb4d7ca544998a9c0fd73d

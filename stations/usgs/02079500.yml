@@ -1,0 +1,16 @@
+name: ROANOKE RIVER AT BUGGS ISLAND, VA
+lat: 36.6031982431643
+lon: -78.297774327087
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 59.96
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02079500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3f2bfadb379b4cb892c4b5804cc591e5

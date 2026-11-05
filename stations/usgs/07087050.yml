@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER BELOW GRANITE, CO
+lat: 38.9769388888889
+lon: -106.213983333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2604.211
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07087050/
+parameter_code: "00065"
+series_begin: 2020-10-01T07:00:00+00:00
+time_series_id: 70152c5f1b97453ab7285ab0939af6fd

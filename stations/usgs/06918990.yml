@@ -1,0 +1,16 @@
+name: Stockton Lake near Stockton, MO
+lat: 37.6941111111111
+lon: -93.7696388888889
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0.131
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06918990/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f7ff739b01d3425e8563cc4f4cf3b953

@@ -1,0 +1,16 @@
+name: POUND RIVER BELOW FLANNAGAN DAM, NEAR HAYSI, VA
+lat: 37.2370538441042
+lon: -82.3432017933168
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 365.473
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03209000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 078d1e02a9064e72897dc3660318c39d

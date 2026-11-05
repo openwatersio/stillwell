@@ -1,0 +1,15 @@
+name: RANDALL CREEK NEAR UPATOI, GA
+lat: 32.5479169968639
+lon: -84.7752068058335
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02341750/
+parameter_code: "00065"
+series_begin: 2008-10-22T04:00:00+00:00
+series_end: 2012-05-16T03:45:00+00:00
+time_series_id: 4fa288f4ab0f48f2aea9f9b18663e8da

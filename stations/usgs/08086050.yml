@@ -1,0 +1,16 @@
+name: Deep Ck at Moran, TX
+lat: 32.5592908507083
+lon: -99.1700739746128
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 394.625
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08086050/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: dead9664375443ea949cee85aa2b7b2e

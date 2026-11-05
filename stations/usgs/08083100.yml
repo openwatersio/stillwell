@@ -1,0 +1,16 @@
+name: Clear Fk Brazos Rv nr Roby, TX
+lat: 32.7876077725375
+lon: -100.388718333292
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 574.706
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08083100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:30:00+00:00
+time_series_id: a267128c120c4675a4f59b39bc952c84

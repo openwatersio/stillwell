@@ -1,0 +1,16 @@
+name: Bayou Pierre near Lake End, LA
+lat: 31.8946075424672
+lon: -93.3418388336036
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 27.347
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07351750/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 54906a373e134f358eae0cf38237f6a7

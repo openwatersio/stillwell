@@ -1,0 +1,16 @@
+name: EAST FORK PINHOOK CR AT WINCHESTER RD AT HUNTSVIL
+lat: 34.79289707184681
+lon: -86.58914991142346
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 209.736
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0357587140/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e817c2e5736e443cb2b67a91c142f6ab

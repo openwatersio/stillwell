@@ -1,0 +1,15 @@
+name: APOPKA FLOW-WAY FEEDER CANAL NEAR ASTATULA, FL
+lat: 28.6663852669485
+lon: -81.7059090449688
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02237698/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2019-10-01T04:45:00+00:00
+time_series_id: 928c941cdde0411790c4b82157094c5d

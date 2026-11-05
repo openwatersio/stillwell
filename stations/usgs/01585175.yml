@@ -1,0 +1,17 @@
+name: Unnamed Ditch on Wilson Pt Rd at Middle River, MD
+lat: 39.332278
+lon: -76.427778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01585175/
+parameter_code: "00065"
+series_begin: 2018-07-22T19:30:00+00:00
+series_end: 2026-04-02T16:34:00+00:00
+time_series_id: 97a993aa1f1940c387b5f8ec7c2a2f2a

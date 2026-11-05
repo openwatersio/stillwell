@@ -1,0 +1,15 @@
+name: Aplacho River at Apra Heights, Guam
+lat: 13.404
+lon: 144.68975
+country_code: GU
+kind: river
+datum: GAGE
+datums:
+  LMSL: 76.2
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16807650/
+parameter_code: "00065"
+time_series_id: 86e84e4b3296450b89fff80b1db64d88

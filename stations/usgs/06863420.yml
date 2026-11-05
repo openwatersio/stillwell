@@ -1,0 +1,16 @@
+name: BIG C NR ELLIS, KS
+lat: 38.9233333333333
+lon: -99.6508333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 657.658
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06863420/
+parameter_code: "00065"
+series_begin: 2010-08-04T18:30:00+00:00
+time_series_id: 49ced4a6e9ec47bba6dfad3521266b35

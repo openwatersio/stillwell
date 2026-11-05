@@ -1,0 +1,17 @@
+name: Wickecheoke Creek at Stockton NJ
+lat: 40.4113888888889
+lon: -74.9866666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 24.384
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01461300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2012-11-01T03:45:00+00:00
+time_series_id: e5e99c98e52e473ebf4864992c4f0b44

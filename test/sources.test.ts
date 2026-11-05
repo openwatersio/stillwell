@@ -11,6 +11,7 @@ import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
+import * as usgs from "../src/sources/usgs/index.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -1192,6 +1193,552 @@ describe("usace", () => {
     await assert.rejects(
       usace.source.observations!(station, new Date("2024-01-01Z"), new Date("2024-01-02Z")),
       /is in NGVD29; CWMS stage comes in GZ/,
+    );
+  });
+});
+
+describe("usgs", () => {
+  usgs.pacing.requestMs = 0;
+  usgs.pacing.blockedMs = 0;
+  const series = (site: string, parameter: string, fields: object = {}) => ({
+    type: "Feature",
+    id: `${site}-${parameter}`,
+    properties: {
+      id: `${site}-${parameter}`,
+      monitoring_location_id: `USGS-${site}`,
+      parameter_code: parameter,
+      statistic_id: "00011",
+      begin: "2014-06-04T04:00:00+00:00",
+      end: new Date().toISOString(),
+      sublocation_identifier: null,
+      primary: "Primary",
+      unit_of_measure: "ft",
+      ...fields,
+    },
+    geometry: null,
+  });
+  const location = (site: string, lon: number, lat: number, fields: object) => ({
+    type: "Feature",
+    id: `USGS-${site}`,
+    properties: {
+      id: `USGS-${site}`,
+      monitoring_location_name: site,
+      agency_code: "USGS",
+      site_type_code: "ST",
+      state_name: "Georgia",
+      country_code: "US",
+      hydrologic_unit_code: "03060109",
+      altitude: null,
+      vertical_datum: null,
+      ...fields,
+    },
+    geometry: { type: "Point", coordinates: [lon, lat] },
+  });
+  const collection = (features: object[], next?: string) =>
+    JSON.stringify({
+      type: "FeatureCollection",
+      features,
+      numberReturned: features.length,
+      links: next ? [{ rel: "next", type: "application/geo+json", href: next }] : [],
+    });
+
+  it("lists every site with a water-level series, in gage datum where there's gage height", async () => {
+    serve([
+      [
+        /parameter_code=00065/,
+        collection([
+          series("02198820", "00065"),
+          series("07010000", "00065", { begin: "2001-10-01T07:00:00+00:00" }),
+          // Olmsted's tailwater began later; the headwater is the longer record.
+          series("03612600", "00065", {
+            id: "tail",
+            sublocation_identifier: "TAILWATER",
+            begin: "2023-04-12T23:00:00+00:00",
+          }),
+          series("03612600", "00065", {
+            id: "head",
+            sublocation_identifier: "HEADWATER",
+            begin: "2013-03-02T06:00:00+00:00",
+          }),
+          // A daily mean isn't an instantaneous series.
+          series("06934500", "00065", { statistic_id: "00003" }),
+          series("06934500", "00065", { end: "2001-01-01T00:00:00+00:00" }),
+          series("02171645", "00065", { statistic_id: null }),
+          // At a site with two primary series, the one still reporting wins.
+          series("07022000", "00065", { id: "ended", end: "2012-01-01T00:00:00+00:00" }),
+          series("07022000", "00065", { id: "current", begin: "2012-01-01T00:00:00+00:00" }),
+          // Within the year, one reporting now beats an earlier one that stopped a month ago.
+          series("07020500", "00065", {
+            id: "stopped",
+            begin: "2007-10-01T00:00:00+00:00",
+            end: new Date(Date.now() - 30 * 86_400_000).toISOString(),
+          }),
+          series("07020500", "00065", { id: "replacement", begin: "2026-10-01T00:00:00+00:00" }),
+        ]),
+      ],
+      [/parameter_code=62620/, collection([series("0158540095", "62620")])],
+      [/parameter_code=63160/, collection([series("02198820", "63160")])],
+      [/parameter_code=/, collection([series("02198820", "72279", { unit_of_measure: "m" })])],
+      [
+        /statistic_id=00021/,
+        collection([
+          {
+            type: "Feature",
+            properties: { monitoring_location_id: "USGS-02171645" },
+            geometry: null,
+          },
+        ]),
+      ],
+      [
+        /monitoring-locations/,
+        collection([
+          location("02198820", -81.15, 32.25, {
+            site_type_code: "ST-TS",
+            altitude: 0,
+            vertical_datum: "NAVD88",
+          }),
+          location("07010000", -90.18, 38.63, {
+            hydrologic_unit_code: "07140101",
+            altitude: 379.58,
+            vertical_datum: "NAVD88",
+            state_name: "Missouri",
+          }),
+          location("03612600", -89.06, 37.17, {
+            hydrologic_unit_code: "05140206",
+            altitude: 270,
+            vertical_datum: "NGVD29",
+          }),
+          // The Missouri at Hermann, outside the Mississippi and Ohio basins, is listed too.
+          location("06934500", -91.44, 38.71, {
+            hydrologic_unit_code: "10300200",
+            altitude: 481.6,
+            vertical_datum: "NAVD88",
+          }),
+          location("0158540095", -76.4, 39.2, { site_type_code: "ES" }),
+          location("02171645", -80.0, 33.2, { state_name: "Puerto Rico" }),
+          location("07022000", -89.5, 37.0, { hydrologic_unit_code: "07140105" }),
+          location("07020500", -89.8, 37.6, { hydrologic_unit_code: "07140105" }),
+        ]),
+      ],
+    ]);
+    const list = await usgs.stations();
+    assert.deepEqual(
+      list.map((s) => [s.id, s.kind, s.datum, s.datums, s.time_series_id, s.live, s.country_code]),
+      [
+        ["usgs/0158540095", "estuary", "NAVD88", {}, "0158540095-62620", true, "US"],
+        // Daily tidal highs and lows mark a stream as tidal.
+        ["usgs/02171645", "estuary", "GAGE", {}, "02171645-00065", true, "PR"],
+        // Gage height is preferred to an elevation series at the same site.
+        ["usgs/02198820", "estuary", "GAGE", { NAVD88: 0 }, "02198820-00065", true, "US"],
+        ["usgs/03612600", "river", "GAGE", { NGVD29: 82.296 }, "head", true, "US"],
+        // Its gage height ended in 2001; a station still, just not live.
+        ["usgs/06934500", "river", "GAGE", { NAVD88: 146.792 }, "06934500-00065", false, "US"],
+        ["usgs/07010000", "river", "GAGE", { NAVD88: 115.696 }, "07010000-00065", true, "US"],
+        ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
+        ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
+      ],
+    );
+    assert.equal(
+      list[0]!.source_url,
+      "https://waterdata.usgs.gov/monitoring-location/USGS-0158540095/",
+    );
+  });
+
+  it("takes a station's kind from USGS's own site type and tidal series, not from its basin or altitude", () => {
+    const kind = (site_type_code: string, tidal = false) => usgs.kindOf({ site_type_code }, tidal);
+    assert.deepEqual(
+      [kind("OC"), kind("OC-CO"), kind("ES"), kind("ST-TS"), kind("ST", true)],
+      ["coastal", "coastal", "estuary", "estuary", "estuary"],
+    );
+    assert.deepEqual([kind("LK"), kind("WE")], ["lake", "lake"]);
+    assert.deepEqual(
+      [kind("ST"), kind("ST-CA"), kind("ST-DCH"), kind("SP"), kind("FA-DV")],
+      ["river", "river", "river", "river", "river"],
+    );
+  });
+
+  it("spaces requests that go out, but not cache hits", async () => {
+    const realFetch = globalThis.fetch;
+    const times: number[] = [];
+    globalThis.fetch = (async () => {
+      times.push(Date.now());
+      return new Response(collection([]));
+    }) as typeof fetch;
+    usgs.pacing.requestMs = 50;
+    try {
+      setTransport(fetchText);
+      const year = (y: number) =>
+        usgs.levels("x", new Date(Date.UTC(y, 0)), new Date(Date.UTC(y, 1)));
+      await Promise.all([year(2020), year(2021)]);
+      assert.equal(times.length, 2);
+      assert.ok(times[1]! - times[0]! >= 45, `${times[1]! - times[0]!} ms apart`);
+      // A cached answer never reaches the pace.
+      setTransport(async () => collection([]));
+      const started = Date.now();
+      await Promise.all([year(2022), year(2023), year(2024)]);
+      assert.ok(Date.now() - started < 45);
+    } finally {
+      globalThis.fetch = realFetch;
+      usgs.pacing.requestMs = 0;
+    }
+  });
+
+  it("refuses an answer that would drop stations", async () => {
+    serve([[/time-series-metadata/, collection([])]]);
+    await assert.rejects(usgs.stations(), /listed no 00065 series/);
+    serve([
+      [/parameter_code=/, collection([series("02198820", "00065")])],
+      [/statistic_id=00021/, collection([])],
+    ]);
+    await assert.rejects(usgs.stations(), /no daily tidal statistics/);
+    const tidal = {
+      type: "Feature",
+      properties: { monitoring_location_id: "USGS-x" },
+      geometry: null,
+    };
+    serve([
+      [/parameter_code=/, collection([series("02198820", "00065"), series("07010000", "00065")])],
+      [/statistic_id=00021/, collection([tidal])],
+      [/monitoring-locations/, collection([location("02198820", -81.15, 32.25, {})])],
+    ]);
+    await assert.rejects(usgs.stations(), /no monitoring location for 1 sites, e.g. USGS-07010000/);
+    // A site a short answer left out is asked for again.
+    let asked = 0;
+    setTransport(async (url) => {
+      if (/statistic_id=00021/.test(url)) return collection([tidal]);
+      if (/parameter_code=/.test(url))
+        return collection([series("02198820", "00065"), series("07010000", "00065")]);
+      return collection(
+        ++asked === 1
+          ? [location("02198820", -81.15, 32.25, { site_type_code: "ES" })]
+          : [location("07010000", -90.18, 38.63, { hydrologic_unit_code: "07140101" })],
+      );
+    });
+    assert.deepEqual(
+      (await usgs.stations()).map((s) => s.source_id),
+      ["02198820", "07010000"],
+    );
+  });
+
+  it("takes a series that still reports over a preferred one that stopped years ago", () => {
+    const stopped = series("01646500", "00065", { end: "2019-03-01T00:00:00+00:00" }).properties;
+    const live = series("01646500", "62620").properties;
+    assert.equal(usgs.choose([stopped, live]).get("USGS-01646500")!.parameter_code, "62620");
+    // An outage of months doesn't.
+    const paused = series("01646500", "00065", {
+      end: new Date(Date.now() - 90 * 86_400_000).toISOString(),
+    }).properties;
+    assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
+  });
+
+  it("notices a station's series or gage zero changing under the same datum name", () => {
+    const committed = {
+      id: "usgs/03612600",
+      datum: "GAGE",
+      datums: { NAVD88: 84.774 },
+      time_series_id: "head",
+    } as never;
+    const listed = (fields: object) =>
+      ({ datum: "GAGE", datums: { NAVD88: 84.774 }, time_series_id: "head", ...fields }) as never;
+    assert.equal(usgs.seriesChanged(committed, listed({})), null);
+    assert.match(
+      usgs.seriesChanged(committed, listed({ time_series_id: "tail" }))!,
+      /series head is now tail/,
+    );
+    assert.match(
+      usgs.seriesChanged(committed, listed({ datums: { NAVD88: 85.344 } }))!,
+      /gage datum is now 85.344 m above NAVD88/,
+    );
+    // An offset to another vertical datum is new information, not a moved zero.
+    assert.equal(
+      usgs.seriesChanged(committed, listed({ datums: { NAVD88: 84.774, NGVD29: 85 } })),
+      null,
+    );
+    // But a gage datum given only against another vertical datum may have moved.
+    assert.match(
+      usgs.seriesChanged(committed, listed({ datums: { NGVD29: 85 } }))!,
+      /now given against NGVD29, not NAVD88/,
+    );
+    // A site that lists no altitude keeps its offsets.
+    assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
+  });
+
+  it("asks only for the years a station's series covers", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(new URL(url).searchParams.get("datetime")!);
+      return collection([]);
+    });
+    const station = {
+      id: "usgs/06934500",
+      datum: "GAGE",
+      time_series_id: "x",
+      parameter_code: "00065",
+      series_begin: "2014-06-04T04:00:00+00:00",
+      series_end: "2016-03-01T00:00:00+00:00",
+    } as never;
+    const fetch = (from: number, to: number) =>
+      usgs.source.observations!(station, new Date(Date.UTC(from, 0)), new Date(Date.UTC(to, 0)));
+    await fetch(2007, 2027);
+    assert.deepEqual(asked, [
+      "2014-06-04T04:00:00.000Z/2015-01-01T00:00:00.000Z",
+      "2015-01-01T00:00:00.000Z/2016-01-01T00:00:00.000Z",
+      "2016-01-01T00:00:00.000Z/2016-03-01T00:00:00.001Z",
+    ]);
+    asked.length = 0;
+    await fetch(2020, 2021);
+    assert.deepEqual(asked, []);
+  });
+
+  it("caches a page only when every value on it is approved", () => {
+    const page = (statuses: (string | null)[]) =>
+      JSON.stringify(
+        { features: statuses.map((approval_status) => ({ properties: { approval_status } })) },
+        null,
+        2,
+      );
+    assert.deepEqual(
+      [
+        page(["Approved"]),
+        page(["Approved", "Provisional"]),
+        page([]),
+        // A value with no status, or one USGS adds later, isn't approved either.
+        page(["Approved", null]),
+        page(["Approved", "Working"]),
+      ].map(usgs.approved),
+      [true, false, false, false, false],
+    );
+  });
+
+  it("sweeps every live station's recent values in one paged query per parameter", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      const v = (time_series_id: string, time: string, value: string) => ({
+        type: "Feature",
+        properties: {
+          time_series_id,
+          time,
+          value,
+          approval_status: "Provisional",
+          qualifier: null,
+        },
+        geometry: null,
+      });
+      if (url.includes("cursor=")) return collection([v("b", "2026-11-04T00:15:00+00:00", "1.00")]);
+      return collection(
+        [
+          v("a", "2026-11-04T00:00:00+00:00", "2.47"),
+          v("unused", "2026-11-04T00:00:00+00:00", "9"),
+        ],
+        "https://api.waterdata.usgs.gov/ogcapi/v1/collections/continuous/items?cursor=x&f=json",
+      );
+    });
+    const station = (id: string, time_series_id: string, datum = "GAGE") =>
+      ({ id, datum, time_series_id, parameter_code: "00065" }) as never;
+    const swept = await usgs.recent(
+      [station("usgs/a", "a"), station("usgs/b", "b"), station("usgs/bad", "c", "NAVD88")],
+      new Date("2026-11-04T00:00:00Z"),
+      new Date("2026-11-04T01:00:00Z"),
+    );
+    assert.deepEqual(
+      [...swept].map(([id, rows]) => [
+        id,
+        rows instanceof Error ? rows.message : rows.map((r) => r.level),
+      ]),
+      [
+        // Refused alone, without stopping the sweep.
+        ["usgs/bad", "usgs/bad is in NAVD88; its USGS series is in GAGE"],
+        ["usgs/a", [0.7529]],
+        ["usgs/b", [0.3048]],
+      ],
+    );
+    assert.equal(asked.length, 2);
+    assert.match(asked[0]!, /parameter_code=00065/);
+    assert.doesNotMatch(asked[0]!, /monitoring_location_id|time_series_id=/);
+  });
+
+  it("reads levels in meters across pages, with flags from approval and qualifiers", async () => {
+    const value = (
+      time: string,
+      value: string | null,
+      approval_status: string,
+      qualifier: string[] | null = null,
+    ) => ({
+      type: "Feature",
+      id: time,
+      properties: { time, value, approval_status, qualifier },
+      geometry: null,
+    });
+    const asked: string[] = [];
+    const kept: boolean[] = [];
+    setTransport(async (url, options) => {
+      asked.push(url);
+      const text = url.includes("cursor=")
+        ? collection([
+            value("2024-01-01T00:30:00+00:00", "-1.00", "Provisional"),
+            value("2024-01-01T00:35:00+00:00", "1.00", "Approved", ["ESTIMATED"]),
+            value("2024-01-01T00:45:00+00:00", "3.10", "Provisional", ["ICE"]),
+            value("2024-01-01T00:50:00+00:00", "3.10", "Approved", ["SEASONAL", "BACKWATER"]),
+            value("2024-01-01T01:00:00+00:00", "3.20", "Approved"),
+          ])
+        : collection(
+            [
+              value("2024-01-01T00:00:00+00:00", "2.47", "Approved"),
+              value("2024-01-01T00:15:00+00:00", null, "Approved", ["EQUIP"]),
+            ],
+            "https://api.waterdata.usgs.gov/ogcapi/v1/collections/continuous/items?cursor=abc&f=json",
+          );
+      kept.push(options.keep!(text));
+      return text;
+    });
+    const levels = await usgs.levels(
+      "58253edd",
+      new Date("2024-01-01T00:00:00Z"),
+      new Date("2024-01-01T01:00:00Z"),
+    );
+    assert.deepEqual(
+      levels.map((l) => [new Date(l.time).toISOString(), l.level, l.flag]),
+      [
+        ["2024-01-01T00:00:00.000Z", 0.7529, Flag.good],
+        ["2024-01-01T00:30:00.000Z", -0.3048, Flag.preliminary],
+        ["2024-01-01T00:35:00.000Z", 0.3048, Flag.interpolated],
+        ["2024-01-01T00:45:00.000Z", 0.9449, Flag.suspect],
+        ["2024-01-01T00:50:00.000Z", 0.9449, Flag.good],
+      ],
+    );
+    // A page with provisional values isn't cached, since USGS will revise them.
+    assert.deepEqual(kept, [true, false]);
+    assert.match(asked[0]!, /time_series_id=58253edd/);
+    assert.match(asked[0]!, /datetime=2024-01-01T00%3A00%3A00.000Z%2F2024-01-01T01%3A00%3A00.000Z/);
+  });
+
+  it("refuses a series with values measured from another datum", async () => {
+    serve([
+      [
+        /continuous/,
+        collection([
+          {
+            type: "Feature",
+            properties: {
+              time: "2024-01-01T00:40:00+00:00",
+              value: "9.00",
+              approval_status: "Provisional",
+              qualifier: ["DIFFDATUM"],
+            },
+            geometry: null,
+          },
+        ]),
+      ],
+    ]);
+    await assert.rejects(
+      usgs.levels("x", new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")),
+      /values in another datum \(DIFFDATUM\)/,
+    );
+  });
+
+  it("fails the stations of a parameter the sweep found nothing for", async () => {
+    setTransport(async (url) =>
+      url.includes("parameter_code=62620")
+        ? collection([])
+        : collection([
+            {
+              type: "Feature",
+              properties: {
+                time_series_id: "a",
+                time: "2026-11-04T00:00:00+00:00",
+                value: "1.00",
+                approval_status: "Provisional",
+                qualifier: null,
+              },
+              geometry: null,
+            },
+          ]),
+    );
+    const swept = await usgs.recent(
+      [
+        { id: "usgs/a", datum: "GAGE", time_series_id: "a", parameter_code: "00065" } as never,
+        { id: "usgs/b", datum: "NAVD88", time_series_id: "b", parameter_code: "62620" } as never,
+      ],
+      new Date("2026-11-04T00:00:00Z"),
+      new Date("2026-11-04T01:00:00Z"),
+    );
+    assert.deepEqual(swept.get("usgs/a"), [
+      { time: Date.UTC(2026, 10, 4), level: 0.3048, flag: Flag.preliminary },
+    ]);
+    assert.match(String(swept.get("usgs/b")), /returned no 62620 values/);
+  });
+
+  it("won't follow a next link off the API, since the key goes with it", async () => {
+    serve([[/continuous/, collection([], "http://elsewhere.example/items?cursor=1")]]);
+    await assert.rejects(
+      usgs.levels("x", new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")),
+      /off the API/,
+    );
+  });
+
+  it("calls an empty sweep an outage", async () => {
+    serve([[/continuous/, collection([])]]);
+    const station = { id: "usgs/a", datum: "GAGE", time_series_id: "a", parameter_code: "00065" };
+    await assert.rejects(
+      usgs.recent(
+        [station as never],
+        new Date("2026-11-04T00:00:00Z"),
+        new Date("2026-11-04T01:00:00Z"),
+      ),
+      /returned no values/,
+    );
+  });
+
+  it("holds back a request already waiting for its slot when a 429 starts a block", async () => {
+    const times: number[] = [];
+    let calls = 0;
+    setTransport(async (url, options) => {
+      await options.pace?.();
+      times.push(Date.now());
+      if (++calls === 1) throw new Error(`GET ${url} returned 429`);
+      return collection([]);
+    });
+    usgs.pacing.requestMs = 20;
+    usgs.pacing.blockedMs = 200;
+    try {
+      const started = Date.now();
+      const year = (y: number) =>
+        usgs.levels("x", new Date(Date.UTC(y, 0)), new Date(Date.UTC(y, 1)));
+      await Promise.all([year(2020), year(2021)]);
+      // The second request took its slot before the 429 but waited out the block.
+      assert.equal(times.length, 3);
+      assert.ok(times[1]! - started >= 190, `second request ${times[1]! - started} ms in`);
+    } finally {
+      usgs.pacing.requestMs = 0;
+      usgs.pacing.blockedMs = 0;
+    }
+  });
+
+  it("waits out a 429 and tries again", async () => {
+    let calls = 0;
+    setTransport(async (url) => {
+      if (++calls === 1) throw new Error(`GET ${url} returned 429`);
+      return collection([]);
+    });
+    assert.deepEqual(
+      await usgs.levels("x", new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")),
+      [],
+    );
+    assert.equal(calls, 2);
+  });
+
+  it("refuses a station committed in another datum than its series", async () => {
+    const station = {
+      id: "usgs/02198820",
+      source_id: "02198820",
+      datum: "NAVD88",
+      time_series_id: "x",
+      parameter_code: "00065",
+    };
+    await assert.rejects(
+      async () => usgs.source.observations!(station as never, new Date(0), new Date(1)),
+      /is in NAVD88; its USGS series is in GAGE/,
     );
   });
 });

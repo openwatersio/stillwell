@@ -1,0 +1,16 @@
+name: BIG RACCOON CREEK NEAR FINCASTLE, IN
+lat: 39.81253498268092
+lon: -86.95388289023008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 208.995
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03340800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9393c1fd014d45e095a87a1bc9212792

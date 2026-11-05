@@ -1,0 +1,16 @@
+name: EAST BRANCH HOUSATONIC RIVER AT COLTSVILLE, MA
+lat: 42.46958333333333
+lon: -73.19733333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 302.666
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01197000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4e546205c00340c8b8c1375c43a79c55

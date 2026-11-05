@@ -1,0 +1,16 @@
+name: ESCATAWPA RIVER NEAR WILMER, AL
+lat: 30.8624092184419
+lon: -88.4177920309271
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 14.655
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02479500/
+parameter_code: "00065"
+series_begin: 2020-11-05T22:45:00+00:00
+time_series_id: be0a4cdbc5bd4ff9befeb002ff7ada6e

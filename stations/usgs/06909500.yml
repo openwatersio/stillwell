@@ -1,0 +1,16 @@
+name: Moniteau Creek near Fayette, MO
+lat: 39.1208333333333
+lon: -92.5672222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.355
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06909500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7a2ed12f999748ddb0f2210073a556a2

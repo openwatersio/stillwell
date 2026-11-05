@@ -1,0 +1,16 @@
+name: CEDAR C AT 95TH ST NR DESOTO, KS
+lat: 38.9552777777778
+lon: -94.9161111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 241.862
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06892493/
+parameter_code: "00065"
+series_begin: 2013-10-01T06:00:00+00:00
+time_series_id: f0fdd00d16124867bea41f0755942b1a

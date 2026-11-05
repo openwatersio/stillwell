@@ -1,0 +1,16 @@
+name: SANTA CLARA R NR PIRU CA
+lat: 34.4036060154662
+lon: -118.73924108438321
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 218.002
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11109000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 10f2c513896b4eacbd1d2ed858e33a17

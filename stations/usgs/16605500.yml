@@ -1,0 +1,16 @@
+name: Wailuku River at Iao Valley Road, Maui, HI
+lat: 20.88296801815339
+lon: -156.53383832210667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 202.082
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16605500/
+parameter_code: "00065"
+series_begin: 2017-04-13T22:20:00+00:00
+time_series_id: 0eb5dba568ed4e0884ecafee176d237b

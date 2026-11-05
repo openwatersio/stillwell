@@ -1,0 +1,13 @@
+name: PINEY RIVER 15 M ABV TRIB 2 NEAR WASHINGTON, VA
+lat: 38.7455
+lon: -78.28183333333334
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0166235777/
+parameter_code: "00065"
+time_series_id: c7d1b83fde254b53a373c2465446960b

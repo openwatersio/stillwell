@@ -1,0 +1,16 @@
+name: NF NOOKSACK RIVER BL CASCADE CREEK NR GLACIER, WA
+lat: 48.9059573882754
+lon: -121.844310364196
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 381.302
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12205000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 0938b759f99e4439bf504b8ed98c0d53

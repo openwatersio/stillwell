@@ -1,0 +1,16 @@
+name: LARAMIE RIVER NEAR FORT LARAMIE, WY
+lat: 42.20051032154447
+lon: -104.53835479584266
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1285.232
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06670500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b53a5fab72c744a981c61d2fc4161565

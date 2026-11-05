@@ -1,0 +1,16 @@
+name: SWEETWATER CREEK NEAR SULPHUR SPRINGS FL
+lat: 28.0430732837902
+lon: -82.5117622710562
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 7.925
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02306500/
+parameter_code: "00065"
+series_begin: 2007-10-06T04:00:00+00:00
+time_series_id: e6f4e7153ee2470c9bc458b59573b32e

@@ -1,0 +1,17 @@
+name: STROBEL DITCH FROM TURKEY CR AT FT. CARSON, CO
+lat: 38.610272
+lon: -104.887478
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1941.576
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-383637104531301/
+parameter_code: "00065"
+series_begin: 2023-05-11T04:30:00+00:00
+series_end: 2026-08-23T23:00:00+00:00
+time_series_id: b0d0327f31e64c52811e6c589109e993

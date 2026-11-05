@@ -1,0 +1,15 @@
+name: JACKSON RIVER AT RANCH ROAD NR APALACHICOLA, FL
+lat: 29.769511
+lon: -85.084281
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02359223/
+parameter_code: "00065"
+series_begin: 2020-09-15T19:00:00+00:00
+series_end: 2026-01-08T16:15:00+00:00
+time_series_id: 6f34dc57d15341349b6cf043bf87023b

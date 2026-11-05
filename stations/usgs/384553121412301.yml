@@ -1,0 +1,15 @@
+name: SACRAMENTO R AB FREMONT WEIR NR KNIGHTS LANDING CA
+lat: 38.7646388888889
+lon: -121.689761111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.449
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384553121412301/
+parameter_code: "00065"
+time_series_id: 571a761a9997480c99dc46fb3c1123a7

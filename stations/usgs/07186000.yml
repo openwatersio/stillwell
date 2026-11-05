@@ -1,0 +1,16 @@
+name: Spring River near Waco, MO
+lat: 37.2456111111111
+lon: -94.5664166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 254.069
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07186000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 687049324dc4407b8233e3803582ccae

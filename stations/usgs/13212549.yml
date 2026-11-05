@@ -1,0 +1,16 @@
+name: CONWAY GULCH BELOW 1ST ST AT NOTUS, ID
+lat: 43.728031
+lon: -116.799722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 703.591
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13212549/
+parameter_code: "00065"
+series_begin: 2016-11-29T20:15:00+00:00
+time_series_id: bfdf97980747471d9f427e6a9120c5ad

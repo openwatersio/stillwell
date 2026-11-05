@@ -1,0 +1,16 @@
+name: LAUREL CREEK NEAR FENWICK, WV
+lat: 38.1636111111111
+lon: -80.5880555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 761.299
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03188900/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: d7f8baac8cd24d85bbd194b5d328975b

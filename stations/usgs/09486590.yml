@@ -1,0 +1,17 @@
+name: ARIVACA CREEK NEAR ARIVACA, AZ
+lat: 31.583556
+lon: -111.34975
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1088.746
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09486590/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2014-10-01T06:45:00+00:00
+time_series_id: da8ec0a2b9bc4d6fa5fef15f643d40c8

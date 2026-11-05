@@ -1,0 +1,16 @@
+name: RED RIVER DIVERSION STRUCTURE NEAR HICKSON, ND
+lat: 46.706522
+lon: -96.792253
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 262.494
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05054000000/
+parameter_code: "00065"
+series_begin: 2026-10-01T06:00:00+00:00
+time_series_id: 03bf5981688f41be835ad93494ae1968

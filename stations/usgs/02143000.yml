@@ -1,0 +1,16 @@
+name: HENRY FORK NEAR HENRY RIVER, NC
+lat: 35.6844444444444
+lon: -81.4033333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.306
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02143000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9db37b4cf4e1405c8e0bda80602da55e

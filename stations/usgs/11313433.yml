@@ -1,0 +1,16 @@
+name: DUTCH SLOUGH BL JERSEY ISLAND RD A JERSEY ISLAND
+lat: 38.0135326217552
+lon: -121.667731090825
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11313433/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: cbb701dc6ad94d5093f5213b80b03aa4

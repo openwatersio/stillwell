@@ -1,0 +1,16 @@
+name: YALOBUSHA RIVER AT GRENADA, MS
+lat: 33.7877777777778
+lon: -89.8097222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 46.372
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07285500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 095234af31584893ab8969c41ff8eeef

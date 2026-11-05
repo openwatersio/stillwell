@@ -1,0 +1,15 @@
+name: FARM RIVER AT ROUTE 142 BRIDGE NEAR EAST HAVEN, CT
+lat: 41.259025
+lon: -72.85232777777777
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-411532072510801/
+parameter_code: "62620"
+series_begin: 2023-06-01T15:42:00+00:00
+series_end: 2025-04-01T15:12:00+00:00
+time_series_id: 382ddbf27b1945ca852273842a2c53d8

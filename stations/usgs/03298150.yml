@@ -1,0 +1,16 @@
+name: CHENOWETH RUN AT GELHAUS LANE NEAR FERN CREEK, KY
+lat: 38.1600672888645
+lon: -85.5421797269917
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.355
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03298150/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 5458e33d528046f2b9a116c8f86ed6e9

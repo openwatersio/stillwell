@@ -1,0 +1,16 @@
+name: CATOCTIN CREEK NEAR MIDDLETOWN, MD
+lat: 39.42725
+lon: -77.55616666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 114.693
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01637500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 30ffe8a65afc4d2a9a2908e58b4fd314

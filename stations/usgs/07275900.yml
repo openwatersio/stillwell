@@ -1,0 +1,16 @@
+name: COLDWATER RIVER NR OLIVE BRANCH, MS
+lat: 34.9075
+lon: -89.7533333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 85.396
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07275900/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+time_series_id: 67a78127cee645df9ac24e817da773ee

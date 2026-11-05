@@ -1,0 +1,16 @@
+name: SMITH RIVER AT BASSETT, VA
+lat: 36.7701370945617
+lon: -80.000875094412
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 229.24
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02072500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 343d5da1c4fb4276b06ec987bc3beaf9

@@ -1,0 +1,16 @@
+name: North Canadian R at Hwy 66 at Oklahoma City, OK
+lat: 35.5145007024174
+lon: -97.6636533890006
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.079
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07240200/
+parameter_code: "00065"
+series_begin: 2007-10-19T05:00:00+00:00
+time_series_id: 929ea6f6357544c4ac6f59ffadc16308

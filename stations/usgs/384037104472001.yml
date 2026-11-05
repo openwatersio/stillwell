@@ -1,0 +1,16 @@
+name: MERRIAMS ROCK CREEK DITCH AT FT. CARSON, CO
+lat: 38.6769400228607
+lon: -104.789418214775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1776.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384037104472001/
+parameter_code: "00065"
+series_begin: 2021-06-24T22:45:00+00:00
+time_series_id: e9edfc1d77db4d57a64a0613e743affc

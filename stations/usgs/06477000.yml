@@ -1,0 +1,16 @@
+name: JAMES RIVER NEAR FORESTBURG, SD
+lat: 43.973889
+lon: -98.07055600000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 368.543
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06477000/
+parameter_code: "00065"
+series_begin: 2018-04-24T16:00:00+00:00
+time_series_id: df68a1fd1b7140e580210704f0854f3b

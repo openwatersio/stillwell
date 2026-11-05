@@ -1,0 +1,16 @@
+name: ANTHRACITE CREEK NEAR SOMERSET, CO.
+lat: 38.95425
+lon: -107.27175
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2058.506
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09132050/
+parameter_code: "00065"
+series_begin: 2024-04-01T07:00:00+00:00
+time_series_id: 1ca0975764534f00bb5c3c71e312e41d

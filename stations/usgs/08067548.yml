@@ -1,0 +1,16 @@
+name: W Fk San Jacinto Rv nr Huntsville, TX
+lat: 30.6460298235276
+lon: -95.6752240511463
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067548/
+parameter_code: "00065"
+series_begin: 2009-09-12T06:00:00+00:00
+time_series_id: dfc41fc517da44af87d9533297d62121

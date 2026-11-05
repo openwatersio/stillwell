@@ -1,0 +1,16 @@
+name: LITTLE CALUMET RIVER NEAR LAKE STATION, IN
+lat: 41.572500000000005
+lon: -87.29944444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.674
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04093250/
+parameter_code: "00065"
+series_begin: 2011-08-04T05:00:00+00:00
+time_series_id: 4075f33421b64ee1aa9e85d600430361

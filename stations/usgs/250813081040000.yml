@@ -1,0 +1,15 @@
+name: EAST CAPE CANAL NEAR LAKE INGRAHAM, FL
+lat: 25.1369444444444
+lon: -81.0666666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-250813081040000/
+parameter_code: "00065"
+series_begin: 2008-12-17T05:00:00+00:00
+series_end: 2010-09-28T03:45:00+00:00
+time_series_id: 6a89ad4492834be68852ee1513830ab6

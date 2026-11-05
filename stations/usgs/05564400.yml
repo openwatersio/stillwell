@@ -1,0 +1,16 @@
+name: MONEY CREEK NEAR TOWANDA, IL
+lat: 40.6053129869285
+lon: -88.8989601304511
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.204
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05564400/
+parameter_code: "00065"
+series_begin: 2022-03-04T19:00:00+00:00
+time_series_id: dd4bd79f474d41738c3366e28e3476e7

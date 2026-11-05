@@ -1,0 +1,15 @@
+name: DITCH 10 AB IRON SPRINGS CREEK NR MCLEOD, ND
+lat: 46.4852438496457
+lon: -97.2678684507171
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 323.393
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05058850/
+parameter_code: "00065"
+time_series_id: c219552875754259b175c6a8632ca366

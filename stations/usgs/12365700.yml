@@ -1,0 +1,16 @@
+name: Stillwater River at Lawrence Park, at Kalispell
+lat: 48.21725
+lon: -114.313736111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 896.112
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12365700/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e45507d817ef4d0a8a498664b2e27917

@@ -1,0 +1,16 @@
+name: Salt Creek at Roca, Nebr.
+lat: 40.657725
+lon: -96.665469
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 363.575
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06803000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b4410e89f1ed4e8f89e1e4c048d11e3c

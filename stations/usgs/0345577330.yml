@@ -1,0 +1,17 @@
+name: WEST FORK PIGEON RIVER NEAR RETREAT, NC
+lat: 35.42666666666666
+lon: -82.91972222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 864.879
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0345577330/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-11-19T19:10:00+00:00
+time_series_id: 5136c5d73ca143d5aae6a0a308397b79

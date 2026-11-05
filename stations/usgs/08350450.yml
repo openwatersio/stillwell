@@ -1,0 +1,17 @@
+name: C. LOS APACHES ARROYO AT TO'HAJIILEE, NM
+lat: 35.09845833333333
+lon: -107.11297777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1712.062
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08350450/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+series_end: 2026-02-09T21:25:00+00:00
+time_series_id: 2ce8c2203bce42dfb1d2a0715ed733df

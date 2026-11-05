@@ -1,0 +1,16 @@
+name: BUCK CREEK NR PELHAM, ALA
+lat: 33.2961111111111
+lon: -86.8252777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 125.075
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02423545/
+parameter_code: "00065"
+series_begin: 2026-03-03T21:00:00+00:00
+time_series_id: d8f5c3e449b0475b834ce6f3536cb264

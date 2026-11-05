@@ -1,0 +1,16 @@
+name: BIG LOST RIVER AT ARCO AT SUNSET ROAD ID
+lat: 43.6381944444444
+lon: -113.3265
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1622.249
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13132373/
+parameter_code: "00065"
+series_begin: 2019-03-25T16:45:00+00:00
+time_series_id: 92077228db3b4e198b0c1886d624c6f0

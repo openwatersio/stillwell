@@ -1,0 +1,16 @@
+name: WARM SPGS CONFL AT IVERSON FLUME NR MOAPA, NV
+lat: 36.7113333333333
+lon: -114.709666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 542.544
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09415927/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 045b408214ea4bc8b238d099d2cfc63a

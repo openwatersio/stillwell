@@ -1,0 +1,16 @@
+name: Amite River at Port Vincent, LA
+lat: 30.3326939052544
+lon: -90.8520418779796
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.415
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07380120/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 03c31e46523e4860877bc1c87f5234e8

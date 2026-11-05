@@ -1,0 +1,16 @@
+name: CHATTAHOOCHEE RIVER NEAR CORNELIA, GA
+lat: 34.5407222222222
+lon: -83.622775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 344.009
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02331600/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 692c8378925d4527bfa6a7f893565557

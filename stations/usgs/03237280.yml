@@ -1,0 +1,16 @@
+name: Upper Twin Creek at McGaw OH
+lat: 38.6436874464893
+lon: -83.2157364849649
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 165.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03237280/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 280305294965421486b2bc5fc0f16816

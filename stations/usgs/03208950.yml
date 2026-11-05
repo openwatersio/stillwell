@@ -1,0 +1,16 @@
+name: CRANES NEST RIVER NEAR CLINTWOOD, VA
+lat: 37.1239952108201
+lon: -82.4387614246052
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 438.79
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03208950/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 53e8c1db8d4c4ef5bc13d4d4a7af84d2

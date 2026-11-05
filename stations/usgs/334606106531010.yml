@@ -1,0 +1,17 @@
+name: NAWCA AT WILDLIFE CROSSING
+lat: 33.76833333333333
+lon: -106.88611111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1370.253
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-334606106531010/
+parameter_code: "00065"
+series_begin: 2022-12-02T00:45:00+00:00
+series_end: 2024-04-25T06:45:00+00:00
+time_series_id: 4c6fb1b8c8ad4393a5ac96e06d1062f3

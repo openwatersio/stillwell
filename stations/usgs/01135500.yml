@@ -1,0 +1,16 @@
+name: PASSUMPSIC RIVER AT PASSUMPSIC, VT
+lat: 44.3656147050381
+lon: -72.0392613150447
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 148.678
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01135500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 189e23a67fbc487fa901c30c9a143c3e

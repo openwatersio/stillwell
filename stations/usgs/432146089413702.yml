@@ -1,0 +1,17 @@
+name: LAKE WISCONSIN AT MP-1
+lat: 43.3627777777778
+lon: -89.6936111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.836
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-432146089413702/
+parameter_code: "00065"
+series_begin: 2020-11-06T19:07:00+00:00
+series_end: 2020-11-06T19:09:00+00:00
+time_series_id: 91102d6822ff42d0a898ef49f6aeed99

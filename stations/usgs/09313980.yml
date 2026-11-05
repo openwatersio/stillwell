@@ -1,0 +1,16 @@
+name: PRICE RIVER AT RIDGE ROAD NEAR WELLINGTON, UT
+lat: 39.536081
+lon: -110.6994
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1627.867
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09313980/
+parameter_code: "00065"
+series_begin: 2025-06-03T14:15:00+00:00
+time_series_id: 34648bb6c73e47e1979030b633c921a0

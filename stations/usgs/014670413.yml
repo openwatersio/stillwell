@@ -1,0 +1,15 @@
+name: Pennypack Creek at Bethayres, PA
+lat: 40.1127777777778
+lon: -75.0730555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.761
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-014670413/
+parameter_code: "00065"
+time_series_id: 02879417ffe64eecbe0b2bded245c52a

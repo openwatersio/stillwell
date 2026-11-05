@@ -1,0 +1,16 @@
+name: CEDAR CREEK AT GA AVE, AT CEDARTOWN, GA
+lat: 33.9969444444444
+lon: -85.2660555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 231.307
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02397410/
+parameter_code: "00065"
+series_begin: 2010-07-28T05:00:00+00:00
+time_series_id: 4632c084e48b400399d91547a0c0e280

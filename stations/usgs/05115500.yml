@@ -1,0 +1,16 @@
+name: LAKE DARLING NEAR FOXHOLM, ND
+lat: 48.458056
+lon: -101.583333
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 457.523
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05115500/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: b749362b74c24eac855a8bb4ee00f391

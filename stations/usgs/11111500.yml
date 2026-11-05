@@ -1,0 +1,16 @@
+name: SESPE CREEK NEAR WHEELER SPRINGS CA
+lat: 34.5777657298618
+lon: -119.257334665478
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1067.3
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11111500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: f8a5246fdca9477f8478a8d1a25f62e8

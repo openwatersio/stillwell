@@ -1,0 +1,16 @@
+name: HACKBERRY C NR TREGO CENTER, KS
+lat: 38.8395055555556
+lon: -100.058513888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 679.96
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06860900/
+parameter_code: "00065"
+series_begin: 2014-12-11T20:45:00+00:00
+time_series_id: 4e5826adb6fe46c2a6013e01fbcf61c0

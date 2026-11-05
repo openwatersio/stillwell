@@ -1,0 +1,16 @@
+name: San Marcos Rv nr Martindale, TX
+lat: 29.83228611111111
+lon: -97.84238333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 146.383
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08171400/
+parameter_code: "00065"
+series_begin: 2011-05-19T05:00:00+00:00
+time_series_id: 2dda9b7c983c4e12801e76eb0d2659f1

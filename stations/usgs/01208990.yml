@@ -1,0 +1,16 @@
+name: SAUGATUCK RIVER NEAR REDDING, CT
+lat: 41.294436386073215
+lon: -73.39510120992368
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 86.71
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01208990/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 92455acf8a01474abb5a908a6448df24

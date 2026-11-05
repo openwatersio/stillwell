@@ -1,0 +1,16 @@
+name: Larrison Ck at FM 1428 nr Midway, TX
+lat: 30.949675
+lon: -95.71642777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08065820/
+parameter_code: "00065"
+series_begin: 2021-08-19T20:20:00+00:00
+time_series_id: 407748091e8143e2a499cb0df7638efd

@@ -1,0 +1,16 @@
+name: Saline River near Lockesburg, AR
+lat: 33.9622222222222
+lon: -94.0616666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 91.346
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07341200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 322d8526e9fa433bb589247f4a4bb994

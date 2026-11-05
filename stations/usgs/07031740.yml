@@ -1,0 +1,16 @@
+name: WOLF RIVER AT HOLLYWOOD ST AT MEMPHIS, TN
+lat: 35.187875206101374
+lon: -89.97564264709122
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 58.278
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07031740/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 83a4823b13aa4b05b8e79a5ab2cbc328

@@ -1,0 +1,16 @@
+name: STORM DRAIN AT RIVERS RDG CIR NR NEWPORT NEWS, VA
+lat: 37.1672027777778
+lon: -76.5662166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 4.602
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204279245/
+parameter_code: "00065"
+series_begin: 2015-04-15T01:50:00+00:00
+time_series_id: e2766238bdd14ffcb5248f719bbc52f0

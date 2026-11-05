@@ -1,0 +1,17 @@
+name: AMMONOOSUC RIVER BELOW LISBON DAM, AT LISBON, NH
+lat: 44.2125
+lon: -71.9141666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 169.164
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01137940/
+parameter_code: "00065"
+series_begin: 2009-06-17T16:45:00+00:00
+series_end: 2011-07-06T17:30:00+00:00
+time_series_id: 472668c376024679a9085ba5cc3cd006

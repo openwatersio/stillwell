@@ -1,0 +1,17 @@
+name: BACK CREEK NEAR SWOOPE, VA
+lat: 38.118722222222225
+lon: -79.20886111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 492.557
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01622258/
+parameter_code: "00065"
+series_begin: 2021-05-26T17:00:00+00:00
+series_end: 2021-11-08T15:35:00+00:00
+time_series_id: 486397a578a14aecbcb5e4cc051a1c24

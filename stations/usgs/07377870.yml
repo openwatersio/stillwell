@@ -1,0 +1,17 @@
+name: Comite River at Hooper Road near Baton Rouge, LA
+lat: 30.530744
+lon: -91.093717
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 8.684
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07377870/
+parameter_code: "00065"
+series_begin: 2007-10-23T22:00:00+00:00
+series_end: 2026-07-24T13:00:00+00:00
+time_series_id: 4fcd348558964df1a84a8d68df0e6372

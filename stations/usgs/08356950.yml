@@ -1,0 +1,17 @@
+name: RIO GRANDE CONVEYANCE CHANNEL NR SAN ANTONIO, NM
+lat: 33.870044
+lon: -106.850983
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1379.525
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08356950/
+parameter_code: "00065"
+series_begin: 2022-04-07T21:45:00+00:00
+series_end: 2024-04-24T18:00:00+00:00
+time_series_id: efd0bcc48482416ba19483b317fb31d3

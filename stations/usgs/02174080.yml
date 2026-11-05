@@ -1,0 +1,16 @@
+name: POLK SWAMP AT US-15 BELOW ST GEORGE, SC
+lat: 33.13361111111111
+lon: -80.581
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.726
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02174080/
+parameter_code: "00065"
+series_begin: 2024-03-29T17:00:00+00:00
+time_series_id: c218cfe521ad461ea7c898511d6fdda0

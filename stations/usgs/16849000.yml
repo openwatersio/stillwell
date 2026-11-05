@@ -1,0 +1,16 @@
+name: Fena Dam Spillway near Agat, Guam
+lat: 13.3593611111111
+lon: 144.70575
+country_code: GU
+kind: lake
+datum: GAGE
+datums:
+  LMSL: 33.939
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16849000/
+parameter_code: "00065"
+series_begin: 2007-09-30T14:00:00+00:00
+time_series_id: 2aaeb2c23b5147bb94d0c9c69a1b173d

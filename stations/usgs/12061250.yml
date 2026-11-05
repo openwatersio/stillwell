@@ -1,0 +1,17 @@
+name: VANCE CREEK ABOVE KIRKLAND CREEK NEAR POTLATCH, WA
+lat: 47.3225138888889
+lon: -123.286097222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12061250/
+parameter_code: "00065"
+series_begin: 2018-09-28T21:15:00+00:00
+series_end: 2024-08-23T02:15:00+00:00
+time_series_id: 641c536f3cc847e5aee501daed0c48b2

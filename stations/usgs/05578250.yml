@@ -1,0 +1,16 @@
+name: NORTH FORK SALT CREEK NEAR DE WITT, IL
+lat: 40.2358611111111
+lon: -88.8095555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.043
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05578250/
+parameter_code: "00065"
+series_begin: 2015-10-23T21:00:00+00:00
+time_series_id: 904853e7a50b42269f837a98e2eb0d03

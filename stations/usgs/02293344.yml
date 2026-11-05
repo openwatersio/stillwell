@@ -1,0 +1,13 @@
+name: NORTH SPREADER CANAL AT CIETUS BOAT L. CAPE CORAL
+lat: 26.6421944444444
+lon: -82.0564444444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02293344/
+parameter_code: "00065"
+time_series_id: 291b57c71db94a98aa6b1d6c81f7469e

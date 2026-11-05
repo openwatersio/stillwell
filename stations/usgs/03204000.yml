@@ -1,0 +1,16 @@
+name: GUYANDOTTE RIVER AT BRANCHLAND, WV
+lat: 38.22085609765807
+lon: -82.20130925250511
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 167.03
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03204000/
+parameter_code: "00065"
+series_begin: 2012-10-01T05:00:00+00:00
+time_series_id: 3a827b61af82448094da9081d40301fb

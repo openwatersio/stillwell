@@ -1,0 +1,15 @@
+name: DITCH 19 N OF GUS HIPP BLVD AT ROCKLEDGE, FL
+lat: 28.3064107165778
+lon: -80.7066926780444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248650/
+parameter_code: "00065"
+series_begin: 2013-09-04T04:00:00+00:00
+series_end: 2017-10-01T05:00:00+00:00
+time_series_id: 03a8b5c1099143b3b606e1988bcb5263

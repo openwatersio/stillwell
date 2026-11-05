@@ -1,0 +1,16 @@
+name: RIO MAJADA AT LA PLENA, PR
+lat: 18.044722
+lon: -66.2075
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 123.968
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50100450/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 4b18444b13b24c2e93240a71b41bec93

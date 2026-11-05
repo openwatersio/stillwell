@@ -1,0 +1,14 @@
+name: HARNEY POND CANAL 2.4 MILES BL S70 NR LAKEPORT, FL
+lat: 27.0908333333333
+lon: -81.1327222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02257750/
+parameter_code: "00065"
+series_begin: 2017-02-03T15:00:00+00:00
+time_series_id: 8d5fef8260ba46fd8d9b35c789585c05

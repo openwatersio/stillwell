@@ -1,0 +1,16 @@
+name: MINNESOTA RIVER NEAR JORDAN, MN
+lat: 44.6926832265224
+lon: -93.642001000184
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 210.336
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05330000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2b76ca5af8f04e528ec5ce6e9434603a

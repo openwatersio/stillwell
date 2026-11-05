@@ -1,0 +1,16 @@
+name: Palo Gaucho Bayou at FM 2784 nr Milam, TX
+lat: 31.395083333333332
+lon: -93.89469444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08024480/
+parameter_code: "00065"
+series_begin: 2021-09-21T17:45:00+00:00
+time_series_id: ce3fc0063f5541f985872f5f53510bbc

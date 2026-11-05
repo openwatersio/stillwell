@@ -1,0 +1,16 @@
+name: BRUSH CREEK NEAR JENSEN, UTAH
+lat: 40.40846111111111
+lon: -109.34056666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1444.35
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09263500/
+parameter_code: "00065"
+series_begin: 2025-04-30T16:15:00+00:00
+time_series_id: 4bcb5e4e64244820844d07ccaa5bf430

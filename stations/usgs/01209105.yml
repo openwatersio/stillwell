@@ -1,0 +1,16 @@
+name: ASPETUCK RIVER AT ASPETUCK, CT
+lat: 41.22874166666667
+lon: -73.32411944444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 65.532
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01209105/
+parameter_code: "00065"
+series_begin: 2009-11-12T18:45:00+00:00
+time_series_id: b164f016838748a1a80673198191984f

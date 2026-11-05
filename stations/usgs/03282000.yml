@@ -1,0 +1,16 @@
+name: KENTUCKY RIVER AT LOCK 14 AT HEIDELBERG, KY
+lat: 37.553141806233
+lon: -83.7693625183374
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 190.619
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03282000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 82105c94bdda415e8c73aceb8a020b01

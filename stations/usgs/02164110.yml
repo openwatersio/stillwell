@@ -1,0 +1,16 @@
+name: REEDY RIVER ABOVE FORK SHOALS, SC
+lat: 34.653389
+lon: -82.298639
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.159
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02164110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: fb93b09869554571a9bb1b884d6de99f

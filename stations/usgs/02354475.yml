@@ -1,0 +1,16 @@
+name: SPRING CREEK NEAR LEARY, GA
+lat: 31.4655555555556
+lon: -84.4494444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 51.063
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02354475/
+parameter_code: "00065"
+series_begin: 2007-12-16T05:00:00+00:00
+time_series_id: eeb49a34c2ed43b8bd23a92ae45c458e

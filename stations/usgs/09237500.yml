@@ -1,0 +1,16 @@
+name: YAMPA RIVER BELOW STAGECOACH RESERVOIR, CO
+lat: 40.286544444444445
+lon: -106.82905555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2151.263
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09237500/
+parameter_code: "00065"
+series_begin: 2020-06-09T18:30:00+00:00
+time_series_id: 236a49d6df874d05ba32b119971fa720

@@ -1,0 +1,13 @@
+name: GULF OF AMERICA AT CLEARWATER BEACH, MIDPIER, FL
+lat: 27.97749722222222
+lon: -82.8308611111111
+country_code: US
+kind: coastal
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-275839082495101/
+parameter_code: "62620"
+time_series_id: 2dd94d01842046b4a7667a5d200b7f3d

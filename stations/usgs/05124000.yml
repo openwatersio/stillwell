@@ -1,0 +1,16 @@
+name: SOURIS RIVER NEAR WESTHOPE, ND
+lat: 48.996389
+lon: -100.958056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 427.878
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05124000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 402931c0991f4ea1a4712ce75f2b7628

@@ -1,0 +1,16 @@
+name: SOUTH CREEK ABOVE RESERVOIR NEAR MONTICELLO, UT
+lat: 37.8466608313115
+lon: -109.369562472974
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2183.761
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09378170/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: efd6c141441142dd9054c0383d63a67d

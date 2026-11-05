@@ -1,0 +1,17 @@
+name: C-41 CANAL NEAR BRIGHTON, FL
+lat: 27.213936
+lon: -81.201458
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02273230/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-11-19T16:30:00+00:00
+time_series_id: aaf38d90233e44709c6622c548808593

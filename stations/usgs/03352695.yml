@@ -1,0 +1,16 @@
+name: HERON LAKE AT INDIANAPOLIS, IN
+lat: 39.8472631925236
+lon: -86.113597377463
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 218.859
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03352695/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: febee3eab55a4c64b115f15870894bd3

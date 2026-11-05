@@ -1,0 +1,16 @@
+name: FALL RIVER NR SQUIRREL ID
+lat: 44.0686111111111
+lon: -111.241388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1701.567
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13047500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 4117fdc53a204a9690a029b966a58e3f

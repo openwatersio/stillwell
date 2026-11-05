@@ -1,0 +1,15 @@
+name: C-1 CANAL 900 FT ABOVE S-148 NEAR GOULDS, FL
+lat: 25.5702777777778
+lon: -80.3856944444445
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0229070838/
+parameter_code: "00065"
+series_begin: 2017-05-11T17:45:00+00:00
+series_end: 2018-06-07T18:45:00+00:00
+time_series_id: eb140c7f84f54d73b3cf53617d38fdf5

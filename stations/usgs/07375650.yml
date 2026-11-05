@@ -1,0 +1,16 @@
+name: Tangipahoa River near Ponchatoula, LA
+lat: 30.4436944444444
+lon: -90.3345833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.838
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07375650/
+parameter_code: "00065"
+series_begin: 2013-03-28T05:00:00+00:00
+time_series_id: 073d23f88ec74b5ab76e14915e7df495

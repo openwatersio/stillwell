@@ -1,0 +1,16 @@
+name: BIG SANDY R AT LOUISA, KY
+lat: 38.1711970795661
+lon: -82.6346023462362
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 156.097
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03215000/
+parameter_code: "00065"
+series_begin: 2016-10-01T05:00:00+00:00
+time_series_id: 56b02f1e8fe7452cb75d74d8064f5846

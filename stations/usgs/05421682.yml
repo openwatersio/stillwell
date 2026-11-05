@@ -1,0 +1,15 @@
+name: Buffalo Creek South of Prairieburg, IA
+lat: 42.195833
+lon: -91.422778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 252.521
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05421682/
+parameter_code: "00065"
+time_series_id: 5048c04008a04497a2959b160f72fe7d

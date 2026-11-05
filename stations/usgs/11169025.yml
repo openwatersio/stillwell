@@ -1,0 +1,16 @@
+name: GUADALUPE R ABV HWY 101 A SAN JOSE CA
+lat: 37.3738296053131
+lon: -121.933012850008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.355
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11169025/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 6a6d6d217ae24dc4aa3d68054fd8c7c3

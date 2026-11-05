@@ -1,0 +1,17 @@
+name: STILLWATER POINT RES DIV CANAL NR FALLON, NV
+lat: 39.4733027777778
+lon: -118.598627777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1193.292
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10312210/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2016-10-04T07:45:00+00:00
+time_series_id: ab390a9d69f541459a733efd42a88916

@@ -1,0 +1,17 @@
+name: ICHETUCKNEE R A DAMPIER'S LANDING NR HILDRETH, FL
+lat: 29.9602777777778
+lon: -82.7722222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2.627
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02322698/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2012-10-01T03:45:00+00:00
+time_series_id: 71130df9345a4da4b2df0f64295b30aa

@@ -1,0 +1,16 @@
+name: RIO ESPIRITU SANTO NR RIO GRANDE, PR
+lat: 18.359908
+lon: -65.814
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 8.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50063800/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 24654cd8176e4294977d6cc2fe11fb82

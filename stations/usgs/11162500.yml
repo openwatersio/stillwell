@@ -1,0 +1,16 @@
+name: PESCADERO C NR PESCADERO CA
+lat: 37.26073382709487
+lon: -122.32881250557213
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.553
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11162500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e22ab53e282a4337b7f4a13df99baa92

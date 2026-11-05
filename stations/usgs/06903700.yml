@@ -1,0 +1,16 @@
+name: South Fork Chariton River near Promise City, IA
+lat: 40.8004444444444
+lon: -93.1926861111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 278.38
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06903700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e0c94bf1a90e4485b1b189ae5cada9ed

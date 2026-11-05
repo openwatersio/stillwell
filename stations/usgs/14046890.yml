@@ -1,0 +1,17 @@
+name: PINE CREEK NEAR CLARNO, OR
+lat: 44.91002777777778
+lon: -120.44102777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 407.356
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14046890/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2022-06-29T16:30:00+00:00
+time_series_id: 3aa493e025194a9f91d5985f3e4aacfe

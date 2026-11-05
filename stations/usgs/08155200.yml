@@ -1,0 +1,16 @@
+name: Barton Ck at SH 71 nr Oak Hill, TX
+lat: 30.2963158693368
+lon: -97.9255649629022
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 224.632
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08155200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e1dd973c43eb499f9025da576cf7f77f

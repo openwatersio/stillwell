@@ -1,0 +1,17 @@
+name: Snyder Creek nr mouth, nr West Glacier, MT
+lat: 48.6164166666667
+lon: -113.876388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 980.846
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12357800/
+parameter_code: "00065"
+series_begin: 2017-11-15T16:20:00+00:00
+series_end: 2021-11-01T06:55:00+00:00
+time_series_id: 2a1479f280c64284bba9598fab39a47a

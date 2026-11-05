@@ -1,0 +1,16 @@
+name: CRYSTAL SPRINGS NEAR ZEPHYRHILLS FL
+lat: 28.1819444444444
+lon: -82.1852777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.287
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02302000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 85b2572f56e34cb7b7f566e74339e0a6

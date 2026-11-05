@@ -1,0 +1,13 @@
+name: KAWAINUI SWAMP AT KAILUA
+lat: 21.398504220788613
+lon: -157.76448027737774
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16264700/
+parameter_code: "00065"
+time_series_id: 5441bd71b26444f2a32d58310634a267

@@ -1,0 +1,16 @@
+name: LV WASH BLW FLAMINGO WASH CONFL NR LAS VEGAS, NV
+lat: 36.1396952663408
+lon: -115.047775462464
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 512.381
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-094196783/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 308a5e79ad854a83abea28e7a2c3366b

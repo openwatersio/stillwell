@@ -1,0 +1,14 @@
+name: PALISADES RESERVOIR NR IRWIN ID
+lat: 43.330278
+lon: -111.205556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13032450/
+parameter_code: "00065"
+series_begin: 2026-05-19T20:00:00+00:00
+time_series_id: 20a1b93f1eb94a28922becfe9a9274ed

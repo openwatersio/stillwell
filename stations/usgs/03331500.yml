@@ -1,0 +1,16 @@
+name: TIPPECANOE RIVER NEAR ORA, IN
+lat: 41.1572426508768
+lon: -86.5635919909411
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 211.077
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03331500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 264e7651fe8543db8dfc9ea1897eaaf1

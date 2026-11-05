@@ -1,0 +1,15 @@
+name: MIDDLE RIVER ROUGE AT PLYMOUTH, MI
+lat: 42.3717030825456
+lon: -83.4454902592375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 210.312
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04166750/
+parameter_code: "00065"
+time_series_id: 69c6293c561148d881f664387d1cd963

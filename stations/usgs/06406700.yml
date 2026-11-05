@@ -1,0 +1,17 @@
+name: SPRING CREEK AT OREVILLE, NEAR HILL CITY, SD
+lat: 43.866253
+lon: -103.62359400000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1630.589
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06406700/
+parameter_code: "00065"
+series_begin: 2018-07-18T11:45:00+00:00
+series_end: 2026-10-22T17:45:00+00:00
+time_series_id: 8929e14c9fce4fbd872021e44a9fd98d

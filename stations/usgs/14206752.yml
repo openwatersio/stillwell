@@ -1,0 +1,16 @@
+name: CHICKEN CREEK ABV SEASONAL TRAIL, NR SHERWOOD, OR
+lat: 45.385417
+lon: -122.837056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 37.49
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14206752/
+parameter_code: "00065"
+series_begin: 2023-07-13T22:30:00+00:00
+time_series_id: e130a121150e4d9593dbbc0dbc199ab6

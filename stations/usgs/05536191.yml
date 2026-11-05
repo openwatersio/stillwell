@@ -1,0 +1,16 @@
+name: LITTLE CALUMET R AT NORTHCOTE AV AT MUNSTER, IN
+lat: 41.566583333333334
+lon: -87.48577777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.766
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05536191/
+parameter_code: "00065"
+series_begin: 2018-03-09T19:45:00+00:00
+time_series_id: 2abfaf6bcf174048a9fd78be85d631e5

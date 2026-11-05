@@ -1,0 +1,16 @@
+name: MIMBRES RIVER AT MIMBRES, NM
+lat: 32.854675
+lon: -107.973788888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1797.884
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08477110/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 861c6143bb204574940a57f5f3881ab3

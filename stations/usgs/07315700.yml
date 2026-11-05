@@ -1,0 +1,16 @@
+name: Mud Creek near Courtney, OK
+lat: 34.004265161916
+lon: -97.5669680876998
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 222.12
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07315700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a5b8de1333ec4e519d1fdbc2e47de590

@@ -1,0 +1,16 @@
+name: WESTCONNAUG STREAM AT PLAINFIELD PIKE, RI
+lat: 41.7853772110209
+lon: -71.6672885333337
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 99.792
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115276/
+parameter_code: "00065"
+series_begin: 2009-04-18T04:00:00+00:00
+time_series_id: ff1bb31b26a44ceda2e6bf435c488fe4

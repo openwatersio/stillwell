@@ -1,0 +1,14 @@
+name: WETLAND 500S BLW S-632 IN WCA-3B NR COOPERTOWN,FL
+lat: 25.823044444444445
+lon: -80.64707777777778
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254923080384901/
+parameter_code: "00065"
+series_begin: 2024-06-27T16:15:00+00:00
+time_series_id: 485abe017da3434c971e04fd652be11d

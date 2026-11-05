@@ -1,0 +1,16 @@
+name: Bayou Dorcheat near Springhill, LA
+lat: 32.9945813298873
+lon: -93.3965599979743
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07348700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7fb4c70b3d734834b192c88b75e3ff9a

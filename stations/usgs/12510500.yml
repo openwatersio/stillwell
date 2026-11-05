@@ -1,0 +1,16 @@
+name: YAKIMA RIVER AT KIONA, WA
+lat: 46.2534674761881
+lon: -119.478079390762
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 138.504
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12510500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 78ca12a569d74349beb5423deb5888c4

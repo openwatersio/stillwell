@@ -1,0 +1,16 @@
+name: SEVIER RIVER NEAR KINGSTON, UT
+lat: 38.2060903785277
+lon: -112.207702373255
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1825.453
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10183500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e2b97a15d1654a7d9ac7397c180e4377

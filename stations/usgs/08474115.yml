@@ -1,0 +1,16 @@
+name: Resaca del Rancho Viejo, Brownsville, TX
+lat: 25.95733333333333
+lon: -97.42150000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08474115/
+parameter_code: "00065"
+series_begin: 2022-03-15T23:30:00+00:00
+time_series_id: 89567bed41c54466b1c9914e6c462272

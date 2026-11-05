@@ -1,0 +1,17 @@
+name: Deep Bayou near Star City, AR
+lat: 33.963125000000005
+lon: -91.69244722222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 45.144
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07364130/
+parameter_code: "00065"
+series_begin: 2014-10-22T17:30:00+00:00
+series_end: 2026-08-26T12:45:00+00:00
+time_series_id: 267df1a08c7f46e1972822dea79e3313

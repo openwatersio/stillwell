@@ -1,0 +1,16 @@
+name: Fifteenmile Ck nr Weser, TX
+lat: 28.897761031422
+lon: -97.3549922210204
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 48.265
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08176550/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a21e7f02d3bd47198af716be4c121bb3

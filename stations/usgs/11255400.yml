@@ -1,0 +1,16 @@
+name: SILVER C A PANOCHE RD BR NR PANOCHE CA
+lat: 36.594569
+lon: -120.684583
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.778
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11255400/
+parameter_code: "00065"
+series_begin: 2026-09-17T19:45:00+00:00
+time_series_id: b44173c0c3674c4c9eb39f581deb5be5

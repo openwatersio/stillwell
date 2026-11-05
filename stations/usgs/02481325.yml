@@ -1,0 +1,13 @@
+name: BAYOU PORTAGE AT HENDERSON AVE NR DE LISLE, MS
+lat: 30.3424186559802
+lon: -89.264488524624
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02481325/
+parameter_code: "00065"
+time_series_id: fe80e20f55944b048203782176d55af7

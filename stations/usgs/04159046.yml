@@ -1,0 +1,16 @@
+name: PINNEBOG RIVER AT KINDE RD NEAR PINNEBOG, MI
+lat: 43.935258
+lon: -83.126747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.418
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04159046/
+parameter_code: "00065"
+series_begin: 2022-09-21T23:30:00+00:00
+time_series_id: a9e106d533fd421f828ce53f5c34fe5d

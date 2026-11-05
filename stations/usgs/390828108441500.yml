@@ -1,0 +1,16 @@
+name: COLORADO RIVER AT FRUITA, CO.
+lat: 39.142442
+lon: -108.738106
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1366.723
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-390828108441500/
+parameter_code: "00065"
+series_begin: 2026-09-23T20:15:00+00:00
+time_series_id: d36362cd33fc438b868adde03d11dbad

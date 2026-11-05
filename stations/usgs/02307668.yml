@@ -1,0 +1,16 @@
+name: ALLIGATOR CREEK BELOW BELCHER RD AT CLEARWATER FL
+lat: 27.9797421060249
+lon: -82.742323158436
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 7.62
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02307668/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 33bce4f1ce984296b12e800e86382564

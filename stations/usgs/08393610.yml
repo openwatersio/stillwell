@@ -1,0 +1,16 @@
+name: RIO HONDO NEAR ROSWELL, NM
+lat: 33.408775
+lon: -104.471716666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1065.706
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08393610/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b3440d4a7bf74dff96378d4d3944df64

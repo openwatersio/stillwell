@@ -1,0 +1,16 @@
+name: ALAMITOS CREEK BLW CANONCITO DITCH NR HOLMAN, NM
+lat: 36.05325
+lon: -105.468
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2933.09
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08277140/
+parameter_code: "00065"
+series_begin: 2025-09-18T21:45:00+00:00
+time_series_id: 5dd68fba304440b3bdf7903471e0ad82

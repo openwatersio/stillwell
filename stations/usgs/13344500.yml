@@ -1,0 +1,16 @@
+name: TUCANNON RIVER NEAR STARBUCK, WA
+lat: 46.5054217153695
+lon: -118.066339343723
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 222.504
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13344500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: f76918c8b56a4f3fa4a1f1e1d3a546c3

@@ -1,0 +1,16 @@
+name: Missouri River at Leavenworth, KS
+lat: 39.3269722222222
+lon: -94.9095
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 226.771
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06820475/
+parameter_code: "00065"
+series_begin: 2013-10-01T06:00:00+00:00
+time_series_id: 3ebe1a5a2b7a49928eafb06665fc6ddf

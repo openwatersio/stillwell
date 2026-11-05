@@ -1,0 +1,16 @@
+name: KLAMATH RIVER AT MILLER ISLAND, NEAR MIDLAND, OR
+lat: 42.14678333333333
+lon: -121.8486861111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1237.957
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11508700/
+parameter_code: "00065"
+series_begin: 2023-08-10T18:15:00+00:00
+time_series_id: a9e75390ccee45d2b596782b7d673b74

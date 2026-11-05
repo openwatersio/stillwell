@@ -1,0 +1,15 @@
+name: Eagle Creek tile 1 near Williamstown OH
+lat: 40.8475
+lon: -83.6527777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-405051083391001/
+parameter_code: "00065"
+series_begin: 2012-08-08T10:30:00+00:00
+series_end: 2020-10-01T04:45:00+00:00
+time_series_id: 00fc0716560e49f299a27ef9c35e3f54

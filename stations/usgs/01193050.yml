@@ -1,0 +1,16 @@
+name: CONNECTICUT RIVER AT MIDDLE HADDAM, CT
+lat: 41.54165281366759
+lon: -72.55312768493529
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 7.925
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01193050/
+parameter_code: "00065"
+series_begin: 2008-12-04T16:20:00+00:00
+time_series_id: 9d92dca50d344ef086ed527069647fc7

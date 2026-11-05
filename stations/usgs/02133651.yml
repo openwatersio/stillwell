@@ -1,0 +1,17 @@
+name: LUMBER RIVER AT STATE HIGHWAY 710 NR PEMBROKE, NC
+lat: 34.6801624573281
+lon: -79.235594121625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 44.196
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02133651/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2012-10-01T03:45:00+00:00
+time_series_id: e0453ca748b24ab48b22ae3eb5ea705a

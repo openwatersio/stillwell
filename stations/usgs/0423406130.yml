@@ -1,0 +1,16 @@
+name: SENECA RIVER AT FREE BRIDGE CORNERS NY
+lat: 42.96292674383
+lon: -76.7368961028541
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 111.862
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0423406130/
+parameter_code: "00065"
+series_begin: 2014-12-08T20:15:00+00:00
+time_series_id: 1b5f82cb05464525ba4aca61cd72f622

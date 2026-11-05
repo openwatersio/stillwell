@@ -1,0 +1,17 @@
+name: BIGHORN RIVER AT WORLAND, WY
+lat: 44.014645584274234
+lon: -107.96959551254433
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1230.935
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06268600/
+parameter_code: "00065"
+series_begin: 2014-12-12T19:30:00+00:00
+series_end: 2018-07-11T18:45:00+00:00
+time_series_id: f911aa18aa7646bf8ea317336c0ed5e2

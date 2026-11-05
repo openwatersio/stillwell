@@ -1,0 +1,16 @@
+name: Village Ck at US Hwy 69 nr Village Mills, TX
+lat: 30.481425
+lon: -94.3946527777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08041300/
+parameter_code: "00065"
+series_begin: 2018-06-13T16:00:00+00:00
+time_series_id: f4306037d6ac459e92813140ac229e07

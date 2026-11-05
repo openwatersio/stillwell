@@ -1,0 +1,16 @@
+name: St. Francis River near Mill Creek, MO
+lat: 37.5024166666667
+lon: -90.4578888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 169.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07035800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 8c6203ab7eb845b8a2bd8eec2ed2907c

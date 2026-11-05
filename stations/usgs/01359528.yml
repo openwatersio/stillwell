@@ -1,0 +1,16 @@
+name: NORMANS KILL AT ALBANY NY
+lat: 42.6336388888889
+lon: -73.8042777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 26.17
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01359528/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c88fb229d07943489da0e1e13a4563cb

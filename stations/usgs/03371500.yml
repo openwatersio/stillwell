@@ -1,0 +1,16 @@
+name: EAST FORK WHITE RIVER NEAR BEDFORD, IN
+lat: 38.77032632107404
+lon: -86.40969880489901
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 144.195
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03371500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 38289883912d406986a82d3d78e1f6b5

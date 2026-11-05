@@ -1,0 +1,14 @@
+name: LEVEE 31 NORTH EXTENSION AT 5 MILE NR WEST MIAMI F
+lat: 25.6859833333333
+lon: -80.4971
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02290767/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7c96501592ce4101ad84bfb9a70e3a1c

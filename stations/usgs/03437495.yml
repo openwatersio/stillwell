@@ -1,0 +1,16 @@
+name: S FK LITTLE R AT HWY 68 BY-PASS AT HOPKINSVILLE,KY
+lat: 36.8494893423498
+lon: -87.4288954352977
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.496
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03437495/
+parameter_code: "00065"
+series_begin: 2009-10-01T06:00:00+00:00
+time_series_id: 7ef3dd2d8f7c4b0982a610c674405ef8

@@ -1,0 +1,17 @@
+name: Fishpot Run near Shippingport, PA
+lat: 40.6369444444444
+lon: -80.3461111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.627
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03108010/
+parameter_code: "00065"
+series_begin: 2014-12-10T15:00:00+00:00
+series_end: 2017-04-26T18:45:00+00:00
+time_series_id: 538d24da4cbf4f5f8e5e3ef40bce1655

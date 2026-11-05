@@ -1,0 +1,16 @@
+name: East Fork Sinnemahoning at Wharton Township, PA
+lat: 41.54138888888889
+lon: -77.98027777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 352.065
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01543693/
+parameter_code: "00065"
+series_begin: 2010-10-27T15:45:00+00:00
+time_series_id: 6b5d374ee58a4b128e504aefaab8b053

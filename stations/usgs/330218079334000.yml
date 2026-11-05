@@ -1,0 +1,17 @@
+name: AIW AT BUCK HALL LANDING NEAR AWENDAW,SC
+lat: 33.0383333333333
+lon: -79.5611111111111
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-330218079334000/
+parameter_code: "00065"
+series_begin: 2016-10-06T18:25:00+00:00
+series_end: 2016-10-11T14:00:00+00:00
+time_series_id: 459ede5a60da40209c2d2492171edd69

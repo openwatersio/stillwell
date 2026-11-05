@@ -1,0 +1,16 @@
+name: JUMPER CREEK CANAL NEAR BUSHNELL, FL
+lat: 28.6972136092335
+lon: -82.1039741223376
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02312640/
+parameter_code: "00065"
+series_begin: 2008-09-23T05:00:00+00:00
+time_series_id: 719794ec9fcc4a38b0200995da007d22

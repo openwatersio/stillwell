@@ -1,0 +1,16 @@
+name: FLATROCK RIVER AT COLUMBUS, IN
+lat: 39.23504207979765
+lon: -85.92662745450355
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.827
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03363900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8e878e11cbd0468081c54b650b2f3dfc

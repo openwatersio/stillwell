@@ -1,0 +1,16 @@
+name: CLINCH RIVER ABOVE TAZEWELL, TN
+lat: 36.4250870141534
+lon: -83.3982345444118
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 323.301
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03528000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2c0e2dafc14a43d6892bb7480b72a7a9

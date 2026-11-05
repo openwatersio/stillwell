@@ -1,0 +1,15 @@
+name: MILL CK AT CHEQUESSETT YT & GOLF WELLFLEET MA
+lat: 41.9336527777778
+lon: -70.051975
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-415601070030701/
+parameter_code: "62620"
+series_begin: 2017-06-02T13:30:00+00:00
+series_end: 2022-08-04T14:15:00+00:00
+time_series_id: 9041e58190fa431dbc4715786fc46764

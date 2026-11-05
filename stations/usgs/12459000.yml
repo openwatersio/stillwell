@@ -1,0 +1,16 @@
+name: WENATCHEE RIVER AT PESHASTIN, WA
+lat: 47.58314473001723
+lon: -120.61950138688913
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 314.465
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12459000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:29:00+00:00
+time_series_id: 8e235a82e454471ebeac5fc3f4e7b1bc

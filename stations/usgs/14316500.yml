@@ -1,0 +1,16 @@
+name: N UMPQUA RIVER ABV COPELAND CK NR TOKETEE FALLS,OR
+lat: 43.2959542686382
+lon: -122.536712668789
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 481.584
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14316500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 1c3cf05075e0457e9c5e0d744db25ed2

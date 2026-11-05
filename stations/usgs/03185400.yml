@@ -1,0 +1,16 @@
+name: NEW RIVER AT THURMOND, WV
+lat: 37.9551128497596
+lon: -81.076488382022
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 313.944
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03185400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 221a777a16854d77b4f35ba0bace7701

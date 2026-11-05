@@ -1,0 +1,17 @@
+name: BLACKWATER RIVER NEAR DAVIS, WV
+lat: 39.1401077546944
+lon: -79.4197714716193
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 953.579
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03065400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2018-10-18T15:30:00+00:00
+time_series_id: 7cbc2a9454c34ae6a3476b8959e21917

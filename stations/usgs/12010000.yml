@@ -1,0 +1,16 @@
+name: NASELLE RIVER NEAR NASELLE, WA
+lat: 46.3739937011528
+lon: -123.743482000849
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.41
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12010000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 6f0dc58dfdfc4643ba3a4e8bdfa4c921

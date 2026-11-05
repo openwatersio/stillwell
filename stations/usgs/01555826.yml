@@ -1,0 +1,15 @@
+name: Mill Run at Beale Ave at Westmont, PA
+lat: 40.496944444444445
+lon: -78.41625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01555826/
+parameter_code: "00065"
+time_series_id: 6af17dd0054043aaba294769e529a7b1

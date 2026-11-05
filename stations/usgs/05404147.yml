@@ -1,0 +1,17 @@
+name: BIG CREEK OUTLET AT LAKE REDSTONE NR LA VALLE, WI
+lat: 43.5863611111111
+lon: -90.0874444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 278.228
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05404147/
+parameter_code: "00065"
+series_begin: 2019-07-30T20:30:00+00:00
+series_end: 2024-10-29T10:45:00+00:00
+time_series_id: 557822008beb4fbd8b4fcded485fde5e

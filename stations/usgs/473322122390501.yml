@@ -1,0 +1,15 @@
+name: Sinclair Inlet - logger near 24N/01E-23M02
+lat: 47.5561
+lon: -122.65163055555556
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-473322122390501/
+parameter_code: "62620"
+series_begin: 2024-07-23T21:19:00+00:00
+series_end: 2025-02-19T22:49:41+00:00
+time_series_id: 1d24855b6be1441483f1e2d6107a7eb3

@@ -1,0 +1,15 @@
+name: SEWER AT GRISSOM SCHOOL AT HEGEWISCH, IL
+lat: 41.6620833333333
+lon: -87.55375
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-413943087331301/
+parameter_code: "00065"
+series_begin: 2016-10-13T18:40:00+00:00
+series_end: 2023-01-18T19:10:00+00:00
+time_series_id: 1ae150e72c4e47eb9a36be7a361febfc

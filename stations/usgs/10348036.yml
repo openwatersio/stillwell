@@ -1,0 +1,16 @@
+name: TRUCKEE RV AT GLENDALE AVE NR SPARKS, NV
+lat: 39.5258333333333
+lon: -119.776638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1351.178
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10348036/
+parameter_code: "00065"
+series_begin: 2014-07-03T15:30:00+00:00
+time_series_id: 1a0b764bb74b4433ac44c1f3dd4987f0

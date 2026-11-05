@@ -1,0 +1,16 @@
+name: FALLS C NR WHITE WATER CA
+lat: 33.86946775968904
+lon: -116.67168194444513
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 580.034
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10257500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7c56f27bbcd84779aea6547a09f843f7

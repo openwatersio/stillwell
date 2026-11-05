@@ -1,0 +1,14 @@
+name: IMPERIAL RIVER NEAR BONITA SPRINGS, FL
+lat: 26.3358333333333
+lon: -81.7493888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02291500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: aa4a20612e2445a0b505e0b49de8a6f9

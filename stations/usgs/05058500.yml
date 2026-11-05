@@ -1,0 +1,16 @@
+name: SHEYENNE RIVER AT VALLEY CITY, ND
+lat: 46.915556
+lon: -98.010556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 365.937
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05058500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c0a404957a864e2ea4bf94130c2955dd

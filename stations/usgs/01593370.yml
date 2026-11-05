@@ -1,0 +1,17 @@
+name: L PAX RIV TRIB ABOVE WILDE LAKE AT COLUMBIA, MD
+lat: 39.225778
+lon: -76.870056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.031
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01593370/
+parameter_code: "00065"
+series_begin: 2012-10-01T05:00:00+00:00
+series_end: 2026-04-24T13:33:00+00:00
+time_series_id: 006f6341cf0d4185858a4ed27422c288

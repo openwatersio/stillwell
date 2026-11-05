@@ -1,0 +1,16 @@
+name: MOHAWK RIVER NEAR SPRINGFIELD, OR
+lat: 44.0929031662724
+lon: -122.957305170928
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 134.865
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14165000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 858ff46a0db542479aa8290343cb216b

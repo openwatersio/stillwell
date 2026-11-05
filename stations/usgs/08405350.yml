@@ -1,0 +1,16 @@
+name: BLACK RIVER BELOW BLUE SPRINGS NR WHITES CITY, NM
+lat: 32.1818722222222
+lon: -104.258894444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 977.841
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08405350/
+parameter_code: "00065"
+series_begin: 2019-06-27T16:30:00+00:00
+time_series_id: 7949cdbe5cdc45ef8beddadbce83d62c

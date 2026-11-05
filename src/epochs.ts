@@ -61,6 +61,13 @@ export interface Fetched {
   /** What the source sent this time, for a new epoch, which never takes the old one's. */
   sent?: Record<string, number>;
   reference?: { id: string; since: string | null } | null;
+  /**
+   * Why the source says the station no longer measures from its current
+   * epoch's zero, though the label and reference are the same, with no date.
+   * The reason names the new state, so it identifies the change the way a
+   * reference would.
+   */
+  changed?: string | null;
 }
 
 export interface EpochOptions {
@@ -112,8 +119,9 @@ export function nextEpochs(
   let event: EpochEvent | null = applyDecisions(epochs, options);
   const current = currentEpoch(epochs);
   const labelChanged = fetched.datum !== null && fetched.datum !== current.datum;
-  const ref = fetched.reference ?? null;
-  const refChanged = !!ref && current.reference !== null && ref.id !== current.reference;
+  const ref = fetched.changed ? { id: fetched.changed, since: null } : (fetched.reference ?? null);
+  const refChanged =
+    !!fetched.changed || (!!ref && current.reference !== null && ref.id !== current.reference);
 
   if (!labelChanged && !refChanged) {
     // The first refresh to see a reference records it, rather than call it a change.
@@ -191,6 +199,7 @@ export function nextEpochs(
         current.until = opened.until;
         opened.until = null;
         event = "opened";
+        if (fetched.changed) reason = fetched.changed;
       }
       epochs.push(opened);
     }

@@ -1,0 +1,16 @@
+name: WHITTENHORSE CREEK NEAR VINELAND, FL
+lat: 28.3850074920712
+lon: -81.6164632035713
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2.204
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02266200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 03d5d08ce1dc41cdb781e274cc184d46

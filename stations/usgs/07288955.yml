@@ -1,0 +1,15 @@
+name: YAZOO RIVER BL STEELE BAYOU NR LONG LAKE, MS
+lat: 32.4441666666667
+lon: -90.9141666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07288955/
+parameter_code: "00065"
+time_series_id: a03302c5b08b4519bfe5387c467b9199

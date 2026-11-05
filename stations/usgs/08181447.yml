@@ -1,0 +1,16 @@
+name: Leon Ck at Morey Rd, San Antonio, TX
+lat: 29.393880555555555
+lon: -98.60135
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 213.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08181447/
+parameter_code: "00065"
+series_begin: 2024-10-30T13:30:00+00:00
+time_series_id: aa7298c5532c42e49bbbfc4b528359d7

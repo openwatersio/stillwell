@@ -1,0 +1,13 @@
+name: NEW MILL CREEK AT CHESAPEAKE, VA
+lat: 36.7298711517105
+lon: -76.3100239783288
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-364347207618373/
+parameter_code: "62620"
+time_series_id: cb1a69a127244503a2e830d8f9ed01c6

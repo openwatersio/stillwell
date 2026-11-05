@@ -1,0 +1,16 @@
+name: Pilot Creek at County Hwy P15 near Rolfe, IA
+lat: 42.80575
+lon: -94.4626388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 340.675
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05476735/
+parameter_code: "00065"
+series_begin: 2009-03-01T06:00:00+00:00
+time_series_id: 08fda1e3a4ec4c23b63c4736b285e778

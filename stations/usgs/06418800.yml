@@ -1,0 +1,16 @@
+name: RAPID CREEK ABOVE WRF NEAR RAPID CITY,  SD
+lat: 44.026806
+lon: -103.101111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 915.388
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06418800/
+parameter_code: "00065"
+series_begin: 2018-04-07T00:00:00+00:00
+time_series_id: c8badc627d3e46abaa641afe7f68cc47

@@ -1,0 +1,15 @@
+name: LOCKWOOD CANYON CREEK NEAR THATCHER, CO
+lat: 37.492793164031
+lon: -103.828011385483
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1458.468
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07126390/
+parameter_code: "00065"
+time_series_id: e3a3895161594c5dbca4cba4b3e3aa59

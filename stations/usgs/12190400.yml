@@ -1,0 +1,16 @@
+name: BAKER RIVER AB BLUM CREEK NEAR CONCRETE, WA
+lat: 48.75397003908075
+lon: -121.5470573493133
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 238.375
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12190400/
+parameter_code: "00065"
+series_begin: 2012-10-01T08:00:00+00:00
+time_series_id: 0391fc08dd7c4699abad9bbb156c382c

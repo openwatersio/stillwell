@@ -1,0 +1,14 @@
+name: BONNET CREEK BELOW CULVERTS NEAR KISSIMMEE, FL
+lat: 28.3080662528024
+lon: -81.5245173809496
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02264141/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4203361a9a9346dbb817d42631e8f6ee

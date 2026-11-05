@@ -1,0 +1,16 @@
+name: Gallatin River above Deer Creek, near Big Sky, MT
+lat: 45.2972777777778
+lon: -111.211391666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1790.7
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06043120/
+parameter_code: "00065"
+series_begin: 2019-05-01T20:15:00+00:00
+time_series_id: 5e1fbb1fb1034b42b3a4423c9021dcd8

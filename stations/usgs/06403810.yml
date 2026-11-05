@@ -1,0 +1,17 @@
+name: BATTLE CREEK ABOVE KEYSTONE, SD
+lat: 43.905044
+lon: -103.463392
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1399.282
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06403810/
+parameter_code: "00065"
+series_begin: 2018-07-18T04:45:00+00:00
+series_end: 2026-10-22T15:15:00+00:00
+time_series_id: f9f3306a411b4e7e84f8335beb704e8d

@@ -1,0 +1,15 @@
+name: GILLS CREEK AT SC768 NEAR COLUMBIA, SC
+lat: 33.955000000000005
+lon: -80.98083333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 37.49
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02169585/
+parameter_code: "00065"
+time_series_id: cc2d39e251c5496c9177ad2fba2b6f49

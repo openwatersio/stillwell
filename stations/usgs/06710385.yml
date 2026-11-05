@@ -1,0 +1,16 @@
+name: BEAR CREEK ABOVE EVERGREEN, CO
+lat: 39.633167
+lon: -105.336944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2158.133
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06710385/
+parameter_code: "00065"
+series_begin: 2020-11-23T19:00:00+00:00
+time_series_id: 78d9faeef4f748739d0ab55a5bebb20c

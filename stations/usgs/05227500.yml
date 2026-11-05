@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER AT AITKIN, MN
+lat: 46.540706
+lon: -93.707429
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 360.584
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05227500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 703f5fcb21254977a9debb756a3c2121

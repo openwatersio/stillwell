@@ -1,0 +1,16 @@
+name: HAW CREEK AT HOPE, IN
+lat: 39.30393001017755
+lon: -85.77467804745555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 207.797
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03364042/
+parameter_code: "00065"
+series_begin: 2010-06-22T14:15:00+00:00
+time_series_id: cc1aae43b1874512b51a4d3c6ffcb0b4

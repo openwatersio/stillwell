@@ -1,0 +1,16 @@
+name: DEVIL CYN C NR SAN BERNARDINO CA
+lat: 34.20834338054659
+lon: -117.33142479443413
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 635.718
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11063680/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 9e7396d252bf4acfb25212d9a435d3a1

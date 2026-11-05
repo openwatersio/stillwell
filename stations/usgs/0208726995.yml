@@ -1,0 +1,16 @@
+name: HARE SNIPE CREEK AT SR 1822 NR LEESVILLE, NC
+lat: 35.862028
+lon: -78.695722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 88.392
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208726995/
+parameter_code: "00065"
+series_begin: 2026-11-04T17:00:00+00:00
+time_series_id: f3cf6d49f145400da851db13a945535a

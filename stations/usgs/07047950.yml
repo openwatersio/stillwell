@@ -1,0 +1,16 @@
+name: LAnguille River at Palestine, AR
+lat: 34.9727777777778
+lon: -90.8855555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 50.844
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07047950/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 858b416f23f04f40a65bd5264ed87158

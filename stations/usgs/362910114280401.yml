@@ -1,0 +1,17 @@
+name: 220  S17 E67 02ACAB1    SPRING (REPORT R50)
+lat: 36.4869111111111
+lon: -114.466655555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 448.97
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-362910114280401/
+parameter_code: "00065"
+series_begin: 2019-02-26T00:30:00+00:00
+series_end: 2021-03-30T19:31:00+00:00
+time_series_id: 22cca0d2f10143eb9dd6444efddbb243

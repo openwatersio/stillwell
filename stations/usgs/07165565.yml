@@ -1,0 +1,16 @@
+name: Little Haikey Creek at 101st St South at Tulsa, OK
+lat: 36.0175982390072
+lon: -95.8608226977779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 191.064
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07165565/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f0d5154f4ce942f38d0824b80ca6afed

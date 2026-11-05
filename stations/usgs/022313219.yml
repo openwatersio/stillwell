@@ -1,0 +1,15 @@
+name: S-253 WEIR UPSTREAM NEAR FORT DRUM, FL
+lat: 27.5909972222222
+lon: -80.6790194444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-022313219/
+parameter_code: "00065"
+series_begin: 2018-09-26T15:00:00+00:00
+series_end: 2025-11-20T12:15:00+00:00
+time_series_id: fb09cfe4c1e04c0eb388fe54a6f62872

@@ -1,0 +1,14 @@
+name: LOXAHATCHEE RIVER DWS LAINHART DAM NR JUPITER FL
+lat: 26.9392777777778
+lon: -80.1748888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02277602/
+parameter_code: "00065"
+series_begin: 2013-06-01T04:00:00+00:00
+time_series_id: 4446384849ae466cac78824ea3d8f76b

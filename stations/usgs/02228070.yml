@@ -1,0 +1,16 @@
+name: SATILLA RIVER AT US 17, AT WOODBINE, GA
+lat: 30.9748888888889
+lon: -81.7268611111111
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.061
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02228070/
+parameter_code: "00065"
+series_begin: 2009-11-20T05:00:00+00:00
+time_series_id: ff9b7935395d4aceb1e1d826c1bafc18

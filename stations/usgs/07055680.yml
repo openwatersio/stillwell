@@ -1,0 +1,16 @@
+name: Buffalo River at Pruitt, AR
+lat: 36.05916666666666
+lon: -93.13777777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 233.876
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07055680/
+parameter_code: "00065"
+series_begin: 2008-06-14T05:00:00+00:00
+time_series_id: ce0189ed23f24fa88979b1f5910eb858

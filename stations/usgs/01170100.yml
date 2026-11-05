@@ -1,0 +1,16 @@
+name: GREEN RIVER NEAR COLRAIN, MA
+lat: 42.7034169531944
+lon: -72.6706473825731
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 132.439
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01170100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 382dc26ad1d14d3f8950e8e2ceb77c2d

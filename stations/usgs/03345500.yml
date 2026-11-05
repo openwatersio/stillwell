@@ -1,0 +1,16 @@
+name: EMBARRAS RIVER AT STE. MARIE, IL
+lat: 38.9366944444444
+lon: -88.0223333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 135.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03345500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e135ae56c757470780206b5dc8054746

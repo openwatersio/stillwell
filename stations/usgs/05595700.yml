@@ -1,0 +1,17 @@
+name: BIG MUDDY RIVER NEAR MT. VERNON, IL
+lat: 38.30972222222222
+lon: -88.98833333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.43
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05595700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2023-10-03T20:00:00+00:00
+time_series_id: 9b9cb2e279ac486da7fa7377e8e11265

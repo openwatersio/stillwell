@@ -1,0 +1,17 @@
+name: MCKAY CREEK NEAR LARGO FL
+lat: 27.907222
+lon: -82.816944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.232
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02309110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-08-12T19:00:00+00:00
+time_series_id: da45e2ee151b43f0a0882cf31138d666

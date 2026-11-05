@@ -1,0 +1,16 @@
+name: Old Stream near Wesley, Maine
+lat: 44.9369444444444
+lon: -67.7361111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 50.161
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01021480/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d6ff467a75e941f4a11741bbb531fa91

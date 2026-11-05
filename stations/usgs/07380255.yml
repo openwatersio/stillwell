@@ -1,0 +1,17 @@
+name: Bayou Dupont nr Round Lake S of Myrtle Grove, LA
+lat: 29.576733
+lon: -89.986408
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.287
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07380255/
+parameter_code: "00065"
+series_begin: 2020-02-25T13:30:00+00:00
+series_end: 2025-11-20T14:30:00+00:00
+time_series_id: 4eca40298a6c4e6599ab0de787f59cc4

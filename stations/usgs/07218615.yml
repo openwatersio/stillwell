@@ -1,0 +1,16 @@
+name: DAILY CREEK NEAR ROCIADA, NM
+lat: 35.83592222222222
+lon: -105.44789166666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2573.122
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07218615/
+parameter_code: "00065"
+series_begin: 2024-05-06T18:55:00+00:00
+time_series_id: 1a7915a586a44ef88d4d3d8f6ceb36db

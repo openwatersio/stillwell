@@ -1,0 +1,16 @@
+name: LITTLE LYNCHES RIVER ABOVE KERSHAW, SC
+lat: 34.5858333333333
+lon: -80.5805555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 108.439
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02131452/
+parameter_code: "00065"
+series_begin: 2015-06-09T15:30:00+00:00
+time_series_id: 988ef9ec98f84fa9a576f36343432962

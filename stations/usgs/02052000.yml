@@ -1,0 +1,16 @@
+name: MEHERRIN RIVER AT EMPORIA, VA
+lat: 36.6901495394249
+lon: -77.540536411124
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.126
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02052000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e1583d212fe748a3a068846f5e26582a

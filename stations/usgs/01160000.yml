@@ -1,0 +1,17 @@
+name: S BR ASHUELOT RIVER AT WEBB, NR MARLBOROUGH, NH
+lat: 42.8720265383321
+lon: -72.2136951681962
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 203.335
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01160000/
+parameter_code: "00065"
+series_begin: 2009-05-31T11:00:00+00:00
+series_end: 2011-08-12T16:30:00+00:00
+time_series_id: fe1241a4c56a43bf98ab7d4a33fff4f5

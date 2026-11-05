@@ -1,0 +1,16 @@
+name: Black Fork at Melco OH
+lat: 40.697778
+lon: -82.360278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 295.363
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03131300/
+parameter_code: "00065"
+series_begin: 2018-04-18T13:30:00+00:00
+time_series_id: 9944fbef4ee342b3a8bf0e5b817f6b11

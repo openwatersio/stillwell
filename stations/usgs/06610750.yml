@@ -1,0 +1,16 @@
+name: Little Papillion Creek at Irvington, Nebr.
+lat: 41.31077222222222
+lon: -96.0475
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 321.951
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06610750/
+parameter_code: "00065"
+series_begin: 2008-05-14T21:30:00+00:00
+time_series_id: 8cf4a9d9371f4921a19d7c478f662310

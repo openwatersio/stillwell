@@ -1,0 +1,16 @@
+name: CORRALITOS C A FREEDOM CA
+lat: 36.9393968095687
+lon: -121.770506476745
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.209
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11159200/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 8b73805c1053470fa03e3f4f73041d21

@@ -1,0 +1,16 @@
+name: BEAVER RUN NEAR FINKSBURG, MD
+lat: 39.489444444444445
+lon: -76.90294444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 130.396
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01586210/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9e092f0e4de04526b426a0cfbbce437c

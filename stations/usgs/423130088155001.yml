@@ -1,0 +1,17 @@
+name: LAKE MARY NEAR TWIN LAKES, WI-IL
+lat: 42.525
+lon: -88.2638888888889
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 240.679
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-423130088155001/
+parameter_code: "00065"
+series_begin: 2019-11-05T19:15:00+00:00
+series_end: 2021-10-18T17:00:00+00:00
+time_series_id: 4d0be8620f59407ab3f280718a6cfbb7

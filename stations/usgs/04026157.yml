@@ -1,0 +1,17 @@
+name: SISKIWIT RIVER AT CTY HWY C NEAR CORNUCOPIA, WI
+lat: 46.80483333333333
+lon: -91.09307777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.245
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04026157/
+parameter_code: "00065"
+series_begin: 2021-04-07T18:15:00+00:00
+series_end: 2021-10-28T17:15:00+00:00
+time_series_id: 92d65cdebd614896aa6d6607c4389381

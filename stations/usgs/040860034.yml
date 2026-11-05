@@ -1,0 +1,17 @@
+name: SHEBOYGAN RIVER AT NEW JERSEY AVE AT SHEBOYGAN, WI
+lat: 43.7463005298911
+lon: -87.730447082016
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.356
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-040860034/
+parameter_code: "00065"
+series_begin: 2012-03-02T20:35:00+00:00
+series_end: 2014-06-12T14:55:00+00:00
+time_series_id: d451075dd30345baa468f687e1e1a522

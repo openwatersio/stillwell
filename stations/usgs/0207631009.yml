@@ -1,0 +1,13 @@
+name: POLE BRIDGE BRANCH AT ROUTE 797 NEAR CHATHAM, VA
+lat: 36.8812777777778
+lon: -79.4285833333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0207631009/
+parameter_code: "00065"
+time_series_id: 57b6e6e18fd74da69e182da179dbe20b

@@ -1,0 +1,16 @@
+name: PILGRIM RIVER AT PARADISE RD NR DODGEVILLE, MI
+lat: 47.0840942963709
+lon: -88.5506791516154
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04043016/
+parameter_code: "00065"
+series_begin: 2020-06-09T22:00:00+00:00
+time_series_id: d5b3c3177f6b43aa8c3ddcbc81207e19

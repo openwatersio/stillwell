@@ -1,0 +1,17 @@
+name: Lk Maumelle at Mouth of Pigeon Roost Cr nr Wye, AR
+lat: 34.8738888888889
+lon: -92.6338888888889
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 83.911
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-072632968/
+parameter_code: "00065"
+series_begin: 2009-07-17T18:15:00+00:00
+series_end: 2025-11-14T05:45:00+00:00
+time_series_id: c45e82d86ad44f8eb53fc5ef41d2fba0

@@ -1,0 +1,16 @@
+name: Trinity Rv at Wallisville, TX
+lat: 29.8124434250837
+lon: -94.7313087281258
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067252/
+parameter_code: "00065"
+series_begin: 2023-10-01T06:00:00+00:00
+time_series_id: 2a4d95dcc9ec4b51a7c08714986c49b8

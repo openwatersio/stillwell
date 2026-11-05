@@ -1,0 +1,17 @@
+name: YAMPA RIVER BELOW SODA CREEK AT STEAMBOAT SPGS, CO
+lat: 40.489222
+lon: -106.841528
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2036.265
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09240020/
+parameter_code: "00065"
+series_begin: 2020-07-15T13:00:00+00:00
+series_end: 2026-09-01T07:15:00+00:00
+time_series_id: 030eff46ae8c4118a4b83c55a5d3979e

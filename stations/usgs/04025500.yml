@@ -1,0 +1,16 @@
+name: BOIS BRULE RIVER AT BRULE, WI
+lat: 46.53777777777778
+lon: -91.59527777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 289.167
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04025500/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: 6d44499cdb684b2c9eaa70f14a2fd2ac

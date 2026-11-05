@@ -1,0 +1,16 @@
+name: CHEYENNE RIVER NEAR BUFFALO GAP, SD
+lat: 43.501978
+lon: -103.073936
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 857.357
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06402600/
+parameter_code: "00065"
+series_begin: 2018-05-01T07:00:00+00:00
+time_series_id: 480c7a21baa546dfa036b07c1f43ac2a

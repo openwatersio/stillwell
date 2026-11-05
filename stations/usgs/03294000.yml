@@ -1,0 +1,16 @@
+name: SILVER CREEK NEAR SELLERSBURG, IN
+lat: 38.3706096744141
+lon: -85.72634374137367
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 130.82
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03294000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0e7f011ae8274e9d94d52e0ee5d383e3

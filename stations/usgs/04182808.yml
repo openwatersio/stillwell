@@ -1,0 +1,16 @@
+name: SPY RUN CREEK NEAR PARK DRIVE AT FORT WAYNE, IN
+lat: 41.10474263356046
+lon: -85.15771189196705
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 231.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04182808/
+parameter_code: "00065"
+series_begin: 2008-05-01T00:30:00+00:00
+time_series_id: d8d2a2822469403da5e1ab926de9ade8

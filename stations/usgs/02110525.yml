@@ -1,0 +1,16 @@
+name: WACCAMAW RIVER AT SC-22 BELOW LONGS, SC
+lat: 33.9004166666667
+lon: -78.8579166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -2.67
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02110525/
+parameter_code: "00065"
+series_begin: 2018-09-11T15:30:00+00:00
+time_series_id: f00426d08ab1416ca658b11d3d193fb4

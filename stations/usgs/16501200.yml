@@ -1,0 +1,16 @@
+name: Oheo Gulch at dam near Kipahulu, Maui, HI
+lat: 20.668356867091536
+lon: -156.05222709765633
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 128.016
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16501200/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 73711f9b036245a383d6605a17522d78

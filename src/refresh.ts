@@ -77,6 +77,7 @@ export async function refreshSource(
     now: options.now,
     offsets: source.metadata.utc_offsets ?? ([0, 0] as [number, number]),
     decisions: source.overrides?.epochs ?? {},
+    seriesChanged: source.seriesChanged?.bind(source),
   };
   const { stations, changes } = mergeStationList(previous, fetched, options_);
   await renumberAboveFiles(lake, stations, previous);

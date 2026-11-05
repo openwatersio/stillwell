@@ -1,0 +1,16 @@
+name: Little Flatrock Creek near Junction OH
+lat: 41.1855555555556
+lon: -84.4955555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 212.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04191444/
+parameter_code: "00065"
+series_begin: 2014-12-16T21:00:00+00:00
+time_series_id: d1836a9ba0d54ffabef392569cd5620c

@@ -1,0 +1,15 @@
+name: NEW RIVER AT SUNDAY BAY, FL
+lat: 25.7975
+lon: -81.2555555555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02290940/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2013-10-23T04:45:00+00:00
+time_series_id: 8978e2bc96554b10b317858bdc3ba3d2

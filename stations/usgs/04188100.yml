@@ -1,0 +1,16 @@
+name: Ottawa River near Kalida OH
+lat: 40.9903287318186
+lon: -84.2266131710274
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 213.61
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04188100/
+parameter_code: "00065"
+series_begin: 2014-03-04T14:00:00+00:00
+time_series_id: 8fa070727efe4ca1a75146441c47efa7

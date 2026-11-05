@@ -1,0 +1,16 @@
+name: N Bosque Rv at Hico, TX
+lat: 31.977222000000005
+lon: -98.035139
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 297.915
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08094800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c4b67f8f0f274aa9ad552617e27c83e3

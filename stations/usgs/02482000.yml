@@ -1,0 +1,16 @@
+name: PEARL RIVER AT EDINBURG, MS
+lat: 32.7988888888889
+lon: -89.335
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.101
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02482000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: edb4aa86f1794827ac7a42b2a2e011c8

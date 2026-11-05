@@ -1,0 +1,16 @@
+name: SAUK RIVER NEAR SAUK, WA
+lat: 48.4245585885768
+lon: -121.568463402451
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 81.077
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12189500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5fb4ce77da124fb3bc2b08cf219abbd3

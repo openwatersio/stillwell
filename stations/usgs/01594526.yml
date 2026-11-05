@@ -1,0 +1,16 @@
+name: WESTERN BRANCH AT UPPER MARLBORO, MD
+lat: 38.81422222222222
+lon: -76.74872222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.32
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01594526/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 75d48aeb697440c3840b52c6bff50319

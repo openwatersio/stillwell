@@ -1,0 +1,17 @@
+name: Big Muddy Creek near Antelope MT
+lat: 48.6728972222222
+lon: -104.512086111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 609.6
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06183450/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2026-10-18T15:15:00+00:00
+time_series_id: 1687ca3728284647a0875c0035ee44bb

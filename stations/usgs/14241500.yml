@@ -1,0 +1,17 @@
+name: SOUTH FORK TOUTLE RIVER AT TOUTLE, WA
+lat: 46.3220554113151
+lon: -122.697055067934
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 121.92
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14241500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2013-10-01T07:45:00+00:00
+time_series_id: fb5d8912da414bb2b3bd3b79bd0b60f8

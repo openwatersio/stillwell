@@ -1,0 +1,14 @@
+name: L-67C CANAL UPS OF S-633 FLOWWAY NR COOPERTOWN,FL
+lat: 25.786272222222223
+lon: -80.65722500000001
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254711080392601/
+parameter_code: "00065"
+series_begin: 2024-02-14T18:00:00+00:00
+time_series_id: 6540b612d82e471592f00a0f85d01148

@@ -1,0 +1,16 @@
+name: ROYAL SPRINGS AT GEORGETOWN, KY
+lat: 38.209519
+lon: -84.561886
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 242.962
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03288110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e276f70655ae4974b3b5ad0c9f2da966

@@ -1,0 +1,17 @@
+name: Castor River at Greenbriar, MO
+lat: 37.1088333333333
+lon: -90.025
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.681
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07021020/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2018-10-02T21:30:00+00:00
+time_series_id: 5daa1623e6094eee9761f188137951c6

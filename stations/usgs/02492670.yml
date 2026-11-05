@@ -1,0 +1,13 @@
+name: EAST PEARL RIVER AT HIGHWAY 90 AT PEARLINGTON, MS
+lat: 30.2390833333333
+lon: -89.6147777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02492670/
+parameter_code: "00065"
+time_series_id: b9e451592d6440a69e9bb448d20a761a

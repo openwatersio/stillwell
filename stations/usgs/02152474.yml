@@ -1,0 +1,16 @@
+name: FIRST BROAD RIVER AT LAWNDALE, NC
+lat: 35.4152777777778
+lon: -81.5616666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.492
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02152474/
+parameter_code: "00065"
+series_begin: 2008-04-12T04:00:00+00:00
+time_series_id: f6886f861876422e9478d3b83cfc7960

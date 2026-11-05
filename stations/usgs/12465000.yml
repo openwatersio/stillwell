@@ -1,0 +1,16 @@
+name: CRAB CREEK AT IRBY, WA
+lat: 47.36038447162474
+lon: -118.84999719877719
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 422.544
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12465000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 120ae2032161421ea836c1db3b7bd8bb

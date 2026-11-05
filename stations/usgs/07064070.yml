@@ -1,0 +1,15 @@
+name: Winchester and Drainage Canal near Reyno, AR
+lat: 36.2671388888889
+lon: -90.8064722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 79.553
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07064070/
+parameter_code: "00065"
+time_series_id: 53acb057e2be4b539f59666f991a44f6

@@ -1,0 +1,14 @@
+name: MARSH TC3 BLW S-632 IN WCA3B NR COOPERTOWN,FL
+lat: 25.789616666666667
+lon: -80.63432222222222
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254723080380401/
+parameter_code: "00065"
+series_begin: 2023-11-13T17:15:00+00:00
+time_series_id: 7d1bf39bac1f4013ab41b3bd5defcffb

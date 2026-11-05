@@ -1,0 +1,14 @@
+name: KISSIMMEE RIVER BELOW S-69 NR BASINGER, FL
+lat: 27.33511111111111
+lon: -81.03521944444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02272702/
+parameter_code: "00065"
+series_begin: 2024-07-25T14:00:00+00:00
+time_series_id: c4fc8512977142a889ce5740e44e5aaf

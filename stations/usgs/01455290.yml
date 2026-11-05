@@ -1,0 +1,16 @@
+name: Pohatcong Crk at Creek Rd nr Carpentersville NJ
+lat: 40.6354722222222
+lon: -75.1686388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 50.018
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01455290/
+parameter_code: "00065"
+series_begin: 2018-08-22T15:45:00+00:00
+time_series_id: 8c061f96fe654ec1872a35029a0cb7be

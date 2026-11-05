@@ -157,6 +157,18 @@ export interface Source {
   /** `previous` is the lake's list, for a source that keeps choices it made before. */
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
+   * Why a listed station no longer measures from what its committed record
+   * does, though its datum's name is unchanged; null when it still does.
+   */
+  seriesChanged?(committed: Station, listed: ListedStation): string | null;
+  /**
+   * Observed levels over [start, end) for many stations in one sweep, by
+   * station ID, with an Error for a station the sweep refused, for sources
+   * where asking each station would take too many requests. `recent` uses it
+   * in place of `observations` when it's there.
+   */
+  recent?(stations: Station[], start: Date, end: Date): Promise<Map<string, Observation[] | Error>>;
+  /**
    * Observed levels over [start, end). Every product comes in `station.datum`,
    * and throws rather than return values in another, so a file never mixes two.
    */

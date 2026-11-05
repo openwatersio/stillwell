@@ -1,0 +1,17 @@
+name: PAWCATUCK RIVER DS OF STILLMAN AVE AT WESTERLY, RI
+lat: 41.383595670525516
+lon: -71.83310560402333
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -1.405
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412301071500100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2023-10-11T04:45:00+00:00
+time_series_id: a5697a9d1978484e97819a5d9de58407

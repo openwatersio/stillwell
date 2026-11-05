@@ -1,0 +1,16 @@
+name: Silver Creek at Welton, IA
+lat: 41.9150253996391
+lon: -90.6001369103065
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 186.291
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05421890/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: cfe198501af94b1093e5a5e2e010d032

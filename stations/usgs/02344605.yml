@@ -1,0 +1,16 @@
+name: LINE CREEK BELOW GA 54, NEAR PEACHTREE CITY, GA
+lat: 33.3955555555556
+lon: -84.6069444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 243.84
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02344605/
+parameter_code: "00065"
+series_begin: 2008-06-28T05:00:00+00:00
+time_series_id: ae5c799d03104aef99d68b8ca3042545

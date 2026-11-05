@@ -1,0 +1,17 @@
+name: DISCOVERY FARMS TILE NEAR PULCIFER, WI
+lat: 44.837138888888894
+lon: -88.31011111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.166
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-445014088183601/
+parameter_code: "00065"
+series_begin: 2017-08-10T18:15:00+00:00
+series_end: 2020-10-01T05:45:00+00:00
+time_series_id: abf963d4f2a749f1a19761605cd6833a

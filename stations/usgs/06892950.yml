@@ -1,0 +1,16 @@
+name: KANSAS R AT KANSAS CITY, KS
+lat: 39.0900045140241
+lon: -94.6091232148435
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 215.53
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06892950/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 12fa386c81394cae9355cbd046870a33

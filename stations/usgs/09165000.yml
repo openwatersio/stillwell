@@ -1,0 +1,16 @@
+name: DOLORES RIVER BELOW RICO, CO.
+lat: 37.63888414474664
+lon: -108.0603668690412
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2568.675
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09165000/
+parameter_code: "00065"
+series_begin: 2020-10-01T16:45:00+00:00
+time_series_id: 7f3f93a4c48c49e79c8bb10d5271b863

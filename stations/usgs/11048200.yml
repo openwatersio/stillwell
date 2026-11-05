@@ -1,0 +1,17 @@
+name: AGUA CHINON WASH NR IRVINE CA
+lat: 33.6789095878419
+lon: -117.714218652305
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 134.112
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11048200/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2020-05-27T20:00:00+00:00
+time_series_id: 1fb69f400a4c4dc8a401b5c52921686e

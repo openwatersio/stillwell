@@ -1,0 +1,16 @@
+name: Spavinaw Creek near Cherokee City, AR
+lat: 36.3420235344013
+lon: -94.5877200848544
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.204
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07191179/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 5fe8a18788bd44b4b702f3a00172999b

@@ -1,0 +1,16 @@
+name: Colorado Rv abv La Grange, TX
+lat: 29.91244741652
+lon: -96.9038699374532
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 63.999
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08160400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f3d03da0b50f4f3fbe7d2eab573767b2

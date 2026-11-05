@@ -1,0 +1,16 @@
+name: BUCKNER C NR JETMORE, KS
+lat: 38.0755555555556
+lon: -99.9166777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 685.962
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07140900/
+parameter_code: "00065"
+series_begin: 2009-07-01T16:15:00+00:00
+time_series_id: 9ab237afbaf84571bdc2790102453d13

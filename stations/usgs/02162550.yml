@@ -1,0 +1,16 @@
+name: SALUDA RIVER ABOVE I-85 NR GOLDEN GROVE, SC
+lat: 34.7793611111111
+lon: -82.4586666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.462
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02162550/
+parameter_code: "00065"
+series_begin: 2022-08-18T13:30:00+00:00
+time_series_id: 115d6d819d564f7fa5fd2c7c1239cf03

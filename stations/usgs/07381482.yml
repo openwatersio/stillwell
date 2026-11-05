@@ -1,0 +1,16 @@
+name: Old River Outflow Channel below Hydropower Channel
+lat: 31.06675
+lon: -91.64827777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.174
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381482/
+parameter_code: "00065"
+series_begin: 2009-02-28T06:00:00+00:00
+time_series_id: a370c87e8bed410988cbff5e065f91e8

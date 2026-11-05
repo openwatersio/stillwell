@@ -1,0 +1,17 @@
+name: NATIONAL C NR MCCARTHY AK
+lat: 61.484689
+lon: -142.886617
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 612.892
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15209770/
+parameter_code: "00065"
+series_begin: 2021-05-12T13:30:00+00:00
+series_end: 2026-10-07T23:00:00+00:00
+time_series_id: 4f0b177836804cc0b8987ded85f5db3d

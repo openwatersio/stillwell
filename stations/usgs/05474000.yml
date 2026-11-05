@@ -1,0 +1,16 @@
+name: Skunk River at Augusta, IA
+lat: 40.75365
+lon: -91.2770888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.825
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05474000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1fda00e9640a4a0c8e641ce7202c558b

@@ -1,0 +1,16 @@
+name: FLATROCK RIVER NEAR RALEIGH, IN
+lat: 39.72916666666667
+lon: -85.365
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 300.929
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03363220/
+parameter_code: "00065"
+series_begin: 2012-01-14T05:00:00+00:00
+time_series_id: 3f3379031bfc455aa29f38362ded22d7

@@ -1,0 +1,16 @@
+name: SNAKE RIVER AB EAGLE ROCK NR IDAHO FALLS ID
+lat: 43.6047222222222
+lon: -112.058611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1442.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13057155/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 56c7177a8cad42e3a110f147042ded49

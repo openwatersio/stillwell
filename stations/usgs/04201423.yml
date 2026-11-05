@@ -1,0 +1,16 @@
+name: Plum Creek near Olmsted Falls OH
+lat: 41.3586111111111
+lon: -81.9213888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.002
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04201423/
+parameter_code: "00065"
+series_begin: 2016-10-01T05:00:00+00:00
+time_series_id: 50244dbc09b34faa9ad2d72a6b9b65c6

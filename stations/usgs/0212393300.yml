@@ -1,0 +1,16 @@
+name: W. BR ROCKY R B MTH OF S PRONG R NR CORNELIUS, NC
+lat: 35.467777777777776
+lon: -80.79027777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 193.816
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0212393300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f5987f949ab5446c97fa7aa9b6e94752

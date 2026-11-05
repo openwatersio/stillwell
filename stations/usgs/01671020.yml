@@ -1,0 +1,16 @@
+name: NORTH ANNA RIVER AT HART CORNER NEAR DOSWELL, VA
+lat: 37.8501402431433
+lon: -77.4277594895589
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.674
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01671020/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6059ffc7d52b4687a32a97a3c311958e

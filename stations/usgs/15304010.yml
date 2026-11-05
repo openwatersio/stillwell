@@ -1,0 +1,16 @@
+name: CROOKED C AB AIRPORT RD NR CROOKED CREEK AK
+lat: 61.89000000000001
+lon: -158.154444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 45.72
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15304010/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: a74095749cb248668c311b6c914f24b6

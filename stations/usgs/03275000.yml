@@ -1,0 +1,16 @@
+name: WHITEWATER RIVER NEAR ALPINE, IN
+lat: 39.574333333333335
+lon: -85.1558888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.539
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03275000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d296d2e9172b4d73a18783f57708085c

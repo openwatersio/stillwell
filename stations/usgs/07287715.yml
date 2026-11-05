@@ -1,0 +1,16 @@
+name: MILL CREEK TRIBUTARY NEAR FRIARS POINT, MS
+lat: 34.3816944444444
+lon: -90.55625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.121
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07287715/
+parameter_code: "00065"
+series_begin: 2019-10-24T16:15:00+00:00
+time_series_id: a762eb56d50b479fae8ed94c8f9b8cd5

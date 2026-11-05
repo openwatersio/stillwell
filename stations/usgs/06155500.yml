@@ -1,0 +1,16 @@
+name: Milk River at Malta MT
+lat: 48.3621944444444
+lon: -107.876375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 684.581
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06155500/
+parameter_code: "00065"
+series_begin: 2012-10-01T05:00:00+00:00
+time_series_id: fb8bf3ea8dc14ffaa94630a18b59e501

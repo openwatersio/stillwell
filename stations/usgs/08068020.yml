@@ -1,0 +1,17 @@
+name: E Fk Crystal Ck at FM 1485 nr Cut and Shoot, TX
+lat: 30.294900000000002
+lon: -95.35210555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 44.501
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08068020/
+parameter_code: "00065"
+series_begin: 2022-03-01T05:05:00+00:00
+series_end: 2024-08-18T09:00:00+00:00
+time_series_id: 662325555d064660a360b47d71e2c532

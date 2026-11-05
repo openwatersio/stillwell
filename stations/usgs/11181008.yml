@@ -1,0 +1,16 @@
+name: CASTRO VALLEY C A HAYWARD CA
+lat: 37.67993112739
+lon: -122.080518632331
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 32.05
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11181008/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: b7d36ad8d714471291741c8a162f0990

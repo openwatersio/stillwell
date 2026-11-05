@@ -1,0 +1,16 @@
+name: WEBER RIVER AT MORGAN, UTAH
+lat: 41.04036111111111
+lon: -111.66548888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1543.73
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10133550/
+parameter_code: "00065"
+series_begin: 2024-10-25T21:45:00+00:00
+time_series_id: b13089d6d1544462bd80d2047f676171

@@ -1,0 +1,16 @@
+name: NORTH CLEAR CREEK ABOVE MOUTH NR BLACK HAWK, CO
+lat: 39.748889
+lon: -105.399167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2106.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06718550/
+parameter_code: "00065"
+series_begin: 2020-10-14T19:15:00+00:00
+time_series_id: 5ab3bc9995ff44e2855b284584896b1d

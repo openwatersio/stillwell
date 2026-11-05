@@ -1,0 +1,16 @@
+name: Maumelle River near Wye, AR
+lat: 34.87888888888889
+lon: -92.68555555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.383
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07263296/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ccafba20b2304baa9113cdc74e133ce4

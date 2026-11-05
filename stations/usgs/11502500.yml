@@ -1,0 +1,16 @@
+name: WILLIAMSON RIVER BLW SPRAGUE RIVER NR CHILOQUIN,OR
+lat: 42.564375
+lon: -121.879713888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1264.463
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11502500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 174985668f81461198d22a01a40de27a

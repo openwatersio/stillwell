@@ -1,0 +1,16 @@
+name: Willow Marsh Bayou at US 90 nr Beaumont, TX
+lat: 30.06381111111111
+lon: -94.21774444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042468/
+parameter_code: "00065"
+series_begin: 2022-03-10T23:35:00+00:00
+time_series_id: 43797a2954724db782d9403833f30b01

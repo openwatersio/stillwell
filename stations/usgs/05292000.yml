@@ -1,0 +1,16 @@
+name: MINNESOTA RIVER AT ORTONVILLE, MN
+lat: 45.2955204601601
+lon: -96.4442231363858
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 292.349
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05292000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d22f13a8559b4a268382da9003bb9be5

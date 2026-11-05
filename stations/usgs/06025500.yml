@@ -1,0 +1,16 @@
+name: Big Hole River near Melrose MT
+lat: 45.5265805555556
+lon: -112.701725
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1534.019
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06025500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 02f97503360245c998f64f4e733dccac

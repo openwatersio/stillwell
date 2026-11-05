@@ -1,0 +1,16 @@
+name: VERDE RIVER BELOW EAST VERDE RIVER NEAR CHILDS, AZ
+lat: 34.2635583333333
+lon: -111.681527777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 746.76
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09508000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 49a4844fe64e41b2949e0bbe4cd51199

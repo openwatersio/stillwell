@@ -1,0 +1,17 @@
+name: BIG WOOD RIVER AT SAGE RD BRIDGE NR KETCHUM, ID
+lat: 43.7283333333333
+lon: -114.383108333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1805.157
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13135840/
+parameter_code: "00065"
+series_begin: 2017-03-07T19:13:00+00:00
+series_end: 2026-10-22T13:31:00+00:00
+time_series_id: 75609189261a4508b88716e307f2cf89

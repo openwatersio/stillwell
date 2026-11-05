@@ -1,0 +1,16 @@
+name: White River at Elkins, AR
+lat: 36.00083333333333
+lon: -94.00361111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 361.435
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07047980/
+parameter_code: "00065"
+series_begin: 2018-01-09T21:15:00+00:00
+time_series_id: e51aa4d60b2144648442b607702cf66d

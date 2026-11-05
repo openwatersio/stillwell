@@ -1,0 +1,17 @@
+name: L WILLOW C NR KASHWITNA AK
+lat: 61.8097458643751
+lon: -150.097237850299
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.746
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15293700/
+parameter_code: "00065"
+series_begin: 2013-05-22T02:00:00+00:00
+series_end: 2018-08-16T17:30:00+00:00
+time_series_id: cc01d34e0376435ca8e2defa14888302

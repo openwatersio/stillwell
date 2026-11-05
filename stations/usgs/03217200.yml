@@ -1,0 +1,16 @@
+name: OHIO RIVER AT PORTSMOUTH, OH
+lat: 38.72910239657388
+lon: -82.9968391978056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 142.954
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03217200/
+parameter_code: "00065"
+series_begin: 2009-09-28T21:30:00+00:00
+time_series_id: b0dbfadb84f74e08a345e01a4a410b99

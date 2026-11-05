@@ -1,0 +1,16 @@
+name: OCKLAWAHA RIVER NEAR CONNER, FL
+lat: 29.2146988848661
+lon: -81.9859202752346
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 9.69
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02240000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d6ffc73c3d7d457ca7eb96e95dcf8a74

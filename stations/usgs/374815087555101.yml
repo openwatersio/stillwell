@@ -1,0 +1,16 @@
+name: BAYOU DRAIN NEAR HOVEY, IN
+lat: 37.804111111111105
+lon: -87.93069444444446
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.242
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-374815087555101/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: bce8002ca314491288eaa52f9c31e7f1

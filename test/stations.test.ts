@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { LakeStation, Station } from "../src/schema.ts";
+import type { LakeStation, ListedStation, Station } from "../src/schema.ts";
 import { seriesPath } from "../src/lake/paths.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 
@@ -111,6 +111,60 @@ describe("mergeStationList", () => {
         [1, "NAP", { LAT: -1.2 }, "closed"],
         [2, "MSL", { LAT: -1.5 }, "open"],
       ],
+    );
+  });
+
+  it("opens an epoch when the source says the series moved under the same datum", () => {
+    const previous = [held("a", { datums: { NAVD88: 1.2 } }), held("b")];
+    const moved = (old: Station, listed: ListedStation) =>
+      old.id === "rws/a" && listed.datums.NAVD88 !== old.datums.NAVD88
+        ? `gage datum is now ${listed.datums.NAVD88} m above NAVD88`
+        : null;
+    const merged = mergeStationList(
+      previous,
+      [station("a", { datums: { NAVD88: 1.5 } }), station("b")],
+      { ...options, seriesChanged: moved },
+    );
+    assert.deepEqual(merged.changes, [
+      {
+        id: "rws/a",
+        event: "opened",
+        from: "NAP",
+        to: "NAP",
+        reason: "gage datum is now 1.5 m above NAVD88",
+      },
+    ]);
+    const [a, b] = merged.stations;
+    assert.deepEqual(
+      a!.epochs.map((e) => [e.id, e.since, e.datums, e.state, e.to_current]),
+      [
+        [1, null, { NAVD88: 1.2 }, "closed", null],
+        [2, options.now, { NAVD88: 1.5 }, "open", 0],
+      ],
+    );
+    assert.equal(a!.status, "active");
+    assert.equal(b!.epochs.length, 1);
+
+    // Rejecting that change carries the station on in epoch 1, and doesn't
+    // block a different move later.
+    const decisions = { [`rws/a ${options.now}`]: { reject: true, note: "a misread altitude" } };
+    const later = { ...options, now: "2027-06-01T00:00:00Z", decisions, seriesChanged: moved };
+    const rejected = mergeStationList(
+      merged.stations,
+      [station("a", { datums: { NAVD88: 1.5 } })],
+      later,
+    );
+    assert.deepEqual(
+      rejected.stations[0]!.epochs.map((e) => e.state),
+      ["open", "rejected"],
+    );
+    const again = mergeStationList(rejected.stations, [station("a", { datums: { NAVD88: 1.9 } })], {
+      ...later,
+      now: "2028-06-01T00:00:00Z",
+    });
+    assert.deepEqual(
+      again.changes.map((c) => [c.event, c.reason]),
+      [["opened", "gage datum is now 1.9 m above NAVD88"]],
     );
   });
 

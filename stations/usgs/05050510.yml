@@ -1,0 +1,16 @@
+name: BOIS DE SIOUX RIVER AT 470TH ST NR FAIRMOUNT, ND
+lat: 46.094542
+lon: -96.556719
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 292.303
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05050510/
+parameter_code: "00065"
+series_begin: 2026-10-20T23:00:00+00:00
+time_series_id: 13c01ff9c6b344c28cb6e433aefb7dca

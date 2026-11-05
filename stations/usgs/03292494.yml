@@ -1,0 +1,16 @@
+name: OHIO RIVER AT WATER TOWER AT LOUISVILLE, KY
+lat: 38.28116655458128
+lon: -85.70217635812126
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.956
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03292494/
+parameter_code: "00065"
+series_begin: 2013-11-13T15:15:00+00:00
+time_series_id: e037f8b3fc954a77b03a42d2c6733531

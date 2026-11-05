@@ -1,0 +1,17 @@
+name: BEAVER CREEK NEAR OTTOBINE, VA
+lat: 38.42861111111111
+lon: -79.03969444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 398.678
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01620821/
+parameter_code: "00065"
+series_begin: 2021-06-01T14:30:00+00:00
+series_end: 2021-11-09T13:05:00+00:00
+time_series_id: 03dd43200e734a4e93c9eac9e852d405

@@ -1,0 +1,16 @@
+name: Middle Concho Rv abv Tankersley, TX
+lat: 31.4273826370566
+lon: -100.711212450484
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 605.546
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08128400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d65dca5a8fc2494a9b084203a7063251

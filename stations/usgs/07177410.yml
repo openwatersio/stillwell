@@ -1,0 +1,15 @@
+name: Hominy Creek below Skiatook Lake nr Skiatook, OK
+lat: 36.3525868865943
+lon: -96.088612234021
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 185.928
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07177410/
+parameter_code: "00065"
+time_series_id: 863fbed929024f4c93e945e1e0b340e8

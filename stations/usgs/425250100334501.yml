@@ -1,0 +1,17 @@
+name: Minnechaduza Cr at U.S. Hwy 83 at Valentine, Nebr.
+lat: 42.8805555555556
+lon: -100.5625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 760.476
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-425250100334501/
+parameter_code: "00065"
+series_begin: 2018-08-29T19:20:55+00:00
+series_end: 2018-10-03T17:10:55+00:00
+time_series_id: ff26eeca32e343fc8e2ea7160235f238

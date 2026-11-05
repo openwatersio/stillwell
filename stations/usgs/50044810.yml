@@ -1,0 +1,16 @@
+name: RIO GUADIANA NR GUADIANA, NARANJITO PR
+lat: 18.301403
+lon: -66.228581
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 66.004
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50044810/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 4f8b0a12b92e4b95bfaa6e46fc6929bd

@@ -1,0 +1,16 @@
+name: SANTIAM RIVER AT JEFFERSON, OR
+lat: 44.7147222222222
+lon: -123.01425
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 60.847
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14189000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: ad3db545e19245ee99ab63ead6c2d169

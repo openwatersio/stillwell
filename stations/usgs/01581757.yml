@@ -1,0 +1,17 @@
+name: OTTER POINT CREEK NEAR EDGEWOOD, MD
+lat: 39.4392777777778
+lon: -76.3060277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.436
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01581757/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2020-12-23T18:05:00+00:00
+time_series_id: bfbed19e8f2448b892ed2c1f3e2a321d

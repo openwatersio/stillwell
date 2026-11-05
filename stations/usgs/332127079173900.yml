@@ -1,0 +1,13 @@
+name: SAMPIT RIVER AT HWY 17
+lat: 33.3575
+lon: -79.2941666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-332127079173900/
+parameter_code: "00065"
+time_series_id: ff8eb4bf6d2040628ff9095791704240

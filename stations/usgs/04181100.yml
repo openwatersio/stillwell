@@ -1,0 +1,16 @@
+name: BLUE CREEK NR PLEASANT MILLS, IN
+lat: 40.746968210337734
+lon: -84.82214558959892
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 236.503
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04181100/
+parameter_code: "00065"
+series_begin: 2023-08-18T16:45:00+00:00
+time_series_id: f351c5506bfa42179449cb5683c48067

@@ -1,0 +1,16 @@
+name: Kettle Creek at Cross Fork, PA
+lat: 41.475838293895336
+lon: -77.82580078407982
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 312.908
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01544500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cf9ab37fb58d4d3a946e45d390553b65

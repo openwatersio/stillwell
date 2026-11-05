@@ -1,0 +1,16 @@
+name: BIG ELK CREEK AT ELK MILLS, MD
+lat: 39.6675833333333
+lon: -75.8255833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.417
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01495000/
+parameter_code: "00065"
+series_begin: 2012-10-23T17:15:00+00:00
+time_series_id: fb8df4f11c8b4d38bee78422a2a850ba

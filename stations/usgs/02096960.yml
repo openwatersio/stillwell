@@ -1,0 +1,16 @@
+name: HAW RIVER NEAR BYNUM, NC
+lat: 35.7652777777778
+lon: -79.1358333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 86.109
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02096960/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ec091ed6e79c414286ede9a5cb68e07c

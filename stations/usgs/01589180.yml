@@ -1,0 +1,17 @@
+name: GWYNNS FALLS AT GLYNDON, MD
+lat: 39.4716944444444
+lon: -76.8168888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.819
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01589180/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2019-06-06T13:30:00+00:00
+time_series_id: da5ea728ac4b48bc8f93db5c93f6cc7d

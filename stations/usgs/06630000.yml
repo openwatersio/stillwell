@@ -1,0 +1,16 @@
+name: N PLATTE RIV AB SEMINOE RESERVOIR, NR SINCLAIR, WY
+lat: 41.87216635653744
+lon: -107.0575983704985
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1952.073
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06630000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: d2ee5234cdfa4328adc034ff02821d56

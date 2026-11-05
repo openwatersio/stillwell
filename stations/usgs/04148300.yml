@@ -1,0 +1,15 @@
+name: SWARTZ CREEK AT FLINT, MI
+lat: 42.9878053672438
+lon: -83.7324570766118
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 221.605
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04148300/
+parameter_code: "00065"
+time_series_id: 4c1ac2596da44212a2349fb165b9831e

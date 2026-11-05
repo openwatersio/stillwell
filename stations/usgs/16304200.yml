@@ -1,0 +1,16 @@
+name: Kaluanui Stream nr Punaluu, Oahu, HI
+lat: 21.586107040799657
+lon: -157.90806087124173
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 33.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16304200/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: e987c774124843c3adfc815fcdbe074e

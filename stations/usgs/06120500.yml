@@ -1,0 +1,16 @@
+name: Musselshell River at Harlowton MT
+lat: 46.428799999999995
+lon: -109.84119444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1269.76
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06120500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 682df22174ed420a9f2a7082f69a637e

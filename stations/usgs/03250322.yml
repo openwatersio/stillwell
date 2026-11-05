@@ -1,0 +1,16 @@
+name: ROCK LICK CR AT STATE HWY 158 NR SHARKEY, KY STA D
+lat: 38.2473019812081
+lon: -83.5893567104412
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.419
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03250322/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8e6620aad6e44871bcad47de2e5f6f05

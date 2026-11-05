@@ -1,0 +1,16 @@
+name: NORTH UMPQUA RIVER AT WINCHESTER, OR
+lat: 43.270966666666666
+lon: -123.41154444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 113.681
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14319500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3ce95bc76a1045d3b5b42d0e4a549d1d

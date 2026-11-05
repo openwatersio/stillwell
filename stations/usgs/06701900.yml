@@ -1,0 +1,16 @@
+name: SOUTH PLATTE RIVER BLW BRUSH CRK NEAR TRUMBULL, CO
+lat: 39.2599902523544
+lon: -105.221937920346
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1944.624
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06701900/
+parameter_code: "00065"
+series_begin: 2020-03-31T19:45:00+00:00
+time_series_id: a221981f16dc4034b71402ddf3dd73e7

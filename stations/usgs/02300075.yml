@@ -1,0 +1,16 @@
+name: FROG CREEK AT BUFFALO ROAD NEAR RUBONIA FL
+lat: 27.5799166666667
+lon: -82.5133888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02300075/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: fad0a76bf91e4290a4fcb938b229fffe

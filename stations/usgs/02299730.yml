@@ -1,0 +1,16 @@
+name: DONNA BAY AT HIGHWAY 41 AT NOKOMIS FL
+lat: 27.1185027777778
+lon: -82.451425
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299730/
+parameter_code: "00065"
+series_begin: 2017-07-19T17:00:00+00:00
+time_series_id: e8624703004d48f2a5a4430d957bbe8e

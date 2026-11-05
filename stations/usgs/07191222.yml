@@ -1,0 +1,16 @@
+name: Beaty Creek near Jay, OK
+lat: 36.355359239132
+lon: -94.7763387569125
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 238.832
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07191222/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 40c6c3477f814edf9f222fb4d78e9e17

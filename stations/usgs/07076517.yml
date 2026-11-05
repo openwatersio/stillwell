@@ -1,0 +1,16 @@
+name: Little Red River near Dewey, AR
+lat: 35.43805555555555
+lon: -91.74583333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 63.587
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07076517/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 430346b48e194e4cb9c98cf6495aa98d

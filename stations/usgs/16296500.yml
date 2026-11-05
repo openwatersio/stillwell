@@ -1,0 +1,16 @@
+name: Kahana Str at alt 30 ft nr Kahana, Oahu, HI
+lat: 21.54060703026554
+lon: -157.8825608639862
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 9.144
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16296500/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 8ff0ea5f0208463aa15c9e074666e1f3

@@ -1,0 +1,16 @@
+name: ARROYO SECO BL RELIZ C NR SOLEDAD CA
+lat: 36.3996870844332
+lon: -121.324096154649
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 50.444
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11152050/
+parameter_code: "00065"
+series_begin: 2007-11-02T00:45:00+00:00
+time_series_id: 0dccbb59ea77463e8d9e3989a13eb2d3

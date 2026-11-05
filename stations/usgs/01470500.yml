@@ -1,0 +1,16 @@
+name: Schuylkill River at Berne, PA
+lat: 40.522593205195
+lon: -75.998268192033
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 94.47
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01470500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 31d6f541e6104d348269bb4e8cfca7df

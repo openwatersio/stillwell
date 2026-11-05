@@ -1,0 +1,16 @@
+name: COLORADO RIVER NEAR DOTSERO, CO
+lat: 39.6446111111111
+lon: -107.078013888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1865.861
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09070500/
+parameter_code: "00065"
+series_begin: 2020-08-04T19:15:00+00:00
+time_series_id: 1cc24023436343a492c49dbdf0578737

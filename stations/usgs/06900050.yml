@@ -1,0 +1,16 @@
+name: Medicine Creek near Laredo, MO
+lat: 40.0266111111111
+lon: -93.4362222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 223.656
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06900050/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 3b5ef138fc7d415b81988e1d29fd456a

@@ -1,0 +1,16 @@
+name: St Clements Creek near Clements, MD
+lat: 38.33330555555556
+lon: -76.72500000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.628
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01661050/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3699abe0eec145c6bad6ee2ce94b6bd4

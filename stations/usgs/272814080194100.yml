@@ -1,0 +1,15 @@
+name: INTERCOASTAL WATERWAY AT FT PIERCE FL
+lat: 27.4706527777778
+lon: -80.3280805555556
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-272814080194100/
+parameter_code: "62620"
+series_begin: 2017-09-07T18:06:00+00:00
+series_end: 2019-09-02T19:15:00+00:00
+time_series_id: 0be23255251b4c64b86ba9583229d0be

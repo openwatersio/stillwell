@@ -1,0 +1,17 @@
+name: INCLINE CK ABV TYROL VILLAGE NR INCLINE VILLAGE NV
+lat: 39.2587734843119
+lon: -119.92322149116634
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2109.216
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-103366993/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2011-04-01T07:00:00+00:00
+time_series_id: 08ba416cb23e4eb19da2273cbc2c5736

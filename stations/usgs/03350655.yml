@@ -1,0 +1,16 @@
+name: STONY CREEK AT FISHERSBURG, IN
+lat: 40.06614286611368
+lon: -85.86301378671496
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 248.119
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03350655/
+parameter_code: "00065"
+series_begin: 2008-10-27T18:30:00+00:00
+time_series_id: 03e815342dbe4b63a2f2354d6c3b7d66

@@ -1,0 +1,16 @@
+name: BAKER RIVER AT HENRY THOMPSON BR AT CONCRETE, WA
+lat: 48.5403925547151
+lon: -121.743473399096
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 53.06
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12193400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4a62f783b12044fb8d5e3c06e6eb5a70

@@ -1,0 +1,16 @@
+name: TOMBIGBEE RIVER AT BIGBEE, MS
+lat: 34.0113888888889
+lon: -88.5136111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 58.031
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02433500/
+parameter_code: "00065"
+series_begin: 2007-10-03T05:00:00+00:00
+time_series_id: 1c74cda3dc40464d900faf6ac028981d

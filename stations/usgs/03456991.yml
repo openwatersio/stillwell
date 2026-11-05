@@ -1,0 +1,16 @@
+name: PIGEON RIVER NEAR CANTON, NC
+lat: 35.5219444444444
+lon: -82.8480555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 786.872
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03456991/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 81f4bbe87c30487bb3634fb13558c7b1

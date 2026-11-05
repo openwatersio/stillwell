@@ -1,0 +1,16 @@
+name: TOWN CREEK NEAR GERALDINE AL
+lat: 34.378461534831295
+lon: -85.99024290102997
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 305.519
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03572900/
+parameter_code: "00065"
+series_begin: 2016-12-01T06:00:00+00:00
+time_series_id: 164c9db4a1394bfa835ec7635e68de54

@@ -1,0 +1,16 @@
+name: MIDDLE FORK RANCH CREEK ABV DIVERSION NR FRASER CO
+lat: 39.92896944444444
+lon: -105.73433888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2899.258
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09029995/
+parameter_code: "00065"
+series_begin: 2024-04-01T06:00:00+00:00
+time_series_id: eb4fe38bd4c3457d9ccc52749da9a074

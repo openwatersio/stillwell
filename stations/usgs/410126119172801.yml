@@ -1,0 +1,17 @@
+name: 024  N36 E24 07DADB1    UNMD SPG W OF CANE SPG
+lat: 41.02375
+lon: -119.290972222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1446.276
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-410126119172801/
+parameter_code: "00065"
+series_begin: 2012-11-15T18:30:00+00:00
+series_end: 2014-06-05T07:45:57+00:00
+time_series_id: 0593fe48f7a04070b2f93348c104f2f5

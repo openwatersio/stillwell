@@ -56,7 +56,7 @@ import {
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
-import { qc } from "../src/qc.ts";
+import { qc, type QcOptions } from "../src/qc.ts";
 import {
   describeReport,
   epochOf,
@@ -320,7 +320,7 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(rows, source.metadata.qc);
+    if (product === "levels") rows = qc(rows, qcFor(source, station));
     const existing = await readObservations(path);
     const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
@@ -352,7 +352,7 @@ async function refuseOtherDatum(path: string, station: Station): Promise<void> {
 
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
   const source = sourceOf(sourceId);
-  if (!source.observations) throw new Error(`${sourceId} has no observations`);
+  if (!source.observations && !source.recent) throw new Error(`${sourceId} has no observations`);
   const live = (await listOf(lakeOfSource(source.metadata), sourceId)).filter(
     (s) => s.live && s.status === "active" && s.products.includes("levels"),
   );
@@ -373,6 +373,14 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   );
   const failed: string[] = [];
 
+  // A source that can sweep every station at once does; a failed sweep fails
+  // every station, which keeps what each had.
+  let swept: Map<string, Observation[] | Error> | Error | undefined;
+  if (source.recent)
+    swept = await source
+      .recent(stations, start, new Date(now))
+      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+
   await pool(stations, async (station) => {
     // Values from an earlier epoch are in another reference: they stay as they
     // are, for compaction to fold into that epoch's files, and aren't merged.
@@ -384,11 +392,17 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
     let merged: Observation[] = old;
     try {
       const from = new Date(Math.max(start.getTime(), since));
-      const fetched = await source.observations!(station, from, new Date(now));
+      if (swept instanceof Error) throw swept;
+      const answer = swept ? swept.get(station.id) : undefined;
+      if (answer instanceof Error) throw answer;
+      // A sweep covers the whole window, so values from before the current epoch are left out.
+      const fetched = swept
+        ? (answer ?? []).filter((o) => o.time >= from.getTime())
+        : await source.observations!(station, from, new Date(now));
       // QC the whole window, so spikes and flatlines are judged against their neighbors.
       // Nothing new keeps what we had, rather than clearing the last hours.
       if (fetched.length)
-        merged = qc(mergeFetched(old, fetched, from.getTime(), now, now), source.metadata.qc);
+        merged = qc(mergeFetched(old, fetched, from.getTime(), now, now), qcFor(source, station));
     } catch (error) {
       // Keep what we had; a failed fetch mustn't empty the window.
       failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
@@ -413,6 +427,18 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
 /** Where a station's current epoch starts, or null for one with no known start. */
 function currentSince(station: LakeStation): string | null {
   return station.epochs.filter((e) => e.state === "open").at(-1)?.since ?? null;
+}
+
+/**
+ * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
+ * or more, so they get two days before a flatline counts as suspect. And they
+ * sit nearly flat for months and then rise meters in a flood, so a level far
+ * outside their own range isn't suspect for that alone. Tide gauges never sit
+ * still that long, and keep the defaults.
+ */
+function qcFor(source: Source, station: Station): QcOptions {
+  const still = station.kind === "river" || station.kind === "lake";
+  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
 }
 
 /** A station by its ID or its source's own code. */

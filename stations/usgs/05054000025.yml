@@ -1,0 +1,16 @@
+name: WILD RICE DIVERSION STRUCTURE NEAR ST BENEDICT, ND
+lat: 46.705981
+lon: -96.837308
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 268.236
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05054000025/
+parameter_code: "00065"
+series_begin: 2026-10-05T13:45:00+00:00
+time_series_id: a48079eac3774d23958adfc136d91662

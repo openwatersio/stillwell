@@ -1,0 +1,15 @@
+name: S FK BEARGRASS CR AT MASON AVE NR LOUISVILLE, KY
+lat: 38.2415
+lon: -85.736875
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03292557/
+parameter_code: "00065"
+series_begin: 2014-11-07T17:15:00+00:00
+series_end: 2017-01-04T13:15:00+00:00
+time_series_id: e99d9d9ab739408b9529b8dbc12249b6

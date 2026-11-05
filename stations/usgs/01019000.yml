@@ -1,0 +1,16 @@
+name: Grand Lake Stream at Grand Lake Stream, Maine
+lat: 45.1725
+lon: -67.7688888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 83.387
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01019000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6233748edb8f44ec8042347f722db36d

@@ -1,0 +1,16 @@
+name: TALLAPOOSA RIVER NR NEW SITE, AL.(HORSESHOE BEND)
+lat: 32.977383146293526
+lon: -85.73968041399858
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 161.117
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02414715/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: dbc442e8622b4ec6b73f6866ee6484c8

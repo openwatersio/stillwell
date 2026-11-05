@@ -1,0 +1,17 @@
+name: Mississippi River at Buras, LA
+lat: 29.3571388888889
+lon: -89.5238611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.256
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07374540/
+parameter_code: "00065"
+series_begin: 2012-09-19T05:00:00+00:00
+series_end: 2016-02-25T15:00:00+00:00
+time_series_id: 89e6940ff68046c98263b7b892932680

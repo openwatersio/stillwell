@@ -1,0 +1,16 @@
+name: Plum Ck at US183 nr Luling, TX
+lat: 29.654922222222222
+lon: -97.59977222222221
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08173210/
+parameter_code: "00065"
+series_begin: 2022-07-27T18:20:00+00:00
+time_series_id: e5c0cdef55d743bbb08bff24ef82ad2e

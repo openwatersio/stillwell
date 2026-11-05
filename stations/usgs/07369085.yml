@@ -1,0 +1,16 @@
+name: Bayou Lafourche at Hwy 847 east of Cane Hill, LA
+lat: 32.194916666666664
+lon: -92.0273611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 8.918
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07369085/
+parameter_code: "00065"
+series_begin: 2024-02-01T18:45:00+00:00
+time_series_id: 37918a620a7c46069d738c8bcec31a38

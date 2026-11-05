@@ -1,0 +1,16 @@
+name: CUCAMONGA C NR MIRA LOMA CA
+lat: 33.9827912162803
+lon: -117.599496616253
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.453
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11073495/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 6e54adcdc6104969921212757b58a5e3

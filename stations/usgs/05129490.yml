@@ -1,0 +1,16 @@
+name: Rainy River at Voyageur Wy International Falls, MN
+lat: 48.604936
+lon: -93.374606
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 336.804
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05129490/
+parameter_code: "00065"
+series_begin: 2026-10-08T18:00:00+00:00
+time_series_id: b27922f0a3d14970ab8abb1fc773fe91

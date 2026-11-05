@@ -1,0 +1,16 @@
+name: E Fk Trinity Rv nr Lavon, TX
+lat: 33.0237306626414
+lon: -96.4755429223805
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 130.963
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08061000/
+parameter_code: "00065"
+series_begin: 2017-09-21T03:15:00+00:00
+time_series_id: 7c9df66fdcc84bccb84140a4b0916f46

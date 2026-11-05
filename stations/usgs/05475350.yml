@@ -1,0 +1,16 @@
+name: DES MOINES RIVER ABOVE WINDOM, MN
+lat: 43.890257069702216
+lon: -95.16111048275005
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 414.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05475350/
+parameter_code: "00065"
+series_begin: 2017-08-23T19:30:00+00:00
+time_series_id: f5c78dbbb1de4e9495c57ba26fe91efc

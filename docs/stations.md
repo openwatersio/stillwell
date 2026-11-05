@@ -41,7 +41,7 @@ epochs: [{ id, datum, since, until, seen, reference, datums, to_current, state }
 - `id` counts up from 1 and is never reused. The next `id` is above both the list's epochs and any epoch directory already in the lake, so a list restored from a snapshot can't hand out an `id` that already has files.
 - `since` and `until` are instants in UTC. The first epoch's `since` is null when the record has no known start, and the current epoch has no `until`. Rows in an epoch's files outside `[since, until)` aren't part of the series. That's how the uncertain stretch around a change stays out without being moved.
 - `seen` is the last refresh whose fetch named this epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.
-- `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`.
+- `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`. A source with no such field can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves; the reason it gives stands in for the reference, and the epoch starts at that refresh, since USGS gives no date.
 - `datums` holds the offsets to other datums. The current epoch's follow the source, refresh by refresh, as `datums` does today. An epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
 - `to_current` is the meters to add to the epoch's levels to put them in the current epoch's datum, or null when they can't be converted (below). Every refresh recomputes it from the frozen offsets and the current ones.
 - `state` is `open`, `closed`, `held` (below) or `rejected`.
@@ -191,7 +191,6 @@ history/stations/<source>/<time>.json        what that refresh changed
   - the README's license paragraph about the copies in `stations/`;
   - the BSH, CO-OPS, PEGELONLINE, RWS and USACE READMEs;
   - the comments in `scripts/ingest.ts`, `scripts/ticon-inventory.ts`, `src/stations.ts` (which also says a series' files carry no datum, though they do), `src/schema.ts`, `src/lake/paths.ts` and `src/sources/usace/index.ts`, and the `stations/<id>.json` error messages.
-- The open USGS PR drops its `stations/usgs.json`.
 - Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
 
 ## What this gives up

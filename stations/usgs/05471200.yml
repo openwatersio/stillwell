@@ -1,0 +1,16 @@
+name: Indian Creek near Mingo, IA
+lat: 41.8057222222222
+lon: -93.3086944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 246.848
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05471200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d72d9909ec984e2198c23345d90474a0

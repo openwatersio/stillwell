@@ -1,0 +1,16 @@
+name: OKANOGAN RIVER AT OROVILLE, WA
+lat: 48.9307184106605
+lon: -119.420341855185
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 274.32
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12439500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 701d9e76f29747929a20abcf29f4d500

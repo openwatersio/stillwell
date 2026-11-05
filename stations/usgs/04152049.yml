@@ -1,0 +1,16 @@
+name: TITTABAWASSEE RIVER AT SECORD DAM NR GLADWIN, MI
+lat: 44.0411322522552
+lon: -84.3422275559913
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 212.906
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04152049/
+parameter_code: "00065"
+series_begin: 2021-03-30T18:15:00+00:00
+time_series_id: 52aaa9b1d88c4b33b86be1d90970f48a

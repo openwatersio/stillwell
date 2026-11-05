@@ -1,0 +1,16 @@
+name: KANKAKEE RIVER AT DAVIS, IN
+lat: 41.3896388888889
+lon: -86.7061666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.491
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05515500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3fdc73d949f14929bc23fe99ac9095d4

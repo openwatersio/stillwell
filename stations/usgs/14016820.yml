@@ -1,0 +1,16 @@
+name: TOUCHET RIVER AT GALLAHER RD NEAR WAITSBURG, WA
+lat: 46.27704166666667
+lon: -118.11157222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 398.983
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14016820/
+parameter_code: "00065"
+series_begin: 2022-11-29T19:30:00+00:00
+time_series_id: 4aebe6357da74d5fb8f6746c4d587825

@@ -1,0 +1,16 @@
+name: ETOWAH RIVER AT KELLY BRIDGE ROAD, NEAR MATT, GA
+lat: 34.3525555555556
+lon: -84.2062222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 297.863
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02390050/
+parameter_code: "00065"
+series_begin: 2014-01-15T05:00:00+00:00
+time_series_id: 5f44a80233c34eb3baa0b7d681298eeb

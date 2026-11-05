@@ -1,0 +1,16 @@
+name: LITTLE WHITE RIVER NEAR VETAL, SD
+lat: 43.100694
+lon: -101.231806
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 847.795
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06449100/
+parameter_code: "00065"
+series_begin: 2018-03-12T05:30:00+00:00
+time_series_id: 704badb020cd4c0fae0a086280094475

@@ -1,0 +1,17 @@
+name: 163  S22 E58 07ADDA1    RAINBOW SPRING
+lat: 36.052728
+lon: -115.509014
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1688.784
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-360310115303201/
+parameter_code: "00065"
+series_begin: 2014-10-23T20:45:00+00:00
+series_end: 2023-03-08T23:45:00+00:00
+time_series_id: 4f6262dd101b4f588db3df8cf43349c8

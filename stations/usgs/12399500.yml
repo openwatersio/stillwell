@@ -1,0 +1,16 @@
+name: COLUMBIA RIVER AT INTERNATIONAL BOUNDARY
+lat: 49.0007496555087
+lon: -117.629420596239
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 366.626
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12399500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a1489f5900394255973ebe6a6e9a05d1

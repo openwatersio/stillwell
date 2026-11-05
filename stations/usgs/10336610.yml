@@ -1,0 +1,16 @@
+name: UPPER TRUCKEE RV AT SOUTH LAKE TAHOE, CA
+lat: 38.9224077995447
+lon: -119.99157059563
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1898.611
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10336610/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: f2997218305d468db53cbfb6f879de9f

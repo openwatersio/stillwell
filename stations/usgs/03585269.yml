@@ -1,0 +1,15 @@
+name: SUGAR CREEK AT HWY 11 NEAR MINOR HILL, TN
+lat: 35.0173051609725
+lon: -87.1983484597293
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03585269/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2008-10-01T05:45:00+00:00
+time_series_id: 9c9bcf20a30848bf887bff743f818f9f

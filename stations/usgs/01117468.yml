@@ -1,0 +1,16 @@
+name: BEAVER RIVER NEAR USQUEPAUG, RI
+lat: 41.4926003660406
+lon: -71.6281194113479
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 32.547
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01117468/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 466231313ddb45329e26c816f067db11

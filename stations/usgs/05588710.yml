@@ -1,0 +1,15 @@
+name: JUDYS BRANCH TRIBUTARY AT GLEN CARBON, IL
+lat: 38.7608333333333
+lon: -89.9575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 149.352
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05588710/
+parameter_code: "00065"
+time_series_id: 6d01ef307ee84fcaa97f3736fd9d0d5c

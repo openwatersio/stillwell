@@ -1,0 +1,16 @@
+name: LITTLE COLORADO RIVER NEAR CAMERON, AZ
+lat: 35.9263819314883
+lon: -111.567368242083
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1212.86
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09402000/
+parameter_code: "00065"
+series_begin: 2012-05-08T22:00:00+00:00
+time_series_id: 613ac9994318435f8cbc7c0562544360

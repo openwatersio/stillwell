@@ -1,0 +1,16 @@
+name: BATAVIA KILL AT RED FALLS NEAR PRATTSVILLE NY
+lat: 42.308416666666666
+lon: -74.38950000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 386.651
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01349950/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 899e01cf5c3c47ffb8236f853124c2df

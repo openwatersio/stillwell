@@ -1,0 +1,17 @@
+name: MARGUERITE C 3.6 MI AB EMMA C NR HEALY AK
+lat: 63.973888888888894
+lon: -148.76111111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 637.459
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15515048/
+parameter_code: "00065"
+series_begin: 2016-05-18T00:00:00+00:00
+series_end: 2025-11-21T17:45:00+00:00
+time_series_id: 97b9a4a361fb48ae8090b305849f96e0

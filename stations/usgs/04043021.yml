@@ -1,0 +1,15 @@
+name: COLE CREEK AT HOUGHTON CANAL ROAD NR HOUGHTON, MI
+lat: 47.1279825485826
+lon: -88.6242902717512
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 192.024
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04043021/
+parameter_code: "00065"
+time_series_id: f286f3701c8d4c3bbe2447aa6c4d8661

@@ -1,0 +1,15 @@
+name: SB Metedeconk R at New Hampshire Av nr Lakewood NJ
+lat: 40.0830555555556
+lon: -74.1797222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01408151/
+parameter_code: "00065"
+series_begin: 2011-06-11T04:00:00+00:00
+series_end: 2014-10-01T03:45:00+00:00
+time_series_id: efeb35824c184760909bdd260c50033e

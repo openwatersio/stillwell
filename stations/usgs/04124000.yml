@@ -1,0 +1,16 @@
+name: MANISTEE RIVER NEAR SHERMAN, MI
+lat: 44.4363923912724
+lon: -85.6986792382895
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 245.056
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04124000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: 126f648981dd4808bf8f0d7393c39371

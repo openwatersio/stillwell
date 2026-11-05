@@ -1,0 +1,14 @@
+name: N. NEW RIVER CANAL AT S-11-A NR ANDYTOWN, FL
+lat: 26.1774444444444
+lon: -80.4486388888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-261150080270001/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 96dfd2384a8f44468eea2df77b6f1870

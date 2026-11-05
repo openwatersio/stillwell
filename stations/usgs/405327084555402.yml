@@ -1,0 +1,14 @@
+name: OVERLAND FLOW NORTH OF CR 1000 N NR DECATUR, IN
+lat: 40.89083333333333
+lon: -84.93208333333334
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-405327084555402/
+parameter_code: "00065"
+series_begin: 2026-05-18T20:15:00+00:00
+time_series_id: 83c3535b21cf4f838561caff79056418

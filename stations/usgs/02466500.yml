@@ -1,0 +1,17 @@
+name: BIG PRAIRIE CREEK NEAR GALLION, AL.
+lat: 32.541283141475915
+lon: -87.68112728917022
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 23.707
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02466500/
+parameter_code: "00065"
+series_begin: 2023-09-01T16:45:00+00:00
+series_end: 2026-10-14T18:30:00+00:00
+time_series_id: 3531103b31eb407b9e2ea9b43ef59057

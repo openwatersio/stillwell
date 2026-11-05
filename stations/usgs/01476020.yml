@@ -1,0 +1,15 @@
+name: Crum Creek at Eddystone, PA
+lat: 39.86695924301227
+lon: -75.34072832651987
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01476020/
+parameter_code: "00065"
+series_begin: 2026-05-16T03:54:40+00:00
+series_end: 2026-10-28T19:56:38+00:00
+time_series_id: 60ff5b6b40794c25ba8571cd8c6c978c

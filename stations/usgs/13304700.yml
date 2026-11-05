@@ -1,0 +1,16 @@
+name: Lemhi River near McFarland, ID
+lat: 44.8025666666667
+lon: -113.565877777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1637.127
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13304700/
+parameter_code: "00065"
+series_begin: 2022-08-10T15:15:00+00:00
+time_series_id: ae3492bcc28342a3a68fbfc27970162a

@@ -1,0 +1,16 @@
+name: Big Sandy River at Gasson Bridge, near Eden, WY
+lat: 41.947427501358945
+lon: -109.68823684167228
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1935.48
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09216050/
+parameter_code: "00065"
+series_begin: 2025-08-21T20:30:00+00:00
+time_series_id: c26d89661163404ba525b9cde43b1801

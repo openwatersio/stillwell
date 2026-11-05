@@ -1,0 +1,16 @@
+name: PECOS RIVER NEAR ACME, NM
+lat: 33.5718555555556
+lon: -104.373602777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1070.726
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08386000/
+parameter_code: "00065"
+series_begin: 2009-04-29T12:00:00+00:00
+time_series_id: 68425e1af2974bfc9d0da5ae74167a32

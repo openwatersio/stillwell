@@ -1,0 +1,16 @@
+name: Rosebud C Bel Lame Deer C nr Lame Deer MT
+lat: 45.6758254457335
+lon: -106.7003090036
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 963.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06295220/
+parameter_code: "00065"
+series_begin: 2015-07-09T20:15:00+00:00
+time_series_id: 6b50625c34434da08b3416c731c0da71

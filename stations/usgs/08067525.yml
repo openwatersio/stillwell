@@ -1,0 +1,16 @@
+name: Goose Ck at Baytown, TX
+lat: 29.7707819720333
+lon: -94.9996503156802
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067525/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4e7d416bdae74e9292850f1b63e78c51

@@ -1,0 +1,16 @@
+name: TURKEY CREEK ABOVE BEAR CREEK LAKE NEAR MORRISON C
+lat: 39.640708333333336
+lon: -105.15935
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1725.689
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06711040/
+parameter_code: "00065"
+series_begin: 2019-03-06T19:15:00+00:00
+time_series_id: deba0fe891aa44f4bc9a6d0593f18314

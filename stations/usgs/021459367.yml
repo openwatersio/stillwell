@@ -1,0 +1,16 @@
+name: BIG DUTCHMAN CREEK AT ROCK HILL, SC
+lat: 34.9868083333333
+lon: -81.0083388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 152.29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021459367/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c571aae29c9e45cbb5dda9bd4bcce3af

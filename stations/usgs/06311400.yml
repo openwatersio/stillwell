@@ -1,0 +1,17 @@
+name: NF POWDER RIVER BELOW PASS CREEK, NR MAYOWORTH, WY
+lat: 43.9113569980217
+lon: -106.889499872375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1737.36
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06311400/
+parameter_code: "00065"
+series_begin: 2012-12-19T07:00:00+00:00
+series_end: 2020-08-25T14:00:00+00:00
+time_series_id: fbd732b1feb44cd3a14a9a60be5ad5da

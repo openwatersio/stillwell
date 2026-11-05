@@ -1,0 +1,16 @@
+name: CAHABA RIVER AT CENTREVILLE AL
+lat: 32.945123832355
+lon: -87.1391623015897
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 55.111
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02424000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c421eedc1b374bc6858d8917884de88c

@@ -1,0 +1,17 @@
+name: MITCHELL CREEK AT SE 162nd AVE, AT PORTLAND, OR
+lat: 45.46
+lon: -122.496944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 121.92
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-452736122294900/
+parameter_code: "00065"
+series_begin: 2018-11-07T08:00:00+00:00
+series_end: 2019-10-10T23:30:00+00:00
+time_series_id: 61de62794d714fef869aa244a9085a47

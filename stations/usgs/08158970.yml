@@ -1,0 +1,16 @@
+name: Williamson Ck at Jimmy Clay Rd, Austin, TX
+lat: 30.1893780269057
+lon: -97.7325039651033
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 150.663
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08158970/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6e087424a1dc47b59fce6e618b5e66cd

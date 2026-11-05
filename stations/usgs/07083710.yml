@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER BELOW EMPIRE GULCH NEAR MALTA, CO
+lat: 39.1638798190847
+lon: -106.320024079471
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2828.544
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07083710/
+parameter_code: "00065"
+series_begin: 2020-09-01T07:00:00+00:00
+time_series_id: b05cbdafcb324a4ba0f22e6fa17bd4c9

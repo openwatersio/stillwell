@@ -1,0 +1,16 @@
+name: SAN JOAQUIN R BL FRIANT CA
+lat: 36.9843939698554
+lon: -119.724312421627
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 90.388
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11251000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 26fc5abe5315422b896dd134af47ffd1

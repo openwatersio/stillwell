@@ -1,0 +1,16 @@
+name: N BRANCH CLINTON R AT 26 MILE NR MEADE, MI
+lat: 42.71718333333334
+lon: -82.90455
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.715
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04164151/
+parameter_code: "00065"
+series_begin: 2024-10-01T05:15:00+00:00
+time_series_id: 0915836a5cbc4d5d8a86a00bc3ff81ce

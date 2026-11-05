@@ -1,0 +1,16 @@
+name: ECHO LAKE AT DAM NR GLEN ALLEN, VA
+lat: 37.674389
+lon: -77.547528
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 61.265
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204226958/
+parameter_code: "00065"
+series_begin: 2022-02-02T19:05:00+00:00
+time_series_id: d63be0db609d45c1bf5ada48b29720f5

@@ -1,0 +1,16 @@
+name: ACCOTINK CREEK AT KEENE MILL RD AT SPRINGFIELD, VA
+lat: 38.775182219357745
+lon: -77.20324307938283
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 42.623
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01654670/
+parameter_code: "00065"
+series_begin: 2024-08-29T17:50:00+00:00
+time_series_id: 77a7258c226b4a309b8e6b6b3681e361

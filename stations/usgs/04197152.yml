@@ -1,0 +1,17 @@
+name: Rock Creek near Republic OH
+lat: 41.1016666666667
+lon: -83.0538888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 252.987
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04197152/
+parameter_code: "00065"
+series_begin: 2025-12-05T04:00:00+00:00
+series_end: 2025-12-05T16:00:00+00:00
+time_series_id: 846b46252bf74a9ba874a84a257e4e58

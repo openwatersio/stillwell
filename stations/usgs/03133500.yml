@@ -1,0 +1,14 @@
+name: Clear Fork bl Pleasant Hill Dam nr Perrysville OH
+lat: 40.6203379154383
+lon: -82.3243284081728
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03133500/
+parameter_code: "00065"
+series_begin: 2018-02-06T05:00:00+00:00
+time_series_id: c7ced7a326c848a8999e6f42cf9d0d1b

@@ -1,0 +1,16 @@
+name: San Miguel Ck nr Tilden, TX
+lat: 28.5874878693366
+lon: -98.54585128707
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 73.932
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08206700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7ba25b27eb4d44cd87bf6216f7b6ae42

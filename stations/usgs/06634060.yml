@@ -1,0 +1,16 @@
+name: L Medicine Bow R ab Sand Cr, nr Shirley Basin, WY
+lat: 42.3311111111111
+lon: -106.155277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2124.761
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06634060/
+parameter_code: "00065"
+series_begin: 2015-04-30T20:45:00+00:00
+time_series_id: 3a885b3cc5914cd8b78f6efb9a2548ed

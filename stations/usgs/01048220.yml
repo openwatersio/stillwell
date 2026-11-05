@@ -1,0 +1,16 @@
+name: East Branch Wesserunsett Stream near Athens, Maine
+lat: 44.9475
+lon: -69.6569444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 128.065
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01048220/
+parameter_code: "00065"
+series_begin: 2008-06-01T04:00:00+00:00
+time_series_id: 6a4c6d50591f4e6ea730457a588ce279

@@ -1,0 +1,16 @@
+name: FLINT CREEK NEAR FALKVILLE AL
+lat: 34.373184032390796
+lon: -86.93360491029564
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03576500/
+parameter_code: "00065"
+series_begin: 2011-10-14T05:00:00+00:00
+time_series_id: 33a3630702c84f7eac7a08003916971e

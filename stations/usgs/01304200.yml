@@ -1,0 +1,14 @@
+name: ORIENT HARBOR AT ORIENT NY
+lat: 41.13663888888889
+lon: -72.30675
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01304200/
+parameter_code: "62620"
+series_begin: 2012-07-20T05:00:00+00:00
+time_series_id: fd1d0772b1b04373b768f0049440685d

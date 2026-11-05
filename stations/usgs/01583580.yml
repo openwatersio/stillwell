@@ -1,0 +1,16 @@
+name: BAISMAN RUN AT BROADMOOR, MD
+lat: 39.47947222222223
+lon: -76.67802777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 100.023
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01583580/
+parameter_code: "00065"
+series_begin: 2007-10-12T05:00:00+00:00
+time_series_id: 25126c75305f4788a3ee2cde49c0e7ea

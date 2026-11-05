@@ -1,0 +1,17 @@
+name: OAKPORT COULEE AT 70TH AVE NR OAKPORT, MN
+lat: 46.9486111111111
+lon: -96.7711111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 262.674
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-465655096461600/
+parameter_code: "00065"
+series_begin: 2011-04-08T05:00:00+00:00
+series_end: 2013-05-05T04:45:00+00:00
+time_series_id: 40735df3b1ff459ebc1d1d7a5cd2bd05

@@ -1,0 +1,16 @@
+name: Caney Ck at SH 35 nr Van Vleck, TX
+lat: 29.0417222222222
+lon: -95.8635194444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08117855/
+parameter_code: "00065"
+series_begin: 2020-02-18T21:30:00+00:00
+time_series_id: caa8aec0956d47fe9bf82dbf1d086dfb

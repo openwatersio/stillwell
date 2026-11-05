@@ -1,0 +1,17 @@
+name: MURRAY C NR SAN ANDREAS CA
+lat: 38.2116111111111
+lon: -120.675611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 268.224
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11308500/
+parameter_code: "00065"
+series_begin: 2015-11-11T08:00:00+00:00
+series_end: 2017-10-10T15:30:00+00:00
+time_series_id: ad08e050af1a4298a654420a97e654ba

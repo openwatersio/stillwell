@@ -1,0 +1,15 @@
+name: TAMIAMI CANAL OUTLETS, 40-MILE BEND TO MONROE, FL
+lat: 25.851763596237276
+lon: -80.98038415036461
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02288900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-05-17T04:45:00+00:00
+time_series_id: 308da8d2ea85416299537873c51c5412

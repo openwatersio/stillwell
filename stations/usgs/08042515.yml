@@ -1,0 +1,16 @@
+name: Rhodair Gully at US 69 nr Nederland, TX
+lat: 29.98205833333333
+lon: -94.02956111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042515/
+parameter_code: "00065"
+series_begin: 2022-03-08T22:40:00+00:00
+time_series_id: 78f3c8ad19494db48fdf36ead33785a9

@@ -1,0 +1,16 @@
+name: OLD RIVER NEAR BYRON CA
+lat: 37.8910362744032
+lon: -121.570228330882
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11313315/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 9bcbfbccc4254ffdb8181460f5724779

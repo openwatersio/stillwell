@@ -1,0 +1,16 @@
+name: CROSS CREEK NEAR MINTURN, CO
+lat: 39.5682916666667
+lon: -106.412430555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2434.047
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09065100/
+parameter_code: "00065"
+series_begin: 2020-06-23T22:15:00+00:00
+time_series_id: 2751e6492bcc477383a1686c84319313

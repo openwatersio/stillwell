@@ -1,0 +1,17 @@
+name: BIG ENTRY DCH ABOVE ROSEMARY DCH NR DEEP CREEK, VA
+lat: 36.72065
+lon: -76.3554
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-364314076211900/
+parameter_code: "00065"
+series_begin: 2014-11-21T05:00:00+00:00
+series_end: 2020-10-01T04:45:00+00:00
+time_series_id: f0d2fffd1be442e3acfa70b612a97377

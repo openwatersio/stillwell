@@ -1,0 +1,17 @@
+name: White Oak Blowhole Cave sump nr Schoolhouse Gap
+lat: 35.6383611111111
+lon: -83.7493611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 431.292
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-353818083445801/
+parameter_code: "00065"
+series_begin: 2017-08-30T21:00:00+00:00
+series_end: 2018-08-29T18:15:00+00:00
+time_series_id: e79b4a18f0614ab5851e8b39f89bcfc8

@@ -1,0 +1,16 @@
+name: MALLARD CR BL STONY CR NR HARRISBURG, NC
+lat: 35.332778
+lon: -80.715833
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.337
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0212414900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7eb68cca7de3435aab54688a7da2dcf1

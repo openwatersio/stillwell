@@ -1,0 +1,16 @@
+name: SKAGIT RIVER AT MARBLEMOUNT, WA
+lat: 48.533730632232
+lon: -121.429849915891
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 94.073
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12181000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3dda7d29677d492bad24528ca7f5c886

@@ -1,0 +1,16 @@
+name: SALINAS R A PASO ROBLES CA
+lat: 35.6285812957266
+lon: -120.684337320485
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.189
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11147500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a7ab6ad08cde4379b3de360d8cd9a99c

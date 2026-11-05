@@ -1,0 +1,16 @@
+name: Chiques Creek near Marietta, PA
+lat: 40.0628745131979
+lon: -76.5155213960526
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 76.2
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01575900/
+parameter_code: "00065"
+series_begin: 2020-12-03T17:15:00+00:00
+time_series_id: 3848b9fc345248aca0f98702363fe510

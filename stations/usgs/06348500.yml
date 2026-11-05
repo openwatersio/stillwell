@@ -1,0 +1,16 @@
+name: SWEETBRIAR CREEK NEAR JUDSON, ND
+lat: 46.851111
+lon: -101.252778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 575.365
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06348500/
+parameter_code: "00065"
+series_begin: 2008-03-26T05:00:00+00:00
+time_series_id: 2c8dd40c54cf4ba892e0fc98bcd6e681

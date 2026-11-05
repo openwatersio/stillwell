@@ -1,0 +1,16 @@
+name: EAGLE RIVER BELOW MILK CREEK NEAR WOLCOTT, CO
+lat: 39.705
+lon: -106.725833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2084.847
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-394220106431500/
+parameter_code: "00065"
+series_begin: 2020-11-18T19:00:00+00:00
+time_series_id: 94a7e52497f54a0b92f90c85ace28ab0

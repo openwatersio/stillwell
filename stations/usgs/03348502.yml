@@ -1,0 +1,16 @@
+name: WHITE RIVER NEAR STRAWTOWN, IN
+lat: 40.12572222222222
+lon: -85.96755555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.361
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03348502/
+parameter_code: "00065"
+series_begin: 2017-03-25T14:15:00+00:00
+time_series_id: f224b94a18354fdc9c51479e6cc62a62

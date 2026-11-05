@@ -1,0 +1,14 @@
+name: HUDSON RIVER NEAR POUGHKEEPSIE NY
+lat: 41.72058333333334
+lon: -73.93875
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01372043/
+parameter_code: "62620"
+series_begin: 2012-10-01T05:00:00+00:00
+time_series_id: bd0c1549bbcf4956bd48013b6309e392

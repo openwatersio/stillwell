@@ -1,0 +1,16 @@
+name: Town Br. at S Morningside at Fayetteville, AR
+lat: 36.0449333333333
+lon: -94.1494333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 357.274
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07048493/
+parameter_code: "00065"
+series_begin: 2023-05-24T17:15:00+00:00
+time_series_id: 356bf1c910b2476586680c2b9caf0750

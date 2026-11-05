@@ -1,0 +1,16 @@
+name: N Concho Rv nr Carlsbad, TX
+lat: 31.592654898324
+lon: -100.637044931008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 599.977
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08134000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 404cced984c64082b42617ec3ff235f1

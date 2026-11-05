@@ -1,0 +1,16 @@
+name: LIVENGOOD C AT LIVENGOOD AK
+lat: 65.52297222222222
+lon: -148.54638888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.423
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15519030/
+parameter_code: "00065"
+series_begin: 2019-05-08T20:00:00+00:00
+time_series_id: 45b92769ecf44084adc06e6a4fedb872

@@ -1,0 +1,16 @@
+name: ELKHORN CREEK NEAR PENROSE, IL
+lat: 41.90275
+lon: -89.6963888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 200.482
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05444000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e88a1e678e9240e3b6f0e063ee8f830a

@@ -1,0 +1,16 @@
+name: HILLSBOROUGH RIVER AT ROWLETT PK DR NEAR TAMPA FL
+lat: 28.022005555555555
+lon: -82.43504166666668
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.238
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02304510/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b3d283f51cc04b0abd7a647431af93ea

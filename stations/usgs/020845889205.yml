@@ -1,0 +1,15 @@
+name: LAKE MATTAMUSKEET AT NC HWY 94 NEAR FAIRFIELD, NC
+lat: 35.493236
+lon: -76.214553
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -0.61
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-020845889205/
+parameter_code: "00065"
+time_series_id: 56e9dfb9b50b44bc897b691e8b3f5712

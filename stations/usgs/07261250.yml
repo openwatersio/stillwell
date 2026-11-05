@@ -1,0 +1,17 @@
+name: Cadron Creek West of Conway, AR
+lat: 35.114722
+lon: -92.524722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 76.654
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07261250/
+parameter_code: "00065"
+series_begin: 2012-03-14T18:45:00+00:00
+series_end: 2020-07-01T05:45:00+00:00
+time_series_id: 9253ac50886c483a80208d6b2cfd8cd9

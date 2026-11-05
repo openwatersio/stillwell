@@ -1,0 +1,16 @@
+name: TITICUS RIVER AT PURDYS STATION NY
+lat: 41.3271111111111
+lon: -73.6556388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.805
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01374821/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8a78014d658e46089a5750d6c7855276

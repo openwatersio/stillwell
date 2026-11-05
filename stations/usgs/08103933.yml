@@ -1,0 +1,16 @@
+name: Reese Ck at Maxdale Rd, Ft Hood, TX
+lat: 31.033022222222222
+lon: -97.80164722222221
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 245.224
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08103933/
+parameter_code: "00065"
+series_begin: 2024-03-29T14:00:00+00:00
+time_series_id: cbb894f6e5bd4cb59c8f0cb73bb5a264

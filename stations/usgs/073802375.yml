@@ -1,0 +1,17 @@
+name: Lake Salvador near Lafitte, LA
+lat: 29.7713888888889
+lon: -90.1933333333333
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -2.64
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073802375/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2013-10-22T05:00:00+00:00
+time_series_id: f6abde1911e64e97a1f0be6871705398

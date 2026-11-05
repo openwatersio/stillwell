@@ -1,0 +1,14 @@
+name: VINES CREEK NEAR DAGSBORO, DE
+lat: 38.5563888888889
+lon: -75.2031666666667
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01484549/
+parameter_code: "62620"
+series_begin: 2015-05-15T05:00:00+00:00
+time_series_id: 09ac7add3de44704800591fc0ab79d37

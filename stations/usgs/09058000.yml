@@ -1,0 +1,16 @@
+name: COLORADO RIVER NEAR KREMMLING, CO
+lat: 40.036667
+lon: -106.439444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2229.874
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09058000/
+parameter_code: "00065"
+series_begin: 2020-10-08T23:15:00+00:00
+time_series_id: 561b6d771ce8419fbe8a027d57061868

@@ -1,0 +1,16 @@
+name: DEVILS LAKE NEAR BARABOO, WI
+lat: 43.4263888888889
+lon: -89.7277777777778
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 291.047
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05404500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 582979f98a3046b8a0f894e351587f98

@@ -1,0 +1,15 @@
+name: LAGUNITAS C AUXILIARY GAGE NR PT REYES STATION CA
+lat: 38.0779777027823
+lon: -122.78360142653
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: -0.116
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11460601/
+parameter_code: "00065"
+time_series_id: dba2b0efdd5544cbaa9ad4663863f1c1

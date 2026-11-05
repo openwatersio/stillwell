@@ -1,0 +1,16 @@
+name: WABASH RIVER AT DELPHI, IN
+lat: 40.59127777777778
+lon: -86.69791666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.356
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03329500/
+parameter_code: "00065"
+series_begin: 2020-08-04T21:15:00+00:00
+time_series_id: 1d6bd61621ec4b45a140f6c71d36c5e8

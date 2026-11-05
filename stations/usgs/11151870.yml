@@ -1,0 +1,16 @@
+name: ARROYO SECO NR GREENFIELD CA
+lat: 36.2374616425301
+lon: -121.481602714755
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 237.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11151870/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2b3e5e0767ed4fbdab764df5bf938744

@@ -1,0 +1,15 @@
+name: POWDER RIVER ABOVE BURGER DRAW, NEAR BUFFALO, WY
+lat: 44.1443780291346
+lon: -106.139259530404
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1219.2
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06313590/
+parameter_code: "00065"
+time_series_id: d116c15bddae485e82fa180e45163472

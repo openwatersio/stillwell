@@ -1,0 +1,16 @@
+name: YADKIN RIVER BL W KERR SCOTT DAM NEAR BUCK, NC
+lat: 36.1361111111111
+lon: -81.2233333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 293.117
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0211139110/
+parameter_code: "00065"
+series_begin: 2007-11-01T04:00:00+00:00
+time_series_id: 24962dab39a74eb085d80b125e50fca5

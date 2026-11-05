@@ -1,0 +1,16 @@
+name: Tensas River at Tendal, LA
+lat: 32.4320870406209
+lon: -91.3667813930878
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 15.264
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07369500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e77581af81b6400884e16b03b677ce55

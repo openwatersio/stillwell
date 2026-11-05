@@ -1,0 +1,16 @@
+name: Rabbit Ck at Kilgore, TX
+lat: 32.3882059920318
+lon: -94.9032716439748
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.694
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08020700/
+parameter_code: "00065"
+series_begin: 2015-08-14T14:45:00+00:00
+time_series_id: 9bbc4ed546a144a2b314c48a46b711a5

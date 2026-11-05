@@ -1,0 +1,14 @@
+name: Donna ID Canal at E Levee Rd nr Donna, TX
+lat: 26.098239
+lon: -98.07215
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08473251/
+parameter_code: "00065"
+series_begin: 2026-04-16T09:45:00+00:00
+time_series_id: a6b46a154fd94525a4c3ed4b071e200c

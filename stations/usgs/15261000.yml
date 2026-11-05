@@ -1,0 +1,16 @@
+name: COOPER C AT MOUTH NR COOPER LANDING AK
+lat: 60.479977225518134
+lon: -149.88272471145518
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 133.167
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15261000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: d327b323c0d6459f8eaffbe888be34d9

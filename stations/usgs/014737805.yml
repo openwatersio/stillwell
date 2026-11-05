@@ -1,0 +1,15 @@
+name: Manayunk Canal at inlet at Roxborough, PA
+lat: 40.038533
+lon: -75.245153
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.278
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-014737805/
+parameter_code: "00065"
+time_series_id: 1ffe6de2522445e7bc007df639183add

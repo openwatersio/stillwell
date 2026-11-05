@@ -1,0 +1,16 @@
+name: RIFLE RIVER NEAR STERLING, MI
+lat: 44.072520306588
+lon: -84.0199939236377
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.8
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04142000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: f7b6097c7aaa42648370ed18f9713d34

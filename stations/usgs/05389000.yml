@@ -1,0 +1,16 @@
+name: Yellow River near Ion, IA
+lat: 43.1119166666667
+lon: -91.2651388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.241
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05389000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0a4663806b4846fea3b21945e509ef7d

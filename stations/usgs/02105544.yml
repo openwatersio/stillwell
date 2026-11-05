@@ -1,0 +1,17 @@
+name: CAPE FEAR RIVER AT LOCK 2 NEAR ELIZABETHTOWN, NC
+lat: 34.6324916666667
+lon: -78.6028444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2.911
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02105544/
+parameter_code: "00065"
+series_begin: 2018-09-12T00:45:00+00:00
+series_end: 2018-09-27T15:45:00+00:00
+time_series_id: b68875105aa5456682d946aa6224501c

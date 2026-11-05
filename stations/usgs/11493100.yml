@@ -1,0 +1,16 @@
+name: SCOTT CREEK BLW SAND CREEK CANAL NR CHINCHALO, OR
+lat: 42.88709166666666
+lon: -121.87275555555554
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1398.118
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11493100/
+parameter_code: "00065"
+series_begin: 2023-11-29T23:10:00+00:00
+time_series_id: 92c8f19557ff48168827de16429feba0

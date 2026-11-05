@@ -1,0 +1,16 @@
+name: Lavaca Rv at Hallettsville, TX
+lat: 29.4432973071308
+lon: -96.9449818837215
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 56.821
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08163500/
+parameter_code: "00065"
+series_begin: 2015-08-20T14:00:00+00:00
+time_series_id: c5f195dc506442599342ce83f3716276

@@ -1,0 +1,15 @@
+name: RAILROAD CUT A OLD R NR BRENTWOOD  CA
+lat: 37.939477777777775
+lon: -121.556175
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.829
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-375622121332201/
+parameter_code: "00065"
+time_series_id: 449282c9066b44e7b4ae23b5e64a61a4

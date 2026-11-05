@@ -1,0 +1,16 @@
+name: Pontoon Bridge Canal near Butte Larose, LA
+lat: 30.2819444444444
+lon: -91.7355555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.055
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-301655091440800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 8bb3acd8172e4856929da8c13d3431b5

@@ -1,0 +1,16 @@
+name: CHIPOLA RIVER AT MARIANNA FL
+lat: 30.7729706362373
+lon: -85.2163177576254
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 17.069
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02358789/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 117fcc76f2bd4619a3e90a7d1083397d

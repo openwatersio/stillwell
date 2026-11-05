@@ -1,0 +1,16 @@
+name: BIG COULEE AT HWY 2 NEAR CHURCHS FERRY, ND
+lat: 48.261667
+lon: -99.187222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 427.107
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05056265/
+parameter_code: "00065"
+series_begin: 2011-02-17T06:00:00+00:00
+time_series_id: 08e106c0e1334542961723e818b41627

@@ -1,0 +1,16 @@
+name: N FK HUMBOLDT RV AT DEVILS GATE NR HALLECK, NV
+lat: 41.1787527777778
+lon: -115.492575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1636.776
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10317500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 795636a13f8a4b3e9a9caa3aa9635c69

@@ -1,0 +1,16 @@
+name: N F HOLSTON RIVER NEAR GATE CITY, VA
+lat: 36.6087111923826
+lon: -82.5679310560956
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 364.815
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03490000/
+parameter_code: "00065"
+series_begin: 2012-04-23T10:30:00+00:00
+time_series_id: e3dd6d8cfef244f0bef9cf03f4b64cbd

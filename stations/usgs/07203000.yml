@@ -1,0 +1,16 @@
+name: VERMEJO RIVER NEAR DAWSON, NM
+lat: 36.6810277777778
+lon: -104.786394444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1944.014
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07203000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c845e15f7ef8477188df433df8e06fc6

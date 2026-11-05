@@ -1,0 +1,14 @@
+name: NORTH FORK BLACK CREEK AT MIDDLEBURG, FL
+lat: 30.0760734313535
+lon: -81.8637113855463
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02246010/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8e731eee3c2c43019feff5fae3ccacc1

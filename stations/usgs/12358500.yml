@@ -1,0 +1,16 @@
+name: M F Flathead River near West Glacier MT
+lat: 48.4955166666667
+lon: -114.010208333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 953.634
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12358500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:01:00+00:00
+time_series_id: ce0bc3111f504a24a1c428f7568c00d8

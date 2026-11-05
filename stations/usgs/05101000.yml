@@ -1,0 +1,16 @@
+name: TONGUE RIVER AT AKRA, ND
+lat: 48.778333
+lon: -97.746389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.796
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05101000/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+time_series_id: d656999dbc714bd19b24c1f5e83e9529

@@ -1,0 +1,16 @@
+name: EAST PEARL RIVER AT CSX RAILROAD NR CLAIBORNE, MS
+lat: 30.1947222222222
+lon: -89.5341666666667
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.104
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-301141089320300/
+parameter_code: "00065"
+series_begin: 2001-08-22T07:15:00+00:00
+time_series_id: ca08109a050f424c8b16971088e7f4ff

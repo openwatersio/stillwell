@@ -1,0 +1,15 @@
+name: ESCATAWPA RIVER NEAR AGRICOLA MS
+lat: 30.8118552012993
+lon: -88.4586273872522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 14.021
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02479560/
+parameter_code: "00065"
+time_series_id: f1eeb85f137d4e8b8e7799d94c4babe5

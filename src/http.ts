@@ -7,6 +7,10 @@ const USER_AGENT = "openwaters-water-levels (+https://github.com/openwatersio/wa
 export interface RequestOptions extends RequestInit {
   /** Skip any cache, e.g. for real-time series that change every fetch. */
   fresh?: boolean;
+  /** Whether a cache may keep this answer; a source whose values change after release says which ones can't. */
+  keep?: (text: string) => boolean;
+  /** Waits for the source's rate limit before each request that goes out, retries included; cache hits skip it. */
+  pace?: () => Promise<void>;
 }
 
 export type Transport = (url: string, options: RequestOptions) => Promise<string>;
@@ -31,12 +35,13 @@ export async function getJson<T>(url: string, options?: RequestOptions): Promise
  */
 export async function fetchText(
   url: string,
-  { fresh: _, ...init }: RequestOptions = {},
+  { fresh: _, keep: __, pace, ...init }: RequestOptions = {},
 ): Promise<string> {
-  return fetchWithRetry(url, {
-    ...init,
-    headers: { "user-agent": USER_AGENT, ...init.headers },
-  });
+  return fetchWithRetry(
+    url,
+    { ...init, headers: { "user-agent": USER_AGENT, ...init.headers } },
+    pace,
+  );
 }
 
 /** The socket or DNS error behind a failed fetch, such as `: ECONNRESET`. */
@@ -46,14 +51,22 @@ function causeOf(error: TypeError): string {
   return reason ? `: ${reason}` : "";
 }
 
-async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Promise<string> {
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  pace?: () => Promise<void>,
+  attempts = 4,
+): Promise<string> {
   for (let attempt = 1; ; attempt++) {
     let status: number | string;
+    let retryAfter = 0;
+    await pace?.();
     try {
       // A year of RWS data is about 15 MB and can take a minute.
       const response = await fetch(url, { ...init, signal: AbortSignal.timeout(300_000) });
       if (response.ok) return await response.text();
       status = response.status;
+      retryAfter = Number(response.headers.get("retry-after")) || 0;
     } catch (error) {
       if (error instanceof Error && error.name === "TimeoutError") status = "timeout";
       // Node's fetch reports a failed or dropped connection as a TypeError,
@@ -63,12 +76,16 @@ async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Pro
         status = `a network error (${error.message}${causeOf(error)})`;
       else throw error;
     }
-    // RWS throttles with 429 and 503; back off and try again.
+    // RWS throttles with 429 and 503; back off and try again. A block of more
+    // than a minute is the caller's to wait out, so it gets the Retry-After.
     if (
       attempt >= attempts ||
+      retryAfter > 60 ||
       !(typeof status === "string" || [429, 500, 502, 503, 504].includes(status))
     )
-      throw new Error(`${init.method ?? "GET"} ${url} returned ${status}`);
-    await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 1000));
+      throw new Error(
+        `${init.method ?? "GET"} ${url} returned ${status}${retryAfter ? ` (retry after ${retryAfter} s)` : ""}`,
+      );
+    await new Promise((resolve) => setTimeout(resolve, Math.max(retryAfter, 2 ** attempt) * 1000));
   }
 }

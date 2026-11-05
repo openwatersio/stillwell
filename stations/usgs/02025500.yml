@@ -1,0 +1,16 @@
+name: JAMES RIVER AT HOLCOMB ROCK, VA
+lat: 37.501250812935
+lon: -79.2625287364124
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.979
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02025500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9f67a789fa25495fbba628d51c5bf733

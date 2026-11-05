@@ -1,0 +1,14 @@
+name: SALMON RIVER CANAL CO RES NR ROGERSON ID
+lat: 42.2122222222222
+lon: -114.733333333333
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13106500/
+parameter_code: "00065"
+series_begin: 2014-03-25T23:00:00+00:00
+time_series_id: 2ee3deafada94313b6da32a8cf945a03

@@ -1,0 +1,16 @@
+name: COTTONWOOD CREEK BEL FIVEMILE CR NR BOISE ID
+lat: 43.628611
+lon: -116.110833
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1135.99
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13204640/
+parameter_code: "00065"
+series_begin: 2026-09-10T01:45:00+00:00
+time_series_id: 173dec0b1e66435cbc2a9767324f3585

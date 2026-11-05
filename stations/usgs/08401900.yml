@@ -1,0 +1,16 @@
+name: ROCKY ARROYO AT HWY BRD NR CARLSBAD, NM
+lat: 32.5060805555556
+lon: -104.374988888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 990.344
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08401900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 81f0eb77e4a249349579b780e2e1e89d

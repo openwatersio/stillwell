@@ -1,0 +1,16 @@
+name: TRIPPS RUN AT FALLS CHURCH, VA
+lat: 38.879444444444445
+lon: -77.17916666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 81.808
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01652620/
+parameter_code: "00065"
+series_begin: 2023-03-14T20:45:00+00:00
+time_series_id: 256e1583b3f2451aa0889bace227355a

@@ -1,0 +1,16 @@
+name: St. Mary River near Babb MT
+lat: 48.8330371842266
+lon: -113.420653317679
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1361.886
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05017500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 15ebdd9b65df44bfb6de965b3c8bb0d4

@@ -1,0 +1,15 @@
+name: PINE KNOT CREEK NEAR EELBEECK, GA
+lat: 32.4393099157927
+lon: -84.7332603059211
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02341725/
+parameter_code: "00065"
+series_begin: 2008-10-22T05:00:00+00:00
+series_end: 2012-09-30T03:45:00+00:00
+time_series_id: 1cf2fd05d3184d6ea2fb35ebf29d2a63

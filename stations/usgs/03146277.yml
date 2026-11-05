@@ -1,0 +1,16 @@
+name: North Fork Licking River at Newark OH
+lat: 40.0872222222222
+lon: -82.4108333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 252.149
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03146277/
+parameter_code: "00065"
+series_begin: 2007-10-05T17:45:00+00:00
+time_series_id: 1a451aafb3e7440fa9e9e59d5247d373

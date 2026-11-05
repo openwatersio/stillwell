@@ -1,0 +1,16 @@
+name: AQUIA CREEK NEAR GARRISONVILLE, VA
+lat: 38.490401376354
+lon: -77.4335942075878
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.478
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01660400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 98b94e6aaee2488dba6ab20b6a25dc2f

@@ -1,0 +1,17 @@
+name: YENTNA R NR SUSITNA STATION AK
+lat: 61.6980747272495
+lon: -150.652788489827
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 24.384
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15294345/
+parameter_code: "00065"
+series_begin: 2013-05-31T01:45:00+00:00
+series_end: 2014-10-01T09:00:00+00:00
+time_series_id: 86636d6b0ffb4fe6afccf2323cbeafc6

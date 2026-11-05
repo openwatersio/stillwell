@@ -1,0 +1,16 @@
+name: SOUTH FORK NEW RIVER NEAR JEFFERSON, NC
+lat: 36.3933333333333
+lon: -81.4069444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 809.793
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03161000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 889b8d1f040e4e2fa9476e44b0c14d33

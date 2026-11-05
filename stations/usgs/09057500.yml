@@ -1,0 +1,16 @@
+name: BLUE RIVER BELOW GREEN MOUNTAIN RESERVOIR, CO
+lat: 39.8802635442017
+lon: -106.33391751291
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2341.675
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09057500/
+parameter_code: "00065"
+series_begin: 2020-10-15T16:45:00+00:00
+time_series_id: f8a052175b654426aa5134d4d567151c

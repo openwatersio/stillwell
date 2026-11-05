@@ -1,0 +1,16 @@
+name: BLACK RIVER AT SC51 NEAR RHEMS, SC
+lat: 33.54719444444444
+lon: -79.4015
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -3.252
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136070/
+parameter_code: "00065"
+series_begin: 2023-07-06T16:15:00+00:00
+time_series_id: b5c3e44e167042f5a4d79f810d0c576a

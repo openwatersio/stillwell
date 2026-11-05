@@ -1,0 +1,16 @@
+name: Little Neshaminy C at Valley Road nr Neshaminy PA
+lat: 40.2292745608912
+lon: -75.1196160477815
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 58.04
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01464907/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 401db08ba2a64d18a9f285f04c42f3da

@@ -1,0 +1,14 @@
+name: Clear Lk Second Outflow Channel at Kemah, TX
+lat: 29.5543963202111
+lon: -95.0257616232106
+country_code: US
+kind: estuary
+datum: NGVD29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08077637/
+parameter_code: "63158"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 69070ec14a134945b0ba1c1c69f9969f

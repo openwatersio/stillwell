@@ -1,0 +1,14 @@
+name: ROUGH RIVER LAKE NEAR FALLS OF ROUGH, KY
+lat: 37.6200554700209
+lon: -86.4994250336656
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03318005/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: a8877023af044c4c8593c45beae8d95f

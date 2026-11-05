@@ -1,0 +1,16 @@
+name: SILVER CK AT BROWN'S STATION WAY AT NEW ALBANY, IN
+lat: 38.300361
+lon: -85.791472
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 117.619
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03294445/
+parameter_code: "00065"
+series_begin: 2023-04-07T14:45:00+00:00
+time_series_id: 323dd15a51fa4c90961d87f7e4526d52

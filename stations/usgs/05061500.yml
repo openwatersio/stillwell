@@ -1,0 +1,16 @@
+name: SOUTH BRANCH BUFFALO RIVER AT SABIN, MN
+lat: 46.77566
+lon: -96.627747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 275.335
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05061500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f0463376ea044bb7ac0ed0c6797d1b3d

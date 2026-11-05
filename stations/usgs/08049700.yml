@@ -1,0 +1,16 @@
+name: Walnut Ck nr Mansfield, TX
+lat: 32.5809694958151
+lon: -97.1019533485925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 161.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08049700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a78a01c9434941bc9b5bcf94920ba89e

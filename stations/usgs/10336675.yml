@@ -1,0 +1,15 @@
+name: WARD C A STANFORD ROCK TRAIL XING NR TAHOE CITY CA
+lat: 39.1368513344482
+lon: -120.181025535665
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1965.96
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10336675/
+parameter_code: "00065"
+time_series_id: d11cf444e1604588b56dda8faf23e263

@@ -1,0 +1,16 @@
+name: Crooked B. NW of L. Cuatro Caballo near Delacroix
+lat: 29.718940166083694
+lon: -89.72408865426524
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -1.28
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073745257/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 81799532074b4b2fbe090758ab62610a

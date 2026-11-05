@@ -1,0 +1,16 @@
+name: DONNER C A DONNER LK NR TRUCKEE CA
+lat: 39.3235172238392
+lon: -120.234365436967
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1807.043
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10338500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: cb2c091c3e4d492781fbd331af0d7fa2

@@ -1,0 +1,16 @@
+name: TRUCKEE RV AT WADSWORTH, NV
+lat: 39.6321344667086
+lon: -119.283225365355
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1231.087
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10351650/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4157087b5fb94a55bf91a7ee162ab2a1

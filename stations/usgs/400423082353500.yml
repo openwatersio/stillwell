@@ -1,0 +1,17 @@
+name: Flume at SR 37 E of Moots Run nr Alexandria OH
+lat: 40.0730555555556
+lon: -82.5930555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 296.327
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-400423082353500/
+parameter_code: "00065"
+series_begin: 2018-03-15T17:46:00+00:00
+series_end: 2020-11-03T12:01:00+00:00
+time_series_id: 3819dcd678fd4f9dac1e3d676e85ea41

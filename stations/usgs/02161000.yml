@@ -1,0 +1,16 @@
+name: BROAD RIVER AT ALSTON, SC
+lat: 34.2432033523527
+lon: -81.319541045799
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 64.392
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02161000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7fd1e1e3e73147fcbf3b0c51d18621ff

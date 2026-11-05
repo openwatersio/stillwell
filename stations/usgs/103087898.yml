@@ -1,0 +1,16 @@
+name: ASPEN C AB LEVIATHAN C NR MARKLEEVILLE CA
+lat: 38.717222
+lon: -119.65833300000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2021.735
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-103087898/
+parameter_code: "00065"
+series_begin: 2025-08-14T20:15:00+00:00
+time_series_id: da89ac2c6953411091d75d60387859b9

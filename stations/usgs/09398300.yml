@@ -1,0 +1,16 @@
+name: CRAGIN DAM RESERVOIR NEAR PINE, AZ (BLUE RIDGE)
+lat: 34.555278
+lon: -111.183333
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 2018.788
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09398300/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 9efc92e3b74e45d89198be52e11783dd

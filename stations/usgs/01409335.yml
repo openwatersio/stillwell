@@ -1,0 +1,14 @@
+name: Little Egg Inlet near Tuckerton NJ
+lat: 39.5088888888889
+lon: -74.3247222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01409335/
+parameter_code: "72279"
+series_begin: 2000-09-12T17:06:00+00:00
+time_series_id: 1d118f5fdeb143909d0860c072f0ef5a

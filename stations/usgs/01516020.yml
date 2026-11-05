@@ -1,0 +1,17 @@
+name: Susquehanna R at Athens, PA
+lat: 41.95721919643634
+lon: -76.5149215864355
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01516020/
+parameter_code: "00065"
+series_begin: 2026-05-04T03:57:31+00:00
+series_end: 2026-09-07T15:50:32+00:00
+time_series_id: 9167408df5134289a9254fa78bc9acc8

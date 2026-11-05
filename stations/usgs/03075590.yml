@@ -1,0 +1,16 @@
+name: YOUGHIOGHENY RIVER NEAR SWALLOW FALLS PARK, MD
+lat: 39.492556
+lon: -79.412028
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 692.253
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03075590/
+parameter_code: "00065"
+series_begin: 2023-10-31T14:30:00+00:00
+time_series_id: 1a99450707e94ab79cfb684cd81ee180

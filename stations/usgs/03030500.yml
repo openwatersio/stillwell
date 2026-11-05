@@ -1,0 +1,16 @@
+name: Clarion River near Piney, PA
+lat: 41.1925625908505
+lon: -79.4400450291091
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 305.257
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03030500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9414b82e121e4a00ad6516dff650dfc6

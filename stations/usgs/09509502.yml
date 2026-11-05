@@ -1,0 +1,16 @@
+name: BARTLETT RESERVOIR AT BARTLETT DAM, AZ
+lat: 33.8180972973032
+lon: -111.631805536177
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NGVD29: 487.515
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09509502/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 0b5a5ad25f0848e090e2810c8b6a3d30

@@ -1,0 +1,16 @@
+name: SENECA RIVER (ERIE CANAL) NEAR PORT BYRON NY
+lat: 43.0786111111111
+lon: -76.6455555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.471
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04235600/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:02:00+00:00
+time_series_id: 9f333ede19a64c15a6e7a8dd0cef9d45

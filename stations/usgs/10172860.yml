@@ -1,0 +1,17 @@
+name: WARM CREEK NEAR GANDY, UT
+lat: 39.459528
+lon: -114.023722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1573.073
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10172860/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2019-10-03T16:30:00+00:00
+time_series_id: df681452f6c648279c9fb06a81eaf841

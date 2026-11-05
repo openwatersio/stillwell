@@ -1,0 +1,16 @@
+name: COTTONWOOD R AT COTTONWOOD FALLS, KS
+lat: 38.387675
+lon: -96.5973194444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 352.282
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07182000/
+parameter_code: "00065"
+series_begin: 2019-09-19T19:30:00+00:00
+time_series_id: c855a13d54b84be0b8ab2c85fd5d03a8

@@ -1,0 +1,17 @@
+name: Roark Creek at Branson, MO
+lat: 36.6522222222222
+lon: -93.2638888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 229.307
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07053710/
+parameter_code: "00065"
+series_begin: 2020-06-10T22:35:00+00:00
+series_end: 2023-08-17T14:40:00+00:00
+time_series_id: e6404ad5a8fe4b1baa5b6b9d89b33f3f

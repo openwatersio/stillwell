@@ -1,0 +1,16 @@
+name: Turtle Creek at Wilmerding, PA
+lat: 40.3942356643447
+lon: -79.8058805077469
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 221.376
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03084698/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c4f19cd1b0184d1ca044db70ad1f8a19

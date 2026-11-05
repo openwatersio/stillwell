@@ -1,0 +1,16 @@
+name: SAND CREEK ABOVE MOUTH AT COLORADO SPRINGS, CO
+lat: 38.788333
+lon: -104.773333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1774.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07105600/
+parameter_code: "00065"
+series_begin: 2020-10-01T21:30:00+00:00
+time_series_id: 1f9e642d8b7e4889b5d094208070b1bc

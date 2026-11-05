@@ -1,0 +1,17 @@
+name: ROCK CREEK NEAR YAMACRAW, KY
+lat: 36.7027777777778
+lon: -84.5630555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 224.814
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03410590/
+parameter_code: "00065"
+series_begin: 2015-08-04T13:45:00+00:00
+series_end: 2020-09-29T20:00:00+00:00
+time_series_id: 5f271570971b48bbbc00ad5a25af0c6a

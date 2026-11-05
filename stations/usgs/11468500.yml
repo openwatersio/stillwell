@@ -1,0 +1,16 @@
+name: NOYO R NR FORT BRAGG CA
+lat: 39.4281806889714
+lon: -123.73776952185828
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 4.164
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11468500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 651e282277e54d949ca1edafeadf1714

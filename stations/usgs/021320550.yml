@@ -1,0 +1,16 @@
+name: LYNCHES RIVER AT US378 NR LAKE CITY, SC
+lat: 33.919999999999995
+lon: -79.65666666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 8.992
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021320550/
+parameter_code: "00065"
+series_begin: 2023-06-29T15:30:00+00:00
+time_series_id: e447c9ccf32445538d650abb9fdb0e99

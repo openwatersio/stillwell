@@ -1,0 +1,16 @@
+name: GOOSE CREEK NEAR HARTSVILLE, TN
+lat: 36.4083835988154
+lon: -86.105820674983
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 142.485
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03425290/
+parameter_code: "00065"
+series_begin: 2021-05-25T15:30:00+00:00
+time_series_id: 8a4ec1a48c564cbda439812cffab5c38

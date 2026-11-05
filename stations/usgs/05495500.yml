@@ -1,0 +1,16 @@
+name: BEAR CREEK NEAR MARCELLINE, IL
+lat: 40.1428222222222
+lon: -91.3373694444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 153.692
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05495500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 8e237fd1dbfe451493ba02a9c8e5da5c

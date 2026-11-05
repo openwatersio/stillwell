@@ -1,0 +1,17 @@
+name: ANACOSTIA RIVER AT BLADENSBURG WATERFRONT PARK, MD
+lat: 38.93416666666666
+lon: -76.93925
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01651007/
+parameter_code: "00065"
+series_begin: 2021-08-04T14:25:00+00:00
+series_end: 2022-12-07T15:35:00+00:00
+time_series_id: 5424968e13d543c69edfa49a5f86b124

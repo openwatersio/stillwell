@@ -1,0 +1,16 @@
+name: SMITH R NR FORT DICK CA
+lat: 41.88064189654304
+lon: -124.13643245653941
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.298
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11532650/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 99ee419984424cbeb1bdec7623b8da56

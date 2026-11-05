@@ -1,0 +1,16 @@
+name: PISCATAQUOG RIVER BL EVERETT DAM, NR E WEARE, NH
+lat: 43.0914705398922
+lon: -71.6595182306919
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 97.231
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01090800/
+parameter_code: "00065"
+series_begin: 2025-10-01T05:00:00+00:00
+time_series_id: cebb72464a524d2bba16b3867639b709

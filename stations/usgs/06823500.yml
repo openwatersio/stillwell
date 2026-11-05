@@ -1,0 +1,16 @@
+name: Buffalo Creek near Haigler, Nebr.
+lat: 40.039253
+lon: -101.866506
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 972.916
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06823500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1456dbc4bab04247ac323735696e9573

@@ -1,0 +1,16 @@
+name: DOLORES RIVER AT DOLORES, CO.
+lat: 37.472495794204335
+lon: -108.4976004674169
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2114.209
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09166500/
+parameter_code: "00065"
+series_begin: 2020-10-01T19:45:00+00:00
+time_series_id: 1c0c18c655a345cfa18c6a812b41c9a1

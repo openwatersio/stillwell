@@ -1,0 +1,16 @@
+name: TYGART VALLEY RIVER AT COLFAX, WV
+lat: 39.4350866091222
+lon: -80.1325788697189
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 260.811
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03057000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d61b4909d0cb4ad498bc922267a3b395

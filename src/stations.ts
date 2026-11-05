@@ -29,11 +29,21 @@ export interface EpochChange {
  * it. A source that sends no offsets at all keeps the old ones while the datum
  * stays the same, so a refresh that loses them doesn't erase them; one that
  * sends some replaces them all.
+ *
+ * `seriesChanged` lets a source say a station kept its datum's name but not
+ * the series or zero it measures from, such as a USGS gage whose datum moved.
+ * That opens an epoch too, from the refresh that saw it, since the source
+ * gives no date.
  */
 export function mergeStationList(
   previous: LakeStation[],
   fetched: ListedStation[],
-  options: Omit<EpochOptions, "nextId" | "station">,
+  {
+    seriesChanged,
+    ...options
+  }: Omit<EpochOptions, "nextId" | "station"> & {
+    seriesChanged?: (previous: Station, listed: ListedStation) => string | null;
+  },
 ): { stations: LakeStation[]; changes: EpochChange[] } {
   const byId = new Map(previous.map((s) => [s.id, s]));
   const listed = new Set<string>();
@@ -54,7 +64,13 @@ export function mergeStationList(
     if (old) {
       const next = nextEpochs(
         old.epochs,
-        { datum: s.datum, datums, sent: s.datums, reference },
+        {
+          datum: s.datum,
+          datums,
+          sent: s.datums,
+          reference,
+          changed: s.datum === null ? null : seriesChanged?.(old, s),
+        },
         { ...options, station: s.id },
       );
       epochs = next.epochs;

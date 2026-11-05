@@ -1,0 +1,15 @@
+name: NAPLES BAY AT US 41 AT NAPLES FL
+lat: 26.1419444444444
+lon: -81.7902777777778
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-260831081472500/
+parameter_code: "62620"
+series_begin: 2017-09-07T10:24:00+00:00
+series_end: 2017-09-17T15:42:00+00:00
+time_series_id: 33eec1578c8d4995a2769696a89b9053

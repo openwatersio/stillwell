@@ -1,0 +1,14 @@
+name: NORTH LOXAHATCHEE CONSERVATION AREA NO. 1
+lat: 26.5937777777778
+lon: -80.3538611111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-263537080211400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d6c1ddbbb21d491983d6caf14dd49508

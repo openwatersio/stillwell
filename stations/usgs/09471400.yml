@@ -1,0 +1,16 @@
+name: BABOCOMARI RIVER NEAR TOMBSTONE, AZ
+lat: 31.7005138888889
+lon: -110.227577777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1205.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09471400/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: d690017a14c1414691d3c3eaeaf767ea

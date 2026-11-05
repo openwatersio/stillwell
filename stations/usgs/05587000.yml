@@ -1,0 +1,16 @@
+name: MACOUPIN CREEK NEAR KANE, IL
+lat: 39.2339444444444
+lon: -90.3944444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.936
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05587000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7a69311e42424aeb83f7f92724e7e142

@@ -1,0 +1,16 @@
+name: DEADWOOD RIVER BL DEADWOOD RES NR LOWMAN ID
+lat: 44.2919444444444
+lon: -115.641944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1579.022
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13236500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: d447f1d049874406844fcc15a8eb16a4

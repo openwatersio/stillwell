@@ -1,0 +1,16 @@
+name: CHERRY CREEK ON STATE HIGHWAY 23 NEAR SCHAFER, ND
+lat: 47.805194
+lon: -103.175994
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 605.107
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06337200/
+parameter_code: "00065"
+series_begin: 2022-05-15T00:00:00+00:00
+time_series_id: 91757f69d505478a9d658101f75e5789

@@ -1,0 +1,16 @@
+name: MOOSE C NR PALMER AK
+lat: 61.68438888888888
+lon: -149.0524166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.834
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15283700/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: 01b77aaf0d9941e9a42bc11e6047d939

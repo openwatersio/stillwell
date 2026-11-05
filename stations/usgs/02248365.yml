@@ -1,0 +1,15 @@
+name: BIG FLOUNDER CREEK NEAR SCOTTSMOOR, FL
+lat: 28.7553611111111
+lon: -80.8461111111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248365/
+parameter_code: "00065"
+series_begin: 2015-05-16T05:00:00+00:00
+series_end: 2016-10-01T03:45:00+00:00
+time_series_id: 797833cdd77c47c6b0eaa08817554e90

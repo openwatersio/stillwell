@@ -1,0 +1,16 @@
+name: TANANA R AT NENANA AK
+lat: 64.56494444444444
+lon: -149.09400000000002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.76
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15515500/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: d8c7d2aec4ab4a50811981d6b0818780

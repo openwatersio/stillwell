@@ -1,0 +1,14 @@
+name: HUDSON RIVER AT ALBANY NY
+lat: 42.6478888888889
+lon: -73.7475
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01359139/
+parameter_code: "62620"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 7bf65098fc1249d698c66fc37a2e8675

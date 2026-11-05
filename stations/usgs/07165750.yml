@@ -1,0 +1,16 @@
+name: VERDIGRIS R NR VIRGIL, KS
+lat: 37.9823777777778
+lon: -96.0230027777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 289.103
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07165750/
+parameter_code: "00065"
+series_begin: 2012-10-01T05:00:00+00:00
+time_series_id: 7d26d666d1444105a3fb8d9eee236b41

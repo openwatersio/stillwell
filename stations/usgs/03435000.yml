@@ -1,0 +1,17 @@
+name: CUMBERLAND RIVER BELOW CHEATHAM DAM, TN
+lat: 36.3229029822596
+lon: -87.2282644737717
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03435000/
+parameter_code: "00065"
+series_begin: 2015-01-22T15:00:00+00:00
+series_end: 2019-10-01T05:45:00+00:00
+time_series_id: 64f5d12ca4b9450b806d0e93797faef5

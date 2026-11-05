@@ -1,0 +1,16 @@
+name: MOHAWK RIVER BELOW DELTA DAM NEAR ROME NY
+lat: 43.265139
+lon: -75.435806
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 143.969
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01336000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 66e4e775131d474c885134564f374e4d

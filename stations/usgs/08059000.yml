@@ -1,0 +1,16 @@
+name: E Fk Trinity Rv nr McKinney, TX
+lat: 33.2037272361111
+lon: -96.5958239975502
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 155.917
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08059000/
+parameter_code: "00065"
+series_begin: 2009-12-17T06:00:00+00:00
+time_series_id: 4cd984caff634ffcabd38ad3d7c3a37a
