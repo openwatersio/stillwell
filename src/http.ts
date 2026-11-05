@@ -11,6 +11,8 @@ export interface RequestOptions extends RequestInit {
   keep?: (text: string) => boolean;
   /** Waits for the source's rate limit before each request that goes out, retries included; cache hits skip it. */
   pace?: () => Promise<void>;
+  /** Told how many seconds a throttled request will wait before its retry, so the source can hold its other requests as long. */
+  throttled?: (seconds: number) => void;
 }
 
 export type Transport = (url: string, options: RequestOptions) => Promise<string>;
@@ -35,12 +37,13 @@ export async function getJson<T>(url: string, options?: RequestOptions): Promise
  */
 export async function fetchText(
   url: string,
-  { fresh: _, keep: __, pace, ...init }: RequestOptions = {},
+  { fresh: _, keep: __, pace, throttled, ...init }: RequestOptions = {},
 ): Promise<string> {
   return fetchWithRetry(
     url,
     { ...init, headers: { "user-agent": USER_AGENT, ...init.headers } },
     pace,
+    throttled,
   );
 }
 
@@ -55,6 +58,7 @@ async function fetchWithRetry(
   url: string,
   init: RequestInit,
   pace?: () => Promise<void>,
+  throttled?: (seconds: number) => void,
   attempts = 4,
 ): Promise<string> {
   for (let attempt = 1; ; attempt++) {
@@ -86,6 +90,8 @@ async function fetchWithRetry(
       throw new Error(
         `${init.method ?? "GET"} ${url} returned ${status}${retryAfter ? ` (retry after ${retryAfter} s)` : ""}`,
       );
-    await new Promise((resolve) => setTimeout(resolve, Math.max(retryAfter, 2 ** attempt) * 1000));
+    const wait = Math.max(retryAfter, 2 ** attempt);
+    if (status === 429) throttled?.(wait);
+    await new Promise((resolve) => setTimeout(resolve, wait * 1000));
   }
 }

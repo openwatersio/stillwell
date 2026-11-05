@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -8,6 +8,7 @@ import {
   readDatums,
   readExtremes,
   readObservations,
+  checkRecent,
   readRecent,
   writeExtremes,
   writeObservations,
@@ -60,14 +61,42 @@ describe("lake files", () => {
   it("keeps the recent window sorted by station, then time", async () => {
     const path = join(root, "recent.parquet");
     await writeRecent(path, [
-      { station: "b", time: T, level: 1, flag: Flag.preliminary },
-      { station: "a", time: T + MIN, level: 2, flag: Flag.preliminary, received: T + 2 * MIN },
-      { station: "a", time: T, level: 3, flag: Flag.preliminary },
+      [
+        { station: "b", time: T, level: 1, flag: Flag.preliminary },
+        { station: "a", time: T + MIN, level: 2, flag: Flag.preliminary, received: T + 2 * MIN },
+        { station: "a", time: T, level: 3, flag: Flag.preliminary },
+      ],
     ]);
     assert.deepEqual(
       (await readRecent(path)).map((r) => `${r.station}${r.time - T}`),
       ["a0", `a${MIN}`, "b0"],
     );
+  });
+
+  it("writes the recent window in batches, and reads back the stations asked for", async () => {
+    const path = join(root, "recent-batches.parquet");
+    async function* batches() {
+      yield [{ station: "b", time: T, level: 1, flag: Flag.preliminary }];
+      // Reading between batches, as ingest does, reads the file being replaced.
+      assert.deepEqual(await readRecent(path, ["b"]), []);
+      yield [{ station: "a", time: T, level: 2, flag: Flag.good }];
+    }
+    await writeRecent(path, batches());
+    assert.deepEqual(
+      (await readRecent(path, ["b", "c"])).map((r) => r.station),
+      ["b"],
+    );
+    assert.equal((await readRecent(path)).length, 2);
+    assert.deepEqual(await readRecent(path, []), []);
+  });
+
+  it("checks a whole recent window can be read, and passes a missing one", async () => {
+    const path = join(root, "recent-check.parquet");
+    await checkRecent(path);
+    await writeRecent(path, [[{ station: "a", time: T, level: 1, flag: Flag.good }]]);
+    await checkRecent(path);
+    writeFileSync(path, "not parquet");
+    await assert.rejects(checkRecent(path));
   });
 
   it("writes stations with datums, products and links", async () => {
