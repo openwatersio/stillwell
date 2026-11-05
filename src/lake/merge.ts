@@ -66,8 +66,9 @@ function canonical(row: object): string {
 /**
  * Every row of both series, so folding the recent window into a year file
  * never drops a value the file had. Where both have a time, `incoming` wins on
- * level and flag, except that a preliminary value never replaces one the
- * source finalized (good or interpolated), such as a verified backfill. The
+ * level and flag, except that a value the source hasn't finalized never
+ * replaces one it has (good or interpolated), such as a verified backfill,
+ * whatever QC made of the unfinalized one. The
  * row keeps the file's `received`, earlier or unknown: a value backfilled
  * before the window saw it arrive has no first arrival on record, not the
  * window's.
@@ -83,7 +84,7 @@ export function upsert<T extends { time: number; flag: number; received?: number
       byTime.set(row.time, row);
       continue;
     }
-    const finalized = before.flag <= Flag.interpolated && row.flag === Flag.preliminary;
+    const finalized = before.flag <= Flag.interpolated && row.flag > Flag.interpolated;
     const next = { ...(finalized ? before : row) };
     const received =
       before.received === undefined

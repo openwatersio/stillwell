@@ -6,6 +6,7 @@ import {
   readDatums,
   readObservationFile,
   readRecent,
+  recentStations,
   writeObservations,
   writeRecent,
   type StationObservation,
@@ -86,15 +87,39 @@ export async function updateRecent({
   const keepFrom = now - keepDays * DAY_MS;
   // Restricted stations' recent values go to the private lake, like their series.
   const pathOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), id)]));
-  const paths = [...new Set(pathOf.values())];
+  const lakeOf = (s: Station): string | undefined => {
+    try {
+      return recentPath(lakeFor(s), id);
+    } catch {
+      return undefined;
+    }
+  };
   const summary = emptySummary(`recent ${id}`, stations.length);
   const reporting = new Set<string>();
 
   // Each file is read in batches after the sweep, so one that can't be read
-  // fails the run here, before the sweep spends a source's request budget. A
-  // station read only from its own lake's file starts empty in the other lake
-  // when its license changes, rather than carry rows across.
-  for (const path of paths) await checkRecent(path);
+  // fails the run here, before the sweep spends a source's request budget.
+  const candidates = new Set([...pathOf.values(), ...all.flatMap((s) => lakeOf(s) ?? [])]);
+  for (const path of candidates) await checkRecent(path);
+
+  // Stations a file holds that this run doesn't fetch, because they've stopped
+  // being live or active or left the list since, keep their rows until they
+  // age out, so compaction can still fold them. One whose license now sends it
+  // to the other lake doesn't, so its rows never stay in the wrong one, and it
+  // starts empty in its new lake rather than carry rows across.
+  const listed = new Map(all.map((s) => [s.id, s]));
+  const carried = new Map<string, string[]>();
+  for (const path of candidates) {
+    const ids = (await recentStations(path)).filter((station) => {
+      if (pathOf.has(station)) return false;
+      const s = listed.get(station);
+      return !s || lakeOf(s) === path;
+    });
+    if (ids.length) carried.set(path, ids);
+  }
+  const paths = [...candidates].filter(
+    (path) => carried.has(path) || [...pathOf.values()].includes(path),
+  );
 
   // A source that can sweep every station at once does; a failed sweep fails
   // every station, which keeps what each had.
@@ -105,6 +130,8 @@ export async function updateRecent({
       .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
   async function* batches(path: string): AsyncGenerator<StationObservation[]> {
+    for (const ids of chunks(carried.get(path) ?? [], BATCH))
+      yield (await readRecent(path, ids)).filter((r) => r.time >= keepFrom);
     const here = stations.filter((s) => pathOf.get(s.id) === path);
     for (let i = 0; i < here.length; i += BATCH) {
       const batch = here.slice(i, i + BATCH);
@@ -286,6 +313,10 @@ export function formatSummary(s: RunSummary, listed = 20): string {
       for (const item of items.slice(0, listed)) lines.push(`- ${item}`);
     }
   return lines.join("\n") + "\n";
+}
+
+function* chunks<T>(items: T[], size: number): Generator<T[]> {
+  for (let i = 0; i < items.length; i += size) yield items.slice(i, i + size);
 }
 
 function emptySummary(title: string, stations: number): RunSummary {

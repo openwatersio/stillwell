@@ -29,9 +29,20 @@ jobs:
       - id: group
         run: |
           set -f
-          set -- $ARGS
-          case "$1" in
-            backfill | recent | compact) echo "name=lake-$2" >> "$GITHUB_OUTPUT" ;;
+          # The command and source are the first two words that aren't an
+          # option or its value; every ingest option takes a value.
+          words=()
+          skip=
+          for arg in $ARGS; do
+            if [ -n "$skip" ]; then skip=; continue; fi
+            case "$arg" in
+              --*=*) ;;
+              --*) skip=1 ;;
+              *) words+=("$arg") ;;
+            esac
+          done
+          case "${words[0]:-}" in
+            backfill | recent | compact) echo "name=lake-${words[1]:-}" >> "$GITHUB_OUTPUT" ;;
             *) echo "name=lake" >> "$GITHUB_OUTPUT" ;;
           esac
         env:

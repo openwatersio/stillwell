@@ -205,6 +205,12 @@ export async function checkRecent(path: string): Promise<void> {
   await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
 }
 
+/** The stations a recent window holds values for; none when the file doesn't exist. */
+export async function recentStations(path: string): Promise<string[]> {
+  const rows = await read(path, "SELECT DISTINCT station", "station");
+  return rows.map((r) => String(r.station));
+}
+
 /** The recent window, or just the named stations' part of it. */
 export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];
@@ -408,9 +414,21 @@ async function readNow(
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {
     // A missing remote file is an empty series, not a failure.
-    if (isRemote(path) && /404|No files found|does not exist/i.test(String(error))) return [];
+    if (isRemote(path) && isMissing(error)) return [];
     throw error;
   }
+}
+
+/**
+ * Whether a remote read failed because the object doesn't exist. DuckDB's
+ * message quotes the object's path, and station IDs such as CO-OPS 1612404
+ * hold "404", so only DuckDB's own wording for a 404 counts; any other error
+ * fails the read rather than pass for an empty file that a write would replace.
+ */
+export function isMissing(error: unknown): boolean {
+  return /\(HTTP 404 Not Found\)|returned HTTP 404 for|No files found that match/.test(
+    String(error),
+  );
 }
 
 async function prepare(path: string): Promise<void> {

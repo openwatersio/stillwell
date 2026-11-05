@@ -318,20 +318,28 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
 }
 
 async function compact(sourceId: string, days: number): Promise<void> {
-  // The window keeps 7 days back from its last hourly run, which is partway
-  // into the seventh day, so 6 is the most whole days it holds.
-  if (!Number.isInteger(days) || days < 1 || days > 6)
-    throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
-  const concurrency = positive("concurrency");
-  setConnections(concurrency);
-  const stations = await committedStations(sourceId);
-  const [start, end] = lastDays(Date.now(), days);
-  const summary = await reporting(`compact ${sourceId}`, () =>
-    compactRecent({ source: sourceOf(sourceId), stations, lakeFor, concurrency, start, end }),
-  );
+  let live = 0;
+  const summary = await reporting(`compact ${sourceId}`, async () => {
+    // The window keeps 7 days back from its last hourly run, which is partway
+    // into the seventh day, so 6 is the most whole days it holds.
+    if (!Number.isInteger(days) || days < 1 || days > 6)
+      throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
+    const concurrency = positive("concurrency");
+    setConnections(concurrency);
+    const stations = await committedStations(sourceId);
+    live = stations.filter((s) => s.live && s.status === "active").length;
+    const [start, end] = lastDays(Date.now(), days);
+    return compactRecent({
+      source: sourceOf(sourceId),
+      stations,
+      lakeFor,
+      concurrency,
+      start,
+      end,
+    });
+  });
   // A failed fold left its year file as it was; a person should look. Every
   // live station silent means recent/ is missing, empty or not being updated.
-  const live = stations.filter((s) => s.live && s.status === "active").length;
   if (summary.failed.length || (live && summary.stale.length >= live)) process.exitCode = 1;
 }
 

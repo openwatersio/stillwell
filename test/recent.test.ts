@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/lake/merge.ts";
+import { isMissing } from "../src/lake/parquet.ts";
 import {
   readObservations,
   readRecent,
@@ -149,6 +150,45 @@ describe("updateRecent", () => {
       now: NOW,
     });
     assert.deepEqual(summary.stale, []);
+  });
+
+  it("carries rows of stations it no longer fetches, until they age out", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    const [live, retired, quiet, gone, moved] = [
+      station("live"),
+      station("retired", { status: "inactive" }),
+      station("quiet", { live: false }),
+      station("gone"),
+      station("moved", { live: false, commercial_use: false }),
+    ];
+    const row = (s: Station, ago: number) => ({ ...at(NOW - ago, 1, NOW - ago), station: s.id });
+    await writeRecent(path, [
+      [
+        row(retired, 2 * HOUR),
+        row(retired, 8 * DAY), // aged out
+        row(quiet, 3 * HOUR),
+        row(gone, 4 * HOUR), // no longer listed at all
+        row(moved, 5 * HOUR), // now restricted: never stays in the public lake
+      ],
+    ]);
+    const restricted = lake();
+    await updateRecent({
+      source: source({ [live.id]: [at(NOW - HOUR, 2)] }),
+      stations: [live, retired, quiet, moved],
+      lakeFor: (s) => (s.commercial_use ? root : restricted),
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(
+      (await readRecent(path)).map((r) => [r.station, (NOW - r.time) / HOUR]),
+      [
+        ["test/gone", 4],
+        ["test/live", 1],
+        ["test/quiet", 3],
+        ["test/retired", 2],
+      ],
+    );
   });
 
   it("looks back two intervals for a station fetched on its own", async () => {
@@ -543,13 +583,33 @@ describe("upsert", () => {
     assert.deepEqual(upsert([at(1, 1, 5)], [at(1, 1, 10)]), [at(1, 1, 5)]);
   });
 
-  it("keeps a finalized value over a preliminary one, but takes a worse QC flag", () => {
+  it("keeps a finalized value over any unfinalized one, whatever QC made of it", () => {
     const verified: Observation = { time: 1, level: 1, flag: Flag.good };
     assert.deepEqual(upsert([verified], [at(1, 1.2, 5)]), [verified]);
-    const suspect: Observation = { time: 1, level: 1, flag: Flag.suspect, received: 5 };
-    assert.deepEqual(upsert([{ ...verified, received: 5 }], [suspect]), [suspect]);
-    // A preliminary value the window has since flagged replaces the file's.
-    assert.deepEqual(upsert([at(1, 1, 5)], [suspect]), [suspect]);
+    const suspect: Observation = { time: 1, level: 1.3, flag: Flag.suspect, received: 5 };
+    assert.deepEqual(upsert([verified], [suspect]), [verified]);
+    // A finalized value replaces another, keeping the file's unknown arrival.
+    const reverified: Observation = { time: 1, level: 1.1, flag: Flag.good, received: 5 };
+    assert.deepEqual(upsert([verified], [reverified]), [{ time: 1, level: 1.1, flag: Flag.good }]);
+  });
+});
+
+describe("isMissing", () => {
+  it("knows DuckDB's 404 from any error whose path holds 404", () => {
+    const path = "s3://water-levels/obs/coops/1612404/2026.parquet";
+    assert.equal(
+      isMissing(new Error(`HTTP Error: HTTP HEAD error checking '${path}' (HTTP 404 Not Found)`)),
+      true,
+    );
+    assert.equal(
+      isMissing(
+        new Error(
+          "HTTP Error: Request returned HTTP 503 for HTTP HEAD to 'https://r2/water-levels/obs/coops/1612404/2026.parquet'",
+        ),
+      ),
+      false,
+    );
+    assert.equal(isMissing(new Error(`IO Error: timed out reading '${path}'`)), false);
   });
 });
 
