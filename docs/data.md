@@ -258,7 +258,8 @@ WITH e AS (
   FROM 'https://water-levels.openwaters.io/stations.parquet' WHERE id = 'pegelonline/5990020'
 ),
 o AS (
-  -- epoch 1's files; add a read_parquet per later epoch from its directory
+  -- epoch 1's files; add one per later epoch from its directory with UNION ALL BY NAME,
+  -- since files written before source_flag was kept lack that column
   SELECT 1 AS epoch, * FROM read_parquet(getvariable('base') || '/2024.parquet')
 )
 SELECT o.time, o.level_m + e.to_current AS level_m, o.flag

@@ -135,8 +135,22 @@ describe("updateRecent", () => {
       ],
     );
     assert.deepEqual(
-      { ...summary, stale: summary.stale.length, failed: summary.failed.length },
-      { title: "recent test", stations: 1, updated: 1, stale: 0, failed: 0, values: 1, files: 1 },
+      {
+        ...summary,
+        stale: summary.stale.length,
+        failed: summary.failed.length,
+        waiting: summary.waiting.length,
+      },
+      {
+        title: "recent test",
+        stations: 1,
+        updated: 1,
+        stale: 0,
+        failed: 0,
+        waiting: 0,
+        values: 1,
+        files: 1,
+      },
     );
   });
 
@@ -614,8 +628,22 @@ describe("compactRecent", () => {
       ],
     );
     assert.deepEqual(
-      { ...summary, stale: summary.stale.length, failed: summary.failed.length },
-      { title: "compact test", stations: 1, updated: 1, stale: 0, failed: 0, values: 2, files: 1 },
+      {
+        ...summary,
+        stale: summary.stale.length,
+        failed: summary.failed.length,
+        waiting: summary.waiting.length,
+      },
+      {
+        title: "compact test",
+        stations: 1,
+        updated: 1,
+        stale: 0,
+        failed: 0,
+        waiting: 0,
+        values: 2,
+        files: 1,
+      },
     );
 
     // A rerun changes nothing, so it writes nothing.
@@ -739,9 +767,18 @@ describe("compactRecent", () => {
       (await readObservations(file("held", 2))).map((r) => r.level),
       [],
     );
-    assert.deepEqual(summary.failed, [
-      "test/held: 1 values wait in recent/ for a held datum change",
-    ]);
+    // Waiting on a person isn't a failure.
+    assert.deepEqual(summary.failed, []);
+    assert.deepEqual(summary.waiting, ["test/held: 1 values"]);
+    // Nor is a held station stale once its rows age out of the window.
+    const later = await compactRecent({
+      source: source({}),
+      stations: [held],
+      lakeFor: () => root,
+      start: end,
+      end: end + DAY,
+    });
+    assert.deepEqual([later.stale, later.failed], [[], []]);
   });
 
   it("folds a station retired since its values arrived", async () => {
@@ -761,6 +798,31 @@ describe("compactRecent", () => {
     assert.deepEqual(summary.stale, []);
     assert.deepEqual(
       (await readObservations(seriesPath(root, "levels", "test", "retired", 2026))).map(
+        (r) => r.level,
+      ),
+      [1],
+    );
+  });
+
+  it("folds a station whose list dropped levels, and doesn't count it stale", async () => {
+    const root = lake();
+    const [dropped, gone] = [
+      station("dropped", { products: ["predictions"] }),
+      station("gone", { products: ["predictions"] }),
+    ];
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + HOUR, 1, start + HOUR), station: dropped.id, epoch: 1 }],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [dropped, gone],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    assert.deepEqual([summary.stations, summary.stale, summary.files], [0, [], 1]);
+    assert.deepEqual(
+      (await readObservations(seriesPath(root, "levels", "test", "dropped", 2026))).map(
         (r) => r.level,
       ),
       [1],
@@ -900,6 +962,7 @@ describe("formatSummary", () => {
         updated: 1,
         stale: ["test/b"],
         failed: ["test/c: timed out"],
+        waiting: ["test/d: 4 values"],
         values: 12,
         files: 1,
       },
@@ -909,5 +972,6 @@ describe("formatSummary", () => {
     assert.match(text, /\| 3 \| 1 \| 1 \| 1 \| 12 \| 1 \|/);
     assert.match(text, /Failed:\n\n- test\/c: timed out/);
     assert.match(text, /Stale:\n\n- test\/b/);
+    assert.match(text, /Waiting on a held datum change:\n\n- test\/d: 4 values/);
   });
 });

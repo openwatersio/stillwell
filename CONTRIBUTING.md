@@ -73,7 +73,7 @@ Fold the last whole UTC days of the recent window (`--days`, 1 by default, which
 node scripts/ingest.ts compact pegelonline --days 6
 ```
 
-Both print a summary (stations updated, stale and failed, and values written), and add it to the workflow run's page in Actions.
+Both print a summary (stations updated, stale, failed and waiting on a held datum change, and values written), and add it to the workflow run's page in Actions.
 
 These environment variables choose where it writes:
 
@@ -83,6 +83,8 @@ These environment variables choose where it writes:
 | `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for stations whose license bars commercial use. Ingest refuses to write one without it, and refuses one that is the public lake. |
 | `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                         |
 | `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                  |
+
+Write to R2 only through the Ingest workflow. A run from your own machine shares no concurrency group with the scheduled jobs, so it and Ingest hourly or Compact daily can each rewrite a file the other just read, and one's values are lost.
 
 If a source starts reporting a station in another datum, `ingest stations` opens a datum epoch for it and reports it. A change it holds for a person (soon after the last one, or back to an earlier reference) fails the run on every refresh until the source's `overrides` decide, and `backfill` and `recent` skip that station meanwhile. `backfill … all` skips inactive stations.
 

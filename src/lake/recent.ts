@@ -37,6 +37,8 @@ export interface RunSummary {
   stale: string[];
   /** Stations the run couldn't fetch or write, with why. */
   failed: string[];
+  /** Stations whose values wait in the window for a person's decision on a held datum change. */
+  waiting: string[];
   /** Values new to the lake. */
   values: number;
   /** Files written. */
@@ -221,8 +223,11 @@ export async function updateRecent({
  * merges them. A year file is read, merged and written whole, so a failed run
  * leaves the file it had; one the fold doesn't change isn't written. Inactive
  * stations are folded too, so the last values of a station retired since they
- * arrived still reach its files. A live, active station with no values in the
- * range is stale.
+ * arrived still reach its files, as are those of a station whose list no
+ * longer has `levels`. A live, active station with levels and no values in the
+ * range is stale. Values at or after a held epoch's start wait in the window,
+ * reported but not failed, and those older than the window when a person
+ * decides need a backfill.
  */
 export async function compactRecent({
   source,
@@ -236,15 +241,18 @@ export async function compactRecent({
   const summary = emptySummary(`compact ${id}`, 0);
   // A station whose lake can't be named, such as a restricted one with no
   // restricted lake set, fails alone rather than stop the source's fold.
+  // A station without levels has rows only from before its list dropped them,
+  // and one of those whose lake can't be named has none to fold there.
+  const levels = (s: Station) => s.products.includes("levels");
   const pathOf = new Map<string, string>();
-  for (const s of all.filter((s) => s.products.includes("levels")))
+  for (const s of all)
     try {
       pathOf.set(s.id, recentPath(lakeFor(s), id));
     } catch (error) {
-      summary.failed.push(`${s.id}: ${message(error)}`);
+      if (levels(s)) summary.failed.push(`${s.id}: ${message(error)}`);
     }
   const stations = all.filter((s) => pathOf.has(s.id));
-  summary.stations = stations.length + summary.failed.length;
+  summary.stations = stations.filter(levels).length + summary.failed.length;
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -264,7 +272,14 @@ export async function compactRecent({
         const rows = window.get(station.id);
         // A live station sends something every day; one that isn't live may not.
         if (!rows?.length) {
-          if (station.live && station.status === "active") summary.stale.push(station.id);
+          // A held station isn't fetched, so it has nothing once its rows age out.
+          if (
+            station.live &&
+            station.status === "active" &&
+            levels(station) &&
+            !isHeld(station.epochs)
+          )
+            summary.stale.push(station.id);
           return;
         }
         let changed = false;
@@ -278,10 +293,7 @@ export async function compactRecent({
             .map((e) => Date.parse(e.since!)),
         );
         const waiting = rows.filter((r) => r.time >= heldFrom);
-        if (waiting.length)
-          summary.failed.push(
-            `${station.id}: ${waiting.length} values wait in recent/ for a held datum change`,
-          );
+        if (waiting.length) summary.waiting.push(`${station.id}: ${waiting.length} values`);
         const parts = Map.groupBy(
           rows.filter((r) => r.time < heldFrom),
           (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
@@ -400,6 +412,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
   for (const [what, items] of [
     ["Failed", s.failed],
     ["Stale", s.stale],
+    ["Waiting on a held datum change", s.waiting],
   ] as const)
     if (items.length) {
       lines.push("", `${what}${items.length > listed ? ` (first ${listed})` : ""}:`, "");
@@ -413,7 +426,7 @@ function* chunks<T>(items: T[], size: number): Generator<T[]> {
 }
 
 function emptySummary(title: string, stations: number): RunSummary {
-  return { title, stations, updated: 0, stale: [], failed: [], values: 0, files: 0 };
+  return { title, stations, updated: 0, stale: [], failed: [], waiting: [], values: 0, files: 0 };
 }
 
 function message(error: unknown): string {
