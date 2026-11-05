@@ -325,7 +325,7 @@ export async function compactRecent({
             const had = new Map(existing.rows.map((r) => [r.time, r]));
             summary.values += merged.filter((r) => {
               const before = had.get(r.time);
-              return !before || before.level !== r.level || before.flag !== r.flag;
+              return !before || !sameRows([before], [r]);
             }).length;
             changed = true;
           } catch (error) {

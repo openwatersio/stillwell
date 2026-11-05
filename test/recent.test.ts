@@ -866,6 +866,42 @@ describe("compactRecent", () => {
     );
   });
 
+  it("counts a value whose source flag alone changed as written", async () => {
+    const root = lake();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    const time = start + HOUR;
+    await writeObservations(
+      file,
+      [{ time, level: 0.5, flag: Flag.suspect, source_flag: Flag.preliminary, received: time }],
+      "NAP",
+    );
+    await writeRecent(recentPath(root, "test"), [
+      [
+        {
+          ...at(time, 0.5, time),
+          flag: Flag.suspect,
+          source_flag: Flag.good,
+          station: a.id,
+          epoch: 1,
+        },
+      ],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [a],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    assert.equal(summary.files, 1);
+    assert.equal(summary.values, 1);
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => r.source_flag),
+      [Flag.good],
+    );
+  });
+
   it("leaves a file in another datum as it was, and counts silent stations stale", async () => {
     const root = lake();
     const [a, quiet, archive] = [
