@@ -1,0 +1,13 @@
+name: Bakersville, PA
+lat: 40.0089
+lon: -79.2344
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 594.36
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Bakersville.Stage.Inst.15Minutes.0.OBS
+series: Bakersville.Stage.Inst.15Minutes.0.OBS

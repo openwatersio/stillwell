@@ -1,0 +1,24 @@
+name: Phipps Pt.
+lat: 43.8983
+lon: -69.7433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.774
+  MHW: -7.646
+  DTL: -6.273
+  MTL: -6.259
+  MSL: -6.283
+  MLW: -4.873
+  MLLW: -4.772
+  NAVD88: -6.287
+  LAT: -4.156
+  HAT: -8.437
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8417087
+established: 2015-04-17T00:00:00Z
+removed: 2015-09-12T00:00:00Z

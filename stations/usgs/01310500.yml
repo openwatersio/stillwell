@@ -1,0 +1,16 @@
+name: EAST MEADOW BROOK AT FREEPORT NY
+lat: 40.6656388888889
+lon: -73.5700833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3.185
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01310500/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: b2917c1be7634806bd7e99293c23bb3d

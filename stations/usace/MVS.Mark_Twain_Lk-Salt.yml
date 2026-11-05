@@ -1,0 +1,13 @@
+name: Mark Twain Pool
+lat: 39.5248701
+lon: -91.6443126
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 176.769
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Mark%20Twain%20Lk-Salt.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Mark Twain Lk-Salt.Stage.Inst.30Minutes.0.lrgsShef-rev

@@ -1,0 +1,13 @@
+name: Parsons, WV (Old)
+lat: 39.1225
+lon: -79.6817
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 484.611
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Parsons-Old.Stage.Inst.15Minutes.0.OBS
+series: Parsons-Old.Stage.Inst.15Minutes.0.OBS

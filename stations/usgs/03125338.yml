@@ -1,0 +1,16 @@
+name: Stillwater Creek above Piedmont Lake OH
+lat: 40.0841666666667
+lon: -81.1272222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 279.825
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03125338/
+parameter_code: "00065"
+series_begin: 2017-09-06T05:00:00+00:00
+time_series_id: e5d62c224f934c3485a542e8273e035b

@@ -1,0 +1,16 @@
+name: CONCHAS RIVER AT VARIADERO, NM
+lat: 35.402825674315
+lon: -104.443593785025
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1350.264
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07222500/
+parameter_code: "00065"
+series_begin: 2021-06-29T14:30:00+00:00
+time_series_id: 73b86bb4468e415f96ff21334452e3c4

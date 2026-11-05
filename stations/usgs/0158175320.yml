@@ -1,0 +1,16 @@
+name: WHEEL CREEK NEAR ABINGDON, MD
+lat: 39.48144444444445
+lon: -76.34044444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.853
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0158175320/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: 06dfb3e7d68e4bdeb8fbc4bf75116a18

@@ -1,0 +1,14 @@
+name: Swift Run at Brickcrafter Rd nr New Oxford, PA
+lat: 39.878055555555555
+lon: -77.10077777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01573816/
+parameter_code: "00065"
+series_begin: 2024-09-17T15:45:00+00:00
+time_series_id: fe8b8335863545e0b7fcd44b4e81d498

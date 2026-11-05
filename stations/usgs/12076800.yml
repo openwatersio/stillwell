@@ -1,0 +1,16 @@
+name: GOLDSBOROUGH CREEK ABOVE 7TH STREET AT SHELTON, WA
+lat: 47.2117610938893
+lon: -123.112929150156
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12076800/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7f570a3c9b134dcdba356c4fa31f2d4f

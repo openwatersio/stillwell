@@ -1,0 +1,15 @@
+name: City Park West Lagoon at New Orleans, LA
+lat: 30.0094444444444
+lon: -90.0980555555555
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-300034090055300/
+parameter_code: "00065"
+series_begin: 2011-07-01T05:00:00+00:00
+series_end: 2015-07-30T04:45:00+00:00
+time_series_id: f6f803433be246f9adceea7ae199ae12

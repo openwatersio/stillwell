@@ -1,0 +1,11 @@
+name: Holtheme Vecht
+lat: 52.620833
+lon: 6.698485
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/holtheme.vecht/details

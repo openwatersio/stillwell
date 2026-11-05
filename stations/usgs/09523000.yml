@@ -1,0 +1,16 @@
+name: ALL-AMERICAN CANAL NR IMPERIAL DAM, CA-AZ
+lat: 32.8709944444444
+lon: -114.480463888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 46.391
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09523000/
+parameter_code: "00065"
+series_begin: 2014-09-29T22:15:00+00:00
+time_series_id: 27d33c267c6e4012942fc720bb67c6a3

@@ -1,0 +1,17 @@
+name: Helemano 11 Reservoir, Oahu, HI
+lat: 21.56860703160909
+lon: -158.05889423702882
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  LMSL: 213.36
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-213407158033201/
+parameter_code: "00065"
+series_begin: 2008-12-27T10:00:00+00:00
+series_end: 2011-06-30T09:45:00+00:00
+time_series_id: cfbb345dd77d4d2ba26f6be6e6156c5a

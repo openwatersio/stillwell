@@ -1,0 +1,16 @@
+name: TWELVEMILE C NR PETERSBURG AK
+lat: 56.968611
+lon: -133.068056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -2.073
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15087585/
+parameter_code: "00065"
+series_begin: 2021-05-28T02:30:00+00:00
+time_series_id: 6eb50296d05d41aaa371a53399e559a6

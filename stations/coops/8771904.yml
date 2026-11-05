@@ -1,0 +1,13 @@
+name: GALVESTON OFFSHORE
+lat: 29.1233
+lon: -94.5083
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771904
+established: 1995-08-19T00:00:00Z
+removed: 1998-08-10T23:59:00Z

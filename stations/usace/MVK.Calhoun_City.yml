@@ -1,0 +1,13 @@
+name: Yalobusha River @ Calhoun City
+lat: 33.838398
+lon: -89.315863
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 68.903
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Calhoun%20City.Stage.Inst.15Minutes.0.DCP-rev
+series: Calhoun City.Stage.Inst.15Minutes.0.DCP-rev

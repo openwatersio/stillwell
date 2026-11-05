@@ -1,0 +1,22 @@
+name: PORT ROYAL PLTN., HILTON HEAD
+lat: 32.22
+lon: -80.6683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.156
+  MHW: -3.013
+  DTL: -2.123
+  MTL: -2.085
+  MSL: -2.109
+  MLW: -1.156
+  MLLW: -1.089
+  NAVD88: -2.192
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8669167
+established: 1979-06-29T00:00:00Z
+removed: 1980-07-15T23:59:00Z

@@ -1,0 +1,16 @@
+name: ALAMEDA C AB DIV DAM NR SUNOL CA
+lat: 37.4974356047766
+lon: -121.773564406969
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 277.115
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11172945/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 08729e422b8540a395226f0c8f984fca

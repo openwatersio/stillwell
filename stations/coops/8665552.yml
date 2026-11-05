@@ -1,0 +1,22 @@
+name: BREACH INLET
+lat: 32.7767
+lon: -79.8117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.432
+  MHW: -2.317
+  DTL: -1.592
+  MTL: -1.564
+  MSL: -1.579
+  MLW: -0.812
+  MLLW: -0.752
+  NAVD88: -1.699
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665552
+established: 1975-01-16T00:00:00Z
+removed: 1977-01-10T23:59:00Z

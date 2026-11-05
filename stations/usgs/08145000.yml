@@ -1,0 +1,16 @@
+name: Brady Ck at Brady, TX
+lat: 31.13823572689501
+lon: -99.33507543270944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 501.829
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08145000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 87883fd63cee4b8bb0f50acc062a1530

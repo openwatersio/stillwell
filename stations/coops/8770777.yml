@@ -1,0 +1,24 @@
+name: Manchester
+lat: 29.7263
+lon: -95.2658
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.176
+  MHW: -2.141
+  DTL: -1.929
+  MTL: -1.948
+  MSL: -1.953
+  MLW: -1.756
+  MLLW: -1.683
+  NAVD88: -1.643
+  LAT: -1.253
+  HAT: -2.4
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770777
+established: 1995-01-01T00:00:00Z

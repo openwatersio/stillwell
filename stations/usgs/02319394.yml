@@ -1,0 +1,16 @@
+name: WITHLACOOCHEE RIVER NR LEE, FLA
+lat: 30.410494354763
+lon: -83.1801397876734
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02319394/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 595a28be69714fb49b6d2fc82e686334

@@ -1,0 +1,16 @@
+name: REDWOOD CREEK NEAR MARSHFIELD, IN
+lat: 40.27975
+lon: -87.44333333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.397
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03335960/
+parameter_code: "00065"
+series_begin: 2019-03-19T19:30:00+00:00
+time_series_id: c858d3a444344377b211f3074d8705bd

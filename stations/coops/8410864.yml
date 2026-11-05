@@ -1,0 +1,23 @@
+name: Gravelly Point, Whiting Bay
+lat: 44.8233
+lon: -67.1517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.334
+  MHW: -8.187
+  DTL: -5.483
+  MTL: -5.459
+  MSL: -5.459
+  MLW: -2.731
+  MLLW: -2.632
+  LAT: -1.973
+  HAT: -9.053
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8410864
+established: 2010-03-11T00:00:00Z
+removed: 2010-11-04T23:59:00Z

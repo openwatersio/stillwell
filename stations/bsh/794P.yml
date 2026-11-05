@@ -1,0 +1,12 @@
+name: Juist, Hafen
+lat: 53.6725
+lon: 6.99583
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -3.15
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/juist_hafen

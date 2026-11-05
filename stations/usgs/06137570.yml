@@ -1,0 +1,16 @@
+name: Boxelder Creek near Rocky Boy, MT
+lat: 48.2988333333333
+lon: -109.835416666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 985.723
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06137570/
+parameter_code: "00065"
+series_begin: 2021-09-07T22:00:00+00:00
+time_series_id: 10f8df24e7b54835aeb942678ade14e1

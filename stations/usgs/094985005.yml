@@ -1,0 +1,16 @@
+name: PINTO CREEK ABOVE HAUNTED CANYON NR MIAMI, AZ
+lat: 33.405833333333334
+lon: -110.99861111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 992.801
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-094985005/
+parameter_code: "00065"
+series_begin: 2008-10-02T16:15:00+00:00
+time_series_id: d77b1dfdb9e34d87b103269dfe2bf957

@@ -1,0 +1,16 @@
+name: L CHENA R NR FAIRBANKS AK
+lat: 64.88568119374902
+lon: -147.24967576860493
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 141.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15511000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: 8551a8cde62d4a69a971759f4122919a

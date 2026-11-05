@@ -1,0 +1,23 @@
+name: Port Townsend
+lat: 48.11122
+lon: -122.759674
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.621
+  MHW: -3.414
+  DTL: -2.323
+  MTL: -2.599
+  MSL: -2.547
+  MLW: -1.785
+  MLLW: -1.025
+  LAT: 0.196
+  HAT: -4.1
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9444900
+established: 1971-12-31T00:00:00Z

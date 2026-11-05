@@ -1,0 +1,13 @@
+name: DEGGENDORF
+lat: 48.824944
+lon: 12.96235
+country_code: DE
+datum: PNP
+datums:
+  NHN: 306.972
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=10081004

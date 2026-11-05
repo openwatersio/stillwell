@@ -1,0 +1,14 @@
+name: C-8 CANAL AT NE 135 ST AT NORTH MIAMI, FL
+lat: 25.9002222222222
+lon: -80.1949722222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02286328/
+parameter_code: "00065"
+series_begin: 2016-06-14T04:00:00+00:00
+time_series_id: d1cc6c5e11eb41ef952250a5da982009

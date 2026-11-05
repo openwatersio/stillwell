@@ -1,0 +1,16 @@
+name: Swan Creek below Monclova OH
+lat: 41.583269
+lon: -83.702775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.319
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04193998/
+parameter_code: "00065"
+series_begin: 2026-03-18T20:30:00+00:00
+time_series_id: e9ed60a778c649e4bc58cbc904b7e5ff

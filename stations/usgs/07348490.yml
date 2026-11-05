@@ -1,0 +1,16 @@
+name: Cross Bayou at Shreveport, LA
+lat: 32.519194444444445
+lon: -93.75097222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.085
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07348490/
+parameter_code: "00065"
+series_begin: 2023-07-19T16:30:00+00:00
+time_series_id: dc1d87d0af9045c18853a54e533a65b8

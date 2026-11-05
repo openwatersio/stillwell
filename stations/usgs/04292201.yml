@@ -1,0 +1,16 @@
+name: LAMOILLE RIVER AT JEFFERSONVILLE, VT
+lat: 44.64416666666666
+lon: -72.83611111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04292201/
+parameter_code: "00065"
+series_begin: 2019-06-20T05:15:00+00:00
+time_series_id: cbbdbe840bd84e99b3c307dd6e6919a0

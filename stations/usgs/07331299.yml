@@ -1,0 +1,14 @@
+name: Spring Creek abv Pennington Ck nr Mill Creek, OK
+lat: 34.37272222222222
+lon: -96.7173138888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07331299/
+parameter_code: "00065"
+series_begin: 2023-11-15T16:30:00+00:00
+time_series_id: 6c454955f0bc41b6a387ef0d9bb7a5c5

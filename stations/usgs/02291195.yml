@@ -1,0 +1,14 @@
+name: Tamiami Canal at U.S. 41 NR Eagle Lakes, FL
+lat: 26.003936111111113
+lon: -81.60646666666666
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02291195/
+parameter_code: "00065"
+series_begin: 2024-09-24T18:30:00+00:00
+time_series_id: 63cf947b25b641d4818d4556a96a6dd3

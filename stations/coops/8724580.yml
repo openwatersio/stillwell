@@ -1,0 +1,24 @@
+name: Key West
+lat: 24.5557
+lon: -81.8079
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.941
+  MHW: -1.853
+  DTL: -1.665
+  MTL: -1.658
+  MSL: -1.662
+  MLW: -1.463
+  MLLW: -1.39
+  NAVD88: -1.928
+  LAT: -1.156
+  HAT: -2.193
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724580
+established: 1913-01-18T00:00:00Z

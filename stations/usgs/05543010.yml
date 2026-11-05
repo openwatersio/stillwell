@@ -1,0 +1,16 @@
+name: ILLINOIS RIVER AT SENECA, IL
+lat: 41.2998888888889
+lon: -88.6141944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 140.994
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05543010/
+parameter_code: "00065"
+series_begin: 2013-07-18T06:00:00+00:00
+time_series_id: 302c68b4d1894589a248d4f8490c1527

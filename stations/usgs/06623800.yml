@@ -1,0 +1,16 @@
+name: ENCAMPMENT RIVER AB HOG PARK CR, NR ENCAMPMENT, WY
+lat: 41.02356507737926
+lon: -106.8248048922121
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2517.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06623800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: ed92d03de38b4f7680d9ff080bc6ad43

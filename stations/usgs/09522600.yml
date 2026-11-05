@@ -1,0 +1,16 @@
+name: NORTH GILA MAIN CANAL NEAR YUMA, AZ
+lat: 32.8029638888889
+lon: -114.495322222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 48.469
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09522600/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c061e225ebf445cdbb4476df127ef862

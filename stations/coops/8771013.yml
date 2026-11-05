@@ -1,0 +1,23 @@
+name: Eagle Point, Galveston Bay
+lat: 29.481306
+lon: -94.91725
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.643
+  MHW: -1.63
+  DTL: -1.472
+  MTL: -1.474
+  MSL: -1.486
+  MLW: -1.319
+  MLLW: -1.302
+  LAT: -0.981
+  HAT: -1.844
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771013
+established: 1973-06-14T00:00:00Z

@@ -1,0 +1,23 @@
+name: Point Hope
+lat: 68.3417
+lon: -166.808
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.888
+  MHW: -0.865
+  DTL: -0.785
+  MTL: -0.789
+  MSL: -0.783
+  MLW: -0.713
+  MLLW: -0.683
+  LAT: -0.468
+  HAT: -1.16
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9491873
+established: 2003-09-25T00:00:00Z
+removed: 2004-09-28T00:00:00Z

@@ -1,0 +1,16 @@
+name: DEEP RIVER AT GRAND BLVD AT MERRILLVILLE, IN
+lat: 41.45247222222223
+lon: -87.25830555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.977
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04092944/
+parameter_code: "00065"
+series_begin: 2018-02-01T21:30:00+00:00
+time_series_id: d36539fa432a4b43b6aa57ab9d4f116d

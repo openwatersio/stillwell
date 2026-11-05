@@ -1,0 +1,16 @@
+name: BRADLEY CREEK NR PRAIRIE PLAINS, TN
+lat: 35.356332375479745
+lon: -85.9790226961775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 295.156
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03578500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: dc93c97455194d44bb3bc60cbeb63ab6

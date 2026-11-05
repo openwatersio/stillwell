@@ -1,0 +1,16 @@
+name: Touby Run at W 6th St at Mansfield OH
+lat: 40.765277777777776
+lon: -82.51805555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 348.673
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03130647/
+parameter_code: "00065"
+series_begin: 2024-05-13T16:15:00+00:00
+time_series_id: 1eca34a1d87b4a93b5fbd38e3986c86a

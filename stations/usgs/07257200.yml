@@ -1,0 +1,16 @@
+name: Little Piney Creek near Lamar, AR
+lat: 35.45
+lon: -93.3380555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 106.153
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07257200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a10384d6e3794cae88674c402c11f6e4

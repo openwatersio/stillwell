@@ -1,0 +1,21 @@
+name: SACHUEST, FLINT POINT
+lat: 41.4867
+lon: -71.2383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.612
+  MHW: -1.541
+  DTL: -1.081
+  MTL: -1.065
+  MSL: -1.023
+  MLW: -0.589
+  MLLW: -0.549
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8451351
+established: 1977-07-27T00:00:00Z
+removed: 1977-11-09T23:59:00Z

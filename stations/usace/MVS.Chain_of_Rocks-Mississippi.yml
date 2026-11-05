@@ -1,0 +1,14 @@
+name: Chain of Rocks
+lat: 38.759989
+lon: -90.181344
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 95.579
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Chain%20of%20Rocks-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Chain of Rocks-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

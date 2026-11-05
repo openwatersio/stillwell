@@ -1,0 +1,16 @@
+name: TWENTYMILE CREEK NR GUNTOWN, MS
+lat: 34.4527777777778
+lon: -88.5772222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 85.344
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02430680/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e10a59245d48472a84a4502a1367436e

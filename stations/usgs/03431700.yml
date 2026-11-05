@@ -1,0 +1,16 @@
+name: RICHLAND CREEK AT CHARLOTTE AVE, AT NASHVILLE, TN
+lat: 36.15125855496062
+lon: -86.85426341940807
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 124.797
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03431700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6f2d2f9d8adc4f10ba0d07191101d5ba

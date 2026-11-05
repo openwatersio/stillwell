@@ -1,0 +1,16 @@
+name: Board Camp Cr nr Wolf Pen Gap Rec nr Nunley, AR
+lat: 34.4859722222222
+lon: -94.1178611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 327.413
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07355860/
+parameter_code: "00065"
+series_begin: 2014-02-21T20:15:00+00:00
+time_series_id: 472b2b7992394c3ca027f440f4e0fcbe

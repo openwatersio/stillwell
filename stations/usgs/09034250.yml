@@ -1,0 +1,16 @@
+name: COLORADO RIVER AT WINDY GAP, NEAR GRANBY, CO.
+lat: 40.1083190164593
+lon: -106.004184684384
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2374.538
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09034250/
+parameter_code: "00065"
+series_begin: 2020-10-15T22:30:00+00:00
+time_series_id: 689287ff347240888f4b7e9c81d30836

@@ -1,0 +1,13 @@
+name: WUSTERWITZ OP
+lat: 52.394272
+lon: 12.356119
+country_code: DE
+datum: PNP
+datums:
+  NHN: 29.217
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=587540

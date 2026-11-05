@@ -1,0 +1,17 @@
+name: BIG COVE CREEK AT DUG HILL ROAD NR HUNTSVILLE, AL.
+lat: 34.7048132473962
+lon: -86.5122120015034
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.139
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0357526200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2026-09-06T08:30:00+00:00
+time_series_id: f03b2e0f592c4716bf7087d04a36c7f1

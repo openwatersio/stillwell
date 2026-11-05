@@ -1,0 +1,16 @@
+name: Kaukonahua Str at Waialua, Oahu, HI
+lat: 21.565301473254692
+lon: -158.1203664726055
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 4.572
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16210500/
+parameter_code: "00065"
+series_begin: 2012-09-15T10:00:00+00:00
+time_series_id: 3632f8c596754beabdfbc04121eccc2c

@@ -1,0 +1,11 @@
+name: ANDERTEN UW
+lat: 52.366715
+lon: 9.858777
+country_code: DE
+datum: NN
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=31010060

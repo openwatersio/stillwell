@@ -1,0 +1,16 @@
+name: WOLF CREEK NEAR NARROWS, VA
+lat: 37.3056765421647
+lon: -80.8497993277182
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 483.364
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03175500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d78a7ce5b076419286117311490c8722

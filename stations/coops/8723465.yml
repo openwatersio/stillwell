@@ -1,0 +1,23 @@
+name: EAST ARSENICKER, CARD SOUND
+lat: 25.3733
+lon: -80.29
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.219
+  MHW: -1.204
+  DTL: -1.064
+  MTL: -1.069
+  MSL: -1.064
+  MLW: -0.933
+  MLLW: -0.909
+  LAT: -0.771
+  HAT: -1.396
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723465
+established: 1971-11-19T00:00:00Z
+removed: 1972-02-28T23:59:00Z

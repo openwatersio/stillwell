@@ -1,0 +1,23 @@
+name: Buzzards Bay
+lat: 41.7417
+lon: -70.6167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.42
+  MHW: -1.314
+  DTL: -0.812
+  MTL: -0.792
+  MSL: -0.751
+  MLW: -0.27
+  MLLW: -0.203
+  LAT: 0.126
+  HAT: -1.873
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447270
+established: 1955-07-29T00:00:00Z
+removed: 2000-10-11T23:59:00Z

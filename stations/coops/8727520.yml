@@ -1,0 +1,24 @@
+name: Cedar Key
+lat: 29.135
+lon: -83.0317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.708
+  MHW: -1.605
+  DTL: -1.129
+  MTL: -1.174
+  MSL: -1.171
+  MLW: -0.743
+  MLLW: -0.55
+  NAVD88: -1.237
+  LAT: -0.059
+  HAT: -1.991
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727520
+established: 1914-03-12T00:00:00Z

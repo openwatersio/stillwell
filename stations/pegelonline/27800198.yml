@@ -1,0 +1,11 @@
+name: HÜNXE SCHLEUSE OW
+lat: 51.648569
+lon: 6.780465
+country_code: DE
+datum: NN
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=27800198

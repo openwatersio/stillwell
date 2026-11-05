@@ -1,0 +1,11 @@
+name: Harpeth River below Franklin, TN
+lat: 35.948056
+lon: -86.881667
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=HBFT1-HarpethR-blwFranklinTN.Stage.Inst.15Minutes.0.dcp-rev
+series: HBFT1-HarpethR-blwFranklinTN.Stage.Inst.15Minutes.0.dcp-rev

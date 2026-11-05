@@ -1,0 +1,13 @@
+name: SEWER AT HUNTLEY ALGONQUIN RD NR LAKE IN THE HILLS
+lat: 42.1758573297783
+lon: -88.3934186486988
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-421033088233601/
+parameter_code: "00065"
+time_series_id: d4ce61aa78b14665a7b0c7b70df1ea65

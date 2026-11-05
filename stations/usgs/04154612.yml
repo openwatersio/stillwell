@@ -1,0 +1,16 @@
+name: WOLF CREEK AT PINE GROVE ROAD NEAR VESTABURG, MI
+lat: 43.4230868962649
+lon: -84.9502955776069
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 262.085
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04154612/
+parameter_code: "00065"
+series_begin: 2019-10-18T17:30:00+00:00
+time_series_id: ed56b3aae4c446f5b878f852b6e0e9ec

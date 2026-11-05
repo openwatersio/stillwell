@@ -1,0 +1,15 @@
+name: SANLANDO SPRINGS NR LONGWOOD, FL
+lat: 28.6887833333333
+lon: -81.3961583333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02234991/
+parameter_code: "00065"
+series_begin: 2018-09-25T17:30:00+00:00
+series_end: 2025-11-18T18:30:00+00:00
+time_series_id: f9b7351bf57448e1acdbb93e0bfab2ea

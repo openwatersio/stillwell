@@ -1,0 +1,13 @@
+name: Macon Lake
+lat: 33.456876
+lon: -91.316025
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 28.813
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Macon%20Lake.Stage.Inst.1Hour.0.DCP-rev
+series: Macon Lake.Stage.Inst.1Hour.0.DCP-rev

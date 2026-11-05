@@ -1,0 +1,13 @@
+name: "Pearl L&D #1 Lock"
+lat: 30.4564
+lon: -89.7797
+country_code: US
+datum: GZ
+datums:
+  NGVD29: -2.981
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Pearl%20L%26D%201-Lock%20Chamber.Stage.Inst.15Minutes.0.DCP-rev
+series: Pearl L&D 1-Lock Chamber.Stage.Inst.15Minutes.0.DCP-rev

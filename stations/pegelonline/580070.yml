@@ -1,0 +1,13 @@
+name: FÜRSTENBERG UP
+lat: 53.181645
+lon: 13.146454
+country_code: DE
+datum: PNP
+datums:
+  NHN: 50.223
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580070

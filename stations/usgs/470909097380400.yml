@@ -1,0 +1,17 @@
+name: MAPLE RIVER AT COUNTY ROAD 26 NR PAGE, ND
+lat: 47.1525
+lon: -97.6344444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 346.71
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-470909097380400/
+parameter_code: "00065"
+series_begin: 2019-03-26T17:30:00+00:00
+series_end: 2020-04-28T06:00:00+00:00
+time_series_id: da209e0201ff4f62a99978578fa33b35

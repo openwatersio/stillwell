@@ -1,0 +1,17 @@
+name: FARLEY CREEK ABOVE 10TH STREET AT INDIANAPOLIS, IN
+lat: 39.78055555555555
+lon: -86.28583333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 229.011
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03353494/
+parameter_code: "00065"
+series_begin: 2014-09-16T16:30:00+00:00
+series_end: 2023-10-31T15:30:00+00:00
+time_series_id: 225df2faa54a4c098aa3fb3e96198bd1

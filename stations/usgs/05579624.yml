@@ -1,0 +1,13 @@
+name: KICKAPOO CR TRIB NR LONGFIELD RD NR BLOOMINGTON,IL
+lat: 40.4628611111111
+lon: -88.8771666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05579624/
+parameter_code: "00065"
+time_series_id: 8836f7046f6541caa58e8f6ea260d94c

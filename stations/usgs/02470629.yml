@@ -1,0 +1,16 @@
+name: MOBILE RIVER AT RIVER MILE 31.0 AT BUCKS, AL
+lat: 31.01576824099667
+lon: -88.02085919472104
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0.04
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02470629/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: df4fc860651a4683948bdf71cc474a3e

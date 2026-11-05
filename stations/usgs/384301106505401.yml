@@ -1,0 +1,16 @@
+name: EAST R NUMBER 1 DITCH ABV ROARING JUDY HATCHERY CO
+lat: 38.71685
+lon: -106.84819999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2496.007
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384301106505401/
+parameter_code: "00065"
+series_begin: 2025-07-01T22:00:00+00:00
+time_series_id: bf2c2f50fd7e43fa9214dc848b9faa1c

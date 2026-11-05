@@ -1,0 +1,13 @@
+name: Cypress Bayou Lake
+lat: 32.6520916
+lon: -93.6698995
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 51.856
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Cypress%20Byu%20Lake.Stage.Inst.15Minutes.0.DCP-rev
+series: Cypress Byu Lake.Stage.Inst.15Minutes.0.DCP-rev

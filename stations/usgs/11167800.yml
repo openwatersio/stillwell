@@ -1,0 +1,17 @@
+name: GUADALUPE R AB ALMADEN EXPRESSWAY A SAN JOSE CA
+lat: 37.2807761483455
+lon: -121.87967635403
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 44.196
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11167800/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2011-10-06T20:15:00+00:00
+time_series_id: 9ccad58833a64230a99cbc72b917e050

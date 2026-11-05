@@ -1,0 +1,16 @@
+name: Little Nemaha River at Auburn, Nebr.
+lat: 40.392622
+lon: -95.814083
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.4
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06811500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 8837a16bccea41d98d5a6d3ac5e13d8d

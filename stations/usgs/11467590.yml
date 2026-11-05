@@ -1,0 +1,16 @@
+name: GARCIA R AT EUREKA HILL RD NR PT ARENA CA
+lat: 38.90361111111111
+lon: -123.60777777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.695
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11467590/
+parameter_code: "00065"
+series_begin: 2016-01-27T08:00:00+00:00
+time_series_id: eefabb928ea7458e9f9e6cfb5591d7f7

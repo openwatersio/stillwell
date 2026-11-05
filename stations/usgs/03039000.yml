@@ -1,0 +1,16 @@
+name: Crooked Creek at Crooked Creek Dam near Ford City
+lat: 40.7203422335336
+lon: -79.5114332402634
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 243.23
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03039000/
+parameter_code: "00065"
+series_begin: 2009-10-01T04:00:00+00:00
+time_series_id: 30e133b8d5264d2fa7175b039e3b11ae

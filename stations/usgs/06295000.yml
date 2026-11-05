@@ -1,0 +1,16 @@
+name: Yellowstone River at Forsyth MT
+lat: 46.266636
+lon: -106.691303
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 764.509
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06295000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 10e2acc5ad3c4be68ed7c3c860a197d9

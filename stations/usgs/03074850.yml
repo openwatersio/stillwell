@@ -1,0 +1,17 @@
+name: Pike Run at Granville, PA
+lat: 40.0661844466677
+lon: -79.9111592983488
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.623
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03074850/
+parameter_code: "00065"
+series_begin: 2013-10-01T05:00:00+00:00
+series_end: 2026-09-23T18:15:00+00:00
+time_series_id: 21ecdcaaf4f14e988cf9a67b81fa621f

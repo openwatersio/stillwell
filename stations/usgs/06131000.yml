@@ -1,0 +1,15 @@
+name: Big Dry Creek near Van Norman MT
+lat: 47.3494472222222
+lon: -106.357816666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 710.184
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06131000/
+parameter_code: "00065"
+time_series_id: d7b8f7c0a26445f384fc3316b3c45213

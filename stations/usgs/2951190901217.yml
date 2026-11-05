@@ -1,0 +1,16 @@
+name: L. Cataouatche at Whiskey Canal S of Waggaman, LA
+lat: 29.85527777777778
+lon: -90.20472222222223
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -1.786
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-2951190901217/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 06f5fe2065fd4a209f6f949149250031

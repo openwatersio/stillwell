@@ -1,0 +1,13 @@
+name: Dunlow
+lat: 38.0175
+lon: -82.2964
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 216.192
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Dunlow.Stage.Inst.15Minutes.0.OBS
+series: Dunlow.Stage.Inst.15Minutes.0.OBS

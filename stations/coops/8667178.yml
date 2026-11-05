@@ -1,0 +1,22 @@
+name: POINT OF PINES, N. EDISTO R.
+lat: 32.585
+lon: -80.2283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.413
+  MHW: -3.303
+  DTL: -2.465
+  MTL: -2.441
+  MSL: -2.512
+  MLW: -1.578
+  MLLW: -1.516
+  NAVD88: -2.583
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667178
+established: 1977-12-21T00:00:00Z
+removed: 1979-09-07T23:59:00Z

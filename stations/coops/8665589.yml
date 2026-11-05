@@ -1,0 +1,22 @@
+name: SANDBLASTERS, PENNY'S CREEK
+lat: 32.77
+lon: -80.0633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.872
+  MHW: -2.788
+  DTL: -1.986
+  MTL: -1.986
+  MSL: -2.13
+  MLW: -1.184
+  MLLW: -1.1
+  NAVD88: -2.118
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665589
+established: 1974-04-17T00:00:00Z
+removed: 1974-07-30T23:59:00Z

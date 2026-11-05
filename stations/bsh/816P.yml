@@ -1,0 +1,13 @@
+name: Herbrum, Ems, Hafendamm
+lat: 53.04278
+lon: 7.31833
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+  SKN: -3.7
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/3770030]
+source_url: https://gezeiten.bsh.de/herbrum_hafendamm

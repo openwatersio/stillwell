@@ -1,0 +1,16 @@
+name: BLUESTONE R NR SPANISHBURG, WV
+lat: 37.4334722222222
+lon: -81.11
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 625.145
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03178000/
+parameter_code: "00065"
+series_begin: 2019-08-04T00:00:00+00:00
+time_series_id: 432aaa226fd5468da498449fd81e6ace

@@ -1,0 +1,16 @@
+name: ASHUELOT RIVER NEAR GILSUM, NH
+lat: 43.0392458643219
+lon: -72.2700857695084
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.428
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01157000/
+parameter_code: "00065"
+series_begin: 2009-07-20T15:25:00+00:00
+time_series_id: aa2fa2037fc64ef7af2aac856b8dffe9

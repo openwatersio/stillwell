@@ -1,0 +1,23 @@
+name: "Daymark #135, South Newport River"
+lat: 31.575
+lon: -81.19
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.81
+  MHW: -9.701
+  DTL: -8.673
+  MTL: -8.65
+  MSL: -8.691
+  MLW: -7.598
+  MLLW: -7.535
+  LAT: -7.018
+  HAT: -10.46
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8674301
+established: 1977-03-14T00:00:00Z
+removed: 2012-05-22T23:59:00Z

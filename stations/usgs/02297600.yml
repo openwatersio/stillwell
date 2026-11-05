@@ -1,0 +1,16 @@
+name: SHELL CREEK AT CIRCLE K GROVES NEAR FT OGDEN FL
+lat: 26.9673444444444
+lon: -81.8266361111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.335
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02297600/
+parameter_code: "00065"
+series_begin: 2009-10-22T04:00:00+00:00
+time_series_id: ed308c77dc134ab39f64023dac17ba16

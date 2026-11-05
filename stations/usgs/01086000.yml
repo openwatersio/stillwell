@@ -1,0 +1,16 @@
+name: WARNER RIVER AT DAVISVILLE, NH
+lat: 43.2509115913054
+lon: -71.7322996387607
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 115.632
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01086000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 27bda6c652e6432f89eae432b807dd6f

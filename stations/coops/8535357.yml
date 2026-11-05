@@ -1,0 +1,13 @@
+name: STITES SOUND
+lat: 39.12
+lon: -74.755
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535357
+established: 1977-07-27T00:00:00Z
+removed: 1979-01-05T23:59:00Z

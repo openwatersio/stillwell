@@ -1,0 +1,15 @@
+name: RED ROCK CANYON CREEK AT MOUTH NR THATCHER, CO.
+lat: 37.5152931431727
+lon: -103.725507120052
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1374.648
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07126415/
+parameter_code: "00065"
+time_series_id: 53b58344a4194c9ea39cf05680597556

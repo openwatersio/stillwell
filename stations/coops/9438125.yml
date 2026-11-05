@@ -1,0 +1,21 @@
+name: Multnomah Channel
+lat: 45.8117
+lon: -122.827
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.538
+  MHW: -1.375
+  DTL: -1.057
+  MTL: -1.011
+  MSL: -1.006
+  MLW: -0.647
+  MLLW: -0.577
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9438125
+established: 2003-10-29T00:00:00Z
+removed: 2003-12-03T23:59:00Z

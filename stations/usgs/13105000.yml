@@ -1,0 +1,16 @@
+name: SALMON FALLS CREEK NR SAN JACINTO NV
+lat: 41.9447222222222
+lon: -114.688611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1556.162
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13105000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 17581e62c13d4b91b8b90f41d5586782

@@ -1,0 +1,17 @@
+name: ELLIOTT DITCH NEAR ELSTON, IN
+lat: 40.37086186606193
+lon: -86.90943693339703
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.288
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-033356725/
+parameter_code: "00065"
+series_begin: 2009-03-19T05:00:00+00:00
+series_end: 2017-10-03T14:15:00+00:00
+time_series_id: a7e2d911c0914b09ac97c2cf39d16b71

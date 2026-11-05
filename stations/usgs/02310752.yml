@@ -1,0 +1,16 @@
+name: SALT RIVER NEAR CRYSTAL RIVER FL
+lat: 28.901555555555554
+lon: -82.64580555555557
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310752/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ac0130f9509e4515b1690fea6ad3fb91

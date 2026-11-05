@@ -1,0 +1,16 @@
+name: REED CREEK AT GRAHAMS FORGE, VA
+lat: 36.9390099492523
+lon: -80.8872996670757
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 586.496
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03167000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f24db62ca71743e19eb6bdd253eafcec

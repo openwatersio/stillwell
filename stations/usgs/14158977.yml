@@ -1,0 +1,15 @@
+name: LOST CREEK ABV YALE LANE NR BELKNAP SPRINGS, OR
+lat: 44.17822222222222
+lon: -122.056
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14158977/
+parameter_code: "00065"
+series_begin: 2023-08-24T00:30:00+00:00
+series_end: 2025-04-01T22:00:00+00:00
+time_series_id: 80ed31a8d072445089ccf5e09225095a

@@ -1,0 +1,13 @@
+name: VENTNOR OFFSHORE 5 MI.
+lat: 39.29
+lon: -74.375
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534774
+established: 1985-09-01T00:00:00Z
+removed: 1985-09-16T23:59:00Z

@@ -1,0 +1,16 @@
+name: East Sandy Ck at FM 1374 nr New Waverly, TX
+lat: 30.58396388888889
+lon: -95.5662611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067555/
+parameter_code: "00065"
+series_begin: 2022-08-08T19:15:00+00:00
+time_series_id: 305e139d621f425c931f7fc0f895bb1a

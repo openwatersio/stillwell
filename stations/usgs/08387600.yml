@@ -1,0 +1,16 @@
+name: EAGLE CREEK BELOW SOUTH FORK NEAR ALTO, NM
+lat: 33.3928527777778
+lon: -105.723344444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2316.48
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08387600/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 88c0f832ceb844bc928e676ba4111c0c

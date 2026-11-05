@@ -1,0 +1,15 @@
+name: DISCOVERY FARMS-RED CEDAR WATERWAY 4 NR COLFAX, WI
+lat: 45.1163333333333
+lon: -91.7373055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 305.41
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-450659091441401/
+parameter_code: "00065"
+time_series_id: ea89dd70e8694d90a795aac4241f685e

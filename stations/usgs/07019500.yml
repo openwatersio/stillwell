@@ -1,0 +1,16 @@
+name: Joachim Creek at De Soto, MO
+lat: 38.1266666666667
+lon: -90.5563888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 149.931
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07019500/
+parameter_code: "00065"
+series_begin: 2018-07-17T14:45:00+00:00
+time_series_id: 25945c4403c24b7cb7c8a1ec1f68df68

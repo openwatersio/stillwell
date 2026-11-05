@@ -1,0 +1,16 @@
+name: BIG LOST RIVER BL INL DIV NEAR ARCO ID
+lat: 43.5158333333333
+lon: -113.081944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1524.917
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13132520/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: eb586ec1c0ac42b4b49a03b9852c1f82

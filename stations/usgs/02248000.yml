@@ -1,0 +1,16 @@
+name: SPRUCE CREEK NEAR SAMSULA, FL
+lat: 29.0508184545576
+lon: -81.0464454628131
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1.905
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d4a9f2ab6bda48d1aef71d3219c9149f

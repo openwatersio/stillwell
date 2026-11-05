@@ -1,0 +1,13 @@
+name: Turtle Creek, PA
+lat: 40.4053
+lon: -79.8281
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 228.6
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=TurtleCreek.Stage.Inst.15Minutes.0.OBS
+series: TurtleCreek.Stage.Inst.15Minutes.0.OBS

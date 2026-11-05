@@ -1,0 +1,14 @@
+name: Tyronza River @ Tyronza
+lat: 35.502972
+lon: -90.384139
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 56.044
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=TY111.Stage.Inst.1Hour.0.opendcs-rev
+series: TY111.Stage.Inst.1Hour.0.opendcs-rev

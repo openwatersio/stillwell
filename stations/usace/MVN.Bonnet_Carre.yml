@@ -1,0 +1,12 @@
+name: Mississippi River at Bonnet Carre (01280)
+lat: 29.9973889
+lon: -90.4248194
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bonnet_Carre.Stage.Inst.1Hour.0.rev
+series: Bonnet_Carre.Stage.Inst.1Hour.0.rev

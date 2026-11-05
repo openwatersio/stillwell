@@ -1,0 +1,14 @@
+name: Jefferson Barracks
+lat: 38.486519
+lon: -90.278858
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 115.013
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Jefferson%20Brks-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Jefferson Brks-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

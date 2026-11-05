@@ -1,0 +1,16 @@
+name: EF OWYHEE RIVER AT CRUTCHER CROSSING, ID
+lat: 42.2613694444444
+lon: -116.868441666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1296.513
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13176400/
+parameter_code: "00065"
+series_begin: 2012-12-05T22:00:00+00:00
+time_series_id: 484c0ab2a9db417ba7d3df19fb6d12ea

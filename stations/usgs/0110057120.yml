@@ -1,0 +1,17 @@
+name: ELM BROOK AT ROUTE 2A NEAR LINCOLN, MA
+lat: 42.45283333333334
+lon: -71.30430555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 43.404
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0110057120/
+parameter_code: "00065"
+series_begin: 2023-09-07T14:45:00+00:00
+series_end: 2024-10-11T12:30:00+00:00
+time_series_id: 4f95ec0952984b3baef7eecd8e04a834

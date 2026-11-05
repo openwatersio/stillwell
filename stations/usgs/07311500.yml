@@ -1,0 +1,16 @@
+name: Deep Red Creek near Randlett, OK
+lat: 34.2209245397366
+lon: -98.4531103894967
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 281.785
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07311500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 468b9d92d09e4739a59d617b4496fe56

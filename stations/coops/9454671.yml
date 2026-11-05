@@ -1,0 +1,21 @@
+name: POINT HELEN, KNIGHT ISLAND
+lat: 60.1533
+lon: -147.767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.276
+  MHW: -2.993
+  DTL: -1.503
+  MTL: -1.59
+  MSL: -1.62
+  MLW: -0.187
+  MLLW: 0.271
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454671
+established: 1996-09-04T00:00:00Z
+removed: 1996-11-22T20:02:54Z

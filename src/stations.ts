@@ -1,80 +1,119 @@
-import type { ListedStation, Station } from "./schema.ts";
+import {
+  currentEpoch,
+  epochKey,
+  firstEpochs,
+  nextEpochs,
+  type EpochEvent,
+  type EpochOptions,
+} from "./epochs.ts";
+import type { LakeStation, ListedStation, Station } from "./schema.ts";
 
-/** A station whose source now reports it in another datum. */
-export interface DatumChange {
+/** Something a refresh did to a station's epochs, for the report. */
+export interface EpochChange {
   id: string;
+  event: EpochEvent;
   from: string;
   to: string;
-  /** Why, when the datum's name stayed the same but what it measures from didn't. */
   reason?: string;
+  /** The key a decision on it takes in the source's overrides. */
+  key: string;
 }
 
 /**
- * Merge a source's fresh station list into the committed one. Fields the lake
- * fills in later survive, and a station the source stopped listing stays,
- * marked inactive, so its ID is never reused.
+ * Merge a source's fresh station list into the lake's. A station the source
+ * stopped listing stays, marked inactive, so its ID is never reused. What the
+ * lake can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
+ * it from the bounds compaction writes.
  *
- * A series' files carry no datum of their own, so a station never changes
- * datum here. One the source now reports in another datum keeps its committed
- * record, inactive, and comes back in `changed` for a person to resolve. A
- * station the source listed without a datum, or without any offsets, keeps the
- * committed ones, and a new station without a datum isn't listed until the
- * source names it. A source that sends no offsets at all keeps the committed
- * ones, so a refresh that loses them doesn't erase them; one that sends some
- * replaces them all.
+ * A station the source now reports against another reference opens a datum
+ * epoch (src/epochs.ts), so its new values go to files of their own. A station
+ * the source listed without a datum, or without any offsets, keeps the ones it
+ * had, and a new station without a datum isn't listed until the source names
+ * it. A source that sends no offsets at all keeps the old ones while the datum
+ * stays the same, so a refresh that loses them doesn't erase them; one that
+ * sends some replaces them all.
  *
- * `seriesChanged` lets a source say when a station kept its datum's name but
- * not the series or zero it measures from, such as a USGS gage whose datum was
- * moved; that station is kept inactive the same way.
+ * `seriesChanged` lets a source say a station kept its datum's name but not
+ * the series or zero it measures from, such as a USGS gage whose datum moved.
+ * That opens an epoch too, from the refresh that saw it, since the source
+ * gives no date.
  */
 export function mergeStationList(
-  previous: Station[],
+  previous: LakeStation[],
   fetched: ListedStation[],
-  seriesChanged?: (committed: Station, listed: ListedStation) => string | null,
-): { stations: Station[]; changed: DatumChange[] } {
+  {
+    seriesChanged,
+    ...options
+  }: Omit<EpochOptions, "nextId" | "station"> & {
+    seriesChanged?: (previous: Station, listed: ListedStation) => string | null;
+  },
+): { stations: LakeStation[]; changes: EpochChange[] } {
   const byId = new Map(previous.map((s) => [s.id, s]));
   const listed = new Set<string>();
-  const changed: DatumChange[] = [];
-  const merged: Station[] = [];
-  for (const s of fetched) {
+  const changes: EpochChange[] = [];
+  const merged: LakeStation[] = [];
+  for (const { reference, ...s } of fetched) {
     if (s.id !== `${s.source}/${s.source_id}` || s.source.includes("/"))
       throw new Error(`Station ${s.id} isn't <source>/<source_id>`);
     const old = byId.get(s.id);
     if (s.datum === null && !old) continue;
     listed.add(s.id);
-    if (old && s.datum !== null && s.datum !== old.datum) {
-      changed.push({ id: s.id, from: old.datum, to: s.datum });
-      merged.push({ ...old, status: "inactive" });
-      continue;
-    }
-    const reason = old && s.datum !== null ? seriesChanged?.(old, s) : null;
-    if (old && reason) {
-      changed.push({ id: s.id, from: old.datum, to: s.datum!, reason });
-      merged.push({ ...old, status: "inactive" });
-      continue;
-    }
-    // Offsets the source left out this time are kept, rather than erased.
-    const omitted = s.datum === null || (!Object.keys(s.datums).length && old);
+    // Offsets the source left out this time are kept, rather than erased, but
+    // only for the same datum: another datum's offsets would be wrong for it.
+    const sameDatum = old && (s.datum === null || s.datum === old.datum);
+    const omitted = s.datum === null || !Object.keys(s.datums).length;
+    const datums = omitted && sameDatum ? old.datums : s.datums;
+    let epochs;
+    if (old) {
+      const next = nextEpochs(
+        old.epochs,
+        {
+          datum: s.datum,
+          datums,
+          sent: s.datums,
+          reference,
+          changed: s.datum === null ? null : seriesChanged?.(old, s),
+        },
+        { ...options, station: s.id },
+      );
+      epochs = next.epochs;
+      if (next.event)
+        changes.push({
+          id: s.id,
+          event: next.event,
+          from: old.datum,
+          to: s.datum ?? old.datum,
+          reason: next.reason,
+          // The epoch a person would decide on: the held one, or else the newest.
+          key: epochKey(
+            s.id,
+            (next.epochs.find((e) => e.state === "held") ?? next.epochs.at(-1)!).since,
+          ),
+        });
+    } else
+      epochs = firstEpochs({ datum: s.datum!, datums, reference }, { ...options, station: s.id });
+    const current = currentEpoch(epochs);
     merged.push({
       ...s,
-      datum: s.datum ?? old!.datum,
-      datums: omitted && old ? old.datums : s.datums,
-      first: s.first ?? old?.first ?? null,
-      last: s.last ?? old?.last ?? null,
+      datum: current.datum,
+      datums: current.datums,
+      first: null,
+      last: null,
       tide_station: s.tide_station ?? old?.tide_station ?? null,
+      epochs,
     });
   }
   const stations = [
     ...merged,
     ...previous
       .filter((s) => !listed.has(s.id))
-      .map((s) => ({ ...s, status: "inactive" as const })),
+      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const })),
   ].sort((a, b) => a.id.localeCompare(b.id));
-  return { stations, changed };
+  return { stations, changes };
 }
 
 /** Make `same_as` links run both ways, whichever list recorded them. */
-export function linkBothWays(stations: Station[]): Station[] {
+export function linkBothWays<T extends Station>(stations: T[]): T[] {
   const links = new Map<string, Set<string>>();
   for (const s of stations)
     for (const other of s.same_as) {

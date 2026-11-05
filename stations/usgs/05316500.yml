@@ -1,0 +1,16 @@
+name: REDWOOD RIVER NEAR REDWOOD FALLS, MN
+lat: 44.523579
+lon: -95.171378
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 296.549
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05316500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 775ebbd5bb9649738f96353cc69fd75c

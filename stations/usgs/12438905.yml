@@ -1,0 +1,16 @@
+name: NINEMILE CREEK AT EASTLAKE RD NEAR OROVILLE, WA
+lat: 48.9703694444444
+lon: -119.418519444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 296.266
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12438905/
+parameter_code: "00065"
+series_begin: 2017-10-17T23:45:00+00:00
+time_series_id: 15fd5d83111149c98039694298369ca5

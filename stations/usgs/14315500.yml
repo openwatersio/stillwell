@@ -1,0 +1,16 @@
+name: NORTH UMPQUA RIVER AT TOKETEE FALLS, OR
+lat: 43.2637331689753
+lon: -122.421708668121
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 704.899
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14315500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 81e0ec7c5f284bd1ae5348cc4c6a615e

@@ -1,0 +1,17 @@
+name: (B- 8- 2)17cdc Bear River Wetland Unit5C Outflow
+lat: 41.422861
+lon: -112.09425
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1280.16
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412522112053901/
+parameter_code: "00065"
+series_begin: 2011-03-29T19:30:00+00:00
+series_end: 2013-04-03T14:15:00+00:00
+time_series_id: 5d49f50d64554c4f80f51168afa057e9

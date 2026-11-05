@@ -1,0 +1,16 @@
+name: SHAVERS FORK NR CHEAT BRIDGE, WV
+lat: 38.6170576288192
+lon: -79.8697849035461
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1078.303
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03067510/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1b6c61ba4aa4473c9c02248b6b28bbee

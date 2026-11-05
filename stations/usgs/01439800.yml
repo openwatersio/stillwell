@@ -1,0 +1,17 @@
+name: Big Flat Brook near Hainesville NJ
+lat: 41.2069444444444
+lon: -74.8036111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.212
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01439800/
+parameter_code: "00065"
+series_begin: 2008-05-01T04:00:00+00:00
+series_end: 2014-04-01T03:45:00+00:00
+time_series_id: 7f18a827f2ee49e5a12620f81312e249

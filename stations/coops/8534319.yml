@@ -1,0 +1,24 @@
+name: GREAT BAY, SHOOTING THOROFARE
+lat: 39.5083
+lon: -74.325
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.458
+  MHW: -0.356
+  DTL: 0.05
+  MTL: 0.079
+  MSL: 0.084
+  MLW: 0.515
+  MLLW: 0.558
+  NAVD88: 0
+  LAT: 0.773
+  HAT: -0.66
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534319
+established: 1976-10-13T00:00:00Z
+removed: 2024-03-13T00:00:00Z

@@ -1,0 +1,16 @@
+name: SANTA FE RIVER AT WORTHINGTON SPRINGS, FLA.
+lat: 29.9219073153196
+lon: -82.4262246125799
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 13.027
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02321500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 60b49a0ddceb4b8da386ecb960c767f4

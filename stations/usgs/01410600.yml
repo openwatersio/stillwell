@@ -1,0 +1,14 @@
+name: Absecon Channel at Atlantic City, NJ
+lat: 39.3777777777778
+lon: -74.4236111111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01410600/
+parameter_code: "72279"
+series_begin: 2002-12-16T05:00:00+00:00
+time_series_id: 2cf7912a99f649cfa22dcc83cbba7d18

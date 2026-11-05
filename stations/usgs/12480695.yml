@@ -1,0 +1,15 @@
+name: HURLEY CREEK AT DURST RD NR LIBERTY, WA
+lat: 47.321513888888894
+lon: -120.67474722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12480695/
+parameter_code: "00065"
+time_series_id: 57245316b5534dbfb92ba67a638b6c38

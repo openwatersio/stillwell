@@ -1,0 +1,16 @@
+name: NORTH BRUSH CREEK NEAR SARATOGA, WY
+lat: 41.37022977901408
+lon: -106.52063208237072
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2449.751
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06622700/
+parameter_code: "00065"
+series_begin: 2017-10-01T07:00:00+00:00
+time_series_id: 982d14196bb246cb94e203dfc618aafb

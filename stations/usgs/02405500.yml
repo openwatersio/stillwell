@@ -1,0 +1,16 @@
+name: KELLY CREEK NEAR VINCENT AL
+lat: 33.44764969811186
+lon: -86.38692187165519
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.194
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02405500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 9c5246fbfe454d889eebba99ca170b42

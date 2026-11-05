@@ -1,0 +1,23 @@
+name: Honolulu
+lat: 21.303333
+lon: -157.86453
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.741
+  MHW: -1.6
+  DTL: -1.451
+  MTL: -1.406
+  MSL: -1.412
+  MLW: -1.211
+  MLLW: -1.161
+  LAT: -1.029
+  HAT: -1.989
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1612340
+established: 1905-01-01T00:00:00Z

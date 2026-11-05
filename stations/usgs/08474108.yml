@@ -1,0 +1,16 @@
+name: N Main Drain at Manzano St, Brownsville, TX
+lat: 25.894027777777776
+lon: -97.45288888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08474108/
+parameter_code: "00065"
+series_begin: 2022-02-20T06:00:00+00:00
+time_series_id: 0e5096672c644d43ad055d7b1f193954

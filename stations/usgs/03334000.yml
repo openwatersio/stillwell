@@ -1,0 +1,16 @@
+name: WILDCAT CREEK AT OWASCO, IN
+lat: 40.46483333333334
+lon: -86.63655555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 190.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03334000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 80987b36a8df41dba9ce19e4ca3b702b

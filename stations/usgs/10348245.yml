@@ -1,0 +1,16 @@
+name: N TRUCKEE DRAIN AT SPANISH SPRINGS RD NR SPARK, NV
+lat: 39.5687998797052
+lon: -119.726576629448
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1344.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10348245/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3e994bee176f41648c9f4018e617d9a8

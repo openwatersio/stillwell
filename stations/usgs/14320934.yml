@@ -1,0 +1,16 @@
+name: LITTLE WOLF CREEK NEAR TYEE, OR
+lat: 43.4312266512488
+lon: -123.586757291433
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 100.584
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14320934/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: c448a40baea8406895fffbbe5f1c5020

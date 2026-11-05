@@ -1,0 +1,21 @@
+name: BOCA CHICA,LONG POINT
+lat: 24.6033
+lon: -81.6983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.419
+  MHW: -1.338
+  DTL: -1.161
+  MTL: -1.147
+  MSL: -1.124
+  MLW: -0.955
+  MLLW: -0.903
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724485
+established: 1970-12-14T00:00:00Z
+removed: 1975-03-26T23:59:00Z

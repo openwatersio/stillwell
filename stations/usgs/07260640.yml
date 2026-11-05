@@ -1,0 +1,16 @@
+name: Petit Jean River near Centerville, AR
+lat: 35.0741666666667
+lon: -93.2
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07260640/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7073fe10c52a42c9af504aceb346d116

@@ -1,0 +1,17 @@
+name: Verdigre Creek near Verdigre, Nebr.
+lat: 42.65454166666667
+lon: -98.04311944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 392.473
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06465700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2019-10-15T14:45:00+00:00
+time_series_id: c88a3fdb593046088cce963f8dee5cdd

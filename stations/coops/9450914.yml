@@ -1,0 +1,23 @@
+name: Burrough Bay, Behm Canal
+lat: 56.0383
+lon: -131.095
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3
+  MHW: -2.726
+  DTL: -0.577
+  MTL: -0.677
+  MSL: -0.671
+  MLW: 1.371
+  MLLW: 1.846
+  LAT: 3.288
+  HAT: -4.266
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450914
+established: 1931-05-14T00:00:00Z
+removed: 2013-06-18T23:59:00Z

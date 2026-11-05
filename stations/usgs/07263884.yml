@@ -1,0 +1,17 @@
+name: Lwr Vallier(LgPondSlough)HW/TW nr New Gascony, AR
+lat: 34.24627777777778
+lon: -91.66930555555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07263884/
+parameter_code: "00065"
+series_begin: 2018-11-30T13:00:00+00:00
+series_end: 2026-09-01T08:00:00+00:00
+time_series_id: 5d586eac0ce54de299e42d682161409e

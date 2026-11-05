@@ -1,0 +1,16 @@
+name: LITTLE RIVER AT MANCHESTER, NC
+lat: 35.1933333333333
+lon: -78.9855555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 37.439
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02103000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 56c08b0c608d4bd0babcde165eca0b11

@@ -1,0 +1,13 @@
+name: CUTOFF BAYOU
+lat: 30.3517
+lon: -89.3883
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8747934
+established: 1979-02-27T00:00:00Z
+removed: 1979-06-01T23:59:00Z

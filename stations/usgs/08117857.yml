@@ -1,0 +1,16 @@
+name: Linnville Bayou at SH 35 nr Van Vleck, TX
+lat: 29.070033333333335
+lon: -95.78891666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08117857/
+parameter_code: "00065"
+series_begin: 2022-03-30T22:45:00+00:00
+time_series_id: 0da938db2b0446ae82793a316c583d6b

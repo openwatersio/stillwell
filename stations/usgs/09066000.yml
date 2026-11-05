@@ -1,0 +1,16 @@
+name: BLACK GORE CREEK NEAR MINTURN, CO.
+lat: 39.5963749502604
+lon: -106.265026366584
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2788.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09066000/
+parameter_code: "00065"
+series_begin: 2020-10-06T15:15:00+00:00
+time_series_id: 0a7ab8c06cc54a268082cb94c23d0fd7

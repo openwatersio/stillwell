@@ -1,0 +1,11 @@
+name: L'Anguille River @ Whitehall
+lat: 35.4747
+lon: -90.7886
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LA104.Stage.Inst.15Minutes.0.opendcs-rev
+series: LA104.Stage.Inst.15Minutes.0.opendcs-rev

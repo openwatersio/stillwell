@@ -1,0 +1,23 @@
+name: Kanaka Bay, San Juan Island
+lat: 48.485
+lon: -123.083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.094
+  MHW: -7.918
+  DTL: -6.978
+  MTL: -7.227
+  MSL: -7.2
+  MLW: -6.537
+  MLLW: -5.862
+  LAT: -4.754
+  HAT: -8.57
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449856
+established: 1976-09-02T00:00:00Z
+removed: 2016-01-31T23:59:00Z

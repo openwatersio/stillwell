@@ -1,0 +1,16 @@
+name: ROCKY R AT SR1300 NR CRUTCHFIELD CROSSROADS, NC
+lat: 35.8069444444444
+lon: -79.5275
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 186.26
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0210166029/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ab85c9e7436c49a891626b1762a40ede

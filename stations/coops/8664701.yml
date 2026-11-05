@@ -1,0 +1,22 @@
+name: NOWELL CREEK
+lat: 32.9
+lon: -79.9
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.518
+  MHW: -2.409
+  DTL: -1.531
+  MTL: -1.508
+  MSL: -1.588
+  MLW: -0.607
+  MLLW: -0.545
+  NAVD88: -1.612
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664701
+established: 1977-05-30T00:00:00Z
+removed: 1978-07-01T23:59:00Z

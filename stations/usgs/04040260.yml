@@ -1,0 +1,15 @@
+name: GRATIOT RIVER AT 5 MILE POINT ROAD NEAR AHMEEK, MI
+lat: 47.3226993018048
+lon: -88.4053895302867
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 249.936
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04040260/
+parameter_code: "00065"
+time_series_id: 0a9f9c2156894d39bf55d4f9c6a78368

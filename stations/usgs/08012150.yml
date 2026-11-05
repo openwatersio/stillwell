@@ -1,0 +1,16 @@
+name: Mermentau River At Mermentau, LA
+lat: 30.19
+lon: -92.5905555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.393
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08012150/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ab1fe90a381e46b0b514c6ff602d4c96

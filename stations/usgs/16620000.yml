@@ -1,0 +1,16 @@
+name: Honokohau Stream near Honokohau, Maui, HI
+lat: 20.95969025803185
+lon: -156.58706055861694
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 286.512
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16620000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: c881b112f41a439a863c2e4614db4fec

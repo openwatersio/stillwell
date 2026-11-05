@@ -1,0 +1,14 @@
+name: R.C. Byrd L&D Tailwater
+lat: 38.6802585
+lon: -82.1911916
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 153.22
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=RCByrdLD-Tailwater.Stage.Inst.15Minutes.0.OBS
+series: RCByrdLD-Tailwater.Stage.Inst.15Minutes.0.OBS

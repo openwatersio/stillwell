@@ -1,0 +1,16 @@
+name: SALT CREEK NEAR TULAROSA, NM
+lat: 33.2755555555556
+lon: -106.397222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1234.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08480595/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: bb9661fd00db434d856fc94f5eee5bca

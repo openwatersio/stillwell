@@ -1,0 +1,14 @@
+name: WETLAND BELOW S-152 IN WCA-3 NR COOPERTOWN, FL
+lat: 25.86485
+lon: -80.6202
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255154080371303/
+parameter_code: "00065"
+series_begin: 2013-11-06T05:00:00+00:00
+time_series_id: 4d2da4ea15ee42e59e71bdbbb4b660e1

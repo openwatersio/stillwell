@@ -1,0 +1,22 @@
+name: TAVERNIER HAWK CHANNEL
+lat: 25.005
+lon: -80.5167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.453
+  MHW: -1.418
+  DTL: -1.095
+  MTL: -1.107
+  MSL: -1.113
+  MLW: -0.795
+  MLLW: -0.737
+  NAVD88: -1.375
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723747
+established: 1970-11-20T00:00:00Z
+removed: 1975-08-28T23:59:00Z

@@ -1,0 +1,23 @@
+name: THE BROTHERS, STEPHENS PASSAGE
+lat: 57.295
+lon: -133.797
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.607
+  MHW: -3.323
+  DTL: -1.346
+  MTL: -1.442
+  MSL: -1.459
+  MLW: 0.44
+  MLLW: 0.915
+  LAT: 2.29
+  HAT: -4.837
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451785
+established: 1982-10-19T00:00:00Z
+removed: 1996-05-22T23:00:00Z

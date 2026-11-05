@@ -1,0 +1,16 @@
+name: WABASH RIVER AT LOGANSPORT, IN
+lat: 40.74641334641238
+lon: -86.3774748369995
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.596
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03329000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ee9572a803ec49a9acb77f2cd25c0bd2

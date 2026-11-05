@@ -1,0 +1,15 @@
+name: FRIPP ISLAND INLET AT US21 NR HUNTING ISLAND,SC
+lat: 32.3425
+lon: -80.4630555555556
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: 1.305
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-322033080274700/
+parameter_code: "00065"
+time_series_id: 82cdc8f737284689badecf58b21bd9cc

@@ -1,0 +1,16 @@
+name: HOUSATONIC RIVER AT LENOXDALE, MA
+lat: 42.342889
+lon: -73.245167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 282.348
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01197145/
+parameter_code: "00065"
+series_begin: 2022-09-14T22:45:00+00:00
+time_series_id: 157bf31b20b0423da8af2a10f1a55019

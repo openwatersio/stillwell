@@ -1,0 +1,17 @@
+name: SAND CYN C A IRVINE CA
+lat: 33.6572430675558
+lon: -117.827555310662
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 15.24
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11048553/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2014-03-31T23:30:00+00:00
+time_series_id: 81273c6188e948c1aa847629e2656d5a

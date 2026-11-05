@@ -1,0 +1,16 @@
+name: REDWOOD RIVER NEAR MARSHALL, MN
+lat: 44.430156
+lon: -95.82945
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 357.786
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05315000/
+parameter_code: "00065"
+series_begin: 2011-08-31T12:00:00+00:00
+time_series_id: 6e9e126c146f4f91aa05bfc1c3a9fc28

@@ -1,0 +1,16 @@
+name: RIO DE LA PLATA AT PROYECTO LA PLATA, PR
+lat: 18.16
+lon: -66.228889
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 256.072
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50043000/
+parameter_code: "00065"
+series_begin: 2012-10-01T04:00:00+00:00
+time_series_id: 7156dd1b289541d1a246575f86971da7

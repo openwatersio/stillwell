@@ -1,0 +1,23 @@
+name: Chinook Bend
+lat: 44.88
+lon: -123.9636
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.877
+  MHW: -9.667
+  DTL: -9.035
+  MTL: -9.025
+  MSL: -9.015
+  MLW: -8.383
+  MLLW: -8.194
+  LAT: -7.784
+  HAT: -10.302
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9435992
+established: 2017-06-13T00:00:00Z
+removed: 2017-10-16T14:00:00Z

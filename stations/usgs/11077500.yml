@@ -1,0 +1,16 @@
+name: SANTIAGO C A SANTA ANA CA
+lat: 33.770295176176084
+lon: -117.8844901968557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 31.05
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11077500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4285b4753908497abeeeb95c6e06e303

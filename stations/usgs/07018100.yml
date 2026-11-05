@@ -1,0 +1,16 @@
+name: Big River near Richwoods, MO
+lat: 38.1596111111111
+lon: -90.7060555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 159.267
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07018100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a488a67c7b1048b4a43a130457ff2501

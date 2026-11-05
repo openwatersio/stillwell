@@ -1,0 +1,16 @@
+name: State Canal near Krotz Springs, LA
+lat: 30.5660263381632
+lon: -91.831504661883
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.271
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07384400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 58b94d8904574353b855d54bd12cbfc3

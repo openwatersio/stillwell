@@ -1,0 +1,16 @@
+name: LAKE TAPPS DIVERSION AT DIERINGER, WA
+lat: 47.2381564461036
+lon: -122.228174612936
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 13.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12101100/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4963649e1cc24dc5a43f098ace1089ec

@@ -1,0 +1,17 @@
+name: BOOKER CREEK AT SR 1751 NEAR CHAPEL HILL, NC
+lat: 35.9419972222222
+lon: -79.0490333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.532
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02097386/
+parameter_code: "00065"
+series_begin: 2019-07-26T19:15:00+00:00
+series_end: 2026-10-28T03:15:00+00:00
+time_series_id: c54acfde58cf4ab4a2635b9e3b2676b5

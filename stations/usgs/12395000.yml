@@ -1,0 +1,16 @@
+name: Priest River near Priest River, ID
+lat: 48.2085199996642
+lon: -116.914642942994
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 639.836
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12395000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 033e4add9b3445e8bbf046e7abb25a75

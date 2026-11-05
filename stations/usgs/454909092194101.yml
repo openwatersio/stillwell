@@ -1,0 +1,15 @@
+name: CLAM R. AT CLAM LAKE OUTFLOW CANAL NR SIREN, WI.
+lat: 45.819167
+lon: -92.328064
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-454909092194101/
+parameter_code: "63160"
+series_begin: 2020-12-09T21:00:00+00:00
+series_end: 2025-09-29T13:30:00+00:00
+time_series_id: 802477427ce24a3c97c49294e5c85f5d

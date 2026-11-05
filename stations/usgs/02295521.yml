@@ -1,0 +1,16 @@
+name: LT CHARLIE CR BL PARKER BRANCH NR BOWLING GREEN FL
+lat: 27.627142
+lon: -81.728017
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.906
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02295521/
+parameter_code: "00065"
+series_begin: 2023-06-01T15:15:00+00:00
+time_series_id: 0a614ab06dba450d9012c7a5b9f05fe2

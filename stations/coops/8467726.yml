@@ -1,0 +1,24 @@
+name: Southport, Southport Harbor
+lat: 41.1333
+lon: -73.2833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.808
+  MHW: -8.706
+  DTL: -7.678
+  MTL: -7.664
+  MSL: -7.665
+  MLW: -6.622
+  MLLW: -6.548
+  NAVD88: -7.716
+  LAT: -6.015
+  HAT: -9.337
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8467726
+established: 2003-06-10T00:00:00Z
+removed: 2003-10-21T23:59:00Z

@@ -1,0 +1,16 @@
+name: JACKS CREEK AT BRANNAN ROAD, NEAR SNELLVILLE, GA
+lat: 33.82527777777778
+lon: -84.05888888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 249.781
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02207055/
+parameter_code: "00065"
+series_begin: 2021-03-12T20:30:00+00:00
+time_series_id: f1ff986137424afb9fde25dd01f9871d

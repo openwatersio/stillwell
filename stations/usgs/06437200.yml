@@ -1,0 +1,16 @@
+name: BEAR BUTTE CREEK NEAR GALENA, SD
+lat: 44.396389
+lon: -103.582222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1149.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06437200/
+parameter_code: "00065"
+series_begin: 2018-06-22T20:50:00+00:00
+time_series_id: 347941ce675d4abba434715223ee385c

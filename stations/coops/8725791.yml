@@ -1,0 +1,24 @@
+name: HARBOUR HEIGHTS, PEACE RIVER
+lat: 26.9883
+lon: -81.9933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.521
+  MHW: -1.443
+  DTL: -1.214
+  MTL: -1.242
+  MSL: -1.242
+  MLW: -1.041
+  MLLW: -0.906
+  NAVD88: -1.371
+  LAT: -0.642
+  HAT: -1.743
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725791
+established: 1977-11-10T00:00:00Z
+removed: 1978-06-12T23:59:00Z

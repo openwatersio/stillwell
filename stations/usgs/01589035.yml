@@ -1,0 +1,16 @@
+name: PATAPSCO RIVER NEAR ELKRIDGE, MD
+lat: 39.227333333333334
+lon: -76.723
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3.091
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01589035/
+parameter_code: "00065"
+series_begin: 2010-10-08T13:15:00+00:00
+time_series_id: 0f83b16923164cc191e78f2d8bff4da6

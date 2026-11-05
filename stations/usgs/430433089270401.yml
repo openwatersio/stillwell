@@ -1,0 +1,16 @@
+name: Rose Place Storm Sewer at Madison, WI
+lat: 43.075833333333335
+lon: -89.45111111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.443
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430433089270401/
+parameter_code: "00065"
+series_begin: 2025-04-08T15:13:28+00:00
+time_series_id: 91051ac18b2041029faf6ec5155cf897

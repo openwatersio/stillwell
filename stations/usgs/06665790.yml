@@ -1,0 +1,15 @@
+name: SYBILLE CREEK AB CANAL NO. 3, NEAR WHEATLAND, WY
+lat: 41.911065374469
+lon: -105.127259857901
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1536.192
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06665790/
+parameter_code: "00065"
+time_series_id: 3a20ec6e981f4de59a68d8e02d706957

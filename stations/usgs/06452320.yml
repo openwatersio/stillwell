@@ -1,0 +1,16 @@
+name: PLATTE CREEK NEAR PLATTE, SD
+lat: 43.327222
+lon: -98.970278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 414.717
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06452320/
+parameter_code: "00065"
+series_begin: 2020-03-01T06:00:00+00:00
+time_series_id: 5cbe44cd6a534e24beba8c518b80cb97

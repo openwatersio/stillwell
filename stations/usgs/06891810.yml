@@ -1,0 +1,15 @@
+name: STRANGER C NR POTTER, KS
+lat: 39.4477753289916
+lon: -95.1621909995297
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 278.563
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06891810/
+parameter_code: "00065"
+time_series_id: 244cd565e3744f16987a52c0e6ede676

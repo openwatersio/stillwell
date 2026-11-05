@@ -1,0 +1,17 @@
+name: Trout Run at Portage, PA
+lat: 40.3855555555556
+lon: -78.6758333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 512.064
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03040050/
+parameter_code: "00065"
+series_begin: 2013-10-01T05:00:00+00:00
+series_end: 2026-09-17T16:30:00+00:00
+time_series_id: 7d5d7151f4e54d55a45c569596449a1f

@@ -1,0 +1,17 @@
+name: RICH CREEK AB BRUSH CREEK AT RT 219 PETERSTOWN, WV
+lat: 37.39715277777778
+lon: -80.80122222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 483.657
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03175593/
+parameter_code: "00065"
+series_begin: 2022-09-30T19:06:00+00:00
+series_end: 2022-10-03T18:30:00+00:00
+time_series_id: 7f7ec30b40f94b60a53ed9d568ae154b

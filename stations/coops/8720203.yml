@@ -1,0 +1,22 @@
+name: BLOUNT ISLAND BRIDGE
+lat: 30.4133
+lon: -81.545
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.752
+  MHW: -1.693
+  DTL: -1.18
+  MTL: -1.164
+  MSL: -1.2
+  MLW: -0.635
+  MLLW: -0.607
+  NAVD88: -1.304
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720203
+established: 1977-08-15T00:00:00Z
+removed: 1978-01-23T23:59:00Z

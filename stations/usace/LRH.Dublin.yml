@@ -1,0 +1,14 @@
+name: Dublin
+lat: 40.1408
+lon: -83.1206
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 235.879
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Dublin.Stage.Inst.15Minutes.0.OBS
+series: Dublin.Stage.Inst.15Minutes.0.OBS

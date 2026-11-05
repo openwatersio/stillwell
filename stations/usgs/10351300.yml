@@ -1,0 +1,16 @@
+name: TRUCKEE CANAL NR WADSWORTH, NV
+lat: 39.6126902328391
+lon: -119.297114645687
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1280.16
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10351300/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5f77fb3631d24e1292d3f557d6cb4181

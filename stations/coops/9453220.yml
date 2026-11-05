@@ -1,0 +1,24 @@
+name: Yakutat, Yakutat Bay
+lat: 59.5485
+lon: -139.7334
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.434
+  MHW: -3.171
+  DTL: -1.914
+  MTL: -1.98
+  MSL: -1.979
+  MLW: -0.789
+  MLLW: -0.364
+  NAVD88: -0.543
+  LAT: 0.644
+  HAT: -4.357
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9453220
+established: 1940-04-24T00:00:00Z

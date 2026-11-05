@@ -1,0 +1,16 @@
+name: KENTUCKY RIVER AT LOCK 3 AT GEST, KY
+lat: 38.4167353159305
+lon: -84.8807828524693
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 135.724
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03290080/
+parameter_code: "00065"
+series_begin: 2009-10-01T04:00:00+00:00
+time_series_id: c9bb9df54dc2429d8cd18a9d5de07488

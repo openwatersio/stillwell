@@ -1,0 +1,24 @@
+name: Ingram Thorofare
+lat: 39.11
+lon: -74.7383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.68
+  MHW: -2.558
+  DTL: -1.976
+  MTL: -1.941
+  MSL: -1.952
+  MLW: -1.325
+  MLLW: -1.273
+  NAVD88: -2.046
+  LAT: -0.924
+  HAT: -3.003
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535419
+established: 1977-11-23T00:00:00Z
+removed: 2015-09-27T23:59:00Z

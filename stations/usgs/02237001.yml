@@ -1,0 +1,14 @@
+name: PALATLAKAHA RIVER BELOW SPWY, NEAR MASCOTTE, FL
+lat: 28.6161078664397
+lon: -81.8659118413617
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02237001/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 009533b5bc7c441cbecf7f09626c23cf

@@ -1,0 +1,16 @@
+name: Trinity Rv at Liberty, TX
+lat: 30.0577153940297
+lon: -94.8182567118379
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.969
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4e925595b514444bb37d9015fe372f6a

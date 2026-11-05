@@ -1,0 +1,22 @@
+name: EDISTO RIVER, SOUTH OF PENNY CREEK
+lat: 32.715
+lon: -80.4367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.84
+  MHW: -2.766
+  DTL: -2.006
+  MTL: -2.009
+  MSL: -2.145
+  MLW: -1.251
+  MLLW: -1.171
+  NAVD88: -1.875
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666017
+established: 1978-08-18T00:00:00Z
+removed: 1979-03-08T23:59:00Z

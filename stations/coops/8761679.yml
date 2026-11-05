@@ -1,0 +1,21 @@
+name: ST. MARYS POINT, BARATARIA BAY
+lat: 29.4317
+lon: -89.9383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.026
+  MHW: -1.026
+  DTL: -0.874
+  MTL: -0.878
+  MSL: -0.879
+  MLW: -0.73
+  MLLW: -0.721
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761679
+established: 1985-07-18T00:00:00Z
+removed: 1987-01-06T23:59:00Z

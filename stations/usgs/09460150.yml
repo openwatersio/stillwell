@@ -1,0 +1,17 @@
+name: FRYE CREEK NEAR THATCHER, AZ
+lat: 32.743889
+lon: -109.8375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1700.784
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09460150/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2015-11-02T06:45:00+00:00
+time_series_id: 118e42b2b31c4add8e4c388043f207f7

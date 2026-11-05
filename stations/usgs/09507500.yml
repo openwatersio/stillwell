@@ -1,0 +1,15 @@
+name: FOSSIL CR DIV TO CHILDS POWERPLANT, NR CAMP VERDE
+lat: 34.3683626267466
+lon: -111.666256763434
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1132.698
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09507500/
+parameter_code: "00065"
+time_series_id: 78fb928f00984385b46909d23181bfa3

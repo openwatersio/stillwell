@@ -1,0 +1,14 @@
+name: TIGER CREEK NEAR LAKEMONT, GA
+lat: 34.7861388888889
+lon: -83.4155833333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02180400/
+parameter_code: "00065"
+series_begin: 2020-07-29T14:30:00+00:00
+time_series_id: 213ff2d71d9a42a89deca320b7a0b2b6

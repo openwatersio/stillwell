@@ -1,0 +1,22 @@
+name: BUCK HALL, AWENDAW CREEK
+lat: 33.04
+lon: -79.56
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.227
+  MHW: -2.113
+  DTL: -1.4
+  MTL: -1.372
+  MSL: -1.378
+  MLW: -0.63
+  MLLW: -0.573
+  NAVD88: -1.49
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8663858
+established: 1975-09-24T00:00:00Z
+removed: 2022-07-22T00:00:00Z

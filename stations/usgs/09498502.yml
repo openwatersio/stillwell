@@ -1,0 +1,16 @@
+name: PINTO CREEK NEAR MIAMI, AZ
+lat: 33.4878297025859
+lon: -110.995394172066
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 859.536
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09498502/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1bb057d3481b4fb38019284f95a1a2bd

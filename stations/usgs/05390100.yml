@@ -1,0 +1,16 @@
+name: LAC VIEUX DESERT NEAR LAND O'LAKES, WI
+lat: 46.1216185086654
+lon: -89.1520803734922
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 487.668
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05390100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 78220a48cbb14701acc2e1400fa883ff

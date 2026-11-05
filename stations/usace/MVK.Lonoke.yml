@@ -1,0 +1,13 @@
+name: Big Bayou Meto @ Lonoke, AR
+lat: 34.73666667
+lon: -91.9158333
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 60.695
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Lonoke.Stage.Inst.15Minutes.0.DCP-rev
+series: Lonoke.Stage.Inst.15Minutes.0.DCP-rev

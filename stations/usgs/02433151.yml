@@ -1,0 +1,14 @@
+name: TENN-TOM WATERWAY BL WILKINS L&D NR SMITHVILLE, MS
+lat: 34.063
+lon: -88.428
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02433151/
+parameter_code: "00065"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: ec00512f329e49aa852b13c7265348e4

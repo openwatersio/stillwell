@@ -1,0 +1,17 @@
+name: Rosebud Creek at Hwy 447 bridge nr Rosebud, MT
+lat: 46.1980305555556
+lon: -106.492569444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 780.898
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06295900/
+parameter_code: "00065"
+series_begin: 2015-10-01T22:45:00+00:00
+series_end: 2016-11-01T06:45:00+00:00
+time_series_id: ad750d6c1b054ac2950b769cd69b2b50

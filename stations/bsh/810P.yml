@@ -1,0 +1,12 @@
+name: Westringaburg, Leda
+lat: 53.20333
+lon: 7.57139
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -5
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/westringaburg

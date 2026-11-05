@@ -1,0 +1,16 @@
+name: BLACKWATER RIVER NEAR WEBSTER, NH
+lat: 43.2970225223808
+lon: -71.6945211633504
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 131.421
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01087000/
+parameter_code: "00065"
+series_begin: 2024-10-01T05:00:00+00:00
+time_series_id: 074e08302bfb48dba20f14350846a0e8

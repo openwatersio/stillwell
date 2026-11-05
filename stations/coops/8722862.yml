@@ -1,0 +1,22 @@
+name: HILLSBORO INLET OCEAN
+lat: 26.2567
+lon: -80.08
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.48
+  MHW: -1.44
+  DTL: -1.051
+  MTL: -1.056
+  MSL: -1.055
+  MLW: -0.673
+  MLLW: -0.621
+  NAVD88: -1.364
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722862
+established: 1970-04-10T00:00:00Z
+removed: 1973-06-15T23:59:00Z

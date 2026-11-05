@@ -1,0 +1,24 @@
+name: HORSESHOE POINT
+lat: 29.4367
+lon: -83.2933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.338
+  MHW: -1.248
+  DTL: -0.793
+  MTL: -0.838
+  MSL: -0.824
+  MLW: -0.427
+  MLLW: -0.247
+  NAVD88: -0.87
+  LAT: 0.169
+  HAT: -1.646
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727648
+established: 1978-06-26T00:00:00Z
+removed: 1979-01-15T23:59:00Z

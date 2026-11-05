@@ -1,0 +1,16 @@
+name: Lost Creek near Galen, MT
+lat: 46.2185722222222
+lon: -112.774166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1447.8
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12323850/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b74119b6272e45e3a32053b5f8939e5d

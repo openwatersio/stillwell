@@ -1,0 +1,21 @@
+name: HORESHOE KEYS
+lat: 24.7667
+lon: -81.2833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.811
+  MHW: -0.747
+  DTL: -0.58
+  MTL: -0.585
+  MSL: -0.565
+  MLW: -0.423
+  MLLW: -0.349
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724139
+established: 1974-05-24T00:00:00Z
+removed: 1974-07-15T23:59:00Z

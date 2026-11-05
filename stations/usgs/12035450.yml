@@ -1,0 +1,16 @@
+name: BIG CREEK NEAR GRISDALE, WA
+lat: 47.3742556726463
+lon: -123.636836493705
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.606
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12035450/
+parameter_code: "00065"
+series_begin: 2015-10-01T07:00:00+00:00
+time_series_id: 47b343e0029f44ee9cc5d3e881127826

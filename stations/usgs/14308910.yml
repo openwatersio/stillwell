@@ -1,0 +1,16 @@
+name: S UMPQUA RIVER AT CANYONVILLE, OR
+lat: 42.943694
+lon: -123.285917
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 204.216
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14308910/
+parameter_code: "00065"
+series_begin: 2024-04-10T20:00:00+00:00
+time_series_id: ae4b2dcb56254632b231ead8cc9a958f

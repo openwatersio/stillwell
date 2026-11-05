@@ -1,0 +1,24 @@
+name: Oakland Inner Harbor
+lat: 37.795
+lon: -122.282
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.288
+  MHW: -3.1
+  DTL: -2.317
+  MTL: -2.391
+  MSL: -2.36
+  MLW: -1.683
+  MLLW: -1.346
+  NAVD88: -1.384
+  LAT: -0.648
+  HAT: -3.738
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414764
+established: 1976-11-30T00:00:00Z
+removed: 2011-05-05T00:00:00Z

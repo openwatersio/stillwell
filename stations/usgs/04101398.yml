@@ -1,0 +1,17 @@
+name: ST. JOSEPH RIVER NEAR BERTRAND, MI
+lat: 41.77456111111111
+lon: -86.26726944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.949
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04101398/
+parameter_code: "00065"
+series_begin: 2025-02-12T11:30:00+00:00
+series_end: 2025-03-27T15:15:00+00:00
+time_series_id: 8671f76e183c4e019927c88824c409fa

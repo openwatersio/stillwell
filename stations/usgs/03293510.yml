@@ -1,0 +1,16 @@
+name: BEARGRASS CREEK AT RIVER ROAD AT LOUISVILLE, KY
+lat: 38.2659039759012
+lon: -85.7207955051059
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 125.498
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03293510/
+parameter_code: "00065"
+series_begin: 2008-01-15T17:00:00+00:00
+time_series_id: d72739e67dae47dab532edd32386ff6b

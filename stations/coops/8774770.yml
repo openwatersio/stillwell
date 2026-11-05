@@ -1,0 +1,24 @@
+name: Rockport
+lat: 28.021667
+lon: -97.04667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.078
+  MHW: -2.077
+  DTL: -2.022
+  MTL: -2.022
+  MSL: -2.025
+  MLW: -1.968
+  MLLW: -1.967
+  NAVD88: -1.682
+  LAT: -1.775
+  HAT: -2.235
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8774770
+established: 1937-02-25T00:00:00Z

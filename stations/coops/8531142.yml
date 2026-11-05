@@ -1,0 +1,23 @@
+name: Port Reading
+lat: 40.555
+lon: -74.245
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.129
+  MHW: -3.023
+  DTL: -2.232
+  MTL: -2.217
+  MSL: -2.241
+  MLW: -1.41
+  MLLW: -1.335
+  LAT: -0.903
+  HAT: -3.547
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531142
+established: 2000-05-25T00:00:00Z
+removed: 2001-09-28T23:59:00Z

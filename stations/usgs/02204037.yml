@@ -1,0 +1,16 @@
+name: POLE BRIDGE CR AT EVANS MILL RD NEAR LITHONIA, GA
+lat: 33.6681944444444
+lon: -84.1511666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 219.858
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02204037/
+parameter_code: "00065"
+series_begin: 2012-05-08T04:00:00+00:00
+time_series_id: a9d2b03aa1a9400ba03d48671b41629b

@@ -1,0 +1,16 @@
+name: Big Spring Cr at R&B Trading Post nr Lewistown MT
+lat: 47.0878333333333
+lon: -109.4575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1171.346
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06111800/
+parameter_code: "00065"
+series_begin: 2014-10-01T07:00:00+00:00
+time_series_id: 1c0e00cd77db4e4687b2483484229a93

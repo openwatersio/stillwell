@@ -1,0 +1,16 @@
+name: APPOMATTOX RIVER AT FARMVILLE, VA
+lat: 37.3070965043743
+lon: -78.3886069770119
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 85.679
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02039500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ad3a69f3ce4b422fac8c49fcf4cedb2f

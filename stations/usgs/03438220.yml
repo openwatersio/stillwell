@@ -1,0 +1,15 @@
+name: CUMBERLAND RIVER NEAR GRAND RIVERS, KY
+lat: 37.0217217415893
+lon: -88.2230851990871
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 91.44
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03438220/
+parameter_code: "00065"
+time_series_id: 46096bad57bb43eebf970cb635dd0e0a

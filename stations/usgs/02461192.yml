@@ -1,0 +1,16 @@
+name: VALLEY CREEK AT AVE W NEAR ENSLEY, AL
+lat: 33.4926111111111
+lon: -86.8721722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.167
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02461192/
+parameter_code: "00065"
+series_begin: 2017-01-04T15:45:00+00:00
+time_series_id: 41f316f075e24e2e83d569d3c961de24

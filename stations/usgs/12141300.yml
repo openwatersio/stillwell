@@ -1,0 +1,16 @@
+name: MIDDLE FORK SNOQUALMIE RIVER NEAR TANNER, WA
+lat: 47.485911892511375
+lon: -121.64786398951844
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 239.149
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12141300/
+parameter_code: "00065"
+series_begin: 2007-10-02T07:00:00+00:00
+time_series_id: 6bd93df32c1b45339d6e224ef9bc2ea7

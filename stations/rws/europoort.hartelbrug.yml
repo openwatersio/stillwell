@@ -1,0 +1,11 @@
+name: Europoort, Hartelbrug
+lat: 51.86635
+lon: 4.307781
+country_code: NL
+datum: NAP
+products: [levels, extremes, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/europoort.hartelbrug/details

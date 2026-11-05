@@ -1,0 +1,16 @@
+name: N YUBA R BL GOODYEARS BAR CA
+lat: 39.52487147147205
+lon: -120.93797491996324
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 748.772
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11413000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2c3626c7fedc45c2a89d8d6523a834fb

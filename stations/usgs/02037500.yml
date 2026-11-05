@@ -1,0 +1,16 @@
+name: JAMES RIVER NEAR RICHMOND, VA
+lat: 37.5632022122318
+lon: -77.5469314070127
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 29.883
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02037500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0935a143b6884f12a7f70d6830109606

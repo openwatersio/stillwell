@@ -1,0 +1,13 @@
+name: NEUHAUS OP
+lat: 52.266423
+lon: 14.290528
+country_code: DE
+datum: PNP
+datums:
+  NHN: 38.821
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=585850

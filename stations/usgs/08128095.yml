@@ -1,0 +1,17 @@
+name: Tepee Draw Trib nr Barnhart, TX
+lat: 31.2108
+lon: -101.17605555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 770.534
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08128095/
+parameter_code: "00065"
+series_begin: 2014-05-25T06:00:00+00:00
+series_end: 2025-12-02T17:36:00+00:00
+time_series_id: 7c4dc1583b4645af97a002c9ac9ad7e6

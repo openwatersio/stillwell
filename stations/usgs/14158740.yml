@@ -1,0 +1,14 @@
+name: MCKENZIE RIVER BL PAYNE CR, NR BELKNAP SPRINGS, OR
+lat: 44.2863888888889
+lon: -122.036805555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14158740/
+parameter_code: "00065"
+series_begin: 2016-07-22T01:15:00+00:00
+time_series_id: 23894c5d2fe447ff934af1e1c73dd49e

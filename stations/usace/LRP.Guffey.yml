@@ -1,0 +1,13 @@
+name: Guffey, PA
+lat: 41.7664
+lon: -78.7183
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 469.392
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Guffey.Stage.Inst.15Minutes.0.OBS
+series: Guffey.Stage.Inst.15Minutes.0.OBS

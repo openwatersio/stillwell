@@ -1,0 +1,13 @@
+name: DÖMITZ UP
+lat: 53.140171
+lon: 11.259947
+country_code: DE
+datum: PNP
+datums:
+  NHN: 10.724
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=596460

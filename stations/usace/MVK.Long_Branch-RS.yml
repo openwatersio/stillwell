@@ -1,0 +1,11 @@
+name: Long Branch Riverside
+lat: 31.39898
+lon: -91.925178
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Long%20Branch-RS.Stage.Inst.1Hour.0.DCP-rev
+series: Long Branch-RS.Stage.Inst.1Hour.0.DCP-rev

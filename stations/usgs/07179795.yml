@@ -1,0 +1,16 @@
+name: N COTTONWOOD R BL MARION LK, KS
+lat: 38.3658583333333
+lon: -97.0823055555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 395.399
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07179795/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c6e085b8cf324d6a8cf3dbaf3ae9f2f2

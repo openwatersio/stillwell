@@ -1,0 +1,13 @@
+name: LINGEN-DARME
+lat: 52.496589
+lon: 7.288342
+country_code: DE
+datum: PNP
+datums:
+  NHN: 14.983
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=3500015

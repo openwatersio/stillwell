@@ -1,0 +1,17 @@
+name: SCHOOL BRANCH AT NOBLE DRIVE AT BROWNSBURG, IN
+lat: 39.846944444444446
+lon: -86.34649999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 255.456
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03353430/
+parameter_code: "00065"
+series_begin: 2014-12-18T05:00:00+00:00
+series_end: 2019-10-01T04:55:00+00:00
+time_series_id: f27e42e52af34874ad2f87eb2f9be85e

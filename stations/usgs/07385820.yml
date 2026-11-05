@@ -1,0 +1,16 @@
+name: Bayou Teche W of Calumet Flood Gate at Calumet, LA
+lat: 29.7040973598583
+lon: -91.3728854358587
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07385820/
+parameter_code: "00065"
+series_begin: 2008-10-30T05:00:00+00:00
+time_series_id: a0939208062a4bbb8f5673eaae7554f6

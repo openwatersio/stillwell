@@ -1,0 +1,17 @@
+name: UNNAMED LAKE, W. SIDE, AT RAFT, SE OF PINEWOOD, MN
+lat: 47.574444444444445
+lon: -95.08555555555554
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 423.367
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-473428095050801/
+parameter_code: "00065"
+series_begin: 2011-06-16T05:00:00+00:00
+series_end: 2011-10-27T04:00:00+00:00
+time_series_id: 25bd055e5aa5417cac67015fced313e8

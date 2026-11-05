@@ -1,0 +1,14 @@
+name: Piketon
+lat: 39.0701
+lon: -83.0196
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 161.818
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Piketon.Stage.Inst.15Minutes.0.OBS
+series: Piketon.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,13 @@
+name: Big Sunflower @ Clarksdale, MS
+lat: 34.196900000802
+lon: -90.575300000635
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 40.142
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Clarksdale_BigS.Stage.Inst.1Hour.0.DCP-rev
+series: Clarksdale_BigS.Stage.Inst.1Hour.0.DCP-rev

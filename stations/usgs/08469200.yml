@@ -1,0 +1,15 @@
+name: Rio Grande bl Anzald Dam nr Misson, TX
+lat: 26.1336867777011
+lon: -98.3350148675887
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 15.24
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08469200/
+parameter_code: "00065"
+time_series_id: 3aef03f49e5c4196b692f878884d3d8f

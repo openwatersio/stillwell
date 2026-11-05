@@ -1,0 +1,11 @@
+name: Oude Zeug, IJsselmeer , midden, noord, meetpaal 48
+lat: 52.87351
+lon: 5.118499
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/oudezeug.ijsselmeer.midden.noord.meetpaal48/details

@@ -1,0 +1,16 @@
+name: NORTH BRANCH HOOSIC RIVER AT NORTH ADAMS, MA
+lat: 42.70220110673973
+lon: -73.09313663717006
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 249.957
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01332000/
+parameter_code: "00065"
+series_begin: 2025-07-01T05:00:00+00:00
+time_series_id: 40d03b6ac25d4d03a8cfe705f4ebff32

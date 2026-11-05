@@ -1,0 +1,15 @@
+name: DRY RUN AT 190TH STREET NEAR JEWETT, WI
+lat: 45.1151388888889
+lon: -92.41625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 303.886
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-053416966/
+parameter_code: "00065"
+time_series_id: fd9d357577464b369ff5a379d03014c7

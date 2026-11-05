@@ -1,0 +1,16 @@
+name: NF STILLAGUAMISH RIVER NEAR ARLINGTON, WA
+lat: 48.26146374764601
+lon: -122.04761650647272
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.365
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12167000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7594157c1ab04fc9bc7888b22841aee2

@@ -1,0 +1,24 @@
+name: CHATHAM, STAGE HARBOR
+lat: 41.6667
+lon: -69.9667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.344
+  MHW: -2.232
+  DTL: -1.647
+  MTL: -1.63
+  MSL: -1.661
+  MLW: -1.028
+  MLLW: -0.949
+  NAVD88: -1.767
+  LAT: -0.694
+  HAT: -2.651
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447505
+established: 1992-05-28T00:00:00Z
+removed: 1992-10-05T23:59:00Z

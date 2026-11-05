@@ -1,0 +1,14 @@
+name: SUGARLOAF SHORES NORTH
+lat: 24.64
+lon: -81.57
+country_code: US
+datum: STND
+datums:
+  MSL: -0.672
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724377
+established: 1974-04-29T00:00:00Z
+removed: 1974-06-18T23:59:00Z

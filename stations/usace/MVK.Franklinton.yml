@@ -1,0 +1,13 @@
+name: Bogue Chitto River @ Franklinton, LA
+lat: 30.84296176
+lon: -90.16203
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 37.67
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Franklinton.Stage.Inst.30Minutes.0.DCP-rev
+series: Franklinton.Stage.Inst.30Minutes.0.DCP-rev

@@ -1,0 +1,24 @@
+name: USCG Station Hatteras
+lat: 35.2086
+lon: -75.7042
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.571
+  MHW: -8.539
+  DTL: -8.472
+  MTL: -8.468
+  MSL: -8.47
+  MLW: -8.396
+  MLLW: -8.373
+  NAVD88: -8.492
+  LAT: -8.317
+  HAT: -8.626
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8654467
+established: 2010-04-22T00:00:00Z

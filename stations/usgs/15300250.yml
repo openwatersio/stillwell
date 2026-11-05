@@ -1,0 +1,17 @@
+name: UPPER TALARIK C NR ILIAMNA AK
+lat: 59.7859761392962
+lon: -155.255240638607
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 129.54
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15300250/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:14:00+00:00
+series_end: 2016-10-12T00:15:00+00:00
+time_series_id: acb213fc8346466ba928befa04a65c29

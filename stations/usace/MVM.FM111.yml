@@ -1,0 +1,14 @@
+name: Forked Deer River @ Oakfield
+lat: 35.741111
+lon: -88.793611
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 102.379
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=FM111.Stage.Inst.15Minutes.0.opendcs-rev
+series: FM111.Stage.Inst.15Minutes.0.opendcs-rev

@@ -1,0 +1,16 @@
+name: Brazos Rv nr South Bend, TX
+lat: 33.0242837651163
+lon: -98.6439481069441
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 305.708
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08088000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e8e9ea264f4d48a8847e8e9594cf82b4

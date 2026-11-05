@@ -1,0 +1,22 @@
+name: ST ANDREW SOUND
+lat: 30.025
+lon: -85.5417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.924
+  MHW: -0.888
+  DTL: -0.714
+  MTL: -0.718
+  MSL: -0.71
+  MLW: -0.548
+  MLLW: -0.504
+  NAVD88: -0.683
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729052
+established: 1976-05-20T00:00:00Z
+removed: 1976-10-04T23:59:00Z

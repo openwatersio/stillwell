@@ -1,0 +1,16 @@
+name: FLAT RIVER AT DAM NEAR BAHAMA, NC
+lat: 36.1486111111111
+lon: -78.8288888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 77.937
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02086500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b8ff43d712f34b9cae186d016c53d977

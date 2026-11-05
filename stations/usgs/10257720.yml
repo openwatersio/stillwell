@@ -1,0 +1,16 @@
+name: CHINO CYN C BL TRAMWAY NR PALM SPRINGS CA
+lat: 33.84385
+lon: -116.60580833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 637.718
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10257720/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a4436369c0424ea6ab0a4651df85299f

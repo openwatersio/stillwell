@@ -1,0 +1,17 @@
+name: GROS VENTRE RIVER AT ZENITH, WY
+lat: 43.5572222222222
+lon: -110.762777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1925.117
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13015000/
+parameter_code: "00065"
+series_begin: 2008-04-01T06:00:00+00:00
+series_end: 2026-10-20T20:15:00+00:00
+time_series_id: 7f945c7e2fa949559aba94d75aa76882

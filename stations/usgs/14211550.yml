@@ -1,0 +1,16 @@
+name: JOHNSON CREEK AT MILWAUKIE, OR
+lat: 45.4528970265752
+lon: -122.643149636135
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14211550/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: cdfd529080ef449590bd49b8eb08817c

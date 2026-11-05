@@ -1,0 +1,16 @@
+name: Bogue Falaya at Covington, LA
+lat: 30.4996363509197
+lon: -90.0845216239589
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07375170/
+parameter_code: "00065"
+series_begin: 2016-03-03T06:00:00+00:00
+time_series_id: 261f16efa21d4d1bbbeeb6d2b4f52b52

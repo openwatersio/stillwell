@@ -1,0 +1,23 @@
+name: HENDRY CREEK, ESTERO BAY
+lat: 26.47
+lon: -81.8767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.434
+  MHW: -1.343
+  DTL: -1.12
+  MTL: -1.114
+  MSL: -1.116
+  MLW: -0.885
+  MLLW: -0.806
+  LAT: -0.57
+  HAT: -1.645
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725377
+established: 1970-06-17T00:00:00Z
+removed: 1973-07-10T23:59:00Z

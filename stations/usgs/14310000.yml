@@ -1,0 +1,16 @@
+name: COW CREEK NEAR RIDDLE, OR
+lat: 42.9234502146334
+lon: -123.428957073995
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 208.056
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14310000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: d55b771227304a269dd751a86e11bf8d

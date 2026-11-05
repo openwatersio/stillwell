@@ -1,0 +1,16 @@
+name: PINHOOK C AT MASTIN LAKE RD AT HUNTSVILLE, ALA
+lat: 34.77150864205428
+lon: -86.5922055646276
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.965
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0357587400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 865dfbaf1136451ea1aab3a680869d46

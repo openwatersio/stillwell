@@ -1,0 +1,16 @@
+name: UMATILLA RIVER NEAR UMATILLA, OR
+lat: 45.90269444444444
+lon: -119.32708333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 101.721
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14033500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: b7b76ae2d76040b8a3924249cc0417ae

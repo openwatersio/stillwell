@@ -1,0 +1,16 @@
+name: BIG SWAMP CREEK SW OF HAYNEVILLE, AL
+lat: 32.167183333333334
+lon: -86.59169999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.121
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02421480/
+parameter_code: "00065"
+series_begin: 2022-03-09T14:00:00+00:00
+time_series_id: 68da9c8ca37d44f4bea71d96209410a4

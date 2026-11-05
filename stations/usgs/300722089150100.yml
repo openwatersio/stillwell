@@ -1,0 +1,17 @@
+name: Mississippi Sound near Grand Pass
+lat: 30.1227777777778
+lon: -89.2502777777778
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: -0.296
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-300722089150100/
+parameter_code: "00065"
+series_begin: 2008-08-28T05:00:00+00:00
+series_end: 2025-01-27T16:45:00+00:00
+time_series_id: f2d96dff48c246f1ae83e704b32bf18b

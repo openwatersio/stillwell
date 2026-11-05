@@ -1,0 +1,15 @@
+name: TAMPA BAY AT SKYWAY BRIDGE NR TERRA CEIA, FL
+lat: 27.586258333333333
+lon: -82.62039999999999
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-273511082371300/
+parameter_code: "62620"
+series_begin: 2022-09-24T22:00:00+00:00
+series_end: 2024-10-16T12:00:00+00:00
+time_series_id: c94ae8a18bd04ba0b9b8d3ebd68db1d1

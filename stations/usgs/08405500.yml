@@ -1,0 +1,16 @@
+name: BLACK RIVER ABOVE MALAGA, NM
+lat: 32.2290888888889
+lon: -104.151852777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 936.093
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08405500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3e324f9d9d1346ba875d47cf312d15c0

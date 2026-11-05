@@ -1,0 +1,16 @@
+name: Weeping Water Creek at Union, Nebr.
+lat: 40.794167
+lon: -95.911389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 282.464
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06806500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c8c3a44be5484dbb9e9617f7d953a18f

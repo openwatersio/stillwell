@@ -1,0 +1,13 @@
+name: Alliance, OH
+lat: 40.9328
+lon: -81.0947
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 315.404
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Alliance.Stage.Inst.15Minutes.0.OBS
+series: Alliance.Stage.Inst.15Minutes.0.OBS

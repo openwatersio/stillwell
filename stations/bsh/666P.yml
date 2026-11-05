@@ -1,0 +1,12 @@
+name: Blauort, Norderpiep
+lat: 54.16861
+lon: 8.675
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.85
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/blauort_norderpiep

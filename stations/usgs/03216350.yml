@@ -1,0 +1,16 @@
+name: LITTLE SANDY RIVER BELOW GRAYSON DAM NEAR LEON, KY
+lat: 38.2539706848749
+lon: -82.9910027458121
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 152.223
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03216350/
+parameter_code: "00065"
+series_begin: 2014-09-11T16:30:00+00:00
+time_series_id: 1fc53881fa4c4063800a842c436638a7

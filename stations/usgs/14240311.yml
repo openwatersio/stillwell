@@ -1,0 +1,16 @@
+name: SPIRIT LAKE TUNNEL OUTLET NR SPIRIT LAKE, WA
+lat: 46.2822222222222
+lon: -122.195277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1018.337
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14240311/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 51ef6aa731d84f8dab6f0ebef8e822f5

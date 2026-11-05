@@ -1,0 +1,13 @@
+name: Pearl River @ Philadelphia, MS
+lat: 32.841389
+lon: -89.097778
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 114.605
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Philadelphia.Stage.Inst.15Minutes.0.DCP-rev
+series: Philadelphia.Stage.Inst.15Minutes.0.DCP-rev

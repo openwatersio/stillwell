@@ -1,0 +1,22 @@
+name: LITTLE DUCK KEY
+lat: 24.6817
+lon: -81.2283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.912
+  MHW: -0.841
+  DTL: -0.723
+  MTL: -0.711
+  MSL: -0.71
+  MLW: -0.581
+  MLLW: -0.534
+  NAVD88: -0.989
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724093
+established: 1974-05-22T00:00:00Z
+removed: 1974-07-09T23:59:00Z

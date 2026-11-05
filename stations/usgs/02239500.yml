@@ -1,0 +1,16 @@
+name: SILVER SPRINGS NEAR OCALA, FL
+lat: 29.212485316358382
+lon: -82.05402068821678
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 11.765
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02239500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a710274a93bd428bbe7d4b609a7d1c04

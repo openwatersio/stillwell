@@ -1,0 +1,16 @@
+name: Concho Rv at San Angelo, TX
+lat: 31.454606021368
+lon: -100.410647402206
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 541.66
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08136000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4f760121cd3248448a979e68fb63337a

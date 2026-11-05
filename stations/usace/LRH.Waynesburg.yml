@@ -1,0 +1,14 @@
+name: Waynesburg
+lat: 40.672593834441
+lon: -81.259957400894
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 290.621
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Waynesburg.Stage.Inst.15Minutes.0.OBS
+series: Waynesburg.Stage.Inst.15Minutes.0.OBS

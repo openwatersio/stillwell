@@ -1,0 +1,23 @@
+name: SHELL POINT, WALKER CREEK
+lat: 30.058332
+lon: -84.29056
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.461
+  MHW: -0.392
+  DTL: 0.076
+  MTL: 0.007
+  MSL: 0.012
+  MLW: 0.407
+  MLLW: 0.614
+  NAVD88: -0.001
+  LAT: 1.132
+  HAT: -0.791
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728229
+established: 1973-04-27T00:00:00Z

@@ -1,0 +1,16 @@
+name: MURRAY DITCH ABOVE HEADGATE AT WY-SD STATE LINE
+lat: 44.576389
+lon: -104.055556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1052.743
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06429997/
+parameter_code: "00065"
+series_begin: 2018-05-29T23:15:00+00:00
+time_series_id: 025440b2d1b64e6387d8e8b294037138

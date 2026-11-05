@@ -1,0 +1,16 @@
+name: Grammond Creek near Wilbur Park, MO
+lat: 38.5645277777778
+lon: -90.3093611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 128.501
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07010094/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+time_series_id: 8ea7c3a955e14d1c81af5e81d8d07bc0

@@ -1,0 +1,12 @@
+name: Friedrichskoog, Hafen, Außenpegel
+lat: 53.99944
+lon: 8.87611
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -2.95
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/friedrichskoog_hafen_aussenpegel

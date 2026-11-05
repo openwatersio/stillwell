@@ -1,0 +1,13 @@
+name: Zehnerloch
+lat: 53.95556
+lon: 8.65833
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.98
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9510010]
+source_url: https://gezeiten.bsh.de/zehnerloch

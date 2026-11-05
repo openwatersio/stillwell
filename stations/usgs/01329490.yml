@@ -1,0 +1,16 @@
+name: BATTEN KILL BELOW MILL AT BATTENVILLE NY
+lat: 43.1086666666667
+lon: -73.4224166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.575
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01329490/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4a7d5948b48e40da9f42108ab5107152

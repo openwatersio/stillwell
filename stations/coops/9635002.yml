@@ -1,0 +1,13 @@
+name: Puerto Santo Tomas de Castilla
+lat: 15.695
+lon: -88.62
+country_code: GT
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9635002
+established: 2001-08-04T00:00:00Z
+removed: 2002-09-12T23:59:00Z

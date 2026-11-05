@@ -1,0 +1,13 @@
+name: Antoine River @ Antione
+lat: 34.03889
+lon: -93.41806
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 69.9
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Antoine.Stage.Inst.15Minutes.0.DCP-rev
+series: Antoine.Stage.Inst.15Minutes.0.DCP-rev

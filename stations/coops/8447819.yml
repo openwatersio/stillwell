@@ -1,0 +1,13 @@
+name: Monomoy Island - East
+lat: 41.56
+lon: -69.99
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447819
+established: 1978-03-08T00:00:00Z
+removed: 2001-10-01T23:59:00Z

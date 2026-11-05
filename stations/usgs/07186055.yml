@@ -1,0 +1,17 @@
+name: COW C NR SCAMMON, KS
+lat: 37.2805555555556
+lon: -94.675
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 256.032
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07186055/
+parameter_code: "00065"
+series_begin: 2014-02-19T18:15:00+00:00
+series_end: 2019-01-29T15:00:00+00:00
+time_series_id: 4ce779f081764ee796a060c94d80e798

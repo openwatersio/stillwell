@@ -1,0 +1,13 @@
+name: Smackover Creek @ Smackover, AR
+lat: 33.375527778678
+lon: -92.777194445471
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 29.736
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Smackover.Stage.Inst.15Minutes.0.DCP-rev
+series: Smackover.Stage.Inst.15Minutes.0.DCP-rev

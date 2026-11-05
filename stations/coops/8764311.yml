@@ -1,0 +1,13 @@
+name: Eugene Island
+lat: 29.3717
+lon: -91.385
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8764311
+established: 1934-04-01T00:00:00Z
+removed: 2005-08-16T23:59:00Z

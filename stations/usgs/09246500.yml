@@ -1,0 +1,16 @@
+name: ELKHEAD CREEK NEAR CRAIG, CO
+lat: 40.53106726165047
+lon: -107.43620792443643
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1899.066
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09246500/
+parameter_code: "00065"
+series_begin: 2020-07-16T20:00:00+00:00
+time_series_id: 69f4266183734286836ad2245c32ab6b

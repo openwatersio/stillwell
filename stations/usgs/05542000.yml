@@ -1,0 +1,16 @@
+name: MAZON RIVER NEAR COAL CITY, IL
+lat: 41.2861944444444
+lon: -88.3598611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 160.694
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05542000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e7795b22d4f24c5094afb1bf7fb479cd

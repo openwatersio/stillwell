@@ -1,0 +1,16 @@
+name: PECOS RIVER AT PIERCE CANYON CROSSING, NM
+lat: 32.1885305555556
+lon: -103.979386111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 881.003
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08407000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1b2cd7b69fff4217b3ac3722f67f28cb

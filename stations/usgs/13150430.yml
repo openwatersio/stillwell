@@ -1,0 +1,16 @@
+name: SILVER CREEK AT SPORTSMAN ACCESS NR PICABO ID
+lat: 43.3233611111111
+lon: -114.10835
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1473.54
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13150430/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 7f001b27eb654260ba36d0a5baa47d6d

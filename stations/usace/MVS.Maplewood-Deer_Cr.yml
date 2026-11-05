@@ -1,0 +1,13 @@
+name: Deer Cr at Maplewood
+lat: 38.601
+lon: -90.326
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 126.721
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Maplewood-Deer%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Maplewood-Deer Cr.Stage.Inst.5Minutes.0.Usgs-raw

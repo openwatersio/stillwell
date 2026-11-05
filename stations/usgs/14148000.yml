@@ -1,0 +1,16 @@
+name: MF WILLAMETTE RIVER BLW N FORK, NR OAKRIDGE, OR.
+lat: 43.8012351684092
+lon: -122.56088788998
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 284.915
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14148000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5b6f60d930d14d7e9fb10c33fc1b3789

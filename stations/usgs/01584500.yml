@@ -1,0 +1,17 @@
+name: LITTLE GUNPOWDER FALLS AT LAUREL BROOK, MD
+lat: 39.505361111111114
+lon: -76.43177777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 79.522
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01584500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2026-10-24T02:30:00+00:00
+time_series_id: 75c6c92e0bb3467a8549357fc6d65753

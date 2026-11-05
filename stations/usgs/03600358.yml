@@ -1,0 +1,17 @@
+name: DUCK RIVER AT CRAIG BRIDGE RD AB WILLIAMSPORT, TN
+lat: 35.68704444444444
+lon: -87.178875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 156.743
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03600358/
+parameter_code: "00065"
+series_begin: 2015-08-18T19:00:00+00:00
+series_end: 2023-10-01T05:45:00+00:00
+time_series_id: fe1f6303e69544c4aa66f32697d79050

@@ -1,0 +1,16 @@
+name: EAST FORK WALLOWA RIVER NEAR JOSEPH, OR
+lat: 45.2711027777778
+lon: -117.211325
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1383.792
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13325000/
+parameter_code: "00065"
+series_begin: 2017-08-30T18:00:00+00:00
+time_series_id: 6dc4ea1aa64d4bea82a560ab9c34abb7

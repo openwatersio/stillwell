@@ -1,0 +1,16 @@
+name: Blanco Rv at Fischer Store Rd nr Fischer, TX
+lat: 30.0005833333333
+lon: -98.2003611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 279.502
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08170950/
+parameter_code: "00065"
+series_begin: 2016-04-07T14:15:00+00:00
+time_series_id: 3ed262ed8f184b0783c4b248cf3947d2

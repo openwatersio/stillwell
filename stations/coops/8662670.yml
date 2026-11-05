@@ -1,0 +1,21 @@
+name: PLEASANT HILL LANDING, SANTEE RIVER
+lat: 33.245
+lon: -79.5217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.98
+  MHW: -4.92
+  DTL: -4.578
+  MTL: -4.569
+  MSL: -4.565
+  MLW: -4.218
+  MLLW: -4.175
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662670
+established: 1976-07-06T00:00:00Z
+removed: 1977-08-11T23:59:00Z

@@ -1,0 +1,13 @@
+name: Rees
+lat: 39.8563
+lon: -82.9569
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 212.811
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Rees.Stage.Inst.15Minutes.0.OBS
+series: Rees.Stage.Inst.15Minutes.0.OBS

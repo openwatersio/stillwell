@@ -1,0 +1,16 @@
+name: SWEETWATER CR 0.05 MI US RR BRIDGE AT AUSTELL, GA
+lat: 33.8177777777778
+lon: -84.65
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 265.615
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02336910/
+parameter_code: "00065"
+series_begin: 2010-04-08T05:00:00+00:00
+time_series_id: 3164f968354b4a03bfbafe2865ef3663

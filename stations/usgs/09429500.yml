@@ -1,0 +1,16 @@
+name: COLORADO RIVER BELOW IMPERIAL DAM, AZ-CA
+lat: 32.8675833333333
+lon: -114.472111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.612
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09429500/
+parameter_code: "00065"
+series_begin: 2015-10-01T07:00:00+00:00
+time_series_id: 371b5e81ff124dd7be3f59b466f5fd3f

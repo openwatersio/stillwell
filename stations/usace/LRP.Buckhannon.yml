@@ -1,0 +1,13 @@
+name: Buckhannon, WV
+lat: 39.0053
+lon: -80.2094
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 429.582
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Buckhannon.Stage.Inst.15Minutes.0.OBS
+series: Buckhannon.Stage.Inst.15Minutes.0.OBS

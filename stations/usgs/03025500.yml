@@ -1,0 +1,16 @@
+name: Allegheny River at Franklin, PA
+lat: 41.3895027143126
+lon: -79.8203321592592
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 291.175
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03025500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 742b6e35cdf74520bda37e54a4580dbc

@@ -1,0 +1,13 @@
+name: FINDENWIRUNSHIER OP
+lat: 53.177667
+lon: 11.29493
+country_code: DE
+datum: PNP
+datums:
+  NHN: 17.737
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=596410

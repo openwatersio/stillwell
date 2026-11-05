@@ -1,0 +1,13 @@
+name: POINT AU FER
+lat: 29.3333
+lon: -91.3533
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8764256
+established: 1960-06-01T00:00:00Z
+removed: 1978-11-17T23:59:00Z

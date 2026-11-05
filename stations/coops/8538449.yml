@@ -1,0 +1,21 @@
+name: BRIDGEPORT, RACOON CREEK
+lat: 39.8067
+lon: -75.355
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.398
+  MHW: -2.297
+  DTL: -1.491
+  MTL: -1.471
+  MSL: -1.547
+  MLW: -0.644
+  MLLW: -0.583
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538449
+established: 1977-04-26T00:00:00Z
+removed: 1978-11-17T23:59:00Z

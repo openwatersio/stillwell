@@ -1,0 +1,23 @@
+name: BOCA RATON
+lat: 26.3433
+lon: -80.0767
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.441
+  MHW: -1.402
+  DTL: -1.065
+  MTL: -1.068
+  MSL: -1.074
+  MLW: -0.735
+  MLLW: -0.689
+  LAT: -0.566
+  HAT: -1.576
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722816
+established: 1970-04-15T00:00:00Z
+removed: 1973-11-02T23:59:00Z

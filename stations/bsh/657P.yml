@@ -1,0 +1,12 @@
+name: St. Peter-Ording, Bad
+lat: 54.30889
+lon: 8.57806
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.83
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/st-peter-ording_bad

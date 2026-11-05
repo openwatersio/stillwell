@@ -1,0 +1,13 @@
+name: POTOMAC RIVER AT POINT LOOKOUT, MD
+lat: 38.0517929236876
+lon: -76.3277243455183
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01661590/
+parameter_code: "62620"
+time_series_id: 22553daac13c4fd2b4e8bbcf2e2618ee

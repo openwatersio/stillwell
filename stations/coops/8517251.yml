@@ -1,0 +1,23 @@
+name: Worlds Fair Marina
+lat: 40.761
+lon: -73.850365
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.754
+  MHW: -7.644
+  DTL: -6.628
+  MTL: -6.616
+  MSL: -6.622
+  MLW: -5.588
+  MLLW: -5.503
+  LAT: -4.983
+  HAT: -8.331
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8517251
+established: 2014-04-13T00:00:00Z
+removed: 2014-08-12T00:00:00Z

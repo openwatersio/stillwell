@@ -1,0 +1,16 @@
+name: COOPER RIVER AT S. ADGERS WHARF AT CHARLESTON, SC
+lat: 32.775031
+lon: -79.92375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -5.59
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720712/
+parameter_code: "00065"
+series_begin: 2025-04-16T19:15:00+00:00
+time_series_id: 8ac0c67fc1ff475c948a31e28bc25fae

@@ -1,0 +1,15 @@
+name: Riley Channel, AK
+lat: 66.781364
+lon: -161.78758
+country_code: US
+datum: STND
+datums:
+  MSL: -8.945
+  NAVD88: -7.677
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490286
+established: 2024-06-19T00:00:00Z
+removed: 2024-10-02T00:00:00Z

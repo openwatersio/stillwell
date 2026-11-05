@@ -1,0 +1,22 @@
+name: Chowan River, E of Harrellsville
+lat: 36.270443
+lon: -76.672806
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.203
+  MHW: -7.177
+  DTL: -7.1
+  MTL: -7.104
+  MSL: -7.096
+  MLW: -7.03
+  MLLW: -6.996
+  NAVD88: -7.173
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8651097
+established: 2021-10-24T00:00:00Z
+removed: 2022-04-24T00:00:00Z

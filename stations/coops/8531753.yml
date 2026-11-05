@@ -1,0 +1,21 @@
+name: OCEANIC, NAVESINK RIVER
+lat: 40.3767
+lon: -74.015
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.913
+  MHW: -1.822
+  DTL: -1.33
+  MTL: -1.303
+  MSL: -1.277
+  MLW: -0.783
+  MLLW: -0.747
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531753
+established: 1976-02-13T00:00:00Z
+removed: 1977-05-05T23:59:00Z

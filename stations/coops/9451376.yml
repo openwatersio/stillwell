@@ -1,0 +1,21 @@
+name: Dorothy Cove
+lat: 56.7217
+lon: -135.075
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.989
+  MHW: -2.759
+  DTL: -1.524
+  MTL: -1.619
+  MSL: -1.613
+  MLW: -0.479
+  MLLW: -0.06
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451376
+established: 1924-10-02T00:00:00Z
+removed: 2007-07-22T23:59:00Z

@@ -1,0 +1,17 @@
+name: SMOKY HILL R NR ELLIS, KS
+lat: 38.76862600963177
+lon: -99.56003905677562
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 607.384
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06862500/
+parameter_code: "00065"
+series_begin: 2013-03-04T15:00:00+00:00
+series_end: 2025-06-25T16:15:00+00:00
+time_series_id: 1456f358e13f45cf95202cf117bfd132

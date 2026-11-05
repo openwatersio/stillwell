@@ -1,0 +1,15 @@
+name: OTTER CREEK AT WILLOW ROAD NEAR PLYMOUTH, WI
+lat: 43.7888888888889
+lon: -87.9213888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 230.124
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-040857005/
+parameter_code: "00065"
+time_series_id: 1424aa9355b5408cbd7830221f09d167

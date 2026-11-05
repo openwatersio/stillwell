@@ -1,0 +1,23 @@
+name: ANTIOCH, SAN JOAQUIN RIVER
+lat: 38.02
+lon: -121.815
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.188
+  MHW: -2.045
+  DTL: -1.597
+  MTL: -1.615
+  MSL: -1.626
+  MLW: -1.185
+  MLLW: -1.007
+  LAT: -0.718
+  HAT: -2.483
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415064
+established: 1977-03-25T00:00:00Z
+removed: 1997-03-03T23:59:00Z

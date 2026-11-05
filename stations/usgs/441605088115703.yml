@@ -1,0 +1,16 @@
+name: TRT WETLAND TWO OUTLET NR KAUKAUNA, WI
+lat: 44.2680555555556
+lon: -88.1991666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 213.18
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-441605088115703/
+parameter_code: "00065"
+series_begin: 2018-10-01T06:05:00+00:00
+time_series_id: 83c990939461498b8df2c0d11f5f6235

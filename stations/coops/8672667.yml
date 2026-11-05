@@ -1,0 +1,23 @@
+name: Range A Light, Bear River
+lat: 31.7933
+lon: -81.1817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.446
+  MHW: -2.333
+  DTL: -1.236
+  MTL: -1.211
+  MSL: -1.286
+  MLW: -0.089
+  MLLW: -0.025
+  LAT: 0.501
+  HAT: -3.124
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8672667
+established: 1977-02-25T00:00:00Z
+removed: 2012-05-24T23:59:00Z

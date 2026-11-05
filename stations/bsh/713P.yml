@@ -1,0 +1,13 @@
+name: Horneburg, Lühe
+lat: 53.51222
+lon: 9.59083
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -5.03
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5960020]
+source_url: https://gezeiten.bsh.de/horneburg

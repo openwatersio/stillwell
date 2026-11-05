@@ -1,0 +1,15 @@
+name: Bayou Saint John Midlake at New Orleans, LA
+lat: 30.0072222222222
+lon: -90.0855555555555
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-300026090050800/
+parameter_code: "00065"
+series_begin: 2011-07-01T05:00:00+00:00
+series_end: 2015-06-25T04:45:00+00:00
+time_series_id: 3d75bd0bf4bf45d7991072d069f1e3b7

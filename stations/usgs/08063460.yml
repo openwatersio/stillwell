@@ -1,0 +1,16 @@
+name: Richland Ck at CR 0030 nr Richland, TX
+lat: 31.967
+lon: -96.4751388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 93.013
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08063460/
+parameter_code: "00065"
+series_begin: 2019-07-31T18:30:00+00:00
+time_series_id: 94fc5d8fb1034c14b2d1a702ab82a621

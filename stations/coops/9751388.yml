@@ -1,0 +1,23 @@
+name: Fish Bay
+lat: 18.3192
+lon: -64.7618
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.224
+  MHW: -9.21
+  DTL: -9.097
+  MTL: -9.099
+  MSL: -9.091
+  MLW: -8.988
+  MLLW: -8.97
+  LAT: -8.824
+  HAT: -9.355
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751388
+established: 2020-11-23T00:00:00Z
+removed: 2021-04-17T18:00:00Z

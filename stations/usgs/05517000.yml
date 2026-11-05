@@ -1,0 +1,16 @@
+name: YELLOW RIVER AT KNOX, IN
+lat: 41.302796853641965
+lon: -86.6205382939863
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 207.17
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05517000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6456fc16e51e4081b6b4e4655ebb1c5c

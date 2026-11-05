@@ -1,0 +1,15 @@
+name: Little Egg Inlet near Beach Haven Heights NJ
+lat: 39.5116666666667
+lon: -74.3013888888889
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01409334/
+parameter_code: "00065"
+series_begin: 2012-07-24T04:00:00+00:00
+series_end: 2014-10-01T04:54:00+00:00
+time_series_id: 73f09815a42b45f2b52d8c614e083894

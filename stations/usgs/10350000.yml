@@ -1,0 +1,16 @@
+name: TRUCKEE RV AT VISTA, NV
+lat: 39.5204671950757
+lon: -119.701019771253
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1332.33
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10350000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 867c1658358d4db3bd087f5bcd97b68a

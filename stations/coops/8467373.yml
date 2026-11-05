@@ -1,0 +1,23 @@
+name: Black Rock Harbor
+lat: 41.1567
+lon: -73.2133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.425
+  MHW: -4.322
+  DTL: -3.306
+  MTL: -3.293
+  MSL: -3.295
+  MLW: -2.264
+  MLLW: -2.188
+  LAT: -1.682
+  HAT: -4.921
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8467373
+established: 2003-06-10T00:00:00Z
+removed: 2003-10-20T23:59:00Z

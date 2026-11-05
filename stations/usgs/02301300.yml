@@ -1,0 +1,16 @@
+name: SOUTH PRONG ALAFIA RIVER NEAR LITHIA FL
+lat: 27.7966952504896
+lon: -82.117587735334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.896
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02301300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 173354b2b06647f2816568a74e18759a

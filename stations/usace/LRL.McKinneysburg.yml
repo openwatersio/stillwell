@@ -1,0 +1,13 @@
+name: LICKING RIVER AT MCKINNEYSBURG,
+lat: 38.60007244
+lon: -84.2663239
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 158.749
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=McKinneysburg.Stage.Inst.15Minutes.0.LRGS-rev
+series: McKinneysburg.Stage.Inst.15Minutes.0.LRGS-rev

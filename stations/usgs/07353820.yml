@@ -1,0 +1,16 @@
+name: Old River at Hwy 1 nr Natchitoches, LA
+lat: 31.72847222222222
+lon: -93.10919444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 27.993
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07353820/
+parameter_code: "00065"
+series_begin: 2023-06-07T15:00:00+00:00
+time_series_id: 72a9543f80014b62b326a6d67a2ff6ca

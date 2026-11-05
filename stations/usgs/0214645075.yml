@@ -1,0 +1,17 @@
+name: TRIB TO BRIAR CREEK AT COLONY RD AT CHARLOTTE, NC
+lat: 35.16888888888889
+lon: -80.83083333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.618
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0214645075/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2020-10-01T05:00:00+00:00
+time_series_id: e36250b6444d4e9cad1ccb0d9777e0e8

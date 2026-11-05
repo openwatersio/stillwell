@@ -1,0 +1,17 @@
+name: SLOUGH CK AT DEVILS GATE NR EUREKA, NV
+lat: 39.573306
+lon: -116.076722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1830.019
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10245980/
+parameter_code: "00065"
+series_begin: 2023-03-17T18:10:00+00:00
+series_end: 2023-09-28T19:45:00+00:00
+time_series_id: ff2e15c92e834f0aa3b9f24996327ff6

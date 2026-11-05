@@ -1,0 +1,16 @@
+name: Big Cow Ck at FM 1416 nr Call, TX
+lat: 30.605011111111114
+lon: -93.79448333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08029520/
+parameter_code: "00065"
+series_begin: 2023-04-04T16:30:00+00:00
+time_series_id: a980637fdc254b3eb9bda87947006b00

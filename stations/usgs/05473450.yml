@@ -1,0 +1,16 @@
+name: Big Creek North of Mount Pleasant, IA
+lat: 41.0069727062089
+lon: -91.5515496654675
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.904
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05473450/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a947ae1e7d4d45d597e48d3d64d3d51d

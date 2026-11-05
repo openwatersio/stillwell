@@ -1,0 +1,16 @@
+name: DRY LAKE NEAR PENN, ND
+lat: 48.231111
+lon: -98.983056
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 427.159
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05056241/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a4d2ff22625445189eb7c5c94481bd0c

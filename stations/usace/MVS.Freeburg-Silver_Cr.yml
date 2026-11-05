@@ -1,0 +1,14 @@
+name: Freeburg
+lat: 38.406053
+lon: -89.873536
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 116.059
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Freeburg-Silver%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Freeburg-Silver Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

@@ -1,0 +1,13 @@
+name: SUNSET LAKE
+lat: 38.9783
+lon: -74.8367
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535838
+established: 1977-06-23T00:00:00Z
+removed: 1978-10-23T23:59:00Z

@@ -1,0 +1,16 @@
+name: COLORADO RVR ABV DIAMOND CREEK NR PEACH SPRINGS AZ
+lat: 35.7735994280541
+lon: -113.363543958913
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 408.432
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09404200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c0a04414f44b4836a6deca2a0e852a0f

@@ -1,0 +1,16 @@
+name: Rockaway River below Reservoir at Boonton NJ
+lat: 40.8969444444444
+lon: -74.3947222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 59.643
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01381000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 414283d768ce4fa0a305339ff9083cfd

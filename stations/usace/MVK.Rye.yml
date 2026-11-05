@@ -1,0 +1,13 @@
+name: Saline River @ Rye, AR
+lat: 33.700833334193
+lon: -92.025833334228
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 29.584
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Rye.Stage.Inst.15Minutes.0.DCP-rev
+series: Rye.Stage.Inst.15Minutes.0.DCP-rev

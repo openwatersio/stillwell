@@ -1,0 +1,16 @@
+name: Bayou Francois at Hwy 61 Near Gonzales, LA
+lat: 30.2274185973636
+lon: -90.8995424526128
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073802273/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 30385c1b975441bfade07ce41484eed4

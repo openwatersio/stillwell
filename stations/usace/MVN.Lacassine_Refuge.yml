@@ -1,0 +1,12 @@
+name: Mermentau River at Lacassine Refuge (70600)
+lat: 30.0025
+lon: -92.7811112
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Lacassine_Refuge.Stage.Inst.1Hour.0.rev
+series: Lacassine_Refuge.Stage.Inst.1Hour.0.rev

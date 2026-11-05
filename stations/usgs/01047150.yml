@@ -1,0 +1,16 @@
+name: Kennebec River near Madison, Maine
+lat: 44.7788888888889
+lon: -69.8869444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 49.42
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01047150/
+parameter_code: "00065"
+series_begin: 2009-04-01T18:00:00+00:00
+time_series_id: fe3bab6c42134c098512b0b695777ab7

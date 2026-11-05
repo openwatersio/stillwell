@@ -1,0 +1,24 @@
+name: Koyuk
+lat: 64.9312
+lon: -161.1508
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.617
+  MHW: -7.546
+  DTL: -7.165
+  MTL: -7.165
+  MSL: -7.125
+  MLW: -6.784
+  MLLW: -6.712
+  NAVD88: -5.873
+  LAT: -5.893
+  HAT: -8.456
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469031
+established: 2020-08-01T00:00:00Z
+removed: 2020-09-24T00:00:00Z

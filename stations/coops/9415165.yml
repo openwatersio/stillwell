@@ -1,0 +1,13 @@
+name: MARE ISLAND STRAIT
+lat: 38.1117
+lon: -122.273
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415165
+established: 1977-04-05T00:00:00Z
+removed: 1978-10-17T23:59:00Z

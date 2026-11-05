@@ -1,0 +1,16 @@
+name: Boggy Bayou N of Spring Ridge, LA
+lat: 32.3566666666667
+lon: -93.9458333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.28
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07350985/
+parameter_code: "00065"
+series_begin: 2008-02-17T06:00:00+00:00
+time_series_id: 193e05b1e49648528805a03e92d75440

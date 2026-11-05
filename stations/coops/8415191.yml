@@ -1,0 +1,22 @@
+name: BELFAST, PENOBSCOT BAY
+lat: 44.4267
+lon: -69.005
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.241
+  MHW: -4.117
+  DTL: -2.56
+  MTL: -2.558
+  MSL: -2.574
+  MLW: -0.999
+  MLLW: -0.879
+  NAVD88: -2.655
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8415191
+established: 1983-05-25T00:00:00Z
+removed: 1985-07-24T23:59:00Z

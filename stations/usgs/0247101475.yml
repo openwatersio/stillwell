@@ -1,0 +1,14 @@
+name: THREEMILE CREEK AT FILLINGIM STREET AT MOBILE, AL
+lat: 30.707999133526165
+lon: -88.10113923286718
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0247101475/
+parameter_code: "00065"
+series_begin: 2025-05-23T15:00:00+00:00
+time_series_id: 355fedd63c6841ee9611e3f7f42f3c62

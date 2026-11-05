@@ -1,0 +1,14 @@
+name: Loudonville
+lat: 40.635880349615
+lon: -82.239100113106
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 283.208
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Loudonville.Stage.Inst.15Minutes.0.OBS
+series: Loudonville.Stage.Inst.15Minutes.0.OBS

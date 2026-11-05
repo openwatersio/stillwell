@@ -1,0 +1,21 @@
+name: PRISONERS HARBOR, SANTA CRUZ IS.
+lat: 34.02
+lon: -119.683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.59
+  MHW: -2.358
+  DTL: -1.79
+  MTL: -1.819
+  MSL: -1.812
+  MLW: -1.28
+  MLLW: -0.99
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410971
+established: 1977-08-13T00:00:00Z
+removed: 1978-09-24T23:59:00Z

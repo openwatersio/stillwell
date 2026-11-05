@@ -1,0 +1,16 @@
+name: Finley Creek below Riverdale, MO
+lat: 36.9748888888889
+lon: -93.3278888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 316.233
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07052345/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 3c571f17abcb44af81006166465dad70

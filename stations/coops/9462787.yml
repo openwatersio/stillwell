@@ -1,0 +1,23 @@
+name: Cape Sarichef, Unimak Island
+lat: 54.6
+lon: -164.928
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.723
+  MHW: -2.617
+  DTL: -1.964
+  MTL: -2.211
+  MSL: -2.113
+  MLW: -1.805
+  MLLW: -1.205
+  LAT: -0.559
+  HAT: -3.023
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462787
+established: 1939-05-24T00:00:00Z
+removed: 2007-08-10T23:59:00Z

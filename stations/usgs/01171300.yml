@@ -1,0 +1,16 @@
+name: FORT RIVER NEAR AMHERST, MA
+lat: 42.358423587129
+lon: -72.5059203932424
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 44.806
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01171300/
+parameter_code: "00065"
+series_begin: 2025-07-01T05:00:00+00:00
+time_series_id: 65ba62a318b04ec595b39de778081644

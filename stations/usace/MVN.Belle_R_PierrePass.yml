@@ -1,0 +1,11 @@
+name: Belle River at Pierre Pass
+lat: 29.907777833333
+lon: -91.216388833333
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 86400
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Belle_R_PierrePass.Stage.Inst.1Day.0.Observed
+series: Belle_R_PierrePass.Stage.Inst.1Day.0.Observed

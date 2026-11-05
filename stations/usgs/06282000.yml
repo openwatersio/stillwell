@@ -1,0 +1,15 @@
+name: SHOSHONE RIVER BELOW BUFFALO BILL RESERVOIR, WY
+lat: 44.5165804949481
+lon: -109.09797159453427
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1493.52
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06282000/
+parameter_code: "00065"
+time_series_id: d24d24e681c246e2adf95219f01cd13e

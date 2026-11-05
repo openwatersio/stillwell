@@ -1,0 +1,14 @@
+name: Stewarts Ck at Silverdale Dr nr Conroe, TX
+lat: 30.301508333333334
+lon: -95.43799722222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08068002/
+parameter_code: "00065"
+series_begin: 2024-01-03T17:00:00+00:00
+time_series_id: 2fb4d8f459704024908ac43e635073f8

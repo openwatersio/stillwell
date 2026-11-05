@@ -1,0 +1,15 @@
+name: COWLITZ RIVER NEAR 1ST AVE NW AT KELSO, WA
+lat: 46.14722007790685
+lon: -122.91605525907515
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14244180/
+parameter_code: "63160"
+series_begin: 2024-09-18T14:15:00+00:00
+series_end: 2026-09-26T12:45:00+00:00
+time_series_id: b5b3a65e1eda4f72bc49ba5b03c27ae3

@@ -1,0 +1,17 @@
+name: MEADOW RUN NEAR WAYNESBORO, VA
+lat: 38.162277777777774
+lon: -78.91850000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 360.883
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01624885/
+parameter_code: "00065"
+series_begin: 2021-05-27T13:00:00+00:00
+series_end: 2021-11-10T13:10:00+00:00
+time_series_id: 2c657814ec514592a70a0e113c8df1c3

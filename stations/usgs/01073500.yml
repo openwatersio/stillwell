@@ -1,0 +1,16 @@
+name: LAMPREY RIVER NEAR NEWMARKET, NH
+lat: 43.1025855772715
+lon: -70.9525590002348
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.445
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01073500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6035d029f26d4ac2ae3a2cce8074856d

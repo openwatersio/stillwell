@@ -1,0 +1,24 @@
+name: STEBBINS, NORTON SOUND, EAST
+lat: 63.525
+lon: -162.293
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.89
+  MHW: -6.815
+  DTL: -6.485
+  MTL: -6.484
+  MSL: -6.451
+  MLW: -6.152
+  MLLW: -6.08
+  NAVD88: -5.437
+  LAT: -5.464
+  HAT: -7.674
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468151
+established: 1982-02-12T00:00:00Z
+removed: 2020-09-26T00:00:00Z

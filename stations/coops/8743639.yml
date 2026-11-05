@@ -1,0 +1,23 @@
+name: BAYOU POITO, BACK BAY OF BILOXI
+lat: 30.4383
+lon: -88.845
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.11
+  MHW: -1.062
+  DTL: -0.829
+  MTL: -0.829
+  MSL: -0.833
+  MLW: -0.596
+  MLLW: -0.548
+  LAT: -0.266
+  HAT: -1.368
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8743639
+established: 1980-01-31T00:00:00Z
+removed: 1980-05-01T23:59:00Z

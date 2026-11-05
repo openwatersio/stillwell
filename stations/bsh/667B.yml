@@ -1,0 +1,12 @@
+name: Meldorf, Sperrwerk, Außenpegel
+lat: 54.09222
+lon: 8.94917
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.82
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/meldorf_sperrwerk_aussenpegel

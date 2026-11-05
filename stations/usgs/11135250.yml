@@ -1,0 +1,15 @@
+name: SANTA YNEZ R A 13TH ST BRIDGE A VAFB NR LOMPOC CA
+lat: 34.6766166666667
+lon: -120.553388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.706
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11135250/
+parameter_code: "00065"
+time_series_id: 6779b1028c8644e1b18a55a1563abcae

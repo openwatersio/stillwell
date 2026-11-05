@@ -1,0 +1,13 @@
+name: Mississippi River South Pass at Port Eads (01850)
+lat: 29.0147222
+lon: -89.1658333
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=S_Pass_PortEads.Stage.Inst.1Hour.0.rev
+series: S_Pass_PortEads.Stage.Inst.1Hour.0.rev
+zero_since: 2011-02-10

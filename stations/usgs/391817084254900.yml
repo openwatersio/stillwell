@@ -1,0 +1,15 @@
+name: Wildermuth overflow channel near West Chester OH
+lat: 39.3047222222222
+lon: -84.4302777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 178.912
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-391817084254900/
+parameter_code: "00065"
+time_series_id: 36ac86d284224d2f9223039b2a523e74

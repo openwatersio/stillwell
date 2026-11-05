@@ -1,0 +1,13 @@
+name: SALT CREEK NEAR HARRODSBURG, IN
+lat: 39.00494444
+lon: -86.5091944
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 146.167
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Harrodsburg.Stage.Inst.15Minutes.0.LRGS-rev
+series: Harrodsburg.Stage.Inst.15Minutes.0.LRGS-rev

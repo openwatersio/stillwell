@@ -1,0 +1,11 @@
+name: Lake Pont at Mandeville (85575)
+lat: 30.365797222222
+lon: -90.092288888889
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Lake_Pon_Mandvil.Stage.Inst.1Hour.0.rev
+series: Lake_Pon_Mandvil.Stage.Inst.1Hour.0.rev

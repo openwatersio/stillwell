@@ -1,0 +1,16 @@
+name: RIO LOCO AT LAS LATAS NR LA JOYA NR GUANICA, PR
+lat: 18.009161
+lon: -66.8767
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 20.763
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50129254/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: e83cbbaeb16245689f4105050a49e4ee

@@ -1,0 +1,14 @@
+name: Tippecanoe
+lat: 40.2703341
+lon: -81.2902429
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 258.544
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Tippecanoe.Stage.Inst.15Minutes.0.OBS
+series: Tippecanoe.Stage.Inst.15Minutes.0.OBS

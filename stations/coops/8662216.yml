@@ -1,0 +1,22 @@
+name: CUMBERLAND, SAMPIT RIVER
+lat: 33.37
+lon: -79.4333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.018
+  MHW: -1.948
+  DTL: -1.349
+  MTL: -1.335
+  MSL: -1.379
+  MLW: -0.722
+  MLLW: -0.68
+  NAVD88: -1.325
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662216
+established: 1982-02-24T00:00:00Z
+removed: 1982-08-23T23:59:00Z

@@ -1,0 +1,16 @@
+name: PAWCATUCK RIVER AT WESTERLY, RI
+lat: 41.385278
+lon: -71.833056
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01118500/
+parameter_code: "00065"
+series_begin: 2023-10-11T05:00:00+00:00
+time_series_id: 402a0f141e304705a3695f1b7db7fb2e

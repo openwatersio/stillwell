@@ -1,0 +1,13 @@
+name: HOOKSIELPLATE
+lat: 53.669165
+lon: 8.14859
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=9430020

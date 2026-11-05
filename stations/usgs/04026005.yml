@@ -1,0 +1,17 @@
+name: BOIS BRULE RIVER NEAR LAKE SUPERIOR, WI
+lat: 46.70553742854396
+lon: -91.6021071411826
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 212.446
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04026005/
+parameter_code: "00065"
+series_begin: 2021-04-20T19:00:00+00:00
+series_end: 2025-06-26T18:30:00+00:00
+time_series_id: f6b6728a79d04d78aada0c42f01b78f2

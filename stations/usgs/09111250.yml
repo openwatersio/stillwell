@@ -1,0 +1,16 @@
+name: COAL CREEK ABV MCCORMICK DTCH AT CRESTED BUTTE, CO
+lat: 38.871556
+lon: -106.985297
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2708.306
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09111250/
+parameter_code: "00065"
+series_begin: 2021-04-06T00:15:00+00:00
+time_series_id: ee8e1242aee445d38a9ccc645a89a6d4

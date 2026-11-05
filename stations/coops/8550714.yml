@@ -1,0 +1,13 @@
+name: WILMINGTON, CHRISTINA R. ENT.
+lat: 39.7183
+lon: -75.52
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8550714
+established: 1982-10-05T00:00:00Z
+removed: 1982-11-05T23:59:00Z

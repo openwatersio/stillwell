@@ -1,0 +1,17 @@
+name: BURNHAMS MARSHES NEAR NOTTINGHAM, NH
+lat: 43.0858333333333
+lon: -71.1561111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 75.743
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430509071092201/
+parameter_code: "00065"
+series_begin: 2016-06-17T17:15:00+00:00
+series_end: 2017-09-26T13:30:00+00:00
+time_series_id: 1b2077a78e2f4ef7aa413669c8dac11a

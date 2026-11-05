@@ -1,0 +1,21 @@
+name: ADAMS KEY
+lat: 25.3967
+lon: -80.2333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.472
+  MHW: -1.471
+  DTL: -1.221
+  MTL: -1.245
+  MSL: -1.252
+  MLW: -1.019
+  MLLW: -0.97
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723453
+established: 1974-06-24T00:00:00Z
+removed: 1987-10-23T23:59:00Z

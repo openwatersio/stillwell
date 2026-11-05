@@ -1,0 +1,11 @@
+name: NORTH FORK LICKING RIVER NEAR MT
+lat: 38.5947955
+lon: -84.0202056
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=MtOlivet.Stage.Inst.15Minutes.0.LRGS-rev
+series: MtOlivet.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,15 @@
+name: SMOKY HILL R NR BUNKER HILL, KS
+lat: 38.7939001426053
+lon: -98.7811920148215
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 508.815
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06864050/
+parameter_code: "00065"
+time_series_id: a264e83e35a04fe99a7a9d57ef8295d5

@@ -1,0 +1,16 @@
+name: MOJAVE R A AFTON CA
+lat: 35.0372056472857
+lon: -116.384188734934
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 426.994
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10263000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 14434244ba874375a9cf368dbd4b1bba

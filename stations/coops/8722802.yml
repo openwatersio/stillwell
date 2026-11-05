@@ -1,0 +1,24 @@
+name: LAKE WYMAN
+lat: 26.37
+lon: -80.07
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.415
+  MHW: -1.377
+  DTL: -1.047
+  MTL: -1.051
+  MSL: -1.032
+  MLW: -0.725
+  MLLW: -0.679
+  NAVD88: -1.394
+  LAT: -0.497
+  HAT: -1.589
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722802
+established: 1973-03-23T00:00:00Z
+removed: 1973-05-08T23:59:00Z

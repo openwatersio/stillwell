@@ -1,0 +1,23 @@
+name: Santa Isabel
+lat: 17.955
+lon: -66.4067
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.014
+  MHW: -8.011
+  DTL: -7.906
+  MTL: -7.906
+  MSL: -7.91
+  MLW: -7.802
+  MLLW: -7.799
+  LAT: -7.644
+  HAT: -8.177
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9756639
+established: 1972-02-09T00:00:00Z
+removed: 2011-09-09T23:59:00Z

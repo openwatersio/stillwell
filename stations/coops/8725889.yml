@@ -1,0 +1,13 @@
+name: VENICE, ROBERTS BAY
+lat: 27.1117
+lon: -82.4633
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725889
+established: 1977-05-19T00:00:00Z
+removed: 1977-12-12T23:59:00Z

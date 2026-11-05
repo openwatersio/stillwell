@@ -1,0 +1,14 @@
+name: MILL CREEK AT EARTHWORKS PARK AT KENT, WA
+lat: 47.3831557705086
+lon: -122.224842912836
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12113347/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 0d934aff52454e43ae93bffb31bcb273

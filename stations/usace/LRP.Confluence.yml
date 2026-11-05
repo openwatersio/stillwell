@@ -1,0 +1,13 @@
+name: Confluence, PA
+lat: 39.8272
+lon: -79.3736
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 397.084
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Confluence.Stage.Inst.15Minutes.0.OBS
+series: Confluence.Stage.Inst.15Minutes.0.OBS

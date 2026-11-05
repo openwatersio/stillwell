@@ -1,0 +1,13 @@
+name: Clarksburg, WV
+lat: 39.2386
+lon: -80.3592
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 283.598
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Clarksburg.Stage.Inst.15Minutes.0.OBS
+series: Clarksburg.Stage.Inst.15Minutes.0.OBS

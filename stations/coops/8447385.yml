@@ -1,0 +1,13 @@
+name: MARION, BUZZARD'S BAY
+lat: 41.705
+lon: -70.7617
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447385
+established: 1976-09-15T00:00:00Z
+removed: 1976-11-10T23:59:00Z

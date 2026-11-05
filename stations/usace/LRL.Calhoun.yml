@@ -1,0 +1,13 @@
+name: GREEN RIVER AT LOCK 2 AT CALHOUN
+lat: 37.533935
+lon: -87.2638873
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 107.884
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Calhoun.Stage.Inst.15Minutes.0.LRGS-rev
+series: Calhoun.Stage.Inst.15Minutes.0.LRGS-rev

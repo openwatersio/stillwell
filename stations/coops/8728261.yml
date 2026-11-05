@@ -1,0 +1,22 @@
+name: ALLIGATOR POINT, SW CAPE
+lat: 29.895
+lon: -84.3883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.427
+  MHW: -1.36
+  DTL: -1.004
+  MTL: -1.06
+  MSL: -1.035
+  MLW: -0.759
+  MLLW: -0.581
+  NAVD88: -1.038
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728261
+established: 1976-12-01T00:00:00Z
+removed: 1977-10-18T23:59:00Z

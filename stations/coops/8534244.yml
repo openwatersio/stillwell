@@ -1,0 +1,21 @@
+name: GRAVELING POINT
+lat: 39.54
+lon: -74.3867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.731
+  MHW: -1.623
+  DTL: -1.173
+  MTL: -1.138
+  MSL: -1.13
+  MLW: -0.653
+  MLLW: -0.614
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534244
+established: 1977-08-03T00:00:00Z
+removed: 1978-12-05T23:59:00Z

@@ -1,0 +1,13 @@
+name: PAVONIA
+lat: 39.9617
+lon: -75.0983
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538779
+established: 1980-06-11T00:00:00Z
+removed: 1980-08-05T23:59:00Z

@@ -1,0 +1,16 @@
+name: Patuxent River below Brighton Dam near Brighton MD
+lat: 39.19219444444444
+lon: -77.00438888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 92.357
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01591610/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8733f3bbca974e6485afdff877f145c9

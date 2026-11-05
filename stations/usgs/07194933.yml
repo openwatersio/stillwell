@@ -1,0 +1,17 @@
+name: Spring Creek at Hwy 112 nr Springdale, AR
+lat: 36.24377777777778
+lon: -94.23913888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 330.821
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07194933/
+parameter_code: "00065"
+series_begin: 2011-10-18T05:00:00+00:00
+series_end: 2025-01-16T17:45:00+00:00
+time_series_id: 67990aeb53394445b0e9efce75390909

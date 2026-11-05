@@ -1,0 +1,16 @@
+name: One Hundred Two River near Bolckow, MO
+lat: 40.1135833333333
+lon: -94.8376111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.225
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06820410/
+parameter_code: "00065"
+series_begin: 2008-02-28T06:00:00+00:00
+time_series_id: d4aded91620a40c99d02c35d4fc40142

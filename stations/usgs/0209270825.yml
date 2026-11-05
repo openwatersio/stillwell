@@ -1,0 +1,15 @@
+name: BOGUE SOUND AT SR 1182 AT ATLANTIC BEACH, NC
+lat: 34.7113527777778
+lon: -76.7368333333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0209270825/
+parameter_code: "62620"
+series_begin: 2016-10-06T21:30:00+00:00
+series_end: 2019-09-10T12:18:00+00:00
+time_series_id: 32df396934f44e9786b009be2a412eb5

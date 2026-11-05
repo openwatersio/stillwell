@@ -1,0 +1,16 @@
+name: FENHOLLOWAY RIVER NEAR FOLEY, FLA.
+lat: 30.0982705715488
+lon: -83.4718111603789
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 16.334
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02324400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 15b0e12fa3f748d9992e7c34e66e4e19

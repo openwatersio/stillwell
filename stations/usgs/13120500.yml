@@ -1,0 +1,16 @@
+name: BIG LOST RIVER AT HOWELL RANCH NR CHILLY ID
+lat: 43.9983333333333
+lon: -114.021111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2019.708
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13120500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 4295cea2f9c94d43b5379e2376a33fb8

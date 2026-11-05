@@ -1,0 +1,23 @@
+name: Beacon, Hudson River
+lat: 41.5
+lon: -73.9833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.807
+  MHW: -6.7
+  DTL: -6.248
+  MTL: -6.223
+  MSL: -6.242
+  MLW: -5.746
+  MLLW: -5.689
+  LAT: -5.518
+  HAT: -7.103
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518934
+established: 2014-04-13T00:00:00Z
+removed: 2014-08-14T00:00:00Z

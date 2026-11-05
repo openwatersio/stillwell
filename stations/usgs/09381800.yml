@@ -1,0 +1,16 @@
+name: PARIA RIVER NEAR KANAB, UTAH
+lat: 37.1074842837047
+lon: -111.906010191065
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1325.453
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09381800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 187c67ad47824007adaa04231cd18b38

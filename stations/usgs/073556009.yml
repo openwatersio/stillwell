@@ -1,0 +1,16 @@
+name: Red River 6.5 miles below Black River, LA
+lat: 31.21947222222222
+lon: -91.75241666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073556009/
+parameter_code: "00065"
+series_begin: 2021-05-19T16:45:00+00:00
+time_series_id: c1c6c56137fc41abb7a577a1c3786a29

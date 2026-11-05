@@ -1,0 +1,21 @@
+name: HOLLY HARBOR FARMS
+lat: 48.0267
+lon: -122.535
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.413
+  MHW: -4.141
+  DTL: -2.67
+  MTL: -2.958
+  MSL: -2.95
+  MLW: -1.775
+  MLLW: -0.926
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9447855
+established: 1977-02-01T00:00:00Z
+removed: 1977-04-13T23:59:00Z

@@ -1,0 +1,16 @@
+name: SALTLICK CREEK NEAR FLATWOODS, WV
+lat: 38.7319444444444
+lon: -80.5952777777778
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 243.697
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03151550/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1b58d34ea5bc4d78b38b6ab8ac639cfb

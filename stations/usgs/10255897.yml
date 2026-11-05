@@ -1,0 +1,17 @@
+name: SF WHITEWATER R DIV NR BANNING CA
+lat: 34.0619444444444
+lon: -116.818861111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2168.652
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10255897/
+parameter_code: "00065"
+series_begin: 2015-10-01T20:02:00+00:00
+series_end: 2020-11-01T07:45:00+00:00
+time_series_id: b792d8d28e8f4f2eabfc58b0db9fb061

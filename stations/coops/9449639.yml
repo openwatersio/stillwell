@@ -1,0 +1,23 @@
+name: Point Roberts
+lat: 48.975
+lon: -123.083
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.007
+  MHW: -7.743
+  DTL: -6.515
+  MTL: -6.797
+  MSL: -6.742
+  MLW: -5.85
+  MLLW: -5.024
+  LAT: -3.708
+  HAT: -8.624
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449639
+established: 1975-01-29T00:00:00Z
+removed: 2015-11-06T07:30:00Z

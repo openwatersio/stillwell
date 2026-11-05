@@ -1,0 +1,24 @@
+name: Schooner Bayou
+lat: 29.7581
+lon: -92.2638
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.933
+  MHW: -8.913
+  DTL: -8.739
+  MTL: -8.765
+  MSL: -8.735
+  MLW: -8.618
+  MLLW: -8.546
+  NAVD88: -8.726
+  LAT: -8.416
+  HAT: -8.96
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8765994
+established: 2019-09-16T00:00:00Z
+removed: 2020-02-22T22:42:00Z

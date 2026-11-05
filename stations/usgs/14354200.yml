@@ -1,0 +1,16 @@
+name: BEAR CREEK BELOW ASHLAND CREEK AT ASHLAND, OR
+lat: 42.2185
+lon: -122.72480555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 511.537
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14354200/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 40d3972676984d91934de9b6fa2895d1

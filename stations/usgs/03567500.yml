@@ -1,0 +1,16 @@
+name: SOUTH CHICKAMAUGA CREEK NEAR CHICKAMAUGA, TN
+lat: 35.0138947273056
+lon: -85.20941038975282
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.306
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03567500/
+parameter_code: "00065"
+series_begin: 2012-04-01T05:00:00+00:00
+time_series_id: 17580c6717c94187ae04bf84276f9a48

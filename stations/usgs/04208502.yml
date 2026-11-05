@@ -1,0 +1,16 @@
+name: Big Creek at Cleveland OH
+lat: 41.4503291627796
+lon: -81.721520354748
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 189.555
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04208502/
+parameter_code: "00065"
+series_begin: 2013-06-13T13:45:00+00:00
+time_series_id: 6cd105197f9d4befb11326be89407477

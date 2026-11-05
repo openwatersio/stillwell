@@ -1,0 +1,23 @@
+name: Menemsha Harbor, MA
+lat: 41.354443
+lon: -70.76783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.65
+  MHW: -8.572
+  DTL: -8.172
+  MTL: -8.152
+  MSL: -8.111
+  MLW: -7.732
+  MLLW: -7.694
+  LAT: -7.432
+  HAT: -8.968
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448725
+established: 1994-06-13T00:00:00Z
+removed: 2013-09-26T23:59:00Z

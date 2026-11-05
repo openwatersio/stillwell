@@ -1,0 +1,13 @@
+name: KUMMERSDORF UP
+lat: 52.268776
+lon: 13.8646
+country_code: DE
+datum: PNP
+datums:
+  NHN: 32.257
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=586360

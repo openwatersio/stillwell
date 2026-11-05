@@ -1,0 +1,24 @@
+name: Imuruk Basin
+lat: 65.1184
+lon: -165.4721
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.63
+  MHW: -10.623
+  DTL: -10.56
+  MTL: -10.568
+  MSL: -10.559
+  MLW: -10.514
+  MLLW: -10.49
+  NAVD88: -9.387
+  LAT: -10.494
+  HAT: -10.612
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469146
+established: 2023-05-16T00:00:00Z
+removed: 2023-10-04T02:00:00Z

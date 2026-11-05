@@ -1,0 +1,16 @@
+name: KASKASKIA RIVER INFLOW AT FICKLIN, IL
+lat: 39.8008333333333
+lon: -88.3638888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.867
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-394803088215001/
+parameter_code: "00065"
+series_begin: 2012-06-23T06:00:00+00:00
+time_series_id: 93680a07ff9e484b89ff8acd28296933

@@ -1,0 +1,13 @@
+name: CANE RIVER AT NC HIGHWAY 197 AT MURCHISON, NC
+lat: 35.82976111111111
+lon: -82.31801944444445
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0346378850/
+parameter_code: "00065"
+time_series_id: 9046c360b031484389c93f610b49fc7d

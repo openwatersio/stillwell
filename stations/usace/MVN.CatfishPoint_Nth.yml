@@ -1,0 +1,13 @@
+name: Catfish Point Control Structure - North (70675)
+lat: 29.8635862
+lon: -92.8484305
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=CatfishPoint_Nth.Stage.Inst.1Hour.0.rev
+series: CatfishPoint_Nth.Stage.Inst.1Hour.0.rev
+zero_since: 1998-02-19

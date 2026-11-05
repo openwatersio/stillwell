@@ -1,0 +1,16 @@
+name: MUDDY CREEK NEAR SHOSHONI, WY
+lat: 43.28603683454482
+lon: -108.27570791635623
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1456.944
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06258000/
+parameter_code: "00065"
+series_begin: 2020-10-06T20:30:00+00:00
+time_series_id: 5b658dbe4a2c4b09b62153d58c6fb177

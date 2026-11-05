@@ -1,0 +1,23 @@
+name: HANBURY POINT, SAN JUAN ISLAND
+lat: 48.5817
+lon: -123.17
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.174
+  MHW: -2.972
+  DTL: -2.011
+  MTL: -2.265
+  MSL: -2.216
+  MLW: -1.558
+  MLLW: -0.849
+  LAT: 0.257
+  HAT: -3.629
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449828
+established: 1973-10-10T00:00:00Z
+removed: 1976-11-05T23:59:00Z

@@ -1,0 +1,14 @@
+name: Upper Bissell Pt
+lat: 38.681892
+lon: -90.194986
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 116.403
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Upper%20Bissell%20Pt-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Upper Bissell Pt-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

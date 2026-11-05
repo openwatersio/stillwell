@@ -1,0 +1,16 @@
+name: Maquoketa River at Manchester, IA
+lat: 42.4699878417593
+lon: -91.4487146874303
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 274.402
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05416900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 40bed32ac4a04a60b1ac53da03248428

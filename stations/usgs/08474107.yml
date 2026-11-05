@@ -1,0 +1,16 @@
+name: Town Resaca at E 6th St, Brownsville, TX
+lat: 25.91444444444444
+lon: -97.4918888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08474107/
+parameter_code: "00065"
+series_begin: 2022-03-16T18:15:00+00:00
+time_series_id: 516a17d6c2b9466db020d61078f75bc2

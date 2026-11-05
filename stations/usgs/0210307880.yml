@@ -1,0 +1,16 @@
+name: TANK CREEK AT REILLY ROAD AT FORT BRAGG, NC
+lat: 35.18071111111111
+lon: -79.00151944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.395
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0210307880/
+parameter_code: "00065"
+series_begin: 2021-05-06T18:15:00+00:00
+time_series_id: fcbc4a51fb34490b997747a9a1c8a508

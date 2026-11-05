@@ -1,0 +1,16 @@
+name: EAST ORANGE BRANCH AT EAST ORANGE, VT
+lat: 44.0928419061256
+lon: -72.3356532740854
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 358.929
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01139800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 18aa355521024b5c9d7af5642f2c446e

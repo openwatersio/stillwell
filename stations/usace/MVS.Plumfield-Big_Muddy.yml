@@ -1,0 +1,14 @@
+name: Plumfield
+lat: 37.891503
+lon: -89.019489
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 107.543
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Plumfield-Big%20Muddy.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Plumfield-Big Muddy.Stage.Inst.15Minutes.0.lrgsShef-rev

@@ -1,0 +1,13 @@
+name: WESERWEHR OW
+lat: 53.058583
+lon: 8.869127
+country_code: DE
+datum: PNP
+datums:
+  NHN: -0.02
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=4910030

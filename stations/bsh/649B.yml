@@ -1,0 +1,12 @@
+name: Holmer Siel
+lat: 54.52833
+lon: 8.86917
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -2.61
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/holmer_siel

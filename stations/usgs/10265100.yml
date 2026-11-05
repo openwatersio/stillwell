@@ -1,0 +1,16 @@
+name: DEADMAN C A BIG SPRINGS NR CRESTVIEW CA
+lat: 37.750277777777775
+lon: -118.93944444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2202.436
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10265100/
+parameter_code: "00065"
+series_begin: 2017-05-05T17:30:00+00:00
+time_series_id: f9286c1b6b4c4923b834550312111ccb

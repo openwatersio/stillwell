@@ -1,0 +1,14 @@
+name: High Gate
+lat: 38.146836
+lon: -91.580915
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 244.526
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=High%20Gate-Bourbeuse.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: High Gate-Bourbeuse.Stage.Inst.15Minutes.0.lrgsShef-rev

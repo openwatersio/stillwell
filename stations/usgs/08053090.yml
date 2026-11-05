@@ -1,0 +1,16 @@
+name: Hutton Br at N Denton Dr at Carrollton, TX
+lat: 32.9571611111111
+lon: -96.9071166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 131.043
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08053090/
+parameter_code: "00065"
+series_begin: 2017-08-02T17:45:00+00:00
+time_series_id: c766c2f3c2b945cf99bb0d9e11628ba5

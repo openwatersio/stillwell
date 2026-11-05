@@ -1,0 +1,16 @@
+name: BOGUE CHITTO NR TYLERTOWN, MS
+lat: 31.1769444444444
+lon: -90.2794444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 69.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02490500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 5cc41e305e134a4db80dc40eb3752b28

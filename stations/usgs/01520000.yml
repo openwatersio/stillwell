@@ -1,0 +1,16 @@
+name: Cowanesque River near Lawrenceville, PA
+lat: 41.9967404830491
+lon: -77.1399724068996
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 299.801
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01520000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 33e76287a9a94d1cb45c26e59fa0ebd3

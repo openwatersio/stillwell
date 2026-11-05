@@ -1,0 +1,17 @@
+name: ALAFIA RIVER AT BELL SHOALS NEAR RIVERVIEW FL
+lat: 27.8589147660454
+lon: -82.2737021267786
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02301638/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2020-05-27T15:15:00+00:00
+time_series_id: 725a1186cdfb469f87f785924b574aa1

@@ -1,0 +1,14 @@
+name: Fredericktown
+lat: 37.559375
+lon: -90.313053
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 206.776
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Fredericktown-L%20St%20Francis.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Fredericktown-L St Francis.Stage.Inst.15Minutes.0.lrgsShef-rev

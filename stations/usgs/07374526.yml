@@ -1,0 +1,16 @@
+name: Black Bay nr Snake Island nr Pointe-A-La-Hache, LA
+lat: 29.6335439514671
+lon: -89.5636693767447
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.088
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07374526/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b9784f41039c4ee9aa7349ae96844b49

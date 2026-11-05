@@ -1,0 +1,16 @@
+name: AMERICAN FK AB UPPER POWERPLANT NR AMERICAN FK, UT
+lat: 40.4477297073219
+lon: -111.682147155605
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1809.662
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10164500/
+parameter_code: "00065"
+series_begin: 2011-06-02T18:45:00+00:00
+time_series_id: c750ca8dae54427cb58c30cf7352f9e4

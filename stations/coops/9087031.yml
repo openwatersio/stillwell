@@ -1,0 +1,16 @@
+name: Holland
+lat: 42.773335
+lon: -86.212776
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087031
+established: 1894-06-01T00:00:00Z

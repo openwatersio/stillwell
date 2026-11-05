@@ -1,0 +1,16 @@
+name: POTTAWATOMIE C NR GARNETT, KS
+lat: 38.3336310046836
+lon: -95.2488634215971
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 266.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06914000/
+parameter_code: "00065"
+series_begin: 2018-04-12T14:00:00+00:00
+time_series_id: 46bfd7d287df46c1b3479c1e3ab77159

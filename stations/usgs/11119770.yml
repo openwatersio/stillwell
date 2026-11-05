@@ -1,0 +1,16 @@
+name: MISSION C BL W GUTIERREZ ST BR A SANTA BARBARA CA
+lat: 34.41421944444444
+lon: -119.69584722222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 8.534
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11119770/
+parameter_code: "00065"
+series_begin: 2024-09-25T22:35:00+00:00
+time_series_id: 0c645e328acb4518baf9a92a1763e8b1

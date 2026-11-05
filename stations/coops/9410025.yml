@@ -1,0 +1,13 @@
+name: ONEONTA SLOUGH,TIJUANA EST.
+lat: 32.5717
+lon: -117.12
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410025
+established: 1978-02-21T00:00:00Z
+removed: 1979-12-11T23:59:00Z

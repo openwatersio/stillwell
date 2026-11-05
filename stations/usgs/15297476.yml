@@ -1,0 +1,16 @@
+name: RED CLOUD R AT ANTON LARSEN BAY NR KODIAK AK
+lat: 57.8175
+lon: -152.62388900000002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -4.45
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15297476/
+parameter_code: "00065"
+series_begin: 2022-10-26T01:15:00+00:00
+time_series_id: 97b1ad19070f4baca15218b3d5d4425d

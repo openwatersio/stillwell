@@ -1,0 +1,13 @@
+name: Mississippi River @ Friar's Point
+lat: 34.383988
+lon: -90.624365
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 42.251
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=MS134.Stage.Inst.1Hour.0.opendcs-rev
+series: MS134.Stage.Inst.1Hour.0.opendcs-rev

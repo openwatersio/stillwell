@@ -1,0 +1,16 @@
+name: MINERAL C NR VALDEZ AK
+lat: 61.1411584086216
+lon: -146.36380459149225
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15227500/
+parameter_code: "00065"
+series_begin: 2024-09-26T06:30:00+00:00
+time_series_id: 9a4a892e3f554faaa4c3f036cd5c9f48

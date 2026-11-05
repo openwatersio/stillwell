@@ -1,0 +1,17 @@
+name: ROCK CREEK NEAR BETHANY LAKE, NEAR BETHANY, OR
+lat: 45.55603055555555
+lon: -122.8742361111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 49.987
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-142063391/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+series_end: 2026-05-04T23:30:00+00:00
+time_series_id: 44c35504192f4e609bb019edf87144ac

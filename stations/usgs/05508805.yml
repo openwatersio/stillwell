@@ -1,0 +1,16 @@
+name: Spencer Creek below Plum Creek near Frankford, MO
+lat: 39.5206111111111
+lon: -91.3434444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 147.819
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05508805/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 884a30ec8ae341d3ba92a5c27beb95ef

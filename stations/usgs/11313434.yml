@@ -1,0 +1,15 @@
+name: OLD R A QUIMBY ISLAND NR BETHEL ISLAND CA
+lat: 38.0272222222222
+lon: -121.564444444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11313434/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2025-10-01T07:45:00+00:00
+time_series_id: 1fb24fd02ca64655bedc8a87550110c0

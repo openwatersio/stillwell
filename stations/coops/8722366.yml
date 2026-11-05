@@ -1,0 +1,13 @@
+name: SEMINOLE SHORES
+lat: 27.1833
+lon: -80.1583
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722366
+established: 1972-09-27T00:00:00Z
+removed: 1973-04-05T23:59:00Z

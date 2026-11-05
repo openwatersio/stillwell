@@ -1,0 +1,13 @@
+name: Big Bayou @ Lake Village, AR
+lat: 33.3042
+lon: -91.4197
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 30.754
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Lake%20Village.Stage.Inst.1Hour.0.DCP-rev
+series: Lake Village.Stage.Inst.1Hour.0.DCP-rev

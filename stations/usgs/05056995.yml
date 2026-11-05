@@ -1,0 +1,17 @@
+name: SHEYENNE RIVER ON HWY 200 NEAR COOPERSTOWN, ND
+lat: 47.439167
+lon: -98.019167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 388.004
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05056995/
+parameter_code: "00065"
+series_begin: 2009-04-10T05:00:00+00:00
+series_end: 2026-04-04T17:00:00+00:00
+time_series_id: 294129a82f1940b9be35e2bc4f5fcec3

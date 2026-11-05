@@ -1,0 +1,16 @@
+name: Tantalus Creek at Norris Junction, YNP
+lat: 44.732725
+lon: -110.713253
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2273.445
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06036940/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: fe693ed75fce4523b86f6e3da394b4dd

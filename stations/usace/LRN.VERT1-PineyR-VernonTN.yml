@@ -1,0 +1,11 @@
+name: Piney River - Vernon TN
+lat: 35.871111
+lon: -87.501389
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=VERT1-PineyR-VernonTN.Stage.Inst.15Minutes.0.dcp-rev
+series: VERT1-PineyR-VernonTN.Stage.Inst.15Minutes.0.dcp-rev

@@ -1,0 +1,21 @@
+name: Eureka
+lat: 40.8067
+lon: -124.167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.155
+  MHW: -5.951
+  DTL: -5.068
+  MTL: -5.163
+  MSL: -5.175
+  MLW: -4.376
+  MLLW: -3.982
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9418801
+established: 1977-08-17T00:00:00Z
+removed: 1980-03-06T23:54:00Z

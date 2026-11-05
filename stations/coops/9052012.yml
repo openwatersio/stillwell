@@ -1,0 +1,15 @@
+name: SACKETS HARBOR
+lat: 43.95028
+lon: -76.120415
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -74.2
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9052012
+removed: 2021-10-21T20:47:00Z

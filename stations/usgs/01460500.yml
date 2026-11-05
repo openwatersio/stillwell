@@ -1,0 +1,14 @@
+name: Delaware and Raritan Canal at Kingston NJ
+lat: 40.3736111111111
+lon: -74.6183333333333
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01460500/
+parameter_code: "63160"
+series_begin: 1981-10-01T04:15:00+00:00
+time_series_id: 48741d60a5834e62ab9f0b54607317e7

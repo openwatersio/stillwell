@@ -1,0 +1,17 @@
+name: Little Dry Creek near Van Norman MT
+lat: 47.3394416666667
+lon: -106.363622222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 713.232
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06130950/
+parameter_code: "00065"
+series_begin: 1958-07-05T19:05:00+00:00
+series_end: 1973-08-24T19:05:00+00:00
+time_series_id: 2e9e7c9e978c4731bbead036c9066bc7

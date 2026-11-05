@@ -1,0 +1,16 @@
+name: Tuscarawas River at Clinton OH
+lat: 40.9278334087981
+lon: -81.6326245092029
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.943
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03116000/
+parameter_code: "00065"
+series_begin: 2020-01-27T15:30:00+00:00
+time_series_id: 830506a87c614599b35665d27fca5be5

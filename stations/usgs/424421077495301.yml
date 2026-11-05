@@ -1,0 +1,17 @@
+name: NY-SW1 MERRIMAC FARMS EDGE OF FIELD, E GROVELAND
+lat: 42.7392861111111
+lon: -77.8312944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.072
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-424421077495301/
+parameter_code: "00065"
+series_begin: 2015-10-15T11:30:00+00:00
+series_end: 2022-05-01T05:00:00+00:00
+time_series_id: 6b20c0159bdd42649e1e3dea5f7783bb

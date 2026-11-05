@@ -1,0 +1,12 @@
+name: Trischen, West
+lat: 54.06417
+lon: 8.65917
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.85
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/trischen_west

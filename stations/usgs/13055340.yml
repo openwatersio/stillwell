@@ -1,0 +1,16 @@
+name: SF TETON RIVER NEAR REXBURG ID
+lat: 43.835
+lon: -111.777777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1479.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13055340/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 789d0c09020849568430e410347bddc9

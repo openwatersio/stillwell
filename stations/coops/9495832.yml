@@ -1,0 +1,22 @@
+name: DREW POINT, SMITH BAY
+lat: 70.8663
+lon: -153.94
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.971
+  MHW: -6.907
+  DTL: -6.851
+  MTL: -6.83
+  MSL: -6.841
+  MLW: -6.753
+  MLLW: -6.731
+  NAVD88: -5.97
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9495832
+established: 2025-07-24T00:00:00Z
+removed: 2025-09-17T00:00:00Z

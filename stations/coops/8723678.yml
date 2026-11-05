@@ -1,0 +1,13 @@
+name: SUNSET COVE, KEY LARGO
+lat: 25.095
+lon: -80.4433
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723678
+established: 1975-05-02T00:00:00Z
+removed: 2024-10-23T00:00:00Z

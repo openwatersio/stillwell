@@ -1,0 +1,16 @@
+name: Schuylkill River at Philadelphia, PA
+lat: 39.96779083088484
+lon: -75.18850066725597
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.384
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01474500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 5bd57f9362804861a885373813e2e9b8

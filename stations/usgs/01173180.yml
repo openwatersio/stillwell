@@ -1,0 +1,16 @@
+name: WARE RIVER AT BARRE PLAINS, MA
+lat: 42.3800906511745
+lon: -72.1142451210912
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.955
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01173180/
+parameter_code: "00065"
+series_begin: 2024-10-01T05:00:00+00:00
+time_series_id: 6bd5475c1ecb4427a5f618bf10efdc53

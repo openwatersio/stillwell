@@ -1,0 +1,13 @@
+name: Rouseville, PA
+lat: 41.4817
+lon: -79.6956
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 313.432
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Rouseville.Stage.Inst.15Minutes.0.OBS
+series: Rouseville.Stage.Inst.15Minutes.0.OBS

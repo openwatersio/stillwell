@@ -1,0 +1,23 @@
+name: South Ossabaw Island, Bear River
+lat: 31.723028
+lon: -81.1417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.28
+  MHW: -3.172
+  DTL: -2.135
+  MTL: -2.11
+  MSL: -2.157
+  MLW: -1.048
+  MLLW: -0.991
+  LAT: -0.442
+  HAT: -3.979
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8673171
+established: 1977-04-01T00:00:00Z
+removed: 2012-06-15T23:59:00Z

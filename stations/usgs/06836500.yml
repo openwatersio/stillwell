@@ -1,0 +1,16 @@
+name: Driftwood Creek near McCook, Nebr.
+lat: 40.145833333333336
+lon: -100.67386666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 763.152
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06836500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b6d56f77640b49c19d13f9993003a391

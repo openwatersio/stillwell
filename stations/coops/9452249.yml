@@ -1,0 +1,21 @@
+name: YOUNG BAY
+lat: 58.1833
+lon: -134.587
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.339
+  MHW: -2.032
+  DTL: 0.159
+  MTL: 0.069
+  MSL: 0.03
+  MLW: 2.171
+  MLLW: 2.657
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452249
+established: 1997-03-19T00:00:00Z
+removed: 1997-05-15T23:59:00Z

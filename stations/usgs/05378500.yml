@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER AT WINONA, MN
+lat: 44.05571
+lon: -91.637823
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 194.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05378500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cadfd8bc19564f57811b21049248a642

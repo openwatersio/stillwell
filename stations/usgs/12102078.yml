@@ -1,0 +1,16 @@
+name: CLARKS CREEK AT STEWART AVENUE NEAR PUYALLUP, WA
+lat: 47.20090471999479
+lon: -122.3417673271908
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12102078/
+parameter_code: "00065"
+series_begin: 2022-10-21T19:45:00+00:00
+time_series_id: 917c4c8a0fb84b258d37b06f2895a4d0

@@ -1,0 +1,16 @@
+name: West Fork Cedar River at Finchford, IA
+lat: 42.6294277777778
+lon: -92.5435222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 264.28
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05458900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b4c542cdcf764a0c9c9811fc78a672b0

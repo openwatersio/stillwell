@@ -1,0 +1,16 @@
+name: BIG BEAVER CREEK NEAR NEWHALEM, WA
+lat: 48.77758621120806
+lon: -121.07343200157571
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 490.798
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12172000/
+parameter_code: "00065"
+series_begin: 2018-06-26T00:20:00+00:00
+time_series_id: f2e07dd66a96433a93587bd8d45c294e

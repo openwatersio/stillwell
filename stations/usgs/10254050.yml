@@ -1,0 +1,16 @@
+name: SALT C NR MECCA
+lat: 33.44698438948789
+lon: -115.8433228527534
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -69.629
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10254050/
+parameter_code: "00065"
+series_begin: 2007-10-03T07:00:00+00:00
+time_series_id: 10b78d6a2f894063b5a71417b524e9e3

@@ -1,0 +1,22 @@
+name: CHOCTAWHATCHEE RIVER
+lat: 30.3967
+lon: -86.0883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.41
+  MHW: -1.392
+  DTL: -1.326
+  MTL: -1.324
+  MSL: -1.323
+  MLW: -1.256
+  MLLW: -1.243
+  NAVD88: -1.222
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729329
+established: 1977-06-30T00:00:00Z
+removed: 1977-12-22T23:59:00Z

@@ -1,0 +1,16 @@
+name: OHIO RIVER AT OLMSTED, IL
+lat: 37.1792186733202
+lon: -89.0584040037475
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 84.774
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03612600/
+parameter_code: "00065"
+series_begin: 2013-03-02T06:00:00+00:00
+time_series_id: 15beb94252164ce0b9a77a90edce7528

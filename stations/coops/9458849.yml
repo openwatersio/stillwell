@@ -1,0 +1,21 @@
+name: Chankliut Island
+lat: 56.1467
+lon: -158.107
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.473
+  MHW: -3.232
+  DTL: -2.177
+  MTL: -2.269
+  MSL: -2.248
+  MLW: -1.306
+  MLLW: -0.881
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9458849
+established: 1997-07-15T00:00:00Z
+removed: 2002-07-30T23:59:00Z

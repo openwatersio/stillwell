@@ -1,0 +1,24 @@
+name: Oak Island, Atlantic Ocean
+lat: 33.9017
+lon: -78.0817
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.653
+  MHW: -2.539
+  DTL: -1.85
+  MTL: -1.819
+  MSL: -1.824
+  MLW: -1.098
+  MLLW: -1.048
+  NAVD88: -1.994
+  LAT: -0.593
+  HAT: -3.154
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8659182
+established: 1977-11-04T00:00:00Z
+removed: 1997-06-25T23:59:00Z

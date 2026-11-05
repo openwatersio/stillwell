@@ -1,0 +1,17 @@
+name: TORCH RIVER AT COUNTY ROAD 593 AT TORCH RIVER, MI
+lat: 44.8504
+lon: -85.327522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.137
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04127570/
+parameter_code: "00065"
+series_begin: 2023-04-11T02:24:00+00:00
+series_end: 2026-01-16T15:36:00+00:00
+time_series_id: 948c3cacf3a4478792dc7634b84536ec

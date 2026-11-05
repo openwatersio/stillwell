@@ -1,0 +1,16 @@
+name: HOWARD CREEK AT WHITE SULPHUR SPRINGS, WV
+lat: 37.7934444444444
+lon: -80.3046111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 557.388
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03182900/
+parameter_code: "00065"
+series_begin: 2018-12-21T01:50:00+00:00
+time_series_id: 8477ffe6259c4fcd832621acf6baa94a

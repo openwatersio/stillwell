@@ -1,0 +1,16 @@
+name: SAN MATEO C A SAN MATEO RD NR SAN ONOFRE CA
+lat: 33.419333333333334
+lon: -117.53705555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.572
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11046325/
+parameter_code: "00065"
+series_begin: 2024-12-02T22:00:00+00:00
+time_series_id: fbba69341376467e852d4e2783ff197d

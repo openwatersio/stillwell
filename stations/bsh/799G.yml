@@ -1,0 +1,13 @@
+name: Dukegat
+lat: 53.43361
+lon: 6.92611
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.07
+  SKN: -3.01
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/3990020]
+source_url: https://gezeiten.bsh.de/dukegat

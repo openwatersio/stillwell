@@ -1,0 +1,22 @@
+name: MICCO, INDIAN RIVER
+lat: 27.8733
+lon: -80.4967
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.147
+  MHW: -1.131
+  DTL: -1.087
+  MTL: -1.09
+  MSL: -1.09
+  MLW: -1.049
+  MLLW: -1.027
+  NAVD88: -1.348
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721994
+established: 1972-03-22T00:00:00Z
+removed: 1972-05-23T23:59:00Z

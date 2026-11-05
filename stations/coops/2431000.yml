@@ -1,0 +1,23 @@
+name: Diego Garcia
+lat: -7.29
+lon: 72.3933
+country_code: GB
+kind: coastal
+datum: STND
+datums:
+  MHHW: -11.249
+  MHW: -11.22
+  DTL: -10.656
+  MTL: -10.665
+  MSL: -10.665
+  MLW: -10.11
+  MLLW: -10.063
+  LAT: -9.666
+  HAT: -11.706
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=2431000
+established: 1990-08-10T00:00:00Z
+removed: 1997-02-17T23:59:00Z

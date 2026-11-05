@@ -1,0 +1,16 @@
+name: Government Cypress HW/TW near New Gascony, AR
+lat: 34.28247222222222
+lon: -91.68430555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07263880/
+parameter_code: "00065"
+series_begin: 2019-07-10T18:15:00+00:00
+time_series_id: 01148d8525304ba9a7f42b2509febbdf

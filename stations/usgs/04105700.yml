@@ -1,0 +1,16 @@
+name: AUGUSTA CREEK NEAR AUGUSTA, MI
+lat: 42.3533734069096
+lon: -85.35388936412
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 247.431
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04105700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 46cc3421a59044309a0fdca8789b94f1

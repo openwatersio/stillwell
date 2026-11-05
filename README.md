@@ -46,7 +46,11 @@ obs/<source>/<station>/<year>.parquet                 observed levels
 extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters
 predictions/<source>/<station>/<year>.parquet         the source's predicted curve
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
+stations/<source>.parquet                             one source's station list, as ingest keeps it
+history/stations/<source>/                            each station refresh's previous list and report
 ```
+
+A station whose source moved it to another datum reference has later files under an epoch number, such as `obs/<source>/<station>/2/<year>.parquet`; `stations.parquet` lists each station's epochs.
 
 Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. [docs/data.md](docs/data.md) describes every column and has more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 
@@ -68,4 +72,4 @@ An implementation of the harmonic representation of inequalities (HRoI), the met
 
 ## License
 
-The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `stations/`, `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
+The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `stations/` (until each list moves to the lake), `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.

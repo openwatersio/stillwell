@@ -1,0 +1,16 @@
+name: Musselshell River ab Big Coulee Creek at Lavina MT
+lat: 46.28905555555556
+lon: -108.93761111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1042.309
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06125600/
+parameter_code: "00065"
+series_begin: 2012-04-01T06:00:00+00:00
+time_series_id: eba732bde1ab401e89e0b3aac0bb19ff

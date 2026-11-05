@@ -1,0 +1,13 @@
+name: Boeuf River @ Eudora, AR
+lat: 33.1242
+lon: -91.3481
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 25.372
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Eudora_Boeuf.Stage.Inst.15Minutes.0.DCP-rev
+series: Eudora_Boeuf.Stage.Inst.15Minutes.0.DCP-rev

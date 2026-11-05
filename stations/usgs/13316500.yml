@@ -1,0 +1,16 @@
+name: LITTLE SALMON RIVER AT RIGGINS ID
+lat: 45.413056
+lon: -116.325278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 535.009
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13316500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: ebb0968fe82446f28812ab046171dbe5

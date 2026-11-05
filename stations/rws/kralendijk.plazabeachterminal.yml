@@ -1,0 +1,11 @@
+name: Kralendijk Plazabeach Terminal
+lat: 12.149638
+lon: -68.277813
+country_code: BQ
+datum: MSL
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/kralendijk.plazabeachterminal/details

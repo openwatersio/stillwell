@@ -1,0 +1,16 @@
+name: RIX OUTFLOW A SANTA ANA R NR GRAND TERRACE CA
+lat: 34.0413861111111
+lon: -117.354569444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.233
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11066320/
+parameter_code: "00065"
+series_begin: 2017-07-31T21:55:00+00:00
+time_series_id: adbf40b1c8094bf4a0222d8e86031b8a

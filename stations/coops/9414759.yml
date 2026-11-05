@@ -1,0 +1,13 @@
+name: HOLLY SUGAR REF.,TOM PAINE SL.
+lat: 37.775
+lon: -121.42
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414759
+established: 1979-04-18T00:00:00Z
+removed: 1979-10-23T23:59:00Z

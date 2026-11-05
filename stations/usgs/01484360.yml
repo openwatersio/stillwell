@@ -1,0 +1,13 @@
+name: CANARY CREEK AT LEWES, DE
+lat: 38.770333
+lon: -75.162389
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01484360/
+parameter_code: "62620"
+time_series_id: 3a191996ce534169abb58a0cc9e1edbf

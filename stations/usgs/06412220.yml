@@ -1,0 +1,17 @@
+name: VICTORIA CREEK ABV VICTORIA DAM NR RAPID CITY, SD
+lat: 44.029917
+lon: -103.435028
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1416.147
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06412220/
+parameter_code: "00065"
+series_begin: 2018-07-22T01:00:00+00:00
+series_end: 2026-07-29T13:50:00+00:00
+time_series_id: 3d64b89cdb0f4e72802372257b42efcd

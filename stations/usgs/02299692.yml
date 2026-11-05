@@ -1,0 +1,17 @@
+name: BLACKBURN CANAL NEAR VENICE FL
+lat: 27.1117214196155
+lon: -82.3600943855094
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299692/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2013-10-21T03:45:00+00:00
+time_series_id: 9bfad13b8ef249c1a852e78b47377939

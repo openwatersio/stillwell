@@ -1,0 +1,22 @@
+name: WIGGINS, CHEHAW RIVER
+lat: 32.6017
+lon: -80.5417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.108
+  MHW: -3.018
+  DTL: -2.104
+  MTL: -2.099
+  MSL: -2.283
+  MLW: -1.179
+  MLLW: -1.099
+  NAVD88: -2.256
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667074
+established: 1977-12-12T00:00:00Z
+removed: 1979-08-10T23:59:00Z

@@ -8,9 +8,9 @@ This repo fetches water levels from each source's own service and writes them as
 src/sources/<source>/  one adapter per source, each with a README on that service's quirks
 src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
-src/                   shared pieces: HTTP and the response cache, the schema, QC, station files, harmonics
+src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
-stations/              each source's committed station list, refreshed by `ingest stations`
+stations/<source>/     the committed station files `ingest seed-stations` starts each lake list from; removed once the lake is seeded
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
 .github/workflows/     CI (ci.yml) and the manual ingest against R2 (ingest.yml)
@@ -38,7 +38,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.       |
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                        |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill` and `recent`, described below.                     |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `seed-stations`, `backfill` and `recent`, described below.    |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                 |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data. |
 
@@ -46,7 +46,7 @@ CI also checks that `package-lock.json` regenerates from `package.json` and that
 
 ## Running ingest
 
-`scripts/ingest.ts` has three commands. Refresh the station lists in `stations/`, and write `stations.parquet` and `sources.json` to the lake, for every source or the ones named:
+`scripts/ingest.ts` has four commands. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`; it changes no file in the repo. Before writing a list it copies the previous one to `history/stations/<source>/`, with a report of the stations added, retired and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs` after checking them). A station the source stops listing stays, marked inactive. `seed-stations` writes a source's first list from its committed station files, and refuses when the lake already has one. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
 
 ```bash
 node scripts/ingest.ts stations
@@ -77,7 +77,7 @@ These environment variables choose where it writes:
 | `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                         |
 | `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                  |
 
-If a source starts reporting a station in another datum, `ingest stations` marks it inactive, prints it and exits nonzero, so a person can decide whether to convert its files or start over. `backfill … all` skips inactive stations.
+If a source starts reporting a station in another datum, `ingest stations` opens a datum epoch for it and reports it. A change it holds for a person (soon after the last one, or back to an earlier reference) fails the run on every refresh until the source's `overrides` decide, and `backfill` and `recent` skip that station meanwhile. `backfill … all` skips inactive stations.
 
 ## TICON replacement
 
@@ -85,7 +85,7 @@ If a source starts reporting a station in another datum, `ingest stations` marks
 npm run ticon:inventory
 ```
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source seeded), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
 
 ## Evaluations
 
@@ -110,7 +110,7 @@ The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` b
 ## Gotchas
 
 - **Everything in the public lake is public.** The bucket serves every file in it, so restricted series go only to `WATER_LEVELS_RESTRICTED_LAKE`, and ingest refuses to write one without it. Don't work around that refusal.
-- **A station keeps one datum.** Adapters refuse values in any other datum, and backfill refuses to write into a file recorded in another. If a source changes a station's datum, `ingest stations` exits nonzero so a person can decide what to do.
+- **A station's files keep one datum.** Adapters refuse values in any datum but the station's, and backfill refuses to write into a file recorded in another. When a source moves a station to another reference, the next `ingest stations` opens a datum epoch whose values go to files of their own; a change soon after the last one, or back to an earlier reference, is held, and the run exits nonzero, until a person decides in the source's `overrides` ([docs/stations.md](docs/stations.md)).
 - **`.cache/` hides upstream changes.** A historical fetch is served from the cache once it has run, keyed by URL and request body, so delete `.cache/`, or point `WATER_LEVELS_CACHE` at an empty directory, when you need to see what the service returns now.
 
 ## Shared conventions

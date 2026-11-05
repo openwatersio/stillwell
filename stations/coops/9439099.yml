@@ -1,0 +1,23 @@
+name: Wauna
+lat: 46.16
+lon: -123.405
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.384
+  MHW: -2.205
+  DTL: -1.347
+  MTL: -1.354
+  MSL: -1.314
+  MLW: -0.503
+  MLLW: -0.309
+  LAT: 0.201
+  HAT: -2.95
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9439099
+established: 1940-11-05T00:00:00Z

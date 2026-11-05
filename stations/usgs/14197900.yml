@@ -1,0 +1,16 @@
+name: WILLAMETTE RIVER AT NEWBERG, OR
+lat: 45.2845625124917
+lon: -122.961489251109
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14197900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e220b131903b464585281def6c0611cb

@@ -1,0 +1,15 @@
+name: Mid Fork Ill Bayou Upstream of Hwy 27 nr Hector,AR
+lat: 35.5325555555556
+lon: -92.9480555555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07257460/
+parameter_code: "00065"
+series_begin: 2013-03-30T06:00:00+00:00
+series_end: 2015-10-02T05:45:00+00:00
+time_series_id: 8b1616db7b854984813374dbef86a959

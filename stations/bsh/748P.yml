@@ -1,0 +1,13 @@
+name: Oldenburg, Drielake, Hunte
+lat: 53.14028
+lon: 8.23417
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -4.16
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/4960030]
+source_url: https://gezeiten.bsh.de/oldenburg_drielake

@@ -1,0 +1,16 @@
+name: CIBECUE CREEK NEAR CHRYSOTILE, AZ
+lat: 33.84311758639455
+lon: -110.55762860334237
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 970.943
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09497800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c58d8aa2df9843249eac784f253b0f1f

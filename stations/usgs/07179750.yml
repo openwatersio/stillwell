@@ -1,0 +1,16 @@
+name: NEOSHO R AT BURLINGAME RD NR EMPORIA, KS
+lat: 38.4286247515969
+lon: -96.1583286509432
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 329.181
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07179750/
+parameter_code: "00065"
+series_begin: 2009-08-06T05:00:00+00:00
+time_series_id: bf57dcb31a844b7d96f6e5ffa517b183

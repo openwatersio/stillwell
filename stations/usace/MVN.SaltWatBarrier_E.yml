@@ -1,0 +1,12 @@
+name: Calcasieu River Salt Water Barrier - East (73472)
+lat: 30.2539638
+lon: -93.2181083
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=SaltWatBarrier_E.Stage.Inst.1Hour.0.rev
+series: SaltWatBarrier_E.Stage.Inst.1Hour.0.rev

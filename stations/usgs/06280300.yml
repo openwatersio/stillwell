@@ -1,0 +1,17 @@
+name: SOUTH FORK SHOSHONE RIVER NEAR VALLEY, WY
+lat: 44.20788888888889
+lon: -109.55525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1889.76
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06280300/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2022-10-06T21:45:00+00:00
+time_series_id: ce376f2014ed49dfbb3f44bcfaad5e29

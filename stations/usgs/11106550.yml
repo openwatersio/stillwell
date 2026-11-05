@@ -1,0 +1,17 @@
+name: CALLEGUAS C NR CAMARILLO CA
+lat: 34.1794498868909
+lon: -119.03982417545
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 17.806
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11106550/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2016-11-01T07:55:00+00:00
+time_series_id: 5c4614803f8f4b359deca9d5150055e6

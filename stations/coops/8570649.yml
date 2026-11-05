@@ -1,0 +1,23 @@
+name: PUBLIC LANDING, CHINCOTEAGUE BAY
+lat: 38.1483
+lon: -75.285
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.767
+  MHW: -0.743
+  DTL: -0.659
+  MTL: -0.662
+  MSL: -0.666
+  MLW: -0.582
+  MLLW: -0.551
+  LAT: -0.45
+  HAT: -0.879
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8570649
+established: 1985-07-13T00:00:00Z
+removed: 1985-11-06T23:59:00Z

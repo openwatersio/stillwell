@@ -1,0 +1,24 @@
+name: Trident Pier, Port Canaveral
+lat: 28.4158
+lon: -80.5931
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.684
+  MHW: -6.577
+  DTL: -6.086
+  MTL: -6.058
+  MSL: -6.06
+  MLW: -5.539
+  MLLW: -5.488
+  NAVD88: -6.348
+  LAT: -5.137
+  HAT: -7.164
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721604
+established: 1994-10-13T00:00:00Z

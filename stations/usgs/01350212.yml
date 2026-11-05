@@ -1,0 +1,16 @@
+name: SCHOHARIE CREEK NEAR NORTH BLENHEIM NY
+lat: 42.47263888888889
+lon: -74.44113888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 233.641
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01350212/
+parameter_code: "00065"
+series_begin: 2017-11-16T12:00:00+00:00
+time_series_id: a5072db0f0a74888bf321391ca7457e3

@@ -1,0 +1,16 @@
+name: BAYOU PIERRE NR WILLOWS, MS
+lat: 32.0186111111111
+lon: -90.8783333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 25.091
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07290650/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0406688bf72846cb9fd7b34d827a74cb

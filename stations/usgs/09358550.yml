@@ -1,0 +1,16 @@
+name: CEMENT CREEK AT SILVERTON, CO
+lat: 37.81971649650515
+lon: -107.66369006519584
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2864.382
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09358550/
+parameter_code: "00065"
+series_begin: 2020-08-27T00:00:00+00:00
+time_series_id: fc8f7180630247699732ffdc98448033

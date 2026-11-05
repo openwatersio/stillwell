@@ -1,0 +1,16 @@
+name: SOUTH FORK GRAND RIVER NEAR CASH, SD
+lat: 45.648694
+lon: -102.642889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 738.911
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06356500/
+parameter_code: "00065"
+series_begin: 2014-11-01T23:30:00+00:00
+time_series_id: efb5ab0d75f4473c9cf2f02144d7ce81

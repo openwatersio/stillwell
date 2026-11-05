@@ -1,0 +1,16 @@
+name: RIO GRANDE DE ARECIBO BLW UTUADO, PR
+lat: 18.302092
+lon: -66.704097
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 95.351
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50024950/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 6122264e46be45b7b52130b20c281494

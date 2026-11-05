@@ -1,0 +1,16 @@
+name: EAST FORK VERMILLION RIVER NEAR PARKER, SD
+lat: 43.445278
+lon: -97.109444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 351.681
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06478600/
+parameter_code: "00065"
+series_begin: 2018-05-01T06:00:00+00:00
+time_series_id: 46c97e9f74c94ba49c2a60dece01f3ed

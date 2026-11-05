@@ -1,0 +1,16 @@
+name: N High Point Rd Drainage Channel at Madison, WI
+lat: 43.080561111111116
+lon: -89.51916944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 297.485
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430450089310901/
+parameter_code: "00065"
+series_begin: 2025-04-23T08:26:57+00:00
+time_series_id: 020b2b762c924b96a551d32f4a5aeaa5

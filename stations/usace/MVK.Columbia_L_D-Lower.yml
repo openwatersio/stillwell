@@ -1,0 +1,11 @@
+name: Columbia L&D Lower
+lat: 32.166794
+lon: -92.110308
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Columbia%20L%26D-Lower.Stage.Inst.15Minutes.0.DCP-rev
+series: Columbia L&D-Lower.Stage.Inst.15Minutes.0.DCP-rev

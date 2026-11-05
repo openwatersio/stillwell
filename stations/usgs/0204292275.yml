@@ -1,0 +1,14 @@
+name: LYNNHAVEN RIVER INLET NEAR VIRGINIA BEACH, VA
+lat: 36.9066111111111
+lon: -76.0955833333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204292275/
+parameter_code: "62620"
+series_begin: 2019-11-25T20:18:00+00:00
+time_series_id: 1ecfa2bbcf2c4ab786a9098f4427346a

@@ -1,0 +1,15 @@
+name: Spring Creek at Derry St at Harrisburg, PA
+lat: 40.2585
+lon: -76.82580555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01571101/
+parameter_code: "00065"
+time_series_id: 8c988ee759634a9b9247e7b4055af873

@@ -1,0 +1,24 @@
+name: Atka
+lat: 52.231945
+lon: -174.1725
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.254
+  MHW: -9.187
+  DTL: -8.733
+  MTL: -8.778
+  MSL: -8.811
+  MLW: -8.369
+  MLLW: -8.212
+  NAVD88: -8.479
+  LAT: -7.618
+  HAT: -9.793
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9461710
+established: 2006-08-01T00:00:00Z

@@ -1,0 +1,16 @@
+name: SAN DIEGO R A MAST RD NR SANTEE CA
+lat: 32.84032620743603
+lon: -117.02584781058977
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 88.419
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11022480/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 80db95192a3b4776841ba8f45fb99823

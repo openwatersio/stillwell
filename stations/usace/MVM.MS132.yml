@@ -1,0 +1,13 @@
+name: Mississippi River @ Mhoon Landing
+lat: 34.740772
+lon: -90.445
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 49.115
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=MS132.Stage.Inst.1Hour.0.opendcs-rev
+series: MS132.Stage.Inst.1Hour.0.opendcs-rev

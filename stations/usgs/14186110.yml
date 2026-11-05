@@ -1,0 +1,16 @@
+name: GREEN PETER DAM TAILWATER NEAR FOSTER, OR
+lat: 44.4492944444444
+lon: -122.549666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14186110/
+parameter_code: "00065"
+series_begin: 2013-10-01T08:15:00+00:00
+time_series_id: 12336b9287a246f4b5edfd439377ea00

@@ -1,0 +1,21 @@
+name: Steamboat Bay
+lat: 55.5333
+lon: -133.637
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.416
+  MHW: -2.169
+  DTL: -0.842
+  MTL: -0.926
+  MSL: -0.92
+  MLW: 0.318
+  MLLW: 0.733
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450578
+established: 1921-05-17T00:00:00Z
+removed: 2006-05-09T23:59:00Z

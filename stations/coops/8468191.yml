@@ -1,0 +1,24 @@
+name: Saugatuck River
+lat: 41.12
+lon: -73.3683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.171
+  MHW: -7.067
+  DTL: -6.016
+  MTL: -6.002
+  MSL: -6.007
+  MLW: -4.936
+  MLLW: -4.862
+  NAVD88: -6.053
+  LAT: -4.408
+  HAT: -7.624
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8468191
+established: 2015-03-25T00:00:00Z
+removed: 2015-09-20T23:59:00Z

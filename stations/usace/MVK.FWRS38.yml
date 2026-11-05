@@ -1,0 +1,11 @@
+name: FWRS Lake 38
+lat: 33.09449722222
+lon: -90.030333333333
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=FWRS38.Stage.Inst.1Hour.0.DCP-raw
+series: FWRS38.Stage.Inst.1Hour.0.DCP-raw

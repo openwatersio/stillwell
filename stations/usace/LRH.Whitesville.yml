@@ -1,0 +1,11 @@
+name: Whitesville
+lat: 37.9662186
+lon: -81.524278
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Whitesville.Stage.Inst.15Minutes.0.OBS
+series: Whitesville.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: Narraguagus River at Cherryfield, Maine
+lat: 44.6080555555556
+lon: -67.9352777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 13.378
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01022500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f62d545e48ef4f57b18ca1e8af1ded74

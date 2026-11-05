@@ -1,0 +1,14 @@
+name: ABIQUIU RESERVOIR NEAR ABIQUIU N MEX
+lat: 36.24
+lon: -106.429444444444
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08286900/
+parameter_code: "00065"
+series_begin: 2019-07-30T14:30:00+00:00
+time_series_id: ccbf2f9144ab48279002520a9869b1d7

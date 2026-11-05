@@ -1,0 +1,13 @@
+name: POQUOSON RIVER AT CREEK CIRCLE NEAR SEAFORD, VA
+lat: 37.1783333333333
+lon: -76.3969444444445
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-371042076234900/
+parameter_code: "62620"
+time_series_id: 9422a370beb84819927bff0a2fc52fb0

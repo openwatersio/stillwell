@@ -1,0 +1,15 @@
+name: TONAWANDA ISLAND
+lat: 43.028305
+lon: -78.886696
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9063018
+established: 1968-01-01T00:00:00Z
+removed: 1975-12-31T23:59:00Z

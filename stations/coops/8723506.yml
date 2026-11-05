@@ -1,0 +1,23 @@
+name: PUMPKIN KEY, CARD SOUND
+lat: 25.325
+lon: -80.2933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.311
+  MHW: -1.309
+  DTL: -1.197
+  MTL: -1.21
+  MSL: -1.194
+  MLW: -1.111
+  MLLW: -1.083
+  LAT: -0.945
+  HAT: -1.484
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723506
+established: 1975-07-17T00:00:00Z
+removed: 1987-10-23T23:59:00Z

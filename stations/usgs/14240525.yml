@@ -1,0 +1,16 @@
+name: NF TOUTLE RIVER BELOW SRS NEAR KID VALLEY, WA
+lat: 46.3717753032771
+lon: -122.578998736335
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 213.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14240525/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 712cc8ea85c144f298dc2be18d1588a8

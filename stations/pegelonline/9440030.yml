@@ -1,0 +1,13 @@
+name: WHV NEUER VORHAFEN
+lat: 53.530306
+lon: 8.160729
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=9440030

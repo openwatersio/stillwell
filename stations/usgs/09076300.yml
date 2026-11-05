@@ -1,0 +1,16 @@
+name: ROARING FORK RIVER BLW MAROON CREEK NR ASPEN, CO
+lat: 39.2232
+lon: -106.857308333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2308.019
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09076300/
+parameter_code: "00065"
+series_begin: 2020-10-05T18:00:00+00:00
+time_series_id: ab4585d6bbeb4ca290da421e9bf0dc37

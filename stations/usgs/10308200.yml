@@ -1,0 +1,16 @@
+name: E FK CARSON RV BLW MARKLEEVILLE CK NR MARKLEEVILLE
+lat: 38.7146274318641
+lon: -119.764898459569
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1645.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10308200/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: b1056d9e7a8f44e9aa77fb399601442e

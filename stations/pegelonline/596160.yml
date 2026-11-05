@@ -1,0 +1,13 @@
+name: NEUBURG OP
+lat: 53.416021
+lon: 11.930333
+country_code: DE
+datum: PNP
+datums:
+  NHN: 46.611
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=596160

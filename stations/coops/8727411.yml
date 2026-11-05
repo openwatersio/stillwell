@@ -1,0 +1,22 @@
+name: YANKEETOWN, WITHLACOOCHEE RIVER
+lat: 29.03
+lon: -82.7133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.599
+  MHW: -1.496
+  DTL: -1.002
+  MTL: -1.032
+  MSL: -1.037
+  MLW: -0.569
+  MLLW: -0.404
+  NAVD88: -1.081
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727411
+established: 1978-05-24T00:00:00Z
+removed: 1979-01-17T23:59:00Z

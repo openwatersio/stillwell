@@ -1,0 +1,16 @@
+name: Niobrara River bl Soldier Cr nr Niobrara, Nebr.
+lat: 42.697581
+lon: -98.119744
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 386.666
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06465520/
+parameter_code: "00065"
+series_begin: 2026-03-25T23:00:00+00:00
+time_series_id: 4076fb8490f4405bbd1cf74fe08e3a09

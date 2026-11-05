@@ -1,0 +1,17 @@
+name: Mahoning Creek at Big Run, PA
+lat: 40.96472222222223
+lon: -78.87944444444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 386.148
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03033289/
+parameter_code: "00065"
+series_begin: 2013-10-01T05:00:00+00:00
+series_end: 2026-08-07T13:45:00+00:00
+time_series_id: 56f6f2a9b8934367976f2d643b794e6b

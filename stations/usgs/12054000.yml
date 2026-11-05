@@ -1,0 +1,16 @@
+name: DUCKABUSH RIVER NEAR BRINNON, WA
+lat: 47.6839805909158
+lon: -123.011551059881
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.743
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12054000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5d22528360e84b758e08459420316f1e

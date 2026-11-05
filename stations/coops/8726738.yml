@@ -1,0 +1,24 @@
+name: SAFETY HARBOR, OLD TAMPA BAY
+lat: 27.9883
+lon: -82.685
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.422
+  MHW: -1.316
+  DTL: -0.997
+  MTL: -1.024
+  MSL: -1.024
+  MLW: -0.733
+  MLLW: -0.572
+  NAVD88: -1.109
+  LAT: -0.246
+  HAT: -1.67
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726738
+established: 1975-12-19T00:00:00Z
+removed: 1991-06-04T23:59:00Z

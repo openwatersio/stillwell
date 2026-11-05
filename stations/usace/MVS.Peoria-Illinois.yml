@@ -1,0 +1,14 @@
+name: Peoria
+lat: 40.7024665
+lon: -89.5657927
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 130.576
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Peoria-Illinois.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Peoria-Illinois.Stage.Inst.15Minutes.0.lrgsShef-rev

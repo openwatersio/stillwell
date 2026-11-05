@@ -1,0 +1,16 @@
+name: TULAROSA CREEK NEAR BENT, NM
+lat: 33.144888888888886
+lon: -105.89790277777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1661.27
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08481500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: bc18d97efef64f1d9160f55fce3fc8bb

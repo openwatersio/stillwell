@@ -1,0 +1,16 @@
+name: DELAWARE RIVER NR RED BLUFF, NM
+lat: 32.0231416666667
+lon: -104.054455555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 884.548
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08408500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 06b3c37e5cbc4497b22728626af32a00

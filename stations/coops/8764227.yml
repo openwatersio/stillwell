@@ -1,0 +1,24 @@
+name: LAWMA, Amerada Pass
+lat: 29.4496
+lon: -91.3381
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.633
+  MHW: -7.586
+  DTL: -7.387
+  MTL: -7.413
+  MSL: -7.4
+  MLW: -7.239
+  MLLW: -7.141
+  NAVD88: -7.421
+  LAT: -6.774
+  HAT: -7.833
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8764227
+established: 2005-11-01T00:00:00Z

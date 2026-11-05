@@ -1,0 +1,16 @@
+name: KAYS CREEK NEAR LAYTON, UTAH
+lat: 41.04088611111111
+lon: -111.99666944444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1290.932
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10141450/
+parameter_code: "00065"
+series_begin: 2024-08-28T19:00:00+00:00
+time_series_id: 7326f9b8e6cf4a2f815a2adfe6aec829

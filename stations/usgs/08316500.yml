@@ -1,0 +1,17 @@
+name: NICHOLS RESERVOIR NEAR SANTA FE N MEX
+lat: 35.6894444444444
+lon: -105.88
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 2255.52
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08316500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2013-09-13T06:15:00+00:00
+time_series_id: 57e72a88a87b418588dae47d4c312a6a

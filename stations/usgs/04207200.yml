@@ -1,0 +1,16 @@
+name: Tinkers Creek at Bedford OH
+lat: 41.3844986836357
+lon: -81.5273419189014
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 266.877
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04207200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 06b096d7f6ff44b0b084888b7a4364ec

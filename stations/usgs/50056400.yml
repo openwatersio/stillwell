@@ -1,0 +1,16 @@
+name: RIO VALENCIANO NR JUNCOS, PR
+lat: 18.216072
+lon: -65.926169
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 71.695
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50056400/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 7dd76803988541298672b94189c3853f

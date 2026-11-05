@@ -1,0 +1,16 @@
+name: Kaukonahua Stream blw Wahiawa Reservoir, Oahu, HI
+lat: 21.500245903717786
+lon: -158.0510886772592
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 231.648
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16210200/
+parameter_code: "00065"
+series_begin: 2012-10-18T00:55:00+00:00
+time_series_id: b0467e79068344138f5ece825479c9d6

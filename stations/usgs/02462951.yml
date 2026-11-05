@@ -1,0 +1,16 @@
+name: BLACK WARRIOR RIVER AT HOLT L&D NEAR HOLT AL.
+lat: 33.2531725836072
+lon: -87.4491702841941
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02462951/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 931e7bf39a4944a9b58a365e6f2223da

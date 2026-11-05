@@ -1,0 +1,16 @@
+name: TIBBETTS POINT
+lat: 44.100304
+lon: -76.37033
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -74.2
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9052001
+established: 1899-08-01T00:00:00Z
+removed: 1915-12-31T00:00:00Z

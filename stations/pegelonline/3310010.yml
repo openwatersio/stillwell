@@ -1,0 +1,13 @@
+name: FUESTRUP
+lat: 52.040267
+lon: 7.680241
+country_code: DE
+datum: PNP
+datums:
+  NHN: 35.687
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=3310010

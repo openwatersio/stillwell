@@ -1,0 +1,12 @@
+name: Avoca Island Cutoff South of Morgan City (03820)
+lat: 29.5333333
+lon: -91.2494444
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Avoca_ISL_Cutoff.Stage.Inst.15Minutes.0.rev
+series: Avoca_ISL_Cutoff.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,13 @@
+name: HANN.MUENDEN
+lat: 51.425789
+lon: 9.640917
+country_code: DE
+datum: PNP
+datums:
+  NN: 114.95
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=43100109

@@ -1,0 +1,17 @@
+name: CONTENTNEA CREEK AT GRIFTON, NC
+lat: 35.37
+lon: -77.4463888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.884
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02091764/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2012-10-01T03:45:00+00:00
+time_series_id: d9d4645dc0c34f84b293b83f4ed7d60f

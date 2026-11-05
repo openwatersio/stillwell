@@ -1,0 +1,23 @@
+name: Kinak Bay
+lat: 59.94753
+lon: -164.21066
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.511
+  MHW: -9.077
+  DTL: -8.08
+  MTL: -8.042
+  MSL: -8.1
+  MLW: -7.007
+  MLLW: -6.649
+  LAT: -6.219
+  HAT: -10.287
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465953
+established: 2016-06-10T00:00:00Z
+removed: 2016-09-29T03:00:00Z

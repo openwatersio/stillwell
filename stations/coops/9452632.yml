@@ -1,0 +1,13 @@
+name: Wachusett Inlet, Glacier Bay
+lat: 58.9467
+lon: -136.333
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452632
+established: 1972-08-29T00:00:00Z
+removed: 2009-11-09T23:59:00Z

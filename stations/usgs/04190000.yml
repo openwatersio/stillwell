@@ -1,0 +1,16 @@
+name: Blanchard River near Dupont OH
+lat: 41.0414393242054
+lon: -84.2268905172716
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 209.425
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04190000/
+parameter_code: "00065"
+series_begin: 2014-02-28T17:30:00+00:00
+time_series_id: 3ebe68cd638e41299ccb05baa051c358

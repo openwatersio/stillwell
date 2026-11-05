@@ -1,0 +1,16 @@
+name: NORTHEAST CAPE FEAR R NR BURGAW, NC
+lat: 34.5983333333333
+lon: -77.8752777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.296
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02108566/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cda04e06ef014f67907f78ac6dd8effc

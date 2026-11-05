@@ -1,0 +1,16 @@
+name: KETTLE RIVER BELOW SANDSTONE, MN
+lat: 46.105191
+lon: -92.864309
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 284.016
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05336700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e3c7bee631c248a293eb8d7517f12c5f

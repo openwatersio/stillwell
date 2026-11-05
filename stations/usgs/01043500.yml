@@ -1,0 +1,16 @@
+name: Dead River near Dead River, Maine
+lat: 45.22905
+lon: -70.2011277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 318.476
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01043500/
+parameter_code: "00065"
+series_begin: 2014-06-19T04:00:00+00:00
+time_series_id: 620b876f3b044391a87c2e02dfdee33b

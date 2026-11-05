@@ -1,0 +1,16 @@
+name: POWDER SPRINGS CREEK NEAR POWDER SPRINGS, GA
+lat: 33.8591666666667
+lon: -84.6883611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 272.229
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02336870/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: fc2c97dbfaf2459c8014d1bc710bd0bb

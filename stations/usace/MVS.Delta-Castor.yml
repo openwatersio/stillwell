@@ -1,0 +1,13 @@
+name: Delta
+lat: 37.2054833
+lon: -89.8492083
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 100.639
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Delta-Castor.Stage.Inst.1Hour.0.lrgsShef-rev
+series: Delta-Castor.Stage.Inst.1Hour.0.lrgsShef-rev

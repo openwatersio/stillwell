@@ -1,0 +1,11 @@
+name: London Ave Canal 4-Prentiss Ave
+lat: 30.0170555
+lon: -90.0705112
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=London_Canal-Prentiss.Stage.Inst.15Minutes.0.rev
+series: London_Canal-Prentiss.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,21 @@
+name: HIDDEN INLET ENTRANCE, PEARSE INLET
+lat: 54.9437
+lon: -130.3358
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.024
+  MHW: -9.753
+  DTL: -7.608
+  MTL: -7.714
+  MSL: -7.713
+  MLW: -5.676
+  MLLW: -5.192
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450192
+established: 2025-05-29T00:00:00Z
+removed: 2025-09-11T00:00:00Z

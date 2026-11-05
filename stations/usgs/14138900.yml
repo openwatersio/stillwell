@@ -1,0 +1,16 @@
+name: NORTH FORK BULL RUN RIVER NEAR MULTNOMAH FALLS, OR
+lat: 45.49424543152181
+lon: -122.03588795804295
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 324.612
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14138900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 8d01162bcc4a4270b8204e683cb2530a

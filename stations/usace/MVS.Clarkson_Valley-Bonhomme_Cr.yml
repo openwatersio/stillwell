@@ -1,0 +1,13 @@
+name: Bonhomme Creek at Clarkson Valley
+lat: 38.658
+lon: -90.619
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 136.913
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Clarkson%20Valley-Bonhomme%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Clarkson Valley-Bonhomme Cr.Stage.Inst.5Minutes.0.Usgs-raw

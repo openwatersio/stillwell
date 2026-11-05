@@ -1,0 +1,12 @@
+name: Wremertief
+lat: 53.64861
+lon: 8.49472
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.5
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/wremertief

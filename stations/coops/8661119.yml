@@ -1,0 +1,13 @@
+name: SANDY ISLAND NORTH, BULL CR.
+lat: 33.6017
+lon: -79.1183
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661119
+established: 1982-03-19T00:00:00Z
+removed: 1983-03-02T23:59:00Z

@@ -1,0 +1,16 @@
+name: Clear Creek near Coralville, IA
+lat: 41.6766805555556
+lon: -91.5987777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.294
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05454300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6484c2d61812435682a2cfa3a39e64e5

@@ -1,0 +1,16 @@
+name: SHASTA R NR YREKA CA
+lat: 41.82288000246793
+lon: -122.59555652562614
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 620.856
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11517500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4aff21d66c7b4cb5aabcb5955e2ff9f9

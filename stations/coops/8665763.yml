@@ -1,0 +1,24 @@
+name: Hollywood, Wadmalaw River
+lat: 32.7467
+lon: -80.165
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.672
+  MHW: -3.577
+  DTL: -2.695
+  MTL: -2.66
+  MSL: -2.789
+  MLW: -1.744
+  MLLW: -1.718
+  NAVD88: -2.778
+  LAT: -1.364
+  HAT: -4.155
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665763
+established: 1976-12-30T00:00:00Z
+removed: 2023-04-26T18:00:00Z

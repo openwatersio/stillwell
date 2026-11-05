@@ -1,0 +1,22 @@
+name: NORTH FORK, ST. LUCIE RIVER
+lat: 27.2433
+lon: -80.3133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.618
+  MHW: -0.586
+  DTL: -0.434
+  MTL: -0.437
+  MSL: -0.443
+  MLW: -0.288
+  MLLW: -0.251
+  NAVD88: -0.717
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722334
+established: 1972-07-11T00:00:00Z
+removed: 1973-01-15T23:59:00Z

@@ -1,0 +1,16 @@
+name: IVY RIVER NEAR MARSHALL, NC
+lat: 35.7697222222222
+lon: -82.6208333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 518.224
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03453000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 85f68c2dda2c46149804232bb680b6b0

@@ -1,0 +1,16 @@
+name: RUSSIAN R A HACIENDA BRIDGE NR GUERNEVILLE CA
+lat: 38.508482040255636
+lon: -122.9277345330354
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.806
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11467000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: ee8b76ce4a5043abb57b5fb3171ad1cb

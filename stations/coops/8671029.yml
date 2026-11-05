@@ -1,0 +1,13 @@
+name: TYBEE MARINA, TYBEE CREEK
+lat: 31.9967
+lon: -80.855
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8671029
+established: 1994-09-27T00:00:00Z
+removed: 1996-04-12T23:59:00Z

@@ -1,0 +1,16 @@
+name: WARM SPRINGS CREEK BELOW DIVERSION NR MACKAY ID
+lat: 43.9851388888889
+lon: -113.799083333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1871.999
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13124265/
+parameter_code: "00065"
+series_begin: 2019-03-26T22:15:00+00:00
+time_series_id: 21a38fd96d8e4158b2769dd62a442af7

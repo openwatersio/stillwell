@@ -1,0 +1,16 @@
+name: HILTON CYN C NR SANTA YNEZ CA
+lat: 34.58220322354205
+lon: -119.98260820241012
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 200.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11125600/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: d0e2856c0a3b45f3bd731f2450027e37

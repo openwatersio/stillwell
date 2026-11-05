@@ -1,0 +1,16 @@
+name: SALAMONIE RIVER AT DORA, IN
+lat: 40.811690236073076
+lon: -85.68384072045771
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 205.231
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03324500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6c464127dc81457c96f092eaa1f5f550

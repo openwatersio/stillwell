@@ -1,0 +1,17 @@
+name: ROCKY REACH DAM TW UNIT 10 NEAR WENATCHEE, WA
+lat: 47.533147943668055
+lon: -120.30115712903192
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.109
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12453690/
+parameter_code: "00065"
+series_begin: 2022-09-30T15:30:00+00:00
+series_end: 2026-10-15T07:00:00+00:00
+time_series_id: 2829bcccb7d24b0f93003d472bec2b39

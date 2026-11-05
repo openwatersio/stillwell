@@ -1,0 +1,17 @@
+name: WALNUT C A DIAMOND BLVD BRIDGE NR CONCORD CA
+lat: 37.96955277777778
+lon: -122.05378333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.058
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11183670/
+parameter_code: "00065"
+series_begin: 2021-11-01T08:00:00+00:00
+series_end: 2022-06-01T07:45:00+00:00
+time_series_id: 03d3f1d41c7a43d1b9f817d003f668c4

@@ -1,0 +1,16 @@
+name: Dry Comal Ck at Loop 337 nr New Braunfels, TX
+lat: 29.688
+lon: -98.1548333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08168797/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4daec05fe879494ab01a0b311d62351a

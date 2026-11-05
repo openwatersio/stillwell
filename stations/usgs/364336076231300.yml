@@ -1,0 +1,17 @@
+name: PORTSMOUTH DCH BL CS AT BIG ENTRY NR DEEP CR, VA
+lat: 36.7266694444444
+lon: -76.3871305555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-364336076231300/
+parameter_code: "00065"
+series_begin: 2014-11-15T05:00:00+00:00
+series_end: 2023-11-28T15:30:00+00:00
+time_series_id: 8643cdbcadc1418087fa426eccc5fe34

@@ -1,0 +1,13 @@
+name: Killbuck
+lat: 40.4816
+lon: -81.9855
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 240.198
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Killbuck.Stage.Inst.15Minutes.0.OBS
+series: Killbuck.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,17 @@
+name: NY-TL1 ALFRED TILE EDGE OF FIELD, SONYEA NY
+lat: 42.6918333333333
+lon: -77.8324722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.784
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-424131077495802/
+parameter_code: "00065"
+series_begin: 2016-04-14T19:35:00+00:00
+series_end: 2022-02-11T11:30:00+00:00
+time_series_id: c0653397ed3a45a991dc2c0c14e8efad

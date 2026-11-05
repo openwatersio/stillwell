@@ -1,0 +1,16 @@
+name: CARSON RV AT TARZYN RD NR FALLON, NV
+lat: 39.5588059401035
+lon: -118.725984184926
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1194.816
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10312275/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: f70d65a35db64140a7f54a708479025a

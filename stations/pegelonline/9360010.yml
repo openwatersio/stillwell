@@ -1,0 +1,14 @@
+name: NORDERNEY RIFFGAT
+lat: 53.696499
+lon: 7.157759
+country_code: DE
+kind: coastal
+datum: PNP
+datums:
+  NHN: -5
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=9360010

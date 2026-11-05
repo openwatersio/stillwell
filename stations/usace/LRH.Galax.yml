@@ -1,0 +1,13 @@
+name: Galax
+lat: 36.6472
+lon: -80.9792
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 714.503
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Galax.Stage.Inst.15Minutes.0.OBS
+series: Galax.Stage.Inst.15Minutes.0.OBS

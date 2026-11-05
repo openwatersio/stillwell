@@ -1,0 +1,16 @@
+name: PORTER BAYOU AT STEPHENSVILLE, MS
+lat: 33.54825
+lon: -90.6723611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07288521/
+parameter_code: "00065"
+series_begin: 2010-02-03T19:30:00+00:00
+time_series_id: b094c65514dd406890de246e1e6155f6

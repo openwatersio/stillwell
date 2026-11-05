@@ -1,0 +1,16 @@
+name: GREEN RIVER AT ROCKPORT, KY
+lat: 37.3353218464501
+lon: -87.0027729557818
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 110.578
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03316645/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 76bf6d652553467c94671f8cf411495b

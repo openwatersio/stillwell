@@ -1,0 +1,22 @@
+name: DUMFOUNDLING BAY
+lat: 25.9417
+lon: -80.125
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.808
+  MHW: -0.787
+  DTL: -0.468
+  MTL: -0.479
+  MSL: -0.477
+  MLW: -0.171
+  MLLW: -0.128
+  NAVD88: -0.704
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723044
+established: 1973-07-19T00:00:00Z
+removed: 1973-09-06T23:59:00Z

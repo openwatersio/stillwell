@@ -1,0 +1,17 @@
+name: DRAIN 14 AT 41ST SE SOUTH OF MAPLETON, ND
+lat: 46.8186111111111
+lon: -97.0319444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.363
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-464907097015500/
+parameter_code: "00065"
+series_begin: 2019-03-27T21:15:00+00:00
+series_end: 2020-04-30T16:00:00+00:00
+time_series_id: 02f24e9db008496c908daaf22c66d42b

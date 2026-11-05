@@ -1,0 +1,13 @@
+name: MURDERKILL RIVER ENTRANCE
+lat: 39.0583
+lon: -75.3967
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8555388
+established: 1983-03-04T00:00:00Z
+removed: 1985-04-26T23:59:00Z

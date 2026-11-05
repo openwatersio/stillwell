@@ -1,0 +1,22 @@
+name: Palm Beach
+lat: 26.705
+lon: -80.045
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.09
+  MHW: -2.033
+  DTL: -1.647
+  MTL: -1.642
+  MSL: -1.634
+  MLW: -1.25
+  MLLW: -1.203
+  NAVD88: -1.938
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722621
+established: 1976-08-09T00:00:00Z
+removed: 1986-12-02T23:59:00Z

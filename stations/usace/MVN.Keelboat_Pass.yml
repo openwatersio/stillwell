@@ -1,0 +1,12 @@
+name: Keelboat Pass below Lake Chicot (03615)
+lat: 30.0384528
+lon: -91.4558333
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Keelboat_Pass.Stage.Inst.1Hour.0.rev
+series: Keelboat_Pass.Stage.Inst.1Hour.0.rev

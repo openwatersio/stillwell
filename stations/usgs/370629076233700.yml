@@ -1,0 +1,13 @@
+name: BRICK KILN CR AT RT 172 NEAR POQUOSON, VA
+lat: 37.1082006322061
+lon: -76.393279388323
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-370629076233700/
+parameter_code: "62620"
+time_series_id: dead8b4075704819aedcb59ca4924c4d

@@ -1,0 +1,16 @@
+name: HERRING RUN AT SINCLAIR LANE AT BALTIMORE, MD
+lat: 39.317972222222224
+lon: -76.55513888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.54
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01585219/
+parameter_code: "00065"
+series_begin: 2013-10-01T05:00:00+00:00
+time_series_id: bd8a9a80087245ebb6a2bd2bc924ef65

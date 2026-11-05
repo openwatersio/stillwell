@@ -1,0 +1,16 @@
+name: SOUTH YAMHILL RIVER AT MCMINNVILLE, OR
+lat: 45.206944444444446
+lon: -123.18166666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 18.806
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14194150/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 892a95b8706b46adb5c4026f08c8a8f0

@@ -1,0 +1,16 @@
+name: NORTH PRONG ALAFIA RIVER NEAR NICHOLS FL
+lat: 27.890602777777776
+lon: -82.01296666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02300882/
+parameter_code: "00065"
+series_begin: 2008-09-26T04:00:00+00:00
+time_series_id: 4424245d2e1d4e288efa0ea583883f9d

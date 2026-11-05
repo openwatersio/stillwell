@@ -1,0 +1,16 @@
+name: Hanalei River nr Hanalei, Kauai, HI
+lat: 22.179579358558023
+lon: -159.46639456813517
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 18.288
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16103000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: c245e2ddc6a649eea0a92689002bf59b

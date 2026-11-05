@@ -1,0 +1,16 @@
+name: LEVISA FORK AT PRESTONSBURG, KY
+lat: 37.6709302671087
+lon: -82.7771043202102
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.033
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03209800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 13b1360d85af4ad2b7cb232d47b4f0c3

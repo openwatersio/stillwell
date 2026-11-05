@@ -1,0 +1,17 @@
+name: Flat Creek above Cache Creek, at Jackson, WY
+lat: 43.4873833333333
+lon: -110.763280555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1892.198
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13018250/
+parameter_code: "00065"
+series_begin: 2019-03-26T07:00:00+00:00
+series_end: 2020-10-20T07:00:00+00:00
+time_series_id: 935a718a0e2749b694b2a278efd28f7b

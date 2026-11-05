@@ -1,0 +1,13 @@
+name: PEEDEE RIVER AT US15 AT SOCIETY HILL,SC
+lat: 34.5255555555556
+lon: -79.8327777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02130700/
+parameter_code: "00065"
+time_series_id: 1fe2967c6e5542e690fe5914c718e0e8

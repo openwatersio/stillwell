@@ -1,0 +1,13 @@
+name: Bayou Bartholomew @ Star City
+lat: 33.9611
+lon: -91.7856
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 46.711
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Star%20City.Stage.Inst.1Hour.0.DCP-rev
+series: Star City.Stage.Inst.1Hour.0.DCP-rev

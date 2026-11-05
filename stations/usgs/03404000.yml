@@ -1,0 +1,16 @@
+name: CUMBERLAND RIVER AT WILLIAMSBURG, KY
+lat: 36.7434169974125
+lon: -84.1560449420929
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.583
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03404000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e7e8993948aa451da695ddcc651da8b2

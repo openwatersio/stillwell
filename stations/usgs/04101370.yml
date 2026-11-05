@@ -1,0 +1,16 @@
+name: JUDY CREEK NEAR SOUTH BEND, IN
+lat: 41.72862636566744
+lon: -86.2627483803372
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 205.737
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04101370/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0f0b0f1c845e4749ad5a6027c1816d93

@@ -1,0 +1,16 @@
+name: West Branch Brandywine Creek near Honey Brook, PA
+lat: 40.072778
+lon: -75.861111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.228
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01480300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: db85687276d64aae872bf4c3cc080473

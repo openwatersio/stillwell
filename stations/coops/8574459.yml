@@ -1,0 +1,23 @@
+name: POND POINT (ABERDEEN P.G.), BUSH RIVER
+lat: 39.3883
+lon: -76.255
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.161
+  MHW: -3.053
+  DTL: -2.888
+  MTL: -2.863
+  MSL: -2.884
+  MLW: -2.673
+  MLLW: -2.615
+  LAT: -2.55
+  HAT: -3.314
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8574459
+established: 1995-07-19T00:00:00Z
+removed: 1995-09-19T23:59:00Z

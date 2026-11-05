@@ -1,0 +1,14 @@
+name: D&R Ca feeder US of gate at Washington Crossing NJ
+lat: 40.2963888888889
+lon: -74.8666666666667
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01460378/
+parameter_code: "63160"
+series_begin: 2019-04-15T05:00:00+00:00
+time_series_id: bb1844b4954445adb1af13fcd8cef6ea

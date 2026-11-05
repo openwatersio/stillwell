@@ -1,0 +1,16 @@
+name: Puohokamoa Str ab Spreckels Ditch, Maui, HI
+lat: 20.85263746498313
+lon: -156.18858546707042
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 402.958
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16545000/
+parameter_code: "00065"
+series_begin: 2024-01-29T22:00:00+00:00
+time_series_id: f1bd8b3aa32b4047b60e55769809ba41

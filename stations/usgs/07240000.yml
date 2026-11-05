@@ -1,0 +1,16 @@
+name: Lake Hefner Canal near Oklahoma City, OK
+lat: 35.55305555555555
+lon: -97.61972222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 364.529
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07240000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e3bcdb3d6c1040e9a081bdd423aaef8d

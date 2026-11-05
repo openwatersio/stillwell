@@ -1,0 +1,22 @@
+name: CAPE HALKETT
+lat: 70.7551
+lon: -152.3378
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.145
+  MHW: -9.106
+  DTL: -9.033
+  MTL: -9.025
+  MSL: -9.035
+  MLW: -8.944
+  MLLW: -8.92
+  NAVD88: -8.15
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9496345
+established: 2025-07-29T00:00:00Z
+removed: 2025-09-19T00:00:00Z

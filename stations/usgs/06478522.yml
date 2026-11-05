@@ -1,0 +1,16 @@
+name: Bow Creek near Wynot, Nebr.
+lat: 42.764986111111114
+lon: -97.17251111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 350.194
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06478522/
+parameter_code: "00065"
+series_begin: 2015-03-27T05:00:00+00:00
+time_series_id: fecef3d4b530402f83367832ac8e183f

@@ -1,0 +1,22 @@
+name: HO-NON-WAH BOYSCOUT CAMP, BOHICKET CR
+lat: 32.625
+lon: -80.1667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.885
+  MHW: -2.776
+  DTL: -1.896
+  MTL: -1.873
+  MSL: -1.975
+  MLW: -0.97
+  MLLW: -0.906
+  NAVD88: -2.029
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666918
+established: 1982-08-17T00:00:00Z
+removed: 1983-03-04T23:59:00Z

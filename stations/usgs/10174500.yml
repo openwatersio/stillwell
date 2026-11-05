@@ -1,0 +1,16 @@
+name: SEVIER RIVER AT HATCH, UT
+lat: 37.6510908638709
+lon: -112.430206925133
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2094.458
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10174500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 97d2e6757a1542afa4015e08a9179e17

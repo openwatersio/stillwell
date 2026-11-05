@@ -1,0 +1,16 @@
+name: SHEYENNE R AB SHEYENNE R DIVERSION NR HORACE, ND
+lat: 46.746389
+lon: -96.926944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 271.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05059300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 32eb88d245e24ab393da23615f2bfac4

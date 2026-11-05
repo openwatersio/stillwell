@@ -1,0 +1,15 @@
+name: MIDDLE FORK BIG MUDDY RIVER NEAR MACEDONIA, IL
+lat: 38.0486111111111
+lon: -88.7602777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05596300/
+parameter_code: "00065"
+series_begin: 2015-10-01T06:00:00+00:00
+series_end: 2017-01-31T05:45:00+00:00
+time_series_id: 2f7d081e36374de6bf2441821ba77541

@@ -1,0 +1,16 @@
+name: East Br Rahway Riv at Millburn Ave at Millburn NJ
+lat: 40.7227777777778
+lon: -74.285
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 27.097
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01393895/
+parameter_code: "00065"
+series_begin: 2009-02-25T05:00:00+00:00
+time_series_id: 9abdd80e31694a938cbccbcaed26f1ce

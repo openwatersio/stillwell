@@ -1,0 +1,17 @@
+name: COTTONWOOD SPR ABV COTTONWOOD CR, NR GRAND CYN, AZ
+lat: 36.023594
+lon: -111.988219
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1194.816
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09402450/
+parameter_code: "00065"
+series_begin: 2017-12-13T22:15:00+00:00
+series_end: 2021-02-23T23:45:00+00:00
+time_series_id: 75462e5f4f8e4d85b5c7c7c275ec1127

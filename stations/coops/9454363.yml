@@ -1,0 +1,13 @@
+name: ROCKY PT, T-17
+lat: 60.9467
+lon: -146.755
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454363
+established: 1977-06-14T00:00:00Z
+removed: 1977-08-16T23:59:00Z

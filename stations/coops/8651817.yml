@@ -1,0 +1,22 @@
+name: Edenhouse Point
+lat: 36.055027
+lon: -76.68425
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.867
+  MHW: -8.856
+  DTL: -8.8
+  MTL: -8.806
+  MSL: -8.805
+  MLW: -8.755
+  MLLW: -8.734
+  NAVD88: -8.847
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8651817
+established: 2012-02-13T00:00:00Z
+removed: 2012-08-08T23:59:00Z

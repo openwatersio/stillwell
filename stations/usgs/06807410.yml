@@ -1,0 +1,16 @@
+name: West Nishnabotna River at Hancock, IA
+lat: 41.3901111111111
+lon: -95.3720555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 331.08
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06807410/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f100d27d43484a2590a09e50eed75cb7

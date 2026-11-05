@@ -1,0 +1,17 @@
+name: WOODWARD CANAL A OLD R NR BRENTWOOD CA
+lat: 37.91375277777777
+lon: -121.55475833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.829
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-375450121331701/
+parameter_code: "00065"
+series_begin: 2021-09-18T08:00:00+00:00
+series_end: 2022-02-03T07:45:00+00:00
+time_series_id: ab18e7eb59b24cc0b466194243af539f

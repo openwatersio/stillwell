@@ -1,0 +1,16 @@
+name: SOUTH FORK LICKING RIVER AT CYNTHIANA, KY
+lat: 38.3909080377298
+lon: -84.3029904509099
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 209.648
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03252500/
+parameter_code: "00065"
+series_begin: 2010-10-16T04:00:00+00:00
+time_series_id: a44743b99edf4b94bf27df4362e6c025

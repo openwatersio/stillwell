@@ -1,0 +1,16 @@
+name: PEE DEE RIVER BELOW POWERHOUSE DAM NR PEE DEE, NC
+lat: 34.9834833333333
+lon: -79.8775805555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.573
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0212880025/
+parameter_code: "00065"
+series_begin: 2011-07-13T04:00:00+00:00
+time_series_id: 28fadf291e5749f1a7f5713f35f033fc

@@ -1,0 +1,14 @@
+name: Wayne
+lat: 38.2486
+lon: -82.4347
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 170.688
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Wayne.Stage.Inst.15Minutes.0.OBS
+series: Wayne.Stage.Inst.15Minutes.0.OBS

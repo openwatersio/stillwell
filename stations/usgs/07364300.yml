@@ -1,0 +1,16 @@
+name: Chemin-A-Haut Bayou near Beekman, LA
+lat: 32.9820721136171
+lon: -91.8056818189198
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.036
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07364300/
+parameter_code: "00065"
+series_begin: 2014-09-10T20:00:00+00:00
+time_series_id: a202384d6f8e4e928a12a875da26478e

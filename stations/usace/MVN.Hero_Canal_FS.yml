@@ -1,0 +1,11 @@
+name: Hero Canal Control Structure -(W) Flood Side (82762)
+lat: 29.7903945
+lon: -90.035413833333
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Hero_Canal_FS.Stage.Inst.15Minutes.0.rev
+series: Hero_Canal_FS.Stage.Inst.15Minutes.0.rev

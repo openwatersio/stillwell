@@ -1,0 +1,16 @@
+name: PINE RIVER AT KINGS CORNER RD NR OSCODA, MI
+lat: 44.51166408338122
+lon: -83.40681335196935
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.924
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04137680/
+parameter_code: "00065"
+series_begin: 2023-10-13T15:00:00+00:00
+time_series_id: e053807b05144d0f81107fa15ff77c40

@@ -1,0 +1,16 @@
+name: RAPID CREEK ABOVE PACTOLA RES AT SILVER CITY, SD
+lat: 44.084722
+lon: -103.58
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1408.84
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06410500/
+parameter_code: "00065"
+series_begin: 2017-12-31T01:15:00+00:00
+time_series_id: d730b2f18bc4418cbdf03ad98da545dd

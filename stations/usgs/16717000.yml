@@ -1,0 +1,16 @@
+name: Honolii Stream nr Papaikou, HI
+lat: 19.764328887011022
+lon: -155.15183798219323
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 469.392
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16717000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 26d1d699aa0841cbb4d3cf8cbe191cd3

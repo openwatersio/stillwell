@@ -1,0 +1,13 @@
+name: Riverview Park Near Louisville
+lat: 38.134711111111
+lon: -85.901230555556
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 113.48
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=RiverviewPK.Stage.Inst.15Minutes.0.USGS-rev
+series: RiverviewPK.Stage.Inst.15Minutes.0.USGS-rev

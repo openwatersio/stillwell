@@ -1,0 +1,22 @@
+name: SIMPSON CREEK
+lat: 30.465
+lon: -81.4317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.463
+  MHW: -2.358
+  DTL: -1.618
+  MTL: -1.584
+  MSL: -1.601
+  MLW: -0.81
+  MLLW: -0.772
+  NAVD88: -1.74
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720168
+established: 1978-03-14T00:00:00Z
+removed: 1978-09-06T23:59:00Z

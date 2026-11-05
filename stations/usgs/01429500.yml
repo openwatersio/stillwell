@@ -1,0 +1,16 @@
+name: Dyberry Creek near Honesdale, PA
+lat: 41.60721813993059
+lon: -75.267104691517
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 295.677
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01429500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: dbe86e096d124a789cabb6f9e78ba328

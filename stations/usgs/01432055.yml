@@ -1,0 +1,16 @@
+name: Lackawaxen River near Baoba, PA
+lat: 41.4694166666667
+lon: -75.1089444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 234.635
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01432055/
+parameter_code: "00065"
+series_begin: 2021-06-10T19:30:00+00:00
+time_series_id: f51fdac552ec415da84c0229518e2fa6

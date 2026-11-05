@@ -1,0 +1,21 @@
+name: OAKLAND MIDDLE HARBOR, PIER 40
+lat: 37.805
+lon: -122.338
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.122
+  MHW: -2.941
+  DTL: -2.175
+  MTL: -2.252
+  MSL: -2.224
+  MLW: -1.563
+  MLLW: -1.227
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414777
+established: 1994-07-29T00:00:00Z
+removed: 1994-09-08T23:59:00Z

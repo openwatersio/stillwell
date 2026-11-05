@@ -1,0 +1,16 @@
+name: SUISUN SLOUGH NR BENICIA CA
+lat: 38.12379722222222
+lon: -122.0813861111111
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0.61
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11455740/
+parameter_code: "00065"
+series_begin: 2025-07-23T00:15:00+00:00
+time_series_id: bc93f8d1c15248b4a19100f69eb8cccd

@@ -1,0 +1,23 @@
+name: Silver Eel Pond
+lat: 41.2567
+lon: -72.03
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.186
+  MHW: -3.097
+  DTL: -2.756
+  MTL: -2.741
+  MSL: -2.758
+  MLW: -2.384
+  MLLW: -2.326
+  LAT: -2.095
+  HAT: -3.428
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8510719
+established: 1989-04-19T00:00:00Z
+removed: 2007-04-30T23:59:00Z

@@ -1,0 +1,16 @@
+name: CHEYENNE RIVER AT RED SHIRT, SD
+lat: 43.672417
+lon: -102.891667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 808.698
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06403700/
+parameter_code: "00065"
+series_begin: 2019-10-01T07:00:00+00:00
+time_series_id: f565e64ee00c4dba9ea0ffac6d78f79c

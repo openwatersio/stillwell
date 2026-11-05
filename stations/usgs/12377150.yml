@@ -1,0 +1,16 @@
+name: Mission Creek ab reservoir nr St. Ignatius MT
+lat: 47.32019166666667
+lon: -113.98789166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1054.608
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12377150/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 67a0ec5c55d8436091611fb87cb49055

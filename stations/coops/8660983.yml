@@ -1,0 +1,22 @@
+name: SOCASTEE BRIDGE
+lat: 33.6867
+lon: -79.005
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.831
+  MHW: -0.789
+  DTL: -0.473
+  MTL: -0.473
+  MSL: -0.516
+  MLW: -0.156
+  MLLW: -0.114
+  NAVD88: -0.33
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660983
+established: 1976-09-22T00:00:00Z
+removed: 1977-04-07T23:59:00Z

@@ -1,0 +1,24 @@
+name: Freeport Entrance Jetty
+lat: 28.9303
+lon: -95.3059
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.39
+  MHW: -7.348
+  DTL: -7.13
+  MTL: -7.143
+  MSL: -7.151
+  MLW: -6.938
+  MLLW: -6.869
+  NAVD88: -6.98
+  LAT: -6.468
+  HAT: -7.643
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8772479
+established: 1977-10-20T00:00:00Z
+removed: 2020-06-15T00:01:00Z

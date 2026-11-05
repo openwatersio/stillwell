@@ -1,0 +1,24 @@
+name: La Quinta Channel North
+lat: 27.8804
+lon: -97.2735
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.39
+  MHW: -2.383
+  DTL: -2.282
+  MTL: -2.284
+  MSL: -2.297
+  MLW: -2.184
+  MLLW: -2.173
+  NAVD88: -2.153
+  LAT: -2.067
+  HAT: -2.479
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8775132
+established: 2020-04-27T00:00:00Z

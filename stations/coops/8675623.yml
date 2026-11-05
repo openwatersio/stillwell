@@ -1,0 +1,13 @@
+name: SAPELO ISLAND (OUTSIDE)
+lat: 31.3917
+lon: -81.2667
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8675623
+established: 1974-03-06T00:00:00Z
+removed: 1983-08-09T23:59:00Z

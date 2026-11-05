@@ -1,0 +1,16 @@
+name: NORTH PRONG ALAFIA RIVER AT KEYSVILLE FL
+lat: 27.8839148277772
+lon: -82.1000868927296
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.457
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02301000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 13908cfd1318454fa814cdf384d80efa

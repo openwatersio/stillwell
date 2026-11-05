@@ -1,0 +1,16 @@
+name: PLATEAU CREEK NEAR CAMEO, CO
+lat: 39.1836111111111
+lon: -108.268333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1473.092
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09105000/
+parameter_code: "00065"
+series_begin: 2020-11-03T17:15:00+00:00
+time_series_id: 5ce1f1adf36444f0a3b34cfbddb24ed5

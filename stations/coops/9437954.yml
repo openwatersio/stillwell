@@ -1,0 +1,23 @@
+name: North Fork
+lat: 45.7338
+lon: -123.8764
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.892
+  MHW: -8.68
+  DTL: -7.616
+  MTL: -7.686
+  MSL: -7.673
+  MLW: -6.691
+  MLLW: -6.34
+  LAT: -5.547
+  HAT: -9.545
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9437954
+established: 2017-06-11T00:00:00Z
+removed: 2017-10-17T23:59:00Z

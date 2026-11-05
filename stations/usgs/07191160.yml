@@ -1,0 +1,16 @@
+name: Spavinaw Creek near Maysville, AR
+lat: 36.3645225860714
+lon: -94.5513298668107
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 286.091
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07191160/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f11ad76518fd4ab99417aeba1a3a6282

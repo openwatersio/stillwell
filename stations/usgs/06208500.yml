@@ -1,0 +1,16 @@
+name: Clarks Fork Yellowstone River at Edgar MT
+lat: 45.4657138888889
+lon: -108.844105555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1054.608
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06208500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: d19ccd20406e4885b54ec0ecef2d572f

@@ -1,0 +1,16 @@
+name: Pascack Bk at Woodcliff Lk outlet at Hillsdale NJ
+lat: 41.0119444444444
+lon: -74.0480555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 18.008
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01377451/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: 54e2eebd48f4453789e4c5a0e5e3c90e

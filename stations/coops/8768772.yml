@@ -1,0 +1,24 @@
+name: Gum Cove, ICWW
+lat: 30.0587
+lon: -93.5226
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.646
+  MHW: -8.628
+  DTL: -8.508
+  MTL: -8.514
+  MSL: -8.526
+  MLW: -8.399
+  MLLW: -8.37
+  NAVD88: -8.494
+  LAT: -8.064
+  HAT: -8.811
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8768772
+established: 2019-09-17T00:00:00Z
+removed: 2020-06-29T23:59:00Z

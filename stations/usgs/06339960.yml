@@ -1,0 +1,17 @@
+name: GOODMAN CREEK NEAR GOLDEN VALLEY, ND
+lat: 47.2966666666667
+lon: -102.093888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 579.425
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06339960/
+parameter_code: "00065"
+series_begin: 2015-03-01T06:00:00+00:00
+series_end: 2016-10-26T04:45:00+00:00
+time_series_id: 7dc9b24ee7e746ef8799056cae3d9b23

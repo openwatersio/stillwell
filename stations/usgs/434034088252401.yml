@@ -1,0 +1,15 @@
+name: SCF WEST BR MILWAUKEE RIVER WATERWAY 1 NR BYRON,WI
+lat: 43.6760555555555
+lon: -88.4233611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 319.43
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-434034088252401/
+parameter_code: "00065"
+time_series_id: 5b41ec73741d4087a9f6482bf513590a

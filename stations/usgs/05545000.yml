@@ -1,0 +1,16 @@
+name: NORTH LAKE NEAR ELKHORN, WI
+lat: 42.743889
+lon: -88.629167
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 272.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05545000/
+parameter_code: "00065"
+series_begin: 2025-08-07T21:59:00+00:00
+time_series_id: 0ea9b0c9d71d4a31bcd0c12cd172d853

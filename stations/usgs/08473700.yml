@@ -1,0 +1,15 @@
+name: Rio Grande nr San Benito, TX & Ramirez, MX
+lat: 26.0336891634013
+lon: -97.7280485483922
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08473700/
+parameter_code: "00065"
+time_series_id: 594ee6a124314165a08805609b9c67d4

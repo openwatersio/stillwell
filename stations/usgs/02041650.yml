@@ -1,0 +1,16 @@
+name: APPOMATTOX RIVER AT MATOACA, VA
+lat: 37.2251504979053
+lon: -77.4752630115332
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.452
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02041650/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9e83be81dfc141b69bc3a5320a7f65a7

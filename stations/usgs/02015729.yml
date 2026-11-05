@@ -1,0 +1,17 @@
+name: COWPASTURE RIVER AT ROUTE 627 NR WILLIAMSVILLE, VA
+lat: 38.1554166666667
+lon: -79.5964444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 466.112
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02015729/
+parameter_code: "00065"
+series_begin: 2017-08-25T12:15:00+00:00
+series_end: 2021-04-06T13:45:00+00:00
+time_series_id: de3c3de6605e410290a505d5cc9fb5e8

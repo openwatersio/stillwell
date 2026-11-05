@@ -1,0 +1,16 @@
+name: SALT RIVER AT GLENSBORO, KY
+lat: 38.00201594366
+lon: -85.0605085458302
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 178.162
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03295400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f782c5399424436cad7de9af62b74143

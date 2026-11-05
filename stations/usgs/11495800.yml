@@ -1,0 +1,15 @@
+name: N FORK SPRAGUE RIVER AT POWER PLANT, NEAR BLY, OR
+lat: 42.5015390783961
+lon: -120.988042060754
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1447.8
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11495800/
+parameter_code: "00065"
+time_series_id: 98bf23b00a8a4cdb953445fb53f8bcab

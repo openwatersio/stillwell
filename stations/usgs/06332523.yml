@@ -1,0 +1,16 @@
+name: EAST FORK SHELL CREEK NEAR PARSHALL, ND
+lat: 47.948611
+lon: -102.214444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 578.422
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06332523/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a3c4274475d54b559461fdeffcc2d878

@@ -1,0 +1,16 @@
+name: Androscoggin River at Bethel, Maine
+lat: 44.41605
+lon: -70.796761
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 198.73
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01054275/
+parameter_code: "00065"
+series_begin: 2026-10-06T04:00:00+00:00
+time_series_id: 796b9d55ee6a47f9a392f251bbb4968b

@@ -1,0 +1,17 @@
+name: LAKE WINNIPESAUKEE AT WEIRS BEACH, NH
+lat: 43.607575799672
+lon: -71.4589621321241
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NGVD29: 152.4
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01080000/
+parameter_code: "00065"
+series_begin: 2016-06-10T05:00:00+00:00
+series_end: 2017-09-30T04:45:00+00:00
+time_series_id: 16bb7a2d0f3b4bc4b7f013e36b3b84ed

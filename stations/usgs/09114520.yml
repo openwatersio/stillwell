@@ -1,0 +1,17 @@
+name: GUNNISON RIVER AT GUNNISON WHITEWATER PARK, CO
+lat: 38.5332722222222
+lon: -106.949086111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2329.925
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09114520/
+parameter_code: "00065"
+series_begin: 2020-10-01T07:00:00+00:00
+series_end: 2026-10-01T07:15:00+00:00
+time_series_id: f8a8ab0d159644c29d055dcdd64348c3

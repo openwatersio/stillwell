@@ -1,0 +1,16 @@
+name: Point Lookout
+lat: 44.04989
+lon: -83.6573
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9075045
+established: 2018-03-14T00:00:00Z
+removed: 2018-10-22T13:00:00Z

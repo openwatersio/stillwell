@@ -1,0 +1,16 @@
+name: Scioto River near Prospect OH
+lat: 40.4195041983232
+lon: -83.1971372128487
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 270.071
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03219500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 89b6f9a811534a179c3f68c29978a594

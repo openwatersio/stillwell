@@ -1,0 +1,21 @@
+name: CUTTYHUNK
+lat: 41.425
+lon: -70.9167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.521
+  MHW: -2.449
+  DTL: -1.953
+  MTL: -1.936
+  MSL: -1.894
+  MLW: -1.423
+  MLLW: -1.385
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448376
+established: 1976-07-11T00:00:00Z
+removed: 1976-11-04T23:59:00Z

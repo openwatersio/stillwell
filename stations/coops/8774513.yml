@@ -1,0 +1,24 @@
+name: Copano Bay
+lat: 28.118305
+lon: -97.0217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.707
+  MHW: -1.706
+  DTL: -1.648
+  MTL: -1.647
+  MSL: -1.651
+  MLW: -1.589
+  MLLW: -1.589
+  NAVD88: -1.397
+  LAT: -1.549
+  HAT: -1.748
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8774513
+established: 2004-01-08T00:00:00Z

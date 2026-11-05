@@ -1,0 +1,24 @@
+name: Pinole Point, San Pablo Bay
+lat: 38.015
+lon: -122.363
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.333
+  MHW: -4.152
+  DTL: -3.382
+  MTL: -3.458
+  MSL: -3.445
+  MLW: -2.763
+  MLLW: -2.431
+  NAVD88: -2.45
+  LAT: -1.719
+  HAT: -4.78
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415056
+established: 1976-09-17T00:00:00Z
+removed: 2011-05-07T00:00:00Z

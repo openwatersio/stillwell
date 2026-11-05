@@ -1,0 +1,16 @@
+name: Blanco Rv at San Marcos, TX
+lat: 29.8795111111111
+lon: -97.9107527777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 165.497
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08171350/
+parameter_code: "00065"
+series_begin: 2015-01-22T15:10:00+00:00
+time_series_id: 13f6c9b9459c4798af33206b8abf4f74

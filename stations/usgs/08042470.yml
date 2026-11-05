@@ -1,0 +1,16 @@
+name: Willow Marsh Bayou at I-10 nr Beaumont, TX
+lat: 30.01472777777778
+lon: -94.18120555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042470/
+parameter_code: "00065"
+series_begin: 2021-09-21T18:30:00+00:00
+time_series_id: ad13a40976a1426cb6a6b87cb12edb6c

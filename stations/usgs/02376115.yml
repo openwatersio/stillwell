@@ -1,0 +1,16 @@
+name: ELEVENMILE CREEK NR WEST PENSACOLA, FL
+lat: 30.4982515885812
+lon: -87.3358086143744
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3.048
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02376115/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a73c265e71de49368655374fbed30818

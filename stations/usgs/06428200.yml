@@ -1,0 +1,15 @@
+name: BELLE FOURCHE RIVER NEAR ALVA, WY
+lat: 44.7893845558872
+lon: -104.481433635649
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1097.28
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06428200/
+parameter_code: "00065"
+time_series_id: 06d4aad13b924a99951dcbff43ea0c15

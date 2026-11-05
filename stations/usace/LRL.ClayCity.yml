@@ -1,0 +1,13 @@
+name: RED RIVER AT CLAY CITY, KY
+lat: 37.86480329
+lon: -83.9335328
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 183.023
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=ClayCity.Stage.Inst.15Minutes.0.LRGS-rev
+series: ClayCity.Stage.Inst.15Minutes.0.LRGS-rev

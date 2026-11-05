@@ -1,0 +1,13 @@
+name: FOX RIVER DS FROM DUTCHMAN CREEK AT GREEN BAY, WI
+lat: 44.4830833333333
+lon: -88.0320277777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04085082/
+parameter_code: "00065"
+time_series_id: a38cd979e2f0434697337f0de008e9e5

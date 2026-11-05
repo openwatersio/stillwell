@@ -1,0 +1,13 @@
+name: Mississippi River @ Caruthersville
+lat: 36.195083
+lon: -89.653472
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 71.777
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=MS117.Stage.Inst.1Hour.0.opendcs-rev
+series: MS117.Stage.Inst.1Hour.0.opendcs-rev

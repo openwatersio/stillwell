@@ -1,0 +1,16 @@
+name: NEW RIVER NEAR ROCK SPRINGS, AZ.
+lat: 33.97436666666667
+lon: -112.09909444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 705.027
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09513780/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 4175ac1793024f46840c917e6c7ecc87

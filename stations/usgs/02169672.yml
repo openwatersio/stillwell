@@ -1,0 +1,16 @@
+name: CEDAR CREEK AT CONGAREE NP NEAR GADSDEN, SC
+lat: 33.8162653604289
+lon: -80.8273121193567
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 27.533
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02169672/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 97c7650e51554e1db7aa66ec8351fc1e

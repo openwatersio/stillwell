@@ -1,0 +1,16 @@
+name: KOYUKUK R AT HUGHES AK
+lat: 66.04698301906083
+lon: -154.26106437962332
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 70.592
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15564900/
+parameter_code: "00065"
+series_begin: 2021-07-21T22:00:00+00:00
+time_series_id: 88d818e3f0ac4e5892577b94e4b961a7

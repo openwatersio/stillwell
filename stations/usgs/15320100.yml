@@ -1,0 +1,16 @@
+name: WADE C TRIB NR CHICKEN AK
+lat: 64.12041729162087
+lon: -141.56020628196978
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 614.568
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15320100/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: 683c337e367449e390eae766fadabb24

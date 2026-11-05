@@ -1,0 +1,17 @@
+name: Maumelle River at Maumelle Dam at Natural Steps,AR
+lat: 34.863055555555555
+lon: -92.48527777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.905
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07263300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2026-08-10T20:30:00+00:00
+time_series_id: 6d7602638d3449b3982b1e0f96a963a2

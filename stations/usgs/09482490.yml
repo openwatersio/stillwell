@@ -1,0 +1,17 @@
+name: SANTA CRUZ RIVER AT STARR PASS GCS AT TUCSON AZ
+lat: 32.207053
+lon: -110.988533
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 715.975
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09482490/
+parameter_code: "00065"
+series_begin: 2021-06-10T15:45:00+00:00
+series_end: 2024-09-01T07:45:00+00:00
+time_series_id: fedc2cd63c69402a9a55a26a62de91bf

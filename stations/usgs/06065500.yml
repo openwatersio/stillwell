@@ -1,0 +1,16 @@
+name: Missouri River bl Hauser Dam near Helena MT
+lat: 46.7661916666667
+lon: -111.888794444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1091.184
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06065500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c918b4b7b85640c5a75023d27f7fa108

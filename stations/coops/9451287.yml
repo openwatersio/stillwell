@@ -1,0 +1,23 @@
+name: Beecher Pass
+lat: 56.595
+lon: -132.987
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.282
+  MHW: -3.011
+  DTL: -0.924
+  MTL: -1.023
+  MSL: -0.975
+  MLW: 0.966
+  MLLW: 1.434
+  LAT: 2.833
+  HAT: -4.453
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451287
+established: 1977-09-30T00:00:00Z
+removed: 2003-09-07T23:59:00Z

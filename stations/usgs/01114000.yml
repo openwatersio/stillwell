@@ -1,0 +1,16 @@
+name: MOSHASSUCK RIVER AT PROVIDENCE, RI
+lat: 41.8339890034243
+lon: -71.410612084192
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.164
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01114000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ac28b0eeab354ff58c7109ff6b02eb32

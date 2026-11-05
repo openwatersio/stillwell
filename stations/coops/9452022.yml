@@ -1,0 +1,13 @@
+name: Sawyer Island, Tracy Arm, Holkham Bay
+lat: 57.8783
+lon: -133.19
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452022
+established: 1974-08-01T00:00:00Z
+removed: 2008-10-20T23:59:00Z

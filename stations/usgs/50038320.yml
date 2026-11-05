@@ -1,0 +1,17 @@
+name: RIO CIBUCO BLW COROZAL, PR
+lat: 18.3516172493372
+lon: -66.3348915429316
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  LMSL: 59.436
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50038320/
+parameter_code: "00065"
+series_begin: 2007-11-20T05:15:00+00:00
+series_end: 2017-09-20T19:47:00+00:00
+time_series_id: 79a03316951d41b7bd85134003d85f1c

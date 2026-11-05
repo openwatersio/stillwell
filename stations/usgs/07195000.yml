@@ -1,0 +1,16 @@
+name: Osage Creek near Elm Springs, AR
+lat: 36.221944444444446
+lon: -94.28833333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 321.29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07195000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:15:00+00:00
+time_series_id: d96c82acc0804554903a23646a5d0cf4

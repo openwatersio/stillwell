@@ -1,0 +1,13 @@
+name: Paint Creek Outflow
+lat: 39.252295
+lon: -83.349371
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 227.436
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=PaintCr-Outflow.Stage.Inst.15Minutes.0.OBS
+series: PaintCr-Outflow.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,15 @@
+name: SHELL CREEK NEAR SHELL, WY
+lat: 44.56492244761347
+lon: -107.7129270777829
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1331.991
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06278500/
+parameter_code: "00065"
+time_series_id: 7061f2f9ecfc47ae94185d4a964cf566

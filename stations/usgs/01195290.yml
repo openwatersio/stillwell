@@ -1,0 +1,15 @@
+name: GUILFORD HARBOR AT OLD WHITFIELD ST NR GUILFORD,CT
+lat: 41.27221111111111
+lon: -72.66542777777778
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01195290/
+parameter_code: "62620"
+series_begin: 2015-04-29T05:00:00+00:00
+series_end: 2017-01-01T04:54:00+00:00
+time_series_id: 00340aa078414900b8b0eac9fdc6e4e8

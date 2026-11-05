@@ -1,0 +1,15 @@
+name: Toponce Canal blw Spillway nr Chesterfield, ID
+lat: 42.8768694444444
+lon: -111.945313888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1647.139
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13070200/
+parameter_code: "00065"
+time_series_id: ceeb67dcbac44957887938b86cc2d36a

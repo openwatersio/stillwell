@@ -1,0 +1,17 @@
+name: MARSH CREEK AB HAWKINS CREEK NR VIRGINIA ID
+lat: 42.50533333333333
+lon: -112.19243888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1416.223
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13074810/
+parameter_code: "00065"
+series_begin: 2024-08-15T22:15:00+00:00
+series_end: 2026-09-02T23:00:00+00:00
+time_series_id: aee981e13a3940459ce564c74c521f09

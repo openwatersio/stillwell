@@ -1,0 +1,16 @@
+name: Tamarack R. at 480th St nr Wright, MN
+lat: 46.708931
+lon: -93.0687
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 386.791
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05218450/
+parameter_code: "00065"
+series_begin: 2026-09-13T09:15:00+00:00
+time_series_id: 5359e84cb6c74a169d70acfd44fb5ab9

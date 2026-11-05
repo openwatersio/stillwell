@@ -1,0 +1,21 @@
+name: NORTH ANCLOTE KEY
+lat: 28.21
+lon: -82.84
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.232
+  MHW: -1.123
+  DTL: -0.764
+  MTL: -0.79
+  MSL: -0.801
+  MLW: -0.457
+  MLLW: -0.296
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726942
+established: 1976-02-13T00:00:00Z
+removed: 1976-04-19T23:59:00Z

@@ -1,0 +1,16 @@
+name: SAN CARLOS RESERVOIR AT COOLIDGE DAM, AZ
+lat: 33.17533611111111
+lon: -110.52801944444444
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 762.616
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09469000/
+parameter_code: "00065"
+series_begin: 2022-04-01T00:15:00+00:00
+time_series_id: ec728d1a5cb344229ee851b270478ce8

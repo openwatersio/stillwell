@@ -1,0 +1,17 @@
+name: KNOX CREEK BELOW STRAIGHT FORK AT BLACKEY, VA
+lat: 37.385758333333335
+lon: -82.00013611111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 323.484
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0321357157/
+parameter_code: "00065"
+series_begin: 2022-09-30T17:24:00+00:00
+series_end: 2025-06-25T16:50:00+00:00
+time_series_id: 36fd80887b0e46d6ac0bde858d55ce28

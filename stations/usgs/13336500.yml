@@ -1,0 +1,16 @@
+name: SELWAY RIVER NR LOWELL ID
+lat: 46.0866666666667
+lon: -115.513888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 467.396
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13336500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: b7e263aa6e114eb2867d10ec4cea3c84

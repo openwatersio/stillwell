@@ -1,0 +1,13 @@
+name: Glenville
+lat: 38.9338
+lon: -80.8391
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 212.686
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Glenville.Stage.Inst.15Minutes.0.OBS
+series: Glenville.Stage.Inst.15Minutes.0.OBS

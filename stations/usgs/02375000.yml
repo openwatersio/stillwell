@@ -1,0 +1,16 @@
+name: BIG ESCAMBIA CREEK AT FLOMATON AL
+lat: 31.01076846754234
+lon: -87.26278144311011
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 14.557
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02375000/
+parameter_code: "00065"
+series_begin: 2015-02-06T06:00:00+00:00
+time_series_id: 589b5895b30243249a3f75506060ea49

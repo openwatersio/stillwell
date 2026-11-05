@@ -1,0 +1,16 @@
+name: BEAVER CK ABV CONF N FK HUMBOLDT RV NR HALLECK, NV
+lat: 41.3297222222222
+lon: -115.571944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1705.661
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10317480/
+parameter_code: "00065"
+series_begin: 2013-09-06T19:45:00+00:00
+time_series_id: aa3b47ecd7b245f199b339c0a43a83ea

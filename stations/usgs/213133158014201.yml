@@ -1,0 +1,14 @@
+name: Upper Helemano Reservoir near Wahiawa, Oahu, HI
+lat: 21.525912577503725
+lon: -158.02842200656195
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-213133158014201/
+parameter_code: "00065"
+series_begin: 2011-08-03T10:00:00+00:00
+time_series_id: 80f781e10da94056b2cc6bf39b97ef67

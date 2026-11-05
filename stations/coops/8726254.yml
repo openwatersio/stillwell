@@ -1,0 +1,21 @@
+name: PERICO BAYOU
+lat: 27.4983
+lon: -82.6683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.894
+  MHW: -0.805
+  DTL: -0.574
+  MTL: -0.572
+  MSL: -0.577
+  MLW: -0.339
+  MLLW: -0.254
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726254
+established: 1977-03-31T00:00:00Z
+removed: 1977-10-07T23:59:00Z

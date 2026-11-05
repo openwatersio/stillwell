@@ -1,0 +1,16 @@
+name: Kamalo Gulch near Kamalo, Molokai, HI
+lat: 21.048773827155433
+lon: -156.88206107110685
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 6.096
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16415700/
+parameter_code: "00065"
+series_begin: 2026-06-10T03:45:00+00:00
+time_series_id: 7a5da4dc04ec49b29cd891158231ed68

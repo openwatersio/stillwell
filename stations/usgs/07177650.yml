@@ -1,0 +1,16 @@
+name: Flat Rock Creek at Cincinnati Ave at Tulsa, OK
+lat: 36.2153693570764
+lon: -95.9952758840953
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 187.708
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07177650/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7ddc131e1401470f9e493ea479de60f0

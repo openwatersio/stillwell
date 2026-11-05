@@ -1,0 +1,12 @@
+name: Bayou Segnette Sector Gate- Flood Side (82742)
+lat: 29.8968083
+lon: -90.1566805
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=B_Segnette_SGate.Stage.Inst.15Minutes.0.rev
+series: B_Segnette_SGate.Stage.Inst.15Minutes.0.rev

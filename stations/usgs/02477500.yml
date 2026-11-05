@@ -1,0 +1,16 @@
+name: CHICKASAWHAY RIVER NR WAYNESBORO, MS
+lat: 31.6825495943072
+lon: -88.6835100758162
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.369
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02477500/
+parameter_code: "00065"
+series_begin: 2011-12-07T18:15:00+00:00
+time_series_id: 0233683b39174a1a9ba61ecba33f4943

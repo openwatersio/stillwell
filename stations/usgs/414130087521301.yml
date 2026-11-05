@@ -1,0 +1,15 @@
+name: MCMAHON FEN RIVULET 9 NEAR PALOS HILLS, IL
+lat: 41.6916666666667
+lon: -87.8702777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-414130087521301/
+parameter_code: "00065"
+series_begin: 2013-03-30T06:00:00+00:00
+series_end: 2013-10-22T05:45:00+00:00
+time_series_id: f2d70bd65f314d42b5662dcfbece9db6

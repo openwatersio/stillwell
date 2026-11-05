@@ -1,0 +1,16 @@
+name: SALINE BRANCH ABOVE 1700E NEAR URBANA, IL
+lat: 40.1298333333333
+lon: -88.1516666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 204.359
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03337570/
+parameter_code: "00065"
+series_begin: 2009-03-31T06:00:00+00:00
+time_series_id: e13d3587d0f7480da1435254e1467337

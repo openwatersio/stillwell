@@ -1,0 +1,13 @@
+name: POINT ADOLPHUS
+lat: 58.2867
+lon: -135.803
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452516
+established: 1976-08-01T00:00:00Z
+removed: 1990-05-17T23:59:00Z

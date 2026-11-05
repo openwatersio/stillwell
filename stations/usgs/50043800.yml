@@ -1,0 +1,16 @@
+name: RIO DE LA PLATA AT COMERIO, PR
+lat: 18.222158
+lon: -66.224619
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 187.876
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50043800/
+parameter_code: "00065"
+series_begin: 2007-10-06T04:00:00+00:00
+time_series_id: f305b8c0af2d4f81945b5ec71374dec0

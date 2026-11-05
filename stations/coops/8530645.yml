@@ -1,0 +1,13 @@
+name: UNION CITY  HUDSON RIVER
+lat: 40.765
+lon: -74.0183
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530645
+established: 1976-02-17T00:00:00Z
+removed: 1980-11-13T23:59:00Z

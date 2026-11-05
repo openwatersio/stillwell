@@ -1,0 +1,13 @@
+name: FORKED RIVER
+lat: 39.825
+lon: -74.1733
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8533391
+established: 1976-05-13T00:00:00Z
+removed: 1977-08-05T23:59:00Z

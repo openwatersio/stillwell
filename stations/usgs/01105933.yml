@@ -1,0 +1,16 @@
+name: PASKAMANSET RIVER NEAR SOUTH DARTMOUTH, MA
+lat: 41.5853818540787
+lon: -70.9903171021358
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.804
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01105933/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 661dcd9c88f14527accdc06009bcfd36

@@ -1,0 +1,17 @@
+name: SCHURZ 4 - CANAL 2 SW/GW - CANAL SW
+lat: 38.9263888888889
+lon: -118.766944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1253.773
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-385535118460101/
+parameter_code: "00065"
+series_begin: 2013-04-16T07:00:00+00:00
+series_end: 2013-10-18T06:30:00+00:00
+time_series_id: 5a3d6c71250c49769319ebffdc79bcdb

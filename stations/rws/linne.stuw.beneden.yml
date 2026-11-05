@@ -1,0 +1,11 @@
+name: Linne beneden
+lat: 51.160525
+lon: 5.942617
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/linne.stuw.beneden/details

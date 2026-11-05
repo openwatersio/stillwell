@@ -1,0 +1,17 @@
+name: OTOUCALOFA CREEK CANAL NR WATER VALLEY, MS
+lat: 34.1441666666667
+lon: -89.6525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 76.49
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07274252/
+parameter_code: "00065"
+series_begin: 2016-04-13T21:15:00+00:00
+series_end: 2024-04-10T18:00:00+00:00
+time_series_id: 8fd92e5c8b0b46899c6dddc85a6af44d

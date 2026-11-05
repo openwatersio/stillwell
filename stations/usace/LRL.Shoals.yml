@@ -1,0 +1,13 @@
+name: EAST FORK WHITE RIVER AT SHOALS,
+lat: 38.66699568
+lon: -86.79194299
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 134.694
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Shoals.Stage.Inst.15Minutes.0.USGS-rev
+series: Shoals.Stage.Inst.15Minutes.0.USGS-rev

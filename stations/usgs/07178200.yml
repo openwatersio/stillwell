@@ -1,0 +1,16 @@
+name: Bird Ck at State Highway 266 near Catoosa, OK
+lat: 36.2231514156363
+lon: -95.8194322494001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.058
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07178200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c82978f6d94d4f1d9c9fe8b5f6a5512d

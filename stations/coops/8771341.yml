@@ -1,0 +1,24 @@
+name: Galveston Bay Entrance, North Jetty
+lat: 29.357462
+lon: -94.724724
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.279
+  MHW: -3.244
+  DTL: -3.024
+  MTL: -3.066
+  MSL: -3.067
+  MLW: -2.888
+  MLLW: -2.77
+  NAVD88: -2.941
+  LAT: -2.368
+  HAT: -3.525
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771341
+established: 2000-04-17T00:00:00Z

@@ -1,0 +1,13 @@
+name: Kendall, PA
+lat: 40.5261111
+lon: -80.451389
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 300.838
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Kendall.Stage.Inst.15Minutes.0.OBS
+series: Kendall.Stage.Inst.15Minutes.0.OBS

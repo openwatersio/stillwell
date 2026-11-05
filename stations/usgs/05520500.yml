@@ -1,0 +1,16 @@
+name: KANKAKEE RIVER AT MOMENCE, IL
+lat: 41.1599444444444
+lon: -87.66875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.593
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05520500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 94913363707343c39a2c38d6d63b4228

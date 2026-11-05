@@ -1,0 +1,16 @@
+name: MILL CREEK NEAR MANHATTAN, IN
+lat: 39.48753900886924
+lon: -86.9247153036406
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.912
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03359000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 617d5f0a5abb464fb9e4dd861d7efcf3

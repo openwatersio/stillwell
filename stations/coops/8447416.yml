@@ -1,0 +1,23 @@
+name: Piney Point
+lat: 41.695
+lon: -70.72
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.447
+  MHW: -2.363
+  DTL: -1.782
+  MTL: -1.767
+  MSL: -1.697
+  MLW: -1.171
+  MLLW: -1.118
+  LAT: -0.782
+  HAT: -2.814
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447416
+established: 2000-07-19T00:00:00Z
+removed: 2000-10-12T23:59:00Z

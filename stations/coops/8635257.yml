@@ -1,0 +1,23 @@
+name: Rappahannock Bend
+lat: 38.2133
+lon: -77.2433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.824
+  MHW: -6.775
+  DTL: -6.454
+  MTL: -6.451
+  MSL: -6.478
+  MLW: -6.128
+  MLLW: -6.084
+  LAT: -5.947
+  HAT: -6.947
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8635257
+established: 2007-01-21T00:00:00Z
+removed: 2009-02-12T23:59:00Z

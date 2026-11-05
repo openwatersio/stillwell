@@ -1,0 +1,21 @@
+name: BIG SPANISH KEY
+lat: 24.7883
+lon: -81.4117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.414
+  MHW: -1.335
+  DTL: -0.924
+  MTL: -0.936
+  MSL: -0.916
+  MLW: -0.537
+  MLLW: -0.434
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724246
+established: 1973-10-11T00:00:00Z
+removed: 1974-03-15T23:59:00Z

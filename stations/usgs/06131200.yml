@@ -1,0 +1,16 @@
+name: Nelson Creek near Van Norman MT
+lat: 47.5365944444444
+lon: -106.153452777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 701.04
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06131200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: fc269e044972461fa4a30bdadec00f17

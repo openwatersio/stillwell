@@ -1,0 +1,16 @@
+name: WEST MONUMENT CREEK BELOW RAMPART RESERVOIR, CO
+lat: 38.975
+lon: -104.955
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2652.272
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103797/
+parameter_code: "00065"
+series_begin: 2020-11-17T18:15:00+00:00
+time_series_id: 2755b6f7005e40178c708ec38fcce141

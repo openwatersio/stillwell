@@ -1,0 +1,22 @@
+name: SUMMERLAND KEY EAST
+lat: 24.6517
+lon: -81.435
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.712
+  MHW: -0.637
+  DTL: -0.479
+  MTL: -0.466
+  MSL: -0.467
+  MLW: -0.295
+  MLLW: -0.246
+  NAVD88: -0.706
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724266
+established: 1974-08-23T00:00:00Z
+removed: 1974-10-04T23:59:00Z

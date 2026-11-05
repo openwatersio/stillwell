@@ -1,0 +1,14 @@
+name: ISLAND PARK DAM NR ISLAND PARK ID
+lat: 44.419722
+lon: -111.397222
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13042010/
+parameter_code: "00065"
+series_begin: 2026-10-14T18:00:00+00:00
+time_series_id: 193a446d533d48a5b67b10d4b3a457f3

@@ -1,0 +1,16 @@
+name: WET BOTTOM CREEK NEAR CHILDS, AZ
+lat: 34.1608678699199
+lon: -111.692923541089
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 707.136
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09508300/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 04a3b96787cb456caed364f6be4cb1af

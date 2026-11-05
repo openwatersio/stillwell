@@ -1,0 +1,17 @@
+name: OKAPILCO CREEK AT GA 333, NEAR QUITMAN, GA
+lat: 30.8255555555556
+lon: -83.5625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 31.73
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02318700/
+parameter_code: "00065"
+series_begin: 2007-12-31T05:00:00+00:00
+series_end: 2017-12-13T15:30:00+00:00
+time_series_id: 227be4e16d2d45fc8dbefdf02ce21552

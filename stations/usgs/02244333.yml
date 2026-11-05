@@ -1,0 +1,15 @@
+name: HAW CREEK AB RUSSELLS LANDING NR ST JOHNS PARK FL
+lat: 29.3946979750742
+lon: -81.3711786500018
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02244333/
+parameter_code: "00065"
+series_begin: 2010-10-20T18:30:00+00:00
+series_end: 2025-11-19T16:30:00+00:00
+time_series_id: 14dfcf6de2bb4753bab6368c50bd9b0f

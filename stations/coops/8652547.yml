@@ -1,0 +1,23 @@
+name: Roanoke Marshes Light
+lat: 35.8117
+lon: -75.7
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.456
+  MHW: -1.43
+  DTL: -1.366
+  MTL: -1.369
+  MSL: -1.368
+  MLW: -1.307
+  MLLW: -1.275
+  LAT: -1.244
+  HAT: -1.495
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8652547
+established: 2002-04-17T00:00:00Z
+removed: 2002-10-08T23:59:00Z

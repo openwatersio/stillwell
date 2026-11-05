@@ -1,0 +1,16 @@
+name: SNAKE CRK DS SNAKE CRK RESERVIOR NR WHITESBURG, GA
+lat: 33.5263888888889
+lon: -84.9367222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 274.32
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02337498/
+parameter_code: "00065"
+series_begin: 2008-02-21T05:00:00+00:00
+time_series_id: 18efad973cfb429db7ab0f26b3e94da0

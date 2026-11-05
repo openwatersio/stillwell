@@ -1,0 +1,13 @@
+name: HOLLERSIEL
+lat: 53.168144
+lon: 8.378497
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=4960050

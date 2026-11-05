@@ -1,0 +1,17 @@
+name: RICEBORO CREEK AT US HWY 17, AT RICEBORO, GA
+lat: 31.7488888888889
+lon: -81.4402777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02203568/
+parameter_code: "00065"
+series_begin: 2022-09-27T21:30:00+00:00
+series_end: 2022-10-04T15:30:00+00:00
+time_series_id: 42a0608fd60047aca17aa5bf7808ebac

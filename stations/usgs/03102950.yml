@@ -1,0 +1,16 @@
+name: Pymatuning Creek at Kinsman OH
+lat: 41.4428323525064
+lon: -80.5881299946113
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.298
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03102950/
+parameter_code: "00065"
+series_begin: 2017-08-30T16:30:00+00:00
+time_series_id: 19507d7ff42445b69979facce12de919

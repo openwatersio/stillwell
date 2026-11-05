@@ -1,0 +1,23 @@
+name: Weeks Bay, Mobile Bay
+lat: 30.4169
+lon: -87.8254
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.704
+  MHW: -9.669
+  DTL: -9.459
+  MTL: -9.459
+  MSL: -9.457
+  MLW: -9.248
+  MLLW: -9.214
+  LAT: -8.877
+  HAT: -9.951
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8732828
+established: 2007-08-23T00:00:00Z
+removed: 2022-04-07T00:00:00Z

@@ -1,0 +1,16 @@
+name: CIBECUE CREEK NEAR OVERGAARD, AZ
+lat: 34.1572222222222
+lon: -110.511111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2194.56
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09497700/
+parameter_code: "00065"
+series_begin: 2023-01-20T19:15:00+00:00
+time_series_id: bb7fb7a0a7834b25bfb26a306d3bcbdf

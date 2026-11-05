@@ -1,0 +1,16 @@
+name: CATAWBA RIVER AT NC HIGHWAY 16 NR MILLERSVILLE, NC
+lat: 35.821897222222226
+lon: -81.19038333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 254.898
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0214196125/
+parameter_code: "00065"
+series_begin: 2017-03-20T17:45:00+00:00
+time_series_id: e23da59625d747dab1b96a012a7b4c25

@@ -1,0 +1,16 @@
+name: LAKE HORTON TAILRACE NEAR FAYETTEVILLE, GA
+lat: 33.3186111111111
+lon: -84.4186111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.03
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02344424/
+parameter_code: "00065"
+series_begin: 2014-09-04T21:00:00+00:00
+time_series_id: 88c03b782c454d87999c1d0164f9403a

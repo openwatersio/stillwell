@@ -1,0 +1,16 @@
+name: PONAGANSET RIVER AT RSVR OUTLET AT GLOCESTER, RI
+lat: 41.867154677899514
+lon: -71.74132661020253
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 188.976
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-011151843/
+parameter_code: "00065"
+series_begin: 2024-04-29T18:50:00+00:00
+time_series_id: c7af92d9d0b348d19edce4e21ab561b5

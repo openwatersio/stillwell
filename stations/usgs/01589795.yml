@@ -1,0 +1,16 @@
+name: SOUTH FORK JABEZ BRANCH AT MILLERSVILLE, MD
+lat: 39.068250000000006
+lon: -76.65152777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 16.228
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01589795/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6eabad875cc645099b28154f9f53d0b4

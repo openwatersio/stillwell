@@ -1,0 +1,22 @@
+name: BIG PINE KEY, WEST SIDE
+lat: 24.69
+lon: -81.3833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.231
+  MHW: -1.166
+  DTL: -1.079
+  MTL: -1.059
+  MSL: -1.076
+  MLW: -0.953
+  MLLW: -0.926
+  NAVD88: -1.295
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724227
+established: 1973-10-16T00:00:00Z
+removed: 1974-03-04T23:59:00Z

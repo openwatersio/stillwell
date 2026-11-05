@@ -1,0 +1,17 @@
+name: RUSSELL FORK AT ELKHORN CITY, KY
+lat: 37.3039971658
+lon: -82.3429236246787
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 235.61
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03209300/
+parameter_code: "00065"
+series_begin: 2008-10-10T14:00:00+00:00
+series_end: 2017-10-03T20:30:00+00:00
+time_series_id: 0db6cd8a05a74cd2900b6ac971c73496

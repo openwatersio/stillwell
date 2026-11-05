@@ -1,0 +1,16 @@
+name: Cowhouse Ck at W Range Rd nr Ft Hood, TX
+lat: 31.214994444444443
+lon: -97.79419444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.872
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08101300/
+parameter_code: "00065"
+series_begin: 2017-04-12T18:20:00+00:00
+time_series_id: 9f4f54f3d587492c8c6640357ef35383

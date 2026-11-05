@@ -1,0 +1,15 @@
+name: TANK CREEK NEAR GALESVILLE, WI
+lat: 44.00111111111111
+lon: -91.35249999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.51
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05380509/
+parameter_code: "00065"
+time_series_id: 06f7faa769004443929aeba4b2297856

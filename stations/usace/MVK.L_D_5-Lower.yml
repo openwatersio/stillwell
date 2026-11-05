@@ -1,0 +1,11 @@
+name: "Red L&D #5 Lower"
+lat: 32.248026
+lon: -93.494682
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=L%26D%205-Lower.Stage.Inst.1Hour.0.DCP-rev
+series: L&D 5-Lower.Stage.Inst.1Hour.0.DCP-rev

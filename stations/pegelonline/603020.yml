@@ -1,0 +1,13 @@
+name: EISENHÜTTENSTADT SCHL. UP
+lat: 52.132134
+lon: 14.656283
+country_code: DE
+datum: PNP
+datums:
+  NHN: 25.328
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=603020

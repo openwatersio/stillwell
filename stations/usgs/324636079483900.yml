@@ -1,0 +1,17 @@
+name: BREACH INLET AT SC 703 NEAR SULLIVANS ISLAND,SC
+lat: 32.7766666666667
+lon: -79.8108333333333
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-324636079483900/
+parameter_code: "00065"
+series_begin: 2016-10-06T22:30:00+00:00
+series_end: 2016-10-10T13:00:00+00:00
+time_series_id: 51a1a7d130204d1fa2c62bed29f25aaa

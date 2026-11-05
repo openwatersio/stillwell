@@ -1,0 +1,16 @@
+name: RED BUD CREEK NR MOORES MILL, MS
+lat: 34.4666666666667
+lon: -88.2836111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 109.838
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02430085/
+parameter_code: "00065"
+series_begin: 2007-10-09T05:00:00+00:00
+time_series_id: 11c27dab16034d9d9659a67e356a6901

@@ -1,0 +1,16 @@
+name: SHADES CREEK AT ELDER ST NEAR SPRINGDALE AL
+lat: 33.52098133675065
+lon: -86.71693178416554
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 206.779
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02423571/
+parameter_code: "00065"
+series_begin: 2017-10-02T16:15:00+00:00
+time_series_id: f520e0caec6f4761a81b9084a4a8f06a

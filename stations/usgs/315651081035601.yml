@@ -1,0 +1,15 @@
+name: SKIDAWAY RIV AT DIAMOND CSWY, NEAR SKIDAWAY ISL,GA
+lat: 31.9475
+lon: -81.0655555555555
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-315651081035601/
+parameter_code: "00065"
+series_begin: 2019-08-31T22:15:00+00:00
+series_end: 2022-10-06T18:30:00+00:00
+time_series_id: 4f30d1dbde8a4dd99a746531450efe58

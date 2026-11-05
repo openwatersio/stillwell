@@ -1,0 +1,16 @@
+name: BROADSTREET HOLLOW BROOK AT HWY28 AT ALLABEN NY
+lat: 42.112556
+lon: -74.358694
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 292.587
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01362232/
+parameter_code: "00065"
+series_begin: 2022-08-17T18:45:00+00:00
+time_series_id: 148b256b8f7b4f35a3b0a2abb24ea739

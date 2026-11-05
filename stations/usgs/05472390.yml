@@ -1,0 +1,14 @@
+name: Middle Creek near Lacey, IA
+lat: 41.4213915978478
+lon: -92.6513024085347
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05472390/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: 44362f49a8de4327850d60ba24331da2

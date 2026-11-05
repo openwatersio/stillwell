@@ -1,0 +1,13 @@
+name: Skuna River @ Bruce, MS
+lat: 33.973271
+lon: -89.347764
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 73.061
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Bruce.Stage.Inst.15Minutes.0.DCP-rev
+series: Bruce.Stage.Inst.15Minutes.0.DCP-rev

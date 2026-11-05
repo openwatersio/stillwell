@@ -1,0 +1,16 @@
+name: Bayou Deview near Brinkley, AR
+lat: 34.9361111111111
+lon: -91.2402777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 47.555
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07077730/
+parameter_code: "00065"
+series_begin: 2014-10-01T06:00:00+00:00
+time_series_id: 10fa2de73f714c468e83ea070dfea751

@@ -1,0 +1,24 @@
+name: PANACEA, DICKERSON BAY
+lat: 30.0283
+lon: -84.3867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.466
+  MHW: -0.4
+  DTL: 0.073
+  MTL: 0.003
+  MSL: 0.007
+  MLW: 0.406
+  MLLW: 0.613
+  NAVD88: 0.002
+  LAT: 1.071
+  HAT: -0.787
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728269
+established: 1975-09-29T00:00:00Z
+removed: 2024-01-24T00:00:00Z

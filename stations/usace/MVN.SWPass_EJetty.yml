@@ -1,0 +1,12 @@
+name: Mississippi River Southwest Pass at East Jetty (01670)
+lat: 28.9323056
+lon: -89.4071111
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=SWPass_EJetty.Stage.Inst.1Hour.0.rev
+series: SWPass_EJetty.Stage.Inst.1Hour.0.rev

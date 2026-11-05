@@ -1,0 +1,16 @@
+name: BOULDER CREEK AT MOUTH NEAR LONGMONT, CO
+lat: 40.1387777777778
+lon: -105.020222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1481.328
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06730500/
+parameter_code: "00065"
+series_begin: 2020-11-17T19:30:00+00:00
+time_series_id: 24c5d30d1a90488fb8b186f5b66dda00

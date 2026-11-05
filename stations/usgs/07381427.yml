@@ -1,0 +1,16 @@
+name: Bayou Grosse Tete S. of I10 at Grosse Tete, LA
+lat: 30.41472222222222
+lon: -91.43208333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.975
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381427/
+parameter_code: "00065"
+series_begin: 2021-10-14T16:45:00+00:00
+time_series_id: cb2138e65d544d6b9fd16b18197888b4

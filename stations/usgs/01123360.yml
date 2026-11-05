@@ -1,0 +1,16 @@
+name: QUINEBAUG R BL E BRIMFIELD DAM AT FISKDALE, MA
+lat: 42.108375
+lon: -72.1261305555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 186.794
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01123360/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4a34d8c837fc4f579f5284a264ed2e2f

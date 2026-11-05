@@ -1,0 +1,13 @@
+name: Bremen, Wilhelm-Kaisen-Brücke, Weser
+lat: 53.07306
+lon: 8.80361
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.9
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/4910050]
+source_url: https://gezeiten.bsh.de/bremen_wilhelm-kaisen-bruecke

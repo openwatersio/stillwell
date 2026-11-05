@@ -1,0 +1,16 @@
+name: SALKEHATCHIE R AT SC HWY 64 NR BARNWELL, SC
+lat: 33.240427653
+lon: -81.4081626890075
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 48.643
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02175200/
+parameter_code: "00065"
+series_begin: 2020-09-15T15:45:00+00:00
+time_series_id: c40cb677a62e4d96943588f95dae5ad8

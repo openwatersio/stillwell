@@ -1,0 +1,23 @@
+name: MAYS LANDING, GREAT EGG HARBOR RIVER
+lat: 39.4483
+lon: -74.7283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.027
+  MHW: -1.943
+  DTL: -1.338
+  MTL: -1.325
+  MSL: -1.408
+  MLW: -0.707
+  MLLW: -0.648
+  LAT: -0.551
+  HAT: -2.195
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534468
+established: 1977-05-24T00:00:00Z
+removed: 1982-06-08T23:59:00Z

@@ -1,0 +1,24 @@
+name: Valparaiso
+lat: 30.5033
+lon: -86.4933
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.507
+  MHW: -1.506
+  DTL: -1.424
+  MTL: -1.424
+  MSL: -1.425
+  MLW: -1.342
+  MLLW: -1.341
+  NAVD88: -1.314
+  LAT: -1.185
+  HAT: -1.64
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729501
+established: 1977-03-29T00:00:00Z
+removed: 2011-03-14T23:59:00Z

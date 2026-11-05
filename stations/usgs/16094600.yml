@@ -1,0 +1,17 @@
+name: Puu Ka Ele Reservoir near Kilauea, Kauai, HI
+lat: 22.185829362424215
+lon: -159.3998389983273
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  LMSL: 125.882
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16094600/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+series_end: 2009-01-10T10:00:00+00:00
+time_series_id: 98866b9210ac4c3caef95ec7c78aefbb

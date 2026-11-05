@@ -1,0 +1,16 @@
+name: SUSITNA R NR DENALI AK
+lat: 63.10340760577859
+lon: -147.51814181199626
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 743.712
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15291000/
+parameter_code: "00065"
+series_begin: 2012-05-24T03:30:00+00:00
+time_series_id: 3e0c6aeac05f458b8f9ad13d52da738f

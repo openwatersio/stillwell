@@ -1,0 +1,16 @@
+name: ONEIDA RIVER NEAR EUCLID NY
+lat: 43.2053611111111
+lon: -76.2177777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 109.548
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04247000/
+parameter_code: "00065"
+series_begin: 2011-10-01T05:00:00+00:00
+time_series_id: 08114adaf6c2428184cb6a6c423c9765

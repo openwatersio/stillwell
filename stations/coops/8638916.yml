@@ -1,0 +1,13 @@
+name: LONG CREEK, LYNNHAVEN BAY
+lat: 36.9033
+lon: -76.07
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638916
+established: 1963-02-14T00:00:00Z
+removed: 1978-01-12T23:59:00Z

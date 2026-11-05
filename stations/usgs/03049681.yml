@@ -1,0 +1,16 @@
+name: Allegheny R at L&D 2 (lower pool) at Aspinwall, PA
+lat: 40.48813611111111
+lon: -79.91733333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 211.409
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03049681/
+parameter_code: "00065"
+series_begin: 2015-10-01T05:00:00+00:00
+time_series_id: c89d5be96f564f4db210052c23ac96c6

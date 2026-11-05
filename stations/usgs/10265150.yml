@@ -1,0 +1,16 @@
+name: HOT C A FLUME NR MAMMOTH LAKES CA
+lat: 37.66881076276735
+lon: -118.81761478802906
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2119.253
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10265150/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 53d9d1c64b8a4156a173a41540d4117d

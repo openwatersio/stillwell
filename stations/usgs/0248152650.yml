@@ -1,0 +1,13 @@
+name: WOLF RIVR AT HENDERSON ROAD AT DELISLE, MS
+lat: 30.358
+lon: -89.2733611111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0248152650/
+parameter_code: "00065"
+time_series_id: e75ff9981a4b49c18ae2f823ab11e5b2

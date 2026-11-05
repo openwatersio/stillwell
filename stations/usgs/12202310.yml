@@ -1,0 +1,16 @@
+name: CARPENTER CREEK NEAR BELLINGHAM, WA
+lat: 48.7539999940154
+lon: -122.354053080811
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 96.548
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12202310/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 49c8b42bcd1b405299c6322858f8bcf5

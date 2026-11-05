@@ -1,0 +1,23 @@
+name: MALLARD ISLAND, SUISUN BAY
+lat: 38.0433
+lon: -121.918
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.323
+  MHW: -2.172
+  DTL: -1.652
+  MTL: -1.68
+  MSL: -1.687
+  MLW: -1.187
+  MLLW: -0.98
+  LAT: -0.711
+  HAT: -2.616
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415112
+established: 1977-06-23T00:00:00Z
+removed: 1991-03-13T23:59:00Z

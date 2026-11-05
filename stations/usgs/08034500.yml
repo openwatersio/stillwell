@@ -1,0 +1,16 @@
+name: Mud Ck nr Jacksonville, TX
+lat: 31.9765557807311
+lon: -95.1607786632751
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 82.793
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08034500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 5f22f3dd250945b18731be18bb4c0a5d

@@ -1,0 +1,17 @@
+name: TIAWASEE CREEK NEAR BRIDGEHEAD, AL
+lat: 30.6427861111111
+lon: -87.8917916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.925
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02378790/
+parameter_code: "00065"
+series_begin: 2017-01-23T15:15:00+00:00
+series_end: 2020-10-26T15:45:00+00:00
+time_series_id: baa25517b2204e559d8cb9fa7ad0d4f4

@@ -1,0 +1,16 @@
+name: SEVIER RIVER NEAR JUAB, UT
+lat: 39.374680285488
+lon: -112.039655690574
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1502.926
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10219000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 81d741c0b2e14ff0a774f988ec4a6341

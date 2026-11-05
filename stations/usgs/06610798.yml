@@ -1,0 +1,16 @@
+name: Papillion Cr at Harlan Lewis Rd nr La Platte, Nebr
+lat: 41.08210555555556
+lon: -95.88975555555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 284.82
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06610798/
+parameter_code: "00065"
+series_begin: 2020-08-11T16:45:00+00:00
+time_series_id: 1d5dd9c80e7e41ed840b769acff7cce8

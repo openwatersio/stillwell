@@ -1,0 +1,16 @@
+name: WALNUT R AT ARKANSAS CITY, KS
+lat: 37.0564182559608
+lon: -97.0258709414571
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 317.01
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07147900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ecb93c0f11544ae78863237ce7c7abb5

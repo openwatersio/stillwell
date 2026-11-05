@@ -1,0 +1,16 @@
+name: NEW RIVER AT GLEN LYN, VA
+lat: 37.3728986089149
+lon: -80.8606347244665
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 454.03
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03176500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8a74152855854e9b995eadbbe689dba7

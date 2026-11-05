@@ -1,0 +1,16 @@
+name: JACKSON RIVER AT FALLING SPRING, VA
+lat: 37.876667
+lon: -79.9775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 406.448
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02012500/
+parameter_code: "00065"
+series_begin: 2018-04-17T05:00:00+00:00
+time_series_id: d37296dfbaf2412ebb8135c240238b95

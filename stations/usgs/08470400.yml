@@ -1,0 +1,15 @@
+name: Arroyo Colorado at Harlingen, TX
+lat: 26.1736864708782
+lon: -97.7005472801233
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08470400/
+parameter_code: "00065"
+time_series_id: 5545bb173a1348f09fd5ee1db1771e40

@@ -1,0 +1,21 @@
+name: GLOUCESTER HARBOR
+lat: 42.61
+lon: -70.66
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.149
+  MHW: -4.013
+  DTL: -2.691
+  MTL: -2.673
+  MSL: -2.685
+  MLW: -1.333
+  MLLW: -1.232
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8441841
+established: 1992-06-13T00:00:00Z
+removed: 1992-10-11T23:59:00Z

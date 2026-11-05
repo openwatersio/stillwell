@@ -1,0 +1,16 @@
+name: South Fork of Little Red River at Clinton, AR
+lat: 35.58694444444445
+lon: -92.45138888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 146.7
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07075300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a27608d0cc424f71900aabe3b0b067b0

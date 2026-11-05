@@ -1,0 +1,23 @@
+name: RIBAUT ISLAND, SKULL CREEK
+lat: 32.2667
+lon: -80.7367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.88
+  MHW: -2.77
+  DTL: -1.754
+  MTL: -1.73
+  MSL: -1.815
+  MLW: -0.689
+  MLLW: -0.628
+  LAT: -0.144
+  HAT: -3.484
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8668918
+established: 1980-07-29T00:00:00Z
+removed: 1997-03-12T23:59:00Z

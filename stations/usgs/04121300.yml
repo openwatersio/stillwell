@@ -1,0 +1,16 @@
+name: CLAM RIVER AT VOGEL CENTER, MI
+lat: 44.2005692327937
+lon: -85.0528147191002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 342.315
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04121300/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: a8be4fd5142540b08b996efc4de9149e

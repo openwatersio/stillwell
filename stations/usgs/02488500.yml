@@ -1,0 +1,16 @@
+name: PEARL RIVER NR MONTICELLO, MS
+lat: 31.5533333333333
+lon: -90.0880555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 48.219
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02488500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 71f53dd1cb284ba7b9a746d5d02cac3e

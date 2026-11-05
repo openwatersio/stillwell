@@ -1,0 +1,16 @@
+name: Platte River nr Fremont, Nebr.
+lat: 41.405967
+lon: -96.501714
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 360.249
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06796450/
+parameter_code: "00065"
+series_begin: 2021-12-21T20:45:00+00:00
+time_series_id: 42e6b349e8724d99a4502818d8a226b5

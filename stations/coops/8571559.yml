@@ -1,0 +1,23 @@
+name: McCready's Creek
+lat: 38.3
+lon: -76.005
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.78
+  MHW: -2.729
+  DTL: -2.416
+  MTL: -2.409
+  MSL: -2.408
+  MLW: -2.09
+  MLLW: -2.051
+  LAT: -1.941
+  HAT: -2.947
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571559
+established: 1981-10-19T00:00:00Z
+removed: 2010-12-09T23:59:00Z

@@ -1,0 +1,16 @@
+name: PRAIRIE DOG C NR WOODRUFF, KS
+lat: 39.978775
+lon: -99.4781027777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 615.94
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06848500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f987a2eb90cd4d86b033bf509ee1dddf

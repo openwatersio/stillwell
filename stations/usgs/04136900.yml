@@ -1,0 +1,16 @@
+name: AU SABLE RIVER NEAR MC KINLEY, MI
+lat: 44.61277536795734
+lon: -83.83766160561008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 251.302
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04136900/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: f31866ca3b904053a99db6158cd9fb1f

@@ -1,0 +1,14 @@
+name: Great Egg Harbor Bay at Ocean City NJ
+lat: 39.2858333333333
+lon: -74.5755555555556
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01411320/
+parameter_code: "72279"
+series_begin: 2011-05-04T04:00:00+00:00
+time_series_id: 70540bd56b214830ba49e09c7ff6a08b

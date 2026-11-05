@@ -1,0 +1,21 @@
+name: SHELL POINT, WEST BAY
+lat: 30.215
+lon: -85.74
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.873
+  MHW: -0.855
+  DTL: -0.664
+  MTL: -0.673
+  MSL: -0.626
+  MLW: -0.49
+  MLLW: -0.455
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729169
+established: 1976-09-30T00:00:00Z
+removed: 1977-02-18T23:59:00Z

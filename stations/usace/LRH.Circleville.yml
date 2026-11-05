@@ -1,0 +1,14 @@
+name: Circleville
+lat: 39.6014
+lon: -82.9553
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 195.996
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Circleville.Stage.Inst.15Minutes.0.OBS
+series: Circleville.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: SAND CREEK AT 116TH STREET AT FISHERS, IN
+lat: 39.956944444444446
+lon: -85.98916666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 239.302
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-033521504/
+parameter_code: "00065"
+series_begin: 2013-05-20T15:30:00+00:00
+time_series_id: d572128a7f874e0185d27e721fecbd4b

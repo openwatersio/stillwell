@@ -1,0 +1,14 @@
+name: ST. JOHNS RIVER NEAR SANFORD, FL
+lat: 28.8380469383062
+lon: -81.3242322769167
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02234500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 478f51cb953c413a899d9b2577ce9589

@@ -1,0 +1,21 @@
+name: OLD TOWER, SAPELO ISLAND, DOBOY SOUND
+lat: 31.39
+lon: -81.2883
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.826
+  MHW: -2.705
+  DTL: -1.694
+  MTL: -1.666
+  MSL: -1.68
+  MLW: -0.626
+  MLLW: -0.562
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8675622
+established: 1980-03-18T00:00:00Z
+removed: 1980-05-21T23:59:00Z

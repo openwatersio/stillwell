@@ -1,0 +1,16 @@
+name: CORRAL GULCH NEAR RANGELY, CO
+lat: 39.920278
+lon: -108.472222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2001.256
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09306242/
+parameter_code: "00065"
+series_begin: 2020-10-27T19:15:00+00:00
+time_series_id: c2f6cdddbb1f4749a8c1d31831fd759b

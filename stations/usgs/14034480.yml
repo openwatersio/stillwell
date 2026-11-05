@@ -1,0 +1,16 @@
+name: BALM FORK NEAR HEPPNER, OR
+lat: 45.3320726498308
+lon: -119.541132530355
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 640.543
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14034480/
+parameter_code: "00065"
+series_begin: 2018-01-21T13:30:00+00:00
+time_series_id: 28cb29939c5e4fd0bc5261aee3b92042

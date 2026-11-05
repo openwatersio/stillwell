@@ -1,0 +1,15 @@
+name: Beckwith Creek Near Singer, LA.
+lat: 30.6425833333333
+lon: -93.3831111111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08016300/
+parameter_code: "00065"
+series_begin: 2024-03-12T19:15:00+00:00
+series_end: 2026-09-16T13:30:00+00:00
+time_series_id: 1cb55754dcd5408c9bb614dfd4778efd

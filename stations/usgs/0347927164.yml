@@ -1,0 +1,16 @@
+name: BUCKEYE CR BELOW BUCKEYE LAKE NEAR CANNON GAP, NC
+lat: 36.2200083333333
+lon: -81.9076055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1017.791
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0347927164/
+parameter_code: "00065"
+series_begin: 2018-12-19T20:00:00+00:00
+time_series_id: 82ba8d21555840219e64cbb8f54cb900

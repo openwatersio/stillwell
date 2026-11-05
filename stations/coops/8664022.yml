@@ -1,0 +1,24 @@
+name: GEN. DYNAMICS PIER, COOPER R.
+lat: 33.0083
+lon: -79.9233
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.416
+  MHW: -2.329
+  DTL: -1.677
+  MTL: -1.666
+  MSL: -1.731
+  MLW: -1.002
+  MLLW: -0.939
+  NAVD88: -1.604
+  LAT: -0.66
+  HAT: -2.79
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664022
+established: 1976-09-09T00:00:00Z
+removed: 1998-12-16T23:59:00Z

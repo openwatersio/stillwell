@@ -1,0 +1,23 @@
+name: Bahia Salinas
+lat: 17.951445
+lon: -67.19659
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.385
+  MHW: -8.378
+  DTL: -8.285
+  MTL: -8.284
+  MSL: -8.283
+  MLW: -8.189
+  MLLW: -8.185
+  LAT: -8.062
+  HAT: -8.523
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9759197
+established: 2011-04-21T00:00:00Z
+removed: 2011-09-09T23:59:00Z

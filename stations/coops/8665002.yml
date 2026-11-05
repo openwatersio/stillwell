@@ -1,0 +1,22 @@
+name: DRAYTON, BEES FERRY, ASHLEY RIVER
+lat: 32.8483
+lon: -80.0517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.627
+  MHW: -2.53
+  DTL: -1.681
+  MTL: -1.663
+  MSL: -1.744
+  MLW: -0.795
+  MLLW: -0.735
+  NAVD88: -1.762
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665002
+established: 1976-01-13T00:00:00Z
+removed: 1990-04-23T23:59:00Z

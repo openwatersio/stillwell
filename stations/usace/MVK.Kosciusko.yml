@@ -1,0 +1,13 @@
+name: Yockanookany River @ Kosciusko, MS
+lat: 33.0322222
+lon: -89.5777778
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 114.065
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Kosciusko.Stage.Inst.15Minutes.0.DCP-rev
+series: Kosciusko.Stage.Inst.15Minutes.0.DCP-rev

@@ -1,0 +1,16 @@
+name: SPICKET RIVER AT NORTH SALEM, NH
+lat: 42.8492547285225
+lon: -71.2150607068002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 56.638
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01100505/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cadd0861b2ea4239b7ba08be7d57f327

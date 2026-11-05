@@ -1,0 +1,16 @@
+name: ELKWATER FORK NEAR SPANGLER, WV
+lat: 38.5983333333333
+lon: -80.0611111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 707.666
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03049930/
+parameter_code: "00065"
+series_begin: 2011-02-20T05:00:00+00:00
+time_series_id: 1c8d5e97565f486caa666f2776d50c36

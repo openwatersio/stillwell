@@ -1,0 +1,17 @@
+name: SANTA CRUZ RIVER AT MISSION LANE GCS AT TUCSON, AZ
+lat: 32.214222
+lon: -110.983306
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 715.061
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09482495/
+parameter_code: "00065"
+series_begin: 2021-06-10T17:45:00+00:00
+series_end: 2024-10-04T17:45:00+00:00
+time_series_id: d3060d7ec2864a2eb7ed7888cc24282c

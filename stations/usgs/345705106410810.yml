@@ -1,0 +1,17 @@
+name: 08N.02E.01.233 I25 WDSW
+lat: 34.9505861111111
+lon: -106.685197222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1494.13
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-345705106410810/
+parameter_code: "00065"
+series_begin: 2008-05-10T06:00:00+00:00
+series_end: 2011-09-21T05:00:00+00:00
+time_series_id: a4d9b93b3b024d7a95000ef4a7031edc

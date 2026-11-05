@@ -1,0 +1,17 @@
+name: SCHURZ 3 - LATERAL 2A SW/GW - CANAL SW
+lat: 38.9536111111111
+lon: -118.801388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1259.278
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-385713118480501/
+parameter_code: "00065"
+series_begin: 2013-04-18T07:00:00+00:00
+series_end: 2013-09-20T06:30:00+00:00
+time_series_id: 6805d888c804440496dacb19378951a8

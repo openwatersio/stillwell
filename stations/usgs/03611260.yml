@@ -1,0 +1,16 @@
+name: MASSAC CREEK NEAR PADUCAH, KY
+lat: 37.0414440375274
+lon: -88.7108852385202
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 105.089
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03611260/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f2436794edf54732a40193e0752ed716

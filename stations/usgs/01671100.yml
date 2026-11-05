@@ -1,0 +1,16 @@
+name: LITTLE RIVER NEAR DOSWELL, VA
+lat: 37.8726401289981
+lon: -77.5130391626874
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.051
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01671100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ff2851be4ee248aba6fe87c69bb5975b

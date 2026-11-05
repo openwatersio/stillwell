@@ -1,0 +1,16 @@
+name: Little Conemaugh River at East Conemaugh, PA
+lat: 40.3459071569598
+lon: -78.8825243556209
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 369.201
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03041000/
+parameter_code: "00065"
+series_begin: 2014-10-01T05:00:00+00:00
+time_series_id: a25dd95cde8b435b8e2c3b85cfa17d7f

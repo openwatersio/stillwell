@@ -1,0 +1,16 @@
+name: Horse Creek at 540 Rd near Afton, OK
+lat: 36.677742
+lon: -94.909214
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 226.594
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07189710/
+parameter_code: "00065"
+series_begin: 2020-08-18T06:00:00+00:00
+time_series_id: 97bfada3b59a463eb2a0918446c6810d

@@ -1,0 +1,16 @@
+name: MAPLE RIVER AT MAPLE RAPIDS, MI
+lat: 43.1097548451142
+lon: -84.6930521118303
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 195.709
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04115000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: 79c59b1c36864467b1f38d54316a0b37

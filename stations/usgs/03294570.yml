@@ -1,0 +1,16 @@
+name: MILL CREEK AT ORELL ROAD NEAR LOUISVILLE, KY
+lat: 38.0781258801277
+lon: -85.8899635194486
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.599
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03294570/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8ce92f1798b94223976b53c1f33ac2c8

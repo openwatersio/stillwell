@@ -1,0 +1,16 @@
+name: CLIFTY CREEK NEAR COLUMBUS, IN
+lat: 39.18532049797762
+lon: -85.8749591438575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.585
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03364650/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b4cf21fef32b4cc2838212efd4b0103f

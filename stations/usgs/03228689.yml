@@ -1,0 +1,16 @@
+name: Blacklick Creek near Pickerington OH
+lat: 39.928888888888885
+lon: -82.7925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 246.169
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03228689/
+parameter_code: "00065"
+series_begin: 2021-12-08T19:15:00+00:00
+time_series_id: ec84ccfc111e46b78ac38f7110b27199

@@ -1,0 +1,17 @@
+name: HOFFMAN DRAINAGE TUNNEL AT CLARYSVILLE, MD
+lat: 39.6383333333333
+lon: -78.8925555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 471.346
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01601420/
+parameter_code: "00065"
+series_begin: 2015-07-27T15:30:00+00:00
+series_end: 2021-07-01T04:55:00+00:00
+time_series_id: e70744a674944826a13ee1b8fa53f663

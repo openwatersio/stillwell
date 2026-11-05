@@ -1,0 +1,16 @@
+name: TINKER CREEK ABOVE GLADE CREEK AT ROANOKE, VA
+lat: 37.2778888888889
+lon: -79.9093611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 270.431
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0205551614/
+parameter_code: "00065"
+series_begin: 2019-09-25T17:45:00+00:00
+time_series_id: 3fbb446bde5545d799abbc9f5ef43fd1

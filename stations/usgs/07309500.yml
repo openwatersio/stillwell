@@ -1,0 +1,14 @@
+name: Lake Lawtonka near Lawton, OK
+lat: 34.7361799245224
+lon: -98.5033912906301
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07309500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: fa4d8aeb903b4f7e974b5de5d7380451

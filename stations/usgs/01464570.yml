@@ -1,0 +1,17 @@
+name: Martins Creek at Tullytown, PA
+lat: 40.14211111111111
+lon: -74.81205555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01464570/
+parameter_code: "00065"
+series_begin: 2026-05-24T15:57:48+00:00
+series_end: 2026-10-11T19:59:23+00:00
+time_series_id: 0e96419360084b34a95d4c1e83e10258

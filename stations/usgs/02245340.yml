@@ -1,0 +1,14 @@
+name: ST JOHNS R BLW SHANDS BRIDGE NR GRN COVE SPRG, FL
+lat: 30.0059222222222
+lon: -81.6151361111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02245340/
+parameter_code: "00065"
+series_begin: 2017-06-01T21:00:00+00:00
+time_series_id: 344c9c2f389245a095e65cc52fa9064e

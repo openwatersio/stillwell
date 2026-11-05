@@ -1,0 +1,13 @@
+name: EL TORO
+lat: 26.9417
+lon: -97.4583
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8777562
+established: 1990-03-04T00:00:00Z
+removed: 1997-09-18T23:59:00Z

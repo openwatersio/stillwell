@@ -1,0 +1,14 @@
+name: Florence
+lat: 39.632572
+lon: -90.610794
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 121.627
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Florence-Illinois.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Florence-Illinois.Stage.Inst.30Minutes.0.lrgsShef-rev

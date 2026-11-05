@@ -1,0 +1,24 @@
+name: BERKELEY,S.F.BAY
+lat: 37.865
+lon: -122.307
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.348
+  MHW: -3.16
+  DTL: -2.418
+  MTL: -2.498
+  MSL: -2.488
+  MLW: -1.835
+  MLLW: -1.488
+  NAVD88: -1.448
+  LAT: -0.803
+  HAT: -3.819
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414816
+established: 1979-02-07T00:00:00Z
+removed: 1979-10-31T23:59:00Z

@@ -1,0 +1,22 @@
+name: NORTH DANIA SOUND
+lat: 26.08
+lon: -80.1117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.008
+  MHW: -0.972
+  DTL: -0.587
+  MTL: -0.595
+  MSL: -0.596
+  MLW: -0.219
+  MLLW: -0.166
+  NAVD88: -0.86
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722957
+established: 1973-07-19T00:00:00Z
+removed: 1973-09-05T23:59:00Z

@@ -1,0 +1,15 @@
+name: PERMEABLE PAVEMENT INFLUENT AT MADISON, WI
+lat: 43.11361111111111
+lon: -89.30333333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.159
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430649089181200/
+parameter_code: "00065"
+time_series_id: 333bf2090f754213941127e2914c35f3

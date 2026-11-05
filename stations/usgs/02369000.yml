@@ -1,0 +1,16 @@
+name: SHOAL RIVER NR CRESTVIEW, FLA.
+lat: 30.6974126797269
+lon: -86.5707859863289
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 14.39
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02369000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 978008b184c349a2a03fe1776d18a2e4

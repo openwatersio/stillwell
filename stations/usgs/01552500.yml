@@ -1,0 +1,16 @@
+name: Muncy Creek near Sonestown, PA
+lat: 41.35694678996294
+lon: -76.53464774850876
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 312.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01552500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 610019aa407f4fef9b29f1400a104b60

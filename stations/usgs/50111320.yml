@@ -1,0 +1,16 @@
+name: CANAL DE JUANA DIAZ AT PIEDRA AGUZADA NR JUANA DIA
+lat: 18.039953000000004
+lon: -66.488756
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 60.622
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50111320/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 279f0692786040b59dfe1b99a77bd22e

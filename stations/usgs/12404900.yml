@@ -1,0 +1,17 @@
+name: KETTLE RIVER NEAR BARSTOW, WA
+lat: 48.7846261366006
+lon: -118.125273055139
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 396.545
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12404900/
+parameter_code: "00065"
+series_begin: 2016-02-19T08:00:00+00:00
+series_end: 2021-02-05T17:30:00+00:00
+time_series_id: 295704ddac1c4b91a39f04daf8955f7f

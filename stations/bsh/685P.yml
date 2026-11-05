@@ -1,0 +1,13 @@
+name: Hechthausen, Oste
+lat: 53.64056
+lon: 9.25278
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -5.01
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5980030]
+source_url: https://gezeiten.bsh.de/hechthausen

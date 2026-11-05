@@ -1,0 +1,13 @@
+name: Black Cr at Brentwood
+lat: 38.617000000297
+lon: -90.337000000614
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 131.341
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Brentwood-Black%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Brentwood-Black Cr.Stage.Inst.5Minutes.0.Usgs-raw

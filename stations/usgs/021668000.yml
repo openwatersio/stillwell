@@ -1,0 +1,16 @@
+name: WILSON CREEK AT NINETY SIX, SC
+lat: 34.2016944444444
+lon: -82.0462777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 132.094
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021668000/
+parameter_code: "00065"
+series_begin: 2020-05-21T17:15:00+00:00
+time_series_id: 20d981489f784b309ba63526fc947c05

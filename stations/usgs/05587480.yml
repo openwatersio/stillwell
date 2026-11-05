@@ -1,0 +1,15 @@
+name: PIASA CREEK NEAR MELVILLE, IL
+lat: 38.9577777777778
+lon: -90.2716666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05587480/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2011-10-03T05:45:00+00:00
+time_series_id: 5730c9102b2f4c73b3cc1b133f11cce0

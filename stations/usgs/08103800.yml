@@ -1,0 +1,16 @@
+name: Lampasas Rv nr Kempner, TX
+lat: 31.0793402971019
+lon: -98.0166918828464
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 252.539
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08103800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7dd4080661e04ebfa1676fac04bbfdd9

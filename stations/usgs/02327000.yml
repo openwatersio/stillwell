@@ -1,0 +1,14 @@
+name: WAKULLA SPRING NR CRAWFORDVILLE, FL
+lat: 30.2349244660051
+lon: -84.3012868854376
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02327000/
+parameter_code: "00065"
+series_begin: 2017-01-27T15:51:28+00:00
+time_series_id: 72ebbd48053c4e0fbbe44a8f6305e0a2

@@ -1,0 +1,14 @@
+name: Elizabeth City
+lat: 36.297638
+lon: -76.218056
+country_code: US
+datum: STND
+datums:
+  MSL: -9.095
+  NAVD88: -9.168
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8650946
+removed: 2022-04-22T00:00:00Z

@@ -1,0 +1,23 @@
+name: PAWLEYS ISLAND PIER, ATLANTIC OCEAN
+lat: 33.4317
+lon: -79.1167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.818
+  MHW: -2.699
+  DTL: -1.981
+  MTL: -1.95
+  MSL: -1.954
+  MLW: -1.2
+  MLLW: -1.144
+  LAT: -0.596
+  HAT: -3.298
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662006
+established: 1975-08-06T00:00:00Z
+removed: 1977-02-15T23:59:00Z

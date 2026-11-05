@@ -1,0 +1,16 @@
+name: Little Conewago Crk, Gingrich Rd at Upper Lawn PA
+lat: 40.22519444444445
+lon: -76.55452777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 134.722
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01573684/
+parameter_code: "00065"
+series_begin: 2023-12-06T17:15:00+00:00
+time_series_id: 54a5c788979c458a997afdca6c7c290c

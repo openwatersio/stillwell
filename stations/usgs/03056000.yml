@@ -1,0 +1,16 @@
+name: TYGART VALLEY R AT TYGART DAM NR GRAFTON, WV
+lat: 39.3198145943487
+lon: -80.0250779443245
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 292.608
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03056000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 995463816fca4302bc4a5aa6b3a6b04b

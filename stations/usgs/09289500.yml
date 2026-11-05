@@ -1,0 +1,16 @@
+name: LAKE FORK RIVER AB MOON LAKE, NR MOUNTAIN HOME, UT
+lat: 40.60252777777778
+lon: -110.5205
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2475.403
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09289500/
+parameter_code: "00065"
+series_begin: 2007-10-28T16:00:00+00:00
+time_series_id: 8d016d7c895c423fa429efa09032b8b3

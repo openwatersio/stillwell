@@ -1,0 +1,16 @@
+name: AIW AT HIGHWAY 9 AT NIXONS CROSSROADS, SC
+lat: 33.8515612220056
+lon: -78.6558482675026
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -3.871
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02110777/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 377d989b256348c6b16c8539105e54f0

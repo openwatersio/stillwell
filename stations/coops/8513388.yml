@@ -1,0 +1,23 @@
+name: Moriches CGS, Moriches Bay
+lat: 40.7867
+lon: -72.75
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.292
+  MHW: -1.222
+  DTL: -0.911
+  MTL: -0.895
+  MSL: -0.892
+  MLW: -0.567
+  MLLW: -0.531
+  LAT: -0.405
+  HAT: -1.427
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8513388
+established: 1989-07-18T00:00:00Z
+removed: 2014-01-26T00:00:00Z

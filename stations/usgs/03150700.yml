@@ -1,0 +1,16 @@
+name: OHIO RIVER AT MARIETTA, OH
+lat: 39.4095187152528
+lon: -81.4576214900089
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 172.623
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03150700/
+parameter_code: "00065"
+series_begin: 2010-10-01T05:00:00+00:00
+time_series_id: e8941cbc0e5d492dab008f831d6607fa

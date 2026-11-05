@@ -1,0 +1,16 @@
+name: Sabine Rv nr Mineola, TX
+lat: 32.6137466710305
+lon: -95.4857900995349
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 92.62
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08018500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 3270555202d34288ade16bba3e667524

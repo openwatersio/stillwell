@@ -1,0 +1,17 @@
+name: UNNAMED STREAM (M08) AT CR. 7 S. NEAR SAX, MN
+lat: 47.196975
+lon: -92.6024166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 397.459
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-471149092360901/
+parameter_code: "00065"
+series_begin: 2020-04-21T18:00:00+00:00
+series_end: 2021-11-03T20:00:00+00:00
+time_series_id: 5388b4121be9429fb4855498f04c19c9

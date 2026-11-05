@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER AT LAS ANIMAS, CO.
+lat: 38.080833
+lon: -103.219167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1184.489
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07124000/
+parameter_code: "00065"
+series_begin: 2020-11-03T19:15:00+00:00
+time_series_id: e5aee6aaf1d04367a3119f15cdfe300c

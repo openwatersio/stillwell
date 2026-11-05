@@ -1,0 +1,16 @@
+name: JAMES RIVER NEAR YANKTON, SD
+lat: 42.995833
+lon: -97.369444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 365.208
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06478513/
+parameter_code: "00065"
+series_begin: 2018-05-01T06:00:00+00:00
+time_series_id: f5b3889ca5e6434e96f495a6ef7e2ddc

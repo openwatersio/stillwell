@@ -1,0 +1,13 @@
+name: GÜLPE OP
+lat: 52.738531
+lon: 12.221626
+country_code: DE
+datum: PNP
+datums:
+  NHN: 22.165
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=580747

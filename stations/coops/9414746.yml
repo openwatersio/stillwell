@@ -1,0 +1,24 @@
+name: PARK STREET BRIDGE
+lat: 37.7717
+lon: -122.235
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.5
+  MHW: -2.311
+  DTL: -1.508
+  MTL: -1.583
+  MSL: -1.544
+  MLW: -0.855
+  MLLW: -0.515
+  NAVD88: -0.56
+  LAT: 0.213
+  HAT: -2.951
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414746
+established: 1977-01-06T00:00:00Z
+removed: 2011-05-06T00:00:00Z

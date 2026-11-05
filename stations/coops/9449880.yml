@@ -1,0 +1,23 @@
+name: Friday Harbor
+lat: 48.545277
+lon: -123.0125
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.538
+  MHW: -3.341
+  DTL: -2.356
+  MTL: -2.607
+  MSL: -2.561
+  MLW: -1.872
+  MLLW: -1.174
+  LAT: -0.051
+  HAT: -4.034
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880
+established: 1932-01-25T00:00:00Z

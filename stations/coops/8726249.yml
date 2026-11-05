@@ -1,0 +1,22 @@
+name: PALMA SOLA BAY NORTH
+lat: 27.5033
+lon: -82.6483
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.148
+  MHW: -1.067
+  DTL: -0.813
+  MTL: -0.819
+  MSL: -0.823
+  MLW: -0.572
+  MLLW: -0.479
+  NAVD88: -0.928
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726249
+established: 1977-03-30T00:00:00Z
+removed: 1977-11-04T23:59:00Z

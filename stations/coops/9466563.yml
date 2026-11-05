@@ -1,0 +1,24 @@
+name: Newtok
+lat: 60.9345
+lon: -164.6387
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.442
+  MHW: -6.374
+  DTL: -5.493
+  MTL: -5.562
+  MSL: -5.579
+  MLW: -4.749
+  MLLW: -4.545
+  NAVD88: -4.384
+  LAT: -4.091
+  HAT: -6.812
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466563
+established: 2021-06-05T00:00:00Z
+removed: 2021-09-17T00:00:00Z

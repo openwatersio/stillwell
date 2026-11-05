@@ -1,0 +1,16 @@
+name: Casselman River at Markleton, PA
+lat: 39.8599166666667
+lon: -79.2288333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 504.383
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03079000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f82a6dbd596b495ea2a2454aa3b004ec

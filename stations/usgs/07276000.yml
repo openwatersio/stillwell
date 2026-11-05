@@ -1,0 +1,16 @@
+name: COLDWATER RIVER NR LEWISBURG, MS
+lat: 34.8409303826923
+lon: -89.8256428726634
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.557
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07276000/
+parameter_code: "00065"
+series_begin: 2021-09-13T18:00:00+00:00
+time_series_id: afe25be7ed0e45e18255f84681f61b6e

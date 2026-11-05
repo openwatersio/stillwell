@@ -1,0 +1,23 @@
+name: Stouts Pass at Six Mile Lake
+lat: 29.7433
+lon: -91.23
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.74
+  MHW: -6.716
+  DTL: -6.604
+  MTL: -6.603
+  MSL: -6.595
+  MLW: -6.49
+  MLLW: -6.469
+  LAT: -6.402
+  HAT: -6.757
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8764025
+established: 2006-02-09T00:00:00Z
+removed: 2007-03-20T23:59:00Z

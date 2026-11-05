@@ -1,0 +1,16 @@
+name: REX RIVER NEAR CEDAR FALLS, WA
+lat: 47.35063398420251
+lon: -121.6631391672642
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 526.557
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12115500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 09f5fd71e32244c2ab17fd7af52e2455

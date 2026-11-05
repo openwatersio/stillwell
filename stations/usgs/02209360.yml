@@ -1,0 +1,16 @@
+name: EAST BEAR CREEK AT POPLAR ROAD, NR MANSFIELD, GA
+lat: 33.50725
+lon: -83.77025
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 194.289
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02209360/
+parameter_code: "00065"
+series_begin: 2010-05-07T04:00:00+00:00
+time_series_id: ed450c2d10e74ebf9fc4afb912229b6b

@@ -1,0 +1,16 @@
+name: Judith River above Carr Creek near Utica MT
+lat: 46.9177222222222
+lon: -110.188944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1425.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06110020/
+parameter_code: "00065"
+series_begin: 2014-10-01T07:00:00+00:00
+time_series_id: 5d58f025abb94b0cb88c8a203e2be658

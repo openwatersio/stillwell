@@ -1,0 +1,24 @@
+name: Cape San Blas, Western Cape
+lat: 29.7644
+lon: -85.4025
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.894
+  MHW: -8.876
+  DTL: -8.644
+  MTL: -8.644
+  MSL: -8.636
+  MLW: -8.413
+  MLLW: -8.394
+  NAVD88: -8.633
+  LAT: -8.076
+  HAT: -9.142
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728978
+established: 2022-02-19T00:00:00Z
+removed: 2022-07-12T00:00:00Z

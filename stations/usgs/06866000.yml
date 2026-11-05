@@ -1,0 +1,16 @@
+name: SMOKY HILL R AT LINDSBORG, KS
+lat: 38.563806593846
+lon: -97.6664946957207
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 395.551
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06866000/
+parameter_code: "00065"
+series_begin: 2014-07-30T11:45:00+00:00
+time_series_id: 04d72e19cdef4215bae529068d8dfd11
