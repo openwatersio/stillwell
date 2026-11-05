@@ -49,7 +49,13 @@ import {
   writeRecent,
   type StationObservation,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, stationListPath, stationsPath } from "../src/lake/paths.ts";
+import {
+  historyPath,
+  recentPath,
+  seriesPath,
+  stationListPath,
+  stationsPath,
+} from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
 import {
   describeReport,
@@ -84,6 +90,17 @@ function lakeFor(station: Pick<Station, "id" | "commercial_use">): string {
   if (overlaps(restricted, LAKE))
     throw new Error("WATER_LEVELS_RESTRICTED_LAKE must be a separate bucket or directory");
   return restricted;
+}
+
+/** WATER_LEVELS_BACKUP, which must be outside both lakes, since it may hold restricted lists. */
+function backupLake(): string | undefined {
+  const backup = process.env.WATER_LEVELS_BACKUP?.replace(/\/$/, "");
+  if (!backup) return undefined;
+  const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
+  for (const lake of [LAKE, restricted].filter((l): l is string => !!l))
+    if (overlaps(backup, lake))
+      throw new Error("WATER_LEVELS_BACKUP must be a separate bucket or directory from the lakes");
+  return backup;
 }
 
 /** The lake that holds a source's list, by its terms; every station in it shares them. */
@@ -153,7 +170,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       const { stations, report } = await refreshSource(lake, source, {
         now,
         acceptEpochs: values["accept-epochs"],
-        backup: process.env.WATER_LEVELS_BACKUP?.replace(/\/$/, ""),
+        backup: backupLake(),
       });
       const active = stations.filter((s) => s.status === "active").length;
       const lines = describeReport(report);
@@ -164,6 +181,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       // (a USACE gauge whose series CWMS withdrew), fails the run so it's seen.
       for (const e of report.epochs)
         if (e.event === "held" || e.event === "suppressed") process.exitCode = 1;
+      if (report.withdrawn.length) process.exitCode = 1;
     } catch (error) {
       // One source failing keeps its list and doesn't stop the others.
       const why = error instanceof Error ? error.message : String(error);
@@ -172,16 +190,32 @@ async function refreshStations(ids: string[]): Promise<void> {
       process.exitCode = 1;
     }
   }
-  for (const lake of lakes) {
-    const count = await publishStations(lake, Object.values(sources));
-    console.log(
-      count === null
-        ? `${stationsPath(lake)}: not written, since the lake has no station lists`
-        : `${stationsPath(lake)}: ${count} stations`,
-    );
-  }
+  for (const lake of lakes) await publish(lake);
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...summary, "```", ""].join("\n"));
+}
+
+/**
+ * Rebuild `stations.parquet` and `sources.json` for `lake`, unless a source it
+ * should hold has no list yet: one with committed station files or history.
+ */
+async function publish(lake: string): Promise<void> {
+  const held = Object.values(sources).filter((s) => lakeOfSource(s.metadata) === lake);
+  const expected: string[] = [];
+  for (const { metadata } of held)
+    if (
+      existsSync(join(STATIONS_DIR, metadata.id)) ||
+      (await exists(historyPath(lake, metadata.id, "*", "parquet")))
+    )
+      expected.push(metadata.id);
+  const result = await publishStations(lake, held, expected);
+  if ("count" in result) console.log(`${stationsPath(lake)}: ${result.count} stations`);
+  else {
+    console.error(
+      `${stationsPath(lake)} not written: ${result.missing.join(", ") || "no source"} has no list in the lake yet`,
+    );
+    process.exitCode = 1;
+  }
 }
 
 /** Write each source's first list into the lake from its committed station files. */
@@ -205,14 +239,7 @@ async function seedStations(ids: string[]): Promise<void> {
       process.exitCode = 1;
     }
   }
-  for (const lake of lakes) {
-    const count = await publishStations(lake, Object.values(sources));
-    console.log(
-      count === null
-        ? `${stationsPath(lake)}: not written, since the lake has no station lists`
-        : `${stationsPath(lake)}: ${count} stations`,
-    );
-  }
+  for (const lake of lakes) await publish(lake);
 }
 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
@@ -332,12 +359,13 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   const failed: string[] = [];
 
   await pool(stations, async (station) => {
-    // Values from an earlier epoch, or before this one began, are in another reference.
+    // Values from an earlier epoch are in another reference: they stay as they
+    // are, for compaction to fold into that epoch's files, and aren't merged.
     const epoch = epochOf(station);
     const since = Date.parse(currentSince(station) ?? "") || -Infinity;
-    const old = (previous.get(station.id) ?? []).filter(
-      (r) => r.time >= keepFrom && r.epoch === epoch && r.time >= since,
-    );
+    const kept = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
+    for (const r of kept) if (r.epoch !== epoch) rows.push(r);
+    const old = kept.filter((r) => r.epoch === epoch && r.time >= since);
     let merged: Observation[] = old;
     try {
       const from = new Date(Math.max(start.getTime(), since));

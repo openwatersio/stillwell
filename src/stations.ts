@@ -26,8 +26,9 @@ export interface EpochChange {
  * epoch (src/epochs.ts), so its new values go to files of their own. A station
  * the source listed without a datum, or without any offsets, keeps the ones it
  * had, and a new station without a datum isn't listed until the source names
- * it. A source that sends no offsets at all keeps the old ones, so a refresh
- * that loses them doesn't erase them; one that sends some replaces them all.
+ * it. A source that sends no offsets at all keeps the old ones while the datum
+ * stays the same, so a refresh that loses them doesn't erase them; one that
+ * sends some replaces them all.
  */
 export function mergeStationList(
   previous: LakeStation[],
@@ -44,9 +45,11 @@ export function mergeStationList(
     const old = byId.get(s.id);
     if (s.datum === null && !old) continue;
     listed.add(s.id);
-    // Offsets the source left out this time are kept, rather than erased.
-    const omitted = s.datum === null || (!Object.keys(s.datums).length && old);
-    const datums = omitted && old ? old.datums : s.datums;
+    // Offsets the source left out this time are kept, rather than erased, but
+    // only for the same datum: another datum's offsets would be wrong for it.
+    const sameDatum = old && (s.datum === null || s.datum === old.datum);
+    const omitted = s.datum === null || !Object.keys(s.datums).length;
+    const datums = omitted && sameDatum ? old.datums : s.datums;
     let epochs;
     if (old) {
       const next = nextEpochs(

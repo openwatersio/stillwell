@@ -70,12 +70,13 @@ node scripts/ingest.ts recent pegelonline --hours 3
 
 These environment variables choose where it writes:
 
-| Variable                                                  | Means                                                                                                                                                     |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WATER_LEVELS_LAKE`                                       | The lake: a directory, `data` by default, or an `s3://` URL.                                                                                              |
-| `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for stations whose license bars commercial use. Ingest refuses to write one without it, and refuses one that is the public lake. |
-| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                         |
-| `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                  |
+| Variable                                                  | Means                                                                                                                                                                                                 |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WATER_LEVELS_LAKE`                                       | The lake: a directory, `data` by default, or an `s3://` URL.                                                                                                                                          |
+| `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for stations whose license bars commercial use. Ingest refuses to write one without it, and refuses one that is the public lake.                                             |
+| `WATER_LEVELS_BACKUP`                                     | A location outside both lakes that every station refresh also writes its snapshot of the previous list to. The lake is the only live copy of the lists, so set it wherever a refresh runs against R2. |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                                                                     |
+| `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                                                              |
 
 If a source starts reporting a station in another datum, `ingest stations` marks it inactive, prints it and exits nonzero, so a person can decide whether to convert its files or start over. `backfill … all` skips inactive stations.
 

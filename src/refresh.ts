@@ -30,6 +30,8 @@ export interface RefreshReport {
   time: string;
   added: string[];
   retired: string[];
+  /** Retired by the source itself, listed inactive, rather than dropped from its list. */
+  withdrawn: string[];
   changed: { id: string; fields: string[] }[];
   epochs: EpochChange[];
 }
@@ -83,7 +85,8 @@ export async function refreshSource(
       `${opened.length} stations changed datum at once (limit ${limit}): ${opened.map((c) => c.id).join(", ")}; check them and rerun with --accept-epochs`,
     );
 
-  const report = reportOf(id, options.now, previous, stations, changes);
+  const listedInactive = new Set(fetched.filter((s) => s.status === "inactive").map((s) => s.id));
+  const report = reportOf(id, options.now, previous, stations, changes, listedInactive);
   if (stored) {
     for (const root of [lake, options.backup].filter((r): r is string => !!r)) {
       await writeStationList(historyPath(root, id, options.now, "parquet"), stored);
@@ -105,13 +108,15 @@ async function renumberAboveFiles(
 ): Promise<void> {
   const before = new Map(previous.map((s) => [s.id, new Set(s.epochs.map((e) => e.id))]));
   for (const station of stations) {
-    const known = before.get(station.id);
-    const fresh = station.epochs.filter((e) => known && !known.has(e.id));
+    const known = before.get(station.id) ?? new Set<number>();
+    const fresh = station.epochs.filter((e) => !known.has(e.id));
     if (!fresh.length) continue;
     const onDisk = await highestEpoch(
       station.products.map((p) => epochDirs(lake, p, station.source, station.source_id)),
     );
-    let next = Math.max(onDisk + 1, ...[...known!].map((n) => n + 1));
+    // A station new to the list with no later epochs on disk starts at 1.
+    if (!known.size && onDisk === 1) continue;
+    let next = Math.max(onDisk + 1, ...[...known].map((n) => n + 1));
     for (const epoch of fresh) epoch.id = Math.max(epoch.id, next++);
   }
 }
@@ -148,21 +153,32 @@ export async function seedSource(
 }
 
 /**
- * Rebuild `stations.parquet` and `sources.json` in `lake` from every source's
- * list there and its bounds. Returns how many stations it published, or null
- * when the lake has no lists, so a lake not yet seeded keeps what it publishes.
+ * Rebuild `stations.parquet` and `sources.json` in `lake` from the lists of
+ * `all`, the sources it holds, and their bounds. A source in `expected` that
+ * has no list yet, because it isn't seeded or its list went missing, stops
+ * the rebuild, which would otherwise drop its stations from what the lake
+ * publishes; it returns the missing ones. A source in neither is new, and
+ * joins once it has a list.
  */
-export async function publishStations(lake: string, all: Source[]): Promise<number | null> {
+export async function publishStations(
+  lake: string,
+  all: Source[],
+  expected: string[],
+): Promise<{ count: number } | { missing: string[] }> {
   let stations: LakeStation[] = [];
   const listed: Source[] = [];
+  const missing: string[] = [];
   for (const source of all) {
     const list = await readStationList(stationListPath(lake, source.metadata.id));
-    if (!list) continue;
+    if (!list) {
+      if (expected.includes(source.metadata.id)) missing.push(source.metadata.id);
+      continue;
+    }
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
     stations.push(...list.map((s) => ({ ...s, ...bounds.get(s.id) })));
   }
-  if (!listed.length) return null;
+  if (missing.length || !listed.length) return { missing };
   stations = linkBothWays(stations);
   await writeStations(stationsPath(lake), stations);
   await writeJsonArray(
@@ -176,14 +192,16 @@ export async function publishStations(lake: string, all: Source[]): Promise<numb
         .length,
     })),
   );
-  return stations.length;
+  return { count: stations.length };
 }
 
 /** A source's list from the lake, or an error naming what to run. */
 export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {
   const list = await readStationList(stationListPath(lake, sourceId));
   if (!list)
-    throw new Error(`No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\``);
+    throw new Error(
+      `No station list for ${sourceId} in ${lake}; run \`seed-stations ${sourceId}\`, or \`stations ${sourceId}\` for a new source`,
+    );
   return list;
 }
 
@@ -227,16 +245,28 @@ function reportOf(
   previous: LakeStation[],
   stations: LakeStation[],
   epochs: EpochChange[],
+  listedInactive: Set<string>,
 ): RefreshReport {
   const before = new Map(previous.map((s) => [s.id, s]));
-  const report: RefreshReport = { source, time, added: [], retired: [], changed: [], epochs };
+  const report: RefreshReport = {
+    source,
+    time,
+    added: [],
+    retired: [],
+    withdrawn: [],
+    changed: [],
+    epochs,
+  };
   for (const station of stations) {
     const old = before.get(station.id);
     if (!old) {
       report.added.push(station.id);
       continue;
     }
-    if (old.status === "active" && station.status === "inactive") report.retired.push(station.id);
+    if (old.status === "active" && station.status === "inactive") {
+      report.retired.push(station.id);
+      if (listedInactive.has(station.id)) report.withdrawn.push(station.id);
+    }
     const [a, b] = [COMPARED(old), COMPARED(station)] as Record<string, unknown>[];
     const fields = [...new Set([...Object.keys(a!), ...Object.keys(b!)])]
       .filter((key) => !isDeepStrictEqual(a![key], b![key]))
@@ -252,7 +282,10 @@ export function describeReport(report: RefreshReport): string[] {
     `${report.source}: ${report.added.length} added, ${report.retired.length} retired, ${report.changed.length} changed`,
   ];
   for (const id of report.added.slice(0, 20)) lines.push(`  added ${id}`);
-  for (const id of report.retired) lines.push(`  retired ${id}`);
+  for (const id of report.retired)
+    lines.push(
+      `  retired ${id}${report.withdrawn.includes(id) ? ", by the source; see its log above" : ""}`,
+    );
   for (const c of report.changed.slice(0, 50)) lines.push(`  ${c.id}: ${c.fields.join(", ")}`);
   for (const e of report.epochs)
     lines.push(

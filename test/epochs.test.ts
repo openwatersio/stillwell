@@ -49,7 +49,7 @@ describe("firstEpochs", () => {
       { datum: "GZ", datums: {}, reference: { id: "2015-06-29", since: "2015-06-29" } },
       options({ offsets: [-6, -4] }),
     );
-    assert.equal(first!.since, "2015-06-29T04:00:00Z");
+    assert.equal(first!.since, "2015-06-29T06:00:00Z");
     assert.equal(first!.reference, "2015-06-29");
   });
 });
@@ -218,6 +218,73 @@ describe("nextEpochs", () => {
   it("gives every new epoch an id above the files already in the lake", () => {
     const { epochs } = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ nextId: 5 }));
     assert.equal(epochs[1]!.id, 5);
+  });
+});
+
+describe("nextEpochs, as a person decides", () => {
+  const now = "2027-06-01T00:00:00Z";
+  const recent = () => [epoch({ since: "2027-03-01T00:00:00Z" })];
+
+  it("leaves the open epoch's end alone while a change is held, and sets it on confirming", () => {
+    const held = nextEpochs(recent(), { datum: "NN", datums: {} }, options({ now })).epochs;
+    assert.deepEqual(
+      held.map((e) => [e.state, e.until]),
+      [
+        ["open", null],
+        ["held", "2027-05-01T00:00:00Z"],
+      ],
+    );
+    const key = epochKey("x/1", now);
+    const confirmed = nextEpochs(
+      held,
+      { datum: "NN", datums: {} },
+      options({ decisions: { [key]: { confirm: true, note: "" } } }),
+    ).epochs;
+    assert.deepEqual(
+      confirmed.map((e) => [e.state, e.until]),
+      [
+        ["closed", "2027-05-01T00:00:00Z"],
+        ["open", null],
+      ],
+    );
+  });
+
+  it("ends the epoch before earlier when a person says so after the change", () => {
+    const opened = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ now })).epochs;
+    const key = epochKey("x/1", now);
+    const { epochs } = nextEpochs(
+      opened,
+      { datum: "NN", datums: {} },
+      options({ decisions: { [key]: { until: "2027-04-15", note: "last good survey" } } }),
+    );
+    assert.equal(epochs[0]!.until, "2027-04-16T00:00:00Z");
+  });
+
+  it("takes a fixed adapter and the rejection of its wrong epoch in one refresh", () => {
+    const wrong = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ now })).epochs;
+    const key = epochKey("x/1", now);
+    const { epochs, event } = nextEpochs(
+      wrong,
+      { datum: "PNP", datums: {} },
+      options({ now: "2027-07-01T00:00:00Z", decisions: { [key]: { reject: true, note: "" } } }),
+    );
+    assert.equal(event, "rejected");
+    assert.deepEqual(
+      epochs.map((e) => [e.datum, e.state]),
+      [
+        ["PNP", "open"],
+        ["NN", "rejected"],
+      ],
+    );
+  });
+
+  it("can't reject the first epoch, which has nothing to fall back on", () => {
+    const { epochs } = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ decisions: { [epochKey("x/1", null)]: { reject: true, note: "" } } }),
+    );
+    assert.equal(epochs[0]!.state, "open");
   });
 });
 

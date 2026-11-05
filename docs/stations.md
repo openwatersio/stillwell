@@ -61,6 +61,8 @@ SELECT o.time, o.level_m + e.to_current AS level_m, o.flag
 FROM epochs e JOIN obs o ON o.epoch = e.id
   AND (e.since IS NULL OR o.time >= e.since) AND (e.until IS NULL OR o.time < e.until)
 WHERE e.to_current IS NOT NULL
+-- after a rejected epoch, its files and the epoch before it can share a time; the latter wins
+QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 1
 ```
 
 [data.md](data.md) would give the full query, and the API does the same. A reader that reads one epoch's files gets one datum, as before. Rows from an epoch that can't be converted stay in the lake, readable in their own datum, but outside the combined series.

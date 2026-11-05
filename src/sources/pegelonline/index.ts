@@ -102,8 +102,8 @@ function parseUnit(unit: string, station: string): { datum: string; scale: numbe
 }
 
 // The measurements endpoint doesn't say its unit, so ask the series once per
-// station and process. A unit that moves the series to another datum also marks
-// the station inactive at the next station refresh.
+// station and process. A unit that moves the series to another datum opens a
+// datum epoch for the station at the next station refresh.
 const units = new Map<string, Promise<string>>();
 
 function unitOf(station: string): Promise<string> {

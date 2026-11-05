@@ -263,9 +263,10 @@ export async function readStationList(path: string): Promise<LakeStation[] | nul
 /** Whether any file matches `pattern`, a path or a glob, local or remote. */
 export async function exists(pattern: string): Promise<boolean> {
   if (!isRemote(pattern) && !/[*?[]/.test(pattern)) return existsSync(pattern);
-  // HTTPS can't list files, so a URL is checked by reading it.
+  // HTTPS can't list files, so a URL is checked by reading it. `read` gives
+  // no rows for "not found", and throws any other failure for the caller.
   if (/^https?:/.test(pattern))
-    return (await read(pattern, "SELECT 1 AS one LIMIT 1", "one").catch(() => [])).length > 0;
+    return (await read(pattern, "SELECT count(*) AS n", "n")).length > 0;
   return serial(async () => {
     const db = await connection();
     const reader = await db.runAndReadAll(`SELECT count(*) AS n FROM glob(${quote(pattern)})`);

@@ -45,6 +45,11 @@ export function localDay(date: string, [min, max]: [number, number]): [number, n
   return [midnight - max * HOUR_MS, midnight + DAY_MS - min * HOUR_MS];
 }
 
+/** The latest instant a source's local day `date` can start: where an epoch from that day begins. */
+const dayStart = (date: string, offsets: [number, number]) => localDay(date, offsets)[1] - DAY_MS;
+/** The earliest instant a local day can start: where an epoch ending before that day ends. */
+const dayStartEarliest = (date: string, offsets: [number, number]) => localDay(date, offsets)[0];
+
 const iso = (ms: number) => new Date(ms).toISOString().replace(".000Z", "Z");
 const dayBefore = (date: string) => iso(Date.parse(`${date}T00:00:00Z`) - DAY_MS).slice(0, 10);
 
@@ -73,7 +78,7 @@ export type EpochEvent = "opened" | "held" | "rejected" | "confirmed" | "suppres
  */
 export function firstEpochs(fetched: Fetched & { datum: string }, options: EpochOptions): Epoch[] {
   const start = fetched.reference?.since;
-  const since = start ? iso(localDay(start, options.offsets)[0]) : null;
+  const since = start ? iso(dayStart(start, options.offsets)) : null;
   return [
     {
       id: Math.max(1, options.nextId ?? 1),
@@ -99,9 +104,10 @@ export function nextEpochs(
   fetched: Fetched,
   options: EpochOptions,
 ): { epochs: Epoch[]; event: EpochEvent | null; reason?: string } {
-  let epochs = previous.map((e) => ({ ...e, datums: { ...e.datums } }));
-  let event: EpochEvent | null = null;
+  const epochs = previous.map((e) => ({ ...e, datums: { ...e.datums } }));
   let reason: string | undefined;
+  // A rejection goes first, so a fix that lands with it isn't read as a change back.
+  let event: EpochEvent | null = applyDecisions(epochs, options);
   const current = currentEpoch(epochs);
   const labelChanged = fetched.datum !== null && fetched.datum !== current.datum;
   const ref = fetched.reference ?? null;
@@ -125,18 +131,14 @@ export function nextEpochs(
       let since: number;
       let until: number;
       if (ref?.since && refChanged) {
-        since = localDay(ref.since, options.offsets)[0];
-        until = localDay(dayBefore(ref.since), options.offsets)[0];
+        since = dayStart(ref.since, options.offsets);
+        until = dayStartEarliest(dayBefore(ref.since), options.offsets);
       } else {
         // The change came sometime after the old reference was last seen.
         since = Date.parse(options.now);
         until = Date.parse(current.seen ?? options.now);
       }
-      const key = epochKey(options.station, iso(since));
-      const decision = options.decisions[key];
-      // The person knows the old reference held through this day, and no longer.
-      if (decision?.until)
-        until = Math.min(until, localDay(decision.until, options.offsets)[0] + DAY_MS);
+      const decision = options.decisions[epochKey(options.station, iso(since))];
       const earlier = epochs.some(
         (e) =>
           e !== current &&
@@ -146,18 +148,18 @@ export function nextEpochs(
       const soon = current.since !== null && since - Date.parse(current.since) < HOLD_WITHIN_MS;
       const backwards = current.since !== null && since <= Date.parse(current.since);
       const id = Math.max(...epochs.map((e) => e.id), (options.nextId ?? 1) - 1) + 1;
+      // A held epoch keeps the end it would give the open one, until a person decides.
       const opened: Epoch = {
         id,
         datum,
         since: iso(since),
-        until: null,
+        until: iso(Math.min(until, since)),
         seen: fetched.datum !== null ? options.now : null,
         reference: ref?.id ?? null,
         datums: fetched.datums,
         to_current: 0,
         state: "open",
       };
-      current.until = iso(Math.min(until, since));
       if (backwards || ((soon || earlier) && !decision?.confirm)) {
         opened.state = "held";
         event = "held";
@@ -168,46 +170,61 @@ export function nextEpochs(
             : "returns to an earlier reference";
       } else {
         current.state = "closed";
+        current.until = opened.until;
+        opened.until = null;
         event = "opened";
       }
       epochs.push(opened);
     }
   }
 
-  const decided = applyDecisions(epochs, options);
-  epochs = decided.epochs;
-  if (decided.event) event = decided.event;
+  event = applyDecisions(epochs, options) ?? event;
   return { epochs: withToCurrent(epochs, options), event, reason };
 }
 
-/** Confirm or reject epochs as a person decided. */
-function applyDecisions(
-  epochs: Epoch[],
-  options: EpochOptions,
-): { epochs: Epoch[]; event: EpochEvent | null } {
+/**
+ * Apply a person's decisions to a station's epochs, in place: confirm or
+ * reject one, or end the one before it earlier. Returns what changed.
+ */
+function applyDecisions(epochs: Epoch[], options: EpochOptions): EpochEvent | null {
   let event: EpochEvent | null = null;
   for (const epoch of epochs) {
     const decision = options.decisions[epochKey(options.station, epoch.since)];
     if (!decision) continue;
+    const before = epochs
+      .filter((e) => e.id < epoch.id && (e.state === "open" || e.state === "closed"))
+      .at(-1);
     if (decision.reject && epoch.state !== "rejected") {
+      // The first epoch has nothing to fall back on, so it can't be rejected.
+      if (!before) continue;
+      const wasHeld = epoch.state === "held";
       const wasOpen = epoch.state === "open";
       epoch.state = "rejected";
       // Its span goes back to the epoch before it.
-      const before = epochs
-        .filter((e) => e.id < epoch.id && (e.state === "open" || e.state === "closed"))
-        .at(-1);
-      if (before) {
+      if (wasHeld) epoch.until = null;
+      else {
         before.until = epoch.until;
-        if (wasOpen || epoch.until === null) before.state = "open";
+        if (wasOpen) before.state = "open";
       }
       event = "rejected";
     } else if (decision.confirm && epoch.state === "held") {
-      for (const e of epochs) if (e.state === "open") e.state = "closed";
+      for (const e of epochs)
+        if (e.state === "open") {
+          e.state = "closed";
+          e.until = epoch.until;
+        }
       epoch.state = "open";
+      epoch.until = null;
       event = "confirmed";
     }
+    // The person knows the reference before held through this day, and no longer.
+    if (decision.until && before && epoch.state !== "rejected") {
+      const end = iso(dayStartEarliest(decision.until, options.offsets) + DAY_MS);
+      const target = epoch.state === "held" ? epoch : before;
+      if (target.until === null || end < target.until) target.until = end;
+    }
   }
-  return { epochs, event };
+  return event;
 }
 
 /**

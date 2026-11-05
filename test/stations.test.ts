@@ -114,6 +114,16 @@ describe("mergeStationList", () => {
     );
   });
 
+  it("never gives a new datum the old one's offsets", () => {
+    const { stations } = mergeStationList(
+      [held("a", { datum: "PNP", datums: { NN: 5.2 } })],
+      [station("a", { datum: "NN", datums: {} })],
+      options,
+    );
+    assert.deepEqual(stations[0]!.datums, {});
+    assert.deepEqual(stations[0]!.epochs[0]!.datums, { NN: 5.2 });
+  });
+
   it("starts a new station's epoch where its source says the reference does", () => {
     const { stations } = mergeStationList(
       [],

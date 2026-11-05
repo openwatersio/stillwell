@@ -161,6 +161,30 @@ describe("refreshSource", () => {
     );
   });
 
+  it("tells a station the source retired itself from one it stopped listing", async () => {
+    await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
+    const { report } = await refreshSource(lake, sourceOf([listed("a", { status: "inactive" })]), {
+      now: LATER,
+    });
+    assert.deepEqual([report.retired, report.withdrawn], [["test/a", "test/b"], ["test/a"]]);
+  });
+
+  it("numbers a station new to the list above epoch files already in the lake", async () => {
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await writeObservations(
+      seriesPath(lake, "levels", "test", "b", 2026, 2),
+      [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
+      "NAP",
+    );
+    const { stations } = await refreshSource(lake, sourceOf([listed("a"), listed("b")]), {
+      now: LATER,
+    });
+    assert.deepEqual(
+      stations.map((s) => s.epochs.map((e) => e.id)),
+      [[1], [3]],
+    );
+  });
+
   it("applies a person's decision on an epoch from the source's overrides", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
     await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), { now: LATER });
@@ -199,7 +223,7 @@ describe("seedSource", () => {
     const seeded = await seedSource(lake, usace, committed, NOW);
     assert.deepEqual(
       seeded.map((s) => s.epochs.map((e) => [e.id, e.since, e.reference])),
-      [[[1, "2015-06-29T04:00:00Z", "2015-06-29"]], [[1, null, null]]],
+      [[[1, "2015-06-29T06:00:00Z", "2015-06-29"]], [[1, null, null]]],
     );
     assert.deepEqual(await readStationList(stationListPath(lake, "test")), seeded);
     await assert.rejects(seedSource(lake, usace, committed, NOW), /already exists/);
@@ -222,7 +246,7 @@ describe("publishStations", () => {
     await writeStations(boundsPath(lake, "test"), [
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
-    assert.equal(await publishStations(lake, [sourceOf([])]), 2);
+    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { count: 2 });
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
@@ -236,10 +260,15 @@ describe("publishStations", () => {
     ]);
   });
 
-  it("publishes nothing from a lake with no lists, and an empty list as none", async () => {
-    assert.equal(await publishStations(lake, [sourceOf([])]), null);
-    assert.equal(await exists(stationsPath(lake)), false);
+  it("publishes nothing while a source it should hold has no list", async () => {
+    const other: Source = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
+    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { missing: ["test"] });
     await writeStationList(stationListPath(lake, "test"), []);
-    assert.equal(await publishStations(lake, [sourceOf([])]), 0);
+    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test", "other"]), {
+      missing: ["other"],
+    });
+    assert.equal(await exists(stationsPath(lake)), false);
+    // A new source with no list yet doesn't hold up the others.
+    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), { count: 0 });
   });
 });

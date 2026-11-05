@@ -264,6 +264,8 @@ SELECT o.time, o.level_m + e.to_current AS level_m, o.flag
 FROM o JOIN e ON o.epoch = e.id
   AND (e.since IS NULL OR o.time >= e.since) AND (e.until IS NULL OR o.time < e.until)
 WHERE e.to_current IS NOT NULL
+-- after a rejected epoch, its files and the epoch before it can share a time; the latter wins
+QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 1
 ORDER BY o.time;
 ```
 
