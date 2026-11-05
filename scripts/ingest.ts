@@ -19,7 +19,7 @@
  * Backfill skips a year whose file is already complete (see `yearDone` in
  * src/backfill.ts), so a run cut short doesn't fetch those again; `--refetch`
  * fetches every year anyway, and `--skip-written` skips every ended year that
- * has a file, complete or not, so a long campaign of runs doesn't fetch
+ * has a file, complete or not (from 2026 on, see `COMPACTED_SINCE`), so a long campaign of runs doesn't fetch
  * provisional years again each time. `--first` names a file of station IDs to
  * run before the rest, and `--shard 2/8` takes the second of eight sets of
  * stations, split by a hash of their IDs, so separate jobs can split them.
@@ -280,7 +280,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     const from_ = Number.isNaN(since) ? start : new Date(Math.max(start.getTime(), since));
     for (const product of station.products) {
       // One read per series tells which years are done, rather than one per year;
-      // --skip-written needs only a listing.
+      // --skip-written needs a listing, and a read of years from 2026 on.
       let plan;
       try {
         const dir = seriesDir(

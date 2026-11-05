@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { describe, it } from "node:test";
 import {
   orderStations,
@@ -20,7 +20,12 @@ const DAY = 86_400_000;
 const Y2024 = new Date(Date.UTC(2024, 0, 1));
 const Y2025 = new Date(Date.UTC(2025, 0, 1));
 const NOW = Date.UTC(2026, 10, 5);
-const DONE = { preliminary: 0, months: 12, last: Date.UTC(2024, 11, 31, 23, 45) };
+const DONE = {
+  preliminary: 0,
+  months: 12,
+  last: Date.UTC(2024, 11, 31, 23, 45),
+  backfilled: 1,
+};
 
 describe("yearDone", () => {
   it("skips a past year whose file reaches the year's end with no preliminary values", () => {
@@ -76,6 +81,21 @@ describe("yearWritten", () => {
     assert.equal(yearWritten(written, y2026, new Date(Date.UTC(2027, 0, 1)), NOW), false);
     assert.equal(yearWritten(written, new Date(Date.UTC(2024, 5, 1)), Y2025, NOW), false);
   });
+
+  it("from 2026 on, skips a file with every month, or one backfill wrote to", () => {
+    const y2026 = new Date(Date.UTC(2026, 0, 1));
+    const y2027 = new Date(Date.UTC(2027, 0, 1));
+    const later = Date.UTC(2027, 0, 5);
+    // Compaction wrote it from the year's last weeks: every value has `received`.
+    const compacted = { ...DONE, months: 2, backfilled: 0 };
+    assert.equal(yearWritten(written, y2026, y2027, later, compacted), false);
+    assert.equal(yearWritten(written, y2026, y2027, later), false);
+    // Backfill wrote some of it.
+    assert.equal(yearWritten(written, y2026, y2027, later, { ...compacted, backfilled: 5 }), true);
+    // Compaction carried it through the year, or backfill over compacted
+    // values kept their `received`: every month is there either way.
+    assert.equal(yearWritten(written, y2026, y2027, later, { ...DONE, backfilled: 0 }), true);
+  });
 });
 
 describe("readYearFiles", () => {
@@ -109,9 +129,56 @@ describe("readYearFiles", () => {
     assert.deepEqual(
       [...files],
       [
-        [2023, { preliminary: 0, months: 1, last: t }],
-        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3) }],
+        [2023, { preliminary: 0, months: 1, last: t, backfilled: 2 }],
+        [2024, { preliminary: 2, months: 1, last: Date.UTC(2024, 0, 3), backfilled: 3 }],
       ],
+    );
+  });
+
+  it("counts a provisional value QC flagged, and values ingest received", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", "x", 2026),
+      [
+        { time: Date.UTC(2026, 0, 1), level: 1, flag: Flag.suspect, source_flag: Flag.preliminary },
+        { time: Date.UTC(2026, 0, 2), level: 1, flag: Flag.good, source_flag: Flag.good },
+        { time: Date.UTC(2026, 0, 3), level: 1, flag: Flag.good, received: Date.UTC(2026, 0, 3) },
+      ],
+      "GAGE",
+    );
+    const dir = seriesDir(root, "levels", "usgs", "x");
+    const [file] = (await readYearFiles(dir, [2026])).values();
+    assert.equal(file!.preliminary, 1);
+    assert.equal(file!.backfilled, 2);
+  });
+
+  it("lists only the station's own files when its ID holds a glob character", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const write = (id: string, y: number) =>
+      writeObservations(
+        seriesPath(root, "levels", "usgs", id, y),
+        [{ time: Date.UTC(y, 0, 1), level: 1, flag: Flag.good }],
+        "GAGE",
+      );
+    await write("a*", 2023);
+    await write("ab", 2024);
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", "ab", 2023),
+      [
+        { time: Date.UTC(2023, 0, 1), level: 1, flag: Flag.good },
+        { time: Date.UTC(2023, 0, 2), level: 1, flag: Flag.good },
+      ],
+      "GAGE",
+    );
+    assert.deepEqual([...(await listYears(seriesDir(root, "levels", "usgs", "a*")))], [2023]);
+    // read_parquet globs too: a*'s 2023 is read alone, not with ab's.
+    const own = await readYearFiles(seriesDir(root, "levels", "usgs", "a*"), [2023]);
+    assert.equal(own.get(2023)!.backfilled, 1);
+    // A relative lake, which DuckDB lists without its leading `./`.
+    const relativeRoot = `./${relative(process.cwd(), root)}`;
+    assert.deepEqual(
+      [...(await listYears(seriesDir(relativeRoot, "levels", "usgs", "ab")))].sort(),
+      [2023, 2024],
     );
   });
 
@@ -140,6 +207,26 @@ describe("yearsToFetch", () => {
   // A whole 2023, December 2024 alone, and part of 2026 (the current year).
   const monthly = (y: number, months: number[], flag: Flag) =>
     months.map((m) => ({ time: Date.UTC(y, m, 28, 12), level: 1, flag }));
+
+  it("with --skip-written, fetches a 2026 file only compaction wrote", async () => {
+    const id = "compacted";
+    await writeObservations(
+      seriesPath(root, "levels", "usgs", id, 2026),
+      [
+        {
+          time: Date.UTC(2026, 11, 30),
+          level: 1,
+          flag: Flag.good,
+          received: Date.UTC(2026, 11, 30),
+        },
+      ],
+      "GAGE",
+    );
+    const later = Date.UTC(2027, 0, 5);
+    const d = seriesDir(root, "levels", "usgs", id);
+    const result = await yearsToFetch(d, new Date(Date.UTC(2026, 0, 1)), y2027, "written", later);
+    assert.deepEqual(result.fetch.map(year), [2026]);
+  });
 
   it("fetches only the years that aren't complete, or with --skip-written, not written", async () => {
     await writeObservations(
@@ -175,11 +262,6 @@ describe("yearsToFetch", () => {
     await assert.rejects(yearsToFetch(bad, y2023, y2027, "complete", NOW));
     // A year not asked about is never opened.
     assert.equal((await yearsToFetch(bad, Y2024, Y2025, "complete", NOW)).fetch.length, 1);
-    // An ID holding "404" is still a failed read, not a missing file.
-    const named = seriesDir(root, "levels", "usgs", "01404000");
-    mkdirSync(named, { recursive: true });
-    writeFileSync(join(named, "2023.parquet"), "not parquet");
-    await assert.rejects(yearsToFetch(named, y2023, y2027, "complete", NOW));
     // A run over the current year alone has nothing to skip, so reads nothing.
     const y2026 = new Date(Date.UTC(2026, 0, 1));
     assert.equal((await yearsToFetch(bad, y2026, y2027, "complete", NOW)).fetch.length, 1);

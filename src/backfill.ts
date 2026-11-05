@@ -21,10 +21,12 @@ const DAY_MS = 86_400_000;
  *   stopped partway through a year, or a seasonal gauge, has that year fetched
  *   again each run, which is one request at USGS and a month's worth at CO-OPS.
  *
- * A value both provisional and `suspect` or `bad`, from QC or a source
- * qualifier such as USGS's ICE, is stored as the worse flag, so this can't see
- * it was provisional; a file whose every provisional value is flagged that way
- * counts as done.
+ * A value QC raised from preliminary to `suspect` keeps `preliminary` in
+ * `source_flag`, and counts here as provisional. Files written before
+ * `source_flag` existed have none, so there a value QC flagged that way
+ * doesn't count, and a year whose every provisional value QC flagged is done. A source qualifier such as
+ * USGS's ICE is mapped to `suspect` by the adapter, before `source_flag` is
+ * set, so a file whose every provisional value carries one counts as done.
  *
  * Provisional years are fetched on every run, so a long campaign of runs
  * uses `--skip-written` (`yearWritten`) instead.
@@ -41,14 +43,38 @@ export function yearDone(file: YearFile | undefined, from: Date, to: Date, now: 
 
 /**
  * For `--skip-written`: whether a year has a file at all, complete or not, for
- * a whole year that has ended. A partial request and the current year are
+ * a whole year that has ended. From `COMPACTED_SINCE` on, the file must also
+ * have values in every month or hold values backfill wrote. A partial request and the current year are
  * still fetched, so a file this campaign writes is always a whole ended year;
  * a file an earlier run wrote partway through its year, or with a month the
  * source returned nothing for, is skipped all the same.
  */
-export function yearWritten(written: Set<number>, from: Date, to: Date, now: number): boolean {
-  return wholeEndedYear(from, to, now) && written.has(from.getUTCFullYear());
+export function yearWritten(
+  written: Set<number>,
+  from: Date,
+  to: Date,
+  now: number,
+  file?: YearFile,
+): boolean {
+  const year = from.getUTCFullYear();
+  if (!wholeEndedYear(from, to, now) || !written.has(year)) return false;
+  if (year < COMPACTED_SINCE) return true;
+  return file !== undefined && (file.months === 12 || file.backfilled > 0);
 }
+
+/**
+ * The first year compaction writes year files for. It began in November 2026,
+ * so it created that year's files from the year's last weeks alone. From this
+ * year on, a file counts as written for `--skip-written` only if it has values
+ * in every month, as a year compaction carried through does, or holds values
+ * backfill wrote (no `received` time; compacted values always have one).
+ * Backfill over compacted values keeps their `received`, so a backfilled year
+ * is known by its months, not by that. A station that began partway through a
+ * year and was never backfilled has that year fetched on every run, one
+ * request at USGS, and so does one whose values the hourly sweep had all
+ * caught before backfill ran over them, since those keep their `received`.
+ */
+export const COMPACTED_SINCE = 2026;
 
 function wholeEndedYear(from: Date, to: Date, now: number): boolean {
   const year = from.getUTCFullYear();
@@ -147,7 +173,7 @@ export function parseShard(value: string): [number, number] {
  * Which years of one station's series backfill fetches over [start, end), and
  * how many it skips: `complete` skips what `yearDone` calls done, from one read
  * of the series directory; `written` skips what `yearWritten` does, from a
- * listing alone; `none` fetches every year. A failed read throws, so the
+ * listing, plus a read of years from `COMPACTED_SINCE` on; `none` fetches every year. A failed read throws, so the
  * caller fails the series rather than fetch every year again.
  */
 export async function yearsToFetch(
@@ -163,7 +189,15 @@ export async function yearsToFetch(
   let done: (from: Date, to: Date) => boolean = () => false;
   if (mode === "written") {
     const listed = await listYears(dir);
-    done = (from, to) => yearWritten(listed, from, to, now);
+    // Only the years compaction may have written need a read.
+    const read = all
+      .filter(([from, to]) => wholeEndedYear(from, to, now))
+      .map(([from]) => from.getUTCFullYear())
+      .filter((y) => y >= COMPACTED_SINCE && listed.has(y));
+    const files = read.length
+      ? await readYearFiles(dir, read, listed)
+      : new Map<number, YearFile>();
+    done = (from, to) => yearWritten(listed, from, to, now, files.get(from.getUTCFullYear()));
   } else if (mode === "complete") {
     const asked = all.filter(([from, to]) => wholeEndedYear(from, to, now));
     const files = await readYearFiles(

@@ -2,7 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { DuckDBInstance, type DuckDBConnection } from "@duckdb/node-api";
 import {
   Flag,
@@ -182,31 +182,53 @@ export async function readDatums(path: string): Promise<string[]> {
 
 /** What backfill needs to know about one yearly file: its preliminary values, months with values and last time. */
 export interface YearFile {
+  /** Values the source sent as preliminary, whatever QC raised them to. */
   preliminary: number;
   months: number;
   last: number;
+  /** Values with no `received` time, which only backfill writes. */
+  backfilled: number;
 }
 
 /**
  * What the yearly files in a station's series directory hold, by year, for the
  * years asked about: a listing, then one read of just those files, so a file
- * for a year not asked about is never opened.
+ * for a year not asked about is never opened. A caller that already listed the
+ * directory passes `listed`, to save a second listing.
  */
-export async function readYearFiles(dir: string, years: number[]): Promise<Map<number, YearFile>> {
-  const listed = await listYears(dir);
+export async function readYearFiles(
+  dir: string,
+  years: number[],
+  listed?: Set<number>,
+): Promise<Map<number, YearFile>> {
+  listed ??= await listYears(dir);
   const files = years.filter((y) => listed.has(y)).map((y) => quote(`${dir}/${y}.parquet`));
   if (!files.length) return new Map();
   const rows = await serial(async () => {
     const db = await connection();
     const reader = await db.runAndReadAll(
-      `SELECT filename, count(*) FILTER (WHERE flag = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last FROM read_parquet([${files.join(", ")}], filename = true, union_by_name = true) GROUP BY filename ORDER BY filename`,
+      // The empty row names `source_flag` and `received`, so files written
+      // before they existed read them as null rather than fail to bind.
+      `SELECT filename, count(*) FILTER (WHERE coalesce(source_flag, flag) = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last, count(*) FILTER (WHERE received IS NULL) AS backfilled FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.join(", ")}], filename = true, union_by_name = true)) GROUP BY filename ORDER BY filename`,
     );
     return reader.getRowObjects();
   });
+  // read_parquet globs too, so a station ID with a glob character reads other
+  // stations' files; only this directory's count, as in listYears.
+  const own = posix.normalize(dir);
+  const mine = rows.filter((r) => {
+    const match = /^(.*)\/\d{4}\.parquet$/.exec(String(r.filename));
+    return match !== null && posix.normalize(match[1]!) === own;
+  });
   return new Map(
-    rows.map((r) => [
+    mine.map((r) => [
       Number(/(\d{4})\.parquet$/.exec(String(r.filename))![1]),
-      { preliminary: Number(r.preliminary), months: Number(r.months), last: Number(r.last) },
+      {
+        preliminary: Number(r.preliminary),
+        months: Number(r.months),
+        last: Number(r.last),
+        backfilled: Number(r.backfilled),
+      },
     ]),
   );
 }
@@ -217,13 +239,16 @@ export function listYears(dir: string): Promise<Set<number>> {
     if (!isRemote(dir) && !existsSync(dir)) return new Set<number>();
     const db = await connection();
     const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(`${dir}/*.parquet`)})`);
-    return new Set(
-      reader
-        .getRowObjects()
-        .map((r) => /(\d{4})\.parquet$/.exec(String(r.file))?.[1])
-        .filter((y) => y !== undefined)
-        .map(Number),
-    );
+    // A station ID with a glob character matches other directories too, so
+    // only files directly in this one count. DuckDB drops a leading `./` and
+    // doubled slashes, so both sides are normalized before comparing.
+    const own = posix.normalize(dir);
+    const years = new Set<number>();
+    for (const r of reader.getRowObjects()) {
+      const match = /^(.*)\/(\d{4})\.parquet$/.exec(String(r.file));
+      if (match && posix.normalize(match[1]!) === own) years.add(Number(match[2]));
+    }
+    return years;
   });
 }
 
