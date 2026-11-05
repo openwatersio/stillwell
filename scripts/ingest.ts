@@ -39,6 +39,7 @@ import {
   writeJsonArray,
   writeObservations,
   writeRecent,
+  readStationBounds,
   writeStations,
   type StationObservation,
 } from "../src/lake/parquet.ts";
@@ -220,7 +221,9 @@ async function refreshStations(ids: string[]): Promise<void> {
     process.exitCode = 1;
     return;
   }
-  all = linkBothWays(all);
+  // The files never hold first and last, so keep what the lake filled in.
+  const bounds = await readStationBounds(stationsPath(LAKE));
+  all = linkBothWays(all).map((s) => ({ ...s, ...bounds.get(s.id) }));
   await writeStations(stationsPath(LAKE), all);
   await writeJsonArray(
     sourcesPath(LAKE),

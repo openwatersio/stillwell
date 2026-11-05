@@ -192,6 +192,26 @@ export async function writeStations(path: string, stations: Station[]): Promise<
   );
 }
 
+/**
+ * Each station's `first` and `last` in a published `stations.parquet`, which
+ * the lake fills in; none when the file doesn't exist yet.
+ */
+export async function readStationBounds(
+  path: string,
+): Promise<Map<string, Pick<Station, "first" | "last">>> {
+  const rows = await read(
+    path,
+    `SELECT id, strftime(first, '%Y-%m-%dT%H:%M:%SZ') AS first, strftime(last, '%Y-%m-%dT%H:%M:%SZ') AS last`,
+    "id",
+  );
+  return new Map(
+    rows.map((r) => [
+      String(r.id),
+      { first: (r.first as string | null) ?? null, last: (r.last as string | null) ?? null },
+    ]),
+  );
+}
+
 /** A JSON array, through DuckDB so it can go to R2 like everything else. */
 export async function writeJsonArray(path: string, rows: object[]): Promise<void> {
   await viaJson(

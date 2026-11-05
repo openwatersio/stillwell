@@ -12,6 +12,7 @@ import {
   writeExtremes,
   writeObservations,
   writeRecent,
+  readStationBounds,
   writeStations,
 } from "../src/lake/parquet.ts";
 import { seriesPath } from "../src/lake/paths.ts";
@@ -97,6 +98,26 @@ describe("lake files", () => {
       source_url: null,
     };
     await writeStations(join(root, "stations.parquet"), [station]);
+  });
+
+  it("reads back the first and last the lake filled in", async () => {
+    const path = join(root, "bounds/stations.parquet");
+    assert.deepEqual(await readStationBounds(path), new Map());
+    const station = {
+      id: "test:1",
+      source: "test",
+      source_id: "1",
+      first: "2001-02-03T04:05:06Z",
+      last: null,
+    } as unknown as Station;
+    await writeStations(path, [station, { ...station, id: "test:2", first: null }]);
+    assert.deepEqual(
+      await readStationBounds(path),
+      new Map([
+        ["test:1", { first: "2001-02-03T04:05:06Z", last: null }],
+        ["test:2", { first: null, last: null }],
+      ]),
+    );
   });
 });
 
