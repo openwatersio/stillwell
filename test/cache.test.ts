@@ -88,4 +88,20 @@ describe("fetchText", () => {
     );
     assert.equal(calls, 1);
   });
+
+  it("tells the caller how long a short Retry-After holds it, then retries", async () => {
+    const { fetchText } = await import("../src/http.ts");
+    let calls = 0;
+    globalThis.fetch = async () =>
+      ++calls === 1
+        ? new Response("", { status: 429, headers: { "retry-after": "1" } })
+        : new Response("ok");
+    const held: number[] = [];
+    assert.equal(
+      await fetchText("https://example.test/briefly", { throttled: (s) => held.push(s) }),
+      "ok",
+    );
+    // The first retry backs off 2 seconds, longer than the 1 the API asked.
+    assert.deepEqual(held, [2]);
+  });
 });

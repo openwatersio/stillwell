@@ -127,22 +127,53 @@ export async function readDatums(path: string): Promise<string[]> {
 export type StationObservation = Observation & { station: string };
 
 /** The recent window for a source: `station`, then the observation columns, sorted by station and time. */
-export async function writeRecent(path: string, rows: StationObservation[]): Promise<void> {
-  await copyRows(
-    path,
-    rows,
-    "station, time, level_m, flag, received",
-    undefined,
-    (r) => [r.time, r.level, r.flag, r.received ?? null, null, r.station, null, null],
-    "station, time_ms",
-  );
+export async function writeRecent(
+  path: string,
+  batches: Iterable<StationObservation[]> | AsyncIterable<StationObservation[]>,
+): Promise<void> {
+  // A batch of stations at a time: every live USGS station's 7 days is about
+  // 9 million values, too many to hold as objects at once.
+  const table = await serial(createTable);
+  try {
+    for await (const rows of batches) await serial(() => appendRows(table, rows, recentCells));
+    await serial(() =>
+      copyOut(path, table, "station, time, level_m, flag, received", undefined, "station, time_ms"),
+    );
+  } finally {
+    await serial(() => dropTable(table));
+  }
 }
 
-export async function readRecent(path: string): Promise<StationObservation[]> {
+const recentCells = (r: StationObservation): Cell[] => [
+  r.time,
+  r.level,
+  r.flag,
+  r.received ?? null,
+  null,
+  r.station,
+  null,
+  null,
+];
+
+/**
+ * Decode every value of a recent window without keeping any, so a file that
+ * can't be read in full fails now. A missing file passes.
+ */
+export async function checkRecent(path: string): Promise<void> {
+  await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
+}
+
+/** The recent window, or just the named stations' part of it. */
+export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
+  if (stations?.length === 0) return [];
   const rows = await read(
     path,
     "SELECT station, epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received",
     "station, time",
+    // The file is sorted by station, so the range lets DuckDB skip the row groups outside it.
+    stations
+      ? `WHERE station BETWEEN ${quote(stations.reduce((a, b) => (a < b ? a : b)))} AND ${quote(stations.reduce((a, b) => (a > b ? a : b)))} AND station IN (${stations.map(quote).join(", ")})`
+      : "",
   );
   return rows.map((r) => {
     const o: StationObservation = {
@@ -247,45 +278,70 @@ async function copyRowsNow<T>(
   cells: (row: T) => Cell[],
   order: string,
 ): Promise<void> {
+  const table = await createTable();
+  try {
+    await appendRows(table, rows, cells);
+    await copyOut(path, table, columns, datum, order);
+  } finally {
+    await dropTable(table);
+  }
+}
+
+async function createTable(): Promise<string> {
   const db = await connection();
-  await prepare(path);
   const table = `rows_${Math.random().toString(36).slice(2)}`;
   await db.run(
     `CREATE TABLE ${table} (time_ms DOUBLE, level_m FLOAT, flag UTINYINT, received_ms DOUBLE, type VARCHAR, station VARCHAR, transit INTEGER, event UTINYINT)`,
   );
-  try {
-    const appender = await db.createAppender(table);
-    for (const row of rows) {
-      const [time, level, flag, received, type, station, transit, event] = cells(row);
-      appender.appendDouble(time as number);
-      appender.appendFloat(level as number);
-      appender.appendUTinyInt(flag as number);
-      received === null ? appender.appendNull() : appender.appendDouble(received as number);
-      type === null ? appender.appendNull() : appender.appendVarchar(type as string);
-      station === null ? appender.appendNull() : appender.appendVarchar(station as string);
-      transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
-      event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
-      appender.endRow();
-    }
-    appender.closeSync();
-    const select = columns
-      .split(", ")
-      .map((c) =>
-        c === "time"
-          ? "epoch_ms(time_ms::BIGINT)::TIMESTAMPTZ AS time"
-          : c === "received"
-            ? "epoch_ms(received_ms::BIGINT)::TIMESTAMPTZ AS received"
-            : c === "datum"
-              ? `${quote(datum!)} AS datum`
-              : c,
-      )
-      .join(", ");
-    await db.run(
-      `COPY (SELECT ${select} FROM ${table} ORDER BY ${order}) TO ${quote(path)} (FORMAT parquet, COMPRESSION zstd)`,
-    );
-  } finally {
-    await db.run(`DROP TABLE ${table}`);
+  return table;
+}
+
+async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]): Promise<void> {
+  const db = await connection();
+  const appender = await db.createAppender(table);
+  for (const row of rows) {
+    const [time, level, flag, received, type, station, transit, event] = cells(row);
+    appender.appendDouble(time as number);
+    appender.appendFloat(level as number);
+    appender.appendUTinyInt(flag as number);
+    received === null ? appender.appendNull() : appender.appendDouble(received as number);
+    type === null ? appender.appendNull() : appender.appendVarchar(type as string);
+    station === null ? appender.appendNull() : appender.appendVarchar(station as string);
+    transit === null ? appender.appendNull() : appender.appendInteger(transit as number);
+    event === null ? appender.appendNull() : appender.appendUTinyInt(event as number);
+    appender.endRow();
   }
+  appender.closeSync();
+}
+
+async function copyOut(
+  path: string,
+  table: string,
+  columns: string,
+  datum: string | undefined,
+  order: string,
+): Promise<void> {
+  const db = await connection();
+  await prepare(path);
+  const select = columns
+    .split(", ")
+    .map((c) =>
+      c === "time"
+        ? "epoch_ms(time_ms::BIGINT)::TIMESTAMPTZ AS time"
+        : c === "received"
+          ? "epoch_ms(received_ms::BIGINT)::TIMESTAMPTZ AS received"
+          : c === "datum"
+            ? `${quote(datum!)} AS datum`
+            : c,
+    )
+    .join(", ");
+  await db.run(
+    `COPY (SELECT ${select} FROM ${table} ORDER BY ${order}) TO ${quote(path)} (FORMAT parquet, COMPRESSION zstd)`,
+  );
+}
+
+async function dropTable(table: string): Promise<void> {
+  await (await connection()).run(`DROP TABLE ${table}`);
 }
 
 /** Write rows to a local NDJSON file, then let DuckDB select from it into `path`. */
@@ -306,20 +362,26 @@ async function viaJsonNow(path: string, rows: object[], select: string, format: 
   }
 }
 
-function read(path: string, select: string, order = "time"): Promise<Record<string, unknown>[]> {
-  return serial(() => readNow(path, select, order));
+function read(
+  path: string,
+  select: string,
+  order = "time",
+  where = "",
+): Promise<Record<string, unknown>[]> {
+  return serial(() => readNow(path, select, order, where));
 }
 
 async function readNow(
   path: string,
   select: string,
   order: string,
+  where: string,
 ): Promise<Record<string, unknown>[]> {
   if (!isRemote(path) && !existsSync(path)) return [];
   const db = await connection();
   try {
     const reader = await db.runAndReadAll(
-      `${select} FROM read_parquet(${quote(path)}) ORDER BY ${order}`,
+      `${select} FROM read_parquet(${quote(path)}) ${where} ORDER BY ${order}`,
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {
