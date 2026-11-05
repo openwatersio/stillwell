@@ -1,0 +1,50 @@
+name: Bucket check
+
+# Read the public bucket from outside Cloudflare, the ways people do: pandas
+# and plain urllib for the root files, and DuckDB for a series file, as in
+# docs/data.md. Without fsspec installed, pandas fetches a URL through urllib
+# with Python's default agent, which a zone setting once refused with a 403
+# (issue #1), so a rule change that blocks either client fails here instead of
+# in someone's notebook.
+on:
+  schedule:
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install pandas==2.2.3 pyarrow==18.1.0 duckdb==1.1.3
+      - name: Read the bucket with pandas, urllib and DuckDB
+        shell: python
+        run: |
+          import importlib.util
+          import json
+          import urllib.request
+
+          import duckdb
+          import pandas as pd
+
+          # With fsspec, pandas would fetch through aiohttp instead of urllib.
+          assert importlib.util.find_spec("fsspec") is None
+
+          base = "https://water-levels.openwaters.io"
+          stations = pd.read_parquet(f"{base}/stations.parquet")
+          print(f"stations.parquet with pandas: {len(stations)} stations")
+          assert len(stations) > 0
+          with urllib.request.urlopen(f"{base}/sources.json") as response:
+              sources = json.load(response)
+          print(f"sources.json with urllib: {len(sources)} sources")
+          assert len(sources) > 0
+          rows = duckdb.sql(
+              f"SELECT count(*) FROM '{base}/obs/rws/hoekvanholland/2024.parquet'"
+          ).fetchone()[0]
+          print(f"obs/rws/hoekvanholland/2024.parquet with DuckDB: {rows} rows")
+          assert rows > 0
