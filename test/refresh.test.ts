@@ -9,10 +9,17 @@ import {
   exists,
   readStationList,
   writeObservations,
+  writeRecent,
   writeStationList,
   writeStations,
 } from "../src/lake/parquet.ts";
-import { boundsPath, seriesPath, stationListPath, stationsPath } from "../src/lake/paths.ts";
+import {
+  boundsPath,
+  recentPath,
+  seriesPath,
+  stationListPath,
+  stationsPath,
+} from "../src/lake/paths.ts";
 import { publishStations, Refused, refreshSource, seedSource } from "../src/refresh.ts";
 import {
   Flag,
@@ -122,6 +129,9 @@ describe("refreshSource", () => {
       /lists 10 stations, down from 30/,
     );
     await assert.rejects(refreshSource(lake, sourceOf([]), { now: LATER }), /listed no stations/);
+    // A new source's first fetch can't be empty either.
+    const other = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
+    await assert.rejects(refreshSource(lake, other, { now: NOW }), /listed no stations/);
   });
 
   it("refuses a station from another source", async () => {
@@ -179,6 +189,21 @@ describe("refreshSource", () => {
       now: LATER,
     });
     assert.deepEqual([report.retired, report.withdrawn], [["test/a", "test/b"], ["test/a"]]);
+  });
+
+  it("numbers a new epoch above an epoch only the recent window still has", async () => {
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    // Rows from an epoch 2 that a restored list no longer knows about.
+    await writeRecent(recentPath(lake, "test"), [
+      [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 2 }],
+    ]);
+    const { stations } = await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), {
+      now: LATER,
+    });
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => e.id),
+      [1, 3],
+    );
   });
 
   it("numbers a station new to the list above epoch files already in the lake", async () => {

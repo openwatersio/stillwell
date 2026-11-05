@@ -7,6 +7,7 @@ import { currentEpoch, firstEpochs } from "./epochs.ts";
 import {
   exists,
   highestEpochs,
+  recentEpochs,
   readStationBounds,
   readStationList,
   writeJsonArray,
@@ -18,6 +19,7 @@ import {
   epochDirs,
   sourceEpochDirs,
   stationDir,
+  recentPath,
   historyPath,
   stationListPath,
   stationsPath,
@@ -65,7 +67,7 @@ export async function refreshSource(
   const previous = stored ?? [];
 
   const fetched = await source.stations(previous);
-  if (!fetched.length && previous.length) throw new Refused("listed no stations");
+  if (!fetched.length) throw new Refused("listed no stations");
   const stray = fetched.find((s) => s.source !== id || !s.source_id);
   if (stray) throw new Refused(`${stray.id} isn't a ${id} station with a code`);
   const shrunk = shrankSharply(previous, fetched);
@@ -104,8 +106,9 @@ export async function refreshSource(
 }
 
 /**
- * A new epoch takes an `id` above any epoch directory already in the lake, so
- * one restored from a snapshot never reuses another's files.
+ * A new epoch takes an `id` above any epoch directory already in the lake, or
+ * any epoch the recent window still has rows for, so one restored from a
+ * snapshot never reuses another's files or rows.
  */
 async function renumberAboveFiles(
   lake: string,
@@ -126,11 +129,12 @@ async function renumberAboveFiles(
       ? products.map((p) => sourceEpochDirs(lake, p, changed[0]!.source))
       : changed.flatMap((s) => s.products.map((p) => epochDirs(lake, p, s.source, s.source_id)));
   const onDiskOf = await highestEpochs(patterns);
+  const inRecent = await recentEpochs(recentPath(lake, changed[0]!.source));
   for (const station of changed) {
     const known = before.get(station.id) ?? new Set<number>();
     const fresh = station.epochs.filter((e) => !known.has(e.id));
     const onDisk = Math.max(
-      1,
+      inRecent.get(station.id) ?? 1,
       ...station.products.map(
         (p) => onDiskOf.get(stationDir(lake, p, station.source, station.source_id)) ?? 1,
       ),

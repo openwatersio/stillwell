@@ -181,6 +181,24 @@ export async function checkRecent(path: string): Promise<void> {
   await read(path, "SELECT sum(hash(station, time, level_m, flag, received)) AS h", "h");
 }
 
+/** The highest epoch each station has rows for in a recent window; none for a file from before epochs. */
+export async function recentEpochs(path: string): Promise<Map<string, number>> {
+  let rows;
+  try {
+    rows = await read(
+      path,
+      "SELECT station, max(epoch) AS epoch",
+      "station",
+      "",
+      "GROUP BY station",
+    );
+  } catch (error) {
+    if (!/column "epoch"/i.test(String(error))) throw error;
+    return new Map();
+  }
+  return new Map(rows.map((r) => [String(r.station), Number(r.epoch)]));
+}
+
 /** The recent window, or just the named stations' part of it. */
 export async function readRecent(path: string, stations?: string[]): Promise<StationObservation[]> {
   if (stations?.length === 0) return [];

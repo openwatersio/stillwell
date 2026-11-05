@@ -38,7 +38,7 @@ The station's list entry carries its epochs:
 epochs: [{ id, datum, since, until, seen, reference, reference_since, datums, to_current, state }]
 ```
 
-- `id` counts up from 1 and is never reused. The next `id` is above both the list's epochs and any epoch directory already in the lake, so a list restored from a snapshot can't hand out an `id` that already has files.
+- `id` counts up from 1 and is never reused. The next `id` is above the list's epochs, any epoch directory already in the lake, and any epoch the recent window still has rows for, so a list restored from a snapshot can't hand out an `id` that already has files or rows.
 - `since` and `until` are instants in UTC. The first epoch's `since` is null when the record has no known start, and the current epoch has no `until`. Rows in an epoch's files outside `[since, until)` aren't part of the series. That's how the uncertain stretch around a change stays out without being moved.
 - `seen` is the last refresh whose fetch named this epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.
 - `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`. A source with no such field can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves; the reason it gives stands in for the reference, and the epoch starts at that refresh, since USGS gives no date.
