@@ -14,6 +14,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { parse } from "yaml";
 import type { Station } from "../src/schema.ts";
 import { readStationFiles, stationSources } from "../src/station-files.ts";
+import { sourceOf } from "../src/sources/index.ts";
 import {
   adoptSiblings,
   parseId,
@@ -84,7 +85,7 @@ if (missing.length)
 const lists: Record<string, Station[]> = {};
 const stationsDir = join(ROOT, "stations");
 for (const source of await stationSources(stationsDir))
-  lists[source] = await readStationFiles(stationsDir, source);
+  lists[source] = await readStationFiles(stationsDir, sourceOf(source).metadata);
 
 const rows = adoptSiblings(
   records.map((record) => ({ record, replacement: replacement(record, lists) })),

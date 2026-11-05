@@ -7,8 +7,5 @@ products: [levels]
 interval_s: 3600
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Yazoo%20City%20Pump-RS.Stage.Inst.1Hour.0.DCP-rev
 series: Yazoo City Pump-RS.Stage.Inst.1Hour.0.DCP-rev

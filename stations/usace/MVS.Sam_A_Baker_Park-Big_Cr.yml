@@ -10,8 +10,5 @@ products: [levels]
 interval_s: 900
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Sam%20A%20Baker%20Park-Big%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
 series: Sam A Baker Park-Big Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

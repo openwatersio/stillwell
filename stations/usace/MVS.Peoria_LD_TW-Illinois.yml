@@ -8,8 +8,5 @@ products: [levels]
 interval_s: 1800
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Peoria%20LD%20TW-Illinois.Stage.Inst.30Minutes.0.lrgsShef-rev
 series: Peoria LD TW-Illinois.Stage.Inst.30Minutes.0.lrgsShef-rev

@@ -157,7 +157,7 @@ async function refreshStations(ids: string[]): Promise<void> {
     let merged;
     try {
       merged = mergeStationList(previous, fetched);
-      checkStationFiles(STATIONS_DIR, id, merged.stations);
+      checkStationFiles(STATIONS_DIR, sourceOf(id).metadata, merged.stations);
     } catch (error) {
       console.error(
         `${id}: ${error instanceof Error ? error.message : error}; keeping the committed list`,
@@ -178,7 +178,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       }
     let written;
     try {
-      written = await writeStationFiles(STATIONS_DIR, id, stations);
+      written = await writeStationFiles(STATIONS_DIR, sourceOf(id).metadata, stations);
     } catch (error) {
       // Past the checks, a failure is the disk's, and may leave some files written.
       console.error(
@@ -385,7 +385,7 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
 }
 
 function committedStations(sourceId: string): Promise<Station[]> {
-  return readStationFiles(STATIONS_DIR, sourceId);
+  return readStationFiles(STATIONS_DIR, sourceOf(sourceId).metadata);
 }
 
 /** A station by its ID or its source's own code. */

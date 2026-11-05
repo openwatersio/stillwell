@@ -10,9 +10,6 @@ products: [levels]
 min_interval_s: 360
 live: false
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: NOAA National Ocean Service, CO-OPS
 source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014099
 established: 1899-11-01T00:00:00Z
 removed: 1985-12-31T00:00:00Z

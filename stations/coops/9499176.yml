@@ -18,9 +18,6 @@ products: [levels, extremes]
 min_interval_s: 360
 live: false
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: NOAA National Ocean Service, CO-OPS
 source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9499176
 established: 1948-07-16T00:00:00Z
 removed: 2008-10-26T00:00:00Z

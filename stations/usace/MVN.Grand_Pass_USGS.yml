@@ -7,8 +7,5 @@ products: [levels]
 interval_s: 300
 live: false
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Grand%20Pass_USGS.Stage.Inst.5Minutes.0.raw
 series: Grand Pass_USGS.Stage.Inst.5Minutes.0.raw

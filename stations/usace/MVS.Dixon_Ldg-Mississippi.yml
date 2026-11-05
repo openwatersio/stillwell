@@ -10,8 +10,5 @@ products: [levels]
 interval_s: 86400
 live: false
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Dixon%20Ldg-Mississippi.Stage.Inst.~1Day.0.gageread-rev
 series: Dixon Ldg-Mississippi.Stage.Inst.~1Day.0.gageread-rev

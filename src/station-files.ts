@@ -5,8 +5,9 @@
  * stations that changed and lets a person resolve one by hand.
  *
  * A file leaves out what its path already says (`id`, `source`, `source_id`),
- * what the lake fills in (`first`, `last`), fields that are null, and an empty
- * `datums` or `same_as`.
+ * what the lake fills in (`first`, `last`), its source's terms (`license`,
+ * `commercial_use`, `attribution`) unless the station's differ, fields that
+ * are null, and an empty `datums` or `same_as`.
  * `stations.parquet` is the complete list.
  */
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
@@ -23,7 +24,7 @@ import {
   type Node,
   type YAMLMap,
 } from "yaml";
-import type { Station } from "./schema.ts";
+import { stationDefaults, type SourceMetadata, type Station } from "./schema.ts";
 
 const OMITTED = new Set(["id", "source", "source_id", "first", "last"]);
 
@@ -49,7 +50,7 @@ const ORDER = [
   "source_url",
 ];
 
-/** What a field a file leaves out reads as. */
+/** What a field a file leaves out reads as, besides its source's terms. */
 const DEFAULTS: Partial<Station> = {
   country_code: null,
   kind: null,
@@ -99,13 +100,20 @@ const FIELDS: Record<string, [test: (v: unknown) => boolean, required: boolean]>
   source_url: [orNull(isString), false],
 };
 
+/** What a file leaves out for a source: the shared defaults and its terms. */
+function defaultsFor(metadata: SourceMetadata): Partial<Station> {
+  const { source: _, ...terms } = stationDefaults(metadata);
+  return { ...DEFAULTS, ...terms };
+}
+
 /** Why a file's fields aren't a station's, if they aren't. */
-function problems(fields: Record<string, unknown>): string[] {
+function problems(fields: Record<string, unknown>, defaults: Partial<Station>): string[] {
   const found: string[] = [];
   for (const key of Object.keys(fields))
     if (OMITTED.has(key)) found.push(`${key} doesn't belong in the file`);
   for (const [key, [test, required]] of Object.entries(FIELDS)) {
     if (!(key in fields)) {
+      if (key in defaults) continue;
       if (required) found.push(`${key} is missing`);
     } else if (!test(fields[key])) found.push(`${key} is ${JSON.stringify(fields[key])}`);
   }
@@ -118,15 +126,21 @@ export function stationFile(dir: string, source: string, sourceId: string): stri
 
 /** The sources with a directory of station files. */
 export async function stationSources(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  return entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort();
+  const entries = (await readdir(dir, { withFileTypes: true })).filter(
+    (e) => !e.name.startsWith("."),
+  );
+  // A list in another layout, such as an old `<source>.json`, would be skipped
+  // and its source's stations listed again as new.
+  const stray = entries.filter((e) => !e.isDirectory()).map((e) => e.name);
+  if (stray.length)
+    throw new Error(`${join(dir, stray[0]!)} isn't a directory of <source_id>.yml files`);
+  return entries.map((e) => e.name).sort();
 }
 
 /** A source's committed stations, sorted by ID; none when it has no directory yet. */
-export async function readStationFiles(dir: string, source: string): Promise<Station[]> {
+export async function readStationFiles(dir: string, metadata: SourceMetadata): Promise<Station[]> {
+  const source = metadata.id;
+  const defaults = defaultsFor(metadata);
   let names: string[];
   try {
     names = await readdir(join(dir, source));
@@ -149,10 +163,10 @@ export async function readStationFiles(dir: string, source: string): Promise<Sta
       throw new Error(`${path}: ${error instanceof Error ? error.message : error}`);
     }
     if (!isPlainObject(fields)) throw new Error(`${path} isn't a mapping of station fields`);
-    const wrong = problems(fields);
+    const wrong = problems(fields, defaults);
     if (wrong.length) throw new Error(`${path}: ${wrong.join("; ")}`);
     stations.push({
-      ...DEFAULTS,
+      ...defaults,
       ...fields,
       id: `${source}/${sourceId}`,
       source,
@@ -176,7 +190,13 @@ function sourceIdOf(name: string): string | undefined {
  * `writeStationFiles` checks this before writing anything, so a refusal
  * leaves the directory as it was; any error after it is the disk's.
  */
-export function checkStationFiles(dir: string, source: string, stations: Station[]): void {
+export function checkStationFiles(
+  dir: string,
+  metadata: SourceMetadata,
+  stations: Station[],
+): void {
+  const source = metadata.id;
+  const defaults = defaultsFor(metadata);
   // Two codes differing only in case would share a file on macOS and Windows.
   const folded = new Map<string, string>();
   for (const station of stations) {
@@ -189,7 +209,7 @@ export function checkStationFiles(dir: string, source: string, stations: Station
     if (other) throw new Error(`${station.id} and ${other} would share ${path}`);
     folded.set(path.toLowerCase(), station.id);
     // The reader's checks, so a refresh never writes a file ingest would refuse.
-    const wrong = problems(fileFields(station));
+    const wrong = problems(fileFields(station, defaults), defaults);
     if (wrong.length) throw new Error(`${station.id}: ${wrong.join("; ")}`);
   }
 }
@@ -201,10 +221,12 @@ export function checkStationFiles(dir: string, source: string, stations: Station
  */
 export async function writeStationFiles(
   dir: string,
-  source: string,
+  metadata: SourceMetadata,
   stations: Station[],
 ): Promise<number> {
-  checkStationFiles(dir, source, stations);
+  const source = metadata.id;
+  const defaults = defaultsFor(metadata);
+  checkStationFiles(dir, metadata, stations);
   await mkdir(join(dir, source), { recursive: true });
   let written = 0;
   for (const station of stations) {
@@ -215,7 +237,7 @@ export async function writeStationFiles(
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }
-    const { text, clean } = render(fileFields(station), old);
+    const { text, clean } = render(fileFields(station, defaults), old);
     if (text === old) continue;
     if (clean) console.warn(`${path}: couldn't edit in place, so rewrote it without its comments`);
     await writeFile(path, text);
@@ -225,7 +247,7 @@ export async function writeStationFiles(
 }
 
 /** The fields a station's file holds, in file order. */
-function fileFields(station: Station): Record<string, unknown> {
+function fileFields(station: Station, defaults: Partial<Station>): Record<string, unknown> {
   const rank = (key: string) => (ORDER.includes(key) ? ORDER.indexOf(key) : ORDER.length);
   const keys = Object.keys(station)
     .filter((key) => !OMITTED.has(key))
@@ -234,7 +256,7 @@ function fileFields(station: Station): Record<string, unknown> {
   for (const key of keys) {
     const value = (station as unknown as Record<string, unknown>)[key];
     if (value === null || value === undefined) continue;
-    if (isDeepStrictEqual(value, DEFAULTS[key as keyof Station])) continue;
+    if (isDeepStrictEqual(value, defaults[key as keyof Station])) continue;
     fields[key] = value;
   }
   return fields;
@@ -295,6 +317,8 @@ function edit(doc: Document, map: YAMLMap, fields: Record<string, unknown>, top:
     if (isScalar(current) && (value === null || typeof value !== "object")) {
       current.value = value;
     } else if (isMap(current) && isPlainObject(value)) {
+      // Prettier pads a flow map's braces, which the writer doesn't, so write it in block style.
+      current.flow = false;
       edit(doc, current, value, false);
     } else if (!isNode(current) || !isDeepStrictEqual(current.toJSON(), value)) {
       const node = doc.createNode(value);

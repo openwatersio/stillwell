@@ -10,8 +10,5 @@ products: [levels]
 interval_s: 900
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=WinfieldLD-Tailwater.Stage.Inst.15Minutes.0.OBS
 series: WinfieldLD-Tailwater.Stage.Inst.15Minutes.0.OBS

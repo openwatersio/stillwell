@@ -20,8 +20,5 @@ interval_s: 360
 min_interval_s: 360
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: NOAA National Ocean Service, CO-OPS
 source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723214
 established: 1994-01-26T00:00:00Z

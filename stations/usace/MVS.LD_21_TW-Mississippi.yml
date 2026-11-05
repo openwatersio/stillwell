@@ -10,8 +10,5 @@ products: [levels]
 interval_s: 600
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=LD%2021%20TW-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw
 series: LD 21 TW-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw

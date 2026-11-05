@@ -8,8 +8,5 @@ products: [levels]
 interval_s: 900
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Pump%20Sta%201-Wood%20River%20E%20Alton.Stage.Inst.15Minutes.0.lrgsShef-rev
 series: Pump Sta 1-Wood River E Alton.Stage.Inst.15Minutes.0.lrgsShef-rev

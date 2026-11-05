@@ -9,7 +9,4 @@ min_interval_s: 300
 live: true
 status: active
 same_as: [rws/amelandwestgat]
-license: CC0-1.0
-commercial_use: true
-attribution: Rijkswaterstaat
 source_url: https://waterinfo.rws.nl/publiek/waterhoogte/ameland.westgat/details

@@ -9,8 +9,5 @@ products: [levels]
 interval_s: 86400
 live: true
 status: active
-license: US-Government-Works
-commercial_use: true
-attribution: U.S. Army Corps of Engineers
 source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Greenville-Mississippi.Stage.Inst.~1Day.0.MVDhist-rev
 series: Greenville-Mississippi.Stage.Inst.~1Day.0.MVDhist-rev

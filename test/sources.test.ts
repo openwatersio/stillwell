@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
@@ -1053,8 +1054,8 @@ describe("usace", () => {
     const committed = new Map(
       (
         (await readStationFiles(
-          new URL("../stations", import.meta.url).pathname,
-          "usace",
+          join(import.meta.dirname, "../stations"),
+          usace.source.metadata,
         )) as usace.UsaceStation[]
       ).map((s) => [s.source_id, s]),
     );
