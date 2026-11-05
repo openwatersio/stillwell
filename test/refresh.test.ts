@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { epochKey } from "../src/epochs.ts";
 import {
+  exists,
   readStationList,
   writeObservations,
   writeStationList,
@@ -235,7 +236,9 @@ describe("publishStations", () => {
     ]);
   });
 
-  it("leaves out a source with no list", async () => {
+  it("publishes nothing from a lake with no lists, and an empty list as none", async () => {
+    assert.equal(await publishStations(lake, [sourceOf([])]), null);
+    assert.equal(await exists(stationsPath(lake)), false);
     await writeStationList(stationListPath(lake, "test"), []);
     assert.equal(await publishStations(lake, [sourceOf([])]), 0);
   });

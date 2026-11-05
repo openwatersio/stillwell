@@ -27,6 +27,8 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
   },
   attribution: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE",
+  // Central European time, standard or summer.
+  utc_offsets: [1, 2],
   terms: "Raw, unchecked values.",
   window_days: 31,
 };
@@ -118,7 +120,7 @@ function unitOf(station: string): Promise<string> {
 // The open sea; everything else in PEGELONLINE is a river, canal or lake.
 const SEA = new Set(["NORDSEE", "OSTSEE"]);
 
-/** A station missing its W series this time lists no datum, so it keeps the committed one. */
+/** A station missing its W series this time lists no datum, so it keeps the one it had. */
 function toStation(s: ApiStation): ListedStation {
   const series = s.timeseries?.find((t) => t.shortname === "W");
   const levelDatum = series ? parseUnit(series.unit, s.number).datum : null;
@@ -128,6 +130,16 @@ function toStation(s: ApiStation): ListedStation {
   const datum = zero && /\b(NHN|NN|HN)\b/.exec(zero.unit)?.[1];
   if (levelDatum === "PNP" && datum && zero.unit.startsWith("m")) datums[datum] = zero.value;
   const kind: Kind | null = SEA.has(s.water.shortname) ? "coastal" : null;
+  // A gauge zero valid from another day is a moved zero; the day itself is left
+  // out, since nobody says when in it the change came. The same date with
+  // another height is a re-survey, which only changes `datums`.
+  const validFrom = levelDatum === "PNP" ? zero?.validFrom?.slice(0, 10) : undefined;
+  const reference = validFrom
+    ? {
+        id: validFrom,
+        since: new Date(Date.parse(validFrom) + 86_400_000).toISOString().slice(0, 10),
+      }
+    : null;
   return {
     ...stationDefaults(metadata),
     id: `pegelonline/${s.number}`,
@@ -149,6 +161,7 @@ function toStation(s: ApiStation): ListedStation {
     live: true,
     min_interval_s: 300,
     source_url: `https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=${s.number}`,
+    reference,
   };
 }
 

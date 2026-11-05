@@ -149,9 +149,10 @@ export async function seedSource(
 
 /**
  * Rebuild `stations.parquet` and `sources.json` in `lake` from every source's
- * list there and its bounds. Returns how many stations it published.
+ * list there and its bounds. Returns how many stations it published, or null
+ * when the lake has no lists, so a lake not yet seeded keeps what it publishes.
  */
-export async function publishStations(lake: string, all: Source[]): Promise<number> {
+export async function publishStations(lake: string, all: Source[]): Promise<number | null> {
   let stations: LakeStation[] = [];
   const listed: Source[] = [];
   for (const source of all) {
@@ -161,6 +162,7 @@ export async function publishStations(lake: string, all: Source[]): Promise<numb
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
     stations.push(...list.map((s) => ({ ...s, ...bounds.get(s.id) })));
   }
+  if (!listed.length) return null;
   stations = linkBothWays(stations);
   await writeStations(stationsPath(lake), stations);
   await writeJsonArray(

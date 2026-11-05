@@ -1,6 +1,13 @@
 # Station lists in the lake
 
-**Status: proposed.** This replaces the committed `stations/<source>.json` lists and the "a station has one datum for its whole record" rule in [plan.md](plan.md) decision 4. Nothing here is built yet, and the other docs describe the system as it runs today.
+**Status: built, not yet switched on.** This replaces the committed station lists and the rule that a station has one datum for its whole record. `ingest stations`, `backfill` and `recent` work against the lake's lists, and `seed-stations` starts them from the committed files. Not built yet:
+
+- the switch (seeding the R2 lake, then removing `stations/` and `seed-stations`);
+- the phase 4 workflows: one job per source, the rebuild job, and the daily refresh after a datum failure;
+- compaction, which will write `stations/bounds/<source>.parquet` and fold `recent` rows into their epoch's files;
+- a `restore` command for a list snapshot;
+- `tide_station` and series pins in `overrides`, which so far holds epoch decisions only;
+- readers outside this repo (tide-database, crowd-depth) reading `epochs`.
 
 Each source's station list lives in the lake, not in git. A new source adds only code: its adapter, README, fixtures and tests. No ingest run changes a file in the repo. A station that changes datum, once or many times, stays active: each datum epoch gets series files of its own, and `stations.parquet` says how to put the epochs together.
 

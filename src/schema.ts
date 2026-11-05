@@ -73,11 +73,12 @@ export interface Station {
  * A station as a source lists it, with `datum` null when the source didn't say
  * this time. `reference` names the reference its levels are measured against,
  * where the source says more than the datum's label: a new `id` under the same
- * label is a moved gauge zero. `since` is the first whole local day on it.
+ * label is a moved gauge zero. `since` is the first whole local day on it,
+ * when the source says.
  */
 export type ListedStation = Omit<Station, "datum"> & {
   datum: string | null;
-  reference?: { id: string; since: string } | null;
+  reference?: { id: string; since: string | null } | null;
 };
 
 /**

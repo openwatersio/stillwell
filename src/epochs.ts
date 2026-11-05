@@ -53,7 +53,7 @@ export interface Fetched {
   datum: string | null;
   /** The station's offsets after the merge. */
   datums: Record<string, number>;
-  reference?: { id: string; since: string } | null;
+  reference?: { id: string; since: string | null } | null;
 }
 
 export interface EpochOptions {
@@ -72,9 +72,8 @@ export type EpochEvent = "opened" | "held" | "rejected" | "confirmed" | "suppres
  * source says.
  */
 export function firstEpochs(fetched: Fetched & { datum: string }, options: EpochOptions): Epoch[] {
-  const since = fetched.reference
-    ? iso(localDay(fetched.reference.since, options.offsets)[0])
-    : null;
+  const start = fetched.reference?.since;
+  const since = start ? iso(localDay(start, options.offsets)[0]) : null;
   return [
     {
       id: Math.max(1, options.nextId ?? 1),
@@ -125,7 +124,7 @@ export function nextEpochs(
       // Offsets fetched with the change belong to the new epoch; the old one keeps its own.
       let since: number;
       let until: number;
-      if (ref && refChanged) {
+      if (ref?.since && refChanged) {
         since = localDay(ref.since, options.offsets)[0];
         until = localDay(dayBefore(ref.since), options.offsets)[0];
       } else {

@@ -31,10 +31,11 @@
  * snapshot also goes to WATER_LEVELS_BACKUP, a location outside the lake, when
  * that's set.
  */
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
+import { existsSync } from "node:fs";
 import { appendFile } from "node:fs/promises";
 import { isHeld } from "../src/epochs.ts";
 import {
@@ -42,12 +43,13 @@ import {
   readDatums,
   readObservations,
   readRecent,
+  exists,
   writeExtremes,
   writeObservations,
   writeRecent,
   type StationObservation,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, stationsPath } from "../src/lake/paths.ts";
+import { recentPath, seriesPath, stationListPath, stationsPath } from "../src/lake/paths.ts";
 import { qc } from "../src/qc.ts";
 import {
   describeReport,
@@ -144,6 +146,10 @@ async function refreshStations(ids: string[]): Promise<void> {
     const lake = lakeOfSource(source.metadata);
     lakes.add(lake);
     try {
+      // Starting a list from the fetch alone would drop what the committed
+      // files carry forward, such as USACE's series picks.
+      if (existsSync(join(STATIONS_DIR, id)) && !(await exists(stationListPath(lake, id))))
+        throw new Error(`no list in the lake yet; run \`seed-stations ${id}\` first`);
       const { stations, report } = await refreshSource(lake, source, {
         now,
         acceptEpochs: values["accept-epochs"],
@@ -168,7 +174,11 @@ async function refreshStations(ids: string[]): Promise<void> {
   }
   for (const lake of lakes) {
     const count = await publishStations(lake, Object.values(sources));
-    console.log(`${stationsPath(lake)}: ${count} stations`);
+    console.log(
+      count === null
+        ? `${stationsPath(lake)}: not written, since the lake has no station lists`
+        : `${stationsPath(lake)}: ${count} stations`,
+    );
   }
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...summary, "```", ""].join("\n"));
@@ -197,7 +207,11 @@ async function seedStations(ids: string[]): Promise<void> {
   }
   for (const lake of lakes) {
     const count = await publishStations(lake, Object.values(sources));
-    console.log(`${stationsPath(lake)}: ${count} stations`);
+    console.log(
+      count === null
+        ? `${stationsPath(lake)}: not written, since the lake has no station lists`
+        : `${stationsPath(lake)}: ${count} stations`,
+    );
   }
 }
 

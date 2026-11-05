@@ -1,7 +1,8 @@
 /**
  * Inventory tide-database's TICON records and the lake source that can replace
  * each one. Reads a tide-database checkout (TIDE_DATABASE, default
- * ../slackwater-database) and this repo's station files, and writes
+ * ../slackwater-database) and the station lists in the lake (WATER_LEVELS_LAKE,
+ * default the public bucket over HTTPS), and writes
  * docs/ticon-replacement.csv (one row per record) and docs/ticon-replacement.md
  * (the summary).
  *
@@ -12,9 +13,10 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parse } from "yaml";
+import { readStationList } from "../src/lake/parquet.ts";
+import { stationListPath } from "../src/lake/paths.ts";
 import type { Station } from "../src/schema.ts";
-import { readStationFiles, stationSources } from "../src/station-files.ts";
-import { sourceOf } from "../src/sources/index.ts";
+import { sources } from "../src/sources/index.ts";
 import {
   adoptSiblings,
   parseId,
@@ -82,10 +84,16 @@ const missing = [...listed.keys()].filter((id) => !known.has(id));
 if (missing.length)
   throw new Error(`Station files list unknown TICON records: ${missing.join(", ")}`);
 
+const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.io").replace(
+  /\/$/,
+  "",
+);
 const lists: Record<string, Station[]> = {};
-const stationsDir = join(ROOT, "stations");
-for (const source of await stationSources(stationsDir))
-  lists[source] = await readStationFiles(stationsDir, sourceOf(source).metadata);
+for (const source of Object.keys(sources)) {
+  const list = await readStationList(stationListPath(LAKE, source));
+  if (list) lists[source] = list;
+}
+if (!Object.keys(lists).length) throw new Error(`No station lists in ${LAKE}`);
 
 const rows = adoptSiblings(
   records.map((record) => ({ record, replacement: replacement(record, lists) })),

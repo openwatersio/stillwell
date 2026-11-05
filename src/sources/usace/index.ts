@@ -34,6 +34,8 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
   },
   attribution: "U.S. Army Corps of Engineers",
+  // Central and Eastern time, standard or daylight.
+  utc_offsets: [-6, -4],
   // Navigation pools sit nearly flat for months, then rise meters in a flood,
   // which the outlier rule would mark suspect.
   qc: { outliers: false },
@@ -74,14 +76,14 @@ export interface CatalogLocation {
 /**
  * A USACE station as listed, with the CWMS series its levels come from and,
  * where the gauge zero moved partway through it, the first day on the zero in
- * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the committed
+ * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the lake's
  * list only; `stations.parquet` doesn't carry them.
  */
 export type UsaceStation = ListedStation & { series: string; zero_since?: string };
 
 /**
  * Every location in the offices with an observed stage series, one series
- * each. A station in `previous` keeps its committed series while CWMS still
+ * each. A station in `previous` keeps its series while CWMS still
  * lists it, so a refresh never moves a station's files to another series.
  */
 export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
@@ -98,10 +100,12 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
     out.push(...toStations(office, series, locations, committed));
   }
   for (const s of out) {
-    // The later of the code's date and the committed one, so neither can be
+    // The later of the code's date and the one the list had, so neither can be
     // dropped on its own and let a backfill reach back past the reset.
     const since = latest(ZERO_SINCE[s.source_id]?.since, committedSince.get(s.id));
     if (since) s.zero_since = since;
+    // A new zero date is a moved gauge zero under the same label, so a new datum epoch.
+    s.reference = { id: since ?? "original", since: since ?? null };
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -147,7 +151,7 @@ export function toStations(
     // Piezometers and observation wells read groundwater in a dam's foundation, not a water surface.
     if (GROUNDWATER.test(name)) continue;
     const id = idOf(office, name);
-    // A committed station's ID belongs to the location its series is at, so
+    // A listed station's ID belongs to the location its series is at, so
     // it's never handed to another location that now maps to the same ID. If
     // that location is gone, the station goes unlisted, and so inactive.
     const committedSeries = committed.get(`usace/${id}`);
@@ -166,7 +170,7 @@ export function toStations(
     const best = candidates.sort((a, b) => rank(b, now) - rank(a, now) || first(a) - first(b))[0]!;
     const kept = committedSeries;
     const station = toStation(office, id, location, kept ? listed.get(kept) : best, kept, now);
-    // A committed series CWMS no longer lists keeps the station on it, inactive,
+    // A series CWMS no longer lists keeps the station on it, inactive,
     // for a person to move to another series (and decide whether its files mix two).
     if (kept && !listed.has(kept)) {
       console.error(
@@ -445,7 +449,7 @@ function latest(a: string | undefined, b: string | undefined): string | undefine
  * (Central and Eastern, standard or daylight time), or -Infinity for a station whose zero never moved. Takes the later of
  * `ZERO_SINCE` and the station's own `zero_since`. A station read from
  * `stations.parquet`, which doesn't carry `zero_since`, is bounded by
- * `ZERO_SINCE` alone; a test checks the committed date is never earlier.
+ * `ZERO_SINCE` alone; a test checks the list's date is never earlier.
  */
 export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: string }): number {
   const since = latest(ZERO_SINCE[station.source_id]?.since, station.zero_since);

@@ -90,7 +90,7 @@ export async function stations(): Promise<ListedStation[]> {
       heights = await datums(s.id);
       inARow = 0;
     } catch (error) {
-      // No offsets this time; the station keeps its committed ones.
+      // No offsets this time; the station keeps the ones it had.
       failed.push(`${s.id}: ${error instanceof Error ? error.message : error}`);
       // A few stations failing is the station's problem; several in a row, or
       // many in all, means the API is, and waiting out each one would take hours.
@@ -134,19 +134,19 @@ async function datums(id: string): Promise<Record<string, number>> {
 
 /**
  * A CO-OPS station as listed, with the dates it was established and removed, so
- * a backfill can skip years it wasn't there. They're kept in the committed list
+ * a backfill can skip years it wasn't there. They're kept in the lake's list
  * only; `stations.parquet` doesn't carry them.
  */
 export type CoopsStation = ListedStation & { established: string | null; removed: string | null };
 
-/** `heights` is null when the datums request failed, so the station keeps its committed offsets. */
+/** `heights` is null when the datums request failed, so the station keeps the offsets it had. */
 function toStation(
   s: ApiStation,
   live: boolean,
   heights: Record<string, number> | null,
 ): CoopsStation {
   // On the Great Lakes, STND is IGLD 1985. A failed or empty answer adds
-  // nothing, so the station keeps its committed offsets rather than IGLD alone.
+  // nothing, so the station keeps the offsets it had rather than IGLD alone.
   heights = heights === null || !Object.keys(heights).length ? {} : heights;
   if (s.greatlakes && Object.keys(heights).length) heights = { IGLD: 0, ...heights };
   const datums: Record<string, number> = {};
@@ -340,7 +340,7 @@ async function rowsOf(product: string, id: string, from: Date, to: Date): Promis
 }
 
 // When the station operated, so a backfill doesn't ask for decades it wasn't
-// there: from the committed list when it has the dates, else from the
+// there: from the lake's list when it has the dates, else from the
 // station's details. A live station's last month needs neither.
 const windows = new Map<string, Promise<[number, number]>>();
 
