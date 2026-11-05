@@ -5,7 +5,7 @@ import type { Product } from "../schema.ts";
  *
  *   stations.parquet                                    one row per series
  *   sources.json                                        license and attribution per source
- *   recent/<source>.parquet                             last 7 days, every live station
+ *   recent/<source>.parquet                             last 7 days, every live station and any since retired
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve

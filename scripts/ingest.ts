@@ -116,7 +116,7 @@ switch (command) {
   case "recent": {
     const [source] = args;
     if (!source) usage();
-    await recent(source, Number(values.hours), Number(values["keep-days"]));
+    await recent(source, positive("hours"), positive("keep-days"));
     break;
   }
   case "compact": {
@@ -367,7 +367,7 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(name: "concurrency"): number {
+function positive(name: "concurrency" | "hours" | "keep-days"): number {
   const value = Number(values[name]);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);

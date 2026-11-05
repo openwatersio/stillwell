@@ -102,18 +102,19 @@ export async function updateRecent({
   const candidates = new Set([...pathOf.values(), ...all.flatMap((s) => lakeOf(s) ?? [])]);
   for (const path of candidates) await checkRecent(path);
 
-  // Stations a file holds that this run doesn't fetch, because they've stopped
-  // being live or active or left the list since, keep their rows until they
-  // age out, so compaction can still fold them. One whose license now sends it
-  // to the other lake doesn't, so its rows never stay in the wrong one, and it
-  // starts empty in its new lake rather than carry rows across.
+  // Listed stations a file holds that this run doesn't fetch, because they've
+  // stopped being live or active since, keep their rows until they age out, so
+  // compaction can still fold them. One whose license now sends it to the other
+  // lake doesn't, so its rows never stay in the wrong one, and it starts empty
+  // in its new lake rather than carry rows across. A station gone from the list
+  // has nowhere to be folded, so its rows go.
   const listed = new Map(all.map((s) => [s.id, s]));
   const carried = new Map<string, string[]>();
   for (const path of candidates) {
     const ids = (await recentStations(path)).filter((station) => {
       if (pathOf.has(station)) return false;
       const s = listed.get(station);
-      return !s || lakeOf(s) === path;
+      return s !== undefined && lakeOf(s) === path;
     });
     if (ids.length) carried.set(path, ids);
   }
@@ -198,9 +199,18 @@ export async function compactRecent({
   end,
 }: RunOptions & { start: number; end: number }): Promise<RunSummary> {
   const id = source.metadata.id;
-  const stations = all.filter((s) => s.products.includes("levels"));
-  const pathOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), id)]));
-  const summary = emptySummary(`compact ${id}`, stations.length);
+  const summary = emptySummary(`compact ${id}`, 0);
+  // A station whose lake can't be named, such as a restricted one with no
+  // restricted lake set, fails alone rather than stop the source's fold.
+  const pathOf = new Map<string, string>();
+  for (const s of all.filter((s) => s.products.includes("levels")))
+    try {
+      pathOf.set(s.id, recentPath(lakeFor(s), id));
+    } catch (error) {
+      summary.failed.push(`${s.id}: ${message(error)}`);
+    }
+  const stations = all.filter((s) => pathOf.has(s.id));
+  summary.stations = stations.length + summary.failed.length;
 
   for (const path of new Set(pathOf.values())) {
     const here = stations.filter((s) => pathOf.get(s.id) === path);

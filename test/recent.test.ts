@@ -168,7 +168,7 @@ describe("updateRecent", () => {
         row(retired, 2 * HOUR),
         row(retired, 8 * DAY), // aged out
         row(quiet, 3 * HOUR),
-        row(gone, 4 * HOUR), // no longer listed at all
+        row(gone, 4 * HOUR), // no longer listed, so nowhere to fold it
         row(moved, 5 * HOUR), // now restricted: never stays in the public lake
       ],
     ]);
@@ -183,7 +183,6 @@ describe("updateRecent", () => {
     assert.deepEqual(
       (await readRecent(path)).map((r) => [r.station, (NOW - r.time) / HOUR]),
       [
-        ["test/gone", 4],
         ["test/live", 1],
         ["test/quiet", 3],
         ["test/retired", 2],
