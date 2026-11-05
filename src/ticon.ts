@@ -128,8 +128,16 @@ const PEGELONLINE_NOTE = "PEGELONLINE keeps 31 days; history needs WSV's archive
 export function replacement(record: TiconRecord, lists: Record<string, Station[]>): Replacement {
   const { contributor, code, iso3 } = record;
   if (contributor === "noaa") return byCode(record, "coops", code, "planned", lists);
-  if (contributor === "usgs")
-    return { source: "usgs", id: `usgs/${usgsSite(code)}`, status: "planned" };
+  if (contributor === "usgs") {
+    // TICON drops a leading zero, which can leave an 8-digit code for a 9-digit
+    // site; the list says which one USGS has, and the nearer wins if it has both.
+    const listed = [code, usgsSite(code), `0${code}`]
+      .map((c) => lists.usgs?.find((s) => s.source_id === c && usable(s)))
+      .filter((s) => s !== undefined)
+      .sort((a, b) => km(record, a) - km(record, b));
+    const site = listed[0]?.source_id ?? usgsSite(code);
+    return byCode(record, "usgs", site, "planned", lists);
+  }
 
   if (contributor === "wsv" || contributor === "bfg") {
     const byNumber = lists.pegelonline?.find((s) => s.source_id === code && usable(s));
@@ -403,8 +411,9 @@ function distanceTo(record: TiconRecord, station: Station | undefined): { distan
 }
 
 /**
- * USGS site numbers are 8, 10 or 15 digits, often with a leading zero that
- * TICON's ids drop. Restore it to the next valid length.
+ * USGS site numbers are mostly 8, 10 or 15 digits, often with a leading zero
+ * that TICON's ids drop. Restore it to the next of those lengths. A few sites
+ * have 9 digits, which `replacement` finds by checking the station list.
  */
 export function usgsSite(code: string): string {
   const length =

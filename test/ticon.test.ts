@@ -122,6 +122,26 @@ describe("TICON replacements", () => {
     assert.equal(replacement(record("x-394118122051301-usa-usgs"), {}).id, "usgs/394118122051301");
   });
 
+  it("finds a 9-digit USGS site TICON shortened to 8, once USGS lists it", () => {
+    const lists = {
+      usgs: [
+        station("usgs/021720825", "Ashley River", 32.9, -80.1),
+        station("usgs/02198820", "Abercorn Creek", 32.2, -81.2),
+      ],
+    };
+    const ashley = record("ashley-21720825-usa-usgs", { lat: 32.9, lon: -80.1 });
+    assert.deepEqual(
+      [replacement(ashley, lists).id, replacement(ashley, lists).status],
+      ["usgs/021720825", "ready"],
+    );
+    const abercorn = record("abercorn_creek_at_mouth-2198820-usa-usgs", { lat: 32.2, lon: -81.2 });
+    assert.equal(replacement(abercorn, lists).id, "usgs/02198820");
+    assert.equal(replacement(record("x-11006988-usa-usgs"), lists).status, "unmatched");
+    // When USGS has both an 8-digit site and the 9-digit one with a zero in front, the nearer is the gauge.
+    const both = { usgs: [station("usgs/21720825", "Elsewhere", 45, -100), ...lists.usgs] };
+    assert.equal(replacement(ashley, both).id, "usgs/021720825");
+  });
+
   it("restores USGS site numbers to 8, 10 or 15 digits", () => {
     assert.deepEqual(["2198820", "158540095", "39411812205130", "12345678"].map(usgsSite), [
       "02198820",

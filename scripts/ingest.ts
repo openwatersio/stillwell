@@ -43,7 +43,7 @@ import {
   type StationObservation,
 } from "../src/lake/parquet.ts";
 import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
-import { qc } from "../src/qc.ts";
+import { qc, type QcOptions } from "../src/qc.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 import type {
   ListedStation,
@@ -140,7 +140,8 @@ async function refreshStations(ids: string[]): Promise<void> {
     }
     let merged;
     try {
-      merged = mergeStationList(previous, fetched);
+      const source = sourceOf(id);
+      merged = mergeStationList(previous, fetched, source.seriesChanged?.bind(source));
     } catch (error) {
       console.error(
         `${id}: ${error instanceof Error ? error.message : error}; keeping the committed list`,
@@ -165,7 +166,11 @@ async function refreshStations(ids: string[]): Promise<void> {
     // The station's files are all in its committed datum, so a person decides
     // whether to convert them or start over; until then it stays inactive.
     for (const c of changed) {
-      console.error(`  ${c.id}: now reported in ${c.to}, not ${c.from}; marked inactive`);
+      console.error(
+        c.reason
+          ? `  ${c.id}: ${c.reason}; marked inactive`
+          : `  ${c.id}: now reported in ${c.to}, not ${c.from}; marked inactive`,
+      );
       process.exitCode = 1;
     }
   }
@@ -257,7 +262,7 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(rows, source.metadata.qc);
+    if (product === "levels") rows = qc(rows, qcFor(source, station));
     const existing = await readObservations(path);
     const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
@@ -289,7 +294,7 @@ async function refuseOtherDatum(path: string, station: Station): Promise<void> {
 
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
   const source = sourceOf(sourceId);
-  if (!source.observations) throw new Error(`${sourceId} has no observations`);
+  if (!source.observations && !source.recent) throw new Error(`${sourceId} has no observations`);
   const stations = (await committedStations(sourceId)).filter(
     (s) => s.live && s.status === "active" && s.products.includes("levels"),
   );
@@ -305,15 +310,28 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   const rows: StationObservation[] = [];
   const failed: string[] = [];
 
+  // A source that can sweep every station at once does; a failed sweep fails
+  // every station, which keeps what each had.
+  let swept: Map<string, Observation[] | Error> | Error | undefined;
+  if (source.recent)
+    swept = await source
+      .recent(stations, since, new Date(now))
+      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
+
   await pool(stations, async (station) => {
     const old = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
     let merged: Observation[] = old;
     try {
-      const fetched = await source.observations!(station, since, new Date(now));
+      if (swept instanceof Error) throw swept;
+      const answer = swept ? swept.get(station.id) : undefined;
+      if (answer instanceof Error) throw answer;
+      const fetched = swept
+        ? (answer ?? [])
+        : await source.observations!(station, since, new Date(now));
       // QC the whole window, so spikes and flatlines are judged against their neighbors.
       // Nothing new keeps what we had, rather than clearing the last hours.
       if (fetched.length)
-        merged = qc(mergeFetched(old, fetched, since.getTime(), now, now), source.metadata.qc);
+        merged = qc(mergeFetched(old, fetched, since.getTime(), now, now), qcFor(source, station));
     } catch (error) {
       // Keep what we had; a failed fetch mustn't empty the window.
       failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
@@ -333,6 +351,18 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   );
   for (const f of failed.slice(0, 20)) console.log(`  ${f}`);
   if (stations.length && failed.length === stations.length) process.exit(1);
+}
+
+/**
+ * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
+ * or more, so they get two days before a flatline counts as suspect. And they
+ * sit nearly flat for months and then rise meters in a flood, so a level far
+ * outside their own range isn't suspect for that alone. Tide gauges never sit
+ * still that long, and keep the defaults.
+ */
+function qcFor(source: Source, station: Station): QcOptions {
+  const still = station.kind === "river" || station.kind === "lake";
+  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
 }
 
 async function committedStations(sourceId: string): Promise<Station[]> {
