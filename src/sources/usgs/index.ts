@@ -597,16 +597,26 @@ async function request<T>(url: string, options: RequestOptions): Promise<T> {
     .USGS_API_KEY;
   for (let attempt = 1; ; attempt++) {
     try {
-      return await getJson<T>(url, { ...options, pace, headers: key ? { "x-api-key": key } : {} });
+      return await getJson<T>(url, {
+        ...options,
+        pace,
+        throttled: hold,
+        headers: key ? { "x-api-key": key } : {},
+      });
     } catch (error) {
       if (attempt >= 3 || !String(error).includes("returned 429")) throw error;
       // Wait as long as the API asks, and hold every other request back too.
       const asked = /retry after (\d+) s/.exec(String(error))?.[1];
       const wait = asked ? Math.min(Number(asked) * 1000 + 5000, 3_700_000) : pacing.blockedMs;
-      blockedUntil = Math.max(blockedUntil, Date.now() + wait);
+      hold(wait / 1000);
       await sleep(wait);
     }
   }
+}
+
+/** Holds every request, those already waiting for their slot too, until a 429's wait is over. */
+function hold(seconds: number): void {
+  blockedUntil = Math.max(blockedUntil, Date.now() + seconds * 1000);
 }
 
 function sleep(ms: number): Promise<void> {

@@ -302,13 +302,18 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
   const since = new Date(now - hours * 3_600_000);
   const keepFrom = now - keepDays * DAY_MS;
   // Restricted stations' recent values go to the private lake, like their series.
-  const paths = [...new Set(stations.map((s) => recentPath(lakeFor(s), sourceId)))];
-  const previous = new Map<string, StationObservation[]>();
-  for (const path of paths)
-    for (const [id, rows] of Map.groupBy(await readRecent(path), (r) => r.station))
-      previous.set(id, rows);
-  const rows: StationObservation[] = [];
+  const lakeOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), sourceId)]));
+  const paths = [...new Set(lakeOf.values())];
   const failed: string[] = [];
+  let written = 0;
+  const reporting = new Set<string>();
+
+  // Each file is read in batches after the sweep, so one that can't be read
+  // fails the run here, before the sweep spends a source's request budget. A
+  // station read only from its own lake's file starts empty in the other lake
+  // when its license changes, rather than carry rows across.
+  for (const path of paths)
+    await readRecent(path, [stations.find((s) => lakeOf.get(s.id) === path)!.id]);
 
   // A source that can sweep every station at once does; a failed sweep fails
   // every station, which keeps what each had.
@@ -318,36 +323,49 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
       .recent(stations, since, new Date(now))
       .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
-  await pool(stations, async (station) => {
-    const old = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
-    let merged: Observation[] = old;
-    try {
-      if (swept instanceof Error) throw swept;
-      const answer = swept ? swept.get(station.id) : undefined;
-      if (answer instanceof Error) throw answer;
-      const fetched = swept
-        ? (answer ?? [])
-        : await source.observations!(station, since, new Date(now));
-      // QC the whole window, so spikes and flatlines are judged against their neighbors.
-      // Nothing new keeps what we had, rather than clearing the last hours.
-      if (fetched.length)
-        merged = qc(mergeFetched(old, fetched, since.getTime(), now, now), qcFor(source, station));
-    } catch (error) {
-      // Keep what we had; a failed fetch mustn't empty the window.
-      failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+  // A batch of stations at a time, read, merged and written: every live USGS
+  // station's window is about 9 million values, too many to hold at once.
+  const BATCH = 500;
+  async function* batches(path: string): AsyncGenerator<StationObservation[]> {
+    const here = stations.filter((s) => lakeOf.get(s.id) === path);
+    for (let i = 0; i < here.length; i += BATCH) {
+      const batch = here.slice(i, i + BATCH);
+      const ids = batch.map((s) => s.id);
+      const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
+      const rows: StationObservation[] = [];
+      await pool(batch, async (station) => {
+        const old = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
+        let merged: Observation[] = old;
+        try {
+          if (swept instanceof Error) throw swept;
+          const answer = swept ? swept.get(station.id) : undefined;
+          if (answer instanceof Error) throw answer;
+          const fetched = swept
+            ? (answer ?? [])
+            : await source.observations!(station, since, new Date(now));
+          // QC the whole window, so spikes and flatlines are judged against their neighbors.
+          // Nothing new keeps what we had, rather than clearing the last hours.
+          if (fetched.length)
+            merged = qc(
+              mergeFetched(old, fetched, since.getTime(), now, now),
+              qcFor(source, station),
+            );
+        } catch (error) {
+          // Keep what we had; a failed fetch mustn't empty the window.
+          failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+        }
+        for (const r of merged) rows.push({ ...r, station: station.id });
+        if (merged.some((r) => r.received === now)) reporting.add(station.id);
+      });
+      if (swept instanceof Map) for (const id of ids) swept.delete(id);
+      written += rows.length;
+      yield rows;
     }
-    for (const r of merged) rows.push({ ...r, station: station.id });
-  });
+  }
+  for (const path of paths) await writeRecent(path, batches(path));
 
-  const lakeOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), sourceId)]));
-  for (const path of paths)
-    await writeRecent(
-      path,
-      rows.filter((r) => lakeOf.get(r.station) === path),
-    );
-  const reporting = new Set(rows.filter((r) => r.received === now).map((r) => r.station)).size;
   console.log(
-    `${paths.join(", ")}: ${rows.length} rows, ${reporting} of ${stations.length} stations sent new values, ${failed.length} failed`,
+    `${paths.join(", ")}: ${written} rows, ${reporting.size} of ${stations.length} stations sent new values, ${failed.length} failed`,
   );
   for (const f of failed.slice(0, 20)) console.log(`  ${f}`);
   if (stations.length && failed.length === stations.length) process.exit(1);
