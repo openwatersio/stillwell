@@ -99,7 +99,7 @@ interface Collection<T> {
 
 /**
  * A USGS station as listed, with the series its levels come from. They're kept
- * in the committed list only; `stations.parquet` doesn't carry them.
+ * in the lake's station list only; `stations.parquet` doesn't carry them.
  */
 export type UsgsStation = ListedStation & {
   time_series_id: string;
@@ -374,7 +374,7 @@ export async function recent(
       bySeries.set(checked(station), station.id);
       parameters.add((station as Station & UsgsStation).parameter_code);
     } catch (error) {
-      // One station committed in another datum fails alone, not the sweep.
+      // One station listed in another datum fails alone, not the sweep.
       out.set(station.id, error as Error);
     }
   }
@@ -423,7 +423,7 @@ export async function recent(
 }
 
 /**
- * A station committed against one series or gage zero, now listed against
+ * A station kept against one series or gage zero, now listed against
  * another: a different `time_series_id` (USGS made another series primary, or
  * reissued it), or a gage datum that moved against its vertical datum. Either
  * way the stored values and new ones aren't measured from the same zero.
@@ -627,7 +627,7 @@ function sleep(ms: number): Promise<void> {
   return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
 }
 
-/** Every request is for the station's own series, so one committed in another datum is refused. */
+/** Every request is for the station's own series, so one listed in another datum is refused. */
 function checked(station: Station): string {
   const s = station as Station & Partial<UsgsStation>;
   if (!s.time_series_id || !s.parameter_code)

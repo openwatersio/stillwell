@@ -188,10 +188,12 @@ obs/<source>/<station>/<year>.parquet          time, level_m, flag, received, da
 extremes/<source>/<station>/<year>.parquet     time, level_m, type, flag, datum
 predictions/<source>/<station>/<year>.parquet  published predictions (RWS, BSH)
 predicted-extremes/<source>/<station>/<year>.parquet  published predicted high and low waters
+obs/<source>/<station>/<epoch>/<year>.parquet  a later datum epoch's files, and likewise for each product
+stations/<source>.parquet, history/stations/   each source's list, and every refresh's snapshot
 bulk/<YYYY-Qn>/<source>.parquet                quarterly snapshots, with a DOI
 ```
 
-Levels in these files are in each station's own datum; `stations.parquet` has the offsets. [data.md](data.md) has example queries.
+Levels in these files are in the datum of the station's epoch they belong to; `stations.parquet` has the offsets and each epoch's conversion into the current one. [data.md](data.md) has example queries.
 
 ```sql
 SELECT time, level_m
