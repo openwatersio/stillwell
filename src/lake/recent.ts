@@ -56,7 +56,9 @@ interface RunOptions {
  * recent window, keeping `keepDays` days. A value first seen in this run gets
  * `received` = `now`; one seen before keeps its first arrival. A station whose
  * fetch fails, or brings nothing, keeps what it had, so a source with a short
- * window of its own never loses values to an outage.
+ * window of its own never loses values to an outage. A station fetched on its
+ * own looks back at least two of its intervals, so a daily gauge that
+ * publishes hours late still gets each value.
  *
  * A station is stale when its newest value is older than three of its
  * intervals, and at least `staleHours`.
@@ -117,16 +119,16 @@ export async function updateRecent({
           if (swept instanceof Error) throw swept;
           const answer = swept ? swept.get(station.id) : undefined;
           if (answer instanceof Error) throw answer;
+          const from = swept
+            ? since.getTime()
+            : Math.min(since.getTime(), now - 2 * (station.interval_s ?? 0) * 1000);
           const fetched = swept
             ? (answer ?? [])
-            : await source.observations!(station, since, new Date(now));
+            : await source.observations!(station, new Date(from), new Date(now));
           // QC the whole window, so spikes and flatlines are judged against their neighbors.
           // Nothing new keeps what we had, rather than clearing the last hours.
           if (fetched.length)
-            merged = qc(
-              mergeFetched(old, fetched, since.getTime(), now, now),
-              qcFor(source, station),
-            );
+            merged = qc(mergeFetched(old, fetched, from, now, now), qcFor(source, station));
         } catch (error) {
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
@@ -154,11 +156,11 @@ export async function updateRecent({
 
 /**
  * Fold the recent window's values in [start, end) into each station's year
- * files, carrying `received`. A year file is read, merged and written whole,
- * so a failed run leaves the file it had; one the fold doesn't change isn't
- * written. Where the file and the window both have a time, the window's level
- * and flag win, and the earlier arrival stays. A station with no values in the
- * range is stale.
+ * files, carrying `received`, as `upsert` merges them. A year file is read,
+ * merged and written whole, so a failed run leaves the file it had; one the
+ * fold doesn't change isn't written. Inactive stations are folded too, so the
+ * last values of a station retired since they arrived still reach its files.
+ * A live, active station with no values in the range is stale.
  */
 export async function compactRecent({
   source,
@@ -169,7 +171,7 @@ export async function compactRecent({
   end,
 }: RunOptions & { start: number; end: number }): Promise<RunSummary> {
   const id = source.metadata.id;
-  const stations = all.filter((s) => s.status === "active" && s.products.includes("levels"));
+  const stations = all.filter((s) => s.products.includes("levels"));
   const pathOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), id)]));
   const summary = emptySummary(`compact ${id}`, stations.length);
 
@@ -190,7 +192,7 @@ export async function compactRecent({
         const rows = window.get(station.id);
         // A live station sends something every day; one that isn't live may not.
         if (!rows?.length) {
-          if (station.live) summary.stale.push(station.id);
+          if (station.live && station.status === "active") summary.stale.push(station.id);
           return;
         }
         let changed = false;
@@ -205,7 +207,7 @@ export async function compactRecent({
             await writeObservations(file, merged, station.datum);
             summary.files++;
             const had = new Map(existing.rows.map((r) => [r.time, r]));
-            summary.values += incoming.filter((r) => {
+            summary.values += merged.filter((r) => {
               const before = had.get(r.time);
               return !before || before.level !== r.level || before.flag !== r.flag;
             }).length;
@@ -221,10 +223,10 @@ export async function compactRecent({
   return summary;
 }
 
-/** The UTC day before `now`, as [start, end). */
-export function yesterday(now: number): [number, number] {
+/** The `days` whole UTC days before `now`, as [start, end). */
+export function lastDays(now: number, days = 1): [number, number] {
   const end = Math.floor(now / DAY_MS) * DAY_MS;
-  return [end - DAY_MS, end];
+  return [end - days * DAY_MS, end];
 }
 
 /**

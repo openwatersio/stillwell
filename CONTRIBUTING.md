@@ -68,10 +68,10 @@ Merge the last hours from every live station into the source's recent window, wh
 node scripts/ingest.ts recent pegelonline --hours 3
 ```
 
-Fold the last whole UTC days of the recent window (`--days`, 1 by default, which is yesterday) into each station's year files under `obs/`, carrying `received`. Each year file is read, merged and written whole, so a failed run leaves the file it had, and a file the fold doesn't change isn't written:
+Fold the last whole UTC days of the recent window (`--days`, 1 by default, which is yesterday, and at most 6) into each station's year files under `obs/`, carrying `received`. Each year file is read, merged and written whole, so a failed run leaves the file it had, and a file the fold doesn't change isn't written. The window's level and flag win over the file's, except that a preliminary value never replaces a finalized one, such as a verified backfill:
 
 ```bash
-node scripts/ingest.ts compact pegelonline --days 2
+node scripts/ingest.ts compact pegelonline --days 6
 ```
 
 Both print a summary (stations updated, stale and failed, and values written), and add it to the workflow run's page in Actions.
@@ -113,7 +113,7 @@ Each source is a directory in `src/sources/` that exports a `Source` (defined in
 
 ## Ingest on R2
 
-The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Two workflows run on a schedule from the same environment, each source a job of its own: Ingest hourly runs `recent` at 17 minutes past each hour, and Compact daily runs `compact --days 2` at 00:45 UTC, so values that arrive after midnight still reach the year file. Both can also be started by hand.
+The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Two workflows run on a schedule from the same environment, each source a job of its own: Ingest hourly runs `recent --hours 12` at 17 minutes past each hour, and Compact daily runs `compact --days 6` at 00:45 UTC, so late values, revised flags and a missed night still reach the year files. Both can also be started by hand. Every job that writes one source's files, a manual `backfill`, `recent` or `compact` included, runs in that source's `lake-<source>` concurrency group, so no two rewrite one file at once. A run waiting in a group is replaced by the next one to arrive, so while a long backfill holds a source, its hourly runs skip until it's done, and the next one's 12 hours, plus the window's 6 days for compaction, catch up.
 
 ## Gotchas
 

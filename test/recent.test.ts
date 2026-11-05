@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, statSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/lake/merge.ts";
@@ -13,7 +13,7 @@ import {
   writeRecent,
 } from "../src/lake/parquet.ts";
 import { recentPath, seriesPath } from "../src/lake/paths.ts";
-import { compactRecent, formatSummary, updateRecent, yesterday } from "../src/lake/recent.ts";
+import { compactRecent, formatSummary, lastDays, updateRecent } from "../src/lake/recent.ts";
 import { Flag, type Observation, type Source, type Station } from "../src/schema.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
@@ -151,6 +151,157 @@ describe("updateRecent", () => {
     assert.deepEqual(summary.stale, []);
   });
 
+  it("looks back two intervals for a station fetched on its own", async () => {
+    const root = lake();
+    const asked: [string, number][] = [];
+    const daily = station("daily", { interval_s: 86_400 });
+    await updateRecent({
+      source: {
+        metadata: { id: "test" } as Source["metadata"],
+        stations: async () => [],
+        observations: async (s, from) => {
+          asked.push([s.id, (NOW - from.getTime()) / HOUR]);
+          // Published hours after it was measured.
+          return [at(NOW - 20 * HOUR, 1)];
+        },
+      },
+      stations: [daily, station("tenminute")],
+      lakeFor: () => root,
+      since: new Date(NOW - 12 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(asked.sort(), [
+      ["test/daily", 48],
+      ["test/tenminute", 12],
+    ]);
+    assert.deepEqual(
+      (await readRecent(recentPath(root, "test"))).map((r) => r.station),
+      ["test/daily"],
+    );
+  });
+
+  it("merges across batches of 500 stations", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    const stations = Array.from({ length: 1001 }, (_, i) => station(String(i).padStart(4, "0")));
+    // Before the fetched hours, so the merge keeps it.
+    const old = (s: Station) => ({ ...at(NOW - 8 * HOUR, 1, NOW - 8 * HOUR), station: s.id });
+    await writeRecent(path, [stations.map(old)]);
+    const summary = await updateRecent({
+      source: source(Object.fromEntries(stations.map((s) => [s.id, [at(NOW - HOUR, 2)]]))),
+      stations,
+      lakeFor: () => root,
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+      concurrency: 8,
+    });
+    const rows = await readRecent(path);
+    assert.equal(rows.length, 2002);
+    for (const s of [stations[0]!, stations[499]!, stations[500]!, stations[1000]!])
+      assert.deepEqual(
+        rows.filter((r) => r.station === s.id).map((r) => r.level),
+        [1, 2],
+      );
+    assert.equal(summary.updated, 1001);
+    assert.equal(summary.values, 1001);
+  });
+
+  it("leaves the old file when a batch fails partway", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    const stations = Array.from({ length: 600 }, (_, i) => station(String(i).padStart(4, "0")));
+    await writeRecent(path, [[{ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: "test/0000" }]]);
+    // A sweep whose second batch breaks after the first was merged.
+    class Breaking extends Map<string, Observation[]> {
+      override delete(id: string): boolean {
+        if (id === "test/0500") throw new Error("broken batch");
+        return super.delete(id);
+      }
+    }
+    await assert.rejects(
+      updateRecent({
+        source: { ...source({}), recent: async () => new Breaking() },
+        stations,
+        lakeFor: () => root,
+        since: new Date(NOW - 6 * HOUR),
+        now: NOW,
+      }),
+      /broken batch/,
+    );
+    assert.deepEqual(
+      (await readRecent(path)).map((r) => [r.station, r.level]),
+      [["test/0000", 1]],
+    );
+  });
+
+  it("writes restricted stations' window to their own lake", async () => {
+    const [open, restricted] = [lake(), lake()];
+    const [a, b] = [station("a"), station("b", { commercial_use: false })];
+    await updateRecent({
+      source: source({ [a.id]: [at(NOW - HOUR, 1)], [b.id]: [at(NOW - HOUR, 2)] }),
+      stations: [a, b],
+      lakeFor: (s) => (s.commercial_use ? open : restricted),
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(
+      (await readRecent(recentPath(open, "test"))).map((r) => r.station),
+      ["test/a"],
+    );
+    assert.deepEqual(
+      (await readRecent(recentPath(restricted, "test"))).map((r) => r.station),
+      ["test/b"],
+    );
+  });
+
+  it("fails on an unreadable window before the sweep spends any requests", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, "not parquet");
+    let swept = false;
+    await assert.rejects(
+      updateRecent({
+        source: {
+          ...source({}),
+          recent: async () => {
+            swept = true;
+            return new Map();
+          },
+        },
+        stations: [station("a")],
+        lakeFor: () => root,
+        since: new Date(NOW - 6 * HOUR),
+        now: NOW,
+      }),
+    );
+    assert.equal(swept, false);
+    assert.equal(readFileSync(path, "utf8"), "not parquet");
+  });
+
+  it("keeps every station's window when a sweep throws", async () => {
+    const root = lake();
+    const path = recentPath(root, "test");
+    const [a, b] = [station("a"), station("b")];
+    await writeRecent(path, [
+      [a, b].map((s) => ({ ...at(NOW - 2 * HOUR, 1, NOW - 2 * HOUR), station: s.id })),
+    ]);
+    const summary = await updateRecent({
+      source: {
+        ...source({}),
+        recent: async () => {
+          throw new Error("sweep down");
+        },
+      },
+      stations: [a, b],
+      lakeFor: () => root,
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(summary.failed, ["test/a: sweep down", "test/b: sweep down"]);
+    assert.equal((await readRecent(path)).length, 2);
+  });
+
   it("writes USGS's batched sweep into the window, one request for every station", async () => {
     usgs.pacing.requestMs = 0;
     const asked: string[] = [];
@@ -246,13 +397,14 @@ describe("updateRecent", () => {
 });
 
 describe("compactRecent", () => {
-  const [start, end] = yesterday(NOW);
+  const [start, end] = lastDays(NOW);
 
-  it("is the UTC day before now", () => {
+  it("is the whole UTC days before now", () => {
     assert.deepEqual(
       [start, end].map((t) => new Date(t).toISOString()),
       ["2026-11-04T00:00:00.000Z", "2026-11-05T00:00:00.000Z"],
     );
+    assert.equal(new Date(lastDays(NOW, 6)[0]).toISOString(), "2026-10-30T00:00:00.000Z");
   });
 
   it("folds yesterday into the year file, carrying received and keeping what it had", async () => {
@@ -264,7 +416,7 @@ describe("compactRecent", () => {
       file,
       [
         at(start - DAY, 0.5), // backfilled history
-        at(start + HOUR, 0.6), // backfilled, then seen arriving
+        at(start + HOUR, 0.6), // backfilled before the window saw it arrive
         at(start + 2 * HOUR, 0.7, start + 2 * HOUR), // the recent window lost it
       ],
       "NAP",
@@ -284,7 +436,8 @@ describe("compactRecent", () => {
       (await readObservations(file)).map((r) => [r.time - start, r.level, r.received]),
       [
         [-DAY, 0.5, undefined],
-        [HOUR, 0.65, start + 3 * HOUR],
+        // Its first arrival is unknown, not when the window saw it.
+        [HOUR, 0.65, undefined],
         [2 * HOUR, 0.7, start + 2 * HOUR],
         [3 * HOUR, 0.8, start + 4 * HOUR],
       ],
@@ -329,6 +482,29 @@ describe("compactRecent", () => {
     );
   });
 
+  it("folds a station retired since its values arrived", async () => {
+    const root = lake();
+    const retired = station("retired", { status: "inactive", live: false });
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + HOUR, 1, start + HOUR), station: retired.id }],
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [retired],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    assert.equal(summary.files, 1);
+    assert.deepEqual(summary.stale, []);
+    assert.deepEqual(
+      (await readObservations(seriesPath(root, "levels", "test", "retired", 2026))).map(
+        (r) => r.level,
+      ),
+      [1],
+    );
+  });
+
   it("leaves a file in another datum as it was, and counts silent stations stale", async () => {
     const root = lake();
     const [a, quiet, archive] = [
@@ -361,9 +537,19 @@ describe("upsert", () => {
   it("takes incoming levels and flags, keeps the earlier arrival and every time", () => {
     assert.deepEqual(
       upsert([at(1, 1, 10), at(2, 2), at(4, 4, 40)], [at(1, 1.5, 5), at(2, 2.5, 20), at(3, 3)]),
-      [at(1, 1.5, 5), at(2, 2.5, 20), at(3, 3), at(4, 4, 40)],
+      // The file never knew when 2 arrived, so neither does the fold.
+      [at(1, 1.5, 5), at(2, 2.5), at(3, 3), at(4, 4, 40)],
     );
     assert.deepEqual(upsert([at(1, 1, 5)], [at(1, 1, 10)]), [at(1, 1, 5)]);
+  });
+
+  it("keeps a finalized value over a preliminary one, but takes a worse QC flag", () => {
+    const verified: Observation = { time: 1, level: 1, flag: Flag.good };
+    assert.deepEqual(upsert([verified], [at(1, 1.2, 5)]), [verified]);
+    const suspect: Observation = { time: 1, level: 1, flag: Flag.suspect, received: 5 };
+    assert.deepEqual(upsert([{ ...verified, received: 5 }], [suspect]), [suspect]);
+    // A preliminary value the window has since flagged replaces the file's.
+    assert.deepEqual(upsert([at(1, 1, 5)], [suspect]), [suspect]);
   });
 });
 

@@ -1,3 +1,5 @@
+import { Flag } from "../schema.ts";
+
 /**
  * Replace the rows of `existing` in [start, end) with `incoming`, keeping
  * everything outside that range. A value seen before keeps its first `received`
@@ -62,21 +64,33 @@ function canonical(row: object): string {
 }
 
 /**
- * Every row of both series. Where both have a time, `incoming` wins on level
- * and flag, and the row keeps the earlier `received`, so folding the recent
- * window into a year file never drops a value the file had or a first arrival.
+ * Every row of both series, so folding the recent window into a year file
+ * never drops a value the file had. Where both have a time, `incoming` wins on
+ * level and flag, except that a preliminary value never replaces one the
+ * source finalized (good or interpolated), such as a verified backfill. The
+ * row keeps the file's `received`, earlier or unknown: a value backfilled
+ * before the window saw it arrive has no first arrival on record, not the
+ * window's.
  */
-export function upsert<T extends { time: number; received?: number }>(
+export function upsert<T extends { time: number; flag: number; received?: number }>(
   existing: T[],
   incoming: T[],
 ): T[] {
   const byTime = new Map(existing.map((r) => [r.time, r]));
   for (const row of incoming) {
     const before = byTime.get(row.time);
-    const times = [before?.received, row.received].filter((t) => t !== undefined);
-    const next = { ...row };
-    if (times.length) next.received = Math.min(...times);
-    else delete next.received;
+    if (!before) {
+      byTime.set(row.time, row);
+      continue;
+    }
+    const finalized = before.flag <= Flag.interpolated && row.flag === Flag.preliminary;
+    const next = { ...(finalized ? before : row) };
+    const received =
+      before.received === undefined
+        ? undefined
+        : Math.min(before.received, row.received ?? before.received);
+    if (received === undefined) delete next.received;
+    else next.received = received;
     byTime.set(row.time, next);
   }
   return [...byTime.values()].sort((a, b) => a.time - b.time);

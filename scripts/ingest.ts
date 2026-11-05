@@ -49,7 +49,7 @@ import {
   qcFor,
   refuseOtherDatum,
   updateRecent,
-  yesterday,
+  lastDays,
   type RunSummary,
 } from "../src/lake/recent.ts";
 import { seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
@@ -237,7 +237,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
 
   const failed: string[] = [];
-  await pool(wanted, Number(values.concurrency), async (station) => {
+  await pool(wanted, positive("concurrency"), async (station) => {
     for (const product of station.products) {
       for (const [from, to] of years(start, end)) {
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
@@ -300,44 +300,70 @@ async function backfillYear(
 
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
   const now = Date.now();
-  const summary = await updateRecent({
-    source: sourceOf(sourceId),
-    stations: await committedStations(sourceId),
-    lakeFor,
-    concurrency: Number(values.concurrency),
-    since: new Date(now - hours * 3_600_000),
-    now,
-    keepDays,
-  });
-  await report(summary);
-  // Some stations failing is ordinary; all of them is an outage, or a broken adapter.
-  if (summary.stations && summary.failed.length === summary.stations) process.exitCode = 1;
+  const summary = await reporting(`recent ${sourceId}`, async () =>
+    updateRecent({
+      source: sourceOf(sourceId),
+      stations: await committedStations(sourceId),
+      lakeFor,
+      concurrency: positive("concurrency"),
+      since: new Date(now - hours * 3_600_000),
+      now,
+      keepDays,
+    }),
+  );
+  // Some stations failing or going quiet is ordinary; all of them is an outage,
+  // or a broken adapter, even one that answers "no data" without an error.
+  if (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
+    process.exitCode = 1;
 }
 
 async function compact(sourceId: string, days: number): Promise<void> {
-  if (!Number.isInteger(days) || days < 1 || days > 7)
-    throw new Error(`--days must be a whole number from 1 to 7, the recent window's length`);
-  const [start, end] = yesterday(Date.now());
-  const concurrency = Number(values.concurrency);
+  // The window keeps 7 days back from its last hourly run, which is partway
+  // into the seventh day, so 6 is the most whole days it holds.
+  if (!Number.isInteger(days) || days < 1 || days > 6)
+    throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
+  const concurrency = positive("concurrency");
   setConnections(concurrency);
-  const summary = await compactRecent({
-    source: sourceOf(sourceId),
-    stations: await committedStations(sourceId),
-    lakeFor,
-    concurrency,
-    start: start - (days - 1) * DAY_MS,
-    end,
-  });
-  await report(summary);
-  // A failed fold left its year file as it was; a person should look.
-  if (summary.failed.length) process.exitCode = 1;
+  const stations = await committedStations(sourceId);
+  const [start, end] = lastDays(Date.now(), days);
+  const summary = await reporting(`compact ${sourceId}`, () =>
+    compactRecent({ source: sourceOf(sourceId), stations, lakeFor, concurrency, start, end }),
+  );
+  // A failed fold left its year file as it was; a person should look. Every
+  // live station silent means recent/ is missing, empty or not being updated.
+  const live = stations.filter((s) => s.live && s.status === "active").length;
+  if (summary.failed.length || (live && summary.stale.length >= live)) process.exitCode = 1;
 }
 
-/** Print a run's summary, and add it to the workflow run's page when there is one. */
-async function report(summary: RunSummary): Promise<void> {
+/**
+ * Run a job and print its summary, adding it to the workflow run's page when
+ * there is one. A job that throws still leaves a line there saying why.
+ */
+async function reporting(title: string, run: () => Promise<RunSummary>): Promise<RunSummary> {
+  const page = process.env.GITHUB_STEP_SUMMARY;
+  let summary;
+  try {
+    summary = await run();
+  } catch (error) {
+    if (page)
+      await appendFile(
+        page,
+        `### ${title}\n\nFailed: ${error instanceof Error ? error.message : error}\n`,
+      );
+    throw error;
+  }
   const text = formatSummary(summary);
   console.log(text);
-  if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, text);
+  if (page) await appendFile(page, text);
+  return summary;
+}
+
+/** A command-line option that must be a whole number of at least 1. */
+function positive(name: "concurrency"): number {
+  const value = Number(values[name]);
+  if (!Number.isInteger(value) || value < 1)
+    throw new Error(`--${name} must be a whole number of at least 1`);
+  return value;
 }
 
 async function committedStations(sourceId: string): Promise<Station[]> {

@@ -8,7 +8,7 @@ It also replaces GESLA and TICON as tide-database's source of observations. TICO
 
 - Adapters for Rijkswaterstaat, BSH and PEGELONLINE that write Parquet to local `data/`, with a response cache.
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](hroi-evaluation.md)).
-- CI for lint, typecheck and tests. Nothing runs on a schedule yet, and there is no API.
+- CI for lint, typecheck and tests, hourly ingest into `recent/` and a daily fold into the year files. There is no API yet.
 
 What the existing Open Waters pieces give us, and don't:
 
@@ -158,7 +158,7 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 ### Phase 4: Scheduled ingest (3 days)
 
 - [x] `ingest-hourly.yml`: a matrix over sources, each with its own concurrency group. Each run merges the fetch into the existing `recent/<source>.parquet` (so sources with short windows don't lose data), trims to 7 days and writes it back. Values first seen in this run get `received` set to the fetch time; compaction carries it into the year files.
-- [x] `compact-daily.yml`: fold yesterday from `recent/` into each station's current-year file (the last two days, so values that arrive after midnight still land). Year files are written whole, so a failed run leaves the previous file. That's one rewrite a day per live station that reported, about 14,000 (11,100 USGS, 1,200 USACE, 690 each RWS and PEGELONLINE, 300 CO-OPS), not the 30,000 first estimated. Measured against a logging S3 server, a year file costs DuckDB one PUT and four HEAD or GET requests, and USGS's 7-day recent file a five-request multipart upload, so the two jobs make about 430,000 Class A and 1.8 million Class B requests a month: inside R2's free tier, or under $3 a month without it.
+- [x] `compact-daily.yml`: fold yesterday from `recent/` into each station's current-year file (every whole day the window holds, six, so late values, revised QC flags and a missed night still land). Year files are written whole, so a failed run leaves the previous file. That's one rewrite a day per live station that reported, about 14,000 (11,100 USGS, 1,200 USACE, 690 each RWS and PEGELONLINE, 300 CO-OPS), not the 30,000 first estimated. Measured against a logging S3 server, a year file costs DuckDB one PUT and four HEAD or GET requests, and USGS's 7-day recent file a five-request multipart upload, so the two jobs make about 430,000 Class A and 1.8 million Class B requests a month: inside R2's free tier, or under $3 a month without it.
 - [ ] `monthly.yml`: refresh station lists, datums and license pages; re-fetch verified CO-OPS months and USGS years that still hold provisional values (USGS approves months to years later), and now and then approved ones too, since the disk cache keeps an approved page for good and USGS still fills gaps and revises values after approval; commit `stations/*.json` through a PR, as tide-database does. The commit keeps scheduled workflows alive on a public repo.
 - [x] A run summary per job (stations updated, stale, failed, values written) on the run's page in Actions.
 - [ ] An issue opened automatically when a source fails twice in a row.
