@@ -13,7 +13,7 @@ scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
 stations/              each source's committed station list, refreshed by `ingest stations`
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml) and the manual ingest against R2 (ingest.yml)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml and compact-daily.yml
 ```
 
 ## Getting started
@@ -38,7 +38,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.       |
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                        |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill` and `recent`, described below.                     |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill`, `recent` and `compact`, described below.          |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                 |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data. |
 
@@ -62,11 +62,19 @@ node scripts/ingest.ts backfill rws hoekvanholland 2016 2025
 node scripts/ingest.ts backfill bsh 506P 2026 2028
 ```
 
-Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`):
+Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`). A value seen for the first time gets `received` set to the time of the fetch, and a station whose fetch fails or brings nothing keeps what it had:
 
 ```bash
 node scripts/ingest.ts recent pegelonline --hours 3
 ```
+
+Fold the last whole UTC days of the recent window (`--days`, 1 by default, which is yesterday) into each station's year files under `obs/`, carrying `received`. Each year file is read, merged and written whole, so a failed run leaves the file it had, and a file the fold doesn't change isn't written:
+
+```bash
+node scripts/ingest.ts compact pegelonline --days 2
+```
+
+Both print a summary (stations updated, stale and failed, and values written), and add it to the workflow run's page in Actions.
 
 These environment variables choose where it writes:
 
@@ -105,7 +113,7 @@ Each source is a directory in `src/sources/` that exports a `Source` (defined in
 
 ## Ingest on R2
 
-The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Nothing runs on a schedule yet.
+The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Two workflows run on a schedule from the same environment, each source a job of its own: Ingest hourly runs `recent` at 17 minutes past each hour, and Compact daily runs `compact --days 2` at 00:45 UTC, so values that arrive after midnight still reach the year file. Both can also be started by hand.
 
 ## Gotchas
 

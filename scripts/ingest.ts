@@ -4,6 +4,7 @@
  *   node scripts/ingest.ts stations [source...]
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
+ *   node scripts/ingest.ts compact <source> [--days 1]
  *
  * `stations` refreshes the committed lists in stations/<source>.json, then
  * writes stations.parquet and sources.json to the lake. `backfill` writes every
@@ -12,7 +13,9 @@
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
  * source withdraws stays until its month is fetched again with others. `recent` fetches the last hours for every
- * live station and merges them into recent/<source>.parquet.
+ * live station and merges them into recent/<source>.parquet. `compact` folds
+ * the last `--days` whole UTC days of that window into each station's year
+ * files. Both print a summary, and add it to the workflow run's page.
  *
  * Files carry no datum of their own, so a station the source now reports in
  * another datum is marked inactive, and `stations` lists it and exits nonzero
@@ -25,26 +28,32 @@
  * its series to WATER_LEVELS_RESTRICTED_LAKE instead, which must be a separate
  * lake, and ingest refuses to write one without it.
  */
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { appendFile, readdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   readExtremes,
-  readDatums,
   readObservations,
-  checkRecent,
-  readRecent,
+  setConnections,
   writeExtremes,
   writeJsonArray,
   writeObservations,
-  writeRecent,
   writeStations,
-  type StationObservation,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
-import { qc, type QcOptions } from "../src/qc.ts";
+import {
+  compactRecent,
+  formatSummary,
+  pool,
+  qcFor,
+  refuseOtherDatum,
+  updateRecent,
+  yesterday,
+  type RunSummary,
+} from "../src/lake/recent.ts";
+import { seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
+import { qc } from "../src/qc.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 import type {
   ListedStation,
@@ -88,6 +97,7 @@ const { positionals, values } = parseArgs({
   options: {
     hours: { type: "string", default: "24" },
     "keep-days": { type: "string", default: "7" },
+    days: { type: "string", default: "1" },
     concurrency: { type: "string", default: "4" },
   },
 });
@@ -107,6 +117,12 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     await recent(source, Number(values.hours), Number(values["keep-days"]));
+    break;
+  }
+  case "compact": {
+    const [source] = args;
+    if (!source) usage();
+    await compact(source, Number(values.days));
     break;
   }
   default:
@@ -221,7 +237,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
 
   const failed: string[] = [];
-  await pool(wanted, async (station) => {
+  await pool(wanted, Number(values.concurrency), async (station) => {
     for (const product of station.products) {
       for (const [from, to] of years(start, end)) {
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
@@ -282,105 +298,46 @@ async function backfillYear(
   return merged.length;
 }
 
-/**
- * Adapters return values in the station's datum; this keeps a file from gaining
- * them when it already holds another, whatever the station list says. It runs
- * once there's something to write, so empty years cost no lake read.
- */
-async function refuseOtherDatum(path: string, station: Station): Promise<void> {
-  const held = (await readDatums(path)).filter((d) => d !== station.datum);
-  if (held.length)
-    throw new Error(`${path} holds ${held.join(", ")}, not ${station.datum}; resolve by hand`);
-}
-
 async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
-  const source = sourceOf(sourceId);
-  if (!source.observations && !source.recent) throw new Error(`${sourceId} has no observations`);
-  const stations = (await committedStations(sourceId)).filter(
-    (s) => s.live && s.status === "active" && s.products.includes("levels"),
-  );
   const now = Date.now();
-  const since = new Date(now - hours * 3_600_000);
-  const keepFrom = now - keepDays * DAY_MS;
-  // Restricted stations' recent values go to the private lake, like their series.
-  const lakeOf = new Map(stations.map((s) => [s.id, recentPath(lakeFor(s), sourceId)]));
-  const paths = [...new Set(lakeOf.values())];
-  const failed: string[] = [];
-  let written = 0;
-  const reporting = new Set<string>();
-
-  // Each file is read in batches after the sweep, so one that can't be read
-  // fails the run here, before the sweep spends a source's request budget. A
-  // station read only from its own lake's file starts empty in the other lake
-  // when its license changes, rather than carry rows across.
-  for (const path of paths) await checkRecent(path);
-
-  // A source that can sweep every station at once does; a failed sweep fails
-  // every station, which keeps what each had.
-  let swept: Map<string, Observation[] | Error> | Error | undefined;
-  if (source.recent)
-    swept = await source
-      .recent(stations, since, new Date(now))
-      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
-
-  // A batch of stations at a time, read, merged and written: every live USGS
-  // station's window is about 9 million values, too many to hold at once.
-  const BATCH = 500;
-  async function* batches(path: string): AsyncGenerator<StationObservation[]> {
-    const here = stations.filter((s) => lakeOf.get(s.id) === path);
-    for (let i = 0; i < here.length; i += BATCH) {
-      const batch = here.slice(i, i + BATCH);
-      const ids = batch.map((s) => s.id);
-      const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
-      const rows: StationObservation[] = [];
-      await pool(batch, async (station) => {
-        const old = (previous.get(station.id) ?? []).filter((r) => r.time >= keepFrom);
-        let merged: Observation[] = old;
-        try {
-          if (swept instanceof Error) throw swept;
-          const answer = swept ? swept.get(station.id) : undefined;
-          if (answer instanceof Error) throw answer;
-          const fetched = swept
-            ? (answer ?? [])
-            : await source.observations!(station, since, new Date(now));
-          // QC the whole window, so spikes and flatlines are judged against their neighbors.
-          // Nothing new keeps what we had, rather than clearing the last hours.
-          if (fetched.length)
-            merged = qc(
-              mergeFetched(old, fetched, since.getTime(), now, now),
-              qcFor(source, station),
-            );
-        } catch (error) {
-          // Keep what we had; a failed fetch mustn't empty the window.
-          failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
-        }
-        for (const r of merged) rows.push({ ...r, station: station.id });
-        if (merged.some((r) => r.received === now)) reporting.add(station.id);
-      });
-      if (swept instanceof Map) for (const id of ids) swept.delete(id);
-      written += rows.length;
-      yield rows;
-    }
-  }
-  for (const path of paths) await writeRecent(path, batches(path));
-
-  console.log(
-    `${paths.join(", ")}: ${written} rows, ${reporting.size} of ${stations.length} stations sent new values, ${failed.length} failed`,
-  );
-  for (const f of failed.slice(0, 20)) console.log(`  ${f}`);
-  if (stations.length && failed.length === stations.length) process.exit(1);
+  const summary = await updateRecent({
+    source: sourceOf(sourceId),
+    stations: await committedStations(sourceId),
+    lakeFor,
+    concurrency: Number(values.concurrency),
+    since: new Date(now - hours * 3_600_000),
+    now,
+    keepDays,
+  });
+  await report(summary);
+  // Some stations failing is ordinary; all of them is an outage, or a broken adapter.
+  if (summary.stations && summary.failed.length === summary.stations) process.exitCode = 1;
 }
 
-/**
- * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
- * or more, so they get two days before a flatline counts as suspect. And they
- * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. Tide gauges never sit
- * still that long, and keep the defaults.
- */
-function qcFor(source: Source, station: Station): QcOptions {
-  const still = station.kind === "river" || station.kind === "lake";
-  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
+async function compact(sourceId: string, days: number): Promise<void> {
+  if (!Number.isInteger(days) || days < 1 || days > 7)
+    throw new Error(`--days must be a whole number from 1 to 7, the recent window's length`);
+  const [start, end] = yesterday(Date.now());
+  const concurrency = Number(values.concurrency);
+  setConnections(concurrency);
+  const summary = await compactRecent({
+    source: sourceOf(sourceId),
+    stations: await committedStations(sourceId),
+    lakeFor,
+    concurrency,
+    start: start - (days - 1) * DAY_MS,
+    end,
+  });
+  await report(summary);
+  // A failed fold left its year file as it was; a person should look.
+  if (summary.failed.length) process.exitCode = 1;
+}
+
+/** Print a run's summary, and add it to the workflow run's page when there is one. */
+async function report(summary: RunSummary): Promise<void> {
+  const text = formatSummary(summary);
+  console.log(text);
+  if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, text);
 }
 
 async function committedStations(sourceId: string): Promise<Station[]> {
@@ -414,17 +371,9 @@ function parseDate(value: string): Date {
   return date;
 }
 
-async function pool<T>(items: T[], run: (item: T) => Promise<void>): Promise<void> {
-  const queue = [...items];
-  const workers = Array.from({ length: Number(values.concurrency) }, async () => {
-    for (let item = queue.shift(); item !== undefined; item = queue.shift()) await run(item);
-  });
-  await Promise.all(workers);
-}
-
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
+    "usage: ingest.ts stations [source...] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
   );
   process.exit(1);
 }

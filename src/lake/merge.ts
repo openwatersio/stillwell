@@ -60,3 +60,24 @@ export function sameRows<T extends object>(a: T[], b: T[]): boolean {
 function canonical(row: object): string {
   return JSON.stringify(Object.entries(row).sort(([x], [y]) => x.localeCompare(y)));
 }
+
+/**
+ * Every row of both series. Where both have a time, `incoming` wins on level
+ * and flag, and the row keeps the earlier `received`, so folding the recent
+ * window into a year file never drops a value the file had or a first arrival.
+ */
+export function upsert<T extends { time: number; received?: number }>(
+  existing: T[],
+  incoming: T[],
+): T[] {
+  const byTime = new Map(existing.map((r) => [r.time, r]));
+  for (const row of incoming) {
+    const before = byTime.get(row.time);
+    const times = [before?.received, row.received].filter((t) => t !== undefined);
+    const next = { ...row };
+    if (times.length) next.received = Math.min(...times);
+    else delete next.received;
+    byTime.set(row.time, next);
+  }
+  return [...byTime.values()].sort((a, b) => a.time - b.time);
+}

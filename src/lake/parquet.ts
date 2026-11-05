@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -14,31 +15,56 @@ import type { EventIndex } from "../types.ts";
  * Times are stored as TIMESTAMPTZ in UTC and levels as FLOAT (float32), so
  * levels read back rounded to a tenth of a millimeter.
  */
-let connecting: Promise<DuckDBConnection> | undefined;
-let queue: Promise<unknown> = Promise.resolve();
+let instance: Promise<DuckDBInstance> | undefined;
+const lanes: { queue: Promise<unknown>; pending: number; db: Promise<DuckDBConnection> }[] = [];
+let laneCount = 1;
+const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
-/** Run DuckDB work one call at a time, since callers share one connection. */
+/**
+ * How many DuckDB connections run lake work at once, 1 by default. Compaction
+ * raises it, since each year file on R2 is mostly waiting on the network.
+ */
+export function setConnections(count: number): void {
+  laneCount = Math.max(1, Math.floor(count));
+}
+
+/**
+ * Run DuckDB work one call at a time on a connection: the least busy of
+ * `setConnections` of them. Connections share one in-memory database, so work
+ * on one table can span calls that land on different connections.
+ */
 function serial<T>(work: () => Promise<T>): Promise<T> {
-  const next = queue.then(work, work);
-  queue = next.catch(() => undefined);
+  while (lanes.length < laneCount)
+    lanes.push({ queue: Promise.resolve(), pending: 0, db: connect() });
+  const lane = lanes.slice(0, laneCount).reduce((a, b) => (b.pending < a.pending ? b : a));
+  lane.pending++;
+  const run = () => current.run(lane.db, work);
+  const next = lane.queue.then(run, run).finally(() => lane.pending--);
+  lane.queue = next.catch(() => undefined);
   return next;
 }
 
 function connection(): Promise<DuckDBConnection> {
-  connecting ??= (async () => {
-    const instance = await DuckDBInstance.create(":memory:");
-    const db = await instance.connect();
-    await db.run("SET TimeZone = 'UTC'");
-    const endpoint = process.env.S3_ENDPOINT;
-    if (endpoint) {
-      await db.run("INSTALL httpfs; LOAD httpfs;");
-      await db.run(
-        `CREATE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path')`,
-      );
-    }
-    return db;
+  const db = current.getStore();
+  if (!db) throw new Error("DuckDB work must run through serial()");
+  return db;
+}
+
+async function connect(): Promise<DuckDBConnection> {
+  instance ??= (async () => {
+    const created = await DuckDBInstance.create(":memory:");
+    if (process.env.S3_ENDPOINT)
+      await (await created.connect()).run("INSTALL httpfs; LOAD httpfs;");
+    return created;
   })();
-  return connecting;
+  const db = await (await instance).connect();
+  await db.run("SET TimeZone = 'UTC'");
+  const endpoint = process.env.S3_ENDPOINT;
+  if (endpoint)
+    await db.run(
+      `CREATE OR REPLACE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
+    );
+  return db;
 }
 
 /**
@@ -64,15 +90,31 @@ export async function writeObservations(
 }
 
 export async function readObservations(path: string): Promise<Observation[]> {
+  return (await readObservationFile(path)).rows;
+}
+
+/** A series file's observations and the datums it holds, in one read. */
+export async function readObservationFile(
+  path: string,
+): Promise<{ rows: Observation[]; datums: string[] }> {
   const rows = await read(
     path,
-    "SELECT epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received",
+    "SELECT epoch_ms(time) AS time, level_m, flag, epoch_ms(received) AS received, datum",
   );
-  return rows.map((r) => {
-    const o: Observation = { time: Number(r.time), level: level(r.level_m), flag: r.flag as Flag };
-    if (r.received !== null) o.received = Number(r.received);
-    return o;
-  });
+  const datums = new Set<string>();
+  return {
+    rows: rows.map((r) => {
+      datums.add(String(r.datum));
+      const o: Observation = {
+        time: Number(r.time),
+        level: level(r.level_m),
+        flag: r.flag as Flag,
+      };
+      if (r.received !== null) o.received = Number(r.received);
+      return o;
+    }),
+    datums: [...datums],
+  };
 }
 
 /**

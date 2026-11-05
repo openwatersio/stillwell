@@ -1,0 +1,51 @@
+name: Compact daily
+
+# Fold the last days of recent/<source>.parquet into each station's year file
+# under obs/ on R2. Each year file is read, merged and written whole, so a
+# failed run leaves the file it had, and a rerun writes nothing new.
+on:
+  schedule:
+    # After the hourly run at :17 has fetched the day's last hour.
+    - cron: "45 0 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Whole UTC days to fold, ending yesterday (up to 7)"
+        required: true
+        default: "2"
+
+permissions:
+  contents: read
+
+jobs:
+  compact:
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [coops, pegelonline, rws, usace, usgs]
+    # Hourly runs write recent/ and this writes obs/, so they don't share a group.
+    concurrency:
+      group: compact-${{ matrix.source }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    # The environment holds the R2 credentials and only runs on main.
+    environment: lake
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # Two days rather than one, so values that arrived after midnight's
+      # compaction for the day before still reach the year file. It costs no
+      # extra writes: both days are in the same year file except at New Year.
+      - run: node scripts/ingest.ts compact "$SOURCE" --days "$DAYS" --concurrency 16
+        env:
+          SOURCE: ${{ matrix.source }}
+          DAYS: ${{ inputs.days || '2' }}
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
