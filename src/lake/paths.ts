@@ -63,6 +63,11 @@ export function stationDir(
   return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
 }
 
+/** A glob for every station's epoch-1 files, at the plain paths, for one source. */
+export function sourceFirstEpochFiles(root: string, product: Product, source: string): string {
+  return `${root}/${DATASET[product]}/${source}/*/*.parquet`;
+}
+
 /** A glob for the files in every station's later epochs' directories, for one source. */
 export function sourceEpochDirs(root: string, product: Product, source: string): string {
   return `${root}/${DATASET[product]}/${source}/*/*/*.parquet`;

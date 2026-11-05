@@ -10,7 +10,6 @@ src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
-stations/<source>/     the committed station files `ingest seed-stations` starts each lake list from; removed once the lake is seeded
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
 .github/workflows/     CI (ci.yml) and the manual ingest against R2 (ingest.yml)
@@ -38,7 +37,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.       |
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                        |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `seed-stations`, `backfill` and `recent`, described below.    |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `backfill` and `recent`, described below.                     |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                 |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data. |
 
@@ -46,7 +45,7 @@ CI also checks that `package-lock.json` regenerates from `package.json` and that
 
 ## Running ingest
 
-`scripts/ingest.ts` has four commands. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`; it changes no file in the repo. Before writing a list it copies the previous one to `history/stations/<source>/`, with a report of the stations added, retired and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs` after checking them). A station the source stops listing stays, marked inactive. `seed-stations` writes a source's first list from its committed station files, and refuses when the lake already has one. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
+`scripts/ingest.ts` has three commands. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`; it changes no file in the repo. Before writing a list it copies the previous one to `history/stations/<source>/`, with a report of the stations added, retired and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs` after checking them). A station the source stops listing stays, marked inactive. A new source's first refresh starts its list; a source with series in the lake but no list or history is refused rather than started over. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
 
 ```bash
 node scripts/ingest.ts stations
@@ -95,7 +94,7 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 npm run ticon:inventory
 ```
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source seeded), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source refreshed), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
 
 ## Evaluations
 

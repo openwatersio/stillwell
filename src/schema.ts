@@ -99,7 +99,7 @@ export interface Epoch {
   reference: string | null;
   /**
    * Where the source says `reference` starts, as a UTC instant, or null when it
-   * doesn't say. A first epoch seeded with no `since` learns it here, so a
+   * doesn't say. A first epoch with no `since` learns it here, so a
    * later change can still be checked against it.
    */
   reference_since: string | null;
