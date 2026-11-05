@@ -1,0 +1,16 @@
+name: Great Miami River at Sidney OH
+lat: 40.2869942080814
+lon: -84.1499429786438
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 281.538
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03261500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a1648803a80e4f43a75c8627f0fa6e96

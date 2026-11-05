@@ -1,0 +1,15 @@
+name: NO FK WALLA WALLA RIVER NR MILTON, OREG.
+lat: 45.9005277777778
+lon: -118.297305555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 429.768
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14011000/
+parameter_code: "00065"
+time_series_id: 16fa158fc82546a58089dbbe3f59efa7

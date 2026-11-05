@@ -1,0 +1,16 @@
+name: ALABAMA RIVER AT MONTGOMERY AL
+lat: 32.3922361111111
+lon: -86.3154055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.014
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02419988/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d276cb9375374e4995ead6d8a602e91a

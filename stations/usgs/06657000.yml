@@ -1,0 +1,16 @@
+name: NORTH PLATTE RIVER BELOW WHALEN DIVERSION DAM, WY
+lat: 42.241009533539916
+lon: -104.62802471083411
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1298.347
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06657000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 2b23bcdd19e141d680c4c1b305888975

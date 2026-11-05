@@ -1,0 +1,16 @@
+name: KEYA PAHA RIVER AT WEWELA, SD
+lat: 43.027083
+lon: -99.780528
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 625.108
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06464500/
+parameter_code: "00065"
+series_begin: 2018-06-28T18:30:00+00:00
+time_series_id: f6cfb0c971ac420b8d5a064a1d919fc8

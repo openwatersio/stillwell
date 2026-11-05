@@ -1,0 +1,16 @@
+name: SOUTH RIVER AT FORREST PARK ROAD, AT ATLANTA, GA
+lat: 33.6789166666667
+lon: -84.3581388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.125
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02203655/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e63c5c28e1ff4fcab1fab29f2ec9ae13

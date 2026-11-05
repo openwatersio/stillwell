@@ -1,0 +1,16 @@
+name: NEW RIVER NEAR GUM BRANCH, NC
+lat: 34.8491666666667
+lon: -77.5194444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.427
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02093000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 64a3969f71d64a44998ce8d4a77705a2

@@ -1,0 +1,16 @@
+name: LITTLE SYCAMORE WASH NEAR BAGDAD, AZ
+lat: 34.5491666666667
+lon: -113.057777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 835.152
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09424600/
+parameter_code: "00065"
+series_begin: 2016-08-23T19:00:00+00:00
+time_series_id: 15670ce2d5fb4c49a64c56cd2b7b99ac

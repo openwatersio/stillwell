@@ -1,0 +1,16 @@
+name: FOURMILE CREEK AT POPLAR RIDGE RD NR ALEXANDRIA,KY
+lat: 38.986666666666665
+lon: -84.36527777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.794
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03238772/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b02310b5cc6e40a1b521b82571650f31

@@ -1,0 +1,16 @@
+name: Alum Creek at Columbus OH
+lat: 39.9450641482862
+lon: -82.9410138041623
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 223.629
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03229000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: c60a2755dcaa4945a90613a5620f37d4

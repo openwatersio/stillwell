@@ -4,9 +4,10 @@ import { source as coops } from "./coops/index.ts";
 import { source as pegelonline } from "./pegelonline/index.ts";
 import { source as rws } from "./rws/index.ts";
 import { source as usace } from "./usace/index.ts";
+import { source as usgs } from "./usgs/index.ts";
 
 /** Every adapter, by source ID. */
-export const sources: Record<string, Source> = { bsh, coops, pegelonline, rws, usace };
+export const sources: Record<string, Source> = { bsh, coops, pegelonline, rws, usace, usgs };
 
 export function sourceOf(id: string): Source {
   const source = sources[id];

@@ -1,0 +1,17 @@
+name: Haynes C at Tuckerton Rd at Lake Pine NJ
+lat: 39.867722
+lon: -74.84175
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.754
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0146587310/
+parameter_code: "00065"
+series_begin: 2019-12-13T18:30:00+00:00
+series_end: 2024-10-21T17:15:00+00:00
+time_series_id: 8603b1402c3c47e5b9ebc091ff964afd

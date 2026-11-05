@@ -1,0 +1,16 @@
+name: Big Ck nr Chico, TX
+lat: 33.3075833333333
+lon: -97.9182777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 263.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042950/
+parameter_code: "00065"
+series_begin: 2020-12-17T19:00:00+00:00
+time_series_id: 5e7f8102641b441a9f4d706575dd066c

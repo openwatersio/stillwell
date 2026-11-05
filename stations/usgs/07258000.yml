@@ -1,0 +1,16 @@
+name: Arkansas River at Dardanelle, AR
+lat: 35.2261111111111
+lon: -93.1494444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 85.353
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07258000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f1e02327f29e4e71944b8890da9a3b4f

@@ -1,0 +1,16 @@
+name: CLEAR FORK AT WHITESVILLE, WV
+lat: 37.9662186323502
+lon: -81.5242779538053
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 249.476
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03198350/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9f724be95e1444d699ff4c2ce5c8e8f7

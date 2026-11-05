@@ -1,0 +1,16 @@
+name: BLACKWATER RIVER NEAR DENDRON, VA
+lat: 37.0251499264414
+lon: -76.8746824342095
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02047500/
+parameter_code: "00065"
+series_begin: 2003-10-02T09:00:00+00:00
+time_series_id: 26d8f9f1f4e14d1aa0a1744832a4ad17

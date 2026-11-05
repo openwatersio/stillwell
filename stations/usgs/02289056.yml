@@ -1,0 +1,15 @@
+name: TAMIAMI CANAL EAST END 2.6 MILE BRIDGE NR MIAMI FL
+lat: 25.761389
+lon: -80.608611
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02289056/
+parameter_code: "00065"
+series_begin: 2018-10-09T22:30:00+00:00
+series_end: 2025-09-09T19:15:00+00:00
+time_series_id: edb0e7aad5c740d3897fa4b5df7a1a4e

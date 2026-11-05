@@ -1,0 +1,16 @@
+name: HUDSON RIVER AT NORTH CREEK NY
+lat: 43.7008611111111
+lon: -73.9831944444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 300.917
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01315500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1889b84b171e420f82a465374dfd718b

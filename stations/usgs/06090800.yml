@@ -1,0 +1,16 @@
+name: Missouri River at Fort Benton MT
+lat: 47.8169111111111
+lon: -110.666141666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 796.762
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06090800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 26374384433345dcb37e531767d84d4a

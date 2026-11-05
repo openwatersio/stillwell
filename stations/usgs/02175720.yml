@@ -1,0 +1,15 @@
+name: LITTLE SALKEHATCHIE RIVER AT SC64 NEAR RUFFIN, SC
+lat: 32.99047222222222
+lon: -80.87283333333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02175720/
+parameter_code: "62620"
+series_begin: 2024-08-05T19:10:00+00:00
+series_end: 2024-08-19T19:10:00+00:00
+time_series_id: 3e8a350ad05c44d0add3ef7b0e0609c1

@@ -1,0 +1,14 @@
+name: NEWMARKET CREEK AT MERCURY BLVD AT HAMPTON, VA
+lat: 37.0449722222222
+lon: -76.3677777777778
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0167892964/
+parameter_code: "62620"
+series_begin: 2015-10-02T04:00:00+00:00
+time_series_id: 6dba4407f0a641078a4e75bd57a152d5

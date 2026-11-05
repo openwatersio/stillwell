@@ -1,0 +1,16 @@
+name: Allegheny River bl Conewango Creek at Warren, PA
+lat: 41.8439485329367
+lon: -79.1497668372665
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 356.006
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03015310/
+parameter_code: "00065"
+series_begin: 2009-02-03T16:30:00+00:00
+time_series_id: c39ecf5113fd408f9d8148b3e8a1b368

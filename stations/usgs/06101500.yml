@@ -1,0 +1,16 @@
+name: Marias River near Chester MT
+lat: 48.3059611111111
+lon: -111.080527777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 857.716
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06101500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: a8a74cbb0e874ceb843b3f44a924795b

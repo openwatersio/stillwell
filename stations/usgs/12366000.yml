@@ -1,0 +1,16 @@
+name: Whitefish River near Kalispell MT
+lat: 48.3201861111111
+lon: -114.278594444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 905.204
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12366000/
+parameter_code: "00065"
+series_begin: 2019-10-16T00:00:00+00:00
+time_series_id: be06a89a839a41469d401a05b2dbc9ee

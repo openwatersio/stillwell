@@ -1,0 +1,16 @@
+name: PERAZZO C NR SODA SPRINGS CA
+lat: 39.454861111111114
+lon: -120.39122222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2062.996
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10341100/
+parameter_code: "00065"
+series_begin: 2017-11-09T02:00:00+00:00
+time_series_id: 09ecf407a51744cdbb24cffcd2d8eb32

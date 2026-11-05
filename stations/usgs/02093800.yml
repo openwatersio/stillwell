@@ -1,0 +1,16 @@
+name: REEDY FORK NEAR OAK RIDGE, NC
+lat: 36.1725
+lon: -79.9527777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 234.909
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02093800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d28ba3c2c5a5453bb482b9f5dceaafa9

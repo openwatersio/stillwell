@@ -1,0 +1,16 @@
+name: KANSAS R AB TOPEKA WEIR AT TOPEKA, KS
+lat: 39.0719443546706
+lon: -95.7163714682093
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 261.262
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06888990/
+parameter_code: "00065"
+series_begin: 2015-11-23T18:15:00+00:00
+time_series_id: e951749e88304be68b66cb88f5c71a86

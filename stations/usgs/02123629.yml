@@ -1,0 +1,16 @@
+name: LITTLE MOUNTAIN CREEK AT NC HWY 740 AT BADIN, NC
+lat: 35.40060833333333
+lon: -80.12288055555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 139.059
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02123629/
+parameter_code: "00065"
+series_begin: 2022-08-18T21:00:00+00:00
+time_series_id: 5b09485b3e214a2b9473473271ba64f9

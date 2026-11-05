@@ -1,0 +1,16 @@
+name: EAST PLUM CR ABV HASKINS GULCH NR CASTLE ROCK, CO
+lat: 39.423
+lon: -104.904611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1811.594
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06708800/
+parameter_code: "00065"
+series_begin: 2020-11-19T18:45:00+00:00
+time_series_id: 9af6093a1e584a12865236e01904bdee

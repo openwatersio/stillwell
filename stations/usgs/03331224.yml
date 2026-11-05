@@ -1,0 +1,17 @@
+name: SHATTO DITCH NEAR MENTONE, IN
+lat: 41.22163888888889
+lon: -86.04569444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.144
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03331224/
+parameter_code: "00065"
+series_begin: 2017-12-07T20:30:00+00:00
+series_end: 2023-12-12T14:00:00+00:00
+time_series_id: 12b3db0698a94ef2979b189c16fb609d

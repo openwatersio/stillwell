@@ -1,0 +1,17 @@
+name: TRT WETLAND TWO SURFACE INLET NR KAUKAUNA, WI
+lat: 44.2680555555556
+lon: -88.1991666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 215.131
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-441605088115701/
+parameter_code: "00065"
+series_begin: 2018-10-01T06:00:00+00:00
+series_end: 2026-03-31T14:18:00+00:00
+time_series_id: 6ccfe6720ce0488992deebc4dad2950a

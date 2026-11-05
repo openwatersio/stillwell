@@ -1,0 +1,16 @@
+name: YAQUI CANAL NEAR YUMA, AZ
+lat: 32.8094861111111
+lon: -114.588494444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 48.152
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09523600/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 73dad8ef1f614a149dbaa7202a52150e

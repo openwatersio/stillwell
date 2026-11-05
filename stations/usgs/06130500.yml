@@ -1,0 +1,16 @@
+name: Musselshell River at Mosby MT
+lat: 46.9946916666667
+lon: -107.889163888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 760.141
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06130500/
+parameter_code: "00065"
+series_begin: 2014-09-04T20:00:00+00:00
+time_series_id: b86208b1a7594fd88286f7913e780efd

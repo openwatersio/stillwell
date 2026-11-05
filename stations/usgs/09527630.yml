@@ -1,0 +1,16 @@
+name: BROCK RESERVOIR INLET NEAR CALEXICO, CA
+lat: 32.7094932106482
+lon: -115.025442488953
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 48.768
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09527630/
+parameter_code: "00065"
+series_begin: 2013-11-05T22:00:00+00:00
+time_series_id: e4bad7278e964cf59d3fbb3261c6f671

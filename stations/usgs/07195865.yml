@@ -1,0 +1,16 @@
+name: Sager Creek near West Siloam Springs, OK
+lat: 36.2017484363395
+lon: -94.6052206666355
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 293.391
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07195865/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: bb14b4cd584e4dc7a389ce3c4587f517

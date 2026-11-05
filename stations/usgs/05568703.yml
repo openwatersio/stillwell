@@ -1,0 +1,14 @@
+name: MASON TAZEWELL DRAINAGE D NR NURSERY NR TOPEKA, IL
+lat: 40.32633333333334
+lon: -89.90477777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05568703/
+parameter_code: "00065"
+series_begin: 2024-03-13T20:15:00+00:00
+time_series_id: 65bfa0dcc4934062bba94056f69cb333

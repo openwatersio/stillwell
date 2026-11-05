@@ -1,0 +1,16 @@
+name: SIUSLAW RIVER NEAR ALMA, OR
+lat: 43.92113888888888
+lon: -123.61158055555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 114.605
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14306950/
+parameter_code: "00065"
+series_begin: 2024-09-26T19:15:00+00:00
+time_series_id: efbb9cc8b0e94b85b1c654051f2ec59a

@@ -1,0 +1,15 @@
+name: Cibolo Ck nr Bubbling Springs Rd, Schertz, TX
+lat: 29.550933333333333
+lon: -98.2538388888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08185040/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+series_end: 2025-04-15T14:30:00+00:00
+time_series_id: dc4f234f413e46cf85c5af37cd11797a

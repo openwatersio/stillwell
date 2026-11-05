@@ -1,0 +1,17 @@
+name: Salt Fork Red River near Wellington, TX
+lat: 34.9575529377293
+lon: -100.220949046195
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 592.044
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07300000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2026-07-27T16:00:00+00:00
+time_series_id: 3e9df195e2404aafb1d8e354f481ed4b

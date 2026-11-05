@@ -1,0 +1,16 @@
+name: RIO TOA VACA ABV LAGO TOA VACA, PR
+lat: 18.1265
+lon: -66.457783
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 167.524
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50110900/
+parameter_code: "00065"
+series_begin: 2007-10-13T04:00:00+00:00
+time_series_id: 37a96ee2f3af469eb09b6dd532a09baf

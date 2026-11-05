@@ -1,0 +1,16 @@
+name: ASHLEY RIVER BELOW SUMMERVILLE, SC
+lat: 32.9258333333333
+lon: -80.1516666666667
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -2.563
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720825/
+parameter_code: "00065"
+series_begin: 2017-01-24T22:00:00+00:00
+time_series_id: 8e6927451815494592a880aa67121ef5

@@ -1,0 +1,16 @@
+name: Birch Run near Wagontown, PA
+lat: 40.0273261386383
+lon: -75.8449449319349
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 154.171
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01480400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 15e8953a1cc84764ae1bba7ab643ecc6

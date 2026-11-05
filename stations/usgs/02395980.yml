@@ -1,0 +1,16 @@
+name: ETOWAH RIVER AT GA 1 LOOP, NEAR ROME, GA
+lat: 34.2321111111111
+lon: -85.1169444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 171.197
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02395980/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4e1724293fbc4dd7a6082faba28b712c

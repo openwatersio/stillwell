@@ -1,0 +1,16 @@
+name: OAK CREEK NEAR CORNVILLE, AZ
+lat: 34.764817
+lon: -111.891319
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1055.525
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09504500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3f8b332721114f15b5d71012e137f2a4

@@ -1,0 +1,16 @@
+name: North Branch Raritan River at South Branch NJ
+lat: 40.5566666666667
+lon: -74.6875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 13.759
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01400010/
+parameter_code: "00065"
+series_begin: 2008-10-02T04:00:00+00:00
+time_series_id: 1feff64fc1ba4a82a3d8394978090da1

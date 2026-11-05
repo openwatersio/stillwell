@@ -1,0 +1,14 @@
+name: CARR CREEK LAKE NEAR SASSAFRAS, KY
+lat: 37.2303748999603
+lon: -83.0334978046227
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03277446/
+parameter_code: "00065"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: 73b38ae9fc214e778db488738fb5e944

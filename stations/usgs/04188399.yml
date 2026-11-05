@@ -1,0 +1,17 @@
+name: The Outlet near Findlay OH
+lat: 41.0355555555556
+lon: -83.52
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 236.464
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04188399/
+parameter_code: "00065"
+series_begin: 2014-12-17T14:45:00+00:00
+series_end: 2017-01-04T04:45:00+00:00
+time_series_id: 062cc87c35b04fbab25dc6b9e46471af

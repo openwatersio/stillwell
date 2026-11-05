@@ -1,0 +1,16 @@
+name: RAMAPO R AT MARY H HARRIMAN MEM PK AT HARRIMAN NY
+lat: 41.3115555555556
+lon: -74.1469722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 159.176
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01387095/
+parameter_code: "00065"
+series_begin: 2020-06-25T21:00:00+00:00
+time_series_id: 2c994ecf1cbb41ea9866e249e17514e2

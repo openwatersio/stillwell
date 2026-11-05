@@ -1,0 +1,16 @@
+name: JAMES RIVER NEAR MITCHELL, SD
+lat: 43.658889
+lon: -97.918889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 363.245
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06478000/
+parameter_code: "00065"
+series_begin: 2018-04-26T22:30:00+00:00
+time_series_id: 2a9ee311ead445d1aaea6281769486ab

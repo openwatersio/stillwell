@@ -1,0 +1,16 @@
+name: WINSOR BROOK AT WINSOR RD NEAR SOUTH FOSTER, RI
+lat: 41.8362100489403
+lon: -71.7225682852551
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 120.091
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115185/
+parameter_code: "00065"
+series_begin: 2020-09-30T16:15:00+00:00
+time_series_id: 32aab4a21cf7414ea0aa513b2b0a1c8d

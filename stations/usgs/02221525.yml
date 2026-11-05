@@ -1,0 +1,16 @@
+name: MURDER CREEK BELOW EATONTON, GA
+lat: 33.25275
+lon: -83.4826111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 114.209
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02221525/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+time_series_id: 977b74e249bd4dc2bc5e8deea5de909e

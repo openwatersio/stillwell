@@ -1,0 +1,16 @@
+name: N FK LITTLE R AT WATER PLANT AT HOPKINSVILLE, KY
+lat: 36.8761561328567
+lon: -87.4719511879958
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 155.448
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03437370/
+parameter_code: "00065"
+series_begin: 2014-11-14T17:30:00+00:00
+time_series_id: 990ee3fba3df4c1db4d83887063a5411

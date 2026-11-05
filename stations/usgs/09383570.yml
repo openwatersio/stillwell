@@ -1,0 +1,17 @@
+name: NUTRIOSO CREEK AT SPRINGERVILLE, AZ
+lat: 34.1389354164123
+lon: -109.271196939004
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2122.932
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09383570/
+parameter_code: "00065"
+series_begin: 2008-06-21T07:00:00+00:00
+series_end: 2013-10-24T06:45:00+00:00
+time_series_id: bf19000cd74f416389d4ed3d9cf8fa9d

@@ -1,0 +1,14 @@
+name: St George Creek at Piney Point, MD
+lat: 38.137861111111114
+lon: -76.50026111111112
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01661510/
+parameter_code: "62620"
+series_begin: 2025-01-13T19:36:00+00:00
+time_series_id: 378a1a32504c46abb13859818fbf84b8

@@ -1,0 +1,17 @@
+name: CROSS BAYOU CNL AT CEDAR BRK DR AT PINELLAS PK FL
+lat: 27.873362197385717
+lon: -82.72681933709232
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02308861/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-08-12T15:30:00+00:00
+time_series_id: a13eef177ddb482db15c754a23bfeccb

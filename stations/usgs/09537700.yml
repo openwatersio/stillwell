@@ -1,0 +1,16 @@
+name: BLACK DRAW AT SAN BERNARDINO NWR NEAR DOUGLAS, AZ
+lat: 31.351369
+lon: -109.267086
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1141.811
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09537700/
+parameter_code: "00065"
+series_begin: 2024-07-23T23:15:00+00:00
+time_series_id: e26b8bb47d5d402e9c7d8448b5023862

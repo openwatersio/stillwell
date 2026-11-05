@@ -1,0 +1,16 @@
+name: MOHAWK RIVER AT REXFORD NY
+lat: 42.8511111111111
+lon: -73.88725
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.795
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01355475/
+parameter_code: "00065"
+series_begin: 2014-06-27T05:00:00+00:00
+time_series_id: 358a930602e24018bb3138f159069e63

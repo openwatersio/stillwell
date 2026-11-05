@@ -1,0 +1,16 @@
+name: Bodcau Bayou near Springhill, LA
+lat: 33.0040245758769
+lon: -93.516840527046
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 58.522
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07349450/
+parameter_code: "00065"
+series_begin: 2014-10-10T19:45:00+00:00
+time_series_id: 3acdf84cf276421f8cc1cca27ac94312

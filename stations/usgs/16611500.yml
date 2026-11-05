@@ -1,0 +1,16 @@
+name: S Waiehu Str US of ditch at alt. 315 ft, Maui, HI
+lat: 20.9107152480364
+lon: -156.50944665097373
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 96.012
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16611500/
+parameter_code: "00065"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: a60fdbdb81c94c98ab41e18cf01e2260

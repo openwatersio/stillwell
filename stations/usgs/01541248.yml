@@ -1,0 +1,16 @@
+name: Anderson Creek at Curwensville, PA
+lat: 40.97544444444445
+lon: -78.53077777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 346.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01541248/
+parameter_code: "00065"
+series_begin: 2024-08-15T18:15:00+00:00
+time_series_id: 888d4a51119b4b71a4fdf3efc311263a

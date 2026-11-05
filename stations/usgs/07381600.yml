@@ -1,0 +1,16 @@
+name: Lower Atchafalaya River at Morgan City, LA
+lat: 29.69284820804636
+lon: -91.21195072040246
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.399
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381600/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 250dcf8bad20424d8cba1ffe08075d54

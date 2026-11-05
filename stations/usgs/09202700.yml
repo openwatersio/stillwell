@@ -1,0 +1,16 @@
+name: Ward Ball Reservoir outflow, nr Boulder, WY
+lat: 42.72528611111111
+lon: -109.70377500000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2126.285
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09202700/
+parameter_code: "00065"
+series_begin: 2025-07-17T01:15:00+00:00
+time_series_id: c9023a4532bb43fdb91cd610418f0be4

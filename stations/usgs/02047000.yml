@@ -1,0 +1,16 @@
+name: NOTTOWAY RIVER NEAR SEBRELL, VA
+lat: 36.7704276281019
+lon: -77.1660778265545
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.414
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02047000/
+parameter_code: "00065"
+series_begin: 1997-04-10T19:30:00+00:00
+time_series_id: 96922e1be07243d9a81cc8f120ecf386

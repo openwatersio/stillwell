@@ -1,0 +1,16 @@
+name: INDIAN C AT STATE LINE RD, LEAWOOD, KS
+lat: 38.9383333333333
+lon: -94.6077777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 244.885
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06893390/
+parameter_code: "00065"
+series_begin: 2008-06-06T05:00:00+00:00
+time_series_id: 5a80644d0f634c71aa62b4180122072d

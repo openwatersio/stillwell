@@ -1,0 +1,16 @@
+name: Oyster Ck at CR 290 nr Angleton, TX
+lat: 29.1253777777778
+lon: -95.4813722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08079005/
+parameter_code: "00065"
+series_begin: 2020-08-07T20:00:00+00:00
+time_series_id: e92cae537c544a55b4696b59b1318812

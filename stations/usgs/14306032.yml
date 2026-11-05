@@ -1,0 +1,16 @@
+name: BIG ELK CREEK NEAR ELK CITY, OR
+lat: 44.603722222222224
+lon: -123.85205555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3.353
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14306032/
+parameter_code: "00065"
+series_begin: 2024-08-22T00:00:00+00:00
+time_series_id: a643db265321490a82053eeee967537d

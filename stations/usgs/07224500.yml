@@ -1,0 +1,15 @@
+name: CANADIAN RIVER BELOW CONCHAS DAM, NM
+lat: 35.4089371287092
+lon: -104.169975813108
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1225.875
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07224500/
+parameter_code: "00065"
+time_series_id: 7ad840dc46f64dd9a53642175a63f486

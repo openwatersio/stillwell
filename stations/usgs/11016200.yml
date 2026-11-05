@@ -1,0 +1,16 @@
+name: SWEETWATER R A DEHESA CA
+lat: 32.774166666666666
+lon: -116.85027777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 150.778
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11016200/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 552c636c6071453386db9cf6596e671c

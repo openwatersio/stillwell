@@ -1,0 +1,16 @@
+name: ASSAWOMAN CANAL AT CENTRAL AVE AT OCEAN VIEW, DE
+lat: 38.552416666666666
+lon: -75.08644444444444
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-383309075051101/
+parameter_code: "00065"
+series_begin: 2024-08-06T17:42:00+00:00
+time_series_id: a998e5fca3ce4399b15f2bf14d66fc44

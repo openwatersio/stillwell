@@ -1,0 +1,16 @@
+name: Davidson Ck nr Lyons, TX
+lat: 30.4196519612315
+lon: -96.5402466078278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 67.175
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08110100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 0153db0e17e34ff6bdd53904007e9a8a

@@ -1,0 +1,16 @@
+name: Rocky Fork near Barretts Mills OH
+lat: 39.218398881898
+lon: -83.3854695347707
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 234.769
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03232500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 48f59648174b4776bf49efdf80cb6464

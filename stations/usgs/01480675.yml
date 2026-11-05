@@ -1,0 +1,16 @@
+name: Marsh Creek near Glenmoore, PA
+lat: 40.09779107595707
+lon: -75.74157324442457
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 135.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01480675/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3e56dbb6e4944894a4bd0f68762ac33d

@@ -1,0 +1,16 @@
+name: ROCKY ARROYO BLW ROCKY DAM, NM
+lat: 33.2662124607721
+lon: -104.702194672543
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1200.656
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08393300/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: fbb336314d8247879fd9af9001bbe6ce

@@ -1,0 +1,16 @@
+name: ELLICOTT CREEK BELOW WILLIAMSVILLE NY
+lat: 42.9779444444444
+lon: -78.7636944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 178.598
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04218518/
+parameter_code: "00065"
+series_begin: 2008-08-30T05:00:00+00:00
+time_series_id: 635abdbfb845472c8b29e70db99758ce

@@ -1,0 +1,17 @@
+name: BOULDER CK NR DUNPHY, NV
+lat: 40.9549101466884
+lon: -116.44009025406
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1529.486
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10324700/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2026-07-01T07:45:00+00:00
+time_series_id: 2f7a3ae37c65423d82c14c9caf42e87f

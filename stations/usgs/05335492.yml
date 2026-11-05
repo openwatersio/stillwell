@@ -1,0 +1,17 @@
+name: CLAM RIVER AT HWY 35 NR WEBSTER, WI
+lat: 45.853497
+lon: -92.365225
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 284.616
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05335492/
+parameter_code: "00065"
+series_begin: 2024-03-12T17:30:00+00:00
+series_end: 2026-06-15T17:00:00+00:00
+time_series_id: 2b0955f5d306444dab91aca69d2fb8ad

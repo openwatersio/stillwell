@@ -5,6 +5,8 @@ export interface DatumChange {
   id: string;
   from: string;
   to: string;
+  /** Why, when the datum's name stayed the same but what it measures from didn't. */
+  reason?: string;
 }
 
 /**
@@ -21,10 +23,15 @@ export interface DatumChange {
  * source names it. A source that sends no offsets at all keeps the committed
  * ones, so a refresh that loses them doesn't erase them; one that sends some
  * replaces them all.
+ *
+ * `seriesChanged` lets a source say when a station kept its datum's name but
+ * not the series or zero it measures from, such as a USGS gage whose datum was
+ * moved; that station is kept inactive the same way.
  */
 export function mergeStationList(
   previous: Station[],
   fetched: ListedStation[],
+  seriesChanged?: (committed: Station, listed: ListedStation) => string | null,
 ): { stations: Station[]; changed: DatumChange[] } {
   const byId = new Map(previous.map((s) => [s.id, s]));
   const listed = new Set<string>();
@@ -39,6 +46,12 @@ export function mergeStationList(
     if (old && s.datum !== null && s.datum !== old.datum) {
       changed.push({ id: s.id, from: old.datum, to: s.datum });
       merged.push({ ...old, first: null, last: null, status: "inactive" });
+      continue;
+    }
+    const reason = old && s.datum !== null ? seriesChanged?.(old, s) : null;
+    if (old && reason) {
+      changed.push({ id: s.id, from: old.datum, to: s.datum!, reason });
+      merged.push({ ...old, status: "inactive" });
       continue;
     }
     // Offsets the source left out this time are kept, rather than erased.

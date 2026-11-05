@@ -1,0 +1,16 @@
+name: E Fk San Jacinto Rv at SH 150 nr Coldspring, TX
+lat: 30.5669444444444
+lon: -95.1913888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08069800/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 3acf7222365c42748d1b79409721f67f

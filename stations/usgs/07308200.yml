@@ -1,0 +1,16 @@
+name: Pease Rv nr Vernon, TX
+lat: 34.1795833333333
+lon: -99.3233333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 359.743
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07308200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 233b02f2f6fd4aa1ab0d428468ac724b

@@ -1,0 +1,16 @@
+name: OKATOMA CREEK AT SANFORD, MS
+lat: 31.4891666666667
+lon: -89.4333333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 55.879
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02472850/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c741e142b2414cf58709f44f6b053756

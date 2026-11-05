@@ -1,0 +1,17 @@
+name: Wilson Creek near Battlefield, MO
+lat: 37.11775
+lon: -93.4038611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 335.28
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07052160/
+parameter_code: "00065"
+series_begin: 2017-09-18T20:15:00+00:00
+series_end: 2021-10-05T22:30:00+00:00
+time_series_id: e1e406fd619747d9be197e0bf0f5551d

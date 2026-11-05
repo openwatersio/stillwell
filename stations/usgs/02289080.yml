@@ -1,0 +1,15 @@
+name: TAMIAMI CANAL WEST END 1 MILE BRIDGE NR MIAMI, FL
+lat: 25.761389
+lon: -80.536667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02289080/
+parameter_code: "00065"
+series_begin: 2014-12-24T05:00:00+00:00
+series_end: 2025-07-09T08:30:00+00:00
+time_series_id: 6742282372ad4ac68871c68a9045e22d

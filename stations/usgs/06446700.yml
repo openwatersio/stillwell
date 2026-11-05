@@ -1,0 +1,16 @@
+name: BEAR IN THE LODGE CREEK NEAR WANBLEE, SD
+lat: 43.536667
+lon: -101.798167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 762.043
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06446700/
+parameter_code: "00065"
+series_begin: 2018-03-31T17:45:00+00:00
+time_series_id: 3fc5d17e902345c0b61009f451287594

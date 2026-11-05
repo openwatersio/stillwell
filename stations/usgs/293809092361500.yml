@@ -1,0 +1,17 @@
+name: CRMS0609-H01-RT
+lat: 29.6358333333333
+lon: -92.6041666666667
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -0.363
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-293809092361500/
+parameter_code: "00065"
+series_begin: 2012-10-01T05:00:00+00:00
+series_end: 2026-07-07T17:00:00+00:00
+time_series_id: bbb75321657a4cc18614c4f2bd5952cc

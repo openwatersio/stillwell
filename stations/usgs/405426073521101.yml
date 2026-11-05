@@ -1,0 +1,17 @@
+name: HILLVIEW RESERVOIR HILLSIDE SEEP A NR YONKERS NY
+lat: 40.9074083333333
+lon: -73.8694194444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 77.724
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-405426073521101/
+parameter_code: "00065"
+series_begin: 2007-08-27T18:00:00+00:00
+series_end: 2007-09-12T19:00:00+00:00
+time_series_id: fca5cb5fda654c8784101d64dd147b5f

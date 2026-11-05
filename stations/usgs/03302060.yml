@@ -1,0 +1,17 @@
+name: SALT RIVER AT MOUTH AT WEST POINT, KY
+lat: 38.0011831168905
+lon: -85.9421857333073
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.904
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03302060/
+parameter_code: "00065"
+series_begin: 2021-08-16T05:00:00+00:00
+series_end: 2023-10-05T12:45:00+00:00
+time_series_id: 834656ff6b964f8a81061549089563d1

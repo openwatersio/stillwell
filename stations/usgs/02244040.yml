@@ -1,0 +1,14 @@
+name: ST. JOHNS R AT BUFFALO BLUFF NEAR SATSUMA, FL
+lat: 29.596362004994198
+lon: -81.68317614753873
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02244040/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 90c00722263c4d528ac11f1d4f4053ca

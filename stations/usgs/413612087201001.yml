@@ -1,0 +1,17 @@
+name: CITY HALL DRAIN OUTFLOW AT GARY, IN
+lat: 41.6033638888889
+lon: -87.3359916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 181.493
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-413612087201001/
+parameter_code: "00065"
+series_begin: 2016-05-10T18:00:00+00:00
+series_end: 2018-10-09T15:57:00+00:00
+time_series_id: 8ca9417f68af4498af97e5bf75c00ff3

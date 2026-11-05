@@ -1,0 +1,16 @@
+name: Scioto River at Chillicothe OH
+lat: 39.3414529703953
+lon: -82.9710126332681
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03231500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 78de0abffb0c457f85a06b4811dfe51c

@@ -1,0 +1,16 @@
+name: PANTANO WASH NEAR VAIL, AZ.
+lat: 32.03594255139179
+lon: -110.67761806433279
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 972.791
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09484600/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 661e1da6511c4f7d88c52742b6886065

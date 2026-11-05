@@ -1,0 +1,13 @@
+name: TRIB TO LUM DRAIN ADJ SHARP RD NR SWARTZ CREEK, MI
+lat: 42.9111111111111
+lon: -83.79
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0414826544/
+parameter_code: "00065"
+time_series_id: 8f28fb1b91fa4074bd65a218ef231d7e

@@ -1,0 +1,16 @@
+name: VAN SWAMP NEAR HOKE, NC
+lat: 35.7308333333333
+lon: -76.7461111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3.597
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02084557/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9782a2c467f144ac87388f9b595ffc9a

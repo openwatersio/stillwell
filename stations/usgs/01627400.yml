@@ -1,0 +1,13 @@
+name: PAINE RUN NEAR HARRISTON, VA
+lat: 38.19863888888889
+lon: -78.79313888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01627400/
+parameter_code: "00065"
+time_series_id: 9472ac18dfe649da946e19d9d81554fb

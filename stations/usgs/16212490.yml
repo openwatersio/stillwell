@@ -1,0 +1,16 @@
+name: Honouliuli Str at H-1 Freeway nr Waipahu, Oahu, HI
+lat: 21.378134762399956
+lon: -158.04478311587846
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 44.196
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16212490/
+parameter_code: "00065"
+series_begin: 2012-11-08T23:00:00+00:00
+time_series_id: ac40c0d0c98c4acea8bd0fba635feeb2

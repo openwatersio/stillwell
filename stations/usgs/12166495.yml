@@ -1,0 +1,17 @@
+name: NORTH FORK STILLAGUAMISH AT OSO, WA
+lat: 48.26665
+lon: -121.928875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12166495/
+parameter_code: "00065"
+series_begin: 2014-10-08T07:00:00+00:00
+series_end: 2015-10-06T06:45:00+00:00
+time_series_id: 0a29f98fc6f547818ea483ddb7259df4

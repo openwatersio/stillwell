@@ -1,0 +1,16 @@
+name: Paint Creek at Chillicothe OH
+lat: 39.320342114553
+lon: -82.9782349269816
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 178.994
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03234300/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a097b7ecf90b44bc8c4a582d53ecd05a

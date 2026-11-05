@@ -1,0 +1,16 @@
+name: New Fork River ab Willow Cr, nr Cora, WY
+lat: 42.98716388888889
+lon: -109.99383055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2261.311
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09193700/
+parameter_code: "00065"
+series_begin: 2025-06-25T19:45:00+00:00
+time_series_id: af939259da3e45f0a9c1f6de6e0d57d7

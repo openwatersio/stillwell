@@ -1,0 +1,14 @@
+name: LOSTMANS RIVER BELOW SECOND BAY, FL
+lat: 25.5555555555556
+lon: -81.1647222222222
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02290918/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e34c284772164314834d43b5bb6636b8

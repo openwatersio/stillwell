@@ -1,0 +1,17 @@
+name: S Lubbock SWDS at CR 2600 nr Lubbock, TX
+lat: 33.510017
+lon: -101.797581
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 964.009
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08079513/
+parameter_code: "00065"
+series_begin: 2023-08-22T16:35:00+00:00
+series_end: 2025-10-01T05:55:00+00:00
+time_series_id: e913b943ecbc401b8fde4c63a7c218d0

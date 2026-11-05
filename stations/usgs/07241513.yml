@@ -1,0 +1,16 @@
+name: Soldier Creek S of SE 15th St. Boone Township, OK
+lat: 35.446894
+lon: -97.373267
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 358.387
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07241513/
+parameter_code: "00065"
+series_begin: 2023-06-01T23:45:00+00:00
+time_series_id: a751c4c336bc479a9ba881480df3b44f

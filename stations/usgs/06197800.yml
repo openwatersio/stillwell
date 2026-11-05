@@ -1,0 +1,16 @@
+name: East Boulder River bl Dry Fork Cr nr Mcleod, MT
+lat: 45.5123333333333
+lon: -110.087722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1875.13
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06197800/
+parameter_code: "00065"
+series_begin: 2019-10-04T19:30:00+00:00
+time_series_id: 42dbf088f9c741aeb76b3fdd093067dc

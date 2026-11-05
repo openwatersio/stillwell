@@ -1,0 +1,17 @@
+name: FOSTER CREEK AT GOOSE CREEK, SC
+lat: 32.9826727702133
+lon: -80.0003630020481
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: -0.722
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720612/
+parameter_code: "00065"
+series_begin: 2013-10-31T17:30:00+00:00
+series_end: 2015-05-22T16:30:00+00:00
+time_series_id: a2146bc97e274b30a9126fb7507cd439

@@ -1,0 +1,17 @@
+name: Flume at SR 30 E of Apple Creek nr Wooster OH
+lat: 40.7986111111111
+lon: -81.8869444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 286.725
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-404755081531300/
+parameter_code: "00065"
+series_begin: 2018-03-21T19:25:00+00:00
+series_end: 2020-11-03T13:01:00+00:00
+time_series_id: df3d7e42b18d4647bf0c69b4cb693fba

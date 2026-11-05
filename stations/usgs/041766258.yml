@@ -1,0 +1,14 @@
+name: WHITEWOOD CREEK AT S.HAROLD DR NR LUNA PIER MI
+lat: 41.8024055555556
+lon: -83.4502027777778
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-041766258/
+parameter_code: "63160"
+series_begin: 2020-08-19T16:30:00+00:00
+time_series_id: 8cfdd215ad6b4ba58002647112b6e507

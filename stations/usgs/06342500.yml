@@ -1,0 +1,16 @@
+name: MISSOURI RIVER AT BISMARCK, ND
+lat: 46.814167
+lon: -100.821389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 493.666
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06342500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1228fe47a3c549b39f220a03e2d030c5

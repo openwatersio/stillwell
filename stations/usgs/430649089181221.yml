@@ -1,0 +1,15 @@
+name: PERMEABLE PAVEMENT CELL 2 DRAIN TILE @ MADISON, WI
+lat: 43.11361111111111
+lon: -89.30333333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.159
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430649089181221/
+parameter_code: "00065"
+time_series_id: 537cfc843e394e8c969f1d054c0e8d0b

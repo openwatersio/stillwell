@@ -1,0 +1,16 @@
+name: PEEPTOAD BROOK AT ELMDALE RD NR NORTH SCITUATE, RI
+lat: 41.8525992036735
+lon: -71.6061754003606
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 95.738
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115098/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 75c7554cfa764463bc6eac094deb6b49

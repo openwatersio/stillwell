@@ -1,0 +1,16 @@
+name: RECAPTURE CREEK NEAR BLANDING, UT
+lat: 37.7555504186149
+lon: -109.476510950721
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2194.56
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09378630/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c23f9ba4e3db438a85b379ab1dd80d2f

@@ -1,0 +1,16 @@
+name: BEAR RIVER NEAR UTAH-WYOMING STATE LINE
+lat: 40.965207931167846
+lon: -110.85353895161616
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2426.589
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10011500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 90b2a13bde9f4e6ebfbe405100bc422e

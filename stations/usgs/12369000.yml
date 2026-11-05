@@ -1,0 +1,15 @@
+name: Flathead River near Bigfork MT
+lat: 48.092325
+lon: -114.115369444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 882.091
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12369000/
+parameter_code: "00065"
+time_series_id: f2e0c44f05054694b4a88e2eb4f04420

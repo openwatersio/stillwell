@@ -1,0 +1,16 @@
+name: EAST RIVER NUMBER 1 DITCH FLUME 2 ABV HWY 135, CO
+lat: 38.769130555555556
+lon: -106.86656111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2562.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384609106520001/
+parameter_code: "00065"
+series_begin: 2025-05-13T20:15:00+00:00
+time_series_id: b67045ca510e444bb0ecc20d41a86410

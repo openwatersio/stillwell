@@ -1,0 +1,16 @@
+name: WEST FORK OBEY RIVER NEAR ALPINE, TN
+lat: 36.3973873333595
+lon: -85.1744486403616
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 207.465
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03415000/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: e0a5ca24005f46f9b22967f52593ab50

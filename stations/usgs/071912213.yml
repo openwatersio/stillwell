@@ -1,0 +1,16 @@
+name: Spavinaw Creek near Colcord, OK
+lat: 36.32256868778965
+lon: -94.6852334218138
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 256.178
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-071912213/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 69697458566f4c35a05e066cc7f084d2

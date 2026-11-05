@@ -1,0 +1,17 @@
+name: Houma Navigation Canal at Dulac, LA
+lat: 29.3852207451415
+lon: -90.7298120894582
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.006
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381328/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2019-10-01T05:45:00+00:00
+time_series_id: ef9544f5d1ca4984bba9a942cf7690af

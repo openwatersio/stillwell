@@ -1,0 +1,13 @@
+name: WHITE HOUSE CREEK AT RENS RD AT POQUOSON, VA
+lat: 37.1419444444444
+lon: -76.3758333333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-370831076223300/
+parameter_code: "62620"
+time_series_id: 45fe14a70f2440099da534126c42214d

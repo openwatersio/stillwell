@@ -1,0 +1,15 @@
+name: KALAMAZOO RIVER NEAR NEW RICHMOND, MI
+lat: 42.6447486474867
+lon: -86.11614737773
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 181.356
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04108670/
+parameter_code: "00065"
+time_series_id: 268ca64297d84aef932b515bbc53b249

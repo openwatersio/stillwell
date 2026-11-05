@@ -1,0 +1,16 @@
+name: NEPONSET RIVER AT NORWOOD, MA
+lat: 42.1775987124175
+lon: -71.2008863408755
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 13.183
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01105000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9788a47a267e4160a07bcdb27dc70fc1

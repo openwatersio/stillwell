@@ -1,0 +1,16 @@
+name: HUNTINGHOUSE BK AT ELMDALE RD AT N SCITUATE, RI
+lat: 41.8456547966694
+lon: -71.6095088349464
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 88.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115110/
+parameter_code: "00065"
+series_begin: 2009-02-20T05:00:00+00:00
+time_series_id: e6051e5e63844ad4b93495a0415a3088

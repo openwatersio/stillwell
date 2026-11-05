@@ -1,0 +1,16 @@
+name: COQUILLE RIVER AT COQUILLE, OR
+lat: 43.1579416666667
+lon: -124.181794444444
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 3.048
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14327055/
+parameter_code: "00065"
+series_begin: 2012-09-30T08:15:00+00:00
+time_series_id: 7d25dbc6333a4428adcc7982a86bb94c

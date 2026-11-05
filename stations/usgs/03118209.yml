@@ -1,0 +1,16 @@
+name: West Branch Nimishillen Creek at North Canton OH
+lat: 40.8680555555556
+lon: -81.3844444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 326.736
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03118209/
+parameter_code: "00065"
+series_begin: 2017-08-28T15:00:00+00:00
+time_series_id: e5b72cb3821348eaa1065c07cfdbb0fc

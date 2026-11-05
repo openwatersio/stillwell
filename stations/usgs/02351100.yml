@@ -1,0 +1,16 @@
+name: KINCHAFOONEE CREEK AT CENTURY RD,NEAR LEESBURG,GA
+lat: 31.6766111111111
+lon: -84.1796388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 54.425
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02351100/
+parameter_code: "00065"
+series_begin: 2021-10-07T16:15:00+00:00
+time_series_id: 2de1b5ae6fbf49f9ad33bed11d0d6c38

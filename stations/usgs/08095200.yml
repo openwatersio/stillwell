@@ -1,0 +1,16 @@
+name: N Bosque Rv at Valley Mills, TX
+lat: 31.6696057492819
+lon: -97.4694601844611
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 159.785
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08095200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6b5957ca04e648759526be86115f6635

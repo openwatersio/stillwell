@@ -1,0 +1,16 @@
+name: RIO DE BAYAMON NR BAYAMON, PR
+lat: 18.334278
+lon: -66.139478
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 29.276
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50047850/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 0489c082dbc349ab93f9b8bd2c592789

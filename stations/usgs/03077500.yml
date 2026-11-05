@@ -1,0 +1,16 @@
+name: Youghiogheny River at Youghiogheny River Dam, PA
+lat: 39.805354848832
+lon: -79.3642018712852
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 399.197
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03077500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 10d2467a098741b69c0dc4e95a8bf468

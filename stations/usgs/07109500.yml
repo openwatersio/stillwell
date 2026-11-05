@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER NEAR AVONDALE, CO.
+lat: 38.248056
+lon: -104.398611
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1374.95
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07109500/
+parameter_code: "00065"
+series_begin: 2020-08-04T19:00:00+00:00
+time_series_id: a6578b7379034e2fb7c7ce143ce36a91

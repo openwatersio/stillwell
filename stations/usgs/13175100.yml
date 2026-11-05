@@ -1,0 +1,16 @@
+name: OWYHEE RV NR MOUNTAIN CITY, NV
+lat: 41.860458312826
+lon: -115.989259686796
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1694.688
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13175100/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: be4aff21f71d40669361c28cd63b3d30

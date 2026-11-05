@@ -1,0 +1,16 @@
+name: SOUTH MAYO RIVER NEAR NETTLERIDGE, VA
+lat: 36.5709710293606
+lon: -80.1294927666299
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 265.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02069700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2647e7343ec7487db6de3daf714762f8

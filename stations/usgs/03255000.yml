@@ -1,0 +1,16 @@
+name: OHIO RIVER AT CINCINNATI, OH
+lat: 39.0945044152032
+lon: -84.5104982826561
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 130.47
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03255000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8c208e8d32544e29bf87777a05684260

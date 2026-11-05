@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER AT HWY 610 IN BROOKLYN PARK, MN
+lat: 45.128992
+lon: -93.298705
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 245.285
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05288500/
+parameter_code: "00065"
+series_begin: 2011-11-01T18:15:00+00:00
+time_series_id: 2dcf3254c77d48d8b3c33962b10ac8cb

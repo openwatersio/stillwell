@@ -1,0 +1,17 @@
+name: MINERS RIVER NR MUNISING, MI
+lat: 46.48777524674734
+lon: -86.54053381402143
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 188.47
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04044755/
+parameter_code: "00065"
+series_begin: 2016-11-02T12:30:00+00:00
+series_end: 2026-10-27T17:15:00+00:00
+time_series_id: 8dde9ee460604f138664d1a60577e08c

@@ -1,0 +1,14 @@
+name: DRAIN TILE NORTH OF CR 1000 N NR DECATUR, IN
+lat: 40.89083333333333
+lon: -84.93166666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-405327084555401/
+parameter_code: "00065"
+series_begin: 2026-03-19T19:45:00+00:00
+time_series_id: 90e2f192d80f427091eefa69f200bbf8

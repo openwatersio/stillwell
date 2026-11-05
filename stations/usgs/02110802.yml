@@ -1,0 +1,16 @@
+name: WACCAMAW RIVER AT BUCKSPORT, SC
+lat: 33.6490583713031
+lon: -79.0942063850337
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -4.764
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02110802/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 425b18a8319240369d112d49bf385c66

@@ -1,0 +1,16 @@
+name: PRAIRIE RIVER NEAR TACONITE, MN
+lat: 47.38884125547791
+lon: -93.3822855636061
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 395.131
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05212700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d2076d4f2778481692fab2d9a4ff84b6

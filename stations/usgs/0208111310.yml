@@ -1,0 +1,16 @@
+name: CASHIE RIVER AT SR1257 NEAR WINDSOR, NC
+lat: 36.0477777777778
+lon: -76.9841666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.914
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208111310/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 966d23a6ff86459a9fc377c7ad304777

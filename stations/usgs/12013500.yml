@@ -1,0 +1,16 @@
+name: WILLAPA RIVER NEAR WILLAPA, WA
+lat: 46.6509341808656
+lon: -123.652658440398
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.109
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12013500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: efe349dae7524bbfa905018baaa8d1e9

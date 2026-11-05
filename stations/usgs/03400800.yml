@@ -1,0 +1,16 @@
+name: MARTINS FORK NEAR SMITH, KY
+lat: 36.7523097401144
+lon: -83.2574011750644
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 383.582
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03400800/
+parameter_code: "00065"
+series_begin: 2015-01-26T05:00:00+00:00
+time_series_id: 8cc4f2d2465948898187c5d633beb8a2

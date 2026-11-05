@@ -1,0 +1,16 @@
+name: Mountain Fork near Eagletown, OK
+lat: 34.0417775689914
+lon: -94.6199357688248
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 101.754
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07339000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: a2cf3b6b4e0a43cb9330e0d79efe59d3

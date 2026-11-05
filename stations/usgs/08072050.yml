@@ -1,0 +1,16 @@
+name: San Jacinto Rv nr Sheldon, TX
+lat: 29.8763342569903
+lon: -95.0938188708232
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08072050/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4cc68238ca5c4aaf82d15817fa3df6b1

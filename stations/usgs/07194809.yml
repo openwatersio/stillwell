@@ -1,0 +1,17 @@
+name: Niokaska Creek at Township St at Fayetteville, AR
+lat: 36.0847222222222
+lon: -94.1347222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 402.437
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07194809/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2015-06-09T04:55:00+00:00
+time_series_id: 3ec64ad386464ffa9978d8fe75d7a64e

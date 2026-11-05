@@ -1,0 +1,16 @@
+name: MISSOURI RIVER NO. 9 AT WILLISTON, ND
+lat: 48.136944
+lon: -103.60444400000002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 555.221
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06330110/
+parameter_code: "00065"
+series_begin: 2009-05-09T05:00:00+00:00
+time_series_id: 15ccd52ee6d540ecb029997e95a4b5a0

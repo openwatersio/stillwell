@@ -1,0 +1,16 @@
+name: CHRISTINA RIVER AT COOCHS BRIDGE, DE
+lat: 39.637388888888886
+lon: -75.72788888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.446
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01478000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0f3876cda2784a45923294029f492dfd

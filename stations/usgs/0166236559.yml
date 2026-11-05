@@ -1,0 +1,13 @@
+name: PINEY RIVER AT ELEVATION 1235 NEAR SPERRYVILLE, VA
+lat: 38.70447222222222
+lon: -78.27038888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0166236559/
+parameter_code: "00065"
+time_series_id: 302a18fb738f40a2baa4fb6f8d86b044

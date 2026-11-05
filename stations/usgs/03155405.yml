@@ -1,0 +1,16 @@
+name: NORTH FORK HUGHES RIVER NEAR CAIRO, WV
+lat: 39.2189678886992
+lon: -81.0998337072301
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 204.051
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03155405/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d65ea48464104166a0d2bc14ccfcf301

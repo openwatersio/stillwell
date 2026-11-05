@@ -1,0 +1,15 @@
+name: TURNBULL CREEK NR OAK HILL, FL
+lat: 28.8210681588677
+lon: -80.8597896530773
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248350/
+parameter_code: "00065"
+series_begin: 2013-08-31T04:00:00+00:00
+series_end: 2017-09-11T09:30:00+00:00
+time_series_id: e79a51bc0c16464e80899ba30f65da41

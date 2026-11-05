@@ -1,0 +1,16 @@
+name: AGUA FRIA RIVER NEAR ROCK SPRINGS, AZ
+lat: 34.01560405890252
+lon: -112.16795192851016
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 540.316
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09512800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: fb128ad218ea4c9587e4dc9d0c7ee701

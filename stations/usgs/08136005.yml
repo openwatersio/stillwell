@@ -1,0 +1,17 @@
+name: East Angelo Draw at San Angelo, TX
+lat: 31.454766666666664
+lon: -100.402
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 541.492
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08136005/
+parameter_code: "00065"
+series_begin: 2023-08-31T22:00:00+00:00
+series_end: 2025-04-09T16:00:00+00:00
+time_series_id: 2ed225b658e84663bd00c45f08a42586

@@ -1,0 +1,17 @@
+name: MILL CREEK NEAR LEXINGTON, VA
+lat: 37.81632222222222
+lon: -79.40255
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 308.458
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0202306395/
+parameter_code: "00065"
+series_begin: 2021-05-24T19:30:00+00:00
+series_end: 2021-11-09T18:40:00+00:00
+time_series_id: 907da315a701406d9ea64a03c46f76b4

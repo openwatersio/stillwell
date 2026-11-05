@@ -1,0 +1,16 @@
+name: CHERRY CREEK NEAR FRANKTOWN, CO.
+lat: 39.3558234238248
+lon: -104.763309202089
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1880.506
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06712000/
+parameter_code: "00065"
+series_begin: 2020-10-07T17:30:00+00:00
+time_series_id: b340f8e7ef8d463ea2e70cfc0698b519

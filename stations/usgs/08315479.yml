@@ -1,0 +1,13 @@
+name: SANTA FE R ABV MCCLURE RES (1.5FT) NR SANTA FE, NM
+lat: 35.688694444444444
+lon: -105.82408333333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08315479/
+parameter_code: "00065"
+time_series_id: 7fc57416b43a49dd967f006b60ffff5c

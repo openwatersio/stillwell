@@ -1,0 +1,16 @@
+name: GEORGES CREEK AT FRANKLIN, MD
+lat: 39.500914
+lon: -79.048819
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 303.819
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01599000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c5a35c6c9f184c33aeeb94dafe7d25e2

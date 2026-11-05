@@ -1,0 +1,16 @@
+name: CEDAR CREEK NEAR CEDARBURG, WI
+lat: 43.3230555555556
+lon: -87.9786111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 242.444
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04086500/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: d65210c845c44fba8390f941c30e3349

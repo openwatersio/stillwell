@@ -1,0 +1,16 @@
+name: CATHARINE CR AT MONTOUR FALLS NY
+lat: 42.3282777777778
+lon: -76.8439166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 144.292
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04232200/
+parameter_code: "00065"
+series_begin: 2018-08-14T17:00:00+00:00
+time_series_id: 8d59b643e9c0433498df53cb940cec04

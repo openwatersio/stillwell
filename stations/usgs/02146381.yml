@@ -1,0 +1,16 @@
+name: SUGAR CREEK AT NC 51 NEAR PINEVILLE, NC
+lat: 35.0908333333333
+lon: -80.8994444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.847
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02146381/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9ba7c498191b4af5b666a542acbabd15

@@ -1,0 +1,16 @@
+name: SENECA RIVER NEAR BALDWINSVILLE NY
+lat: 43.1623333333333
+lon: -76.3626944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.776
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04237496/
+parameter_code: "00065"
+series_begin: 2014-10-01T05:00:00+00:00
+time_series_id: 4d730b146ea04b40ad1ec1720a71c6cd

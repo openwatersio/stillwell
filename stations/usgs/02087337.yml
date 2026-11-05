@@ -1,0 +1,16 @@
+name: WALNUT CREEK AT BUCK JONES ROAD AT RALEIGH, NC
+lat: 35.77300555555556
+lon: -78.73714722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.319
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02087337/
+parameter_code: "00065"
+series_begin: 2018-07-31T18:25:00+00:00
+time_series_id: 0f99d4d7bd4e465abc2f29330a947f41

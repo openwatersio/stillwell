@@ -1,0 +1,17 @@
+name: RAFT RIVER NR MOUTH AT YALE RAFT RIVER, ID
+lat: 42.5900472222222
+lon: -113.236525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1282.839
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13079901/
+parameter_code: "00065"
+series_begin: 2020-12-14T16:45:00+00:00
+series_end: 2023-02-19T23:45:00+00:00
+time_series_id: 7c50126c97bc442cbc7b64df944c41cf

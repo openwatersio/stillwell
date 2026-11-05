@@ -1,0 +1,15 @@
+name: Rock Creek near Darby, MT
+lat: 46.06758333333334
+lon: -114.22287222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1240.536
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12345000/
+parameter_code: "00065"
+time_series_id: cd6af4cc171548caa7fdfb985927a7ff

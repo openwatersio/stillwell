@@ -1,0 +1,16 @@
+name: Hinkson Creek at Columbia, MO
+lat: 38.92775
+lon: -92.3399444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.659
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06910230/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: dc757c9ecaf248289d98d24a575d597b

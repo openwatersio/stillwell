@@ -1,0 +1,16 @@
+name: Hams Fork at Diamondville, WY
+lat: 41.779744
+lon: -110.535603
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2093.976
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09224000/
+parameter_code: "00065"
+series_begin: 2025-08-18T22:15:00+00:00
+time_series_id: 6701c10e1d714f8b86e014be49b465d0

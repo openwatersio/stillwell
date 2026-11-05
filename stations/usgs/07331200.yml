@@ -1,0 +1,16 @@
+name: Mill Creek near Mill Creek, OK
+lat: 34.4050916540351
+lon: -96.8633439318378
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 298.119
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07331200/
+parameter_code: "00065"
+series_begin: 2008-01-01T06:00:00+00:00
+time_series_id: 4994cfa3e0a248d4b1b5b5f15e6d2ad6

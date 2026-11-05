@@ -1,0 +1,16 @@
+name: BEAR RIVER AT BORDER, WY
+lat: 42.2110433789753
+lon: -111.053802247823
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1846.128
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10039500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: a4f4a0a6043349e280f2f1a02082fa43

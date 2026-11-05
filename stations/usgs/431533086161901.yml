@@ -1,0 +1,15 @@
+name: BEAR LAKE AT BEAR LK BEACH PARK AT N MUSKEGON, MI
+lat: 43.2591666666667
+lon: -86.2719444444444
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 176.622
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-431533086161901/
+parameter_code: "00065"
+time_series_id: 910040b8713b417b8f5f987b4bf9d39f

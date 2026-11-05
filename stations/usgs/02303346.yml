@@ -1,0 +1,16 @@
+name: TROUT CREEK AT CHANCEY RD AT WESLEY CHAPEL FL
+lat: 28.2098916666667
+lon: -82.3475527777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02303346/
+parameter_code: "00065"
+series_begin: 2019-12-11T19:45:00+00:00
+time_series_id: 15c686af3aeb44988248c9e70e7e892a

@@ -1,0 +1,14 @@
+name: Lake Thunderbird near Norman, OK
+lat: 35.2234029631328
+lon: -97.2175276587592
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07229900/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 6a653f3dbf6e4d2e9d3379d95776d20f

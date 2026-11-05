@@ -1,0 +1,16 @@
+name: Iowa River at Wapello, IA
+lat: 41.1780861111111
+lon: -91.1820916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.007
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05465500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f1148b0524754242b464320cfec3e16a

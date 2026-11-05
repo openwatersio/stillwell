@@ -1,0 +1,16 @@
+name: NF SALMON RIVER AT NORTH FORK ID
+lat: 45.4075
+lon: -113.993056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1103.376
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13306000/
+parameter_code: "00065"
+series_begin: 2026-05-05T20:30:00+00:00
+time_series_id: 2c786ed77bc04149a98822d90a3ca83a

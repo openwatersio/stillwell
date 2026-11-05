@@ -1,0 +1,17 @@
+name: Bayou Lafourche at Donaldsonville, LA
+lat: 30.1008888888889
+lon: -90.9934722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.25
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07380400/
+parameter_code: "00065"
+series_begin: 2012-06-07T17:45:00+00:00
+series_end: 2019-03-01T16:30:00+00:00
+time_series_id: 2ccef3a993644651a417dff6138cdc41

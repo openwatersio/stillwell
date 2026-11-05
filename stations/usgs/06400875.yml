@@ -1,0 +1,16 @@
+name: HORSEHEAD CREEK AT OELRICHS, SD
+lat: 43.188056
+lon: -103.226111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1010.808
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06400875/
+parameter_code: "00065"
+series_begin: 2017-10-29T00:00:00+00:00
+time_series_id: d2390c7a4f064a019ada136548d8037f

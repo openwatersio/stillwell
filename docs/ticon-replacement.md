@@ -6,11 +6,11 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | All listed | Meaning |
 | --- | --- | --- | --- |
-| ready | 284 | 1092 | An adapter exists and the record matched one of its stations |
-| planned | 615 | 836 | Cleared source, adapter in the plan |
+| ready | 715 | 1679 | An adapter exists and the record matched one of its stations |
+| planned | 180 | 245 | Cleared source, adapter in the plan |
 | to_match | 89 | 297 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
 | license | 1131 | 2066 | The source's terms need confirming first |
-| unmatched | 17 | 39 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| unmatched | 21 | 43 | An adapter exists, but no station matched, or two matched equally; check by hand |
 | restricted | 391 | 508 | The source forbids it; stays on TICON |
 
 ## By replacement source
@@ -19,7 +19,7 @@ Accepted records only, in the order to build adapters: most records first.
 
 | Source | Records | Status | TICON contributors |
 | --- | --- | --- | --- |
-| usgs | 435 | planned 435 | usgs |
+| usgs | 435 | ready 431, unmatched 4 | usgs |
 | uhslc | 421 | license 421 | uhslc_fd, uhslc_rq |
 | chs | 256 | restricted 256 | meds |
 | crms | 164 | license 164 | crms |
@@ -55,7 +55,7 @@ Accepted records only, in the order to build adapters: most records first.
 
 ## How records are matched
 
-- **Codes in the id.** TICON ids end in `<code>-<country>-<contributor>`. NOAA, USGS and Norwegian (`nhs`) records carry the originator's station code, so they map to `coops`, `usgs` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits) and `kartverket`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
+- **Codes in the id.** TICON ids end in `<code>-<country>-<contributor>`. NOAA, USGS and Norwegian (`nhs`) records carry the originator's station code, so they map to `coops`, `usgs` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site) and `kartverket`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
 - **Declared provenance.** UHSLC and JODC records use tide-database's `sources/ticon/provenance.ts`, so a relay of a NOAA, Kartverket, JMA or JODC gauge goes to that originator, as tide-database already treats it. Other UHSLC records go to UHSLC itself.
 - **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, and CMEMS records in the Netherlands and Germany match an active station with levels: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently.
 - **Same station.** A record still unmatched takes the match of another record in its tide-database station file, since tide-database merges records only when they're the same gauge.

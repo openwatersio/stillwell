@@ -1,0 +1,17 @@
+name: ST JONES RIVER NEAR MAGNOLIA, DE
+lat: 39.08486111111112
+lon: -75.46052777777778
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 1.219
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01483750/
+parameter_code: "00065"
+series_begin: 2023-11-06T20:24:00+00:00
+series_end: 2025-05-20T16:00:00+00:00
+time_series_id: d799d66209824328ac0367e485b96a92

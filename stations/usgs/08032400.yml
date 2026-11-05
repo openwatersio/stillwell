@@ -1,0 +1,16 @@
+name: Neches Rv at SH 294 nr Alto, TX
+lat: 31.6296444444444
+lon: -95.2858333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08032400/
+parameter_code: "00065"
+series_begin: 2020-07-10T15:00:00+00:00
+time_series_id: 963e677d92224bd08c032fc574f4374f

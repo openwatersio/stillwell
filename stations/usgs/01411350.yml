@@ -1,0 +1,14 @@
+name: Ludlum Thorofare at Sea Isle City NJ
+lat: 39.1577777777778
+lon: -74.6977777777778
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01411350/
+parameter_code: "72279"
+series_begin: 2000-02-02T10:30:00+00:00
+time_series_id: b06f5c7ccbbd46e29953a80ce10495a8

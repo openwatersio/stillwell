@@ -1,0 +1,16 @@
+name: L HUMBOLDT RV NR PARADISE VALLEY, NV
+lat: 41.4158222222222
+lon: -117.373511111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1360.749
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10329000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3f753f62f62d4f71b4966c081e8ce38a

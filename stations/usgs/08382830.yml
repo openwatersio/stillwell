@@ -1,0 +1,16 @@
+name: PECOS RIVER BELOW SANTA ROSA DAM, NM
+lat: 35.0241666666667
+lon: -104.688888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1414.272
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08382830/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c2460d1712ce4ec39be4a3107885a195

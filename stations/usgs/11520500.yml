@@ -1,0 +1,16 @@
+name: KLAMATH R NR SEIAD VALLEY CA
+lat: 41.8537379018284
+lon: -123.232273315503
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 400.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11520500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a14efe90af024dc5b89c7e8e039a72f0

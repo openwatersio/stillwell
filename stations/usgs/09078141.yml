@@ -1,0 +1,17 @@
+name: NORTH CUNNINGHAM CREEK CONDUIT BYPASS NR NORRIE,CO
+lat: 39.3359621901701
+lon: -106.544211471723
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3071.47
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09078141/
+parameter_code: "00065"
+series_begin: 2020-05-05T18:00:00+00:00
+series_end: 2026-07-29T19:30:00+00:00
+time_series_id: 72c0ed42f5c74f8eb79926d03c32495c

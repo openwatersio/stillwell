@@ -1,0 +1,16 @@
+name: MARSH TE1 BLW S-632 IN WCA3B NR COOPERTOWN,FL
+lat: 25.770519444444442
+lon: -80.6326111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 1.829
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-254614080375701/
+parameter_code: "00065"
+series_begin: 2023-11-13T20:15:00+00:00
+time_series_id: 71e04cf44b68496691d1cbd1e0af84fb

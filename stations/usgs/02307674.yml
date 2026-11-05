@@ -1,0 +1,16 @@
+name: ALLIGATOR CREEK AT KAPOK PARK AT CLEARWATER FL
+lat: 27.9755061770307
+lon: -82.713155811686
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02307674/
+parameter_code: "00065"
+series_begin: 2009-10-06T04:00:00+00:00
+time_series_id: 221c7550e1544c86ad168222ce46bb63

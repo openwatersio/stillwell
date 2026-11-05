@@ -1,0 +1,16 @@
+name: QUINSIGAMOND RIVER AT NORTH GRAFTON, MA
+lat: 42.2303720169532
+lon: -71.7109023280131
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 101.901
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01110000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 472bd13d11a34124aa901a08dc7e1785

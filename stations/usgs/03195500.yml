@@ -1,0 +1,16 @@
+name: ELK RIVER AT SUTTON, WV
+lat: 38.6631555500342
+lon: -80.7095412755377
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 243.718
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03195500/
+parameter_code: "00065"
+series_begin: 2010-10-01T05:00:00+00:00
+time_series_id: 077363d110774c35bec3ee3d95ed00bc

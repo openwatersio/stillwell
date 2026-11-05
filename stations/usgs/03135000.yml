@@ -1,0 +1,14 @@
+name: Lake Fork bl Mohicanville Dam near Mohicanville OH
+lat: 40.7233915562177
+lon: -82.1548766814459
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03135000/
+parameter_code: "00065"
+series_begin: 2017-09-01T16:30:00+00:00
+time_series_id: 3662c0aeace8453bb5068c900ebec18e

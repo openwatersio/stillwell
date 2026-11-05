@@ -1,0 +1,15 @@
+name: Conococheague Cr, Lincoln Hwy at Chambersburg PA
+lat: 39.93780555555555
+lon: -77.66319444444446
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01614131/
+parameter_code: "00065"
+time_series_id: 2874e5c398e04d00bccbb7fef3ee29d0

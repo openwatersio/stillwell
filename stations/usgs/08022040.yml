@@ -1,0 +1,16 @@
+name: Sabine Rv nr Beckville, TX
+lat: 32.3285333333333
+lon: -94.3538277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 57.869
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08022040/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d2f71519db724a1396ed289acc9e44e5

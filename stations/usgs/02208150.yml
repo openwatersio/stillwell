@@ -1,0 +1,16 @@
+name: ALCOVY RIVER AT NEW HOPE ROAD, NEAR GRAYSON, GA
+lat: 33.9169444444444
+lon: -83.8880555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 239.423
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02208150/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3edbf930842d46daab1a16810c6aca3d

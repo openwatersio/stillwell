@@ -1,0 +1,16 @@
+name: Tongue River at Ashland, MT
+lat: 45.597750000000005
+lon: -106.27494444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 884.834
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06307662/
+parameter_code: "00065"
+series_begin: 2021-09-28T17:45:00+00:00
+time_series_id: 84cabe5dfd52460489c325a8abd33858

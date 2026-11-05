@@ -1,0 +1,16 @@
+name: Ukumehame Gulch nr Olowalu, Maui, HI
+lat: 20.818537445024084
+lon: -156.58336888646173
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 121.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16647000/
+parameter_code: "00065"
+series_begin: 2018-04-10T23:30:00+00:00
+time_series_id: f73beab59406476591e74b38221d1b80

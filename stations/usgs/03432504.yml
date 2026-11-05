@@ -1,0 +1,15 @@
+name: ROBINSON BRANCH ABOVE BOSTON, TN
+lat: 35.8141666666667
+lon: -87.0191666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03432504/
+parameter_code: "00065"
+series_begin: 2008-09-16T17:05:00+00:00
+series_end: 2012-10-11T13:45:00+00:00
+time_series_id: 92eb5f0e2dab4ca5bd891eba79e8b499

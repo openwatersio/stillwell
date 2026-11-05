@@ -1,0 +1,16 @@
+name: Girtys Run above Grant Avenue at Millvale, PA
+lat: 40.4778333333333
+lon: -79.9700277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 218.481
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03049819/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: bc0194af4aaa4bcab11a22552817b7be

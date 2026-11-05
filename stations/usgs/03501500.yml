@@ -1,0 +1,17 @@
+name: LITTLE TENNESSEE R AT FRANKLIN, NC
+lat: 35.1859284611918
+lon: -83.3712646736313
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 607.162
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03501500/
+parameter_code: "00065"
+series_begin: 2013-12-21T05:00:00+00:00
+series_end: 2016-02-01T04:45:00+00:00
+time_series_id: ac75f1db9a4e4148892150fcaeab8d19

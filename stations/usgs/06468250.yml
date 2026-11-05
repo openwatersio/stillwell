@@ -1,0 +1,16 @@
+name: JAMES RIVER ABOVE ARROWWOOD LAKE NR KENSAL, ND
+lat: 47.399722
+lon: -98.797222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 438.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06468250/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c3cb9e1e2ef34f76a723d3d3b1119ca1

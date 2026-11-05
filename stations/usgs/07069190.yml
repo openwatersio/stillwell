@@ -1,0 +1,16 @@
+name: Mammoth Spring at Mammoth Spring
+lat: 36.498125857859684
+lon: -91.53569237354537
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 152.763
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07069190/
+parameter_code: "00065"
+series_begin: 2007-10-03T05:00:00+00:00
+time_series_id: 9727b0f8c672474685e1d51587ed3e39

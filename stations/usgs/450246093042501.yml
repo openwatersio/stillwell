@@ -1,0 +1,15 @@
+name: CENTERVILLE ROAD IN VADNAIS HGTS.,MN - COUNTY-URBA
+lat: 45.04609117924911
+lon: -93.07382072321866
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 277.673
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-450246093042501/
+parameter_code: "00065"
+time_series_id: 422c55635d3549008f2d324618e76bf4

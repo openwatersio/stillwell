@@ -1,0 +1,16 @@
+name: EMMA C AT SEDGWICK, KS
+lat: 37.9851666666667
+lon: -97.4457333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 417.905
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07144050/
+parameter_code: "00065"
+series_begin: 2015-02-13T21:15:00+00:00
+time_series_id: 3781cb756e8d400180f5db9c5ef00331

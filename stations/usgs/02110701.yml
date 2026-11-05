@@ -1,0 +1,16 @@
+name: CRABTREE SWAMP AT CONWAY, SC
+lat: 33.8610034858081
+lon: -79.0411471237008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -2.844
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02110701/
+parameter_code: "00065"
+series_begin: 2014-01-10T05:00:00+00:00
+time_series_id: eae768605cfc4175a4aa453cb94fb824

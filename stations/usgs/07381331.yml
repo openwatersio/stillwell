@@ -1,0 +1,17 @@
+name: GIWW at Houma, LA
+lat: 29.5980555555556
+lon: -90.71
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.366
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381331/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2019-10-21T14:30:00+00:00
+time_series_id: 6603b42aa3ea48ac87bf7551a413a3f3

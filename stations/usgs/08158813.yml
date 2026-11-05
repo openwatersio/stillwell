@@ -1,0 +1,16 @@
+name: Bear Ck at Spillar Ranch Rd nr Manchaca, TX
+lat: 30.1636611111111
+lon: -97.9070194444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 241.801
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08158813/
+parameter_code: "00065"
+series_begin: 2015-10-01T06:00:00+00:00
+time_series_id: 5c62380e673440fe9bf05489a3ee7721

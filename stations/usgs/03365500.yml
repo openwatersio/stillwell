@@ -1,0 +1,16 @@
+name: EAST FORK WHITE RIVER AT SEYMOUR, IN
+lat: 38.98254546139802
+lon: -85.89912670697065
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 167.719
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03365500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e9d71f13be864fc2b4c77c3603874c82

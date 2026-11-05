@@ -1,0 +1,15 @@
+name: WEST FARM POND AT BEAR LAKE NR NORTH MUSKEGON, MI
+lat: 43.2655555555556
+lon: -86.2669444444444
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 176.702
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-431556086161001/
+parameter_code: "00065"
+time_series_id: 51b4ed102bb64dcf862bfd2f03425c1b

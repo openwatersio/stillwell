@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER AT HOLLY, CO.
+lat: 38.0436225801017
+lon: -102.119629417525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1029.599
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07135500/
+parameter_code: "00065"
+series_begin: 2023-01-19T23:30:00+00:00
+time_series_id: ea7277c825784fc1aa7c41dc2a392b29

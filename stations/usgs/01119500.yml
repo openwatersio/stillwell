@@ -1,0 +1,16 @@
+name: WILLIMANTIC RIVER NEAR COVENTRY, CT
+lat: 41.750538565954706
+lon: -72.26561677369888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 72.555
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01119500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e86e42e7fb6649d69278e912709b8693

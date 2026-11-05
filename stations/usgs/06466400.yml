@@ -1,0 +1,16 @@
+name: Bazile Creek at Center, Nebr.
+lat: 42.61573055555556
+lon: -97.87807222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 412.529
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06466400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 96ba78f2ae89474bbc018c1ad67d0c5d

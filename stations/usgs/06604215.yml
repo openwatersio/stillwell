@@ -1,0 +1,15 @@
+name: East-West Okoboji Lake Channel near Milford, IA
+lat: 43.37718464137002
+lon: -95.12820979574374
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 423.645
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06604215/
+parameter_code: "00065"
+time_series_id: f720020653d94cf4898c95296b576dde

@@ -1,0 +1,15 @@
+name: WIELAND DITCH AT CR 375E AT BEVERLY SHORES, IN
+lat: 41.665
+lon: -86.99527777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 187.97
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04095096/
+parameter_code: "00065"
+time_series_id: c79393302b16475992c66eb6022951f2

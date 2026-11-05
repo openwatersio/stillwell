@@ -1,0 +1,16 @@
+name: Clear Ck nr Sanger, TX
+lat: 33.3362269008958
+lon: -97.1794587003861
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 172.37
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08051500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6d770331f7504d7cb5e4eb89c6ef0059

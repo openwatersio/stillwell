@@ -1,0 +1,16 @@
+name: PRICE RIVER BELOW GOLF COURSE NEAR HELPER, UT
+lat: 39.63738333333333
+lon: -110.85777222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1712.388
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09313520/
+parameter_code: "00065"
+series_begin: 2024-06-13T18:00:00+00:00
+time_series_id: 313a397301624137985e94acbe9a66f0

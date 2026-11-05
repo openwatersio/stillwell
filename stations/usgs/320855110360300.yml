@@ -1,0 +1,15 @@
+name: LOWER MADRONA CREEK AT SAGUARO NATL PARK EAST, AZ
+lat: 32.1486083333333
+lon: -110.600811111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1008.888
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-320855110360300/
+parameter_code: "00065"
+time_series_id: cdf25066e70944e5820c308fcb0e5bdc

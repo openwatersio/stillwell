@@ -1,0 +1,16 @@
+name: Beaver Bayou at Wax Rd near Baton Rouge, LA
+lat: 30.5429659254691
+lon: -91.0206589660423
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.096
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07378100/
+parameter_code: "00065"
+series_begin: 2007-10-09T05:00:00+00:00
+time_series_id: d96966c9b4e145ada878549b565ff0a3

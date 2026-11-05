@@ -1,0 +1,17 @@
+name: FISHER CREEK AT HOWARDS GROVE, WI
+lat: 43.825
+lon: -87.8333333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 208.788
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-040854592/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+series_end: 2018-10-01T05:45:00+00:00
+time_series_id: 54e29f969f4d49e1866f0cd8b0a2ff29

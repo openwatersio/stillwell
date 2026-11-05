@@ -1,0 +1,16 @@
+name: BOISE RIVER AT CALDWELL, ID
+lat: 43.67735277777778
+lon: -116.70113055555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 712.351
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13211205/
+parameter_code: "00065"
+series_begin: 2015-11-16T23:00:00+00:00
+time_series_id: f5484103d63341309319936fb55e146d

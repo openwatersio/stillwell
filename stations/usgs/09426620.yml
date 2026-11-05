@@ -1,0 +1,16 @@
+name: BILL WILLIAMS RIVER NEAR PARKER, AZ
+lat: 34.2612361111111
+lon: -114.028980555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 152.894
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09426620/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 34633d085ecd4cc482161d2d16cc37c6

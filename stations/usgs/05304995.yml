@@ -1,0 +1,16 @@
+name: CHIPPEWA R. (HW) ABOVE COUNTY RD 13 NR WATSON, MN
+lat: 45.022486
+lon: -95.790547
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 274.521
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05304995/
+parameter_code: "00065"
+series_begin: 2017-10-04T22:15:00+00:00
+time_series_id: 3dddbdb06b894e62aef6d3ad10bfc901

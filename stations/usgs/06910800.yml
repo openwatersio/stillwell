@@ -1,0 +1,16 @@
+name: MARAIS DES CYGNES R NR READING, KS
+lat: 38.5669552441223
+lon: -95.961657055878
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 319.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06910800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 57e43696559d470a9f5b1ef6c8535943

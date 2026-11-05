@@ -1,0 +1,16 @@
+name: OAK ORCHARD CREEK AT THE BRIDGES NY
+lat: 43.35330555555556
+lon: -78.19305555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 69.918
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0422018610/
+parameter_code: "00065"
+series_begin: 2020-09-23T22:15:00+00:00
+time_series_id: 484fa9ff474448718d2773d5f057841e

@@ -1,0 +1,16 @@
+name: Saline River near Rye, AR
+lat: 33.7008333333333
+lon: -92.0258333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 29.492
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07363500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: db2370524edd4900b885531e02677b6f

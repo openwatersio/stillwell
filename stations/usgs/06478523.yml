@@ -1,0 +1,16 @@
+name: MISSOURI RIVER NEAR ST. JAMES, NE
+lat: 42.761111
+lon: -97.081944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 356.262
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06478523/
+parameter_code: "00065"
+series_begin: 2017-10-11T16:45:00+00:00
+time_series_id: f3606a495e074f32b5b2ea5d55f2674f

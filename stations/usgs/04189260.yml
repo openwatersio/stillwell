@@ -1,0 +1,16 @@
+name: Blanchard River at Ottawa OH
+lat: 41.0169962350728
+lon: -84.0468888559279
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 212.881
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04189260/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: 2139e8558a314fbc8e967ce90ebc3c4d

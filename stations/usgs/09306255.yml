@@ -1,0 +1,16 @@
+name: YELLOW CREEK NEAR WHITE RIVER, CO.
+lat: 40.16856616902169
+lon: -108.40123386659118
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1685.001
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09306255/
+parameter_code: "00065"
+series_begin: 2020-11-18T19:45:00+00:00
+time_series_id: 281828c3e65744ecb2cb82ea171c376e

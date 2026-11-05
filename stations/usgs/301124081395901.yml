@@ -1,0 +1,14 @@
+name: ST.JOHNS RIVER BUCKMAN BRIDGE AT JACKSONVILLE,FL
+lat: 30.190240505279
+lon: -81.6662048479226
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-301124081395901/
+parameter_code: "00065"
+series_begin: 2017-10-25T21:15:00+00:00
+time_series_id: c42b52ad782e4d138f97c125830ef956

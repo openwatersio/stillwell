@@ -1,0 +1,16 @@
+name: Spindletop Bayou at SH 65 nr Stowell, TX
+lat: 29.792436111111112
+lon: -94.42376944444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08042539/
+parameter_code: "00065"
+series_begin: 2022-07-06T19:25:00+00:00
+time_series_id: b3bbcf6e926e4f98b00ba0c2888f1f9a

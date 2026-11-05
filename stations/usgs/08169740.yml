@@ -1,0 +1,16 @@
+name: Guadalupe Rv at Hwy 123-BR at Seguin, TX
+lat: 29.5514083333333
+lon: -97.9693805555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 138.227
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08169740/
+parameter_code: "00065"
+series_begin: 2016-10-14T05:00:00+00:00
+time_series_id: 93ca3b486ce84af4a34d1618cfae4058

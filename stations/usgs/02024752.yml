@@ -1,0 +1,16 @@
+name: JAMES RIVER AT BLUE RIDGE PKWY NR BIG ISLAND, VA
+lat: 37.5554152375783
+lon: -79.3672546520747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.923
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02024752/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c208243e0e014aeba01e36b62cff8dd0

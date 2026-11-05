@@ -1,0 +1,16 @@
+name: Bear Ck at FM 2722 nr Sattler, TX
+lat: 29.8085
+lon: -98.2302805555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 264.676
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08167870/
+parameter_code: "00065"
+series_begin: 2016-06-17T05:00:00+00:00
+time_series_id: ed14ed237c974329ade63c8f5f45fab4

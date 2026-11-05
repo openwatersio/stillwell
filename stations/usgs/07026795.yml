@@ -1,0 +1,17 @@
+name: INDIAN CREEK NEAR SAMBURG, TN
+lat: 36.3828208694428
+lon: -89.3424772481242
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 86.362
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07026795/
+parameter_code: "00065"
+series_begin: 2013-02-12T20:30:00+00:00
+series_end: 2017-01-05T06:45:00+00:00
+time_series_id: d3e3b72f99864bc58b016bc36c8c872e

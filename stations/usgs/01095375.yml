@@ -1,0 +1,16 @@
+name: QUINAPOXET RIVER AT CANADA MILLS NEAR HOLDEN, MA
+lat: 42.3728696665639
+lon: -71.8281278503135
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.116
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01095375/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 54a21cb5fc6c43748bcba08e52588c8c

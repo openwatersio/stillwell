@@ -1,0 +1,16 @@
+name: Mayhaw Bayou at SH 73 nr Hamshire, TX
+lat: 29.825469444444444
+lon: -94.29532499999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08041970/
+parameter_code: "00065"
+series_begin: 2022-06-23T17:05:00+00:00
+time_series_id: 66c63c62e472438f8e7868a54c3721ea

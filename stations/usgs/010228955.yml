@@ -1,0 +1,17 @@
+name: Outlet Bass Hbr Marsh at Rt 102 at Tremont, Maine
+lat: 44.2529138888889
+lon: -68.3492
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -2.46
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-010228955/
+parameter_code: "00065"
+series_begin: 2011-05-26T04:00:00+00:00
+series_end: 2012-10-01T04:00:00+00:00
+time_series_id: 9e6b94fbc8ff43ca9bfdcfb5c310bb6b

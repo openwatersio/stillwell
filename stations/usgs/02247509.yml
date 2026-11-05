@@ -1,0 +1,15 @@
+name: ELEVENTH STREET CANAL AT HOLLY HILL, FL
+lat: 29.2458137537575
+lon: -81.0414445026147
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02247509/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2013-10-01T04:45:00+00:00
+time_series_id: 84e4e95387114b67a96c1548ac12ec9d

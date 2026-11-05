@@ -1,0 +1,17 @@
+name: ANDREWS SPRING 1
+lat: 40.2908179418212
+lon: -105.66722722185
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3202.838
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-401727105400000/
+parameter_code: "00065"
+series_begin: 2019-04-09T18:40:00+00:00
+series_end: 2026-10-07T19:10:00+00:00
+time_series_id: a20d4da2eb344f519bb382f8072073ad

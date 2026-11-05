@@ -1,0 +1,16 @@
+name: DMF Brazos Rv nr Aspermont, TX
+lat: 33.008158
+lon: -100.180658
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 493.724
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08080500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 91542abcea7a46d88701a5c518bcb4a0

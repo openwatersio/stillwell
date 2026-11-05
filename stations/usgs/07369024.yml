@@ -1,0 +1,16 @@
+name: Youngs Bayou nr Monroe, LA
+lat: 32.46
+lon: -92.0475
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 13.183
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07369024/
+parameter_code: "00065"
+series_begin: 2022-05-04T14:30:00+00:00
+time_series_id: 1f03d290197e4e97963de2bce185690d

@@ -1,0 +1,16 @@
+name: BIG WOOD RIVER BL MAGIC DAM NR RICHFIELD ID
+lat: 43.2480555555556
+lon: -114.356666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1420.856
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13142500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 361f645e6d1145b6b94f9ee7cf0baeeb

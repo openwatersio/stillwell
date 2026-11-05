@@ -1,0 +1,16 @@
+name: FLINT RIVER AT NEWTON, GA
+lat: 31.3069444444444
+lon: -84.3388888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 33.589
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02353000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 44ab7f6aa8f24b2f94c9a9e04fdbc862

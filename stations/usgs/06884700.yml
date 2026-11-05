@@ -1,0 +1,16 @@
+name: BIG BLUE R AT BLUE RAPIDS, KS
+lat: 39.6872225209431
+lon: -96.6400161643949
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 327.764
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06884700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 760d8012d2004dc0ba6bdc4b82416501

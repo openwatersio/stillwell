@@ -1,0 +1,16 @@
+name: CONNECTICUT RIVER NEAR NORTHFIELD, MA
+lat: 42.68333333333333
+lon: -72.47194444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 56.388
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01161280/
+parameter_code: "00065"
+series_begin: 2018-07-19T17:30:00+00:00
+time_series_id: e2842cb5d4ed4a04b5a5eba233ed1d23

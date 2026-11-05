@@ -1,0 +1,16 @@
+name: RUSSELL FORK AT BARTLICK, VA
+lat: 37.2459430745939
+lon: -82.3234786850497
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 354.818
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03209200/
+parameter_code: "00065"
+series_begin: 1985-10-01T04:15:00+00:00
+time_series_id: 1000e4d13b1445ffb739b3cd4e8f3648

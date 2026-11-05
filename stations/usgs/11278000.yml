@@ -1,0 +1,16 @@
+name: ELEANOR C NR HETCH HETCHY CA
+lat: 37.96907414785974
+lon: -119.88209155375053
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1376.078
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11278000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 2bf3aa25bf1a4a59acb9792376cdef06

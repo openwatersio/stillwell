@@ -1,0 +1,16 @@
+name: CANAL DE PATILLAS AT INTAKE 113 SALINAS, PR
+lat: 17.982936
+lon: -66.26720000000002
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 17.828
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50093110/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: fde0bea764b64e3eae90f7719a0a994b

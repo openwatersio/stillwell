@@ -1,0 +1,16 @@
+name: SPEELYAI CREEK NEAR COUGAR, WA
+lat: 46.0045550217158
+lon: -122.344263773844
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 149.977
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14219800/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 99c1ea6611c54143af878024d6346cdc

@@ -1,0 +1,15 @@
+name: BREACH 3 IN NORTH SPREADER CANAL AT CAPE CORAL, FL
+lat: 26.6707777777778
+lon: -82.0633055555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-022933462/
+parameter_code: "00065"
+series_begin: 2013-08-22T04:00:00+00:00
+series_end: 2014-03-19T03:45:00+00:00
+time_series_id: f7a7090ad3e147cab0be3412860f534f

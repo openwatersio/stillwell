@@ -1,0 +1,13 @@
+name: SEWER AT CALUMET WASTEWATER PLANT AT CHICAGO, IL
+lat: 41.6672222222222
+lon: -87.6022222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-414002087360801/
+parameter_code: "00065"
+time_series_id: 53a060b9b5b847c4ba1148c954e8a89e

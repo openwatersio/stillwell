@@ -64,6 +64,26 @@ describe("mergeStationList", () => {
     );
   });
 
+  it("marks a station inactive when the source says its series changed under the same datum", () => {
+    const previous = [station("a", { datums: { LAT: -1.2 } }), station("b")];
+    const changed = (old: Station) => (old.id === "rws/a" ? "gage zero moved" : null);
+    const merged = mergeStationList(
+      previous,
+      [station("a", { datums: { LAT: -1.5 } }), station("b")],
+      changed,
+    );
+    assert.deepEqual(merged.changed, [
+      { id: "rws/a", from: "NAP", to: "NAP", reason: "gage zero moved" },
+    ]);
+    assert.deepEqual(
+      merged.stations.map((s) => [s.id, s.datums, s.status]),
+      [
+        ["rws/a", { LAT: -1.2 }, "inactive"],
+        ["rws/b", {}, "active"],
+      ],
+    );
+  });
+
   it("marks a station inactive when its datum changes, and brings it back when it returns", () => {
     const previous = [station("a", { datums: { LAT: -1.2 } })];
     const moved = mergeStationList(previous, [station("a", { datum: "MSL", datums: {} })]);

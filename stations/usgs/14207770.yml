@@ -1,0 +1,16 @@
+name: WILLAMETTE RIVER BELOW FALLS, AT OREGON CITY, OR
+lat: 45.3576206628572
+lon: -122.610925062923
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14207770/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e3859cc3003b4dca8561922d88d77177

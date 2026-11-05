@@ -1,0 +1,16 @@
+name: Mahoning River at Alliance OH
+lat: 40.9328361509708
+lon: -81.0945412589507
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.404
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03086500/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: 163f2fd405f04ea0805775b882e55d0c

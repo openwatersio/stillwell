@@ -1,0 +1,16 @@
+name: NF PAYETTE RIVER AT MCCALL ID
+lat: 44.9072222222222
+lon: -116.119166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1515.411
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13239000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 44e36567e0004e65bcfa9d86dab52364

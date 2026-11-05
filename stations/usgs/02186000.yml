@@ -1,0 +1,16 @@
+name: TWELVEMILE CREEK NEAR LIBERTY, SC
+lat: 34.80150561928389
+lon: -82.74847713667842
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 250.515
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02186000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 30fc1087469346c1ba8ad920c56a5ae7

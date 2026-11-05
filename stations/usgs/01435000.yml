@@ -1,0 +1,16 @@
+name: NEVERSINK RIVER NEAR CLARYVILLE NY
+lat: 41.889944444444446
+lon: -74.58980555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 463.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01435000/
+parameter_code: "00065"
+series_begin: 2012-07-10T15:45:00+00:00
+time_series_id: f22a2084703c45578e9fb1fcc3880b1f

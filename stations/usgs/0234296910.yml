@@ -1,0 +1,16 @@
+name: CHATTAHOOCHEE RIVER AT COAST GUARD DOCK AT EUFAULA
+lat: 31.9082156822724
+lon: -85.1449320405459
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0234296910/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6e5ed0dd0dea4fb7a231c7c7ff91ed44

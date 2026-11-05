@@ -1,0 +1,16 @@
+name: BIG LOST RIVER NR LESLIE ID
+lat: 43.859375
+lon: -113.466669444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1729.673
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13130300/
+parameter_code: "00065"
+series_begin: 2022-06-23T17:45:00+00:00
+time_series_id: 7e08607417c44e088c61d88c7b1555fb

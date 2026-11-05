@@ -1,0 +1,17 @@
+name: LITTLE TRUCKEE R BL DIV DAM NR SIERRAVILLE CA
+lat: 39.49154433680049
+lon: -120.29267926879864
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1944.624
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10341950/
+parameter_code: "00065"
+series_begin: 2012-11-16T23:30:00+00:00
+series_end: 2016-11-02T07:45:00+00:00
+time_series_id: 93d7e1050fa44d8aa855e7c490d631e0

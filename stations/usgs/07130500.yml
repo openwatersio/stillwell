@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER BELOW JOHN MARTIN RESERVOIR, CO.
+lat: 38.066389
+lon: -102.931944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1141.683
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07130500/
+parameter_code: "00065"
+series_begin: 2020-11-04T22:00:00+00:00
+time_series_id: 7f39827f7f694d119ed7ba9550b99bad

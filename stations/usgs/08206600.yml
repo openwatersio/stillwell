@@ -1,0 +1,16 @@
+name: Frio Rv at Tilden, TX
+lat: 28.4674927922804
+lon: -98.5475173731209
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 64.819
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08206600/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 54ea22b82c8a402d859fa19e2ca182a5

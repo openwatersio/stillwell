@@ -1,0 +1,16 @@
+name: CACHE LA POUDRE RIVER AT FORT COLLINS, CO
+lat: 40.588083
+lon: -105.069222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1504.971
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06752260/
+parameter_code: "00065"
+series_begin: 2020-11-24T18:40:00+00:00
+time_series_id: d7b2914d063b4639aabb9fa7816d7553

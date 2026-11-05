@@ -1,0 +1,16 @@
+name: SOUHEGAN RIVER (SITE WLR-1) NEAR MILFORD, NH
+lat: 42.842585841209
+lon: -71.7067399279561
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 80.565
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01093852/
+parameter_code: "00065"
+series_begin: 2008-05-29T12:30:00+00:00
+time_series_id: e48e66233d4342f3bea64be3ef255e77

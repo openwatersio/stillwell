@@ -1,0 +1,15 @@
+name: LITTLE WOOD RIVER NEAR GOODLAND, FL
+lat: 25.9120555555556
+lon: -81.5298333333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-255443081314700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2011-10-06T04:45:00+00:00
+time_series_id: b2d9b44b66c148c7a90e274b533da7ac

@@ -1,0 +1,16 @@
+name: TALLAPOOSA RIVER AT MALONE, ALABAMA
+lat: 33.197062561824
+lon: -85.5771772182284
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 193.548
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02414300/
+parameter_code: "00065"
+series_begin: 2019-05-31T12:00:00+00:00
+time_series_id: 1b7f67229eb247ae8ea92664a4d16e9f

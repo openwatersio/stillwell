@@ -1,0 +1,16 @@
+name: Black Hawk Creek at Hudson, IA
+lat: 42.4077638888889
+lon: -92.4632472222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 263.64
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05463500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 61a023c9f7c4440880861ea4ee1bc2b8

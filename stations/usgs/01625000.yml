@@ -1,0 +1,16 @@
+name: MIDDLE RIVER NEAR GROTTOES, VA
+lat: 38.2617961561603
+lon: -78.8619702957481
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 323.362
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01625000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 126d0da66f034f7ea39f17b5a5e97465

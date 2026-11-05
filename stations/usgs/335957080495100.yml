@@ -1,0 +1,13 @@
+name: WESTONS POND NEAR COLUMBIA,SC
+lat: 33.9991666666667
+lon: -80.8308333333333
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-335957080495100/
+parameter_code: "00065"
+time_series_id: c8d44eac314a4c07a0272cc18404f0ea

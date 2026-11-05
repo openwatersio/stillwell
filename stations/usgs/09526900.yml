@@ -1,0 +1,16 @@
+name: PILOT KNOB POWERPLANT INLET DIVERSION FROM AAC, CA
+lat: 32.73784722222222
+lon: -114.71468611111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.426
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09526900/
+parameter_code: "00065"
+series_begin: 2025-03-25T21:45:00+00:00
+time_series_id: 31bbc2c160f34588b4e191b1bce6e901

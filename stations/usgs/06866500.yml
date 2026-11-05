@@ -1,0 +1,16 @@
+name: SMOKY HILL R NR MENTOR, KS
+lat: 38.7111151988635
+lon: -97.5717015002957
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 378.168
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06866500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e460995d68f3417f8f84679696813be2

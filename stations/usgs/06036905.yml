@@ -1,0 +1,16 @@
+name: Firehole River near West Yellowstone MT
+lat: 44.620183
+lon: -110.863503
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2150.693
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06036905/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 28aa1866889f40f1b6cdffafccc2574a

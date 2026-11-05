@@ -1,0 +1,16 @@
+name: Middle Fk Byu D'Arbonne nr Bernice, LA
+lat: 32.76380555555556
+lon: -92.65819444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 29.584
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07365500/
+parameter_code: "00065"
+series_begin: 2021-11-11T20:00:00+00:00
+time_series_id: fb5f0e52a20b41ceb60e3b92a6cb1230

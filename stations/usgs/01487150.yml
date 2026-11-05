@@ -1,0 +1,17 @@
+name: BUCKS BRANCH NEAR ATLANTA, DE
+lat: 38.6914722222222
+lon: -75.6348888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.385
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01487150/
+parameter_code: "00065"
+series_begin: 2014-01-21T19:30:00+00:00
+series_end: 2016-07-01T04:45:00+00:00
+time_series_id: b424f1e8c9db4d15b50907e04ef1c9d8

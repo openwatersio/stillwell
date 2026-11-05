@@ -1,0 +1,15 @@
+name: WHITEFISH (BARDON) LAKE NEAR GORDON, WI
+lat: 46.2085530624872
+lon: -91.8804649674301
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 313.764
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-461231091524900/
+parameter_code: "00065"
+time_series_id: 71a2b6576c7041cab8788d4ee2427bf5

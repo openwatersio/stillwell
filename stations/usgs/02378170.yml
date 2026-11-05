@@ -1,0 +1,17 @@
+name: WOLF CREEK BELOW FOLEY, ALA
+lat: 30.388286174754644
+lon: -87.65279276552612
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 4.947
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02378170/
+parameter_code: "00065"
+series_begin: 2007-12-06T06:00:00+00:00
+series_end: 2024-11-22T18:30:00+00:00
+time_series_id: 7e115104a80d4c1d956279f81185a029

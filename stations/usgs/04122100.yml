@@ -1,0 +1,16 @@
+name: BEAR CREEK NEAR MUSKEGON, MI
+lat: 43.2886254320807
+lon: -86.2228377712293
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.698
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04122100/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: d049cd0b346f44f0b2acdf7d871e3a63

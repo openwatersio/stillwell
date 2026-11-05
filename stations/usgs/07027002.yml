@@ -1,0 +1,13 @@
+name: REELFOOT LAKE SPILLWAY NEAR TIPTONVILLE, TN
+lat: 36.3517825513746
+lon: -89.405362101793
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07027002/
+parameter_code: "00065"
+time_series_id: ccbf5f0148734e118926e661f24f082d

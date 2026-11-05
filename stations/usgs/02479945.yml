@@ -1,0 +1,16 @@
+name: BIG CREEK AT COUNTY RD 63 NEAR WILMER, AL.
+lat: 30.8560196798731
+lon: -88.3338988344674
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 38.146
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02479945/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e5dbe19014ff4097b4bcd5cf8ef83d64

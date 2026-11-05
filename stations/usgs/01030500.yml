@@ -1,0 +1,16 @@
+name: Mattawamkeag River near Mattawamkeag, Maine
+lat: 45.5011111111111
+lon: -68.3058333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 64.197
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01030500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8b027c1fc00a43e9ba13e1b8a97717bf

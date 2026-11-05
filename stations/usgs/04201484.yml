@@ -1,0 +1,16 @@
+name: East Branch Rocky River near Strongsville OH
+lat: 41.3344444444444
+lon: -81.8347222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 236.494
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04201484/
+parameter_code: "00065"
+series_begin: 2016-09-27T15:10:00+00:00
+time_series_id: 56286cd94462445ea7109f18f3dd725a

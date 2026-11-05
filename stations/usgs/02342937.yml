@@ -1,0 +1,17 @@
+name: SOUTH FORK COWIKEE CREEK NR HOWE, AL
+lat: 32.01678611111111
+lon: -85.2138
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 59.741
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02342937/
+parameter_code: "00065"
+series_begin: 2021-07-29T19:38:00+00:00
+series_end: 2026-02-24T17:30:00+00:00
+time_series_id: 0cb7fec350424b9984abdd6ff4960949

@@ -1,0 +1,16 @@
+name: LONG TOM RIVER AT MONROE, OR
+lat: 44.31283333333333
+lon: -123.29636111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 83.412
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14170000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 56d28a20285d4dac937b32c5a5386d3c

@@ -1,0 +1,16 @@
+name: Kahaluu Str nr Ahuimanu, Oahu, HI
+lat: 21.438718117199492
+lon: -157.8438664073581
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 45.72
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16283200/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 9e2d5051dc284569b981a58db7fccf8f

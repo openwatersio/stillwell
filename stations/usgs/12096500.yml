@@ -1,0 +1,16 @@
+name: PUYALLUP RIVER AT ALDERTON, WA
+lat: 47.1851011479701
+lon: -122.22956251685
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.35
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12096500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: cad4f605b5eb48a9988a20b93526a1c8

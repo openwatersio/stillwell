@@ -1,0 +1,16 @@
+name: WALNUT CREEK AT SOUTH WILMINGTON ST AT RALEIGH, NC
+lat: 35.7568888888889
+lon: -78.6406111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 66.995
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208734795/
+parameter_code: "00065"
+series_begin: 2018-08-08T16:15:00+00:00
+time_series_id: d1fbd1e1c1d846f690e613d4a6b74d8c

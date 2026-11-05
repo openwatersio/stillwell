@@ -1,0 +1,16 @@
+name: COLUMBIA RIVER AT PORT WESTWARD, NEAR QUINCY, OR
+lat: 46.1812213607103
+lon: -123.183453932368
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: -0.305
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14246900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: d76121cf481249b99b3f2639228d8ac5

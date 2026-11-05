@@ -1,0 +1,16 @@
+name: CANAL MOCA ABV AGUADILLA PLANT, AGUADILLA, PR
+lat: 18.449219
+lon: -67.137322
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 152.461
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50011128/
+parameter_code: "00065"
+series_begin: 2009-09-02T04:00:00+00:00
+time_series_id: 7033d720caaa49eaab7703b71f8cdaba

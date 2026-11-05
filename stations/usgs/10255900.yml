@@ -1,0 +1,17 @@
+name: BLACK WHEEL C DIV NR BANNING CA
+lat: 34.0607833333333
+lon: -116.819016666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2173.224
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10255900/
+parameter_code: "00065"
+series_begin: 2015-10-07T20:00:00+00:00
+series_end: 2017-10-25T20:00:00+00:00
+time_series_id: b4fa032087b64545b82b18bef3ae9bd2

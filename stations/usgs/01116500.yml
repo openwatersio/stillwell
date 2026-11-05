@@ -1,0 +1,16 @@
+name: PAWTUXET RIVER AT CRANSTON, RI
+lat: 41.7509339863069
+lon: -71.4450575337562
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.195
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01116500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c21086fa58f64d9881b0780402ff87aa

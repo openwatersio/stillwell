@@ -1,0 +1,16 @@
+name: WEST CLEAR CREEK NEAR CAMP VERDE, AZ
+lat: 34.5386360558508
+lon: -111.694035643064
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1106.424
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09505800/
+parameter_code: "00065"
+series_begin: 2015-10-19T21:15:00+00:00
+time_series_id: 7142c04915244a1b89eb0fdefc2bae61

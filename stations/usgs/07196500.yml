@@ -1,0 +1,16 @@
+name: Illinois River near Tahlequah, OK
+lat: 35.9255472222222
+lon: -94.9217027777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.716
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07196500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 79b89e6ab1f64137b76d6403d6273ed3

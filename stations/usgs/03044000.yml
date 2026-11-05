@@ -1,0 +1,16 @@
+name: Conemaugh River at Tunnelton, PA
+lat: 40.4545117091235
+lon: -79.3908723706986
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 257.343
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03044000/
+parameter_code: "00065"
+series_begin: 2009-10-01T04:00:00+00:00
+time_series_id: 665e3bb37d604addb4d7b01a91b96c4b

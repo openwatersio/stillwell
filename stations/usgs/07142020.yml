@@ -1,0 +1,15 @@
+name: WALNUT C BLW CHEYENNE BTMS DV NR GREAT BEND, KS
+lat: 38.4189008658487
+lon: -98.7650844772197
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 556.565
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07142020/
+parameter_code: "00065"
+time_series_id: ecf9a8a97ac9465d9d62c9f6e31dbb94

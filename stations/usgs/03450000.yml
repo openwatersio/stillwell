@@ -1,0 +1,16 @@
+name: BEETREE CREEK NEAR SWANNANOA, NC
+lat: 35.6530555555556
+lon: -82.4052777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 820.866
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03450000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e4c7183c2a0b42a69ca3eb9abdacf27a

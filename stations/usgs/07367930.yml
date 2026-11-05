@@ -1,0 +1,17 @@
+name: Bayou Bonne Idee east of Oak Ridge, LA
+lat: 32.64361111111111
+lon: -91.70355555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.8
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07367930/
+parameter_code: "00065"
+series_begin: 2022-05-05T16:15:00+00:00
+series_end: 2026-09-16T19:15:00+00:00
+time_series_id: 80f2aa1d3a384b958bbd02d8cf346ac5

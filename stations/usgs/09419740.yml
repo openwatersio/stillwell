@@ -1,0 +1,16 @@
+name: C-1 CHANNEL NR WARM SPGS RD AT HENDERSON, NV
+lat: 36.044699022983
+lon: -114.959158350693
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 564.572
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09419740/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: b82c589d8ec440fca2f378b043fda8e6

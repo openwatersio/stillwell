@@ -1,0 +1,17 @@
+name: MARTIS C NR TRUCKEE CA
+lat: 39.328795767055
+lon: -120.117696357681
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1746.504
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10339400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2010-10-01T08:00:00+00:00
+time_series_id: d50dea50ad0d42f5b5023ef83c0c3edc

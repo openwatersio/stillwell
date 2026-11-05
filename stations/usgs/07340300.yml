@@ -1,0 +1,16 @@
+name: Cossatot River near Vandervoort, AR
+lat: 34.38
+lon: -94.2363888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.226
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07340300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 83e48c7b365e48318a0e5c346604af87

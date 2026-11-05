@@ -1,0 +1,16 @@
+name: Canadian Rv nr Canadian, TX
+lat: 35.9350420001461
+lon: -100.370688402663
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 701.823
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07228000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d7a2d3a3fbb14c0cb7bcd69b73b5748a

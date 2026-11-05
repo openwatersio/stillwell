@@ -1,0 +1,16 @@
+name: EKLUTNA LK NR PALMER AK
+lat: 61.4102917218888
+lon: -149.124435680071
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 262.067
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15278000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: 46af199ac23447afbb29850e26eee48d

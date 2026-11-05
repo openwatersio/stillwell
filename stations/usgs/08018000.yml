@@ -1,0 +1,16 @@
+name: Grand Saline Ck at FM 857 nr Grand Saline, TX
+lat: 32.661741666666664
+lon: -95.69108055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 105.156
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08018000/
+parameter_code: "00065"
+series_begin: 2022-12-07T21:00:00+00:00
+time_series_id: 50759624785046fe84a239d33b7bd9c6

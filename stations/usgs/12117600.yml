@@ -1,0 +1,16 @@
+name: CEDAR RIVER BELOW DIVERSION NEAR LANDSBURG, WA
+lat: 47.3795458229604
+lon: -121.983447957596
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 149.352
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12117600/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7c2c5a10f7f141c9b50037169e323e8d

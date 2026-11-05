@@ -1,0 +1,16 @@
+name: INDIAN RIVER NEAR INDIAN LAKE NY
+lat: 43.7565
+lon: -74.2670555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 488.881
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01315000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 41eeb4924ed44cd3846fd539ca4b80b6

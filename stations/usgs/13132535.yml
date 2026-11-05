@@ -1,0 +1,16 @@
+name: BIG LOST R AT LINCOLN BLVD BRIDGE NR ATOMIC CITY
+lat: 43.5744027777778
+lon: -112.942116666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1494.151
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13132535/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 8be83a591e61451bae77bc5af374ecbb

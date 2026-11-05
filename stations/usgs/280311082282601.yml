@@ -1,0 +1,16 @@
+name: LAKE ECKLES NEAR CARROLLWOOD FL
+lat: 28.053175
+lon: -82.4740111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-280311082282601/
+parameter_code: "00065"
+series_begin: 2015-04-16T04:00:00+00:00
+time_series_id: 935bd09741004d3a9e65a22ac60c165a

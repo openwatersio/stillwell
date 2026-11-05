@@ -1,0 +1,16 @@
+name: WADING RIVER NEAR NORTON, MA
+lat: 41.9476001464146
+lon: -71.1767154983626
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 16.566
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01109000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d661b21ce5eb424d924ad4b31c733b82

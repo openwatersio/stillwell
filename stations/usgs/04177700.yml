@@ -1,0 +1,16 @@
+name: HAMILTON LAKE AT HAMILTON, IN
+lat: 41.5361616247658
+lon: -84.9124618235763
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 271.083
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04177700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e4ac59c0920848d79f26d94b48f7303d

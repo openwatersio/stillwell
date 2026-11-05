@@ -1,0 +1,16 @@
+name: Pukele Stream near Honolulu, Oahu, HI
+lat: 21.30666253047666
+lon: -157.78833861265696
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 105.089
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16244000/
+parameter_code: "00065"
+series_begin: 2011-12-12T10:00:00+00:00
+time_series_id: e5737dd5440b4c2f9b1a62c7df87ea4e

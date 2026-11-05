@@ -1,0 +1,16 @@
+name: BOONE CREEK NEAR MC HENRY, IL
+lat: 42.3206944444444
+lon: -88.3126388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 234.513
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05549000/
+parameter_code: "00065"
+series_begin: 2012-11-19T21:15:00+00:00
+time_series_id: 10cdea6ee692476a9e183a3da497b8c3

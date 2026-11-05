@@ -1,0 +1,16 @@
+name: CYPRESS CR AT COUNTY LINE RD AT WESLEY CHAPEL FL
+lat: 28.1713055555556
+lon: -82.3886111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02303424/
+parameter_code: "00065"
+series_begin: 2014-02-28T05:00:00+00:00
+time_series_id: 5d0a59230ed140cbb7065d00e7ce1e37

@@ -1,0 +1,17 @@
+name: Pawtuckaway Lake near Nottingham, NH
+lat: 43.0844444444444
+lon: -71.1561111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 75.743
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01073389/
+parameter_code: "00065"
+series_begin: 2014-08-13T04:00:00+00:00
+series_end: 2017-09-26T13:15:00+00:00
+time_series_id: 6ddc9c091caa4dbeaac6a48d086381b1

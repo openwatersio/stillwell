@@ -1,0 +1,16 @@
+name: NEOSHO R NR AMERICUS, KS
+lat: 38.466956985826
+lon: -96.250553326879
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 337.444
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07179730/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e5f729efcb934755a3a41e565713f4db

@@ -1,0 +1,16 @@
+name: TREMPEALEAU RIVER AT DODGE, WI
+lat: 44.13175
+lon: -91.5530277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.531
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05379500/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: 40a70fed51ce42f3ba94b71ca805c957

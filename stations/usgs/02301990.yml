@@ -1,0 +1,16 @@
+name: HILLSBOROUGH R AB CRYSTAL SPR NEAR ZEPHYRHILLS FL
+lat: 28.1855555555556
+lon: -82.1841666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02301990/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 436cf3a414574570b422e63c620e0fdb

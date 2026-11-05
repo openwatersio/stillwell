@@ -1,0 +1,16 @@
+name: Medina Rv at La Coste, TX
+lat: 29.3241246153272
+lon: -98.8130810222157
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 203.411
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08180640/
+parameter_code: "00065"
+series_begin: 2017-07-20T15:00:00+00:00
+time_series_id: 5f9092d7eb3f4ab39e3a58568705066d

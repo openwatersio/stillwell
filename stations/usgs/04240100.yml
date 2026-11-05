@@ -1,0 +1,17 @@
+name: HARBOR BROOK AT SYRACUSE NY
+lat: 43.0358333333333
+lon: -76.1816666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 119.226
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04240100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2020-10-01T05:00:00+00:00
+time_series_id: 3aded321ccce4c9f90f9480f7d717820

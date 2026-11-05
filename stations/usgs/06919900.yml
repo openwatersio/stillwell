@@ -1,0 +1,16 @@
+name: Sac River near Caplinger Mills, MO
+lat: 37.8698333333333
+lon: -93.8031666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 219.791
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06919900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 53aaff0df8af41dba884f75df1c85aa4

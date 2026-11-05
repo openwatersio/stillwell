@@ -1,0 +1,17 @@
+name: SECOND CREEK AT MANBONE ROAD NR WATERLOO, AL
+lat: 34.956100000000006
+lon: -88.0243111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 133.807
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03590945/
+parameter_code: "00065"
+series_begin: 2024-08-21T21:15:00+00:00
+series_end: 2026-07-07T18:15:00+00:00
+time_series_id: 6b56a540a4e0447dbad805f33bc6abfc

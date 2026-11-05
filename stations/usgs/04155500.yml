@@ -1,0 +1,16 @@
+name: PINE RIVER NEAR MIDLAND, MI
+lat: 43.5644727599866
+lon: -84.3691619163691
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 190.025
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04155500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 25c4ea909cea4a72a8066b52a0aab7c9

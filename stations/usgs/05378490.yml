@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER AT LOCK AND DAM 5A NR WINONA, MN
+lat: 44.085096
+lon: -91.667552
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 194.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05378490/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1fb1d754910b44bf8d74a8939222123a

@@ -1,0 +1,16 @@
+name: Honokahua Stream at Honoapiilani Highway, Maui, HI
+lat: 20.999806932907404
+lon: -156.64953557374042
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 18.288
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16623300/
+parameter_code: "00065"
+series_begin: 2025-09-09T23:45:00+00:00
+time_series_id: 5709a97b76bb49209098dd2288037756

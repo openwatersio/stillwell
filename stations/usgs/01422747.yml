@@ -1,0 +1,16 @@
+name: EAST BROOK EAST OF WALTON NY
+lat: 42.1726666666667
+lon: -75.1219166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 371.579
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01422747/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4b3d52d26ac6447cbea9a2ca3a10caa2

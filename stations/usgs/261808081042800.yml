@@ -1,0 +1,14 @@
+name: WEST FEEDER CANAL ABV WEST WEIR NR  CLEWISTON FL
+lat: 26.3023333333333
+lon: -81.0744444444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-261808081042800/
+parameter_code: "00065"
+series_begin: 2012-02-23T05:00:00+00:00
+time_series_id: 46d3d2430cfc4786a935a0077b810dce

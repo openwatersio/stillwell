@@ -1,0 +1,16 @@
+name: HENRYS LAKE NR LAKE ID
+lat: 44.5972222222222
+lon: -111.353611111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 1969.834
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13039000/
+parameter_code: "00065"
+series_begin: 2007-10-02T06:00:00+00:00
+time_series_id: 93787659cd304bd39c076981c2747691

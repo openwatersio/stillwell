@@ -1,0 +1,16 @@
+name: SIPSEY RIVER NR ELROD, AL
+lat: 33.25709873100439
+lon: -87.7764080563981
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.094
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02446500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 84c1314c22a942a783f98c51079f8a24

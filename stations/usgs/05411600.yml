@@ -1,0 +1,16 @@
+name: Turkey River at Spillville, IA
+lat: 43.2072777777778
+lon: -91.9503333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.995
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05411600/
+parameter_code: "00065"
+series_begin: 2010-04-06T05:00:00+00:00
+time_series_id: b3ed6f399e544f9dbef3a1e8b626e3d2

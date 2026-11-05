@@ -1,0 +1,16 @@
+name: SOQUEL C A SOQUEL CA
+lat: 36.9913389096379
+lon: -121.955793275174
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 6.517
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11160000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 5cfca83c7e3c4464a06a24687db976ed

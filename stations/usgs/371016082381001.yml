@@ -1,0 +1,17 @@
+name: ELKHORN CREEK AT FREEDOM LANE AT JENKINS, KY
+lat: 37.17107222222222
+lon: -82.63613055555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 463.445
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-371016082381001/
+parameter_code: "00065"
+series_begin: 2024-04-01T19:05:00+00:00
+series_end: 2026-09-23T22:55:00+00:00
+time_series_id: 6a8776d893ef48a2a55ffa07bcb660f6

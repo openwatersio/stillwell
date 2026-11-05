@@ -1,0 +1,16 @@
+name: WILLAMETTE RIVER AT SALEM, OR
+lat: 44.9442862974769
+lon: -123.042874245737
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 32.351
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14191000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: bf5c1a17947a4dc1913efb90f073360c

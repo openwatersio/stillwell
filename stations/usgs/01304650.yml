@@ -1,0 +1,14 @@
+name: SHELTER ISLAND SOUND AT SHELTER ISLAND NY
+lat: 41.04430555555555
+lon: -72.31697222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01304650/
+parameter_code: "62620"
+series_begin: 2020-11-17T19:30:00+00:00
+time_series_id: 100cdf762817456c9833721389f910ed

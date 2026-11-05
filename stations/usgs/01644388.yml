@@ -1,0 +1,16 @@
+name: TENMILE CREEK NEAR CLARKSBURG, MD
+lat: 39.22338888888889
+lon: -77.31224999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.851
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01644388/
+parameter_code: "00065"
+series_begin: 2013-06-11T14:55:00+00:00
+time_series_id: 850fcece204646e3b5cb176921a105a8

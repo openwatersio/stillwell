@@ -1,0 +1,16 @@
+name: SOUTH FORK ZUMBRO RIVER AT ROCHESTER, MN
+lat: 44.0616507031399
+lon: -92.46629625379711
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 290.17
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05372995/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: defd8ab99da54bf7bd92b04b832af3db

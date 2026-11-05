@@ -1,0 +1,16 @@
+name: FISH CREEK AT HAMILTON, IN
+lat: 41.532238546750904
+lon: -84.90353628364535
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 266.782
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04177720/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 5fb5b0287c794e848ad4349cddfe689f

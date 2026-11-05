@@ -1,0 +1,15 @@
+name: MALLETTS CREEK AT DOYLE PARK AT ANN ARBOR, MI
+lat: 42.2425388813721
+lon: -83.7102178246191
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 242.712
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04174514/
+parameter_code: "00065"
+time_series_id: 47ef0db84a764bbfbdb6a27c699c6c31

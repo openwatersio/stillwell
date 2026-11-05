@@ -1,0 +1,17 @@
+name: RAINEY CK AT SWAN VALLEY IDAHO
+lat: 43.4456305555556
+lon: -111.329855555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1608.457
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13034450/
+parameter_code: "00065"
+series_begin: 2017-09-06T20:30:00+00:00
+series_end: 2017-11-16T20:45:00+00:00
+time_series_id: 0a53912c12ed4d8b87bdedfedc2d0a9b

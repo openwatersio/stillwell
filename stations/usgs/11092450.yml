@@ -1,0 +1,16 @@
+name: LOS ANGELES R A SEPULVEDA DAM CA
+lat: 34.1616724715098
+lon: -118.466748990578
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.684
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11092450/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 0fc15b471ee0423a842b991724cc063c

@@ -1,0 +1,16 @@
+name: JAMES RIVER AT LAMOURE, ND
+lat: 46.355556
+lon: -98.304167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 393.518
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06470500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7fd1f82fa6c545b4ba23b1456e2a2776

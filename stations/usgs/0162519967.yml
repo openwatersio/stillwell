@@ -1,0 +1,17 @@
+name: MILL CREEK NEAR PORT REPUBLIC, VA
+lat: 38.31922222222222
+lon: -78.81672222222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 329.184
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0162519967/
+parameter_code: "00065"
+series_begin: 2021-05-27T17:00:00+00:00
+series_end: 2021-11-12T14:30:00+00:00
+time_series_id: d7a1b064a9924cd2956f8a6e0a5d8b16

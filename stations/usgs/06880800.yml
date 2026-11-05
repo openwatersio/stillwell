@@ -1,0 +1,16 @@
+name: West Fork Big Blue River near Dorchester, Nebr.
+lat: 40.73151666666667
+lon: -97.17776666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 427.982
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06880800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 132726d376c0491ea18cc6d962b1571f

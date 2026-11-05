@@ -1,0 +1,16 @@
+name: VAN ETTEN CREEK AT HWY F-41 AT OSCODA, MI
+lat: 44.44067777777777
+lon: -83.34156388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.84
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04137716/
+parameter_code: "00065"
+series_begin: 2023-10-10T12:15:00+00:00
+time_series_id: ccff74c884e64f288edd16bf442c80d7

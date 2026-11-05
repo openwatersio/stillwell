@@ -1,0 +1,16 @@
+name: Current River above Powder Mill, MO
+lat: 37.1856138888889
+lon: -91.1776638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 166.604
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07066510/
+parameter_code: "00065"
+series_begin: 2015-09-24T05:00:00+00:00
+time_series_id: 6fb3f95747c94eb29fd81b1c1dd49bba

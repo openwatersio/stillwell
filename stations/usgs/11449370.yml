@@ -1,0 +1,17 @@
+name: MOLESWORTH C NR CLEARLAKE CA
+lat: 38.93894444444444
+lon: -122.62888888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 407.323
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11449370/
+parameter_code: "00065"
+series_begin: 2022-10-01T08:00:00+00:00
+series_end: 2024-05-01T07:45:00+00:00
+time_series_id: 5ceeba11c96445d3b31d63f8bdfa51a4

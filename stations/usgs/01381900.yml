@@ -1,0 +1,16 @@
+name: Passaic River at Pine Brook NJ
+lat: 40.862500000000004
+lon: -74.32166666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 45.494
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01381900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0a37d086465444a9a6f0fb2fe328aab7

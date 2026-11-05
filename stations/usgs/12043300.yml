@@ -1,0 +1,16 @@
+name: HOKO RIVER NEAR SEKIU, WA
+lat: 48.2414641646246
+lon: -124.383832835962
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.366
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12043300/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 0fcbc68c4e174d1489052883de6f1c15

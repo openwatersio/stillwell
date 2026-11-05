@@ -1,0 +1,16 @@
+name: BYNUM RUN NEAR ABINGDON, MD
+lat: 39.479888888888894
+lon: -76.28047222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 9.818
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01581590/
+parameter_code: "00065"
+series_begin: 2022-06-29T15:45:00+00:00
+time_series_id: 3bb3b5f2a369427fa2a6b9c2f2b0bd0c

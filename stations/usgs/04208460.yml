@@ -1,0 +1,16 @@
+name: Mill Creek at Garfield Hts OH
+lat: 41.4239415157337
+lon: -81.6376266249724
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.035
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04208460/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a19ae566851a4b2e83e5a78c4ef59aee

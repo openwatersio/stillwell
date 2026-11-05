@@ -1,0 +1,16 @@
+name: Kennebec River at Calumet Bridge at Augusta, Maine
+lat: 44.3186111111111
+lon: -69.7716666666667
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01049320/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b5be2e0d6a12443f80c51aacf28514c6

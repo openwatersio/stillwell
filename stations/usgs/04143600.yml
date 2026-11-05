@@ -1,0 +1,16 @@
+name: KAWKAWLIN RIVER AT STATE PARK DR AT BAY CITY, MI
+lat: 43.65163333333333
+lon: -83.89778611111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.479
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04143600/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: 8215ce377d4545a2859cae264c20bc6f

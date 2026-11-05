@@ -1,0 +1,14 @@
+name: ISLE OF WIGHT BAY AT ISLE OF WIGHT, MD
+lat: 38.3899166666667
+lon: -75.1005833333333
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0148471370/
+parameter_code: "62620"
+series_begin: 2020-05-05T18:48:00+00:00
+time_series_id: bf7598ce8c1d4b8a8c96ef3a9cd907f7

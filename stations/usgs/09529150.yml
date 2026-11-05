@@ -1,0 +1,16 @@
+name: NORTH GILA MAIN CANAL WASTEWAY NEAR YUMA, AZ
+lat: 32.7262805555556
+lon: -114.504244444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 42.251
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09529150/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: addb5c14bd8d46ec882a888eea6368be

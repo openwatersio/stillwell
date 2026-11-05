@@ -1,0 +1,16 @@
+name: South Fork Saline Creek near Perryville, MO
+lat: 37.7369444444444
+lon: -89.9283333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 135.514
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07020550/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1fa9df0cd05143398280fe32aaa8dcfe

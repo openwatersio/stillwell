@@ -1,0 +1,16 @@
+name: CANEY R NR ELGIN, KS
+lat: 37.0039555555556
+lon: -96.3166611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.895
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07172000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 018b3cbd8376480f978ac0d86e8e6f87

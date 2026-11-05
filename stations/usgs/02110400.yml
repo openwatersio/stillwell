@@ -1,0 +1,16 @@
+name: BUCK CREEK NEAR LONGS, SC
+lat: 33.95346258967119
+lon: -78.71974629465349
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.615
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02110400/
+parameter_code: "00065"
+series_begin: 2014-04-21T17:00:00+00:00
+time_series_id: ee9691aa516346aca2898b608bd406ff

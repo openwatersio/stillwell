@@ -1,0 +1,16 @@
+name: LITTLE RIVER NR QUINCY, FLA.
+lat: 30.587418061035
+lon: -84.4965762620191
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 25.356
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02329500/
+parameter_code: "00065"
+series_begin: 2012-03-14T04:00:00+00:00
+time_series_id: 21d2523048304f6eac63c6e371608f24

@@ -1,0 +1,16 @@
+name: MERCED R A POHONO BRIDGE NR YOSEMITE CA
+lat: 37.71627777777778
+lon: -119.66566666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1178.015
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11266500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7638ca394ee4498a95a354ed2916fb04

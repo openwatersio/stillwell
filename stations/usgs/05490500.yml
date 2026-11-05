@@ -1,0 +1,16 @@
+name: Des Moines River at Keosauqua, IA
+lat: 40.7278055555556
+lon: -91.9596138888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 165.674
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05490500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 6cf71aec82c94aa38970bdfd0ebe6e11

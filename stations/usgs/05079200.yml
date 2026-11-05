@@ -1,0 +1,17 @@
+name: County Ditch 72 (Burnham Ck) Nr. Maple Bay  (SW3)
+lat: 47.6386111111111
+lon: -96.28
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 343.077
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05079200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2015-10-01T05:45:00+00:00
+time_series_id: 3ea3bff9037f452da5b313f07af540d0

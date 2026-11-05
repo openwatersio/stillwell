@@ -1,0 +1,16 @@
+name: Caney Ck nr Splendora, TX
+lat: 30.2596578887507
+lon: -95.3024361174479
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 36.101
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08070500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 05fe1347ddc14e40a3d082efd75b3746

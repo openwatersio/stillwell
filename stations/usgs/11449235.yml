@@ -1,0 +1,16 @@
+name: CLOVER C BYPASS A ELK MTN RD NR UPPER LAKE CA
+lat: 39.175777777777775
+lon: -122.9028888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 411.379
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11449235/
+parameter_code: "00065"
+series_begin: 2022-10-01T08:00:00+00:00
+time_series_id: 645e624ecc9249d9b63c597d0db29cd6

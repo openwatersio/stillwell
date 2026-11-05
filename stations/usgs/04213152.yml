@@ -1,0 +1,16 @@
+name: Walnut Creek Upstream Pool, near Erie, PA
+lat: 42.073888888888895
+lon: -80.23472222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 174.376
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04213152/
+parameter_code: "00065"
+series_begin: 2008-03-27T17:30:00+00:00
+time_series_id: 5153c7ede93148798753fb10ddb48b82

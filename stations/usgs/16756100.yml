@@ -1,0 +1,16 @@
+name: Kohakohau Stream above intake, nr Kamuela, HI
+lat: 20.045606721250977
+lon: -155.68169921868537
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 1057.656
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16756100/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 1e5583a9fd2f4db2b09cab4935a4146e

@@ -1,0 +1,15 @@
+name: CAUSEWAY DRIVE BRIDGE, HWY 904 TO SUNSET BEACH, NC
+lat: 33.8956722222222
+lon: -78.4395777777778
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-335344078262295/
+parameter_code: "00065"
+series_begin: 2018-09-11T16:35:00+00:00
+series_end: 2018-09-22T12:45:00+00:00
+time_series_id: 7f1eb4dff32d4c9cb32d55bde925380d

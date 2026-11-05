@@ -1,0 +1,16 @@
+name: Shell Rock River at Shell Rock, IA
+lat: 42.711925
+lon: -92.5829666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.858
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05462000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 42a7c4e7e0ef4a659cf2e950bec50442

@@ -1,0 +1,16 @@
+name: Muncy Creek near Muncy, PA
+lat: 41.20750443335981
+lon: -76.75215568077957
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 149.078
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01553005/
+parameter_code: "00065"
+series_begin: 2018-10-01T13:15:00+00:00
+time_series_id: 818ec90c2ab3466e9e65a7312b9ccad1

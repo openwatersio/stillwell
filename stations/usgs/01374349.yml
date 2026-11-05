@@ -1,0 +1,13 @@
+name: HUDSON RIVER AT TOMKINS COVE NY
+lat: 41.2587050194161
+lon: -73.9776400879157
+country_code: US
+kind: estuary
+datum: NGVD29
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01374349/
+parameter_code: "62619"
+time_series_id: ca8973a098e84ab48d5b57014a4a6d77

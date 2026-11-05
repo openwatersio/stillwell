@@ -1,0 +1,16 @@
+name: CANNONBALL RIVER NEAR RALEIGH, ND
+lat: 46.126944
+lon: -101.33277800000002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 565.285
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06351200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 32cf42e3807a4a5a92490720dfc0b4bc

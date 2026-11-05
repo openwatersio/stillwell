@@ -1,0 +1,16 @@
+name: OHIO RIVER AT MADISON, IN
+lat: 38.726111
+lon: -85.370278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.956
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03292000/
+parameter_code: "00065"
+series_begin: 2026-09-02T18:45:00+00:00
+time_series_id: cdd7b6dc4fe942419b6dadc0ba2c496a

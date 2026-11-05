@@ -1,0 +1,16 @@
+name: BIG CREEK NEAR WADESVILLE, IN
+lat: 38.083111111111116
+lon: -87.76963888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.685
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03378550/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 20a7073872e24a8f894fbc6ad0686e25

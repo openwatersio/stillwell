@@ -1,0 +1,16 @@
+name: BOXLEY CREEK NEAR EDGEWICK, WA
+lat: 47.4487145935831
+lon: -121.731774351842
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 198.12
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12143900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3c6fd9d39e254e7a921afe242bdac344

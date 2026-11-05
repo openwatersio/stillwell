@@ -1,0 +1,17 @@
+name: SMITH CK AT RAINBOW HILL FARM NR HARRISONBURG, VA
+lat: 38.514916666666664
+lon: -78.74641666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 348.7
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0163283609/
+parameter_code: "00065"
+series_begin: 2021-06-09T15:25:00+00:00
+series_end: 2021-11-15T18:00:00+00:00
+time_series_id: 9810341b6d2949b192d27a1daf04e5d9

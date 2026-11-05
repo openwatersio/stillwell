@@ -1,0 +1,16 @@
+name: GOODNO CANAL BELOW S-78 NEAR LABELLE FL
+lat: 26.787906
+lon: -81.30495
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02292490/
+parameter_code: "00065"
+series_begin: 2018-12-03T17:00:00+00:00
+time_series_id: 0ec4a3ae6d7e4db09ddaa0eecb78ba97

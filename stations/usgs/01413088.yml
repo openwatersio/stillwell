@@ -1,0 +1,16 @@
+name: EAST BRANCH DELAWARE RIVER AT ROXBURY NY
+lat: 42.2938055555556
+lon: -74.5591944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 450.595
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01413088/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 76d9a3a13f0f458aa4031887b53417e5

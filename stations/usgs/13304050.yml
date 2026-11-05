@@ -1,0 +1,16 @@
+name: Big Timber Creek Abv Mouth at Leadore ID
+lat: 44.6887916666667
+lon: -113.370405555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1809.979
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13304050/
+parameter_code: "00065"
+series_begin: 2021-10-12T17:15:00+00:00
+time_series_id: 33945ff392014542a862dd14a918ecb7

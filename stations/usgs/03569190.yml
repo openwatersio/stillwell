@@ -1,0 +1,16 @@
+name: MOUNTAIN CREEK NEAR  GLENDALE, TN
+lat: 35.10927889260137
+lon: -85.32077762356234
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.412
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03569190/
+parameter_code: "00065"
+series_begin: 2019-10-02T19:00:00+00:00
+time_series_id: 5f8586297d7349e197b658f450e6e0e6

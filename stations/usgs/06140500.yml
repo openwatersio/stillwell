@@ -1,0 +1,16 @@
+name: Milk River at Havre MT
+lat: 48.5636861111111
+lon: -109.695955555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 751.405
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06140500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 68cf1b7142c047e7ac476d5a9fbb5905

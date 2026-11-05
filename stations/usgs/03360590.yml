@@ -1,0 +1,15 @@
+name: EPSOM LATERAL NEAR PLAINVILLE, IN
+lat: 38.812416666666664
+lon: -87.07888888888888
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03360590/
+parameter_code: "63160"
+series_begin: 2015-03-09T05:00:00+00:00
+series_end: 2026-08-03T21:00:00+00:00
+time_series_id: 7aa4535669bc40069591758f9bd88996

@@ -1,0 +1,15 @@
+name: Unnamed Trb to WB Wapsinonoc Cr at West Branch, IA
+lat: 41.690583
+lon: -91.350194
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0546494150/
+parameter_code: "00065"
+series_begin: 2015-05-14T05:00:00+00:00
+series_end: 2017-11-14T15:15:00+00:00
+time_series_id: 451995491f7d49149c728efa00a2ff1f

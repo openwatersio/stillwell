@@ -1,0 +1,16 @@
+name: YAMPA RIVER ABOVE ELKHEAD CREEK NEAR HAYDEN, CO
+lat: 40.51793055555555
+lon: -107.39894444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1903.177
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09244490/
+parameter_code: "00065"
+series_begin: 2020-07-14T15:45:00+00:00
+time_series_id: cfd268e236784132a4d1479d53a18453

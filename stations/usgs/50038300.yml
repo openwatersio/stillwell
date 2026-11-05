@@ -1,0 +1,16 @@
+name: RIO COROZAL AT COROZAL, PR
+lat: 18.344583
+lon: -66.322333
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 70.211
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50038300/
+parameter_code: "00065"
+series_begin: 2018-06-25T18:45:00+00:00
+time_series_id: 192030cbe7ce4324be12756b2bd143b3

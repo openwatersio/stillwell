@@ -1,0 +1,16 @@
+name: MONUMENT CREEK AT BIJOU ST. AT COLO. SPRINGS, CO
+lat: 38.837222
+lon: -104.828889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1816.812
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07104905/
+parameter_code: "00065"
+series_begin: 2020-11-18T19:35:00+00:00
+time_series_id: 7cda4260c88749d1b08fcf62dc82e8a4

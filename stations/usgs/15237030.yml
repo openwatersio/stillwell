@@ -1,0 +1,17 @@
+name: ESHAMY C AT ESHAMY LAKE OUTLET NR WHITTIER AK
+lat: 60.451888888888895
+lon: -148.108
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 18.898
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15237030/
+parameter_code: "00065"
+series_begin: 2019-07-29T23:00:00+00:00
+series_end: 2020-10-01T09:00:00+00:00
+time_series_id: 49bda0d812b3460bbeff2adfb732d2a3

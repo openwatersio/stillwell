@@ -1,0 +1,16 @@
+name: Leon Rv nr Hasse, TX
+lat: 31.9579235137322
+lon: -98.4592116007898
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 339.886
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08099500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1f8fef97c97d4386b60dc0617b5d7bc7

@@ -1,0 +1,16 @@
+name: REEDY RIVER NEAR GREENVILLE, SC
+lat: 34.800044
+lon: -82.364578
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 246.397
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02164000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d72f9888af4d4145a0ca1cefa363529d

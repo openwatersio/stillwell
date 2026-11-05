@@ -1,0 +1,16 @@
+name: JACKS BRANCH AT CR 78 NR FT DENAUD FL
+lat: 26.747428
+lon: -81.513233
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02292740/
+parameter_code: "00065"
+series_begin: 2018-11-15T18:30:00+00:00
+time_series_id: 90a4f255fe094a31970f81e1fb828de8

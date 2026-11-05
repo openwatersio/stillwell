@@ -1,0 +1,16 @@
+name: COYOTE C AB HWY 237 A MILPITAS CA
+lat: 37.4221617182426
+lon: -121.927457739056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11172175/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 27dd35fe8a444813b9ad63bb2d1ed5a0

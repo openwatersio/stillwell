@@ -1,0 +1,17 @@
+name: WILLOW RIVER @ WILLOW R STATE PARK NR BURKHARDT,WI
+lat: 45.0116666666667
+lon: -92.7083333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 215.896
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05341752/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+series_end: 2024-01-08T15:00:00+00:00
+time_series_id: 2d4cce761c0d41699fdf33d0072fcc03

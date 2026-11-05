@@ -1,0 +1,16 @@
+name: RIO GRANDE ABOVE US HWY 380 NR SAN ANTONIO, NM
+lat: 33.92666666666666
+lon: -106.85116666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1377.848
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08355490/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: d61e68f6fea04927afcb7a52799e134a

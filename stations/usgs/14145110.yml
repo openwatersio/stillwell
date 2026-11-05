@@ -1,0 +1,16 @@
+name: HILLS CREEK DAM TAILWATER NEAR OAKRIDGE, OR
+lat: 43.7107027777778
+lon: -122.423938888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14145110/
+parameter_code: "00065"
+series_begin: 2013-10-01T08:00:00+00:00
+time_series_id: bfe5eb4a6a4c40789fa045d90843ec49

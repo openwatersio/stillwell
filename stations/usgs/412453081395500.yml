@@ -1,0 +1,16 @@
+name: West Creek at Brooklyn Heights OH
+lat: 41.4147222222222
+lon: -81.6652777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 191.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412453081395500/
+parameter_code: "00065"
+series_begin: 2013-06-13T19:45:00+00:00
+time_series_id: 59e5d9b6f41241fead7109e8e4a8579f

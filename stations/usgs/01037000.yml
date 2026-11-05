@@ -1,0 +1,16 @@
+name: Kenduskeag Stream near Bangor, Maine
+lat: 44.8611111111111
+lon: -68.8316666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 21.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01037000/
+parameter_code: "00065"
+series_begin: 2009-12-22T19:00:00+00:00
+time_series_id: 8bae482525374fb3a2a649a3037efdac

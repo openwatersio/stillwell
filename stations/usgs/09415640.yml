@@ -1,0 +1,17 @@
+name: ASH SPGS CK BLW HWY 93 AT ASH SPGS, NV
+lat: 37.460278
+lon: -115.19361100000002
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1097.28
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09415640/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2011-08-10T19:15:00+00:00
+time_series_id: fabfa3882f554f7e8ac2e9a58a79fca3

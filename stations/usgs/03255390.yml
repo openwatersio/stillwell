@@ -1,0 +1,16 @@
+name: Sharon Creek at Sharonville OH
+lat: 39.2733913443651
+lon: -84.4110524306101
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 175.982
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03255390/
+parameter_code: "00065"
+series_begin: 2017-08-15T05:00:00+00:00
+time_series_id: e6fede93fa064a0b99c2d868ff53a2b9

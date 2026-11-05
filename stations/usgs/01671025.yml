@@ -1,0 +1,17 @@
+name: NORTH ANNA RIVER ABOVE LITTLE RIVER NR DOSWELL, VA
+lat: 37.8256964295856
+lon: -77.4260929130411
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.759
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01671025/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2021-04-05T15:15:00+00:00
+time_series_id: 7f4c558c19dd4366a931f001b41baa8b

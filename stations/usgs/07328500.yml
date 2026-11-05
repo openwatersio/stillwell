@@ -1,0 +1,16 @@
+name: Washita River near Pauls Valley, OK
+lat: 34.7548024520998
+lon: -97.2514123965199
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.937
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07328500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 15ca8d3a44f64c6eba9323c110191e6f

@@ -1,0 +1,16 @@
+name: Bush Kill at Shoemakers, PA
+lat: 41.0881507808152
+lon: -75.0376746885667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 128.138
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01439500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: bc063d956e824fe3acb24c7446d42b86

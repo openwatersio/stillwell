@@ -1,0 +1,13 @@
+name: WITHLACOOCHEE RI AB WYSONG DAM, AT CARLSON, FLA.
+lat: 28.8230417919274
+lon: -82.1825892035712
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02312719/
+parameter_code: "00065"
+time_series_id: 8fcf345e7ff542899239b7a8ff0f1b92

@@ -1,0 +1,15 @@
+name: EF PINE CREEK ABV NABOB CR NEAR PINEHURST ID
+lat: 47.4766666666667
+lon: -116.221666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 758.952
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12413370/
+parameter_code: "00065"
+time_series_id: d947064391e7467e9e63ad7731008536

@@ -1,0 +1,16 @@
+name: SHELDRAKE STREAM AT THOMPSONVILLE NY
+lat: 41.667833333333334
+lon: -74.62302777777776
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 339.703
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01436655/
+parameter_code: "00065"
+series_begin: 2019-11-22T22:00:00+00:00
+time_series_id: 6d8f803c3f87447d90924eceaef58e12

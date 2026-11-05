@@ -1,0 +1,16 @@
+name: N F Flathead River nr Columbia Falls MT
+lat: 48.4957972222222
+lon: -114.126763888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 958.776
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12355500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 09003477355147ada44c55a779b5cdad

@@ -1,0 +1,16 @@
+name: PECOS R AT DAMSITE 3 NR CARLSBAD, NM
+lat: 32.5112277777778
+lon: -104.333288888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 967.079
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08402000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1bb4dbc1a8a74039a9dfe7f1c79fa7bd

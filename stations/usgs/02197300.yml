@@ -1,0 +1,16 @@
+name: UPPER THREE RUNS NEAR NEW ELLENTON, SC
+lat: 33.384866397515
+lon: -81.6164980075249
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.913
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02197300/
+parameter_code: "00065"
+series_begin: 2017-08-03T21:00:00+00:00
+time_series_id: 2f2bdedcb9404075930c1d5b5d5781cd

@@ -1,0 +1,16 @@
+name: PEACE RIVER NR PEACE RIVER HEIGHTS NR FT. OGDEN FL
+lat: 27.07755529291
+lon: -82.0073091870903
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02297350/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 334df33495ef4a84be2aa88d9191ed3c

@@ -1,0 +1,16 @@
+name: NORTH BRANCH POTOMAC RIVER AT LUKE, MD
+lat: 39.478972222222225
+lon: -79.06377777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 287.625
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01598500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 85e35baa92b14b80ac68843c844c4a25

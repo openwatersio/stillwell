@@ -1,0 +1,16 @@
+name: Ches Bay at Mouth of Susq R at Havre de Grace, MD
+lat: 39.537749999999996
+lon: -76.08958333333332
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01580620/
+parameter_code: "00065"
+series_begin: 2012-10-29T05:00:00+00:00
+time_series_id: e6ab2f73ce9a4f0c8a18bf9bd037f552

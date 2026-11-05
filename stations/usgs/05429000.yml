@@ -1,0 +1,16 @@
+name: LAKE MONONA AT MADISON, WI
+lat: 43.0633297289341
+lon: -89.3970635799135
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 255.989
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05429000/
+parameter_code: "00065"
+series_begin: 1983-10-01T07:00:00+00:00
+time_series_id: 818fb2c77c084979b11409717d4592af

@@ -1,0 +1,16 @@
+name: Llano Rv at Llano, TX
+lat: 30.7513041125954
+lon: -98.66977734287708
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 295.68
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08151500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 23e3230a566f48cea4308e5a54c984fe

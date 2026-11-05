@@ -1,0 +1,15 @@
+name: TIPPECANOE RIVER NEAR AMERICUS, IN
+lat: 40.54238888888889
+lon: -86.76477777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.154
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03333080/
+parameter_code: "00065"
+time_series_id: 7573cc16b4b14e72beebede2bfba9cfc

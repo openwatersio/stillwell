@@ -1,0 +1,16 @@
+name: POOTATUCK RIVER AT BERKSHIRE
+lat: 41.40654722222222
+lon: -73.27318333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 76.2
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-012035055/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: eb8e9318e3f04ca4afb69701c364e6ab

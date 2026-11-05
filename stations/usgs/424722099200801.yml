@@ -1,0 +1,15 @@
+name: Big Anne Cr at Old Hwy 137 at Mariaville, Nebr.
+lat: 42.7894444444444
+lon: -99.3355555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 551.688
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-424722099200801/
+parameter_code: "00065"
+time_series_id: caf34b6a711d433bb025b446fa25a6b9

@@ -1,0 +1,16 @@
+name: COCHITUATE BK BL LAKE COCHITUATE AT FRAMINGHAM, MA
+lat: 42.31514166666666
+lon: -71.38380833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.624
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01098500/
+parameter_code: "00065"
+series_begin: 2010-08-27T21:00:00+00:00
+time_series_id: 4f7ebc5e412c434c8351d6fc86cb4775

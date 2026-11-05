@@ -1,0 +1,16 @@
+name: RIO INABON AT REAL ABAJO, PR
+lat: 18.086478
+lon: -66.563075
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 120.113
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50112500/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 31de6e857c98425a8a255169adbab0d3

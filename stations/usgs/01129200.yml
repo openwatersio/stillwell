@@ -1,0 +1,16 @@
+name: CONNECTICUT R BELOW INDIAN STREAM NR PITTSBURG, NH
+lat: 45.0403236756507
+lon: -71.4439704328761
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 350.813
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01129200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d103313a45e64aca9c28cf0b833b9510

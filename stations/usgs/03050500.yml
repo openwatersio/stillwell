@@ -1,0 +1,16 @@
+name: TYGART VALLEY RIVER NEAR ELKINS, WV
+lat: 38.9237170462308
+lon: -79.8789587308114
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 577.398
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03050500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c870429b20ba439fb416b1ad269b744d

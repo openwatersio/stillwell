@@ -1,0 +1,16 @@
+name: SMOKY HILL R AT ENTERPRISE, KS
+lat: 38.9063890590769
+lon: -97.1177952096449
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 334.853
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06877600/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c3fdda3323ca4f1a94ecd8e5cd21484b

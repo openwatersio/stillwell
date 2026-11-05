@@ -1,0 +1,16 @@
+name: BIG LOST RIVER BELOW MOORE DIV NR MOORE ID
+lat: 43.7843611111111
+lon: -113.360888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1682.691
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13132100/
+parameter_code: "00065"
+series_begin: 2019-03-25T22:00:00+00:00
+time_series_id: 69e5d558346742c7bef32958a3e1cf50

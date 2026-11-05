@@ -1,0 +1,16 @@
+name: MOYER CREEK NEAR FRANKFORT NY
+lat: 43.0269444444444
+lon: -75.1043055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.442
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01342682/
+parameter_code: "00065"
+series_begin: 2014-10-22T16:45:00+00:00
+time_series_id: 81939fa226b74a3f8af771aa3d685099

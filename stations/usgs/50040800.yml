@@ -1,0 +1,16 @@
+name: RIO DE LA PLATA AT CAYEY, PR
+lat: 18.136389
+lon: -66.138611
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 360.901
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50040800/
+parameter_code: "00065"
+series_begin: 2022-06-15T16:10:00+00:00
+time_series_id: a475d36faab74fb99b224ef7316f5cfc

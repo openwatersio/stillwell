@@ -1,0 +1,16 @@
+name: Flint Creek at Springtown, AR
+lat: 36.2561111111111
+lon: -94.4336111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 357.003
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07195800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 9c59afd8ca254d13a2d39606d6a71445

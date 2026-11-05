@@ -1,0 +1,15 @@
+name: LOXAHATCHEE RIVER, PENNOCK POINT, CHANNEL MARKER 2
+lat: 26.9488888888889
+lon: -80.1097222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-265656080063500/
+parameter_code: "00065"
+series_begin: 2008-08-13T04:00:00+00:00
+series_end: 2011-10-14T03:45:00+00:00
+time_series_id: f821062f2b8d44b790ea01035bb510a2

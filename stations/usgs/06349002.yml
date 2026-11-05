@@ -1,0 +1,15 @@
+name: HEART RIVER AT HWY 10 ABOVE MANDAN, ND
+lat: 46.8244381763487
+lon: -100.91152122616
+country_code: US
+kind: river
+datum: NGVD29
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06349002/
+parameter_code: "63158"
+series_begin: 1985-03-20T19:43:00+00:00
+series_end: 2016-03-09T22:25:00+00:00
+time_series_id: d6e04012291844a48931f7ea3f182596

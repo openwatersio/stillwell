@@ -1,0 +1,14 @@
+name: Zacate Ck at Jacaman Rd, Laredo, TX
+lat: 27.561227777777777
+lon: -99.47115833333334
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08458993/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: bfa45f09127446068e6691fa0506453e

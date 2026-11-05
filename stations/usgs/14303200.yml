@@ -1,0 +1,16 @@
+name: TUCCA CREEK NEAR BLAINE, OR.
+lat: 45.324276352969
+lon: -123.546501221565
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 426.72
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14303200/
+parameter_code: "00065"
+series_begin: 2007-10-03T16:15:00+00:00
+time_series_id: 66696316ef8944878f8e15e2efed8b5e

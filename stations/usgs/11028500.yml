@@ -1,0 +1,16 @@
+name: SANTA MARIA C NR RAMONA CA
+lat: 33.0522655005513
+lon: -116.945584385077
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 395.14
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11028500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: eaee1712cf064af0ae288a60980c9c28

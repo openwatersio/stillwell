@@ -1,0 +1,16 @@
+name: Ouachita River at Remmel Dam above Jones Mill, AR
+lat: 34.426111
+lon: -92.890833
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 80.162
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07359002/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 32a02e0f66b540fa8b7f26dca3679f2c

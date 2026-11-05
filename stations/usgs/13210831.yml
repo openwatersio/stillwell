@@ -1,0 +1,16 @@
+name: SOUTH MIDDLETON DRAIN AT MIDDLETON ID
+lat: 43.702106
+lon: -116.618192
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 728.448
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13210831/
+parameter_code: "00065"
+series_begin: 2016-11-22T22:00:00+00:00
+time_series_id: 956070880c774882a67a03a31d4685f8

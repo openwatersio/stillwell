@@ -1,0 +1,16 @@
+name: OAK CREEK ABOVE TIETON RIVER NEAR NACHES, WA
+lat: 46.72376944444444
+lon: -120.8146
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 524.561
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12492900/
+parameter_code: "00065"
+series_begin: 2025-01-07T23:00:00+00:00
+time_series_id: a53c75b6bcbb4388baf4b70df3b7bd7c

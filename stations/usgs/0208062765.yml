@@ -1,0 +1,16 @@
+name: ROANOKE RIVER AT HALIFAX, NC
+lat: 36.3311111111111
+lon: -77.5802777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.305
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208062765/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 261682822068453c93f1302f2d93171e

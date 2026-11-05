@@ -1,0 +1,15 @@
+name: Randolph AFB West Drain nr Schertz, TX
+lat: 29.541666666666668
+lon: -98.26288611111111
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08185025/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+series_end: 2025-04-17T15:15:00+00:00
+time_series_id: d30ccd2cc32b44dfa67160bd00571aa9

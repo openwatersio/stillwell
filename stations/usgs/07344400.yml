@@ -1,0 +1,16 @@
+name: Red River near Hosston, LA.
+lat: 32.8931941147852
+lon: -93.8224007532677
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 46.107
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07344400/
+parameter_code: "00065"
+series_begin: 2015-12-02T20:00:00+00:00
+time_series_id: 5684b99e28d34bcaa6b6992880408ef3

@@ -1,0 +1,16 @@
+name: HART DITCH AT MUNSTER, IN
+lat: 41.561127892849534
+lon: -87.48056705101372
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.155
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05536190/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0a255f1c52b6464db969655324a914bc

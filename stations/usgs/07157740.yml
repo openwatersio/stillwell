@@ -1,0 +1,16 @@
+name: Cimarron R near Buttermilk, KS
+lat: 37.0267111111111
+lon: -99.4821611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 517.669
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07157740/
+parameter_code: "00065"
+series_begin: 2014-09-16T19:45:00+00:00
+time_series_id: 58ac7cc8c7f045998f719a6ee564c9f3

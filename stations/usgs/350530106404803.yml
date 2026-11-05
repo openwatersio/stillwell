@@ -1,0 +1,17 @@
+name: T10N.R02E.13.414b (projected) cedsw
+lat: 35.0915861111111
+lon: -106.680002777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1510.284
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-350530106404803/
+parameter_code: "00065"
+series_begin: 2009-02-19T07:00:00+00:00
+series_end: 2011-11-09T06:00:00+00:00
+time_series_id: 5752349a52b0454290a513d69361110a

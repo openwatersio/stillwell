@@ -1,0 +1,16 @@
+name: SOUTH SALUDA RIVER NEAR CLEVELAND, SC
+lat: 35.063481
+lon: -82.650511
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 331.964
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02162290/
+parameter_code: "00065"
+series_begin: 2012-07-18T05:00:00+00:00
+time_series_id: e82af35106534851b3ee4ccc1385a6c7

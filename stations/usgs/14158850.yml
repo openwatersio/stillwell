@@ -1,0 +1,16 @@
+name: MCKENZIE R BLW TRAIL BR DAM NR BELKNAP SPRINGS, OR
+lat: 44.267900099113
+lon: -122.049782610289
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 603.504
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14158850/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7fdfa92ede6a4cce9ae1239586d34a5c

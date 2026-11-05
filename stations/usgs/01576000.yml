@@ -1,0 +1,16 @@
+name: Susquehanna River at Marietta, PA
+lat: 40.0545412951354
+lon: -76.5307991679784
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 61.131
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01576000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 49dc99563b8940b1b9e4d0923f443557

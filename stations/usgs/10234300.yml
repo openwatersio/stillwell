@@ -1,0 +1,17 @@
+name: BEAVER RIVER BLW SOUTH FORK NEAR BEAVER, UT
+lat: 38.264444
+lon: -112.491111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2174.748
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10234300/
+parameter_code: "00065"
+series_begin: 2026-07-15T17:00:00+00:00
+series_end: 2026-07-19T20:25:00+00:00
+time_series_id: cd3e16026714498681d77d7b1706d335

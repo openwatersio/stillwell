@@ -1,0 +1,16 @@
+name: Buffalo Creek at Iron Bridge, PA
+lat: 40.7344722222222
+lon: -79.6781111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 249.966
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03048900/
+parameter_code: "00065"
+series_begin: 2014-10-23T19:00:00+00:00
+time_series_id: b94e735221664f71a9c3c25c10bcdee9

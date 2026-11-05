@@ -1,0 +1,16 @@
+name: FRASER RIVER AT UPPER STA, NEAR WINTER PARK, CO.
+lat: 39.845833
+lon: -105.751389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2905.899
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09022000/
+parameter_code: "00065"
+series_begin: 2020-11-03T22:45:00+00:00
+time_series_id: 0edb4df245fc42af9c80426aaa358476

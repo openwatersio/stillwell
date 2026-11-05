@@ -1,0 +1,16 @@
+name: GREENBRIER RIVER AT CALDWELL, WV
+lat: 37.7821388888889
+lon: -80.3975277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 509.138
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03182890/
+parameter_code: "00065"
+series_begin: 2019-09-26T16:45:00+00:00
+time_series_id: a105e9b3bdec4212bf5101a332ff184e

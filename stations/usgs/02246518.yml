@@ -1,0 +1,14 @@
+name: POTTSBURG CRK AT US90 NR S. JACKSONVILLE, FL
+lat: 30.2869694444444
+lon: -81.57
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02246518/
+parameter_code: "00065"
+series_begin: 2015-09-30T14:15:00+00:00
+time_series_id: e312bee0dd1242eb82c4ea5fc1f919a8

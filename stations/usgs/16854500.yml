@@ -1,0 +1,16 @@
+name: Ugum River above Talofofo Falls, nr Talofofo, Guam
+lat: 13.3224166666667
+lon: 144.736138888889
+country_code: GU
+kind: river
+datum: GAGE
+datums:
+  LMSL: 39.624
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16854500/
+parameter_code: "00065"
+series_begin: 2007-09-30T14:00:00+00:00
+time_series_id: 8d5c14dd0d6547129fa68a4da70477d6

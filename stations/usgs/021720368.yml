@@ -1,0 +1,16 @@
+name: FRENCH QUARTER CREEK NEAR HUGER, SC
+lat: 33.0285
+lon: -79.8541111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -1.817
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021720368/
+parameter_code: "00065"
+series_begin: 2018-08-15T16:30:00+00:00
+time_series_id: 06e3001350f248b4aab2e4ad89140c56

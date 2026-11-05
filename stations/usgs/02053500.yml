@@ -1,0 +1,16 @@
+name: AHOSKIE CREEK AT AHOSKIE, NC
+lat: 36.2802777777778
+lon: -76.9994444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 4.968
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02053500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e36ebdf344b84dbc852fdac8a296ad38

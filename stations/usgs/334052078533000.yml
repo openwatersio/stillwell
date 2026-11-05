@@ -1,0 +1,17 @@
+name: WITHERS SWASH AT S OCEAN BLVD NR MYRTLE BEACH,SC
+lat: 33.6811111111111
+lon: -78.8916666666667
+country_code: US
+kind: coastal
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-334052078533000/
+parameter_code: "00065"
+series_begin: 2016-10-05T23:00:00+00:00
+series_end: 2016-10-12T12:45:00+00:00
+time_series_id: bd3cdd4711ef4965887618c7d1e96027

@@ -1,0 +1,17 @@
+name: RIVER RAISIN NEAR MANCHESTER, MI
+lat: 42.1680947338582
+lon: -84.0760575425538
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 272.366
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04175600/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+series_end: 2025-10-01T05:00:00+00:00
+time_series_id: 79c55bc9f9a14a7f84c5fd52a0739d3c

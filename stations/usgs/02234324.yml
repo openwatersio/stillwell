@@ -1,0 +1,14 @@
+name: HOWELL CREEK NEAR SLAVIA, FL
+lat: 28.6477758660374
+lon: -81.2645108703497
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02234324/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 75ffc9ef25924bbb82bd0e338243f066

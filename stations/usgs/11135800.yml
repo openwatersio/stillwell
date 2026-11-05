@@ -1,0 +1,16 @@
+name: SAN ANTONIO C A LOS ALAMOS CA
+lat: 34.743308069578966
+lon: -120.27095069671586
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.51
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11135800/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 7ac9abcefed948eaab673c49f6dd9053

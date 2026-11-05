@@ -1,0 +1,16 @@
+name: PINEY RIVER AT PINEY RIVER, VA
+lat: 37.7023625122172
+lon: -79.027525411678
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 192.268
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02027500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d471c9aecb694845bc5552a80eccc59c

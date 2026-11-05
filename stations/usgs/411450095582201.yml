@@ -1,0 +1,17 @@
+name: DCHC Evaporation Site at Omaha, Nebr.
+lat: 41.2471638888889
+lon: -95.9726972222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 362.102
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-411450095582201/
+parameter_code: "00065"
+series_begin: 2011-05-10T16:15:00+00:00
+series_end: 2017-09-28T13:15:00+00:00
+time_series_id: 2321d06bf97043ef8522896f24c2621e

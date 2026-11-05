@@ -1,0 +1,16 @@
+name: Lake Pontchartrain at Mandeville
+lat: 30.36251808362581
+lon: -90.09022193095603
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -0.043
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-302144090052401/
+parameter_code: "00065"
+series_begin: 2024-04-03T00:00:00+00:00
+time_series_id: cfc991e0c4f34da0a822788466b1bc23

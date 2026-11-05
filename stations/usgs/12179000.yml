@@ -1,0 +1,17 @@
+name: SKAGIT RIVER ABOVE ALMA CREEK NEAR MARBLEMOUNT, WA
+lat: 48.6073446777861
+lon: -121.361515481583
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 110.581
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12179000/
+parameter_code: "00065"
+series_begin: 2020-06-11T17:30:00+00:00
+series_end: 2026-10-20T23:15:00+00:00
+time_series_id: 081fb5268ec94887b2c707887533fe66

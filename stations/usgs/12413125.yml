@@ -1,0 +1,16 @@
+name: CANYON CREEK AB MOUTH AT WALLACE, ID
+lat: 47.4725
+lon: -115.914722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 843.452
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12413125/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e47cca56300c480faa37dd3a8e679c11

@@ -1,0 +1,16 @@
+name: GREEN RIVER AT ROCHESTER, KY
+lat: 37.21566666666667
+lon: -86.89355555555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 107.28
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03315850/
+parameter_code: "00065"
+series_begin: 2021-12-16T13:30:00+00:00
+time_series_id: fd8ceba5a5b3485f984e89ec36489dc2

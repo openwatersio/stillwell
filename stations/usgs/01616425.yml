@@ -1,0 +1,16 @@
+name: HOPEWELL RUN AT LEETOWN, WV
+lat: 39.3546388888889
+lon: -77.9336111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 136.066
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01616425/
+parameter_code: "00065"
+series_begin: 2015-02-03T20:45:00+00:00
+time_series_id: 0fa241518fde41aa9c5f7484fa6df9ed

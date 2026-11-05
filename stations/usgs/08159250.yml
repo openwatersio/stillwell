@@ -1,0 +1,16 @@
+name: Maha Ck at Von Quintus Rd nr Del Valle, TX
+lat: 30.0945305555556
+lon: -97.6593222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 168.134
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08159250/
+parameter_code: "00065"
+series_begin: 2019-07-19T17:35:00+00:00
+time_series_id: 539da79aa95048f29bf16ae60f13e20f

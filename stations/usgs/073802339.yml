@@ -1,0 +1,16 @@
+name: GIWW East Storm Surge Barrier at New Orleans, LA
+lat: 30.0144444444444
+lon: -89.9019444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073802339/
+parameter_code: "00065"
+series_begin: 2017-03-08T16:00:00+00:00
+time_series_id: 96706cd253f448fea49d85c812eeaba8

@@ -1,0 +1,16 @@
+name: S.B. KALAMAZOO RIVER AT GROVER RD NR HANOVER, MI
+lat: 42.076389
+lon: -84.592778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 319.126
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04102786/
+parameter_code: "00065"
+series_begin: 2025-05-07T15:00:00+00:00
+time_series_id: dbb62953dee8446c81ac083b40757b99

@@ -1,0 +1,16 @@
+name: SUMMIT CONDUIT OUTFALL AT SUMMIT, IL
+lat: 41.7958333333333
+lon: -87.8136111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.534
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-414745087484901/
+parameter_code: "00065"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: 7452c7768fb44fb48cf79e986d9ea62e

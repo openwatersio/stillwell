@@ -1,0 +1,16 @@
+name: Lee Creek at Lee Creek Reservoir near Van Buren,AR
+lat: 35.4844444444444
+lon: -94.3927777777778
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 122.103
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07250085/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1995c5367a6f48fe9b30a7d441e13c80

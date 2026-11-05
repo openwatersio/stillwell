@@ -1,0 +1,16 @@
+name: HURON RIVER NEAR HAMBURG, MI
+lat: 42.4652858393169
+lon: -83.79988659729729
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.979
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04172000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: 6dd6e255fb024a2298383b9ca3dd84c3

@@ -1,0 +1,15 @@
+name: French Fork Little River at Archie, LA
+lat: 31.573999999999998
+lon: -91.9918888888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073732645/
+parameter_code: "00065"
+series_begin: 2024-03-28T20:00:00+00:00
+series_end: 2026-08-11T21:45:00+00:00
+time_series_id: e9998486eaed40688d62e82ae502bb63

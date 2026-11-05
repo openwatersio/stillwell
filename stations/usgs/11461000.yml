@@ -1,0 +1,17 @@
+name: RUSSIAN R NR UKIAH CA
+lat: 39.1954470961813
+lon: -123.1950048154
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.566
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11461000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2022-10-01T08:00:00+00:00
+time_series_id: 4bbd90cb07274daeac2d2622abce944a

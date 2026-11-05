@@ -1,0 +1,16 @@
+name: CLINCH RIVER AT CLEVELAND, VA
+lat: 36.9448295214793
+lon: -82.1548569284747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 457.133
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03524000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 68bf6d4441fd45bebe680b0d0cef8847

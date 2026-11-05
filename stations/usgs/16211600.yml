@@ -1,0 +1,16 @@
+name: Makaha Str nr Makaha, Oahu, HI
+lat: 21.50157923324258
+lon: -158.18017203892168
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 286.097
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16211600/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: a1f1e901af03491a850ca383acfcc1f0

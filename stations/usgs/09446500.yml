@@ -1,0 +1,16 @@
+name: EAGLE CREEK NR DOUBLE CIRCLE RANCH, NR MORENCI, AZ
+lat: 33.30008149883492
+lon: -109.49231728041362
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1425.784
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09446500/
+parameter_code: "00065"
+series_begin: 2018-09-16T22:15:00+00:00
+time_series_id: ec7525f79fcd41c4a35e86459f3b892d

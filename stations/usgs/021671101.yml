@@ -1,0 +1,16 @@
+name: LITTLE RIVER AT LAURENS, SC
+lat: 34.50075
+lon: -82.008944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 163.787
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021671101/
+parameter_code: "00065"
+series_begin: 2021-04-02T17:15:00+00:00
+time_series_id: 002ca67b8503436e8d68582d57442f68

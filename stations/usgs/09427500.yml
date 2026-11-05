@@ -1,0 +1,16 @@
+name: LAKE HAVASU NEAR PARKER DAM, AZ-CA
+lat: 34.3161256441171
+lon: -114.157170161686
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 122.789
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09427500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e770f0f4bf7a4e638f1326786a605788

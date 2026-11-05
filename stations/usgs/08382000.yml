@@ -1,0 +1,16 @@
+name: GALLINAS RIVER NEAR LOURDES, NM
+lat: 35.4689027777778
+lon: -105.161441666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1806.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08382000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 632c9dfc36764ba5aa78f840a40cf0a5

@@ -1,0 +1,17 @@
+name: CROW CREEK AT 19TH STREET, AT CHEYENNE, WY
+lat: 41.1313333333333
+lon: -104.828916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1844.04
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06755960/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+series_end: 2018-07-03T06:45:00+00:00
+time_series_id: 22a8d031cd15446aa02238860152f93d

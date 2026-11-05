@@ -1,0 +1,16 @@
+name: Wapsipinicon River near Tripoli, IA
+lat: 42.8360916666667
+lon: -92.2574
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 300.652
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05420680/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4ac5955138124659a5c9c01db71f6055

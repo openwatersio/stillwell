@@ -1,0 +1,16 @@
+name: WEST FORK PORTAGE CREEK NEAR OSHTEMO, MI
+lat: 42.2353183926837
+lon: -85.6483389138335
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 264.697
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04106320/
+parameter_code: "00065"
+series_begin: 2019-05-01T05:00:00+00:00
+time_series_id: 8bc88e3a79ee43baa3f4cdc590c88e61

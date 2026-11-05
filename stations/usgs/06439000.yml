@@ -1,0 +1,16 @@
+name: CHERRY CREEK NEAR PLAINVIEW, SD
+lat: 44.743056
+lon: -102.053056
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 658.109
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06439000/
+parameter_code: "00065"
+series_begin: 2020-12-04T07:00:00+00:00
+time_series_id: a010b2a72250413596f7d942c5b652ce

@@ -1,0 +1,16 @@
+name: STONES RIVER AT US HWY 70 NEAR DONELSON, TN
+lat: 36.186480087927755
+lon: -86.63276208626456
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 116.543
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03430200/
+parameter_code: "00065"
+series_begin: 2011-12-12T15:45:00+00:00
+time_series_id: a4b8edc0dc0e49a9bef31e0e408212af

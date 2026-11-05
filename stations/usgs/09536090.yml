@@ -1,0 +1,16 @@
+name: GRANT CREEK NEAR FORT GRANT, AZ
+lat: 32.589942
+lon: -109.968258
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1382.573
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09536090/
+parameter_code: "00065"
+series_begin: 2026-10-08T17:00:00+00:00
+time_series_id: a3d4f75b3c214fb5855617b0041d627a

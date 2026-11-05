@@ -1,0 +1,17 @@
+name: SOUTH FORK CHALK CREEK NEAR FILLMORE, UT
+lat: 38.9453833333333
+lon: -112.257302777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1708.044
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10232000/
+parameter_code: "00065"
+series_begin: 2022-09-08T17:35:00+00:00
+series_end: 2023-10-17T15:45:00+00:00
+time_series_id: 1ed3e779f32c4bdc8115e9b04ba6475e

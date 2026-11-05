@@ -1,0 +1,16 @@
+name: SCRIBA CREEK NEAR CONSTANTIA NY
+lat: 43.2598055555556
+lon: -76.0027777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.374
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04245840/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 730a5d5f78b1491aa7557f199465513b

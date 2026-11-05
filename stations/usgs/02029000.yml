@@ -1,0 +1,16 @@
+name: JAMES RIVER AT SCOTTSVILLE, VA
+lat: 37.7973651308903
+lon: -78.4913980436332
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 76.953
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02029000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7a5cdb4ed7bc465686474f926ec08899

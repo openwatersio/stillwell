@@ -1,0 +1,16 @@
+name: PIGEON RIVER AT LIMERICK ROAD NEAR CASEVILLE, MI
+lat: 43.917222
+lon: -83.243333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.708
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04159005/
+parameter_code: "00065"
+series_begin: 2022-11-02T18:00:00+00:00
+time_series_id: 3d75abe431bb4f659a886bc4c38f20ef

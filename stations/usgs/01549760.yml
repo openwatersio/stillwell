@@ -1,0 +1,16 @@
+name: WB Susquehanna River at Jersey Shore, PA
+lat: 41.20222816286789
+lon: -77.2510609680386
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 156.222
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01549760/
+parameter_code: "00065"
+series_begin: 2014-10-01T05:00:00+00:00
+time_series_id: 6e94d5e1429c4563911d3db957df014e

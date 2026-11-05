@@ -1,0 +1,16 @@
+name: FRENCH BROAD RIVER NEAR NEWPORT, TN
+lat: 35.9815138888889
+lon: -83.1612083333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 308.189
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03455000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3723fe6cede949448e99e34afeac81c5

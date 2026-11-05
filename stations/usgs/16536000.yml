@@ -1,0 +1,16 @@
+name: Haipuaena Stream abv Spreckels Ditch, Maui, HI
+lat: 20.84807913050714
+lon: -156.18856046691695
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 460.925
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16536000/
+parameter_code: "00065"
+series_begin: 2024-03-29T21:50:00+00:00
+time_series_id: 341a3a645aaf470eb7bafe0012c40220

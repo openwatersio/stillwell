@@ -1,0 +1,16 @@
+name: YALOBUSHA R AND TOPASHAW C CA AT CALHOUN CITY, MS
+lat: 33.8386111111111
+lon: -89.3155555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 68.867
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07282000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: fa0e18fb083949a6bfd8f525d02e6b7e

@@ -1,0 +1,14 @@
+name: Black Fork below Charles Mill Dam near Mifflin OH
+lat: 40.7378353086225
+lon: -82.3632186911777
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03130000/
+parameter_code: "00065"
+series_begin: 2017-09-05T14:30:00+00:00
+time_series_id: ecb058c8b21443fcb729d5bb6bad134f

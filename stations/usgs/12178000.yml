@@ -1,0 +1,16 @@
+name: SKAGIT RIVER AT NEWHALEM, WA
+lat: 48.6717922878038
+lon: -121.246234788845
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.81
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12178000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 36a3510dbc124fed82bbb337e9e42e5d

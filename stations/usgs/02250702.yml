@@ -1,0 +1,17 @@
+name: TROUT CREEK AT OLD DIXIE HWY AT GRANT, FL
+lat: 27.93675
+lon: -80.53124444444444
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 1.219
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02250702/
+parameter_code: "00065"
+series_begin: 2020-09-15T22:45:00+00:00
+series_end: 2021-10-01T05:15:00+00:00
+time_series_id: 22ddbab891b046078ece7bafe03b0885

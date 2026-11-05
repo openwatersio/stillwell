@@ -1,0 +1,16 @@
+name: Bird Creek near Sperry, OK
+lat: 36.2784253382926
+lon: -95.9541620959136
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.711
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07177500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cc5305aecb204935ab026724e900be96

@@ -1,0 +1,15 @@
+name: WEST BRANCH MILWAUKEE RIVER AT CTH F NEAR BYRON,WI
+lat: 43.6602777777778
+lon: -88.4163888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.163
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04086110/
+parameter_code: "00065"
+time_series_id: 897d75f13e974c768160de992608fcdc

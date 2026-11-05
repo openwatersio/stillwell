@@ -1,0 +1,16 @@
+name: PEABODY CREEK AT E 2ND ST AT PORT ANGELES, WA
+lat: 48.11713888888889
+lon: -123.43188888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.797
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12046870/
+parameter_code: "00065"
+series_begin: 2024-12-23T21:40:00+00:00
+time_series_id: e1ec5cc138d64b5aa44c516baa500898

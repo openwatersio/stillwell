@@ -1,0 +1,16 @@
+name: PRESQUE ISLE RIVER NEAR CONNORVILLE, MI
+lat: 46.696094866730334
+lon: -89.97399253620041
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 220.105
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04032150/
+parameter_code: "00065"
+series_begin: 2023-06-21T12:15:00+00:00
+time_series_id: 01fe53e262e744168ca8b00d77c55f3d

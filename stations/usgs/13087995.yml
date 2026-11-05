@@ -1,0 +1,16 @@
+name: SNAKE RIVER GAGING STATION AT MILNER ID
+lat: 42.5280555555556
+lon: -114.018333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1239.241
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13087995/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: f396ea3c245a4ed880fb99d2fb1913a4

@@ -1,0 +1,16 @@
+name: NEOSHO R NR ERIE, KS
+lat: 37.5495
+lon: -95.2643611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 259.562
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07183300/
+parameter_code: "00065"
+series_begin: 2012-06-28T05:00:00+00:00
+time_series_id: fde4bcc850dd476c84dbcea2b17a47e6

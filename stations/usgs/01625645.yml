@@ -1,0 +1,17 @@
+name: SOUTH RIVER AT SUFFANGUS FARM NEAR GREENVILLE, VA
+lat: 38.011
+lon: -79.13733333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 462.077
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01625645/
+parameter_code: "00065"
+series_begin: 2021-05-26T13:00:00+00:00
+series_end: 2021-11-10T13:05:00+00:00
+time_series_id: 7806de9bc7434ca78d1a144d5c805cae

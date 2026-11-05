@@ -1,0 +1,17 @@
+name: LITTLE ROCK BL SANTIAGO CYN C NR LITTLEROCK CA
+lat: 34.46783333333334
+lon: -118.02088888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 999.134
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-342804118011501/
+parameter_code: "00065"
+series_begin: 2021-03-11T19:45:00+00:00
+series_end: 2022-07-05T10:30:00+00:00
+time_series_id: 21f39219e47443878028b6a21e973200

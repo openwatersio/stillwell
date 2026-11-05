@@ -1,0 +1,16 @@
+name: Beaverhead River at Dillon MT
+lat: 45.2183833333333
+lon: -112.655333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1554.48
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06017000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 46d0626a15c54c919782d08555f6941c

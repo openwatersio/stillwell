@@ -1,0 +1,16 @@
+name: San Antonio Rv at Loop 410, San Antonio, TX
+lat: 29.32218094511002
+lon: -98.45032200267552
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 148.873
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08178565/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d5b500029ca14572821e1cbfb4f8b235

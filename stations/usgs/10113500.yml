@@ -1,0 +1,16 @@
+name: BLACKSMITH FORK AB UP and L CO.'S DAM NR HYRUM, UT
+lat: 41.6240055555556
+lon: -111.736163888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1530.254
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10113500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: ddf22cf5f12444b08b109fe02bbda9be

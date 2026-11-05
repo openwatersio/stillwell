@@ -1,0 +1,16 @@
+name: KANKAKEE RIVER AT SHELBY, IN
+lat: 41.1828134312722
+lon: -87.3403095598096
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 191.396
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05518000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 71b74a2d9ec04b2e9ec2d1f369cace1e

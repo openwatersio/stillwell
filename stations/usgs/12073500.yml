@@ -1,0 +1,16 @@
+name: HUGE CREEK NEAR WAUNA, WA
+lat: 47.3892620484497
+lon: -122.699024148903
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.817
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12073500/
+parameter_code: "00065"
+series_begin: 2007-10-02T07:00:00+00:00
+time_series_id: 16383a1b1c184d15aa56dcf587154656

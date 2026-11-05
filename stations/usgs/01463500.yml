@@ -1,0 +1,16 @@
+name: Delaware River at Trenton NJ
+lat: 40.2216666666667
+lon: -74.7780555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.329
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01463500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4bbb126a1c3c441183ecb94babb3278c

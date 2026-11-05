@@ -1,0 +1,16 @@
+name: Raccoon Creek at Adamsville OH
+lat: 38.8736111111111
+lon: -82.3558333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.532
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03202000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 762ce40d22584eb295f6937518da7d67

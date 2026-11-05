@@ -1,0 +1,17 @@
+name: ETOWAH RIVER NEAR DAHLONEGA, GA
+lat: 34.5155555555556
+lon: -84.0602777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 387.34
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02388900/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2014-04-24T03:45:00+00:00
+time_series_id: 98d781229ae64a7686565053c265423b

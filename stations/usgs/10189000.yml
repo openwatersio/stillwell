@@ -1,0 +1,16 @@
+name: EAST FORK SEVIER RIVER NEAR KINGSTON, UT
+lat: 38.1963695471778
+lon: -112.147700540483
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1877.428
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10189000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 64a21e35660e49639ad24710cfff72c4

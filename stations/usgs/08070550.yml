@@ -1,0 +1,16 @@
+name: Spring Branch at SH 242 nr Splendora, TX
+lat: 30.21981111111111
+lon: -95.24920833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08070550/
+parameter_code: "00065"
+series_begin: 2023-11-06T00:00:00+00:00
+time_series_id: 7d0adac2f3604b1c846a98ef7703ad16

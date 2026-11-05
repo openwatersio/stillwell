@@ -1,0 +1,16 @@
+name: NORTH FORK CLOVER CREEK NEAR PARKLAND, WA
+lat: 47.13451511088991
+lon: -122.41510134475807
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 93.202
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12090400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 1bdf60e74b2c4929a715241dc6673ce3

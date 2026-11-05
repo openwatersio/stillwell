@@ -1,0 +1,16 @@
+name: SOUTH BRANCH PISCATAQUOG RIVER NEAR GOFFSTOWN, NH
+lat: 43.0148051905757
+lon: -71.6414612940613
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 93.964
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01091000/
+parameter_code: "00065"
+series_begin: 2008-06-12T20:15:00+00:00
+time_series_id: 28261d4e76cd4d86ac1de20f2baeeb9b

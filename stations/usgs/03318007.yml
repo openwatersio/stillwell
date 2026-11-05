@@ -1,0 +1,14 @@
+name: RRD STILLING BASIN NR FALLS OF ROUGH, KY
+lat: 37.62144444444444
+lon: -86.50125
+country_code: US
+kind: river
+datum: NGVD29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03318007/
+parameter_code: "63158"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 22fff5609ae547468c55ff16fd911d28

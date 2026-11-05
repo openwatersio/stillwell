@@ -1,0 +1,16 @@
+name: EAST KILL NEAR JEWETT CENTER NY
+lat: 42.24894444444445
+lon: -74.30338888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 442.463
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01349700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e2aaf77544f34ace956edad2ebb8258d

@@ -1,0 +1,15 @@
+name: SR-6 AT CECIL WEBB NEAR NORTH FT. MYERS, FL
+lat: 26.8161944444444
+lon: -81.8447222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-264858081504100/
+parameter_code: "63160"
+series_begin: 2011-08-17T04:00:00+00:00
+series_end: 2014-08-27T03:45:00+00:00
+time_series_id: adcc0d7790c6436b8e9942a09eee035c

@@ -1,0 +1,16 @@
+name: East Branch Big Creek at Brooklyn OH
+lat: 41.44
+lon: -81.7519444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 215.286
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412624081450700/
+parameter_code: "00065"
+series_begin: 2014-05-07T15:45:00+00:00
+time_series_id: e525516416c040b3a85a3a07228b5366

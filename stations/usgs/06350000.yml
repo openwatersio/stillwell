@@ -1,0 +1,16 @@
+name: CANNONBALL RIVER AT REGENT, ND
+lat: 46.426667
+lon: -102.551389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 738.985
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06350000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4b801f759b9d4840b2121ae3006f5a67

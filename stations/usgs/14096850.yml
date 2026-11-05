@@ -1,0 +1,16 @@
+name: BEAVER CREEK BELOW QUARTZ CREEK, NR SIMNASHO, OR
+lat: 44.958727244191
+lon: -121.394228590228
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 688.848
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14096850/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 889f7d496422456696b852bc8871c011

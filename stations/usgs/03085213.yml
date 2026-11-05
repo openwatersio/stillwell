@@ -1,0 +1,16 @@
+name: Sawmill Run at Duquesne Heights nr Pittsburgh, PA
+lat: 40.432798448617135
+lon: -80.02948860566748
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 226.284
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03085213/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d006c0910d384204b1e6d5e87c69508f

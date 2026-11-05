@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER BELOW L&D 2 AT HASTINGS, MN
+lat: 44.7460860980958
+lon: -92.8478746823739
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 203.57
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05331580/
+parameter_code: "00065"
+series_begin: 2008-11-06T20:00:00+00:00
+time_series_id: 698013be18e64f438f82a81efc0c115a

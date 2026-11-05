@@ -1,0 +1,16 @@
+name: Slaughter Ck at FM 2304 nr Austin, TX
+lat: 30.162155416966
+lon: -97.8322278784219
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 199.998
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08158860/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 3450c0d0413c45bb92f2e90b11326184

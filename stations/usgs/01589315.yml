@@ -1,0 +1,16 @@
+name: DEAD RUN AT WOODLAWN, MD
+lat: 39.31325
+lon: -76.73211111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 99.164
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01589315/
+parameter_code: "00065"
+series_begin: 2007-11-29T05:00:00+00:00
+time_series_id: 0ddf1f171f7e425cbe8ed3dfb8b2ca09

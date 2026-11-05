@@ -1,0 +1,16 @@
+name: Angelina Rv at Hwy 59 nr Lufkin, TX
+lat: 31.4571833333333
+lon: -94.7263277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08037180/
+parameter_code: "00065"
+series_begin: 2020-01-08T20:00:00+00:00
+time_series_id: d2c5f986c7c942ae8cd198ff4fdf8395

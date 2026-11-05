@@ -1,0 +1,16 @@
+name: RUSSIAN R NR WINDSOR CA
+lat: 38.51570470527335
+lon: -122.86467745431828
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.436
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11465390/
+parameter_code: "00065"
+series_begin: 2009-06-02T18:15:00+00:00
+time_series_id: 1441533a8d174cffae2283b8f5e9d9ed

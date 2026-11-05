@@ -1,0 +1,16 @@
+name: MF NOOKSACK RIVER NEAR DEMING, WA
+lat: 48.7792828169565
+lon: -122.106543414437
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 176.784
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12208000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 8b046bda0aa44d1fac5061dffbc59235

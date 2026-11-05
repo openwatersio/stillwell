@@ -1,0 +1,16 @@
+name: French Creek at Meadville, PA
+lat: 41.6325547591252
+lon: -80.1595042551233
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 322.558
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03023100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 026f14c63d094e9aac48932595156b9e

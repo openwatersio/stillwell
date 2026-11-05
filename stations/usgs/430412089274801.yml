@@ -1,0 +1,16 @@
+name: North Eau Claire Ave Storm Sewer at Madison, WI
+lat: 43.07
+lon: -89.46333055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.769
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430412089274801/
+parameter_code: "00065"
+series_begin: 2025-04-14T19:11:13+00:00
+time_series_id: 3dd38bbeb7e84084a359745842dad9a9

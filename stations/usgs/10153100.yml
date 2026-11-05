@@ -1,0 +1,16 @@
+name: HOBBLE CREEK AT 1650 WEST AT SPRINGVILLE, UTAH
+lat: 40.1788719153256
+lon: -111.639338071263
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1370.6
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10153100/
+parameter_code: "00065"
+series_begin: 2008-11-14T21:00:00+00:00
+time_series_id: 401d16eba9634e71be518fc57e7b28ed

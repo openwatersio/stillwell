@@ -1,0 +1,16 @@
+name: DRY CREEK AT TUCKAHOE, WV
+lat: 37.7412334374316
+lon: -80.2781241008813
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 614.51
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03182888/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 0bd013f66f944e0292418c1339aa270a

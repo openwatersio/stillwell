@@ -1,0 +1,16 @@
+name: Little Lake near Bay Dosgris E of Galliano, LA
+lat: 29.4666666666667
+lon: -90.1
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -1.335
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-292800090060000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cebb7f8fc48b4802a8015d629eccfe36

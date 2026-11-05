@@ -1,0 +1,17 @@
+name: RED LION CREEK NEAR DELAWARE CITY, DE
+lat: 39.6052
+lon: -75.63001666666666
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01482320/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2017-11-02T14:15:00+00:00
+time_series_id: a37ebe32a8134dac9b6a33adb3752aef

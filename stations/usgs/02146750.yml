@@ -1,0 +1,16 @@
+name: MCALPINE CR BELOW MCMULLEN CR NR PINEVILLE, NC
+lat: 35.0664972222222
+lon: -80.86985
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 157.066
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02146750/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ddb211711b6742fa944e45e7c1c096c1

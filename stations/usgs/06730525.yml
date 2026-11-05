@@ -1,0 +1,16 @@
+name: ST VRAIN CR BLW BOULDER CR AT HWY 119 NR LONGMONT
+lat: 40.160467
+lon: -105.007936
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1474.814
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06730525/
+parameter_code: "00065"
+series_begin: 2020-11-17T21:15:00+00:00
+time_series_id: 9a7b2a8646854745ac0aae4f02be444b

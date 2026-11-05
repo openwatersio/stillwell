@@ -1,0 +1,14 @@
+name: Conneaut Creek at Dickonsburg, PA
+lat: 41.715333333333334
+lon: -80.35005555555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04212895/
+parameter_code: "00065"
+series_begin: 2024-12-10T17:15:00+00:00
+time_series_id: bb738f974f3447a4b1ce6a408734f1d4

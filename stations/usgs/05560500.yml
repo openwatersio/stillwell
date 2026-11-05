@@ -1,0 +1,16 @@
+name: FARM CREEK AT FARMDALE, IL
+lat: 40.66738888888889
+lon: -89.50389444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 161.98
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05560500/
+parameter_code: "00065"
+series_begin: 2007-10-26T06:00:00+00:00
+time_series_id: 92ff4087c29a4cbf90802cd31c51a95e

@@ -1,0 +1,16 @@
+name: Unnamed Spring at Blue River nr Connerville, OK
+lat: 34.386675
+lon: -96.603775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 270.745
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07332389/
+parameter_code: "00065"
+series_begin: 2020-03-10T16:30:00+00:00
+time_series_id: 34e26b3d879544b18f917f95293a330c

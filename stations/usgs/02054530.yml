@@ -1,0 +1,16 @@
+name: ROANOKE RIVER AT GLENVAR, VA
+lat: 37.2679115749511
+lon: -80.1394858106244
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 324.258
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02054530/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 952bdc312a744f2dbfd10b84b7044e52

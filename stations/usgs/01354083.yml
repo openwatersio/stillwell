@@ -1,0 +1,16 @@
+name: MOHAWK RIVER AT AMSTERDAM NY
+lat: 42.934
+lon: -74.1918611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 71.476
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01354083/
+parameter_code: "00065"
+series_begin: 2015-01-16T05:00:00+00:00
+time_series_id: bbe4e35149da405f8c0dcabad5ad08a3

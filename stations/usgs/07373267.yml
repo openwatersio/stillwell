@@ -1,0 +1,14 @@
+name: Black R @ Jonesville, LA
+lat: 31.6221111111111
+lon: -91.8121388888889
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07373267/
+parameter_code: "00065"
+series_begin: 2024-03-28T11:00:00+00:00
+time_series_id: 2d460e233d76444dbdef38cb4770a9bd

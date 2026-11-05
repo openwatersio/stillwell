@@ -1,0 +1,14 @@
+name: Atoka Reservoir near Stringtown, OK
+lat: 34.4453708707779
+lon: -96.0836032825403
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07333010/
+parameter_code: "00065"
+series_begin: 2007-10-01T13:00:00+00:00
+time_series_id: a963b2b5587941229729588cc4d4223b

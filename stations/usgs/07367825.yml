@@ -1,0 +1,14 @@
+name: Boeuf River at Hwy 2 near Mer Rouge, LA
+lat: 32.7709722222222
+lon: -91.5956944444444
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07367825/
+parameter_code: "00065"
+series_begin: 2024-04-23T19:30:00+00:00
+time_series_id: 83dbb1cd96524b369bdf4a8ab287b16a

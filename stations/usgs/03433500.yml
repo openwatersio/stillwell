@@ -1,0 +1,16 @@
+name: HARPETH RIVER AT BELLEVUE, TN
+lat: 36.054596511889144
+lon: -86.92850184497145
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.793
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03433500/
+parameter_code: "00065"
+series_begin: 1983-11-15T16:30:00+00:00
+time_series_id: 4d6bc1266d3e4e3990bdb38ef68c5d25

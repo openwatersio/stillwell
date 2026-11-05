@@ -1,0 +1,16 @@
+name: POLECAT CREEK AT ROUTE 301 NEAR PENOLA, VA
+lat: 37.9603333333333
+lon: -77.3434444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.455
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01674182/
+parameter_code: "00065"
+series_begin: 2012-10-22T14:15:00+00:00
+time_series_id: 5a0b0663f4c54828a99de431516871b3

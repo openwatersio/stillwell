@@ -1,0 +1,16 @@
+name: COLORADO R. ABV GUNNISON R. AT GRAND JUNCTION, CO
+lat: 39.05458333333333
+lon: -108.5411111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1395.07
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09106485/
+parameter_code: "00065"
+series_begin: 2024-10-21T22:45:00+00:00
+time_series_id: 0b8902230c284c73b2fb5eb54d313a20

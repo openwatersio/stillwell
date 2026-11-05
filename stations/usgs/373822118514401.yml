@@ -1,0 +1,17 @@
+name: 003S028E34RS01M HOT C FH
+lat: 37.6393781616405
+lon: -118.863186877565
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2148.84
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-373822118514401/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2022-11-01T07:30:00+00:00
+time_series_id: 717bd10dae3b412489a989679b2a3558

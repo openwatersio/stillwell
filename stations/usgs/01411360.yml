@@ -1,0 +1,14 @@
+name: Great Channel at Stone Harbor NJ
+lat: 39.0569444444444
+lon: -74.765
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01411360/
+parameter_code: "72279"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c2e6e121040c42baa7d3820231824c21

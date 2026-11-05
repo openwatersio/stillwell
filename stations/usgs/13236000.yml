@@ -1,0 +1,14 @@
+name: DEADWOOD RES NR LOWMAN ID
+lat: 44.29361111111111
+lon: -115.6463888888889
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13236000/
+parameter_code: "00065"
+series_begin: 2026-04-29T15:45:00+00:00
+time_series_id: 413a14db16a649ba9fc9be1d47fa2478

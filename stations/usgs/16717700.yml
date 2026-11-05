@@ -1,0 +1,16 @@
+name: Hakalau Stream nr alt 1300 ft, HI
+lat: 19.871695580218393
+lon: -155.16682132196397
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 396.24
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16717700/
+parameter_code: "00065"
+series_begin: 2018-10-31T23:00:00+00:00
+time_series_id: 5ffa8a6dfcd441c5b3fc93d03bfd76a6

@@ -1,0 +1,16 @@
+name: Salt Creek at 70th Street at Lincoln, Nebr.
+lat: 40.885925
+lon: -96.624264
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 334.5
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06803513/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cad211716e15473ca2f69c4a2d65276c

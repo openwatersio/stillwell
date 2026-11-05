@@ -1,0 +1,16 @@
+name: LITTLE PATUXENT RIVER AT GUILFORD, MD
+lat: 39.16775
+lon: -76.85125
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 78.516
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01593500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: d254c6abadc2442bb431352ed9bf38ca

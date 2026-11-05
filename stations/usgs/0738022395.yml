@@ -1,0 +1,16 @@
+name: Black Bayou at Hwy 621 near Prairieville, LA
+lat: 30.269444444444442
+lon: -90.91694444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0738022395/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 53df9096ef4840aab4595a402eaf4708

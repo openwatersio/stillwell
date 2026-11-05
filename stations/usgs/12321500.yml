@@ -1,0 +1,16 @@
+name: BOUNDARY CREEK NR PORTHILL ID
+lat: 48.9972222222222
+lon: -116.569166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 539.094
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12321500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 38c674944ade4494ab4df3962974ef97

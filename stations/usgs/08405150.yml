@@ -1,0 +1,16 @@
+name: DARK CANYON AT CARLSBAD, NM
+lat: 32.4033333333333
+lon: -104.229444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 941.756
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08405150/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: c7186e9b49724c2392a7086548793b2a

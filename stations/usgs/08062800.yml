@@ -1,0 +1,16 @@
+name: Cedar Ck nr Kemp, TX
+lat: 32.5034712905145
+lon: -96.112750824136
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 104.129
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08062800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 69dc4d725cb4408ab11d23936d8349a2

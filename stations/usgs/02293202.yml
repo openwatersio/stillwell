@@ -1,0 +1,15 @@
+name: CALOOSAHATCHEE RIVER AT FORT MYERS FL
+lat: 26.651058441062474
+lon: -81.86898558189563
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02293202/
+parameter_code: "62620"
+series_begin: 2016-09-15T18:45:00+00:00
+series_end: 2022-11-12T04:30:00+00:00
+time_series_id: af9654a0894e44a086f17eaf305f7c50

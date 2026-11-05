@@ -1,0 +1,16 @@
+name: WUERCHES CREEK AT CT HWY B NEAR GREEN LAKE, WI
+lat: 43.7485921995354
+lon: -89.0542803960426
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 255.118
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04073457/
+parameter_code: "00065"
+series_begin: 2022-08-08T18:23:00+00:00
+time_series_id: c149564871e74310999f1ab7d3c6bcfb

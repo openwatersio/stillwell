@@ -1,0 +1,16 @@
+name: CANAL DE RIEGO DE LAJAS ABV MAJINAS FILT. PLANT PR
+lat: 18.045869
+lon: -66.949139
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 55.821
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50128920/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 9c79e4dd026542628a91af9feee01c8e

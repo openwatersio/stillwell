@@ -1,0 +1,16 @@
+name: TELLICO RIVER AT TELLICO PLAINS, TN
+lat: 35.3620163240345
+lon: -84.2790141105342
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 257.967
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03518500/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 6bf9382480bd49f484d0517efbedd0fd

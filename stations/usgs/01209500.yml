@@ -1,0 +1,16 @@
+name: SAUGATUCK RIVER NEAR WESTPORT, CT
+lat: 41.17073055555555
+lon: -73.36481666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01209500/
+parameter_code: "00065"
+series_begin: 2015-01-21T17:15:00+00:00
+time_series_id: 8ad305a6c8c748cf961269a23a4af126

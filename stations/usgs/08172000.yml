@@ -1,0 +1,16 @@
+name: San Marcos Rv at Luling, TX
+lat: 29.666338848553373
+lon: -97.65085611912131
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 98.21
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08172000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 35a61cc4b75e4a4ea07e12b7f6aad309

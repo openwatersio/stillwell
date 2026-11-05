@@ -1,0 +1,17 @@
+name: GRASS VALLEY C BL GRASS VLY LK NR LK ARROWHEAD CA
+lat: 34.2636111111111
+lon: -117.218055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1563.624
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10260865/
+parameter_code: "00065"
+series_begin: 2008-10-01T08:00:00+00:00
+series_end: 2013-02-25T19:15:00+00:00
+time_series_id: 2d2ce2cd6c4543a98575977fe1dcf4e7

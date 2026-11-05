@@ -1,0 +1,16 @@
+name: Cedar River at Cedar Falls, IA
+lat: 42.5375694444444
+lon: -92.4434916666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 232.404
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05463050/
+parameter_code: "00065"
+series_begin: 2013-03-01T06:00:00+00:00
+time_series_id: dfd5c95deb0b406f8cff7c0dfee5afaa

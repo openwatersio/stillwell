@@ -1,0 +1,16 @@
+name: Company Canal at Salt Barrier near Lockport, LA
+lat: 29.627333333333333
+lon: -90.55766666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381355/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c59e5e8f61df4650b2358a0099d8c075

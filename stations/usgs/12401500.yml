@@ -1,0 +1,16 @@
+name: KETTLE RIVER NEAR FERRY, WA
+lat: 48.9812842757324
+lon: -118.766425907726
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 559.857
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12401500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 647ac629b6b344679b966ed6bd49d283

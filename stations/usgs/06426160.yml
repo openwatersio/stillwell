@@ -1,0 +1,15 @@
+name: STONEPILE CREEK AT MOUTH, NEAR GILLETTE, WY
+lat: 44.2677147179287
+lon: -105.438682232768
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1359.408
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06426160/
+parameter_code: "00065"
+time_series_id: 820ee92916264a81ba59a1d6fa05384d

@@ -1,0 +1,16 @@
+name: Black River above Williamsville, MO
+lat: 36.9725
+lon: -90.596944
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 115.943
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07062575/
+parameter_code: "00065"
+series_begin: 2009-06-03T18:45:00+00:00
+time_series_id: 3906bb7fecf343aa96b7deba01cd9b8a

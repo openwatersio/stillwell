@@ -1,0 +1,16 @@
+name: San Antonio Rv nr Floresville, TX
+lat: 29.110000000000003
+lon: -98.17444444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 99.81
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08183200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: af2c76d4f3974b4f89d807890358f7ed

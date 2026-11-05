@@ -1,0 +1,17 @@
+name: BECKER LAKE DITCH AT SPRINGERVILLE, AZ
+lat: 34.1327777777778
+lon: -109.296944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2121.408
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09383420/
+parameter_code: "00065"
+series_begin: 2008-06-21T07:00:00+00:00
+series_end: 2013-08-01T06:45:00+00:00
+time_series_id: d01f501192c546c9a05e84c44adb8c14

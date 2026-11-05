@@ -1,0 +1,16 @@
+name: MEDICINE CREEK NEAR LOWER BRULE, SD
+lat: 44.016389
+lon: -99.744722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 445.858
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06442600/
+parameter_code: "00065"
+series_begin: 2018-05-01T06:00:00+00:00
+time_series_id: 1af636855f5d451f84fa6f274109ea8f

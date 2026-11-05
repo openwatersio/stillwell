@@ -1,0 +1,16 @@
+name: SILVER CREEK NEAR SILVER CREEK JUNCTION, UT
+lat: 40.7352263414828
+lon: -111.476031250118
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1964.11
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10129900/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 5e28916e83874858a9f3db2a21058ed6

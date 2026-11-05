@@ -1,0 +1,16 @@
+name: LITTLE RIVER NEAR MARYVILLE, TN
+lat: 35.78563370330686
+lon: -83.8846022291635
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 259.199
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03498500/
+parameter_code: "00065"
+series_begin: 1984-03-22T17:00:00+00:00
+time_series_id: 9b7d8a72825f499b9a1fa78a80ddeeab

@@ -1,0 +1,17 @@
+name: NF OF MF WILLAMETTE R AB PARKER CR NR OAKRIDGE, OR
+lat: 43.88468888888889
+lon: -122.24513055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 679.094
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14147200/
+parameter_code: "00065"
+series_begin: 2024-08-28T23:00:00+00:00
+series_end: 2026-09-09T23:30:00+00:00
+time_series_id: 8c5d80874e5b49ca9e2c3f6380a60e0e

@@ -1,0 +1,16 @@
+name: WALNUT CREEK AT TRAILWOOD DRIVE AT RALEIGH, NC
+lat: 35.7683888888889
+lon: -78.691
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 83.85
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208734210/
+parameter_code: "00065"
+series_begin: 2018-08-02T18:20:00+00:00
+time_series_id: 7e76f92e1db4475ba95e93c10d2873c4
