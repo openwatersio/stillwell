@@ -8,7 +8,7 @@ It also replaces GESLA and TICON as tide-database's source of observations. TICO
 
 - Adapters for Rijkswaterstaat, BSH and PEGELONLINE that write Parquet to local `data/`, with a response cache.
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](hroi-evaluation.md)).
-- CI for lint, typecheck and tests. Nothing runs on a schedule yet, and there is no API.
+- CI for lint, typecheck and tests, hourly ingest into `recent/` and a daily fold into the year files. There is no API yet.
 
 What the existing Open Waters pieces give us, and don't:
 
@@ -63,7 +63,7 @@ src/
   datums.ts            offsets to MSL, LAT, NAVD88; joins to tide-database
   hroi/                as now
 scripts/
-  ingest.ts <source> recent|backfill|stations
+  ingest.ts stations|backfill|recent|compact <source>
   compact.ts, snapshot.ts, report.ts
 worker/                the API: wrangler.jsonc, src/, test/
 .github/workflows/     ci, ingest-hourly, compact-daily, monthly, snapshot-quarterly, canary
@@ -95,8 +95,8 @@ Bucket `water-levels`, public read at `water-levels.openwaters.io`. Non-commerci
 ```
 stations.parquet                                 one row per series
 sources.json                                     license and attribution per source
-recent/<source>.parquet                          last 7 days, every public station, sorted by station then time
-obs/<source>/<station>/<year>.parquet            time, level_m, flag, received, datum
+recent/<source>.parquet                          last 7 days, every live public station and any since retired, sorted by station then time
+obs/<source>/<station>/<year>.parquet            time, level_m, flag, source_flag, received, datum
 extremes/<source>/<station>/<year>.parquet       the source's observed high and low waters: time, level_m, type, flag, datum
 predictions/<source>/<station>/<year>.parquet    published predictions (RWS, BSH), same columns as obs
 predicted-extremes/<source>/<station>/<year>.parquet  published predicted extremes, plus transit and event for BSH
@@ -107,7 +107,7 @@ bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by 
 
 `stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` will come from the lake: until compaction fills them in they're null. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
 
-Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
+Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `source_flag` (UTINYINT, the source's flag before QC, null where it wasn't kept), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
 
 ## Phases
 
@@ -156,10 +156,12 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 
 ### Phase 4: Scheduled ingest (3 days)
 
-- [ ] `ingest-hourly.yml`: a matrix over sources, each with its own concurrency group. Each run merges the fetch into the existing `recent/<source>.parquet` (so sources with short windows don't lose data), trims to 7 days and writes it back. Values first seen in this run get `received` set to the fetch time; compaction carries it into the year files.
-- [ ] `compact-daily.yml`: fold yesterday from `recent/` into each station's current-year file, at about 30,000 rewrites a day. Year files are written whole, so a failed run leaves the previous file. It also writes each source's `first` and `last` per station to `stations/bounds/<source>.parquet`, which `stations.parquet` is built with, and writes recent rows into their datum epoch's files.
+- [x] `ingest-hourly.yml`: a matrix over sources, each with its own concurrency group. Each run merges the fetch into the existing `recent/<source>.parquet` (so sources with short windows don't lose data), trims to 7 days and writes it back. Values first seen in this run get `received` set to the fetch time; compaction carries it into the year files.
+- [x] `compact-daily.yml`: fold yesterday from `recent/` into each station's current-year file, each row into its datum epoch's files (every whole day the window holds, six, so late values, revised QC flags and a missed night still land). Year files are written whole, so a failed run leaves the previous file. That's one rewrite a day per live station that reported, about 14,000 (11,100 USGS, 1,200 USACE, 690 each RWS and PEGELONLINE, 300 CO-OPS), not the 30,000 first estimated. Measured against a logging S3 server, a year file costs DuckDB one PUT and four HEAD or GET requests, and USGS's 7-day recent file a five-request multipart upload, so the two jobs make about 430,000 Class A and 1.8 million Class B requests a month: inside R2's free tier, or under $3 a month without it. Folding rewrites each year file whole, so the work grows through the year: on year-end-sized files on local disk it took 27 ms a file for 15-minute series and 0.45 s for 1-minute ones at 16 connections, peaking at 2.5 GB of heap (4.1 GB resident), so USGS's 11,100 files take about 5 minutes and PEGELONLINE's 223 one-minute gauges under 2, before R2's round trips.
+- [ ] Compaction also writes each source's `first` and `last` per station to `stations/bounds/<source>.parquet`, which `stations.parquet` is built with.
 - [ ] `monthly.yml`: refresh station lists, datums and license pages, one job per source in a `lake-<source>` group, then rebuild `stations.parquet`; re-fetch verified CO-OPS months and USGS years that still hold provisional values (USGS approves months to years later), and now and then approved ones too, since the disk cache keeps an approved page for good and USGS still fills gaps and revises values after approval. Also run `stations` daily for a source whose `recent` failed on a datum change. A scheduled workflow needs a commit every 60 days to stay alive on a public repo, which no longer comes from the station lists.
-- [ ] A run summary per job (stations updated, stale, failed, values written), and an issue opened automatically when a source fails twice in a row.
+- [x] A run summary per job (stations updated, stale, failed, values written) on the run's page in Actions.
+- [ ] An issue opened automatically when a source fails twice in a row.
 - [ ] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps.
 
 Done when every source's `recent/` is under 2 hours old and the year files fill in daily without anyone touching them.

@@ -4,6 +4,7 @@
  *   node scripts/ingest.ts stations [source...] [--accept-epochs]
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
+ *   node scripts/ingest.ts compact <source> [--days 1]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet
@@ -14,7 +15,10 @@
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
  * source withdraws stays until its month is fetched again with others. `recent` fetches the last hours for every
- * live station and merges them into recent/<source>.parquet.
+ * live station and merges them into recent/<source>.parquet. `compact` folds
+ * the last `--days` whole UTC days of that window into each station's year
+ * files, each row into its datum epoch's. Both print a summary, and add it to
+ * the workflow run's page.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -32,22 +36,28 @@ import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
+import {
+  compactRecent,
+  formatSummary,
+  lastDays,
+  pool,
+  qcFor,
+  refuseOtherDatum,
+  updateRecent,
+  type RunSummary,
+} from "../src/lake/recent.ts";
 import { appendFile } from "node:fs/promises";
-import { isHeld, recentWindow } from "../src/epochs.ts";
+import { isHeld } from "../src/epochs.ts";
 import {
   readExtremes,
-  readDatums,
   readObservations,
-  checkRecent,
-  readRecent,
+  setConnections,
   writeExtremes,
   publishedSources,
   writeObservations,
-  writeRecent,
-  type StationObservation,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, stationsPath } from "../src/lake/paths.ts";
-import { qc, type QcOptions } from "../src/qc.ts";
+import { seriesPath, stationsPath } from "../src/lake/paths.ts";
+import { qc, withSourceFlag } from "../src/qc.ts";
 import {
   describeReport,
   hasHistory,
@@ -103,6 +113,7 @@ const { positionals, values } = parseArgs({
   options: {
     hours: { type: "string", default: "24" },
     "keep-days": { type: "string", default: "7" },
+    days: { type: "string", default: "1" },
     concurrency: { type: "string", default: "4" },
     "accept-epochs": { type: "boolean", default: false },
   },
@@ -122,7 +133,13 @@ switch (command) {
   case "recent": {
     const [source] = args;
     if (!source) usage();
-    await recent(source, Number(values.hours), Number(values["keep-days"]));
+    await recent(source);
+    break;
+  }
+  case "compact": {
+    const [source] = args;
+    if (!source) usage();
+    await compact(source, Number(values.days));
     break;
   }
   default:
@@ -214,7 +231,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
 
   const failed: string[] = [];
-  await pool(wanted, async (station) => {
+  await pool(wanted, positive("concurrency"), async (station) => {
     // Nothing from before the current epoch: those values are in another reference.
     const since = Date.parse(currentSince(station) ?? "");
     const from_ = Number.isNaN(since) ? start : new Date(Math.max(start.getTime(), since));
@@ -260,7 +277,7 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(rows, qcFor(source, station));
+    if (product === "levels") rows = qc(withSourceFlag(rows), qcFor(source, station));
     const existing = await readObservations(path);
     const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
@@ -279,125 +296,83 @@ async function backfillYear(
   return merged.length;
 }
 
-/**
- * Adapters return values in the station's datum; this keeps a file from gaining
- * them when it already holds another, whatever the station list says. It runs
- * once there's something to write, so empty years cost no lake read.
- */
-async function refuseOtherDatum(path: string, station: Station): Promise<void> {
-  const held = (await readDatums(path)).filter((d) => d !== station.datum);
-  if (held.length)
-    throw new Error(`${path} holds ${held.join(", ")}, not ${station.datum}; resolve by hand`);
+async function recent(sourceId: string): Promise<void> {
+  const now = Date.now();
+  const summary = await reporting(`recent ${sourceId}`, async () => {
+    const [hours, keepDays] = [positive("hours"), positive("keep-days")];
+    const source = sourceOf(sourceId);
+    return updateRecent({
+      source,
+      stations: await listOf(lakeOfSource(source.metadata), sourceId),
+      lakeFor,
+      concurrency: positive("concurrency"),
+      since: new Date(now - hours * 3_600_000),
+      now,
+      keepDays,
+    });
+  });
+  // Some stations failing or going quiet is ordinary; all of them is an outage,
+  // or a broken adapter, even one that answers "no data" without an error.
+  if (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
+    process.exitCode = 1;
 }
 
-async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
-  const source = sourceOf(sourceId);
-  if (!source.observations && !source.recent) throw new Error(`${sourceId} has no observations`);
-  const live = (await listOf(lakeOfSource(source.metadata), sourceId)).filter(
-    (s) => s.live && s.status === "active" && s.products.includes("levels"),
-  );
-  // A station whose new epoch waits on a person isn't fetched, but keeps what it had.
-  const stations = live.filter((s) => !isHeld(s.epochs));
-  const now = Date.now();
-  const start = new Date(now - hours * 3_600_000);
-  const keepFrom = now - keepDays * DAY_MS;
-  // Restricted stations' recent values go to the private lake, like their series.
-  const lakeOf = new Map(live.map((s) => [s.id, recentPath(lakeFor(s), sourceId)]));
-  const paths = [...new Set(lakeOf.values())];
-  const failed: string[] = [];
-  let written = 0;
-  const reporting = new Set<string>();
+async function compact(sourceId: string, days: number): Promise<void> {
+  let live = 0;
+  const summary = await reporting(`compact ${sourceId}`, async () => {
+    // The window keeps 7 days back from its last hourly run, which is partway
+    // into the seventh day, so 6 is the most whole days it holds.
+    if (!Number.isInteger(days) || days < 1 || days > 6)
+      throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
+    const concurrency = positive("concurrency");
+    setConnections(concurrency);
+    const source = sourceOf(sourceId);
+    const stations = await listOf(lakeOfSource(source.metadata), sourceId);
+    live = stations.filter(
+      (s) => s.live && s.status === "active" && s.products.includes("levels"),
+    ).length;
+    const [start, end] = lastDays(Date.now(), days);
+    return compactRecent({ source, stations, lakeFor, concurrency, start, end });
+  });
+  // A failed fold left its year file as it was; a person should look. Every
+  // live station silent means recent/ is missing, empty or not being updated.
+  if (summary.failed.length || (live && summary.stale.length >= live)) process.exitCode = 1;
+}
 
-  // Each file is read in batches after the sweep, so one that can't be read
-  // fails the run here, before the sweep spends a source's request budget. A
-  // station read only from its own lake's file starts empty in the other lake
-  // when its license changes, rather than carry rows across.
-  for (const path of paths) await checkRecent(path);
-
-  // A source that can sweep every station at once does; a failed sweep fails
-  // every station, which keeps what each had.
-  let swept: Map<string, Observation[] | Error> | Error | undefined;
-  if (source.recent)
-    swept = await source
-      .recent(stations, start, new Date(now))
-      .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
-
-  // A batch of stations at a time, read, merged and written: every live USGS
-  // station's window is about 9 million values, too many to hold at once.
-  const BATCH = 500;
-  async function* batches(path: string): AsyncGenerator<StationObservation[]> {
-    const here = live.filter((s) => lakeOf.get(s.id) === path);
-    for (let i = 0; i < here.length; i += BATCH) {
-      const batch = here.slice(i, i + BATCH);
-      const ids = batch.map((s) => s.id);
-      const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
-      const rows: StationObservation[] = [];
-      await pool(batch, async (station) => {
-        const window = recentWindow(
-          station.epochs,
-          previous.get(station.id) ?? [],
-          keepFrom,
-          start.getTime(),
-        );
-        // Rows from other epochs are in another reference, and stay as they are.
-        rows.push(...window.other);
-        // A held station isn't fetched, but keeps what it had.
-        if (isHeld(station.epochs)) {
-          rows.push(...window.current);
-          return;
-        }
-        let merged: Observation[] = window.current;
-        try {
-          if (swept instanceof Error) throw swept;
-          const answer = swept ? swept.get(station.id) : undefined;
-          if (answer instanceof Error) throw answer;
-          // A sweep covers the whole window, so values from before the current epoch are left out.
-          const fetched = swept
-            ? (answer ?? []).filter((o) => o.time >= window.from)
-            : await source.observations!(station, new Date(window.from), new Date(now));
-          // QC the whole window, so spikes and flatlines are judged against their neighbors.
-          // Nothing new keeps what we had, rather than clearing the last hours.
-          if (fetched.length)
-            merged = qc(
-              mergeFetched(window.current, fetched, window.from, now, now),
-              qcFor(source, station),
-            );
-        } catch (error) {
-          // Keep what we had; a failed fetch mustn't empty the window.
-          failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
-        }
-        for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
-        if (merged.some((r) => r.received === now)) reporting.add(station.id);
-      });
-      if (swept instanceof Map) for (const id of ids) swept.delete(id);
-      written += rows.length;
-      yield rows;
-    }
+/**
+ * Run a job and print its summary, adding it to the workflow run's page when
+ * there is one. A job that throws still leaves a line there saying why.
+ */
+async function reporting(title: string, run: () => Promise<RunSummary>): Promise<RunSummary> {
+  const page = process.env.GITHUB_STEP_SUMMARY;
+  let summary;
+  try {
+    summary = await run();
+  } catch (error) {
+    if (page)
+      await appendFile(
+        page,
+        `### ${title}\n\nFailed: ${error instanceof Error ? error.message : error}\n`,
+      );
+    throw error;
   }
-  for (const path of paths) await writeRecent(path, batches(path));
+  const text = formatSummary(summary);
+  console.log(text);
+  if (page) await appendFile(page, text);
+  return summary;
+}
 
-  console.log(
-    `${paths.join(", ")}: ${written} rows, ${reporting.size} of ${stations.length} stations sent new values, ${failed.length} failed`,
-  );
-  for (const f of failed.slice(0, 20)) console.log(`  ${f}`);
-  if (stations.length && failed.length === stations.length) process.exit(1);
+/** A command-line option that must be a whole number of at least 1. */
+function positive(name: "concurrency" | "hours" | "keep-days"): number {
+  const value = Number(values[name]);
+  if (!Number.isInteger(value) || value < 1)
+    throw new Error(`--${name} must be a whole number of at least 1`);
+  return value;
 }
 
 /** Where a station's current epoch starts, or null for one with no known start. */
 function currentSince(station: LakeStation): string | null {
   return station.epochs.filter((e) => e.state === "open").at(-1)?.since ?? null;
-}
-
-/**
- * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
- * or more, so they get two days before a flatline counts as suspect. And they
- * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. Tide gauges never sit
- * still that long, and keep the defaults.
- */
-function qcFor(source: Source, station: Station): QcOptions {
-  const still = station.kind === "river" || station.kind === "lake";
-  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
 }
 
 /** A station by its ID or its source's own code. */
@@ -422,17 +397,9 @@ function parseDate(value: string): Date {
   return date;
 }
 
-async function pool<T>(items: T[], run: (item: T) => Promise<void>): Promise<void> {
-  const queue = [...items];
-  const workers = Array.from({ length: Number(values.concurrency) }, async () => {
-    for (let item = queue.shift(); item !== undefined; item = queue.shift()) await run(item);
-  });
-  await Promise.all(workers);
-}
-
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
   );
   process.exit(1);
 }

@@ -4,7 +4,7 @@ Every public series in the lake is Parquet at `https://water-levels.openwaters.i
 
 Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every source here allows commercial use.
 
-So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest fills in the rest (phase 4 of [plan.md](plan.md)).
+So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
 
 ## Layout
 
@@ -13,10 +13,10 @@ stations.parquet                                      one row per station
 sources.json                                          license and attribution per source
 stations/<source>.parquet                             one source's list, as ingest keeps it
 history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
-recent/<source>.parquet                               last 7 days: station, time, level_m, flag, received, epoch
-obs/<source>/<station>/<year>.parquet                 observed levels: time, level_m, flag, received, datum
+recent/<source>.parquet                               last 7 days: station, time, level_m, flag, source_flag, received, epoch
+obs/<source>/<station>/<year>.parquet                 observed levels: time, level_m, flag, source_flag, received, datum
 extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters: time, level_m, type, flag, datum
-predictions/<source>/<station>/<year>.parquet         the source's predicted curve: time, level_m, flag, received, datum
+predictions/<source>/<station>/<year>.parquet         the source's predicted curve: time, level_m, flag, source_flag, received, datum
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters: time, level_m, type, flag[, transit, event], datum
 ```
 
@@ -25,6 +25,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
 - **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only makes a flag worse. `flag <= 2` keeps everything not flagged as a problem.
+- **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. It's null in predictions and in values written before it was kept, and files written before then don't have the column.
 - **`received`** is when ingest first saw a value arrive. It's empty for backfilled history.
 - **`type`** is `high` or `low`. BSH's predicted extremes also carry its `transit` number and `event` index.
 
@@ -233,14 +234,14 @@ ORDER BY abs(o.level_m - p.level_m) DESC LIMIT 3;
 
 ## Reading many files
 
-HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` don't work. Build the list of paths, then pass it to `read_parquet`. For several years of one station:
+HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` don't work. Build the list of paths, then pass it to `read_parquet`, with `union_by_name = true` when you select `*`, since older files lack `source_flag`. For several years of one station:
 
 ```sql
 SET VARIABLE files = (
   SELECT list('https://water-levels.openwaters.io/obs/rws/hoekvanholland/' || y || '.parquet')
   FROM range(2024, 2025) t(y)
 );
-SELECT count(*) AS n FROM read_parquet(getvariable('files'));
+SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
 ```
 
 The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once compaction derives them from the lake; until then they're empty.
@@ -257,7 +258,8 @@ WITH e AS (
   FROM 'https://water-levels.openwaters.io/stations.parquet' WHERE id = 'pegelonline/5990020'
 ),
 o AS (
-  -- epoch 1's files; add a read_parquet per later epoch from its directory
+  -- epoch 1's files; add one per later epoch from its directory with UNION ALL BY NAME,
+  -- since files written before source_flag was kept lack that column
   SELECT 1 AS epoch, * FROM read_parquet(getvariable('base') || '/2024.parquet')
 )
 SELECT o.time, o.level_m + e.to_current AS level_m, o.flag

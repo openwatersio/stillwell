@@ -9,7 +9,7 @@ import type { Product } from "../schema.ts";
  *   stations/bounds/<source>.parquet                    first and last, written by compaction
  *   history/stations/<source>/<time>.parquet            the list as each refresh started
  *   history/stations/<source>/<time>.json               what that refresh changed
- *   recent/<source>.parquet                             last 7 days, every live station
+ *   recent/<source>.parquet                             last 7 days, every live station and any since retired
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve

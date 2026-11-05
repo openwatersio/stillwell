@@ -1,7 +1,8 @@
 name: Ingest
 
 # Run any ingest command against the R2 lake by hand, e.g.
-# `backfill rws hoekvanholland 2024 2025`. Scheduled jobs come later.
+# `backfill rws hoekvanholland 2024 2025`. Ingest hourly and Compact daily run
+# `recent` and `compact` on a schedule.
 on:
   workflow_dispatch:
     inputs:
@@ -14,10 +15,46 @@ on:
         required: true
         default: "180"
 
-concurrency: lake
-
 jobs:
+  # A command for one source shares that source's group with the scheduled
+  # jobs, so a backfill and a compaction never rewrite one year file at once.
+  # `stations` takes the `lake` group whatever its sources, since every run
+  # rebuilds stations.parquet from all the lists.
+  group:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      name: ${{ steps.group.outputs.name }}
+    steps:
+      - id: group
+        run: |
+          set -f
+          # The command and sources are the words that aren't an option or
+          # its value; every ingest option takes a value but --accept-epochs.
+          words=()
+          skip=
+          for arg in $ARGS; do
+            if [ -n "$skip" ]; then skip=; continue; fi
+            case "$arg" in
+              --accept-epochs | --*=*) ;;
+              --*) skip=1 ;;
+              *) words+=("$arg") ;;
+            esac
+          done
+          case "${words[0]:-}" in
+            backfill | recent | compact) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            *) group=lake ;;
+          esac
+          echo "name=$group" >> "$GITHUB_OUTPUT"
+        env:
+          ARGS: ${{ inputs.args }}
+
   ingest:
+    needs: group
+    concurrency:
+      group: ${{ needs.group.outputs.name }}
+      cancel-in-progress: false
     # The lake environment only deploys from main; this stops a run from another
     # branch before it waits on that rule.
     if: github.ref == 'refs/heads/main'

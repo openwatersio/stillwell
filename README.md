@@ -54,7 +54,7 @@ A station whose source moved it to another datum reference has later files under
 
 Station IDs are `<source>/<source_id>`, such as `rws/hoekvanholland`. [docs/data.md](docs/data.md) describes every column and has more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 
-The lake is new. So far it holds the station lists for every source and one year of observations, Hoek van Holland in 2024. Scheduled ingest will fill in the rest.
+The lake is new. It holds the station lists for every source and one year of observations, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and adds each day to the year files, and backfill of older years comes next.
 
 An API at `api.openwaters.io/water-levels` is planned, with live levels for a station, and an archive series that can include Slackwater's prediction and the residual alongside the observations. [docs/api.md](docs/api.md) has the design.
 

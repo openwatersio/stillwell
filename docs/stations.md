@@ -2,8 +2,8 @@
 
 **Status: built and switched on.** This replaced the station lists once committed to the repo, and the rule that a station has one datum for its whole record. On 2026-11-05 the R2 lake was seeded from the last committed lists (19,809 stations), and the published `stations.parquet` matched one built from them, as did every station's own fields in each list's `extra` (USACE `series` and `zero_since`, CO-OPS `established` and `removed`, USGS series). Not built yet:
 
-- the phase 4 workflows: one job per source, the rebuild job, and the daily refresh after a datum failure;
-- compaction, which will write `stations/bounds/<source>.parquet` and fold `recent` rows into their epoch's files;
+- the phase 4 `stations` workflows: one job per source, the rebuild job, and the daily refresh after a datum failure (Ingest hourly and Compact daily already run `recent` and `compact` one job per source, in `lake-<source>` groups);
+- compaction's `stations/bounds/<source>.parquet`: `compact` folds `recent` rows into their epoch's files, but doesn't write the bounds yet;
 - a `restore` command for a list snapshot;
 - `tide_station` and series pins in `overrides`, which so far holds epoch decisions only, and no adapter has one yet: the first decision adds `overrides` to its `Source`;
 - readers outside this repo (tide-database, crowd-depth) reading `epochs`.
@@ -118,7 +118,7 @@ Each change opens one more epoch, with its own files. Nothing about earlier epoc
 - a change back (A → B → A) is a new epoch, not a return to an old one. The label matches, but the reference may not have;
 - several changes between two refreshes show up as one. The source's own dates, or a person's decisions, can enter the epochs in between; otherwise their rows fall in the gap.
 
-A station that keeps changing is held. A change within 180 days of the current epoch's `since`, or a label returning to one of the station's earlier ones, opens the epoch as `held`. While held, the station's `backfill` and `recent` skip it, and the report lists it, until the source's `overrides` confirms or rejects the change. 180 days spans several refreshes at any cadence, so a source that flips labels gets one epoch at most before a person looks.
+A station that keeps changing is held. A change within 180 days of the current epoch's `since`, or a label returning to one of the station's earlier ones, opens the epoch as `held`. While held, the station's `backfill` and `recent` skip it, and the report lists it, until the source's `overrides` confirms or rejects the change. `compact` folds its values from before the held epoch's start and lists the rest as waiting, without failing; they age out of the 7-day window, so after a decision, `backfill` the held span. 180 days spans several refreshes at any cadence, so a source that flips labels gets one epoch at most before a person looks.
 
 **Undoing an epoch** is an entry in the source's `overrides` marking it `rejected`. For example, an adapter bug misread a label, so the reference never changed. A rejected epoch's span goes back to the epoch before it: that one's `until` becomes the rejected epoch's (none, when the rejected epoch was the current one), and the rejected epoch's files are read as the earlier epoch's, with `to_current` 0, unless the entry gives another offset. No file moves, so an undo can itself be undone. Rejecting says the source's new reference continues the old one: a USGS station whose new series is rejected as a change goes on fetching that series, into the epoch before. USACE is the exception: its `zero_since` keeps the later of the list's and `zeros.ts`'s dates, so a rejected zero date still bounds its fetches until it's removed from both. Entries are marked, never deleted: as `zeros.ts` says today, removing a reset date would let a backfill write the old zero's values back.
 
@@ -154,7 +154,7 @@ history/stations/<source>/<time>.json        what that refresh changed
 6. Copy the previous list to history, then write the new list. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
 7. Write the change report next to the snapshot, and add it to the job summary: stations added, retired and changed field by field, plus epochs opened, held and rejected.
 
-**Jobs.** `stations` with no source runs as a matrix, one job per source in a `lake-<source>` group, which `backfill`, `recent` and compaction of that source share. A final job, with `if: always()`, rebuilds `stations.parquet` in its own `lake-stations` group. Within a group, GitHub cancels a pending run when a newer one queues; for the rebuild that's harmless, because each run reads every list fresh. A cancelled source run leaves no summary, so the scheduled workflow checks each source's list age instead, and the next run does the work. This is phase 4 workflow work, alongside the daily refresh above. Today's `ingest.yml` has one `lake` group for every run. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
+**Jobs.** `stations` with no source runs as a matrix, one job per source in a `lake-<source>` group, which `backfill`, `recent` and compaction of that source share. A final job, with `if: always()`, rebuilds `stations.parquet` in its own `lake-stations` group. Within a group, GitHub cancels a pending run when a newer one queues; for the rebuild that's harmless, because each run reads every list fresh. A cancelled source run leaves no summary, so the scheduled workflow checks each source's list age instead, and the next run does the work. This is phase 4 workflow work, alongside the daily refresh above. Today's `ingest.yml` runs `backfill`, `recent` and `compact` in the source's `lake-<source>` group, and `stations` in the `lake` group. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
 
 **Nothing is lost by a refresh.** Before a refresh writes a list, it writes the list it read to `history/`, and the series files never change for an epoch. A bad refresh is undone by restoring the snapshot before it (below), and a bad epoch by rejecting it in the source's overrides. Some of what a list holds can't be fetched again (retired stations, USACE series pins, closed epochs' frozen offsets), so the snapshots matter, but protecting the bucket itself, from deletion or a bad credential, is a matter for the whole lake, observations included, and lives outside ingest.
 
@@ -177,8 +177,9 @@ The R2 lake was seeded once from the committed lists, with a command since remov
 - `scripts/ingest.ts`: `stations`, `backfill` and `recent` read the lists from the lake, write the current epoch, and skip held stations.
 - `Source.overrides` (`src/schema.ts`): a person's decisions on a source's epochs, keyed by station and epoch start. Each epoch event in the report prints the key.
 - Adapters: PEGELONLINE reports `gaugeZero.validFrom` and USACE its `zeros.ts` dates as each station's `reference`; USGS says through `seriesChanged` when a station's series or gage zero moved.
+- `src/lake/recent.ts`: `recent` and `compact`. Compaction folds each `recent` row into its own epoch's year file, in that epoch's datum, and fails a row whose epoch the list doesn't have.
 
-Still to come: the per-source matrix, the rebuild job and the daily refresh after a datum failure in `.github/workflows/` (phase 4); compaction, which writes `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
+Still to come: the per-source `stations` matrix, the rebuild job and the daily refresh after a datum failure in `.github/workflows/` (phase 4); the bounds compaction writes to `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
 
 ## What this gives up
 
