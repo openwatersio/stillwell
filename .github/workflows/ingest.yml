@@ -17,8 +17,9 @@ on:
 
 jobs:
   # A command for one source shares that source's group with the scheduled
-  # jobs, so a backfill and a compaction never rewrite one year file at once.
-  # `stations` writes only the station lists, and takes the `lake` group.
+  # jobs, so a backfill and a compaction never rewrite one year file at once,
+  # and a refresh never changes a list while they read it. `stations` or
+  # `seed-stations` for several sources, or all, takes the `lake` group.
   group:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -29,22 +30,24 @@ jobs:
       - id: group
         run: |
           set -f
-          # The command and source are the first two words that aren't an
-          # option or its value; every ingest option takes a value.
+          # The command and sources are the words that aren't an option or
+          # its value; every ingest option takes a value but --accept-epochs.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --*=*) ;;
+              --accept-epochs | --*=*) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact) echo "name=lake-${words[1]:-}" >> "$GITHUB_OUTPUT" ;;
-            *) echo "name=lake" >> "$GITHUB_OUTPUT" ;;
+            backfill | recent | compact) group="lake-${words[1]:-}" ;;
+            stations | seed-stations) [ "${#words[@]}" -eq 2 ] && group="lake-${words[1]}" || group=lake ;;
+            *) group=lake ;;
           esac
+          echo "name=$group" >> "$GITHUB_OUTPUT"
         env:
           ARGS: ${{ inputs.args }}
 

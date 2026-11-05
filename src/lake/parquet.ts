@@ -41,8 +41,13 @@ export function setConnections(count: number): void {
  * on one table can span calls that land on different connections.
  */
 function serial<T>(work: () => Promise<T>): Promise<T> {
-  while (lanes.length < laneCount)
-    lanes.push({ queue: Promise.resolve(), pending: 0, db: connect() });
+  while (lanes.length < laneCount) {
+    const db = connect();
+    // A lane no work reaches yet mustn't end the process if its setup fails;
+    // the work that does reach it gets the error.
+    db.catch(() => undefined);
+    lanes.push({ queue: Promise.resolve(), pending: 0, db });
+  }
   const lane = lanes.slice(0, laneCount).reduce((a, b) => (b.pending < a.pending ? b : a));
   lane.pending++;
   const run = () => current.run(lane.db, work);
@@ -57,20 +62,27 @@ function connection(): Promise<DuckDBConnection> {
   return db;
 }
 
+/**
+ * A connection to the one in-memory instance. The instance loads httpfs and
+ * creates the lake's S3 secret once, when it starts: secrets belong to the
+ * instance, and connections creating one at the same moment conflict in its
+ * catalog, which failed most of a 16-connection compaction's reads.
+ */
 async function connect(): Promise<DuckDBConnection> {
   instance ??= (async () => {
     const created = await DuckDBInstance.create(":memory:");
-    if (process.env.S3_ENDPOINT)
-      await (await created.connect()).run("INSTALL httpfs; LOAD httpfs;");
+    const endpoint = process.env.S3_ENDPOINT;
+    if (endpoint) {
+      const setup = await created.connect();
+      await setup.run("INSTALL httpfs; LOAD httpfs;");
+      await setup.run(
+        `CREATE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
+      );
+    }
     return created;
   })();
   const db = await (await instance).connect();
   await db.run("SET TimeZone = 'UTC'");
-  const endpoint = process.env.S3_ENDPOINT;
-  if (endpoint)
-    await db.run(
-      `CREATE OR REPLACE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
-    );
   return db;
 }
 

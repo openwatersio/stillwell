@@ -282,6 +282,26 @@ describe("updateRecent", () => {
     );
   });
 
+  it("fails a station whose lake can't be named alone", async () => {
+    const root = lake();
+    const [a, b] = [station("a"), station("b", { commercial_use: false })];
+    const summary = await updateRecent({
+      source: source({ [a.id]: [at(NOW - HOUR, 1)] }),
+      stations: [a, b],
+      lakeFor: (s) => {
+        if (!s.commercial_use) throw new Error("no restricted lake");
+        return root;
+      },
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+    });
+    assert.deepEqual(summary.failed, ["test/b: no restricted lake"]);
+    assert.deepEqual(
+      (await readRecent(recentPath(root, "test"))).map((r) => r.station),
+      ["test/a"],
+    );
+  });
+
   it("looks back two intervals for a station fetched on its own", async () => {
     const root = lake();
     const asked: [string, number][] = [];
@@ -655,6 +675,59 @@ describe("compactRecent", () => {
     assert.deepEqual(await readDatums(second), ["NHN"]);
     // An epoch the list doesn't know has no datum to write in.
     assert.deepEqual(summary.failed, ["test/lost epoch 3 2026: the list has no epoch 3"]);
+  });
+
+  it("folds a row into an epoch opened after it was tagged, by its time", async () => {
+    const root = lake();
+    const opened = start + 6 * HOUR;
+    const moved = station("moved", {
+      datum: "NHN",
+      epochs: [
+        epoch(1, "PNP", { state: "closed", until: new Date(opened).toISOString() }),
+        epoch(2, "NHN", { since: new Date(opened).toISOString() }),
+      ],
+    });
+    const held = station("held", {
+      epochs: [
+        epoch(1, "NAP"),
+        epoch(2, "MSL", { state: "held", since: new Date(opened).toISOString() }),
+      ],
+    });
+    // The hourly run tagged every row epoch 1 before the refresh opened epoch 2 in the past.
+    await writeRecent(recentPath(root, "test"), [
+      [held, moved].flatMap((s) => [
+        { ...at(start + HOUR, 1, start + HOUR), station: s.id, epoch: 1 },
+        { ...at(start + 8 * HOUR, 2, start + 8 * HOUR), station: s.id, epoch: 1 },
+      ]),
+    ]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [moved, held],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    const file = (s: string, n: number) => seriesPath(root, "levels", "test", s, 2026, n);
+    assert.deepEqual(
+      (await readObservations(file("moved", 1))).map((r) => r.level),
+      [1],
+    );
+    assert.deepEqual(
+      (await readObservations(file("moved", 2))).map((r) => r.level),
+      [2],
+    );
+    // A held change's values wait; the ones before it fold.
+    assert.deepEqual(
+      (await readObservations(file("held", 1))).map((r) => r.level),
+      [1],
+    );
+    assert.deepEqual(
+      (await readObservations(file("held", 2))).map((r) => r.level),
+      [],
+    );
+    assert.deepEqual(summary.failed, [
+      "test/held: 1 values wait in recent/ for a held datum change",
+    ]);
   });
 
   it("folds a station retired since its values arrived", async () => {

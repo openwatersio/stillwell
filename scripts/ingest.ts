@@ -143,7 +143,7 @@ switch (command) {
   case "recent": {
     const [source] = args;
     if (!source) usage();
-    await recent(source, positive("hours"), positive("keep-days"));
+    await recent(source);
     break;
   }
   case "compact": {
@@ -338,9 +338,10 @@ async function backfillYear(
   return merged.length;
 }
 
-async function recent(sourceId: string, hours: number, keepDays: number): Promise<void> {
+async function recent(sourceId: string): Promise<void> {
   const now = Date.now();
   const summary = await reporting(`recent ${sourceId}`, async () => {
+    const [hours, keepDays] = [positive("hours"), positive("keep-days")];
     const source = sourceOf(sourceId);
     return updateRecent({
       source,
@@ -369,7 +370,9 @@ async function compact(sourceId: string, days: number): Promise<void> {
     setConnections(concurrency);
     const source = sourceOf(sourceId);
     const stations = await listOf(lakeOfSource(source.metadata), sourceId);
-    live = stations.filter((s) => s.live && s.status === "active").length;
+    live = stations.filter(
+      (s) => s.live && s.status === "active" && s.products.includes("levels"),
+    ).length;
     const [start, end] = lastDays(Date.now(), days);
     return compactRecent({ source, stations, lakeFor, concurrency, start, end });
   });

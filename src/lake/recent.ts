@@ -1,6 +1,6 @@
 import { qc, type QcOptions } from "../qc.ts";
 import { isHeld, recentWindow } from "../epochs.ts";
-import type { LakeStation, Observation, Source, Station } from "../schema.ts";
+import type { Epoch, LakeStation, Observation, Source, Station } from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import {
   checkRecent,
@@ -92,7 +92,6 @@ export async function updateRecent({
   const stations = live.filter((s) => !isHeld(s.epochs));
   const keepFrom = now - keepDays * DAY_MS;
   // Restricted stations' recent values go to the private lake, like their series.
-  const pathOf = new Map(live.map((s) => [s.id, recentPath(lakeFor(s), id)]));
   const lakeOf = (s: Station): string | undefined => {
     try {
       return recentPath(lakeFor(s), id);
@@ -101,6 +100,15 @@ export async function updateRecent({
     }
   };
   const summary = emptySummary(`recent ${id}`, stations.length);
+  // A station whose lake can't be named, such as a restricted one with no
+  // restricted lake set, fails alone rather than stop the source's run.
+  const pathOf = new Map<string, string>();
+  for (const s of live)
+    try {
+      pathOf.set(s.id, recentPath(lakeFor(s), id));
+    } catch (error) {
+      summary.failed.push(`${s.id}: ${message(error)}`);
+    }
   const reporting = new Set<string>();
 
   // Each file is read in batches after the sweep, so one that can't be read
@@ -132,7 +140,11 @@ export async function updateRecent({
   let swept: Map<string, Observation[] | Error> | Error | undefined;
   if (source.recent)
     swept = await source
-      .recent(stations, since, new Date(now))
+      .recent(
+        stations.filter((s) => pathOf.has(s.id)),
+        since,
+        new Date(now),
+      )
       .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
 
   async function* batches(path: string): AsyncGenerator<StationObservation[]> {
@@ -256,7 +268,24 @@ export async function compactRecent({
           return;
         }
         let changed = false;
-        const parts = Map.groupBy(rows, (r) => `${r.epoch} ${new Date(r.time).getUTCFullYear()}`);
+        // A row goes to the epoch its time falls in, as the next hourly run
+        // would move it: a refresh can open an epoch whose start is in the
+        // past after the window's rows were tagged. Rows at or after a held
+        // epoch's start wait in the window for a person's decision.
+        const heldFrom = Math.min(
+          ...station.epochs
+            .filter((e) => e.state === "held" && e.since !== null)
+            .map((e) => Date.parse(e.since!)),
+        );
+        const waiting = rows.filter((r) => r.time >= heldFrom);
+        if (waiting.length)
+          summary.failed.push(
+            `${station.id}: ${waiting.length} values wait in recent/ for a held datum change`,
+          );
+        const parts = Map.groupBy(
+          rows.filter((r) => r.time < heldFrom),
+          (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
+        );
         for (const [key, values] of parts) {
           const [epochId, year] = key.split(" ").map(Number) as [number, number];
           const label =
@@ -296,6 +325,22 @@ export async function compactRecent({
     }
   }
   return summary;
+}
+
+/**
+ * The epoch a recent row belongs to: its own, or a later open or closed one
+ * whose known start is at or before the row's time.
+ */
+function epochAt(epochs: Epoch[], row: { time: number; epoch: number }): number {
+  let id = row.epoch;
+  for (const e of epochs)
+    if (
+      (e.state === "open" || e.state === "closed") &&
+      e.since !== null &&
+      Date.parse(e.since) <= row.time
+    )
+      id = Math.max(id, e.id);
+  return id;
 }
 
 /** The `days` whole UTC days before `now`, as [start, end). */
