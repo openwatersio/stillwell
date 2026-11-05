@@ -97,6 +97,12 @@ export interface Epoch {
   seen: string | null;
   /** The source's own name for the reference, such as PEGELONLINE's `gaugeZero.validFrom`. */
   reference: string | null;
+  /**
+   * Where the source says `reference` starts, as a UTC instant, or null when it
+   * doesn't say. A first epoch seeded with no `since` learns it here, so a
+   * later change can still be checked against it.
+   */
+  reference_since: string | null;
   /** Offsets to other datums, as `Station.datums`; frozen when the epoch closes. */
   datums: Record<string, number>;
   to_current: number | null;

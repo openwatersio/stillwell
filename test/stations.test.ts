@@ -48,6 +48,7 @@ const held = (id: string, fields: Partial<LakeStation> = {}): LakeStation => {
         until: null,
         seen: "2026-01-01T00:00:00Z",
         reference: null,
+        reference_since: null,
         datums: s.datums,
         to_current: 0,
         state: "open",
@@ -101,7 +102,14 @@ describe("mergeStationList", () => {
       options,
     );
     assert.deepEqual(moved.changes, [
-      { id: "rws/a", event: "opened", from: "NAP", to: "MSL", reason: undefined },
+      {
+        id: "rws/a",
+        event: "opened",
+        from: "NAP",
+        to: "MSL",
+        reason: undefined,
+        key: `rws/a ${options.now}`,
+      },
     ]);
     const [a] = moved.stations;
     assert.deepEqual([a!.datum, a!.datums, a!.status], ["MSL", { LAT: -1.5 }, "active"]);
@@ -132,6 +140,7 @@ describe("mergeStationList", () => {
         from: "NAP",
         to: "NAP",
         reason: "gage datum is now 1.5 m above NAVD88",
+        key: `rws/a ${options.now}`,
       },
     ]);
     const [a, b] = merged.stations;

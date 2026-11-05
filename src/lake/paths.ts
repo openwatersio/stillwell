@@ -39,14 +39,29 @@ export function seriesPath(
   return epoch === 1 ? `${dir}/${year}.parquet` : `${dir}/${epoch}/${year}.parquet`;
 }
 
-/** A glob for the epoch directories a station's series has in the lake. */
+/** A station's directory for one product, which holds epoch 1's years and later epochs' directories. */
+export function stationDir(
+  root: string,
+  product: Product,
+  source: string,
+  sourceId: string,
+): string {
+  return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
+}
+
+/** A glob for the files in every station's later epochs' directories, for one source. */
+export function sourceEpochDirs(root: string, product: Product, source: string): string {
+  return `${root}/${DATASET[product]}/${source}/*/*/*.parquet`;
+}
+
+/** A glob for the files in a station's later epochs' directories. */
 export function epochDirs(
   root: string,
   product: Product,
   source: string,
   sourceId: string,
 ): string {
-  return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}/*/*.parquet`;
+  return `${stationDir(root, product, source, sourceId)}/*/*.parquet`;
 }
 
 export function stationListPath(root: string, source: string): string {

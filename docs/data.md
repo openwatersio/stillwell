@@ -21,7 +21,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 ```
 
 - **`<station>`** is the station's `source_id` from `stations.parquet`, URL-encoded. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
-- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path. Most stations have one epoch; [Datum epochs](#datum-epochs) below shows how to read across them.
+- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch; [Datum epochs](#datum-epochs) below shows how to read across them.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
 - **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only makes a flag worse. `flag <= 2` keeps everything not flagged as a problem.
@@ -35,7 +35,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 `stations.parquet` has one row per station. Besides `id`, `name`, `lat` and `lon`, these columns matter most:
 
 - **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum), `STND` (CO-OPS station datum), `GZ` (USACE gauge zero) or `GAGE` (USGS gage datum).
-- **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes.
+- **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.
 - **`status`**: `active` or `inactive`.
@@ -247,7 +247,7 @@ The same works for many stations, with paths built from `stations.parquet`. A mi
 
 ## Datum epochs
 
-`stations.parquet`'s `epochs` lists each span over which a station's levels share one reference: `id`, `datum`, `since` and `until` (UTC, either null when open-ended), `seen` (the last refresh that confirmed it), `reference` (the source's own name for it, where it has one), `datums` (its offsets), `to_current` and `state`. `to_current` is the meters to add to that epoch's levels to put them in the station's current `datum`, and null when they can't be converted, such as across a gauge zero reset nobody has measured. Rows in an epoch's files outside its `since` and `until` aren't part of the series; they're the uncertain stretch around a change. A station's whole record in its current datum:
+`stations.parquet`'s `epochs` lists each span over which a station's levels share one reference: `id`, `datum`, `since` and `until` (UTC, either null when open-ended), `seen` (the last refresh that confirmed it), `reference` (the source's own name for it, where it has one), `reference_since` (where the source says that starts), `datums` (its offsets), `to_current` and `state`. `to_current` is the meters to add to that epoch's levels to put them in the station's current `datum`, and null when they can't be converted, such as across a gauge zero reset nobody has measured. Rows in an epoch's files outside its `since` and `until` aren't part of the series; they're the uncertain stretch around a change. A station's whole record in its current datum:
 
 ```sql
 SET TimeZone = 'UTC';

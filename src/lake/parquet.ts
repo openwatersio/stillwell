@@ -200,7 +200,7 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
 };
 
 const EPOCHS =
-  "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
+  "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, reference_since TIMESTAMPTZ, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
 
 /** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
 export async function writeStations(path: string, stations: LakeStation[]): Promise<void> {
@@ -254,6 +254,7 @@ export async function readStationList(path: string): Promise<LakeStation[] | nul
         since: isoOf(e.since),
         until: isoOf(e.until),
         seen: isoOf(e.seen),
+        reference_since: isoOf(e.reference_since),
         datums: e.datums ?? {},
       })),
     } as LakeStation;
@@ -275,16 +276,19 @@ export async function exists(pattern: string): Promise<boolean> {
   });
 }
 
-/** The highest epoch directory under any of `patterns`, or 1 when there's none. */
-export async function highestEpoch(patterns: string[]): Promise<number> {
+/**
+ * The highest epoch directory each station has among the files `patterns`
+ * match, by the station's directory (`epochDirs` without its last two parts).
+ */
+export async function highestEpochs(patterns: string[]): Promise<Map<string, number>> {
   return serial(async () => {
     const db = await connection();
-    let highest = 1;
+    const highest = new Map<string, number>();
     for (const pattern of patterns) {
       const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(pattern)})`);
       for (const { file } of reader.getRowObjects()) {
-        const epoch = /\/(\d+)\/\d{4}\.parquet$/.exec(String(file))?.[1];
-        if (epoch) highest = Math.max(highest, Number(epoch));
+        const match = /^(.*)\/(\d+)\/\d{4}\.parquet$/.exec(String(file));
+        if (match) highest.set(match[1]!, Math.max(highest.get(match[1]!) ?? 1, Number(match[2])));
       }
     }
     return highest;

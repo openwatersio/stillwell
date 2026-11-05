@@ -26,6 +26,7 @@ const epoch = (fields: Partial<Epoch> = {}): Epoch => ({
   until: null,
   seen: "2027-05-01T00:00:00Z",
   reference: null,
+  reference_since: null,
   datums: {},
   to_current: 0,
   state: "open",
@@ -103,7 +104,53 @@ describe("nextEpochs", () => {
       options(),
     );
     assert.equal(event, null);
-    assert.equal(epochs[0]!.reference, "2019-11-01");
+    assert.deepEqual(
+      [epochs[0]!.since, epochs[0]!.reference, epochs[0]!.reference_since],
+      [null, "2019-11-01", "2019-11-02T00:00:00Z"],
+    );
+    // An epoch with no start still holds a change dated before its reference's.
+    const back = nextEpochs(
+      epochs,
+      { datum: "PNP", datums: {}, reference: { id: "2019-10-01", since: "2019-10-02" } },
+      options(),
+    );
+    assert.deepEqual(
+      [back.event, back.reason],
+      ["held", "starts no later than the epoch before it"],
+    );
+  });
+
+  it("holds a reference first seen with a recent date, for a person to place", () => {
+    const fetched = {
+      datum: "PNP",
+      datums: {},
+      reference: { id: "2027-03-01", since: "2027-03-02" },
+    };
+    const held = nextEpochs([epoch()], fetched, options());
+    assert.equal(held.event, "held");
+    assert.match(held.reason!, /first seen within 180 days/);
+    const key = epochKey("x/1", "2027-03-02T00:00:00Z");
+
+    const confirmed = nextEpochs(held.epochs, fetched, {
+      ...options(),
+      decisions: { [key]: { confirm: true, note: "moved then" } },
+    });
+    assert.deepEqual(
+      confirmed.epochs.map((e) => [e.since, e.until, e.reference, e.state]),
+      [
+        [null, "2027-03-01T00:00:00Z", null, "closed"],
+        ["2027-03-02T00:00:00Z", null, "2027-03-01", "open"],
+      ],
+    );
+
+    // Rejected, it's epoch 1's own reference after all, and stops coming up.
+    const decisions = { [key]: { reject: true, note: "it moved years ago" } };
+    const rejected = nextEpochs(held.epochs, fetched, { ...options(), decisions });
+    const quiet = nextEpochs(rejected.epochs, fetched, { ...options(), decisions });
+    assert.deepEqual(
+      [quiet.event, quiet.epochs[0]!.reference, quiet.epochs[0]!.state],
+      [null, "2027-03-01", "open"],
+    );
   });
 
   it("holds a change soon after the last one, or back to an earlier label", () => {

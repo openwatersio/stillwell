@@ -449,7 +449,7 @@ function latest(a: string | undefined, b: string | undefined): string | undefine
  * (Central and Eastern, standard or daylight time), or -Infinity for a station whose zero never moved. Takes the later of
  * `ZERO_SINCE` and the station's own `zero_since`. A station read from
  * `stations.parquet`, which doesn't carry `zero_since`, is bounded by
- * `ZERO_SINCE` alone; a test checks the list's date is never earlier.
+ * `ZERO_SINCE` alone.
  */
 export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: string }): number {
   const since = latest(ZERO_SINCE[station.source_id]?.since, station.zero_since);

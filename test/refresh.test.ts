@@ -87,9 +87,15 @@ describe("refreshSource", () => {
       { id: "test/b", fields: ["status"] },
     ]);
     const history = (await readdir(join(lake, "history/stations/test"))).sort();
-    assert.deepEqual(history, ["2026-12-05T000000Z.json", "2026-12-05T000000Z.parquet"]);
-    // The snapshot is the list as the refresh started.
-    const snapshot = await readStationList(join(lake, "history/stations/test", history[1]!));
+    assert.deepEqual(history, [
+      "2026-11-05T000000Z.json",
+      "2026-11-05T000000Z.parquet",
+      "2026-12-05T000000Z.json",
+      "2026-12-05T000000Z.parquet",
+    ]);
+    // Each snapshot is the list as its refresh started: none, then the first.
+    assert.deepEqual(await readStationList(join(lake, "history/stations/test", history[1]!)), []);
+    const snapshot = await readStationList(join(lake, "history/stations/test", history[3]!));
     assert.deepEqual(
       snapshot!.map((s) => [s.id, s.name, s.status]),
       [
@@ -101,7 +107,6 @@ describe("refreshSource", () => {
 
   it("refuses to start over when the list is gone but its history isn't", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    await refreshSource(lake, sourceOf([listed("a")]), { now: LATER });
     await rm(stationListPath(lake, "test"));
     await assert.rejects(
       refreshSource(lake, sourceOf([listed("a")]), { now: LATER }),
@@ -192,6 +197,18 @@ describe("refreshSource", () => {
     );
   });
 
+  it("finds epoch files for many new stations with one listing per product", async () => {
+    await writeObservations(
+      seriesPath(lake, "levels", "test", "7", 2026, 3),
+      [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
+      "NAP",
+    );
+    const many = Array.from({ length: 60 }, (_, i) => listed(String(i)));
+    const { stations } = await refreshSource(lake, sourceOf(many), { now: NOW });
+    const ids = new Map(stations.map((s) => [s.source_id, s.epochs.map((e) => e.id)]));
+    assert.deepEqual([ids.get("7"), ids.get("8")], [[4], [1]]);
+  });
+
   it("applies a person's decision on an epoch from the source's overrides", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
     await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), { now: LATER });
@@ -233,9 +250,18 @@ describe("seedSource", () => {
       [[[1, "2015-06-29T06:00:00Z", "2015-06-29"]], [[1, null, null]]],
     );
     assert.deepEqual(await readStationList(stationListPath(lake, "test")), seeded);
+    // A field the files left out isn't a change when the source sends it as null.
+    const { report } = await refreshSource(
+      lake,
+      { metadata: usace, stations: async () => committed.map((s) => ({ ...s, series_end: null })) },
+      { now: LATER },
+    );
+    assert.deepEqual(report.changed, []);
     await assert.rejects(seedSource(lake, usace, committed, NOW), /already exists/);
-    // A seeded list that goes missing is refused, not rebuilt from the fetch.
+    // Nor over a list that went missing: that's a restore from history.
     await rm(stationListPath(lake, "test"));
+    await assert.rejects(seedSource(lake, usace, committed, NOW), /history for test but no list/);
+    // A seeded list that goes missing is refused, not rebuilt from the fetch.
     await assert.rejects(
       refreshSource(lake, { metadata: usace, stations: async () => [] }, { now: LATER }),
       /history for test but no list/,

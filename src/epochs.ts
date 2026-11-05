@@ -96,6 +96,7 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
       until: null,
       seen: options.now,
       reference: fetched.reference?.id ?? null,
+      reference_since: since,
       datums: fetched.datums,
       to_current: 0,
       state: "open",
@@ -120,12 +121,26 @@ export function nextEpochs(
   const current = currentEpoch(epochs);
   const labelChanged = fetched.datum !== null && fetched.datum !== current.datum;
   const ref = fetched.changed ? { id: fetched.changed, since: null } : (fetched.reference ?? null);
+  // A reference first seen with a recent date may have moved after the station
+  // was last checked, so epoch 1 could hold values from both zeros.
+  const refStart = ref?.since ? dayStart(ref.since, options.offsets) : null;
+  const fresh =
+    refStart !== null &&
+    current.reference === null &&
+    !labelChanged &&
+    refStart <= Date.parse(options.now) &&
+    Date.parse(options.now) - refStart < HOLD_WITHIN_MS;
   const refChanged =
-    !!fetched.changed || (!!ref && current.reference !== null && ref.id !== current.reference);
+    !!fetched.changed ||
+    fresh ||
+    (!!ref && current.reference !== null && ref.id !== current.reference);
 
   if (!labelChanged && !refChanged) {
     // The first refresh to see a reference records it, rather than call it a change.
-    if (ref && current.reference === null) current.reference = ref.id;
+    if (ref && current.reference === null) {
+      current.reference = ref.id;
+      if (ref.since) current.reference_since = iso(dayStart(ref.since, options.offsets));
+    }
     if (fetched.datum !== null) current.seen = options.now;
     if (!isHeld(epochs)) current.datums = fetched.datums;
   } else if (!isHeld(epochs)) {
@@ -141,6 +156,11 @@ export function nextEpochs(
       if (!labelChanged) {
         current.seen = options.now;
         current.datums = fetched.datums;
+        // A rejected first sighting is the current reference after all.
+        if (fresh && ref) {
+          current.reference = ref.id;
+          current.reference_since = iso(refStart!);
+        }
       }
       event = "ignored";
       reason = "a person rejected this change";
@@ -171,8 +191,10 @@ export function nextEpochs(
           e.state !== "rejected" &&
           (labelChanged ? e.datum === datum : e.reference !== null && e.reference === ref?.id),
       );
-      const soon = current.since !== null && since - Date.parse(current.since) < HOLD_WITHIN_MS;
-      const backwards = current.since !== null && since <= Date.parse(current.since);
+      // A seeded epoch with no start still knows where its reference starts, if the source said.
+      const start = current.since ?? current.reference_since;
+      const soon = start !== null && since - Date.parse(start) < HOLD_WITHIN_MS;
+      const backwards = start !== null && since <= Date.parse(start);
       const id = Math.max(...epochs.map((e) => e.id), (options.nextId ?? 1) - 1) + 1;
       // A held epoch keeps the end it would give the open one, until a person decides.
       const opened: Epoch = {
@@ -182,18 +204,21 @@ export function nextEpochs(
         until: iso(Math.min(until, since)),
         seen: fetched.datum !== null ? options.now : null,
         reference: ref?.id ?? null,
+        reference_since: ref?.since ? iso(since) : null,
         datums: fetched.sent ?? fetched.datums,
         to_current: 0,
         state: "open",
       };
-      if (backwards || ((soon || earlier) && !decision?.confirm)) {
+      if (backwards || ((soon || earlier || fresh) && !decision?.confirm)) {
         opened.state = "held";
         event = "held";
         reason = backwards
           ? "starts no later than the epoch before it"
           : soon
             ? "comes within 180 days of the last change"
-            : "returns to an earlier reference";
+            : earlier
+              ? "returns to an earlier reference"
+              : "first seen within 180 days of its date, so epoch 1 may hold values from before and after it";
       } else {
         current.state = "closed";
         current.until = opened.until;

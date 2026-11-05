@@ -1,5 +1,6 @@
 /**
- * The committed station lists: one YAML file per station, at
+ * The committed station files `ingest seed-stations` starts each source's
+ * list in the lake from, until they're removed: one YAML file per station, at
  * `stations/<source>/<source_id>.yml`, with the `source_id` URL-encoded as in
  * the lake's paths. One file per station keeps a refresh's diff to the
  * stations that changed and lets a person resolve one by hand.
@@ -8,7 +9,6 @@
  * what the lake fills in (`first`, `last`), its source's terms (`license`,
  * `commercial_use`, `attribution`) unless the station's differ, fields that
  * are null, and an empty `datums` or `same_as`.
- * `stations.parquet` is the complete list.
  */
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";

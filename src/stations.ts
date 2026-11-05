@@ -1,5 +1,6 @@
 import {
   currentEpoch,
+  epochKey,
   firstEpochs,
   nextEpochs,
   type EpochEvent,
@@ -14,6 +15,8 @@ export interface EpochChange {
   from: string;
   to: string;
   reason?: string;
+  /** The key a decision on it takes in the source's overrides. */
+  key: string;
 }
 
 /**
@@ -81,6 +84,11 @@ export function mergeStationList(
           from: old.datum,
           to: s.datum ?? old.datum,
           reason: next.reason,
+          // The epoch a person would decide on: the held one, or else the newest.
+          key: epochKey(
+            s.id,
+            (next.epochs.find((e) => e.state === "held") ?? next.epochs.at(-1)!).since,
+          ),
         });
     } else
       epochs = firstEpochs({ datum: s.datum!, datums, reference }, { ...options, station: s.id });

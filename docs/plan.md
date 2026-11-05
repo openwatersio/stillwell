@@ -106,7 +106,7 @@ models/gtsm/<point>.parquet                      surge reanalysis at coastal poi
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year
 ```
 
-`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` will come from the lake: until compaction fills them in they're null. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless a station's file sets its own. Every other column comes from the committed station files, which hold only what the source says or a person curates, so only the monthly station refresh changes them, never the hourly or daily jobs.
+`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` will come from the lake: until compaction fills them in they're null. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
 
 Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
 
@@ -240,7 +240,7 @@ The rest of the API in the same Worker, reading R2 through a binding with `hypar
 
 ### Phase 12: Bulk and launch (3 days)
 
-- [ ] `snapshot-quarterly.yml`: cleared data into `bulk/<YYYY-Qn>/`, a manifest with checksums, and a Zenodo deposit for a DOI.
+- [ ] `snapshot-quarterly.yml`: cleared data into `bulk/<YYYY-Qn>/`, a manifest with checksums, and a Zenodo deposit for a DOI. Each row carries its datum epoch, and only rows inside their epoch's span go in.
 - [ ] Data README: schema, flags, datums, licenses per source, how to query with DuckDB, Polars and pandas.
 - [ ] Observed levels on the website's station pages, and `heightNow` in signalk-tides (in those repos).
 

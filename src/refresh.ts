@@ -6,7 +6,7 @@ import { isDeepStrictEqual } from "node:util";
 import { currentEpoch, firstEpochs } from "./epochs.ts";
 import {
   exists,
-  highestEpoch,
+  highestEpochs,
   readStationBounds,
   readStationList,
   writeJsonArray,
@@ -16,6 +16,8 @@ import {
 import {
   boundsPath,
   epochDirs,
+  sourceEpochDirs,
+  stationDir,
   historyPath,
   stationListPath,
   stationsPath,
@@ -40,8 +42,6 @@ export interface RefreshOptions {
   now: string;
   /** Accept more epochs opening at once than the guard allows, after a person checked them. */
   acceptEpochs?: boolean;
-  /** A location outside the lake that every snapshot is also written to. */
-  backup?: string;
 }
 
 /** Why a refresh kept the previous list, as an error the caller reports. */
@@ -61,8 +61,7 @@ export async function refreshSource(
   const listPath = stationListPath(lake, id);
   const stored = await readStationList(listPath);
   // A list that went missing would read as an empty lake, and rebuild every station.
-  if (!stored && (await exists(historyPath(lake, id, "*", "parquet"))))
-    throw new Refused(`the lake has history for ${id} but no list at ${listPath}`);
+  if (!stored && (await hasHistory(lake, id))) throw new Refused(lostList(lake, id));
   const previous = stored ?? [];
 
   const fetched = await source.stations(previous);
@@ -91,12 +90,10 @@ export async function refreshSource(
 
   const listedInactive = new Set(fetched.filter((s) => s.status === "inactive").map((s) => s.id));
   const report = reportOf(id, options.now, previous, stations, changes, listedInactive);
-  if (stored) {
-    for (const root of [lake, options.backup].filter((r): r is string => !!r)) {
-      await writeStationList(historyPath(root, id, options.now, "parquet"), stored);
-      await writeJsonArray(historyPath(root, id, options.now, "json"), [report]);
-    }
-  }
+  // A new source's snapshot is its empty list, so a list lost after its first
+  // refresh is refused too, rather than rebuilt from scratch.
+  await writeStationList(historyPath(lake, id, options.now, "parquet"), previous);
+  await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
   await writeStationList(listPath, stations);
   return { stations, report };
 }
@@ -111,12 +108,27 @@ async function renumberAboveFiles(
   previous: LakeStation[],
 ): Promise<void> {
   const before = new Map(previous.map((s) => [s.id, new Set(s.epochs.map((e) => e.id))]));
-  for (const station of stations) {
+  const changed = stations.filter((s) => {
+    const known = before.get(s.id);
+    return s.epochs.some((e) => !known?.has(e.id));
+  });
+  if (!changed.length) return;
+  // A source's first refresh has every station new, and one listing per
+  // product beats one per station; a few stations are cheaper one by one.
+  const products = [...new Set(changed.flatMap((s) => s.products))];
+  const patterns =
+    changed.length > 50
+      ? products.map((p) => sourceEpochDirs(lake, p, changed[0]!.source))
+      : changed.flatMap((s) => s.products.map((p) => epochDirs(lake, p, s.source, s.source_id)));
+  const onDiskOf = await highestEpochs(patterns);
+  for (const station of changed) {
     const known = before.get(station.id) ?? new Set<number>();
     const fresh = station.epochs.filter((e) => !known.has(e.id));
-    if (!fresh.length) continue;
-    const onDisk = await highestEpoch(
-      station.products.map((p) => epochDirs(lake, p, station.source, station.source_id)),
+    const onDisk = Math.max(
+      1,
+      ...station.products.map(
+        (p) => onDiskOf.get(stationDir(lake, p, station.source, station.source_id)) ?? 1,
+      ),
     );
     // A station new to the list with no later epochs on disk starts at 1.
     if (!known.size && onDisk === 1) continue;
@@ -134,10 +146,12 @@ export async function seedSource(
   metadata: SourceMetadata,
   committed: Station[],
   now: string,
-  backup?: string,
 ): Promise<LakeStation[]> {
   const path = stationListPath(lake, metadata.id);
   if (await exists(path)) throw new Refused(`${path} already exists`);
+  // Seeding over a lost list would bring back the committed files' stale
+  // epochs, and new values would go into files from another reference.
+  if (await hasHistory(lake, metadata.id)) throw new Refused(lostList(lake, metadata.id));
   refuseMixedTerms(metadata, committed);
   const offsets = metadata.utc_offsets ?? ([0, 0] as [number, number]);
   const stations = committed.map((s) => {
@@ -156,8 +170,7 @@ export async function seedSource(
   });
   await writeStationList(path, stations);
   // Seeding counts as the first refresh, so a list lost later is refused, not rebuilt.
-  for (const root of [lake, backup].filter((r): r is string => !!r))
-    await writeStationList(historyPath(root, metadata.id, now, "parquet"), stations);
+  await writeStationList(historyPath(lake, metadata.id, now, "parquet"), stations);
   return stations;
 }
 
@@ -207,11 +220,21 @@ export async function publishStations(
 /** A source's list from the lake, or an error naming what to run. */
 export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {
   const list = await readStationList(stationListPath(lake, sourceId));
+  if (!list && (await hasHistory(lake, sourceId))) throw new Error(lostList(lake, sourceId));
   if (!list)
     throw new Error(
       `No station list for ${sourceId} in ${lake}; run \`seed-stations ${sourceId}\`, or \`stations ${sourceId}\` for a new source`,
     );
   return list;
+}
+
+/** Whether a source's list has ever been written to `lake`. */
+export async function hasHistory(lake: string, sourceId: string): Promise<boolean> {
+  return exists(historyPath(lake, sourceId, "*", "parquet"));
+}
+
+function lostList(lake: string, sourceId: string): string {
+  return `the lake has history for ${sourceId} but no list at ${stationListPath(lake, sourceId)}; copy its latest snapshot in history/ back rather than start over`;
 }
 
 /** The epoch new values for a station go to. */
@@ -277,8 +300,9 @@ function reportOf(
       if (listedInactive.has(station.id)) report.withdrawn.push(station.id);
     }
     const [a, b] = [COMPARED(old), COMPARED(station)] as Record<string, unknown>[];
+    // A field left out, as the seeded station files leave out nulls, is null.
     const fields = [...new Set([...Object.keys(a!), ...Object.keys(b!)])]
-      .filter((key) => !isDeepStrictEqual(a![key], b![key]))
+      .filter((key) => !isDeepStrictEqual(a![key] ?? null, b![key] ?? null))
       .sort();
     if (fields.length) report.changed.push({ id: station.id, fields });
   }
@@ -298,7 +322,7 @@ export function describeReport(report: RefreshReport): string[] {
   for (const c of report.changed.slice(0, 50)) lines.push(`  ${c.id}: ${c.fields.join(", ")}`);
   for (const e of report.epochs)
     lines.push(
-      `  ${e.id}: epoch ${e.event}, ${e.from} to ${e.to}${e.reason ? ` (${e.reason})` : ""}`,
+      `  ${e.id}: epoch ${e.event}, ${e.from} to ${e.to}${e.reason ? ` (${e.reason})` : ""}; overrides key "${e.key}"`,
     );
   return lines;
 }

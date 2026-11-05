@@ -27,9 +27,7 @@
  * The lake is WATER_LEVELS_LAKE: a directory (default `data`) or an `s3://` URL.
  * Its bucket is public, so a source whose license bars commercial use keeps
  * its list and series in WATER_LEVELS_RESTRICTED_LAKE instead, which must be a
- * separate lake, and ingest refuses to write one without it. Every refresh's
- * snapshot also goes to WATER_LEVELS_BACKUP, a location outside the lake, when
- * that's set.
+ * separate lake, and ingest refuses to write one without it.
  */
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -59,6 +57,7 @@ import {
 import { qc, type QcOptions } from "../src/qc.ts";
 import {
   describeReport,
+  hasHistory,
   epochOf,
   listOf,
   publishStations,
@@ -90,23 +89,6 @@ function lakeFor(station: Pick<Station, "id" | "commercial_use">): string {
   if (overlaps(restricted, LAKE))
     throw new Error("WATER_LEVELS_RESTRICTED_LAKE must be a separate bucket or directory");
   return restricted;
-}
-
-/** WATER_LEVELS_BACKUP, which must be outside both lakes, since it may hold restricted lists. */
-function backupLake(): string | undefined {
-  const backup = process.env.WATER_LEVELS_BACKUP?.replace(/\/$/, "");
-  if (!backup) {
-    if (/^[a-z0-9]+:\/\//.test(LAKE))
-      console.warn(
-        "WATER_LEVELS_BACKUP isn't set, so this refresh's snapshot stays in the lake only",
-      );
-    return undefined;
-  }
-  const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
-  for (const lake of [LAKE, restricted].filter((l): l is string => !!l))
-    if (overlaps(backup, lake))
-      throw new Error("WATER_LEVELS_BACKUP must be a separate bucket or directory from the lakes");
-  return backup;
 }
 
 /** The lake that holds a source's list, by its terms; every station in it shares them. */
@@ -171,12 +153,15 @@ async function refreshStations(ids: string[]): Promise<void> {
       lakes.add(lake);
       // Starting a list from the fetch alone would drop what the committed
       // files carry forward, such as USACE's series picks.
-      if (existsSync(join(STATIONS_DIR, id)) && !(await exists(stationListPath(lake, id))))
+      if (
+        existsSync(join(STATIONS_DIR, id)) &&
+        !(await exists(stationListPath(lake, id))) &&
+        !(await hasHistory(lake, id))
+      )
         throw new Error(`no list in the lake yet; run \`seed-stations ${id}\` first`);
       const { stations, report } = await refreshSource(lake, source, {
         now,
         acceptEpochs: values["accept-epochs"],
-        backup: backupLake(),
       });
       const active = stations.filter((s) => s.status === "active").length;
       const lines = describeReport(report);
@@ -196,9 +181,10 @@ async function refreshStations(ids: string[]): Promise<void> {
       process.exitCode = 1;
     }
   }
-  for (const lake of lakes) await publish(lake);
+  // The lists are written, so their report is kept even if publishing fails.
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...summary, "```", ""].join("\n"));
+  for (const lake of lakes) await publish(lake);
 }
 
 /**
@@ -245,7 +231,6 @@ async function seedStations(ids: string[]): Promise<void> {
         metadata,
         await readStationFiles(STATIONS_DIR, metadata),
         now,
-        backupLake(),
       );
       lakes.add(lake);
       console.log(`${id}: seeded ${stations.length} stations`);

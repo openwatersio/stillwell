@@ -1,6 +1,6 @@
 # Station lists in the lake
 
-**Status: built; switched on by seeding.** This replaces the committed station lists and the rule that a station has one datum for its whole record. `ingest stations`, `backfill` and `recent` read the lake's lists, so once this merges they fail for a source until `seed-stations` has written its list from the committed files, and the published `stations.parquet` isn't rewritten until every source is seeded. Set up `WATER_LEVELS_BACKUP` in `ingest.yml` before seeding R2. Not built yet:
+**Status: built; switched on by seeding.** This replaces the committed station lists and the rule that a station has one datum for its whole record. `ingest stations`, `backfill` and `recent` read the lake's lists, so once this merges they fail for a source until `seed-stations` has written its list from the committed files, and the published `stations.parquet` isn't rewritten until every source is seeded. Not built yet:
 
 - the switch (seeding the R2 lake, then removing `stations/` and `seed-stations`);
 - the phase 4 workflows: one job per source, the rebuild job, and the daily refresh after a datum failure;
@@ -35,13 +35,14 @@ The same goes for `extremes/`, `predictions/` and `predicted-extremes/`. Every f
 The station's list entry carries its epochs:
 
 ```
-epochs: [{ id, datum, since, until, seen, reference, datums, to_current, state }]
+epochs: [{ id, datum, since, until, seen, reference, reference_since, datums, to_current, state }]
 ```
 
 - `id` counts up from 1 and is never reused. The next `id` is above both the list's epochs and any epoch directory already in the lake, so a list restored from a snapshot can't hand out an `id` that already has files.
 - `since` and `until` are instants in UTC. The first epoch's `since` is null when the record has no known start, and the current epoch has no `until`. Rows in an epoch's files outside `[since, until)` aren't part of the series. That's how the uncertain stretch around a change stays out without being moved.
 - `seen` is the last refresh whose fetch named this epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.
 - `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`. A source with no such field can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves; the reason it gives stands in for the reference, and the epoch starts at that refresh, since USGS gives no date.
+- `reference_since` is where the source says `reference` starts, or null. A first epoch seeded with no `since` learns it on the first refresh, so a later change can still be held for coming soon after it, or before it.
 - `datums` holds the offsets to other datums. The current epoch's follow the source, refresh by refresh, as `datums` does today. An epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
 - `to_current` is the meters to add to the epoch's levels to put them in the current epoch's datum, or null when they can't be converted (below). Every refresh recomputes it from the frozen offsets and the current ones.
 - `state` is `open`, `closed`, `held` (below) or `rejected`.
@@ -113,14 +114,14 @@ USACE stations carry an NGVD29 or NAVD88 offset at 984 of 1,353 stations. Their 
 
 Each change opens one more epoch, with its own files. Nothing about earlier epochs changes except their `to_current`, which is recomputed against the new current epoch:
 
-- epoch 1 converts to epoch 3 if they share a fixed reference, whether or not epoch 2 did;
+- epoch 1 converts to epoch 3 if they share a fixed reference, whether or not epoch 2 did. A return to the same label (NAP → MSL → NAP) never converts on its own, though, since the zero may have moved in between; a person sets its `to_current`;
 - an epoch that can't convert drops out of the combined series, and its files stay as they are;
 - a change back (A → B → A) is a new epoch, not a return to an old one. The label matches, but the reference may not have;
 - several changes between two refreshes show up as one. The source's own dates, or a person's decisions, can enter the epochs in between; otherwise their rows fall in the gap.
 
 A station that keeps changing is held. A change within 180 days of the current epoch's `since`, or a label returning to one of the station's earlier ones, opens the epoch as `held`. While held, the station's `backfill` and `recent` skip it, and the report lists it, until the source's `overrides` confirms or rejects the change. 180 days spans several refreshes at any cadence, so a source that flips labels gets one epoch at most before a person looks.
 
-**Undoing an epoch** is an entry in the source's `overrides` marking it `rejected`. For example, an adapter bug misread a label, so the reference never changed. A rejected epoch's span goes back to the epoch before it: that one's `until` is cleared, and the rejected epoch's files are read as the earlier epoch's, with `to_current` 0, unless the entry gives another offset. No file moves, so an undo can itself be undone. Entries are marked, never deleted: as `zeros.ts` says today, removing a reset date would let a backfill write the old zero's values back.
+**Undoing an epoch** is an entry in the source's `overrides` marking it `rejected`. For example, an adapter bug misread a label, so the reference never changed. A rejected epoch's span goes back to the epoch before it: that one's `until` becomes the rejected epoch's (none, when the rejected epoch was the current one), and the rejected epoch's files are read as the earlier epoch's, with `to_current` 0, unless the entry gives another offset. No file moves, so an undo can itself be undone. Rejecting says the source's new reference continues the old one: a USGS station whose new series is rejected as a change goes on fetching that series, into the epoch before. Entries are marked, never deleted: as `zeros.ts` says today, removing a reset date would let a backfill write the old zero's values back.
 
 ## Lake layout
 
@@ -155,7 +156,7 @@ history/stations/<source>/<time>.json        what that refresh changed
 
 **Jobs.** `stations` with no source runs as a matrix, one job per source in a `lake-<source>` group, which `backfill`, `recent` and compaction of that source share. A final job, with `if: always()`, rebuilds `stations.parquet` in its own `lake-stations` group. Within a group, GitHub cancels a pending run when a newer one queues; for the rebuild that's harmless, because each run reads every list fresh. A cancelled source run leaves no summary, so the scheduled workflow checks each source's list age instead, and the next run does the work. This is phase 4 workflow work, alongside the daily refresh above. Today's `ingest.yml` has one `lake` group for every run. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
 
-**Backups.** The lake becomes the only live copy of the station lists, and some of what they hold can't be fetched again: retired stations, USACE series pins, and closed epochs' frozen offsets. History snapshots sit in the same bucket and are written by the same job that could damage a list. So every refresh also writes its snapshot to `WATER_LEVELS_BACKUP`, a location outside the lake, when that's set. Nothing relies on R2 object versioning.
+**Nothing is lost by a refresh.** Before a refresh writes a list, it writes the list it read to `history/`, and the series files never change for an epoch. A bad refresh is undone by restoring the snapshot before it (below), and a bad epoch by rejecting it in the source's overrides. Some of what a list holds can't be fetched again (retired stations, USACE series pins, closed epochs' frozen offsets), so the snapshots matter, but protecting the bucket itself, from deletion or a bad credential, is a matter for the whole lake, observations included, and lives outside ingest.
 
 **Restoring a list** copies a snapshot back to `stations/<source>.parquet` and rebuilds. The series files never change for an epoch, so any snapshot is safe to restore. A station's epochs go back to what the snapshot says, and files written under an epoch it doesn't have stay in the lake, unread. The restore runs the source's refresh straight after, before any `backfill` or `recent`, so an epoch the source or the source's `overrides` still reports opens again, under a new `id`, and is backfilled.
 
@@ -168,35 +169,24 @@ history/stations/<source>/<time>.json        what that refresh changed
 3. **Check.** Build a `stations.parquet` from main's lists with today's code, and one from the seeded lists, and compare them with DuckDB `EXCEPT` both ways. Don't compare against the published file, which a manual run may have refreshed since main. Compare `extra` with the JSON lists field by field, since `stations.parquet` doesn't carry it.
 4. **Switch.** The PR after that removes `stations/` and the seed command.
 
-**Rolling the code back** past the switch isn't supported. A revert brings back the station files as they were at the switch, but the old build knows nothing of epochs, so it could write a new epoch's values into epoch 1's files under the same label. Roll forward instead. If an old build does run, the lake lists still bound what the new build reads afterwards: epoch 1's `until` leaves out anything written after it.
+**Rolling the code back** past the switch isn't supported. A revert brings back the station files as they were at the switch, but the old build knows nothing of epochs, so it could write a new epoch's values into epoch 1's files under the same label. Roll forward instead. If an old build does run, the lake lists still bound what the new build reads afterwards: epoch 1's `until` leaves out anything written after it. `recent` isn't covered: the old build rewrites it without the `epoch` column, so its rows read back as epoch 1, and a station in a later epoch loses up to a week of recent values.
 
-## What changes in the code
+## Where it lives
 
-- `src/stations.ts`: `mergeStationList` opens epochs instead of marking a station inactive. `first`/`last` leave the merge.
+- `src/epochs.ts`: opening, holding and deciding epochs, and `to_current`.
+- `src/stations.ts`: `mergeStationList`, which opens epochs rather than marking a station inactive.
+- `src/refresh.ts`: a source's refresh with its guards and report, seeding, and the rebuild of `stations.parquet` and `sources.json`.
 - `src/lake/`: epoch paths, the `epoch` column in `recent`, readers and writers for the lists, bounds and history, and an HTTPS reader for the public bucket.
 - `scripts/ingest.ts`: `stations`, `backfill` and `recent` read the lists from the lake, write the current epoch, and skip held stations. `seed-stations` is temporary.
-- `Source.overrides` (`src/schema.ts`): a person's decisions on a source's epochs, keyed by station and epoch start. USACE's `zeros.ts` stays where it is and reaches the epochs as each station's `reference`.
-- `src/sources/pegelonline`: report `gaugeZero.validFrom` as the station's `reference`.
-- `src/sources/usace/index.ts`: `zero_since` becomes the current epoch's `since`.
-- `scripts/ticon-inventory.ts`: read the lists from the lake.
-- `.github/workflows/`: the per-source matrix, the rebuild job, and the daily refresh after a datum failure (phase 4).
-- Tests that pin today's behavior change with it: `test/stations.test.ts` (inactive on a datum change) and `test/sources.test.ts` (the USACE zero dates against `stations/usace.json`).
-- Docs to update when built:
-  - [plan.md](plan.md): decision 4, the repo shape, the `Source` interface comment, the columns paragraph, the checklist line, and phase 4's monthly commit;
-  - [data.md](data.md): the layout, the epoch paths, the `epochs` column and the combined-series query;
-  - [api.md](api.md): the layout and "each station's own datum";
-  - the README's layout;
-  - the plan's bulk snapshot, which must carry each row's epoch and keep only rows inside their epoch's span;
-  - CONTRIBUTING: the layout, the ingest paragraph, and "a station keeps one datum";
-  - the README's license paragraph about the copies in `stations/`;
-  - the BSH, CO-OPS, PEGELONLINE, RWS and USACE READMEs;
-  - the comments in `scripts/ingest.ts`, `scripts/ticon-inventory.ts`, `src/stations.ts` (which also says a series' files carry no datum, though they do), `src/schema.ts`, `src/lake/paths.ts` and `src/sources/usace/index.ts`, and the `stations/<id>.json` error messages.
-- Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
+- `Source.overrides` (`src/schema.ts`): a person's decisions on a source's epochs, keyed by station and epoch start. Each epoch event in the report prints the key.
+- Adapters: PEGELONLINE reports `gaugeZero.validFrom` and USACE its `zeros.ts` dates as each station's `reference`; USGS says through `seriesChanged` when a station's series or gage zero moved.
+
+Still to come: the per-source matrix, the rebuild job and the daily refresh after a datum failure in `.github/workflows/` (phase 4); compaction, which writes `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
 
 ## What this gives up
 
 - **No reviewed diff of station changes.** The change report and guards replace PR review, and a station that moves or is renamed shows only in the report.
-- **The lake is the only live copy of the station lists.** Snapshots and the quarterly copy cover that.
+- **The lake is the only live copy of the station lists.** Its history snapshots undo a bad refresh; losing the bucket itself is the same risk as for the rest of the lake.
 - **A combined series takes a join.** Readers that want one datum across a station's whole history use `epochs`, not a single file glob. Most stations have one epoch, and for them nothing changes.
 - **A held station stops** until the source's `overrides` decide. That's the price of never filling a station's series from a source that keeps flipping its datum.
 - **A hand decision needs a code PR.** That's the right weight for something that changes how a station's history is read.
