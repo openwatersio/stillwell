@@ -1,3 +1,4 @@
+import type { QcOptions } from "./qc.ts";
 import type { Extreme, Sample, TransitExtreme } from "./types.ts";
 
 /**
@@ -78,6 +79,8 @@ export interface SourceMetadata {
   terms?: string;
   /** How far back `observations` reaches, in days, when the source keeps a rolling window. */
   window_days?: number;
+  /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
+  qc?: QcOptions;
 }
 
 /**
@@ -86,7 +89,8 @@ export interface SourceMetadata {
  */
 export interface Source {
   metadata: SourceMetadata;
-  stations(): Promise<ListedStation[]>;
+  /** `previous` is the committed list, for a source that keeps choices it made before. */
+  stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
    * Observed levels over [start, end). Every product comes in `station.datum`,
    * and throws rather than return values in another, so a file never mixes two.

@@ -31,7 +31,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 
 `stations.parquet` has one row per station. Besides `id`, `name`, `lat` and `lon`, these columns matter most:
 
-- **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum) or `STND` (CO-OPS station datum).
+- **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum), `STND` (CO-OPS station datum) or `GZ` (USACE gauge zero).
 - **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes.
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.

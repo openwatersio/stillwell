@@ -151,6 +151,17 @@ describe("qc", () => {
     assert.equal(flags[800], Flag.suspect);
   });
 
+  it("can leave out the outlier rule, for pools that sit flat and then flood", () => {
+    // Six days flat at 4 m, then a 2 m rise.
+    const rows = Array.from({ length: 7 * 24 }, (_, i) => ({
+      time: T + i * 3_600_000,
+      level: i < 6 * 24 ? 4 + (i % 2) * 0.01 : 4 + (i - 6 * 24) / 12,
+      flag: Flag.good,
+    })) as Observation[];
+    assert.equal(qc(rows).at(-1)!.flag, Flag.suspect);
+    assert.equal(qc(rows, { outliers: false }).at(-1)!.flag, Flag.good);
+  });
+
   it("judges limits against the series, not zero, for gauges far above their datum", () => {
     const rows = tide(200).map((r) => ({ ...r, level: r.level + 250 }));
     rows[50]!.level = 300;

@@ -114,9 +114,10 @@ switch (command) {
 
 async function refreshStations(ids: string[]): Promise<void> {
   for (const id of ids) {
+    const previous = await committedStations(id);
     let fetched;
     try {
-      fetched = await sourceOf(id).stations();
+      fetched = await sourceOf(id).stations(previous);
     } catch (error) {
       // One source failing keeps its committed list and doesn't stop the others.
       console.error(
@@ -125,7 +126,6 @@ async function refreshStations(ids: string[]): Promise<void> {
       process.exitCode = 1;
       continue;
     }
-    const previous = await committedStations(id);
     // An empty list is a broken response, not every station retiring at once.
     if (!fetched.length && previous.length) {
       console.error(`${id}: listed no stations; keeping the committed list`);
@@ -149,6 +149,16 @@ async function refreshStations(ids: string[]): Promise<void> {
       continue;
     }
     const { stations, changed } = merged;
+    // A station the source itself newly lists as inactive, such as a USACE
+    // gauge whose series CWMS withdrew, fails the refresh that marks it, so a
+    // person sees it in the commit. Left inactive, it's retired; a person who
+    // moves it to another series brings it back.
+    const wasActive = new Set(previous.filter((s) => s.status === "active").map((s) => s.id));
+    for (const s of fetched)
+      if (s.status === "inactive" && wasActive.has(s.id)) {
+        console.error(`  ${s.id}: listed inactive by the source; see its log above`);
+        process.exitCode = 1;
+      }
     await writeFile(`${STATIONS_DIR}/${id}.json`, JSON.stringify(stations, null, 2) + "\n");
     const active = stations.filter((s) => s.status === "active").length;
     console.log(`${id}: ${active} active, ${stations.length - active} inactive`);
@@ -168,7 +178,8 @@ async function refreshStations(ids: string[]): Promise<void> {
   await writeJsonArray(
     sourcesPath(LAKE),
     Object.values(sources).map((s) => ({
-      ...s.metadata,
+      // QC settings are ingest's business, not part of a source's terms.
+      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => key !== "qc")),
       stations: all.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
@@ -246,7 +257,7 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return undefined;
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(rows);
+    if (product === "levels") rows = qc(rows, source.metadata.qc);
     const existing = await readObservations(path);
     const merged = mergeFetched(existing, rows, ...range);
     if (!merged.length || sameRows(existing, merged)) return undefined;
@@ -301,7 +312,8 @@ async function recent(sourceId: string, hours: number, keepDays: number): Promis
       const fetched = await source.observations!(station, since, new Date(now));
       // QC the whole window, so spikes and flatlines are judged against their neighbors.
       // Nothing new keeps what we had, rather than clearing the last hours.
-      if (fetched.length) merged = qc(mergeFetched(old, fetched, since.getTime(), now, now));
+      if (fetched.length)
+        merged = qc(mergeFetched(old, fetched, since.getTime(), now, now), source.metadata.qc);
     } catch (error) {
       // Keep what we had; a failed fetch mustn't empty the window.
       failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
