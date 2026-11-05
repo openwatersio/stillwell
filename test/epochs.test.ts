@@ -127,9 +127,9 @@ describe("nextEpochs", () => {
     const later = options({ now: "2028-06-01T00:00:00Z" });
     const back = nextEpochs(two, { datum: "PNP", datums: {} }, later);
     assert.deepEqual([back.event, back.reason], ["held", "returns to an earlier reference"]);
-    // A held station takes no more changes until a person decides.
+    // A held station takes no more changes until a person decides, and says so each time.
     const again = nextEpochs(back.epochs, { datum: "MSL", datums: {} }, later);
-    assert.equal(again.epochs.length, 3);
+    assert.deepEqual([again.epochs.length, again.event], [3, "waiting"]);
   });
 
   it("confirms or rejects a held epoch as a person decides", () => {
@@ -168,7 +168,7 @@ describe("nextEpochs", () => {
       { datum: "NN", datums: {} },
       options({ decisions: { [key]: { reject: true, note: "" } } }),
     );
-    assert.deepEqual([after.event, after.epochs.length], ["suppressed", 2]);
+    assert.deepEqual([after.event, after.epochs.length], [null, 2]);
   });
 
   it("reads a rejected epoch's files as the one before it", () => {
@@ -191,6 +191,35 @@ describe("nextEpochs", () => {
       ],
     );
     assert.equal(currentEpoch(undone.epochs).id, 1);
+  });
+
+  it("opens a second same-label reset like the first, not as a change back", () => {
+    const one = nextEpochs(
+      [epoch({ reference: "2015-01-01" })],
+      { datum: "GZ", datums: {}, reference: { id: "2016-01-01", since: "2016-01-01" } },
+      options({ now: "2016-02-01T00:00:00Z" }),
+    ).epochs;
+    const two = nextEpochs(
+      one.map((e) => ({ ...e, datum: "GZ" })),
+      { datum: "GZ", datums: {}, reference: { id: "2027-01-01", since: "2027-01-01" } },
+      options(),
+    );
+    assert.deepEqual(
+      [two.event, two.epochs.map((e) => e.state)],
+      ["opened", ["closed", "closed", "open"]],
+    );
+  });
+
+  it("waits for a change dated ahead until its day has come", () => {
+    const ahead = {
+      datum: "PNP",
+      datums: {},
+      reference: { id: "2027-08-01", since: "2027-08-02" },
+    };
+    const before = nextEpochs([epoch({ reference: "2019-11-01" })], ahead, options());
+    assert.deepEqual([before.event, before.epochs.length], [null, 1]);
+    const after = nextEpochs(before.epochs, ahead, options({ now: "2027-08-03T00:00:00Z" }));
+    assert.equal(after.event, "opened");
   });
 
   it("refuses a change that starts before the current epoch", () => {

@@ -191,7 +191,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  published predicted high a
 bulk/<YYYY-Qn>/<source>.parquet                quarterly snapshots, with a DOI
 ```
 
-Levels in these files are in each station's own datum; `stations.parquet` has the offsets. [data.md](data.md) has example queries.
+Levels in these files are in the datum of the station's epoch they belong to; `stations.parquet` has the offsets and each epoch's conversion into the current one. [data.md](data.md) has example queries.
 
 ```sql
 SELECT time, level_m

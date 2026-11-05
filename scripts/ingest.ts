@@ -95,7 +95,13 @@ function lakeFor(station: Pick<Station, "id" | "commercial_use">): string {
 /** WATER_LEVELS_BACKUP, which must be outside both lakes, since it may hold restricted lists. */
 function backupLake(): string | undefined {
   const backup = process.env.WATER_LEVELS_BACKUP?.replace(/\/$/, "");
-  if (!backup) return undefined;
+  if (!backup) {
+    if (/^[a-z0-9]+:\/\//.test(LAKE))
+      console.warn(
+        "WATER_LEVELS_BACKUP isn't set, so this refresh's snapshot stays in the lake only",
+      );
+    return undefined;
+  }
   const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
   for (const lake of [LAKE, restricted].filter((l): l is string => !!l))
     if (overlaps(backup, lake))
@@ -160,9 +166,9 @@ async function refreshStations(ids: string[]): Promise<void> {
   const summary: string[] = [];
   for (const id of ids) {
     const source = sourceOf(id);
-    const lake = lakeOfSource(source.metadata);
-    lakes.add(lake);
     try {
+      const lake = lakeOfSource(source.metadata);
+      lakes.add(lake);
       // Starting a list from the fetch alone would drop what the committed
       // files carry forward, such as USACE's series picks.
       if (existsSync(join(STATIONS_DIR, id)) && !(await exists(stationListPath(lake, id))))
@@ -180,7 +186,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       // A station waiting on a person, or newly retired by the source itself
       // (a USACE gauge whose series CWMS withdrew), fails the run so it's seen.
       for (const e of report.epochs)
-        if (e.event === "held" || e.event === "suppressed") process.exitCode = 1;
+        if (e.event === "held" || e.event === "waiting") process.exitCode = 1;
       if (report.withdrawn.length) process.exitCode = 1;
     } catch (error) {
       // One source failing keeps its list and doesn't stop the others.
@@ -200,7 +206,15 @@ async function refreshStations(ids: string[]): Promise<void> {
  * should hold has no list yet: one with committed station files or history.
  */
 async function publish(lake: string): Promise<void> {
-  const held = Object.values(sources).filter((s) => lakeOfSource(s.metadata) === lake);
+  // A restricted source with no restricted lake configured isn't in this one.
+  const inLake = (metadata: SourceMetadata) => {
+    try {
+      return lakeOfSource(metadata) === lake;
+    } catch {
+      return false;
+    }
+  };
+  const held = Object.values(sources).filter((s) => inLake(s.metadata));
   const expected: string[] = [];
   for (const { metadata } of held)
     if (
@@ -224,8 +238,8 @@ async function seedStations(ids: string[]): Promise<void> {
   const lakes = new Set<string>();
   for (const id of ids) {
     const { metadata } = sourceOf(id);
-    const lake = lakeOfSource(metadata);
     try {
+      const lake = lakeOfSource(metadata);
       const stations = await seedSource(
         lake,
         metadata,

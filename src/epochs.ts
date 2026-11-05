@@ -70,7 +70,7 @@ export interface EpochOptions {
   nextId?: number;
 }
 
-export type EpochEvent = "opened" | "held" | "rejected" | "confirmed" | "suppressed";
+export type EpochEvent = "opened" | "held" | "waiting" | "rejected" | "confirmed";
 
 /**
  * A new station's epochs: one, open, starting where its reference does if the
@@ -124,8 +124,19 @@ export function nextEpochs(
       (e) => e.state === "rejected" && e.datum === datum && e.reference === (ref?.id ?? null),
     );
     if (rejected) {
-      // A person said this change never happened; the adapter needs fixing, not a new epoch.
-      event = "suppressed";
+      // A person said this change never happened, so the station carries on in
+      // its current epoch; a reference that only looked new still brings its
+      // offsets under the same label.
+      if (!labelChanged) {
+        current.seen = options.now;
+        current.datums = fetched.datums;
+      }
+    } else if (
+      ref?.since &&
+      refChanged &&
+      dayStart(ref.since, options.offsets) > Date.parse(options.now)
+    ) {
+      // A change dated ahead takes effect at the first refresh after its day.
     } else {
       // Offsets fetched with the change belong to the new epoch; the old one keeps its own.
       let since: number;
@@ -139,11 +150,13 @@ export function nextEpochs(
         until = Date.parse(current.seen ?? options.now);
       }
       const decision = options.decisions[epochKey(options.station, iso(since))];
+      // A label back to an earlier one, or under the same label a reference
+      // back to an earlier one. A same-label reset to a new reference is neither.
       const earlier = epochs.some(
         (e) =>
           e !== current &&
           e.state !== "rejected" &&
-          (e.datum === datum || (e.reference !== null && e.reference === ref?.id)),
+          (labelChanged ? e.datum === datum : e.reference !== null && e.reference === ref?.id),
       );
       const soon = current.since !== null && since - Date.parse(current.since) < HOLD_WITHIN_MS;
       const backwards = current.since !== null && since <= Date.parse(current.since);
@@ -179,6 +192,11 @@ export function nextEpochs(
   }
 
   event = applyDecisions(epochs, options) ?? event;
+  // A station still waiting on a person is reported on every refresh, not only the first.
+  if (!event && isHeld(epochs)) {
+    event = "waiting";
+    reason = "waiting for a decision in the source's overrides";
+  }
   return { epochs: withToCurrent(epochs, options), event, reason };
 }
 

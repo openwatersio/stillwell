@@ -227,6 +227,12 @@ describe("seedSource", () => {
     );
     assert.deepEqual(await readStationList(stationListPath(lake, "test")), seeded);
     await assert.rejects(seedSource(lake, usace, committed, NOW), /already exists/);
+    // A seeded list that goes missing is refused, not rebuilt from the fetch.
+    await rm(stationListPath(lake, "test"));
+    await assert.rejects(
+      refreshSource(lake, { metadata: usace, stations: async () => [] }, { now: LATER }),
+      /history for test but no list/,
+    );
   });
 });
 

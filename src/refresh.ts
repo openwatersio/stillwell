@@ -79,6 +79,7 @@ export async function refreshSource(
   const { stations, changes } = mergeStationList(previous, fetched, options_);
   await renumberAboveFiles(lake, stations, previous);
   const opened = changes.filter((c) => c.event === "opened" || c.event === "held");
+  // A station already waiting on a person isn't a new change.
   const limit = Math.max(5, Math.floor(previous.length * 0.02));
   if (opened.length > limit && !options.acceptEpochs)
     throw new Refused(
@@ -149,6 +150,8 @@ export async function seedSource(
     };
   });
   await writeStationList(path, stations);
+  // Seeding counts as the first refresh, so a list lost later is refused, not rebuilt.
+  await writeStationList(historyPath(lake, metadata.id, now, "parquet"), stations);
   return stations;
 }
 
