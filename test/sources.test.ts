@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
-import { readStationFiles } from "../src/station-files.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -1060,30 +1058,14 @@ describe("usace", () => {
     );
   });
 
-  it("keeps every hand-entered zero date in the committed station files", async () => {
-    const committed = new Map(
-      (
-        (await readStationFiles(
-          join(import.meta.dirname, "../stations"),
-          usace.source.metadata,
-        )) as usace.UsaceStation[]
-      ).map((s) => [s.source_id, s]),
-    );
+  it("enters every hand-entered zero date as a day", () => {
+    // The lake's lists keep these too, but a date dropped here would no longer
+    // bound a station read from stations.parquet, which doesn't carry them.
+    assert.equal(Object.keys(ZERO_SINCE).length, 33);
     for (const [id, { since }] of Object.entries(ZERO_SINCE)) {
       assert.match(since, /^\d{4}-\d{2}-\d{2}$/, id);
       assert.ok(Number.isFinite(Date.parse(since)), id);
-      const station = committed.get(id);
-      assert.ok(station, `${id} isn't in stations/usace/`);
-      assert.ok(
-        station.zero_since && station.zero_since >= since,
-        `${id} zero_since ${station.zero_since}`,
-      );
     }
-    // And the other way: a date only the committed list has would bound
-    // backfills but not a station read from stations.parquet.
-    for (const [id, station] of committed)
-      if (station.zero_since)
-        assert.ok(ZERO_SINCE[id], `${id} has zero_since but no ZERO_SINCE entry`);
   });
 
   it("maps CWMS quality codes to flags", () => {

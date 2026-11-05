@@ -7,6 +7,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { epochKey } from "../src/epochs.ts";
 import {
   exists,
+  publishedSources,
   readStationList,
   writeObservations,
   writeRecent,
@@ -20,7 +21,7 @@ import {
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
-import { publishStations, Refused, refreshSource, seedSource } from "../src/refresh.ts";
+import { publishStations, Refused, refreshSource } from "../src/refresh.ts";
 import {
   Flag,
   type ListedStation,
@@ -121,6 +122,28 @@ describe("refreshSource", () => {
     );
   });
 
+  it("refuses to start a list over a recent window the lake already has", async () => {
+    await writeRecent(recentPath(lake, "test"), [
+      [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 1 }],
+    ]);
+    await assert.rejects(
+      refreshSource(lake, sourceOf([listed("a")]), { now: NOW }),
+      /has test series but no list or history/,
+    );
+  });
+
+  it("refuses to start a list over the source's series already in the lake", async () => {
+    await writeObservations(
+      seriesPath(lake, "levels", "test", "a", 2024),
+      [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
+      "NAP",
+    );
+    await assert.rejects(
+      refreshSource(lake, sourceOf([listed("a")]), { now: NOW }),
+      (e) => e instanceof Refused && /has test series but no list or history/.test(e.message),
+    );
+  });
+
   it("refuses a list that shrank sharply or came back empty", async () => {
     const many = Array.from({ length: 30 }, (_, i) => listed(String(i)));
     await refreshSource(lake, sourceOf(many), { now: NOW });
@@ -191,6 +214,16 @@ describe("refreshSource", () => {
     );
   });
 
+  it("counts a field a stored station leaves out as null, not a change", async () => {
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    const { report } = await refreshSource(
+      lake,
+      sourceOf([{ ...listed("a"), series_end: null } as ListedStation]),
+      { now: LATER },
+    );
+    assert.deepEqual(report.changed, []);
+  });
+
   it("tells a station the source retired itself from one it stopped listing", async () => {
     await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
     const { report } = await refreshSource(lake, sourceOf([listed("a", { status: "inactive" })]), {
@@ -247,13 +280,17 @@ describe("refreshSource", () => {
   });
 
   it("finds epoch files for many new stations with one listing per product", async () => {
+    // The source has a list, so the epoch-3 files aren't another list's lost series.
+    await refreshSource(lake, sourceOf([listed("x")]), { now: NOW });
     await writeObservations(
       seriesPath(lake, "levels", "test", "7", 2026, 3),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "NAP",
     );
     const many = Array.from({ length: 60 }, (_, i) => listed(String(i)));
-    const { stations } = await refreshSource(lake, sourceOf(many), { now: NOW });
+    const { stations } = await refreshSource(lake, sourceOf([listed("x"), ...many]), {
+      now: LATER,
+    });
     const ids = new Map(stations.map((s) => [s.source_id, s.epochs.map((e) => e.id)]));
     assert.deepEqual([ids.get("7"), ids.get("8")], [[4], [1]]);
   });
@@ -280,48 +317,6 @@ describe("refreshSource", () => {
   });
 });
 
-describe("seedSource", () => {
-  let lake: string;
-  beforeEach(async () => {
-    lake = await mkdtemp(join(tmpdir(), "lake-"));
-  });
-  afterEach(() => rm(lake, { recursive: true }));
-
-  it("seeds one epoch per station, starting USACE's at its zero date, once", async () => {
-    const usace = { ...metadata, utc_offsets: [-6, -4] as [number, number] };
-    const committed = [
-      { ...listed("a"), datum: "GZ", zero_since: "2015-06-29" },
-      { ...listed("b"), datum: "GZ" },
-    ];
-    const seeded = await seedSource(lake, usace, committed, NOW);
-    assert.deepEqual(
-      seeded.map((s) => s.epochs.map((e) => [e.id, e.since, e.reference])),
-      [[[1, "2015-06-29T06:00:00Z", "2015-06-29"]], [[1, null, null]]],
-    );
-    assert.deepEqual(await readStationList(stationListPath(lake, "test")), seeded);
-    // A field the files left out isn't a change when the source sends it as null.
-    const { report } = await refreshSource(
-      lake,
-      { metadata: usace, stations: async () => committed.map((s) => ({ ...s, series_end: null })) },
-      { now: LATER },
-    );
-    assert.deepEqual(report.changed, []);
-    await assert.rejects(seedSource(lake, usace, committed, NOW), /already exists/);
-    await assert.rejects(
-      seedSource(lake, { ...usace, id: "other" }, [], NOW),
-      /no committed stations/,
-    );
-    // Nor over a list that went missing: that's a restore from history.
-    await rm(stationListPath(lake, "test"));
-    await assert.rejects(seedSource(lake, usace, committed, NOW), /history for test but no list/);
-    // A seeded list that goes missing is refused, not rebuilt from the fetch.
-    await assert.rejects(
-      refreshSource(lake, { metadata: usace, stations: async () => [] }, { now: LATER }),
-      /history for test but no list/,
-    );
-  });
-});
-
 describe("publishStations", () => {
   let lake: string;
   beforeEach(async () => {
@@ -339,6 +334,7 @@ describe("publishStations", () => {
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
     assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { count: 2 });
+    assert.deepEqual(await publishedSources(stationsPath(lake)), ["test"]);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
@@ -360,6 +356,7 @@ describe("publishStations", () => {
       missing: ["other"],
     });
     assert.equal(await exists(stationsPath(lake)), false);
+    assert.deepEqual(await publishedSources(stationsPath(lake)), []);
     // A new source with no list yet doesn't hold up the others.
     assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), { count: 0 });
   });

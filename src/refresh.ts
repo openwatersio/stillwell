@@ -1,11 +1,12 @@
 /**
- * Station lists in the lake: refreshing a source's list, seeding it, and
- * publishing stations.parquet from every list. docs/stations.md has the design.
+ * Station lists in the lake: refreshing a source's list, and publishing
+ * stations.parquet from every list. docs/stations.md has the design.
  */
 import { isDeepStrictEqual } from "node:util";
-import { currentEpoch, firstEpochs } from "./epochs.ts";
+import { currentEpoch } from "./epochs.ts";
 import {
   exists,
+  anyFile,
   highestEpochs,
   recentEpochs,
   readStationBounds,
@@ -18,6 +19,7 @@ import {
   boundsPath,
   epochDirs,
   sourceEpochDirs,
+  sourceFirstEpochFiles,
   stationDir,
   recentPath,
   historyPath,
@@ -65,6 +67,13 @@ export async function refreshSource(
   const stored = await readStationList(listPath);
   // A list that went missing would read as an empty lake, and rebuild every station.
   if (!stored && (await hasHistory(lake, id))) throw new Refused(lostList(lake, id));
+  // Nor is a lake with the source's series a new source: a list started from
+  // the fetch would forget what the old one carried forward, such as USACE's
+  // series picks, and write another series into the same files.
+  if (!stored && (await hasSeries(lake, id)))
+    throw new Refused(
+      `the lake has ${id} series but no list or history for it; copy stations/${id}.parquet in from a snapshot or another lake, such as the public one at https://water-levels.openwaters.io, rather than start one from the fetch`,
+    );
   const previous = stored ?? [];
 
   const fetched = await source.stations(previous);
@@ -151,51 +160,11 @@ async function renumberAboveFiles(
 }
 
 /**
- * Write a source's list into the lake for the first time from a committed
- * list, each station with one epoch. Refuses when the lake already has one.
- */
-export async function seedSource(
-  lake: string,
-  metadata: SourceMetadata,
-  committed: Station[],
-  now: string,
-): Promise<LakeStation[]> {
-  const path = stationListPath(lake, metadata.id);
-  if (await exists(path)) throw new Refused(`${path} already exists`);
-  // Seeding over a lost list would bring back the committed files' stale
-  // epochs, and new values would go into files from another reference.
-  if (await hasHistory(lake, metadata.id)) throw new Refused(lostList(lake, metadata.id));
-  // No committed stations means a wrong directory or a missing source, and an
-  // empty seed would block the real one.
-  if (!committed.length) throw new Refused(`no committed stations for ${metadata.id}`);
-  refuseMixedTerms(metadata, committed);
-  const offsets = metadata.utc_offsets ?? ([0, 0] as [number, number]);
-  const stations = committed.map((s) => {
-    // USACE's zero dates are where its current epoch starts.
-    const since = (s as Station & { zero_since?: string }).zero_since;
-    const reference = since ? { id: since, since } : null;
-    return {
-      ...s,
-      first: null,
-      last: null,
-      epochs: firstEpochs(
-        { datum: s.datum, datums: s.datums, reference },
-        { station: s.id, now, offsets, decisions: {} },
-      ),
-    };
-  });
-  await writeStationList(path, stations);
-  // Seeding counts as the first refresh, so a list lost later is refused, not rebuilt.
-  await writeStationList(historyPath(lake, metadata.id, now, "parquet"), stations);
-  return stations;
-}
-
-/**
  * Rebuild `stations.parquet` and `sources.json` in `lake` from the lists of
  * `all`, the sources it holds, and their bounds. A source in `expected` that
- * has no list yet, because it isn't seeded or its list went missing, stops
- * the rebuild, which would otherwise drop its stations from what the lake
- * publishes; it returns the missing ones. A source in neither is new, and
+ * has no list, because it went missing, stops the rebuild, which would
+ * otherwise drop its stations from what the lake publishes; it returns the
+ * missing ones. A source in neither is new, and
  * joins once it has a list.
  */
 export async function publishStations(
@@ -239,9 +208,20 @@ export async function listOf(lake: string, sourceId: string): Promise<LakeStatio
   if (!list && (await hasHistory(lake, sourceId))) throw new Error(lostList(lake, sourceId));
   if (!list)
     throw new Error(
-      `No station list for ${sourceId} in ${lake}; run \`seed-stations ${sourceId}\`, or \`stations ${sourceId}\` for a new source`,
+      `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
     );
   return list;
+}
+
+/** Whether `lake` holds any of a source's values: series files in any epoch, or a recent window. */
+async function hasSeries(lake: string, sourceId: string): Promise<boolean> {
+  if (await exists(recentPath(lake, sourceId))) return true;
+  return anyFile(
+    PRODUCTS.flatMap((p) => [
+      sourceFirstEpochFiles(lake, p, sourceId),
+      sourceEpochDirs(lake, p, sourceId),
+    ]),
+  );
 }
 
 /** Whether a source's list has ever been written to `lake`. */
@@ -316,7 +296,7 @@ function reportOf(
       if (listedInactive.has(station.id)) report.withdrawn.push(station.id);
     }
     const [a, b] = [COMPARED(old), COMPARED(station)] as Record<string, unknown>[];
-    // A field left out, as the seeded station files leave out nulls, is null.
+    // A field left out, as the lists seeded from YAML files leave out nulls, is null.
     const fields = [...new Set([...Object.keys(a!), ...Object.keys(b!)])]
       .filter((key) => !isDeepStrictEqual(a![key] ?? null, b![key] ?? null))
       .sort();

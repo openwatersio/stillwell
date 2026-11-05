@@ -2,14 +2,13 @@
  * Fetch from upstream sources into the lake.
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs]
- *   node scripts/ingest.ts seed-stations [source...]
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet
- * and sources.json. It changes no file in the repo. `seed-stations` writes a
- * source's first list from the committed station files, once.
+ * and sources.json. It changes no file in the repo. A new source's first
+ * refresh starts its list.
  * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
  * so a rerun gives the same files. A calendar month the fetch returned nothing
@@ -29,12 +28,10 @@
  * its list and series in WATER_LEVELS_RESTRICTED_LAKE instead, which must be a
  * separate lake, and ingest refuses to write one without it.
  */
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
-import { existsSync } from "node:fs";
 import { appendFile } from "node:fs/promises";
 import { isHeld, recentWindow } from "../src/epochs.ts";
 import {
@@ -43,19 +40,13 @@ import {
   readObservations,
   checkRecent,
   readRecent,
-  exists,
   writeExtremes,
+  publishedSources,
   writeObservations,
   writeRecent,
   type StationObservation,
 } from "../src/lake/parquet.ts";
-import {
-  historyPath,
-  recentPath,
-  seriesPath,
-  stationListPath,
-  stationsPath,
-} from "../src/lake/paths.ts";
+import { recentPath, seriesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc, type QcOptions } from "../src/qc.ts";
 import {
   describeReport,
@@ -64,9 +55,7 @@ import {
   listOf,
   publishStations,
   refreshSource,
-  seedSource,
 } from "../src/refresh.ts";
-import { readStationFiles } from "../src/station-files.ts";
 import type {
   LakeStation,
   Observation,
@@ -105,8 +94,6 @@ function overlaps(a: string, b: string): boolean {
   const [x, y] = [resolve(a), resolve(b)];
   return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
 }
-// The repo's, wherever ingest runs from.
-const STATIONS_DIR = fileURLToPath(new URL("../stations", import.meta.url));
 const DAY_MS = 86_400_000;
 
 useDiskCache();
@@ -125,9 +112,6 @@ const [command, ...args] = positionals;
 switch (command) {
   case "stations":
     await refreshStations(args.length ? args : Object.keys(sources));
-    break;
-  case "seed-stations":
-    await seedStations(args.length ? args : Object.keys(sources));
     break;
   case "backfill": {
     const [source, ids, start, end] = args;
@@ -154,14 +138,6 @@ async function refreshStations(ids: string[]): Promise<void> {
     try {
       const lake = lakeOfSource(source.metadata);
       lakes.add(lake);
-      // Starting a list from the fetch alone would drop what the committed
-      // files carry forward, such as USACE's series picks.
-      if (
-        existsSync(join(STATIONS_DIR, id)) &&
-        !(await exists(stationListPath(lake, id))) &&
-        !(await hasHistory(lake, id))
-      )
-        throw new Error(`no list in the lake yet; run \`seed-stations ${id}\` first`);
       const { stations, report } = await refreshSource(lake, source, {
         now,
         acceptEpochs: values["accept-epochs"],
@@ -191,8 +167,8 @@ async function refreshStations(ids: string[]): Promise<void> {
 }
 
 /**
- * Rebuild `stations.parquet` and `sources.json` for `lake`, unless a source it
- * should hold has no list yet: one with committed station files or history.
+ * Rebuild `stations.parquet` and `sources.json` for `lake`, unless a source
+ * that has had a list there, by the published file or its history, has none.
  */
 async function publish(lake: string): Promise<void> {
   // A restricted source with no restricted lake configured isn't in this one.
@@ -204,45 +180,21 @@ async function publish(lake: string): Promise<void> {
     }
   };
   const held = Object.values(sources).filter((s) => inLake(s.metadata));
+  // A source the published file lists, or that has history, has had a list:
+  // publishing without it would drop its stations.
+  const published = new Set(await publishedSources(stationsPath(lake)));
   const expected: string[] = [];
   for (const { metadata } of held)
-    if (
-      existsSync(join(STATIONS_DIR, metadata.id)) ||
-      (await exists(historyPath(lake, metadata.id, "*", "parquet")))
-    )
+    if (published.has(metadata.id) || (await hasHistory(lake, metadata.id)))
       expected.push(metadata.id);
   const result = await publishStations(lake, held, expected);
   if ("count" in result) console.log(`${stationsPath(lake)}: ${result.count} stations`);
   else {
     console.error(
-      `${stationsPath(lake)} not written: no list in the lake yet for ${result.missing.join(", ") || "any source"}`,
+      `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
     );
     process.exitCode = 1;
   }
-}
-
-/** Write each source's first list into the lake from its committed station files. */
-async function seedStations(ids: string[]): Promise<void> {
-  const now = new Date().toISOString().replace(/\.\d+Z$/, "Z");
-  const lakes = new Set<string>();
-  for (const id of ids) {
-    const { metadata } = sourceOf(id);
-    try {
-      const lake = lakeOfSource(metadata);
-      const stations = await seedSource(
-        lake,
-        metadata,
-        await readStationFiles(STATIONS_DIR, metadata),
-        now,
-      );
-      lakes.add(lake);
-      console.log(`${id}: seeded ${stations.length} stations`);
-    } catch (error) {
-      console.error(`${id}: ${error instanceof Error ? error.message : error}`);
-      process.exitCode = 1;
-    }
-  }
-  for (const lake of lakes) await publish(lake);
 }
 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
@@ -480,7 +432,7 @@ async function pool<T>(items: T[], run: (item: T) => Promise<void>): Promise<voi
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] | seed-stations [source...] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
   );
   process.exit(1);
 }
