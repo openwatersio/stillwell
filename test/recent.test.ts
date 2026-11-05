@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "n
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
-import { fetchText, setTransport } from "../src/http.ts";
+import { Blocked, fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/lake/merge.ts";
 import { isMissing } from "../src/lake/parquet.ts";
 import {
@@ -95,6 +95,20 @@ const at = (time: number, level: number, received?: number): Observation =>
     : { time, level, flag: Flag.preliminary, received };
 
 describe("updateRecent", () => {
+  it("says when the source blocked this client", async () => {
+    const root = lake();
+    const [a, b] = [station("a"), station("b")];
+    const summary = await updateRecent({
+      source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: new Blocked("refused") }),
+      stations: [a, b],
+      lakeFor: () => root,
+      since: new Date(NOW - 6 * HOUR),
+      now: NOW,
+    });
+    assert.equal(summary.blocked, true);
+    assert.equal(summary.updated, 1);
+  });
+
   it("merges the fetch into the window, trims it, and stamps only new values", async () => {
     const root = lake();
     const path = recentPath(root, "test");

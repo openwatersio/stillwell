@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
-import { fetchText, setTransport } from "../src/http.ts";
+import { Blocked, fetchText, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -234,7 +234,161 @@ describe("bsh", () => {
 
 describe("coops", () => {
   coops.pacing.metadataMs = 0;
+  coops.pacing.dataMs = 0;
   coops.pacing.blockedMs = 0;
+
+  describe("data API pacing", () => {
+    const realFetch = globalThis.fetch;
+    // The last two hours at a live station: one water_level request, no metadata.
+    const lastHours = (id: string) => {
+      const end = new Date(Math.floor(Date.now() / 60_000) * 60_000);
+      return coops.levels(id, new Date(end.getTime() - 2 * 3_600_000), end, { live: true });
+    };
+    const empty = () => new Response(JSON.stringify({ data: [] }));
+    afterEach(() => {
+      globalThis.fetch = realFetch;
+      coops.pacing.dataMs = 0;
+      coops.pacing.blockedMs = 0;
+      coops.resetPacing();
+    });
+
+    it("spaces data requests that go out", async () => {
+      const times: number[] = [];
+      globalThis.fetch = (async () => {
+        times.push(Date.now());
+        return empty();
+      }) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.dataMs = 50;
+      await Promise.all([lastHours("1"), lastHours("2")]);
+      assert.ok(times.length >= 2);
+      assert.ok(times[1]! - times[0]! >= 45, `${times[1]! - times[0]!} ms apart`);
+    });
+
+    it("waits out a 403 and carries on once it lifts", async () => {
+      let calls = 0;
+      globalThis.fetch = (async () =>
+        ++calls === 1 ? new Response("Forbidden", { status: 403 }) : empty()) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 10;
+      assert.deepEqual(await lastHours("1"), []);
+      assert.ok(calls >= 2);
+    });
+
+    it("stops sending requests once a block outlasts its waits", async () => {
+      let calls = 0;
+      globalThis.fetch = (async () => {
+        calls++;
+        return new Response("Forbidden", { status: 403 });
+      }) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 5;
+      // Each station's request is tried three times; the third station's
+      // first try is the third hold in a row.
+      await assert.rejects(lastHours("1"), (error) => !(error instanceof Blocked));
+      await assert.rejects(lastHours("2"), (error) => !(error instanceof Blocked));
+      await assert.rejects(lastHours("3"), Blocked);
+      assert.equal(calls, 7);
+      // Every data request after it fails at once, without going out.
+      await assert.rejects(lastHours("2"), Blocked);
+      const end = new Date(Math.floor(Date.now() / 60_000) * 60_000);
+      const start = new Date(end.getTime() - 3_600_000);
+      await assert.rejects(coops.extremes("2", start, end, { live: true }), Blocked);
+      assert.equal(calls, 7);
+    });
+
+    it("holds every data request while a 403's hold lasts", async () => {
+      const times: number[] = [];
+      globalThis.fetch = (async () => {
+        times.push(Date.now());
+        return times.length === 1 ? new Response("Forbidden", { status: 403 }) : empty();
+      }) as typeof fetch;
+      setTransport(fetchText);
+      // Spaced, so the others are waiting for their slots when the 403 comes back.
+      coops.pacing.dataMs = 20;
+      coops.pacing.blockedMs = 60;
+      await Promise.all([lastHours("1"), lastHours("2"), lastHours("3")]);
+      // The first request went out, was refused, and nothing went out until its hold ended.
+      assert.ok(
+        times.slice(1).every((t) => t - times[0]! >= 55),
+        `${times.map((t) => t - times[0]!)}`,
+      );
+    });
+
+    it("fails a URL refused on its own without stopping the rest", async () => {
+      globalThis.fetch = (async (url: string) =>
+        String(url).includes("station=bad")
+          ? new Response("Forbidden", { status: 403 })
+          : empty()) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 5;
+      // Other stations' answers between its tries keep the count from building.
+      const bad = lastHours("bad");
+      const good = (async () => {
+        for (let i = 0; i < 20; i++) await lastHours(`good${i}`);
+      })();
+      await assert.rejects(
+        bad,
+        (error) => !(error instanceof Blocked) && /403/.test(String(error)),
+      );
+      await good;
+      assert.deepEqual(await lastHours("after"), []);
+    });
+
+    it("fails a refused metadata request alone, and data requests carry on", async () => {
+      globalThis.fetch = (async (url: string) =>
+        String(url).includes("/mdapi/")
+          ? new Response("Forbidden", { status: 403 })
+          : empty()) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 5;
+      // A station without dates looks them up in the metadata API.
+      await assert.rejects(
+        coops.levels("9", new Date(Date.UTC(2020, 0)), new Date(Date.UTC(2020, 1))),
+        (error) => !(error instanceof Blocked) && /403/.test(String(error)),
+      );
+      assert.deepEqual(await lastHours("1"), []);
+    });
+
+    it("counts 403s for requests already in flight as one hold", async () => {
+      let calls = 0;
+      globalThis.fetch = (async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        return ++calls <= 3 ? new Response("Forbidden", { status: 403 }) : empty();
+      }) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 10;
+      // All three go out before the first 403 comes back.
+      await Promise.all([lastHours("1"), lastHours("2"), lastHours("3")]);
+    });
+
+    it("doesn't take a cached answer as a sign a block has lifted", async () => {
+      globalThis.fetch = (async () => new Response("Forbidden", { status: 403 })) as typeof fetch;
+      // Months already in the disk cache answer without going out.
+      setTransport((url, options) =>
+        url.includes("station=cached")
+          ? Promise.resolve(JSON.stringify({ data: [] }))
+          : fetchText(url, options),
+      );
+      coops.pacing.blockedMs = 5;
+      let stop = false;
+      const cached = (async () => {
+        while (!stop) {
+          await lastHours("cached");
+          // Cache hits never wait on a timer; let the hold's timers run.
+          await new Promise((resolve) => setTimeout(resolve, 1));
+        }
+      })();
+      try {
+        await assert.rejects(lastHours("live1"), (error) => !(error instanceof Blocked));
+        await assert.rejects(lastHours("live2"), (error) => !(error instanceof Blocked));
+        await assert.rejects(lastHours("live3"), Blocked);
+      } finally {
+        stop = true;
+      }
+      await cached.catch(() => undefined);
+    });
+  });
   const station = (fields: object) => ({
     id: "9447130",
     name: "Seattle",
