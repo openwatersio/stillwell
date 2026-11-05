@@ -1,0 +1,16 @@
+name: Cave Run Lake
+lat: 38.117744000339
+lon: -83.532410999313
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 220.675
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=CaveRun.Stage.Inst.15Minutes.0.LRGS-rev
+series: CaveRun.Stage.Inst.15Minutes.0.LRGS-rev

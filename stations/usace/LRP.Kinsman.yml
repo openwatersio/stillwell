@@ -1,0 +1,16 @@
+name: Kinsman, OH
+lat: 41.4433
+lon: -80.5883
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 276.298
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Kinsman.Stage.Inst.15Minutes.0.OBS
+series: Kinsman.Stage.Inst.15Minutes.0.OBS

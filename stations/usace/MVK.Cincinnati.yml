@@ -1,0 +1,16 @@
+name: Ohio River @ Cincinnati, OH
+lat: 39.0945044
+lon: -84.5105611
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 130.47
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Cincinnati.Stage.Inst.15Minutes.0.DCP-rev
+series: Cincinnati.Stage.Inst.15Minutes.0.DCP-rev

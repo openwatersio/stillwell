@@ -1,0 +1,16 @@
+name: Red Chute @ Dogwood Trail
+lat: 32.5697222
+lon: -93.6347222
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 43.565
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Dogwood%20Trail.Stage.Inst.15Minutes.0.DCP-rev
+series: Dogwood Trail.Stage.Inst.15Minutes.0.DCP-rev

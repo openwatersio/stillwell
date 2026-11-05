@@ -1,0 +1,17 @@
+name: Mulberry Grove
+lat: 38.922272
+lon: -89.236736
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 142.064
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Mulberry%20Grove-Hurricane%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Mulberry Grove-Hurricane Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

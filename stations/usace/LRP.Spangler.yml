@@ -1,0 +1,16 @@
+name: Spangler, WV
+lat: 38.5984
+lon: -80.0611
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 707.746
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Spangler.Stage.Inst.1Hour.0.OBS
+series: Spangler.Stage.Inst.1Hour.0.OBS

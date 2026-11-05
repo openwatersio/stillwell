@@ -1,0 +1,16 @@
+name: Cache River @ Brasfield
+lat: 34.831111
+lon: -91.377222
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 44.129
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=CR114.Stage.Inst.1Hour.0.opendcs-rev
+series: CR114.Stage.Inst.1Hour.0.opendcs-rev

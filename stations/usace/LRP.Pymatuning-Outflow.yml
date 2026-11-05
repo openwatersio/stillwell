@@ -1,0 +1,16 @@
+name: Pymatuning Dam Outflow, PA
+lat: 41.4981667
+lon: -80.4585167
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 295.656
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Pymatuning-Outflow.Stage.Inst.15Minutes.0.OBS
+series: Pymatuning-Outflow.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: Dubois, PA
+lat: 41.1255556
+lon: -78.763611
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 421.24
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Dubois.Stage.Inst.15Minutes.0.OBS
+series: Dubois.Stage.Inst.15Minutes.0.OBS

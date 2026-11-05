@@ -1,0 +1,14 @@
+name: Upper Grand River (Flood Water Side) (49570)
+lat: 30.224333333333
+lon: -91.42325
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Upper_Grand_FWS.Stage.Inst.1Hour.0.rev
+series: Upper_Grand_FWS.Stage.Inst.1Hour.0.rev

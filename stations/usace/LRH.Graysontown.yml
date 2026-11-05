@@ -1,0 +1,16 @@
+name: Graysontown
+lat: 37.0375
+lon: -80.5569
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 170.063
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Graysontown.Stage.Inst.15Minutes.0.OBS
+series: Graysontown.Stage.Inst.15Minutes.0.OBS

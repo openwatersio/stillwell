@@ -1,0 +1,18 @@
+name: Paris
+lat: 39.584903
+lon: -91.993608
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 189.549
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Paris-Mid%20Fork%20Salt.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Paris-Mid Fork Salt.Stage.Inst.15Minutes.0.lrgsShef-rev
+zero_since: 1968-07-24

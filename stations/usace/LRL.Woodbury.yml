@@ -1,0 +1,16 @@
+name: GREEN RIVER AT LOCK 4 AT WOODBUR
+lat: 37.183635782975
+lon: -86.631157733131
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 115.702
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Woodbury.Stage.Inst.15Minutes.0.LRGS-rev
+series: Woodbury.Stage.Inst.15Minutes.0.LRGS-rev

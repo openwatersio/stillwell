@@ -1,0 +1,16 @@
+name: WEST FORK DRAKES CREEK NEAR FRAN
+lat: 36.7233738
+lon: -86.5522175
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 174.8
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Franklin.Stage.Inst.15Minutes.0.LRGS-rev
+series: Franklin.Stage.Inst.15Minutes.0.LRGS-rev

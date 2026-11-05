@@ -1,0 +1,17 @@
+name: Cowden
+lat: 39.229878
+lon: -88.841892
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 152.306
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Cowden-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Cowden-Kaskaskia.Stage.Inst.15Minutes.0.lrgsShef-rev

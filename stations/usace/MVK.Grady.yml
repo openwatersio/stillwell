@@ -1,0 +1,16 @@
+name: Deep Bayou @ Grady, AR
+lat: 34.0342
+lon: -91.7097
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 49.53
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Grady.Stage.Inst.1Hour.0.DCP-rev
+series: Grady.Stage.Inst.1Hour.0.DCP-rev

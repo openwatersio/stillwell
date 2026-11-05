@@ -1,0 +1,16 @@
+name: Cumberland River at Barbourville, KY
+lat: 36.863056
+lon: -83.8875
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 287.417
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=BBVK2-CumberlandR-BarbourvilleKY.Stage.Inst.15Minutes.0.dcp-rev
+series: BBVK2-CumberlandR-BarbourvilleKY.Stage.Inst.15Minutes.0.dcp-rev

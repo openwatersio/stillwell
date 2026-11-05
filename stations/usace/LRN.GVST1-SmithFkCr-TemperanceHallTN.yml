@@ -1,0 +1,14 @@
+name: Smith Fork Creek at Temperance Hall, TN
+lat: 36.0875
+lon: -85.907778
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=GVST1-SmithFkCr-TemperanceHallTN.Stage.Inst.30Minutes.0.dcp-rev
+series: GVST1-SmithFkCr-TemperanceHallTN.Stage.Inst.30Minutes.0.dcp-rev

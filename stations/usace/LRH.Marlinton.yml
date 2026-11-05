@@ -1,0 +1,16 @@
+name: Knapp Creek Near Marlinton, WV
+lat: 38.197861
+lon: -80.027805
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 204.303
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Marlinton.Stage.Inst.5Minutes.0.OBS-USGS
+series: Marlinton.Stage.Inst.5Minutes.0.OBS-USGS

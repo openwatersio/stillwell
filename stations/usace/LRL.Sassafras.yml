@@ -1,0 +1,16 @@
+name: CARR FORK NEAR SASSAFRAS, KY
+lat: 37.2312082
+lon: -83.0359979
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 286.512
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Sassafras.Stage.Inst.15Minutes.0.LRGS-rev
+series: Sassafras.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,15 @@
+name: Western Tie-In Sector Gate - Protected Side (82718)
+lat: 29.9100028
+lon: -90.2733778
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Western_TieIn_PS.Stage.Inst.15Minutes.0.rev
+series: Western_TieIn_PS.Stage.Inst.15Minutes.0.rev

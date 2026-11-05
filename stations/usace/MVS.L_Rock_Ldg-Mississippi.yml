@@ -1,0 +1,16 @@
+name: L Rock Ldg
+lat: 38.005428
+lon: -90.060739
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 65.044
+products: [levels]
+interval_s: 86400
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=L%20Rock%20Ldg-Mississippi.Stage.Inst.~1Day.0.gageread-rev
+series: L Rock Ldg-Mississippi.Stage.Inst.~1Day.0.gageread-rev

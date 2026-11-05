@@ -1,0 +1,16 @@
+name: Alderson
+lat: 37.7243
+lon: -80.6413
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 466.039
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Alderson.Stage.Inst.15Minutes.0.OBS
+series: Alderson.Stage.Inst.15Minutes.0.OBS

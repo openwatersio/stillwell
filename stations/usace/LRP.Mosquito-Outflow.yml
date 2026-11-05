@@ -1,0 +1,16 @@
+name: Mosquito Creek Lake Outflow, OH
+lat: 41.2992
+lon: -80.7584
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 266.194
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Mosquito-Outflow.Stage.Inst.15Minutes.0.OBS
+series: Mosquito-Outflow.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: BARREN RIVER AT BOWLING GREEN, K
+lat: 37.002820116436
+lon: -86.432768014018
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 124.916
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=BowlingGreenKY.Stage.Inst.15Minutes.0.LRGS-rev
+series: BowlingGreenKY.Stage.Inst.15Minutes.0.LRGS-rev

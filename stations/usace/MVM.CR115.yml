@@ -1,0 +1,16 @@
+name: Cache River @ Little Dixie
+lat: 35.006639
+lon: -91.339111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 48.768
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=CR115.Stage.Inst.1Hour.0.opendcs-rev
+series: CR115.Stage.Inst.1Hour.0.opendcs-rev

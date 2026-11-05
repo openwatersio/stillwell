@@ -1,0 +1,16 @@
+name: Big Black River @ Bovina, MS
+lat: 32.3475
+lon: -90.6966667
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 25.887
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Bovina.Stage.Inst.15Minutes.0.DCP-rev
+series: Bovina.Stage.Inst.15Minutes.0.DCP-rev

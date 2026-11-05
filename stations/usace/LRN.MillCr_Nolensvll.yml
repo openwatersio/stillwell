@@ -1,0 +1,14 @@
+name: Mill Creek near Nolensville, TN
+lat: 36.009203410577
+lon: -86.701519999918
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=MillCr%20Nolensvll.Stage.Inst.5Minutes.0.GOES-Rev
+series: MillCr Nolensvll.Stage.Inst.5Minutes.0.GOES-Rev

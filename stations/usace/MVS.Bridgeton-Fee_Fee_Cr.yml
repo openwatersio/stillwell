@@ -1,0 +1,16 @@
+name: Fee Fee Cr at Bridgeton
+lat: 38.728
+lon: -90.447
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 137.767
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Bridgeton-Fee%20Fee%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Bridgeton-Fee Fee Cr.Stage.Inst.5Minutes.0.Usgs-raw

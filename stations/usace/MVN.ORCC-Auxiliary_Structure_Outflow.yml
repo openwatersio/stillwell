@@ -1,0 +1,14 @@
+name: Old River Auxiliary Outflow near Knox Landing
+lat: 31.0657777
+lon: -91.5916444
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=ORCC-Auxiliary_Structure_Outflow.Stage.Inst.1Hour.0.rev
+series: ORCC-Auxiliary_Structure_Outflow.Stage.Inst.1Hour.0.rev

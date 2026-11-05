@@ -1,0 +1,16 @@
+name: Rocksdale
+lat: 38.8438
+lon: -81.2213
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 200.513
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Rocksdale.Stage.Inst.15Minutes.0.OBS
+series: Rocksdale.Stage.Inst.15Minutes.0.OBS

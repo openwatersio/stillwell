@@ -1,0 +1,17 @@
+name: Hoffman
+lat: 38.506672
+lon: -89.273594
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 127.961
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Hoffman-Crooked%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Hoffman-Crooked Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

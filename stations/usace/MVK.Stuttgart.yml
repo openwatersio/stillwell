@@ -1,0 +1,16 @@
+name: Big Bayou Meto @ Stuttgart, AR
+lat: 34.4536
+lon: -91.6164
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 51.798
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Stuttgart.Stage.Inst.1Hour.0.DCP-rev
+series: Stuttgart.Stage.Inst.1Hour.0.DCP-rev

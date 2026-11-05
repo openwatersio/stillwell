@@ -1,0 +1,16 @@
+name: Yalobusha River @ Grenada, MS
+lat: 33.78777778
+lon: -89.8097222
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 46.372
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Grenada.Stage.Inst.15Minutes.0.DCP-rev
+series: Grenada.Stage.Inst.15Minutes.0.DCP-rev

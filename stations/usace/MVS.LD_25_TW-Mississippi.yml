@@ -1,0 +1,17 @@
+name: LD 25 TW
+lat: 39.000817
+lon: -90.687644
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 123.932
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=LD%2025%20TW-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: LD 25 TW-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

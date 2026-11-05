@@ -1,0 +1,16 @@
+name: Buckhorn-Lake
+lat: 37.340277800415
+lon: -83.469166699306
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 230.734
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Buckhorn-Lake.Stage.Inst.5Minutes.0.USGS-rev
+series: Buckhorn-Lake.Stage.Inst.5Minutes.0.USGS-rev

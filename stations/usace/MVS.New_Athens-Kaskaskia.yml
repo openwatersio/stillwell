@@ -1,0 +1,17 @@
+name: New Athens
+lat: 38.3193139
+lon: -89.8875583
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 91.44
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=New%20Athens-Kaskaskia.Stage.Inst.15Minutes.0.Usgs-raw
+series: New Athens-Kaskaskia.Stage.Inst.15Minutes.0.Usgs-raw

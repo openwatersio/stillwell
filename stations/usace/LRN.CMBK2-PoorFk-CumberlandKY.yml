@@ -1,0 +1,16 @@
+name: Poor Fork at Cumberland, KY
+lat: 36.973333
+lon: -82.993889
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 429.814
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CMBK2-PoorFk-CumberlandKY.Stage.Inst.15Minutes.0.dcp-rev
+series: CMBK2-PoorFk-CumberlandKY.Stage.Inst.15Minutes.0.dcp-rev

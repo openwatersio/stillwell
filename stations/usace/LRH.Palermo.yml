@@ -1,0 +1,17 @@
+name: Palermo
+lat: 38.165
+lon: -82.05861
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 213.15
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Palermo.Stage.Inst.15Minutes.0.OBS
+series: Palermo.Stage.Inst.15Minutes.0.OBS

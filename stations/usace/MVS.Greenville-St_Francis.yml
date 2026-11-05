@@ -1,0 +1,17 @@
+name: Greenville
+lat: 37.097567
+lon: -90.453239
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 91.44
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Greenville-St%20Francis.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Greenville-St Francis.Stage.Inst.15Minutes.0.lrgsShef-rev

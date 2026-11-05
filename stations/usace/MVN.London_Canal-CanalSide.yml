@@ -1,0 +1,14 @@
+name: London Canal 2-ICS Canalside
+lat: 30.0259445
+lon: -90.0719805
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=London_Canal-CanalSide.Stage.Inst.15Minutes.0.rev
+series: London_Canal-CanalSide.Stage.Inst.15Minutes.0.rev

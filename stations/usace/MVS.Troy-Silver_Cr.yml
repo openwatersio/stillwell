@@ -1,0 +1,17 @@
+name: Troy-Silver Cr
+lat: 38.7166667
+lon: -89.8291667
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 131.064
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Troy-Silver%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Troy-Silver Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

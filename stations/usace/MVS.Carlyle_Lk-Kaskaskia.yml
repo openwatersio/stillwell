@@ -1,0 +1,16 @@
+name: Carlyle Pool
+lat: 38.61805
+lon: -89.351083
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 121.804
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Carlyle%20Lk-Kaskaskia.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Carlyle Lk-Kaskaskia.Stage.Inst.30Minutes.0.lrgsShef-rev

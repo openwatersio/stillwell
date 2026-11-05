@@ -1,0 +1,14 @@
+name: Boeuf River @ Fort Necessity, LA
+lat: 32.070814
+lon: -91.928114
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Ft%20Necessity.Stage.Inst.1Hour.0.DCP-rev
+series: Ft Necessity.Stage.Inst.1Hour.0.DCP-rev

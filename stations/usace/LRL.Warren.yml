@@ -1,0 +1,16 @@
+name: SALAMONIE RIVER NEAR WARREN, IN
+lat: 40.71254489
+lon: -85.4535847
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 239.161
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Warren.Stage.Inst.15Minutes.0.USGS-rev
+series: Warren.Stage.Inst.15Minutes.0.USGS-rev

@@ -25,32 +25,49 @@ export async function getJson<T>(url: string, options?: RequestOptions): Promise
   return JSON.parse(await getText(url, options)) as T;
 }
 
-/** Fetch without caching, retrying on throttling, server errors and timeouts. */
+/**
+ * Fetch without caching, retrying on throttling, server errors, timeouts and
+ * dropped connections, including one that drops while the body downloads.
+ */
 export async function fetchText(
   url: string,
   { fresh: _, ...init }: RequestOptions = {},
 ): Promise<string> {
-  const response = await fetchWithRetry(url, {
+  return fetchWithRetry(url, {
     ...init,
     headers: { "user-agent": USER_AGENT, ...init.headers },
   });
-  return response.text();
 }
 
-async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Promise<Response> {
+/** The socket or DNS error behind a failed fetch, such as `: ECONNRESET`. */
+function causeOf(error: TypeError): string {
+  const cause = error.cause as { code?: string; message?: string } | undefined;
+  const reason = cause?.code ?? cause?.message;
+  return reason ? `: ${reason}` : "";
+}
+
+async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Promise<string> {
   for (let attempt = 1; ; attempt++) {
     let status: number | string;
     try {
       // A year of RWS data is about 15 MB and can take a minute.
       const response = await fetch(url, { ...init, signal: AbortSignal.timeout(300_000) });
-      if (response.ok) return response;
+      if (response.ok) return await response.text();
       status = response.status;
     } catch (error) {
-      if (!(error instanceof Error) || error.name !== "TimeoutError") throw error;
-      status = "timeout";
+      if (error instanceof Error && error.name === "TimeoutError") status = "timeout";
+      // Node's fetch reports a failed or dropped connection as a TypeError,
+      // "fetch failed", or "terminated" when it drops mid-body. Others, such as
+      // "Failed to parse URL", won't go better on a retry.
+      else if (error instanceof TypeError && /^(fetch failed|terminated)$/.test(error.message))
+        status = `a network error (${error.message}${causeOf(error)})`;
+      else throw error;
     }
     // RWS throttles with 429 and 503; back off and try again.
-    if (attempt >= attempts || ![429, 500, 502, 503, 504, "timeout"].includes(status))
+    if (
+      attempt >= attempts ||
+      !(typeof status === "string" || [429, 500, 502, 503, 504].includes(status))
+    )
       throw new Error(`${init.method ?? "GET"} ${url} returned ${status}`);
     await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 1000));
   }

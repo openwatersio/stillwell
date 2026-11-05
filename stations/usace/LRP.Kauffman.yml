@@ -1,0 +1,16 @@
+name: Kauffman, PA
+lat: 39.903056
+lon: -79.4644444
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 428.244
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Kauffman.Stage.Inst.5Minutes.0.OBS
+series: Kauffman.Stage.Inst.5Minutes.0.OBS

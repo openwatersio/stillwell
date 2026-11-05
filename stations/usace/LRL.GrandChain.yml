@@ -1,0 +1,16 @@
+name: OHIO RIVER AT DAM 53 NEAR GRAND
+lat: 37.2031076
+lon: -89.041737
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 84.216
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=GrandChain.Stage.Inst.15Minutes.0.LRGS-rev
+series: GrandChain.Stage.Inst.15Minutes.0.LRGS-rev

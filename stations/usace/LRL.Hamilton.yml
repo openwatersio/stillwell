@@ -1,0 +1,16 @@
+name: Great Miami River at Hamilton OH
+lat: 39.3911674
+lon: -84.572169
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 152.153
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Hamilton.Stage.Inst.15Minutes.0.LRGS-rev
+series: Hamilton.Stage.Inst.15Minutes.0.LRGS-rev

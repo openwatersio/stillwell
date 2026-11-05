@@ -1,0 +1,16 @@
+name: CHEAT RIVER AT LAKE LYNN, PA
+lat: 39.720911111111
+lon: -79.855333333333
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 236.671
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=LakeLynn.Stage.Inst.15Minutes.0.USGS-rev
+series: LakeLynn.Stage.Inst.15Minutes.0.USGS-rev

@@ -1,0 +1,16 @@
+name: Red River @ Spring Bank, AR
+lat: 33.089438889817
+lon: -93.859438890102
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 48.902
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Spring%20Bank.Stage.Inst.30Minutes.0.DCP-rev
+series: Spring Bank.Stage.Inst.30Minutes.0.DCP-rev

@@ -1,0 +1,17 @@
+name: Sullivan
+lat: 38.158561
+lon: -91.108592
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 177.442
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Sullivan-Meramec.Stage.Inst.15Minutes.0.Usgs-raw
+series: Sullivan-Meramec.Stage.Inst.15Minutes.0.Usgs-raw

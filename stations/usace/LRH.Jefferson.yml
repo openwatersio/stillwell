@@ -1,0 +1,17 @@
+name: Jefferson
+lat: 36.394686293223
+lon: -81.407403847885
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 809.866
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Jefferson.Stage.Inst.15Minutes.0.OBS
+series: Jefferson.Stage.Inst.15Minutes.0.OBS

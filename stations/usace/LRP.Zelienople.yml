@@ -1,0 +1,16 @@
+name: Zelienople, PA
+lat: 40.8169
+lon: -80.2425
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 259.784
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Zelienople.Stage.Inst.15Minutes.0.OBS
+series: Zelienople.Stage.Inst.15Minutes.0.OBS

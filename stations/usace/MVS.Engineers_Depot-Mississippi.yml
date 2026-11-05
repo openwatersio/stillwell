@@ -1,0 +1,17 @@
+name: Engineers Depot
+lat: 38.589722
+lon: -90.206825
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 115.513
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Engineers%20Depot-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Engineers Depot-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

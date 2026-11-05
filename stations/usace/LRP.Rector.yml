@@ -1,0 +1,16 @@
+name: Rector, PA
+lat: 40.1689
+lon: -79.2339
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 472.44
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Rector.Stage.Inst.15Minutes.0.OBS
+series: Rector.Stage.Inst.15Minutes.0.OBS

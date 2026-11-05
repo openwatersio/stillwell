@@ -1,0 +1,16 @@
+name: Zanesville
+lat: 39.94
+lon: -82.0125
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 203.302
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Zanesville.Stage.Inst.15Minutes.0.OBS
+series: Zanesville.Stage.Inst.15Minutes.0.OBS

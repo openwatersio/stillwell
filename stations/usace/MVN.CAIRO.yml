@@ -1,0 +1,15 @@
+name: Mississippi River at Cairo
+lat: 37
+lon: -89.1625
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=CAIRO.Stage.Inst.1Hour.0.rev
+series: CAIRO.Stage.Inst.1Hour.0.rev

@@ -1,0 +1,16 @@
+name: TIPPECANOE RIVER NEAR DELPHI, IN
+lat: 40.6172596
+lon: -86.76084299
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 168.253
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Delphi.Stage.Inst.15Minutes.0.LRGS-rev
+series: Delphi.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,14 @@
+name: Arm of Grand Lake
+lat: 30.05388889
+lon: -91.5052778
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Arm_Grand_Lake.Stage.Inst.~15Minutes.0.rev
+series: Arm_Grand_Lake.Stage.Inst.~15Minutes.0.rev

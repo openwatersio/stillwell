@@ -1,0 +1,14 @@
+name: Walker Drainage Structure - Protected Side (85666)
+lat: 29.990222166667
+lon: -90.2907305
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Walker_DS_PS.Stage.Inst.15Minutes.0.rev
+series: Walker_DS_PS.Stage.Inst.15Minutes.0.rev

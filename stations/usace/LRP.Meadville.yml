@@ -1,0 +1,16 @@
+name: Meadville, PA
+lat: 41.6326
+lon: -80.1601
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 322.731
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Meadville.Stage.Inst.15Minutes.0.OBS
+series: Meadville.Stage.Inst.15Minutes.0.OBS

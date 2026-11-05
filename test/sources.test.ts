@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport } from "../src/http.ts";
-import { Flag } from "../src/schema.ts";
+import { Flag, type Station } from "../src/schema.ts";
+import { readStationFiles } from "../src/station-files.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import * as usace from "../src/sources/usace/index.ts";
+import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -629,5 +632,556 @@ describe("coops", () => {
       [/type=waterlevels/, JSON.stringify({ stations: [] })],
     ]);
     await assert.rejects(coops.stations(), /listed no water-level stations/);
+  });
+});
+
+describe("usace", () => {
+  const now = Date.parse("2026-11-04T00:00:00Z");
+  const series = (name: string, interval: string, from: string, to: string) => ({
+    office: "MVS",
+    name,
+    interval,
+    versioned: false,
+    extents: [{ "earliest-time": from, "latest-time": to }],
+  });
+
+  it("lists one observed stage series per location, in GZ with the gauge zero's elevation", async () => {
+    serve([
+      [/catalog\/TIMESERIES\?office=MVN/, fixture("usace-catalog.json")],
+      [/catalog\/LOCATIONS\?office=MVN/, fixture("usace-locations.json")],
+      [/catalog\/(TIMESERIES|LOCATIONS)/, JSON.stringify({ entries: [] })],
+    ]);
+    // Only MVN answers here, and an office with no series fails the refresh.
+    await assert.rejects(usace.stations(), /no stage series or locations for MVS/);
+    const mvn = usace.toStations(
+      "MVN",
+      JSON.parse(fixture("usace-catalog.json")).entries,
+      JSON.parse(fixture("usace-locations.json")).entries,
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      mvn.map((s) => [s.id, s.series, s.datum, s.datums, s.interval_s, s.live, s.kind]),
+      [
+        // Forecasts, statistics, the LWRP year and the NAVD88 copies are left out.
+        [
+          "usace/MVN.Baton_Rouge",
+          "Baton_Rouge.Stage.Inst.1Hour.0.rev",
+          "GZ",
+          {},
+          3600,
+          true,
+          "river",
+        ],
+        [
+          "usace/MVN.Donaldsonville",
+          "Donaldsonville.Stage.Inst.1Hour.0.rev",
+          "GZ",
+          {},
+          3600,
+          true,
+          "river",
+        ],
+        // A local datum isn't one we can refer to.
+        [
+          "usace/MVN.New_Orleans",
+          "New_Orleans.Stage.Inst.1Hour.0.rev",
+          "GZ",
+          {},
+          3600,
+          true,
+          "river",
+        ],
+        // An elevation of 0 is as often a blank as a gauge set at the datum.
+        ["usace/MVN.Reserve", "Reserve.Stage.Inst.1Hour.0.rev", "GZ", {}, 3600, true, "river"],
+      ],
+    );
+    assert.equal(mvn[3]!.name, "Mississippi River at Reserve (01260)");
+  });
+
+  it("prefers a current series, then sub-daily, then revised, then the finest interval", () => {
+    const [stLouis] = usace.toStations(
+      "MVS",
+      [
+        series(
+          "St Louis-Mississippi.Stage.Inst.1Hour.0.CWMS-Forecast-QPF",
+          "1Hour",
+          "2017-04-29T00:00:00Z",
+          "2026-10-24T00:00:00Z",
+        ),
+        series(
+          "St Louis-Mississippi.Stage.Inst.1Hour.0.historic-data-merge",
+          "1Hour",
+          "1983-11-15T00:00:00Z",
+          "2011-01-01T00:00:00Z",
+        ),
+        series(
+          "St Louis-Mississippi.Stage.Inst.~1Day.0.MVDhist-rev",
+          "~1Day",
+          "1861-01-01T00:00:00Z",
+          "2026-09-11T00:00:00Z",
+        ),
+        series(
+          "St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-raw",
+          "30Minutes",
+          "1983-11-15T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+        series(
+          "St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev",
+          "30Minutes",
+          "1983-11-15T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+        series(
+          "St Louis-Mississippi.Stage.Inst.15Minutes.0.rev-NAVD88",
+          "15Minutes",
+          "2020-01-01T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+      ],
+      [
+        {
+          office: "MVS",
+          name: "St Louis-Mississippi",
+          "public-name": "St Louis",
+          kind: "STREAM_LOCATION",
+          latitude: 38.629006,
+          longitude: -90.179872,
+          elevation: 379.5799999999999,
+          unit: "ft",
+          "vertical-datum": "NAVD88",
+          nation: "United States",
+        },
+      ],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      [stLouis!.series, stLouis!.datums, stLouis!.interval_s, stLouis!.live],
+      ["St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev", { NAVD88: 115.696 }, 1800, true],
+    );
+    // A gauge whose only series stopped years ago is listed for its history, not live.
+    const [old] = usace.toStations(
+      "MVS",
+      [
+        series(
+          "St Louis-Mississippi.Stage.Inst.1Hour.0.historic-data-merge",
+          "1Hour",
+          "1983-11-15T00:00:00Z",
+          "2011-01-01T00:00:00Z",
+        ),
+      ],
+      [{ office: "MVS", name: "St Louis-Mississippi", latitude: 38.6, longitude: -90.2 }],
+      new Map(),
+      now,
+    );
+    assert.deepEqual([old!.live, old!.datums, old!.kind], [false, {}, null]);
+  });
+
+  it("refers gauge zero to NGVD29 or NAVD88, whatever CWMS calls them", () => {
+    const vicksburg = {
+      office: "MVK",
+      name: "Vicksburg",
+      elevation: 46.23,
+      unit: "ft",
+      "vertical-datum": "NGVD29",
+    };
+    assert.deepEqual(usace.datumsOf(vicksburg), { NGVD29: 14.091 });
+    assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "ngvd29" }), {
+      NGVD29: 14.091,
+    });
+    assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "NAVD88(2009.55)" }), {
+      NAVD88: 14.091,
+    });
+    assert.deepEqual(usace.datumsOf({ ...vicksburg, elevation: 14.091, unit: "m" }), {
+      NGVD29: 14.091,
+    });
+    assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "LOCAL" }), {});
+    assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "COE1912" }), {});
+  });
+
+  it("keeps a committed series while CWMS lists it, and marks the station inactive when it doesn't", () => {
+    const listed = [
+      series(
+        "Reserve.Stage.Inst.1Hour.0.rev",
+        "1Hour",
+        "1987-01-01T00:00:00Z",
+        "2026-09-14T00:00:00Z",
+      ),
+      series(
+        "Reserve.Stage.Inst.15Minutes.0.DCP-rev",
+        "15Minutes",
+        "2020-01-01T00:00:00Z",
+        "2026-09-14T00:00:00Z",
+      ),
+    ];
+    const reserve = [{ office: "MVN", name: "Reserve", latitude: 30.05, longitude: -90.57 }];
+    // Fresh, the finer series wins.
+    assert.equal(
+      usace.toStations("MVN", listed, reserve, new Map(), now)[0]!.series,
+      "Reserve.Stage.Inst.15Minutes.0.DCP-rev",
+    );
+    const [kept] = usace.toStations(
+      "MVN",
+      listed,
+      reserve,
+      new Map([["usace/MVN.Reserve", "Reserve.Stage.Inst.1Hour.0.rev"]]),
+      now,
+    );
+    // Still reporting, so still live.
+    assert.deepEqual(
+      [kept!.series, kept!.interval_s, kept!.status, kept!.live],
+      ["Reserve.Stage.Inst.1Hour.0.rev", 3600, "active", true],
+    );
+    // A committed ID belongs to its own location: another that maps to it is
+    // skipped, even when it sorts first, so the station's files keep one gauge.
+    const clash = usace.toStations(
+      "MVN",
+      [
+        ...listed,
+        series(
+          "Reserve-.Stage.Inst.1Hour.0.rev",
+          "1Hour",
+          "2020-01-01T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+        series(
+          "Reserve&.Stage.Inst.1Hour.0.rev",
+          "1Hour",
+          "2020-01-01T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+        series(
+          "Reserve_.Stage.Inst.1Hour.0.rev",
+          "1Hour",
+          "2020-01-01T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+      ],
+      [
+        ...reserve,
+        ...["Reserve-", "Reserve&", "Reserve_"].map((name) => ({ ...reserve[0]!, name })),
+      ],
+      new Map([["usace/MVN.Reserve_", "Reserve_.Stage.Inst.1Hour.0.rev"]]),
+      now,
+    );
+    assert.deepEqual(
+      clash.map((s) => [s.id, s.series]),
+      [
+        ["usace/MVN.Reserve", "Reserve.Stage.Inst.15Minutes.0.DCP-rev"],
+        ["usace/MVN.Reserve-", "Reserve-.Stage.Inst.1Hour.0.rev"],
+        ["usace/MVN.Reserve_", "Reserve_.Stage.Inst.1Hour.0.rev"],
+      ],
+    );
+    // A location gone, and another now mapping to its ID, leaves the station unlisted.
+    assert.deepEqual(
+      usace
+        .toStations(
+          "MVN",
+          listed,
+          reserve,
+          new Map([["usace/MVN.Reserve", "Reserve_Old.Stage.Inst.1Hour.0.rev"]]),
+          now,
+        )
+        .map((s) => s.id),
+      [],
+    );
+    const [gone] = usace.toStations(
+      "MVN",
+      listed,
+      reserve,
+      new Map([["usace/MVN.Reserve", "Reserve.Stage.Inst.1Hour.0.raw"]]),
+      now,
+    );
+    assert.deepEqual(
+      [gone!.series, gone!.status, gone!.live],
+      ["Reserve.Stage.Inst.1Hour.0.raw", "inactive", false],
+    );
+  });
+
+  it("gives IDs safe in paths and shell arguments, and leaves out piezometers and wells", () => {
+    const at = { latitude: 33.4, longitude: -92.1 };
+    const stations = usace.toStations(
+      "MVK",
+      ["Columbia L&D-Lower", "Columbia L&D-Piezometer B1", "Columbia L&D-OW7L", "Baton Rouge"].map(
+        (name) => ({
+          ...series(
+            `${name}.Stage.Inst.1Hour.0.DCP-rev`,
+            "1Hour",
+            "2011-01-01T00:00:00Z",
+            "2026-09-14T00:00:00Z",
+          ),
+          office: "MVK",
+        }),
+      ),
+      [
+        "Columbia L&D-Lower",
+        "Columbia L&D-Piezometer B1",
+        "Columbia L&D-OW7L",
+        "Baton Rouge",
+        "Baton_Rouge",
+      ].map((name) => ({ office: "MVK", name, ...at })),
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      stations.map((s) => [s.id, s.series]),
+      [
+        ["usace/MVK.Baton_Rouge", "Baton Rouge.Stage.Inst.1Hour.0.DCP-rev"],
+        ["usace/MVK.Columbia_L_D-Lower", "Columbia L&D-Lower.Stage.Inst.1Hour.0.DCP-rev"],
+      ],
+    );
+  });
+
+  it("lists every office's catalogs, following pages", async () => {
+    const entries = JSON.parse(fixture("usace-catalog.json")).entries as { name: string }[];
+    const half = Math.ceil(entries.length / 2);
+    serve([
+      [/catalog\/TIMESERIES.*page=next/, JSON.stringify({ entries: entries.slice(half) })],
+      [
+        /catalog\/TIMESERIES/,
+        JSON.stringify({ entries: entries.slice(0, half), "next-page": "next" }),
+      ],
+      [/catalog\/LOCATIONS/, fixture("usace-locations.json")],
+    ]);
+    const previous = [{ id: "usace/LRC.Reserve", zero_since: "2001-01-01" } as unknown as Station];
+    const listed = (await usace.stations(previous)) as usace.UsaceStation[];
+    assert.equal(listed.length, 9 * 4);
+    // Donaldsonville's zero moved in 1988, per ZERO_SINCE; a date only the
+    // committed list has is kept too.
+    const since = (id: string) => listed.find((s) => s.id === id)!.zero_since;
+    assert.equal(since("usace/MVN.Donaldsonville"), "1988-06-15");
+    assert.equal(since("usace/LRC.Reserve"), "2001-01-01");
+    assert.equal(since("usace/MVN.Reserve"), undefined);
+    assert.deepEqual(
+      listed.filter((s) => s.id.startsWith("usace/LRC.")).map((s) => s.series),
+      [
+        "Baton_Rouge.Stage.Inst.1Hour.0.rev",
+        "Donaldsonville.Stage.Inst.1Hour.0.rev",
+        "New_Orleans.Stage.Inst.1Hour.0.rev",
+        "Reserve.Stage.Inst.1Hour.0.rev",
+      ],
+    );
+  });
+
+  it("reads a station's series from its source_url when it comes from stations.parquet", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      return JSON.stringify({ units: "m", values: [[1704070800000, 2.5, 3]] });
+    });
+    const [reserve] = usace
+      .toStations(
+        "MVN",
+        JSON.parse(fixture("usace-catalog.json")).entries,
+        JSON.parse(fixture("usace-locations.json")).entries,
+        new Map(),
+        now,
+      )
+      .filter((s) => s.id === "usace/MVN.Reserve");
+    const { series: _, ...fromParquet } = reserve!;
+    const levels = await usace.source.observations!(
+      fromParquet as Station,
+      new Date("2024-01-01Z"),
+      new Date("2024-01-02Z"),
+    );
+    assert.deepEqual(levels, [{ time: 1704070800000, level: 2.5, flag: Flag.good }]);
+    assert.match(requests[0]!, /office=MVN&name=Reserve.Stage.Inst.1Hour.0.rev&/);
+  });
+
+  it("leaves out locations placed outside the contiguous US", () => {
+    const at = (latitude: number, longitude: number, name: string) => ({
+      office: "MVS",
+      name,
+      latitude,
+      longitude,
+    });
+    const names = ["Anoka", "BuckCreek", "Grafton"];
+    const stations = usace.toStations(
+      "MVS",
+      names.map((n) =>
+        series(
+          `${n}.Stage.Inst.1Hour.0.rev`,
+          "1Hour",
+          "2011-01-01T00:00:00Z",
+          "2026-09-14T00:00:00Z",
+        ),
+      ),
+      [at(9.09, 9.09, "Anoka"), at(37.9, 83.75, "BuckCreek"), at(38.97, -90.43, "Grafton")],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      stations.map((s) => s.id),
+      ["usace/MVS.Grafton"],
+    );
+  });
+
+  it("never fetches levels from before a station's gauge zero moved", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      return JSON.stringify({ units: "m", values: [[Date.parse("2015-07-01T00:00:00Z"), 1.2, 3]] });
+    });
+    // As read from stations.parquet: no series, no zero_since.
+    const venice = {
+      id: "usace/MVN.Venice",
+      source_id: "MVN.Venice",
+      datum: "GZ",
+      source_url: `https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=${encodeURIComponent("Venice.Stage.Inst.1Hour.0.rev")}`,
+    } as Station;
+    const observe = (start: string, end: string) =>
+      usace.source.observations!(venice, new Date(start), new Date(end));
+    assert.deepEqual(await observe("2014-01-01Z", "2015-06-01Z"), []);
+    assert.equal(requests.length, 0);
+    assert.equal((await observe("2015-01-01Z", "2016-01-01Z")).length, 1);
+    assert.equal(new URL(requests[0]!).searchParams.get("begin"), "2015-06-29T06:00:00.000Z");
+    // A later date on the station wins over the table's.
+    assert.equal(
+      usace.zeroSince({ source_id: "MVN.Venice", zero_since: "2016-01-01" }),
+      Date.parse("2016-01-01T06:00:00Z"),
+    );
+    assert.equal(usace.zeroSince({ source_id: "MVN.Reserve" }), -Infinity);
+    assert.throws(
+      () => usace.zeroSince({ source_id: "MVN.Reserve", zero_since: "June 2015" }),
+      /unreadable/,
+    );
+  });
+
+  it("keeps every hand-entered zero date in the committed station files", async () => {
+    const committed = new Map(
+      (
+        (await readStationFiles(
+          new URL("../stations", import.meta.url).pathname,
+          "usace",
+        )) as usace.UsaceStation[]
+      ).map((s) => [s.source_id, s]),
+    );
+    for (const [id, { since }] of Object.entries(ZERO_SINCE)) {
+      assert.match(since, /^\d{4}-\d{2}-\d{2}$/, id);
+      assert.ok(Number.isFinite(Date.parse(since)), id);
+      const station = committed.get(id);
+      assert.ok(station, `${id} isn't in stations/usace/`);
+      assert.ok(
+        station.zero_since && station.zero_since >= since,
+        `${id} zero_since ${station.zero_since}`,
+      );
+    }
+    // And the other way: a date only the committed list has would bound
+    // backfills but not a station read from stations.parquet.
+    for (const [id, station] of committed)
+      if (station.zero_since)
+        assert.ok(ZERO_SINCE[id], `${id} has zero_since but no ZERO_SINCE entry`);
+  });
+
+  it("maps CWMS quality codes to flags", () => {
+    assert.deepEqual([0, 1, 3, 5, 9, 17, 2051, 4099, -2147483645].map(usace.flagOf), [
+      Flag.preliminary, // unscreened
+      Flag.preliminary, // screened, with no verdict
+      Flag.good, // screened okay
+      null, // missing
+      Flag.suspect, // questionable
+      Flag.bad, // rejected
+      Flag.interpolated, // okay, replaced by linear interpolation
+      Flag.good, // okay, replaced by hand
+      Flag.good, // okay and protected
+    ]);
+  });
+
+  it("reads stage in meters a year at a time, following pages and dropping missing values", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      const u = new URL(url);
+      const begin = u.searchParams.get("begin")!;
+      if (begin.startsWith("2023") && !u.searchParams.get("page"))
+        return JSON.stringify({
+          name: "Donaldsonville.Stage.Inst.1Hour.0.rev",
+          "office-id": "MVN",
+          units: "m",
+          "next-page": "MTY4MjExMDgwMDAwMHx8NHx8Mg==",
+          values: [
+            [1704060000000, 5.748528, 3],
+            [1704063600000, 5.855207999999999, 0],
+          ],
+        });
+      if (begin.startsWith("2023"))
+        return JSON.stringify({
+          units: "m",
+          values: [
+            [1704063600000, 5.855207999999999, 0],
+            [1704067200000, 6.626352, 5],
+            [1704070800000, null, 0],
+          ],
+        });
+      return JSON.stringify({
+        units: "m",
+        values: [
+          [1704070800000, 6.089904, 9],
+          [1704074400000, 6.1, 3],
+        ],
+      });
+    });
+    const levels = await usace.levels(
+      "MVN",
+      "Donaldsonville.Stage.Inst.1Hour.0.rev",
+      new Date("2023-12-31T22:00:00Z"),
+      new Date("2024-01-01T02:00:00Z"),
+    );
+    assert.deepEqual(
+      levels.map((l) => [new Date(l.time).toISOString(), l.level, l.flag]),
+      [
+        ["2023-12-31T22:00:00.000Z", 5.749, Flag.good],
+        ["2023-12-31T23:00:00.000Z", 5.855, Flag.preliminary],
+        // 00:00 was marked missing; at 01:00 the 2023 page had no value and 2024 a questionable one.
+        ["2024-01-01T01:00:00.000Z", 6.09, Flag.suspect],
+      ],
+    );
+    assert.deepEqual(
+      requests.map((r) => {
+        const u = new URL(r);
+        return [u.searchParams.get("begin"), u.searchParams.get("end"), u.searchParams.get("unit")];
+      }),
+      [
+        ["2023-12-31T22:00:00.000Z", "2024-01-01T00:00:00.000Z", "SI"],
+        ["2023-12-31T22:00:00.000Z", "2024-01-01T00:00:00.000Z", "SI"],
+        ["2024-01-01T00:00:00.000Z", "2024-01-01T02:00:00.000Z", "SI"],
+      ],
+    );
+  });
+
+  it("refuses a series in feet, and a station committed in another datum", async () => {
+    serve([[/timeseries/, JSON.stringify({ units: "ft", values: [[1704070800000, 20.1, 3]] })]]);
+    await assert.rejects(
+      usace.levels(
+        "MVN",
+        "Reserve.Stage.Inst.1Hour.0.rev",
+        new Date("2024-01-01Z"),
+        new Date("2024-01-02Z"),
+      ),
+      /came in ft, not m/,
+    );
+    // A response that doesn't say its unit is refused too.
+    serve([[/timeseries/, JSON.stringify({ values: [[1704070800000, 20.1, 3]] })]]);
+    await assert.rejects(
+      usace.levels(
+        "MVN",
+        "Reserve.Stage.Inst.1Hour.0.rev",
+        new Date("2024-01-01Z"),
+        new Date("2024-01-02Z"),
+      ),
+      /came in undefined, not m/,
+    );
+    const station = {
+      id: "usace/MVN.Reserve",
+      source_id: "MVN.Reserve",
+      datum: "NGVD29",
+      series: "Reserve.Stage.Inst.1Hour.0.rev",
+    } as unknown as Station;
+    await assert.rejects(
+      usace.source.observations!(station, new Date("2024-01-01Z"), new Date("2024-01-02Z")),
+      /is in NGVD29; CWMS stage comes in GZ/,
+    );
   });
 });

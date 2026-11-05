@@ -1,0 +1,16 @@
+name: East Fork Stones River near Lascassas, TN
+lat: 35.918333
+lon: -86.333611
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 154.802
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=LAST1-EFkStonesR-LascassasTN.Stage.Inst.30Minutes.0.dcp-rev
+series: LAST1-EFkStonesR-LascassasTN.Stage.Inst.30Minutes.0.dcp-rev

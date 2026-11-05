@@ -1,0 +1,16 @@
+name: ReReg Pool
+lat: 39.564253
+lon: -91.570533
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 152.296
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=ReReg%20Pool-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: ReReg Pool-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev

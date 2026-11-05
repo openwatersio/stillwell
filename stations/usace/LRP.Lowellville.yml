@@ -1,0 +1,16 @@
+name: Lowellville, OH
+lat: 41.0367
+lon: -80.5364
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 242.795
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Lowellville.Stage.Inst.15Minutes.0.OBS
+series: Lowellville.Stage.Inst.15Minutes.0.OBS

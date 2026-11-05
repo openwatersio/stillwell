@@ -1,0 +1,16 @@
+name: GREEN RIVER AT LIVERMORE, KY
+lat: 37.48560237
+lon: -87.1363854
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 109.762
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Livermore.Stage.Inst.15Minutes.0.LRGS-rev
+series: Livermore.Stage.Inst.15Minutes.0.LRGS-rev

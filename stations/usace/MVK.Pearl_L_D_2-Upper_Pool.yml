@@ -1,0 +1,16 @@
+name: "Pearl L&D #2 Upper"
+lat: 30.5931
+lon: -89.8644
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 5.813
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Pearl%20L%26D%202-Upper%20Pool.Stage.Inst.15Minutes.0.DCP-rev
+series: Pearl L&D 2-Upper Pool.Stage.Inst.15Minutes.0.DCP-rev

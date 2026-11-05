@@ -1,0 +1,14 @@
+name: Bayou Cocodrie @ Deer Park, LA
+lat: 31.459389
+lon: -91.650907
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Deer%20Park.Stage.Inst.1Hour.0.DCP-rev
+series: Deer Park.Stage.Inst.1Hour.0.DCP-rev

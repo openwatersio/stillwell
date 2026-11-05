@@ -1,0 +1,16 @@
+name: GREEN RIVER AT LOCK 6 AT BROWNSV
+lat: 37.20699194
+lon: -86.2610868
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 125.892
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=BrownsvilleLD6.Stage.Inst.15Minutes.0.LRGS-rev
+series: BrownsvilleLD6.Stage.Inst.15Minutes.0.LRGS-rev

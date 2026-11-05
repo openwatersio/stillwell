@@ -1,0 +1,16 @@
+name: Cumberland River at Penitentiary Branch, TN
+lat: 36.439444
+lon: -85.595833
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 149.047
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=PENT1-CumberlandR-PenitentiaryBrTN.Stage.Inst.30Minutes.0.dcp-rev
+series: PENT1-CumberlandR-PenitentiaryBrTN.Stage.Inst.30Minutes.0.dcp-rev

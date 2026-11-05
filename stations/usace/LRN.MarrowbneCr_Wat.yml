@@ -1,0 +1,14 @@
+name: Marrowbone Creek at Mud Creek Road at Waterview, KY
+lat: 36.815138
+lon: -85.45883
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=MarrowbneCr%20Wat.Stage.Inst.15Minutes.0.GOES-Rev
+series: MarrowbneCr Wat.Stage.Inst.15Minutes.0.GOES-Rev

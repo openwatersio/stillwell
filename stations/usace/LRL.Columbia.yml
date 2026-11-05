@@ -1,0 +1,16 @@
+name: RUSSELL CREEK NEAR COLUMBIA, KY
+lat: 37.1192281
+lon: -85.39385239
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 186.221
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Columbia.Stage.Inst.15Minutes.0.LRGS-rev
+series: Columbia.Stage.Inst.15Minutes.0.LRGS-rev

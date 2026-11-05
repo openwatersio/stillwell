@@ -1,0 +1,16 @@
+name: Mississippi River @ Lake Providence, MS
+lat: 32.80000000101
+lon: -91.153888889625
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 21.248
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Lake%20Providence.Stage.Inst.1Hour.0.DCP-rev
+series: Lake Providence.Stage.Inst.1Hour.0.DCP-rev

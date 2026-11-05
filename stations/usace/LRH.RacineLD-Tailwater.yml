@@ -1,0 +1,17 @@
+name: Racine L&D Tailwater
+lat: 38.9175209
+lon: -81.9108072
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 160.182
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=RacineLD-Tailwater.Stage.Inst.15Minutes.0.OBS
+series: RacineLD-Tailwater.Stage.Inst.15Minutes.0.OBS

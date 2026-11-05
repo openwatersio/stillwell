@@ -1,0 +1,14 @@
+name: Coldwater River @ Hernando, MS
+lat: 34.801152778501
+lon: -89.883088889399
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Hernando.Stage.Inst.1Hour.0.DCP-rev
+series: Hernando.Stage.Inst.1Hour.0.DCP-rev

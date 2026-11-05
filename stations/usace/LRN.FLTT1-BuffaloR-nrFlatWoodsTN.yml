@@ -1,0 +1,14 @@
+name: Buffalo River - Flat Woods TN
+lat: 35.495833
+lon: -87.832778
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=FLTT1-BuffaloR-nrFlatWoodsTN.Stage.Inst.15Minutes.0.dcp-rev
+series: FLTT1-BuffaloR-nrFlatWoodsTN.Stage.Inst.15Minutes.0.dcp-rev

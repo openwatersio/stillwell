@@ -1,0 +1,17 @@
+name: Little River Ditch 258 @ Peach Orchard
+lat: 36.361066
+lon: -89.898876
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 73.152
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LR258.Stage.Inst.15Minutes.0.opendcs-rev
+series: LR258.Stage.Inst.15Minutes.0.opendcs-rev

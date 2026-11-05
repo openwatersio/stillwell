@@ -1,0 +1,16 @@
+name: Bayou Macon @ Eudora, AR
+lat: 33.099764
+lon: -91.253533
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 24.664
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Eudora_Macon.Stage.Inst.15Minutes.0.DCP-rev
+series: Eudora_Macon.Stage.Inst.15Minutes.0.DCP-rev

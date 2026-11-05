@@ -1,0 +1,17 @@
+name: Mel Price Pool
+lat: 38.871569
+lon: -90.157433
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 120.408
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Mel%20Price%20Pool-Mississippi.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Mel Price Pool-Mississippi.Stage.Inst.15Minutes.0.lrgsShef-rev

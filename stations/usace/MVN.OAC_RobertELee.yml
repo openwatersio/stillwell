@@ -1,0 +1,14 @@
+name: Orleans Ave Canal 3-Robert E L
+lat: 30.0187
+lon: -90.0986695
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=OAC_RobertELee.Stage.Inst.15Minutes.0.rev
+series: OAC_RobertELee.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,15 @@
+name: Atchafalaya River at Melville (03060)
+lat: 30.6905556
+lon: -91.7361111
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Melville.Stage.Inst.1Hour.0.rev
+series: Melville.Stage.Inst.1Hour.0.rev

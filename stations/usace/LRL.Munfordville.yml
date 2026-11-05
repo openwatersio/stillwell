@@ -1,0 +1,16 @@
+name: GREEN RIVER AT MUNFORDVILLE, KY
+lat: 37.26944444
+lon: -85.8880556
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 137.678
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Munfordville.Stage.Inst.15Minutes.0.USGS-rev
+series: Munfordville.Stage.Inst.15Minutes.0.USGS-rev

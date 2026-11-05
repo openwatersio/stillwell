@@ -1,0 +1,16 @@
+name: Garrett Bridge
+lat: 33.86638889
+lon: -91.6561111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 43.931
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Garrett%20Bridge.Stage.Inst.15Minutes.0.DCP-rev
+series: Garrett Bridge.Stage.Inst.15Minutes.0.DCP-rev

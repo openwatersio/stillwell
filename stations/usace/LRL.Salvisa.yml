@@ -1,0 +1,16 @@
+name: KENTUCKY RIVER AT LOCK 6 NEAR SA
+lat: 37.92563166
+lon: -84.8213381
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 148.709
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Salvisa.Stage.Inst.15Minutes.0.LRGS-rev
+series: Salvisa.Stage.Inst.15Minutes.0.LRGS-rev

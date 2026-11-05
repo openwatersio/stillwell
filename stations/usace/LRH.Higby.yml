@@ -1,0 +1,16 @@
+name: Higby
+lat: 39.2125
+lon: -82.8641
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 172.907
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Higby.Stage.Inst.15Minutes.0.OBS
+series: Higby.Stage.Inst.15Minutes.0.OBS

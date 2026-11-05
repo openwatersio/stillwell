@@ -1,0 +1,16 @@
+name: WHITE RIVER ABOVE PETERSBURG, IN
+lat: 38.52838237
+lon: -87.2539017
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 122.133
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Petersburg-USGS.Stage.Inst.15Minutes.0.LRGS-rev
+series: Petersburg-USGS.Stage.Inst.15Minutes.0.LRGS-rev

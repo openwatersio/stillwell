@@ -1,0 +1,17 @@
+name: Marion
+lat: 37.7311111
+lon: -88.8891667
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 126.742
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Marion-Crab%20Orchard%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Marion-Crab Orchard Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

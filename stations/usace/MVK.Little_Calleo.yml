@@ -1,0 +1,16 @@
+name: Big Sunflower @ Little Calleo, MS
+lat: 33.1838889
+lon: -90.6861111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 20.123
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Little%20Calleo.Stage.Inst.1Hour.0.DCP-rev
+series: Little Calleo.Stage.Inst.1Hour.0.DCP-rev

@@ -1,0 +1,16 @@
+name: Mississippi River @ New Madrid
+lat: 36.580833
+lon: -89.547417
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 77.916
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=MS115.Stage.Inst.1Hour.0.opendcs-rev
+series: MS115.Stage.Inst.1Hour.0.opendcs-rev

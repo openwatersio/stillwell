@@ -1,0 +1,16 @@
+name: Bogue Phalia @ Leland, MS
+lat: 33.39666667
+lon: -90.8477778
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 26.243
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Leland.Stage.Inst.1Hour.0.DCP-rev
+series: Leland.Stage.Inst.1Hour.0.DCP-rev

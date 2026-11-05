@@ -1,0 +1,16 @@
+name: Branchland
+lat: 38.2217
+lon: -82.2022
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 167.052
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Branchland.Stage.Inst.15Minutes.0.OBS
+series: Branchland.Stage.Inst.15Minutes.0.OBS

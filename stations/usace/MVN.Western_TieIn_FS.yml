@@ -1,0 +1,15 @@
+name: Western Tie-In Sector Gate - Flood Side (82715)
+lat: 29.9096362
+lon: -90.2732138
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Western_TieIn_FS.Stage.Inst.15Minutes.0.rev
+series: Western_TieIn_FS.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,16 @@
+name: Deer Cr at Litzinger Rd
+lat: 38.622
+lon: -90.375
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 136.88
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Litzinger%20Rd-Deer%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Litzinger Rd-Deer Cr.Stage.Inst.5Minutes.0.Usgs-raw

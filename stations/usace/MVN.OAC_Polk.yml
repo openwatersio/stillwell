@@ -1,0 +1,14 @@
+name: Orleans Ave Canal 7-Polk St.
+lat: 29.9984305
+lon: -90.1009
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=OAC_Polk.Stage.Inst.15Minutes.0.rev
+series: OAC_Polk.Stage.Inst.15Minutes.0.rev

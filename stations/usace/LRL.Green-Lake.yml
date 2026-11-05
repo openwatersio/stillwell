@@ -1,0 +1,16 @@
+name: Green-Lake
+lat: 37.246111100435
+lon: -85.339166699658
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 203.606
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Green-Lake.Stage.Inst.5Minutes.0.USGS-rev
+series: Green-Lake.Stage.Inst.5Minutes.0.USGS-rev

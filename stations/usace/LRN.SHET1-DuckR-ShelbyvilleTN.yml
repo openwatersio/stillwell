@@ -1,0 +1,14 @@
+name: Duck River - Shelbyville TN
+lat: 35.482778
+lon: -86.4625
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 1800
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=SHET1-DuckR-ShelbyvilleTN.Stage.Inst.30Minutes.0.dcp-rev
+series: SHET1-DuckR-ShelbyvilleTN.Stage.Inst.30Minutes.0.dcp-rev

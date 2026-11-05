@@ -1,0 +1,16 @@
+name: WABASH RIVER AT TERRE HAUTE, IN
+lat: 39.4758698
+lon: -87.4189093
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 135.721
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=TerreHaute.Stage.Inst.15Minutes.0.USGS-rev
+series: TerreHaute.Stage.Inst.15Minutes.0.USGS-rev

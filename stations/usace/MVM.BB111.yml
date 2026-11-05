@@ -1,0 +1,16 @@
+name: Blackfish Bayou @ Hughes
+lat: 34.960556
+lon: -90.5839
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 45.72
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=BB111.Stage.Inst.1Hour.0.opendcs-rev
+series: BB111.Stage.Inst.1Hour.0.opendcs-rev

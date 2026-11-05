@@ -1,0 +1,16 @@
+name: BIG WALNUT CREEK NEAR REELSVILLE
+lat: 39.53587705
+lon: -86.9761239
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 179.296
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Reelsville.Stage.Inst.15Minutes.0.USGS-rev
+series: Reelsville.Stage.Inst.15Minutes.0.USGS-rev

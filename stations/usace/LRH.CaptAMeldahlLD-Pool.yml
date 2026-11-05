@@ -1,0 +1,17 @@
+name: C.A. Meldahl L&D Pool
+lat: 38.7946651
+lon: -84.1666764
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 143.957
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=CaptAMeldahlLD-Pool.Stage.Inst.15Minutes.0.OBS
+series: CaptAMeldahlLD-Pool.Stage.Inst.15Minutes.0.OBS

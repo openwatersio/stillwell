@@ -1,0 +1,16 @@
+name: Ouachita River @ Mount Ida, AR
+lat: 34.6104491
+lon: -93.697567
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 209.398
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Mt%20Ida.Stage.Inst.15Minutes.0.DCP-rev
+series: Mt Ida.Stage.Inst.15Minutes.0.DCP-rev

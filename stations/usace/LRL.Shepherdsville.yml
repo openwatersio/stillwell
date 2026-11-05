@@ -1,0 +1,16 @@
+name: SALT RIVER AT SHEPHERDSVILLE, KY
+lat: 37.9850659
+lon: -85.7174591
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 123.938
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Shepherdsville.Stage.Inst.15Minutes.0.LRGS-rev
+series: Shepherdsville.Stage.Inst.15Minutes.0.LRGS-rev

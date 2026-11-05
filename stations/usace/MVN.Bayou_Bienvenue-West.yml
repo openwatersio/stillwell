@@ -1,0 +1,15 @@
+name: Bayou Bienvenue Floodgate - West/Protected Side (76024)
+lat: 29.9978445
+lon: -89.9165167
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_Bienvenue-West.Stage.Inst.15Minutes.0.rev
+series: Bayou_Bienvenue-West.Stage.Inst.15Minutes.0.rev

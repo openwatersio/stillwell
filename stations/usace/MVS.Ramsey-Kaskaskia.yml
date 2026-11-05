@@ -1,0 +1,17 @@
+name: Ramsey
+lat: 39.132081
+lon: -88.972147
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 121.841
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Ramsey-Kaskaskia.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Ramsey-Kaskaskia.Stage.Inst.30Minutes.0.lrgsShef-rev

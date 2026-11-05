@@ -1,0 +1,16 @@
+name: SOUTH FORK KENTUCKY RIVER AT BOO
+lat: 37.479811111111
+lon: -83.675191666667
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 195.831
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Booneville.Stage.Inst.15Minutes.0.LRGS-rev
+series: Booneville.Stage.Inst.15Minutes.0.LRGS-rev

@@ -1,0 +1,16 @@
+name: Michael J Kirwan Dam Outflow, OH
+lat: 41.1569
+lon: -81.0717
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 282.193
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=MJKirwan-Outflow.Stage.Inst.15Minutes.0.OBS
+series: MJKirwan-Outflow.Stage.Inst.15Minutes.0.OBS

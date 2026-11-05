@@ -1,0 +1,16 @@
+name: NORTH FORK KENTUCKY RIVER AT HAZ
+lat: 37.2467624
+lon: -83.181839
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 255.959
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Hazard.Stage.Inst.15Minutes.0.LRGS-rev
+series: Hazard.Stage.Inst.15Minutes.0.LRGS-rev

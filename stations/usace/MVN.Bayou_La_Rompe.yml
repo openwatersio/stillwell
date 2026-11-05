@@ -1,0 +1,15 @@
+name: Bayou La Rompe at Lake Long (03210)
+lat: 30.2331944
+lon: -91.5896667
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_La_Rompe.Stage.Inst.1Hour.0.rev
+series: Bayou_La_Rompe.Stage.Inst.1Hour.0.rev

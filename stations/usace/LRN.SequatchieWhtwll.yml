@@ -1,0 +1,14 @@
+name: Sequatchie River near Whitwell
+lat: 35.206388888889
+lon: -85.497222222222
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=SequatchieWhtwll.Stage.Inst.15Minutes.0.GOES-Rev
+series: SequatchieWhtwll.Stage.Inst.15Minutes.0.GOES-Rev

@@ -1,0 +1,16 @@
+name: Mississippi River @ Natchez, MS
+lat: 31.544017
+lon: -91.433412
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 5.267
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Natchez.Stage.Inst.1Hour.0.DCP-rev
+series: Natchez.Stage.Inst.1Hour.0.DCP-rev

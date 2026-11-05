@@ -1,0 +1,16 @@
+name: Lobutcha Creek @ Renfroe, MS
+lat: 32.862222223236
+lon: -89.443333333758
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 107.954
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Renfroe.Stage.Inst.15Minutes.0.DCP-rev
+series: Renfroe.Stage.Inst.15Minutes.0.DCP-rev

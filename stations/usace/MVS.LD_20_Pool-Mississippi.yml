@@ -1,0 +1,17 @@
+name: LD 20 Pool
+lat: 40.14462
+lon: -91.515639
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 142.799
+products: [levels]
+interval_s: 600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=LD%2020%20Pool-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw
+series: LD 20 Pool-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw

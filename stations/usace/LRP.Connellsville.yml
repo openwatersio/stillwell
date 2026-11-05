@@ -1,0 +1,16 @@
+name: Connellsville, PA
+lat: 40.0175
+lon: -79.5936
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 262.168
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Connellsville.Stage.Inst.15Minutes.0.OBS
+series: Connellsville.Stage.Inst.15Minutes.0.OBS

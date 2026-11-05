@@ -1,0 +1,16 @@
+name: Harpeth River at Franklin, TN
+lat: 35.921111
+lon: -86.865556
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 184.227
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=FRAT1-HarpethR-FranklinTN.Stage.Inst.15Minutes.0.dcp-rev
+series: FRAT1-HarpethR-FranklinTN.Stage.Inst.15Minutes.0.dcp-rev

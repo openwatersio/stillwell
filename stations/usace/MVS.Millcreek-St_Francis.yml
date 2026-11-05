@@ -1,0 +1,17 @@
+name: Millcreek
+lat: 37.502197
+lon: -90.457325
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 169.521
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Millcreek-St%20Francis.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Millcreek-St Francis.Stage.Inst.15Minutes.0.lrgsShef-rev

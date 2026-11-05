@@ -1,0 +1,16 @@
+name: Mill Creek at Reading OH
+lat: 39.2206139
+lon: -84.4468864
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 160.169
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Reading.Stage.Inst.15Minutes.0.USGS-rev
+series: Reading.Stage.Inst.15Minutes.0.USGS-rev

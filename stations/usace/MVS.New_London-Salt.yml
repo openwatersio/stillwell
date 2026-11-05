@@ -1,0 +1,17 @@
+name: New London
+lat: 39.612789
+lon: -91.407408
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 145.259
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=New%20London-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: New London-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev

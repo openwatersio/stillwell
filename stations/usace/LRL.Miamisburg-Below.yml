@@ -1,0 +1,16 @@
+name: Great Miami River below Miamisbu
+lat: 39.6067252
+lon: -84.2868854
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 204.216
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Miamisburg-Below.Stage.Inst.15Minutes.0.USGS-rev
+series: Miamisburg-Below.Stage.Inst.15Minutes.0.USGS-rev

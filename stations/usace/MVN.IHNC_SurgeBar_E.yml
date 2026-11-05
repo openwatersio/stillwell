@@ -1,0 +1,15 @@
+name: IHNC Surge Barrier East / Flood Side (76030)
+lat: 30.0123888
+lon: -89.9005278
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=IHNC_SurgeBar_E.Stage.Inst.15Minutes.0.rev
+series: IHNC_SurgeBar_E.Stage.Inst.15Minutes.0.rev

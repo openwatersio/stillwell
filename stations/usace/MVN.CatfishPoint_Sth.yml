@@ -1,0 +1,16 @@
+name: Catfish Point Control Structure - South (70750)
+lat: 29.8629333
+lon: -92.8492417
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=CatfishPoint_Sth.Stage.Inst.1Hour.0.rev
+series: CatfishPoint_Sth.Stage.Inst.1Hour.0.rev
+zero_since: 1998-02-19

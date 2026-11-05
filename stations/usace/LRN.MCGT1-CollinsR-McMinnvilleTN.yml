@@ -1,0 +1,16 @@
+name: Collins River near McMinnville, TN
+lat: 35.708333
+lon: -85.731944
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 251.698
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=MCGT1-CollinsR-McMinnvilleTN.Stage.Inst.30Minutes.0.dcp-rev
+series: MCGT1-CollinsR-McMinnvilleTN.Stage.Inst.30Minutes.0.dcp-rev

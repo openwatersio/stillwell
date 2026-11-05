@@ -1,0 +1,17 @@
+name: Hecker
+lat: 38.323892
+lon: -89.970311
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 114.187
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Hecker-Richland%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Hecker-Richland Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

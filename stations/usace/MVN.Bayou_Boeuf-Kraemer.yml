@@ -1,0 +1,15 @@
+name: Bayou Boeuf near Kraemer (82725)
+lat: 29.8691666
+lon: -90.5952777
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_Boeuf-Kraemer.Stage.Inst.1Hour.0.rev
+series: Bayou_Boeuf-Kraemer.Stage.Inst.1Hour.0.rev
+zero_since: 2016-03-17

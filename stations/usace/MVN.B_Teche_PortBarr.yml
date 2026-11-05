@@ -1,0 +1,14 @@
+name: Bayou Teche at Port Barre (64050)
+lat: 30.546388833333
+lon: -91.9675
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=B_Teche_PortBarr.Stage.Inst.1Hour.0.rev
+series: B_Teche_PortBarr.Stage.Inst.1Hour.0.rev

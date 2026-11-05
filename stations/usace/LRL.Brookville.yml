@@ -1,0 +1,16 @@
+name: Brookville Lake Dam
+lat: 39.440000000234
+lon: -85.001111099585
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 181.572
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Brookville.Stage.Inst.15Minutes.0.LRGS-rev
+series: Brookville.Stage.Inst.15Minutes.0.LRGS-rev

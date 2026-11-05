@@ -1,0 +1,17 @@
+name: Obion River @ Rives
+lat: 36.275944
+lon: -89.060583
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 81.372
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=OB111.Stage.Inst.1Hour.0.opendcs-rev
+series: OB111.Stage.Inst.1Hour.0.opendcs-rev

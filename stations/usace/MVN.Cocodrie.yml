@@ -1,0 +1,16 @@
+name: Bayou Petit Caillou at Cocodrie (76305)
+lat: 29.25425
+lon: -90.6635278
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Cocodrie.Stage.Inst.1Hour.0.rev
+series: Cocodrie.Stage.Inst.1Hour.0.rev
+zero_since: 2011-10-12

@@ -1,0 +1,16 @@
+name: West Fork Stones River at Murfreesboro, TN
+lat: 35.9025
+lon: -86.428611
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 156.957
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=MUGT1-WFkStonesR-MurfreesboroTN.Stage.Inst.30Minutes.0.dcp-rev
+series: MUGT1-WFkStonesR-MurfreesboroTN.Stage.Inst.30Minutes.0.dcp-rev

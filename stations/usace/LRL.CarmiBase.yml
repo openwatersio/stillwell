@@ -1,0 +1,16 @@
+name: LITTLE WABASH RIVER AT CARMI, IL
+lat: 38.0611573
+lon: -88.1597597
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 103.605
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=CarmiBase.Stage.Inst.15Minutes.0.LRGS-rev
+series: CarmiBase.Stage.Inst.15Minutes.0.LRGS-rev

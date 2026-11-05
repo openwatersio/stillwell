@@ -1,0 +1,16 @@
+name: Latrobe, PA
+lat: 40.3158
+lon: -79.3911
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 291.191
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Latrobe.Stage.Inst.15Minutes.0.OBS
+series: Latrobe.Stage.Inst.15Minutes.0.OBS

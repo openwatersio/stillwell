@@ -1,0 +1,16 @@
+name: OHIO RIVER AT EVANSVILLE, IN
+lat: 37.971350969771
+lon: -87.577477383606
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 100.169
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Evansville.Stage.Inst.15Minutes.0.LRGS-rev
+series: Evansville.Stage.Inst.15Minutes.0.LRGS-rev

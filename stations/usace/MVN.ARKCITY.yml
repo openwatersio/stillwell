@@ -1,0 +1,15 @@
+name: Mississippi River Arkansas City
+lat: 33.551509
+lon: -91.238365
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=ARKCITY.Stage.Inst.1Hour.0.rev
+series: ARKCITY.Stage.Inst.1Hour.0.rev

@@ -1,0 +1,16 @@
+name: Hoyes, MD
+lat: 39.525806
+lon: -79.41075
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 614.925
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Hoyes.Stage.Inst.15Minutes.0.OBS
+series: Hoyes.Stage.Inst.15Minutes.0.OBS

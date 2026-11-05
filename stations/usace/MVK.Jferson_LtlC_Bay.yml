@@ -1,0 +1,16 @@
+name: Little Cypress @ Jefferson, TX
+lat: 32.71291998
+lon: -94.3460265
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 53.276
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Jferson_LtlC_Bay.Stage.Inst.15Minutes.0.DCP-rev
+series: Jferson_LtlC_Bay.Stage.Inst.15Minutes.0.DCP-rev

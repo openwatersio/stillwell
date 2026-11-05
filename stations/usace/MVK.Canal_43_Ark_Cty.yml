@@ -1,0 +1,16 @@
+name: Canal 43 @ Arkansas City
+lat: 33.605758334216
+lon: -91.278341667428
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 32.324
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Canal%2043_Ark%20Cty.Stage.Inst.1Hour.0.DCP-rev
+series: Canal 43_Ark Cty.Stage.Inst.1Hour.0.DCP-rev

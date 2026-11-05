@@ -1,0 +1,14 @@
+name: IWW at Calcasieu Lock -West (76960)
+lat: 30.0887194
+lon: -93.294886
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Calcasieu_Lock-West.Stage.Inst.1Hour.0.rev
+series: Calcasieu_Lock-West.Stage.Inst.1Hour.0.rev

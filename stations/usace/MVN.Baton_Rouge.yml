@@ -1,0 +1,15 @@
+name: Mississippi River at Baton Rouge (01160)
+lat: 29.4291638
+lon: -91.2069388
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Baton_Rouge.Stage.Inst.1Hour.0.rev
+series: Baton_Rouge.Stage.Inst.1Hour.0.rev

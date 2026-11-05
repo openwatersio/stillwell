@@ -1,0 +1,17 @@
+name: LD 21 Pool
+lat: 39.903894
+lon: -91.427831
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 139.537
+products: [levels]
+interval_s: 600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=LD%2021%20Pool-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw
+series: LD 21 Pool-Mississippi.Stage.Inst.10Minutes.0.lrgsShef-raw

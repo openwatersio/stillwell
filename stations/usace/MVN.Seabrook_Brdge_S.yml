@@ -1,0 +1,15 @@
+name: Seabrook Floodgate - IHNC Side (76062)
+lat: 30.0302362
+lon: -90.0346167
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Seabrook_Brdge_S.Stage.Inst.15Minutes.0.rev
+series: Seabrook_Brdge_S.Stage.Inst.15Minutes.0.rev

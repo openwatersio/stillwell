@@ -1,0 +1,16 @@
+name: Big Sunflower @ Holly Bluff, MS
+lat: 32.814072
+lon: -90.718024
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 0.177
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Holly%20Bluff.Stage.Inst.1Hour.0.DCP-rev
+series: Holly Bluff.Stage.Inst.1Hour.0.DCP-rev

@@ -1,0 +1,14 @@
+name: IWW at Calcasieu Lock - East (76880)
+lat: 30.0863445
+lon: -93.2913833
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Calcasieu_Lock-East.Stage.Inst.1Hour.0.rev
+series: Calcasieu_Lock-East.Stage.Inst.1Hour.0.rev

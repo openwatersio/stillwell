@@ -1,0 +1,16 @@
+name: WHITE RIVER AT NEWBERRY, IN
+lat: 38.92754676
+lon: -87.0113968
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 141.756
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Newberry.Stage.Inst.15Minutes.0.USGS-rev
+series: Newberry.Stage.Inst.15Minutes.0.USGS-rev

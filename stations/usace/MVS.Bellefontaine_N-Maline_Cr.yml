@@ -1,0 +1,16 @@
+name: Maline Cr at Bellefontaine Neighbors
+lat: 38.737
+lon: -90.226
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 124.956
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Bellefontaine%20N-Maline%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Bellefontaine N-Maline Cr.Stage.Inst.5Minutes.0.Usgs-raw

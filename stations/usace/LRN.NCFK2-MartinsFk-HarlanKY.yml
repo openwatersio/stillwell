@@ -1,0 +1,16 @@
+name: Martins Fork at Clover Fork near Harlan, KY
+lat: 36.844722
+lon: -83.325278
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 352.257
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=NCFK2-MartinsFk-HarlanKY.Stage.Inst.30Minutes.0.dcp-rev
+series: NCFK2-MartinsFk-HarlanKY.Stage.Inst.30Minutes.0.dcp-rev

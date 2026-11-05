@@ -1,0 +1,17 @@
+name: St Charles
+lat: 38.7872
+lon: -90.471797
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 126.026
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=St%20Charles-Missouri.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: St Charles-Missouri.Stage.Inst.30Minutes.0.lrgsShef-rev

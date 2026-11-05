@@ -1,0 +1,17 @@
+name: St Louis
+lat: 38.629006
+lon: -90.179872
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 115.696
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=St%20Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

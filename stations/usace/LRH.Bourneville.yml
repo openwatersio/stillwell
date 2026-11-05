@@ -1,0 +1,17 @@
+name: Bourneville
+lat: 39.263437061336
+lon: -83.167532730103
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 202.753
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Bourneville.Stage.Inst.15Minutes.0.OBS
+series: Bourneville.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: Leavittsburg, OH
+lat: 41.2392
+lon: -80.8808
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 265.408
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Leavittsburg.Stage.Inst.15Minutes.0.OBS
+series: Leavittsburg.Stage.Inst.15Minutes.0.OBS

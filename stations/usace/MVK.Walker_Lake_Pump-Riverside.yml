@@ -1,0 +1,14 @@
+name: Walker Lake Pump Riverside
+lat: 33.487163888889
+lon: -90.223005555556
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Walker%20Lake%20Pump-Riverside.Stage.Inst.1Hour.0.DCP-rev
+series: Walker Lake Pump-Riverside.Stage.Inst.1Hour.0.DCP-rev

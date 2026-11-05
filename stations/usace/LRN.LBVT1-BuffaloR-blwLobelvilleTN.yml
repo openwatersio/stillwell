@@ -1,0 +1,14 @@
+name: Buffalo River - Lobelville TN
+lat: 35.810833
+lon: -87.780278
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=LBVT1-BuffaloR-blwLobelvilleTN.Stage.Inst.15Minutes.0.dcp-rev
+series: LBVT1-BuffaloR-blwLobelvilleTN.Stage.Inst.15Minutes.0.dcp-rev

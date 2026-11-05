@@ -1,0 +1,14 @@
+name: Ross Barnett Tailwater
+lat: 32.397066666667
+lon: -90.064525
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Ross%20Barnett-Tailwater.Stage.Inst.1Hour.0.DCP-rev
+series: Ross Barnett-Tailwater.Stage.Inst.1Hour.0.DCP-rev

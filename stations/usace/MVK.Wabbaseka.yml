@@ -1,0 +1,16 @@
+name: Wabbaseka Bayou @ Wabbaseka, AR
+lat: 34.3589
+lon: -91.7992
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 53.892
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Wabbaseka.Stage.Inst.1Hour.0.DCP-rev
+series: Wabbaseka.Stage.Inst.1Hour.0.DCP-rev

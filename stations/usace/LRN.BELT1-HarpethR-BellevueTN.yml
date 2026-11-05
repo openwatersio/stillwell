@@ -1,0 +1,16 @@
+name: Harpeth River at Bellevue, TN
+lat: 36.054444
+lon: -86.928889
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 164.909
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=BELT1-HarpethR-BellevueTN.Stage.Inst.15Minutes.0.dcp-rev
+series: BELT1-HarpethR-BellevueTN.Stage.Inst.15Minutes.0.dcp-rev

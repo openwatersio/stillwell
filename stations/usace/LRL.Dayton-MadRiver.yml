@@ -1,0 +1,14 @@
+name: Dayton-MadRiver
+lat: 39.7653365
+lon: -84.1974405
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Dayton-MadRiver.Stage.Inst.15Minutes.0.USGS-rev
+series: Dayton-MadRiver.Stage.Inst.15Minutes.0.USGS-rev

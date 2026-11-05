@@ -1,0 +1,14 @@
+name: Big Rock Creek - Double Bridges TN
+lat: 35.504444
+lon: -86.768611
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=DBLT1-BigRockCr-nrDoubleBridgesTN.Stage.Inst.15Minutes.0.dcp-rev
+series: DBLT1-BigRockCr-nrDoubleBridgesTN.Stage.Inst.15Minutes.0.dcp-rev

@@ -1,0 +1,16 @@
+name: SKILLET FORK AT WAYNE CITY, IL
+lat: 38.3633333
+lon: -88.5877778
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 116.659
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=WayneCity.Stage.Inst.15Minutes.0.USGS-rev
+series: WayneCity.Stage.Inst.15Minutes.0.USGS-rev

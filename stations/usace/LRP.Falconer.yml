@@ -1,0 +1,16 @@
+name: Falconer, NY
+lat: 42.1126
+lon: -79.2036
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 382.954
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Falconer.Stage.Inst.15Minutes.0.OBS
+series: Falconer.Stage.Inst.15Minutes.0.OBS

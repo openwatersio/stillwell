@@ -1,0 +1,14 @@
+name: "Red L&D #1 Lower"
+lat: 31.255984
+lon: -91.958177
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=L%26D%201-Lower.Stage.Inst.1Hour.0.DCP-rev
+series: L&D 1-Lower.Stage.Inst.1Hour.0.DCP-rev

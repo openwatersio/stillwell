@@ -1,0 +1,15 @@
+name: West Bay Receiving Area
+lat: 29.2192445
+lon: -89.3150833
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=West_Bay_Receive.Stage.Inst.1Hour.0.rev
+series: West_Bay_Receive.Stage.Inst.1Hour.0.rev

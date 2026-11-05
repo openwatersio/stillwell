@@ -1,0 +1,16 @@
+name: Forked Deer River @ Eaton
+lat: 35.960667
+lon: -89.140889
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 78.114
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=FM104.Stage.Inst.1Hour.0.opendcs-rev
+series: FM104.Stage.Inst.1Hour.0.opendcs-rev

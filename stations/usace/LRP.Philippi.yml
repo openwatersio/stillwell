@@ -1,0 +1,16 @@
+name: Philippi, WV
+lat: 39.150478
+lon: -80.038613
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 390.132
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Philippi.Stage.Inst.15Minutes.0.OBS
+series: Philippi.Stage.Inst.15Minutes.0.OBS

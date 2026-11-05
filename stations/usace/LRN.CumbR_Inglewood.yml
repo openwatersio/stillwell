@@ -1,0 +1,16 @@
+name: Cumberland River at Briley Pkwy nr Inglewood, TN
+lat: 36.2352
+lon: -86.7125
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 110.856
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CumbR%20Inglewood.Stage.Inst.15Minutes.0.GOES-Rev
+series: CumbR Inglewood.Stage.Inst.15Minutes.0.GOES-Rev

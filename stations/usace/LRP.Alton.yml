@@ -1,0 +1,16 @@
+name: Alton, WV
+lat: 38.82
+lon: -80.2153
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 542.376
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Alton.Stage.Inst.15Minutes.0.OBS
+series: Alton.Stage.Inst.15Minutes.0.OBS

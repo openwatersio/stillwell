@@ -1,0 +1,16 @@
+name: L'Anguille River @ Marianna
+lat: 34.790167
+lon: -90.751667
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 47.643
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LA112.Stage.Inst.1Hour.0.opendcs-rev
+series: LA112.Stage.Inst.1Hour.0.opendcs-rev

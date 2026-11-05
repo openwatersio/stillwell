@@ -1,0 +1,16 @@
+name: Eldred, PA
+lat: 41.9633
+lon: -78.3861
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 431.758
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Eldred.Stage.Inst.15Minutes.0.OBS
+series: Eldred.Stage.Inst.15Minutes.0.OBS

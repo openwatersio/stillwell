@@ -1,0 +1,17 @@
+name: Price Landing
+lat: 37.026078
+lon: -89.356803
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 91.12
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Price%20Ldg-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Price Ldg-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev

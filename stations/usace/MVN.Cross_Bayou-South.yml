@@ -1,0 +1,14 @@
+name: Cross Bayou Canal - South of Drainage Control Str (85660)
+lat: 29.9858861
+lon: -90.3490333
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Cross_Bayou-South.Stage.Inst.15Minutes.0.rev
+series: Cross_Bayou-South.Stage.Inst.15Minutes.0.rev

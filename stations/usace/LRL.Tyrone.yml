@@ -1,0 +1,16 @@
+name: KENTUCKY RIVER AT LOCK 5 NEAR TY
+lat: 38.05285275
+lon: -84.8305045
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 144.393
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Tyrone.Stage.Inst.15Minutes.0.USGS-rev
+series: Tyrone.Stage.Inst.15Minutes.0.USGS-rev

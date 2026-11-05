@@ -1,0 +1,14 @@
+name: Beech River - Lexington TN
+lat: 35.634167
+lon: -88.414722
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=BCHT1-BeechR-nrLexingtonTN.Stage.Inst.15Minutes.0.dcp-rev
+series: BCHT1-BeechR-nrLexingtonTN.Stage.Inst.15Minutes.0.dcp-rev

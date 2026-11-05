@@ -1,0 +1,16 @@
+name: North Cut Ditch @ Miner
+lat: 36.833206
+lon: -89.524872
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 82.296
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=ND112.Stage.Inst.15Minutes.0.opendcs-rev
+series: ND112.Stage.Inst.15Minutes.0.opendcs-rev

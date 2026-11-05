@@ -1,0 +1,16 @@
+name: MIDDLE FORK KENTUCKY RIVER AT TA
+lat: 37.55508768
+lon: -83.5937993
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 195.721
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Tallega.Stage.Inst.15Minutes.0.LRGS-rev
+series: Tallega.Stage.Inst.15Minutes.0.LRGS-rev

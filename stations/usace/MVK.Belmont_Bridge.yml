@@ -1,0 +1,16 @@
+name: Ltl Tallahatchie @ Belmont Bridge
+lat: 34.3875
+lon: -89.8819444
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 57.254
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Belmont%20Bridge.Stage.Inst.1Hour.0.DCP-rev
+series: Belmont Bridge.Stage.Inst.1Hour.0.DCP-rev

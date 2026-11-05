@@ -1,0 +1,17 @@
+name: Mississippi River @ Hickman
+lat: 36.569722
+lon: -89.205833
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 80.69
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=MS113.Stage.Inst.1Hour.0.opendcs-rev
+series: MS113.Stage.Inst.1Hour.0.opendcs-rev

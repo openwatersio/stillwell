@@ -1,0 +1,15 @@
+name: Charenton Drainage Canal at Baldwin
+lat: 29.8230556
+lon: -91.5416667
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Baldwin.Stage.Inst.15Minutes.0.rev
+series: Baldwin.Stage.Inst.15Minutes.0.rev

@@ -1,0 +1,17 @@
+name: Raleigh
+lat: 37.7605556
+lon: -81.1625
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 635.218
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Raleigh.Stage.Inst.15Minutes.0.OBS
+series: Raleigh.Stage.Inst.15Minutes.0.OBS

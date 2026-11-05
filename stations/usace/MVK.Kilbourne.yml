@@ -1,0 +1,16 @@
+name: Bayou Macon at Kilbourne, LA
+lat: 32.9932018
+lon: -91.262623
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 22.208
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Kilbourne.Stage.Inst.15Minutes.0.DCP-rev
+series: Kilbourne.Stage.Inst.15Minutes.0.DCP-rev

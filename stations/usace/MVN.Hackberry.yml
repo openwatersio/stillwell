@@ -1,0 +1,15 @@
+name: Calcasieu River at Hackberry (73600)
+lat: 30.006
+lon: -93.3343333
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Hackberry.Stage.Inst.1Hour.0.rev
+series: Hackberry.Stage.Inst.1Hour.0.rev

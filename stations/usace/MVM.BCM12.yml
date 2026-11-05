@@ -1,0 +1,17 @@
+name: Big Creek @ Rosemark
+lat: 35.365861
+lon: -89.804
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 82.601
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=BCM12.Stage.Inst.15Minutes.0.opendcs-rev
+series: BCM12.Stage.Inst.15Minutes.0.opendcs-rev

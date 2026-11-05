@@ -1,0 +1,16 @@
+name: Imperial, PA
+lat: 40.4572
+lon: -80.1844
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 259.08
+products: [levels]
+interval_s: 900
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Imperial.Stage.Inst.15Minutes.0.OBS
+series: Imperial.Stage.Inst.15Minutes.0.OBS

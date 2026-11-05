@@ -15,12 +15,18 @@ export interface QcOptions {
   flatline_s?: number;
   /** The smallest jump from its neighbors that counts as a spike, in meters. */
   spike_m?: number;
+  /**
+   * Whether a level far outside the series' own range is suspect. Off for
+   * sources with regulated pools, which sit nearly flat for months and then
+   * rise meters in a flood.
+   */
+  outliers?: boolean;
 }
 
 /** Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and outliers. */
 export function qc<T extends Observation>(
   rows: T[],
-  { limit_m = 20, flatline_s = 6 * 3600, spike_m = 0.25 }: QcOptions = {},
+  { limit_m = 20, flatline_s = 6 * 3600, spike_m = 0.25, outliers = true }: QcOptions = {},
 ): T[] {
   const sorted = [...rows].sort((a, b) => a.time - b.time);
   const out = sorted
@@ -67,12 +73,14 @@ export function qc<T extends Observation>(
 
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
   // The floor keeps a short, nearly flat window from flagging ordinary changes.
-  const levels = out.map((r) => r.level);
-  const center = median(levels)!;
-  const outlier = Math.max(10 * mad(levels), 4 * spike_m);
-  out.forEach((r, i) => {
-    if (Math.abs(r.level - center) > outlier) worsen(i, Flag.suspect);
-  });
+  if (outliers) {
+    const levels = out.map((r) => r.level);
+    const center = median(levels)!;
+    const outlier = Math.max(10 * mad(levels), 4 * spike_m);
+    out.forEach((r, i) => {
+      if (Math.abs(r.level - center) > outlier) worsen(i, Flag.suspect);
+    });
+  }
 
   return out;
 }

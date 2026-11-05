@@ -1,0 +1,16 @@
+name: Walkersville, WV
+lat: 38.868825
+lon: -80.457932
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 326.139
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Walkersville.Stage.Inst.15Minutes.0.OBS
+series: Walkersville.Stage.Inst.15Minutes.0.OBS

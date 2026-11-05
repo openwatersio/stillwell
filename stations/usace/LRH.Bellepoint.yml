@@ -1,0 +1,14 @@
+name: Bellepoint
+lat: 40.2483
+lon: -83.1738
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Bellepoint.Stage.Inst.15Minutes.0.OBS
+series: Bellepoint.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: WABASH RIVER AT WABASH, IN
+lat: 40.7908765
+lon: -85.8202632
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 195.883
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Wabash.Stage.Inst.15Minutes.0.USGS-rev
+series: Wabash.Stage.Inst.15Minutes.0.USGS-rev

@@ -1,0 +1,16 @@
+name: WABASH RIVER AT COVINGTON, IN
+lat: 40.1400377
+lon: -87.4066805
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 144.381
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Covington.Stage.Inst.15Minutes.0.LRGS-rev
+series: Covington.Stage.Inst.15Minutes.0.LRGS-rev

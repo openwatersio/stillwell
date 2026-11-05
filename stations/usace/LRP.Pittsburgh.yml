@@ -1,0 +1,16 @@
+name: Pittsburgh, PA Point Gage
+lat: 40.4416
+lon: -80.0133
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 211.601
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Pittsburgh.Stage.Inst.5Minutes.0.OBS
+series: Pittsburgh.Stage.Inst.5Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: Belington, WV
+lat: 39.0292
+lon: -79.9361
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 511.948
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Belington.Stage.Inst.15Minutes.0.OBS
+series: Belington.Stage.Inst.15Minutes.0.OBS

@@ -1,0 +1,16 @@
+name: DIX RIVER NEAR DANVILLE, KY
+lat: 37.6420234
+lon: -84.6607768
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 228.63
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=DanvilleKY.Stage.Inst.5Minutes.0.USGS-rev
+series: DanvilleKY.Stage.Inst.5Minutes.0.USGS-rev

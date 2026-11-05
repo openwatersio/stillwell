@@ -1,0 +1,15 @@
+name: Mouth of Atchafalaya River at Atchafalaya Bay (88600)
+lat: 29.43025
+lon: -91.3338889
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Atch_Bay_Mouth.Stage.Inst.~15Minutes.0.rev
+series: Atch_Bay_Mouth.Stage.Inst.~15Minutes.0.rev

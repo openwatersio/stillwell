@@ -1,0 +1,17 @@
+name: Maysville
+lat: 38.6494
+lon: -83.7658
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 137.434
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Maysville.Stage.Inst.15Minutes.0.OBS
+series: Maysville.Stage.Inst.15Minutes.0.OBS

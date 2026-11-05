@@ -1,0 +1,16 @@
+name: Monroe-Lake
+lat: 39.007500000273
+lon: -86.512499999879
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 163.982
+products: [levels]
+interval_s: 300
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Monroe-Lake.Stage.Inst.5Minutes.0.LRGS-rev
+series: Monroe-Lake.Stage.Inst.5Minutes.0.LRGS-rev

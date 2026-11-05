@@ -1,0 +1,16 @@
+name: Kinzua Dam Outflow, PA
+lat: 41.8417
+lon: -79.0125
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 363.489
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Kinzua-Outflow.Stage.Inst.15Minutes.0.OBS
+series: Kinzua-Outflow.Stage.Inst.15Minutes.0.OBS

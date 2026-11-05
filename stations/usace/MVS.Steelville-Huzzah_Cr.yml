@@ -1,0 +1,16 @@
+name: Steelville-Huzzah Cr
+lat: 37.974722200349
+lon: -91.204444400773
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 202.704
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Steelville-Huzzah%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Steelville-Huzzah Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

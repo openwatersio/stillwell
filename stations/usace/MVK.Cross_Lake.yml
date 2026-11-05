@@ -1,0 +1,16 @@
+name: Cross Lake
+lat: 32.5125
+lon: -93.798333333333
+country_code: US
+datum: GZ
+datums:
+  NAVD88: -0.04
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Cross%20Lake.Stage.Inst.15Minutes.0.DCP-rev
+series: Cross Lake.Stage.Inst.15Minutes.0.DCP-rev

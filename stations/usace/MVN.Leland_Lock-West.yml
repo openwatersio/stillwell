@@ -1,0 +1,14 @@
+name: IWW at Leland Bowman Lock - West (76800)
+lat: 29.7870195
+lon: -92.20925
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: false
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Leland_Lock-West.Stage.Inst.1Hour.0.rev
+series: Leland_Lock-West.Stage.Inst.1Hour.0.rev

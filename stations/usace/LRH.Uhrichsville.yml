@@ -1,0 +1,17 @@
+name: Uhrichsville
+lat: 40.3863
+lon: -81.3466
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 255.621
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Uhrichsville.Stage.Inst.15Minutes.0.OBS
+series: Uhrichsville.Stage.Inst.15Minutes.0.OBS

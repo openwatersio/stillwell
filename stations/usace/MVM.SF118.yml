@@ -1,0 +1,16 @@
+name: St. Francis River @ Holcomb
+lat: 36.3975
+lon: -90.07806
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 79.248
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=SF118.Stage.Inst.1Hour.0.opendcs-rev
+series: SF118.Stage.Inst.1Hour.0.opendcs-rev

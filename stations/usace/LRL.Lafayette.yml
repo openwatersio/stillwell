@@ -1,0 +1,16 @@
+name: WABASH RIVER AT LAFAYETTE, IN
+lat: 40.42516667
+lon: -86.8965
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 153.57
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Lafayette.Stage.Inst.15Minutes.0.LRGS-rev
+series: Lafayette.Stage.Inst.15Minutes.0.LRGS-rev

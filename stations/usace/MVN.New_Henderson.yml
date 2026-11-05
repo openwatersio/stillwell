@@ -1,0 +1,14 @@
+name: WABPL Borrow Pit (LS) at New Henderson (58600)
+lat: 30.313761
+lon: -91.789039
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=New_Henderson.Stage.Inst.1Hour.0.rev
+series: New_Henderson.Stage.Inst.1Hour.0.rev

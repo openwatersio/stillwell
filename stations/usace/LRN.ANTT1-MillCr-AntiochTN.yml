@@ -1,0 +1,16 @@
+name: Mill Creek near Antioch, TN
+lat: 36.081667
+lon: -86.680833
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 144.149
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=ANTT1-MillCr-AntiochTN.Stage.Inst.30Minutes.0.dcp-rev
+series: ANTT1-MillCr-AntiochTN.Stage.Inst.30Minutes.0.dcp-rev

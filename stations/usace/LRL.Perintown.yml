@@ -1,0 +1,16 @@
+name: East Fork Little Miami River at
+lat: 39.13700548
+lon: -84.2379918
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 154.543
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Perintown.Stage.Inst.15Minutes.0.USGS-rev
+series: Perintown.Stage.Inst.15Minutes.0.USGS-rev

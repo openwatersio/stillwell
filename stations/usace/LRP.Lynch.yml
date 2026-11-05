@@ -1,0 +1,16 @@
+name: Lynch, PA
+lat: 41.6014
+lon: -79.0497
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 381.741
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Lynch.Stage.Inst.15Minutes.0.OBS
+series: Lynch.Stage.Inst.15Minutes.0.OBS

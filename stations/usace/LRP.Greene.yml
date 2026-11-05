@@ -1,0 +1,16 @@
+name: Greene Center, OH
+lat: 41.482778
+lon: -80.746667
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 278.584
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Greene.Stage.Inst.15Minutes.0.OBS
+series: Greene.Stage.Inst.15Minutes.0.OBS

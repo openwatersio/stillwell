@@ -1,0 +1,16 @@
+name: Jefferson, PA
+lat: 39.9231
+lon: -80.0724
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 290.334
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Jefferson.Stage.Inst.15Minutes.0.OBS
+series: Jefferson.Stage.Inst.15Minutes.0.OBS

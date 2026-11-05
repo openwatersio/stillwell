@@ -1,0 +1,16 @@
+name: WABASH RIVER AT PERU, IN
+lat: 40.75
+lon: -86.0666667
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 188.248
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Peru.Stage.Inst.15Minutes.0.USGS-rev
+series: Peru.Stage.Inst.15Minutes.0.USGS-rev

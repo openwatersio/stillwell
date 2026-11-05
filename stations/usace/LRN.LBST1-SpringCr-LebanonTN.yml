@@ -1,0 +1,16 @@
+name: Spring Creek below Lebanon, TN
+lat: 36.221667
+lon: -86.236944
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 152.4
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=LBST1-SpringCr-LebanonTN.Stage.Inst.30Minutes.0.dcp-rev
+series: LBST1-SpringCr-LebanonTN.Stage.Inst.30Minutes.0.dcp-rev

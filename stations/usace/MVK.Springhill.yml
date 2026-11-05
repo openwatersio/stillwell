@@ -1,0 +1,16 @@
+name: Bayou Bodcau @ Springhill, LA
+lat: 33.003888889836
+lon: -93.516666667821
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 58.522
+products: [levels]
+interval_s: 900
+live: true
+status: active
+license: US-Government-Works
+commercial_use: true
+attribution: U.S. Army Corps of Engineers
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Springhill.Stage.Inst.15Minutes.0.DCP-rev
+series: Springhill.Stage.Inst.15Minutes.0.DCP-rev
