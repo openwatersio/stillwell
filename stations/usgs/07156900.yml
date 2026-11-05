@@ -1,0 +1,16 @@
+name: Cimarron River near Forgan, OK
+lat: 37.0111372011856
+lon: -100.491817145702
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 707.474
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07156900/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 81633b8c12da46d9a87df139afb2560b

@@ -1,0 +1,16 @@
+name: TSOO-YESS RIVER BLW MILLER CREEK NEAR OZETTE, WA
+lat: 48.2653434029992
+lon: -124.625792264098
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 6.983
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12043163/
+parameter_code: "00065"
+series_begin: 2010-10-28T22:15:00+00:00
+time_series_id: 1a44dc5f034d4d8889bda0f06814f893

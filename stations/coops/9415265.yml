@@ -1,0 +1,23 @@
+name: SUISUN SLOUGH ENTRANCE
+lat: 38.1283
+lon: -122.073
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.439
+  MHW: -2.284
+  DTL: -1.68
+  MTL: -1.714
+  MSL: -1.716
+  MLW: -1.144
+  MLLW: -0.92
+  LAT: -0.531
+  HAT: -2.726
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415265
+established: 1977-08-02T00:00:00Z
+removed: 1989-07-18T23:59:00Z

@@ -1,0 +1,13 @@
+name: WEST SIDE, TOGIAK BAY (BACKUP)
+lat: 58.9867
+lon: -160.625
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465358
+established: 1987-06-22T00:00:00Z
+removed: 1987-09-02T23:59:00Z

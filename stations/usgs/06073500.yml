@@ -1,0 +1,16 @@
+name: Dearborn River near Craig MT
+lat: 47.199025
+lon: -112.095905555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1158.24
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06073500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 6d32fa47ddd940b4b111e60045ab470b

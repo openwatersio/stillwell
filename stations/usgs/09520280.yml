@@ -1,0 +1,16 @@
+name: GILA RIVER NEAR DATELAND, AZ
+lat: 32.8792805555556
+lon: -113.541263888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 110.441
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09520280/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 088b22e1e33c4f6e84ab9cdf966cffdb

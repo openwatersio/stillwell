@@ -1,0 +1,21 @@
+name: LAIEMALOO, OAHU ISLAND
+lat: 21.6367
+lon: -157.922
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.743
+  MHW: -3.617
+  DTL: -3.393
+  MTL: -3.381
+  MSL: -3.37
+  MLW: -3.145
+  MLLW: -3.043
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1612702
+established: 1982-10-25T00:00:00Z
+removed: 1983-12-01T23:59:00Z

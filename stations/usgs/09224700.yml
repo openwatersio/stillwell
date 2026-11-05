@@ -1,0 +1,16 @@
+name: BLACKS FORK NEAR LITTLE AMERICA, WY
+lat: 41.5460425047848
+lon: -109.693510206512
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1867.711
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09224700/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3a2541ebaf1743a38f92e0440181d0f6

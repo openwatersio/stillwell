@@ -1,0 +1,24 @@
+name: SAUSALITO, SAN FRANCISCO BAY
+lat: 37.8467
+lon: -122.477
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.69
+  MHW: -2.507
+  DTL: -1.822
+  MTL: -1.905
+  MSL: -1.89
+  MLW: -1.303
+  MLLW: -0.955
+  NAVD88: -0.903
+  LAT: -0.37
+  HAT: -3.119
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414806
+established: 1977-02-25T00:00:00Z
+removed: 1979-11-02T23:59:00Z

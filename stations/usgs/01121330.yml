@@ -1,0 +1,16 @@
+name: FENTON RIVER AT MANSFIELD, CT
+lat: 41.833194444444445
+lon: -72.24278055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 96.737
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01121330/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7d6df5c5ffd9455c9b3bb73598591f70

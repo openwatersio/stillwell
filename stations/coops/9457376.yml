@@ -1,0 +1,23 @@
+name: Uzkosti Point
+lat: 57.9283
+lon: -152.812
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.874
+  MHW: -4.588
+  DTL: -3.151
+  MTL: -3.266
+  MSL: -3.279
+  MLW: -1.944
+  MLLW: -1.428
+  LAT: -0.4
+  HAT: -5.879
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457376
+established: 1981-06-13T00:00:00Z
+removed: 2014-07-10T00:00:00Z

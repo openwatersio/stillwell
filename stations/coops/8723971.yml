@@ -1,0 +1,22 @@
+name: BOOT KEY HARBOR
+lat: 24.7033
+lon: -81.105
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.108
+  MHW: -1.038
+  DTL: -0.812
+  MTL: -0.804
+  MSL: -0.809
+  MLW: -0.569
+  MLLW: -0.516
+  NAVD88: -1.081
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723971
+established: 1975-03-20T00:00:00Z
+removed: 1975-06-02T23:59:00Z

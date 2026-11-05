@@ -1,0 +1,17 @@
+name: WASILLA C NR PALMER AK
+lat: 61.6430727810812
+lon: -149.198330508038
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 144.78
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15285000/
+parameter_code: "00065"
+series_begin: 2008-05-31T08:00:00+00:00
+series_end: 2013-06-28T01:00:00+00:00
+time_series_id: c7949a429748433386cc28cc7e768404

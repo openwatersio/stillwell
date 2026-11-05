@@ -1,0 +1,11 @@
+name: J6
+lat: 53.816632
+lon: 2.95001
+country_code: NL
+datum: MSL
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/j6/details

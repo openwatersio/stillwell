@@ -1,0 +1,16 @@
+name: NORTH FORK EDISTO RIVER AT SC394, ABOVE NORTH, SC
+lat: 33.6070277777778
+lon: -81.1356111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 61.734
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02173299/
+parameter_code: "00065"
+series_begin: 2020-04-17T08:00:00+00:00
+time_series_id: 91307d46ea164025818878ba6f1ff357

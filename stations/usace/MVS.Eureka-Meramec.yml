@@ -1,0 +1,14 @@
+name: Eureka
+lat: 38.504753
+lon: -90.590439
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 123.121
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Eureka-Meramec.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Eureka-Meramec.Stage.Inst.30Minutes.0.lrgsShef-rev

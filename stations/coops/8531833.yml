@@ -1,0 +1,21 @@
+name: RED BANK, NAVESINK RIVER
+lat: 40.355
+lon: -74.065
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.09
+  MHW: -2
+  DTL: -1.493
+  MTL: -1.465
+  MSL: -1.453
+  MLW: -0.93
+  MLLW: -0.895
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531833
+established: 1976-02-13T00:00:00Z
+removed: 1982-07-23T23:59:00Z

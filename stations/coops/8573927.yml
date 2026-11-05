@@ -1,0 +1,24 @@
+name: Chesapeake City
+lat: 39.52667
+lon: -75.81
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.944
+  MHW: -1.882
+  DTL: -1.452
+  MTL: -1.454
+  MSL: -1.435
+  MLW: -1.026
+  MLLW: -0.961
+  NAVD88: -1.448
+  LAT: -0.753
+  HAT: -2.105
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8573927
+established: 1972-11-15T00:00:00Z

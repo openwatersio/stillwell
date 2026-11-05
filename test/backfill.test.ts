@@ -111,6 +111,15 @@ describe("readYearFiles", () => {
     );
   });
 
+  it("reads the current epoch's directory, not epoch 1's", () => {
+    assert.equal(seriesDir("lake", "levels", "usgs", "x"), "lake/obs/usgs/x");
+    assert.equal(seriesDir("lake", "levels", "usgs", "x", 2), "lake/obs/usgs/x/2");
+    assert.equal(
+      seriesPath("lake", "levels", "usgs", "x", 2024, 2),
+      "lake/obs/usgs/x/2/2024.parquet",
+    );
+  });
+
   it("reads a station with no files as none", async () => {
     const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
     assert.equal((await readYearFiles(seriesDir(root, "levels", "usgs", "x"))).size, 0);

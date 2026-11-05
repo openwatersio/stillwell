@@ -1,0 +1,17 @@
+name: Saline Byu nr Clarence, LA
+lat: 31.768055555555556
+lon: -92.96944444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 22.665
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07353000/
+parameter_code: "00065"
+series_begin: 2023-11-16T13:45:00+00:00
+series_end: 2026-09-03T15:30:00+00:00
+time_series_id: bfe9fceac9274469b98b64fc79bc24c9

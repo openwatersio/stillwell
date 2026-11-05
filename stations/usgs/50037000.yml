@@ -1,0 +1,16 @@
+name: RIO GRANDE DE MANATI NR MANATI, PR
+lat: 18.399444
+lon: -66.496944
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 7.547
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50037000/
+parameter_code: "00065"
+series_begin: 2019-06-12T19:47:01+00:00
+time_series_id: f3d564bb50614756b13c3958b5d9fbe8

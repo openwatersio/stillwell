@@ -1,0 +1,16 @@
+name: Brazos Rv nr Aquilla, TX
+lat: 31.8123821956092
+lon: -97.2977882321638
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.426
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08093100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b1619d9cb3c747ebacc186261c29677b

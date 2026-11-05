@@ -1,0 +1,16 @@
+name: PROCTOR BROOK NR VETERANS MEM PARK, PEABODY, MA
+lat: 42.525514
+lon: -70.923325
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-011020635/
+parameter_code: "00065"
+series_begin: 2026-08-18T19:45:00+00:00
+time_series_id: 833e373971c44f799a126d8f1ebeb1cd

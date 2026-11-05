@@ -1,0 +1,13 @@
+name: Stör-Sperrwerk, Außenpegel
+lat: 53.82583
+lon: 9.40111
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -3.11
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970041]
+source_url: https://gezeiten.bsh.de/stoer-sperrwerk_aussenpegel

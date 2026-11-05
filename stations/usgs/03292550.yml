@@ -1,0 +1,16 @@
+name: S FK BEARGRASS CREEK AT E OAK ST AT LOUISVILLE, KY
+lat: 38.233683
+lon: -85.729622
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 131.155
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03292550/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:03+00:00
+time_series_id: 3841e4e8148b480aaed201fae869431d

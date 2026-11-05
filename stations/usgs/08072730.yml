@@ -1,0 +1,16 @@
+name: Bear Ck nr Barker, TX
+lat: 29.8307828070017
+lon: -95.6868912222427
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08072730/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 165854ee0fb84e2291e4a272acb64903

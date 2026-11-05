@@ -1,0 +1,16 @@
+name: WILBUR HOLLOW BK AT OLD PLAINFIELD PK NR CLAYVILLE
+lat: 41.7648219119249
+lon: -71.6356207172558
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 98.694
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115297/
+parameter_code: "00065"
+series_begin: 2009-02-26T05:00:00+00:00
+time_series_id: 0d3ded0a92ee45239c9a5100ab8d2f72

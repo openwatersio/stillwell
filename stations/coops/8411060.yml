@@ -1,0 +1,24 @@
+name: Cutler Farris Wharf
+lat: 44.6567
+lon: -67.21
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.105
+  MHW: -5.967
+  DTL: -3.886
+  MTL: -3.878
+  MSL: -3.859
+  MLW: -1.789
+  MLLW: -1.667
+  NAVD88: -3.96
+  LAT: -0.81
+  HAT: -7.017
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8411060
+established: 1963-09-25T00:00:00Z

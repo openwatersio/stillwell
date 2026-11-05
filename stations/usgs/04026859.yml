@@ -1,0 +1,17 @@
+name: POTATO RIVER AT UPSON, WI
+lat: 46.36666666666667
+lon: -90.41055555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 452.018
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04026859/
+parameter_code: "00065"
+series_begin: 2014-06-11T23:00:00+00:00
+series_end: 2014-10-01T05:45:00+00:00
+time_series_id: 33d161a1e4b64067b40029ca51b7ff5d

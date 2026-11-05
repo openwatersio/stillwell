@@ -1,0 +1,16 @@
+name: CHAFFEE CREEK AT I-39 NEAR COLOMA, WI
+lat: 43.98175
+lon: -89.4978055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 280.952
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04073240/
+parameter_code: "00065"
+series_begin: 2017-08-31T16:00:00+00:00
+time_series_id: 03db32d848944e19b97424884ffb48e2

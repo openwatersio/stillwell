@@ -1,0 +1,22 @@
+name: Fly Creek, Mobile Bay
+lat: 30.5428
+lon: -87.901
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.391
+  MHW: -5.376
+  DTL: -5.128
+  MTL: -5.119
+  MSL: -5.126
+  MLW: -4.862
+  MLLW: -4.864
+  LAT: -4.496
+  HAT: -5.659
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8733502
+removed: 2021-08-12T11:00:00Z

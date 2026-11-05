@@ -1,0 +1,17 @@
+name: UNDERWOOD CREEK AT W BLUE MOUND RD, ELM GROVE, WI
+lat: 43.0361111111111
+lon: -88.0669444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 212.665
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-040870860/
+parameter_code: "00065"
+series_begin: 2018-10-01T18:00:00+00:00
+series_end: 2022-12-13T18:30:00+00:00
+time_series_id: 7262581a9a054a43911e7520e623cc57

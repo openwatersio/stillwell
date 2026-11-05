@@ -1,0 +1,16 @@
+name: BATTLE RUN NEAR LAUREL MILLS, VA
+lat: 38.6556756437033
+lon: -78.0738869252972
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01662800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 65f328eb51b242d0aaba8f6756093680

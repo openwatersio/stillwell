@@ -1,0 +1,16 @@
+name: SHOAL CREEK AT IRON CITY, TN
+lat: 35.02415328955763
+lon: -87.57902185707103
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.827
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03588500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: fc7a3490f5264a998888225fe14ce8b0

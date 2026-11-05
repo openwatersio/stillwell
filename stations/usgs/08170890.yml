@@ -1,0 +1,16 @@
+name: Little Blanco Rv at FM 32 nr Fischer, TX
+lat: 30.020805555555555
+lon: -98.33055555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 350.389
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08170890/
+parameter_code: "00065"
+series_begin: 2016-01-14T18:00:00+00:00
+time_series_id: 72cf4fc60a5849ddbd7249548cd6352e

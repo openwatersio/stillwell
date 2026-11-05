@@ -1,0 +1,17 @@
+name: LB Honoulimaloo Str US diversion, Molokai, HI
+lat: 21.128026406396447
+lon: -156.75293282309104
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 222.504
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16417800/
+parameter_code: "00065"
+series_begin: 2018-11-06T21:16:45+00:00
+series_end: 2026-04-24T01:17:00+00:00
+time_series_id: 88fe0a4421924f1b9965ed40baf15ee1

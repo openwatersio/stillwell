@@ -1,0 +1,17 @@
+name: CURLEW CREEK AT EVANS ROAD NEAR DUNEDIN FL
+lat: 28.023353
+lon: -82.740656
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 16.039
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02309415/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2026-09-10T15:00:00+00:00
+time_series_id: 537da0998b3f4e2aa583b29702c88529

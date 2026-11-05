@@ -1,0 +1,24 @@
+name: Sheep Bay
+lat: 60.67189
+lon: -145.99217
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.619
+  MHW: -9.338
+  DTL: -7.765
+  MTL: -7.854
+  MSL: -7.893
+  MLW: -6.37
+  MLLW: -5.911
+  NAVD88: -6.19
+  LAT: -4.751
+  HAT: -10.729
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9454124
+established: 2024-05-01T00:00:00Z
+removed: 2024-10-21T00:00:00Z

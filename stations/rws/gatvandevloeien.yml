@@ -1,0 +1,11 @@
+name: Gat van de vloeien
+lat: 51.735798
+lon: 4.788049
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/gatvandevloeien/details

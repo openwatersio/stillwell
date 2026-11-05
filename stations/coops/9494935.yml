@@ -1,0 +1,23 @@
+name: Barrow Offshore
+lat: 71.36011
+lon: -156.72986
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -45.158
+  MHW: -45.122
+  DTL: -45.057
+  MTL: -45.048
+  MSL: -45.05
+  MLW: -44.974
+  MLLW: -44.956
+  LAT: -44.81
+  HAT: -45.352
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9494935
+established: 2008-08-13T00:00:00Z
+removed: 2010-08-20T23:59:00Z

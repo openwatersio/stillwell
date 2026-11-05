@@ -1,0 +1,16 @@
+name: DEEP RIVER NEAR UPHAM, ND
+lat: 48.584167
+lon: -100.862222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 435.029
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05123510/
+parameter_code: "00065"
+series_begin: 2008-03-26T05:00:00+00:00
+time_series_id: 10a91933043c45e38c371e8f3e37c5a4

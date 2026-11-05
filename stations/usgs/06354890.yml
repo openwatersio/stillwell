@@ -1,0 +1,17 @@
+name: NORTH FORK GRAND RIVER ABOVE BOWMAN-HALEY LAKE, ND
+lat: 45.95250000000001
+lon: -103.306389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 833.518
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06354890/
+parameter_code: "00065"
+series_begin: 2023-04-10T19:00:00+00:00
+series_end: 2025-11-25T04:00:00+00:00
+time_series_id: b5c1d8077e894af2b96bc5e0765a05e9

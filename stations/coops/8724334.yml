@@ -1,0 +1,22 @@
+name: TARPON CREEK, SUGARLOAF KEY
+lat: 24.63
+lon: -81.5167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.156
+  MHW: -1.128
+  DTL: -1.061
+  MTL: -1.059
+  MSL: -1.057
+  MLW: -0.99
+  MLLW: -0.966
+  NAVD88: -1.268
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724334
+established: 1974-03-05T00:00:00Z
+removed: 1974-05-21T23:59:00Z

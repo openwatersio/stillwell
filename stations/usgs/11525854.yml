@@ -1,0 +1,16 @@
+name: TRINITY R A DOUGLAS CITY CA
+lat: 40.64527777777778
+lon: -122.95666666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 485.638
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11525854/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3fb7340a880048d4b52a792feb1a671e

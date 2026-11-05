@@ -1,0 +1,16 @@
+name: SPARKS CREEK NEAR ROCIADA, NM
+lat: 35.86293333333334
+lon: -105.46033611111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2492.654
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07218655/
+parameter_code: "00065"
+series_begin: 2024-04-22T20:20:00+00:00
+time_series_id: c275f7a9da0445dd8c17087ff39485fb

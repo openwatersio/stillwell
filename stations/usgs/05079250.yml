@@ -1,0 +1,17 @@
+name: County Ditch 65 Near Maple Bay, MN (SW2)
+lat: 47.61194444444445
+lon: -96.27916666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 346.862
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05079250/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+series_end: 2015-08-08T04:45:00+00:00
+time_series_id: bdeab4d01afa43c1b495eb94ee6c2db5

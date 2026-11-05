@@ -1,0 +1,16 @@
+name: ALAPAHA RIVER NEAR JENNINGS FLA
+lat: 30.5982688799036
+lon: -83.0731950828149
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02317620/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f1793b38dfea4818a0dac25bf0f6c932

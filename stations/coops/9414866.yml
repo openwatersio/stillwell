@@ -1,0 +1,13 @@
+name: HOLT, WHISKEY SLOUGH
+lat: 37.935
+lon: -121.435
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414866
+established: 1977-05-20T00:00:00Z
+removed: 1978-09-20T23:59:00Z

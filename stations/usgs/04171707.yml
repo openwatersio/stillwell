@@ -1,0 +1,15 @@
+name: ORE LAKE OUTLET NEAR HAMBURG, MI
+lat: 42.4758333333333
+lon: -83.7972222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 260.278
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04171707/
+parameter_code: "00065"
+time_series_id: 3f22542781a948459d00a7c00f742b12

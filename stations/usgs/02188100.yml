@@ -1,0 +1,14 @@
+name: RUSSELL LAKE ABOVE CALHOUN FALLS, SC
+lat: 34.1011111111111
+lon: -82.6180555555555
+country_code: US
+kind: lake
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02188100/
+parameter_code: "63160"
+series_begin: 2023-01-02T00:00:00+00:00
+time_series_id: 091b999018cd470ea9b776e23cdd2095

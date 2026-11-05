@@ -1,0 +1,16 @@
+name: IRVING CREEK NEAR LENZ, OR
+lat: 42.95166666666667
+lon: -121.45905555555557
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1407.262
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11491450/
+parameter_code: "00065"
+series_begin: 2024-05-06T21:45:00+00:00
+time_series_id: 9dddfcc6507a4c14b3faf7c2bd9d84fe

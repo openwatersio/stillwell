@@ -1,0 +1,17 @@
+name: SACRAMENTO R DEEP WATER SHIP CHANNEL NR FREEPORT
+lat: 38.4768694444444
+lon: -121.583641666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.438
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11455095/
+parameter_code: "00065"
+series_begin: 2018-08-10T01:15:00+00:00
+series_end: 2025-10-01T07:45:00+00:00
+time_series_id: d9a81c1cd8d14770af39a6a0dc0a745f

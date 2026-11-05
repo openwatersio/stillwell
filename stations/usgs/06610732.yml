@@ -1,0 +1,17 @@
+name: Big Papillion Creek at Fort Street at Omaha, Nebr.
+lat: 41.30654444444444
+lon: -96.10386388888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 313.536
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06610732/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2026-10-21T16:15:00+00:00
+time_series_id: 18c56d37cc734c6f9d03481779e96e4f

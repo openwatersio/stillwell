@@ -1,0 +1,15 @@
+name: Rio Grande nr Brownsville, TX
+lat: 25.8767479302314
+lon: -97.45442596612
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08475000/
+parameter_code: "00065"
+time_series_id: 9d40524560194174ac6ef05f8aaa9033

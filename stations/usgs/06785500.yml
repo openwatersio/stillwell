@@ -1,0 +1,16 @@
+name: North Loup River at Brewster, Nebr.
+lat: 41.941739
+lon: -99.860103
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 752.576
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06785500/
+parameter_code: "00065"
+series_begin: 2010-04-29T05:00:00+00:00
+time_series_id: 4feb7feca4a74e1fa8dc90219c4590f5

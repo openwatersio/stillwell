@@ -1,0 +1,23 @@
+name: BLACK ROCK, WALRUS IS BRISTOL B
+lat: 58.7083
+lon: -160.188
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.916
+  MHW: -5.59
+  DTL: -4.383
+  MTL: -4.473
+  MSL: -4.48
+  MLW: -3.355
+  MLLW: -2.85
+  LAT: -1.745
+  HAT: -6.889
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9465182
+established: 1948-06-23T00:00:00Z
+removed: 1986-09-09T23:59:00Z

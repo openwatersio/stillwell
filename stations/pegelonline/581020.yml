@@ -1,0 +1,13 @@
+name: DIEMITZ OP
+lat: 53.207797
+lon: 12.860458
+country_code: DE
+datum: PNP
+datums:
+  NHN: 56.777
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=581020

@@ -1,0 +1,16 @@
+name: MOSQUITO CREEK NEAR OKEECHOBEE, FL
+lat: 27.2372685130976
+lon: -80.780614974659
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02275197/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2610727ff3bf414e81ed3fd45adb3503

@@ -1,0 +1,17 @@
+name: CROOKED CREEK NEAR HUMPHREY, ARK.
+lat: 34.4264855630772
+lon: -91.6679075925368
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 53.745
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07265000/
+parameter_code: "00065"
+series_begin: 2021-02-10T22:30:00+00:00
+series_end: 2026-05-07T16:45:00+00:00
+time_series_id: ec77c98312ab40679ecb2b1dc7e97a30

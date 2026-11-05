@@ -1,0 +1,13 @@
+name: PEDRICKTOWN, OLDMANS CREEK
+lat: 39.7617
+lon: -75.4033
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8538369
+established: 1977-04-26T00:00:00Z
+removed: 1982-07-09T23:59:00Z

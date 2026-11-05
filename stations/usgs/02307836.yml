@@ -1,0 +1,17 @@
+name: ROOSEVELT RESERVOIR AT OUTFALL NR PINELLAS PK FL
+lat: 27.8713888888889
+lon: -82.69
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NGVD29: -1.033
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02307836/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2016-09-21T03:45:00+00:00
+time_series_id: c6854d61127141049b44039d2eecb64f

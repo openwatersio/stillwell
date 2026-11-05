@@ -1,0 +1,14 @@
+name: ST. JOSEPH R. MAIN CHAN. AT BL-94 AT BENTON HARBOR
+lat: 42.1118638888889
+lon: -86.4706138888889
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04102085/
+parameter_code: "63160"
+series_begin: 2020-04-16T16:30:00+00:00
+time_series_id: 73b25967ebd34a46a242f00071bf7783

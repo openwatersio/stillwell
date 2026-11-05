@@ -1,0 +1,16 @@
+name: Devils Run Ck at US 77 nr Woodsboro, TX
+lat: 28.216933333333333
+lon: -97.35169444444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08189520/
+parameter_code: "00065"
+series_begin: 2022-08-15T02:05:00+00:00
+time_series_id: 98d24ae32e484201bd8bc79566228700

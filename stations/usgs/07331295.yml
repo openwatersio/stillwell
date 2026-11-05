@@ -1,0 +1,16 @@
+name: Pennington Creek East of Mill Creek, OK
+lat: 34.4203699803726
+lon: -96.7588959141865
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 310.887
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07331295/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c067e42efb10418abb5c7438fa06bcdc

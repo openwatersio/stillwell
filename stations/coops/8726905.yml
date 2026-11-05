@@ -1,0 +1,22 @@
+name: TARPON SPRINGS, ANCLOTE RIVER
+lat: 28.16
+lon: -82.7683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.062
+  MHW: -0.952
+  DTL: -0.612
+  MTL: -0.634
+  MSL: -0.646
+  MLW: -0.316
+  MLLW: -0.162
+  NAVD88: -0.699
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726905
+established: 1975-09-29T00:00:00Z
+removed: 1975-11-06T23:59:00Z

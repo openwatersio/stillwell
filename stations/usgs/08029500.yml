@@ -1,0 +1,16 @@
+name: Big Cow Ck nr Newton, TX
+lat: 30.81888888888889
+lon: -93.78555555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 40.794
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08029500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 208280a7a4e6433fa672218e9b953390

@@ -1,0 +1,13 @@
+name: KEESLER AFB, BACK BAY OF BILOXI
+lat: 30.4183
+lon: -88.925
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8744284
+established: 1979-07-28T00:00:00Z
+removed: 1979-11-07T00:00:00Z

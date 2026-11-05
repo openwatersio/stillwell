@@ -1,0 +1,16 @@
+name: STRONG RIVER AT D`LO, MS
+lat: 31.977777777777778
+lon: -89.89750000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 78.974
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02487500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2c492581678f47a796c4732829d433b8

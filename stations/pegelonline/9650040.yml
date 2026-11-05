@@ -1,0 +1,14 @@
+name: BARHÖFT
+lat: 54.434539
+lon: 13.032221
+country_code: DE
+kind: coastal
+datum: PNP
+datums:
+  NHN: -4.977
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=9650040

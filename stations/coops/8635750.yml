@@ -1,0 +1,24 @@
+name: Lewisetta
+lat: 37.9961
+lon: -76.4644
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.913
+  MHW: -1.87
+  DTL: -1.683
+  MTL: -1.68
+  MSL: -1.685
+  MLW: -1.49
+  MLLW: -1.454
+  NAVD88: -1.707
+  LAT: -1.307
+  HAT: -2.051
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8635750
+established: 1970-10-20T00:00:00Z

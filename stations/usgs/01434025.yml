@@ -1,0 +1,16 @@
+name: BISCUIT BK ABOVE PIGEON BK AT FROST VALLEY NY
+lat: 41.9960833333333
+lon: -74.5002222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 627.05
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01434025/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: fa0c535871db49b88fd5c9d3b35c8bc9

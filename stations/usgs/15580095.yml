@@ -1,0 +1,16 @@
+name: NIUKLUK R AB MELSING C AT COUNCIL AK
+lat: 64.89194444444445
+lon: -163.67
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 18.044
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15580095/
+parameter_code: "00065"
+series_begin: 2013-08-14T02:00:00+00:00
+time_series_id: a1e9f85f083d4ebf86bebe0361f7f774

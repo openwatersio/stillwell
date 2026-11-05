@@ -1,0 +1,16 @@
+name: Wolf Creek at Barber Road near Barberton OH
+lat: 41.0344444444444
+lon: -81.6088888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 289.996
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-410204081363200/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 840bce309f8f4784860455bd9e247f42

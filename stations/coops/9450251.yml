@@ -1,0 +1,23 @@
+name: Entrance to Windy Cove
+lat: 55.035446
+lon: -133.02377
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.336
+  MHW: -3.068
+  DTL: -1.35
+  MTL: -1.45
+  MSL: -1.45
+  MLW: 0.168
+  MLLW: 0.636
+  LAT: 1.804
+  HAT: -4.411
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450251
+established: 2016-05-05T00:00:00Z
+removed: 2016-06-17T00:00:00Z

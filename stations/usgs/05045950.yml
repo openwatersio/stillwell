@@ -1,0 +1,14 @@
+name: ORWELL LAKE AT ORWELL DAM NEAR FERGUS FALLS, MN
+lat: 46.21638888888889
+lon: -96.17805555555556
+country_code: US
+kind: lake
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05045950/
+parameter_code: "00065"
+series_begin: 2024-10-01T06:00:00+00:00
+time_series_id: 7e0ed58049fb480dbaf3132e831673e9

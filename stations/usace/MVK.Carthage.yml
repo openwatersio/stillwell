@@ -1,0 +1,13 @@
+name: Pearl River @ Carthage, MS
+lat: 32.7072222
+lon: -89.5263889
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 96.07
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Carthage.Stage.Inst.15Minutes.0.DCP-rev
+series: Carthage.Stage.Inst.15Minutes.0.DCP-rev

@@ -1,0 +1,16 @@
+name: PIEDRA RIVER NEAR ARBOLES, CO.
+lat: 37.08834204484558
+lon: -107.39784279705945
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1874.532
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09349800/
+parameter_code: "00065"
+series_begin: 2020-10-06T19:45:00+00:00
+time_series_id: 7e2dba74f55a45be968ab721bb949e46

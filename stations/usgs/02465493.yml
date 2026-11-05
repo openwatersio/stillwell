@@ -1,0 +1,16 @@
+name: ELLIOTTS CREEK AT MOUNDVILLE AL
+lat: 32.9973463632297
+lon: -87.6222295236986
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 45.086
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02465493/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 801a29f60e5f4845b77e0a7ec7b812f7

@@ -1,0 +1,17 @@
+name: CHILKAT R NR KLUKWAN AK
+lat: 59.415278
+lon: -135.929167
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15056500/
+parameter_code: "00065"
+series_begin: 2013-01-11T19:15:00+00:00
+series_end: 2026-04-12T19:30:00+00:00
+time_series_id: f1cfbb002ff344fc88f53c464dbd9daf

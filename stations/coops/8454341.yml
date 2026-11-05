@@ -1,0 +1,21 @@
+name: BOSTON NECK
+lat: 41.46
+lon: -71.4283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.139
+  MHW: -2.062
+  DTL: -1.576
+  MTL: -1.556
+  MSL: -1.514
+  MLW: -1.05
+  MLLW: -1.012
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8454341
+established: 1977-07-30T00:00:00Z
+removed: 1977-08-30T23:59:00Z

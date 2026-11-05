@@ -1,0 +1,15 @@
+name: HICKORY CREEK NEAR CAESAR, MS
+lat: 30.5815
+lon: -89.4851388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 24.994
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02481549/
+parameter_code: "00065"
+time_series_id: 9a5be85ba4224222b29e5ac19c21cbe7

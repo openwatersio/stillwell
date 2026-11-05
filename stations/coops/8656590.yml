@@ -1,0 +1,24 @@
+name: Atlantic Beach Triple S Pier
+lat: 34.6933
+lon: -76.7117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.869
+  MHW: -2.765
+  DTL: -2.237
+  MTL: -2.209
+  MSL: -2.215
+  MLW: -1.652
+  MLLW: -1.605
+  NAVD88: -2.362
+  LAT: -1.231
+  HAT: -3.281
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8656590
+established: 1972-12-21T00:00:00Z
+removed: 2000-10-17T23:59:00Z

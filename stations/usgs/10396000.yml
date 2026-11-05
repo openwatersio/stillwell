@@ -1,0 +1,16 @@
+name: DONNER UND BLITZEN RIVER NR FRENCHGLEN OR
+lat: 42.79083333333333
+lon: -118.86749999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1298.549
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10396000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 02b14d83b1934f07abae612d4d2a626f

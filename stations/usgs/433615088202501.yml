@@ -1,0 +1,15 @@
+name: SCF W BR MILWAUKEE RIVER WATERWAY 3 NR ASHFORD, WI
+lat: 43.6041944444444
+lon: -88.34025
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 315.468
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-433615088202501/
+parameter_code: "00065"
+time_series_id: 82dafa5492a54deca1bc357b7ccee38c

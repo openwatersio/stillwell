@@ -1,0 +1,16 @@
+name: ARROYO VALLE BL LANG CYN NR LIVERMORE CA
+lat: 37.5613219596063
+lon: -121.683838917005
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.323
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11176400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 07a0fd1cd6d745588726442645970244

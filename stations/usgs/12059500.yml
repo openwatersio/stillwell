@@ -1,0 +1,16 @@
+name: NORTH FORK SKOKOMISH RIVER NEAR POTLATCH, WA
+lat: 47.32978386759779
+lon: -123.24318607854143
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 20.644
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12059500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 9d0b2841f57947fb802aa81065030c5a

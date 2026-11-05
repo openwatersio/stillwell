@@ -1,0 +1,16 @@
+name: Longview Reservoir at Kansas City, MO
+lat: 38.9247292735545
+lon: -94.4599523030176
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0.07
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06893791/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 57687763374248ed9ae55c5adbe60d74

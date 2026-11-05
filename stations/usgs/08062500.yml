@@ -1,0 +1,16 @@
+name: Trinity Rv nr Rosser, TX
+lat: 32.4265298827489
+lon: -96.4630415213096
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 90.815
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08062500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 707f459924074b92ab050dc1b085b8af

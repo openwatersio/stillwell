@@ -1,0 +1,16 @@
+name: MACKAY CRK AT CC HAIGH LANDING NR HILTON HEAD, SC
+lat: 32.228500000000004
+lon: -80.78841666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02176702/
+parameter_code: "00065"
+series_begin: 2023-03-23T14:30:00+00:00
+time_series_id: 9ba0c80064af4d33b5e152f9a9c37048

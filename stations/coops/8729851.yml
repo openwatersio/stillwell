@@ -1,0 +1,22 @@
+name: CHEMSTRAND PIER
+lat: 30.5983
+lon: -87.2467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.635
+  MHW: -1.612
+  DTL: -1.413
+  MTL: -1.413
+  MSL: -1.413
+  MLW: -1.214
+  MLLW: -1.19
+  NAVD88: -1.272
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729851
+established: 1977-03-16T00:00:00Z
+removed: 1977-11-01T23:59:00Z

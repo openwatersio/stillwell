@@ -1,0 +1,16 @@
+name: ISLAND CREEK AT ROUTE 44 AT LOGAN, WV
+lat: 37.8449444444444
+lon: -82.0098888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 197.59
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03203647/
+parameter_code: "00065"
+series_begin: 2019-08-13T18:49:08+00:00
+time_series_id: 5e786dd915254f0faf59ad381e3f1fea

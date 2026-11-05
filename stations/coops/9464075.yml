@@ -1,0 +1,23 @@
+name: Meshik, Port Heiden
+lat: 56.9083
+lon: -158.6849
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -15.262
+  MHW: -14.908
+  DTL: -13.493
+  MTL: -13.669
+  MSL: -13.681
+  MLW: -12.43
+  MLLW: -11.723
+  LAT: -10.516
+  HAT: -16.19
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9464075
+established: 2013-09-10T00:00:00Z
+removed: 2013-10-13T00:00:00Z

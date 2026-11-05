@@ -1,0 +1,24 @@
+name: South Beach
+lat: 44.625446
+lon: -124.044945
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.935
+  MHW: -3.723
+  DTL: -2.663
+  MTL: -2.768
+  MSL: -2.75
+  MLW: -1.813
+  MLLW: -1.392
+  NAVD88: -1.626
+  LAT: -0.541
+  HAT: -4.631
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9435380
+established: 1967-01-28T00:00:00Z

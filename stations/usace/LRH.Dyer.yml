@@ -1,0 +1,13 @@
+name: Williams River at Dyer
+lat: 38.378998888889
+lon: -80.483973888889
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 203.82
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Dyer.Stage.Inst.15Minutes.0.OBS-USGS
+series: Dyer.Stage.Inst.15Minutes.0.OBS-USGS

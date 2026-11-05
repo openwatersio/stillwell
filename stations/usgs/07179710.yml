@@ -1,0 +1,16 @@
+name: NEOSHO R NR DUNLAP, KS
+lat: 38.5547326492867
+lon: -96.3713894109398
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 348.612
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07179710/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d7566096769b483eb2b4e45942ed7517

@@ -1,0 +1,16 @@
+name: MILL CREEK AT BUNKER HILL, WV
+lat: 39.334625
+lon: -78.0534361111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 162.312
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01616400/
+parameter_code: "00065"
+series_begin: 2011-10-14T13:00:00+00:00
+time_series_id: c3903d5d63cb4a48b4c8e0182cfc84f0

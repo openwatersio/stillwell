@@ -1,0 +1,16 @@
+name: SNAKE RIVER AT LORENZO ID
+lat: 43.73527777777778
+lon: -111.87805555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1476.722
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13038500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1cedc55ef3604ac9a17ef2a521cf0b0b

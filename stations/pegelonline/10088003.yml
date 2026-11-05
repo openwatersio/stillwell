@@ -1,0 +1,13 @@
+name: HOFKIRCHEN
+lat: 48.676675
+lon: 13.115154
+country_code: DE
+datum: PNP
+datums:
+  NHN: 299.575
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=10088003

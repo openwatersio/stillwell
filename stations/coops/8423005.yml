@@ -1,0 +1,24 @@
+name: ATLANTIC TERMINALS  T14A
+lat: 43.1167
+lon: -70.8117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.051
+  MHW: -5.936
+  DTL: -4.927
+  MTL: -4.909
+  MSL: -4.931
+  MLW: -3.883
+  MLLW: -3.803
+  NAVD88: -5.019
+  LAT: -3.396
+  HAT: -6.491
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8423005
+established: 1975-08-26T00:00:00Z
+removed: 2017-01-04T23:59:00Z

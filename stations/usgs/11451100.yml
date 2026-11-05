@@ -1,0 +1,16 @@
+name: NF CACHE C A HOUGH SPRING NR CLEARLAKE OAKS CA
+lat: 39.1654458258597
+lon: -122.619986173626
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 468.331
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11451100/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 46b2b2c9087e4da7be0b06c4ca55ee20

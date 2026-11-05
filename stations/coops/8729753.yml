@@ -1,0 +1,24 @@
+name: BLACKWATER RIVER
+lat: 30.6367
+lon: -87.0283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.529
+  MHW: -1.491
+  DTL: -1.277
+  MTL: -1.276
+  MSL: -1.277
+  MLW: -1.061
+  MLLW: -1.024
+  NAVD88: -1.168
+  LAT: -0.677
+  HAT: -1.766
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729753
+established: 1976-03-09T00:00:00Z
+removed: 1993-11-02T23:59:00Z

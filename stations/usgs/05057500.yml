@@ -1,0 +1,16 @@
+name: LAKE ASHTABULA AT BALDHILL DAM, ND
+lat: 47.036189
+lon: -98.081536
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 366.135
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05057500/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: 0369a83b694347859a4d7534d2eae8a0

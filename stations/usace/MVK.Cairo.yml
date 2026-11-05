@@ -1,0 +1,13 @@
+name: Ohio River @ Cairo, IL
+lat: 37.0000517
+lon: -89.1625713
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 82.57
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Cairo.Stage.Inst.1Hour.0.DCP-rev
+series: Cairo.Stage.Inst.1Hour.0.DCP-rev

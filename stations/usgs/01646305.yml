@@ -1,0 +1,16 @@
+name: DEAD RUN AT WHANN AVENUE NEAR MCLEAN, VA
+lat: 38.9597771566359
+lon: -77.1756742556365
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 54.004
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01646305/
+parameter_code: "00065"
+series_begin: 2008-01-09T21:30:00+00:00
+time_series_id: 3f718ed5950b41b5a0e3b5117ddb321a

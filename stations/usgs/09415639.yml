@@ -1,0 +1,17 @@
+name: ASH SPGS DIV AT ASH SPGS, NV
+lat: 37.4598217901698
+lon: -115.194102518885
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1097.28
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09415639/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2011-07-05T09:45:00+00:00
+time_series_id: 06d101a5390c48718a88c037441e189c

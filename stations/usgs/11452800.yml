@@ -1,0 +1,16 @@
+name: CACHE C OVERFLOW WEIR FROM SETTLING BAS NR WOOD'LD
+lat: 38.682658
+lon: -121.672983
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.229
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11452800/
+parameter_code: "00065"
+series_begin: 2008-01-24T17:30:00+00:00
+time_series_id: 1f96233279fa472f8ee5df5d83b260d1

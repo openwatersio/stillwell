@@ -1,0 +1,16 @@
+name: LV WASH BLW LAKE LAS VEGAS NR BOULDER CITY, NV
+lat: 36.1221981576396
+lon: -114.904992087494
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 380.832
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09419800/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: dd3b93f2e1994418a6c568bcf315b657

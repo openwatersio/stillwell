@@ -1,0 +1,16 @@
+name: Muddy Creek at Vaughn MT
+lat: 47.56126666666666
+lon: -111.54176944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1014.984
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06088500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 552d2496d4334d8e8756a73236558ca0

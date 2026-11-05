@@ -1,0 +1,16 @@
+name: HOMME RESERVOIR NEAR PARK RIVER, ND
+lat: 48.406111
+lon: -97.789444
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 305.126
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05088500/
+parameter_code: "00065"
+series_begin: 2022-10-01T06:00:00+00:00
+time_series_id: 927573b5610c47cfab2a11e14c10f036

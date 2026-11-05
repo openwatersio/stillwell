@@ -1,0 +1,16 @@
+name: Mullica River near Batsto NJ
+lat: 39.6744444444444
+lon: -74.665
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3.636
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01409400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8ddc5c4788f04b189fe9684d5b3a1ab0

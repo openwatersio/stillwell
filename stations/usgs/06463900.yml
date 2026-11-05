@@ -1,0 +1,16 @@
+name: ANTELOPE CR NEAR MISSION, SD
+lat: 43.273778
+lon: -100.684222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 788.161
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06463900/
+parameter_code: "00065"
+series_begin: 2018-05-08T18:00:00+00:00
+time_series_id: 2484f7fd713442bdaa13b233f0504152

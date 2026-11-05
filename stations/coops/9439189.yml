@@ -1,0 +1,23 @@
+name: Rocky Point
+lat: 45.6967
+lon: -122.868
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.571
+  MHW: -1.399
+  DTL: -1.066
+  MTL: -1.014
+  MSL: -0.994
+  MLW: -0.63
+  MLLW: -0.56
+  LAT: -0.406
+  HAT: -1.758
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9439189
+established: 1938-11-04T00:00:00Z
+removed: 2006-12-05T23:59:00Z

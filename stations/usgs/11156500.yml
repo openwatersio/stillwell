@@ -1,0 +1,16 @@
+name: SAN BENITO R NR WILLOW CREEK SCHOOL CA
+lat: 36.614128
+lon: -121.211361
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 275.786
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11156500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 45caa998c91e4c918e179a3a7a4e28ec

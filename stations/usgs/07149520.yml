@@ -1,0 +1,17 @@
+name: Salt Fork Arkansas River at SH 11 nr Cherokee, OK
+lat: 36.8055555555556
+lon: -98.2472222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 344.476
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07149520/
+parameter_code: "00065"
+series_begin: 2013-10-01T06:00:00+00:00
+series_end: 2024-01-03T16:00:00+00:00
+time_series_id: 09229dfa4c5644a3b99729de201ac183

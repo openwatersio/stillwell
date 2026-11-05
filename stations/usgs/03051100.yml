@@ -1,0 +1,16 @@
+name: MIDDLE FORK RIVER AT ADOLPH, WV
+lat: 38.7459407365687
+lon: -80.0456285804918
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 699.87
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03051100/
+parameter_code: "00065"
+series_begin: 2019-06-25T19:00:00+00:00
+time_series_id: b6bfbd3674c3431aa3cd1d85edf44fe4

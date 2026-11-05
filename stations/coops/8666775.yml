@@ -1,0 +1,21 @@
+name: LEADENWAH CREEK
+lat: 32.6367
+lon: -80.2017
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.854
+  MHW: -2.743
+  DTL: -1.853
+  MTL: -1.829
+  MSL: -1.942
+  MLW: -0.916
+  MLLW: -0.852
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666775
+established: 1977-02-22T00:00:00Z
+removed: 1978-11-08T23:59:00Z

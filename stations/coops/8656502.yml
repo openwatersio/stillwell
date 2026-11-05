@@ -1,0 +1,24 @@
+name: MOREHEAD CITY HARBOR, HARBOR CHANNEL
+lat: 34.72
+lon: -76.7108
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.867
+  MHW: -1.784
+  DTL: -1.335
+  MTL: -1.315
+  MSL: -1.326
+  MLW: -0.845
+  MLLW: -0.802
+  NAVD88: -1.444
+  LAT: -0.532
+  HAT: -2.229
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8656502
+established: 1996-04-16T00:00:00Z
+removed: 1996-09-03T23:00:00Z

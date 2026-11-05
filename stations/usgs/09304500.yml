@@ -1,0 +1,16 @@
+name: WHITE RIVER NEAR MEEKER, CO.
+lat: 40.033591666666666
+lon: -107.86241944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1921.837
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09304500/
+parameter_code: "00065"
+series_begin: 2020-08-28T21:00:00+00:00
+time_series_id: ccb63a52fe9b4efa95e255fafb59e152

@@ -1,0 +1,16 @@
+name: PEARL RIVER NR COLUMBIA, MS
+lat: 31.2377777777778
+lon: -89.8469444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 35.299
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02489000/
+parameter_code: "00065"
+series_begin: 2023-12-19T05:00:00+00:00
+time_series_id: 07ca1a558b234afca6fb5fc29f63e4e0

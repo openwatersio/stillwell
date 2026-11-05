@@ -1,0 +1,23 @@
+name: Bangor
+lat: 47.7483
+lon: -122.727
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.205
+  MHW: -3.934
+  DTL: -2.518
+  MTL: -2.821
+  MSL: -2.809
+  MLW: -1.708
+  MLLW: -0.831
+  LAT: 0.575
+  HAT: -4.762
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445133
+established: 1977-01-19T00:00:00Z
+removed: 2003-04-02T23:59:00Z

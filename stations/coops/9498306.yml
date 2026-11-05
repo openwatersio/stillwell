@@ -1,0 +1,22 @@
+name: POINT THOMSON, BEAUFORT SEA
+lat: 70.1691
+lon: -146.2494
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.277
+  MHW: -6.243
+  DTL: -6.166
+  MTL: -6.162
+  MSL: -6.166
+  MLW: -6.08
+  MLLW: -6.055
+  NAVD88: -5.179
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9498306
+established: 2025-06-24T00:00:00Z
+removed: 2025-10-03T00:00:00Z

@@ -1,0 +1,16 @@
+name: BIG SIOUX RIVER AT LAKE KAMPESKA NR WATERTOWN, SD
+lat: 44.948889
+lon: -97.160556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 518.41
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06479452/
+parameter_code: "00065"
+series_begin: 2017-09-24T04:15:00+00:00
+time_series_id: 996b3d875312463aa2db37194d6817d4

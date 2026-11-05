@@ -1,0 +1,15 @@
+name: Rio Grande at Ft Ringgold, Rio Grande City,TX
+lat: 26.3683991045282
+lon: -98.8058598821987
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 30.48
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08464700/
+parameter_code: "00065"
+time_series_id: 295697c9761645f4ab3234e5beaf6692

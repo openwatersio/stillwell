@@ -1,0 +1,17 @@
+name: SHOAL CREEK NEAR HEFLIN, AL
+lat: 33.72522777777778
+lon: -85.60119722222221
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 287.426
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02403170/
+parameter_code: "00065"
+series_begin: 2022-11-01T18:30:00+00:00
+series_end: 2024-07-30T17:45:00+00:00
+time_series_id: 59e94d8431b84fcdbef6b10d32fc27ae

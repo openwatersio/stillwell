@@ -1,0 +1,23 @@
+name: Lake Montauk
+lat: 41.0733
+lon: -71.935
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.001
+  MHW: -0.914
+  DTL: -0.626
+  MTL: -0.609
+  MSL: -0.608
+  MLW: -0.303
+  MLLW: -0.251
+  LAT: -0.132
+  HAT: -1.183
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8510448
+established: 1973-10-15T00:00:00Z
+removed: 1999-08-27T23:59:00Z

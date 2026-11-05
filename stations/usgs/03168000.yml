@@ -1,0 +1,16 @@
+name: NEW RIVER AT ALLISONIA, VA
+lat: 36.9376223536548
+lon: -80.7456256574902
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 563.319
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03168000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 15617fdcf8c343c9bcb3617c92f143b7

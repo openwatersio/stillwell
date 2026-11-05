@@ -1,0 +1,23 @@
+name: Cape Espenberg, Kotzebue Sound
+lat: 66.58569
+lon: -164.25084
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -46.883
+  MHW: -46.851
+  DTL: -46.732
+  MTL: -46.741
+  MSL: -46.74
+  MLW: -46.631
+  MLLW: -46.581
+  LAT: -46.497
+  HAT: -46.95
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490096
+established: 2015-06-23T00:00:00Z
+removed: 2015-12-01T00:00:00Z

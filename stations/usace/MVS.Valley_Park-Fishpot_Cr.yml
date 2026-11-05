@@ -1,0 +1,14 @@
+name: Valley Park
+lat: 38.55175
+lon: -90.5147222
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 128.632
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Valley%20Park-Fishpot%20Cr.Stage.Inst.5Minutes.0.Usgs-raw
+series: Valley Park-Fishpot Cr.Stage.Inst.5Minutes.0.Usgs-raw

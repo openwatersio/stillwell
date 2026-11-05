@@ -1,0 +1,16 @@
+name: ROCK RIVER AT NEWVILLE, WI
+lat: 42.830000000000005
+lon: -89.0213888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.781
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05427530/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: a4bc5827dbfc49acaf1cee8ead24fdae

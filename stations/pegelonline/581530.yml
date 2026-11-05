@@ -1,0 +1,13 @@
+name: BISCHOFSWERDER UP
+lat: 52.892222
+lon: 13.380958
+country_code: DE
+datum: PNP
+datums:
+  NHN: 37.811
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=581530

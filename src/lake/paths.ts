@@ -5,14 +5,20 @@ import type { Product } from "../schema.ts";
  *
  *   stations.parquet                                    one row per series
  *   sources.json                                        license and attribution per source
+ *   stations/<source>.parquet                           one source's list, with datum epochs
+ *   stations/bounds/<source>.parquet                    first and last, written by compaction
+ *   history/stations/<source>/<time>.parquet            the list as each refresh started
+ *   history/stations/<source>/<time>.json               what that refresh changed
  *   recent/<source>.parquet                             last 7 days, every live station
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
  *   predicted-extremes/<source>/<station>/<year>.parquet the source's predicted high and low waters
  *
- * `<station>` is the station's `source_id`, URL-encoded. Every file is in the
- * station's one datum, named in `stations.parquet`.
+ * `<station>` is the station's `source_id`, URL-encoded. Each datum epoch has
+ * files of its own: epoch 1 at the paths above, a later one with its number
+ * after `<station>`, as `obs/<source>/<station>/2/<year>.parquet`. Every file
+ * is in its epoch's one datum.
  */
 export const DATASET: Record<Product, string> = {
   levels: "obs",
@@ -21,24 +27,73 @@ export const DATASET: Record<Product, string> = {
   predicted_extremes: "predicted-extremes",
 };
 
+/** Every product a station can have files for. */
+export const PRODUCTS = Object.keys(DATASET) as Product[];
+
 export function seriesPath(
   root: string,
   product: Product,
   source: string,
   sourceId: string,
   year: number,
+  epoch = 1,
 ): string {
-  return `${seriesDir(root, product, source, sourceId)}/${year}.parquet`;
+  return `${seriesDir(root, product, source, sourceId, epoch)}/${year}.parquet`;
 }
 
-/** The directory that holds a station's yearly files of one product. */
+/** The directory that holds one epoch's yearly files: the station's own for epoch 1, its numbered subdirectory for a later one. */
 export function seriesDir(
+  root: string,
+  product: Product,
+  source: string,
+  sourceId: string,
+  epoch = 1,
+): string {
+  const dir = stationDir(root, product, source, sourceId);
+  return epoch === 1 ? dir : `${dir}/${epoch}`;
+}
+
+/** A station's directory for one product, which holds epoch 1's years and later epochs' directories. */
+export function stationDir(
   root: string,
   product: Product,
   source: string,
   sourceId: string,
 ): string {
   return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
+}
+
+/** A glob for the files in every station's later epochs' directories, for one source. */
+export function sourceEpochDirs(root: string, product: Product, source: string): string {
+  return `${root}/${DATASET[product]}/${source}/*/*/*.parquet`;
+}
+
+/** A glob for the files in a station's later epochs' directories. */
+export function epochDirs(
+  root: string,
+  product: Product,
+  source: string,
+  sourceId: string,
+): string {
+  return `${stationDir(root, product, source, sourceId)}/*/*.parquet`;
+}
+
+export function stationListPath(root: string, source: string): string {
+  return `${root}/stations/${source}.parquet`;
+}
+
+export function boundsPath(root: string, source: string): string {
+  return `${root}/stations/bounds/${source}.parquet`;
+}
+
+/** A refresh's snapshot of the list, and with `.json`, its report. */
+export function historyPath(
+  root: string,
+  source: string,
+  time: string,
+  ext: "parquet" | "json",
+): string {
+  return `${root}/history/stations/${source}/${time.replaceAll(":", "")}.${ext}`;
 }
 
 export function recentPath(root: string, source: string): string {

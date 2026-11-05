@@ -1,0 +1,17 @@
+name: GLRI EAST RIVER WATERWAY NUMBER 2 NR GREENLEAF, WI
+lat: 44.2628333333333
+lon: -88.13875
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 222.504
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-441546088082001/
+parameter_code: "00065"
+series_begin: 2019-10-01T06:00:00+00:00
+series_end: 2022-09-28T20:00:00+00:00
+time_series_id: 99ff32e190a04a858797e7fd0533c577

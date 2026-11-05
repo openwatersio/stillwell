@@ -1,0 +1,14 @@
+name: WAYNE LEE SPRING AT I-75 NR WILDWOOD, FL
+lat: 28.859056
+lon: -82.091806
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02312672/
+parameter_code: "00065"
+series_begin: 2024-08-30T12:30:00+00:00
+time_series_id: 84b6b99ff8744676955e099c2a622cf8

@@ -1,0 +1,23 @@
+name: Barbuda
+lat: 17.590834
+lon: -61.820557
+country_code: AG
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.757
+  MHW: -8.751
+  DTL: -8.645
+  MTL: -8.659
+  MSL: -8.665
+  MLW: -8.567
+  MLLW: -8.532
+  LAT: -8.364
+  HAT: -8.846
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9761115
+established: 2011-05-24T00:00:00Z
+removed: 2023-04-03T23:59:00Z

@@ -1,0 +1,16 @@
+name: ICHETUCKNEE R @ HWY27 NR HILDRETH, FL
+lat: 29.9527328804449
+lon: -82.7859572739247
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02322700/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4b1cec34e0a74a5f840b3e1e60f11362

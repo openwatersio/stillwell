@@ -1,0 +1,13 @@
+name: Claridon
+lat: 40.5827
+lon: -82.9888
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 293.132
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Claridon.Stage.Inst.15Minutes.0.OBS
+series: Claridon.Stage.Inst.15Minutes.0.OBS

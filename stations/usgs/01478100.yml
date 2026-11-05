@@ -1,0 +1,16 @@
+name: EB White Clay Creek Trib near London Grove, PA
+lat: 39.8583496716297
+lon: -75.78324253908895
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 96.804
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01478100/
+parameter_code: "00065"
+series_begin: 2020-01-15T19:15:00+00:00
+time_series_id: 7f4f58638f3146f9bc1fd27e7ae4572d

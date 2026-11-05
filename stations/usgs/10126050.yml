@@ -1,0 +1,16 @@
+name: BEAR RIVER BELOW O-LINE CANAL NR BRIGHAM CITY, UT
+lat: 41.470172
+lon: -112.220383
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1281.163
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10126050/
+parameter_code: "00065"
+series_begin: 2025-06-13T18:45:00+00:00
+time_series_id: 86cfad76ee14485ab37d77de4985cc5d

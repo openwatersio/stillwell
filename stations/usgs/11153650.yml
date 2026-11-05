@@ -1,0 +1,16 @@
+name: LLAGAS C NR GILROY
+lat: 36.98741307587692
+lon: -121.52712158157685
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 44.525
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11153650/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a5aa226b7e4e4425ada6a53865407698

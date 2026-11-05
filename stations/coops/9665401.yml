@@ -1,0 +1,13 @@
+name: Puerto Cabezas
+lat: 14.0422
+lon: -83.3819
+country_code: NI
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9665401
+established: 1949-02-01T00:00:00Z
+removed: 2002-09-12T23:59:00Z

@@ -1,0 +1,16 @@
+name: HUMBOLDT RV AT PALISADE, NV
+lat: 40.6074174679243
+lon: -116.201744442889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1471.94
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10322500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3f3de68ab48c432c895224dc636e7bdb

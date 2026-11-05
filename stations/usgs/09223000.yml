@@ -1,0 +1,16 @@
+name: HAMS FORK BELOW POLE CREEK, NEAR FRONTIER, WY
+lat: 42.1108888888889
+lon: -110.709416666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2272.284
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09223000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: aec87e2ad8ca466a82040224ac56347e

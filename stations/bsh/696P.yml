@@ -1,0 +1,12 @@
+name: Wischhafen, Elbe, Sperrwerk
+lat: 53.785
+lon: 9.34111
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -3.1
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/wischhafen_sperrwerk

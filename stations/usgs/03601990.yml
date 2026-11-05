@@ -1,0 +1,16 @@
+name: DUCK RIVER AT HWY 100 AT CENTERVILLE, TN
+lat: 35.7842341172683
+lon: -87.4600141903055
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 136.489
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03601990/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ea96aea4f39c423fbe9b98eec4cd74a6

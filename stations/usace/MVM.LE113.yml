@@ -1,0 +1,13 @@
+name: Loosahatchie River @ Somerville
+lat: 35.259167
+lon: -89.353611
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 96.792
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=LE113.Stage.Inst.1Hour.0.opendcs-rev
+series: LE113.Stage.Inst.1Hour.0.opendcs-rev

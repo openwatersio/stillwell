@@ -1,0 +1,17 @@
+name: Nezinscot River at Turner Center, Maine
+lat: 44.269444
+lon: -70.229722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 83.844
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01055500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-10-01T04:45:00+00:00
+time_series_id: e83a466b33fc420ba8316d25d25c7fc7

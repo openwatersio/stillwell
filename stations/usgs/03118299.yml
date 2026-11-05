@@ -1,0 +1,17 @@
+name: W Br Nimishillen Crk at Tuscarawas St at Canton OH
+lat: 40.8008333333333
+lon: -81.3908333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 307.836
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03118299/
+parameter_code: "00065"
+series_begin: 2017-08-28T11:30:00+00:00
+series_end: 2020-10-07T15:30:00+00:00
+time_series_id: 47448df2b3fe4dcba6518ee2e568bfe3

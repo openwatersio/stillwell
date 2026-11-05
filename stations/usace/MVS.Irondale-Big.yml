@@ -1,0 +1,14 @@
+name: Irondale
+lat: 37.830011
+lon: -90.6909
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 229.588
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Irondale-Big.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Irondale-Big.Stage.Inst.15Minutes.0.lrgsShef-rev

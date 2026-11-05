@@ -1,0 +1,15 @@
+name: SOUTH GARRISON BRANCH NEAR HOLTS CHAPEL, TN
+lat: 35.8538888888889
+lon: -87.0675
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03432522/
+parameter_code: "00065"
+series_begin: 2008-09-23T19:15:00+00:00
+series_end: 2012-12-18T17:45:00+00:00
+time_series_id: 000f48a5f8ea4663b3f0f0bf48e7a3e5

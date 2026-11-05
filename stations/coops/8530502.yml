@@ -1,0 +1,21 @@
+name: BERRYS CREEK, NO. 7
+lat: 40.8167
+lon: -74.0867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.673
+  MHW: -2.581
+  DTL: -1.768
+  MTL: -1.754
+  MSL: -1.833
+  MLW: -0.927
+  MLLW: -0.863
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530502
+established: 1973-06-01T00:00:00Z
+removed: 1975-01-28T23:59:00Z

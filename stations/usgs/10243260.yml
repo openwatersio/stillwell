@@ -1,0 +1,16 @@
+name: LEHMAN CK NR BAKER, NV
+lat: 39.0116129152109
+lon: -114.214439170085
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2038.493
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10243260/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: de0435f7f2764ae7bcc04e669efd8326

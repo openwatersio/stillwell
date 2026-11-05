@@ -1,0 +1,22 @@
+name: OHIO-BAHIA HONDA CHANNEL
+lat: 24.67
+lon: -81.2517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.595
+  MHW: -1.524
+  DTL: -1.373
+  MTL: -1.36
+  MSL: -1.361
+  MLW: -1.196
+  MLLW: -1.151
+  NAVD88: -1.664
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724112
+established: 1975-01-21T00:00:00Z
+removed: 1975-03-10T23:59:00Z

@@ -1,0 +1,16 @@
+name: TEN MILE RIVER AT ATTLEBORO, MA
+lat: 41.943989
+lon: -71.285331
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 34.747
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01109380/
+parameter_code: "00065"
+series_begin: 2026-09-09T17:15:00+00:00
+time_series_id: 9b66f85fefa4416b9f9f3125ae2674a3

@@ -1,0 +1,16 @@
+name: FOUR MILE CREEK NEAR PINEVILLE, NC
+lat: 35.0769444444445
+lon: -80.8225
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 161.145
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02146670/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f8fd7da5c3284dc9ad95885ccd3c34b5

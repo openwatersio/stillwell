@@ -1,0 +1,15 @@
+name: Maumee River at Boers-Boyer Way at Toledo OH
+lat: 41.6469444444444
+lon: -83.5305555555556
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-413849083315000/
+parameter_code: "63160"
+series_begin: 2013-04-24T22:00:00+00:00
+series_end: 2013-10-22T19:17:05+00:00
+time_series_id: bd2500f5257d4663bd0ee52ed6d58e2f

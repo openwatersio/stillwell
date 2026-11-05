@@ -1,0 +1,16 @@
+name: JONES CREEK AT ACME, WA
+lat: 48.71840725343668
+lon: -122.21429940721676
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 99.758
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12210220/
+parameter_code: "00065"
+series_begin: 2022-10-25T05:15:00+00:00
+time_series_id: 6d5777d2503d47b38eab693fb3a82c36

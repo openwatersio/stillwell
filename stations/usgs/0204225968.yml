@@ -1,0 +1,16 @@
+name: WYNDHAM LAKE AT DAM AT WYNDHAM VA
+lat: 37.698056
+lon: -77.606833
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 71.628
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0204225968/
+parameter_code: "00065"
+series_begin: 2022-02-02T16:40:00+00:00
+time_series_id: 8d701bb969524055af390db3d851df3b

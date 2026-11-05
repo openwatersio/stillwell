@@ -1,0 +1,16 @@
+name: SCHAFER CREEK NEAR LACOMB, OR
+lat: 44.6195672805625
+lon: -122.465916174627
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 883.92
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14188610/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 6e6412e8de7b4bbd9f7dd18f8e719d17

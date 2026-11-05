@@ -1,0 +1,16 @@
+name: COTTONWOOD CREEK AT WOODMEN RD NR COLO SPRINGS, CO
+lat: 38.939444
+lon: -104.740556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2035.342
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103980/
+parameter_code: "00065"
+series_begin: 2020-10-06T16:05:00+00:00
+time_series_id: 9389f5275be14ff99c28dea886002562

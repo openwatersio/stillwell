@@ -1,0 +1,14 @@
+name: Sam A Baker Park
+lat: 37.260253
+lon: -90.505983
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 123.849
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Sam%20A%20Baker%20Park-Big%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Sam A Baker Park-Big Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

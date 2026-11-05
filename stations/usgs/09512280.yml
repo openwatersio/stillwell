@@ -1,0 +1,16 @@
+name: CAVE CREEK BLW COTTONWOOD CR NEAR CAVE CREEK, AZ.
+lat: 33.88704166666667
+lon: -111.95419444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 688.818
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09512280/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 6ef775056a3e49fcb1b5a69ca31e2713

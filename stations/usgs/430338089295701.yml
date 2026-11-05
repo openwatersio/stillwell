@@ -1,0 +1,16 @@
+name: DETENTION POND OUTLET AT MEMORIAL HS @ MADISON, WI
+lat: 43.0605277777778
+lon: -89.49925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 312.725
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-430338089295701/
+parameter_code: "00065"
+series_begin: 2023-01-03T17:13:00+00:00
+time_series_id: 592a25775d074268a0ee9b6571c09ea6

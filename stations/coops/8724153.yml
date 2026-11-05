@@ -1,0 +1,21 @@
+name: JOHNSON KEYS SOUTH
+lat: 24.7433
+lon: -81.3
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.324
+  MHW: -1.256
+  DTL: -1.125
+  MTL: -1.126
+  MSL: -1.131
+  MLW: -0.996
+  MLLW: -0.926
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724153
+established: 1974-07-24T00:00:00Z
+removed: 1974-09-11T23:59:00Z

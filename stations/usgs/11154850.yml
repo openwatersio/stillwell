@@ -1,0 +1,16 @@
+name: SAN CARLOS C BL NEW IDRIA MINE DRAIN A IDRIA CA
+lat: 36.415708
+lon: -120.671367
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 779.983
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11154850/
+parameter_code: "00065"
+series_begin: 2026-08-27T22:00:00+00:00
+time_series_id: 96c80702e1f5468ebb6b68b17c3d15b3

@@ -1,0 +1,16 @@
+name: Buffalo Cove at Round Island near Charenton, LA
+lat: 29.9835356238315
+lon: -91.5251136411625
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381567/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 82c21ed1937a471d8370070e16032caf

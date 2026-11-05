@@ -1,0 +1,16 @@
+name: RIO PENASCO NEAR DUNKEN, NM
+lat: 32.8815277777778
+lon: -105.178055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1596.094
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08397600/
+parameter_code: "00065"
+series_begin: 2007-10-01T19:45:00+00:00
+time_series_id: b05d843db97e4b1989c6ef815fd30428

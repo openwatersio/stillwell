@@ -1,0 +1,16 @@
+name: Lycoming Creek near Trout Run, PA
+lat: 41.418058820116904
+lon: -77.0329971470846
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 211.306
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01550000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 5a76bb1b890c4af89b3cb13c1a87d821

@@ -1,0 +1,23 @@
+name: LOST RIVER, SEWARD PENINSULA
+lat: 65.39
+lon: -167.145
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.795
+  MHW: -1.753
+  DTL: -1.628
+  MTL: -1.622
+  MSL: -1.62
+  MLW: -1.49
+  MLLW: -1.462
+  LAT: -1.354
+  HAT: -1.828
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469338
+established: 1973-06-29T00:00:00Z
+removed: 2005-08-31T23:59:00Z

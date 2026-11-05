@@ -1,0 +1,13 @@
+name: Clear Fork
+lat: 37.6231
+lon: -81.7075
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 345.247
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=ClearFk.Stage.Inst.15Minutes.0.OBS
+series: ClearFk.Stage.Inst.15Minutes.0.OBS

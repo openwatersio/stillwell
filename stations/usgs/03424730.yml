@@ -1,0 +1,16 @@
+name: SMITH FORK AT TEMPERANCE HALL, TN
+lat: 36.08734569587428
+lon: -85.9074257025393
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 151.928
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03424730/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 79c32b64ab4648f197bb7f51f20ff318

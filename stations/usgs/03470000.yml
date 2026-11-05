@@ -1,0 +1,16 @@
+name: LITTLE PIGEON RIVER AT SEVIERVILLE, TN
+lat: 35.878469
+lon: -83.577539
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 267.892
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03470000/
+parameter_code: "00065"
+series_begin: 2012-03-30T12:45:00+00:00
+time_series_id: 5123cb64e7424588bd845353fb2c12d0

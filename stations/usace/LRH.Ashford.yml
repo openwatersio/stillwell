@@ -1,0 +1,13 @@
+name: Ashford
+lat: 38.1797222
+lon: -81.7116667
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 189.509
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Ashford.Stage.Inst.15Minutes.0.OBS
+series: Ashford.Stage.Inst.15Minutes.0.OBS

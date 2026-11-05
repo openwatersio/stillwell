@@ -1,0 +1,16 @@
+name: Wilkinson Bayou cutoff north of Wilkinson Bay, LA
+lat: 29.4941388888889
+lon: -89.9123055555556
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -1.222
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-292939089544400/
+parameter_code: "00065"
+series_begin: 2021-10-12T19:15:00+00:00
+time_series_id: 8338ef00b1964e6893a3b06ee0952e67

@@ -1,0 +1,16 @@
+name: WOODALL CREEK AT DEFOORS FERRY RD, AT ATLANTA, GA
+lat: 33.8216388888889
+lon: -84.4386388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 230.493
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02336313/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e121c65cded54162b7533716b057b5b7

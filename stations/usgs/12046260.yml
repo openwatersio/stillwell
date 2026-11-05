@@ -1,0 +1,13 @@
+name: ELWHA RIVER AT DIVERSION NEAR PORT ANGELES, WA
+lat: 48.1120338317055
+lon: -123.552134174732
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12046260/
+parameter_code: "00065"
+time_series_id: b3c9c24b46d541b8b6037f3c7081c94a

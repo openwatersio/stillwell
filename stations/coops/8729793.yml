@@ -1,0 +1,22 @@
+name: MULLATTO BAYOU
+lat: 30.545
+lon: -87.1033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.241
+  MHW: -1.232
+  DTL: -1.016
+  MTL: -1.024
+  MSL: -1.016
+  MLW: -0.816
+  MLLW: -0.79
+  NAVD88: -0.918
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729793
+established: 1977-03-14T00:00:00Z
+removed: 1977-08-02T23:59:00Z

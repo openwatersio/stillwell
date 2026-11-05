@@ -1,0 +1,12 @@
+name: Blind Tensas Cut nr Little Tensas Bayou (03315)
+lat: 30.2079722
+lon: -91.5336667
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Blind_Tensus_Cut.Stage.Inst.1Hour.0.rev
+series: Blind_Tensus_Cut.Stage.Inst.1Hour.0.rev

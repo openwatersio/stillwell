@@ -1,0 +1,11 @@
+name: Rosmalen Hinthamsluis boven
+lat: 51.697111
+lon: 5.359194
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/rosmalen.hinthamsluis.boven/details

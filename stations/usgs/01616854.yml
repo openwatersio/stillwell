@@ -1,0 +1,17 @@
+name: TUSCARORA CK AT HAMMOND FARM NR MARTINSBURG, WV
+lat: 39.45638888888889
+lon: -78.04127777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 179.741
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01616854/
+parameter_code: "00065"
+series_begin: 2021-05-13T19:35:00+00:00
+series_end: 2021-11-03T14:55:00+00:00
+time_series_id: d897c29cdae9478799f25955434a056e

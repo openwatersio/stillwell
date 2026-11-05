@@ -1,0 +1,16 @@
+name: PACK CREEK AT PACK CREEK ROAD BRIDGE NEAR MOAB, UT
+lat: 38.445528
+lon: -109.383667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1737.317
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09184600/
+parameter_code: "00065"
+series_begin: 2022-06-16T18:55:00+00:00
+time_series_id: b3e1ca0742094377a0ee20ab745c2ad8

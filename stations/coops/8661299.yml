@@ -1,0 +1,22 @@
+name: LOWER TOPSAW LANDING, PEE DEE RIVER
+lat: 33.6083
+lon: -79.1517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.882
+  MHW: -2.86
+  DTL: -2.709
+  MTL: -2.714
+  MSL: -2.743
+  MLW: -2.568
+  MLLW: -2.537
+  NAVD88: -2.014
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661299
+established: 1981-12-18T00:00:00Z
+removed: 1982-09-02T23:59:00Z

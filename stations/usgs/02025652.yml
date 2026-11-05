@@ -1,0 +1,16 @@
+name: HARRIS CREEK BELOW ROUTE 130 NEAR MONROE, VA
+lat: 37.4852777777778
+lon: -79.1666666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.544
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02025652/
+parameter_code: "00065"
+series_begin: 2012-02-08T20:45:00+00:00
+time_series_id: 576d78670bdb439ab753fc7410367efd

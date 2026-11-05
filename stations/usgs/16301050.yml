@@ -1,0 +1,16 @@
+name: Punaluu Str abv Punaluu Ditch Intake, Oahu, HI
+lat: 21.556384811457686
+lon: -157.8988942014788
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 64.618
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16301050/
+parameter_code: "00065"
+series_begin: 2009-09-15T10:00:00+00:00
+time_series_id: a0748996d9b340c18bf9e14183eace13

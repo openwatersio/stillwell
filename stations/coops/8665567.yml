@@ -1,0 +1,22 @@
+name: BEN SAWYER BRIDGE, IWW
+lat: 32.7733
+lon: -79.8417
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.97
+  MHW: -2.856
+  DTL: -2.115
+  MTL: -2.086
+  MSL: -2.113
+  MLW: -1.317
+  MLLW: -1.26
+  NAVD88: -2.223
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665567
+established: 1976-03-17T00:00:00Z
+removed: 1977-02-08T23:59:00Z

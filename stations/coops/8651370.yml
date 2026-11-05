@@ -1,0 +1,24 @@
+name: Duck
+lat: 36.1833
+lon: -75.7467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.787
+  MHW: -6.69
+  DTL: -6.225
+  MTL: -6.198
+  MSL: -6.202
+  MLW: -5.707
+  MLLW: -5.663
+  NAVD88: -6.33
+  LAT: -5.341
+  HAT: -7.184
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8651370
+established: 1977-12-01T00:00:00Z

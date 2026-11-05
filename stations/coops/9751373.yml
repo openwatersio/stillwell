@@ -1,0 +1,23 @@
+name: ST JOHN'S ISLAND, CORAL HARBOR
+lat: 18.3483
+lon: -64.7167
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.138
+  MHW: -1.109
+  DTL: -1.001
+  MTL: -1
+  MSL: -0.995
+  MLW: -0.89
+  MLLW: -0.865
+  LAT: -0.718
+  HAT: -1.281
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751373
+established: 1983-02-21T00:00:00Z
+removed: 1983-06-04T23:59:00Z

@@ -1,0 +1,15 @@
+name: WALLA WALLA RIVER AT MILTON-FREEWATER, OR
+lat: 45.92161111111111
+lon: -118.37452777777777
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14012000/
+parameter_code: "00065"
+series_begin: 2021-02-23T18:00:00+00:00
+series_end: 2022-10-21T17:30:00+00:00
+time_series_id: 7cf5cc04e6a34f7883ac722051ae65a9

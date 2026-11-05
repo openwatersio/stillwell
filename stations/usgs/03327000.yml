@@ -1,0 +1,16 @@
+name: MISSISSINEWA RIVER AT PEORIA, IN
+lat: 40.72335791180677
+lon: -85.95746094796425
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 201.028
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03327000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 033fe064cb9d48c8b5c4eead5139d152

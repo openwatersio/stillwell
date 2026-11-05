@@ -1,0 +1,16 @@
+name: D-24-20 11DBD [Clark-Smith Spring Box]
+lat: 31.356111
+lon: -110.278917
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1844.65
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-312123110164301/
+parameter_code: "00065"
+series_begin: 2026-04-08T17:30:00+00:00
+time_series_id: 2a97bd6c326a454da82fcca24100172a

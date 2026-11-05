@@ -1,0 +1,16 @@
+name: PEE DEE RIVER AT GEORGETOWN, SC
+lat: 33.3693339595624
+lon: -79.2636616723701
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -3.53
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02136350/
+parameter_code: "00065"
+series_begin: 2017-07-20T19:00:00+00:00
+time_series_id: c2ec3b31ceb84affacfaf094b32b8dcb

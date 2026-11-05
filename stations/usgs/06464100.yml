@@ -1,0 +1,16 @@
+name: KEYA PAHA RIVER NEAR KEYAPAHA, SD
+lat: 43.129167
+lon: -100.106667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 674.212
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06464100/
+parameter_code: "00065"
+series_begin: 2017-04-06T18:15:00+00:00
+time_series_id: 6919ddd50b854bc8ba25ba80a920e434

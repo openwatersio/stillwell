@@ -1,0 +1,16 @@
+name: MILL CREEK NEAR MOUTH AT ORILLIA, WA
+lat: 47.43009988229
+lon: -122.243177181298
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12113349/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: e31f1c2cf2eb4260a72c9c72610e85c9

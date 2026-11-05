@@ -1,0 +1,14 @@
+name: CREW BIRD ROOKERY SWAMP NE NR ORANGETREE, FL
+lat: 26.353219444444445
+lon: -81.61903055555555
+country_code: US
+kind: lake
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-262112081370901/
+parameter_code: "63160"
+series_begin: 2022-08-19T15:30:00+00:00
+time_series_id: df87743bb02145a78d86a8e9abcf67f7

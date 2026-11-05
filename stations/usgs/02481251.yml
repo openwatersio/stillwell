@@ -1,0 +1,17 @@
+name: TURKEY CREEK AT AIRPORT ROAD AT GULFPORT, MS
+lat: 30.4184361111111
+lon: -89.0825027777778
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02481251/
+parameter_code: "00065"
+series_begin: 2019-04-18T16:45:00+00:00
+series_end: 2024-08-08T17:15:00+00:00
+time_series_id: 02f7c916fb8d426c9f50d0bf20459cbc

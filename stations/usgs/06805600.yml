@@ -1,0 +1,17 @@
+name: Missouri River at Plattsmouth, NE
+lat: 41.0011104013713
+lon: -95.8666751132201
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 282.989
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06805600/
+parameter_code: "00065"
+series_begin: 2019-10-01T06:00:00+00:00
+series_end: 2021-10-01T05:45:00+00:00
+time_series_id: 067971a3a443410f9bd73b6905bc4b09

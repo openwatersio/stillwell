@@ -1,0 +1,22 @@
+name: LOWER TOOGOODOO CREEK
+lat: 32.7033
+lon: -80.2783
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.11
+  MHW: -3.002
+  DTL: -1.994
+  MTL: -1.977
+  MSL: -2.174
+  MLW: -0.952
+  MLLW: -0.878
+  NAVD88: -2.168
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666131
+established: 1977-09-23T00:00:00Z
+removed: 1978-07-18T23:59:00Z

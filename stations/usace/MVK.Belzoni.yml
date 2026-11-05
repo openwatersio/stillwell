@@ -1,0 +1,13 @@
+name: Big Sunflower River @ Belzoni
+lat: 33.164377
+lon: -90.494692
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 23.171
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Belzoni.Stage.Inst.1Hour.0.DCP-rev
+series: Belzoni.Stage.Inst.1Hour.0.DCP-rev

@@ -1,0 +1,24 @@
+name: Wrightsville Beach
+lat: 34.213306
+lon: -77.7867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.105
+  MHW: -7
+  DTL: -6.421
+  MTL: -6.393
+  MSL: -6.396
+  MLW: -5.786
+  MLLW: -5.738
+  NAVD88: -6.579
+  LAT: -5.324
+  HAT: -7.57
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8658163
+established: 2004-04-27T00:00:00Z

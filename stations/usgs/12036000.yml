@@ -1,0 +1,16 @@
+name: WYNOOCHEE RIVER ABOVE SAVE CREEK NEAR ABERDEEN, WA
+lat: 47.2989784400872
+lon: -123.653223493674
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.093
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12036000/
+parameter_code: "00065"
+series_begin: 2007-10-03T07:00:00+00:00
+time_series_id: 39879594bde845e88d3e5abf54b6312c

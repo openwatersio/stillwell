@@ -1,0 +1,16 @@
+name: ROCKY RIVER NEAR NORWOOD, NC
+lat: 35.1569972222222
+lon: -80.1657722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 61.576
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02126000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1fd2bdd8dfd243abbdbbe7b6ab089fae

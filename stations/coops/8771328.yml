@@ -1,0 +1,23 @@
+name: Port Bolivar
+lat: 29.365
+lon: -94.78
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.651
+  MHW: -1.627
+  DTL: -1.438
+  MTL: -1.455
+  MSL: -1.483
+  MLW: -1.284
+  MLLW: -1.225
+  LAT: -0.782
+  HAT: -1.942
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771328
+established: 1994-06-01T00:00:00Z
+removed: 2001-05-29T23:59:00Z

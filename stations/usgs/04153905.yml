@@ -1,0 +1,16 @@
+name: N BR CHIPPEWA RIVER MERIDIAN RD NR MT PLEASANT MI
+lat: 43.5926805555556
+lon: -84.847925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.452
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04153905/
+parameter_code: "00065"
+series_begin: 2021-09-23T17:15:00+00:00
+time_series_id: 2d9c5f61df4a4affa652ed916383119c

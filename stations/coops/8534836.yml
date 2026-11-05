@@ -1,0 +1,23 @@
+name: LONGPORT, RISELY CHANNEL
+lat: 39.3083
+lon: -74.5333
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.945
+  MHW: -1.822
+  DTL: -1.285
+  MTL: -1.246
+  MSL: -1.244
+  MLW: -0.67
+  MLLW: -0.625
+  LAT: -0.338
+  HAT: -2.262
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534836
+established: 1977-05-26T00:00:00Z
+removed: 1978-07-18T23:59:00Z

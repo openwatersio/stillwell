@@ -1,0 +1,14 @@
+name: Union
+lat: 38.444122
+lon: -90.995753
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 148.934
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Union-Bourbeuse.Stage.Inst.30Minutes.0.lrgsShef-rev
+series: Union-Bourbeuse.Stage.Inst.30Minutes.0.lrgsShef-rev

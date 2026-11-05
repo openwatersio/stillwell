@@ -1,0 +1,24 @@
+name: Shell Mound
+lat: 29.2064
+lon: -83.0697
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.634
+  MHW: -6.541
+  DTL: -6.071
+  MTL: -6.122
+  MSL: -6.125
+  MLW: -5.703
+  MLLW: -5.508
+  NAVD88: -6.221
+  LAT: -4.957
+  HAT: -7.015
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727535
+established: 2022-02-15T00:00:00Z
+removed: 2022-06-19T13:00:00Z

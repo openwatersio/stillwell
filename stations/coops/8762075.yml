@@ -1,0 +1,23 @@
+name: Port Fourchon, Belle Pass
+lat: 29.1142
+lon: -90.1993
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.486
+  MHW: -9.482
+  DTL: -9.302
+  MTL: -9.303
+  MSL: -9.31
+  MLW: -9.124
+  MLLW: -9.118
+  LAT: -8.792
+  HAT: -9.762
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8762075
+established: 2003-07-19T00:00:00Z

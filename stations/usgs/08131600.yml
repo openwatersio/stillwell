@@ -1,0 +1,17 @@
+name: Tom Green County WCID No. 1 Canal nr San Angelo,TX
+lat: 31.416111
+lon: -100.39416700000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 565.666
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08131600/
+parameter_code: "00065"
+series_begin: 2024-08-23T17:00:00+00:00
+series_end: 2025-09-30T15:45:00+00:00
+time_series_id: f99180ca55dc4c70a0acad3bd4086677

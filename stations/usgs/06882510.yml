@@ -1,0 +1,16 @@
+name: BIG BLUE R AT MARYSVILLE, KS
+lat: 39.8419463131844
+lon: -96.6622424751982
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 338.91
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06882510/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 7f3604a8009f4a7da46aa91c13d9eaa2

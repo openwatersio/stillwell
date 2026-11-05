@@ -1,0 +1,16 @@
+name: Rock Creek at E Wilson Road in Independence, MO
+lat: 39.109030555555556
+lon: -94.47246666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.823
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06893619/
+parameter_code: "00065"
+series_begin: 2024-10-29T16:45:00+00:00
+time_series_id: f907d8421ac7449dbc7ead571091b4d2

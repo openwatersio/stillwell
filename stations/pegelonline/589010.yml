@@ -1,0 +1,13 @@
+name: WOLFSBRUCH UP
+lat: 53.182159
+lon: 12.902642
+country_code: DE
+datum: PNP
+datums:
+  NHN: 54.076
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=589010

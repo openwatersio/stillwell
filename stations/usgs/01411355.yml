@@ -1,0 +1,14 @@
+name: Ingram Thorofare at Avalon NJ
+lat: 39.1086111111111
+lon: -74.7419444444444
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01411355/
+parameter_code: "72279"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b538b65704d946edbfdb32078f5faa11

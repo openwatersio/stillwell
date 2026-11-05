@@ -1,0 +1,14 @@
+name: Raritan Bay at Keansburg NJ
+lat: 40.4491666666667
+lon: -74.1475
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01407081/
+parameter_code: "72279"
+series_begin: 2000-10-30T00:00:00+00:00
+time_series_id: 59b8556ec6344913827d987fc46b7f67

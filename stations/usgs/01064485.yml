@@ -1,0 +1,16 @@
+name: SWIFT RIVER 0.5 MI BL HOBBS BR, NR CONWAY, NH
+lat: 43.9930555555556
+lon: -71.2075
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 225.552
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01064485/
+parameter_code: "00065"
+series_begin: 2009-08-28T16:15:00+00:00
+time_series_id: 274971e85de6419dba77df5fdc31f353

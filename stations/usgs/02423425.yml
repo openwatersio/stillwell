@@ -1,0 +1,16 @@
+name: CAHABA RIVER NEAR CAHABA HEIGHTS AL
+lat: 33.4156637152686
+lon: -86.7397099222477
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 123.496
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02423425/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 56878194f1664ae880779b520768b0f5

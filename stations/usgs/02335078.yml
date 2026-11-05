@@ -1,0 +1,15 @@
+name: JOHNS CREEK AT BUICE ROAD, NEAR WARSAW, GA
+lat: 34.0162110250363
+lon: -84.2110305616869
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 268.224
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02335078/
+parameter_code: "00065"
+time_series_id: 2ebb238a537341a5a85e2b69fa2df8cc

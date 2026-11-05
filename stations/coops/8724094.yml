@@ -1,0 +1,21 @@
+name: EAST BAHIA HONDA KEY
+lat: 24.775
+lon: -81.2267
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.894
+  MHW: -0.834
+  DTL: -0.683
+  MTL: -0.699
+  MSL: -0.68
+  MLW: -0.564
+  MLLW: -0.472
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724094
+established: 1974-05-23T00:00:00Z
+removed: 1974-07-12T23:59:00Z

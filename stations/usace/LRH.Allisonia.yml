@@ -1,0 +1,14 @@
+name: Allisonia
+lat: 36.9375
+lon: -80.7458
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 563.38
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Allisonia.Stage.Inst.15Minutes.0.OBS
+series: Allisonia.Stage.Inst.15Minutes.0.OBS

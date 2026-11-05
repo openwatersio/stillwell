@@ -1,0 +1,13 @@
+name: Coldwater River @ Darling, MS
+lat: 34.3625
+lon: -90.2903
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 40.938
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Darling.Stage.Inst.1Hour.0.DCP-rev
+series: Darling.Stage.Inst.1Hour.0.DCP-rev

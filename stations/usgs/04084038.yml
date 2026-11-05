@@ -1,0 +1,15 @@
+name: DE NEVEU CREEK @ E. MERRILL ST. AT FOND DU LAC, WI
+lat: 43.7808333333333
+lon: -88.4302777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 228.6
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04084038/
+parameter_code: "00065"
+time_series_id: b11a034be6df4a59b6633783a1fc7285

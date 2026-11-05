@@ -1,0 +1,16 @@
+name: AMARGOSA RV AT TECOPA, CA
+lat: 35.8494444444444
+lon: -116.230833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 394.033
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10251300/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: bb277fe85fd840d6a787e0261552fb5b

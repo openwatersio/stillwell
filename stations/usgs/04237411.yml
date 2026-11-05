@@ -1,0 +1,16 @@
+name: SENECA RIVER, MOUTH OF STATE DITCH, NR JORDAN NY
+lat: 43.1150277777778
+lon: -76.4386111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.139
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04237411/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 12daf2ab44464ea0a2d70c0420eebec9

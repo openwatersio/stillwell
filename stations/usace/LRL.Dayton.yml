@@ -1,0 +1,11 @@
+name: Great Miami River at Dayton OH
+lat: 39.7653365
+lon: -84.1974405
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Dayton.Stage.Inst.15Minutes.0.LRGS-rev
+series: Dayton.Stage.Inst.15Minutes.0.LRGS-rev

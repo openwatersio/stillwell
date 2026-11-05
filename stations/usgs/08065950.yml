@@ -1,0 +1,15 @@
+name: Nelson Ck nr Riverside, TX
+lat: 30.89441111111111
+lon: -95.51446111111112
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08065950/
+parameter_code: "00065"
+series_begin: 2025-01-27T18:30:00+00:00
+series_end: 2026-10-08T04:15:00+00:00
+time_series_id: 80ea3d99f4f64abcb9a1da5d349786ef

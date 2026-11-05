@@ -1,0 +1,14 @@
+name: DUNNS CREEK NEAR SATSUMA, FL
+lat: 29.5777478333259
+lon: -81.6261910087271
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02244440/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9f183567e4d547d980cdb247e472dbee

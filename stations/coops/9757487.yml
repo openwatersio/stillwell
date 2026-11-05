@@ -1,0 +1,23 @@
+name: Ponce
+lat: 17.9696
+lon: -66.6199
+country_code: PR
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.374
+  MHW: -8.377
+  DTL: -8.269
+  MTL: -8.271
+  MSL: -8.267
+  MLW: -8.165
+  MLLW: -8.164
+  LAT: -8.037
+  HAT: -8.496
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9757487
+established: 2020-11-23T00:00:00Z
+removed: 2021-04-02T20:00:00Z

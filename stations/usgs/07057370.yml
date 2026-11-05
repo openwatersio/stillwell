@@ -1,0 +1,16 @@
+name: White River near Norfork, AR
+lat: 36.22361111111111
+lon: -92.3
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 106.909
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07057370/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 86d0d8f515274880a76e8f62e4b57c12

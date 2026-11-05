@@ -1,0 +1,16 @@
+name: KENAI R AT SOLDOTNA AK
+lat: 60.477500000000006
+lon: -151.079444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 12.314
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15266300/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: 4f2779278d36437fb33a86c0c7771994

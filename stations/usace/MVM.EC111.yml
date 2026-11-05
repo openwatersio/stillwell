@@ -1,0 +1,14 @@
+name: Elk Chute Ditch @ Rives
+lat: 36.089065
+lon: -90.0461
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 66.699
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=EC111.Stage.Inst.1Hour.0.opendcs-rev
+series: EC111.Stage.Inst.1Hour.0.opendcs-rev

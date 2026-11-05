@@ -1,0 +1,16 @@
+name: REPUBLICAN R AT JUNCTION CITY, KS
+lat: 39.0427758243317
+lon: -96.8294533450798
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 317.748
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06857100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e239c58c04404900bc78c5bff337f6f3

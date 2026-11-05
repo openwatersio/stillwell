@@ -1,0 +1,16 @@
+name: ROLLING FORK AT NEW HAVEN, KY
+lat: 37.6495063214299
+lon: -85.5974617489366
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 133.761
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03299500/
+parameter_code: "00065"
+series_begin: 2016-09-09T16:15:00+00:00
+time_series_id: 475f559f34fa4b6dbb54057bde0ad0c2

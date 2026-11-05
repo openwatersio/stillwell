@@ -1,0 +1,16 @@
+name: COSTILLA CREEK ABOVE COSTILLA DAM, NM
+lat: 36.8983611111111
+lon: -105.254666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2881.579
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08252500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 93b7f159fa12455ea56b5c00d90859e3

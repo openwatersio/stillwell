@@ -1,0 +1,13 @@
+name: Big Black River @ West, MS
+lat: 33.194444
+lon: -89.771111
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 76.121
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=West.Stage.Inst.15Minutes.0.DCP-rev
+series: West.Stage.Inst.15Minutes.0.DCP-rev

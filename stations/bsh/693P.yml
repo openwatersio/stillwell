@@ -1,0 +1,13 @@
+name: Breitenberg, Stör
+lat: 53.92778
+lon: 9.63222
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -5.01
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970038]
+source_url: https://gezeiten.bsh.de/breitenberg

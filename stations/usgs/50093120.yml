@@ -1,0 +1,16 @@
+name: RIO GRANDE DE PATILLAS BLW LAGO PATILLAS, PR
+lat: 18.016389
+lon: -66.023611
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 26.289
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50093120/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 7cf593598dc548678f95db1e8285dde5

@@ -1,0 +1,16 @@
+name: FLATFORD SWAMP NR MYAKKA RIVER NR MYAKKA CITY FL
+lat: 27.393932003926
+lon: -82.1423108850657
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02298494/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 391f1e92b5494aa397c2bb5e36dda88a

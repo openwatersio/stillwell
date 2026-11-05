@@ -1,0 +1,16 @@
+name: SCHOOL BRANCH AT CR750N AT BROWNSBURG, IN
+lat: 39.87258333333333
+lon: -86.36152777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.166
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03353420/
+parameter_code: "00065"
+series_begin: 2015-06-12T19:00:00+00:00
+time_series_id: 6bab5b53182347afb6827f5e76be1d8a

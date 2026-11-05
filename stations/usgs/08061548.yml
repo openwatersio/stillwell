@@ -1,0 +1,16 @@
+name: Muddy Ck at Creek Crossing Ln nr Sachse, TX
+lat: 32.9858611111111
+lon: -96.5564166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 140.208
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08061548/
+parameter_code: "00065"
+series_begin: 2017-02-06T18:45:00+00:00
+time_series_id: 328df4941b7a40a6bd0db258944a9221

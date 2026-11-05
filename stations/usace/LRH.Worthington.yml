@@ -1,0 +1,14 @@
+name: Worthington
+lat: 40.109769626333
+lon: -83.033192824745
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 226.527
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Worthington.Stage.Inst.15Minutes.0.OBS
+series: Worthington.Stage.Inst.15Minutes.0.OBS

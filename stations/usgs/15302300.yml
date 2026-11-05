@@ -1,0 +1,17 @@
+name: MULCHATNA R AB STUYAHOK R NR NEW STUYAHOK AK
+lat: 59.8376227273208
+lon: -156.69386931164
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 76.2
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15302300/
+parameter_code: "00065"
+series_begin: 2008-10-09T14:45:00+00:00
+series_end: 2014-10-18T20:15:00+00:00
+time_series_id: 89e93af36df5422c99780d1a445697c9

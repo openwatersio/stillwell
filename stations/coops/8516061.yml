@@ -1,0 +1,23 @@
+name: COLD SPRING HARBOR
+lat: 40.8733
+lon: -73.47
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.153
+  MHW: -4.042
+  DTL: -2.952
+  MTL: -2.931
+  MSL: -2.933
+  MLW: -1.819
+  MLLW: -1.751
+  LAT: -1.198
+  HAT: -4.718
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8516061
+established: 1990-05-31T00:00:00Z
+removed: 1993-06-24T23:59:00Z

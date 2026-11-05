@@ -1,0 +1,22 @@
+name: BACON BRIDGE, ASHLEY RIVER
+lat: 32.9583
+lon: -80.2033
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.812
+  MHW: -1.743
+  DTL: -1.454
+  MTL: -1.424
+  MSL: -1.39
+  MLW: -1.104
+  MLLW: -1.096
+  NAVD88: -0.723
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664531
+established: 1976-06-02T00:00:00Z
+removed: 1977-10-05T23:59:00Z

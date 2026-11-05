@@ -1,0 +1,14 @@
+name: CHESTER RIVER NEAR CHESTERTOWN, MD
+lat: 39.129772
+lon: -76.09705
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01494028/
+parameter_code: "62620"
+series_begin: 2026-10-29T04:00:00+00:00
+time_series_id: 205f98c5ffd24119ad666508914d3e7c

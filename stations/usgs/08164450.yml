@@ -1,0 +1,16 @@
+name: Sandy Ck nr Ganado, TX
+lat: 29.1602539063552
+lon: -96.546360842633
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 17.88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08164450/
+parameter_code: "00065"
+series_begin: 2007-10-02T05:00:00+00:00
+time_series_id: 23b5a989896549119bcf7e1a1099fb0c

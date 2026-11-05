@@ -1,0 +1,17 @@
+name: Barnegat Bay at Waretown NJ
+lat: 39.7911111111111
+lon: -74.1819444444445
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01409110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2015-06-09T15:18:00+00:00
+time_series_id: 3f970bfbaf2d427ab53613644384fb24

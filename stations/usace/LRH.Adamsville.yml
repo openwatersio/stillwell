@@ -1,0 +1,13 @@
+name: Adamsville
+lat: 38.8736
+lon: -82.3558
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 173.995
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Adamsville.Stage.Inst.15Minutes.0.OBS
+series: Adamsville.Stage.Inst.15Minutes.0.OBS

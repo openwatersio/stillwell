@@ -1,0 +1,12 @@
+name: Augustfehn, Aper Tief
+lat: 53.21
+lon: 7.7575
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -5.02
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/augustfehn

@@ -1,0 +1,16 @@
+name: Little Miami River near Spring Valley OH
+lat: 39.5833935785193
+lon: -84.0302109562798
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 222.288
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03242050/
+parameter_code: "00065"
+series_begin: 2022-05-09T14:30:00+00:00
+time_series_id: 438df22ba492459fa4c4bc62cb5da369

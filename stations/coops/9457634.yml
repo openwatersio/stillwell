@@ -1,0 +1,23 @@
+name: Japanese Bay, Kodiak Island
+lat: 56.96
+lon: -153.687
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.402
+  MHW: -2.216
+  DTL: -1.146
+  MTL: -1.231
+  MSL: -1.226
+  MLW: -0.245
+  MLLW: 0.109
+  LAT: 0.926
+  HAT: -3.099
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457634
+established: 1931-06-17T00:00:00Z
+removed: 2014-08-14T00:00:00Z

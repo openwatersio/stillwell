@@ -1,0 +1,16 @@
+name: Clear Fork Trinity Rv at Kelly Rd nr Aledo, TX
+lat: 32.6530555555556
+lon: -97.5863888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 224.439
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08045995/
+parameter_code: "00065"
+series_begin: 2010-07-23T05:00:00+00:00
+time_series_id: 342991f9a68e486b8219045493efca57

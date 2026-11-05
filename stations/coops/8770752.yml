@@ -1,0 +1,23 @@
+name: COX WC-53 Platform
+lat: 29.624
+lon: -93.75
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 16.596
+  MHW: 16.673
+  DTL: 16.964
+  MTL: 16.915
+  MSL: 16.926
+  MLW: 17.156
+  MLLW: 17.332
+  NAVD88: 16.87
+  LAT: 17.784
+  HAT: 16.421
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770752
+established: 2020-01-01T00:00:00Z

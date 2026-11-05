@@ -1,0 +1,16 @@
+name: TALLULAH R AT TERRORA PWRHSE, NR TALLULAH FALLS,GA
+lat: 34.7502777777778
+lon: -83.405
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 472.745
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02181350/
+parameter_code: "00065"
+series_begin: 2014-11-21T05:00:00+00:00
+time_series_id: 7f15696e10d44c49a8be07a27ae681e6

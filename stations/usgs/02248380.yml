@@ -1,0 +1,14 @@
+name: HAULOVER CANAL NEAR MIMS,FL
+lat: 28.7363807944702
+lon: -80.7547730798326
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248380/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6d8af2b915fb4fbf828e12cd47c1c2e7

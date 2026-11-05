@@ -1,0 +1,11 @@
+name: Zuid-Willemsvaart, sluis 13
+lat: 51.330111
+lon: 5.746621
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/zuidwillemsvaart.sluis13/details

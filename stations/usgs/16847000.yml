@@ -1,0 +1,16 @@
+name: Imong River near Agat, Guam
+lat: 13.339
+lon: 144.701527777778
+country_code: GU
+kind: river
+datum: GAGE
+datums:
+  LMSL: 36.576
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16847000/
+parameter_code: "00065"
+series_begin: 2007-09-30T14:00:00+00:00
+time_series_id: c6875fe350334e9781f8f79a06acea11

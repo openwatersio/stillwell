@@ -1,0 +1,22 @@
+name: FRESHWATER SLOUGH, HUMBOLDT BAY
+lat: 40.7983
+lon: -124.12
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.401
+  MHW: -2.182
+  DTL: -1.32
+  MTL: -1.376
+  MSL: -1.35
+  MLW: -0.571
+  MLLW: -0.239
+  NAVD88: -0.377
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9418799
+established: 1978-04-01T00:00:00Z
+removed: 1979-01-16T23:59:00Z

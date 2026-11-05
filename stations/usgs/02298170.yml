@@ -1,0 +1,16 @@
+name: PRAIRIE CREEK ON CR 764 NEAR PUNTA GORDA FL
+lat: 26.9902777777778
+lon: -81.8947222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -3.67
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02298170/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 503d987d504643b3b7eb7e3aa4613a21

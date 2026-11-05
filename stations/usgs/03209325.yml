@@ -1,0 +1,16 @@
+name: ELKHORN CREEK AT BURDINE, KY
+lat: 37.18783333333333
+lon: -82.60456944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 440.284
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03209325/
+parameter_code: "00065"
+series_begin: 2024-01-31T19:45:00+00:00
+time_series_id: 27a98ceb16d54474ae349fa8f47c2167

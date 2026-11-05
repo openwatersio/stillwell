@@ -1,0 +1,16 @@
+name: YUMA MAIN CANAL ABOVE WASTEWAY NR WINTERHAVEN, CA
+lat: 32.7340833333333
+lon: -114.623055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.365
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09524700/
+parameter_code: "00065"
+series_begin: 2015-03-25T20:10:00+00:00
+time_series_id: 651b40a7ea4644e2a09ced2ca198c6ec

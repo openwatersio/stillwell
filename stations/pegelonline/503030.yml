@@ -1,0 +1,13 @@
+name: SCHARLEUK
+lat: 52.956969
+lon: 11.837558
+country_code: DE
+datum: PNP
+datums:
+  NHN: 17.567
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=503030

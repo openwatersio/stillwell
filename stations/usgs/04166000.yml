@@ -1,0 +1,17 @@
+name: RIVER ROUGE AT BIRMINGHAM, MI
+lat: 42.5458678184808
+lon: -83.2235417537348
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 218.097
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04166000/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+series_end: 2020-10-01T05:00:00+00:00
+time_series_id: 2a2d67dc940642fe86e91f4179e4997a

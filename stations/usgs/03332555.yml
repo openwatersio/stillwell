@@ -1,0 +1,16 @@
+name: TIPPECANOE RIVER AT NORWAY, IN
+lat: 40.778638888888885
+lon: -86.75888888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 185.044
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03332555/
+parameter_code: "00065"
+series_begin: 2008-12-13T05:00:00+00:00
+time_series_id: bd8ef921540b4bca96970cd781122f2c

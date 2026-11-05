@@ -1,0 +1,16 @@
+name: EF Kawela Gulch nr Kamalo, Molokai, HI
+lat: 21.109631952855768
+lon: -156.90333285563852
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 1104.857
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16415000/
+parameter_code: "00065"
+series_begin: 2018-11-07T21:30:00+00:00
+time_series_id: 02dab841ceba45cfb1d91b51e7801a76

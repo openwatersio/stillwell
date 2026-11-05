@@ -1,0 +1,16 @@
+name: MAUMEE RIVER AT NEW HAVEN, IN
+lat: 41.08502052107206
+lon: -85.0221518483285
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 220.66
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04183000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 48dc6cb817094b718ead2e69cbe37d16

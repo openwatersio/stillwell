@@ -1,0 +1,16 @@
+name: ENO RIVER AT COLE MILL RD NR HUCKLEBERRY SPRING
+lat: 36.0594166666667
+lon: -78.9780833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 103.632
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02085039/
+parameter_code: "00065"
+series_begin: 2008-07-22T04:00:00+00:00
+time_series_id: d3a2aaa182564732b740f651eaddcef5

@@ -1,0 +1,16 @@
+name: MUSCOOT RIVER AT BALDWIN PLACE NY
+lat: 41.3381388888889
+lon: -73.7686944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 151.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01374930/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 6094fd124bda48cda265d3524531468b

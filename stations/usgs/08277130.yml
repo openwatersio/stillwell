@@ -1,0 +1,16 @@
+name: ALAMITOS CREEK AT FOREST ROAD 161D NR HOLMAN, NM
+lat: 36.050019444444445
+lon: -105.484
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 3018.13
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08277130/
+parameter_code: "00065"
+series_begin: 2025-09-17T22:45:00+00:00
+time_series_id: e3e1e338dc324ed48d4b6585a7c38de1

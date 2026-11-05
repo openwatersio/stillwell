@@ -1,0 +1,17 @@
+name: Rollover Bayou
+lat: 29.576666
+lon: -92.535
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.06
+  MHW: -8.002
+  NAVD88: -7.897
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8766503
+established: 2019-09-16T00:00:00Z
+removed: 2020-07-02T23:59:00Z

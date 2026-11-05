@@ -1,0 +1,24 @@
+name: PHILADELPHIA (PIER 11 NORTH), DEL. RIVER
+lat: 39.9533
+lon: -75.1383
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.213
+  MHW: -3.095
+  DTL: -2.173
+  MTL: -2.144
+  MSL: -2.202
+  MLW: -1.192
+  MLLW: -1.133
+  NAVD88: -2.12
+  LAT: -0.921
+  HAT: -3.607
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8545530
+established: 1900-07-01T00:00:00Z
+removed: 1989-09-09T00:00:00Z

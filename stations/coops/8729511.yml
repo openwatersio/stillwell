@@ -1,0 +1,22 @@
+name: DESTIN, EAST PASS
+lat: 30.395
+lon: -86.5133
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.963
+  MHW: -1.961
+  DTL: -1.87
+  MTL: -1.871
+  MSL: -1.863
+  MLW: -1.78
+  MLLW: -1.777
+  NAVD88: -1.74
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729511
+established: 1977-04-27T00:00:00Z
+removed: 1993-04-28T23:59:00Z

@@ -1,0 +1,16 @@
+name: Aroostook River at Washburn, Maine
+lat: 46.7772222222222
+lon: -68.1572222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 132.795
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01017000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 5c56414f2b1a4a4e9aec8bd24cfdc333

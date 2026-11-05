@@ -1,0 +1,22 @@
+name: Fare Ute Point
+lat: -17.535
+lon: -149.572
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.948
+  MHW: -12.933
+  DTL: -12.839
+  MTL: -12.836
+  MSL: -12.837
+  MLW: -12.74
+  MLLW: -12.729
+  LAT: -12.645
+  HAT: -13.078
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1732417
+established: 1990-08-20T00:00:00Z
+removed: 2002-09-05T23:59:00Z

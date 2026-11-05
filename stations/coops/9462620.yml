@@ -1,0 +1,24 @@
+name: Unalaska
+lat: 53.879196
+lon: -166.5403
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.89
+  MHW: -1.803
+  DTL: -1.341
+  MTL: -1.439
+  MSL: -1.427
+  MLW: -1.075
+  MLLW: -0.792
+  NAVD88: -0.712
+  LAT: -0.236
+  HAT: -2.357
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9462620
+established: 1955-05-07T00:00:00Z

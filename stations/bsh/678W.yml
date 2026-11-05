@@ -1,0 +1,12 @@
+name: Neuwerk, Anleger
+lat: 53.91778
+lon: 8.48639
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.9
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/neuwerk_anleger

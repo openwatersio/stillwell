@@ -1,0 +1,16 @@
+name: Lackawaxen River at Rowland, PA
+lat: 41.4759228189641
+lon: -75.0362809642223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 203.859
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01432110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 76c229e2d84148d5b5cbba2997201656

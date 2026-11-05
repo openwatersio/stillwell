@@ -1,0 +1,11 @@
+name: Calfkiller River - Sparta TN
+lat: 35.9265
+lon: -85.4675
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CAFT1-CalfkillerR-blwSpartaTN.Stage.Inst.15Minutes.0.dcp-rev
+series: CAFT1-CalfkillerR-blwSpartaTN.Stage.Inst.15Minutes.0.dcp-rev

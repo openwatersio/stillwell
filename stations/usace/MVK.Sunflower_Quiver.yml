@@ -1,0 +1,13 @@
+name: Quiver River @ Sunflower, MS
+lat: 33.52917
+lon: -90.438739
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 28.346
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Sunflower_Quiver.Stage.Inst.1Hour.0.DCP-rev
+series: Sunflower_Quiver.Stage.Inst.1Hour.0.DCP-rev

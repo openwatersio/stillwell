@@ -1,0 +1,13 @@
+name: WOODLAND CREEK AT WILMOT WAY NEAR WOODLAND NY
+lat: 42.03525
+lon: -74.36552777777777
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01362286/
+parameter_code: "00065"
+time_series_id: bbaef05c1ea84d6e8feea4bde6e2b1c8

@@ -1,0 +1,16 @@
+name: SANTA MARIA R A SUEY CROSSING NR SANTA MARIA CA
+lat: 34.968301472220595
+lon: -120.40401223096111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 69.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11140585/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a5aefc469700413f9d709c1c202f199b

@@ -1,0 +1,17 @@
+name: South Halawa Stream nr H-3 Freeway, Oahu, HI
+lat: 21.370673653704703
+lon: -157.91002753052604
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 25.908
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16226700/
+parameter_code: "00065"
+series_begin: 2022-01-08T01:00:00+00:00
+series_end: 2026-10-26T22:45:00+00:00
+time_series_id: 6676c216be014aaca291858a8a431af8

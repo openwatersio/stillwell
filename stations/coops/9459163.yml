@@ -1,0 +1,23 @@
+name: Herendeen Island, Shumagin Islands
+lat: 55.065556
+lon: -159.41867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.664
+  MHW: -1.432
+  DTL: -0.538
+  MTL: -0.628
+  MSL: -0.611
+  MLW: 0.175
+  MLLW: 0.588
+  LAT: 1.478
+  HAT: -2.373
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9459163
+established: 2009-06-09T00:00:00Z
+removed: 2009-08-11T23:59:00Z

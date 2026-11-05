@@ -1,0 +1,16 @@
+name: Bear Br at Research Blvd, The Woodlands, TX
+lat: 30.1905555555556
+lon: -95.4911111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08068390/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 528bf2b053fc4ea59248585af59b08cb

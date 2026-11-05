@@ -1,0 +1,14 @@
+name: CEDAR CREEK NEAR SLAUGHTER BEACH, DE
+lat: 38.9350277777778
+lon: -75.3236944444444
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01484235/
+parameter_code: "62620"
+series_begin: 2017-06-20T18:24:00+00:00
+time_series_id: 170527f95cbb453b894f716489b714d6

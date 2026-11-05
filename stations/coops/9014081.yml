@@ -1,0 +1,15 @@
+name: St. Clair
+lat: 42.804165
+lon: -82.46528
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014081
+established: 1910-05-01T00:00:00Z
+removed: 1985-12-31T00:00:00Z

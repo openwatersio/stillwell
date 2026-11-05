@@ -1,0 +1,16 @@
+name: MARSH CREEK AT E RICHARDS RD NR VIRGINIA, ID
+lat: 42.4888
+lon: -112.21285
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1423.416
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13074800/
+parameter_code: "00065"
+series_begin: 2026-07-08T16:45:00+00:00
+time_series_id: 717d7a454a4e45eeb382f581f1044bf3

@@ -1,0 +1,16 @@
+name: DEL PUERTO C NR PATTERSON CA
+lat: 37.486572267540836
+lon: -121.20906445075791
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 60.594
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11274630/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 4048245248b94f6185f22c3e3ec4fff6

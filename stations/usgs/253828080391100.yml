@@ -1,0 +1,14 @@
+name: NORTHEAST SHARK RV SLOUGH NO. 4 NR COOPERTOWN, FL
+lat: 25.6401611111111
+lon: -80.6527666666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-253828080391100/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 782aaeeffa954dc28a72acc3000b8dd1

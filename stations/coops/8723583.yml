@@ -1,0 +1,21 @@
+name: CARYSFORT REEF LIGHTHOUSE
+lat: 25.2217
+lon: -80.2117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.81
+  MHW: -1.788
+  DTL: -1.422
+  MTL: -1.439
+  MSL: -1.438
+  MLW: -1.09
+  MLLW: -1.034
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723583
+established: 1975-06-06T00:00:00Z
+removed: 1991-10-19T23:59:00Z

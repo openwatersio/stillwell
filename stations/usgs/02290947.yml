@@ -1,0 +1,15 @@
+name: SWEETWATER STRAND AT LOOP RD. NR MONROE STATION FL
+lat: 25.788572222222225
+lon: -81.09992222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02290947/
+parameter_code: "00065"
+series_begin: 2014-06-25T04:00:00+00:00
+series_end: 2017-11-16T13:30:00+00:00
+time_series_id: f38a6ae05a934c078f2a8e5a0c06a837

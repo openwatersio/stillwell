@@ -1,0 +1,16 @@
+name: YELLOW RIVER AT PLEASANT HILL ROAD, NR LITHONIA,GA
+lat: 33.7335833333333
+lon: -84.0615555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 213.677
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02207220/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: aae0a1aa222c4bd2b0eb5b5a9a4044d1

@@ -1,0 +1,17 @@
+name: SILVER CREEK AT SILVERTON, OR
+lat: 45.00923999465754
+lon: -122.78867751200909
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 66.599
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14200300/
+parameter_code: "00065"
+series_begin: 2014-02-06T08:00:00+00:00
+series_end: 2020-06-02T16:45:00+00:00
+time_series_id: 8412e72947ab493b93dbd1d9f29cbd45

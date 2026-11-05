@@ -1,0 +1,15 @@
+name: DUNN SPRING NEAR TOWNSEND, TN
+lat: 35.6678651875911
+lon: -83.7796180659744
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03497319/
+parameter_code: "00065"
+series_begin: 2017-11-07T14:00:00+00:00
+series_end: 2018-08-31T18:15:00+00:00
+time_series_id: 0734a0e052864fd1b39b3fb235089ba9

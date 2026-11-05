@@ -1,0 +1,16 @@
+name: OHIO RIVER AT EVANSVILLE, IN
+lat: 37.97228264107407
+lon: -87.57640285193835
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 100.072
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03322000/
+parameter_code: "00065"
+series_begin: 2014-10-02T21:45:00+00:00
+time_series_id: 409004dd1a704470a47d17079274c13e

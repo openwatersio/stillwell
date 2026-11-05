@@ -1,0 +1,14 @@
+name: Little Bayou Long North of Duck Lake, LA
+lat: 29.8365
+lon: -91.3119166666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-295011091184300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 33af871dedc5465f932909bbedcf3109

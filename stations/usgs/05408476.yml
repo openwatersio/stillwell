@@ -1,0 +1,15 @@
+name: WEST FORK KICKAPOO RIVER @ OGDEN AVE AT CASHTON,WI
+lat: 43.7256666666667
+lon: -90.781
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 375.818
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05408476/
+parameter_code: "00065"
+time_series_id: 6df1abbb3dd34fbc8382a52bc13711b9

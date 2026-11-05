@@ -1,0 +1,16 @@
+name: OOSTANAULA RIVER AT RESACA, GA
+lat: 34.5775
+lon: -84.9419166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 184.188
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02387500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a0c652975b274f40be72c9c8a7423fa8

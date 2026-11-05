@@ -1,0 +1,13 @@
+name: Schillig
+lat: 53.69889
+lon: 8.04694
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.66
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9430030]
+source_url: https://gezeiten.bsh.de/schillig

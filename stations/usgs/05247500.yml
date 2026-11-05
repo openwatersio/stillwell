@@ -1,0 +1,16 @@
+name: CROW WING RIVER NEAR PILLAGER, MN
+lat: 46.304779
+lon: -94.377525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 350.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05247500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1ab59dd0bbe24e8392cdd89cc84d87e4

@@ -1,0 +1,16 @@
+name: Dutch Creek Near Waltreak, AR
+lat: 34.956661
+lon: -93.720592
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 140.915
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07259950/
+parameter_code: "00065"
+series_begin: 2021-08-18T12:00:00+00:00
+time_series_id: 935a7e1b13fb4ce4949e361a51da9421

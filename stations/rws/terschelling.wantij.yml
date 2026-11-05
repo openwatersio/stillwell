@@ -1,0 +1,11 @@
+name: Terschelling wantij
+lat: 53.325
+lon: 5.53833
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/terschelling.wantij/details

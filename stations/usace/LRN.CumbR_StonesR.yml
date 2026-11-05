@@ -1,0 +1,13 @@
+name: Cumberland River at Stones River
+lat: 36.1916
+lon: -86.665
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 111.731
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CumbR%20StonesR.Stage.Inst.15Minutes.0.GOES-Rev
+series: CumbR StonesR.Stage.Inst.15Minutes.0.GOES-Rev

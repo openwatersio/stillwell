@@ -1,0 +1,16 @@
+name: Verdigris River near Lenapah, OK
+lat: 36.8511961534813
+lon: -95.5860881657001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 196.712
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07171000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 702a2a7ad75849fb994a56d4ce2942ba

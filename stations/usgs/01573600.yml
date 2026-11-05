@@ -1,0 +1,14 @@
+name: Swatara Creek at Middletown, PA
+lat: 40.1925531354386
+lon: -76.7279082589688
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01573600/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 13eca8dfc13f413eae7707237e66a0be

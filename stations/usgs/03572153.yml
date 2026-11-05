@@ -1,0 +1,15 @@
+name: LITTLE COON CREEK AT COUNTY RD 53 NR. STEVENSON
+lat: 34.8741666666667
+lon: -85.9108333333333
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03572153/
+parameter_code: "00065"
+series_begin: 2015-12-09T14:30:00+00:00
+series_end: 2017-10-17T16:45:00+00:00
+time_series_id: ec003350641e4c26924945cfd4c6e163

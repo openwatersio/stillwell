@@ -1,0 +1,23 @@
+name: Turn Point
+lat: 56.8
+lon: -132.98
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.746
+  MHW: -3.476
+  DTL: -1.297
+  MTL: -1.391
+  MSL: -1.389
+  MLW: 0.694
+  MLLW: 1.152
+  LAT: 2.418
+  HAT: -4.863
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451434
+established: 1978-09-21T00:00:00Z
+removed: 2006-05-27T23:59:00Z

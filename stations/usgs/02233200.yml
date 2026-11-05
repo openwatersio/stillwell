@@ -1,0 +1,15 @@
+name: LITTLE ECONLOCKHATCHEE RIVER NEAR UNION PARK, FL
+lat: 28.5250021213271
+lon: -81.243955998891
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02233200/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2020-10-01T05:15:00+00:00
+time_series_id: a2a8bea4b06b4012a5d3737c3e847857

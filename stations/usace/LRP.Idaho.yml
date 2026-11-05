@@ -1,0 +1,13 @@
+name: Idaho, PA
+lat: 40.6547222
+lon: -79.3488889
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 292.925
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Idaho.Stage.Inst.15Minutes.0.OBS
+series: Idaho.Stage.Inst.15Minutes.0.OBS

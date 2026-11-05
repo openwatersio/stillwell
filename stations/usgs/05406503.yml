@@ -1,0 +1,16 @@
+name: BLACK EARTH CR NR PARK ST BRIDGE @ BLACK EARTH, WI
+lat: 43.137222
+lon: -89.741389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 247.193
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05406503/
+parameter_code: "00065"
+series_begin: 2025-02-12T21:15:00+00:00
+time_series_id: fdc2a8663077407cb143a6a0905fe282

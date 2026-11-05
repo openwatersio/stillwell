@@ -1,0 +1,16 @@
+name: CRANE LAKE AT CRANE LAKE, MN
+lat: 48.26925
+lon: -92.47086111111112
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 335.451
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05129200/
+parameter_code: "00065"
+series_begin: 2024-09-01T21:45:00+00:00
+time_series_id: 251f3c754a1f4c039d85a7715d313ad2

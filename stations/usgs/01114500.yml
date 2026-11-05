@@ -1,0 +1,16 @@
+name: WOONASQUATUCKET RIVER AT CENTERDALE, RI
+lat: 41.8589884253646
+lon: -71.4872823280115
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.468
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01114500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9920bad82841449cb2e6032880d9f122

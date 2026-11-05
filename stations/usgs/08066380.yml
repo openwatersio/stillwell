@@ -1,0 +1,16 @@
+name: Big Ck at SH 150 nr Shepherd, TX
+lat: 30.502177777777778
+lon: -95.0312888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08066380/
+parameter_code: "00065"
+series_begin: 2021-08-16T20:15:00+00:00
+time_series_id: 2f3c082f7a3a4830b526354b684bb709

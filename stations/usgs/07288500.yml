@@ -1,0 +1,16 @@
+name: BIG SUNFLOWER RIVER AT SUNFLOWER, MS
+lat: 33.54735571674962
+lon: -90.54315791906323
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.051
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07288500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c2987f6d78704dd19573372b30d7e858

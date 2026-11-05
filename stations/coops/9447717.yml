@@ -1,0 +1,24 @@
+name: Priest Point
+lat: 48.034943
+lon: -122.227196
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.957
+  MHW: -8.696
+  DTL: -7.288
+  MTL: -7.567
+  MSL: -7.558
+  MLW: -6.438
+  MLLW: -5.619
+  NAVD88: -6.194
+  LAT: -4.28
+  HAT: -9.578
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9447717
+established: 2014-05-12T00:00:00Z
+removed: 2014-10-01T00:00:00Z

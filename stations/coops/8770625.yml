@@ -1,0 +1,23 @@
+name: UMBRELLA POINT, TRINITY BAY
+lat: 29.68
+lon: -94.8683
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.349
+  MHW: -2.337
+  DTL: -2.155
+  MTL: -2.164
+  MSL: -2.173
+  MLW: -1.99
+  MLLW: -1.961
+  LAT: -1.624
+  HAT: -2.561
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8770625
+established: 1994-11-03T00:00:00Z
+removed: 1996-06-14T23:59:00Z

@@ -1,0 +1,16 @@
+name: COPPER R DI AT BRIDGE 1187 NR CORDOVA AK
+lat: 60.44449718486333
+lon: -145.0809516442868
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 14.021
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15214190/
+parameter_code: "00065"
+series_begin: 2023-06-06T00:45:00+00:00
+time_series_id: f89380c6b45e416eb9313ed579845c53

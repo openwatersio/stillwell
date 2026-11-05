@@ -1,0 +1,13 @@
+name: PATOKA RIVER AT JASPER, IN
+lat: 38.4136646
+lon: -86.8766636
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 135.703
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Jasper.Stage.Inst.15Minutes.0.LRGS-rev
+series: Jasper.Stage.Inst.15Minutes.0.LRGS-rev

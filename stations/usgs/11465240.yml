@@ -1,0 +1,16 @@
+name: DRY C BLW LAMBERT BR NR GEYSERVILLE CA
+lat: 38.65320164545917
+lon: -122.92718110814447
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 34.147
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11465240/
+parameter_code: "00065"
+series_begin: 2011-11-10T23:00:00+00:00
+time_series_id: 68e3dcee659345119caf8ad3f7bcf515

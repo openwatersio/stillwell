@@ -1,0 +1,23 @@
+name: Hydaburg, Sukkwan Strait
+lat: 55.2017
+lon: -132.823
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.916
+  MHW: -4.641
+  DTL: -2.928
+  MTL: -3.027
+  MSL: -3.016
+  MLW: -1.413
+  MLLW: -0.941
+  LAT: 0.253
+  HAT: -6.047
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9450364
+established: 1955-08-24T00:00:00Z
+removed: 2008-11-10T23:59:00Z

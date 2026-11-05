@@ -1,0 +1,14 @@
+name: Massillon
+lat: 40.7703
+lon: -81.5214
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 278.91
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Massillon.Stage.Inst.15Minutes.0.OBS
+series: Massillon.Stage.Inst.15Minutes.0.OBS

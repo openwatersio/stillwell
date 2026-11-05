@@ -1,0 +1,16 @@
+name: Grand Marais, Lake Superior
+lat: 47.748554
+lon: -90.34128
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -183.2
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9099090
+established: 1966-01-01T00:00:00Z

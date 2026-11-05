@@ -1,0 +1,14 @@
+name: SUGARLOAF SHORES WEST
+lat: 24.6333
+lon: -81.5517
+country_code: US
+datum: STND
+datums:
+  MSL: -0.623
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724363
+established: 1974-04-29T00:00:00Z
+removed: 1974-06-18T23:59:00Z

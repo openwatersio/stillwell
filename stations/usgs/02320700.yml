@@ -1,0 +1,17 @@
+name: SANTA FE RIVER NEAR GRAHAM, FLA.
+lat: 29.8463539394223
+lon: -82.2195493369328
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 31.562
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02320700/
+parameter_code: "00065"
+series_begin: 2009-10-01T03:00:00+00:00
+series_end: 2025-12-01T18:15:00+00:00
+time_series_id: 76928dd2d1bc4ef4a60e5d9fa8075a5b

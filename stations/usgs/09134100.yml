@@ -1,0 +1,16 @@
+name: NORTH FORK GUNNISON RIVER BELOW PAONIA, CO
+lat: 38.8575
+lon: -107.621944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1694.746
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09134100/
+parameter_code: "00065"
+series_begin: 2021-07-01T05:45:00+00:00
+time_series_id: fa3a89b3ce0248cf8928b8ba03b20f9e

@@ -1,0 +1,16 @@
+name: Copano Ck nr Refugio, TX
+lat: 28.303605379948387
+lon: -97.11250386528667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 4.855
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08189200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 822f272eef804f81a04e30eda131bc94

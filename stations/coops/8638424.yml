@@ -1,0 +1,23 @@
+name: Kingsmill
+lat: 37.22
+lon: -76.6633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.436
+  MHW: -3.371
+  DTL: -3.036
+  MTL: -3.027
+  MSL: -3.028
+  MLW: -2.683
+  MLLW: -2.635
+  LAT: -2.462
+  HAT: -3.672
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8638424
+established: 2003-06-06T00:00:00Z
+removed: 2003-09-18T23:59:00Z

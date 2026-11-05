@@ -1,0 +1,16 @@
+name: BADFISH CREEK NEAR COOKSVILLE, WI
+lat: 42.83333998425939
+lon: -89.19673706687487
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 251.155
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05430150/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: 95fb820c419b48618e179cea838cfd0f

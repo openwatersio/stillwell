@@ -1,0 +1,13 @@
+name: VENTNOR OFFSHORE 2
+lat: 39.3317
+lon: -74.42
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534773
+established: 1985-07-24T00:00:00Z
+removed: 1985-08-28T23:59:00Z

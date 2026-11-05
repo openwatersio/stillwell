@@ -1,0 +1,16 @@
+name: HATCHET CREEK BELOW ROCKFORD AL
+lat: 32.91682922963294
+lon: -86.27025185375273
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.843
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02408540/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 198e2721cb7446359cddbe20ad257d3d

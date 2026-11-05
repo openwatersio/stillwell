@@ -1,0 +1,16 @@
+name: Frio Rv bl Dry Frio Rv nr Uvalde, TX
+lat: 29.2457934133058
+lon: -99.6744978243874
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.144
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08197500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: decc3f82c4994082be4310c43074df2b

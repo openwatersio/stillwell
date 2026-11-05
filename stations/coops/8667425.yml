@@ -1,0 +1,22 @@
+name: PETERS POINT, ST. PIERRE CREEK
+lat: 32.54
+lon: -80.34
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.448
+  MHW: -2.336
+  DTL: -1.432
+  MTL: -1.408
+  MSL: -1.494
+  MLW: -0.481
+  MLLW: -0.416
+  NAVD88: -1.529
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667425
+established: 1977-12-20T00:00:00Z
+removed: 1979-02-02T23:59:00Z

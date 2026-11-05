@@ -1,0 +1,16 @@
+name: WOLF RUN AT OLD FRANKFORT PIKE AT LEXINGTON, KY
+lat: 38.0667433424971
+lon: -84.5543852203286
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 262.674
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03289193/
+parameter_code: "00065"
+series_begin: 2007-10-02T04:00:00+00:00
+time_series_id: 54ea3f5fc66b47cda481fe4d347560f6

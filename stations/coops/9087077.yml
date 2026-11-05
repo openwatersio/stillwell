@@ -1,0 +1,16 @@
+name: Green Bay East
+lat: 44.539024
+lon: -88.00106
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087077
+established: 2009-05-27T00:00:00Z

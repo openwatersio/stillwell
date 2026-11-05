@@ -1,0 +1,22 @@
+name: SMITH'S DOCK, MURRELLS INLET
+lat: 33.545
+lon: -79.045
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.492
+  MHW: -1.373
+  DTL: -0.751
+  MTL: -0.719
+  MSL: -0.748
+  MLW: -0.066
+  MLLW: -0.011
+  NAVD88: -0.846
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661559
+established: 1974-09-20T00:00:00Z
+removed: 1976-02-10T23:59:00Z

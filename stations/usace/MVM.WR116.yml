@@ -1,0 +1,14 @@
+name: White River @ Clarendon
+lat: 34.682425
+lon: -91.31483
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 42.654
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=WR116.Stage.Inst.1Hour.0.opendcs-rev
+series: WR116.Stage.Inst.1Hour.0.opendcs-rev

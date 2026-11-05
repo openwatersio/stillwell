@@ -1,0 +1,17 @@
+name: SARONI CANAL 1.1 SW/GW - CANAL SW
+lat: 38.7488888888889
+lon: -119.3725
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1502.704
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-384456119222101/
+parameter_code: "00065"
+series_begin: 2013-04-23T07:00:00+00:00
+series_end: 2013-10-18T06:30:00+00:00
+time_series_id: 8f67c36f15944d1e8e06f668bb7e15bd

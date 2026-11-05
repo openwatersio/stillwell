@@ -1,0 +1,13 @@
+name: DUMBARTON RAILROAD BRIDGE
+lat: 37.5
+lon: -122.1
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414510
+established: 1983-05-11T00:00:00Z
+removed: 1985-05-09T23:59:00Z

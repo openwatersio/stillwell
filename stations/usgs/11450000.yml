@@ -1,0 +1,16 @@
+name: CLEAR LK A LAKEPORT CA
+lat: 39.0390283160782
+lon: -122.91329765256268
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 402.562
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11450000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: a80545646ce940d3868d589a0fa97a2c

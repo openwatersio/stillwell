@@ -1,0 +1,12 @@
+name: Empire Floodgate Water Side (01441)
+lat: 29.3766667
+lon: -89.6016667
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Empire_FloodGate-WaterSide.Stage.Inst.15Minutes.0.rev
+series: Empire_FloodGate-WaterSide.Stage.Inst.15Minutes.0.rev
+zero_since: 2022-04-19

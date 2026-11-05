@@ -1,0 +1,23 @@
+name: Saginaw Bay, Kuiu Island
+lat: 56.90333
+lon: -134.30305
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -6.369
+  MHW: -6.112
+  DTL: -4.277
+  MTL: -4.38
+  MSL: -4.399
+  MLW: -2.649
+  MLLW: -2.184
+  LAT: -0.944
+  HAT: -7.502
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451497
+established: 1967-05-10T00:00:00Z
+removed: 1996-05-02T23:00:00Z

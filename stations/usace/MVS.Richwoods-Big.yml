@@ -1,0 +1,14 @@
+name: Richwoods
+lat: 38.159639
+lon: -90.706075
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 159.264
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Richwoods-Big.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Richwoods-Big.Stage.Inst.15Minutes.0.lrgsShef-rev

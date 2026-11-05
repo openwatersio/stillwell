@@ -1,0 +1,16 @@
+name: GREEN RIVER NEAR GREENDALE, UT
+lat: 40.908292959641
+lon: -109.422914017045
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1705.115
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09234500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 60e71219843b49a9a4c54a820228c935

@@ -1,0 +1,16 @@
+name: MISSISSIPPI RIVER AT DAM 13 NEAR FULTON, IL
+lat: 41.8944725373443
+lon: -90.1567930273846
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.078
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05420400/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: e59bc47550674d489d0c2333e69a8040

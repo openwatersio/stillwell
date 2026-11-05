@@ -1,0 +1,17 @@
+name: LUCKIAMUTE RIVER NEAR PARKER, OR
+lat: 44.78051111111111
+lon: -123.22924722222223
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-444650123134500/
+parameter_code: "00065"
+series_begin: 2018-12-14T19:30:00+00:00
+series_end: 2026-05-11T16:20:00+00:00
+time_series_id: ba3933a66d304ddc9b7d2dd0fe2f45ac

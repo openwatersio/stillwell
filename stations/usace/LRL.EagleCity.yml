@@ -1,0 +1,13 @@
+name: Mad River at St Paris Pike at Ea
+lat: 39.9642265
+lon: -83.8315962
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 275.74
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=EagleCity.Stage.Inst.15Minutes.0.LRGS-rev
+series: EagleCity.Stage.Inst.15Minutes.0.LRGS-rev

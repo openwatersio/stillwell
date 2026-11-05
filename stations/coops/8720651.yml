@@ -1,0 +1,24 @@
+name: Crescent Beach, Matanzas River
+lat: 29.7683
+lon: -81.2583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.576
+  MHW: -0.481
+  DTL: 0.118
+  MTL: 0.138
+  MSL: 0.11
+  MLW: 0.757
+  MLLW: 0.813
+  NAVD88: -0.001
+  LAT: 1.13
+  HAT: -1.044
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8720651
+established: 1997-02-20T00:00:00Z
+removed: 2008-08-18T23:59:00Z

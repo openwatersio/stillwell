@@ -1,0 +1,16 @@
+name: REELFOOT CREEK NEAR SAMBURG, TN
+lat: 36.44230807246568
+lon: -89.29645619646003
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.407
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07026500/
+parameter_code: "00065"
+series_begin: 2013-01-24T22:30:00+00:00
+time_series_id: 8563b633805d49aeacce2c06a7fe056f

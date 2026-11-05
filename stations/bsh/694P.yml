@@ -1,0 +1,13 @@
+name: Grönhude, Stör
+lat: 53.93583
+lon: 9.69083
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -5.01
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/5970037]
+source_url: https://gezeiten.bsh.de/groenhude

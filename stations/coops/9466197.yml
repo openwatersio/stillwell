@@ -1,0 +1,24 @@
+name: Tuntutuliak
+lat: 60.3415
+lon: -162.686
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.995
+  MHW: -8.531
+  DTL: -7.831
+  MTL: -7.672
+  MSL: -7.786
+  MLW: -6.812
+  MLLW: -6.668
+  NAVD88: -6.223
+  LAT: -6.507
+  HAT: -9.736
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9466197
+established: 2021-06-01T00:00:00Z
+removed: 2021-09-19T00:00:00Z

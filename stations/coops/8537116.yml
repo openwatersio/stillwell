@@ -1,0 +1,13 @@
+name: BACK CREEK, DEL. BAY
+lat: 39.305
+lon: -75.2783
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8537116
+established: 1977-08-25T00:00:00Z
+removed: 1978-01-14T23:59:00Z

@@ -1,0 +1,16 @@
+name: Calcasieu River near Oberlin, LA
+lat: 30.6404757248483
+lon: -92.8140368349525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 12.018
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08013500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e401b9ee4d0c44a4a196783b7f9d9885

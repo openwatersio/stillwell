@@ -1,0 +1,17 @@
+name: DONNER UND BLITZEN ABOVE INDIAN CREEK
+lat: 42.637425
+lon: -118.760772
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1554.48
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-423815118453900/
+parameter_code: "00065"
+series_begin: 2019-07-23T18:00:00+00:00
+series_end: 2022-10-26T18:30:00+00:00
+time_series_id: cca181c35b5644eab5c270fe4420174b

@@ -1,0 +1,24 @@
+name: CUTLER, BISCAYNE BAY
+lat: 25.615
+lon: -80.305
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.512
+  MHW: -1.494
+  DTL: -1.188
+  MTL: -1.199
+  MSL: -1.197
+  MLW: -0.903
+  MLLW: -0.863
+  NAVD88: -1.455
+  LAT: -0.656
+  HAT: -1.825
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723289
+established: 1970-04-22T00:00:00Z
+removed: 1972-04-04T23:59:00Z

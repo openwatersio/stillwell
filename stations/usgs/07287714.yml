@@ -1,0 +1,16 @@
+name: LONG LAKE AT CONTROL STRUCTURE NR FRIARS POINT, MS
+lat: 34.3817777777778
+lon: -90.5564722222222
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 49.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07287714/
+parameter_code: "00065"
+series_begin: 2019-10-17T18:35:00+00:00
+time_series_id: 2236c94bec46476da3cd5f5a421b2a15

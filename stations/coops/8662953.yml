@@ -1,0 +1,24 @@
+name: WINDSOR PLANTATION, BLACK RIVER
+lat: 33.415
+lon: -79.25
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.293
+  MHW: -2.226
+  DTL: -1.713
+  MTL: -1.702
+  MSL: -1.73
+  MLW: -1.177
+  MLLW: -1.134
+  NAVD88: -1.73
+  LAT: -0.897
+  HAT: -2.572
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662953
+established: 1975-09-16T00:00:00Z
+removed: 1977-01-25T23:59:00Z

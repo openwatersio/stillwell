@@ -1,0 +1,13 @@
+name: NORWALK RIVER AT FERRY POINT NEAR NORWALK, CT
+lat: 41.111869444444444
+lon: -73.41023611111112
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-410643073243700/
+parameter_code: "62620"
+time_series_id: 2a1e6813be0449d29443cb071404c7d6

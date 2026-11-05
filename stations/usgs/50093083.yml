@@ -1,0 +1,16 @@
+name: CANAL DE PATILLAS ABV AES INTAKE AT GUAYAMA, PR
+lat: 17.969722
+lon: -66.139167
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 28.487
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50093083/
+parameter_code: "00065"
+series_begin: 2007-10-01T04:00:00+00:00
+time_series_id: 13e7df61b7b741a3bb7d39e448b43cbb

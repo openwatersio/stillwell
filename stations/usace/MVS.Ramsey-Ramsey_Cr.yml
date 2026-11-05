@@ -1,0 +1,14 @@
+name: Ramsey Cr
+lat: 39.101811
+lon: -89.087772
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 152.4
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Ramsey-Ramsey%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Ramsey-Ramsey Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

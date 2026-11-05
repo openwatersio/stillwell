@@ -1,0 +1,13 @@
+name: OSLO,INDIAN RIVER
+lat: 27.5933
+lon: -80.3567
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722146
+established: 1972-05-10T00:00:00Z
+removed: 1972-09-13T23:59:00Z

@@ -1,0 +1,15 @@
+name: COWLITZ RIVER AT DIKE RD NEAR CASTLE ROCK, WA
+lat: 46.26720869076179
+lon: -122.90958825260448
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14243550/
+parameter_code: "63160"
+series_begin: 2024-09-18T16:15:00+00:00
+series_end: 2026-09-28T21:00:00+00:00
+time_series_id: ce54629bb7cd46f2878d4fa9d2c7a41b

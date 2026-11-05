@@ -1,0 +1,16 @@
+name: RITO SAN JOSE AT LOWER ROCIADA, NM
+lat: 35.83656666666667
+lon: -105.41643888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2285.39
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07218680/
+parameter_code: "00065"
+series_begin: 2024-04-24T15:25:00+00:00
+time_series_id: 2a6bba5d52324df5a840e7bb67be89cb

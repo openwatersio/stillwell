@@ -1,0 +1,14 @@
+name: HUDSON RIVER AT PIERMONT NY
+lat: 41.043194
+lon: -73.896056
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01376269/
+parameter_code: "62620"
+series_begin: 2010-11-04T05:00:00+00:00
+time_series_id: d8a8dff49e8f47a39d080fb059cd3ff9

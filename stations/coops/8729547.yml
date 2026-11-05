@@ -1,0 +1,24 @@
+name: Okaloosa Island
+lat: 30.3914
+lon: -86.5932
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.204
+  MHW: -8.177
+  DTL: -7.991
+  MTL: -7.988
+  MSL: -7.98
+  MLW: -7.798
+  MLLW: -7.778
+  NAVD88: -7.931
+  LAT: -7.452
+  HAT: -8.467
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729547
+established: 2021-11-11T00:00:00Z
+removed: 2022-03-23T20:12:00Z

@@ -1,0 +1,24 @@
+name: Gaviota State Park, Pacific Ocean
+lat: 34.469387
+lon: -120.2283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -14.901
+  MHW: -14.677
+  DTL: -14.096
+  MTL: -14.132
+  MSL: -14.127
+  MLW: -13.587
+  MLLW: -13.29
+  NAVD88: -13.318
+  LAT: -12.66
+  HAT: -15.474
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9411399
+established: 2012-10-31T00:00:00Z
+removed: 2013-03-09T23:59:00Z

@@ -1,0 +1,22 @@
+name: DIVINE'S DOCK, MURRELLS INLET
+lat: 33.5417
+lon: -79.0283
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.975
+  MHW: -4.854
+  DTL: -4.247
+  MTL: -4.211
+  MSL: -4.218
+  MLW: -3.568
+  MLLW: -3.52
+  NAVD88: -4.34
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8661582
+established: 1974-11-01T00:00:00Z
+removed: 1976-10-20T23:59:00Z

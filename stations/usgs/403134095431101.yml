@@ -1,0 +1,15 @@
+name: Kansas Chute Downstream, Nebr.
+lat: 40.5169777777778
+lon: -95.7097972222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 276.454
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-403134095431101/
+parameter_code: "00065"
+time_series_id: acac0ea3b1384f6ab91f7d479ab6f20d

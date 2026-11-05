@@ -1,0 +1,16 @@
+name: SHAKETT CREEK AT CR 762 NR NOKOMIS, FL
+lat: 27.137631
+lon: -82.435681
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -2.78
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299729/
+parameter_code: "00065"
+series_begin: 2024-07-31T13:45:00+00:00
+time_series_id: 3bed18858a974f25bb37dc3eaca2f54d

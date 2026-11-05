@@ -1,0 +1,16 @@
+name: MERRIMACK RIVER AT FRANKLIN JUNCTION, NH
+lat: 43.4228545641333
+lon: -71.6528543423813
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 76.377
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01081500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 082fa1818f3c416780fd38e5b5dbbd4e

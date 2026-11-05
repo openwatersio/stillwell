@@ -1,0 +1,24 @@
+name: St. George, St. George Island
+lat: 56.60328
+lon: -169.54956
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.151
+  MHW: -12.08
+  DTL: -11.624
+  MTL: -11.72
+  MSL: -11.709
+  MLW: -11.361
+  MLLW: -11.098
+  NAVD88: -11.009
+  LAT: -10.545
+  HAT: -12.441
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9463888
+established: 2024-01-01T00:00:00Z
+removed: 2024-09-19T00:00:00Z

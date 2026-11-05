@@ -1,0 +1,16 @@
+name: Little Sugar Creek near Pineville, MO
+lat: 36.5840555555556
+lon: -94.3729722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.4
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07188838/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e6e99cda4f4e42578c0e0dbb37e5ada0

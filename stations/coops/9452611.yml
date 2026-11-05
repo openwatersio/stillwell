@@ -1,0 +1,23 @@
+name: Pelican Harbor, Lisianski Inlet, AK
+lat: 57.95778
+lon: -136.22678
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.664
+  MHW: -5.394
+  DTL: -4.047
+  MTL: -4.134
+  MSL: -4.129
+  MLW: -2.875
+  MLLW: -2.431
+  LAT: -1.41
+  HAT: -6.46
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452611
+established: 1989-10-09T00:00:00Z
+removed: 2009-12-08T23:59:00Z

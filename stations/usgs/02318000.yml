@@ -1,0 +1,16 @@
+name: LITTLE RIVER NEAR ADEL, GA
+lat: 31.1555555555556
+lon: -83.5436111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.782
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02318000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: dcd797b29ffc462cadbba30950664a6b

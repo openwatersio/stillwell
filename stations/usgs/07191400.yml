@@ -1,0 +1,16 @@
+name: Lake Hudson near Locust Grove, OK
+lat: 36.2300934387045
+lon: -95.1821854084706
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 0.076
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07191400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1a6ed54980f249189b89616c34e6b6a4

@@ -1,0 +1,23 @@
+name: Pago Bay, Guam
+lat: 13.428333
+lon: 144.79889
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.952
+  MHW: -7.917
+  DTL: -7.688
+  MTL: -7.747
+  MSL: -7.734
+  MLW: -7.577
+  MLLW: -7.424
+  LAT: -7.187
+  HAT: -8.075
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1631428
+established: 2004-04-22T00:00:00Z

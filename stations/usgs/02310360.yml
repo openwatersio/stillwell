@@ -1,0 +1,17 @@
+name: BEAR CREEK AT MAJESTIC BLVD NR BAYONET POINT FL
+lat: 28.3342805555556
+lon: -82.6847222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310360/
+parameter_code: "00065"
+series_begin: 2018-01-22T06:15:00+00:00
+series_end: 2019-10-01T18:00:00+00:00
+time_series_id: 4efb539fb69e4ea08ac88b0627bd7fd7

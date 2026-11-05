@@ -1,0 +1,22 @@
+name: US HIGHWAY 17, SOUTH SANTEE RIVER
+lat: 33.185
+lon: -79.4067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.094
+  MHW: -2.007
+  DTL: -1.406
+  MTL: -1.388
+  MSL: -1.404
+  MLW: -0.768
+  MLLW: -0.718
+  NAVD88: -1.404
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8662799
+established: 1975-05-29T00:00:00Z
+removed: 1989-09-21T23:59:00Z

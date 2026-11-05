@@ -1,0 +1,22 @@
+name: SPRING BAYOU, TARPON SPRINGS
+lat: 28.1467
+lon: -82.7583
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.921
+  MHW: -0.807
+  DTL: -0.456
+  MTL: -0.476
+  MSL: -0.485
+  MLW: -0.145
+  MLLW: 0.008
+  NAVD88: -0.549
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726892
+established: 1975-12-17T00:00:00Z
+removed: 1976-02-11T23:59:00Z

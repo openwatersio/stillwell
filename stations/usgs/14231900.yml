@@ -1,0 +1,16 @@
+name: CISPUS RIVER AB YELLOWJACKET CREEK NEAR RANDLE, WA
+lat: 46.44396664160067
+lon: -121.84006890644278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 382.122
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14231900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: cbaf61c525ad4371ab42735e26bfced3

@@ -1,0 +1,16 @@
+name: EB of NF Wailua River nr Lihue, Kauai, HI
+lat: 22.068773777322512
+lon: -159.41517233032351
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 152.4
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16068000/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 8bcf125eb2234701a91a173f8a7e5352

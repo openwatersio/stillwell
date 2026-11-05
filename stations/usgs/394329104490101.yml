@@ -1,0 +1,16 @@
+name: TOLL GATE CREEK ABOVE 6TH AVE AT AURORA, CO
+lat: 39.7250888888889
+lon: -104.817894444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1642.872
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-394329104490101/
+parameter_code: "00065"
+series_begin: 2020-11-01T07:00:00+00:00
+time_series_id: 34e5955b683642ffbe683cd85cbd807b

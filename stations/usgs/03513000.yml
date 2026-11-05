@@ -1,0 +1,16 @@
+name: TUCKASEGEE RIVER AT BRYSON CITY, NC
+lat: 35.4275
+lon: -83.4469444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 522.525
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03513000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c4d98f59c70a4023856afb2f58701f3a

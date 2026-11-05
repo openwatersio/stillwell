@@ -1,0 +1,24 @@
+name: San Diego
+lat: 32.715557
+lon: -117.17667
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.9
+  MHW: -2.675
+  DTL: -2.028
+  MTL: -2.058
+  MSL: -2.052
+  MLW: -1.441
+  MLLW: -1.155
+  NAVD88: -1.287
+  LAT: -0.528
+  HAT: -3.479
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410170
+established: 1906-01-26T00:00:00Z

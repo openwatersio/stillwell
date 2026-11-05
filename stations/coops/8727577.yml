@@ -1,0 +1,22 @@
+name: SUWANNEE
+lat: 29.3283
+lon: -83.1517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.642
+  MHW: -1.548
+  DTL: -1.114
+  MTL: -1.145
+  MSL: -1.133
+  MLW: -0.742
+  MLLW: -0.585
+  NAVD88: -1.154
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727577
+established: 1973-02-18T00:00:00Z
+removed: 1979-03-12T23:59:00Z

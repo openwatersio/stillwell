@@ -1,0 +1,13 @@
+name: "Pearl L&D #3 Upper"
+lat: 30.6381
+lon: -89.8681
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 10.357
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Pearl%20L%26D%203-Upper%20Pool.Stage.Inst.15Minutes.0.DCP-rev
+series: Pearl L&D 3-Upper Pool.Stage.Inst.15Minutes.0.DCP-rev

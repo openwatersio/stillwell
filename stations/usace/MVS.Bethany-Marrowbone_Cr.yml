@@ -1,0 +1,14 @@
+name: Bethany
+lat: 39.635524
+lon: -88.741374
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 182.88
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Bethany-Marrowbone%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Bethany-Marrowbone Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

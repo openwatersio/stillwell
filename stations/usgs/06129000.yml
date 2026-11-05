@@ -1,0 +1,17 @@
+name: Box Elder Creek near Winnett MT
+lat: 47.0125277777778
+lon: -108.155341666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 829.056
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06129000/
+parameter_code: "00065"
+series_begin: 1955-05-03T19:05:00+00:00
+series_end: 1958-04-22T19:05:00+00:00
+time_series_id: 7c1d8e49b40345c8b5959bb4e5f1f672

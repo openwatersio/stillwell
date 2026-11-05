@@ -1,0 +1,15 @@
+name: Trout Ck US Rt 23  near Valley Forge,PA
+lat: 40.0974305555556
+lon: -75.4192
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 28.164
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01473205/
+parameter_code: "00065"
+time_series_id: 5a0f5ed7fde2467fa0a1923c7af8c25c

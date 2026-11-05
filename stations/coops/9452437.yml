@@ -1,0 +1,21 @@
+name: EXCURSION INLET (SOUTH END)
+lat: 58.4167
+lon: -135.447
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.086
+  MHW: -4.814
+  DTL: -2.813
+  MTL: -2.918
+  MSL: -2.94
+  MLW: -1.021
+  MLLW: -0.539
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452437
+established: 1923-06-14T00:00:00Z
+removed: 1999-06-08T23:59:00Z

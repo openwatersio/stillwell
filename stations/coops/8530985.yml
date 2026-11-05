@@ -1,0 +1,13 @@
+name: CONSTABLE HOOK  UPPER BAY
+lat: 40.655
+lon: -74.085
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530985
+established: 1976-02-18T00:00:00Z
+removed: 1980-05-20T23:59:00Z

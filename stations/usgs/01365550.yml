@@ -1,0 +1,16 @@
+name: CHESTNUT CREEK AT MOUTH AT GRAHAMSVILLE NY
+lat: 41.8490833333333
+lon: -74.5318333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 256.437
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01365550/
+parameter_code: "00065"
+series_begin: 2018-09-13T16:30:00+00:00
+time_series_id: b75592b3812443c9aca8d3c931b7136a

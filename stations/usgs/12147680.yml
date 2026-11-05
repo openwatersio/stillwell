@@ -1,0 +1,16 @@
+name: PHELPS CREEK BLW UNNAMED TRIB NR INDEX, WA
+lat: 47.7041638888889
+lon: -121.600775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 562.682
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12147680/
+parameter_code: "00065"
+series_begin: 2019-10-24T19:30:00+00:00
+time_series_id: ab92d39ceb07463c89a2ca63d2f5c75a

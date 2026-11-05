@@ -1,0 +1,22 @@
+name: FORT PICKENS, PENSACOLA BAY
+lat: 30.33
+lon: -87.2917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.923
+  MHW: -0.919
+  DTL: -0.748
+  MTL: -0.75
+  MSL: -0.742
+  MLW: -0.581
+  MLLW: -0.573
+  NAVD88: -0.65
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729882
+established: 1977-01-21T00:00:00Z
+removed: 1983-06-23T23:59:00Z

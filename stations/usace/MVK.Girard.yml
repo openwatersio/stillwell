@@ -1,0 +1,13 @@
+name: Boeuf River @ Girard, LA
+lat: 32.481013889945
+lon: -91.798227778629
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 15.063
+products: [levels]
+interval_s: 1800
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Girard.Stage.Inst.30Minutes.0.DCP-rev
+series: Girard.Stage.Inst.30Minutes.0.DCP-rev

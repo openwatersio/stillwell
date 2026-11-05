@@ -1,0 +1,16 @@
+name: MINEBANK RUN NEAR GLEN ARM, MD
+lat: 39.4096111111111
+lon: -76.55725
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 65.913
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0158397967/
+parameter_code: "00065"
+series_begin: 2001-10-15T18:25:00+00:00
+time_series_id: 2a80a2ad347544bcb60fbd0c57485ce1

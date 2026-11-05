@@ -1,0 +1,21 @@
+name: MOLASSES KEY
+lat: 24.6833
+lon: -81.1917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.488
+  MHW: -1.413
+  DTL: -1.27
+  MTL: -1.251
+  MSL: -1.254
+  MLW: -1.089
+  MLLW: -1.052
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724062
+established: 1974-05-29T00:00:00Z
+removed: 1974-07-11T23:59:00Z

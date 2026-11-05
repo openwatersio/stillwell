@@ -1,0 +1,16 @@
+name: SHAWSHEEN RIVER AT BALMORAL STREET AT ANDOVER, MA
+lat: 42.6714806311078
+lon: -71.1492239389811
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 10.424
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01100627/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 31952583ef0c45d597bc26495ba03594

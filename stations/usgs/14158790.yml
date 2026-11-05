@@ -1,0 +1,16 @@
+name: SMITH RIVER ABV SMITH R RESV,NR BELKNAP SPRNGS,OR
+lat: 44.3345665972081
+lon: -122.047007398804
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 795.528
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14158790/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 49aa3e27420c4f4e9809d539f0d0df6c

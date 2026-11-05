@@ -1,0 +1,17 @@
+name: CHATTAHOOCHEE RIVER AT MILE 46 NEAR COLUMBIA, ALA
+lat: 31.2490833333333
+lon: -85.1066111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02343805/
+parameter_code: "00065"
+series_begin: 2009-09-01T05:00:00+00:00
+series_end: 2019-07-02T04:30:00+00:00
+time_series_id: d39e9d2ad9354d218a4d3d21eaf8fb4d

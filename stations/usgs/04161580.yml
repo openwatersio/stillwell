@@ -1,0 +1,15 @@
+name: STONY CREEK NEAR ROMEO, MI
+lat: 42.8008637037238
+lon: -83.090212095758
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 262.628
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04161580/
+parameter_code: "00065"
+time_series_id: 7f642c2e89eb4a1699bc11e7489d2156

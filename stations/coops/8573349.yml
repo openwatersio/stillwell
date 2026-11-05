@@ -1,0 +1,23 @@
+name: Crumpton
+lat: 39.245
+lon: -75.925
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.152
+  MHW: -4.059
+  DTL: -3.732
+  MTL: -3.722
+  MSL: -3.73
+  MLW: -3.385
+  MLLW: -3.311
+  LAT: -3.096
+  HAT: -4.34
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8573349
+established: 2005-03-30T00:00:00Z
+removed: 2010-12-14T23:59:00Z

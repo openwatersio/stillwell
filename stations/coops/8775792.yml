@@ -1,0 +1,24 @@
+name: Packery Channel
+lat: 27.6333
+lon: -97.2367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.994
+  MHW: -0.995
+  DTL: -0.929
+  MTL: -0.929
+  MSL: -0.932
+  MLW: -0.863
+  MLLW: -0.864
+  NAVD88: -0.753
+  LAT: -0.689
+  HAT: -1.205
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8775792
+established: 1988-11-30T00:00:00Z

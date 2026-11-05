@@ -1,0 +1,13 @@
+name: DELAWARE CITY BRIDGE
+lat: 39.57
+lon: -75.59
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8551851
+established: 1983-07-20T00:00:00Z
+removed: 1983-08-29T23:59:00Z

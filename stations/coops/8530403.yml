@@ -1,0 +1,21 @@
+name: EAST RUTHERFORD, PASSAIC RIVER
+lat: 40.8467
+lon: -74.12
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.787
+  MHW: -2.681
+  DTL: -1.8
+  MTL: -1.787
+  MSL: -1.8
+  MLW: -0.893
+  MLLW: -0.812
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530403
+established: 1975-12-30T00:00:00Z
+removed: 1994-11-10T23:59:00Z

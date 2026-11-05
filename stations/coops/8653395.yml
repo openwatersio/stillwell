@@ -1,0 +1,22 @@
+name: Belhaven, Pungo River
+lat: 35.536682
+lon: -76.6229
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.363
+  MHW: -9.323
+  DTL: -9.25
+  MTL: -9.244
+  MSL: -9.247
+  MLW: -9.164
+  MLLW: -9.137
+  NAVD88: -9.347
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8653395
+established: 2021-11-06T00:00:00Z
+removed: 2022-04-28T15:00:00Z

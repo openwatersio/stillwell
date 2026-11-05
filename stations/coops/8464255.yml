@@ -1,0 +1,21 @@
+name: ROCKY HILL,CONNECTICUT RIVER
+lat: 41.6633
+lon: -72.63
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.963
+  MHW: -2.885
+  DTL: -2.619
+  MTL: -2.599
+  MSL: -2.609
+  MLW: -2.312
+  MLLW: -2.274
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8464255
+established: 1987-05-19T00:00:00Z
+removed: 1987-10-03T23:59:00Z

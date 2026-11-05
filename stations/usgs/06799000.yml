@@ -1,0 +1,16 @@
+name: Elkhorn River at Norfolk, Nebr.
+lat: 42.003778
+lon: -97.426028
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 457.49
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06799000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e00d0a3ae4a0442ba10acfb7714c773d

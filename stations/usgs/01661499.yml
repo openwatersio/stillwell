@@ -1,0 +1,16 @@
+name: St Marys Lake near Callaway, MD
+lat: 38.25277777777778
+lon: -76.53347222222222
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: -0.631
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01661499/
+parameter_code: "00065"
+series_begin: 2024-03-26T16:30:00+00:00
+time_series_id: 0e46676cf3d147b5b9cc7b7548670fb8

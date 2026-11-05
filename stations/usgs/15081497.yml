@@ -1,0 +1,16 @@
+name: STANEY C NR KLAWOCK AK
+lat: 55.8012313406504
+lon: -133.1102971802972
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.852
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15081497/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:14:00+00:00
+time_series_id: a44f8cf5c2854d48b1c07acb026bfb3d

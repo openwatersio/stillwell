@@ -1,0 +1,16 @@
+name: Las Moras Spgs Dws of pool at Brackettville,TX
+lat: 29.3079166666667
+lon: -100.419222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 333.756
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08456310/
+parameter_code: "00065"
+series_begin: 2014-10-01T06:00:00+00:00
+time_series_id: da94ec6f57cb41619e94fb4f7e04b46a

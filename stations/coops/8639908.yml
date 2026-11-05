@@ -1,0 +1,14 @@
+name: MUNDEN POINT, NORTH LANDING RIVER
+lat: 36.5767
+lon: -76.0383
+country_code: US
+datum: STND
+datums:
+  MSL: -4.389
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8639908
+established: 1934-10-05T00:00:00Z
+removed: 1996-09-18T23:00:00Z

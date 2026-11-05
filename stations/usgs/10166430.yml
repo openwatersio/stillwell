@@ -1,0 +1,16 @@
+name: WEST CANYON CREEK NEAR CEDAR FORT, UT
+lat: 40.40520631651142
+lon: -112.10051423394638
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1715.603
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10166430/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 5be801b32188497d976568154e1651d2

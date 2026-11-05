@@ -1,0 +1,16 @@
+name: SOUTHSIDE DITCH NR LAKIN, KS
+lat: 37.8722397352711
+lon: -101.358781754522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 927.668
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07138063/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: db63d92f004e41489c533a62df874700

@@ -1,0 +1,13 @@
+name: Huntebrück, Hunte
+lat: 53.2
+lon: 8.44639
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.25
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/4960070]
+source_url: https://gezeiten.bsh.de/huntebrueck

@@ -97,7 +97,7 @@ function csvFields(line: string): string[] {
 }
 
 /** The stations named in `first`, in its order, then the rest in theirs. */
-export function orderStations(stations: Station[], first: string[]): Station[] {
+export function orderStations<T extends Pick<Station, "id">>(stations: T[], first: string[]): T[] {
   const rank = new Map(first.map((id, i) => [id, i]));
   const named = stations
     .filter((s) => rank.has(s.id))
@@ -110,7 +110,11 @@ export function orderStations(stations: Station[], first: string[]): Station[] {
  * station always lands in the same shard, whatever order `--first` asks for and
  * however the station list changes between one shard's run and the next.
  */
-export function shard(stations: Station[], index: number, count: number): Station[] {
+export function shard<T extends Pick<Station, "id">>(
+  stations: T[],
+  index: number,
+  count: number,
+): T[] {
   if (
     !Number.isInteger(count) ||
     count < 1 ||

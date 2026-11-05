@@ -1,0 +1,16 @@
+name: Pecan Bayou nr Cross Cut, TX
+lat: 31.9726444159031
+lon: -99.130337615343
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 442.643
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08140700/
+parameter_code: "00065"
+series_begin: 2015-09-22T22:30:00+00:00
+time_series_id: 5f46361ada5c449d882210483eff71bb

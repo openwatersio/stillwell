@@ -1,0 +1,22 @@
+name: PORT WILLIAM, SHUYAK ISLAND
+lat: 58.490223
+lon: -152.58377
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.554
+  MHW: -8.288
+  DTL: -6.431
+  MTL: -6.544
+  MSL: -6.544
+  MLW: -4.8
+  MLLW: -4.308
+  NAVD88: -5.237
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9457313
+established: 1971-05-23T00:00:00Z
+removed: 2024-09-11T00:00:00Z

@@ -1,0 +1,15 @@
+name: 1.4M PIEZOMETER ABV GLENBROOK CK NR SPOONER SUMMIT
+lat: 39.08958611111111
+lon: -119.91303611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2034.235
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-390523119544702/
+parameter_code: "00065"
+time_series_id: 7045304fc516429fb1246ad4a183c9ae

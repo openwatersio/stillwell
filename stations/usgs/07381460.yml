@@ -1,0 +1,16 @@
+name: Bayou Milhomme near Stephensville, LA
+lat: 29.78025
+lon: -91.1669166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07381460/
+parameter_code: "00065"
+series_begin: 2018-06-05T14:45:00+00:00
+time_series_id: e0a1e5ed99334c7d892179ae679caa31

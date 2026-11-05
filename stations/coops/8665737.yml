@@ -1,0 +1,22 @@
+name: JACKSONBORO CAMP, SOUTH EDISTO RIVER
+lat: 32.7533
+lon: -80.45
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.565
+  MHW: -2.501
+  DTL: -1.889
+  MTL: -1.886
+  MSL: -1.965
+  MLW: -1.271
+  MLLW: -1.212
+  NAVD88: -1.613
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665737
+established: 1977-06-08T00:00:00Z
+removed: 1983-03-22T23:59:00Z

@@ -1,0 +1,13 @@
+name: NOK BREIHOLZ
+lat: 54.200164
+lon: 9.552319
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+products: [levels]
+interval_s: 60
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=5970075

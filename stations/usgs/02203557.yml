@@ -1,0 +1,17 @@
+name: PEACOCK CREEK AT ATLANTIC RR LINE NR MCINTOSH, GA
+lat: 31.820556
+lon: -81.539556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2.134
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02203557/
+parameter_code: "00065"
+series_begin: 2007-10-19T04:00:00+00:00
+series_end: 2026-06-23T12:15:00+00:00
+time_series_id: f51e3e3b870c4e6582dd1d79073e5db6

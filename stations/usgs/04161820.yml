@@ -1,0 +1,16 @@
+name: CLINTON RIVER AT STERLING HEIGHTS, MI
+lat: 42.6144781384667
+lon: -83.0265932880866
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.898
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04161820/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cc2d9b1b91e84f91b149ce5a1beb62d9

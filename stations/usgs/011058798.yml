@@ -1,0 +1,15 @@
+name: HERRING R AT CHEQUESSETT NECK RD AT WELLFLEET, MA
+lat: 41.9311111111111
+lon: -70.0645555555556
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-011058798/
+parameter_code: "00065"
+series_begin: 2015-06-24T04:00:00+00:00
+series_end: 2022-08-05T14:25:00+00:00
+time_series_id: ba70bb7562cc47fdb24077ace75965ee

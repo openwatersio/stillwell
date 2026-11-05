@@ -1,0 +1,24 @@
+name: Snipe Island
+lat: 30.0619
+lon: -83.9527
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -10.197
+  MHW: -10.147
+  DTL: -9.693
+  MTL: -9.747
+  MSL: -9.722
+  MLW: -9.347
+  MLLW: -9.188
+  NAVD88: -9.757
+  LAT: -8.728
+  HAT: -10.487
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8727976
+established: 2023-01-20T00:00:00Z
+removed: 2023-05-05T20:00:00Z

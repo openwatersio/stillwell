@@ -1,0 +1,16 @@
+name: Chicot Pass near Myette Point near Charenton, LA
+lat: 29.8927040554871
+lon: -91.4456662389444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-073815450/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: b9c668a8372342d498c3ed3a1783d058

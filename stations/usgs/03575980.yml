@@ -1,0 +1,16 @@
+name: MCDONALD CREEK AT PATTON ROAD NR HUNTSVILLE AL
+lat: 34.6925911472854
+lon: -86.6274940169839
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.735
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03575980/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 2c781c03063b4cab842f5a1151da5671

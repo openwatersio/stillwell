@@ -1,0 +1,15 @@
+name: CNWR-BIG-POND A
+lat: 43.9487111111111
+lon: -112.270325
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 1460.419
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13114145/
+parameter_code: "00065"
+time_series_id: 5e36bb24e4554c55bb0326c82669d095

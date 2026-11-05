@@ -1,0 +1,16 @@
+name: SOLDIER C NR DELIA, KS
+lat: 39.238330244477
+lon: -95.8885992397602
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 286.567
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06889200/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 02bccf86b94243adb9d4a4e5be465d9f

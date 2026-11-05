@@ -1,0 +1,16 @@
+name: COWSKIN C AT KELLOGG ST, WICHITA, KS
+lat: 37.6657111111111
+lon: -97.4576138888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 394.033
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07144490/
+parameter_code: "00065"
+series_begin: 2010-10-01T14:00:00+00:00
+time_series_id: bbb15eed05e94b148319407f12a2c892

@@ -1,0 +1,16 @@
+name: LITTLE TRUCKEE R AB BOCA RES NR TRUCKEE CA
+lat: 39.43571369789357
+lon: -120.08433949200122
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1713.732
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10344400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: da933ce4a84a453082ef8d6c90aca0e5

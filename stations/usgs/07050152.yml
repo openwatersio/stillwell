@@ -1,0 +1,16 @@
+name: Roaring River at Roaring River State Park
+lat: 36.5809722222222
+lon: -93.8336944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 309.436
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07050152/
+parameter_code: "00065"
+series_begin: 2008-11-05T06:00:00+00:00
+time_series_id: 0a2403d70ef14ce68ef2ad5f82a776e7

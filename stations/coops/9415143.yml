@@ -1,0 +1,24 @@
+name: CROCKETT, CARQUINEZ STRAIT
+lat: 38.0583
+lon: -122.223
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.024
+  MHW: -3.855
+  DTL: -3.118
+  MTL: -3.185
+  MSL: -3.192
+  MLW: -2.515
+  MLLW: -2.212
+  NAVD88: -2.094
+  LAT: -1.749
+  HAT: -4.366
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9415143
+established: 1977-04-22T00:00:00Z
+removed: 1988-09-01T23:59:00Z

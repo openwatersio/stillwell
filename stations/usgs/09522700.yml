@@ -1,0 +1,14 @@
+name: WELLTON-MOHAWK MAIN CANAL NEAR YUMA, AZ
+lat: 32.7422682969855
+lon: -114.43383555421
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09522700/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 373d93c6f7d24462aae0c5e9b3056415

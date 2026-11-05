@@ -1,0 +1,23 @@
+name: CAMP COVE, HARRIS PENNINSULA
+lat: 59.6933
+lon: -149.748
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.028
+  MHW: -4.754
+  DTL: -3.403
+  MTL: -3.474
+  MSL: -3.478
+  MLW: -2.194
+  MLLW: -1.778
+  LAT: -0.714
+  HAT: -6.052
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9455151
+established: 2000-08-29T00:00:00Z
+removed: 2000-11-11T23:59:00Z

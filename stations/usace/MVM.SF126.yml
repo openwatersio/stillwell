@@ -1,0 +1,13 @@
+name: St. Francis Lake @ Tulot
+lat: 35.602861
+lon: -90.461861
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 60.847
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=SF126.Stage.Inst.1Hour.0.opendcs-rev
+series: SF126.Stage.Inst.1Hour.0.opendcs-rev

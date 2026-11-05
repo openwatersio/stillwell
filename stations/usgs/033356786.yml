@@ -1,0 +1,17 @@
+name: LITTLE PINE CREEK NEAR MONTMORENCI, IN
+lat: 40.46724970900036
+lon: -87.0580529332607
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.829
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-033356786/
+parameter_code: "00065"
+series_begin: 2009-03-21T05:00:00+00:00
+series_end: 2017-10-02T15:00:00+00:00
+time_series_id: aec33175f5754b4cbe134ec9139f7100

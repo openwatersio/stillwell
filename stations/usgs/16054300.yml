@@ -1,0 +1,16 @@
+name: Weoweopilau Stream at Highway 50 bridge, Kauai, HI
+lat: 21.95557096991898
+lon: -159.46108622470445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 166.116
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16054300/
+parameter_code: "00065"
+series_begin: 2025-09-24T00:55:00+00:00
+time_series_id: d046e82cb91a46ed841660292794aed2

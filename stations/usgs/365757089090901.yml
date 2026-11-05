@@ -1,0 +1,15 @@
+name: New Madrid Floodway Stage Sensor No. 911315
+lat: 36.9658333333333
+lon: -89.1525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 95.768
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-365757089090901/
+parameter_code: "00065"
+time_series_id: c7424273d86b4909a1a9ad0696129c8f

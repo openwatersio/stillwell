@@ -1,0 +1,16 @@
+name: WILSON RIVER NEAR TILLAMOOK, OR
+lat: 45.4759399592551
+lon: -123.725120924774
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 12.838
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14301500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: c47ea086a1674ca5b3862514a27217b8

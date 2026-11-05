@@ -1,0 +1,22 @@
+name: POINT SAN QUENTIN, SAN FRANCISCO BAY
+lat: 37.945
+lon: -122.475
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.236
+  MHW: -4.052
+  DTL: -3.355
+  MTL: -3.425
+  MSL: -3.411
+  MLW: -2.798
+  MLLW: -2.474
+  NAVD88: -2.423
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414873
+established: 1977-02-11T00:00:00Z
+removed: 1979-10-30T23:59:00Z

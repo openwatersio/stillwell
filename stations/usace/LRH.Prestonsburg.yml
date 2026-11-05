@@ -1,0 +1,13 @@
+name: Prestonsburg
+lat: 37.6708
+lon: -82.7772
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 179.503
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Prestonsburg.Stage.Inst.15Minutes.0.OBS
+series: Prestonsburg.Stage.Inst.15Minutes.0.OBS

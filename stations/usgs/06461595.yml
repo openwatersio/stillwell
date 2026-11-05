@@ -1,0 +1,17 @@
+name: East Middle Creek at Norden Road nr Norden, Nebr.
+lat: 42.79416666666666
+lon: -100.05499999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 652.577
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06461595/
+parameter_code: "00065"
+series_begin: 2015-11-18T20:00:00+00:00
+series_end: 2018-07-12T14:40:00+00:00
+time_series_id: 4bd55e4b5362443f97d5acd7627d045e

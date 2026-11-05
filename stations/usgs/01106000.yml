@@ -1,0 +1,16 @@
+name: ADAMSVILLE BROOK AT ADAMSVILLE, RI
+lat: 41.558314
+lon: -71.129192
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.861
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01106000/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 8ac45c513ecb47e8a130c63688b87e38

@@ -1,0 +1,16 @@
+name: LITTLE COLORADO R ABV LYMAN LAKE NR ST. JOHNS, AZ
+lat: 34.31502222222222
+lon: -109.36233055555554
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1830.211
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09384000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 5fbd7ba5d9eb41ea93afe5e005b150a3

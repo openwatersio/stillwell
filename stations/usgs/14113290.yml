@@ -1,0 +1,17 @@
+name: COLUMBIA RIVER AT HOOD RIVER, OR
+lat: 45.714308
+lon: -121.503233
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14113290/
+parameter_code: "00065"
+series_begin: 2013-03-15T07:00:00+00:00
+series_end: 2024-01-31T21:30:00+00:00
+time_series_id: b3803069d3c447d8b0811cd55e50c56e

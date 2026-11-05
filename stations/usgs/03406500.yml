@@ -1,0 +1,16 @@
+name: ROCKCASTLE RIVER AT BILLOWS, KY
+lat: 37.1711951996748
+lon: -84.29604704146
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 244.657
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03406500/
+parameter_code: "00065"
+series_begin: 2008-10-01T04:00:00+00:00
+time_series_id: 25de4ab35be04c4aadd96f900a3b5fcf

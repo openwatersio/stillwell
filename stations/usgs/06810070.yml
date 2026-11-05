@@ -1,0 +1,16 @@
+name: Missouri River at Brownville, NE
+lat: 40.3981944444444
+lon: -95.6536666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 262.113
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06810070/
+parameter_code: "00065"
+series_begin: 2019-10-01T06:00:00+00:00
+time_series_id: c0baeec85e7f4260827068f81dd28bae

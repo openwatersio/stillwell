@@ -1,0 +1,16 @@
+name: Little Schuylkill River at Tamaqua, PA
+lat: 40.806950520598065
+lon: -75.97185458245598
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 248.967
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01469500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 51b4540f15a8483892f13154bce03abb

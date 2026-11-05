@@ -1,0 +1,17 @@
+name: UNNAMED TRIB TO SCITUATE RES NR NORTH SCITUATE, RI
+lat: 41.8314882290892
+lon: -71.608953232744
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 92.812
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01115120/
+parameter_code: "00065"
+series_begin: 2009-04-17T05:00:00+00:00
+series_end: 2014-04-28T03:40:00+00:00
+time_series_id: 353536218ee24a349eeb2ae590f544a5

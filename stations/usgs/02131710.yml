@@ -1,0 +1,15 @@
+name: SPARROW SWAMP AT I95 NEAR FLORENCE, SC
+lat: 34.05922222222222
+lon: -79.94338888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.319
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02131710/
+parameter_code: "00065"
+time_series_id: 2acfbc0a350a499e9f0e105dad9998ee

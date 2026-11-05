@@ -1,0 +1,16 @@
+name: LITTLE DRY CRK BLW FEDERAL BLVD AT WESTMINSTER, CO
+lat: 39.819367
+lon: -105.021447
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1592.519
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06719845/
+parameter_code: "00065"
+series_begin: 2019-03-26T17:00:00+00:00
+time_series_id: 10a71fe7dd3d4ec1adccfd5f8525ca41

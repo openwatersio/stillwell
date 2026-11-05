@@ -1,0 +1,16 @@
+name: West Branch Susquehanna River at Allenwood, PA
+lat: 41.10805555555556
+lon: -76.89
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 134.478
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01553025/
+parameter_code: "00065"
+series_begin: 2015-07-08T18:45:00+00:00
+time_series_id: 2517d8e283aa42ba83f28c3e37e07eff

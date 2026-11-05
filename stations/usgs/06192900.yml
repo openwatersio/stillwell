@@ -1,0 +1,17 @@
+name: Dugout Creek at mouth, nr Wilsall, MT
+lat: 46.1848055555555
+lon: -110.379638888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1983.334
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06192900/
+parameter_code: "00065"
+series_begin: 2018-10-11T21:00:00+00:00
+series_end: 2022-10-04T22:00:00+00:00
+time_series_id: fb372184eddb455a987547e71eda0de0

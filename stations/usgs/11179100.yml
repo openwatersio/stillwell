@@ -1,0 +1,16 @@
+name: ALAMEDA C NR FREMONT CA
+lat: 37.5666024525516
+lon: -122.001627784168
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.324
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11179100/
+parameter_code: "00065"
+series_begin: 2012-12-04T17:30:00+00:00
+time_series_id: 281521cbfa6044049ac0dbd6e6fdd619

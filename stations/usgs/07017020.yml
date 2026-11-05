@@ -1,0 +1,16 @@
+name: Meramec River at Pacific, MO
+lat: 38.4669444444444
+lon: -90.7348888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 131.765
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07017020/
+parameter_code: "00065"
+series_begin: 2014-07-01T06:00:00+00:00
+time_series_id: 079ce815b7e44b9f8e6d7ad60931fbbb

@@ -1,0 +1,16 @@
+name: Black Bayou at Rodessa, LA
+lat: 32.95861111111111
+lon: -93.99388888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 52.304
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07346450/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7ba7fd88fa9a4a72a840f8f2e5b2adab

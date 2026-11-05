@@ -1,0 +1,17 @@
+name: CUMBERLAND RIVER NEAR ROWENA, KY
+lat: 36.8839548445983
+lon: -85.1394008216774
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.616
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03414000/
+parameter_code: "00065"
+series_begin: 2020-08-31T15:15:00+00:00
+series_end: 2026-04-09T19:45:00+00:00
+time_series_id: fbcb7f81d42e48bda52976544aeb2cad

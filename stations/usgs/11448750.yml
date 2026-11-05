@@ -1,0 +1,17 @@
+name: SF SCOTTS C NR LAKEPORT CA
+lat: 39.040277777777774
+lon: -122.98330555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 448.952
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11448750/
+parameter_code: "00065"
+series_begin: 2021-01-05T04:15:00+00:00
+series_end: 2026-06-11T16:30:00+00:00
+time_series_id: 58e546aa73c74f2cb8dfbb99a6f62044

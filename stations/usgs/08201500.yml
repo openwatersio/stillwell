@@ -1,0 +1,16 @@
+name: Seco Ck at Miller Rh nr Utopia, TX
+lat: 29.57328400152
+lon: -99.4030997373775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 389.864
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08201500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 1099d659b5ff46b48cfd39c7469cbea3

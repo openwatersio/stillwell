@@ -1,0 +1,16 @@
+name: EAGLE CREEK ABOVE PUMPING PLANT, NEAR MORENCI, AZ.
+lat: 33.06615
+lon: -109.444975
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1100.465
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09447000/
+parameter_code: "00065"
+series_begin: 2007-10-03T07:00:00+00:00
+time_series_id: fd24974821df466692a9c54832d2be0c

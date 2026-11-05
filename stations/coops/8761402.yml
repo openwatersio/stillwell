@@ -1,0 +1,23 @@
+name: The Rigolets
+lat: 30.1667
+lon: -89.7367
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.132
+  MHW: -1.126
+  DTL: -1.022
+  MTL: -1.025
+  MSL: -1.031
+  MLW: -0.924
+  MLLW: -0.912
+  LAT: -0.658
+  HAT: -1.328
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761402
+established: 1980-12-04T00:00:00Z
+removed: 2014-11-22T00:00:00Z

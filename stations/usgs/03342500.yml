@@ -1,0 +1,16 @@
+name: BUSSERON CREEK NEAR CARLISLE, IN
+lat: 38.97421244257797
+lon: -87.42584263336742
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 129.543
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03342500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: c6b9ed34d7ac472e8acce13ecd3bb335

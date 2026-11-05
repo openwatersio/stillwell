@@ -1,0 +1,22 @@
+name: HAMLIN CREEK, ISLE OF PALMS
+lat: 32.7867
+lon: -79.7917
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.527
+  MHW: -2.41
+  DTL: -1.671
+  MTL: -1.642
+  MSL: -1.669
+  MLW: -0.874
+  MLLW: -0.815
+  NAVD88: -1.772
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8665387
+established: 1975-01-28T00:00:00Z
+removed: 1977-01-10T23:59:00Z

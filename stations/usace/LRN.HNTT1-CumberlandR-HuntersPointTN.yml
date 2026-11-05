@@ -1,0 +1,13 @@
+name: Cumberland River at Hunters Point, TN
+lat: 36.299167
+lon: -86.264167
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 121.92
+products: [levels]
+interval_s: 1800
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=HNTT1-CumberlandR-HuntersPointTN.Stage.Inst.30Minutes.0.dcp-rev
+series: HNTT1-CumberlandR-HuntersPointTN.Stage.Inst.30Minutes.0.dcp-rev

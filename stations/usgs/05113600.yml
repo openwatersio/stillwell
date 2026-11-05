@@ -1,0 +1,16 @@
+name: LONG CREEK NEAR NOONAN, ND
+lat: 48.981111
+lon: -103.076111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 562.368
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05113600/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 8db8ec7b9be64b9abc4971f6a20335de

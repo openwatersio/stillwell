@@ -1,0 +1,16 @@
+name: BEAVER RIVER AT CROGHAN NY
+lat: 43.8971666666667
+lon: -75.4042777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 245.629
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04258000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 27e8337a1afd48d09d2cd3e6f4400a6d

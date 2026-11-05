@@ -1,0 +1,17 @@
+name: W Fk Mill Creek at Hille Park at Cincinnati OH
+lat: 39.15
+lon: -84.5475
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 141.375
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03259813/
+parameter_code: "00065"
+series_begin: 2011-10-18T18:35:00+00:00
+series_end: 2014-05-08T04:45:00+00:00
+time_series_id: 67fe9f5bf5e04341a654ee932df1ca0b

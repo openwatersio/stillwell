@@ -1,0 +1,13 @@
+name: LITTLE RIVER TOWN, LITTLE R.
+lat: 33.87
+lon: -78.6083
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660121
+established: 1974-09-25T00:00:00Z
+removed: 1975-05-13T23:59:00Z

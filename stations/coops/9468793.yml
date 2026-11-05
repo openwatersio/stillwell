@@ -1,0 +1,24 @@
+name: Golovin, Golovnin Lagoon Entrance
+lat: 64.5463
+lon: -163.0317
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.889
+  MHW: -7.865
+  DTL: -7.408
+  MTL: -7.401
+  MSL: -7.41
+  MLW: -6.938
+  MLLW: -6.927
+  NAVD88: -6.273
+  LAT: -6.516
+  HAT: -8.39
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9468793
+established: 1900-08-22T00:00:00Z
+removed: 2023-10-02T00:00:00Z

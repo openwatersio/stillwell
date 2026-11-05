@@ -1,0 +1,13 @@
+name: Mississippi River at West Pointe a la Hache (01400)
+lat: 29.5711111
+lon: -89.7969444
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=West_Pointe.Stage.Inst.1Hour.0.rev
+series: West_Pointe.Stage.Inst.1Hour.0.rev
+zero_since: 2015-07-02

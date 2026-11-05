@@ -1,0 +1,15 @@
+name: Quillayute River at River Mile 4.8 nr La Push, WA
+lat: 47.9093
+lon: -124.55506111111112
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-475433124331801/
+parameter_code: "63160"
+series_begin: 2021-08-10T20:00:00+00:00
+series_end: 2021-09-08T18:15:00+00:00
+time_series_id: acfc874ab1b44177bd833fd12088291f

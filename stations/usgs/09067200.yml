@@ -1,0 +1,16 @@
+name: LAKE CREEK NEAR EDWARDS, CO
+lat: 39.6474860332069
+lon: -106.609200303722
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1965.302
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09067200/
+parameter_code: "00065"
+series_begin: 2020-11-19T20:15:00+00:00
+time_series_id: 223a82fad55f4fca884980aa14d4b3d8

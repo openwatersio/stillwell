@@ -1,0 +1,21 @@
+name: OCEANSIDE HARBOR
+lat: 33.21
+lon: -117.395
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.905
+  MHW: -5.68
+  DTL: -5.09
+  MTL: -5.114
+  MSL: -5.107
+  MLW: -4.549
+  MLLW: -4.275
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410396
+established: 1979-09-18T00:00:00Z
+removed: 1980-06-02T23:59:00Z

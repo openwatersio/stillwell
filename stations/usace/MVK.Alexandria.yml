@@ -1,0 +1,13 @@
+name: Red River @ Alexandria, LA
+lat: 31.308965
+lon: -92.439541
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 13.49
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Alexandria.Stage.Inst.1Hour.0.DCP-rev
+series: Alexandria.Stage.Inst.1Hour.0.DCP-rev

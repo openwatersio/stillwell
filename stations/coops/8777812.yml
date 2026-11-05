@@ -1,0 +1,15 @@
+name: Rincon Del San Jose
+lat: 26.801195
+lon: -97.47056
+country_code: US
+datum: STND
+datums:
+  MSL: -1.137
+  NAVD88: -1.007
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8777812
+established: 1990-03-04T00:00:00Z

@@ -1,0 +1,16 @@
+name: NORTH SALUDA RESERVOIR NEAR TIGERVILLE, SC
+lat: 35.1416666666667
+lon: -82.4086111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 365.76
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-021623961/
+parameter_code: "00065"
+series_begin: 2016-12-14T20:00:00+00:00
+time_series_id: 23f6a51999b14414ba29698d7a83d254

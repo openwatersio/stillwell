@@ -1,0 +1,13 @@
+name: PaintsvilleKY
+lat: 37.8172
+lon: -82.7906
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 172.634
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=PaintsvilleKY.Stage.Inst.15Minutes.0.OBS
+series: PaintsvilleKY.Stage.Inst.15Minutes.0.OBS

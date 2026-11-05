@@ -1,0 +1,13 @@
+name: LICKING RIVER AT BLUE LICK SPRIN
+lat: 38.420075
+lon: -83.997425
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 170.99
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=BlueLickSprings.Stage.Inst.15Minutes.0.LRGS-rev
+series: BlueLickSprings.Stage.Inst.15Minutes.0.LRGS-rev

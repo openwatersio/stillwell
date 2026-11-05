@@ -1,0 +1,16 @@
+name: Mountain Fork at Smithville, OK
+lat: 34.4623262209573
+lon: -94.635220184723
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 202.829
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07338750/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e55c30ff5df546908f1d357055089484

@@ -1,0 +1,17 @@
+name: LAS VEGAS WASH NR SAHARA AVE NR LAS VEGAS, NV
+lat: 36.1463616786778
+lon: -115.052775807213
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 522.732
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09419658/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+series_end: 2013-11-20T07:45:00+00:00
+time_series_id: 08e1feef7dde43a0bf87f9fb59a09918

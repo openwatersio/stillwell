@@ -1,0 +1,21 @@
+name: NANCOTE CREEK
+lat: 39.535
+lon: -74.4633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.503
+  MHW: -2.403
+  DTL: -1.961
+  MTL: -1.932
+  MSL: -1.958
+  MLW: -1.461
+  MLLW: -1.42
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534256
+established: 1977-08-24T00:00:00Z
+removed: 1978-11-14T23:59:00Z

@@ -1,0 +1,16 @@
+name: Crosswicks Creek at Extonville NJ
+lat: 40.1372222222222
+lon: -74.6
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 7.306
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01464500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 31c91d816aec43bab451c782da4bc596

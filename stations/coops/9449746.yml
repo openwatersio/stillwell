@@ -1,0 +1,23 @@
+name: Waldron Island
+lat: 48.6868
+lon: -123.0376
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.102
+  MHW: -8.888
+  DTL: -7.819
+  MTL: -8.07
+  MSL: -8.023
+  MLW: -7.251
+  MLLW: -6.536
+  LAT: -5.34
+  HAT: -9.66
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9449746
+established: 2015-07-22T00:00:00Z
+removed: 2016-01-31T23:59:00Z

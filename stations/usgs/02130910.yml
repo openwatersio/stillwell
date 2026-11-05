@@ -1,0 +1,16 @@
+name: BLACK CREEK NEAR HARTSVILLE, SC
+lat: 34.3973761825769
+lon: -80.1497909571086
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 53.837
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02130910/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4e7d0c8bed9b4ab9bf4dfbb2a524881e

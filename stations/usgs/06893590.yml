@@ -1,0 +1,16 @@
+name: Blue River at 12th Street in Kansas City, MO
+lat: 39.0969166666667
+lon: -94.4910277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.883
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06893590/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: bb44fb074f5d46489dcf70117d09d5a7

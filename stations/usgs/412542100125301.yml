@@ -1,0 +1,17 @@
+name: South Loup R Spring 0.86 mi west of Arnold, Nebr.
+lat: 41.4283333333333
+lon: -100.214722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 823.265
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-412542100125301/
+parameter_code: "00065"
+series_begin: 2019-05-14T14:15:00+00:00
+series_end: 2019-10-22T15:45:00+00:00
+time_series_id: 9e1a7ce215304c3e9f4d4d59a48a281c

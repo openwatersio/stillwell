@@ -1,0 +1,16 @@
+name: CHIPPEWA RIVER AT S HOMER RD NR MIDLAND
+lat: 43.601108333333336
+lon: -84.33054722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.612
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04154512/
+parameter_code: "00065"
+series_begin: 2021-06-16T19:15:00+00:00
+time_series_id: dbf8c155064d48deac22d684dfa6800a

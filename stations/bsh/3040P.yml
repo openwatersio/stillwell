@@ -1,0 +1,13 @@
+name: Travemünde, Ostsee
+lat: 53.95806
+lon: 10.87222
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -5.03
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9620085]
+source_url: https://gezeiten.bsh.de/travemuende

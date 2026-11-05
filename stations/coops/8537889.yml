@@ -1,0 +1,13 @@
+name: QUINTON, ALLOWAY CREEK
+lat: 39.5483
+lon: -75.415
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8537889
+established: 1977-08-22T00:00:00Z
+removed: 1979-01-16T23:59:00Z

@@ -1,0 +1,16 @@
+name: CHERRY C BL DION R HOLM PH NR MATHER CA
+lat: 37.89018601058264
+lon: -119.96987061497359
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 651.117
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11278400/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 9c352422446f41fda1fd3c840ead140b

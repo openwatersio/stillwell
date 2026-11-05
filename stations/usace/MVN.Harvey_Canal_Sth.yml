@@ -1,0 +1,11 @@
+name: Harvey Canal Lapalco Blvd South
+lat: 29.848358333333
+lon: -90.0598695
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Harvey_Canal_Sth.Stage.Inst.15Minutes.0.rev
+series: Harvey_Canal_Sth.Stage.Inst.15Minutes.0.rev

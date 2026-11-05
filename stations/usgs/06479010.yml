@@ -1,0 +1,16 @@
+name: VERMILLION RIVER NEAR VERMILLION,SD
+lat: 42.8172187106219
+lon: -96.92421059609
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 341.879
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06479010/
+parameter_code: "00065"
+series_begin: 2018-01-01T00:00:00+00:00
+time_series_id: a265a32b1ad54836b4cbbfddc34a8e4e

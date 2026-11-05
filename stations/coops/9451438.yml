@@ -1,0 +1,23 @@
+name: Entrance Island
+lat: 56.8117
+lon: -133.787
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.416
+  MHW: -3.155
+  DTL: -1.197
+  MTL: -1.301
+  MSL: -1.31
+  MLW: 0.552
+  MLLW: 1.022
+  LAT: 2.239
+  HAT: -4.432
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451438
+established: 1929-04-16T00:00:00Z
+removed: 2006-06-08T23:59:00Z

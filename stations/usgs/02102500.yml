@@ -1,0 +1,16 @@
+name: CAPE FEAR RIVER AT LILLINGTON, NC
+lat: 35.4061111111111
+lon: -78.8133333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 31.586
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02102500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 047334d6ae774267b7dd12059970cd05

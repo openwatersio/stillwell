@@ -1,0 +1,16 @@
+name: WILLOW CREEK BELOW CABIN CREEK NEAR GRANBY, CO
+lat: 40.21426944444445
+lon: -106.05066111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2568.55
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09019850/
+parameter_code: "00065"
+series_begin: 2024-04-01T06:00:00+00:00
+time_series_id: d9a9abb83b0841d0bbdd67a65fe5acce

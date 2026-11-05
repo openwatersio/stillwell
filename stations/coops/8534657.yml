@@ -1,0 +1,21 @@
+name: PLEASANTVILLE, LAKES BAY
+lat: 39.3817
+lon: -74.5183
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.984
+  MHW: -4.866
+  DTL: -4.3
+  MTL: -4.262
+  MSL: -4.268
+  MLW: -3.658
+  MLLW: -3.616
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8534657
+established: 1977-05-26T00:00:00Z
+removed: 1978-07-18T23:59:00Z

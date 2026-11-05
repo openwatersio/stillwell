@@ -1,0 +1,11 @@
+name: Old River Lowsill Outflow Channel near Knox Landing
+lat: 31.0756639
+lon: -91.5996667
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=ORCC-LowSill_Structure_Outflow.Stage.Inst.1Hour.0.rev
+series: ORCC-LowSill_Structure_Outflow.Stage.Inst.1Hour.0.rev

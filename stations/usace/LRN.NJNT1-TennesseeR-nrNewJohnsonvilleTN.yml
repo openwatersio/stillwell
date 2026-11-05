@@ -1,0 +1,11 @@
+name: Tennessee River - Johnsonville TN
+lat: 36.017778
+lon: -88.000278
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=NJNT1-TennesseeR-nrNewJohnsonvilleTN.Stage.Inst.15Minutes.0.dcp-rev
+series: NJNT1-TennesseeR-nrNewJohnsonvilleTN.Stage.Inst.15Minutes.0.dcp-rev

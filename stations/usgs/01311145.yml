@@ -1,0 +1,14 @@
+name: EAST ROCKAWAY INLET AT ATLANTIC BEACH NY
+lat: 40.59297222222222
+lon: -73.73736111111111
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01311145/
+parameter_code: "62620"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 3aecd94d94bc4ec2986388e31b5858db

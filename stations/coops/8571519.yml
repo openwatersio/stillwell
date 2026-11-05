@@ -1,0 +1,13 @@
+name: MIDDLE HOOPERS ISLAND
+lat: 38.2967
+lon: -76.205
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8571519
+established: 1971-06-23T00:00:00Z
+removed: 1986-04-25T23:59:00Z

@@ -1,0 +1,16 @@
+name: POMPERAUG RIVER AT SOUTHBURY, CT
+lat: 41.48193888888889
+lon: -73.22457222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 50.146
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01204000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9924e82396c1405aa51f899f4001fb1f

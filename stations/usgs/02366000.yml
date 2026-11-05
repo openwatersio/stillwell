@@ -1,0 +1,16 @@
+name: HOLMES CREEK AT VERNON, FLA.
+lat: 30.6268589946213
+lon: -85.7121531100662
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 3.261
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02366000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 95fd0d373c364f1bb726296f234ae2f0

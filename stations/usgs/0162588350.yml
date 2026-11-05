@@ -1,0 +1,17 @@
+name: SOUTH FORK BACK CREEK AT RT 814 NEAR SHERANDO, VA
+lat: 37.9218611111111
+lon: -78.9873055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 518.416
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0162588350/
+parameter_code: "00065"
+series_begin: 2017-11-24T17:30:00+00:00
+series_end: 2021-04-05T15:00:00+00:00
+time_series_id: 326e2b7b23314522855087a7cf13b759

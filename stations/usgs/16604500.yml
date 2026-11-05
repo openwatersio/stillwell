@@ -1,0 +1,16 @@
+name: Wailuku River at Kepaniwai Park, Maui, HI
+lat: 20.882384684515205
+lon: -156.53928276773374
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 237.744
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16604500/
+parameter_code: "00065"
+series_begin: 2007-10-01T10:00:00+00:00
+time_series_id: 940a19548a8447c181fb88a71858fc36

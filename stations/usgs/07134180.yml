@@ -1,0 +1,16 @@
+name: ARKANSAS RIVER NEAR GRANADA, CO.
+lat: 38.0955649247054
+lon: -102.310745257598
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1060.704
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07134180/
+parameter_code: "00065"
+series_begin: 2020-11-05T17:45:00+00:00
+time_series_id: 3a748c40ef8f4d61add86b7e5d379669

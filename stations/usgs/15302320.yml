@@ -1,0 +1,17 @@
+name: STUYAHOK R NR NEW STUYAHOK AK
+lat: 59.8090114850149
+lon: -156.666922874239
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 89.916
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15302320/
+parameter_code: "00065"
+series_begin: 2008-10-09T21:30:00+00:00
+series_end: 2014-10-18T18:30:00+00:00
+time_series_id: fcd0a246548441dcb157b36eed3f175a

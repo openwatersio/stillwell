@@ -1,0 +1,15 @@
+name: BOTTOM CREEK BL POOR MTN RD NEAR BENT MOUNTAIN, VA
+lat: 37.16475
+lon: -80.14136111111112
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0205373422/
+parameter_code: "00065"
+series_begin: 2017-10-27T17:55:00+00:00
+series_end: 2025-05-19T19:15:00+00:00
+time_series_id: 629f4ce97eb54551845c69e79b51c768

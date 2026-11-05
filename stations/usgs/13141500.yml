@@ -1,0 +1,16 @@
+name: CAMAS CREEK NR BLAINE ID
+lat: 43.3327777777778
+lon: -114.541944444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1484.376
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13141500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:30:00+00:00
+time_series_id: 671b5c37fcf14be3b3589dc63eeccfcc

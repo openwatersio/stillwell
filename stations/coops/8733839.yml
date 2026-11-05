@@ -1,0 +1,23 @@
+name: Meaher State Park, Mobile Bay
+lat: 30.667166
+lon: -87.93645
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.493
+  MHW: -9.492
+  DTL: -9.259
+  MTL: -9.266
+  MSL: -9.265
+  MLW: -9.04
+  MLLW: -9.024
+  LAT: -8.711
+  HAT: -9.771
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8733839
+established: 2010-11-03T00:00:00Z
+removed: 2011-02-10T23:59:00Z

@@ -1,0 +1,16 @@
+name: Lower Keechi Ck at IH 45 nr Centerville, TX
+lat: 31.310188888888888
+lon: -96.00222777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08065420/
+parameter_code: "00065"
+series_begin: 2021-08-12T15:25:00+00:00
+time_series_id: 438ca61fbf2140e8924dc23ab4b24cad

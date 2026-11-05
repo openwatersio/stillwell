@@ -1,0 +1,22 @@
+name: NEWFOUND HARBOR
+lat: 24.6517
+lon: -81.375
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.07
+  MHW: -0.998
+  DTL: -0.846
+  MTL: -0.828
+  MSL: -0.827
+  MLW: -0.658
+  MLLW: -0.622
+  NAVD88: -1.099
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724215
+established: 1974-11-20T00:00:00Z
+removed: 1975-02-07T23:59:00Z

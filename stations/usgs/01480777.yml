@@ -1,0 +1,14 @@
+name: Beaver Cr at Mary St Field at Downingtown, PA
+lat: 40.00508333333333
+lon: -75.71797222222223
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01480777/
+parameter_code: "00065"
+series_begin: 2024-10-23T18:00:00+00:00
+time_series_id: e556ac95b0d04318b3b368ef2008fc6a

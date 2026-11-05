@@ -1,0 +1,16 @@
+name: NATCHAUG RIVER AT WILLIMANTIC, CT
+lat: 41.7201
+lon: -72.195575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 45.507
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01122000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1dd24fe9f052487aa41cf46511afa871

@@ -1,0 +1,24 @@
+name: Sandy Hook
+lat: 40.4669
+lon: -74.0094
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.359
+  MHW: -2.258
+  DTL: -1.562
+  MTL: -1.541
+  MSL: -1.551
+  MLW: -0.825
+  MLLW: -0.766
+  NAVD88: -1.624
+  LAT: -0.295
+  HAT: -2.786
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8531680
+established: 1910-01-07T00:00:00Z

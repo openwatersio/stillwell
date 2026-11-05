@@ -1,0 +1,16 @@
+name: PEACE RIVER AT STATE HWY 664A NEAR WAUCHULA FL
+lat: 27.5755555555556
+lon: -81.8047222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02295440/
+parameter_code: "00065"
+series_begin: 2016-10-17T13:15:00+00:00
+time_series_id: 6247fdd1d0f54268b29584271194e1d1

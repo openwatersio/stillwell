@@ -1,0 +1,16 @@
+name: GYPSUM C NR GYPSUM, KS
+lat: 38.62726388888889
+lon: -97.42755833333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 375.556
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06870300/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: bf7a0ac221094dc58f4ec91dcc0f7ee0

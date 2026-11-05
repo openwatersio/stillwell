@@ -1,0 +1,16 @@
+name: CHUB CREEK AT CO. HWY. 47 ABOVE RANDOLPH, MN
+lat: 44.528888888888886
+lon: -93.07249999999999
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.748
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05355038/
+parameter_code: "00065"
+series_begin: 2016-05-05T06:00:00+00:00
+time_series_id: 2a97bf0070ac414bba4bafe2c14e0fc1

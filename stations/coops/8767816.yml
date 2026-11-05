@@ -1,0 +1,24 @@
+name: Lake Charles
+lat: 30.223612
+lon: -93.221664
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.471
+  MHW: -8.44
+  DTL: -8.257
+  MTL: -8.28
+  MSL: -8.283
+  MLW: -8.121
+  MLLW: -8.043
+  NAVD88: -8.247
+  LAT: -7.75
+  HAT: -8.583
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8767816
+established: 1932-03-01T00:00:00Z

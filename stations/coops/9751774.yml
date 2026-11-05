@@ -1,0 +1,23 @@
+name: Botany Bay, St. Thomas
+lat: 18.3633
+lon: -65.035
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.746
+  MHW: -0.668
+  DTL: -0.55
+  MTL: -0.531
+  MSL: -0.534
+  MLW: -0.394
+  MLLW: -0.355
+  LAT: -0.181
+  HAT: -0.957
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751774
+established: 1975-12-21T00:00:00Z
+removed: 2011-08-29T23:59:00Z

@@ -1,0 +1,16 @@
+name: Mouth of the Black River
+lat: 42.974667
+lon: -82.41881
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -175.62
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014091
+established: 2008-10-20T00:00:00Z
+removed: 2009-12-15T23:59:00Z

@@ -1,0 +1,17 @@
+name: Camas Creek near Moose Pond
+lat: 43.9401638888889
+lon: -112.279219444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1460.906
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-4356251121645/
+parameter_code: "00065"
+series_begin: 2019-04-09T16:30:00+00:00
+series_end: 2020-08-01T07:31:00+00:00
+time_series_id: 0acef63d791c46079a3eb87d683e9442

@@ -1,0 +1,16 @@
+name: Sister Grove Ck nr Blue Ridge, TX
+lat: 33.2945578636774
+lon: -96.4830412782483
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 160.425
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08059400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 18c40007233946e09418bbb85f2535f8

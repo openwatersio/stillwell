@@ -1,0 +1,16 @@
+name: Little Peoples Creek near Hays, MT
+lat: 47.9649333333333
+lon: -108.655961111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1154.887
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06154410/
+parameter_code: "00065"
+series_begin: 2024-10-01T07:00:00+00:00
+time_series_id: ce0f56c650b94860afd94a5bf19ee1e7

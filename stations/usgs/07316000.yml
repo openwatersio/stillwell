@@ -1,0 +1,16 @@
+name: Red River near Gainesville, TX
+lat: 33.7278833324689
+lon: -97.1600129471109
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 191.21
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07316000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 807812e260e14c69939754671f3b9fb9

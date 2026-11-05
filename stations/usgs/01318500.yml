@@ -1,0 +1,16 @@
+name: HUDSON RIVER AT HADLEY NY
+lat: 43.3190555555556
+lon: -73.8443055555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 171.81
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01318500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9bbae077ad9c4415935ba2ae7cc5e850

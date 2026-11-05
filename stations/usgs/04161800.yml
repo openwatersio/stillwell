@@ -1,0 +1,15 @@
+name: STONY CREEK NEAR WASHINGTON, MI
+lat: 42.7153095040279
+lon: -83.091876790921
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 235.485
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04161800/
+parameter_code: "00065"
+time_series_id: 03eab6c9dba34f21beafe69caec11c6e

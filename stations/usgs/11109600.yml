@@ -1,0 +1,16 @@
+name: PIRU CREEK ABOVE LAKE PIRU CA
+lat: 34.523047329631915
+lon: -118.7570206140436
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 323.737
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11109600/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 174c71e1bc3c4266981bc81a1cdcf1fa

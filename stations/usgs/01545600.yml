@@ -1,0 +1,16 @@
+name: Young Womans Creek near Renovo, PA
+lat: 41.38944983438286
+lon: -77.69079674249522
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 237.686
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01545600/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f6193f15ffd94efab0ec53c52649e7e4

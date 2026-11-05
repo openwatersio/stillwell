@@ -1,0 +1,22 @@
+name: NIXON CROSSROADS, LITTLE RIVER
+lat: 33.855
+lon: -78.6483
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.675
+  MHW: -1.576
+  DTL: -0.982
+  MTL: -0.951
+  MSL: -0.944
+  MLW: -0.327
+  MLLW: -0.288
+  NAVD88: -0.961
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8660166
+established: 1974-09-25T00:00:00Z
+removed: 1978-02-08T23:59:00Z

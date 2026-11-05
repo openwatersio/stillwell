@@ -1,0 +1,16 @@
+name: COTTONWOOD CK AT UNION BLVD, AT COLO SPRINGS, CO
+lat: 38.930361
+lon: -104.77615
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1973.827
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103987/
+parameter_code: "00065"
+series_begin: 2020-10-06T17:15:00+00:00
+time_series_id: e34d26953d674a7a8bfe28e92ea2af62

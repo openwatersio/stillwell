@@ -1,0 +1,16 @@
+name: Comite River near Olive Branch, LA
+lat: 30.7565718232494
+lon: -91.0439935335675
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 34.488
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07377500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 46f4c62fa2264f089a2d77be40e8b238

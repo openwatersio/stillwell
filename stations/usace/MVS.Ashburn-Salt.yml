@@ -1,0 +1,14 @@
+name: Ashburn
+lat: 39.522039
+lon: -91.202003
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 136.392
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Ashburn-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Ashburn-Salt.Stage.Inst.15Minutes.0.lrgsShef-rev

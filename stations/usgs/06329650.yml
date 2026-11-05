@@ -1,0 +1,17 @@
+name: MISSOURI RIVER NO. 6 NEAR BUFORD, ND
+lat: 47.955833
+lon: -103.908611
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 561.158
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06329650/
+parameter_code: "00065"
+series_begin: 2025-11-24T05:00:00+00:00
+series_end: 2026-10-19T14:00:00+00:00
+time_series_id: 153a7f79ece24ba88eaf4f4f4eb218f0

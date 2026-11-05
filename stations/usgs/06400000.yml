@@ -1,0 +1,16 @@
+name: HAT CREEK NEAR EDGEMONT, SD
+lat: 43.24
+lon: -103.587778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1005.017
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06400000/
+parameter_code: "00065"
+series_begin: 2017-09-17T00:00:00+00:00
+time_series_id: c175e84a0b834cf990550d49c56b2028

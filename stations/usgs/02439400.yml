@@ -1,0 +1,16 @@
+name: BUTTAHATCHEE RIVER NR ABERDEEN, MS
+lat: 33.79
+lon: -88.3152777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 67.361
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02439400/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: c70733a29f304641897cc891a7a9cdc8

@@ -1,0 +1,13 @@
+name: Tuscolameta Creek @ Walnut Grove
+lat: 32.5883
+lon: -89.465
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 101.407
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Walnut%20Grove.Stage.Inst.15Minutes.0.DCP-rev
+series: Walnut Grove.Stage.Inst.15Minutes.0.DCP-rev

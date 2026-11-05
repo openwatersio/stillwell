@@ -1,0 +1,16 @@
+name: Yellowstone River near Sidney MT
+lat: 47.677413888888886
+lon: -104.15541111111112
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 573.899
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06329500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:02:00+00:00
+time_series_id: 1aec5f2fefb64604a1d1e9a2d81d6e1d

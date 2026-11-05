@@ -1,0 +1,16 @@
+name: PIPESTEM CREEK NEAR BUCHANAN, ND
+lat: 47.066389
+lon: -98.918611
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 447.501
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06469500/
+parameter_code: "00065"
+series_begin: 2021-03-20T17:15:00+00:00
+time_series_id: 91d802596dd646bf9fa0360108cdbcd4

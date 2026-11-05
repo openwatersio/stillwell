@@ -1,0 +1,13 @@
+name: Welch
+lat: 37.4411
+lon: -81.5833
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 386.486
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Welch.Stage.Inst.15Minutes.0.OBS
+series: Welch.Stage.Inst.15Minutes.0.OBS

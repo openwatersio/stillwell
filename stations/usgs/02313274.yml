@@ -1,0 +1,17 @@
+name: WITHLACOOCHEE R AT BUNGALOW PASS AT PORT INGLIS FL
+lat: 28.9946957510163
+lon: -82.7589955895839
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0.107
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02313274/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2013-10-22T03:45:00+00:00
+time_series_id: 037f6a5c478543c794166b352e28ec36

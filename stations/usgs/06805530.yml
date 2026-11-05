@@ -1,0 +1,16 @@
+name: Springfield Creek at Springfield, Nebr.
+lat: 41.086272
+lon: -96.136578
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 312.972
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06805530/
+parameter_code: "00065"
+series_begin: 2026-03-05T18:15:00+00:00
+time_series_id: 9e6f050a5db54e988743fc72fd91963e

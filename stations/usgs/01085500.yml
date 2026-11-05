@@ -1,0 +1,16 @@
+name: CONTOOCOOK R BL HOPKINTON DAM AT W HOPKINTON, NH
+lat: 43.1928569410284
+lon: -71.7472995001022
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 108.25
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01085500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 306209f05adc49fabf1c729f6ec410f3

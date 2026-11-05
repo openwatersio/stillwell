@@ -1,0 +1,22 @@
+name: RIVER VILLAGE, ANCLOTE RIVER
+lat: 28.1567
+lon: -82.7467
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.801
+  MHW: -0.703
+  DTL: -0.436
+  MTL: -0.44
+  MSL: -0.446
+  MLW: -0.177
+  MLLW: -0.071
+  NAVD88: -0.512
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726906
+established: 1975-12-05T00:00:00Z
+removed: 1976-02-11T23:59:00Z

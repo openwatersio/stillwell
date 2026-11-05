@@ -1,0 +1,15 @@
+name: Blue River Abv Little W Blue Ck Nr Connerville, OK
+lat: 34.477781
+lon: -96.673792
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07332335/
+parameter_code: "00065"
+series_begin: 2024-04-03T17:00:00+00:00
+series_end: 2026-06-25T16:15:00+00:00
+time_series_id: 55586a23af574ecaa5799523eac059da

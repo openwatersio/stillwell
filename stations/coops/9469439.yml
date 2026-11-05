@@ -1,0 +1,23 @@
+name: Tin City, Bering Sea
+lat: 65.558334
+lon: -167.975
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.415
+  MHW: -1.356
+  DTL: -1.259
+  MTL: -1.245
+  MSL: -1.248
+  MLW: -1.134
+  MLLW: -1.104
+  LAT: -0.989
+  HAT: -1.462
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9469439
+established: 1960-08-01T00:00:00Z
+removed: 2010-08-30T23:59:00Z

@@ -1,0 +1,16 @@
+name: BULLSKIN RUN BELOW KABLETOWN, WV
+lat: 39.2115833333333
+lon: -77.8348611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 113.742
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01636464/
+parameter_code: "00065"
+series_begin: 2008-04-02T04:00:00+00:00
+time_series_id: 5605fd9cba1b49649583b687d885b8e7

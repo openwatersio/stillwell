@@ -1,0 +1,15 @@
+name: Swan Creek at Champion Street at Toledo OH
+lat: 41.6330555555556
+lon: -83.5819444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 171.066
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04194002/
+parameter_code: "00065"
+time_series_id: 94b4068a808c4ad6a01025b203572ea3

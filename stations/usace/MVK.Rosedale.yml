@@ -1,0 +1,13 @@
+name: Mississippi River @ Rosedale, MS
+lat: 33.565277778667
+lon: -91.24305555631
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 33.141
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Rosedale.Stage.Inst.1Hour.0.DCP-rev
+series: Rosedale.Stage.Inst.1Hour.0.DCP-rev

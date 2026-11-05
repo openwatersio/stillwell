@@ -1,0 +1,13 @@
+name: SYLVAN GLEN, CROSSWICKS CREEK
+lat: 40.1817
+lon: -74.705
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8539808
+established: 1977-03-23T00:00:00Z
+removed: 1978-10-24T23:59:00Z

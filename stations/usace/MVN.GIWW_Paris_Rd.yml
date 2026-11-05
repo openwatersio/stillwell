@@ -1,0 +1,12 @@
+name: GIWW near Paris Road Bridge (76040)
+lat: 30.0067055
+lon: -89.9373612
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=GIWW_Paris_Rd.Stage.Inst.1Hour.0.rev
+series: GIWW_Paris_Rd.Stage.Inst.1Hour.0.rev

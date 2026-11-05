@@ -1,0 +1,16 @@
+name: CIMARRON RIVER BELOW EAGLE NEST DAM, NM
+lat: 36.532125
+lon: -105.228144444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 2462.784
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07206000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 13f4040a593b430bb01a5cb306a60999

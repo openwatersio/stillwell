@@ -1,0 +1,16 @@
+name: MILL C NR LOS MOLINOS CA
+lat: 40.0546022213626
+lon: -122.024154148444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 117.119
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11381500/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 1c4fd4be818947ccb84f214b447d2dda

@@ -1,0 +1,13 @@
+name: Büsum, Schleuse
+lat: 54.12222
+lon: 8.85917
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -2.8
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9510095]
+source_url: https://gezeiten.bsh.de/buesum_schleuse

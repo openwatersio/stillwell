@@ -1,0 +1,16 @@
+name: Navidad Rv nr Speaks, TX
+lat: 29.3219140249381
+lon: -96.7091425094027
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.552
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08164350/
+parameter_code: "00065"
+series_begin: 2008-05-28T05:00:00+00:00
+time_series_id: 2e50c5566e5a4d8695065c3595346445

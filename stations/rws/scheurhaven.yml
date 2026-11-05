@@ -1,0 +1,11 @@
+name: Scheurhaven
+lat: 51.962297
+lon: 4.138792
+country_code: NL
+datum: NAP
+products: [levels, predictions, predicted_extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/scheurhaven/details

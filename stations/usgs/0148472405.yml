@@ -1,0 +1,14 @@
+name: BUNTINGS GUT NEAR CEDARTOWN, MD
+lat: 38.1389722222222
+lon: -75.1836388888889
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0148472405/
+parameter_code: "62620"
+series_begin: 2018-06-25T17:18:00+00:00
+time_series_id: de75c0f699b64f5d8f76c0c9a0fda9bc

@@ -1,0 +1,17 @@
+name: ROOSEVELT CANAL BELOW STR 23-8 NR PINELLAS PARK FL
+lat: 27.9078002470446
+lon: -82.6759327246582
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.707
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02308866/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2021-04-30T12:00:00+00:00
+time_series_id: 1cf58b98f83d44cbbd6c6826302ab193

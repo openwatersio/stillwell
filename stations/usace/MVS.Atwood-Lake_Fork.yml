@@ -1,0 +1,14 @@
+name: Atwood
+lat: 39.8063889
+lon: -88.4761111
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 196.468
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Atwood-Lake%20Fork.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Atwood-Lake Fork.Stage.Inst.15Minutes.0.lrgsShef-rev

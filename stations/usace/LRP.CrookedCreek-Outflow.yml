@@ -1,0 +1,13 @@
+name: Crooked Creek Lake Outflow, PA
+lat: 40.7203
+lon: -79.5117
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 243.691
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=CrookedCreek-Outflow.Stage.Inst.15Minutes.0.OBS
+series: CrookedCreek-Outflow.Stage.Inst.15Minutes.0.OBS

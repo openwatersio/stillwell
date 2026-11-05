@@ -1,0 +1,17 @@
+name: SLATE RIVER ABV O-B-J CREEK NR CRESTED BUTTE, CO
+lat: 38.91441111111111
+lon: -107.03403888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2730.377
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-385450107015700/
+parameter_code: "00065"
+series_begin: 2024-04-01T07:00:00+00:00
+series_end: 2026-04-23T22:25:00+00:00
+time_series_id: b79fef5f5ec54fa1af0b9a563e179cf5

@@ -1,0 +1,17 @@
+name: N FK JOHNSON CR NR SE ORIENT DR, NR GRESHAM, OR
+lat: 45.46866666666667
+lon: -122.36397222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 150.266
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-452807122215001/
+parameter_code: "00065"
+series_begin: 2015-10-28T17:15:00+00:00
+series_end: 2018-10-17T23:30:00+00:00
+time_series_id: d743b2f763ff4d699dbcc0cde0e24b08

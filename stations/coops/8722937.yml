@@ -1,0 +1,24 @@
+name: FT. LAUDERDALE, ANDREWS AVENUE BRIDGE
+lat: 26.1183
+lon: -80.145
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.138
+  MHW: -0.107
+  DTL: 0.208
+  MTL: 0.204
+  MSL: 0.207
+  MLW: 0.516
+  MLLW: 0.556
+  NAVD88: 0
+  LAT: 0.773
+  HAT: -0.444
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722937
+established: 1970-04-20T00:00:00Z
+removed: 2022-02-14T23:59:00Z

@@ -1,0 +1,24 @@
+name: Hammond
+lat: 46.2017
+lon: -123.945
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.309
+  MHW: -3.093
+  DTL: -2.036
+  MTL: -2.12
+  MSL: -2.098
+  MLW: -1.146
+  MLLW: -0.763
+  NAVD88: -0.78
+  LAT: -0.062
+  HAT: -4.006
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9439011
+established: 1982-05-11T00:00:00Z
+removed: 2014-08-13T00:00:00Z

@@ -1,0 +1,21 @@
+name: OSTEGO BAY, ESTERO BAY
+lat: 26.4133
+lon: -81.8983
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.457
+  MHW: -1.374
+  DTL: -1.078
+  MTL: -1.107
+  MSL: -1.116
+  MLW: -0.84
+  MLLW: -0.699
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725331
+established: 1973-05-16T00:00:00Z
+removed: 1973-07-09T23:59:00Z

@@ -1,0 +1,16 @@
+name: E BR AU GRES R AT E ANDREWS RD NR ALABASTER, MI
+lat: 44.14358333333333
+lon: -83.58562777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.802
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04138030/
+parameter_code: "00065"
+series_begin: 2022-09-30T18:15:00+00:00
+time_series_id: 8fa746c082f841f18aba3628c3e4a280

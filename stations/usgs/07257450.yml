@@ -1,0 +1,15 @@
+name: East Fork Illinois Bayou nr Hector, AR
+lat: 35.5337777777778
+lon: -92.9307222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07257450/
+parameter_code: "00065"
+series_begin: 2013-03-29T05:00:00+00:00
+series_end: 2015-10-01T05:45:00+00:00
+time_series_id: 05f3618d83054d029454ffb3107767c0

@@ -1,0 +1,16 @@
+name: SQUANNACOOK RIVER NEAR WEST GROTON, MA
+lat: 42.6342561948181
+lon: -71.6578478973968
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 74.219
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01096000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1d159e3505d04f5c8ddacd5701776d13

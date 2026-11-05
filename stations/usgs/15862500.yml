@@ -1,0 +1,17 @@
+name: UBLUTUOCH R 13.7 MI AB MOUTH NR NUIQSUT AK
+lat: 70.2426555555556
+lon: -151.294947222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 15.24
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15862500/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+series_end: 2009-10-01T08:45:00+00:00
+time_series_id: 038f0b3e71444baab1f7722c62824a88

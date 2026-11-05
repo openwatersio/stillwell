@@ -1,0 +1,13 @@
+name: Big Black River @ Bentonia, MS
+lat: 32.602786
+lon: -90.364035
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 39.679
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Bentonia.Stage.Inst.1Hour.0.DCP-rev
+series: Bentonia.Stage.Inst.1Hour.0.DCP-rev

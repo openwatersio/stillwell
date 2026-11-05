@@ -1,0 +1,16 @@
+name: Cedar Bayou at I-10 nr Mont Belvieu, TX
+lat: 29.821513888888887
+lon: -94.90970555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08067505/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 25d53f81d5b5432194e66fdaa89bcbd7

@@ -1,0 +1,16 @@
+name: HICKORY LOG CREEK NEAR CANTON, GA
+lat: 34.2650555555556
+lon: -84.4735
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 269.59
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02391840/
+parameter_code: "00065"
+series_begin: 2007-11-30T05:00:00+00:00
+time_series_id: 6ebcef9248834f32b39e929708d82ffc

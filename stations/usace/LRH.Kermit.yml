@@ -1,0 +1,13 @@
+name: Kermit
+lat: 37.8372
+lon: -82.4088
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 175.19
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Kermit.Stage.Inst.15Minutes.0.OBS
+series: Kermit.Stage.Inst.15Minutes.0.OBS

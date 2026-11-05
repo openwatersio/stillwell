@@ -1,0 +1,22 @@
+name: STRATHMERE, STRATHMERE BAY
+lat: 39.2
+lon: -74.6567
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.823
+  MHW: -1.703
+  DTL: -1.158
+  MTL: -1.123
+  MSL: -1.141
+  MLW: -0.544
+  MLLW: -0.493
+  NAVD88: -1.228
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8535163
+established: 1977-06-17T00:00:00Z
+removed: 1978-12-06T23:59:00Z

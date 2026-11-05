@@ -1,0 +1,16 @@
+name: SNAKE RIVER NR SHELLEY ID
+lat: 43.4130555555556
+lon: -112.135
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1402.607
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13060000/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 85f23e8c683448688bad05adfcc16b55

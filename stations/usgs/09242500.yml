@@ -1,0 +1,16 @@
+name: ELK RIVER NEAR MILNER, CO.
+lat: 40.51468125863173
+lon: -106.95397069382082
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2006.322
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09242500/
+parameter_code: "00065"
+series_begin: 2020-10-06T15:30:00+00:00
+time_series_id: 769a90f2e1044533995297a97c192f61

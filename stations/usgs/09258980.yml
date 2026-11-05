@@ -1,0 +1,16 @@
+name: MUDDY CREEK BELOW YOUNG DRAW, NEAR BAGGS, WY
+lat: 41.068143369095736
+lon: -107.63163592512453
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1910.276
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09258980/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 5dd5b045574f47dda96f1851e98e4a3c

@@ -1,0 +1,23 @@
+name: Cape Krusenstern
+lat: 67.05419
+lon: -163.32127
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -12.404
+  MHW: -12.387
+  DTL: -12.303
+  MTL: -12.314
+  MSL: -12.274
+  MLW: -12.24
+  MLLW: -12.203
+  LAT: -12.156
+  HAT: -12.412
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9490571
+established: 2011-06-07T00:00:00Z
+removed: 2011-10-12T23:59:00Z

@@ -1,0 +1,12 @@
+name: Amite River near Denham Springs (85040)
+lat: 30.464079
+lon: -90.99038
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Amite_River-DenhamSprings.Stage.Inst.~15Minutes.0.rev
+series: Amite_River-DenhamSprings.Stage.Inst.~15Minutes.0.rev

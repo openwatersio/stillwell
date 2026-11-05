@@ -1,0 +1,16 @@
+name: CHINLE CREEK AT CHINLE, AZ
+lat: 36.155
+lon: -109.5375
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1691.64
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09379025/
+parameter_code: "00065"
+series_begin: 2022-11-21T18:15:00+00:00
+time_series_id: 06adcaf42b794c7699b6f7c07d2cdb6b

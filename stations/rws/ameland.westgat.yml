@@ -1,0 +1,12 @@
+name: Ameland, Westgat
+lat: 53.491639
+lon: 5.941194
+country_code: NL
+datum: MSL
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+same_as: [rws/amelandwestgat]
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/ameland.westgat/details

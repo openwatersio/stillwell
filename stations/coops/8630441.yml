@@ -1,0 +1,13 @@
+name: WALLOPS ISLAND
+lat: 37.8417
+lon: -75.4783
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8630441
+established: 1968-12-13T00:00:00Z
+removed: 1982-12-07T23:59:00Z

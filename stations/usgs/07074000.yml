@@ -1,0 +1,16 @@
+name: Strawberry River near Poughkeepsie, AR
+lat: 36.111111111111114
+lon: -91.44944444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 90.968
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07074000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 144be11b59344ac384daf68d774f89ea

@@ -1,0 +1,24 @@
+name: East Bay
+lat: 27.9231
+lon: -82.4214
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.864
+  MHW: -0.761
+  DTL: -0.456
+  MTL: -0.485
+  MSL: -0.494
+  MLW: -0.209
+  MLLW: -0.048
+  NAVD88: -0.604
+  LAT: 0.296
+  HAT: -1.106
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726674
+established: 2019-09-09T00:00:00Z

@@ -1,0 +1,16 @@
+name: OTTER C AT CLIMAX, KS
+lat: 37.7081916666667
+lon: -96.2232972222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 298.189
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07167500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7a3d51cc93114925a8bfd21ded45532b

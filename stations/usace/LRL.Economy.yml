@@ -1,0 +1,13 @@
+name: WHITEWATER RIVER NEAR ECONOMY, I
+lat: 40.00421314
+lon: -85.1155201
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 324.917
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Economy.Stage.Inst.15Minutes.0.LRGS-rev
+series: Economy.Stage.Inst.15Minutes.0.LRGS-rev

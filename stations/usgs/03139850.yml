@@ -1,0 +1,16 @@
+name: Walhonding River below Randle OH
+lat: 40.3092362894918
+lon: -81.9068012298491
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 227.698
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03139850/
+parameter_code: "00065"
+series_begin: 2017-10-01T05:00:00+00:00
+time_series_id: b1cf6dd3d13c4b46a2aee66d892392f8

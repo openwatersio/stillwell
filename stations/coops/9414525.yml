@@ -1,0 +1,21 @@
+name: PALO ALTO YACHT HARBOR, S. F. BAY
+lat: 37.4583
+lon: -122.105
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.712
+  MHW: -3.521
+  DTL: -2.551
+  MTL: -2.573
+  MSL: -2.54
+  MLW: -1.625
+  MLLW: -1.391
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414525
+established: 1976-11-12T00:00:00Z
+removed: 1985-01-14T23:59:00Z

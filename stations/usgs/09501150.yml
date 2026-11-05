@@ -1,0 +1,16 @@
+name: FISH CREEK NEAR TORTILLA FLAT, AZ
+lat: 33.5327777777778
+lon: -111.305
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 657.149
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09501150/
+parameter_code: "00065"
+series_begin: 2026-07-06T00:00:00+00:00
+time_series_id: 19c657a46bff453ab8de2abf1fe3125d

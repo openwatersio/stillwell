@@ -1,0 +1,16 @@
+name: CHIKASKIA R NR CORBIN, KS
+lat: 37.1286888888889
+lon: -97.6015694444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 337.886
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07151500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: d4f98f31a2074ed5b1ce8c1ace14fc27

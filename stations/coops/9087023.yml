@@ -1,0 +1,16 @@
+name: Ludington
+lat: 43.94736
+lon: -86.4415
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -176
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9087023
+established: 1895-11-01T00:00:00Z

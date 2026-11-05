@@ -1,0 +1,13 @@
+name: Tchoutacabouffa River Entrance
+lat: 30.4417
+lon: -88.9733
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8744663
+established: 1979-07-26T00:00:00Z
+removed: 1979-11-06T00:00:00Z

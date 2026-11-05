@@ -1,0 +1,13 @@
+name: MATTAPOISETT
+lat: 41.6567
+lon: -70.8133
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8447531
+established: 1976-04-28T00:00:00Z
+removed: 1994-06-11T23:59:00Z

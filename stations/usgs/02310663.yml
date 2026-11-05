@@ -1,0 +1,16 @@
+name: CHASSAHOWITZKA RIVER NEAR CHASSAHOWITZKA FL
+lat: 28.7152640427809
+lon: -82.6062106606517
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.216
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310663/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a7ee900539b3428f9debfbc05b9e5104

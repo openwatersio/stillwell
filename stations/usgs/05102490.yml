@@ -1,0 +1,16 @@
+name: RED RIVER OF THE NORTH AT PEMBINA, ND
+lat: 48.973611
+lon: -97.241389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 225.781
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05102490/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: aff28e0c046a491bb110fd93abde671b

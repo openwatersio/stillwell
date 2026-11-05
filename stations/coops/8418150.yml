@@ -1,0 +1,24 @@
+name: Portland
+lat: 43.658054
+lon: -70.24416
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.626
+  MHW: -5.493
+  DTL: -4.117
+  MTL: -4.103
+  MSL: -4.113
+  MLW: -2.712
+  MLLW: -2.607
+  NAVD88: -4.208
+  LAT: -1.959
+  HAT: -6.256
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8418150
+established: 1910-03-04T00:00:00Z

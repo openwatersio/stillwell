@@ -1,0 +1,16 @@
+name: OCMULGEE RIVER NEAR JACKSON, GA
+lat: 33.3126111111111
+lon: -83.8373611111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 127.72
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02210500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b47b802bf5fc4d438b47d255a613f2ee

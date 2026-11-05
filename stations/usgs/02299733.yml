@@ -1,0 +1,17 @@
+name: DONNA BAY AT NOKOMIS FL
+lat: 27.1136659235435
+lon: -82.4564855083477
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02299733/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2017-04-13T15:00:00+00:00
+time_series_id: 5a04691096444ee3982ad470ba910ebd

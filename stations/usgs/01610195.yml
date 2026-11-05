@@ -1,0 +1,16 @@
+name: PARKER HOLLOW RUN AT NEEDMORE, WV
+lat: 39.0427777777778
+lon: -78.7977777777778
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 468.801
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01610195/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 756e02134aed43dc8d8ebe0a69c9a7f5

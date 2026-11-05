@@ -1,0 +1,16 @@
+name: S Fk Guadalupe Rv at Lynx Haven Crsg nr Hunt, TX
+lat: 29.980181
+lon: -99.4423
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 592.226
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08165400/
+parameter_code: "00065"
+series_begin: 2026-04-22T13:25:00+00:00
+time_series_id: 520ccd3eb3e5472ca79a99308c82c65f

@@ -1,0 +1,16 @@
+name: GREEN RIVER BELOW MEEKER ST AT KENT, WA
+lat: 47.3788611111111
+lon: -122.268805555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12113310/
+parameter_code: "00065"
+series_begin: 2020-08-24T23:45:00+00:00
+time_series_id: 8e6a74d503c44bc8824ac3358ad60a36

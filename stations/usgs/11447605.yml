@@ -1,0 +1,15 @@
+name: BARGE CANAL NR WEST SACRAMENTO CA
+lat: 38.5611388888889
+lon: -121.5292
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 5.486
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11447605/
+parameter_code: "00065"
+time_series_id: 2df182843d8548789b4f260d39b11c3b

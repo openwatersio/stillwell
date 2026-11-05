@@ -1,0 +1,16 @@
+name: SMOKY HILL R NR RUSSELL, KS
+lat: 38.7766781294004
+lon: -98.8548066233751
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 514.399
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06864000/
+parameter_code: "00065"
+series_begin: 2011-06-09T22:15:00+00:00
+time_series_id: 93efb4284cec42a2a0d6c8539dfd687e

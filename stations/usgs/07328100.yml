@@ -1,0 +1,16 @@
+name: Washita River at Alex, OK
+lat: 34.9259029757553
+lon: -97.7739272517747
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 301.898
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07328100/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ae2af4cfe56d484c9597bafd171c7099

@@ -1,0 +1,16 @@
+name: CROOKED CREEK NEAR EMERSON, ND
+lat: 47.182583
+lon: -102.604444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 628.723
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06339200/
+parameter_code: "00065"
+series_begin: 2024-03-22T15:45:00+00:00
+time_series_id: c9ea721ca496433f9e3a50e93cf97e39

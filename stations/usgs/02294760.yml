@@ -1,0 +1,16 @@
+name: BARBER BRANCH NEAR HOMELAND FL
+lat: 27.8383333333333
+lon: -81.8122222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 25.698
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02294760/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 300f3d7732434c0bac7a1a23c87b7cac

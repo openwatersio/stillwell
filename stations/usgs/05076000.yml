@@ -1,0 +1,16 @@
+name: THIEF RIVER NEAR THIEF RIVER FALLS, MN
+lat: 48.186179
+lon: -96.169948
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 339.419
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05076000/
+parameter_code: "00065"
+series_begin: 2009-03-31T17:00:00+00:00
+time_series_id: 743f001dc5af45ab8e2455968caabfbf

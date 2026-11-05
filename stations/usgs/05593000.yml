@@ -1,0 +1,16 @@
+name: KASKASKIA RIVER AT CARLYLE, IL
+lat: 38.6102777777778
+lon: -89.3575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 122.7
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05593000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 59d7d9ecb9c74eaa8d20da1a8ad75da8

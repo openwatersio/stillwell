@@ -1,0 +1,16 @@
+name: Bayou Perot at Point Legard near Cutoff, LA
+lat: 29.56577777777778
+lon: -90.16555555555556
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.509
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07380330/
+parameter_code: "00065"
+series_begin: 2009-11-25T06:00:00+00:00
+time_series_id: fba4567d8d8342138c867c78c5141ff8

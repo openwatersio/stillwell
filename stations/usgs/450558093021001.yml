@@ -1,0 +1,15 @@
+name: OTTER LAKE RD. IN WHITE BEAR TWSP.,MN
+lat: 45.099424476939504
+lon: -93.03631960155326
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 284.378
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-450558093021001/
+parameter_code: "00065"
+time_series_id: 8d16875a20ed42b9a5c9c6e6e3f316c4

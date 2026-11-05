@@ -1,0 +1,23 @@
+name: Sabine Offshore Light
+lat: 29.469
+lon: -93.72
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.147
+  MHW: -0.09
+  DTL: 0.203
+  MTL: 0.155
+  MSL: 0.169
+  MLW: 0.4
+  MLLW: 0.554
+  LAT: 1.05
+  HAT: -0.402
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771367
+established: 2020-01-01T00:00:00Z

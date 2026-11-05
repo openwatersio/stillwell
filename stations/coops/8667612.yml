@@ -1,0 +1,24 @@
+name: Air Station Beaufort, McCalleys Creek
+lat: 32.5019
+lon: -80.6849
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.954
+  MHW: -7.842
+  DTL: -6.762
+  MTL: -6.737
+  MSL: -6.885
+  MLW: -5.631
+  MLLW: -5.57
+  NAVD88: -6.969
+  LAT: -5.07
+  HAT: -8.658
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8667612
+established: 2022-02-09T00:00:00Z
+removed: 2022-06-28T19:00:00Z

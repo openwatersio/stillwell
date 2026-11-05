@@ -1,0 +1,14 @@
+name: FOURMILE RUN ABOVE HIGHWAY 1 AT ALEXANDRIA, VA
+lat: 38.84022222222222
+lon: -77.05330555555555
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01652545/
+parameter_code: "62620"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e4706d60b63c4210941e1b9467c5ec3f

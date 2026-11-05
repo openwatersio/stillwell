@@ -1,0 +1,16 @@
+name: MINNEHAHA CREEK AT HIAWATHA AVE. IN MINNEAPOLIS,MN
+lat: 44.915502777777775
+lon: -93.21293888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 240.987
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05289800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 5724ee8ed47e4391883466c18bf1445a

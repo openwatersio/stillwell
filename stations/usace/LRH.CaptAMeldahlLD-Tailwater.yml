@@ -1,0 +1,14 @@
+name: C.A. Meldahl L&D Tailwater
+lat: 38.7965381
+lon: -84.1788214
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 134.813
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=CaptAMeldahlLD-Tailwater.Stage.Inst.15Minutes.0.OBS
+series: CaptAMeldahlLD-Tailwater.Stage.Inst.15Minutes.0.OBS

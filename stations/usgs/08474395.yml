@@ -1,0 +1,16 @@
+name: Brazos Santiago Pass at South Padre Island, TX
+lat: 26.067444
+lon: -97.154833
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.716
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08474395/
+parameter_code: "00065"
+series_begin: 2024-06-25T20:25:00+00:00
+time_series_id: 85f63fa0e9794b5bb09f9709efc91589

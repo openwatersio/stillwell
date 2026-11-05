@@ -1,0 +1,22 @@
+name: CUDJOE KEY PIRATES COVE
+lat: 24.6617
+lon: -81.515
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.236
+  MHW: -1.166
+  DTL: -1.022
+  MTL: -1.016
+  MSL: -0.999
+  MLW: -0.866
+  MLLW: -0.809
+  NAVD88: -1.179
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8724332
+established: 1970-12-08T00:00:00Z
+removed: 1975-05-01T23:59:00Z

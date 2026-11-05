@@ -1,0 +1,17 @@
+name: S Mayde Ck nr Addicks, TX
+lat: 29.8010615860667
+lon: -95.6924470799738
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08072700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2015-10-01T05:45:00+00:00
+time_series_id: 6c1d766527dd49b496723769a22c219a

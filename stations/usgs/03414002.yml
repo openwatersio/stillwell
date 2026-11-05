@@ -1,0 +1,14 @@
+name: CUMBERLAND RIVER AT LONG BOTTOM NEAR ROWENA, KY
+lat: 36.884055555555555
+lon: -85.12963888888888
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03414002/
+parameter_code: "00065"
+series_begin: 2026-04-23T05:00:00+00:00
+time_series_id: 000c38b90b12472cbc25a33b7469b97e

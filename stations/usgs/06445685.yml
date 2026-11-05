@@ -1,0 +1,16 @@
+name: WHITE RIVER NEAR NE-SD STATE LINE
+lat: 43.013056
+lon: -102.835278
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 921.919
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06445685/
+parameter_code: "00065"
+series_begin: 2018-05-01T07:00:00+00:00
+time_series_id: 1b0bdb2b42c24dd1b6ed54207fec9133

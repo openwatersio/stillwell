@@ -1,0 +1,16 @@
+name: CARSON RV BLW LAHONTAN RESERVOIR NR FALLON, NV
+lat: 39.4639361111111
+lon: -119.046258333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1231.392
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10312150/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 891072a283264b45b92c163097223da6

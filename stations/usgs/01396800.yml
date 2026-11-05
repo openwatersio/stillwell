@@ -1,0 +1,16 @@
+name: Spruce Run at Clinton NJ
+lat: 40.64
+lon: -74.9155555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 58.75
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01396800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b269cbde9e004c348712bd6df2ca2d94

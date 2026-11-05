@@ -1,0 +1,16 @@
+name: DIFFICULT RUN ABOVE FOX LAKE NEAR FAIRFAX, VA
+lat: 38.8846951782971
+lon: -77.3324293386678
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 87.813
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01645704/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 466b8c3f3c0a4bf58cb39f7a1c586880

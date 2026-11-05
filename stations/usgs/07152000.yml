@@ -1,0 +1,16 @@
+name: Chikaskia River near Blackwell, OK
+lat: 36.8114211227207
+lon: -97.2772650354768
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 294.94
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07152000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: da8f9dfd89db44d9abc53cba3616b770

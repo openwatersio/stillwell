@@ -1,0 +1,16 @@
+name: CATAWBA RIVER AT GREAT FALLS, SC
+lat: 34.598056
+lon: -80.890556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02147310/
+parameter_code: "00065"
+series_begin: 2016-06-16T22:15:00+00:00
+time_series_id: 99dbacfd894240cc831d8e39a2a01be4

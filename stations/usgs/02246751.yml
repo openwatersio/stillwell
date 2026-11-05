@@ -1,0 +1,15 @@
+name: BROWARD RIVER BL BISCAYNE BLVD NR JACKSONVILLE, FL
+lat: 30.4433388888889
+lon: -81.6682
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02246751/
+parameter_code: "00065"
+series_begin: 2015-09-29T15:15:00+00:00
+series_end: 2025-12-08T21:15:00+00:00
+time_series_id: c983b98339c1410ca20db0eb4999cdd9

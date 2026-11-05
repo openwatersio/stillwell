@@ -1,0 +1,15 @@
+name: Big Hole River near Wise River MT
+lat: 45.850822
+lon: -113.068361
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1737.36
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06024580/
+parameter_code: "00065"
+time_series_id: 887f4fef3e71401d91a8348ca4d0ab0f

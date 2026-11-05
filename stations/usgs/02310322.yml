@@ -1,0 +1,17 @@
+name: LAKE WORRELL OUTFALL NR NEW PORT RICHEY EAST FL
+lat: 28.280555555555555
+lon: -82.66777777777779
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310322/
+parameter_code: "00065"
+series_begin: 2011-11-18T05:00:00+00:00
+series_end: 2025-12-03T17:00:00+00:00
+time_series_id: 69984b0d293a4308b69c953203304bae

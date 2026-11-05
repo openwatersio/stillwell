@@ -1,0 +1,21 @@
+name: New Bern, Trent River
+lat: 35.108162
+lon: -77.03449
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.217
+  MHW: -9.159
+  DTL: -9.051
+  MTL: -9.049
+  MSL: -9.051
+  MLW: -8.939
+  MLLW: -8.885
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8654812
+established: 2021-11-14T00:00:00Z
+removed: 2022-06-13T18:00:00Z

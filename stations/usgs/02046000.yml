@@ -1,0 +1,16 @@
+name: STONY CREEK NEAR DINWIDDIE, VA
+lat: 37.0670942073627
+lon: -77.6024890009658
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.277
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02046000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 9c14da97f619462d8bb3cb803f9c2b34

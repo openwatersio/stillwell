@@ -1,0 +1,24 @@
+name: Wainwright
+lat: 70.6438
+lon: -160.0651
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -22.298
+  MHW: -22.293
+  DTL: -22.228
+  MTL: -22.214
+  MSL: -22.245
+  MLW: -22.136
+  MLLW: -22.157
+  NAVD88: -21.244
+  LAT: -21.937
+  HAT: -22.617
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9494212
+established: 2021-07-25T00:00:00Z
+removed: 2021-09-24T23:00:00Z

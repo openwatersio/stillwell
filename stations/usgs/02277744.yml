@@ -1,0 +1,14 @@
+name: LOXAHATCHEE RV 500 FT DS OF US-1 AT JUPITER, FL
+lat: 26.947872222222223
+lon: -80.08338888888889
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02277744/
+parameter_code: "00065"
+series_begin: 2022-03-23T18:45:00+00:00
+time_series_id: 90bb109be6d24796874095badb6f0cee

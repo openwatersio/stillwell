@@ -1,0 +1,17 @@
+name: CHULITNA R 5MI AB MOUTH NR PORT ALSWORTH AK
+lat: 60.2036591427114
+lon: -154.70443485369
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 76.2
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15298040/
+parameter_code: "00065"
+series_begin: 2009-10-07T23:00:00+00:00
+series_end: 2017-10-03T18:30:00+00:00
+time_series_id: 8a571fac3fd742a9aab9fa0b7f3731d0

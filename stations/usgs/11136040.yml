@@ -1,0 +1,16 @@
+name: HARRIS CANYON C NR ORCUTT CA
+lat: 34.77777777777778
+lon: -120.43166666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 100.672
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11136040/
+parameter_code: "00065"
+series_begin: 2016-12-14T23:15:00+00:00
+time_series_id: a7f4c5da27074309905820bece745549

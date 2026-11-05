@@ -1,0 +1,17 @@
+name: SWAUK CREEK AT MM 159.6 HWY 97 NEAR LIBERTY, WA
+lat: 47.32736111111112
+lon: -120.66417777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12480690/
+parameter_code: "00065"
+series_begin: 2023-06-08T18:00:19+00:00
+series_end: 2024-10-30T17:30:00+00:00
+time_series_id: a00bddb310b9418a861df7953bb549e9

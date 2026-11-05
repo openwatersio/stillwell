@@ -1,0 +1,16 @@
+name: WALKER CREEK AT BANE, VA
+lat: 37.2681784514093
+lon: -80.7095124726064
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 507.638
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03173000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: fdb2ad5db0c0420985605208e222e10e

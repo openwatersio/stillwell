@@ -1,0 +1,17 @@
+name: CUMBERLAND RIVER AT BRILEY PKWY AT COCKRILL BEND
+lat: 36.1833333333333
+lon: -86.8652222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 112.694
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03431712/
+parameter_code: "00065"
+series_begin: 2011-10-01T06:00:00+00:00
+series_end: 2026-05-01T05:45:00+00:00
+time_series_id: 2a9e4f3a8fd544f88e0aff4c4a0d4726

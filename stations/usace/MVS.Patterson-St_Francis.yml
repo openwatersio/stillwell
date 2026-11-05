@@ -1,0 +1,14 @@
+name: Patterson
+lat: 37.194581
+lon: -90.503361
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 112.877
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Patterson-St%20Francis.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Patterson-St Francis.Stage.Inst.15Minutes.0.lrgsShef-rev

@@ -1,0 +1,13 @@
+name: River Des Peres at University City
+lat: 38.668
+lon: -90.324
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 149.952
+products: [levels]
+interval_s: 300
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=University%20City-River%20Des%20Peres.Stage.Inst.5Minutes.0.Usgs-raw
+series: University City-River Des Peres.Stage.Inst.5Minutes.0.Usgs-raw

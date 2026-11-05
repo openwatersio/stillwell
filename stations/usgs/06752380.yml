@@ -1,0 +1,15 @@
+name: CACHE LA POUDRE RIVER NEAR HWY 257 NR WINDSOR, CO
+lat: 40.436606
+lon: -104.877592
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1445.057
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06752380/
+parameter_code: "00065"
+time_series_id: 1e5be4e111974c039c8be297f0672762

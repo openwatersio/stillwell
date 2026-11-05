@@ -1,0 +1,16 @@
+name: ETOWAH RIVER AT COOSA VALLEY F.G., AT ROME, GA
+lat: 34.2562222222222
+lon: -85.1509166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 171.206
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02395996/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2296752e75114a0d972b9169eda4b641

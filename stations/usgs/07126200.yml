@@ -1,0 +1,16 @@
+name: VAN BREMER ARROYO NEAR MODEL, CO
+lat: 37.345556
+lon: -103.9575
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1511.555
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07126200/
+parameter_code: "00065"
+series_begin: 2020-09-22T21:45:00+00:00
+time_series_id: 020137d0d4414575b320025efaa8ac54

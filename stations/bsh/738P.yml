@@ -1,0 +1,12 @@
+name: Fedderwardersiel, Fedderwarder Priel
+lat: 53.59639
+lon: 8.35444
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.04
+  SKN: -2.54
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/fedderwardersiel

@@ -1,0 +1,16 @@
+name: West Nishnabotna River at Randolph, IA
+lat: 40.8732777777778
+lon: -95.5814444444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 284.616
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06808500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: ad34b2ec850c411cbf465409ac616713

@@ -1,0 +1,12 @@
+name: Rantumdamm, Sylt
+lat: 54.86
+lon: 8.31333
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.01
+  SKN: -3.57
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/rantumdamm

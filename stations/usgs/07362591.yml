@@ -1,0 +1,16 @@
+name: Alum Fork Saline River at Winona Dam at Reform, AR
+lat: 34.797777777777775
+lon: -92.84555555555555
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 213.82
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07362591/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: f01929299cb844bab047a9edfe25b7df

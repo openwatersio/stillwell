@@ -1,0 +1,15 @@
+name: RED RIVER BELOW RED RIVER DIV STRUCTURE, ND
+lat: 46.706792
+lon: -96.791503
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 262.494
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05051524/
+parameter_code: "00065"
+time_series_id: e705690fcbff42f499a24f612fe30108

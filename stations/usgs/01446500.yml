@@ -1,0 +1,16 @@
+name: Delaware River at Belvidere NJ
+lat: 40.8263888888889
+lon: -75.0825
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 68.937
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01446500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 72564d6934c945bc9ea1c6a6929638f0

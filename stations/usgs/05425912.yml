@@ -1,0 +1,16 @@
+name: BEAVERDAM RIVER AT BEAVER DAM, WI
+lat: 43.4444444444444
+lon: -88.845
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05425912/
+parameter_code: "00065"
+series_begin: 2017-10-01T06:00:00+00:00
+time_series_id: 3d4ec13cb5eb458ba70c676644791fd5

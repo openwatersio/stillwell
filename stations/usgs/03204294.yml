@@ -1,0 +1,16 @@
+name: MUD RIVER AT HAMLIN, WV
+lat: 38.2783055555556
+lon: -82.1143888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 189.829
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03204294/
+parameter_code: "00065"
+series_begin: 2019-07-18T15:13:19+00:00
+time_series_id: c686ea4ef7ad4f7fa24a3eb7a2f8a2b1

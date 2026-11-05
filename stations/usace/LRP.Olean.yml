@@ -1,0 +1,13 @@
+name: Olean, NY
+lat: 42.0728
+lon: -78.4517
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 427.055
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRP&name=Olean.Stage.Inst.15Minutes.0.OBS
+series: Olean.Stage.Inst.15Minutes.0.OBS

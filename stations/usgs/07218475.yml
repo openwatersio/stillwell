@@ -1,0 +1,16 @@
+name: SAPELLO RIVER NEAR ROCIADA, NM
+lat: 35.79623888888889
+lon: -105.40093888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2306.117
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07218475/
+parameter_code: "00065"
+series_begin: 2024-05-02T16:20:00+00:00
+time_series_id: b6e55fc785e44d28a566ee19496c7478

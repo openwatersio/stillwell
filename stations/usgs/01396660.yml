@@ -1,0 +1,16 @@
+name: Mulhockaway Creek at Van Syckel NJ
+lat: 40.6475
+lon: -74.9688888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 85.152
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01396660/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4652837485a34afa98c5d46c8c931d76

@@ -1,0 +1,22 @@
+name: BAYOU CHICO
+lat: 30.4017
+lon: -87.2517
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.311
+  MHW: -1.301
+  DTL: -1.123
+  MTL: -1.125
+  MSL: -1.117
+  MLW: -0.949
+  MLLW: -0.935
+  NAVD88: -1.015
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729849
+established: 1977-01-28T00:00:00Z
+removed: 1983-06-14T23:59:00Z

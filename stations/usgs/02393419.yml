@@ -1,0 +1,16 @@
+name: ALLATOONA CREEK AT STILESBORO RD, NEAR ACWORTH, GA
+lat: 33.9952777777778
+lon: -84.6930555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 263.826
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02393419/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 7110255836154af0b5e6ccd5d113acb5

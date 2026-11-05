@@ -1,0 +1,23 @@
+name: Foulweather Bluff
+lat: 47.9267
+lon: -122.617
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.133
+  MHW: -3.881
+  DTL: -2.609
+  MTL: -2.896
+  MSL: -2.875
+  MLW: -1.911
+  MLLW: -1.084
+  LAT: 0.095
+  HAT: -4.681
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9445016
+established: 1977-01-18T00:00:00Z
+removed: 2012-06-05T23:59:00Z

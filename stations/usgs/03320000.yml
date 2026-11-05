@@ -1,0 +1,16 @@
+name: GREEN RIVER AT LOCK 2 AT CALHOUN, KY
+lat: 37.5339350198082
+lon: -87.263887278177
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 107.783
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03320000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: eed97d90624f473da42a1f62f8384d0a

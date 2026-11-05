@@ -1,0 +1,13 @@
+name: Bane
+lat: 37.2681
+lon: -80.7097
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 507.772
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Bane.Stage.Inst.15Minutes.0.OBS
+series: Bane.Stage.Inst.15Minutes.0.OBS

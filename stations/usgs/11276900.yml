@@ -1,0 +1,16 @@
+name: TUOLUMNE R BL EARLY INTAKE NR MATHER CA
+lat: 37.88157505987477
+lon: -119.97014828580748
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 676.824
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-11276900/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 3a6ae0eb76654d9a950cfcca29330f79

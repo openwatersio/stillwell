@@ -1,0 +1,16 @@
+name: CHERRY CREEK NEAR GLOBE, AZ
+lat: 33.8278261953151
+lon: -110.856226633845
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 975.36
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09497980/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 3444abe99ebb47b4ade488b1cdb7e879

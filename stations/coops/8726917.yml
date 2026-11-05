@@ -1,0 +1,23 @@
+name: ANCLOTE LIGHTHOUSE, ANCLOTE KEY
+lat: 28.165
+lon: -82.8433
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.713
+  MHW: -1.627
+  DTL: -1.208
+  MTL: -1.223
+  MSL: -1.223
+  MLW: -0.819
+  MLLW: -0.703
+  LAT: -0.28
+  HAT: -1.98
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8726917
+established: 1976-02-17T00:00:00Z
+removed: 1976-04-19T23:59:00Z

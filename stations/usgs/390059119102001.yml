@@ -1,0 +1,17 @@
+name: CAMPBELL DITCH 2 SW/GW - CANAL SW
+lat: 39.0163888888889
+lon: -119.172222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1331.452
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-390059119102001/
+parameter_code: "00065"
+series_begin: 2012-03-27T07:00:00+00:00
+series_end: 2012-05-12T06:30:00+00:00
+time_series_id: dc3816f7a1be403dae84c965efc1a61d

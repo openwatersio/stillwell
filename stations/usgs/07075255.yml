@@ -1,0 +1,13 @@
+name: Cedar Creek in Gulf Mt WMA nr Scotland, AR
+lat: 35.5768611111111
+lon: -92.6784222222222
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07075255/
+parameter_code: "00065"
+time_series_id: 9a84abda2b4d4ef19e39521329e82619

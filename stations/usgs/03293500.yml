@@ -1,0 +1,16 @@
+name: M FK BEARGRASS CR AT LEXINGTON RD AT LOUISVILLE,KY
+lat: 38.2503489483725
+lon: -85.7166286517485
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 131.216
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03293500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 863adc43873845dcb2b85c970688b907

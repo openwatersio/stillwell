@@ -1,0 +1,16 @@
+name: LATERAL M5L, CANAL DE RIEGO DE LAJAS SABANA GRANDE
+lat: 18.035028
+lon: -66.898117
+country_code: PR
+kind: river
+datum: GAGE
+datums:
+  PRVD02: 61.21
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-50128907/
+parameter_code: "00065"
+series_begin: 2007-11-07T04:00:00+00:00
+time_series_id: a18a7c02ef4143808db6283dfad21452

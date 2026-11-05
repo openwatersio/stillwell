@@ -1,0 +1,14 @@
+name: Hatchie River @ Pocahontas
+lat: 35.056
+lon: -88.799361
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 106.223
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=HA113.Stage.Inst.1Hour.0.opendcs-rev
+series: HA113.Stage.Inst.1Hour.0.opendcs-rev

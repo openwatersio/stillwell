@@ -1,0 +1,16 @@
+name: W BR NEVERSINK R AT WINNISOOK L NR FROST VALLEY NY
+lat: 42.011111
+lon: -74.414444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 815.34
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01434021/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 4e35c0d619a34803b2e0093a5019dd45

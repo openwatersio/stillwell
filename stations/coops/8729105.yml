@@ -1,0 +1,22 @@
+name: BEACON BEACH, ST ANDREW BAY
+lat: 30.0917
+lon: -85.6483
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.989
+  MHW: -1.975
+  DTL: -1.788
+  MTL: -1.79
+  MSL: -1.787
+  MLW: -1.604
+  MLLW: -1.587
+  NAVD88: -1.753
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8729105
+established: 1976-06-11T00:00:00Z
+removed: 1985-05-09T23:59:00Z

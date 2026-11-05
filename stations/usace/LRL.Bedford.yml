@@ -1,0 +1,13 @@
+name: EAST FORK WHITE RIVER NEAR BEDFO
+lat: 38.770330555556
+lon: -86.409711111111
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 144.195
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Bedford.Stage.Inst.15Minutes.0.USGS-rev
+series: Bedford.Stage.Inst.15Minutes.0.USGS-rev

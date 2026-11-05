@@ -1,0 +1,13 @@
+name: HOME, PUGET SOUND
+lat: 47.275
+lon: -122.758
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9446500
+established: 1973-11-01T00:00:00Z
+removed: 1973-11-30T23:59:00Z

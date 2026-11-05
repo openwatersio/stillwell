@@ -1,0 +1,16 @@
+name: Mill Ck nr Bellville, TX
+lat: 29.8810614544962
+lon: -96.2052401934136
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 37.436
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08111700/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 51e488c137bf4b95a54791c74b05a357

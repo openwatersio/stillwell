@@ -1,0 +1,12 @@
+name: Bayou Sara (01140)
+lat: 30.7639333
+lon: -91.3866667
+country_code: US
+kind: river
+datum: GZ
+products: [levels]
+interval_s: 86400
+live: false
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVN&name=Bayou_Sara.Stage.Inst.1Day.0.Observed
+series: Bayou_Sara.Stage.Inst.1Day.0.Observed

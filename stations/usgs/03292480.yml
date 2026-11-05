@@ -1,0 +1,16 @@
+name: LITTLE GOOSE CREEK NEAR HARRODS CREEK, KY
+lat: 38.3127635231948
+lon: -85.6261557995965
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 134.981
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03292480/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: dc5290fb2ee44e969f7591ad862de896

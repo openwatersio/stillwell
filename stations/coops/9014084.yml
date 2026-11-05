@@ -1,0 +1,16 @@
+name: Marysville
+lat: 42.9067
+lon: -82.4667
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+  LWD: -175.35
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9014084
+established: 1924-11-01T00:00:00Z
+removed: 2000-09-30T23:59:00Z

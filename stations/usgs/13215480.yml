@@ -1,0 +1,16 @@
+name: SOUTH FORK MALHEUR RIVER NR RIVERSIDE, OR
+lat: 43.5190833333333
+lon: -118.175058333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1008.803
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13215480/
+parameter_code: "00065"
+series_begin: 2024-02-14T16:30:00+00:00
+time_series_id: 2a6702fda3894b749ca3d0e42fef7cda

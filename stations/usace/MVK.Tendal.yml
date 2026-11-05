@@ -1,0 +1,13 @@
+name: Tensas River @ Tendal, LA
+lat: 32.44563
+lon: -91.411447
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 15.261
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Tendal.Stage.Inst.1Hour.0.DCP-rev
+series: Tendal.Stage.Inst.1Hour.0.DCP-rev

@@ -1,0 +1,13 @@
+name: LAUFFEN
+lat: 49.072331
+lon: 9.159787
+country_code: DE
+datum: PNP
+datums:
+  NHN: 159.37
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=23800500

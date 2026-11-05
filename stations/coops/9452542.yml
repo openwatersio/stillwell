@@ -1,0 +1,13 @@
+name: Port Gustavus
+lat: 58.3817
+lon: -135.918
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9452542
+established: 1976-08-10T00:00:00Z
+removed: 1999-06-08T23:59:00Z

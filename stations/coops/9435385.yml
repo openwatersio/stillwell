@@ -1,0 +1,21 @@
+name: YAQUINA USCG STA, NEWPORT
+lat: 44.6267
+lon: -124.055
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.929
+  MHW: -3.745
+  DTL: -2.679
+  MTL: -2.798
+  MSL: -2.785
+  MLW: -1.851
+  MLLW: -1.429
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9435385
+established: 1982-10-25T00:00:00Z
+removed: 1982-12-07T23:59:00Z

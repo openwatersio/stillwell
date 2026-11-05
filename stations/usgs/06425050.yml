@@ -1,0 +1,16 @@
+name: STAGEBARN CANYON CR ABV ELK CR NR SUMMERSET, SD
+lat: 44.22389444444445
+lon: -103.36412777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1045.01
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06425050/
+parameter_code: "00065"
+series_begin: 2024-05-02T15:50:00+00:00
+time_series_id: 7c94186ae81f4f0ba38f8aa9d3d9f212

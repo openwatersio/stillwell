@@ -1,0 +1,22 @@
+name: HOBE SOUND, STATE PARK
+lat: 27.0367
+lon: -80.1067
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -0.598
+  MHW: -0.555
+  DTL: -0.298
+  MTL: -0.298
+  MSL: -0.301
+  MLW: -0.041
+  MLLW: 0.001
+  NAVD88: -0.594
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8722445
+established: 1972-10-24T00:00:00Z
+removed: 1973-01-16T23:59:00Z

@@ -1,0 +1,13 @@
+name: Tensas Bayou @ Transylvania, LA
+lat: 32.7144
+lon: -91.2686
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 20.507
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVK&name=Transylvania.Stage.Inst.1Hour.0.DCP-rev
+series: Transylvania.Stage.Inst.1Hour.0.DCP-rev

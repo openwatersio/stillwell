@@ -1,0 +1,11 @@
+name: Willowton
+lat: 37.3485
+lon: -80.8861
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Willowton.Stage.Inst.15Minutes.0.OBS
+series: Willowton.Stage.Inst.15Minutes.0.OBS

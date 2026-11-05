@@ -1,0 +1,16 @@
+name: MILLE LACS LAKE NR GARRISON, MN
+lat: 46.30731096053564
+lon: -93.81193527972532
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 378.165
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05284000/
+parameter_code: "00065"
+series_begin: 2015-03-31T05:00:00+00:00
+time_series_id: 96bf06051df64afda41ca4e98bdde842

@@ -1,0 +1,14 @@
+name: Clintwood
+lat: 37.1239
+lon: -82.4389
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 439.003
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Clintwood.Stage.Inst.15Minutes.0.OBS
+series: Clintwood.Stage.Inst.15Minutes.0.OBS

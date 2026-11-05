@@ -1,0 +1,14 @@
+name: (Old) St. Francis River @ Parkin
+lat: 35.273333
+lon: -90.56
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 53.431
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=SF129.Stage.Inst.1Hour.0.opendcs-rev
+series: SF129.Stage.Inst.1Hour.0.opendcs-rev

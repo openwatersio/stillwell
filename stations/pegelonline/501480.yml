@@ -1,0 +1,13 @@
+name: VOCKERODE
+lat: 51.851333
+lon: 12.355387
+country_code: DE
+datum: PNP
+datums:
+  NHN: 55.948
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=501480

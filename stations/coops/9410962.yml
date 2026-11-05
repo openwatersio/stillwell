@@ -1,0 +1,21 @@
+name: BECHERS BAY, SANTA ROSA ISLAND
+lat: 34.0083
+lon: -120.047
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.078
+  MHW: -1.857
+  DTL: -1.295
+  MTL: -1.331
+  MSL: -1.325
+  MLW: -0.806
+  MLLW: -0.511
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9410962
+established: 1977-08-17T00:00:00Z
+removed: 1978-09-28T23:59:00Z

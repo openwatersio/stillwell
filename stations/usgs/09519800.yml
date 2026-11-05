@@ -1,0 +1,16 @@
+name: GILA RIVER BELOW PAINTED ROCK DAM, AZ
+lat: 33.07810833333334
+lon: -113.01807777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 158.496
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09519800/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 897594e7253d4626acfc501d77216185

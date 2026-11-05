@@ -1,0 +1,16 @@
+name: ROCK RIVER AT COMO, IL
+lat: 41.7722222222222
+lon: -89.7455555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.834
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05443500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e9ca06161b284b9aae90ae5e7e5e9069

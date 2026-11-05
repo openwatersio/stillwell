@@ -1,0 +1,24 @@
+name: Cape May
+lat: 38.9683
+lon: -74.96
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.398
+  MHW: -2.265
+  DTL: -1.568
+  MTL: -1.526
+  MSL: -1.521
+  MLW: -0.787
+  MLLW: -0.738
+  NAVD88: -1.657
+  LAT: -0.374
+  HAT: -2.781
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8536110
+established: 1965-10-25T00:00:00Z

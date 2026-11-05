@@ -1,0 +1,16 @@
+name: Kaunakakai Gulch at altitude 75 feet, Molokai, HI
+lat: 21.096523612805964
+lon: -157.01786621375953
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 22.86
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16414200/
+parameter_code: "00065"
+series_begin: 2007-11-07T22:30:00+00:00
+time_series_id: 871c2c8495964a979c6058b43facb813

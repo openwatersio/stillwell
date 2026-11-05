@@ -1,0 +1,17 @@
+name: SKAGIT RIVER ABV DIOBSUD CRK NEAR MARBLEMOUNT, WA
+lat: 48.5608611111111
+lon: -121.411277777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 98.728
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12180300/
+parameter_code: "00065"
+series_begin: 2020-06-09T22:15:00+00:00
+series_end: 2026-10-05T18:30:00+00:00
+time_series_id: 5335c4fe084640d698bb8e7119068ced

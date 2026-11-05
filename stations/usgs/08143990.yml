@@ -1,0 +1,16 @@
+name: Noyes Canal at Diversion pt nr. Menard, TX
+lat: 30.92175
+lon: -99.8525
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 580.19
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08143990/
+parameter_code: "00065"
+series_begin: 2015-07-24T14:00:00+00:00
+time_series_id: 3f0d027b924d4120a24ff5d166892cff

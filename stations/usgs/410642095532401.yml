@@ -1,0 +1,17 @@
+name: Outfall 11 at Harlan Lewis Rd ab Base Lake, Nebr
+lat: 41.111647
+lon: -95.890153
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 290.02
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-410642095532401/
+parameter_code: "00065"
+series_begin: 2023-08-02T16:05:00+00:00
+series_end: 2024-11-09T05:55:00+00:00
+time_series_id: bc885441d9a04e0eb93bd0144a7c1594

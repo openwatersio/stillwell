@@ -1,0 +1,14 @@
+name: St. Francis River @ Fisk
+lat: 36.790278
+lon: -90.200556
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NAVD88: 93.699
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=SF115.Stage.Inst.1Hour.0.opendcs-rev
+series: SF115.Stage.Inst.1Hour.0.opendcs-rev

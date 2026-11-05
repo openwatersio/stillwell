@@ -1,0 +1,16 @@
+name: WEST FORK RIVER AT ENTERPRISE, WV
+lat: 39.4223081815402
+lon: -80.2759186709826
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 264.914
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03061000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 61865f76dfd1428a809dca55797e5866

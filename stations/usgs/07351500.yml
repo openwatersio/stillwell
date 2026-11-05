@@ -1,0 +1,16 @@
+name: Cypress Bayou near Keithville, LA
+lat: 32.3
+lon: -93.8277777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 49.57
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07351500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7832fafc03a44971b0ec63340e6b8104

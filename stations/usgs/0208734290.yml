@@ -1,0 +1,16 @@
+name: BUSHY BRANCH CREEK AT GORMAN STREET AT RALEIGH, NC
+lat: 35.772831
+lon: -78.693161
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 89.093
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0208734290/
+parameter_code: "00065"
+series_begin: 2026-04-03T04:00:00+00:00
+time_series_id: 62ad73790a4842ebb199d2b195baa048

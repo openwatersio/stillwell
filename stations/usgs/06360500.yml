@@ -1,0 +1,16 @@
+name: MOREAU RIVER NEAR WHITEHORSE, SD
+lat: 45.255833
+lon: -100.8425
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 507.102
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06360500/
+parameter_code: "00065"
+series_begin: 2018-05-01T00:00:00+00:00
+time_series_id: 66fff9bf5bbf4db2955f4878b2114bba

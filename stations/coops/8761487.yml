@@ -1,0 +1,21 @@
+name: CHEF MENTEUR, CHEF MENTEUR PASS
+lat: 30.065
+lon: -89.8
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.194
+  MHW: -1.182
+  DTL: -1.033
+  MTL: -1.034
+  MSL: -1.041
+  MLW: -0.887
+  MLLW: -0.871
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8761487
+established: 1982-11-25T00:00:00Z
+removed: 1991-01-02T23:59:00Z

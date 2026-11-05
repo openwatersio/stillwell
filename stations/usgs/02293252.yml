@@ -1,0 +1,15 @@
+name: DURDEN CREEK NR CAPE CORAL, FL
+lat: 26.7438333333333
+lon: -82.0600277777778
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02293252/
+parameter_code: "00065"
+series_begin: 2011-10-07T04:00:00+00:00
+series_end: 2014-07-08T03:45:00+00:00
+time_series_id: f388b935b1c849939e1e364e1d3cf8d1

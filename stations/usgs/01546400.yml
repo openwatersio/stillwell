@@ -1,0 +1,16 @@
+name: Spring Creek at Houserville, PA
+lat: 40.83367261279
+lon: -77.8275010842489
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 282.233
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01546400/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1fc8fd667bb74608911c4fb630ad0376

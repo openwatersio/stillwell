@@ -1,0 +1,16 @@
+name: Iowa River near Belle Plaine, IA
+lat: 41.8590555555556
+lon: -92.2779166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 228.527
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05452500/
+parameter_code: "00065"
+series_begin: 2014-07-30T22:15:00+00:00
+time_series_id: 2bf625287f054af5a3db9d4f53f688c4

@@ -1,0 +1,14 @@
+name: N NEW RIVER CANAL BELOW S351 NR SOUTH  BAY FLA
+lat: 26.6976
+lon: -80.7128166666667
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02283500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: de2f086455b040ef8d92878de0402bc9

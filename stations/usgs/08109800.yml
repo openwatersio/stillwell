@@ -1,0 +1,16 @@
+name: E Yegua Ck nr Dime Box, TX
+lat: 30.4074310534485
+lon: -96.8174791194603
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 86.603
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08109800/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 790d4b8542ef493faffa428881885b38

@@ -1,0 +1,23 @@
+name: PRIEST LANDING, WILMINGTON RIVER
+lat: 31.9633
+lon: -81.0117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.415
+  MHW: -4.296
+  DTL: -3.21
+  MTL: -3.186
+  MSL: -3.223
+  MLW: -2.075
+  MLLW: -2.005
+  LAT: -1.462
+  HAT: -5.031
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8671315
+established: 1994-10-01T00:00:00Z
+removed: 1994-11-11T23:59:00Z

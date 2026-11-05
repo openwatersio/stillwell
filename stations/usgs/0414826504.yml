@@ -1,0 +1,13 @@
+name: TRIB TO KIMBALL DRAIN NEAR SWARTZ CREEK, MI
+lat: 42.92222222222222
+lon: -83.83305555555555
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0414826504/
+parameter_code: "00065"
+time_series_id: 90598c87d4c84e618eb704079e6f995c

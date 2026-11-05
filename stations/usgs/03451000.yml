@@ -1,0 +1,16 @@
+name: SWANNANOA RIVER AT BILTMORE, NC
+lat: 35.5683333333333
+lon: -82.5447222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 602.398
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03451000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 395464c064304aa7a1e033afb446e9db

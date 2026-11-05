@@ -1,0 +1,24 @@
+name: Eastport
+lat: 44.90461
+lon: -66.98289
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.336
+  MHW: -7.191
+  DTL: -4.399
+  MTL: -4.395
+  MSL: -4.42
+  MLW: -1.598
+  MLLW: -1.462
+  NAVD88: -4.491
+  LAT: -0.41
+  HAT: -8.4
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8410140
+established: 1929-09-12T00:00:00Z

@@ -1,0 +1,16 @@
+name: SUGAR CREEK NEAR BOGGSTOWN, IN
+lat: 39.564277777777775
+lon: -85.93813888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 217.761
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03361872/
+parameter_code: "00065"
+series_begin: 2019-10-01T05:00:00+00:00
+time_series_id: a6f709671a7f4fdfbbaedafa6a29f36e

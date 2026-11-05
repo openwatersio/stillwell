@@ -1,0 +1,15 @@
+name: American Falls
+lat: 43.08106
+lon: -79.06136
+country_code: US
+kind: lake
+datum: STND
+datums:
+  IGLD: 0
+products: [levels]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9063009
+established: 1900-01-01T00:00:00Z

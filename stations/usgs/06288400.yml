@@ -1,0 +1,16 @@
+name: Bighorn River at Two Leggins Bridge, near Hardin
+lat: 45.64408631160221
+lon: -107.65821643602376
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 895.198
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06288400/
+parameter_code: "00065"
+series_begin: 2012-04-03T18:30:00+00:00
+time_series_id: 3bfeef803ed8446a95078c7562b1a0f2

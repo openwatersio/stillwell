@@ -1,0 +1,16 @@
+name: GREEN LAKE INLET AT CT HIGHWAY A NR GREEN LAKE, WI
+lat: 43.8244444444444
+lon: -88.9266666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 240.765
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04073468/
+parameter_code: "00065"
+series_begin: 2024-05-01T17:20:00+00:00
+time_series_id: 3748f0b1572d48178e022a3c6dcbd3e1

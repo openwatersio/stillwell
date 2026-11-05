@@ -1,0 +1,13 @@
+name: Leda-Sperrwerk, Unterpegel
+lat: 53.21417
+lon: 7.47444
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.02
+  SKN: -3.05
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/3880050]
+source_url: https://gezeiten.bsh.de/leda-sperrwerk_unterpegel

@@ -1,0 +1,24 @@
+name: Wilmington
+lat: 34.2267
+lon: -77.9533
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.174
+  MHW: -2.098
+  DTL: -1.461
+  MTL: -1.446
+  MSL: -1.49
+  MLW: -0.794
+  MLLW: -0.747
+  NAVD88: -1.539
+  LAT: -0.341
+  HAT: -2.495
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8658120
+established: 1908-01-01T00:00:00Z

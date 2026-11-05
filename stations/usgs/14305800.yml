@@ -1,0 +1,14 @@
+name: SILETZ RIVER NEAR SILETZ, OR
+lat: 44.7646
+lon: -123.91379722222223
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14305800/
+parameter_code: "00065"
+series_begin: 2024-10-21T22:00:00+00:00
+time_series_id: 5952bb4db6784d978cfa2881eaa85ca9

@@ -1,0 +1,14 @@
+name: ST. JOHNS RIVER AT ASTOR, FL
+lat: 29.166930564081312
+lon: -81.52206108600707
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02236125/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: f4aaef45fe6c43c282e5d91cdddfbe83

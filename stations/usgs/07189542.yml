@@ -1,0 +1,16 @@
+name: Honey Creek near South West City, MO
+lat: 36.5488888888889
+lon: -94.6836111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 241.408
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07189542/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: fd7ea2962ce140f1894e91607c90ae44

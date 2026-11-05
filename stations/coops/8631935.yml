@@ -1,0 +1,21 @@
+name: Delmarva GPS Buoy
+lat: 37.087807
+lon: -75.5473
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: 37.479
+  MHW: 37.567
+  DTL: 38.093
+  MTL: 38.123
+  MSL: 38.115
+  MLW: 38.679
+  MLLW: 38.707
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8631935
+established: 2014-10-05T00:00:00Z
+removed: 2014-11-06T00:00:00Z

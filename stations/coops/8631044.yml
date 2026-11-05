@@ -1,0 +1,24 @@
+name: Wachapreague
+lat: 37.607777
+lon: -75.68584
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.071
+  MHW: -1.973
+  DTL: -1.39
+  MTL: -1.366
+  MSL: -1.396
+  MLW: -0.758
+  MLLW: -0.708
+  NAVD88: -1.502
+  LAT: -0.381
+  HAT: -2.397
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8631044
+established: 1978-06-28T00:00:00Z

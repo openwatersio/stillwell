@@ -1,0 +1,16 @@
+name: Monongahela R L&D8 (Upper Pool) @ Point Marion, PA
+lat: 39.728389796327704
+lon: -79.91090383018232
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 240.076
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03062998/
+parameter_code: "00065"
+series_begin: 2015-09-01T05:00:00+00:00
+time_series_id: 27a24c4fdb484c2dbed052a402156ea1

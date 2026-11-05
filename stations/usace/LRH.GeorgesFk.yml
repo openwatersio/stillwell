@@ -1,0 +1,13 @@
+name: Georges Fork
+lat: 37.1642
+lon: -82.525
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 448.175
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=GeorgesFk.Stage.Inst.15Minutes.0.OBS
+series: GeorgesFk.Stage.Inst.15Minutes.0.OBS

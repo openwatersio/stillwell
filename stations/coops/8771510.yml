@@ -1,0 +1,24 @@
+name: Galveston Pleasure Pier
+lat: 29.2853
+lon: -94.7894
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.688
+  MHW: -1.629
+  DTL: -1.377
+  MTL: -1.407
+  MSL: -1.404
+  MLW: -1.185
+  MLLW: -1.066
+  NAVD88: -1.252
+  LAT: -0.605
+  HAT: -1.98
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8771510
+established: 1957-01-01T00:00:00Z
+removed: 2011-07-20T23:59:00Z

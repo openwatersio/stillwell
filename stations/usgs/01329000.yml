@@ -1,0 +1,16 @@
+name: BATTEN KILL AT ARLINGTON, VT
+lat: 43.076189
+lon: -73.156772
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 181.868
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01329000/
+parameter_code: "00065"
+series_begin: 2026-10-21T18:30:00+00:00
+time_series_id: c4e1e31801174fa9bfb11a5c952cb438

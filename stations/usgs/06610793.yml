@@ -1,0 +1,16 @@
+name: West Papillion Creek at Papillion, Nebr.
+lat: 41.15598611111111
+lon: -96.04283333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 298.802
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06610793/
+parameter_code: "00065"
+series_begin: 2010-05-12T11:40:00+00:00
+time_series_id: d2b2f613dc3f4af199455806d792a0f3

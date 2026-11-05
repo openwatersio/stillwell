@@ -1,0 +1,15 @@
+name: OCHLOCKONEE RIVER NR SMITH CREEK, FLA.
+lat: 30.176588999999996
+lon: -84.667964
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02330150/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+series_end: 2025-07-02T12:45:00+00:00
+time_series_id: 1b5589fc43ee4a75b83a648a716d5988

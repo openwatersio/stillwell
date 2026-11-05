@@ -1,0 +1,16 @@
+name: RICE CREEK AT MONROE STREET AT MARSHALL, MI
+lat: 42.266430914981
+lon: -84.9585921954177
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 268.142
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04103490/
+parameter_code: "00065"
+series_begin: 2019-12-01T05:00:00+00:00
+time_series_id: f59e297ecbaf4b49be58e631f3d2544b

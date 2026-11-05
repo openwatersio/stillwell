@@ -1,0 +1,16 @@
+name: BEAVER RIVER NEAR BEAVER, UT
+lat: 38.2798
+lon: -112.568286111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1890.83
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10234500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 9b6934be1a1d449495f72e4afc1b64d8

@@ -1,0 +1,16 @@
+name: White Oak Ck at IH 30 nr Omaha, TX
+lat: 33.2747222222222
+lon: -94.8025
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 73.073
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07343840/
+parameter_code: "00065"
+series_begin: 2010-08-25T05:00:00+00:00
+time_series_id: 0922391fcb54487d871a84af4411148e

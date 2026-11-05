@@ -1,0 +1,24 @@
+name: Port Alexander
+lat: 56.2467
+lon: -134.647
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -4.478
+  MHW: -4.219
+  DTL: -2.812
+  MTL: -2.902
+  MSL: -2.894
+  MLW: -1.585
+  MLLW: -1.145
+  NAVD88: -1.505
+  LAT: -0.082
+  HAT: -5.422
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451054
+established: 1924-04-10T00:00:00Z

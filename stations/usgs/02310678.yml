@@ -1,0 +1,16 @@
+name: HOMOSASSA SPRINGS AT HOMOSASSA SPRINGS FL
+lat: 28.79972100686917
+lon: -82.58875874980593
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: -0.911
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310678/
+parameter_code: "00065"
+series_begin: 2007-10-15T05:00:00+00:00
+time_series_id: 0a8bf58680f44bd8b8c42d1f0153ef55

@@ -1,0 +1,16 @@
+name: DEAD RUN NEAR CATONSVILLE, MD
+lat: 39.29588888888889
+lon: -76.74408333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 124.224
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01589312/
+parameter_code: "00065"
+series_begin: 2007-11-27T16:15:00+00:00
+time_series_id: b34a4dc56841444d9e2ffa26cd78726f

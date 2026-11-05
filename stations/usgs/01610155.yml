@@ -1,0 +1,16 @@
+name: SIDELING HILL CREEK NEAR BELLEGROVE, MD
+lat: 39.64952777777778
+lon: -78.34413888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 134.036
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01610155/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: aef5375a9f3248178b67eba21c492414

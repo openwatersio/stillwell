@@ -1,0 +1,15 @@
+name: PINEDA, INDIAN RIVER
+lat: 28.2117
+lon: -80.6633
+country_code: US
+datum: STND
+datums:
+  MSL: -0.825
+  NAVD88: -1.049
+products: [levels]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8721749
+established: 1972-04-01T00:00:00Z
+removed: 1981-04-21T23:59:00Z

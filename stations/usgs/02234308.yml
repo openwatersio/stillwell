@@ -1,0 +1,16 @@
+name: HOWELL CREEK NEAR ALTAMONTE SPRINGS, FL
+lat: 28.6315
+lon: -81.3246388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02234308/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 1aa88ef88d5345c5b98249c0a9550d91

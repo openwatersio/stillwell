@@ -1,0 +1,24 @@
+name: Freeport Harbor
+lat: 28.9357
+lon: -95.2942
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.846
+  MHW: -8.804
+  DTL: -8.591
+  MTL: -8.613
+  MSL: -8.614
+  MLW: -8.423
+  MLLW: -8.337
+  NAVD88: -8.534
+  LAT: -7.904
+  HAT: -9.138
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8772471
+established: 2016-06-24T00:00:00Z

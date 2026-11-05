@@ -1,0 +1,16 @@
+name: SUSQUEHANNA RIVER AT CONKLIN NY
+lat: 42.0355555555556
+lon: -75.8022777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 256.142
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01503000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 10c8cb503550478582cf24509d282a26

@@ -1,0 +1,15 @@
+name: IRRIGATION DITCH AT WATSON RD NEAR BUCKEYE, AZ
+lat: 33.352136
+lon: -112.555653
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-332108112332001/
+parameter_code: "63160"
+series_begin: 2020-11-04T04:30:00+00:00
+series_end: 2023-11-07T22:00:00+00:00
+time_series_id: 1007027745374ce3b8ea0356af0b7a20

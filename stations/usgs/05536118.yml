@@ -1,0 +1,16 @@
+name: NB CHICAGO RIVER AT GRAND AVENUE AT CHICAGO, IL
+lat: 41.89233333333333
+lon: -87.64236111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 176.54
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05536118/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 66eed0c802cc4e0ca413246407bb0a5e

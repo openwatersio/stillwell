@@ -1,0 +1,22 @@
+name: GAGE A, POINT CHARLES, KEY LARGO
+lat: 25.0767
+lon: -80.455
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.307
+  MHW: -1.277
+  DTL: -0.971
+  MTL: -0.976
+  MSL: -0.977
+  MLW: -0.675
+  MLLW: -0.635
+  NAVD88: -1.223
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8723693
+established: 1975-04-30T00:00:00Z
+removed: 1975-08-12T23:59:00Z

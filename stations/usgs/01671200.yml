@@ -1,0 +1,14 @@
+name: SOUTH ANNA RIVER NEAR GORDONSVILLE, VA
+lat: 38.1237471049076
+lon: -78.2052814269445
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01671200/
+parameter_code: "00065"
+series_begin: 2024-03-20T20:45:00+00:00
+time_series_id: 9b7d9ca63ef64b5eb8424fc1ab9f9577

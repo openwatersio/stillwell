@@ -1,0 +1,17 @@
+name: Lk Wallenpaupack Div at Powerplant at Kimble, PA
+lat: 41.4681111111111
+lon: -75.1305555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 248.412
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01432045/
+parameter_code: "00065"
+series_begin: 2016-09-15T04:00:00+00:00
+series_end: 2016-10-22T04:00:00+00:00
+time_series_id: eb01d7d6af5040b89fd4aa83dac3aa36

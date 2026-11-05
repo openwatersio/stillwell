@@ -1,0 +1,16 @@
+name: MIDDLE FORK WILLAMETTE RIVER NEAR DEXTER, OR
+lat: 43.9456814973011
+lon: -122.837296737992
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 180.533
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14150000/
+parameter_code: "00065"
+series_begin: 2007-10-01T08:00:00+00:00
+time_series_id: 55733732aa0d452dad0053d4b4f85e68

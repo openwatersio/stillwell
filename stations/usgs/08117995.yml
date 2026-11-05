@@ -1,0 +1,16 @@
+name: Colorado Rv nr Gail, TX
+lat: 32.62874497447017
+lon: -101.28541516480021
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 684.3
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08117995/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7a0ef9ee5a304679973b84eacc45a0cf

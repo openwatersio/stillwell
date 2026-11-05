@@ -1,0 +1,16 @@
+name: COCHITI EAST SIDE MAIN CANAL AT COCHITI, NM
+lat: 35.617
+lon: -106.32416666666666
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1596.244
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08313500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: b8a8fe08a63842389b8b03823d2596de

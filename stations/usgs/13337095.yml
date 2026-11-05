@@ -1,0 +1,16 @@
+name: UPPER CLEAR CREEK NEAR KOOSKIA, ID
+lat: 46.04703611111111
+lon: -115.86616111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 538.277
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13337095/
+parameter_code: "00065"
+series_begin: 2024-06-05T05:15:00+00:00
+time_series_id: e421c1aa8fc943f3b859d4dc1b8af889

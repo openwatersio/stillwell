@@ -1,0 +1,24 @@
+name: Blaquiere Point
+lat: 56.584694
+lon: -132.54219
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -8.741
+  MHW: -8.466
+  DTL: -6.43
+  MTL: -6.471
+  MSL: -6.42
+  MLW: -4.477
+  MLLW: -4.12
+  NAVD88: -4.968
+  LAT: -2.784
+  HAT: -9.962
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9451281
+established: 2024-05-05T00:00:00Z
+removed: 2024-09-19T00:00:00Z

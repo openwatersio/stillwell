@@ -1,0 +1,13 @@
+name: BONAFORTH
+lat: 51.403492
+lon: 9.632042
+country_code: DE
+datum: PNP
+datums:
+  NHN: 117.679
+products: [levels]
+interval_s: 900
+min_interval_s: 300
+live: true
+status: active
+source_url: https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=42900201

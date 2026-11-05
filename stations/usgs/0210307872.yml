@@ -1,0 +1,15 @@
+name: TANK CREEK AT HURST DRIVE AT FORT BRAGG, NC
+lat: 35.16126944444444
+lon: -79.01268055555556
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0210307872/
+parameter_code: "00065"
+series_begin: 2021-06-23T21:15:00+00:00
+series_end: 2021-08-10T13:30:00+00:00
+time_series_id: 482fe9408fb846928bc28cbcb4e121d4

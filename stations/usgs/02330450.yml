@@ -1,0 +1,16 @@
+name: CHATTAHOOCHEE RIVER AT HELEN, GA
+lat: 34.7009722222222
+lon: -83.72925
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 427.951
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02330450/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 94ab747ab0d540a9badd75dae50f7a60

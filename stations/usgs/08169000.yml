@@ -1,0 +1,16 @@
+name: Comal Rv at New Braunfels, TX
+lat: 29.706408333333332
+lon: -98.12220833333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 177.711
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08169000/
+parameter_code: "00065"
+series_begin: 2014-05-05T06:00:00+00:00
+time_series_id: 0eb094e2e71046aa9edf5e1a382faa0e

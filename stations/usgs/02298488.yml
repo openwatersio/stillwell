@@ -1,0 +1,16 @@
+name: MYAKKA RIVER UPST FROM YOUNGS CK NR MYAKKA CITY FL
+lat: 27.4292084057947
+lon: -82.1386996955267
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02298488/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 2795f459ff2f49f0ba4289c2de643702

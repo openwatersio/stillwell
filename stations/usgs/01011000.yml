@@ -1,0 +1,16 @@
+name: Allagash River near Allagash, Maine
+lat: 47.069722222222225
+lon: -69.07944444444443
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 184.2
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01011000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 80b78ba27d0f4748bba284bad152a3ed

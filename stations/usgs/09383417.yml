@@ -1,0 +1,17 @@
+name: WATER CANYON CREEK NEAR EAGAR, AZ
+lat: 34.058
+lon: -109.296333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2314.956
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09383417/
+parameter_code: "00065"
+series_begin: 2013-04-08T21:45:00+00:00
+series_end: 2015-10-01T06:45:00+00:00
+time_series_id: df53a51d4fed401791d284ccafb59e96

@@ -1,0 +1,17 @@
+name: Threemile Ck near New Meadows, ID
+lat: 45.013580555555556
+lon: -116.2094888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1546.25
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13315765/
+parameter_code: "00065"
+series_begin: 2023-07-27T16:15:00+00:00
+series_end: 2023-11-14T18:15:00+00:00
+time_series_id: 981376e47e6d4a74b48f27165c567da1

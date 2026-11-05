@@ -1,0 +1,17 @@
+name: HARDSCRABBLE CK ABV TH RANCH AT SUTCLIFFE, NV
+lat: 39.9387333333333
+lon: -119.6481
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1428.902
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10351900/
+parameter_code: "00065"
+series_begin: 2016-11-04T18:30:00+00:00
+series_end: 2019-10-08T20:45:00+00:00
+time_series_id: c7ee9f673662452cb3be47ca860c2483

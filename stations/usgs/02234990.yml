@@ -1,0 +1,14 @@
+name: LITTLE WEKIVA RIVER NEAR ALTAMONTE SPRINGS, FL
+lat: 28.6872192092294
+lon: -81.3970137711575
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02234990/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: e35a042b740f4adcbc91576884bbf452

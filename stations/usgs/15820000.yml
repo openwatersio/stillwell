@@ -1,0 +1,17 @@
+name: IKPIKPUK R BL FRY C NR ALAKTAK AK
+lat: 69.7663904826378
+lon: -154.664406427404
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 30.48
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15820000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+series_end: 2009-10-01T08:45:00+00:00
+time_series_id: a13b20a475d04b4b8933c43da2130298

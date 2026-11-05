@@ -1,0 +1,23 @@
+name: Lake Wimico
+lat: 29.8214
+lon: -85.1733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -9.686
+  MHW: -9.673
+  DTL: -9.569
+  MTL: -9.57
+  MSL: -9.585
+  MLW: -9.466
+  MLLW: -9.452
+  LAT: -9.208
+  HAT: -9.852
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728819
+established: 2022-12-17T00:00:00Z
+removed: 2023-05-02T17:00:00Z

@@ -1,0 +1,17 @@
+name: TAKATZ C AT TAKATZ LAKE OUTLET NR BARANOF AK
+lat: 57.1310482493031
+lon: -134.887586235381
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 289.56
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15099900/
+parameter_code: "00065"
+series_begin: 2008-11-24T21:45:00+00:00
+series_end: 2016-01-06T08:45:00+00:00
+time_series_id: 5784f5960b534753a66ae8236e6a5944

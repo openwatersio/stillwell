@@ -1,0 +1,23 @@
+name: VINEYARD HAVEN, VINEYARD HVN HBR
+lat: 41.4583
+lon: -70.6
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2
+  MHW: -1.886
+  DTL: -1.676
+  MTL: -1.643
+  MSL: -1.675
+  MLW: -1.4
+  MLLW: -1.352
+  LAT: -1.203
+  HAT: -2.155
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448157
+established: 1994-05-20T00:00:00Z
+removed: 1994-09-09T23:59:00Z

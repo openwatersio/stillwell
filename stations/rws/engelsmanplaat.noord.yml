@@ -1,0 +1,11 @@
+name: Engelsmanplaat, noord
+lat: 53.463389
+lon: 6.054827
+country_code: NL
+datum: NAP
+products: [levels, extremes]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/engelsmanplaat.noord/details

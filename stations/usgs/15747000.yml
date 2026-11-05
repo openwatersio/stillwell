@@ -1,0 +1,16 @@
+name: WULIK R BL TUTAK C NR KIVALINA AK
+lat: 67.87547518657742
+lon: -163.6775591627873
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 49.439
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15747000/
+parameter_code: "00065"
+series_begin: 2007-10-01T09:00:00+00:00
+time_series_id: a447d69ebabe4a66b8fcfa754e457d73

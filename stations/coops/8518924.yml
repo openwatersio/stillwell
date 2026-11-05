@@ -1,0 +1,24 @@
+name: HAVERSTRAW BAY
+lat: 41.2183
+lon: -73.9633
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.047
+  MHW: -2.962
+  DTL: -2.487
+  MTL: -2.47
+  MSL: -2.477
+  MLW: -1.979
+  MLLW: -1.927
+  NAVD88: -2.427
+  LAT: -1.714
+  HAT: -3.336
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8518924
+established: 1981-09-19T00:00:00Z
+removed: 1987-08-12T23:59:00Z

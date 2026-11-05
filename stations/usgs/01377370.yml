@@ -1,0 +1,16 @@
+name: Pascack Brook at Park Ridge NJ
+lat: 41.0366666666667
+lon: -74.0391666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 39.036
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01377370/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: ceef3caba50d4b2caa0fe12bb0c30405

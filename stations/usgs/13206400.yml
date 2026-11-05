@@ -1,0 +1,16 @@
+name: EAGLE DRAIN AT EAGLE, ID
+lat: 43.691667
+lon: -116.356389
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 773.631
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-13206400/
+parameter_code: "00065"
+series_begin: 2010-07-08T20:15:00+00:00
+time_series_id: 10a7dd9f70be4210ba6a845979211f51

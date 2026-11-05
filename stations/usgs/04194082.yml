@@ -1,0 +1,15 @@
+name: Wolf Ditch at Oregon OH
+lat: 41.6528259085464
+lon: -83.3829855440361
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04194082/
+parameter_code: "00065"
+series_begin: 2010-04-12T16:45:00+00:00
+series_end: 2011-10-01T04:45:00+00:00
+time_series_id: 4ef3c9c4f2e74ab2ba979e6f3bd9b43a

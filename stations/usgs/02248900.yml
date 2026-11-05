@@ -1,0 +1,15 @@
+name: HORSE CREEK NR MELBOURNE,FL
+lat: 28.1614020914066
+lon: -80.6553314480643
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02248900/
+parameter_code: "00065"
+series_begin: 2020-09-16T14:00:00+00:00
+series_end: 2021-10-01T06:00:00+00:00
+time_series_id: 970315c3a4cd4ea18c4815b808c72fd0

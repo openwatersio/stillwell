@@ -1,0 +1,13 @@
+name: St. Francis River @ Madison
+lat: 35.013056
+lon: -90.719167
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 50.609
+products: [levels]
+interval_s: 3600
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=SF133.Stage.Inst.1Hour.0.opendcs-rev
+series: SF133.Stage.Inst.1Hour.0.opendcs-rev

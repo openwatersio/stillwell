@@ -1,0 +1,16 @@
+name: SKRINE CREEK NEAR MCCLELLENVILLE, SC
+lat: 33.074444
+lon: -79.419167
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02171920/
+parameter_code: "00065"
+series_begin: 2017-07-19T18:30:00+00:00
+time_series_id: 48417171c73747e5aa730ce12ced965a

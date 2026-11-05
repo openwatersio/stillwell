@@ -1,0 +1,16 @@
+name: PITHLACHASCOTEE R BL SUNCOAST PKWY NR FIVAY JCT FL
+lat: 28.29488888888889
+lon: -82.57283333333334
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02310288/
+parameter_code: "00065"
+series_begin: 2014-03-08T05:00:00+00:00
+time_series_id: e3377e402df849d7b9fb3c5002fb4a0f

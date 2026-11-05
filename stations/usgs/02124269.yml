@@ -1,0 +1,16 @@
+name: BACK CR AT SR1173 NEAR HARRISBURG, NC
+lat: 35.3091666666667
+lon: -80.6736111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 180.176
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02124269/
+parameter_code: "00065"
+series_begin: 2009-05-15T04:00:00+00:00
+time_series_id: 92f1747f97394b089704aba9277f295a

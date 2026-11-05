@@ -1,0 +1,22 @@
+name: CASEY KEY
+lat: 27.1533
+lon: -82.4833
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.518
+  MHW: -1.426
+  DTL: -1.238
+  MTL: -1.234
+  MSL: -1.24
+  MLW: -1.041
+  MLLW: -0.958
+  NAVD88: -1.366
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725916
+established: 1977-05-23T00:00:00Z
+removed: 1978-01-09T23:59:00Z

@@ -1,0 +1,14 @@
+name: SHINNECOCK BAY AT PONQUOGUE NY
+lat: 40.8505555555556
+lon: -72.5032777777778
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01304746/
+parameter_code: "62620"
+series_begin: 2016-10-04T20:30:00+00:00
+time_series_id: d3dd512c439e4837b5b27064e25fdb1b

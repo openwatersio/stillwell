@@ -1,0 +1,17 @@
+name: FOUNTAIN CREEK NEAR FOUNTAIN HEIGHTS, TN
+lat: 35.518270927028816
+lon: -86.94206063967047
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.371
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03599450/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+series_end: 2023-10-01T05:45:00+00:00
+time_series_id: f6ce67fd2caa42deb3459eb9f6307be6

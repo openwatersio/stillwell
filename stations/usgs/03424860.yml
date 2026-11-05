@@ -1,0 +1,16 @@
+name: CANEY FORK AT STONEWALL
+lat: 36.18611111111111
+lon: -85.90444444444445
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 137.157
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03424860/
+parameter_code: "00065"
+series_begin: 2011-01-06T13:00:00+00:00
+time_series_id: fab1d40516c740099174cdc86d5ea68a

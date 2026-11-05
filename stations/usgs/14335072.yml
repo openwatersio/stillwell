@@ -1,0 +1,16 @@
+name: ROGUE R AT COLE M RIVERS F HATCHERY NR MCLEOD, OR
+lat: 42.6658333333333
+lon: -122.686388888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 472.44
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14335072/
+parameter_code: "00065"
+series_begin: 2011-12-16T21:45:00+00:00
+time_series_id: 711d2faf1c844680854feb7e2089848a

@@ -1,0 +1,16 @@
+name: NORTH FORK VIRGIN RIVER NEAR SPRINGDALE, UT
+lat: 37.2097046008605
+lon: -112.978551153545
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1206.374
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09405500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: e0dcb4d7600d468da38f94bde97f70d2

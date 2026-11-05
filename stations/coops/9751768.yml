@@ -1,0 +1,23 @@
+name: Dorothea Bay, Saint Thomas
+lat: 18.37125
+lon: -64.96347
+country_code: VI
+kind: coastal
+datum: STND
+datums:
+  MHHW: -5.589
+  MHW: -5.514
+  DTL: -5.393
+  MTL: -5.372
+  MSL: -5.373
+  MLW: -5.23
+  MLLW: -5.196
+  LAT: -5.074
+  HAT: -5.765
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9751768
+established: 2010-10-30T00:00:00Z
+removed: 2011-04-12T23:59:00Z

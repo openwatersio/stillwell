@@ -1,0 +1,14 @@
+name: Coffeen
+lat: 39.1486111
+lon: -89.3525
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 175.187
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=Coffeen-E%20Fork%20Shoal%20Cr.Stage.Inst.15Minutes.0.lrgsShef-rev
+series: Coffeen-E Fork Shoal Cr.Stage.Inst.15Minutes.0.lrgsShef-rev

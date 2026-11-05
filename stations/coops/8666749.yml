@@ -1,0 +1,22 @@
+name: AIRY HALL, ASHEPOO RIVER
+lat: 32.6317
+lon: -80.4717
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -3.399
+  MHW: -3.349
+  DTL: -2.724
+  MTL: -2.732
+  MSL: -2.818
+  MLW: -2.116
+  MLLW: -2.049
+  NAVD88: -2.72
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8666749
+established: 1981-04-22T00:00:00Z
+removed: 1981-11-09T23:59:00Z

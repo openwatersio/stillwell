@@ -1,0 +1,24 @@
+name: Naples
+lat: 26.131666
+lon: -81.8075
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.527
+  MHW: -1.45
+  DTL: -1.09
+  MTL: -1.144
+  MSL: -1.155
+  MLW: -0.837
+  MLLW: -0.653
+  NAVD88: -1.343
+  LAT: -0.223
+  HAT: -1.819
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8725110
+established: 1965-03-04T00:00:00Z
+removed: 2024-01-12T17:00:00Z

@@ -1,0 +1,16 @@
+name: CHELAN R AT HABITAT 4 CHANNEL AT CHELAN FALLS, WA
+lat: 47.8079305555556
+lon: -119.985763888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 219.761
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12452550/
+parameter_code: "00065"
+series_begin: 2017-11-01T22:00:00+00:00
+time_series_id: f21aceb9e8ae432a98b92d52893d5778

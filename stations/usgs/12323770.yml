@@ -1,0 +1,16 @@
+name: Warm Springs Creek at Warm Springs MT
+lat: 46.180375
+lon: -112.785077777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1466.088
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12323770/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 70df2b2dcc99412794eccaa57e10ef8d

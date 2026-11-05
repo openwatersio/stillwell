@@ -1,0 +1,16 @@
+name: N FK COQUILLE R NR MYRTLE POINT, OR
+lat: 43.0681777777778
+lon: -124.107844444444
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 15.24
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14327000/
+parameter_code: "00065"
+series_begin: 2012-10-06T07:00:00+00:00
+time_series_id: eeca8b01c4704bfea26b97df83ada00b

@@ -1,0 +1,14 @@
+name: PUYALLUP RIVER AT 5TH ST BRIDGE AT PUYALLUP, WA
+lat: 47.1987117860707
+lon: -122.287341977406
+country_code: US
+kind: river
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12101470/
+parameter_code: "00065"
+series_begin: 2010-10-21T22:15:00+00:00
+time_series_id: 29c0d5bdb0a3438f8510a76a7300d25c

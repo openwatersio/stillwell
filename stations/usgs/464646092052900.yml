@@ -1,0 +1,15 @@
+name: SUPERIOR BAY DULUTH SHIP CANAL AT DULUTH, MN
+lat: 46.7794444444444
+lon: -92.0913888888889
+country_code: US
+kind: estuary
+datum: GAGE
+datums:
+  NAVD88: 185.928
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-464646092052900/
+parameter_code: "00065"
+time_series_id: 6b888649527444bab76a8014f6489493

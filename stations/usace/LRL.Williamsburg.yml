@@ -1,0 +1,13 @@
+name: East Fork Little Miami River at Williamsburg OH
+lat: 39.052564546022
+lon: -84.05048851093
+country_code: US
+datum: GZ
+datums:
+  NAVD88: 783.27
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRL&name=Williamsburg.Stage.Inst.15Minutes.0.USGS-rev
+series: Williamsburg.Stage.Inst.15Minutes.0.USGS-rev

@@ -1,0 +1,16 @@
+name: L ARKANSAS R AT HWY 50 NR HALSTEAD, KS
+lat: 38.0285305555556
+lon: -97.5405416666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 417.893
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07143672/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: cf5cf8b7f5804df4a35901a233d5b015

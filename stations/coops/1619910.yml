@@ -1,0 +1,23 @@
+name: Sand Island, Midway Islands
+lat: 28.211666
+lon: -177.36
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.206
+  MHW: -1.152
+  DTL: -1.015
+  MTL: -1.021
+  MSL: -1.02
+  MLW: -0.889
+  MLLW: -0.824
+  LAT: -0.675
+  HAT: -1.363
+products: [levels, extremes]
+interval_s: 360
+min_interval_s: 360
+live: true
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=1619910
+established: 1947-02-02T00:00:00Z

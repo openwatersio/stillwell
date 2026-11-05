@@ -1,0 +1,17 @@
+name: Loramie Creek near Fort Loramie OH
+lat: 40.3591666666667
+lon: -84.3738888888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 283.199
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03261890/
+parameter_code: "00065"
+series_begin: 2017-07-25T14:15:00+00:00
+series_end: 2019-12-18T13:30:00+00:00
+time_series_id: 4efe97be0bc84f35906c24f2c47a23cc

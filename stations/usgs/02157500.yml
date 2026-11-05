@@ -1,0 +1,15 @@
+name: MIDDLE TYGER RIVER AT LYMAN, S.C.
+lat: 34.944117
+lon: -82.133578
+country_code: US
+kind: river
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02157500/
+parameter_code: "63160"
+series_begin: 2020-11-13T09:00:00+00:00
+series_end: 2024-09-27T17:00:00+00:00
+time_series_id: 0d6e9b7029924107814b4bb09ac5c892

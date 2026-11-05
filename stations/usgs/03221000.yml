@@ -1,0 +1,16 @@
+name: Scioto River below O'Shaughnessy Dam nr Dublin OH
+lat: 40.1433956427286
+lon: -83.1204664243601
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 235.879
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03221000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 430b66ec79fb4d0b8af268faebff2ec4

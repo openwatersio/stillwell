@@ -1,0 +1,13 @@
+name: BurnsvilleWV
+lat: 38.8619
+lon: -80.6733
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 225.144
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=BurnsvilleWV.Stage.Inst.15Minutes.0.OBS
+series: BurnsvilleWV.Stage.Inst.15Minutes.0.OBS

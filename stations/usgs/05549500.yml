@@ -1,0 +1,16 @@
+name: FOX RIVER NEAR MCHENRY, IL
+lat: 42.3100222225937
+lon: -88.251474520618
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 223.367
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05549500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 97a94adcda2e4db8ab68438a20e9fba5

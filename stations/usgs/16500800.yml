@@ -1,0 +1,17 @@
+name: Kukuiula Gulch near Kipahulu, Maui, HI
+lat: 20.65160686222232
+lon: -156.0758937690201
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 36.576
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16500800/
+parameter_code: "00065"
+series_begin: 2018-08-02T22:45:00+00:00
+series_end: 2021-12-09T21:45:00+00:00
+time_series_id: 1b48e4d832db495099993562063d0957

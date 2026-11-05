@@ -1,0 +1,16 @@
+name: WILLAMETTE RIVER AT EUGENE, OR
+lat: 44.052499999999995
+lon: -123.08277777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 120.055
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14158050/
+parameter_code: "00065"
+series_begin: 2016-09-27T21:00:00+00:00
+time_series_id: 08402f572bba4c3ab0b3c47a32d8cde4

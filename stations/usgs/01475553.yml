@@ -1,0 +1,16 @@
+name: Darby Creek at 84th St Bridge at Eastwick,PA
+lat: 39.8986111111111
+lon: -75.2552777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01475553/
+parameter_code: "00065"
+series_begin: 2016-12-14T21:30:00+00:00
+time_series_id: 886bf41735b242568e014e96bc1cdf68

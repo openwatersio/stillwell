@@ -1,0 +1,16 @@
+name: BIG CREEK BELOW HOG WALLOW CREEK AT ROSWELL, GA
+lat: 34.0175
+lon: -84.3533333333333
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 281.123
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02335757/
+parameter_code: "00065"
+series_begin: 2007-10-04T05:00:00+00:00
+time_series_id: 749d16ce950b4995ae5c5d2795007995

@@ -1,0 +1,16 @@
+name: POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA
+lat: 38.949777777777776
+lon: -77.12763888888888
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 11.29
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01646500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 8a83eb3a3cbc4087b0c201cf07c0c76d

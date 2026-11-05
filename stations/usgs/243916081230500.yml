@@ -1,0 +1,15 @@
+name: JOLLY ROGER DRIVE AT LITTLE TORCH KEY, FL
+lat: 24.654366666666665
+lon: -81.38484444444445
+country_code: US
+kind: coastal
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-243916081230500/
+parameter_code: "62620"
+series_begin: 2022-09-28T02:12:00+00:00
+series_end: 2022-09-28T05:36:00+00:00
+time_series_id: 0d0dad5b05764acb82b0f127709a5b9c

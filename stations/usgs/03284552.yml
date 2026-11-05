@@ -1,0 +1,16 @@
+name: WEST HICKMAN CR AT VETERANS PARK NR LEXINGTON, KY
+lat: 37.9577777777778
+lon: -84.5011111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 268.733
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03284552/
+parameter_code: "00065"
+series_begin: 2012-06-12T11:10:00+00:00
+time_series_id: f21e8c71cc284abe9002c2d509d0ef0f

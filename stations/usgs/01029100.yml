@@ -1,0 +1,16 @@
+name: E. Br. Penobscot River below Grand Lake Matagamon
+lat: 46.13436111111111
+lon: -68.79390555555555
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 190.805
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01029100/
+parameter_code: "00065"
+series_begin: 2024-05-13T18:30:00+00:00
+time_series_id: 1b900363da1340568f8454c934aaf347

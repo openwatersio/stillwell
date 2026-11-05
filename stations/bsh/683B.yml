@@ -1,0 +1,9 @@
+name: Oberndorf, Oste
+lat: 53.75444
+lon: 9.14694
+country_code: DE
+datum: PNP
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/oberndorf

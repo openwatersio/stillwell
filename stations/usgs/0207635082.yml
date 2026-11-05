@@ -1,0 +1,15 @@
+name: CHERRYSTONE CK ABOVE NR CO RD 1444 NR CHATHAM, VA
+lat: 36.808339
+lon: -79.364211
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 173.431
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-0207635082/
+parameter_code: "00065"
+time_series_id: 59b07f0f3c054d61b8969674aa28f8d9

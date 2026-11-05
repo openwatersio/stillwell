@@ -1,0 +1,16 @@
+name: Brushy Ck at FM 973 nr Coupland, TX
+lat: 30.4693888888889
+lon: -97.4634722222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 153.711
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08105897/
+parameter_code: "00065"
+series_begin: 2014-11-20T06:00:00+00:00
+time_series_id: 497d3588d1b4434e943e68192eae8144

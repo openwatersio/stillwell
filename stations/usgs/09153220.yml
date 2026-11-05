@@ -1,0 +1,16 @@
+name: LITTLE SALT WASH BLW GREENWAY DRIVE AT FRUITA, CO
+lat: 39.159319
+lon: -108.743739
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1362.319
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-09153220/
+parameter_code: "00065"
+series_begin: 2025-07-03T17:30:00+00:00
+time_series_id: cfd07839c74340e5b7d4089e5f9e72ba

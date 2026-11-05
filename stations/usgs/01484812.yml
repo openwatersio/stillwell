@@ -1,0 +1,14 @@
+name: NASSAWADOX CREEK AB CHURCH CRK NR SILVER BEACH, VA
+lat: 37.4763333333333
+lon: -75.9352222222222
+country_code: US
+kind: estuary
+datum: NAVD88
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01484812/
+parameter_code: "62620"
+series_begin: 2015-03-28T04:00:00+00:00
+time_series_id: 5741a0c6e3c0443c9b777c5de0de304e

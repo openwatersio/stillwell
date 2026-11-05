@@ -1,0 +1,16 @@
+name: CYPRESS CREEK TRIBUTARY NR WESLEY CHAPEL FL
+lat: 28.2593611111111
+lon: -82.3861111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02303410/
+parameter_code: "00065"
+series_begin: 2011-10-08T04:00:00+00:00
+time_series_id: c8d50a8a2b9349ca9d2097dc6a1472fe

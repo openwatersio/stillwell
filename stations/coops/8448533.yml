@@ -1,0 +1,13 @@
+name: CAPE HIGGON NORTH, VINEYARD SND
+lat: 41.41
+lon: -70.7117
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8448533
+established: 1994-06-25T00:00:00Z
+removed: 1994-09-09T23:59:00Z

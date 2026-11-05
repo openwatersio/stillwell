@@ -1,0 +1,16 @@
+name: Connoquenessing Creek near Zelienople, PA
+lat: 40.8170092014693
+lon: -80.2422837139515
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 259.629
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03106000/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: a55605e7f6c74893b545bfc8d8215e22

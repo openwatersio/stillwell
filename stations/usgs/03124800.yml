@@ -1,0 +1,16 @@
+name: Tuscarawas River at New Philadelphia OH
+lat: 40.4808984137097
+lon: -81.4481706725899
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 258.854
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03124800/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: bc27f72c9d7f45afa3bb3be5ae2cf87d

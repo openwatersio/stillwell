@@ -1,0 +1,16 @@
+name: E Fk Angelina Rv nr Cushing, TX
+lat: 31.8601716888635
+lon: -94.8232696872788
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 88.715
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08033900/
+parameter_code: "00065"
+series_begin: 2015-09-30T21:15:00+00:00
+time_series_id: 98ab65c9cd1540b88aa360d0db6ec7fa

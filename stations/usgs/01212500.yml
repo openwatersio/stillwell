@@ -1,0 +1,16 @@
+name: BYRAM RIVER AT PEMBERWICK, CT
+lat: 41.027297222222224
+lon: -73.66175000000001
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 12.192
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01212500/
+parameter_code: "00065"
+series_begin: 2009-10-01T05:00:00+00:00
+time_series_id: dc47810be609491994128266053b3253

@@ -1,0 +1,13 @@
+name: Lynn Camp Creek at Corbin, KY
+lat: 36.951667
+lon: -84.093333
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 319.735
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CORK2-LynnCampCr-CorbinKY.Stage.Inst.15Minutes.0.dcp-rev
+series: CORK2-LynnCampCr-CorbinKY.Stage.Inst.15Minutes.0.dcp-rev

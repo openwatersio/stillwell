@@ -1,0 +1,16 @@
+name: Right Branch Lawai Stream nr Umauma Rd, Kauai, HI
+lat: 21.93931263105132
+lon: -159.50481123356775
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 204.216
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16052350/
+parameter_code: "00065"
+series_begin: 2021-09-17T03:15:00+00:00
+time_series_id: b5094af537ce43c29518fe4fccbf3bbd

@@ -1,0 +1,16 @@
+name: MUSCATATUCK RIVER NEAR DEPUTY, IN
+lat: 38.804214512147034
+lon: -85.67384177968576
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.415
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03366500/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 723946ba8f094226bc6560b80f18fac2

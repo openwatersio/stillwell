@@ -1,0 +1,14 @@
+name: ST LUCIE ESTUARY AT A1A (STEELE PT)STUART FL
+lat: 27.1990277777778
+lon: -80.2074444444444
+country_code: US
+kind: estuary
+datum: GAGE
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02277110/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 32fc076c28764498ac5cb0faee8a9235

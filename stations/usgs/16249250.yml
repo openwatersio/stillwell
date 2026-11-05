@@ -1,0 +1,16 @@
+name: Kaelepulu Canal near mouth, Oahu, HI
+lat: 21.39643477700845
+lon: -157.72694415795232
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  LMSL: 0.61
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-16249250/
+parameter_code: "00065"
+series_begin: 2026-06-12T22:15:00+00:00
+time_series_id: c195bbf7dc464f00b5c7d79dc71fb4b7

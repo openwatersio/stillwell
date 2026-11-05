@@ -1,0 +1,13 @@
+name: Obion River @ Milan
+lat: 35.946556
+lon: -88.71325
+country_code: US
+datum: GZ
+datums:
+  NGVD29: 106.814
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVM&name=OR105.Stage.Inst.15Minutes.0.opendcs-rev
+series: OR105.Stage.Inst.15Minutes.0.opendcs-rev

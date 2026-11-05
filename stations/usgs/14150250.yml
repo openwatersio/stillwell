@@ -1,0 +1,17 @@
+name: FALL CREEK ABOVE TILLER CREEK, NEAR LOWELL, OR
+lat: 43.98478055555556
+lon: -122.4336
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 421.538
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-14150250/
+parameter_code: "00065"
+series_begin: 2024-08-27T21:00:00+00:00
+series_end: 2026-10-07T21:00:00+00:00
+time_series_id: 67ec9b73c033416e90d251361d90d3c9

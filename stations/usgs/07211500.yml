@@ -1,0 +1,16 @@
+name: CANADIAN RIVER NEAR TAYLOR SPRINGS, NM
+lat: 36.29756944444444
+lon: -104.49547222222222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1718.465
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07211500/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 1c07235f41534e95941714126abfdf62

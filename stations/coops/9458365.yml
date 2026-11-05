@@ -1,0 +1,13 @@
+name: KANATAK LAGOON, PORTAGE BAY
+lat: 57.52
+lon: -156.052
+country_code: US
+kind: coastal
+datum: STND
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9458365
+established: 1923-06-05T00:00:00Z
+removed: 1984-08-02T23:59:00Z

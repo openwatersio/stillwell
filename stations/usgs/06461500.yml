@@ -1,0 +1,16 @@
+name: Niobrara River near Sparks, Nebr.
+lat: 42.90207777777778
+lon: -100.36252777777777
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 697.59
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06461500/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 7768da7acdf14408b2ccb72b1084cc3a

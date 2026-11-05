@@ -1,0 +1,23 @@
+name: Cockrobin Island Bridge
+lat: 40.6372
+lon: -124.2822
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -7.996
+  MHW: -7.785
+  DTL: -7.047
+  MTL: -7.115
+  MSL: -7.127
+  MLW: -6.445
+  MLLW: -6.099
+  LAT: -5.595
+  HAT: -8.65
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9418637
+established: 2017-03-28T00:00:00Z
+removed: 2017-10-19T18:00:00Z

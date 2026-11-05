@@ -1,0 +1,16 @@
+name: Dry Frio Rv at FM 2690 nr Knippa, TX
+lat: 29.3736111111111
+lon: -99.7041666666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 321.445
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-08196300/
+parameter_code: "00065"
+series_begin: 2008-10-01T05:00:00+00:00
+time_series_id: 72439668ef634b25999d8f23fb12493d

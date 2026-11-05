@@ -1,0 +1,14 @@
+name: Enterprise
+lat: 39.565
+lon: -82.475
+country_code: US
+kind: river
+datum: GZ
+datums:
+  NGVD29: 220.547
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRH&name=Enterprise.Stage.Inst.15Minutes.0.OBS
+series: Enterprise.Stage.Inst.15Minutes.0.OBS

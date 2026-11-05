@@ -1,0 +1,22 @@
+name: OAKLAND AIRPORT, SAN FRANCISCO BAY
+lat: 37.7317
+lon: -122.208
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -2.593
+  MHW: -2.4
+  DTL: -1.563
+  MTL: -1.637
+  MSL: -1.62
+  MLW: -0.875
+  MLLW: -0.533
+  NAVD88: -0.606
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=9414711
+established: 1977-01-26T00:00:00Z
+removed: 1977-06-18T23:59:00Z

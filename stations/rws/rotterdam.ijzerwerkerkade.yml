@@ -1,0 +1,11 @@
+name: Rotterdam IJzerwerkerkade
+lat: 51.89947
+lon: 4.51838
+country_code: NL
+datum: NAP
+products: [levels]
+interval_s: 600
+min_interval_s: 300
+live: true
+status: active
+source_url: https://waterinfo.rws.nl/publiek/waterhoogte/rotterdam.ijzerwerkerkade/details

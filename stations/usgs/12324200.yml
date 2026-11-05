@@ -1,0 +1,16 @@
+name: Clark Fork at Deer Lodge MT
+lat: 46.39765
+lon: -112.742538888889
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1372.271
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12324200/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 7b4195a072724985bf60a1e85aa0c9d5

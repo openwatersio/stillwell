@@ -1,0 +1,16 @@
+name: BEAUCOUP CK NR COTTON PLANT, LA
+lat: 32.1091666666667
+lon: -92.3211111111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 31.806
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07370600/
+parameter_code: "00065"
+series_begin: 2018-02-26T06:00:00+00:00
+time_series_id: 35d408c38aa04b6c8a5d84648ee5177a

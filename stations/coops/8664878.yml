@@ -1,0 +1,21 @@
+name: OLD CAPERS LANDING, CAPERS ISLAND
+lat: 32.87
+lon: -79.6867
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.579
+  MHW: -1.457
+  DTL: -0.743
+  MTL: -0.706
+  MSL: -0.724
+  MLW: 0.044
+  MLLW: 0.091
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8664878
+established: 1975-08-29T00:00:00Z
+removed: 1976-02-19T23:59:00Z

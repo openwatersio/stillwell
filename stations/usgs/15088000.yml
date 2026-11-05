@@ -1,0 +1,17 @@
+name: SAWMILL C NR SITKA AK
+lat: 57.051219
+lon: -135.229592
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 0.579
+products: [levels]
+min_interval_s: 900
+live: false
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-15088000/
+parameter_code: "00065"
+series_begin: 2026-02-17T08:00:00+00:00
+series_end: 2026-10-27T20:30:00+00:00
+time_series_id: 15d77d1f9b694abe96aca923a30cfd55

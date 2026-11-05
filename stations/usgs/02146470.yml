@@ -1,0 +1,16 @@
+name: LITTLE HOPE CR AT SENECA PLACE AT CHARLOTTE, NC
+lat: 35.1644444444444
+lon: -80.8530555555556
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 182.063
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02146470/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: b1f149deee984fcea8768c17076b1d7f

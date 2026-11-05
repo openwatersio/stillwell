@@ -1,0 +1,11 @@
+name: Cypress Creek - Camden TN
+lat: 36.046944
+lon: -88.075833
+country_code: US
+datum: GZ
+products: [levels]
+interval_s: 900
+live: true
+status: active
+source_url: https://cwms-data.usace.army.mil/cwms-data/timeseries?office=LRN&name=CMTT1-CypressCr-CamdenTN.Stage.Inst.15Minutes.0.dcp-rev
+series: CMTT1-CypressCr-CamdenTN.Stage.Inst.15Minutes.0.dcp-rev

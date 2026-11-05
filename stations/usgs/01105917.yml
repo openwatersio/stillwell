@@ -1,0 +1,16 @@
+name: MATTAPOISETT RIVER NEAR MATTAPOISETT, MA
+lat: 41.6626044609541
+lon: -70.8383695999008
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2.795
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01105917/
+parameter_code: "00065"
+series_begin: 2008-05-05T04:00:00+00:00
+time_series_id: 7598aa4d41de4d69b07dde9b9729a61a

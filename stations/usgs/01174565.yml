@@ -1,0 +1,16 @@
+name: WEST BRANCH SWIFT RIVER NEAR SHUTESBURY, MA
+lat: 42.4550890589821
+lon: -72.3817516116226
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 164.421
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01174565/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: cfc83d395816492d89eb682618be4688

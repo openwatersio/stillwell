@@ -1,0 +1,24 @@
+name: TURKEY POINT
+lat: 29.915
+lon: -84.5117
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.001
+  MHW: -0.937
+  DTL: -0.584
+  MTL: -0.644
+  MSL: -0.63
+  MLW: -0.352
+  MLLW: -0.167
+  NAVD88: -0.673
+  LAT: 0.315
+  HAT: -1.26
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8728360
+established: 1973-05-01T00:00:00Z
+removed: 2025-06-16T00:00:00Z

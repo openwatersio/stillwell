@@ -1,0 +1,16 @@
+name: THOMAS CREEK AT SH 115 NR CALLAHAN, FLA.
+lat: 30.5188888888889
+lon: -81.7652777777778
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -2.353
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-02231284/
+parameter_code: "00065"
+series_begin: 2022-02-02T21:45:00+00:00
+time_series_id: f001ff0f00b24ee69f6f4df029e6e29e

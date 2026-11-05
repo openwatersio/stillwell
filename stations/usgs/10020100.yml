@@ -1,0 +1,16 @@
+name: BEAR RIVER ABOVE RESERVOIR, NEAR WOODRUFF, UT
+lat: 41.4343899229011
+lon: -111.017686266336
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1970.419
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-10020100/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 736f5c1a0db440afb26d69671a6cf48a

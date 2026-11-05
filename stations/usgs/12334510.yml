@@ -1,0 +1,16 @@
+name: Rock Creek near Clinton MT
+lat: 46.7223361111111
+lon: -113.683061111111
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NGVD29: 1072.731
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-12334510/
+parameter_code: "00065"
+series_begin: 2007-10-01T07:00:00+00:00
+time_series_id: 411148fca14c476ea460b02a18c545ab

@@ -1,0 +1,16 @@
+name: Sun River bl Willow Cr nr Augusta MT
+lat: 47.54713611111111
+lon: -112.36743055555554
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 1207.078
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-06082200/
+parameter_code: "00065"
+series_begin: 2012-10-01T06:00:00+00:00
+time_series_id: e3024ea7b76c44d6b7f1b0061ea4cde7

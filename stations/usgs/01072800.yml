@@ -1,0 +1,16 @@
+name: COCHECO RIVER NEAR ROCHESTER, NH
+lat: 43.2684152658152
+lon: -70.9736739007988
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 36.201
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-01072800/
+parameter_code: "00065"
+series_begin: 2007-10-01T05:00:00+00:00
+time_series_id: 02588af5ef9d424ebff87545be51e7df

@@ -1,0 +1,12 @@
+name: Spieka Neufeld
+lat: 53.78806
+lon: 8.55306
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5
+  SKN: -2.73
+products: [predictions, predicted_extremes]
+live: false
+status: active
+source_url: https://gezeiten.bsh.de/spieka_neufeld

@@ -1,0 +1,16 @@
+name: BUFFALO CREEK AT GARDENVILLE NY
+lat: 42.8546111111111
+lon: -78.7564166666667
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 183.828
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-04214500/
+parameter_code: "00065"
+series_begin: 2012-07-14T21:00:00+00:00
+time_series_id: bd97d70d54f6426b8cb654090aa8dd05

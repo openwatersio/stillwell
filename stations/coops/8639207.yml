@@ -1,0 +1,23 @@
+name: Rudee Inlet
+lat: 36.8317
+lon: -75.9733
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.903
+  MHW: -1.815
+  DTL: -1.338
+  MTL: -1.314
+  MSL: -1.319
+  MLW: -0.812
+  MLLW: -0.772
+  LAT: -0.469
+  HAT: -2.255
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8639207
+established: 1977-06-21T00:00:00Z
+removed: 2009-11-17T09:37:00Z

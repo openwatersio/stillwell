@@ -1,0 +1,16 @@
+name: Upper Iowa River at Bluffton, IA
+lat: 43.406913160576
+lon: -91.8990464335351
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 287.929
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-05387440/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: e5a24e8c6bb540bbb762633dc83a47c7

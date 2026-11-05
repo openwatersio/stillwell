@@ -1,0 +1,21 @@
+name: POINT NO POINT, PASSAIC RIVER
+lat: 40.7317
+lon: -74.1167
+country_code: US
+kind: coastal
+datum: STND
+datums:
+  MHHW: -1.997
+  MHW: -1.902
+  DTL: -1.122
+  MTL: -1.108
+  MSL: -1.131
+  MLW: -0.315
+  MLLW: -0.247
+products: [levels, extremes]
+min_interval_s: 360
+live: false
+status: active
+source_url: https://tidesandcurrents.noaa.gov/stationhome.html?id=8530743
+established: 1975-12-17T00:00:00Z
+removed: 1977-01-19T23:59:00Z

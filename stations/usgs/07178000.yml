@@ -1,0 +1,16 @@
+name: Bird Creek near Owasso, OK
+lat: 36.2487053441679
+lon: -95.8672129744507
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 170.883
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07178000/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: bbd6352ec8104d229e5b1dd67db9b898

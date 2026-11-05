@@ -1,0 +1,13 @@
+name: Pellworm, Anleger
+lat: 54.50083
+lon: 8.70194
+country_code: DE
+datum: PNP
+datums:
+  NHN: -5.03
+  SKN: -2.63
+products: [predictions, predicted_extremes]
+live: false
+status: active
+same_as: [pegelonline/9550021]
+source_url: https://gezeiten.bsh.de/pellworm_anleger

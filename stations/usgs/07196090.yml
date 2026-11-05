@@ -1,0 +1,16 @@
+name: Illinois River at Chewey, OK
+lat: 36.1042527298898
+lon: -94.7827282997696
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 244.117
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07196090/
+parameter_code: "00065"
+series_begin: 2010-06-07T10:30:00+00:00
+time_series_id: ca473fb2eed945eeb8699f2366e2702a

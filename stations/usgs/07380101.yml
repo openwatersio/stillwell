@@ -1,0 +1,16 @@
+name: Bayou Manchac near Little Prairie, LA
+lat: 30.340471289985
+lon: -90.9173215741486
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: -0.39
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07380101/
+parameter_code: "00065"
+series_begin: 2007-10-01T06:00:00+00:00
+time_series_id: 4934f341422b4f19b2812f0a7ba82572

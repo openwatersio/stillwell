@@ -1,0 +1,16 @@
+name: WEST MONUMENT CREEK AT U.S. AIR FORCE ACADEMY, CO
+lat: 38.970556
+lon: -104.902222
+country_code: US
+kind: river
+datum: GAGE
+datums:
+  NAVD88: 2195.362
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-07103800/
+parameter_code: "00065"
+series_begin: 2020-10-20T19:30:00+00:00
+time_series_id: 919fbcc73244498186972c446f0f1d10

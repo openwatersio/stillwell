@@ -1,0 +1,16 @@
+name: GEIST RESERVOIR AT INDIANAPOLIS, IN
+lat: 39.9054166666667
+lon: -85.9821111111111
+country_code: US
+kind: lake
+datum: GAGE
+datums:
+  NAVD88: 236.083
+products: [levels]
+min_interval_s: 900
+live: true
+status: active
+source_url: https://waterdata.usgs.gov/monitoring-location/USGS-03351700/
+parameter_code: "00065"
+series_begin: 2020-02-21T19:00:00+00:00
+time_series_id: 8796fe1f65aa442c84c3449453278341
