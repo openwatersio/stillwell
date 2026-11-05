@@ -28,7 +28,17 @@ export function seriesPath(
   sourceId: string,
   year: number,
 ): string {
-  return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}/${year}.parquet`;
+  return `${seriesDir(root, product, source, sourceId)}/${year}.parquet`;
+}
+
+/** The directory that holds a station's yearly files of one product. */
+export function seriesDir(
+  root: string,
+  product: Product,
+  source: string,
+  sourceId: string,
+): string {
+  return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
 }
 
 export function recentPath(root: string, source: string): string {

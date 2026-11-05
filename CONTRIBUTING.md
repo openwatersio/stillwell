@@ -62,6 +62,16 @@ node scripts/ingest.ts backfill rws hoekvanholland 2016 2025
 node scripts/ingest.ts backfill bsh 506P 2026 2028
 ```
 
+Backfill skips a year whose file is already complete: a past year, asked for whole, whose file has values in every month, runs into the year's last week and holds no preliminary values (`yearDone` in `src/backfill.ts`). So a run cut short, such as by the Ingest workflow's 6-hour cap, doesn't fetch those years again, and `--refetch` fetches every year anyway. A station's first and last years, and years with a missing month, are never complete, so they're fetched every run too. That rule still fetches every year with preliminary values on each run, so a campaign of many runs, such as the USGS record, passes `--skip-written` to skip every whole, ended year that has a file at all, from a listing of each station's files without reading them, and ends at the current year so it never fetches a year still under way. It skips a file whatever it holds, so a year an earlier run wrote only part of, such as `backfill bsh 506P 2026 2028` above, needs `--refetch` or a run without `--skip-written` to fill in. A year a source returns nothing for writes no file, so it's fetched again each run; USGS and CO-OPS ask only within each series' dates, but USACE doesn't yet, so start a USACE backfill near its series' first year.
+
+`--first <file>` runs the stations a file names before the rest: one ID per line, or a CSV with a `replacement_id`, `id` or `station` column, such as `docs/ticon-replacement.csv`, which lists the station matched to every TICON record, accepted or not. A file that names none of the stations stops the run.
+
+```bash
+node scripts/ingest.ts backfill usgs all 2007 2026 --skip-written --first docs/ticon-replacement.csv
+```
+
+`--shard 2/8` takes the second of eight sets of stations, split by a hash of their IDs so a station's shard never changes, for separate jobs. The Ingest workflow runs one job at a time (`concurrency: lake` keeps one pending and cancels the rest), so there a shard gains nothing over one resumed run; shards are for jobs that can run at once, such as a matrix workflow, which doesn't exist yet.
+
 Merge the last hours from every live station into the source's recent window, which keeps 7 days by default (`--keep-days`):
 
 ```bash

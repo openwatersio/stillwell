@@ -3,6 +3,7 @@
  *
  *   node scripts/ingest.ts stations [source...]
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
+ *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *
  * `stations` refreshes the committed lists in stations/<source>.json, then
@@ -11,8 +12,15 @@
  * exclusive) into its yearly files, replacing that range and keeping the rest,
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
- * source withdraws stays until its month is fetched again with others. `recent` fetches the last hours for every
- * live station and merges them into recent/<source>.parquet.
+ * source withdraws stays until its month is fetched again with others.
+ * Backfill skips a year whose file is already complete (see `yearDone` in
+ * src/backfill.ts), so a run cut short doesn't fetch those again; `--refetch`
+ * fetches every year anyway, and `--skip-written` skips every ended year that
+ * has a file, complete or not, so a long campaign of runs doesn't fetch
+ * provisional years again each time. `--first` names a file of station IDs to
+ * run before the rest, and `--shard 2/8` takes the second of eight sets of
+ * stations, split by a hash of their IDs, so separate jobs can split them. `recent` fetches the last hours for every live station
+ * and merges them into recent/<source>.parquet.
  *
  * Files carry no datum of their own, so a station the source now reports in
  * another datum is marked inactive, and `stations` lists it and exits nonzero
@@ -28,11 +36,21 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import {
+  orderStations,
+  parseShard,
+  parseStationList,
+  shard,
+  yearDone,
+  yearWritten,
+} from "../src/backfill.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   readExtremes,
   readDatums,
+  readYearFiles,
+  listYears,
   readObservations,
   checkRecent,
   readRecent,
@@ -43,7 +61,7 @@ import {
   writeStations,
   type StationObservation,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
+import { recentPath, seriesDir, seriesPath, sourcesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc, type QcOptions } from "../src/qc.ts";
 import { linkBothWays, mergeStationList } from "../src/stations.ts";
 import type {
@@ -89,6 +107,10 @@ const { positionals, values } = parseArgs({
     hours: { type: "string", default: "24" },
     "keep-days": { type: "string", default: "7" },
     concurrency: { type: "string", default: "4" },
+    first: { type: "string" },
+    shard: { type: "string" },
+    refetch: { type: "boolean", default: false },
+    "skip-written": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -212,18 +234,58 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const list = await committedStations(sourceId);
   if (!list.length)
     throw new Error(`No stations/${sourceId}.json; run \`stations ${sourceId}\` first`);
-  const wanted =
+  let wanted =
     ids === "all"
       ? list.filter((s) => s.status === "active")
       : ids.split(",").map((id) => find(list, sourceId, id));
+  if (values.shard) wanted = shard(wanted, ...parseShard(values.shard));
+  if (values["skip-written"] && values.refetch)
+    throw new Error("--skip-written and --refetch contradict each other");
+  if (values.first) {
+    const text = await readFile(values.first, "utf8");
+    const first = parseStationList(text, sourceId, /\.csv$/i.test(values.first));
+    wanted = orderStations(wanted, first);
+    // Stations in another shard, inactive or misspelled don't run first here.
+    // Unsharded, a file that matches nothing is a mistake, not an order.
+    const here = new Set(wanted.map((s) => s.id));
+    const matched = first.filter((id) => here.has(id)).length;
+    if (!matched && !values.shard)
+      throw new Error(`${values.first} names none of the ${sourceId} stations here`);
+    console.log(
+      `${values.first}: ${matched} of its ${first.length} ${sourceId} stations run first`,
+    );
+  }
   // Sources with a rolling window can't reach further back than it.
   const window = source.metadata.window_days;
   if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
+  const now = Date.now();
+  console.log(`${sourceId}: backfilling ${wanted.length} stations`);
 
   const failed: string[] = [];
+  let skipped = 0;
   await pool(wanted, async (station) => {
     for (const product of station.products) {
+      // One read per series tells which years are done, rather than one per year;
+      // --skip-written needs only a listing.
+      let done: (from: Date, to: Date) => boolean = () => false;
+      try {
+        const dir = seriesDir(lakeFor(station), product, station.source, station.source_id);
+        if (values["skip-written"]) {
+          const listed = await listYears(dir);
+          done = (from, to) => yearWritten(listed, from, to, now);
+        } else if (!values.refetch) {
+          const files = await readYearFiles(dir);
+          done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
+        }
+      } catch (error) {
+        failed.push(`${station.id} ${product}: ${error instanceof Error ? error.message : error}`);
+        continue;
+      }
       for (const [from, to] of years(start, end)) {
+        if (done(from, to)) {
+          skipped++;
+          continue;
+        }
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
         try {
           const written = await backfillYear(source, station, product, from, to);
@@ -235,6 +297,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       }
     }
   });
+  const why = values["skip-written"] ? "already written" : "already complete";
+  console.log(`${sourceId}: skipped ${skipped} years ${why}, ${failed.length} failed`);
   for (const f of failed) console.error(`  ${f}`);
   if (failed.length) process.exitCode = 1;
 }
@@ -424,7 +488,7 @@ async function pool<T>(items: T[], run: (item: T) => Promise<void>): Promise<voi
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
+    "usage: ingest.ts stations [source...] | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N]",
   );
   process.exit(1);
 }

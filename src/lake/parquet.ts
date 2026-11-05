@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DuckDBInstance, type DuckDBConnection } from "@duckdb/node-api";
-import type { Flag, Observation, PublishedExtreme, Station } from "../schema.ts";
+import { Flag, type Observation, type PublishedExtreme, type Station } from "../schema.ts";
 import type { EventIndex } from "../types.ts";
 
 /**
@@ -122,6 +122,61 @@ export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
 export async function readDatums(path: string): Promise<string[]> {
   const rows = await read(path, "SELECT DISTINCT datum", "datum");
   return rows.map((r) => String(r.datum));
+}
+
+/** What backfill needs to know about one yearly file: its preliminary values, months with values and last time. */
+export interface YearFile {
+  preliminary: number;
+  months: number;
+  last: number;
+}
+
+/**
+ * Every yearly file in a station's series directory, by year, in one read, so
+ * backfill can tell which years are already written without a request per year.
+ */
+export async function readYearFiles(dir: string): Promise<Map<number, YearFile>> {
+  if (!isRemote(dir) && !existsSync(dir)) return new Map();
+  const rows = await read(
+    `${dir}/*.parquet`,
+    `SELECT filename, count(*) FILTER (WHERE flag = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last`,
+    "filename",
+    "GROUP BY filename",
+    { filename: true },
+  );
+  return new Map(
+    rows.flatMap((r) => {
+      const year = /(\d{4})\.parquet$/.exec(String(r.filename))?.[1];
+      return year
+        ? [
+            [
+              Number(year),
+              {
+                preliminary: Number(r.preliminary),
+                months: Number(r.months),
+                last: Number(r.last),
+              },
+            ],
+          ]
+        : [];
+    }),
+  );
+}
+
+/** The years a station's series directory has files for, from a listing alone. */
+export function listYears(dir: string): Promise<Set<number>> {
+  return serial(async () => {
+    if (!isRemote(dir) && !existsSync(dir)) return new Set<number>();
+    const db = await connection();
+    const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(`${dir}/*.parquet`)})`);
+    return new Set(
+      reader
+        .getRowObjects()
+        .map((r) => /(\d{4})\.parquet$/.exec(String(r.file))?.[1])
+        .filter((y) => y !== undefined)
+        .map(Number),
+    );
+  });
 }
 
 export type StationObservation = Observation & { station: string };
@@ -347,8 +402,9 @@ function read(
   select: string,
   order = "time",
   where = "",
+  { filename = false } = {},
 ): Promise<Record<string, unknown>[]> {
-  return serial(() => readNow(path, select, order, where));
+  return serial(() => readNow(path, select, order, where, filename));
 }
 
 async function readNow(
@@ -356,17 +412,23 @@ async function readNow(
   select: string,
   order: string,
   where: string,
+  filename = false,
 ): Promise<Record<string, unknown>[]> {
-  if (!isRemote(path) && !existsSync(path)) return [];
+  if (!isRemote(path) && !path.includes("*") && !existsSync(path)) return [];
   const db = await connection();
   try {
-    const reader = await db.runAndReadAll(
-      `${select} FROM read_parquet(${quote(path)}) ${where} ORDER BY ${order}`,
-    );
+    const source = filename
+      ? `read_parquet(${quote(path)}, filename = true, union_by_name = true)`
+      : `read_parquet(${quote(path)})`;
+    const reader = await db.runAndReadAll(`${select} FROM ${source} ${where} ORDER BY ${order}`);
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {
-    // A missing remote file is an empty series, not a failure.
-    if (isRemote(path) && /404|No files found|does not exist/i.test(String(error))) return [];
+    // A missing remote file, or a pattern nothing matches, is an empty series, not a failure.
+    if (
+      (isRemote(path) || path.includes("*")) &&
+      /404|No files found|does not exist/i.test(String(error))
+    )
+      return [];
     throw error;
   }
 }
