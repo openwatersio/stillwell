@@ -11,7 +11,10 @@ const DAY_MS = 86_400_000;
  *   always fetches it;
  * - the year has ended, so the current year (and any later one) is always fetched;
  * - its file exists and holds no `preliminary` values, so provisional USGS and
- *   preliminary CO-OPS values are fetched again until the source approves them;
+ *   preliminary CO-OPS values are fetched again until the source approves them.
+ *   A month whose provisional values the source later withdraws keeps them,
+ *   since a month the fetch returns nothing for keeps what it had, so that year
+ *   is fetched on every run until someone removes them;
  * - it has values in every month and its last value is in the year's last 7
  *   days, so a file an earlier run wrote over part of the year, or with a month
  *   the source returned nothing for, is fetched again. A station that began or
@@ -154,15 +157,21 @@ export async function yearsToFetch(
   mode: "complete" | "written" | "none",
   now: number,
 ): Promise<{ fetch: [Date, Date][]; skipped: number }> {
+  const all = [...years(start, end)];
+  // No whole ended year asked for means nothing to skip, so nothing to read.
+  if (!all.some(([from, to]) => wholeEndedYear(from, to, now))) mode = "none";
   let done: (from: Date, to: Date) => boolean = () => false;
   if (mode === "written") {
     const listed = await listYears(dir);
     done = (from, to) => yearWritten(listed, from, to, now);
   } else if (mode === "complete") {
-    const files = await readYearFiles(dir);
+    const asked = all.filter(([from, to]) => wholeEndedYear(from, to, now));
+    const files = await readYearFiles(
+      dir,
+      asked.map(([from]) => from.getUTCFullYear()),
+    );
     done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
   }
-  const all = [...years(start, end)];
   const fetch = all.filter(([from, to]) => !done(from, to));
   return { fetch, skipped: all.length - fetch.length };
 }

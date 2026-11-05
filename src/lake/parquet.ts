@@ -139,35 +139,26 @@ export interface YearFile {
 }
 
 /**
- * Every yearly file in a station's series directory, by year, in one read, so
- * backfill can tell which years are already written without a request per year.
+ * What the yearly files in a station's series directory hold, by year, for the
+ * years asked about: a listing, then one read of just those files, so a file
+ * for a year not asked about is never opened.
  */
-export async function readYearFiles(dir: string): Promise<Map<number, YearFile>> {
-  if (!isRemote(dir) && !existsSync(dir)) return new Map();
-  const rows = await read(
-    `${dir}/*.parquet`,
-    `SELECT filename, count(*) FILTER (WHERE flag = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last`,
-    "filename",
-    "",
-    "GROUP BY filename",
-    { filename: true },
-  );
+export async function readYearFiles(dir: string, years: number[]): Promise<Map<number, YearFile>> {
+  const listed = await listYears(dir);
+  const files = years.filter((y) => listed.has(y)).map((y) => quote(`${dir}/${y}.parquet`));
+  if (!files.length) return new Map();
+  const rows = await serial(async () => {
+    const db = await connection();
+    const reader = await db.runAndReadAll(
+      `SELECT filename, count(*) FILTER (WHERE flag = ${Flag.preliminary}) AS preliminary, count(DISTINCT month(time)) AS months, epoch_ms(max(time)) AS last FROM read_parquet([${files.join(", ")}], filename = true, union_by_name = true) GROUP BY filename ORDER BY filename`,
+    );
+    return reader.getRowObjects();
+  });
   return new Map(
-    rows.flatMap((r) => {
-      const year = /(\d{4})\.parquet$/.exec(String(r.filename))?.[1];
-      return year
-        ? [
-            [
-              Number(year),
-              {
-                preliminary: Number(r.preliminary),
-                months: Number(r.months),
-                last: Number(r.last),
-              },
-            ],
-          ]
-        : [];
-    }),
+    rows.map((r) => [
+      Number(/(\d{4})\.parquet$/.exec(String(r.filename))![1]),
+      { preliminary: Number(r.preliminary), months: Number(r.months), last: Number(r.last) },
+    ]),
   );
 }
 
@@ -561,9 +552,8 @@ function read(
   order = "time",
   alias = "",
   where = "",
-  { filename = false } = {},
 ): Promise<Record<string, unknown>[]> {
-  return serial(() => readNow(path, select, order, alias, where, filename));
+  return serial(() => readNow(path, select, order, alias, where));
 }
 
 async function readNow(
@@ -572,26 +562,20 @@ async function readNow(
   order: string,
   alias: string,
   where: string,
-  filename = false,
 ): Promise<Record<string, unknown>[]> {
-  if (!isRemote(path) && !path.includes("*") && !existsSync(path)) return [];
+  if (!isRemote(path) && !existsSync(path)) return [];
   const db = await connection();
   if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
   try {
-    const source = filename
-      ? `read_parquet(${quote(path)}, filename = true, union_by_name = true)`
-      : `read_parquet(${quote(path)})`;
     const reader = await db.runAndReadAll(
-      `${select} FROM ${source} ${alias} ${where} ORDER BY ${order}`,
+      `${select} FROM read_parquet(${quote(path)}) ${alias} ${where} ORDER BY ${order}`,
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {
-    // A missing remote file, or a pattern nothing matches, is an empty series, not a failure.
-    if (
-      (isRemote(path) || path.includes("*")) &&
-      /404|No files found|does not exist/i.test(String(error))
-    )
-      return [];
+    // A missing remote file is an empty series, not a failure. Quoted paths are
+    // left out first, since a station ID can hold "404".
+    const message = String(error).replace(/'[^']*'|"[^"]*"/g, "''");
+    if (isRemote(path) && /\b404\b|No files found|does not exist/i.test(message)) return [];
     throw error;
   }
 }

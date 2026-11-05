@@ -279,6 +279,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
     return !isHeld(s.epochs);
   });
+  if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
   if (values.shard) wanted = shard(wanted, ...parseShard(values.shard));
   if (values["skip-written"] && values.refetch)
     throw new Error("--skip-written and --refetch contradict each other");
@@ -534,8 +535,7 @@ async function pool<T>(items: T[], run: (item: T) => Promise<void>): Promise<voi
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] | seed-stations [source...] | backfill <source> <station,...|all> <start> <end> | recent <source> [--hours N] [--keep-days N]",
-    "usage: ingest.ts stations [source...] | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] | seed-stations [source...] | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N]",
   );
   process.exit(1);
 }

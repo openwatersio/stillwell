@@ -100,8 +100,12 @@ describe("readYearFiles", () => {
       "GAGE",
     );
     const dir = seriesDir(root, "levels", "usgs", "07010000");
-    const files = await readYearFiles(dir);
+    const files = await readYearFiles(dir, [2022, 2023, 2024]);
     assert.deepEqual([...(await listYears(dir))].sort(), [2023, 2024]);
+    assert.deepEqual(
+      [...(await readYearFiles(dir, [2024]))].map(([y]) => y),
+      [2024],
+    );
     assert.deepEqual(
       [...files],
       [
@@ -122,7 +126,7 @@ describe("readYearFiles", () => {
 
   it("reads a station with no files as none", async () => {
     const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
-    assert.equal((await readYearFiles(seriesDir(root, "levels", "usgs", "x"))).size, 0);
+    assert.equal((await readYearFiles(seriesDir(root, "levels", "usgs", "x"), [2024])).size, 0);
     assert.equal((await listYears(seriesDir(root, "levels", "usgs", "x"))).size, 0);
   });
 });
@@ -169,6 +173,16 @@ describe("yearsToFetch", () => {
     mkdirSync(bad, { recursive: true });
     writeFileSync(join(bad, "2023.parquet"), "not parquet");
     await assert.rejects(yearsToFetch(bad, y2023, y2027, "complete", NOW));
+    // A year not asked about is never opened.
+    assert.equal((await yearsToFetch(bad, Y2024, Y2025, "complete", NOW)).fetch.length, 1);
+    // An ID holding "404" is still a failed read, not a missing file.
+    const named = seriesDir(root, "levels", "usgs", "01404000");
+    mkdirSync(named, { recursive: true });
+    writeFileSync(join(named, "2023.parquet"), "not parquet");
+    await assert.rejects(yearsToFetch(named, y2023, y2027, "complete", NOW));
+    // A run over the current year alone has nothing to skip, so reads nothing.
+    const y2026 = new Date(Date.UTC(2026, 0, 1));
+    assert.equal((await yearsToFetch(bad, y2026, y2027, "complete", NOW)).fetch.length, 1);
     // A listing doesn't open the files.
     assert.equal((await yearsToFetch(bad, y2023, y2027, "written", NOW)).skipped, 1);
   });
