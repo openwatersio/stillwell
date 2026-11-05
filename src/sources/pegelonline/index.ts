@@ -54,7 +54,7 @@ export async function list(): Promise<ApiStation[]> {
     { fresh: true },
   );
   // Without a position there's nothing to place.
-  return stations.filter((s) => s.latitude !== undefined);
+  return stations.filter((s) => s.latitude !== undefined && s.longitude !== undefined);
 }
 
 export async function stations(): Promise<ListedStation[]> {

@@ -173,6 +173,12 @@ describe("pegelonline", () => {
     const [listed] = await pegelonline.stations();
     assert.equal(listed!.datum, null);
   });
+
+  it("leaves out a station with half a position", async () => {
+    const [first] = JSON.parse(fixture("pegelonline-stations.json"));
+    serve([[/stations\.json/, JSON.stringify([{ ...first, longitude: undefined }])]]);
+    assert.deepEqual(await pegelonline.stations(), []);
+  });
 });
 
 describe("bsh", () => {
