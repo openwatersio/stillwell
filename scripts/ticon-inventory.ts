@@ -232,6 +232,6 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 - **CMEMS elsewhere.** CMEMS records in countries whose feed has no adapter yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.
 - **Contributor.** The rest map by contributor to a planned source, with its license status from the plan's internal [sources research](https://github.com/openwatersio/planning/blob/main/water-levels/research/sources.md#commercial-clearance). A record's own \`commercial_use\` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
 
-"Ready" means a station matched, not that its history is in the lake: PEGELONLINE keeps 31 days, so German records also need WSV's archive or GESLA's WSV years. "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
+"Ready" means a station matched, not that its history is in the lake: German records also need a PEGELONLINE backfill, which reaches 2000 at most gauges. "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
 `;
 }

@@ -1,4 +1,4 @@
-import { getJson } from "../../http.ts";
+import { getJson, getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -7,14 +7,20 @@ import {
   type Observation,
   type Source,
   type SourceMetadata,
+  type Station,
 } from "../../schema.ts";
 
 /**
- * PEGELONLINE, the WSV's real-time gauge service. It keeps 31 days of raw water
- * levels in centimeters above gauge zero (PNP), at 1-minute resolution at tide
- * gauges. Longer records have to be collected by fetching on a schedule.
+ * PEGELONLINE, the WSV's gauge service: raw water levels in centimeters above
+ * gauge zero (PNP), at 1-minute resolution at tide gauges. The REST API keeps
+ * 31 days; the station pages' raw-data download reaches back to 2000 at most
+ * federal gauges.
  */
 const API = "https://www.pegelonline.wsv.de/webservices/rest-api/v2";
+const SITE = "https://pegelonline.wsv.de";
+const DAY_MS = 86_400_000;
+// A day short of the REST API's 31, so a range near its edge isn't cut short.
+const REST_DAYS = 30;
 
 export const metadata: SourceMetadata = {
   id: "pegelonline",
@@ -30,8 +36,15 @@ export const metadata: SourceMetadata = {
   // Central European time, standard or summer.
   utc_offsets: [1, 2],
   terms: "Raw, unchecked values.",
-  window_days: 31,
+  // The download shows no step at any gauge zero's validFrom it covers (README).
+  archive: "current",
 };
+
+/**
+ * A station with the first day of its raw-data download, or null where the
+ * download reaches no further back than the REST API or isn't offered.
+ */
+export type PegelonlineStation = ListedStation & { history_since?: string | null };
 
 export interface ApiStation {
   uuid: string;
@@ -59,13 +72,68 @@ export async function list(): Promise<ApiStation[]> {
   return stations.filter((s) => s.latitude !== undefined && s.longitude !== undefined);
 }
 
-export async function stations(): Promise<ListedStation[]> {
-  return (await list()).map(toStation).sort((a, b) => a.id.localeCompare(b.id));
+/**
+ * Each station with its `history_since`. A station in `previous` with a date
+ * keeps it; the rest ask the download dialog, one at a time.
+ */
+export async function stations(previous: Station[] = []): Promise<PegelonlineStation[]> {
+  const known = new Map(
+    previous.map((s) => [s.id, (s as Partial<PegelonlineStation>).history_since]),
+  );
+  const listed: PegelonlineStation[] = [];
+  let failures = 0;
+  for (const s of await list()) {
+    const station: PegelonlineStation = toStation(s);
+    let since = known.get(station.id);
+    // A date is kept; a null is asked again, since a new gauge's record grows and
+    // WSV can add history. A failed request leaves it as it was, to try again at
+    // the next refresh, and five stop the asking, so a site that's down can't
+    // stall the refresh.
+    if (!since && failures < 5) {
+      try {
+        since = await historySince(s.uuid);
+      } catch (error) {
+        failures++;
+        console.warn(`PEGELONLINE ${s.number}: no history_since: ${(error as Error).message}`);
+      }
+    }
+    if (since !== undefined) station.history_since = since;
+    listed.push(station);
+  }
+  return listed.sort((a, b) => a.id.localeCompare(b.id));
 }
 
 /**
- * Water levels in meters over [start, end), within the last 31 days, in the
- * series' own datum (see `UNITS`). `station` is a PEGELONLINE number or UUID.
+ * The first day the raw-data download offers for a station's water levels, as
+ * YYYY-MM-DD, from the dialog behind its "Download Wasserstände (Rohdaten)"
+ * button. Null when it offers only about the REST API's 31 days, or nothing.
+ */
+export async function historySince(uuid: string): Promise<string | null> {
+  let html: string;
+  try {
+    html = await getText(`${SITE}/gast/download/modal?uuid=${uuid}&parameter=W`, {
+      fresh: true,
+      // A small page; a site that hangs shouldn't hold a refresh for minutes a station.
+      timeout: 30,
+    });
+  } catch (error) {
+    // A gauge without a download answers 400.
+    if (/returned 400$/.test((error as Error).message)) return null;
+    throw error;
+  }
+  const [min, max] = ["min", "max"].map(
+    (a) => new RegExp(`${a}="(\\d{4}-\\d{2}-\\d{2})"`).exec(html)?.[1],
+  );
+  if (!min || !max) throw new Error("download dialog has no date range");
+  // Hamburg Port Authority's gauges, among others, offer a rolling 31 days; the
+  // margin over that only absorbs a slightly longer window, so a new gauge's
+  // record counts once it's longer.
+  return Date.parse(max) - Date.parse(min) <= 40 * DAY_MS ? null : min;
+}
+
+/**
+ * Water levels in meters over [start, end) from the REST API, within the last
+ * 31 days, in the series' own datum (see `UNITS`). `station` is a PEGELONLINE number or UUID.
  * With `datum`, throws if the series is now in another.
  */
 export async function levels(
@@ -86,6 +154,108 @@ export async function levels(
   return values
     .map((v) => ({ time: Date.parse(v.timestamp), level: v.value * scale, flag: Flag.preliminary }))
     .filter((v) => v.time >= start.getTime() && v.time < end.getTime());
+}
+
+/**
+ * Water levels in meters over [start, end) from the raw-data download, in the
+ * unit its series information gives. `station` is a PEGELONLINE number. With
+ * `datum`, throws if the file is in another. Days the download doesn't cover
+ * come back empty.
+ */
+export async function history(
+  station: string,
+  start: Date,
+  end: Date,
+  datum?: string,
+): Promise<Observation[]> {
+  const { uuid } = await getJson<ApiStation>(`${API}/stations/${encodeURIComponent(station)}.json`);
+  // The form takes whole local days, both included; a local day starts up to
+  // two hours before the UTC one.
+  const day = (t: number) => new Date(t).toISOString().slice(0, 10);
+  const body = new URLSearchParams({
+    uuid,
+    parameter: "W",
+    start: day(start.getTime() - DAY_MS),
+    end: day(end.getTime() + 2 * 3_600_000),
+    // JSON's timestamps carry their offset; CSV's local times repeat an hour each autumn.
+    format: "json",
+  });
+  // One download at a time, and each prepared file downloads once, so neither
+  // answer can be cached.
+  const files = await oneAtATime(async () => {
+    // A retried download URL has already been spent, so a failure prepares again.
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const { downloadUrl } = await getJson<{ downloadUrl?: string }>(
+          `${SITE}/gast/download/prepare`,
+          {
+            method: "POST",
+            body: body.toString(),
+            headers: { "content-type": "application/x-www-form-urlencoded" },
+            fresh: true,
+          },
+        );
+        if (!downloadUrl) throw new Error(`PEGELONLINE ${station} download wasn't prepared`);
+        return await unzip(await getText(`${SITE}${downloadUrl}`, { fresh: true, base64: true }));
+      } catch (error) {
+        if (attempt >= 3) throw error;
+      }
+    }
+  });
+  const info = files.get("zeitreiheninformation.txt") ?? "";
+  const unit = parseUnit(/^timeseries_unit=(.*)$/m.exec(info)?.[1] ?? "", station);
+  if (datum && unit.datum !== datum)
+    throw new Error(`PEGELONLINE ${station} download is in ${unit.datum}, not ${datum}`);
+  const json = [...files].find(([name]) => name.endsWith(".json"));
+  if (!json) throw new Error(`PEGELONLINE ${station} download has no JSON file`);
+  return (JSON.parse(json[1]) as { timestamp: string; value: number | null }[])
+    .filter((v) => typeof v.value === "number")
+    .map((v) => ({
+      time: Date.parse(v.timestamp),
+      level: v.value! * unit.scale,
+      flag: Flag.preliminary,
+    }))
+    .filter((v) => v.time >= start.getTime() && v.time < end.getTime());
+}
+
+let queue: Promise<unknown> = Promise.resolve();
+
+function oneAtATime<T>(task: () => Promise<T>): Promise<T> {
+  const next = queue.then(task);
+  queue = next.catch(() => {});
+  return next;
+}
+
+/**
+ * The text files in a zip, by name, from its central directory: PEGELONLINE's
+ * local headers leave the sizes to a descriptor after the data.
+ */
+export async function unzip(base64: string): Promise<Map<string, string>> {
+  const zip = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const view = new DataView(zip.buffer);
+  let end = zip.length - 22;
+  while (end > 0 && view.getUint32(end, true) !== 0x06054b50) end--;
+  if (end <= 0) throw new Error("not a zip");
+  const files = new Map<string, string>();
+  let p = view.getUint32(end + 16, true);
+  for (let i = view.getUint16(end + 10, true); i > 0; i--) {
+    const method = view.getUint16(p + 10, true);
+    const size = view.getUint32(p + 20, true);
+    const [nameLength, extraLength, commentLength] = [28, 30, 32].map((o) =>
+      view.getUint16(p + o, true),
+    );
+    const name = new TextDecoder().decode(zip.subarray(p + 46, p + 46 + nameLength!));
+    const local = view.getUint32(p + 42, true);
+    const offset = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
+    const data = zip.subarray(offset, offset + size);
+    if (method !== 0 && method !== 8) throw new Error(`zip method ${method}`);
+    const stream = new Blob([data]).stream();
+    const bytes =
+      method === 8 ? stream.pipeThrough(new DecompressionStream("deflate-raw")) : stream;
+    files.set(name, await new Response(bytes).text());
+    p += 46 + nameLength! + extraLength! + commentLength!;
+  }
+  return files;
 }
 
 /** Series units: most are centimeters above gauge zero, some meters above NN. */
@@ -168,5 +338,23 @@ function toStation(s: ApiStation): ListedStation {
 export const source: Source = {
   metadata,
   stations,
-  observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
+  observations,
 };
+
+/**
+ * `recent` stays on the REST API; anything older comes from the download,
+ * from the station's `history_since` where it's known.
+ */
+async function observations(s: Station, start: Date, end: Date): Promise<Observation[]> {
+  const rest = Date.now() - REST_DAYS * DAY_MS;
+  if (start.getTime() >= rest) return levels(s.source_id, start, end, s.datum);
+  const since = (s as Partial<PegelonlineStation>).history_since;
+  // Unset until a refresh asks; without it, a backfill would ask for years the gauge doesn't have.
+  if (since === undefined)
+    throw new Error(`PEGELONLINE ${s.source_id} has no history_since; run ingest stations first`);
+  // Not the REST API's last 30 days either: backfill replaces whole months, so
+  // a month it only half covers would lose the rows before.
+  if (since === null) return [];
+  const from = Math.max(start.getTime(), Date.parse(since) - DAY_MS);
+  return from < end.getTime() ? history(s.source_id, new Date(from), end, s.datum) : [];
+}

@@ -91,7 +91,7 @@ Errors against observed 2024 extremes, as HRoI / harmonic (canonical) / harmonic
 
 Still open:
 
-- Score BSH-derived HRoI against observed German levels. PEGELONLINE keeps only 31 days, so this needs a scheduled fetch, or the WSV records in GESLA.
+- Score BSH-derived HRoI against observed German levels, from a PEGELONLINE backfill, which reaches 2000 at most gauges.
 - Check the one-year ridge fit against a third year of BSH predictions when 2028 is published (August 2027).
 - Mean tide curves by tidal range and event index, to bring the HRoI curve closer to BSH's (5–10 cm off at Husum, Büsum and Papenburg).
 

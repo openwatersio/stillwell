@@ -87,6 +87,7 @@ export async function refreshSource(
   const options_ = {
     now: options.now,
     offsets: source.metadata.utc_offsets ?? ([0, 0] as [number, number]),
+    archive: source.metadata.archive,
     decisions: source.overrides?.epochs ?? {},
     seriesChanged: source.seriesChanged?.bind(source),
   };
@@ -191,9 +192,11 @@ export async function publishStations(
   await writeJsonArray(
     sourcesPath(lake),
     listed.map((s) => ({
-      // QC settings and offsets are ingest's business, not part of a source's terms.
+      // QC settings, offsets and archive are ingest's business, not part of a source's terms.
       ...Object.fromEntries(
-        Object.entries(s.metadata).filter(([key]) => key !== "qc" && key !== "utc_offsets"),
+        Object.entries(s.metadata).filter(
+          ([key]) => key !== "qc" && key !== "utc_offsets" && key !== "archive",
+        ),
       ),
       stations: stations.filter((st) => st.source === s.metadata.id && st.status === "active")
         .length,

@@ -122,7 +122,6 @@ function overlaps(a: string, b: string): boolean {
   const [x, y] = [resolve(a), resolve(b)];
   return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
 }
-const DAY_MS = 86_400_000;
 
 useDiskCache();
 
@@ -266,9 +265,6 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       `${values.first}: ${matched} of its ${first.length} ${sourceId} stations run first`,
     );
   }
-  // Sources with a rolling window can't reach further back than it.
-  const window = source.metadata.window_days;
-  if (window) start = new Date(Math.max(start.getTime(), Date.now() - window * DAY_MS));
   const now = Date.now();
   const mode = values["skip-written"] ? "written" : values.refetch ? "none" : "complete";
   console.log(`${sourceId}: backfilling ${wanted.length} stations`);

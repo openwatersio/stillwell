@@ -113,6 +113,17 @@ describe("refreshSource", () => {
     );
   });
 
+  it("gives a source whose history comes in today's reference first epochs with no start", async () => {
+    const reference = { id: "2019-11-01", since: "2019-11-02" };
+    const source = {
+      ...sourceOf([listed("a", { reference })]),
+      metadata: { ...metadata, archive: "current" as const },
+    };
+    await refreshSource(lake, source, { now: NOW });
+    const [epoch] = (await readStationList(stationListPath(lake, "test")))![0]!.epochs;
+    assert.deepEqual([epoch!.since, epoch!.reference_since], [null, "2019-11-02T00:00:00Z"]);
+  });
+
   it("refuses to start over when the list is gone but its history isn't", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
     await rm(stationListPath(lake, "test"));

@@ -73,7 +73,7 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  metadata: SourceMetadata; // id, name, url, license, attribution, terms, window_days, qc
+  metadata: SourceMetadata; // id, name, url, license, attribution, terms, qc
   stations(previous?: Station[]): Promise<ListedStation[]>; // datum null when the source didn't say; previous is the lake's list
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed
@@ -176,7 +176,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **European originators**: REFMAR, SMHI, Kartverket, Marine Institute, DMI, UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
 - [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
-- [ ] **WSV history**: ask WSV or BfG for the archive behind PEGELONLINE. Until it arrives, use GESLA's WSV years with tide-database's Europe/Berlin correction, and the lake's own record from the day PEGELONLINE ingest starts.
+- [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
 - [ ] **GESLA 4.1** as the fallback for years an originator can't supply, from the existing R2 mirror, with tide-database's clock fixes and per-contributor licenses. Never where the originator has the same years.
 - [ ] Restricted series (Copernicus in situ, IOC, restricted GESLA contributors) into the private lake.
 - [ ] Clock check on every new series: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets before anything fits to it. This is how the WSV, RWS and Hong Kong errors showed up.
@@ -252,7 +252,7 @@ The [evaluation](hroi-evaluation.md) found HRoI times high and low waters better
 
 - [ ] Wait for BSH's answer on the 1 August rule ([tide-database#335](https://github.com/openwatersio/slackwater-database/issues/335)) before publishing anything fitted to BSH predictions.
 - [ ] Ingest BSH predictions yearly from August into `predictions/bsh/` as reference data.
-- [ ] Test HRoI against observed German levels from PEGELONLINE, now that the lake keeps more than 31 days of them.
+- [ ] Test HRoI against observed German levels from a PEGELONLINE backfill, which reaches 2000 at most gauges.
 - [ ] Learn BSH's per-gauge curve shapes instead of one mean curve (the Husum, Büsum and Papenburg gap).
 - [ ] Propose HRoI extremes to `@slackwater/engine` as an event method for stations with a long extremes record, in a separate issue there.
 
@@ -272,7 +272,7 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, G
 - ECCC datamart license; FMI sea-level license.
 - STOFS-2D station count and file sizes.
 - UHSLC and PSMSL replies on commercial redistribution (PSMSL request sent 2026-11-01). UHSLC now matters most: it covers 968 TICON records.
-- Whether WSV or BfG will supply the gauge archive behind PEGELONLINE, and under what terms.
+- Whether WSV or BfG will supply PEGELONLINE's archive before 2000, and whether they're content with scripted use of the raw-data download for a full backfill.
 - Terms for the US state networks, JMA and JODC, UNAM and BOM.
 - CHS: its reply on [tide-database#320](https://github.com/openwatersio/slackwater-database/issues/320) says any commercial use, derivatives included, needs a separate license, and it isn't taking new commercial requests while its licensing program (including the Value-Added Reseller Licence) is reviewed. Apply when the new options appear.
 - The 304 TICON `meds` records are Canadian gauge data that tide-database marks CC BY 4.0 with commercial use, on TICON's label. Check whether CHS's terms reach them, the same question GESLA's license page raises.
