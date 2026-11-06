@@ -2,7 +2,6 @@
 
 **Status: built and switched on.** This replaced the station lists once committed to the repo, and the rule that a station has one datum for its whole record. On 2026-11-05 the R2 lake was seeded from the last committed lists (19,809 stations), and the published `stations.parquet` matched one built from them, as did every station's own fields in each list's `extra` (USACE `series` and `zero_since`, CO-OPS `established` and `removed`, USGS series). Not built yet:
 
-- the phase 4 `stations` workflows: one job per source, the rebuild job, and the daily refresh after a datum failure (Ingest hourly and Compact daily already run `recent` and `compact` one job per source, in `lake-<source>` groups);
 - compaction's `stations/bounds/<source>.parquet`: `compact` folds `recent` rows into their epoch's files, but doesn't write the bounds yet;
 - a `restore` command for a list snapshot;
 - `tide_station` and series pins in `overrides`, which so far holds epoch decisions only, and no adapter has one yet: the first decision adds `overrides` to its `Source`;
@@ -92,7 +91,7 @@ Rows in between are in the lake, in the old epoch's files, but outside both span
 
 A `since` no later than the current epoch's is refused. The station is held, and the report says so.
 
-**Detected between refreshes.** Adapters that refuse values in another datum, as PEGELONLINE's `levels` does, make `recent` fail for that station. `recent` records the failure and goes on, and the next station refresh opens the epoch. With phase 4's monthly refresh that's up to a month, so phase 4 should also run `stations` daily for a source with such a failure.
+**Detected between refreshes.** Adapters that refuse values in another datum, as PEGELONLINE's `levels` does, make `recent` fail for that station. `recent` records the failure and goes on, and the next station refresh opens the epoch. When such a failure is a `DatumChanged` error, Ingest hourly starts the Monthly workflow's refresh of that source, at most once a day, so the epoch opens within a day rather than at the next monthly refresh. A change a person rejected for that station, to the same datum and reference, doesn't start one, since a refresh ignores it. PEGELONLINE's `levels` can't tell a PNP series' reference, so a change to PNP starts one every day, even when rejected, until the rejection is removed.
 
 ### When epochs convert
 
@@ -152,11 +151,11 @@ history/stations/<source>/<time>.json        what that refresh changed
    - it shrank sharply (`shrankSharply`);
    - the lake has no list for the source but does have its history. A list that went missing would otherwise read as an empty lake, and every station would be rebuilt from scratch;
    - the lake has no list or history for the source but does have its values, in series files or a recent window. A list started from the fetch would forget what the old one carried forward;
-   - more stations opened an epoch than the source's limit, by default 5 stations or 2%, whichever is larger. That's likelier an adapter bug than gauge work. A person who has checked it reruns with `--accept-epochs`, so a real batch of changes doesn't hold up the source for good.
+   - more stations opened an epoch than the source's limit, by default 5 stations or 2%, whichever is larger. That's likelier an adapter bug than gauge work. A person who has checked it reruns with `--accept-epochs` (the Monthly workflow's `accept_epochs`), so a real batch of changes doesn't hold up the source for good.
 6. Copy the previous list to history, then write the new list. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
 7. Write the change report next to the snapshot, and add it to the job summary: stations added, retired and changed field by field, plus epochs opened, held and rejected.
 
-**Jobs.** `stations` with no source runs as a matrix, one job per source in a `lake-<source>` group, which `backfill`, `recent` and compaction of that source share. A final job, with `if: always()`, rebuilds `stations.parquet` in its own `lake-stations` group. Within a group, GitHub cancels a pending run when a newer one queues; for the rebuild that's harmless, because each run reads every list fresh. A cancelled source run leaves no summary, so the scheduled workflow checks each source's list age instead, and the next run does the work. This is phase 4 workflow work, alongside the daily refresh above. Today's `ingest.yml` runs `backfill`, `recent` and `compact` in the source's `lake-<source>` group, and `stations` in the `lake` group. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
+**Jobs.** The Monthly workflow refreshes each list in a job of its own, in the source's `lake-<source>` group, which `backfill`, `recent` and compaction of that source share, and the Ingest workflow refuses `stations`, so no two jobs write one list at once. A final job rebuilds `stations.parquet` with `publish`, in the `lake` group, from whatever lists the lake holds, so a source whose refresh failed or was cancelled keeps its last list there. Within a group, GitHub cancels a pending job when a newer one queues, so a refresh queued behind a long backfill is cancelled by the next hourly run, shows as cancelled in the run, and is rerun from Actions. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
 
 **Nothing is lost by a refresh.** Before a refresh writes a list, it writes the list it read to `history/`, and the series files never change for an epoch. A bad refresh is undone by restoring the snapshot before it (below), and a bad epoch by rejecting it in the source's overrides. Some of what a list holds can't be fetched again (retired stations, USACE series pins, closed epochs' frozen offsets), so the snapshots matter, but protecting the bucket itself, from deletion or a bad credential, is a matter for the whole lake, observations included, and lives outside ingest.
 
@@ -181,7 +180,7 @@ The R2 lake was seeded once from the committed lists, with a command since remov
 - Adapters: PEGELONLINE reports `gaugeZero.validFrom` and USACE its `zeros.ts` dates as each station's `reference`; USGS says through `seriesChanged` when a station's series or gage zero moved.
 - `src/lake/recent.ts`: `recent` and `compact`. Compaction folds each `recent` row into its own epoch's year file, in that epoch's datum, and fails a row whose epoch the list doesn't have.
 
-Still to come: the per-source `stations` matrix, the rebuild job and the daily refresh after a datum failure in `.github/workflows/` (phase 4); the bounds compaction writes to `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
+Still to come: the bounds compaction writes to `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
 
 ## What this gives up
 

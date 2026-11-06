@@ -1,3 +1,4 @@
+import { DatumChanged } from "../../epochs.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -144,7 +145,12 @@ export async function levels(
 ): Promise<Observation[]> {
   const unit = parseUnit(await unitOf(station), station);
   if (datum && unit.datum !== datum)
-    throw new Error(`PEGELONLINE ${station} is now in ${unit.datum}, not ${datum}`);
+    throw new DatumChanged(
+      `PEGELONLINE ${station} is now in ${unit.datum}, not ${datum}`,
+      unit.datum,
+      // Only a PNP series has a reference, its gauge zero's date, which the unit doesn't give.
+      unit.datum === "PNP" ? undefined : null,
+    );
   const { scale } = unit;
   const params = new URLSearchParams({ start: start.toISOString(), end: end.toISOString() });
   const values = await getJson<{ timestamp: string; value: number }[]>(

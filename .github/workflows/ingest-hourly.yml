@@ -31,8 +31,15 @@ jobs:
     timeout-minutes: 50
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
+    permissions:
+      contents: read
+      # To start the Monthly workflow's refresh of this source.
+      actions: write
     steps:
+      # The token can start workflows, so only the dispatch step gets it.
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version-file: .mise.toml
@@ -41,7 +48,8 @@ jobs:
       # Twelve hours covers values that arrive late, and hours skipped while a
       # manual run holds the source's group; a station fetched on its own also
       # looks back two of its intervals, for daily gauges.
-      - run: node scripts/ingest.ts recent "$SOURCE" --hours 12
+      - id: recent
+        run: node scripts/ingest.ts recent "$SOURCE" --hours 12
         env:
           SOURCE: ${{ matrix.source }}
           WATER_LEVELS_LAKE: s3://water-levels
@@ -49,6 +57,27 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+      # A station the source now reports in another datum fails until a station
+      # refresh opens its epoch, or holds it for a person, after which recent
+      # skips it. One refresh a day, not counting one that was cancelled, such
+      # as one queued behind a long backfill. A refresh of several sources, or
+      # of all of them (titled Monthly, the 2nd's scheduled run included),
+      # counts; the 9th's is titled Refetch. Failing to start one doesn't fail
+      # the hourly run, which wrote what it fetched.
+      - if: ${{ !cancelled() && steps.recent.outputs.datum_changed == 'true' }}
+        continue-on-error: true
+        run: |
+          since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
+          started=$(gh run list --workflow monthly.yml --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
+          if grep -Eqx "Monthly|Refresh( [a-z]+)* $SOURCE( [a-z]+)*" <<< "$started"; then
+            echo "A refresh of $SOURCE started in the last day"
+          else
+            gh workflow run monthly.yml --ref "$GITHUB_REF_NAME" -f sources="$SOURCE"
+          fi
+        env:
+          SOURCE: ${{ matrix.source }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
   # Opens an issue when a source's job fails in two scheduled runs in a row,
   # and closes it when the job next succeeds (scripts/alert.sh).

@@ -9,7 +9,7 @@ on:
       args:
         description: "ingest.ts arguments"
         required: true
-        default: "stations"
+        default: "publish"
       timeout:
         description: "Minutes before the job is stopped (up to 360)"
         required: true
@@ -18,8 +18,9 @@ on:
 jobs:
   # A command for one source shares that source's group with the scheduled
   # jobs, so a backfill and a compaction never rewrite one year file at once.
-  # `stations` takes the `lake` group whatever its sources, since every run
-  # rebuilds stations.parquet from all the lists.
+  # Station lists are refreshed only by the Monthly workflow, so two refreshes
+  # never rewrite one list, nor two publishes stations.parquet. Anything else,
+  # `publish` included, takes the `lake` group.
   group:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -31,20 +32,24 @@ jobs:
         run: |
           set -f
           # The command and sources are the words that aren't an option or
-          # its value; every ingest option takes a value but --accept-epochs, --refetch and
-          # --skip-written.
+          # its value; every ingest option takes a value but --accept-epochs, --no-publish,
+          # --refetch and --skip-written.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --refetch | --skip-written | --*=*) ;;
+              --accept-epochs | --no-publish | --refetch | --skip-written | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
           done
           case "${words[0]:-}" in
             backfill | recent | compact) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            stations)
+              echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
+              exit 1
+              ;;
             *) group=lake ;;
           esac
           echo "name=$group" >> "$GITHUB_OUTPUT"
@@ -60,8 +65,8 @@ jobs:
     # branch before it waits on that rule.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # A station refresh takes about an hour, mostly CO-OPS, so 180 minutes stops a
-    # stuck run without holding the lake for six hours. Long backfills raise it.
+    # 180 minutes stops a stuck run without holding the lake for six hours.
+    # Long backfills raise it.
     timeout-minutes: ${{ fromJSON(inputs.timeout) }}
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
