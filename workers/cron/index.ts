@@ -28,6 +28,7 @@ export default {
         headers: {
           Accept: "application/vnd.github+json",
           Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          "Content-Type": "application/json",
           "User-Agent": "water-levels-cron",
           "X-GitHub-Api-Version": "2022-11-28",
         },

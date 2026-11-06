@@ -12,10 +12,15 @@ test("every Worker cron dispatches a workflow on main", async () => {
   const config = parse(jsonc.replace(/^\s*\/\/.*$/gm, ""));
   assert.deepEqual(config.triggers.crons.toSorted(), Object.keys(DISPATCHES).toSorted());
 
-  const calls: { url: string; body: unknown; auth: string }[] = [];
+  const calls: { url: string; body: unknown; auth: string; type: string }[] = [];
   mock.method(globalThis, "fetch", async (url: string, init: RequestInit) => {
     const headers = init.headers as Record<string, string>;
-    calls.push({ url, body: JSON.parse(init.body as string), auth: headers.Authorization });
+    calls.push({
+      url,
+      body: JSON.parse(init.body as string),
+      auth: headers.Authorization,
+      type: headers["Content-Type"],
+    });
     return new Response(null, { status: 204 });
   });
   await worker.scheduled({ cron: "35 3 9 * *" }, { GITHUB_TOKEN: "t" });
@@ -24,6 +29,7 @@ test("every Worker cron dispatches a workflow on main", async () => {
       url: "https://api.github.com/repos/openwatersio/water-levels/actions/workflows/monthly.yml/dispatches",
       body: { ref: "main", inputs: { refetch: "true" } },
       auth: "Bearer t",
+      type: "application/json",
     },
   ]);
 });

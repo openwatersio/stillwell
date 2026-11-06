@@ -58,7 +58,7 @@ jobs:
           if [ "$EVENT" = schedule ]; then
             title=$([ "$REFETCH" = true ] && echo Refetch || echo Monthly)
             since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
-            if titles=$(gh run list --workflow monthly.yml --branch main --event workflow_dispatch --created ">=$since" --json displayTitle --jq '.[].displayTitle') && grep -qx "$title" <<< "$titles"; then
+            if titles=$(gh run list --workflow monthly.yml --limit 100 --branch main --event workflow_dispatch --created ">=$since" --json displayTitle --jq '.[].displayTitle') && grep -qx "$title" <<< "$titles"; then
               echo "A dispatched $title run started in the last day"
               echo "sources=[]" >> "$GITHUB_OUTPUT"
               echo "refetch=[]" >> "$GITHUB_OUTPUT"

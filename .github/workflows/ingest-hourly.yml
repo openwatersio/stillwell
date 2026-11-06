@@ -102,7 +102,7 @@ jobs:
         continue-on-error: true
         run: |
           since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
-          started=$(gh run list --workflow monthly.yml --branch main --event workflow_dispatch --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
+          started=$(gh run list --workflow monthly.yml --limit 100 --branch main --event workflow_dispatch --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
           if grep -Eqx "Monthly|Refresh( [a-z]+)* $SOURCE( [a-z]+)*" <<< "$started"; then
             echo "A refresh of $SOURCE started in the last day"
           else
