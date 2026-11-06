@@ -1,0 +1,25 @@
+{
+  "/cwms-data/timeseries": {
+    "$": "object",
+    "$.begin": "string",
+    "$.date-version-type": "string",
+    "$.end": "string",
+    "$.interval": "string",
+    "$.interval-offset": "number",
+    "$.name": "string",
+    "$.office-id": "string",
+    "$.page": "string",
+    "$.page-size": "number",
+    "$.time-zone": "string",
+    "$.total": "number",
+    "$.units": "string",
+    "$.value-columns": "array",
+    "$.value-columns[]": "object",
+    "$.value-columns[].datatype": "string",
+    "$.value-columns[].name": "string",
+    "$.value-columns[].ordinal": "number",
+    "$.values": "array",
+    "$.values[]": "array",
+    "$.values[][]": "number"
+  }
+}

@@ -134,10 +134,10 @@ When a source's job fails in two scheduled runs of either workflow in a row, the
 
 ## Canary
 
-The Canary workflow runs `scripts/canary.ts` each Monday: one small request per adapter, through the adapter's own code and pacing, for a few days at a gauge that has run for years. It fails when an adapter returns no values, or when a response's shape (each JSON path and its types, or for BSH the code that starts each line) has lost a path or gained a type since the shape recorded in `src/sources/<source>/canary.json`. A field the source adds doesn't fail it, and neither does a null where the recording had a value or an object, or a value where it had only null. A source with no recording yet, USACE and USGS for now, prints its shape and has only to return values. USGS is skipped until `USGS_API_KEY` is set as a repository secret, since the canary doesn't run in the `lake` environment. Once the adapter handles a change, check the new shape and record it:
+The Canary workflow runs `scripts/canary.ts` each Monday: one small request per adapter, through the adapter's own code and pacing, for a few days at a gauge that has run for years. It fails when an adapter returns no values, or when a response's shape (each JSON path and its types, or for BSH the code that starts each line) has lost a path or gained a type since the shape recorded in `src/sources/<source>/canary.json`. A field the source adds doesn't fail it, and neither does a null where the recording had a value or an object, or a value where it had only null. A source with no recording yet, USGS for now, prints its shape and has only to return values. USGS is skipped until `USGS_API_KEY` is set as a repository secret, since the canary doesn't run in the `lake` environment. Once the adapter handles a change, check the new shape and record it:
 
 ```bash
-node scripts/canary.ts usace --record
+node scripts/canary.ts usgs --record
 ```
 
 ## Gotchas
