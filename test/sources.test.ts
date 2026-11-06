@@ -261,6 +261,9 @@ describe("pegelonline", () => {
     // A rolling 31 days, as at Hamburg Port Authority's gauges, is no history.
     serve([[/download\/modal/, modal.replaceAll("2000-01-01", "2026-10-05")]]);
     assert.equal(await pegelonline.historySince("aad49293"), null);
+    // A new gauge's 45 days is history.
+    serve([[/download\/modal/, modal.replaceAll("2000-01-01", "2026-09-21")]]);
+    assert.equal(await pegelonline.historySince("aad49293"), "2026-09-21");
     setTransport(async (url) => {
       throw new Error(`GET ${url} returned 400`);
     });

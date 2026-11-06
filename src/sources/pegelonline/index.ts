@@ -125,8 +125,10 @@ export async function historySince(uuid: string): Promise<string | null> {
     (a) => new RegExp(`${a}="(\\d{4}-\\d{2}-\\d{2})"`).exec(html)?.[1],
   );
   if (!min || !max) throw new Error("download dialog has no date range");
-  // Hamburg Port Authority's gauges, among others, offer a rolling 31 days.
-  return Date.parse(max) - Date.parse(min) <= 62 * DAY_MS ? null : min;
+  // Hamburg Port Authority's gauges, among others, offer a rolling 31 days; the
+  // margin over that only absorbs a slightly longer window, so a new gauge's
+  // record counts once it's longer.
+  return Date.parse(max) - Date.parse(min) <= 40 * DAY_MS ? null : min;
 }
 
 /**
