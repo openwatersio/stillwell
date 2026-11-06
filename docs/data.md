@@ -244,7 +244,7 @@ SET VARIABLE files = (
 SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` will record each station's `first` and `last` observation once compaction derives them from the lake; until then they're empty.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction writes each night; they reach it when `stations.parquet` is next rebuilt, and are empty for a station with no observations yet.
 
 ## Datum epochs
 

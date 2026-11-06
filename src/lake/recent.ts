@@ -6,14 +6,24 @@ import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import {
   checkRecent,
   readDatums,
+  listFiles,
   readObservationFile,
   readRecent,
+  readStationBounds,
+  readTimeBounds,
   recentStations,
   writeObservations,
   writeRecent,
+  writeStationBounds,
   type StationObservation,
 } from "./parquet.ts";
-import { recentPath, seriesPath } from "./paths.ts";
+import {
+  boundsPath,
+  recentPath,
+  seriesPath,
+  sourceEpochDirs,
+  sourceFirstEpochFiles,
+} from "./paths.ts";
 
 /**
  * The scheduled jobs: `updateRecent` merges a fetch into each source's
@@ -246,7 +256,7 @@ export async function updateRecent({
  * longer has `levels`. A live, active station with levels and no values in the
  * range is stale. Values at or after a held epoch's start wait in the window,
  * reported but not failed, and those older than the window when a person
- * decides need a backfill.
+ * decides need a backfill. Then it writes the source's bounds (`updateBounds`).
  */
 export async function compactRecent({
   source,
@@ -255,7 +265,8 @@ export async function compactRecent({
   concurrency = 8,
   start,
   end,
-}: RunOptions & { start: number; end: number }): Promise<RunSummary> {
+  rebuildBounds = false,
+}: RunOptions & { start: number; end: number; rebuildBounds?: boolean }): Promise<RunSummary> {
   const id = source.metadata.id;
   const summary = emptySummary(`compact ${id}`, 0);
   // A station whose lake can't be named, such as a restricted one with no
@@ -272,6 +283,8 @@ export async function compactRecent({
     }
   const stations = all.filter((s) => pathOf.has(s.id));
   summary.stations = stations.filter(levels).length + summary.failed.length;
+  // The span of each year file this run read whole, by `spanKey`, for the bounds.
+  const spans = new Map<string, Span | null>();
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -338,8 +351,14 @@ export async function compactRecent({
             await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
             const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
             const merged = upsert(existing.rows, incoming);
-            if (sameRows(existing.rows, merged)) continue;
+            const span = spanOf(merged, epochWindow(station.epochs, epochId));
+            const key = spanKey(station, epochId, year);
+            if (sameRows(existing.rows, merged)) {
+              spans.set(key, span);
+              continue;
+            }
             await writeObservations(file, merged, epoch.datum);
+            spans.set(key, span);
             summary.files++;
             const had = new Map(existing.rows.map((r) => [r.time, r]));
             summary.values += merged.filter((r) => {
@@ -355,7 +374,188 @@ export async function compactRecent({
       });
     }
   }
+  // A source's stations share its terms, so this is one lake. A failure goes
+  // first, so the summary's list of failures shows it.
+  for (const [lake, members] of Map.groupBy(stations, (s) => lakeFor(s)))
+    try {
+      await updateBounds({
+        lake,
+        source: id,
+        stations: members,
+        spans,
+        year: new Date(end).getUTCFullYear(),
+        rebuild: rebuildBounds,
+        concurrency,
+      });
+    } catch (error) {
+      summary.failed.unshift(`bounds: ${message(error)}`);
+    }
   return summary;
+}
+
+type Span = [number, number];
+
+/** A station's year file in one epoch, as `updateBounds` names it. */
+function spanKey(station: Pick<Station, "source_id">, epoch: number, year: number): string {
+  return `${encodeURIComponent(station.source_id)} ${epoch} ${year}`;
+}
+
+/**
+ * The times an epoch's files count in, `[since, until)`; null for an epoch
+ * whose files aren't part of the series: a held one, or one the list doesn't
+ * have, such as after a restore.
+ */
+function epochWindow(epochs: Epoch[], id: number): Span | null {
+  const epoch = epochs.find((e) => e.id === id);
+  if (!epoch || epoch.state === "held") return null;
+  return [
+    epoch.since ? Date.parse(epoch.since) : -Infinity,
+    epoch.until ? Date.parse(epoch.until) : Infinity,
+  ];
+}
+
+/** The earliest and latest of `rows` inside `window`, or null when none are. */
+function spanOf(rows: { time: number }[], window: Span | null): Span | null {
+  if (!window) return null;
+  // A loop, not Math.min(...): a one-minute year file has too many rows to spread.
+  let [first, last] = [Infinity, -Infinity];
+  for (const { time } of rows)
+    if (time >= window[0] && time < window[1]) {
+      if (time < first) first = time;
+      if (time > last) last = time;
+    }
+  return first <= last ? [first, last] : null;
+}
+
+/**
+ * Write each station's first and last level to the source's bounds in
+ * `lake`, over the rows its epochs count: each epoch's files within its
+ * `[since, until)`, and none of a held epoch's or one the list doesn't have.
+ *
+ * A listing of the source's files gives each station's first and last year.
+ * The files of those years come from `spans`, which compaction read whole
+ * this run; or else from the bound already known, when it's in that year,
+ * still inside an epoch, and the year is before last year; or else from a
+ * read. So a backfill of earlier years is read, as is any end year from last
+ * year on that compaction didn't fold, where backfills of a new station's
+ * first weeks and a station that isn't live land. A first run, or `rebuild`,
+ * reads every station's end years.
+ *
+ * shortcut: a backfill within a station's first or last year, when that year
+ * is before last year, isn't seen, nor are rows an epoch's widened span takes
+ * in; `compact --rebuild-bounds` reads every station again.
+ */
+export async function updateBounds({
+  lake,
+  source,
+  stations,
+  spans,
+  year: thisYear,
+  rebuild = false,
+  concurrency = 8,
+}: {
+  lake: string;
+  source: string;
+  stations: LakeStation[];
+  spans: Map<string, Span | null>;
+  /** The year compaction ran up to. */
+  year: number;
+  rebuild?: boolean;
+  concurrency?: number;
+}): Promise<void> {
+  const path = boundsPath(lake, source);
+  const had = await readStationBounds(path);
+  const known = rebuild ? new Map<string, never>() : had;
+  // Files by station directory, then year: epoch 1's beside later epochs' directories.
+  const listed = new Map<string, Map<number, { epoch: number; file: string }[]>>();
+  for (const [pattern, depth] of [
+    [sourceFirstEpochFiles(lake, "levels", source), 2],
+    [sourceEpochDirs(lake, "levels", source), 3],
+  ] as const)
+    for (const file of await listFiles(pattern)) {
+      const parts = file.split("/");
+      const year = Number(parts.at(-1)!.replace(/\.parquet$/, ""));
+      const epoch = depth === 2 ? 1 : Number(parts.at(-2));
+      if (!Number.isInteger(year) || !Number.isInteger(epoch)) continue;
+      const dir = parts.at(-depth)!;
+      const byYear = listed.get(dir) ?? new Map<number, { epoch: number; file: string }[]>();
+      byYear.set(year, [...(byYear.get(year) ?? []), { epoch, file }]);
+      listed.set(dir, byYear);
+    }
+  // A listing that finds nothing when the lake had bounds is a wrong path or a failed list, not a lake emptied.
+  if (!listed.size && had.size)
+    throw new Error(`no ${source} files listed in ${lake}, yet it has bounds; keeping them`);
+
+  // Each end of each station: its counted years from that end inward, and
+  // the bound kept there, if any.
+  type File = { file: string; key: string; window: Span };
+  type End = { id: string; pick: 0 | 1; years: File[][]; at: number; value?: number };
+  const ends: End[] = [];
+  for (const station of stations) {
+    const dir = encodeURIComponent(station.source_id);
+    const counted = new Map<number, File[]>();
+    for (const [year, files] of listed.get(dir) ?? [])
+      for (const { epoch, file } of files) {
+        const window = epochWindow(station.epochs, epoch);
+        if (window)
+          counted.set(year, [
+            ...(counted.get(year) ?? []),
+            { file, key: spanKey(station, epoch, year), window },
+          ]);
+      }
+    const ascending = [...counted.keys()].sort((x, y) => x - y);
+    for (const pick of [0, 1] as const) {
+      const years = (pick === 0 ? ascending : ascending.toReversed()).map((y) => counted.get(y)!);
+      const end: End = { id: station.id, pick, years, at: 0 };
+      const bound = known.get(station.id)?.[pick === 0 ? "first" : "last"];
+      const time = bound ? Date.parse(bound) : NaN;
+      const year = (pick === 0 ? ascending[0] : ascending.at(-1)) ?? NaN;
+      const files = years[0] ?? [];
+      if (
+        new Date(time).getUTCFullYear() === year &&
+        year < thisYear - 1 &&
+        files.some((f) => time >= f.window[0] && time < f.window[1]) &&
+        !files.some((f) => spans.has(f.key))
+      )
+        end.value = time;
+      ends.push(end);
+    }
+  }
+
+  // Each end's year is read, files compaction didn't give in batches at once;
+  // a year with no counted rows moves the end a year inward.
+  for (let open = ends.filter((e) => e.value === undefined && e.years.length); open.length;) {
+    const unread = new Map<string, File>();
+    for (const e of open)
+      for (const f of e.years[e.at]!) if (!spans.has(f.key)) unread.set(f.key, f);
+    await pool([...chunks([...unread], 100)], concurrency, async (batch) => {
+      const read = await readTimeBounds(batch.map(([, f]) => f));
+      for (const [key, f] of batch) spans.set(key, read.get(f.file) ?? null);
+    });
+    for (const e of open) {
+      const times = e.years[e.at]!.flatMap((f) => spans.get(f.key)?.[e.pick] ?? []);
+      if (times.length) e.value = e.pick === 0 ? Math.min(...times) : Math.max(...times);
+      else e.at++;
+    }
+    open = open.filter((e) => e.value === undefined && e.at < e.years.length);
+  }
+
+  const iso = (time: number) => new Date(time).toISOString().replace(/\.\d+Z$/, "Z");
+  const found = Map.groupBy(ends, (e) => e.id);
+  const bounds: { id: string; first: string; last: string }[] = [];
+  for (const station of stations) {
+    const [first, last] = found.get(station.id)!.map((e) => e.value);
+    if (first !== undefined && last !== undefined)
+      bounds.push({ id: station.id, first: iso(first), last: iso(last) });
+  }
+  // A station not in this run, such as one whose lake can't be named, keeps
+  // what it had; so does one with no counted rows, unless this is a rebuild.
+  const here = new Set(stations.map((s) => s.id));
+  const bounded = new Set(bounds.map((b) => b.id));
+  for (const [id, b] of had)
+    if (!bounded.has(id) && (!rebuild || !here.has(id)) && b.first && b.last)
+      bounds.push({ id, first: b.first, last: b.last });
+  await writeStationBounds(path, bounds);
 }
 
 /**
