@@ -70,6 +70,22 @@ describe("transits", () => {
 });
 
 describe("HRoI", () => {
+  it("includes tides from December transits when predicting January 1950", () => {
+    const series = { interval: [20], height: [1], count: 1 };
+    const model = {
+      tides: [],
+      intervals: { high: 20, low: 20 },
+      series: { 1: series, 2: series, 3: series, 4: series },
+    };
+    const start = Date.UTC(1950, 0, 1);
+    const events = hroi.predict(model, start, Date.UTC(1950, 0, 2));
+    assert.deepEqual(
+      events.map((e) => e.transit),
+      [-1, -1, 0, 0],
+    );
+    assert.equal(hroi.predict(model, Date.UTC(1950, 0, 3), Date.UTC(1950, 0, 4)).length, 4);
+  });
+
   it("estimates BSH's mean lunitidal intervals", () => {
     const intervals = hroi.estimateIntervals(bshExtremes, range);
     // BSH: MHWI 11:51, MNWI 18:36, over a 19-year epoch.

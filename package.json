@@ -24,8 +24,8 @@
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.0-r.1",
+    "@openwaters/almanac": "^0.13.0",
     "@slackwater/engine": "^1.0.0-beta.8",
-    "astronomy-engine": "^2.1.19",
     "ml-matrix": "^6.15.1",
     "yaml": "^2.9.1"
   },

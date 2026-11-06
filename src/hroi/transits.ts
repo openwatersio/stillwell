@@ -1,4 +1,4 @@
-import { Body, MakeTime, Observer, SearchHourAngle } from "astronomy-engine";
+import { moonTransits } from "@openwaters/almanac";
 
 /** A meridian passage of the moon at Greenwich. */
 export interface Transit {
@@ -14,33 +14,23 @@ export interface Transit {
 /** Mean lunar day, in milliseconds per transit number. */
 export const LUNAR_DAY_MS = 1.03505013 * 86_400_000;
 
-// Hour angle 0 at Greenwich is independent of the observer's latitude, and the
-// moon's topocentric right ascension equals its geocentric one at transit.
-const GREENWICH = new Observer(51.4769, 0, 0);
-
-const EPOCH = SearchHourAngle(
-  Body.Moon,
+const GREENWICH = { latitudeDeg: 51.4769, longitudeDeg: 0 };
+// BSH counts from the upper Greenwich transit on December 31, 1949.
+const EPOCH = moonTransits(
+  new Date(Date.UTC(1949, 11, 31)),
+  new Date(Date.UTC(1950, 0, 1)),
   GREENWICH,
-  0,
-  MakeTime(new Date(Date.UTC(1949, 11, 31))),
-).time.date.getTime();
+)
+  .find((event) => event.kind === "upper")!
+  .time.getTime();
 
 /** Upper and lower transits at Greenwich in [start, end), in order. */
 export function transits(start: number, end: number): Transit[] {
-  const result: Transit[] = [];
-  let time = MakeTime(new Date(start));
-  for (;;) {
-    const upper = SearchHourAngle(Body.Moon, GREENWICH, 0, time);
-    const lower = SearchHourAngle(Body.Moon, GREENWICH, 12, time);
-    const next = upper.time.ut < lower.time.ut ? upper : lower;
-    const t = next.time.date.getTime();
-    if (t >= end) break;
-    const isUpper = next === upper;
-    result.push({ time: t, upper: isUpper, number: transitNumber(t, isUpper) });
-    // Transits are about 12.4 hours apart, so a few hours on finds the next one.
-    time = next.time.AddDays(0.1);
-  }
-  return result;
+  return moonTransits(new Date(start), new Date(end), GREENWICH).map((event) => {
+    const time = event.time.getTime();
+    const upper = event.kind === "upper";
+    return { time, upper, number: transitNumber(time, upper) };
+  });
 }
 
 export function transitNumber(time: number, upper: boolean): number {
