@@ -210,8 +210,9 @@ export async function history(
         const zip = await ask(station, () =>
           getText(`${SITE}${downloadUrl}`, { fresh: true, base64: true }),
         );
+        const files = await unzip(zip);
         endRefusals();
-        return await unzip(zip);
+        return files;
       } catch (error) {
         // The HTTP layer has already retried a refusal with backoff, or found
         // its Retry-After too long to wait, so asking again now won't help.

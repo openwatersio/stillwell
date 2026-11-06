@@ -346,6 +346,21 @@ describe("pegelonline", () => {
     assert.ok(prepared[1]! - prepared[0]! >= 45, `${prepared[1]! - prepared[0]!} ms apart`);
   });
 
+  it("doesn't take a file that isn't a zip as a download that ended a run of refusals", async () => {
+    let prepared = 0;
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/gast\/download\?/.test(url)) return btoa("not a zip");
+      // Stations 1, 2 and 4 are refused; station 3's files come back broken.
+      if (++prepared <= 2 || prepared > 5) throw new Error(`POST ${url} returned 503`);
+      return JSON.stringify({ downloadUrl: `/gast/download?filename=${prepared}.zip` });
+    });
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("3", ...day), /not a zip/);
+    await assert.rejects(pegelonline.history("4", ...day), Blocked);
+  });
+
   it("rests at least restMs after a quick download", async () => {
     const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
     const prepared: number[] = [];
