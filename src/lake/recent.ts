@@ -201,11 +201,17 @@ export async function updateRecent({
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
           if (error instanceof Blocked) summary.blocked = true;
-          // A refresh ignores a change to a datum a person rejected, so that
-          // one doesn't ask for one.
+          // A refresh ignores a change a person rejected, matched on datum and
+          // reference as nextEpochs does, so that one doesn't ask for one; an
+          // unknown reference matches none.
           if (
             error instanceof DatumChanged &&
-            !station.epochs.some((e) => e.state === "rejected" && e.datum === error.datum)
+            !station.epochs.some(
+              (e) =>
+                e.state === "rejected" &&
+                e.datum === error.datum &&
+                e.reference === error.reference,
+            )
           )
             summary.datumChanged = true;
           failed = true;

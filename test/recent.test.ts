@@ -124,10 +124,20 @@ describe("updateRecent", () => {
     assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, true);
     assert.equal((await run(new Error("timed out"))).datumChanged, undefined);
     // A change a person rejected stays rejected, however often the list is
-    // refreshed, but a change to another datum still asks for a refresh.
+    // refreshed, but a change to another datum or reference still asks for one.
     b.epochs.push(epoch(2, "NHN", { state: "rejected" }));
-    assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, undefined);
-    assert.equal((await run(new DatumChanged("now in NN", "NN"))).datumChanged, true);
+    assert.equal((await run(new DatumChanged("now in NHN", "NHN", null))).datumChanged, undefined);
+    assert.equal((await run(new DatumChanged("now in NN", "NN", null))).datumChanged, true);
+    b.epochs.push(epoch(3, "PNP", { state: "rejected", reference: "2020-01-01" }));
+    assert.equal(
+      (await run(new DatumChanged("now in PNP", "PNP", "2020-01-01"))).datumChanged,
+      undefined,
+    );
+    assert.equal(
+      (await run(new DatumChanged("now in PNP", "PNP", "2024-06-01"))).datumChanged,
+      true,
+    );
+    assert.equal((await run(new DatumChanged("now in PNP", "PNP"))).datumChanged, true);
   });
 
   it("merges the fetch into the window, trims it, and stamps only new values", async () => {

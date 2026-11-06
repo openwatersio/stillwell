@@ -148,6 +148,8 @@ export async function levels(
     throw new DatumChanged(
       `PEGELONLINE ${station} is now in ${unit.datum}, not ${datum}`,
       unit.datum,
+      // Only a PNP series has a reference, its gauge zero's date, which the unit doesn't give.
+      unit.datum === "PNP" ? undefined : null,
     );
   const { scale } = unit;
   const params = new URLSearchParams({ start: start.toISOString(), end: end.toISOString() });

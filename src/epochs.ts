@@ -8,9 +8,12 @@ import type { Epoch, EpochDecision } from "./schema.ts";
 export class DatumChanged extends Error {
   /** The datum the source now reports. */
   readonly datum: string;
-  constructor(message: string, datum: string) {
+  /** The reference the source now reports, null for none, or undefined when the adapter can't tell. */
+  readonly reference: string | null | undefined;
+  constructor(message: string, datum: string, reference?: string | null) {
     super(message);
     this.datum = datum;
+    this.reference = reference;
   }
 }
 

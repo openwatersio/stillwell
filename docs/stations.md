@@ -91,7 +91,7 @@ Rows in between are in the lake, in the old epoch's files, but outside both span
 
 A `since` no later than the current epoch's is refused. The station is held, and the report says so.
 
-**Detected between refreshes.** Adapters that refuse values in another datum, as PEGELONLINE's `levels` does, make `recent` fail for that station. `recent` records the failure and goes on, and the next station refresh opens the epoch. When such a failure is a `DatumChanged` error, Ingest hourly starts the Monthly workflow's refresh of that source, at most once a day, so the epoch opens within a day rather than at the next monthly refresh. A change to a datum a person rejected for that station doesn't start one, since a refresh ignores it.
+**Detected between refreshes.** Adapters that refuse values in another datum, as PEGELONLINE's `levels` does, make `recent` fail for that station. `recent` records the failure and goes on, and the next station refresh opens the epoch. When such a failure is a `DatumChanged` error, Ingest hourly starts the Monthly workflow's refresh of that source, at most once a day, so the epoch opens within a day rather than at the next monthly refresh. A change a person rejected for that station, to the same datum and reference, doesn't start one, since a refresh ignores it. PEGELONLINE's `levels` can't tell a PNP series' reference, so a change to PNP starts one every day, even when rejected, until the rejection is removed.
 
 ### When epochs convert
 

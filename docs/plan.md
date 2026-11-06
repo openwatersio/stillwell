@@ -63,7 +63,7 @@ src/
   datums.ts            offsets to MSL, LAT, NAVD88; joins to tide-database
   hroi/                as now
 scripts/
-  ingest.ts stations|backfill|recent|compact <source>
+  ingest.ts stations|backfill|recent|compact <source>, publish
   compact.ts, snapshot.ts, report.ts
 worker/                the API: wrangler.jsonc, src/, test/
 .github/workflows/     ci, ingest-hourly, compact-daily, monthly, snapshot-quarterly, canary

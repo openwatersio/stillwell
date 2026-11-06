@@ -265,6 +265,7 @@ export async function extremes(
       throw new DatumChanged(
         `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
         all[0]!.AquoMetadata.Hoedanigheid.Code,
+        null,
       );
     if (!types || !heights) continue;
     assertCentimeters(heights, datum);
@@ -339,6 +340,7 @@ function assertCentimeters(series: Series, datum: string): void {
     throw new DatumChanged(
       `RWS height datum is ${series.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
       series.AquoMetadata.Hoedanigheid.Code,
+      null,
     );
 }
 

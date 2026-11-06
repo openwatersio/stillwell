@@ -60,14 +60,16 @@ jobs:
       # A station the source now reports in another datum fails until a station
       # refresh opens its epoch, or holds it for a person, after which recent
       # skips it. One refresh a day, not counting one that was cancelled, such
-      # as one queued behind a long backfill. Failing to start one doesn't fail
+      # as one queued behind a long backfill. A refresh of several sources, or
+      # of all of them (titled Monthly, the 2nd's scheduled run included),
+      # counts; the 9th's is titled Refetch. Failing to start one doesn't fail
       # the hourly run, which wrote what it fetched.
       - if: ${{ !cancelled() && steps.recent.outputs.datum_changed == 'true' }}
         continue-on-error: true
         run: |
           since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
-          started=$(gh run list --workflow monthly.yml --event workflow_dispatch --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
-          if grep -qx "Refresh $SOURCE" <<< "$started"; then
+          started=$(gh run list --workflow monthly.yml --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
+          if grep -Eqx "Monthly|Refresh( [a-z]+)* $SOURCE( [a-z]+)*" <<< "$started"; then
             echo "A refresh of $SOURCE started in the last day"
           else
             gh workflow run monthly.yml --ref "$GITHUB_REF_NAME" -f sources="$SOURCE"

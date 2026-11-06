@@ -5,7 +5,7 @@ name: Monthly
 # enabled. On the 9th, refetch CO-OPS and USGS years that may hold values the
 # source has verified since. Ingest hourly starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
-run-name: ${{ inputs.refetch && 'Refetch' || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
+run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && 'Refetch' || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
 # Each job waits in its source's group. GitHub keeps one job waiting per
 # group and cancels it when a newer one arrives, so a job queued behind
@@ -48,8 +48,13 @@ jobs:
           set -f
           sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
+            refetch=$(jq -c 'map(select(. == "coops" or . == "usgs"))' <<< "$sources")
+            if [ "$refetch" = "[]" ]; then
+              echo "::error::Only coops and usgs are refetched"
+              exit 1
+            fi
             echo "sources=[]" >> "$GITHUB_OUTPUT"
-            echo "refetch=$(jq -c 'map(select(. == "coops" or . == "usgs"))' <<< "$sources")" >> "$GITHUB_OUTPUT"
+            echo "refetch=$refetch" >> "$GITHUB_OUTPUT"
           else
             echo "sources=$sources" >> "$GITHUB_OUTPUT"
             echo "refetch=[]" >> "$GITHUB_OUTPUT"
