@@ -1,3 +1,4 @@
+import { DatumChanged } from "../../epochs.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -261,8 +262,10 @@ export async function extremes(
     const heights = all.find((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
     // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
     if (types && all.length && !heights)
-      throw new Error(
+      throw new DatumChanged(
         `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
+        all[0]!.AquoMetadata.Hoedanigheid.Code,
+        null,
       );
     if (!types || !heights) continue;
     assertCentimeters(heights, datum);
@@ -334,7 +337,11 @@ function assertCentimeters(series: Series, datum: string): void {
   const unit = series.AquoMetadata.Eenheid?.Code;
   if (unit && unit !== "cm") throw new Error(`RWS height unit is ${unit}, not cm`);
   if (series.AquoMetadata.Hoedanigheid.Code !== datum)
-    throw new Error(`RWS height datum is ${series.AquoMetadata.Hoedanigheid.Code}, not ${datum}`);
+    throw new DatumChanged(
+      `RWS height datum is ${series.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
+      series.AquoMetadata.Hoedanigheid.Code,
+      null,
+    );
 }
 
 function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
