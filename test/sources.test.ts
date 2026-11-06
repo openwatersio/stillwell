@@ -72,8 +72,8 @@ describe("rws", () => {
   };
 
   it("puts observed values from before 2005 on the revised NAP where PSMSL gives the offset", async () => {
-    // The revision starts at midnight in RWS's own time.
-    const times = ["2004-12-31T23:50:00.000+01:00", "2005-01-01T00:00:00.000+01:00"];
+    // The revision starts at UTC midnight, so old-NAP epochs line up with year files.
+    const times = ["2005-01-01T00:50:00.000+01:00", "2005-01-01T01:00:00.000+01:00"];
     serve([
       [
         /OphalenWaarnemingen/,
@@ -97,30 +97,11 @@ describe("rws", () => {
       ),
       [1, 1],
     );
-  });
-
-  it("asks for nothing before 2005 at a NAP gauge whose revision isn't known", async () => {
-    const asked: string[] = [];
-    setTransport(async (_url, options) => {
-      asked.push(JSON.parse(String(options.body)).Periode.Begindatumtijd);
-      return "";
-    });
-    const k13a = { source_id: "k13a", datum: "MSL" } as never;
-    const dordrecht = { source_id: "dordrecht", datum: "NAP" } as never;
-    const [start, end] = [new Date("2004-01-01T00:00:00Z"), new Date("2005-01-01T00:00:00Z")];
-    await rws.source.observations!(dordrecht, start, end);
-    await rws.source.extremes!(dordrecht, start, end);
-    // MSL never changed realization, and the astronomical tide is left as served.
-    const january = new Date("2004-02-01T00:00:00Z");
-    await rws.source.observations!(k13a, start, january);
-    await rws.source.predictions!(dordrecht, start, january);
-    // The year's last hour in UTC is 2005 in RWS's time.
-    assert.deepEqual(asked, [
-      "2004-12-31T23:00:00.000+00:00",
-      "2004-12-31T23:00:00.000+00:00",
-      "2004-01-01T00:00:00.000+00:00",
-      "2004-01-01T00:00:00.000+00:00",
-    ]);
+    // A gauge without an offset is served as RWS gives it, for its old-NAP epoch.
+    assert.deepEqual(
+      (await rws.levels("dordrecht", ...range)).map((l) => l.level),
+      [1, 1],
+    );
   });
 
   it("reads both lows of a double low water, and not the rise between them", async () => {
@@ -193,6 +174,12 @@ describe("rws stations", () => {
         ["rws/k13a", "MSL", ["levels"], "NL"],
         ["rws/kralendijk", "NAP", ["levels"], "BQ"],
       ],
+    );
+    // Dutch NAP stations without an offset have their history before 2005 in
+    // the old NAP; MSL and Bonaire's NAP never changed.
+    assert.deepEqual(
+      stations.map((s) => s.reference),
+      [null, rws.REVISED_NAP, null, null],
     );
   });
 

@@ -8,6 +8,7 @@ import {
   type PublishedExtreme,
   type Source,
   type SourceMetadata,
+  type ListedStation,
   type Station,
 } from "../../schema.ts";
 
@@ -35,6 +36,8 @@ export const metadata: SourceMetadata = {
   },
   attribution: "Rijkswaterstaat",
   terms: "No uptime guarantee; fair use, at most 160,000 values per request.",
+  // Values from before the 2005 NAP revision come in the old NAP.
+  archive: "previous",
 };
 
 // The service refuses requests over 160,000 values. A year of 10-minute data is
@@ -44,15 +47,20 @@ const CHUNK_MS = 365 * 86_400_000;
 /**
  * The 2005 NAP revision gave every gauge's zero post a new height, and RWS
  * serves values from before 2005 against the old one. These are the
- * centimeters to add to a pre-2005 NAP value to put it on today's NAP, from the
- * two RLR factors PSMSL records for each gauge (Dillingh et al. 2010): the
- * factor up to 2005 minus the one from 2005 on. Each converted series matches
- * PSMSL's RLR series within a few millimeters in every year from 1990 to 2006.
- * Delfzijl's doesn't: RWS has corrected its archive for subsidence since, by
- * 5 to 40 mm. No other gauge's offset is public, so at Delfzijl and elsewhere
- * the adapter serves observed NAP values from 2005 on only. The astronomical
- * tide is left as served: converting it would step its mean level by 4 to 5 cm
- * at 2005, where it steps by 1 to 2 cm as served.
+ * centimeters to add to a pre-2005 observed value to put it on today's NAP,
+ * from the two RLR factors PSMSL records for each gauge (Dillingh et al. 2010):
+ * the factor up to 2005 minus the one from 2005 on. Each converted series
+ * matches PSMSL's RLR series within a few millimeters in every year from 1990
+ * to 2006. Delfzijl's doesn't: RWS has corrected its archive for subsidence
+ * since, by 5 to 40 mm. The astronomical tide is left as served: converting it
+ * would step its mean level by 4 to 5 cm at 2005, where it steps by 1 to 2 cm
+ * as served.
+ *
+ * Every other Dutch NAP station lists `REVISED_NAP` as its reference, so its
+ * values before 2005 go to an epoch of their own, in the old NAP, which
+ * converts to today's only by a decision in `overrides`. A gauge whose offset
+ * turns up later gets that decision, not an entry here, since its old-NAP
+ * epoch's files would then mix two references.
  */
 export const NAP_2005: Record<string, number> = {
   vlissingen: -3.0, // PSMSL 20
@@ -66,25 +74,19 @@ export const NAP_2005: Record<string, number> = {
 };
 
 /**
- * Where the revised NAP starts: midnight in RWS's own time, UTC+1. PSMSL's
- * factors change between monthly means, so the hour isn't known.
+ * Where the revised NAP starts. PSMSL's factors change between monthly means,
+ * so the hour isn't known; UTC midnight lines the old-NAP epochs up with the
+ * year files.
  */
-const NAP_REVISED = Date.UTC(2004, 11, 31, 23);
+const NAP_REVISED = Date.UTC(2005, 0, 1);
 
-/**
- * Where a NAP series can start, and the centimeters to add to values before
- * 2005. Other datums never changed realization, so they pass through.
- */
-function revision(
-  location: string,
-  datum: string,
-  process: ProcessType,
-  start: Date,
-): { start: Date; cm: number } {
-  if (datum !== "NAP" || process === "astronomisch") return { start, cm: 0 };
-  const cm = NAP_2005[location];
-  if (cm !== undefined) return { start, cm };
-  return { start: new Date(Math.max(start.getTime(), NAP_REVISED)), cm: 0 };
+/** The reference Dutch NAP stations without a `NAP_2005` offset list. */
+export const REVISED_NAP = { id: "NAP 2005", since: "2005-01-01" };
+
+/** Centimeters to add to a value before 2005 to put it on today's NAP. */
+function revision(location: string, datum: string, process: ProcessType): number {
+  if (datum !== "NAP" || process !== "meting") return 0;
+  return NAP_2005[location] ?? 0;
 }
 
 // Rounded to the millimeter, so float noise doesn't reach the files.
@@ -150,7 +152,7 @@ interface Catalog {
  * Locations with a water-level series against NAP, or against MSL where that's
  * all a location has (the offshore platforms).
  */
-export async function stations(): Promise<Station[]> {
+export async function stations(): Promise<ListedStation[]> {
   const catalog = await getJson<Catalog>(CATALOG, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -215,6 +217,15 @@ export async function stations(): Promise<Station[]> {
         source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
       }))
       .sort((a, b) => a.id.localeCompare(b.id)),
+  ).map((s) => ({ ...s, reference: revisedNap(s) ? REVISED_NAP : null }));
+}
+
+/** Whether a station's NAP values before 2005 are in the old NAP, with no known offset. */
+function revisedNap(station: Station): boolean {
+  return (
+    station.datum === "NAP" &&
+    station.country_code === "NL" &&
+    NAP_2005[station.source_id] === undefined
   );
 }
 
@@ -267,8 +278,8 @@ export async function levels(
   { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
 ): Promise<Observation[]> {
   const samples: Observation[] = [];
-  const nap = revision(location, datum, process, start);
-  for (const [from, to] of chunks(nap.start, end)) {
+  const cm = revision(location, datum, process);
+  for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
       { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: datum }, ProcesType: process },
@@ -285,7 +296,7 @@ export async function levels(
       // RWS marks missing values with large sentinels (e.g. 999999999).
       if (value === undefined || Math.abs(value) > 10_000) continue;
       const time = Date.parse(m.Tijdstip);
-      samples.push({ time, level: onRevisedNap(value, time, nap.cm), flag: flagOf(m, process) });
+      samples.push({ time, level: onRevisedNap(value, time, cm), flag: flagOf(m, process) });
     }
   }
   return dedupe(samples).filter((s) => s.time >= start.getTime() && s.time < end.getTime());
@@ -313,8 +324,8 @@ export async function extremes(
   const grouping = EXTREME_GROUPING[process];
   if (!grouping) throw new Error(`RWS publishes no extremes for ${process}`);
   const result: PublishedExtreme[] = [];
-  const nap = revision(location, datum, process, start);
-  for (const [from, to] of chunks(nap.start, end)) {
+  const cm = revision(location, datum, process);
+  for (const [from, to] of chunks(start, end)) {
     const series = await request(
       location,
       { Groepering: { Code: grouping }, ProcesType: process },
@@ -348,7 +359,7 @@ export async function extremes(
       if (!type) throw new Error(`RWS ${location}: unknown extreme type ${kind}`);
       result.push({
         time,
-        level: onRevisedNap(value, time, nap.cm),
+        level: onRevisedNap(value, time, cm),
         type,
         flag: flagOf(m, process),
       });
