@@ -162,8 +162,8 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 - [ ] Compaction also writes each source's `first` and `last` per station to `stations/bounds/<source>.parquet`, which `stations.parquet` is built with.
 - [ ] `monthly.yml`: refresh station lists, datums and license pages, one job per source in a `lake-<source>` group, then rebuild `stations.parquet`; re-fetch verified CO-OPS months and USGS years that still hold provisional values (USGS approves months to years later), and now and then approved ones too, since the disk cache keeps an approved page for good and USGS still fills gaps and revises values after approval. Also run `stations` daily for a source whose `recent` failed on a datum change. A scheduled workflow needs a commit every 60 days to stay alive on a public repo, which no longer comes from the station lists.
 - [x] A run summary per job (stations updated, stale, failed, values written) on the run's page in Actions.
-- [ ] An issue opened automatically when a source fails twice in a row.
-- [ ] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps.
+- [x] An issue opened automatically when a source's scheduled `recent` or `compact` job fails twice in a row, closed when it next succeeds.
+- [x] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps. USGS waits on a `USGS_API_KEY` repository secret, and USACE and USGS check only that they return values until their shapes are recorded.
 
 Done when every source's `recent/` is under 2 hours old and the year files fill in daily without anyone touching them.
 

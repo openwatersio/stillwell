@@ -9,10 +9,10 @@ src/sources/<source>/  one adapter per source, each with a README on that servic
 src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the TICON inventory and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml and bucket-check.yml (a weekly read of the public bucket)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -125,6 +125,16 @@ Each source is a directory in `src/sources/` that exports a `Source` (defined in
 ## Ingest on R2
 
 The Ingest workflow runs `scripts/ingest.ts` against the public `water-levels` bucket. Only maintainers can start it, and its credentials live in the `lake` environment, which only runs on `main`. Two workflows run on a schedule from the same environment, each source a job of its own: Ingest hourly runs `recent --hours 12` at 17 minutes past each hour, and Compact daily runs `compact --days 6` at 00:45 UTC, so late values, revised flags and a missed night still reach the year files. Both can also be started by hand. Every job that writes one source's files, a manual `backfill`, `recent` or `compact` included, runs in that source's `lake-<source>` concurrency group, so no two rewrite one file at once. `stations` runs in the `lake` group whatever its sources, since every run rebuilds `stations.parquet` from all the lists. It can run beside a source's jobs: one that read the list before a refresh opened an epoch writes the new epoch's rows into the old epoch's files, past its `until`, where readers ignore them, and the next run puts them in the new epoch's files. A run waiting in a group is cancelled when the next one arrives, so while a long backfill holds a source, its hourly runs skip until it's done, and the next one's 12 hours, plus the window's 6 days for compaction, catch up. That goes for a manual run too: one started while the source's scheduled job is running can be cancelled by the next hourly run, so start it when the group is free, and check that it started rather than show as cancelled.
+
+When a source's job fails in two scheduled runs of either workflow in a row, the workflow's `alert` job (`scripts/alert.sh`) opens an issue titled "Ingest hourly is failing for <source>" or "Compact daily is failing for <source>", and closes it when that job next succeeds. It opens one issue per workflow and source at a time. A job cancelled or skipped before its first step, such as one cancelled while it waited on its group, doesn't count either way; any other that didn't succeed, a timeout or a cancelled job that had started included, is a failure. It runs only on a scheduled run's first attempt, since a re-run would judge a source by an older result than its latest.
+
+## Canary
+
+The Canary workflow runs `scripts/canary.ts` each Monday: one small request per adapter, through the adapter's own code and pacing, for a few days at a gauge that has run for years. It fails when an adapter returns no values, or when a response's shape (each JSON path and its types, or for BSH the code that starts each line) has lost a path or gained a type since the shape recorded in `src/sources/<source>/canary.json`. A field the source adds doesn't fail it, and neither does a null where the recording had a value or an object, or a value where it had only null. A source with no recording yet, USACE and USGS for now, prints its shape and has only to return values. USGS is skipped until `USGS_API_KEY` is set as a repository secret, since the canary doesn't run in the `lake` environment. Once the adapter handles a change, check the new shape and record it:
+
+```bash
+node scripts/canary.ts usace --record
+```
 
 ## Gotchas
 

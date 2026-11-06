@@ -1,0 +1,19 @@
+{
+  "/webservices/rest-api/v2/stations/5990020/W.json": {
+    "$": "object",
+    "$.equidistance": "number",
+    "$.gaugeZero": "object",
+    "$.gaugeZero.unit": "string",
+    "$.gaugeZero.validFrom": "string",
+    "$.gaugeZero.value": "number",
+    "$.longname": "string",
+    "$.shortname": "string",
+    "$.unit": "string"
+  },
+  "/webservices/rest-api/v2/stations/5990020/W/measurements.json": {
+    "$": "array",
+    "$[]": "object",
+    "$[].timestamp": "string",
+    "$[].value": "number"
+  }
+}

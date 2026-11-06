@@ -1,0 +1,29 @@
+name: Canary
+
+# One small live request per adapter, checked against the shape recorded in
+# src/sources/<source>/canary.json (scripts/canary.ts), so a change upstream
+# fails here rather than leaving gaps in the lake. USGS runs only once the
+# USGS_API_KEY repository secret is set.
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    # A USGS rate limit can ask for up to an hour's wait.
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - run: node scripts/canary.ts
+        env:
+          USGS_API_KEY: ${{ secrets.USGS_API_KEY }}

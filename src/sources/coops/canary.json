@@ -1,0 +1,17 @@
+{
+  "/api/prod/datagetter": {
+    "$": "object",
+    "$.data": "array",
+    "$.data[]": "object",
+    "$.data[].f": "string",
+    "$.data[].q": "string",
+    "$.data[].s": "string",
+    "$.data[].t": "string",
+    "$.data[].v": "string",
+    "$.metadata": "object",
+    "$.metadata.id": "string",
+    "$.metadata.lat": "string",
+    "$.metadata.lon": "string",
+    "$.metadata.name": "string"
+  }
+}
