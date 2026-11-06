@@ -5,15 +5,22 @@ name: Monthly
 # enabled. On the 9th, refetch CO-OPS and USGS years that may hold values the
 # source has verified since. Ingest hourly starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
-run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && 'Refetch' || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
+run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
 # Each job waits in its source's group. GitHub keeps one job waiting per
 # group and cancels it when a newer one arrives, so a job queued behind
 # anything that outlasts the hour, a manual backfill or a long refresh, is
-# cancelled by the next hourly run. Starting at 01:30 and 03:40, after that
+# cancelled by the next hourly run. Starting at 01:25 and 03:35, after that
 # hour's run and compaction, the groups are usually free; rerun a cancelled
 # job from Actions. The refetch runs on its own day for the same reason: queued
 # behind the refreshes, it would be cancelled.
+#
+# The Worker in workers/cron dispatches both at those times, since GitHub's
+# schedule runs late or not at all. The schedule, five minutes later, is a
+# backup that plans nothing when a dispatched run on main of the same title,
+# Monthly or Refetch for every source, started in the last day, so the
+# refreshes don't run twice; rerun a cancelled job from Actions instead. A
+# failed lookup runs the backup.
 on:
   schedule:
     - cron: "30 1 2 * *"
@@ -39,6 +46,8 @@ jobs:
   plan:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     outputs:
       sources: ${{ steps.plan.outputs.sources }}
       refetch: ${{ steps.plan.outputs.refetch }}
@@ -46,6 +55,16 @@ jobs:
       - id: plan
         run: |
           set -f
+          if [ "$EVENT" = schedule ]; then
+            title=$([ "$REFETCH" = true ] && echo Refetch || echo Monthly)
+            since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
+            if titles=$(gh run list --workflow monthly.yml --branch main --event workflow_dispatch --created ">=$since" --json displayTitle --jq '.[].displayTitle') && grep -qx "$title" <<< "$titles"; then
+              echo "A dispatched $title run started in the last day"
+              echo "sources=[]" >> "$GITHUB_OUTPUT"
+              echo "refetch=[]" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
             refetch=$(jq -c 'map(select(. == "coops" or . == "usgs"))' <<< "$sources")
@@ -62,6 +81,9 @@ jobs:
         env:
           SOURCES: ${{ inputs.sources }}
           REFETCH: ${{ github.event.schedule == '40 3 9 * *' || inputs.refetch }}
+          EVENT: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
   # Each list in its source's group, the one every job that writes the source's
   # files or list shares, so a refresh that opens a datum epoch never lands
@@ -181,8 +203,9 @@ jobs:
   # keepalive-workflow action relies on, so this monthly call keeps every
   # schedule running, this one included, with no commits. One a maintainer
   # turned off stays off. It needs no lake credentials or concurrency group.
+  # It runs on every run titled Monthly, scheduled or dispatched.
   keepalive:
-    if: github.event.schedule == '30 1 2 * *'
+    if: github.event.schedule == '30 1 2 * *' || (github.event_name == 'workflow_dispatch' && !inputs.sources && !inputs.refetch)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

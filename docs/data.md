@@ -4,7 +4,7 @@ Every public series in the lake is Parquet at `https://water-levels.openwaters.i
 
 Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every source here allows commercial use.
 
-So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
+So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
 
 ## Layout
 

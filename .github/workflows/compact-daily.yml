@@ -20,6 +20,40 @@ permissions:
   contents: read
 
 jobs:
+  # The Worker in workers/cron dispatches this workflow, since GitHub's
+  # schedule runs late or not at all. The schedule is a backup, skipped when a
+  # dispatched run on main started in the last 23 hours: a second run would wait in each
+  # source's group, and cancel any job already waiting there, such as a
+  # compaction or a station refresh. A dispatched run counts even when one of
+  # its jobs was cancelled while waiting, since a backup would cancel whatever
+  # replaced it. A failed lookup runs the backup.
+  gate:
+    # The lake environment only deploys from main; this stops a run from another
+    # branch before it waits on that rule.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        run: |
+          run=true
+          if [ "$EVENT" = schedule ]; then
+            since=$(date -u -d '23 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            if dispatched=$(gh run list --workflow compact-daily.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
+              echo "A dispatched run started in the last 23 hours"
+              run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
   compact:
     strategy:
       fail-fast: false
@@ -31,9 +65,8 @@ jobs:
     concurrency:
       group: lake-${{ matrix.source }}
       cancel-in-progress: false
-    # The lake environment only deploys from main; this stops a run from another
-    # branch before it waits on that rule.
-    if: github.ref == 'refs/heads/main'
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     # The environment holds the R2 credentials and only runs on main.
