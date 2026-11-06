@@ -113,12 +113,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 
-  # Opens an issue when a source's job fails in two scheduled runs in a row,
-  # and closes it when the job next succeeds (scripts/alert.sh).
+  # Opens an issue when a source's job fails in two runs on main in a row,
+  # and closes it when the job next succeeds (scripts/alert.sh). Not on a
+  # backup the gate skipped, which ran no jobs.
   alert:
-    needs: recent
+    needs: [gate, recent]
     # A re-run would judge a source by an older result than its latest.
-    if: always() && github.event_name == 'schedule' && github.run_attempt == 1
+    if: always() && needs.gate.outputs.run == 'true' && github.run_attempt == 1
     # One at a time, so two runs' alerts never both open an issue.
     concurrency:
       group: alert-${{ github.workflow }}

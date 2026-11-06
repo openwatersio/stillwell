@@ -7,7 +7,7 @@
   "preview_urls": false,
   "triggers": {
     // UTC, matching DISPATCHES in index.ts.
-    "crons": ["12 * * * *", "40 0 * * *", "25 1 2 * *", "35 3 9 * *"],
+    "crons": ["12 * * * *", "40 0 * * *", "25 1 2 * *", "35 3 9 * *", "0 7 * * MON"],
   },
   "observability": { "enabled": true },
 }

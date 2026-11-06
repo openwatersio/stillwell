@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Open an issue when a source's scheduled job fails twice in a row, and close
+# Open an issue when a source's job fails in two runs on main in a row, and close
 # it once the source's job succeeds again. One open issue per workflow and
 # source, found by its title, so failures after the second add nothing.
 #
@@ -29,11 +29,13 @@ if [ -z "$current" ]; then
   echo "No \`$job (<source>)\` jobs in this run; was the matrix job renamed?" >&2
   exit 1
 fi
-# Scheduled runs before this one, newest first, until each source has one
-# whose job started: up to about 4 days of hourly runs or 100 nights, for a
-# source whose jobs keep waiting behind a long backfill. Assigned first so a
-# failed listing fails the job.
-runs=$(gh api "repos/$repo/actions/workflows/$workflow/runs?event=schedule&status=completed&per_page=100" \
+# Runs on main before this one, dispatched or scheduled, newest first, until
+# each source has one whose job started: up to 100 runs, for a source whose
+# jobs keep waiting behind a long backfill. A backup that skipped is one of
+# them, so that's between 2 and 4 days of hourly runs, or 50 to 100 nights.
+# A skipped backup's jobs count as none. Assigned first so a failed listing
+# fails the job.
+runs=$(gh api "repos/$repo/actions/workflows/$workflow/runs?branch=main&status=completed&per_page=100" \
   --jq ".workflow_runs[] | select(.created_at < \"$created\") | .id")
 earlier=""
 for id in $runs; do
@@ -52,7 +54,7 @@ while read -r source conclusion; do
   last=$(grep -m1 -E "^$source (success|failure)$" <<<"$earlier" | cut -d' ' -f2 || true)
   echo "$source: $conclusion, before that ${last:-unknown}, open issue ${open:-none}"
   if [ "$conclusion" = failure ] && [ "$last" = failure ] && [ -z "$open" ]; then
-    gh issue create --repo "$repo" --title "$title" --body "The scheduled \`$job\` job for \`$source\` failed in [this run]($run_url) and in its last run before that. This issue closes on its own when the job next succeeds."
+    gh issue create --repo "$repo" --title "$title" --body "The \`$job\` job for \`$source\` failed in [this run]($run_url) and in its last run before that. This issue closes on its own when the job next succeeds."
   elif [ "$conclusion" = success ] && [ -n "$open" ]; then
     gh issue close "$open" --repo "$repo" --comment "Succeeded again in [this run]($run_url)."
   fi

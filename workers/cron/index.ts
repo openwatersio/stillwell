@@ -15,6 +15,8 @@ export const DISPATCHES: Record<string, { workflow: string; inputs?: Record<stri
   "40 0 * * *": { workflow: "compact-daily.yml", inputs: { days: "6" } },
   "25 1 2 * *": { workflow: "monthly.yml" },
   "35 3 9 * *": { workflow: "monthly.yml", inputs: { refetch: "true" } },
+  // Named, since Cloudflare numbers weekdays from Sunday = 1 and GitHub from Sunday = 0.
+  "0 7 * * MON": { workflow: "canary.yml" },
 };
 
 export default {
