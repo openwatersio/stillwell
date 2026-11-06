@@ -607,6 +607,33 @@ describe("backfill script", () => {
     assert.equal((await readStationBounds(path)).get("coops/9")?.screened, true);
   });
 
+  it("takes one shard of the stations with preliminary values", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    const stations = ["11", "12", "13", "14", "15", "16"].map((id) => coopsStation(id, "inactive"));
+    await writeStationList(stationListPath(lake, "coops"), stations);
+    await writeStationBounds(
+      boundsPath(lake, "coops"),
+      stations.map((s) => ({
+        id: s.id,
+        first: "2024-12-01T00:00:00Z",
+        last: "2024-12-01T00:00:00Z",
+        preliminary: "2024-12-01T00:00:00Z",
+      })),
+    );
+    const run = backfillCoops(lake, ["preliminary", "2023", "2025", "--shard", "1/2"]);
+    assert.equal(run.status, 0, run.stderr);
+    const asked = [
+      ...new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1])),
+    ];
+    assert.deepEqual(
+      asked.sort(),
+      shard(stations, 1, 2)
+        .map((s) => s.source_id)
+        .sort(),
+    );
+    assert.ok(asked.length > 0 && asked.length < stations.length);
+  });
+
   it("gives a lowered station its value back when it had no year to fetch", async () => {
     const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
     await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);

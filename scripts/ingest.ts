@@ -309,7 +309,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   });
   if (values.shard && ids !== "all" && ids !== "preliminary")
     throw new Error("--shard splits `all` or `preliminary`, not named stations");
-  if (values.shard) wanted = shard(wanted, ...parseShard(values.shard));
+  // `preliminary` took its shard before picking stations, so the cutoff list is the shard's too.
+  if (values.shard && ids === "all") wanted = shard(wanted, ...parseShard(values.shard));
   if (values["skip-written"] && values.refetch)
     throw new Error("--skip-written and --refetch contradict each other");
   // Skipping every written year would skip the very years holding preliminary values.
