@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Open an issue when a source's scheduled job fails twice in a row, and close
+# it once the source's job succeeds again. One open issue per workflow and
+# source, found by its title, so failures after the second add nothing.
+#
+#   scripts/alert.sh <job>
+#
+# Run from a workflow's alert job after its matrix, with `job` the matrix
+# job's name (`recent` or `compact`) and GH_TOKEN allowed to read Actions and
+# write issues.
+set -euo pipefail
+
+job=$1
+repo=$GITHUB_REPOSITORY
+run_url="$GITHUB_SERVER_URL/$repo/actions/runs/$GITHUB_RUN_ID"
+run=$(gh api "repos/$repo/actions/runs/$GITHUB_RUN_ID" --jq '"\(.workflow_id) \(.created_at)"')
+read -r workflow created <<<"$run"
+
+# One "<source> <result>" line per matrix job in a run: success, none for a
+# job cancelled or skipped before its first step, such as one cancelled while
+# it waited on its group, or failure for any other, a timeout included.
+conclusions() {
+  gh api "repos/$repo/actions/runs/$1/jobs?per_page=100" --jq \
+    ".jobs[] | select(.name | startswith(\"$job (\")) | (.name | ltrimstr(\"$job (\") | rtrimstr(\")\")) + \" \" + (if .conclusion == \"success\" then \"success\" elif (.conclusion == \"cancelled\" or .conclusion == \"skipped\") and (.steps | length) == 0 then \"none\" else \"failure\" end)"
+}
+
+current=$(conclusions "$GITHUB_RUN_ID")
+if [ -z "$current" ]; then
+  echo "No \`$job (<source>)\` jobs in this run; was the matrix job renamed?" >&2
+  exit 1
+fi
+# Scheduled runs before this one, newest first, until each source has one
+# whose job started: up to about 4 days of hourly runs or 100 nights, for a
+# source whose jobs keep waiting behind a long backfill. Assigned first so a
+# failed listing fails the job.
+runs=$(gh api "repos/$repo/actions/workflows/$workflow/runs?event=schedule&status=completed&per_page=100" \
+  --jq ".workflow_runs[] | select(.created_at < \"$created\") | .id")
+earlier=""
+for id in $runs; do
+  earlier+="$(conclusions "$id")"$'\n'
+  unknown=$(cut -d' ' -f1 <<<"$current" | while read -r s; do
+    grep -qE "^$s (success|failure)$" <<<"$earlier" || echo "$s"
+  done)
+  [ -n "$unknown" ] || break
+done
+
+while read -r source conclusion; do
+  [ -n "$source" ] || continue
+  title="$GITHUB_WORKFLOW is failing for $source"
+  open=$(gh issue list --repo "$repo" --state open --limit 200 --json number,title \
+    --jq "map(select(.title == \"$title\"))[0].number // empty")
+  last=$(grep -m1 -E "^$source (success|failure)$" <<<"$earlier" | cut -d' ' -f2 || true)
+  echo "$source: $conclusion, before that ${last:-unknown}, open issue ${open:-none}"
+  if [ "$conclusion" = failure ] && [ "$last" = failure ] && [ -z "$open" ]; then
+    gh issue create --repo "$repo" --title "$title" --body "The scheduled \`$job\` job for \`$source\` failed in [this run]($run_url) and in its last run before that. This issue closes on its own when the job next succeeds."
+  elif [ "$conclusion" = success ] && [ -n "$open" ]; then
+    gh issue close "$open" --repo "$repo" --comment "Succeeded again in [this run]($run_url)."
+  fi
+done <<<"$current"

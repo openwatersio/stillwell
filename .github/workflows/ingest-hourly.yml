@@ -78,3 +78,25 @@ jobs:
           SOURCE: ${{ matrix.source }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+
+  # Opens an issue when a source's job fails in two scheduled runs in a row,
+  # and closes it when the job next succeeds (scripts/alert.sh).
+  alert:
+    needs: recent
+    # A re-run would judge a source by an older result than its latest.
+    if: always() && github.event_name == 'schedule' && github.run_attempt == 1
+    # One at a time, so two runs' alerts never both open an issue.
+    concurrency:
+      group: alert-${{ github.workflow }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+      - run: scripts/alert.sh recent
+        env:
+          GH_TOKEN: ${{ github.token }}
