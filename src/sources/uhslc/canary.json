@@ -1,0 +1,28 @@
+{
+  "/erddap/tabledap/global_hourly_fast.json": {
+    "$": "object",
+    "$.table": "object",
+    "$.table.columnNames": "array",
+    "$.table.columnNames[]": "string",
+    "$.table.columnTypes": "array",
+    "$.table.columnTypes[]": "string",
+    "$.table.columnUnits": "array",
+    "$.table.columnUnits[]": "null | string",
+    "$.table.rows": "array",
+    "$.table.rows[]": "array",
+    "$.table.rows[][]": "number | string"
+  },
+  "/erddap/tabledap/global_hourly_rqds.json": {
+    "$": "object",
+    "$.table": "object",
+    "$.table.columnNames": "array",
+    "$.table.columnNames[]": "string",
+    "$.table.columnTypes": "array",
+    "$.table.columnTypes[]": "string",
+    "$.table.columnUnits": "array",
+    "$.table.columnUnits[]": "null | string",
+    "$.table.rows": "array",
+    "$.table.rows[]": "array",
+    "$.table.rows[][]": "number | string"
+  }
+}

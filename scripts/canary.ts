@@ -19,6 +19,7 @@ import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import * as uhslc from "../src/sources/uhslc/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
@@ -36,6 +37,16 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
+  // Honolulu: its FD series ten weeks back, since FD values arrive 4 to 6
+  // weeks late, and three days of its research-quality version A.
+  uhslc: async () => [
+    ...(await uhslc.levels(
+      "057",
+      new Date(start.getTime() - 70 * DAY_MS),
+      new Date(end.getTime() - 70 * DAY_MS),
+    )),
+    ...(await uhslc.levels("057a", new Date("1880-01-01Z"), new Date("1880-01-04Z"))),
+  ],
   usace: () => usace.levels("MVN", "Baton_Rouge.Stage.Inst.1Hour.0.rev", start, end),
   // Mississippi River at Baton Rouge, gage height.
   usgs: () => usgs.levels("9361fa9f474443a4b2391c1f1a63ca4b", start, end),

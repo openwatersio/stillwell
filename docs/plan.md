@@ -172,7 +172,8 @@ Done when every source's `recent/` is under 2 hours old and the year files fill 
 
 In the order phase 2 sets. Every adapter backfills the whole record its originator publishes, so a fit can use 19 years where they exist.
 
-- [ ] **UHSLC** research-quality and fast-delivery, from ERDDAP (968 records). Carry the Hong Kong +1 h correction until UHSLC fixes it, and exclude SANHO stations.
+- [x] **UHSLC** (`uhslc`) research-quality and fast-delivery, from ERDDAP (968 records): each FD series is one station carrying its latest RQ version, RQ replacing FD as UHSLC releases it, and each other RQ version a station of its own. Hong Kong's times are moved an hour later until UHSLC fixes them, and SANHO's South African stations are left out. Restricted until UHSLC confirms commercial redistribution. See [the adapter's README](../src/sources/uhslc/README.md).
+- [ ] Backfill UHSLC into the restricted lake, and run its list refresh, once a workflow has one.
 - [ ] **RWS** history back to 1990 at tide gauges, plus extremes (`GETETM2`, `GETETBRKD2`).
 - [ ] **European originators**: REFMAR, SMHI, Kartverket, Marine Institute, DMI, UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
@@ -180,7 +181,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
 - [ ] **GESLA 4.1** as the fallback for years an originator can't supply, from the existing R2 mirror, with tide-database's clock fixes and per-contributor licenses. Never where the originator has the same years.
 - [ ] Restricted series (Copernicus in situ, IOC, restricted GESLA contributors) into the private lake.
-- [ ] Clock check on every new series: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets before anything fits to it. This is how the WSV, RWS and Hong Kong errors showed up.
+- [ ] Clock check on every new series: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets before anything fits to it. This is how the WSV, RWS and Hong Kong errors showed up. `scripts/clock-check.ts` does the TICON half for a station at a time, and checked 13 UHSLC series; neighbors, and running it on every new series, are still to do.
 - [ ] Deduplicate across sources: when two series share a gauge, `stations.parquet` links them (`same_as`) and says which is preferred.
 
 ### Phase 6: tide-database reads the lake (6 days, in tide-database)

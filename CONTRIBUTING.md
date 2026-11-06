@@ -9,7 +9,7 @@ src/sources/<source>/  one adapter per source, each with a README on that servic
 src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the lake's layout and the evaluations
@@ -41,6 +41,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent` and `compact`, described below. |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                   |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.   |
+| `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.              |
 
 CI also checks that `package-lock.json` regenerates from `package.json` and that every package resolves from the npm registry.
 
@@ -51,6 +52,8 @@ CI also checks that `package-lock.json` regenerates from `package.json` and that
 ```bash
 node scripts/ingest.ts stations
 ```
+
+A source whose stations bar commercial use, UHSLC for now, is refreshed only with `WATER_LEVELS_RESTRICTED_LAKE` set; without it, that source fails and the run exits nonzero after refreshing the rest.
 
 Backfill stations' observations, extremes and predictions by year, with the end year exclusive. Pass a comma-separated list of station IDs, or `all` for every active station of the source:
 
@@ -66,7 +69,13 @@ node scripts/ingest.ts backfill bsh 506P 2026 2028
 node scripts/ingest.ts backfill pegelonline 5990020 2000 2027
 ```
 
-Backfill skips a year whose file is already complete: a past year, asked for whole, whose file has values in every month, runs into the year's last week and holds no preliminary values (`yearDone` in `src/backfill.ts`). So a run cut short, such as by the Ingest workflow's 6-hour cap, doesn't fetch those years again, and `--refetch` fetches every year anyway. A station's first and last years, and years with a missing month, are never complete, so they're fetched every run too. That rule still fetches every year with preliminary values on each run, so a campaign of many runs, such as the USGS record, passes `--skip-written` to skip every whole, ended year that has a file at all, from a listing of each station's files, and ends at the current year so it never fetches a year still under way. Compaction writes the current year's file for every live station each night, so from 2026 on (`COMPACTED_SINCE`) a year's file counts as written only if it has values in every month or holds values backfill wrote, which takes a read of those years. Compaction began in November 2026, so that year's files need a backfill before `--skip-written` trusts them. Otherwise it skips a file whatever it holds, so a year an earlier run wrote only part of, such as `backfill bsh 506P 2026 2028` above, needs `--refetch` or a run without `--skip-written` to fill in. A year a source returns nothing for writes no file, so it's fetched again each run; USGS and CO-OPS ask only within each series' dates, but USACE doesn't yet, so start a USACE backfill near its series' first year.
+UHSLC hasn't confirmed that commercial use is allowed, so its stations go only to a restricted lake, which `WATER_LEVELS_RESTRICTED_LAKE` names; [its README](src/sources/uhslc/README.md) has the full backfill:
+
+```bash
+WATER_LEVELS_RESTRICTED_LAKE=restricted node scripts/ingest.ts backfill uhslc 001,329 1960 2027
+```
+
+Backfill skips a year whose file is already complete: a past year, asked for whole, whose file has values in every month, runs into the year's last week and holds no preliminary values (`yearDone` in `src/backfill.ts`). So a run cut short, such as by the Ingest workflow's 6-hour cap, doesn't fetch those years again, and `--refetch` fetches every year anyway. A station's first and last years, and years with a missing month, are never complete, so they're fetched every run too. That rule still fetches every year with preliminary values on each run, so a campaign of many runs, such as the USGS record, passes `--skip-written` to skip every whole, ended year that has a file at all, from a listing of each station's files, and ends at the current year so it never fetches a year still under way. Compaction writes the current year's file for every live station each night, so from 2026 on (`COMPACTED_SINCE`) a year's file counts as written only if it has values in every month or holds values backfill wrote, which takes a read of those years. Compaction began in November 2026, so that year's files need a backfill before `--skip-written` trusts them. Otherwise it skips a file whatever it holds, so a year an earlier run wrote only part of, such as `backfill bsh 506P 2026 2028` above, needs `--refetch` or a run without `--skip-written` to fill in. A year a source returns nothing for writes no file, so it's fetched again each run; USGS, CO-OPS and UHSLC ask only within each series' dates, but USACE doesn't yet, so start a USACE backfill near its series' first year.
 
 `--first <file>` runs the stations a file names before the rest: one ID per line, or a CSV with a `replacement_id`, `id` or `station` column, such as `docs/ticon-replacement.csv`, which lists the station matched to every TICON record, accepted or not. An unsharded run stops if the file names none of the stations; a shard can hold none of them, so it doesn't.
 
@@ -111,7 +120,15 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 npm run ticon:inventory
 ```
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source refreshed), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every public source refreshed; restricted sources such as UHSLC are left out), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+
+## Clock check
+
+```bash
+npm run clock-check -- 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd uhslc/057=honolulu-1612340-usa-noaa
+```
+
+Cross-correlates a year of each station's levels, fetched through its adapter, against the prediction from a TICON record's constants in a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`), at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check, which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A TICON record fitted to the same series only shows a clock that changed since, so check against another originator's record for the same gauge where TICON has one. It can't see an error of 12 hours, such as New Zealand or Fiji local time labeled UTC: the semidiurnal tide repeats every 12.42 hours, so that looks like a lag of under half an hour.
 
 ## Evaluations
 

@@ -22,7 +22,7 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 
 [`stations.parquet`](https://water-levels.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://water-levels.openwaters.io/sources.json) gives each source's license and the attribution it asks for.
 
-More European agencies come next, including the UK Environment Agency, Kartverket, SMHI, DMI, the Irish Marine Institute and REFMAR. [docs/plan.md](docs/plan.md) has the order. Sources that bar commercial use, such as IOC's sea level monitoring facility, parts of GESLA and the Canadian Hydrographic Service, aren't in the public data.
+More European agencies come next, including the UK Environment Agency, Kartverket, SMHI, DMI, the Irish Marine Institute and REFMAR. [docs/plan.md](docs/plan.md) has the order. Sources that bar commercial use, such as IOC's sea level monitoring facility, parts of GESLA and the Canadian Hydrographic Service, aren't in the public data, and neither is the University of Hawaii Sea Level Center (UHSLC) until it confirms commercial redistribution.
 
 ## Getting the data
 

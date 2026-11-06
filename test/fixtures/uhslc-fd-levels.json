@@ -1,0 +1,15 @@
+{
+  "table": {
+    "columnNames": ["time", "sea_level", "quality", "reference_datum"],
+    "columnTypes": ["String", "short", "short", "String"],
+    "columnUnits": ["UTC", "millimeters", null, null],
+    "rows": [
+      ["2021-12-31T21:00:00Z", 510, 4, "station zero"],
+      ["2021-12-31T22:00:00Z", 615, 4, "station zero"],
+      ["2021-12-31T23:00:00Z", 809, 4, "station zero"],
+      ["2022-01-01T00:00:00Z", 1082, 3, "station zero"],
+      ["2022-01-01T01:00:00Z", 1325, 3, "station zero"],
+      ["2022-01-01T02:00:00Z", 1519, 3, "station zero"]
+    ]
+  }
+}

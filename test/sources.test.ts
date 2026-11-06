@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
-import { Blocked, fetchText, setTransport } from "../src/http.ts";
+import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import * as uhslc from "../src/sources/uhslc/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
@@ -2042,6 +2043,254 @@ describe("usgs", () => {
     await assert.rejects(
       async () => usgs.source.observations!(station as never, new Date(0), new Date(1)),
       /is in NAVD88; its USGS series is in GAGE/,
+    );
+  });
+});
+
+describe("uhslc", () => {
+  uhslc.pacing.requestMs = 0;
+
+  it("lists each FD series with its latest RQ version, and the other versions apart", async () => {
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, fixture("uhslc-rq-spans.json")],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    const stations = await uhslc.stations();
+    assert.deepEqual(
+      stations.map((s) => [s.id, s.version, s.reference, s.record_start, s.record_end]),
+      [
+        // Pohnpei's FD series carries version C; A and B have benchmarks of their own.
+        ["uhslc/001", "C", { id: "C", since: "2001-12-16" }, "2001-12-17", null],
+        ["uhslc/001a", "A", undefined, "1969-05-09", "1971-02-27"],
+        ["uhslc/001b", "B", undefined, "1974-04-22", "2004-12-31"],
+        // Abidjan has no FD series, so its one version stands alone.
+        ["uhslc/230a", "A", undefined, "1982-01-01", "1988-12-31"],
+        ["uhslc/329", "B", { id: "B", since: "1985-12-31" }, "1986-01-01", null],
+        ["uhslc/329a", "A", undefined, "1962-01-01", "1985-12-30"],
+        // Durban (181) is SANHO's, so it isn't listed.
+      ],
+    );
+    const pohnpei = stations[0]!;
+    assert.deepEqual(pohnpei.same_as, ["uhslc/001a", "uhslc/001b"]);
+    assert.equal(pohnpei.country_code, "FM");
+    assert.equal(stations.find((s) => s.id === "uhslc/230a")!.country_code, "CI");
+    assert.equal(stations.find((s) => s.id === "uhslc/329")!.country_code, "HK");
+    // Longitudes come as 0 to 360.
+    assert.equal(stations.find((s) => s.id === "uhslc/230a")!.lon < 0, true);
+    assert.equal(pohnpei.commercial_use, false);
+  });
+
+  it("reads millimeters as meters, RQ as good and FD as preliminary, skipping missing values", async () => {
+    const urls: string[] = [];
+    setTransport(async (url) => {
+      urls.push(decodeURIComponent(url));
+      return fixture("uhslc-fd-levels.json");
+    });
+    const levels = await uhslc.levels(
+      "001",
+      new Date("2021-12-31T21:00:00Z"),
+      new Date("2022-01-01T03:00:00Z"),
+    );
+    assert.deepEqual(urls, [
+      "https://uhslc.soest.hawaii.edu/erddap/tabledap/global_hourly_fast.json?time,sea_level,quality,reference_datum&uhslc_id=1&time>=2021-12-31T21:00:00.000Z&time<2022-01-01T00:00:00.000Z",
+      "https://uhslc.soest.hawaii.edu/erddap/tabledap/global_hourly_fast.json?time,sea_level,quality,reference_datum&uhslc_id=1&time>=2022-01-01T00:00:00.000Z&time<2022-01-01T03:00:00.000Z",
+    ]);
+    const first = levels.slice(0, levels.length / 2);
+    assert.deepEqual(first.at(0), {
+      time: Date.parse("2021-12-31T21:00:00Z"),
+      level: 0.51,
+      flag: Flag.good,
+    });
+    assert.deepEqual(first.at(-1), {
+      time: Date.parse("2022-01-01T02:00:00Z"),
+      level: 1.519,
+      flag: Flag.preliminary,
+    });
+  });
+
+  it("moves Hong Kong's times an hour later, asking for the hour before", async () => {
+    const urls: string[] = [];
+    setTransport(async (url) => {
+      urls.push(decodeURIComponent(url));
+      return JSON.stringify({
+        table: {
+          columnNames: ["time", "sea_level", "quality", "reference_datum"],
+          rows: [
+            ["2024-12-31T23:00:00Z", null, 4, "station zero"],
+            ["2025-01-01T00:00:00Z", 1080, 4, "station zero"],
+          ],
+        },
+      });
+    });
+    const levels = await uhslc.levels(
+      "329b",
+      new Date("2025-01-01T00:00:00Z"),
+      new Date("2025-01-01T02:00:00Z"),
+    );
+    assert.match(
+      urls[0]!,
+      /global_hourly_rqds.*version="B"&time>=2024-12-31T23:00:00.000Z&time<2025-01-01T01:00/,
+    );
+    assert.deepEqual(levels, [
+      { time: Date.parse("2025-01-01T01:00:00Z"), level: 1.08, flag: Flag.good },
+    ]);
+  });
+
+  it("asks only for the years a version has, and reads ERDDAP's 404 as no values", async () => {
+    const urls: string[] = [];
+    setTransport(async (url) => {
+      urls.push(url);
+      throw new HttpError(
+        `GET ${url} returned 404`,
+        'Error {\n    code=404;\n    message="Not Found: Your query produced no matching results. (nothing)";\n}\n',
+      );
+    });
+    const levels = await uhslc.levels("230a", new Date("1970-01-01Z"), new Date("2000-01-01Z"), {
+      record_start: "1982-01-01",
+      record_end: "1988-12-31",
+    });
+    assert.deepEqual(levels, []);
+    // 1981's last month through 1989's first.
+    assert.equal(urls.length, 9);
+  });
+
+  it("fails on any other 404, such as a renamed dataset", async () => {
+    setTransport(async (url) => {
+      throw new HttpError(`GET ${url} returned 404`, "<html>Not Found</html>");
+    });
+    await assert.rejects(
+      uhslc.levels("001", new Date("2020-01-01Z"), new Date("2020-01-02Z")),
+      /returned 404/,
+    );
+  });
+
+  it("refuses a list without record spans", async () => {
+    const empty = JSON.stringify({ table: { columnNames: ["uhslc_id", "time"], rows: [] } });
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, empty],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    await assert.rejects(uhslc.stations(), /research-quality stations and record spans disagree/);
+  });
+
+  it("waits for a version the daily set doesn't have yet", async () => {
+    const spans = JSON.parse(fixture("uhslc-rq-spans.json"));
+    // Drop Pohnpei version C's span.
+    spans.table.rows = spans.table.rows.filter((r: unknown[]) => !(r[0] === 1 && r[1] === "C"));
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, JSON.stringify(spans)],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    await assert.rejects(uhslc.stations(), /research-quality stations and record spans disagree/);
+  });
+
+  it("ends an FD series that stopped over a year ago, and labels another reference", async () => {
+    const fd = JSON.parse(fixture("uhslc-fd-stations.json"));
+    fd.table.rows.find((r: unknown[]) => r[0] === 329)[6] = "chart datum";
+    const spans = JSON.parse(fixture("uhslc-fd-spans.json"));
+    spans.table.rows.find((r: unknown[]) => r[0] === 1 && r[1] === "2026-09-30T12:00:00Z")[1] =
+      "2018-11-25T12:00:00Z";
+    // A daily-only record, as UHSLC has, isn't a partial list.
+    const rqSpans = JSON.parse(fixture("uhslc-rq-spans.json"));
+    rqSpans.table.rows.push([391, "A", "1990-01-01T12:00:00Z"], [391, "A", "1991-01-01T12:00:00Z"]);
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, JSON.stringify(fd)],
+      [/global_daily_rqds\.json/, JSON.stringify(rqSpans)],
+      [/global_daily_fast\.json/, JSON.stringify(spans)],
+    ]);
+    const stations = await uhslc.stations();
+    assert.equal(stations.find((s) => s.id === "uhslc/001")!.record_end, "2018-11-25");
+    assert.equal(stations.find((s) => s.id === "uhslc/329")!.datum, "chart datum");
+  });
+
+  it("caches only a version's values, never the FD series's", async () => {
+    const kept: Record<string, boolean> = {};
+    const text = JSON.stringify({
+      table: {
+        columnNames: ["time", "sea_level", "quality", "reference_datum"],
+        rows: [["2020-12-31T23:00:00Z", 1, 4, "station zero"]],
+      },
+    });
+    setTransport(async (url, options) => {
+      kept[/version/.test(decodeURIComponent(url)) ? "version" : "fd"] = options.keep!(text);
+      return text;
+    });
+    const year = [new Date("2020-01-01Z"), new Date("2021-01-01Z")] as const;
+    await uhslc.levels("001", ...year);
+    await uhslc.levels("001b", ...year);
+    assert.deepEqual(kept, { fd: false, version: true });
+  });
+
+  it("caches a version's last year, cut at its last day, once it's all RQ", async () => {
+    let keep: ((text: string) => boolean) | undefined;
+    let asked = "";
+    setTransport(async (url, options) => {
+      asked = decodeURIComponent(url);
+      keep = options.keep;
+      return "{}";
+    });
+    await uhslc
+      .levels("001a", new Date("1971-01-01Z"), new Date("1972-01-01Z"), {
+        record_start: "1969-05-09",
+        record_end: "1971-02-27",
+      })
+      .catch(() => {});
+    // The cut is in the URL, so a release that extends the version is fetched anew.
+    assert.match(asked, /time<1971-03-30T00:00:00.000Z/);
+    const text = JSON.stringify({
+      table: {
+        columnNames: ["time", "sea_level", "quality"],
+        rows: [["1971-02-28T07:00:00Z", 1, 4]],
+      },
+    });
+    assert.equal(keep!(text), true);
+  });
+
+  it("reads levels in the station's own label, so a person's decision can let them through", async () => {
+    setTransport(async () =>
+      JSON.stringify({
+        table: {
+          columnNames: ["time", "sea_level", "quality", "reference_datum"],
+          rows: [["2020-01-01T00:00:00Z", 1, 4, "chart datum"]],
+        },
+      }),
+    );
+    const levels = await uhslc.levels("001", new Date("2020-01-01Z"), new Date("2020-01-02Z"), {
+      datum: "chart datum",
+    });
+    assert.equal(levels.length, 1);
+  });
+
+  it("caches a range only when it's all RQ and runs to its last hour", () => {
+    const end = Date.parse("2021-01-01T00:00:00Z");
+    const table = (rows: (string | number)[][]) =>
+      JSON.stringify({ table: { columnNames: ["time", "sea_level", "quality"], rows } });
+    assert.equal(uhslc.final(table([["2020-12-31T23:00:00Z", 1, 4]]), end), true);
+    // FD values change.
+    assert.equal(uhslc.final(table([["2020-12-31T23:00:00Z", 1, 3]]), end), false);
+    // RQ that stops in September may be extended by the next release.
+    assert.equal(uhslc.final(table([["2020-09-30T23:00:00Z", 1, 4]]), end), false);
+  });
+
+  it("refuses levels from another reference", async () => {
+    setTransport(async () =>
+      JSON.stringify({
+        table: {
+          columnNames: ["time", "sea_level", "quality", "reference_datum"],
+          rows: [["2020-01-01T00:00:00Z", 1, 4, "chart datum"]],
+        },
+      }),
+    );
+    await assert.rejects(
+      uhslc.levels("001", new Date("2020-01-01Z"), new Date("2020-01-02Z")),
+      /chart datum/,
     );
   });
 });
