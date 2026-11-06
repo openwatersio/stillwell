@@ -1,4 +1,4 @@
-import { getJson } from "../../http.ts";
+import { Blocked, getJson } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -329,9 +329,10 @@ async function rowsOf(product: string, id: string, from: Date, to: Date): Promis
     // end_date is inclusive and to the minute: the last whole minute before `to`.
     end_date: stamp(new Date(Math.ceil(to.getTime() / MINUTE_MS) * MINUTE_MS - MINUTE_MS)),
   });
-  const body = await getJson<{ data?: Row[]; error?: { message: string } }>(`${DATA}?${params}`, {
-    fresh: fresh(to),
-  });
+  const body = await dataOf<{ data?: Row[]; error?: { message: string } }>(
+    `${DATA}?${params}`,
+    fresh(to),
+  );
   if (body.error) {
     if (/No data was found/i.test(body.error.message)) return [];
     throw new Error(`CO-OPS ${product} ${id}: ${body.error.message.trim()}`);
@@ -444,15 +445,31 @@ function fresh(end: Date): boolean {
 }
 
 /**
- * The metadata API blocks a client for a few minutes once it passes a rate
- * limit, answering 403 ForbiddenException from its AWS gateway. So its requests
- * start at least a second apart, and a 403 waits for the block to lift before
- * trying again. The data API has shown no such limit. Tests shrink the waits.
+ * Both APIs block a client for a few minutes once it passes a rate limit,
+ * answering 403 from their gateway: the data API did after about 16 seconds of
+ * a backfill asking for four stations' months at once with no pause. So
+ * metadata requests start at least a second apart, data requests `dataMs`
+ * apart. A metadata 403 waits `blockedMs`, then twice that. A data 403 holds
+ * every data request for `blockedMs`, the next for twice that, and a third
+ * hold in a row throws `Blocked`: every data request
+ * after it fails at once without going out, for the life of the process, so a
+ * run stops instead of sending thousands of requests into the block. (A
+ * long-lived Worker would need the block to expire.) Tests shrink the waits.
  */
-export const pacing = { metadataMs: 1000, blockedMs: 150_000, refreshBudgetMs: 120 * 60_000 };
+export const pacing = {
+  metadataMs: 1000,
+  dataMs: 1000,
+  blockedMs: 150_000,
+  refreshBudgetMs: 120 * 60_000,
+};
 let metadataQueue: Promise<unknown> = Promise.resolve();
 let lastMetadata = 0;
 
+/**
+ * Metadata requests go one at a time. A station refresh skips a station whose
+ * request still fails and stops on its own after several in a row, so a 403
+ * here fails only its request.
+ */
 function metadataOf<T>(path: string, fresh = false): Promise<T> {
   const next = metadataQueue.then(async () => {
     for (let attempt = 1; ; attempt++) {
@@ -468,6 +485,83 @@ function metadataOf<T>(path: string, fresh = false): Promise<T> {
   });
   metadataQueue = next.catch(() => undefined);
   return next as Promise<T>;
+}
+
+let blocked: Blocked | undefined;
+let nextData = 0;
+let dataHeldUntil = 0;
+// Holds in a row, and which one is current: a request knows the hold that was
+// current when it went out.
+let dataHolds = 0;
+let holdGeneration = 0;
+
+/**
+ * Holds each data request that goes out to its slot, `dataMs` after the last
+ * one's. One that wakes inside a hold a 403 started since it took its slot
+ * takes a new slot after the hold.
+ */
+async function paceData(): Promise<void> {
+  do {
+    if (blocked) throw blocked;
+    const now = Date.now();
+    const slot = Math.max(now, nextData, dataHeldUntil);
+    nextData = slot + pacing.dataMs;
+    await sleep(slot - now);
+  } while (Date.now() < dataHeldUntil);
+  if (blocked) throw blocked;
+}
+
+/**
+ * Only answers that went over the network count, never cache hits, and only
+ * for requests that went out after the current hold began: a 403 for one sent
+ * before it is the same block, and a 200 for one is no sign it has lifted. An
+ * answer resets the count. Only a request's first try starts a hold; its
+ * retries wait out the current one and then fail that request alone. So a URL
+ * CO-OPS refuses on its own costs one hold, and a block stops the run once
+ * three requests in turn, each after the last one's hold, are refused.
+ */
+async function dataOf<T>(url: string, fresh: boolean): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    if (blocked) throw blocked;
+    let sent: number | undefined;
+    const pace = async () => {
+      await paceData();
+      sent = holdGeneration;
+    };
+    try {
+      const body = await getJson<T>(url, { fresh, pace });
+      if (sent === holdGeneration) dataHolds = 0;
+      return body;
+    } catch (error) {
+      if (error instanceof Blocked || !String(error).includes("returned 403")) throw error;
+      // Only a first try starts a hold, so a URL refused on its own costs one
+      // hold, and a block is known by different requests refused in turn.
+      if (attempt === 1 && sent === holdGeneration) {
+        if (dataHolds + 1 >= 3) throw block(error);
+        dataHolds++;
+        holdGeneration++;
+        dataHeldUntil = Date.now() + pacing.blockedMs * dataHolds;
+      } else if (attempt >= 3) throw error;
+      await sleep(dataHeldUntil - Date.now());
+    }
+  }
+}
+
+function block(error: unknown): Blocked {
+  blocked ??= new Blocked(
+    `CO-OPS's data API is still refusing requests after ${(3 * pacing.blockedMs) / 60_000} minutes of waiting (${error instanceof Error ? error.message : error}); stopping`,
+  );
+  return blocked;
+}
+
+/** For tests: forget a block and the pacing state. */
+export function resetPacing(): void {
+  blocked = undefined;
+  nextData = 0;
+  dataHeldUntil = 0;
+  dataHolds = 0;
+  holdGeneration = 0;
+  lastMetadata = 0;
 }
 
 function sleep(ms: number): Promise<void> {
