@@ -150,8 +150,11 @@ export interface SourceMetadata {
    * `current` when the source serves past values measured from each station's
    * current reference, as PEGELONLINE's raw-data download does, so a backfill
    * can reach back before the date the source gives that reference.
+   * `previous` when it serves past values in the reference of their time, as
+   * RWS does across the 2005 NAP revision, so those before the reference's
+   * start go to an epoch of their own, which backfill fills too.
    */
-  archive?: "current";
+  archive?: "current" | "previous";
   /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
   qc?: QcOptions;
   /**

@@ -1,5 +1,6 @@
+import { currentEpoch } from "./epochs.ts";
 import { listYears, readYearFiles, type YearFile } from "./lake/parquet.ts";
-import type { Station } from "./schema.ts";
+import type { Epoch, SourceMetadata, Station } from "./schema.ts";
 
 const DAY_MS = 86_400_000;
 
@@ -217,4 +218,42 @@ export function* years(start: Date, end: Date): Generator<[Date, Date]> {
     yield [new Date(t), new Date(Math.min(next, end.getTime()))];
     t = next;
   }
+}
+
+/**
+ * The epochs a backfill over [start, end) writes, each with the part of the
+ * range in its span: the current one, never before its start, since earlier
+ * values are in another reference. An `archive: "previous"` source serves past
+ * values in the reference of their time, so its current epoch also never
+ * starts before the reference it names, which a station with more than one
+ * epoch records without a split; and each closed epoch under the same label,
+ * as a split leaves, gets its own span. A closed epoch under another label
+ * isn't, since the source serves only the station's current one.
+ */
+export function epochSpans(
+  epochs: Epoch[],
+  start: Date,
+  end: Date,
+  archive: SourceMetadata["archive"],
+): { epoch: Epoch; from: Date; to: Date }[] {
+  const current = currentEpoch(epochs);
+  const at = (iso: string | null, fallback: number) => (iso === null ? fallback : Date.parse(iso));
+  const previous = archive === "previous";
+  const currentStart = Math.max(
+    at(current.since, -Infinity),
+    previous ? at(current.reference_since, -Infinity) : -Infinity,
+  );
+  return epochs
+    .filter((e) => e === current || (previous && e.state === "closed" && e.datum === current.datum))
+    .map((epoch) => {
+      const from = epoch === current ? currentStart : at(epoch.since, -Infinity);
+      // A closed epoch never reaches into the current one's span, whatever its own says.
+      const to = epoch === current ? Infinity : Math.min(at(epoch.until, Infinity), currentStart);
+      return {
+        epoch,
+        from: new Date(Math.max(start.getTime(), from)),
+        to: new Date(Math.min(end.getTime(), to)),
+      };
+    })
+    .filter(({ from, to }) => from < to);
 }

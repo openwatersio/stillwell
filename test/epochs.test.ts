@@ -471,3 +471,44 @@ describe("recentWindow", () => {
     assert.equal(recentWindow([epoch()], [], 0, 5).from, 5);
   });
 });
+
+describe("an archive in the reference of its time", () => {
+  const nap = { datum: "NAP", datums: {}, reference: { id: "NAP 2005", since: "2005-01-01" } };
+  const opts = options({ station: "rws/a", archive: "previous" });
+
+  it("splits a station's only epoch where the reference starts, once", () => {
+    const first = nextEpochs([epoch({ datum: "NAP" })], nap, opts);
+    assert.equal(first.event, "opened");
+    assert.deepEqual(
+      first.epochs.map((e) => [e.id, e.since, e.until, e.state, e.reference, e.to_current]),
+      [
+        // The old NAP converts to today's only by a person's decision.
+        [1, null, "2005-01-01T00:00:00Z", "closed", null, null],
+        [2, "2005-01-01T00:00:00Z", null, "open", "NAP 2005", 0],
+      ],
+    );
+    const again = nextEpochs(first.epochs, nap, opts);
+    assert.equal(again.event, null);
+    assert.equal(again.epochs.length, 2);
+  });
+
+  it("only records the reference for a source whose archive is in today's reference", () => {
+    const { epochs, event } = nextEpochs([epoch({ datum: "NAP" })], nap, options());
+    assert.equal(event, null);
+    assert.deepEqual(
+      epochs.map((e) => [e.since, e.reference]),
+      [[null, "NAP 2005"]],
+    );
+  });
+
+  it("gives a new station both epochs", () => {
+    const epochs = firstEpochs(nap, { ...opts, nextId: 3 });
+    assert.deepEqual(
+      epochs.map((e) => [e.id, e.since, e.until, e.state, e.to_current]),
+      [
+        [3, null, "2005-01-01T00:00:00Z", "closed", null],
+        [4, "2005-01-01T00:00:00Z", null, "open", 0],
+      ],
+    );
+  });
+});

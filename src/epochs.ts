@@ -90,8 +90,12 @@ export interface EpochOptions {
   decisions: Record<string, EpochDecision>;
   /** The lowest `id` a new epoch may take, above any epoch directory in the lake. */
   nextId?: number;
-  /** The source's `archive`: `current` gives a first epoch no start, since its history comes in its reference. */
-  archive?: "current";
+  /**
+   * The source's `archive`: `current` gives a first epoch no start, since its
+   * history comes in its reference; `previous` gives the history before a
+   * reference's start an epoch of its own, since it comes in the reference of its time.
+   */
+  archive?: "current" | "previous";
 }
 
 export type EpochEvent = "opened" | "held" | "waiting" | "ignored" | "rejected" | "confirmed";
@@ -103,9 +107,12 @@ export type EpochEvent = "opened" | "held" | "waiting" | "ignored" | "rejected" 
 export function firstEpochs(fetched: Fetched & { datum: string }, options: EpochOptions): Epoch[] {
   const start = fetched.reference?.since;
   const since = start ? iso(dayStart(start, options.offsets)) : null;
+  const id = Math.max(1, options.nextId ?? 1);
+  if (options.archive === "previous" && since && Date.parse(since) <= Date.parse(options.now))
+    return withToCurrent(splitAt(before(id, fetched.datum), since, fetched, options), options);
   return [
     {
-      id: Math.max(1, options.nextId ?? 1),
+      id,
       datum: fetched.datum,
       // A zero dated ahead isn't today's yet, so the values until then are on another.
       since:
@@ -124,6 +131,50 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
   ];
 }
 
+/** An epoch with no start, before any reference the source names. */
+function before(id: number, datum: string): Epoch {
+  return {
+    id,
+    datum,
+    since: null,
+    until: null,
+    seen: null,
+    reference: null,
+    reference_since: null,
+    datums: {},
+    to_current: 0,
+    state: "open",
+  };
+}
+
+/**
+ * For an `archive: "previous"` source: close `first` at `since`, where the
+ * reference the source names starts, and open an epoch from there. Both keep
+ * the label, so the earlier one converts only by a person's decision.
+ */
+function splitAt(
+  first: Epoch,
+  since: string,
+  fetched: Fetched & { datum: string },
+  options: EpochOptions,
+): Epoch[] {
+  return [
+    { ...first, until: since, state: "closed" },
+    {
+      id: first.id + 1,
+      datum: fetched.datum,
+      since,
+      until: null,
+      seen: options.now,
+      reference: fetched.reference?.id ?? null,
+      reference_since: since,
+      datums: fetched.sent ?? fetched.datums,
+      to_current: 0,
+      state: "open",
+    },
+  ];
+}
+
 /**
  * A station's epochs after a refresh: the current one carried forward, or a
  * new one opened, held or suppressed when the source reports another
@@ -133,9 +184,16 @@ export function nextEpochs(
   previous: Epoch[],
   fetched: Fetched,
   options: EpochOptions,
-): { epochs: Epoch[]; event: EpochEvent | null; reason?: string } {
+): {
+  epochs: Epoch[];
+  event: EpochEvent | null;
+  reason?: string;
+  /** The epoch a person would decide on, when it isn't the held or newest one. */
+  decide?: Epoch;
+} {
   const epochs = previous.map((e) => ({ ...e, datums: { ...e.datums } }));
   let reason: string | undefined;
+  let decide: Epoch | undefined;
   // A rejection goes first, so a fix that lands with it isn't read as a change back.
   let event: EpochEvent | null = applyDecisions(epochs, options);
   const current = currentEpoch(epochs);
@@ -157,8 +215,31 @@ export function nextEpochs(
 
   // A reference first seen with a date ahead isn't recorded until its day, so it opens an epoch then.
   const ahead = refStart !== null && refStart > Date.parse(options.now);
+  // An `archive: "previous"` source's history before the reference is in the
+  // reference of its time, so the first sighting splits the station's only epoch there.
+  const split =
+    options.archive === "previous" &&
+    refStart !== null &&
+    !ahead &&
+    !labelChanged &&
+    epochs.length === 1 &&
+    current.since === null &&
+    current.reference === null;
 
-  if (!labelChanged && !refChanged) {
+  if (split) {
+    const next = Math.max(current.id, (options.nextId ?? 1) - 1);
+    const [closed, opened] = splitAt(
+      current,
+      iso(refStart),
+      { ...fetched, datum: current.datum },
+      options,
+    );
+    epochs.splice(0, 1, closed!, { ...opened!, id: next + 1 });
+    event = "opened";
+    reason = `values before ${iso(refStart)} are in the reference before ${ref!.id}`;
+    // A person's decision converts the earlier epoch, not the new one.
+    decide = closed;
+  } else if (!labelChanged && !refChanged) {
     // The first refresh to see a reference records it, rather than call it a change.
     if (ref && current.reference === null && !ahead) {
       current.reference = ref.id;
@@ -260,7 +341,7 @@ export function nextEpochs(
     event = "waiting";
     reason = "waiting for a decision in the source's overrides";
   }
-  return { epochs: withToCurrent(epochs, options), event, reason };
+  return { epochs: withToCurrent(epochs, options), event, reason, decide };
 }
 
 /**

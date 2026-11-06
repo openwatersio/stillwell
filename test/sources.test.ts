@@ -45,6 +45,114 @@ describe("rws", () => {
       ],
     );
   });
+
+  /** One series per channel, each given as [time, value] pairs. */
+  const answer = (...channels: [Record<string, unknown>, [string, number | string][]][]) =>
+    JSON.stringify({
+      Succesvol: true,
+      WaarnemingenLijst: channels.map(([aquo, values]) => ({
+        Locatie: { Code: "x" },
+        AquoMetadata: { Eenheid: { Code: "cm" }, ...aquo },
+        MetingenLijst: values.map(([time, value]) => ({
+          Tijdstip: time,
+          Meetwaarde:
+            typeof value === "number"
+              ? { Waarde_Numeriek: value }
+              : { Waarde_Alfanumeriek: value, Waarde_Numeriek: 0 },
+          WaarnemingMetadata: { Statuswaarde: "Gecontroleerd", Kwaliteitswaardecode: "00" },
+        })),
+      })),
+    });
+  const nap = { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: "NAP" } };
+  const typeChannel = {
+    Grootheid: { Code: "NVT" },
+    Hoedanigheid: { Code: "NVT" },
+    Groepering: { Code: "GETETM2" },
+    Typering: { Code: "GETETTPE" },
+  };
+
+  it("puts observed values from before 2005 on the revised NAP where PSMSL gives the offset", async () => {
+    // The revision starts at UTC midnight, so old-NAP epochs line up with year files.
+    const times = ["2005-01-01T00:50:00.000+01:00", "2005-01-01T01:00:00.000+01:00"];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, times.map((t) => [t, "laagwater"])],
+          [nap, times.map((t) => [t, 100])],
+        ),
+      ],
+    ]);
+    const range = [new Date("2004-12-31T00:00:00Z"), new Date("2005-01-02T00:00:00Z")] as const;
+    // Hoek van Holland reads 2.8 cm lower on the revised NAP.
+    for (const get of [rws.levels, rws.extremes])
+      assert.deepEqual(
+        (await get("hoekvanholland", ...range)).map((l) => l.level),
+        [0.972, 1],
+      );
+    // The astronomical tide is left as RWS serves it.
+    assert.deepEqual(
+      (await rws.levels("hoekvanholland", ...range, { process: "astronomisch" })).map(
+        (l) => l.level,
+      ),
+      [1, 1],
+    );
+    // A gauge without an offset is served as RWS gives it, for its old-NAP epoch.
+    assert.deepEqual(
+      (await rws.levels("dordrecht", ...range)).map((l) => l.level),
+      [1, 1],
+    );
+  });
+
+  it("reads both lows of a double low water, and not the rise between them", async () => {
+    const times = [
+      "2024-01-01T02:00:00+01:00",
+      "2024-01-01T08:00:00+01:00",
+      "2024-01-01T09:00:00+01:00",
+      "2024-01-01T10:00:00+01:00",
+    ];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            {
+              Grootheid: { Code: "NVT" },
+              Hoedanigheid: { Code: "NVT" },
+              Typering: { Code: "GETETTPE" },
+            },
+            times.map((t, i) => [t, ["hoogwater", "laagwater 1", "topagger", "laagwater 2"][i]!]),
+          ],
+          [nap, times.map((t, i) => [t, [199, -40, -20, -45][i]!])],
+        ),
+      ],
+    ]);
+    const extremes = await rws.extremes(
+      "hoekvanholland",
+      new Date("2024-01-01T00:00:00Z"),
+      new Date("2024-01-02T00:00:00Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [e.type, e.level]),
+      [
+        ["high", 1.99],
+        ["low", -0.4],
+        ["low", -0.45],
+      ],
+    );
+  });
+
+  it("fails on an extreme type it doesn't know rather than drop it", async () => {
+    const time = "2024-01-01T02:00:00+01:00";
+    serve([
+      [/OphalenWaarnemingen/, answer([typeChannel, [[time, "hoogwater 1"]]], [nap, [[time, 199]]])],
+    ]);
+    const range = [new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
+    await assert.rejects(
+      rws.extremes("hoekvanholland", ...range),
+      /unknown extreme type hoogwater 1/,
+    );
+  });
 });
 
 describe("rws stations", () => {
@@ -66,6 +174,12 @@ describe("rws stations", () => {
         ["rws/k13a", "MSL", ["levels"], "NL"],
         ["rws/kralendijk", "NAP", ["levels"], "BQ"],
       ],
+    );
+    // Dutch NAP stations without an offset have their history before 2005 in
+    // the old NAP; MSL and Bonaire's NAP never changed.
+    assert.deepEqual(
+      stations.map((s) => s.reference),
+      [null, rws.REVISED_NAP, null, null],
     );
   });
 

@@ -65,6 +65,22 @@ const options = {
 };
 
 describe("mergeStationList", () => {
+  it("names the earlier epoch as the one to decide on when a station's history splits", () => {
+    const listed: ListedStation = {
+      ...station("a"),
+      reference: { id: "NAP 2005", since: "2005-01-01" },
+    };
+    const { changes } = mergeStationList([held("a")], [listed], {
+      ...options,
+      archive: "previous",
+    });
+    // A to_current under this key converts the old-NAP epoch.
+    assert.deepEqual(
+      changes.map((c) => [c.event, c.key]),
+      [["opened", "rws/a start"]],
+    );
+  });
+
   it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
     const previous = [held("a", { tide_station: "ticon/a" }), held("b")];
     const { stations } = mergeStationList(previous, [station("a")], options);
