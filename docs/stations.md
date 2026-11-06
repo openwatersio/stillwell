@@ -2,7 +2,6 @@
 
 **Status: built and switched on.** This replaced the station lists once committed to the repo, and the rule that a station has one datum for its whole record. On 2026-11-05 the R2 lake was seeded from the last committed lists (19,809 stations), and the published `stations.parquet` matched one built from them, as did every station's own fields in each list's `extra` (USACE `series` and `zero_since`, CO-OPS `established` and `removed`, USGS series). Not built yet:
 
-- compaction's `stations/bounds/<source>.parquet`: `compact` folds `recent` rows into their epoch's files, but doesn't write the bounds yet;
 - a `restore` command for a list snapshot;
 - `tide_station` and series pins in `overrides`, which so far holds epoch decisions only, and no adapter has one yet: the first decision adds `overrides` to its `Source`;
 - readers outside this repo (tide-database, crowd-depth) reading `epochs`.
@@ -178,9 +177,9 @@ The R2 lake was seeded once from the committed lists, with a command since remov
 - `scripts/ingest.ts`: `stations`, `backfill` and `recent` read the lists from the lake, write the current epoch, and skip held stations.
 - `Source.overrides` (`src/schema.ts`): a person's decisions on a source's epochs, keyed by station and epoch start. Each epoch event in the report prints the key.
 - Adapters: PEGELONLINE reports `gaugeZero.validFrom` and USACE its `zeros.ts` dates as each station's `reference`; USGS says through `seriesChanged` when a station's series or gage zero moved.
-- `src/lake/recent.ts`: `recent` and `compact`. Compaction folds each `recent` row into its own epoch's year file, in that epoch's datum, and fails a row whose epoch the list doesn't have.
+- `src/lake/recent.ts`: `recent` and `compact`. Compaction folds each `recent` row into its own epoch's year file, in that epoch's datum, and fails a row whose epoch the list doesn't have. Then it writes the source's bounds, each station's first and last level over the rows its epochs count (`updateBounds`). A listing of the source's files gives each station's first and last year. Those years' spans come from the files compaction just folded, or from the bound already known when it's in that year and the year is before last year, or else from reading the files; an end year with no counted rows moves the end a year inward. So a backfill of earlier years, or of any end year from last year on, is seen. A backfill within an older end year isn't, nor are rows an epoch's widened span takes in, such as after a rejection; `compact --rebuild-bounds` reads every station again.
 
-Still to come: the bounds compaction writes to `stations/bounds/`; and a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
+Still to come: a `restore` command. Readers outside this repo that read series paths directly, tide-database and crowd-depth, need to read `epochs`, or they stop at epoch 1.
 
 ## What this gives up
 

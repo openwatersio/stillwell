@@ -523,6 +523,60 @@ export async function readStationBounds(
   );
 }
 
+/** A source's bounds, `stations/bounds/<source>.parquet`: `id`, `first` and `last`, sorted by ID. */
+export async function writeStationBounds(
+  path: string,
+  bounds: { id: string; first: string; last: string }[],
+): Promise<void> {
+  const columns = { id: "VARCHAR", first: "TIMESTAMPTZ", last: "TIMESTAMPTZ" };
+  await viaJson(
+    path,
+    bounds,
+    `SELECT id, first, last FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
+    "FORMAT parquet, COMPRESSION zstd",
+  );
+}
+
+/** The files a glob matches, local or remote; none when its directory doesn't exist. */
+export function listFiles(pattern: string): Promise<string[]> {
+  return serial(async () => {
+    const db = await connection();
+    const reader = await db.runAndReadAll(`SELECT file FROM glob(${quote(pattern)})`);
+    return reader.getRowObjects().map((r) => String(r.file));
+  });
+}
+
+/**
+ * Each series file's earliest and latest `time` inside its `window`, `[from,
+ * until)` in milliseconds, by its path as given; a file with none there has no entry.
+ */
+export async function readTimeBounds(
+  files: { file: string; window: [number, number] }[],
+): Promise<Map<string, [number, number]>> {
+  if (!files.length) return new Map();
+  // Infinity isn't SQL; these are past any time a level has.
+  const ms = (t: number) => String(Math.max(-8.64e15, Math.min(8.64e15, t)));
+  const windows = files
+    .map((f) => `(${quote(f.file)}, ${ms(f.window[0])}, ${ms(f.window[1])})`)
+    .join(", ");
+  const inside = "epoch_ms(p.time) >= w.lo AND epoch_ms(p.time) < w.hi";
+  const rows = await serial(async () => {
+    const db = await connection();
+    const reader = await db.runAndReadAll(
+      `SELECT p.filename, count(w.path) AS asked, epoch_ms(min(p.time) FILTER (WHERE ${inside})) AS first, epoch_ms(max(p.time) FILTER (WHERE ${inside})) AS last FROM read_parquet([${files.map((f) => quote(f.file)).join(", ")}], filename = true) p LEFT JOIN (VALUES ${windows}) w(path, lo, hi) ON p.filename = w.path GROUP BY p.filename`,
+    );
+    return reader.getRowObjects();
+  });
+  // read_parquet globs too, so a path with a glob character can read other files.
+  const other = rows.find((r) => Number(r.asked) === 0);
+  if (other) throw new Error(`read ${String(other.filename)}, which wasn't asked for`);
+  return new Map(
+    rows
+      .filter((r) => r.first !== null)
+      .map((r) => [String(r.filename), [Number(r.first), Number(r.last)]]),
+  );
+}
+
 /** A JSON array, through DuckDB so it can go to R2 like everything else. */
 export async function writeJsonArray(path: string, rows: object[]): Promise<void> {
   await viaJson(

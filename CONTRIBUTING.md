@@ -87,6 +87,8 @@ Fold the last whole UTC days of the recent window (`--days`, 1 by default, which
 node scripts/ingest.ts compact pegelonline --days 6
 ```
 
+Then it writes each station's first and last level, over all its epochs, to `stations/bounds/<source>.parquet`, which `stations.parquet` is built from on its next rebuild. It lists the source's files under `obs/` and reads only the end years it can't take from the fold or the bounds it has; `--rebuild-bounds` reads every station's end years again, as the first run does.
+
 Both print a summary (stations updated, stale, failed and waiting on a held datum change, and values written), and add it to the workflow run's page in Actions.
 
 These environment variables choose where it writes:
