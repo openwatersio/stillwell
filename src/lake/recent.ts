@@ -1,6 +1,6 @@
 import { Blocked } from "../http.ts";
 import { qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { isHeld, recentWindow } from "../epochs.ts";
+import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import type { Epoch, LakeStation, Observation, Source, Station } from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import {
@@ -40,6 +40,8 @@ export interface RunSummary {
   failed: string[];
   /** Whether the source blocked this client partway, so the stations after it failed without asking. */
   blocked?: boolean;
+  /** Whether a station failed because its source now reports it in another datum, which a station refresh handles. */
+  datumChanged?: boolean;
   /** Stations whose values wait in the window for a person's decision on a held datum change. */
   waiting: string[];
   /** Values new to the lake. */
@@ -199,6 +201,13 @@ export async function updateRecent({
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
           if (error instanceof Blocked) summary.blocked = true;
+          // A refresh ignores a change to a datum a person rejected, so that
+          // one doesn't ask for one.
+          if (
+            error instanceof DatumChanged &&
+            !station.epochs.some((e) => e.state === "rejected" && e.datum === error.datum)
+          )
+            summary.datumChanged = true;
           failed = true;
         }
         for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });

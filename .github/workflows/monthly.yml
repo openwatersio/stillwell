@@ -1,0 +1,200 @@
+name: Monthly
+
+# On the 2nd, refresh every source's station list, datums and terms, then
+# rebuild stations.parquet and sources.json, and keep the scheduled workflows
+# enabled. On the 9th, refetch CO-OPS and USGS years that may hold values the
+# source has verified since. Ingest hourly starts a refresh of one source, at
+# most once a day, when that source reports a station in another datum.
+run-name: ${{ inputs.refetch && 'Refetch' || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
+
+# Each job waits in its source's group. GitHub keeps one job waiting per
+# group and cancels it when a newer one arrives, so a job queued behind
+# anything that outlasts the hour, a manual backfill or a long refresh, is
+# cancelled by the next hourly run. Starting at 01:30 and 03:40, after that
+# hour's run and compaction, the groups are usually free; rerun a cancelled
+# job from Actions. The refetch runs on its own day for the same reason: queued
+# behind the refreshes, it would be cancelled.
+on:
+  schedule:
+    - cron: "30 1 2 * *"
+    - cron: "40 3 9 * *"
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "Sources, separated by spaces (empty for every source)"
+        required: false
+        default: ""
+      accept_epochs:
+        description: "Pass --accept-epochs: open every datum change, after checking them"
+        type: boolean
+        default: false
+      refetch:
+        description: "Refetch CO-OPS and USGS years with unverified values, instead of refreshing lists"
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      sources: ${{ steps.plan.outputs.sources }}
+      refetch: ${{ steps.plan.outputs.refetch }}
+    steps:
+      - id: plan
+        run: |
+          set -f
+          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws usace usgs} | jq -Rnc '[inputs | select(. != "")]')
+          if [ "$REFETCH" = true ]; then
+            echo "sources=[]" >> "$GITHUB_OUTPUT"
+            echo "refetch=$(jq -c 'map(select(. == "coops" or . == "usgs"))' <<< "$sources")" >> "$GITHUB_OUTPUT"
+          else
+            echo "sources=$sources" >> "$GITHUB_OUTPUT"
+            echo "refetch=[]" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          SOURCES: ${{ inputs.sources }}
+          REFETCH: ${{ github.event.schedule == '40 3 9 * *' || inputs.refetch }}
+
+  # Each list in its source's group, the one every job that writes the source's
+  # files or list shares, so a refresh that opens a datum epoch never lands
+  # while a backfill, hourly, compaction or other refresh is writing that source.
+  lists:
+    needs: plan
+    if: needs.plan.outputs.sources != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        source: ${{ fromJSON(needs.plan.outputs.sources) }}
+    concurrency:
+      group: lake-${{ matrix.source }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    # CO-OPS's datums take up to 2 hours (refreshBudgetMs).
+    timeout-minutes: 180
+    # The environment holds the R2 credentials and only runs on main.
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # stations.parquet is rebuilt once, from every list, by the next job.
+      - run: node scripts/ingest.ts stations "$SOURCE" --no-publish ${ACCEPT_EPOCHS:+--accept-epochs}
+        env:
+          SOURCE: ${{ matrix.source }}
+          ACCEPT_EPOCHS: ${{ inputs.accept_epochs && 'yes' || '' }}
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+
+  # A source whose refresh failed kept its list, so the rest still publish.
+  publish:
+    needs: [plan, lists]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
+    # The group the Ingest workflow's `publish` runs take.
+    concurrency:
+      group: lake
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - run: node scripts/ingest.ts publish
+        env:
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+
+  # Backfill fetches again every ended year whose file holds preliminary values
+  # (yearDone in src/backfill.ts) and every part of a year still under way, so
+  # values the source has verified since replace the ones compaction wrote.
+  refetch:
+    needs: plan
+    if: needs.plan.outputs.refetch != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        source: ${{ fromJSON(needs.plan.outputs.refetch) }}
+    concurrency:
+      group: lake-${{ matrix.source }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # CO-OPS verifies a month a month or two after it ends: last year, and
+      # this year up to this month, up to about 50 requests a station at one
+      # a second, about 4 hours for 300 stations in December.
+      # USGS approves months to years later: the last two ended years, a year a
+      # request at one every 3.7 seconds, too many for one run across 11,000
+      # stations, so each month takes a twelfth of them, about 1,200 stations
+      # and 2.5 hours, and each station comes round once a year. The current year is left to compaction.
+      - run: |
+          year=$(date -u +%Y)
+          month=$(date -u +%m)
+          case "$SOURCE" in
+            coops) set -- coops all $((year - 1)) "$year-$month-01" ;;
+            usgs) set -- usgs all $((year - 2)) "$year" --shard "$((10#$month))/12" ;;
+          esac
+          node scripts/ingest.ts backfill "$@"
+        env:
+          SOURCE: ${{ matrix.source }}
+          WATER_LEVELS_LAKE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+
+  # GitHub disables a public repo's scheduled workflows after 60 days without
+  # a commit. Enabling a workflow through the API restarts that count, as the
+  # keepalive-workflow action relies on, so this monthly call keeps every
+  # schedule running, this one included, with no commits. One a maintainer
+  # turned off stays off. It needs no lake credentials or concurrency group.
+  keepalive:
+    if: github.event.schedule == '30 1 2 * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - run: |
+          # Monthly first, since it enables the rest; one failure doesn't stop the others.
+          failed=0
+          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml; do
+            if ! state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow" --jq .state); then
+              failed=1
+            elif [ "$state" = disabled_manually ]; then
+              echo "$workflow was turned off by hand; leaving it"
+            elif ! gh api --method PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/enable"; then
+              failed=1
+            fi
+          done
+          exit "$failed"
+        env:
+          GH_TOKEN: ${{ github.token }}

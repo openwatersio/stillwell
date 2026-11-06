@@ -4,6 +4,16 @@
  */
 import type { Epoch, EpochDecision } from "./schema.ts";
 
+/** A source now reports a station in a datum other than its list says; a station refresh opens the epoch. */
+export class DatumChanged extends Error {
+  /** The datum the source now reports. */
+  readonly datum: string;
+  constructor(message: string, datum: string) {
+    super(message);
+    this.datum = datum;
+  }
+}
+
 const DAY_MS = 86_400_000;
 const HOUR_MS = 3_600_000;
 /** A change this soon after the last one, or back to an earlier label, waits for a person. */

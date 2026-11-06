@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "n
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
+import { DatumChanged } from "../src/epochs.ts";
 import { Blocked, fetchText, setTransport } from "../src/http.ts";
 import { upsert } from "../src/lake/merge.ts";
 import { isMissing } from "../src/lake/parquet.ts";
@@ -107,6 +108,26 @@ describe("updateRecent", () => {
     });
     assert.equal(summary.blocked, true);
     assert.equal(summary.updated, 1);
+  });
+
+  it("says when a station failed because its source moved it to another datum", async () => {
+    const root = lake();
+    const [a, b] = [station("a"), station("b")];
+    const run = (answer: Error) =>
+      updateRecent({
+        source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: answer }),
+        stations: [a, b],
+        lakeFor: () => root,
+        since: new Date(NOW - 6 * HOUR),
+        now: NOW,
+      });
+    assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, true);
+    assert.equal((await run(new Error("timed out"))).datumChanged, undefined);
+    // A change a person rejected stays rejected, however often the list is
+    // refreshed, but a change to another datum still asks for a refresh.
+    b.epochs.push(epoch(2, "NHN", { state: "rejected" }));
+    assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, undefined);
+    assert.equal((await run(new DatumChanged("now in NN", "NN"))).datumChanged, true);
   });
 
   it("merges the fetch into the window, trims it, and stamps only new values", async () => {

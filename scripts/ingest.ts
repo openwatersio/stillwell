@@ -1,7 +1,8 @@
 /**
  * Fetch from upstream sources into the lake.
  *
- *   node scripts/ingest.ts stations [source...] [--accept-epochs]
+ *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--no-publish]
+ *   node scripts/ingest.ts publish
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
@@ -9,8 +10,8 @@
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet
- * and sources.json. It changes no file in the repo. A new source's first
- * refresh starts its list.
+ * and sources.json, unless `--no-publish`; `publish` writes only those two. It
+ * changes no file in the repo. A new source's first refresh starts its list.
  * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
  * so a rerun gives the same files. A calendar month the fetch returned nothing
@@ -133,6 +134,7 @@ const { positionals, values } = parseArgs({
     days: { type: "string", default: "1" },
     concurrency: { type: "string", default: "4" },
     "accept-epochs": { type: "boolean", default: false },
+    "no-publish": { type: "boolean", default: false },
     first: { type: "string" },
     shard: { type: "string" },
     refetch: { type: "boolean", default: false },
@@ -144,6 +146,9 @@ const [command, ...args] = positionals;
 switch (command) {
   case "stations":
     await refreshStations(args.length ? args : Object.keys(sources));
+    break;
+  case "publish":
+    for (const lake of new Set(Object.values(sources).flatMap(lakesOf))) await publish(lake);
     break;
   case "backfill": {
     const [source, ids, start, end] = args;
@@ -201,7 +206,16 @@ async function refreshStations(ids: string[]): Promise<void> {
   // The lists are written, so their report is kept even if publishing fails.
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...summary, "```", ""].join("\n"));
-  for (const lake of lakes) await publish(lake);
+  if (!values["no-publish"]) for (const lake of lakes) await publish(lake);
+}
+
+/** The lake a source's list is in, or none for a restricted source with no restricted lake configured. */
+function lakesOf(source: Source): string[] {
+  try {
+    return [lakeOfSource(source.metadata)];
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -378,6 +392,10 @@ async function recent(sourceId: string): Promise<void> {
       keepDays,
     });
   });
+  // A source now reporting a station in another datum needs a station refresh,
+  // which the Ingest hourly workflow starts.
+  const output = process.env.GITHUB_OUTPUT;
+  if (output && summary.datumChanged) await appendFile(output, "datum_changed=true\n");
   // Some stations failing or going quiet is ordinary; all of them is an outage,
   // or a broken adapter, even one that answers "no data" without an error.
   // A source that blocked this client needs a person, however many stations got through.
@@ -461,7 +479,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
   );
   process.exit(1);
 }
