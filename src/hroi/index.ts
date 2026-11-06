@@ -1,7 +1,7 @@
 import { Matrix, SingularValueDecomposition } from "ml-matrix";
 import type { EventIndex, Extreme, Sample, TransitExtreme } from "../types.ts";
 import { type PartialTide, SET_3 } from "./constituents.ts";
-import { LUNAR_DAY_MS, type Transit, transits as findTransits } from "./transits.ts";
+import { LUNAR_DAY_MS, predictionTransits, type Transit } from "./transits.ts";
 
 /**
  * Harmonic representation of inequalities (HRoI), after Horn (1960) and Boesch
@@ -156,7 +156,7 @@ export function fit(extremes: AssignedExtreme[], options: FitOptions = {}): Mode
 export function predict(model: Model, start: number, end: number): AssignedExtreme[] {
   // An event follows its transit by up to about a lunar day, so start early.
   const result: AssignedExtreme[] = [];
-  for (const transit of findTransits(start - 2 * LUNAR_DAY_MS, end)) {
+  for (const transit of predictionTransits(start, end)) {
     const vector = basis(transit.number, model.tides);
     for (const type of ["high", "low"] as const) {
       const event = eventIndex(type, transit.upper);
