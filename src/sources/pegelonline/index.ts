@@ -1,5 +1,5 @@
 import { DatumChanged } from "../../epochs.ts";
-import { getJson, getText } from "../../http.ts";
+import { Blocked, getJson, getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -174,37 +174,48 @@ export async function history(
   end: Date,
   datum?: string,
 ): Promise<Observation[]> {
-  const { uuid } = await getJson<ApiStation>(`${API}/stations/${encodeURIComponent(station)}.json`);
+  if (blocked) throw blocked;
   // The form takes whole local days, both included; a local day starts up to
   // two hours before the UTC one.
   const day = (t: number) => new Date(t).toISOString().slice(0, 10);
-  const body = new URLSearchParams({
-    uuid,
-    parameter: "W",
-    start: day(start.getTime() - DAY_MS),
-    end: day(end.getTime() + 2 * 3_600_000),
-    // JSON's timestamps carry their offset; CSV's local times repeat an hour each autumn.
-    format: "json",
-  });
   // One download at a time, and each prepared file downloads once, so neither
-  // answer can be cached.
+  // answer can be cached. The station lookup waits its turn with them.
   const files = await oneAtATime(async () => {
-    // A retried download URL has already been spent, so a failure prepares again.
+    // A lookup can come from the cache, so only its refusals count, not its answers.
+    const { uuid } = await ask(station, () =>
+      getJson<ApiStation>(`${API}/stations/${encodeURIComponent(station)}.json`),
+    );
+    const body = new URLSearchParams({
+      uuid,
+      parameter: "W",
+      start: day(start.getTime() - DAY_MS),
+      end: day(end.getTime() + 2 * 3_600_000),
+      // JSON's timestamps carry their offset; CSV's local times repeat an hour each autumn.
+      format: "json",
+    });
+    // A download URL works once, so a download that fails without a refusal
+    // (a bad zip, say) prepares again, after a rest, rather than retry it.
     for (let attempt = 1; ; attempt++) {
+      if (attempt > 1) await sleep(pacing.restMs);
       try {
-        const { downloadUrl } = await getJson<{ downloadUrl?: string }>(
-          `${SITE}/gast/download/prepare`,
-          {
+        const { downloadUrl } = await ask(station, () =>
+          getJson<{ downloadUrl?: string }>(`${SITE}/gast/download/prepare`, {
             method: "POST",
             body: body.toString(),
             headers: { "content-type": "application/x-www-form-urlencoded" },
             fresh: true,
-          },
+          }),
         );
         if (!downloadUrl) throw new Error(`PEGELONLINE ${station} download wasn't prepared`);
-        return await unzip(await getText(`${SITE}${downloadUrl}`, { fresh: true, base64: true }));
+        const zip = await ask(station, () =>
+          getText(`${SITE}${downloadUrl}`, { fresh: true, base64: true }),
+        );
+        endRefusals();
+        return await unzip(zip);
       } catch (error) {
-        if (attempt >= 3) throw error;
+        // The HTTP layer has already retried a refusal with backoff, or found
+        // its Retry-After too long to wait, so asking again now won't help.
+        if (blocked || attempt >= 3 || REFUSAL.test(String(error))) throw error;
       }
     }
   });
@@ -224,12 +235,89 @@ export async function history(
     .filter((v) => v.time >= start.getTime() && v.time < end.getTime());
 }
 
+/**
+ * After each download the next waits as long as it took, at least `restMs`
+ * and at most `maxRestMs`, or longer when the site's Retry-After asks, up to
+ * `maxHoldMs`. Refusals at `refusals` different stations with no download
+ * completed between them stop every download after, including those already
+ * queued (see `ask`).
+ */
+export const pacing = { restMs: 5_000, maxRestMs: 60_000, maxHoldMs: 15 * 60_000, refusals: 3 };
+// `fetchWithRetry`'s wording for a refusal, an outage, a hang or a dropped connection.
+const REFUSAL = /returned (403|429|500|502|503|504|timeout|a network error)\b/;
 let queue: Promise<unknown> = Promise.resolve();
+let restUntil = 0;
+let holdUntil = 0;
+let refused = 0;
+const refusing = new Set<string>();
+let blocked: Blocked | undefined;
 
 function oneAtATime<T>(task: () => Promise<T>): Promise<T> {
-  const next = queue.then(task);
+  const next = queue.then(async () => {
+    if (!blocked) await sleep(restUntil - Date.now());
+    if (blocked) throw blocked;
+    const began = Date.now();
+    try {
+      return await task();
+    } finally {
+      const done = Date.now();
+      restUntil = Math.max(
+        done + Math.min(Math.max(pacing.restMs, done - began), pacing.maxRestMs),
+        holdUntil,
+      );
+    }
+  });
   queue = next.catch(() => {});
   return next;
+}
+
+/**
+ * Asks the site, keeping count of refusals: a 403, 429, 500, 502, 503 or 504,
+ * timeout or dropped connection, once the HTTP layer has retried. Refusals at
+ * `pacing.refusals` different stations, with no download completed between
+ * them, are a block. One gauge refused year after year is a broken series, not
+ * the site turning this client away, so it fails only its own years.
+ */
+async function ask<T>(station: string, request: () => Promise<T>): Promise<T> {
+  if (blocked) throw blocked;
+  try {
+    return await request();
+  } catch (error) {
+    const message = String(error);
+    if (!REFUSAL.test(message)) throw error;
+    refused++;
+    refusing.add(station);
+    // A Retry-After too long for the HTTP layer to wait holds the next
+    // request as long, and one longer than `maxHoldMs` stops the run.
+    const asked = Number(/\(retry after (\d+) s\)/.exec(message)?.[1] ?? 0) * 1000;
+    if (asked > pacing.maxHoldMs)
+      blocked = new Blocked(
+        `PEGELONLINE asked to wait ${asked / 1000} s (${(error as Error).message}); stopping`,
+      );
+    else if (asked) holdUntil = Math.max(holdUntil, Date.now() + asked);
+    if (!blocked && refusing.size >= pacing.refusals)
+      blocked = new Blocked(
+        `PEGELONLINE refused ${refused} requests at ${refusing.size} stations with no download between (${(error as Error).message}); stopping`,
+      );
+    throw blocked ?? error;
+  }
+}
+
+function endRefusals(): void {
+  refused = 0;
+  refusing.clear();
+}
+
+function sleep(ms: number): Promise<void> {
+  return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
+}
+
+/** For tests: forget a block and the count of refusals. */
+export function resetPacing(): void {
+  restUntil = 0;
+  holdUntil = 0;
+  endRefusals();
+  blocked = undefined;
 }
 
 /**
