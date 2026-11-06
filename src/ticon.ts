@@ -115,7 +115,7 @@ const DECLARED: Record<string, { source: string; status: Status }> = {
   linz: { source: "linz", status: "license" },
 };
 
-const PEGELONLINE_NOTE = "PEGELONLINE keeps 31 days; history needs WSV's archive or GESLA";
+const PEGELONLINE_NOTE = "history needs a PEGELONLINE backfill";
 
 /**
  * Picks the replacement for one record. `lists` holds the lake's station lists

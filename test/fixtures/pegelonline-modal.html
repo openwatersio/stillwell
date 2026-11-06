@@ -1,0 +1,108 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dialog id="zeitreihen-download-modal" class="zeitreihen-download-modal" data-testid="zeitreihen-download-modal" aria-labelledby="zeitreihen-download-title">
+    <a href="" class="close-zeitreihen-download-modal float_right" data-testid="zeitreihen-download-close" aria-label="Schließen">&times;</a>
+    <div class="zeitreihen-download-modal-body">
+        <h2 id="zeitreihen-download-title" class="margin_bottom10">Download Wasserstände (Rohdaten) ab dem 1.1.2000</h2>
+        
+        <form method="post" action="/gast/download/prepare" id="zeitreihen-download-form" class="zeitreihen-download-form" novalidate>
+            
+                <input type="hidden" name="uuid" value="aad49293-242a-43ad-a8b1-e91d7792c4b2"/>
+            
+            <input type="hidden" name="parameter" value="W"/>
+            <input type="hidden" name="start" value="" id="zeitreihen-download-form-start"/>
+            <input type="hidden" name="end" value="" id="zeitreihen-download-form-end"/>
+            <input type="hidden" name="progressId" value="" id="zeitreihen-download-form-progress-id"/>
+            <table class="zeitreihen-download-table">
+                <tr>
+                    <td colspan="2">
+                        <b class="zeitreihen-download-messstellen-zeile">Messstelle <span data-testid="zeitreihen-download-messstellen">CUXHAVEN STEUBENHÖFT</span></b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Zeitraum</b></td>
+                    <td>
+                        <select id="zeitreihen-download-daterange" data-testid="zeitreihen-download-daterange">
+                            <option selected
+                                    data-start="2026-11-01"
+                                    data-end="2026-11-05">
+                                Aktueller Monat
+                            </option>
+                            
+                            
+                                <option data-start="2026-01-01"
+                                        data-end="2026-11-05">
+                                    Aktuelles Jahr
+                                </option>
+                            
+                            <option data-start="2000-01-01" data-end="2026-11-05">
+                                Gesamter Zeitraum
+                            </option>
+                            <option value="datepicker">
+                                Auswählbarer Zeitraum
+                            </option>
+                        </select>
+                        <span id="zeitreihen-download-datepicker-container" class="zeitreihen-download-datepicker" hidden>
+                            <input type="date"
+                                   id="zeitreihen-download-start"
+                                   data-testid="zeitreihen-download-start"
+                                   aria-label="Beginn des Zeitraums"
+                                   min="2000-01-01"
+                                   max="2026-11-05"
+                                   value="2000-01-01"/> -
+                            <input type="date"
+                                   id="zeitreihen-download-end"
+                                   data-testid="zeitreihen-download-end"
+                                   aria-label="Ende des Zeitraums"
+                                   min="2000-01-01"
+                                   max="2026-11-05"
+                                   value="2026-11-05"/>
+                        </span>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Format</b></td>
+                    <td>
+                        <label><input type="radio" name="format" value="json" data-testid="zeitreihen-download-format-json" checked> JSON</label>
+                        <label><input type="radio" name="format" value="csv" data-testid="zeitreihen-download-format-csv"> CSV</label>
+                        <label><input type="radio" name="format" value="zrxp" data-testid="zeitreihen-download-format-zrxp"> ZRXP</label>
+                        <br>
+                        <a href="/gast/hilfe#hilfe_dwl_langfr_w_q" target="_blank">Hilfe zu den Formaten und weitere Hinweise</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="checkbox" id="zeitreihen-download-terms-of-use" data-testid="zeitreihen-download-terms-of-use"/> <a href="/gast/nutzungsbedingungen" target="_blank">Nutzungsbedingungen gelesen und akzeptiert</a>.
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="submit" class="button" value="Download" data-testid="zeitreihen-download-submit">
+                        <span class="zeitreihen-download-error-message" id="zeitreihen-download-error-message" data-testid="zeitreihen-download-error-message"></span>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div id="zeitreihen-download-confirm" class="zeitreihen-download-confirm" data-testid="zeitreihen-download-confirm" hidden>
+            <p id="zeitreihen-download-status" data-testid="zeitreihen-download-status" role="status"
+               data-done-text="Die Datei wurde erstellt und wird jetzt im Browser heruntergeladen.">Ihre Datei wird erstellt. Bleiben Sie währenddessen auf dieser Seite und verzichten Sie auf eine Aktualisierung des Browsers.</p>
+            
+            <progress id="zeitreihen-download-progress" class="zeitreihen-download-progress" data-testid="zeitreihen-download-progress" max="100" value="0" aria-label="Fortschritt der Erstellung" hidden></progress>
+            <a href="" class="zeitreihen-download-confirm-close" data-testid="zeitreihen-download-confirm-close">Schließen</a>
+        </div>
+    </div>
+</dialog>

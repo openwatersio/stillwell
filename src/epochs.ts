@@ -77,6 +77,8 @@ export interface EpochOptions {
   decisions: Record<string, EpochDecision>;
   /** The lowest `id` a new epoch may take, above any epoch directory in the lake. */
   nextId?: number;
+  /** The source's `archive`: `current` gives a first epoch no start, since its history comes in its reference. */
+  archive?: "current";
 }
 
 export type EpochEvent = "opened" | "held" | "waiting" | "ignored" | "rejected" | "confirmed";
@@ -92,7 +94,12 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
     {
       id: Math.max(1, options.nextId ?? 1),
       datum: fetched.datum,
-      since,
+      // A zero dated ahead isn't today's yet, so the values until then are on another.
+      since:
+        options.archive === "current" &&
+        (since === null || Date.parse(since) <= Date.parse(options.now))
+          ? null
+          : since,
       until: null,
       seen: options.now,
       reference: fetched.reference?.id ?? null,

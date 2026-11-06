@@ -46,6 +46,27 @@ describe("localDay", () => {
 });
 
 describe("firstEpochs", () => {
+  it("gives a source whose history comes in today's reference a first epoch with no start", () => {
+    const fetched = {
+      datum: "PNP",
+      datums: {},
+      reference: { id: "2019-11-01", since: "2019-11-02" },
+    };
+    const [epoch] = firstEpochs(fetched, { ...options(), station: "x/1", archive: "current" });
+    // The reference keeps its date, so a later change before it is still held.
+    assert.deepEqual([epoch!.since, epoch!.reference_since], [null, "2019-11-02T00:00:00Z"]);
+  });
+
+  it("keeps the start of a zero dated ahead, even when the source's history is in today's reference", () => {
+    const fetched = {
+      datum: "PNP",
+      datums: {},
+      reference: { id: "2027-07-01", since: "2027-07-02" },
+    };
+    const [epoch] = firstEpochs(fetched, { ...options(), station: "x/1", archive: "current" });
+    assert.equal(epoch!.since, "2027-07-02T00:00:00Z");
+  });
+
   it("starts where the source says the reference does, with USACE's 06:00 boundary", () => {
     const [first] = firstEpochs(
       { datum: "GZ", datums: {}, reference: { id: "2015-06-29", since: "2015-06-29" } },

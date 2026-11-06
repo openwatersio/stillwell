@@ -146,8 +146,12 @@ export interface SourceMetadata {
   attribution: string;
   /** Anything a user of the data should know about the terms. */
   terms?: string;
-  /** How far back `observations` reaches, in days, when the source keeps a rolling window. */
-  window_days?: number;
+  /**
+   * `current` when the source serves past values measured from each station's
+   * current reference, as PEGELONLINE's raw-data download does, so a backfill
+   * can reach back before the date the source gives that reference.
+   */
+  archive?: "current";
   /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
   qc?: QcOptions;
   /**

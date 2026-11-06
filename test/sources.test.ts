@@ -184,6 +184,131 @@ describe("pegelonline", () => {
     serve([[/stations\.json/, JSON.stringify([{ ...first, longitude: undefined }])]]);
     assert.deepEqual(await pegelonline.stations(), []);
   });
+
+  /** Serve the raw-data download from the recorded zip, keeping each request's body. */
+  function serveDownload(bodies: string[]): void {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    setTransport(async (url, options) => {
+      if (/stations\/5990020\.json/.test(url))
+        return JSON.stringify({ uuid: "aad49293-242a-43ad-a8b1-e91d7792c4b2" });
+      if (/download\/prepare/.test(url)) {
+        bodies.push(String(options.body));
+        return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip-abc" });
+      }
+      if (/gast\/download\?/.test(url)) return zip.toString("base64");
+      throw new Error(`GET ${url} returned 404`);
+    });
+  }
+
+  it("reads the raw-data download in UTC across the autumn clock change", async () => {
+    const bodies: string[] = [];
+    serveDownload(bodies);
+    // 31 October 2010 local, 25 hours long: 22:00 UTC the day before to 23:00 UTC.
+    const start = new Date("2010-10-30T22:00:00Z");
+    const end = new Date("2010-10-31T23:00:00Z");
+    const levels = await pegelonline.history("5990020", start, end, "PNP");
+    assert.equal(levels.length, 25 * 60);
+    assert.ok(levels.every((l, i) => i === 0 || l.time - levels[i - 1]!.time === 60_000));
+    assert.equal(new Date(levels[0]!.time).toISOString(), start.toISOString());
+    assert.equal(levels[0]!.flag, Flag.preliminary);
+    assert.ok(levels.every((l) => l.level > 0 && l.level < 12));
+    // Whole local days, both included, from the day before the UTC start to the local day of the end.
+    const body = new URLSearchParams(bodies[0]);
+    assert.deepEqual(
+      [body.get("start"), body.get("end"), body.get("format")],
+      ["2010-10-29", "2010-11-01", "json"],
+    );
+    await assert.rejects(pegelonline.history("5990020", start, end, "NN"), /in PNP, not NN/);
+  });
+
+  it("takes old ranges from the download and recent ones from the REST API", async () => {
+    serveDownload([]);
+    const station = {
+      source_id: "5990020",
+      datum: "PNP",
+      history_since: "2000-01-01",
+    } as unknown as Station;
+    const old = await pegelonline.source.observations!(
+      station,
+      new Date("2010-10-31T00:00:00Z"),
+      new Date("2010-10-31T01:00:00Z"),
+    );
+    assert.equal(old.length, 60);
+    // Nothing before the first downloadable day, and nothing where there's no history.
+    const hour = [new Date("2010-10-31T00:00:00Z"), new Date("2010-10-31T01:00:00Z")] as const;
+    const later = { ...station, history_since: "2011-01-01" } as Station;
+    assert.deepEqual(await pegelonline.source.observations!(later, ...hour), []);
+    const none = { ...station, history_since: null } as unknown as Station;
+    assert.deepEqual(await pegelonline.source.observations!(none, ...hour), []);
+    // Unknown until a refresh has asked, which also records the gauge zero's validFrom.
+    const unknown = { source_id: "5990020", datum: "PNP" } as Station;
+    await assert.rejects(
+      pegelonline.source.observations!(unknown, ...hour),
+      /run ingest stations first/,
+    );
+    const now = Date.now();
+    // The REST API isn't served, so a recent range reaching it fails.
+    await assert.rejects(
+      pegelonline.source.observations!(station, new Date(now - 3_600_000), new Date(now)),
+      /measurements\.json.*returned 404/,
+    );
+  });
+
+  it("reads each station's first downloadable day from the download dialog", async () => {
+    const modal = fixture("pegelonline-modal.html");
+    serve([[/download\/modal/, modal]]);
+    assert.equal(await pegelonline.historySince("aad49293"), "2000-01-01");
+    // A rolling 31 days, as at Hamburg Port Authority's gauges, is no history.
+    serve([[/download\/modal/, modal.replaceAll("2000-01-01", "2026-10-05")]]);
+    assert.equal(await pegelonline.historySince("aad49293"), null);
+    // A new gauge's 45 days is history.
+    serve([[/download\/modal/, modal.replaceAll("2000-01-01", "2026-09-21")]]);
+    assert.equal(await pegelonline.historySince("aad49293"), "2026-09-21");
+    setTransport(async (url) => {
+      throw new Error(`GET ${url} returned 400`);
+    });
+    assert.equal(await pegelonline.historySince("aad49293"), null);
+  });
+
+  it("lists each station's history_since, keeping one it already has", async () => {
+    let asked = 0;
+    serve([
+      [/stations\.json/, fixture("pegelonline-stations.json")],
+      [
+        /download\/modal/,
+        () => {
+          asked++;
+          return fixture("pegelonline-modal.html");
+        },
+      ],
+    ]);
+    const listed = await pegelonline.stations([
+      { id: "pegelonline/5990020", history_since: "2001-01-01" } as unknown as Station,
+    ]);
+    assert.equal(listed.find((s) => s.source_id === "5990020")!.history_since, "2001-01-01");
+    assert.equal(listed.find((s) => s.source_id !== "5990020")!.history_since, "2000-01-01");
+    assert.equal(asked, 1);
+  });
+
+  it("stops asking for history_since after five failures", async () => {
+    const [first] = JSON.parse(fixture("pegelonline-stations.json"));
+    const many = Array.from({ length: 8 }, (_, i) => ({ ...first, number: String(i) }));
+    let asked = 0;
+    serve([
+      [/stations\.json/, JSON.stringify(many)],
+      [
+        /download\/modal/,
+        () => {
+          asked++;
+          throw new Error("GET modal returned 503");
+        },
+      ],
+    ]);
+    const listed = await pegelonline.stations();
+    assert.equal(listed.length, 8);
+    assert.ok(listed.every((s) => !("history_since" in s)));
+    assert.equal(asked, 5);
+  });
 });
 
 describe("bsh", () => {
