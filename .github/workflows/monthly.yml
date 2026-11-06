@@ -55,7 +55,8 @@ jobs:
       - id: plan
         run: |
           set -f
-          if [ "$EVENT" = schedule ]; then
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
             title=$([ "$REFETCH" = true ] && echo Refetch || echo Monthly)
             since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
             if titles=$(gh run list --workflow monthly.yml --limit 100 --branch main --event workflow_dispatch --created ">=$since" --json displayTitle --jq '.[].displayTitle') && grep -qx "$title" <<< "$titles"; then
@@ -82,6 +83,7 @@ jobs:
           SOURCES: ${{ inputs.sources }}
           REFETCH: ${{ github.event.schedule == '40 3 9 * *' || inputs.refetch }}
           EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 

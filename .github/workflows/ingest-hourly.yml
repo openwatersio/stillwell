@@ -33,7 +33,8 @@ jobs:
       - id: gate
         run: |
           run=true
-          if [ "$EVENT" = schedule ]; then
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
             since=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)
             if dispatched=$(gh run list --workflow ingest-hourly.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
               echo "A dispatched run started in the last hour"
@@ -43,6 +44,7 @@ jobs:
           echo "run=$run" >> "$GITHUB_OUTPUT"
         env:
           EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 
@@ -55,7 +57,9 @@ jobs:
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so no two rewrite one file at once.
     concurrency:
-      group: lake-${{ matrix.source }}
+      # A backup the gate skipped names a group of its own, so its skipped jobs
+      # can't touch a job waiting in the source's.
+      group: ${{ needs.gate.outputs.run == 'true' && format('lake-{0}', matrix.source) || format('skipped-{0}', github.run_id) }}
       cancel-in-progress: false
     needs: gate
     if: needs.gate.outputs.run == 'true'
@@ -122,7 +126,7 @@ jobs:
     if: always() && needs.gate.outputs.run == 'true' && github.run_attempt == 1
     # One at a time, so two runs' alerts never both open an issue.
     concurrency:
-      group: alert-${{ github.workflow }}
+      group: ${{ needs.gate.outputs.run == 'true' && format('alert-{0}', github.workflow) || format('skipped-alert-{0}', github.run_id) }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 5

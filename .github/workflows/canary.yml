@@ -28,7 +28,8 @@ jobs:
       - id: gate
         run: |
           run=true
-          if [ "$EVENT" = schedule ]; then
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
             since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
             if dispatched=$(gh run list --workflow canary.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
               echo "A dispatched run started in the last day"
@@ -38,6 +39,7 @@ jobs:
           echo "run=$run" >> "$GITHUB_OUTPUT"
         env:
           EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 
