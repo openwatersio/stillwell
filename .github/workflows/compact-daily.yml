@@ -20,6 +20,42 @@ permissions:
   contents: read
 
 jobs:
+  # The Worker in workers/cron dispatches this workflow, since GitHub's
+  # schedule runs late or not at all. The schedule is a backup, skipped when a
+  # dispatched run on main started in the last 23 hours: a second run would wait in each
+  # source's group, and cancel any job already waiting there, such as a
+  # compaction or a station refresh. A dispatched run counts even when one of
+  # its jobs was cancelled while waiting, since a backup would cancel whatever
+  # replaced it. A failed lookup runs the backup.
+  gate:
+    # The lake environment only deploys from main; this stops a run from another
+    # branch before it waits on that rule.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        run: |
+          run=true
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
+            since=$(date -u -d '23 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            if dispatched=$(gh run list --workflow compact-daily.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
+              echo "A dispatched run started in the last 23 hours"
+              run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
   compact:
     strategy:
       fail-fast: false
@@ -29,11 +65,12 @@ jobs:
     # Ingest runs included, so a compaction never reads recent/ while the hourly
     # run replaces it, or rewrites a year file a backfill is writing.
     concurrency:
-      group: lake-${{ matrix.source }}
+      # A backup the gate skipped names a group of its own, so its skipped jobs
+      # can't touch a job waiting in the source's.
+      group: ${{ needs.gate.outputs.run == 'true' && format('lake-{0}', matrix.source) || format('skipped-{0}', github.run_id) }}
       cancel-in-progress: false
-    # The lake environment only deploys from main; this stops a run from another
-    # branch before it waits on that rule.
-    if: github.ref == 'refs/heads/main'
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     # The environment holds the R2 credentials and only runs on main.
@@ -62,15 +99,16 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
-  # Opens an issue when a source's job fails in two scheduled runs in a row,
-  # and closes it when the job next succeeds (scripts/alert.sh).
+  # Opens an issue when a source's job fails in two runs on main in a row,
+  # and closes it when the job next succeeds (scripts/alert.sh). Not on a
+  # backup the gate skipped, which ran no jobs.
   alert:
-    needs: compact
+    needs: [gate, compact]
     # A re-run would judge a source by an older result than its latest.
-    if: always() && github.event_name == 'schedule' && github.run_attempt == 1
+    if: always() && needs.gate.outputs.run == 'true' && github.run_attempt == 1
     # One at a time, so two runs' alerts never both open an issue.
     concurrency:
-      group: alert-${{ github.workflow }}
+      group: ${{ needs.gate.outputs.run == 'true' && format('alert-{0}', github.workflow) || format('skipped-alert-{0}', github.run_id) }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 5

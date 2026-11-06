@@ -1,0 +1,13 @@
+{
+  "name": "water-levels-cron",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  // Cron Triggers only; nothing answers HTTP.
+  "workers_dev": false,
+  "preview_urls": false,
+  "triggers": {
+    // UTC, matching DISPATCHES in index.ts.
+    "crons": ["12 * * * *", "40 0 * * *", "25 1 2 * *", "35 3 9 * *", "0 7 * * MON"],
+  },
+  "observability": { "enabled": true },
+}

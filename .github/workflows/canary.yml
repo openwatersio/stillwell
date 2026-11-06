@@ -4,16 +4,48 @@ name: Canary
 # src/sources/<source>/canary.json (scripts/canary.ts), so a change upstream
 # fails here rather than leaving gaps in the lake. USGS runs only once the
 # USGS_API_KEY repository secret is set.
+#
+# The Worker in workers/cron dispatches it at 07:00 on Mondays, since GitHub's
+# schedule runs late or not at all. The schedule is a backup, skipped when a
+# dispatched run on main started in the last day. A failed lookup runs it.
 on:
   schedule:
-    - cron: "0 7 * * 1"
+    - cron: "5 7 * * MON"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        run: |
+          run=true
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
+            since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
+            if dispatched=$(gh run list --workflow canary.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
+              echo "A dispatched run started in the last day"
+              run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
   canary:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     # A USGS rate limit can ask for up to an hour's wait.
     timeout-minutes: 75

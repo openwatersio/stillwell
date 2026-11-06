@@ -12,6 +12,42 @@ permissions:
   contents: read
 
 jobs:
+  # The Worker in workers/cron dispatches this workflow, since GitHub's
+  # schedule runs late or not at all. The schedule is a backup, skipped when a
+  # dispatched run on main started in the last hour: a second run would wait in each
+  # source's group, and cancel any job already waiting there, such as a
+  # compaction or a station refresh. A dispatched run counts even when one of
+  # its jobs was cancelled while waiting, since a backup would cancel whatever
+  # replaced it. A failed lookup runs the backup.
+  gate:
+    # The lake environment only deploys from main; this stops a run from another
+    # branch before it waits on that rule.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        run: |
+          run=true
+          # A re-run of every job is someone asking for this run, so it runs.
+          if [ "$EVENT" = schedule ] && [ "$ATTEMPT" = 1 ]; then
+            since=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)
+            if dispatched=$(gh run list --workflow ingest-hourly.yml --branch main --event workflow_dispatch --created ">=$since" --json databaseId --jq '.[].databaseId') && [ -n "$dispatched" ]; then
+              echo "A dispatched run started in the last hour"
+              run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          ATTEMPT: ${{ github.run_attempt }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
   recent:
     strategy:
       fail-fast: false
@@ -21,11 +57,12 @@ jobs:
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so no two rewrite one file at once.
     concurrency:
-      group: lake-${{ matrix.source }}
+      # A backup the gate skipped names a group of its own, so its skipped jobs
+      # can't touch a job waiting in the source's.
+      group: ${{ needs.gate.outputs.run == 'true' && format('lake-{0}', matrix.source) || format('skipped-{0}', github.run_id) }}
       cancel-in-progress: false
-    # The lake environment only deploys from main; this stops a run from another
-    # branch before it waits on that rule.
-    if: github.ref == 'refs/heads/main'
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     # Stopped before the next hour's run is due.
     timeout-minutes: 50
@@ -60,15 +97,16 @@ jobs:
       # A station the source now reports in another datum fails until a station
       # refresh opens its epoch, or holds it for a person, after which recent
       # skips it. One refresh a day, not counting one that was cancelled, such
-      # as one queued behind a long backfill. A refresh of several sources, or
-      # of all of them (titled Monthly, the 2nd's scheduled run included),
-      # counts; the 9th's is titled Refetch. Failing to start one doesn't fail
-      # the hourly run, which wrote what it fetched.
+      # as one queued behind a long backfill. A dispatched refresh of several
+      # sources, or of all of them (titled Monthly, as the Worker's on the 2nd
+      # is), counts; a scheduled one is usually a backup that planned nothing.
+      # The 9th's is titled Refetch. Failing to start one doesn't fail the
+      # hourly run, which wrote what it fetched.
       - if: ${{ !cancelled() && steps.recent.outputs.datum_changed == 'true' }}
         continue-on-error: true
         run: |
           since=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
-          started=$(gh run list --workflow monthly.yml --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
+          started=$(gh run list --workflow monthly.yml --limit 100 --branch main --event workflow_dispatch --created ">=$since" --json displayTitle,conclusion --jq '.[] | select(.conclusion != "cancelled") | .displayTitle')
           if grep -Eqx "Monthly|Refresh( [a-z]+)* $SOURCE( [a-z]+)*" <<< "$started"; then
             echo "A refresh of $SOURCE started in the last day"
           else
@@ -79,15 +117,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 
-  # Opens an issue when a source's job fails in two scheduled runs in a row,
-  # and closes it when the job next succeeds (scripts/alert.sh).
+  # Opens an issue when a source's job fails in two runs on main in a row,
+  # and closes it when the job next succeeds (scripts/alert.sh). Not on a
+  # backup the gate skipped, which ran no jobs.
   alert:
-    needs: recent
+    needs: [gate, recent]
     # A re-run would judge a source by an older result than its latest.
-    if: always() && github.event_name == 'schedule' && github.run_attempt == 1
+    if: always() && needs.gate.outputs.run == 'true' && github.run_attempt == 1
     # One at a time, so two runs' alerts never both open an issue.
     concurrency:
-      group: alert-${{ github.workflow }}
+      group: ${{ needs.gate.outputs.run == 'true' && format('alert-{0}', github.workflow) || format('skipped-alert-{0}', github.run_id) }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 5
