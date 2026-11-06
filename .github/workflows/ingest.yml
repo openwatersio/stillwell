@@ -33,13 +33,13 @@ jobs:
           set -f
           # The command and sources are the words that aren't an option or
           # its value; every ingest option takes a value but --accept-epochs, --no-publish,
-          # --refetch, --skip-written and --rebuild-bounds.
+          # --refetch, --skip-written, --skip-unscreened and --rebuild-bounds.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --no-publish | --refetch | --skip-written | --rebuild-bounds | --*=* | --) ;;
+              --accept-epochs | --no-publish | --refetch | --skip-written | --skip-unscreened | --rebuild-bounds | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac

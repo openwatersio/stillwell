@@ -6,7 +6,7 @@ import type { Product } from "../schema.ts";
  *   stations.parquet                                    one row per series
  *   sources.json                                        license and attribution per source
  *   stations/<source>.parquet                           one source's list, with datum epochs
- *   stations/bounds/<source>.parquet                    first and last, written by compaction
+ *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
  *   history/stations/<source>/<time>.parquet            the list as each refresh started
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   recent/<source>.parquet                             last 7 days, every live station and any since retired

@@ -1,5 +1,11 @@
-import { listYears, readYearFiles, type YearFile } from "./lake/parquet.ts";
-import type { Station } from "./schema.ts";
+import {
+  listYears,
+  readTimeBounds,
+  readYearFiles,
+  type StationBounds,
+  type YearFile,
+} from "./lake/parquet.ts";
+import type { LakeStation, Station } from "./schema.ts";
 
 const DAY_MS = 86_400_000;
 
@@ -217,4 +223,85 @@ export function* years(start: Date, end: Date): Generator<[Date, Date]> {
     yield [new Date(t), new Date(Math.min(next, end.getTime()))];
     t = next;
   }
+}
+
+/**
+ * For `backfill <source> preliminary <start> <end>`: every station whose
+ * bounds hold a preliminary value, active or not, with the range to fetch:
+ * from that value's month, or from `start` when it's earlier, to `end`, or to
+ * the end of the year of the station's last value when that's sooner. A
+ * station whose earliest preliminary value is before `start` is past the
+ * cutoff and listed in `past`; it's still fetched from `start` when its last
+ * value is after it, since its later values may be preliminary too. With
+ * `skipUnscreened`, a station with at least a year of record in its current
+ * epoch and no value there the source screened is left out and listed in `unscreened`, since a source
+ * that screens nothing, such as some USACE offices, would have it fetched
+ * every month for nothing; one whose `screened` isn't known yet isn't.
+ */
+export function preliminaryRuns<T extends Pick<LakeStation, "id" | "products" | "epochs">>(
+  stations: T[],
+  bounds: Map<string, StationBounds>,
+  start: Date,
+  end: Date,
+  skipUnscreened = false,
+): {
+  runs: { station: T; from: Date; to: Date }[];
+  past: { id: string; preliminary: string }[];
+  unscreened: string[];
+} {
+  const runs: { station: T; from: Date; to: Date }[] = [];
+  const past: { id: string; preliminary: string }[] = [];
+  const unscreened: string[] = [];
+  for (const station of stations) {
+    const { preliminary, first, last, screened } = bounds.get(station.id) ?? {};
+    // A station whose list dropped levels can't have them read again.
+    if (!preliminary || !station.products.includes("levels")) continue;
+    if (
+      skipUnscreened &&
+      screened === false &&
+      first &&
+      last &&
+      Date.parse(last) - recordSince(station, first) >= 365 * DAY_MS
+    ) {
+      unscreened.push(station.id);
+      continue;
+    }
+    const time = new Date(preliminary);
+    if (time < start) past.push({ id: station.id, preliminary });
+    const month = Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), 1);
+    const from = new Date(Math.max(start.getTime(), month));
+    const lastYear = last ? new Date(last).getUTCFullYear() : NaN;
+    const to = new Date(Math.min(end.getTime(), Date.UTC(lastYear + 1, 0, 1) || Infinity));
+    if (from < to) runs.push({ station, from, to });
+  }
+  return { runs, past, unscreened };
+}
+
+/** Where a station's record in its current epoch starts: its first value, or the epoch's start if later. */
+function recordSince(station: Pick<LakeStation, "epochs">, first: string): number {
+  const since = station.epochs.filter((e) => e.state === "open").at(-1)?.since;
+  return Math.max(Date.parse(first), since ? Date.parse(since) : -Infinity);
+}
+
+/**
+ * The earliest value a station's series directory holds inside `window`,
+ * `[since, until)` in milliseconds, in its files from `fromYear` on, that the
+ * source sent as preliminary, or null when it holds none: the rows compaction
+ * counts for the same epoch and years. With it, whether any value there is
+ * one the source screened.
+ */
+export async function earliestPreliminary(
+  dir: string,
+  window: [number, number] = [-Infinity, Infinity],
+  fromYear = -Infinity,
+): Promise<{ preliminary: number | null; screened: boolean }> {
+  const years = [...(await listYears(dir))].filter((y) => y >= fromYear);
+  const read = [
+    ...(await readTimeBounds(years.map((y) => ({ file: `${dir}/${y}.parquet`, window })))).values(),
+  ];
+  const times = read.flatMap(([, , p]) => p ?? []);
+  return {
+    preliminary: times.length ? Math.min(...times) : null,
+    screened: read.some(([, , , screened]) => screened),
+  };
 }
