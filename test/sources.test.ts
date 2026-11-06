@@ -297,6 +297,23 @@ describe("coops", () => {
       assert.equal(calls, 7);
     });
 
+    it("holds twice as long after a second refusal", async () => {
+      const times: number[] = [];
+      globalThis.fetch = (async () => {
+        times.push(Date.now());
+        return times.length <= 4 ? new Response("Forbidden", { status: 403 }) : empty();
+      }) as typeof fetch;
+      setTransport(fetchText);
+      coops.pacing.blockedMs = 40;
+      // The first station's three tries, then the second station's first try
+      // is the second hold, and its retry waits that out.
+      await assert.rejects(lastHours("1"));
+      assert.deepEqual(await lastHours("2"), []);
+      const gaps = times.slice(1).map((t, i) => t - times[i]!);
+      assert.ok(gaps[0]! >= 35 && gaps[0]! < 75, `first hold ${gaps}`);
+      assert.ok(gaps[3]! >= 75, `second hold ${gaps}`);
+    });
+
     it("holds every data request while a 403's hold lasts", async () => {
       const times: number[] = [];
       globalThis.fetch = (async () => {
