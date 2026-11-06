@@ -52,6 +52,7 @@ import {
   yearsToFetch,
 } from "../src/backfill.ts";
 import { useDiskCache } from "../src/cache.ts";
+import { Blocked } from "../src/http.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   compactRecent,
@@ -270,7 +271,11 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
 
   const failed: string[] = [];
   let skipped = 0;
+  // A source that blocks this client fails every request after, so the run
+  // stops rather than go on through its stations.
+  let stopped: Blocked | undefined;
   await pool(wanted, positive("concurrency"), async (station) => {
+    if (stopped) return;
     // Nothing from before the current epoch: those values are in another reference.
     const since = Date.parse(currentSince(station) ?? "");
     const from_ = Number.isNaN(since) ? start : new Date(Math.max(start.getTime(), since));
@@ -293,13 +298,15 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       }
       skipped += plan.skipped;
       for (const [from, to] of plan.fetch) {
+        if (stopped) return;
         const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
         try {
           const written = await backfillYear(source, station, product, from, to);
           if (written !== undefined) console.log(`${label}: ${written} rows`);
         } catch (error) {
           // A failed year writes nothing, so its file keeps what it had.
-          failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+          if (error instanceof Blocked) stopped ??= error;
+          else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
         }
       }
     }
@@ -307,8 +314,9 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const why = { written: "already written", complete: "already complete", none: "" }[mode];
   if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
   console.log(`${sourceId}: ${failed.length} failed`);
+  if (stopped) console.error(`${sourceId}: stopped: ${stopped.message}`);
   for (const f of failed) console.error(`  ${f}`);
-  if (failed.length) process.exitCode = 1;
+  if (failed.length || stopped) process.exitCode = 1;
 }
 
 /** Returns how many rows the year's file now holds, or undefined when nothing changed. */
@@ -372,7 +380,11 @@ async function recent(sourceId: string): Promise<void> {
   });
   // Some stations failing or going quiet is ordinary; all of them is an outage,
   // or a broken adapter, even one that answers "no data" without an error.
-  if (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
+  // A source that blocked this client needs a person, however many stations got through.
+  if (
+    summary.blocked ||
+    (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
+  )
     process.exitCode = 1;
 }
 

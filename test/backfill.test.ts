@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
@@ -12,9 +13,14 @@ import {
   yearWritten,
   yearsToFetch,
 } from "../src/backfill.ts";
-import { listYears, readYearFiles, writeObservations } from "../src/lake/parquet.ts";
-import { seriesDir, seriesPath } from "../src/lake/paths.ts";
-import { Flag, type Station } from "../src/schema.ts";
+import {
+  listYears,
+  readYearFiles,
+  writeObservations,
+  writeStationList,
+} from "../src/lake/parquet.ts";
+import { seriesDir, seriesPath, stationListPath } from "../src/lake/paths.ts";
+import { Flag, type LakeStation, type Station } from "../src/schema.ts";
 
 const DAY = 86_400_000;
 const Y2024 = new Date(Date.UTC(2024, 0, 1));
@@ -344,5 +350,67 @@ describe("shard", () => {
     assert.throws(() => parseShard("2-8"), /INDEX\/COUNT/);
     assert.throws(() => shard(stations, 0, 3), /Not a shard/);
     assert.throws(() => shard(stations, 4, 3), /Not a shard/);
+  });
+});
+
+describe("backfill script", () => {
+  it("stops, and fails the run, once CO-OPS blocks it", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const lake = join(root, "lake");
+    const stations = ["1", "2", "3", "4", "5"].map(
+      (id) =>
+        ({
+          id: `coops/${id}`,
+          source: "coops",
+          source_id: id,
+          datum: "STND",
+          products: ["levels"],
+          status: "active",
+          live: false,
+          interval_s: 360,
+          kind: "coastal",
+          commercial_use: true,
+          epochs: [
+            {
+              id: 1,
+              datum: "STND",
+              since: null,
+              until: null,
+              seen: null,
+              reference: null,
+              reference_since: null,
+              datums: {},
+              to_current: 0,
+              state: "open",
+            },
+          ],
+        }) as LakeStation,
+    );
+    await writeStationList(stationListPath(lake, "coops"), stations);
+    const run = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "./test/fixtures/coops-blocked.ts",
+        "scripts/ingest.ts",
+        "backfill",
+        "coops",
+        "all",
+        "2024",
+        "2025",
+        "--concurrency",
+        "1",
+      ],
+      {
+        encoding: "utf8",
+        env: { ...process.env, WATER_LEVELS_LAKE: lake, WATER_LEVELS_CACHE: join(root, "cache") },
+      },
+    );
+    assert.equal(run.status, 1, run.stderr);
+    assert.match(run.stderr, /^coops: stopped: /m);
+    // Three holds in a row stop the run before the last stations send anything.
+    const asked = [...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]);
+    assert.ok(asked.length > 0, run.stderr);
+    assert.ok(!asked.includes("4") && !asked.includes("5"), `asked ${asked}`);
   });
 });

@@ -19,6 +19,14 @@ export interface RequestOptions extends RequestInit {
   timeout?: number;
 }
 
+/**
+ * A source refusing this client for longer than it's worth waiting, such as a
+ * rate limit's block that outlasted the adapter's waits. Every request after
+ * it would fail the same way, so a run stops rather than go on through its
+ * stations.
+ */
+export class Blocked extends Error {}
+
 export type Transport = (url: string, options: RequestOptions) => Promise<string>;
 
 let transport: Transport = fetchText;
