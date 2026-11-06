@@ -24,7 +24,7 @@ where the angular velocities ω come from combinations of the rates of s, h, p a
 
 The implementation is in [src/hroi](../src/hroi):
 
-- Transit numbers follow Boesch and Müller-Navarra (2019): upper transits at Greenwich since the one on 1949-12-31, with a lower transit taking the number of the upper transit before it. Transit times come from [astronomy-engine](https://github.com/cosinekitty/astronomy).
+- Transit numbers follow Boesch and Müller-Navarra (2019): upper transits at Greenwich since the one on 1949-12-31, with a lower transit taking the number of the upper transit before it. The original evaluation used Astronomy Engine for transit times. The implementation now uses [Almanac](https://github.com/openwatersio/almanac), whose supported interval runs from 1950 through 2100.
 - The partial tides are Table 2 of [Boesch and Müller-Navarra (2019)](https://doi.org/10.5194/os-15-1363-2019). BSH has used the 39-tide set since its 2020 tables, and its 2026 files say "39 39".
 - Extremes without transit numbers are assigned to the transit whose mean lunitidal interval puts them closest. The high-water interval is taken in [0, 12.42) hours, and a low water goes with the high water before it.
 - The curve between predicted extremes uses mean rising and falling branches, normalized in time and height, averaged over the training record.
