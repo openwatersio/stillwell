@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { afterEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
@@ -129,6 +129,11 @@ describe("rws stations", () => {
 });
 
 describe("pegelonline", () => {
+  beforeEach(() => {
+    pegelonline.pacing.restMs = 0;
+    pegelonline.resetPacing();
+  });
+
   it("lists stations with their datum, gauge zero and sampling interval", async () => {
     serve([[/stations\.json/, fixture("pegelonline-stations.json")]]);
     const stations = await pegelonline.stations();
@@ -220,6 +225,198 @@ describe("pegelonline", () => {
       ["2010-10-29", "2010-11-01", "json"],
     );
     await assert.rejects(pegelonline.history("5990020", start, end, "NN"), /in PNP, not NN/);
+  });
+
+  it("rests after each download as long as it took, and at least restMs", async () => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const fetched: number[] = [];
+    setTransport(async (url) => {
+      if (/stations\/5990020\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/download\/prepare/.test(url)) {
+        fetched.push(Date.now());
+        await new Promise((resolve) => setTimeout(resolve, 80));
+        return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip-abc" });
+      }
+      return zip.toString("base64");
+    });
+    pegelonline.pacing.restMs = 20;
+    const day = [new Date("2010-10-31T00:00:00Z"), new Date("2010-10-31T01:00:00Z")] as const;
+    await Promise.all([
+      pegelonline.history("5990020", ...day),
+      pegelonline.history("5990020", ...day),
+    ]);
+    // The second starts after the first's 80 ms and a rest as long, not after restMs.
+    assert.ok(fetched[1]! - fetched[0]! >= 155, `${fetched[1]! - fetched[0]!} ms apart`);
+  });
+
+  // A transport whose `prepare` answers come from `answers` in turn ("ok", or a
+  // status for the HTTP layer's error), with lookups for any station.
+  const refusing = (answers: string[], lookup = () => "ok") => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const counts = { prepared: 0, looked: 0 };
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) {
+        counts.looked++;
+        const answer = lookup();
+        if (answer !== "ok") throw new Error(`GET ${url} returned ${answer}`);
+        return JSON.stringify({ uuid: "aad49293" });
+      }
+      if (/gast\/download\?/.test(url)) return zip.toString("base64");
+      const answer = answers[counts.prepared++] ?? "ok";
+      if (answer === "ok") return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip" });
+      throw new Error(`POST ${url} returned ${answer}`);
+    });
+    return counts;
+  };
+  const day = [new Date("2010-10-31T00:00:00Z"), new Date("2010-10-31T01:00:00Z")] as const;
+  const notBlocked = (e: unknown) => !(e instanceof Blocked);
+
+  it("stops downloading after refusals at three stations with no download between", async () => {
+    const counts = refusing(["429", "429", "ok", "429", "429", "429", "429"]);
+    // A completed download ends a run of refusals; one station's refusals,
+    // however many, count once.
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await pegelonline.history("1", ...day);
+    for (const id of ["3", "3", "4"])
+      await assert.rejects(pegelonline.history(id, ...day), notBlocked);
+    assert.equal(counts.prepared, 6);
+    // The third station's refusal blocks. Downloads already queued behind it
+    // fail without asking or waiting out a rest.
+    pegelonline.pacing.restMs = 10_000;
+    const began = Date.now();
+    const queued = ["5", "6", "7"].map((id) => pegelonline.history(id, ...day));
+    for (const q of queued) await assert.rejects(q, /at 3 stations with no download between/);
+    assert.equal(counts.prepared, 7);
+    assert.ok(Date.now() - began < 1_000);
+  });
+
+  it("counts a 500 as a refusal", async () => {
+    const counts = refusing(["500", "500", "500"]);
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("3", ...day), Blocked);
+    assert.equal(counts.prepared, 3);
+  });
+
+  it("fails one gauge refused year after year without stopping the rest", async () => {
+    refusing(["500", "500", "500", "500", "504"]);
+    for (let i = 0; i < 4; i++) await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await pegelonline.history("3", ...day);
+  });
+
+  it("counts a refused station lookup toward a block", async () => {
+    const counts = refusing([], () => "403");
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("3", ...day), Blocked);
+    assert.equal(counts.prepared, 0);
+  });
+
+  it("counts a refused file download toward a block, without preparing again", async () => {
+    let prepared = 0;
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/gast\/download\?/.test(url)) throw new Error(`GET ${url} returned 429`);
+      prepared++;
+      return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip" });
+    });
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("3", ...day), Blocked);
+    assert.equal(prepared, 3);
+  });
+
+  it("prepares again when a prepared file isn't a readable zip", async () => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const prepared: number[] = [];
+    let downloads = 0;
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      // Two of every three files come back broken.
+      if (/gast\/download\?/.test(url))
+        return ++downloads % 3 ? btoa("not a zip") : zip.toString("base64");
+      prepared.push(Date.now());
+      return JSON.stringify({ downloadUrl: `/gast/download?filename=${prepared.length}.zip` });
+    });
+    pegelonline.pacing.restMs = 50;
+    for (const id of ["1", "2"]) await pegelonline.history(id, ...day);
+    assert.equal(prepared.length, 6);
+    // Each prepares again only after a rest.
+    assert.ok(prepared[1]! - prepared[0]! >= 45, `${prepared[1]! - prepared[0]!} ms apart`);
+  });
+
+  it("doesn't take a file that isn't a zip as a download that ended a run of refusals", async () => {
+    let prepared = 0;
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/gast\/download\?/.test(url)) return btoa("not a zip");
+      // Stations 1, 2 and 4 are refused; station 3's files come back broken.
+      if (++prepared <= 2 || prepared > 5) throw new Error(`POST ${url} returned 503`);
+      return JSON.stringify({ downloadUrl: `/gast/download?filename=${prepared}.zip` });
+    });
+    await assert.rejects(pegelonline.history("1", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("2", ...day), notBlocked);
+    await assert.rejects(pegelonline.history("3", ...day), /not a zip/);
+    await assert.rejects(pegelonline.history("4", ...day), Blocked);
+  });
+
+  it("rests at least restMs after a quick download", async () => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const prepared: number[] = [];
+    setTransport(async (url) => {
+      if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/gast\/download\?/.test(url)) return zip.toString("base64");
+      prepared.push(Date.now());
+      return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip" });
+    });
+    pegelonline.pacing.restMs = 100;
+    await Promise.all([pegelonline.history("1", ...day), pegelonline.history("2", ...day)]);
+    assert.ok(prepared[1]! - prepared[0]! >= 95, `${prepared[1]! - prepared[0]!} ms apart`);
+  });
+
+  it("stops when the site asks to wait longer than maxHoldMs", async () => {
+    refusing(["429 (retry after 3600 s)"]);
+    await assert.rejects(pegelonline.history("1", ...day), /asked to wait 3600 s/);
+    await assert.rejects(pegelonline.history("2", ...day), Blocked);
+  });
+
+  it("holds the next download as long as a Retry-After the HTTP layer wouldn't wait", async () => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const asked: number[] = [];
+    setTransport(async (url) => {
+      if (/stations\/5990020\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
+      if (/gast\/download\?/.test(url)) return zip.toString("base64");
+      asked.push(Date.now());
+      // http.ts throws at once on a Retry-After over a minute; one second keeps the test short.
+      if (asked.length === 1) throw new Error(`POST ${url} returned 429 (retry after 1 s)`);
+      return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip" });
+    });
+    const day = [new Date("2010-10-31T00:00:00Z"), new Date("2010-10-31T01:00:00Z")] as const;
+    await assert.rejects(pegelonline.history("5990020", ...day));
+    await pegelonline.history("5990020", ...day);
+    assert.ok(asked[1]! - asked[0]! >= 950, `${asked[1]! - asked[0]!} ms apart`);
+  });
+
+  it("queues the station lookup with the downloads", async () => {
+    const zip = readFileSync(new URL("fixtures/pegelonline-download.zip", import.meta.url));
+    const looked: number[] = [];
+    setTransport(async (url) => {
+      if (/stations\/5990020\.json/.test(url)) {
+        looked.push(Date.now());
+        return JSON.stringify({ uuid: "aad49293" });
+      }
+      if (/gast\/download\?/.test(url)) return zip.toString("base64");
+      return JSON.stringify({ downloadUrl: "/gast/download?filename=x.zip" });
+    });
+    pegelonline.pacing.restMs = 60;
+    const day = [new Date("2010-10-31T00:00:00Z"), new Date("2010-10-31T01:00:00Z")] as const;
+    await Promise.all([
+      pegelonline.history("5990020", ...day),
+      pegelonline.history("5990020", ...day),
+    ]);
+    assert.ok(looked[1]! - looked[0]! >= 55, `${looked[1]! - looked[0]!} ms apart`);
   });
 
   it("takes old ranges from the download and recent ones from the REST API", async () => {
