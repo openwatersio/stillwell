@@ -17,7 +17,7 @@ import {
  *
  * Observed levels (`meting`) and the astronomical tide (`astronomisch`) are 10-minute
  * series in integer centimeters. Extremes come as two channels on the same
- * timestamps: GETETTPE says `hoogwater` or `laagwater`, WATHTE carries the height.
+ * timestamps: GETETTPE gives the type (`EXTREME_TYPES`), WATHTE the height.
  */
 const BASE = "https://ddapi20-waterwebservices.rijkswaterstaat.nl";
 const OBSERVATIONS = `${BASE}/ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen`;
@@ -40,6 +40,56 @@ export const metadata: SourceMetadata = {
 // The service refuses requests over 160,000 values. A year of 10-minute data is
 // 52,560, so yearly chunks stay well inside it.
 const CHUNK_MS = 365 * 86_400_000;
+
+/**
+ * The 2005 NAP revision gave every gauge's zero post a new height, and RWS
+ * serves values from before 2005 against the old one. These are the
+ * centimeters to add to a pre-2005 NAP value to put it on today's NAP, from the
+ * two RLR factors PSMSL records for each gauge (Dillingh et al. 2010): the
+ * factor up to 2005 minus the one from 2005 on. Each converted series matches
+ * PSMSL's RLR series within a few millimeters in every year from 1990 to 2006.
+ * Delfzijl's doesn't: RWS has corrected its archive for subsidence since, by
+ * 5 to 40 mm. No other gauge's offset is public, so at Delfzijl and elsewhere
+ * the adapter serves observed NAP values from 2005 on only. The astronomical
+ * tide is left as served: converting it would step its mean level by 4 to 5 cm
+ * at 2005, where it steps by 1 to 2 cm as served.
+ */
+export const NAP_2005: Record<string, number> = {
+  vlissingen: -3.0, // PSMSL 20
+  "oosterschelde.roompotsluis.buiten": -3.0, // PSMSL 1551
+  hoekvanholland: -2.8, // PSMSL 22
+  maassluis: -2.4, // PSMSL 9
+  "ijmuiden.buitenhaven": -2.1, // PSMSL 32
+  "terschelling.west": -2.1, // PSMSL 236
+  "denhelder.marsdiep": -1.7, // PSMSL 23
+  "harlingen.waddenzee": -0.7, // PSMSL 25
+};
+
+/**
+ * Where the revised NAP starts: midnight in RWS's own time, UTC+1. PSMSL's
+ * factors change between monthly means, so the hour isn't known.
+ */
+const NAP_REVISED = Date.UTC(2004, 11, 31, 23);
+
+/**
+ * Where a NAP series can start, and the centimeters to add to values before
+ * 2005. Other datums never changed realization, so they pass through.
+ */
+function revision(
+  location: string,
+  datum: string,
+  process: ProcessType,
+  start: Date,
+): { start: Date; cm: number } {
+  if (datum !== "NAP" || process === "astronomisch") return { start, cm: 0 };
+  const cm = NAP_2005[location];
+  if (cm !== undefined) return { start, cm };
+  return { start: new Date(Math.max(start.getTime(), NAP_REVISED)), cm: 0 };
+}
+
+// Rounded to the millimeter, so float noise doesn't reach the files.
+const onRevisedNap = (value: number, time: number, cm: number) =>
+  Math.round((time < NAP_REVISED ? value + cm : value) * 10) / 1000;
 
 export type ProcessType = "meting" | "astronomisch" | "verwachting";
 
@@ -217,7 +267,8 @@ export async function levels(
   { process = "meting", datum = "NAP", fresh }: LevelsOptions = {},
 ): Promise<Observation[]> {
   const samples: Observation[] = [];
-  for (const [from, to] of chunks(start, end)) {
+  const nap = revision(location, datum, process, start);
+  for (const [from, to] of chunks(nap.start, end)) {
     const series = await request(
       location,
       { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: datum }, ProcesType: process },
@@ -233,11 +284,24 @@ export async function levels(
       const value = m.Meetwaarde.Waarde_Numeriek;
       // RWS marks missing values with large sentinels (e.g. 999999999).
       if (value === undefined || Math.abs(value) > 10_000) continue;
-      samples.push({ time: Date.parse(m.Tijdstip), level: value / 100, flag: flagOf(m, process) });
+      const time = Date.parse(m.Tijdstip);
+      samples.push({ time, level: onRevisedNap(value, time, nap.cm), flag: flagOf(m, process) });
     }
   }
   return dedupe(samples).filter((s) => s.time >= start.getTime() && s.time < end.getTime());
 }
+
+/**
+ * Where a cycle has a double low water (an agger), RWS publishes both lows as
+ * `laagwater 1` and `laagwater 2`, with the rise between them as `topagger`.
+ * Both are low waters; the rise isn't a high water.
+ */
+const EXTREME_TYPES: Record<string, "high" | "low"> = {
+  hoogwater: "high",
+  laagwater: "low",
+  "laagwater 1": "low",
+  "laagwater 2": "low",
+};
 
 /** High and low waters at `location` over [start, end), as RWS selects them. */
 export async function extremes(
@@ -249,7 +313,8 @@ export async function extremes(
   const grouping = EXTREME_GROUPING[process];
   if (!grouping) throw new Error(`RWS publishes no extremes for ${process}`);
   const result: PublishedExtreme[] = [];
-  for (const [from, to] of chunks(start, end)) {
+  const nap = revision(location, datum, process, start);
+  for (const [from, to] of chunks(nap.start, end)) {
     const series = await request(
       location,
       { Groepering: { Code: grouping }, ProcesType: process },
@@ -277,11 +342,14 @@ export async function extremes(
       const kind = typeAt.get(time);
       const value = m.Meetwaarde.Waarde_Numeriek;
       if (value === undefined || Math.abs(value) > 10_000) continue;
-      if (kind !== "hoogwater" && kind !== "laagwater") continue;
+      if (kind === undefined || kind === "topagger") continue;
+      const type = EXTREME_TYPES[kind];
+      // A type RWS adds would otherwise vanish, as the agger's lows once did.
+      if (!type) throw new Error(`RWS ${location}: unknown extreme type ${kind}`);
       result.push({
         time,
-        level: value / 100,
-        type: kind === "hoogwater" ? "high" : "low",
+        level: onRevisedNap(value, time, nap.cm),
+        type,
         flag: flagOf(m, process),
       });
     }

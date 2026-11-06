@@ -45,6 +45,133 @@ describe("rws", () => {
       ],
     );
   });
+
+  /** One series per channel, each given as [time, value] pairs. */
+  const answer = (...channels: [Record<string, unknown>, [string, number | string][]][]) =>
+    JSON.stringify({
+      Succesvol: true,
+      WaarnemingenLijst: channels.map(([aquo, values]) => ({
+        Locatie: { Code: "x" },
+        AquoMetadata: { Eenheid: { Code: "cm" }, ...aquo },
+        MetingenLijst: values.map(([time, value]) => ({
+          Tijdstip: time,
+          Meetwaarde:
+            typeof value === "number"
+              ? { Waarde_Numeriek: value }
+              : { Waarde_Alfanumeriek: value, Waarde_Numeriek: 0 },
+          WaarnemingMetadata: { Statuswaarde: "Gecontroleerd", Kwaliteitswaardecode: "00" },
+        })),
+      })),
+    });
+  const nap = { Grootheid: { Code: "WATHTE" }, Hoedanigheid: { Code: "NAP" } };
+  const typeChannel = {
+    Grootheid: { Code: "NVT" },
+    Hoedanigheid: { Code: "NVT" },
+    Groepering: { Code: "GETETM2" },
+    Typering: { Code: "GETETTPE" },
+  };
+
+  it("puts observed values from before 2005 on the revised NAP where PSMSL gives the offset", async () => {
+    // The revision starts at midnight in RWS's own time.
+    const times = ["2004-12-31T23:50:00.000+01:00", "2005-01-01T00:00:00.000+01:00"];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, times.map((t) => [t, "laagwater"])],
+          [nap, times.map((t) => [t, 100])],
+        ),
+      ],
+    ]);
+    const range = [new Date("2004-12-31T00:00:00Z"), new Date("2005-01-02T00:00:00Z")] as const;
+    // Hoek van Holland reads 2.8 cm lower on the revised NAP.
+    for (const get of [rws.levels, rws.extremes])
+      assert.deepEqual(
+        (await get("hoekvanholland", ...range)).map((l) => l.level),
+        [0.972, 1],
+      );
+    // The astronomical tide is left as RWS serves it.
+    assert.deepEqual(
+      (await rws.levels("hoekvanholland", ...range, { process: "astronomisch" })).map(
+        (l) => l.level,
+      ),
+      [1, 1],
+    );
+  });
+
+  it("asks for nothing before 2005 at a NAP gauge whose revision isn't known", async () => {
+    const asked: string[] = [];
+    setTransport(async (_url, options) => {
+      asked.push(JSON.parse(String(options.body)).Periode.Begindatumtijd);
+      return "";
+    });
+    const k13a = { source_id: "k13a", datum: "MSL" } as never;
+    const dordrecht = { source_id: "dordrecht", datum: "NAP" } as never;
+    const [start, end] = [new Date("2004-01-01T00:00:00Z"), new Date("2005-01-01T00:00:00Z")];
+    await rws.source.observations!(dordrecht, start, end);
+    await rws.source.extremes!(dordrecht, start, end);
+    // MSL never changed realization, and the astronomical tide is left as served.
+    const january = new Date("2004-02-01T00:00:00Z");
+    await rws.source.observations!(k13a, start, january);
+    await rws.source.predictions!(dordrecht, start, january);
+    // The year's last hour in UTC is 2005 in RWS's time.
+    assert.deepEqual(asked, [
+      "2004-12-31T23:00:00.000+00:00",
+      "2004-12-31T23:00:00.000+00:00",
+      "2004-01-01T00:00:00.000+00:00",
+      "2004-01-01T00:00:00.000+00:00",
+    ]);
+  });
+
+  it("reads both lows of a double low water, and not the rise between them", async () => {
+    const times = [
+      "2024-01-01T02:00:00+01:00",
+      "2024-01-01T08:00:00+01:00",
+      "2024-01-01T09:00:00+01:00",
+      "2024-01-01T10:00:00+01:00",
+    ];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [
+            {
+              Grootheid: { Code: "NVT" },
+              Hoedanigheid: { Code: "NVT" },
+              Typering: { Code: "GETETTPE" },
+            },
+            times.map((t, i) => [t, ["hoogwater", "laagwater 1", "topagger", "laagwater 2"][i]!]),
+          ],
+          [nap, times.map((t, i) => [t, [199, -40, -20, -45][i]!])],
+        ),
+      ],
+    ]);
+    const extremes = await rws.extremes(
+      "hoekvanholland",
+      new Date("2024-01-01T00:00:00Z"),
+      new Date("2024-01-02T00:00:00Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [e.type, e.level]),
+      [
+        ["high", 1.99],
+        ["low", -0.4],
+        ["low", -0.45],
+      ],
+    );
+  });
+
+  it("fails on an extreme type it doesn't know rather than drop it", async () => {
+    const time = "2024-01-01T02:00:00+01:00";
+    serve([
+      [/OphalenWaarnemingen/, answer([typeChannel, [[time, "hoogwater 1"]]], [nap, [[time, 199]]])],
+    ]);
+    const range = [new Date("2024-01-01T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
+    await assert.rejects(
+      rws.extremes("hoekvanholland", ...range),
+      /unknown extreme type hoogwater 1/,
+    );
+  });
 });
 
 describe("rws stations", () => {
