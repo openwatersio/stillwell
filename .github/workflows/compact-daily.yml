@@ -2,7 +2,8 @@ name: Compact daily
 
 # Fold the whole days in recent/<source>.parquet into each station's year file
 # under obs/ on R2. Each year file is read, merged and written whole, so a
-# failed run leaves the file it had, and a rerun writes nothing new.
+# failed run leaves the file it had, and a rerun writes nothing new. Then it
+# writes each station's first and last level to stations/bounds/<source>.parquet.
 on:
   schedule:
     # Between hourly runs; the fold covers six days, so a late hourly run, or

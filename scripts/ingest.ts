@@ -6,7 +6,7 @@
  *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
- *   node scripts/ingest.ts compact <source> [--days 1]
+ *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet
@@ -28,7 +28,10 @@
  * years over. `recent` fetches the last hours for every live station and merges them into
  * recent/<source>.parquet. `compact` folds
  * the last `--days` whole UTC days of that window into each station's year
- * files, each row into its datum epoch's. Both print a summary, and add it to
+ * files, each row into its datum epoch's, then writes each station's first and
+ * last level to stations/bounds/<source>.parquet (`updateBounds` in
+ * src/lake/recent.ts); `--rebuild-bounds` reads every station's again rather
+ * than keep the ones it knows. Both print a summary, and add it to
  * the workflow run's page.
  *
  * A station the source now reports against another reference opens a datum
@@ -139,6 +142,7 @@ const { positionals, values } = parseArgs({
     shard: { type: "string" },
     refetch: { type: "boolean", default: false },
     "skip-written": { type: "boolean", default: false },
+    "rebuild-bounds": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -421,7 +425,15 @@ async function compact(sourceId: string, days: number): Promise<void> {
       (s) => s.live && s.status === "active" && s.products.includes("levels"),
     ).length;
     const [start, end] = lastDays(Date.now(), days);
-    return compactRecent({ source, stations, lakeFor, concurrency, start, end });
+    return compactRecent({
+      source,
+      stations,
+      lakeFor,
+      concurrency,
+      start,
+      end,
+      rebuildBounds: values["rebuild-bounds"],
+    });
   });
   // A failed fold left its year file as it was; a person should look. Every
   // live station silent means recent/ is missing, empty or not being updated.
@@ -479,7 +491,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds]",
   );
   process.exit(1);
 }

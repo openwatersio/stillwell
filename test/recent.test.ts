@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
@@ -11,11 +11,13 @@ import {
   readDatums,
   readObservations,
   readRecent,
+  readStationBounds,
   setConnections,
   writeObservations,
   writeRecent,
+  writeStationBounds,
 } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath } from "../src/lake/paths.ts";
+import { boundsPath, recentPath, seriesPath } from "../src/lake/paths.ts";
 import { compactRecent, formatSummary, lastDays, updateRecent } from "../src/lake/recent.ts";
 import {
   Flag,
@@ -696,6 +698,231 @@ describe("compactRecent", () => {
     const again = await run();
     assert.equal(again.files, 0);
     assert.equal(statSync(file).mtimeMs, written);
+  });
+
+  it("writes each station's first and last over its epochs to the source's bounds", async () => {
+    const root = lake();
+    const a = station("a", {
+      datum: "NHN",
+      epochs: [epoch(1, "NAP", { state: "closed" }), epoch(2, "NHN")],
+    });
+    const quiet = station("quiet", { live: false });
+    const empty = station("empty");
+    const march2020 = Date.UTC(2020, 2, 1);
+    // Backfilled years, in epoch 1, written without compaction.
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2020),
+      [at(march2020, 1), at(march2020 + DAY, 1)],
+      "NAP",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2026, 2),
+      [at(start - DAY, 2)],
+      "NHN",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "test", "quiet", 2024),
+      [at(Date.UTC(2024, 4, 1), 3), at(Date.UTC(2024, 5, 1), 3)],
+      "NAP",
+    );
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + 3 * HOUR, 2, start + 3 * HOUR), station: a.id, epoch: 2 }],
+    ]);
+    const run = () =>
+      compactRecent({
+        source: source({}),
+        stations: [a, quiet, empty],
+        lakeFor: () => root,
+        start,
+        end,
+      });
+    const path = boundsPath(root, "test");
+
+    await run();
+    assert.deepEqual(
+      await readStationBounds(path),
+      new Map([
+        [a.id, { first: "2020-03-01T00:00:00Z", last: "2026-11-04T03:00:00Z" }],
+        [quiet.id, { first: "2024-05-01T00:00:00Z", last: "2024-06-01T00:00:00Z" }],
+      ]),
+    );
+
+    // A backfill of earlier years moves first; the next fold moves last.
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2019),
+      [at(Date.UTC(2019, 6, 1), 1)],
+      "NAP",
+    );
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + 5 * HOUR, 2, start + 5 * HOUR), station: a.id, epoch: 2 }],
+    ]);
+    await run();
+    assert.deepEqual((await readStationBounds(path)).get(a.id), {
+      first: "2019-07-01T00:00:00Z",
+      last: "2026-11-04T05:00:00Z",
+    });
+
+    // A backfill within this year's file is seen, folded or not.
+    const fresh = station("fresh", { live: false });
+    await writeObservations(
+      seriesPath(root, "levels", "test", "fresh", 2026),
+      [at(start - 10 * DAY, 4)],
+      "NAP",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2026, 2),
+      [at(Date.UTC(2026, 0, 5), 2), at(start - DAY, 2)],
+      "NHN",
+    );
+    const withFresh = (rebuildBounds = false) =>
+      compactRecent({
+        source: source({}),
+        stations: [a, quiet, empty, fresh],
+        lakeFor: () => root,
+        start,
+        end,
+        rebuildBounds,
+      });
+    await withFresh();
+    await writeObservations(
+      seriesPath(root, "levels", "test", "fresh", 2026),
+      [at(start - 20 * DAY, 4), at(start - 10 * DAY, 4)],
+      "NAP",
+    );
+    await withFresh();
+    assert.deepEqual((await readStationBounds(path)).get(fresh.id), {
+      first: "2026-10-15T00:00:00Z",
+      last: "2026-10-25T00:00:00Z",
+    });
+
+    // A bound in a station's first or last year, before last year, is kept
+    // without reading its files, until a rebuild.
+    await writeStationBounds(path, [
+      { id: quiet.id, first: "2024-01-02T00:00:00Z", last: "2024-12-30T00:00:00Z" },
+    ]);
+    await withFresh();
+    const kept = await readStationBounds(path);
+    assert.deepEqual(kept.get(quiet.id), {
+      first: "2024-01-02T00:00:00Z",
+      last: "2024-12-30T00:00:00Z",
+    });
+    assert.equal(kept.get(a.id)?.last, "2026-11-04T05:00:00Z");
+    await withFresh(true);
+    assert.deepEqual((await readStationBounds(path)).get(quiet.id), {
+      first: "2024-05-01T00:00:00Z",
+      last: "2024-06-01T00:00:00Z",
+    });
+  });
+
+  it("bounds a station by the rows its epochs count", async () => {
+    const root = lake();
+    const b = station("b", {
+      datum: "NHN",
+      epochs: [
+        epoch(1, "NAP", { state: "closed", until: "2020-06-01T00:00:00Z" }),
+        epoch(2, "NHN", { since: "2020-07-01T00:00:00Z" }),
+        epoch(3, "PNP", { state: "held", since: "2026-01-01T00:00:00Z" }),
+      ],
+    });
+    const write = (year: number, epochId: number, times: number[]) =>
+      writeObservations(
+        seriesPath(root, "levels", "test", "b", year, epochId),
+        times.map((t) => at(t, 1)),
+        "NAP",
+      );
+    await write(2019, 1, [Date.UTC(2019, 11, 1)]);
+    await write(2020, 1, [Date.UTC(2020, 5, 15)]); // after epoch 1's until
+    await write(2020, 2, [Date.UTC(2020, 5, 20), Date.UTC(2020, 7, 1)]); // the first is before its since
+    await write(2026, 3, [Date.UTC(2026, 1, 1)]); // held
+    await write(2027, 9, [Date.UTC(2027, 1, 1)]); // an epoch the list doesn't have
+    await compactRecent({ source: source({}), stations: [b], lakeFor: () => root, start, end });
+    assert.deepEqual((await readStationBounds(boundsPath(root, "test"))).get(b.id), {
+      first: "2019-12-01T00:00:00Z",
+      last: "2020-08-01T00:00:00Z",
+    });
+  });
+
+  it("moves an end a year inward when its year holds no counted rows", async () => {
+    const root = lake();
+    const c = station("c", {
+      datum: "NHN",
+      epochs: [
+        epoch(1, "NAP", { state: "closed", until: "2020-06-01T00:00:00Z" }),
+        epoch(2, "NHN", { since: "2021-01-01T00:00:00Z" }),
+      ],
+    });
+    const write = (year: number, epochId: number, time: number) =>
+      writeObservations(
+        seriesPath(root, "levels", "test", "c", year, epochId),
+        [at(time, 1)],
+        "NAP",
+      );
+    await write(2018, 1, Date.UTC(2018, 8, 1));
+    await write(2022, 2, Date.UTC(2022, 3, 1));
+    await write(2023, 1, Date.UTC(2023, 3, 1)); // after epoch 1's until
+    await compactRecent({ source: source({}), stations: [c], lakeFor: () => root, start, end });
+    assert.deepEqual((await readStationBounds(boundsPath(root, "test"))).get(c.id), {
+      first: "2018-09-01T00:00:00Z",
+      last: "2022-04-01T00:00:00Z",
+    });
+  });
+
+  it("keeps the bounds when the listing finds no files", async () => {
+    const root = lake();
+    const path = boundsPath(root, "test");
+    const had = { id: "test/a", first: "2020-01-01T00:00:00Z", last: "2020-02-01T00:00:00Z" };
+    await writeStationBounds(path, [had]);
+    const summary = await compactRecent({
+      source: source({}),
+      stations: [station("a", { live: false })],
+      lakeFor: () => root,
+      start,
+      end,
+    });
+    assert.match(summary.failed[0]!, /^bounds: no test files listed/);
+    const rebuilt = await compactRecent({
+      source: source({}),
+      stations: [station("a", { live: false })],
+      lakeFor: () => root,
+      start,
+      end,
+      rebuildBounds: true,
+    });
+    assert.match(rebuilt.failed[0]!, /^bounds: no test files listed/);
+    assert.deepEqual((await readStationBounds(path)).get(had.id), {
+      first: had.first,
+      last: had.last,
+    });
+  });
+
+  it("doesn't bound a station by a value whose write failed", async () => {
+    const root = lake();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(file, [at(start - DAY, 1)], "NAP");
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + HOUR, 1, start + HOUR), station: a.id, epoch: 1 }],
+    ]);
+    // A read-only file in a read-only directory makes the write fail.
+    chmodSync(file, 0o444);
+    chmodSync(dirname(file), 0o555);
+    try {
+      const summary = await compactRecent({
+        source: source({}),
+        stations: [a],
+        lakeFor: () => root,
+        start,
+        end,
+      });
+      assert.equal(summary.failed.length, 1);
+    } finally {
+      chmodSync(dirname(file), 0o755);
+      chmodSync(file, 0o644);
+    }
+    assert.deepEqual((await readStationBounds(boundsPath(root, "test"))).get(a.id), {
+      first: "2026-11-03T00:00:00Z",
+      last: "2026-11-03T00:00:00Z",
+    });
   });
 
   it("splits a range across New Year into each year's file", async () => {
