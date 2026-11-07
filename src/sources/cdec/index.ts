@@ -1,7 +1,9 @@
 import { getText } from "../../http.ts";
+import { currentEpoch } from "../../epochs.ts";
 import {
   Flag,
   stationDefaults,
+  type LakeStation,
   type ListedStation,
   type Observation,
   type Source,
@@ -91,7 +93,7 @@ export interface Meta {
 
 /** Every station in `CODES` that an operator other than USGS runs and that has 15-minute stage. */
 export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
-  const before = new Map(previous.map((s) => [s.source_id, s as Partial<ListedStation>]));
+  const before = new Map(previous.map((s) => [s.source_id, s as Partial<LakeStation>]));
   const out: CdecStation[] = [];
   for (const code of CODES) {
     let meta: Meta;
@@ -110,18 +112,22 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
       throw error;
     }
     // USGS's gauges are in `usgs`; one it runs with another agency is too.
-    if (/USGS|Geological/i.test(meta.operator) || !meta.stage) continue;
+    if (/USGS|Geological/i.test(meta.operator)) continue;
     const listed = before.get(code);
+    if (!meta.stage) {
+      // A listed station's stage row gone missing is likelier a changed page than a gauge without stage.
+      if (listed) throw new Error(`CDEC's page for ${code} no longer shows its 15-minute stage`);
+      continue;
+    }
     let { datum, datums, reference } = datumOf(code, meta.zero);
-    // A page that loses its gauge-zero table keeps the station as it was, since
-    // a template change or a gap is likelier than a datum the station dropped.
-    if (!meta.zero && listed?.reference && listed.reference.id !== "none" && listed.datum) {
-      console.warn(
-        `CDEC's page for ${code} has no gauge-zero table; keeping ${listed.reference.id}`,
-      );
-      datum = listed.datum;
-      datums = listed.datums ?? {};
-      reference = listed.reference.id;
+    // A page that loses its gauge-zero table says nothing of the datum this
+    // time, so the station keeps the one it was listed with, as `datum: null`
+    // means; a template change or a gap is likelier than a gauge losing its datum.
+    const was = listed?.epochs?.length ? currentEpoch(listed.epochs).reference : null;
+    if (!meta.zero && was) {
+      console.warn(`CDEC's page for ${code} has no gauge-zero table; keeping ${was}`);
+      datum = null;
+      datums = {};
     }
     const from = Math.max(local(meta.stage.from), navd88Since(code));
     const active = meta.stage.to === null;
@@ -139,7 +145,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
       datum,
       datums,
       // The gauge-zero row, so a moved zero under the same label opens an epoch.
-      reference: { id: reference, since: null },
+      reference: reference === null ? null : { id: reference, since: null },
       products: ["levels"],
       first: null,
       last: null,
@@ -175,10 +181,12 @@ function local(date: string, days = 0): number {
 export function datumOf(
   code: string,
   zero: Meta["zero"],
-): { datum: string; datums: Record<string, number>; reference: string } {
-  if (!zero) return { datum: NOTED[code] ?? "GZ", datums: {}, reference: "none" };
+): { datum: string | null; datums: Record<string, number>; reference: string | null } {
+  // No table: a datum the notes give, or gauge zero, and no reference, so a
+  // table appearing later is recorded rather than read as a moved zero.
+  if (!zero) return { datum: NOTED[code] ?? "GZ", datums: {}, reference: null };
   const named = DATUMS[zero.datum];
-  if (!named) throw new Error(`CDEC's page for ${code} names an unknown datum, ${zero.datum}`);
+  if (!named) throw new Error(`CDEC's page for ${code} names an unknown datum, "${zero.datum}"`);
   const reference = `${zero.feet} ft ${named}`;
   if (zero.feet === 0) return { datum: named, datums: {}, reference };
   return {
@@ -232,8 +240,10 @@ export function parseMeta(html: string, code: string): Meta {
   }
   // The gauge-zero table's first row: the zero's elevation and its datum.
   const table = /<th>Zero[\s\S]*?<\/table>/.exec(html)?.[0];
-  const row = table && /<td>\s*(-?[\d.]+)'\s*([A-Z]+ ?\d+)\s*<\/td>/.exec(table);
-  const zero = row ? { feet: Number(row[1]), datum: row[2]!.replace(/\s+/g, " ") } : null;
+  // Any datum name is read, so one the adapter doesn't know fails rather than reads as no table.
+  const row = table && /<td>\s*(-?[\d.]+)'\s*([^<]*?)\s*<\/td>/.exec(table);
+  const zero =
+    row && row[2]!.trim() ? { feet: Number(row[1]), datum: row[2]!.replace(/\s+/g, " ") } : null;
   return { name: titleCase(name), lat, lon, operator, zero, stage };
 }
 

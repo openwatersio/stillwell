@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
+import { mergeStationList } from "../src/stations.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -113,9 +114,12 @@ describe("cdec", () => {
       reference: "5 ft NGVD29",
     });
     // No table: a datum the notes give, or gauge zero.
-    assert.deepEqual(cdec.datumOf("BDL", null), { datum: "NAVD88", datums: {}, reference: "none" });
-    assert.deepEqual(cdec.datumOf("HOL", null), { datum: "GZ", datums: {}, reference: "none" });
-    assert.throws(() => cdec.datumOf("HOL", { feet: 0, datum: "MLLW 1" }), /unknown datum, MLLW 1/);
+    assert.deepEqual(cdec.datumOf("BDL", null), { datum: "NAVD88", datums: {}, reference: null });
+    assert.deepEqual(cdec.datumOf("HOL", null), { datum: "GZ", datums: {}, reference: null });
+    assert.throws(
+      () => cdec.datumOf("HOL", { feet: 0, datum: "MLLW 1" }),
+      /unknown datum, "MLLW 1"/,
+    );
     // A page that moves GSS to NGVD 29 moves the station, for the refresh to open or hold an epoch.
     const gss = fixture("cdec-meta-GSS.html").replace("NAVD 88", "NGVD 29");
     serve((url) => (/station_id=GSS/.test(url) ? gss : NO_STAGE));
@@ -123,18 +127,47 @@ describe("cdec", () => {
     assert.deepEqual([listed!.id, listed!.datum], ["cdec/GSS", "NGVD29"]);
   });
 
-  it("reports the gauge zero as the reference, and keeps it when a page loses its table", async () => {
+  it("reports the gauge zero as the reference, and keeps the datum when a page loses its table", async () => {
     serve((url) => (/station_id=GSS/.test(url) ? fixture("cdec-meta-GSS.html") : NO_STAGE));
-    const [gss] = await cdec.stations();
-    assert.deepEqual(gss!.reference, { id: "0 ft NAVD88", since: null });
-    // The same page without its gauge-zero table: GSS stays as it was listed.
+    const fetched = await cdec.stations();
+    assert.deepEqual(fetched[0]!.reference, { id: "0 ft NAVD88", since: null });
+    // The lake's list keeps the reference on the station's epoch, not the station.
+    const options = {
+      now: "2026-11-02T00:00:00Z",
+      offsets: [-8, -7] as [number, number],
+      decisions: {},
+    };
+    const { stations: lake } = mergeStationList([], fetched, options);
+    assert.equal("reference" in lake[0]!, false);
+    // The same page without its gauge-zero table says nothing of the datum this time.
     const bare = fixture("cdec-meta-GSS.html").replace(/<th>Zero[\s\S]*?<\/table>/, "</table>");
     serve((url) => (/station_id=GSS/.test(url) ? bare : NO_STAGE));
-    const [kept] = await cdec.stations([gss as never]);
-    assert.deepEqual(
-      [kept!.datum, kept!.reference],
-      ["NAVD88", { id: "0 ft NAVD88", since: null }],
+    const again = await cdec.stations(lake);
+    assert.deepEqual([again[0]!.datum, again[0]!.reference], [null, null]);
+    // So the merge keeps GSS in NAVD88, with no new epoch.
+    const merged = mergeStationList(lake, again, { ...options, now: "2026-12-02T00:00:00Z" });
+    assert.equal(merged.stations[0]!.datum, "NAVD88");
+    assert.equal(merged.stations[0]!.epochs.length, 1);
+    // A new station without a table has no reference to compare later.
+    serve((url) => (/station_id=GSS/.test(url) ? bare : NO_STAGE));
+    assert.deepEqual((await cdec.stations())[0]!.reference, null);
+  });
+
+  it("refuses a listed station whose stage row is gone, and a datum it doesn't know", async () => {
+    serve((url) => (/station_id=GSS/.test(url) ? fixture("cdec-meta-GSS.html") : NO_STAGE));
+    const fetched = await cdec.stations();
+    serve((url) => (/station_id=GSS/.test(url) ? NO_STAGE.replace("NO STAGE", "GSS") : NO_STAGE));
+    await assert.rejects(
+      cdec.stations(fetched as never),
+      /GSS no longer shows its 15-minute stage/,
     );
+    const msl = fixture("cdec-meta-GSS.html").replace(/0\.0' NAVD 88/, "0.0' MSL");
+    assert.deepEqual(cdec.parseMeta(msl, "GSS").zero, { feet: 0, datum: "MSL" });
+    serve((url) => (/station_id=GSS/.test(url) ? msl : NO_STAGE));
+    await assert.rejects(cdec.stations(), /unknown datum, "MSL"/);
+    // A non-zero zero read from a page, as SDC's 5.0 ft NGVD 29.
+    const sdc = fixture("cdec-meta-GSS.html").replace(/0\.0' NAVD 88/, "5.0' NGVD 29");
+    assert.deepEqual(cdec.parseMeta(sdc, "SDC").zero, { feet: 5, datum: "NGVD 29" });
   });
 
   it("skips a bad page only for a code the last list left out", async () => {
