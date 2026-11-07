@@ -46,10 +46,16 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
   // Smögen's latest day, and three days of the closed gauge at Götaälvbron in Gothenburg,
   // whose whole archive is about 100 KB; a recent range would download Smögen's.
-  smhi: async () => [
-    ...(await smhi.levels("2111", new Date(end.getTime() - 18 * 3_600_000), end)),
-    ...(await smhi.levels("33092", new Date("2012-01-01Z"), new Date("2012-01-04Z"))),
-  ],
+  smhi: async () => {
+    const latest = await smhi.levels("2111", new Date(end.getTime() - 18 * 3_600_000), end);
+    // The archive alone would pass a live feed that returns nothing.
+    return latest.length
+      ? [
+          ...latest,
+          ...(await smhi.levels("33092", new Date("2012-01-01Z"), new Date("2012-01-04Z"))),
+        ]
+      : [];
+  },
   // Honolulu: its FD series ten weeks back, since FD values arrive 4 to 6
   // weeks late, and three days of its research-quality version A.
   uhslc: async () => [

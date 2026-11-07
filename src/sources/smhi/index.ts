@@ -31,7 +31,7 @@ export const metadata: SourceMetadata = {
   },
   attribution: "SMHI",
   terms:
-    "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the lake: levels converted from centimeters to meters, and quality flags added; values from the last two months are marked preliminary.",
+    "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the lake: levels converted from centimeters to meters, and quality flags added; values from the current and previous calendar months are marked preliminary.",
   archive: "current",
 };
 
@@ -131,7 +131,7 @@ export async function levels(
     const archive = await archiveOf(sourceId, datum);
     // Only a range that reaches past the archive's end can lose hours to a cut;
     // checking every range would fail a station's whole record during an outage.
-    if (to > archive.last) complete(archive, sourceId);
+    if (to > archive.last) complete(archive, sourceId, record_end);
     out = archive.values.slice(lowerBound(archive.values, from), lowerBound(archive.values, to));
     last = archive.last;
   }
@@ -184,17 +184,16 @@ function archiveOf(sourceId: string, datum: string): Promise<Parsed> {
 }
 
 /**
- * An archive read to its end runs to the station's last hour or to the previous UTC midnight,
- * where `latest-day` takes over, whichever is earlier; SMHI builds it to
- * today's midnight. One that ends sooner was cut short, as a dropped
- * connection can do to a 30 MB file, and backfill would take its missing
- * hours as gone and delete them from the lake.
+ * An archive read to its end runs to the previous UTC midnight, where
+ * `latest-day` takes over, or for a closed station to the end the station list
+ * gives; SMHI builds an active station's archive to today's midnight. One that
+ * ends sooner was cut short, or is a stale copy, and backfill would take its
+ * missing hours as gone and delete them from the lake. The archive's own
+ * `t.o.m.` note can't tell: it follows the file's last row.
  */
-function complete(archive: Parsed, sourceId: string): void {
-  const due = Math.min(
-    archive.through ?? Infinity,
-    Math.floor(Date.now() / DAY_MS) * DAY_MS - DAY_MS,
-  );
+function complete(archive: Parsed, sourceId: string, recordEnd?: string | null): void {
+  const midnight = Math.floor(Date.now() / DAY_MS) * DAY_MS - DAY_MS;
+  const due = recordEnd ? Math.min(Date.parse(recordEnd), midnight) : midnight;
   if (archive.last < due - HOUR_MS)
     throw new Error(
       `SMHI ${sourceId}'s archive ends at ${new Date(archive.last).toISOString()}, before ${new Date(due).toISOString()}`,
@@ -241,9 +240,17 @@ export function parse(text: string, sourceId: string, datum: string): Parsed {
 /** Rows the notes column spans; `Höjdsystem` is the fourth note. */
 const NOTE_ROWS = 12;
 
-/** G is checked and approved, O unchecked; Y is suspect, and SMHI documents no others. */
+/**
+ * G is checked and approved. O is unchecked, and Y roughly checked, including
+ * the last two hours, so both are preliminary, for QC to judge. SMHI documents
+ * no others.
+ */
 function flagOf(quality: string): Flag {
-  return quality === "G" ? Flag.good : quality === "O" ? Flag.preliminary : Flag.suspect;
+  return quality === "G"
+    ? Flag.good
+    : quality === "O" || quality === "Y"
+      ? Flag.preliminary
+      : Flag.suspect;
 }
 
 /** The first index whose time is at or after `time`. */

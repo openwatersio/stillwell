@@ -119,19 +119,19 @@ describe("smhi", () => {
     assert.equal(requests.filter(([url]) => /corrected-archive/.test(url)).length, 1);
   });
 
-  it("maps G to good, O to preliminary and Y to suspect once SMHI's corrections are done", async () => {
+  it("maps G to good, O and Y to preliminary, and others to suspect once SMHI's corrections are done", async () => {
     mock.timers.setTime(Date.parse("2027-03-01T00:00:00Z"));
     // Recorded archives hold no Y, so one value is changed to it here.
-    const archive = fixture("smhi-archive.csv").replace(
-      "2026-11-04 05:00:00;7.6;G",
-      "2026-11-04 05:00:00;7.6;Y",
-    );
+    const archive = fixture("smhi-archive.csv")
+      .replace("2026-11-04 05:00:00;7.6;G", "2026-11-04 05:00:00;7.6;Y")
+      .replace("2026-11-04 06:00:00;7.1;G", "2026-11-04 06:00:00;7.1;X");
     serve([[/corrected-archive/, archive]]);
     const levels = await smhi.levels("2545", new Date("2014-01-01Z"), new Date("2026-11-05Z"));
     const flags = Object.fromEntries(levels.map((l) => [iso(l.time), l.flag]));
     assert.equal(flags["2014-04-02T08:00:00.000Z"], Flag.preliminary);
     assert.equal(flags["2026-11-04T04:00:00.000Z"], Flag.good);
-    assert.equal(flags["2026-11-04T05:00:00.000Z"], Flag.suspect);
+    assert.equal(flags["2026-11-04T05:00:00.000Z"], Flag.preliminary);
+    assert.equal(flags["2026-11-04T06:00:00.000Z"], Flag.suspect);
     assert.equal(levels.find((l) => iso(l.time) === "2014-04-02T08:00:00.000Z")!.level, -0.006);
   });
 
@@ -143,6 +143,25 @@ describe("smhi", () => {
     );
   });
 
+  it("refuses a stale archive whose own end note matches its last row", async () => {
+    const text = fixture("smhi-archive.csv");
+    // A copy built on 5 November: its rows and its note end together.
+    const stale = text
+      .slice(0, text.indexOf("2026-11-05 01:00:00"))
+      .replace("t.o.m.) = 2026-11-07 01:00:00", "t.o.m.) = 2026-11-05 01:00:00");
+    serve([[/corrected-archive/, stale]]);
+    await assert.rejects(
+      smhi.levels("2545", new Date("2026-11-04Z"), new Date("2026-11-07Z")),
+      /archive ends at 2026-11-05T00:00:00.000Z, before 2026-11-06T00:00:00/,
+    );
+    // A closed station's archive only has to reach the end the list gives.
+    smhi.forgetArchives();
+    const levels = await smhi.levels("2545", new Date("2026-11-04Z"), new Date("2026-11-06Z"), {
+      record_end: "2026-11-05T01:00:00.000Z",
+    });
+    assert.ok(levels.length);
+  });
+
   it("refuses an archive cut within its last day, read after the station's year", async () => {
     mock.timers.setTime(Date.parse("2027-03-01T00:00:00Z"));
     const text = fixture("smhi-archive.csv");
@@ -150,7 +169,7 @@ describe("smhi", () => {
     serve([[/corrected-archive/, cut]]);
     await assert.rejects(
       smhi.levels("2545", new Date("2026-01-01Z"), new Date("2027-01-01Z")),
-      /archive ends at 2026-11-06T12:00:00.000Z, before 2026-11-07T01:00:00/,
+      /archive ends at 2026-11-06T12:00:00.000Z, before 2027-02-28T00:00:00/,
     );
   });
 

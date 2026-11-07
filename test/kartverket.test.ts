@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
+import { DatumChanged } from "../src/epochs.ts";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
@@ -116,6 +117,108 @@ describe("kartverket", () => {
       kartverket.levels("BGO", ...range, { datums: { NN2000: -1.2 } }),
       /chart datum is now 1.022 m below NN2000, not 1.2; run ingest stations/,
     );
+    // Hourly ingest's few hours too: compaction folds them into the year files. It's a
+    // DatumChanged whose reference is the refresh's reason, so Ingest hourly asks for a
+    // refresh and a change a person rejected matches its epoch.
+    kartverket.forgetChecks();
+    serve([
+      [/stationlevels&stationcode=BGO/, fixture("kartverket-levels-BGO.xml")],
+      [/stationdata/, fixture("kartverket-obs-recent.xml")],
+    ]);
+    const bgo = { datums: { NN2000: -1.2 } } as unknown as Station;
+    const reason = kartverket.seriesChanged(bgo, { datums: { NN2000: -1.022 } } as never);
+    await assert.rejects(
+      kartverket.levels("BGO", new Date(Date.now() - 12 * 3_600_000), new Date(), {
+        datums: { NN2000: -1.2 },
+      }),
+      (error) =>
+        error instanceof DatumChanged && error.datum === "CD" && error.reference === reason,
+    );
+  });
+
+  it("checks chart datum strictly for a backfill and leniently for hourly ingest", async () => {
+    kartverket.forgetChecks();
+    // The recorded recent values are from early on 5 November.
+    mock.timers.setTime(Date.parse("2026-11-05T02:00:00Z"));
+    serve([
+      [/stationlevels/, "<tide><error>timeout</error></tide>"],
+      [/stationdata/, fixture("kartverket-obs-recent.xml")],
+    ]);
+    const recent = await kartverket.levels(
+      "BGO",
+      new Date(Date.now() - 12 * 3_600_000),
+      new Date(),
+      {
+        datums: { NN2000: -1.022 },
+      },
+    );
+    assert.ok(recent.length);
+    await assert.rejects(
+      kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"), {
+        datums: { NN2000: -1.022 },
+      }),
+      /timeout/,
+    );
+    // An answer that gives no NN2000 can't say the datum stayed either.
+    kartverket.forgetChecks();
+    serve([
+      [/stationlevels/, "<tide></tide>"],
+      [/stationdata/, fixture("kartverket-obs-1990.xml")],
+    ]);
+    await assert.rejects(
+      kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"), {
+        datums: { NN2000: -1.022 },
+      }),
+      /don't give NN2000/,
+    );
+    // A list with no baseline can't be checked, so a backfill waits for a refresh.
+    kartverket.forgetChecks();
+    serve([
+      [/stationlevels&stationcode=BGO/, fixture("kartverket-levels-BGO.xml")],
+      [/stationdata/, fixture("kartverket-obs-1990.xml")],
+    ]);
+    await assert.rejects(
+      kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"), {
+        datums: {},
+      }),
+      /no NN2000 in the lake's list/,
+    );
+    // Ny-Ålesund has none to give, so it backfills unchecked.
+    serve([
+      [/stationlevels&stationcode=NYA/, fixture("kartverket-levels-NYA.xml")],
+      [/stationdata/, fixture("kartverket-obs-1990.xml").replaceAll("BGO", "NYA")],
+    ]);
+    await kartverket.levels("NYA", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"), {
+      datums: { MSL: -0.952 },
+    });
+  });
+
+  it("counts a move of exactly a centimeter as none", () => {
+    const at = (nn2000: number) => ({ datums: { NN2000: nn2000 } }) as unknown as Station;
+    assert.equal(kartverket.seriesChanged(at(-1.022), at(-1.032)), null);
+    assert.equal(kartverket.seriesChanged(at(-1.02), at(-1.03)), null);
+    assert.ok(kartverket.seriesChanged(at(-1.022), at(-1.033)));
+  });
+
+  it("keeps NN2000 from the lake's list when a reply leaves it out", async () => {
+    serve(listRoutes);
+    const previous = (await kartverket.stations()) as Station[];
+    const noNn2000 = fixture("kartverket-levels-BGO.xml").replace(
+      /<reflevel[^>]*code="NN2000"[^>]*\/>/,
+      "",
+    );
+    assert.notEqual(noNn2000, fixture("kartverket-levels-BGO.xml"));
+    serve([[/stationlevels&stationcode=BGO/, noNn2000], ...listRoutes]);
+    const bgo = (await kartverket.stations(previous)).find((s) => s.id === "kartverket/BGO")!;
+    assert.equal(bgo.datums.NN2000, -1.022);
+    // Other offsets aren't carried: a new epoch mustn't start with the old datum's.
+    const noMsl = fixture("kartverket-levels-BGO.xml").replace(
+      /<reflevel[^>]*code="MSL"[^>]*\/>/,
+      "",
+    );
+    serve([[/stationlevels&stationcode=BGO/, noMsl], ...listRoutes]);
+    const without = (await kartverket.stations(previous)).find((s) => s.id === "kartverket/BGO")!;
+    assert.equal(without.datums.MSL, undefined);
   });
 
   it("refuses an empty station list", async () => {

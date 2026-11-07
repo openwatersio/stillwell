@@ -1,3 +1,4 @@
+import { DatumChanged } from "../../epochs.ts";
 import { getText } from "../../http.ts";
 import {
   Flag,
@@ -74,14 +75,21 @@ export async function stations(previous: Station[] = []): Promise<KartverketStat
       (xml) => elements(xml, "obstime")[0]?.first,
       (error: Error) => void console.warn(`  kartverket ${code}: no obstime: ${error.message}`),
     );
-    // Offsets that can't be read are kept from the lake's list, so `seriesChanged`
-    // still has the committed NN2000 to compare the next refresh with.
-    const datums =
-      (await offsets(code).catch(
-        (error: Error) => void console.warn(`  kartverket ${code}: no levels: ${error.message}`),
-      )) ??
-      known.get(`kartverket/${code}`)?.datums ??
-      {};
+    // Offsets that can't be read are kept from the lake's list, and so is NN2000
+    // when a reply leaves it out, so `seriesChanged` keeps its baseline. Other
+    // offsets aren't, since a new epoch mustn't start with the old datum's.
+    const previousDatums = known.get(`kartverket/${code}`)?.datums;
+    const read = await offsets(code).catch(
+      (error: Error) => void console.warn(`  kartverket ${code}: no levels: ${error.message}`),
+    );
+    const datums: Record<string, number> = read
+      ? {
+          ...read,
+          ...(read.NN2000 === undefined && previousDatums?.NN2000 !== undefined
+            ? { NN2000: previousDatums.NN2000 }
+            : {}),
+        }
+      : { ...previousDatums };
     const lat = Number(s.latitude);
     out.push({
       ...stationDefaults(metadata),
@@ -136,33 +144,69 @@ async function offsets(code: string): Promise<Record<string, number> | null> {
 }
 
 /**
- * Refuses a backfill once chart datum has moved against NN2000 since the lake's
+ * Refuses levels once chart datum has moved against NN2000 since the lake's
  * list, which the API would serve the whole record against, until a refresh
  * opens an epoch for it. Asked once a station per process.
  */
-const checked = new Map<string, Promise<void>>();
+const asked = new Map<string, Promise<Record<string, number> | null>>();
 
-function checkChartDatum(code: string, nn2000: number): Promise<void> {
-  let check = checked.get(code);
-  if (!check) {
-    check = offsets(code).then((now) => {
-      if (now?.NN2000 !== undefined && Math.abs(now.NN2000 - nn2000) > 0.01)
-        throw new Error(
-          `Kartverket ${code}'s chart datum is now ${-now.NN2000} m below NN2000, not ${-nn2000}; run ingest stations`,
-        );
-    });
-    checked.set(code, check);
-    // A request that failed is asked again for the next year; a moved datum fails on its own.
-    check.catch((error: Error) => {
-      if (!/chart datum is now/.test(error.message)) checked.delete(code);
-    });
+/**
+ * Throws `DatumChanged` with `seriesChanged`'s reason as the reference, so
+ * Ingest hourly starts a refresh, which opens or holds the epoch, and a change
+ * a person rejected matches its epoch and asks for none. Offsets that can't be
+ * read refuse a backfill, which writes the lake's years, but only warn for
+ * `strict` false, so an outage of `stationlevels` doesn't stop hourly ingest.
+ */
+async function checkChartDatum(
+  code: string,
+  nn2000: number | undefined,
+  strict: boolean,
+): Promise<void> {
+  let offsetsNow = asked.get(code);
+  if (!offsetsNow) {
+    offsetsNow = offsets(code);
+    asked.set(code, offsetsNow);
+    // A request that failed is asked again next time.
+    offsetsNow.catch(() => asked.delete(code));
   }
-  return check;
+  let now: Record<string, number> | null;
+  try {
+    now = await offsetsNow;
+  } catch (error) {
+    if (strict) throw error;
+    console.warn(`  kartverket ${code}: chart datum not checked: ${(error as Error).message}`);
+    return;
+  }
+  // A reply without NN2000 can't say the datum stayed, so a backfill refuses it too.
+  if (now?.NN2000 === undefined) {
+    if (strict && nn2000 !== undefined)
+      throw new Error(`Kartverket ${code}'s offsets don't give NN2000`);
+    if (nn2000 !== undefined)
+      console.warn(`  kartverket ${code}: chart datum not checked: no NN2000 in its offsets`);
+    return;
+  }
+  // A list with no baseline gives nothing to compare with, so a backfill waits for a refresh that reads one.
+  if (nn2000 === undefined) {
+    if (strict)
+      throw new Error(`Kartverket ${code} has no NN2000 in the lake's list; run ingest stations`);
+    return;
+  }
+  const reason = moved(nn2000, now.NN2000);
+  if (reason)
+    throw new DatumChanged(`Kartverket ${code}'s ${reason}; run ingest stations`, DATUM, reason);
+}
+
+/** Why chart datum isn't where it was against NN2000, when it moved more than a centimeter. */
+function moved(was: number | undefined, now: number | undefined): string | null {
+  if (was === undefined || now === undefined) return null;
+  // Whole millimeters, as the offsets come, so floating point can't tip the boundary.
+  if (Math.round(Math.abs(now - was) * 1000) <= 10) return null;
+  return `chart datum is now ${-now} m below NN2000, not ${-was}`;
 }
 
 /** For tests: forget the chart datum checks. */
 export function forgetChecks(): void {
-  checked.clear();
+  asked.clear();
 }
 
 /**
@@ -180,9 +224,10 @@ export async function levels(
   }: { datum?: string; record_start?: string | null; datums?: Record<string, number> } = {},
 ): Promise<Observation[]> {
   if (!/^[A-Z]{3}$/.test(sourceId)) throw new Error(`Not a Kartverket station: ${sourceId}`);
-  // Hourly ingest's few hours can't rewrite the lake's years, so only longer ranges are checked.
-  if (datums?.NN2000 !== undefined && start.getTime() < Date.now() - 2 * DAY_MS)
-    await checkChartDatum(sourceId, datums.NN2000);
+  // Hourly ingest's few hours too, since compaction folds them into the year files.
+  const strict = start.getTime() < Date.now() - 2 * DAY_MS;
+  if (datums && (strict || datums.NN2000 !== undefined))
+    await checkChartDatum(sourceId, datums.NN2000, strict);
   const from = Math.max(
     start.getTime(),
     record_start ? Date.parse(record_start) - DAY_MS : -Infinity,
@@ -317,9 +362,7 @@ async function request(
  * has no NN2000, so a change there goes unseen.
  */
 export function seriesChanged(committed: Station, listed: ListedStation): string | null {
-  const [was, now] = [committed.datums.NN2000, listed.datums.NN2000];
-  if (was === undefined || now === undefined || Math.abs(now - was) <= 0.01) return null;
-  return `chart datum is now ${-now} m below NN2000, not ${-was}`;
+  return moved(committed.datums.NN2000, listed.datums.NN2000);
 }
 
 export const source: Source = {
