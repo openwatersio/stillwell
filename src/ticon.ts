@@ -89,7 +89,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   fmi: { source: "fmi", status: "license", note: "FMI's sea-level terms not confirmed" },
   crms: { source: "crms", status: "license", note: "Louisiana CRMS terms to check" },
   cdwr: { source: "cdec", status: "license", note: "California CDEC terms to check" },
-  sfwmd: { source: "sfwmd", status: "license", note: "South Florida WMD terms to check" },
+  sfwmd: { source: "sfwmd", status: "planned" },
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
   bom: { source: "bom", status: "license", note: "BOM license not stated" },

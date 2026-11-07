@@ -24,6 +24,7 @@ import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import * as sfwmd from "../src/sources/sfwmd/index.ts";
 import * as smhi from "../src/sources/smhi/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
@@ -60,6 +61,25 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     )),
   ],
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
+  // S-123 tailwater on Biscayne Bay: the telemetry series, and two days of the derived one in 2024.
+  sfwmd: async () => {
+    const live = await sfwmd.levels(
+      { series: "IY320", history: null, history_end: null },
+      start,
+      end,
+    );
+    // The derived series alone would pass a live feed that returns nothing.
+    return live.length
+      ? [
+          ...live,
+          ...(await sfwmd.levels(
+            { series: "IY320", history: "AP159", history_end: "2026-05-11T05:00:00.000Z" },
+            new Date("2024-01-16T05:00:00Z"),
+            new Date("2024-01-18T05:00:00Z"),
+          )),
+        ]
+      : [];
+  },
   // Smögen's latest day, and three days of the closed gauge at Götaälvbron in Gothenburg,
   // whose whole archive is about 100 KB; a recent range would download Smögen's.
   smhi: async () => {
