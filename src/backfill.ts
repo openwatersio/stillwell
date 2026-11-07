@@ -33,7 +33,9 @@ const DAY_MS = 86_400_000;
  * `source_flag` existed have none, so there a value QC flagged that way
  * doesn't count, and a year whose every provisional value QC flagged is done. A source qualifier such as
  * USGS's ICE is mapped to `suspect` by the adapter, before `source_flag` is
- * set, so a file whose every provisional value carries one counts as done.
+ * set, so a file whose every provisional value carries one counts as done. An
+ * adapter's own verdict, such as REFMAR's suspect clock spans, sets
+ * `source_flag` to the source's flag itself.
  *
  * Provisional years are fetched on every run, so a long campaign of runs
  * uses `--skip-written` (`yearWritten`) instead.

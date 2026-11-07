@@ -37,10 +37,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   coops: () => coops.levels("9414290", start, end, { live: true }),
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
-  // Brest: its record, which carries the datum and owners, three days of raw
-  // values, and three of validated ones a year back.
+  // Brest: three days of raw values, and three of validated ones a year back.
   refmar: async () => [
-    await refmar.gauge("3"),
     ...(await refmar.levels({ source_id: "3", first_observation: null }, start, end)),
     ...(await refmar.levels(
       { source_id: "3", first_observation: null },

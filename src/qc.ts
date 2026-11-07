@@ -26,10 +26,11 @@ export interface QcOptions {
 /**
  * Rows as a source sent them, with `source_flag` set to their flag before QC
  * can make it worse. Only freshly fetched rows get this: a stored row's flag
- * may already hold QC's marks.
+ * may already hold QC's marks. An adapter that marks a source's value worse
+ * itself, such as REFMAR's suspect spans, sets `source_flag` to the source's.
  */
 export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
-  return rows.map((r) => ({ ...r, source_flag: r.flag }));
+  return rows.map((r) => ({ ...r, source_flag: r.source_flag ?? r.flag }));
 }
 
 /** Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and outliers. */

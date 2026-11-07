@@ -79,7 +79,6 @@ const BODC_NOTE =
 /** Contributors whose records all go to one planned source. */
 const DIRECT: Record<string, { source: string; status: Status; note?: string }> = {
   smhi: { source: "smhi", status: "planned" },
-  refmar: { source: "refmar", status: "planned" },
   mi_c: { source: "marine-institute", status: "planned" },
   mi_r: { source: "marine-institute", status: "planned" },
   dmi: { source: "dmi", status: "planned" },

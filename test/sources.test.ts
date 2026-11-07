@@ -2836,7 +2836,6 @@ describe("refmar", () => {
     serveGauges(JSON.parse(fixture("refmar-gauges.json")));
     const previous = await refmar.stations();
     const gauges = JSON.parse(fixture("refmar-gauges.json"));
-    delete gauges["3"].verticalRef;
     delete gauges["6118"];
     serveGauges(gauges);
     const brestBefore = previous.find((s) => s.id === "refmar/3")!;
@@ -2844,17 +2843,65 @@ describe("refmar", () => {
     const hidden = { ...brestBefore, id: "refmar/6326", source_id: "6326" };
     const stations = await refmar.stations([...previous, hidden] as Station[]);
     const of = (id: string) => stations.find((s) => s.id === id)!;
-    assert.deepEqual(of("refmar/3"), brestBefore);
     assert.equal(of("refmar/6118").datum, "ZH");
     // A hidden gauge keeps its owners' credit, but loses its products.
     assert.equal(of("refmar/6326").attribution, brestBefore.attribution);
     assert.deepEqual(of("refmar/6326").products, []);
+    // A record without a vertical reference keeps what the gauge had.
+    gauges["6118"] = { ...JSON.parse(fixture("refmar-gauges.json"))["6118"] };
+    delete gauges["3"].verticalRef;
+    serveGauges(gauges);
+    assert.deepEqual(
+      (await refmar.stations(previous as Station[])).find((s) => s.id === "refmar/3"),
+      brestBefore,
+    );
+    // A record with no owners, or one that dropped its first observation, keeps
+    // what the gauge had.
+    gauges["16"].organismes = [];
+    const brest = { ...JSON.parse(fixture("refmar-gauges.json"))["3"] };
+    delete brest.date_prem_obs;
+    gauges["3"] = brest;
+    serveGauges(gauges);
+    const again = await refmar.stations(previous as Station[]);
+    const ofAgain = (id: string) => again.find((s) => s.id === id)!;
+    assert.equal(
+      ofAgain("refmar/16").attribution,
+      previous.find((s) => s.id === "refmar/16")!.attribution,
+    );
+    assert.equal(ofAgain("refmar/3").first_observation, "1846-01-04");
+    // An empty vertical reference doesn't move a ZH gauge to ZI.
+    brest.verticalRef = {};
+    serveGauges(gauges);
+    assert.equal(
+      (await refmar.stations(previous as Station[])).find((s) => s.id === "refmar/3")!.datum,
+      null,
+    );
     // A new gauge without a full record is left out.
+    gauges["16"] = JSON.parse(fixture("refmar-gauges.json"))["16"];
+    delete gauges["6118"];
     serveGauges(gauges);
     assert.equal(
       (await refmar.stations()).some((s) => s.id === "refmar/6118"),
       false,
     );
+  });
+
+  it("publishes only gauge states it knows, and refuses a list most records failed", async () => {
+    const list = JSON.parse(fixture("refmar-tidegauges.json"));
+    list.find((g: { shom_id: string }) => g.shom_id === "3").state = "PRIVATE";
+    const gauges = JSON.parse(fixture("refmar-gauges.json"));
+    setTransport(async (url) => {
+      if (/service\/tidegauges$/.test(url)) return JSON.stringify(list);
+      const id = /completetidegauge\/(\d+)$/.exec(url)?.[1];
+      if (id && gauges[id]) return JSON.stringify(gauges[id]);
+      throw new Error(`GET ${url} returned 404`);
+    });
+    const brest = (await refmar.stations()).find((s) => s.id === "refmar/3")!;
+    assert.deepEqual([brest.products, brest.datum], [[], null]);
+    delete gauges["3"];
+    delete gauges["6118"];
+    delete gauges["16"];
+    await assert.rejects(refmar.stations(), /no full record/);
   });
 
   it("places overseas gauges by sector and latitude", () => {
@@ -2944,6 +2991,58 @@ describe("refmar", () => {
     );
   });
 
+  it("keeps raw values from before SHOM validated the gauge", async () => {
+    setTransport(async (url) => {
+      const start = new URL(url).searchParams.get("dtStart")!;
+      if (new URL(url).searchParams.get("sources") === "1") return JSON.stringify({ data: [] });
+      if (start.startsWith("2015-01"))
+        return JSON.stringify({ data: [row(3, "2015/01/01 00:00:00")] });
+      return JSON.stringify({ data: [row(2, "2014/12/20 00:00:00")] });
+    });
+    const values = await refmar.levels(
+      { source_id: "6118", first_observation: "2010-01-01" },
+      new Date("2014-12-01Z"),
+      new Date("2015-01-01Z"),
+    );
+    assert.deepEqual(
+      values.map((v) => v.flag),
+      [Flag.preliminary],
+    );
+    // The same within one range: December's raw values come before any validated one.
+    const both = await refmar.levels(
+      { source_id: "6118", first_observation: "2010-01-01" },
+      new Date("2014-12-01Z"),
+      new Date("2015-02-01Z"),
+    );
+    assert.deepEqual(
+      both.map((v) => v.flag),
+      [Flag.preliminary, Flag.good],
+    );
+  });
+
+  it("drops raw values at a range's start when the month before is validated", async () => {
+    setTransport(async (url) => {
+      const params = new URL(url).searchParams;
+      if (params.get("sources") === "1") return JSON.stringify({ data: [] });
+      const start = params.get("dtStart")!;
+      // December was validated; January 2026, rejected whole, has raw values only.
+      if (start.startsWith("2025-12"))
+        return JSON.stringify({ data: [row(3, "2025/12/31 23:50:00")] });
+      if (start.startsWith("2026-01"))
+        return JSON.stringify({ data: [row(2, "2026/01/10 00:00:00")] });
+      return JSON.stringify({ data: [row(3, "2026/02/03 00:00:00")] });
+    });
+    const values = await refmar.levels(
+      { source_id: "3", first_observation: "1846-01-04" },
+      new Date("2026-01-01Z"),
+      new Date("2026-03-01Z"),
+    );
+    assert.deepEqual(
+      values.map((v) => v.flag),
+      [Flag.good],
+    );
+  });
+
   it("drops raw values at a range's end when the next month is validated", async () => {
     setTransport(async (url) => {
       const params = new URL(url).searchParams;
@@ -2965,6 +3064,49 @@ describe("refmar", () => {
     );
   });
 
+  it("flags Pointe-à-Pitre's values from 2020 to 2024 suspect", async () => {
+    setTransport(async (url) => {
+      const start = new URL(url).searchParams.get("dtStart")!;
+      if (start.startsWith("2019-12"))
+        return JSON.stringify({ data: [row(3, "2019/12/31 23:50:00")] });
+      if (start.startsWith("2020-01"))
+        return JSON.stringify({ data: [row(3, "2020/01/01 00:00:00")] });
+      if (start.startsWith("2024-12"))
+        return JSON.stringify({ data: [row(3, "2024/12/31 23:50:00")] });
+      if (start.startsWith("2025-01"))
+        return JSON.stringify({ data: [row(3, "2025/01/01 00:00:00")] });
+      return JSON.stringify({ data: [] });
+    });
+    const flags = async (id: string, from: string, to: string) =>
+      (
+        await refmar.levels(
+          { source_id: id, first_observation: "1983-01-04" },
+          new Date(from),
+          new Date(to),
+        )
+      ).map((v) => [new Date(v.time).toISOString().slice(0, 4), v.flag]);
+    const [, flagged] = await refmar.levels(
+      { source_id: "125", first_observation: "1983-01-04" },
+      new Date("2019-12-01Z"),
+      new Date("2020-02-01Z"),
+    );
+    // SHOM's own flag stays as the source's.
+    assert.equal(flagged!.source_flag, Flag.good);
+    assert.deepEqual(await flags("125", "2019-12-01Z", "2020-02-01Z"), [
+      ["2019", Flag.good],
+      ["2020", Flag.suspect],
+    ]);
+    assert.deepEqual(await flags("125", "2024-12-01Z", "2025-02-01Z"), [
+      ["2024", Flag.suspect],
+      ["2025", Flag.good],
+    ]);
+    // Other gauges keep SHOM's flag.
+    assert.deepEqual(await flags("126", "2019-12-01Z", "2020-02-01Z"), [
+      ["2019", Flag.good],
+      ["2020", Flag.good],
+    ]);
+  });
+
   it("caches a month only once its validated values run to its end", () => {
     const to = Date.parse("2026-11-01T00:00:00Z");
     const answer = (...rows: object[]) => JSON.stringify({ data: rows });
@@ -2976,6 +3118,19 @@ describe("refmar", () => {
       false,
     );
     assert.equal(refmar.complete(answer(), to), false);
+    // Raw values after an hourly validated one would be cached unrevised.
+    assert.equal(
+      refmar.complete(answer(row(4, "2026/10/31 23:00:00"), row(2, "2026/10/31 23:50:00")), to),
+      false,
+    );
+    // A validated row with no value doesn't make the month final.
+    assert.equal(
+      refmar.complete(
+        answer({ idstation: 3, idsource: 3, value: null, timestamp: "2026/10/31 23:50:00" }),
+        to,
+      ),
+      false,
+    );
   });
 
   it("asks nothing for months before a gauge's first observation", async () => {

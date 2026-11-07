@@ -83,6 +83,23 @@ const UNDATED_DEFAULT = 2010;
 /** Raw 1-minute values start in the 2000s; a month before this isn't asked for them. */
 const RAW_1MIN_FROM = Date.UTC(2005, 0, 1);
 
+/**
+ * Spans whose clock SHOM's values can't be trusted on, flagged `suspect` so
+ * fits and products skip them. Pointe-à-Pitre fits UHSLC's record within 10
+ * minutes in 2015, 2018, 2021 and 2022, but 60 to 70 minutes late in 2023
+ * against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly at all
+ * in 2020 (r 0.36) and 2024 (r 0.15), and within 10 minutes again in 2025
+ * (r 0.93) (clock check, November 2026). No steady offset fits, so 2020 to
+ * 2024 is flagged whole, keeping SHOM's own flag as `source_flag`. Remove once
+ * SHOM corrects it.
+ */
+const SUSPECT: Record<string, [number, number][]> = {
+  125: [[Date.UTC(2020, 0, 1), Date.UTC(2025, 0, 1)]],
+};
+
+/** Gauge states SHOM publishes: working, irregular, stopped, broken, in maintenance. */
+const PUBLISHED = new Set(["OK", "ASYNC", "OLD", "KO", "PB"]);
+
 /** Requests start at least this far apart. */
 export const pacing = { requestMs: 500 };
 let nextSlot = 0;
@@ -109,22 +126,47 @@ export async function stations(previous: Station[] = []): Promise<RefmarStation[
   if (!listed.length) throw new Error("REFMAR listed no tide gauges");
   const before = new Map(previous.map((s) => [s.id, s as RefmarStation]));
   const gauges: RefmarStation[] = [];
+  let asked = 0;
+  let partial = 0;
   for (const g of listed) {
     const old = before.get(`refmar/${g.shom_id}`);
-    if (g.state === "HIDDEN") {
+    // A state this adapter doesn't know, such as HIDDEN, isn't published.
+    if (!PUBLISHED.has(g.state)) {
       gauges.push({ ...(old ?? toStation(g)), datum: null, products: [], live: false });
       continue;
     }
+    asked++;
     let detail: Gauge | undefined;
     try {
       detail = await gauge(g.shom_id);
     } catch (error) {
       console.warn(`REFMAR ${g.shom_id}: ${(error as Error).message}`);
     }
-    if (detail?.verticalRef && detail.organismes) gauges.push(toStation({ ...g, ...detail }));
-    else if (old) gauges.push({ ...old, live: g.state !== "OLD" });
-    else console.warn(`REFMAR ${g.shom_id}: no full record; left out until the next refresh`);
+    let station: RefmarStation | undefined;
+    try {
+      // A record needs a vertical reference and at least one owner to credit.
+      if (detail?.verticalRef && detail.organismes?.length)
+        station = toStation({ ...g, ...detail });
+    } catch (error) {
+      console.warn(`REFMAR ${g.shom_id}: ${(error as Error).message}`);
+    }
+    // An empty vertical reference reads as an unknown zero, which a gauge
+    // with a named one keeps rather than open a datum epoch on.
+    if (station && old && station.datum === "ZI" && !detail?.verticalRef?.zero_hydro)
+      station.datum = null;
+    // A record that drops its first observation keeps the one it had.
+    if (station && old && !station.first_observation)
+      station.first_observation = old.first_observation ?? null;
+    if (station) gauges.push(station);
+    else partial++;
+    if (!station && old) gauges.push({ ...old, live: g.state !== "OLD" });
+    else if (!station)
+      console.warn(`REFMAR ${g.shom_id}: no full record; left out until the next refresh`);
   }
+  // Most records failing at once is the service, or a changed record shape,
+  // not those gauges; a list frozen at the previous records would hide it.
+  if (partial > asked / 2)
+    throw new Error(`REFMAR gave ${partial} of ${asked} gauges no full record`);
   return gauges.sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -233,16 +275,40 @@ export async function levels(
     const to = Math.min(nextMonth(m), stop);
     out.push(...(await month(station.source_id, from, to)));
   }
-  // Raw values before a later validated one are ones validation rejected,
-  // such as a gap that runs to the end of a month. Raw values at the end of a
-  // range more than a week back are checked against the month after it,
-  // since backfill asks a year at a time.
+  // Raw values between two validated ones are ones validation rejected, such
+  // as a gap that runs to the end of a month. Raw values before the range's
+  // first validated one are kept: they can be from before SHOM validated the
+  // gauge at all. Raw values after its last, in a range more than a week
+  // back, are checked against the month after it, since backfill asks a year
+  // at a time.
+  let firstGood = out.find((o) => o.flag === Flag.good)?.time;
+  // Raw values at the start of a range are checked against the month before
+  // it in the same way, unless that's before the gauge's first observation.
+  if (firstGood !== undefined && out[0]?.flag === Flag.preliminary && start.getTime() > first) {
+    const before = monthStart(start.getTime() - 1);
+    if ((await rowsOf(station.source_id, [VALIDATED, HOURLY], before, start.getTime())).length)
+      firstGood = -Infinity;
+  }
   let lastGood = out.findLast((o) => o.flag === Flag.good)?.time ?? -Infinity;
-  if (out.at(-1)?.flag === Flag.preliminary && stop < Date.now() - 7 * DAY_MS) {
+  if (
+    firstGood !== undefined &&
+    out.at(-1)?.flag === Flag.preliminary &&
+    stop < Date.now() - 7 * DAY_MS
+  ) {
     const next = await rowsOf(station.source_id, [VALIDATED, HOURLY], stop, nextMonth(stop));
     if (next.length) lastGood = Infinity;
   }
-  return out.filter((o) => o.flag === Flag.good || o.time > lastGood);
+  const suspect = SUSPECT[station.source_id] ?? [];
+  return out
+    .filter(
+      (o) =>
+        o.flag === Flag.good || firstGood === undefined || o.time < firstGood || o.time > lastGood,
+    )
+    .map((o) =>
+      suspect.some(([from, to]) => o.time >= from && o.time < to)
+        ? { ...o, flag: Math.max(o.flag, Flag.suspect) as Flag, source_flag: o.flag }
+        : o,
+    );
 }
 
 async function month(id: string, from: number, to: number): Promise<Observation[]> {
@@ -296,10 +362,16 @@ async function rowsOf(
 
 /** Whether an answer's validated values run to its last hour, so it won't change. */
 export function complete(text: string, to: number): boolean {
-  const validated = (JSON.parse(text) as { data: Row[] }).data.filter(
-    (r) => r.idsource === VALIDATED || r.idsource === HOURLY,
+  const rows = (JSON.parse(text) as { data: Row[] }).data.filter(
+    (r) => typeof r.value === "number",
   );
-  return validated.some((r) => parseTime(r.timestamp) >= to - 3_600_000);
+  const isValidated = (r: Row) => r.idsource === VALIDATED || r.idsource === HOURLY;
+  const lastValidated = Math.max(...rows.filter(isValidated).map((r) => parseTime(r.timestamp)));
+  // Raw values after the validated ones would be served from the cache unrevised.
+  return (
+    lastValidated >= to - 3_600_000 &&
+    !rows.some((r) => !isValidated(r) && parseTime(r.timestamp) > lastValidated)
+  );
 }
 
 const parseTime = (timestamp: string) =>

@@ -93,7 +93,7 @@ const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.
 // replaces unmatched, so that stops the run, except for a source none of whose
 // records the last inventory found ready: a new adapter before its first
 // refresh, whose records keep the planned ids their codes give.
-const previous = await readFile(join(ROOT, "docs/ticon-replacement.csv"), "utf8").catch(() => "");
+const previous = await readFile(join(ROOT, "docs/ticon-replacement.csv"), "utf8");
 const lists: Record<string, Station[]> = {};
 for (const [source, { metadata }] of Object.entries(sources)) {
   if (!metadata.license.redistribution) continue;
