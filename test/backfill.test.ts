@@ -5,10 +5,12 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { describe, it } from "node:test";
 import {
+  earliestPreliminary,
   epochSpans,
   orderStations,
   parseShard,
   parseStationList,
+  preliminaryRuns,
   shard,
   yearDone,
   yearWritten,
@@ -16,11 +18,16 @@ import {
 } from "../src/backfill.ts";
 import {
   listYears,
+  readObservations,
+  readStationBounds,
   readYearFiles,
   writeObservations,
+  writeStationBounds,
   writeStationList,
+  writeStations,
 } from "../src/lake/parquet.ts";
-import { seriesDir, seriesPath, stationListPath } from "../src/lake/paths.ts";
+import { boundsPath, seriesDir, seriesPath, stationListPath } from "../src/lake/paths.ts";
+import { REFETCH_YEARS } from "../src/lake/recent.ts";
 import { Flag, type LakeStation, type Station } from "../src/schema.ts";
 
 const DAY = 86_400_000;
@@ -277,6 +284,135 @@ describe("yearsToFetch", () => {
   });
 });
 
+describe("preliminaryRuns", () => {
+  const Y2023 = new Date(Date.UTC(2023, 0, 1));
+  const Y2026 = new Date(Date.UTC(2026, 0, 1));
+  const bounds = (preliminary: string | null, last: string | null = "2025-12-31T00:00:00Z") => ({
+    first: "2010-01-01T00:00:00Z",
+    last,
+    preliminary,
+  });
+
+  it("takes each station from its preliminary value's month, or the cutoff, to its last year", () => {
+    const { runs, past } = preliminaryRuns(
+      [
+        ..."abcdef".split("").map((id) => ({ id, products: ["levels" as const], epochs: [] })),
+        // Its list dropped levels, so there's nothing to read again.
+        { id: "g", products: ["extremes" as const], epochs: [] },
+      ],
+      new Map([
+        ["g", bounds("2024-03-15T06:00:00Z")],
+        ["a", bounds("2024-03-15T06:00:00Z", "2024-06-30T00:00:00Z")],
+        ["b", bounds(null)],
+        ["c", bounds("2021-05-01T00:00:00Z")],
+        ["d", bounds("2021-05-01T00:00:00Z", "2021-05-01T00:00:00Z")],
+        ["f", bounds("2026-02-01T00:00:00Z", null)],
+      ]),
+      Y2023,
+      Y2026,
+    );
+    assert.deepEqual(
+      runs.map((r) => [r.station.id, r.from.toISOString(), r.to.toISOString()]),
+      [
+        // Its last value ends the run with its year.
+        ["a", "2024-03-01T00:00:00.000Z", "2025-01-01T00:00:00.000Z"],
+        // Past the cutoff, but its later values may be preliminary too.
+        ["c", "2023-01-01T00:00:00.000Z", "2026-01-01T00:00:00.000Z"],
+      ],
+    );
+    // d stopped before the cutoff, so it's listed and not fetched; f starts after the end.
+    assert.deepEqual(past, [
+      { id: "c", preliminary: "2021-05-01T00:00:00Z" },
+      { id: "d", preliminary: "2021-05-01T00:00:00Z" },
+    ]);
+  });
+});
+
+describe("preliminaryRuns with skipUnscreened", () => {
+  const levels = (id: string, epochs: LakeStation["epochs"] = []) => ({
+    id,
+    products: ["levels" as const],
+    epochs,
+  });
+  const row = (first: string, screened: boolean | null) => ({
+    first,
+    last: "2025-12-31T00:00:00Z",
+    preliminary: "2025-03-01T00:00:00Z",
+    screened,
+  });
+  const bounds = new Map([
+    ["never", row("2023-01-01T00:00:00Z", false)],
+    ["young", row("2025-06-01T00:00:00Z", false)],
+    ["unknown", row("2023-01-01T00:00:00Z", null)],
+    ["screens", row("2023-01-01T00:00:00Z", true)],
+    ["renewed", row("2023-01-01T00:00:00Z", false)],
+  ]);
+  const stations = [
+    ...["never", "young", "unknown", "screens"].map((id) => levels(id)),
+    // Its current epoch began under a year ago, whatever came before.
+    levels("renewed", [
+      { ...coopsStation("x", "active").epochs[0]!, since: "2025-06-01T00:00:00Z" },
+    ]),
+  ];
+  const Y2023 = new Date(Date.UTC(2023, 0, 1));
+  const Y2026 = new Date(Date.UTC(2026, 0, 1));
+
+  it("leaves out a station with a year of record and no value the source screened", () => {
+    const { runs, unscreened } = preliminaryRuns(stations, bounds, Y2023, Y2026, true);
+    assert.deepEqual(
+      runs.map((r) => r.station.id),
+      ["young", "unknown", "screens", "renewed"],
+    );
+    assert.deepEqual(unscreened, ["never"]);
+  });
+
+  it("takes it like any other without the option", () => {
+    const { runs, unscreened } = preliminaryRuns(stations, bounds, Y2023, Y2026);
+    assert.equal(runs.length, 5);
+    assert.deepEqual(unscreened, []);
+  });
+});
+
+describe("monthly refetch", () => {
+  it("reaches back as far as compaction looks for preliminary values", () => {
+    const workflow = readFileSync(".github/workflows/monthly.yml", "utf8");
+    assert.match(workflow, new RegExp(`preliminary \\$\\(\\(year - ${REFETCH_YEARS}\\)\\)`));
+  });
+});
+
+describe("earliestPreliminary", () => {
+  it("reads the earliest value the source sent as preliminary across a station's files", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const write = (year: number, rows: Parameters<typeof writeObservations>[1]) =>
+      writeObservations(seriesPath(root, "levels", "usgs", "x", year), rows, "GAGE");
+    const dir = seriesDir(root, "levels", "usgs", "x");
+    assert.deepEqual(await earliestPreliminary(dir), { preliminary: null, screened: false });
+    // Without a source flag, a suspect one may be QC's alone, so it isn't the source's screening.
+    await write(2021, [{ time: Date.UTC(2021, 5, 1), level: 1, flag: Flag.suspect }]);
+    assert.deepEqual(await earliestPreliminary(dir), { preliminary: null, screened: false });
+    await write(2022, [{ time: Date.UTC(2022, 5, 1), level: 1, flag: Flag.good }]);
+    // A good value is one the source screened.
+    assert.deepEqual(await earliestPreliminary(dir), { preliminary: null, screened: true });
+    await write(2025, [{ time: Date.UTC(2025, 1, 1), level: 1, flag: Flag.preliminary }]);
+    // QC raised it to suspect, but the source hasn't approved it.
+    await write(2024, [
+      { time: Date.UTC(2024, 6, 1), level: 1, flag: Flag.suspect, source_flag: Flag.preliminary },
+    ]);
+    assert.equal((await earliestPreliminary(dir)).preliminary, Date.UTC(2024, 6, 1));
+    // Only inside the epoch's window, as compaction counts them.
+    assert.deepEqual(
+      await earliestPreliminary(dir, [Date.UTC(2025, 0, 1), Infinity]),
+      // The 2022 file's good value is outside it.
+      { preliminary: Date.UTC(2025, 1, 1), screened: false },
+    );
+    // Only the files from `fromYear` on: 2022's good value isn't among them.
+    assert.deepEqual(await earliestPreliminary(dir, [-Infinity, Infinity], 2025), {
+      preliminary: Date.UTC(2025, 1, 1),
+      screened: false,
+    });
+  });
+});
+
 describe("parseStationList", () => {
   it("reads a plain list, bare or with the source, skipping comments and other sources", () => {
     const text = "# TICON first\n07010000\nusgs/02198820  # Abercorn\n\ncoops/8761724\n07010000\n";
@@ -354,7 +490,454 @@ describe("shard", () => {
   });
 });
 
+/** A CO-OPS station with only levels, in one open epoch. */
+function coopsStation(id: string, status: "active" | "inactive"): LakeStation {
+  return {
+    id: `coops/${id}`,
+    source: "coops",
+    source_id: id,
+    datum: "STND",
+    products: ["levels"],
+    status,
+    live: false,
+    interval_s: 360,
+    kind: "coastal",
+    commercial_use: true,
+    epochs: [
+      {
+        id: 1,
+        datum: "STND",
+        since: null,
+        until: null,
+        seen: null,
+        reference: null,
+        reference_since: null,
+        datums: {},
+        to_current: 0,
+        state: "open",
+      },
+    ],
+  } as LakeStation;
+}
+
+/** `ingest.ts backfill coops …` against `lake`, through the verifying CO-OPS fixture. */
+function backfillCoops(lake: string, args: string[], env: Record<string, string> = {}) {
+  return spawnSync(
+    process.execPath,
+    [
+      "--import",
+      "./test/fixtures/coops-verified.ts",
+      "scripts/ingest.ts",
+      "backfill",
+      "coops",
+      ...args,
+    ],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        WATER_LEVELS_LAKE: lake,
+        WATER_LEVELS_CACHE: join(lake, "..", "cache"),
+        ...env,
+      },
+    },
+  );
+}
+
 describe("backfill script", () => {
+  it("lowers each batch's values before fetching, so a killed run leaves them early", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    const ids = [...Array(102).keys()].map((i) => String(2000 + i));
+    await writeStationList(
+      stationListPath(lake, "coops"),
+      ids.map((id) => coopsStation(id, "active")),
+    );
+    const path = boundsPath(lake, "coops");
+    // Relative to now: lowering goes no earlier than the cutoff, three years back.
+    const year = new Date().getUTCFullYear();
+    const late = `${year}-02-01T00:00:00Z`;
+    const fetchFrom = `${year - 2}-12-01`;
+    await writeStationBounds(
+      path,
+      ids.map((id) => ({
+        id: `coops/${id}`,
+        first: late,
+        last: late,
+        // The last one's is already earlier than its fetch, so it isn't raised.
+        preliminary: id === "2101" ? `${year - 6}-01-01T00:00:00Z` : late,
+      })),
+    );
+    // One request each; the process dies at the second batch's first station.
+    const run = backfillCoops(lake, ["all", fetchFrom, `${year - 1}`, "--concurrency", "1"], {
+      EXIT_AFTER: "101",
+    });
+    assert.equal(run.status, 9, run.stderr);
+    const after = [...(await readStationBounds(path)).values()].map((b) => b.preliminary);
+    // The first batch was read again and has none; the killed one says where its fetch began.
+    assert.equal(after.filter((p) => p === null).length, 100);
+    assert.deepEqual(
+      after.filter((p) => p !== null),
+      [`${fetchFrom}T00:00:00Z`, `${year - 6}-01-01T00:00:00Z`],
+    );
+  });
+
+  it("with --skip-unscreened, skips a station whose source never screened its values", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    await writeStationList(stationListPath(lake, "coops"), [
+      coopsStation("8", "inactive"),
+      coopsStation("9", "inactive"),
+    ]);
+    const path = boundsPath(lake, "coops");
+    await writeStationBounds(
+      path,
+      ["8", "9"].map((id) => ({
+        id: `coops/${id}`,
+        first: "2023-01-01T00:00:00Z",
+        last: "2024-12-31T00:00:00Z",
+        preliminary: "2024-12-01T00:00:00Z",
+        screened: id === "8" ? false : null,
+      })),
+    );
+    assert.equal(backfillCoops(lake, ["all", "2024", "2025", "--skip-unscreened"]).status, 1);
+    const run = backfillCoops(lake, ["preliminary", "2023", "2025", "--skip-unscreened"]);
+    assert.equal(run.status, 0, run.stderr);
+    const asked = new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]));
+    assert.deepEqual([...asked], ["9"]);
+    assert.match(
+      run.stdout,
+      /skipped 1 stations with a year of record and no value the source screened/,
+    );
+    // The fetch's verified values are screened, so 9 is known to be now.
+    assert.equal((await readStationBounds(path)).get("coops/9")?.screened, true);
+  });
+
+  it("takes one shard of the stations with preliminary values", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    const stations = ["11", "12", "13", "14", "15", "16"].map((id) => coopsStation(id, "inactive"));
+    await writeStationList(stationListPath(lake, "coops"), stations);
+    await writeStationBounds(
+      boundsPath(lake, "coops"),
+      stations.map((s) => ({
+        id: s.id,
+        first: "2024-12-01T00:00:00Z",
+        last: "2024-12-01T00:00:00Z",
+        preliminary: "2024-12-01T00:00:00Z",
+      })),
+    );
+    const run = backfillCoops(lake, ["preliminary", "2023", "2025", "--shard", "1/2"]);
+    assert.equal(run.status, 0, run.stderr);
+    const asked = [
+      ...new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1])),
+    ];
+    assert.deepEqual(
+      asked.sort(),
+      shard(stations, 1, 2)
+        .map((s) => s.source_id)
+        .sort(),
+    );
+    assert.ok(asked.length > 0 && asked.length < stations.length);
+  });
+
+  it("lowers no earlier than the cutoff, and not for a fetch that ends before it", async () => {
+    const year = new Date().getUTCFullYear();
+    const late = `${year}-02-01T00:00:00Z`;
+    const killed = async (from: string, to: string) => {
+      const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+      await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);
+      const path = boundsPath(lake, "coops");
+      await writeStationBounds(path, [
+        { id: "coops/7", first: late, last: late, preliminary: late },
+      ]);
+      const run = backfillCoops(lake, ["all", from, to], { EXIT_AFTER: "1" });
+      assert.equal(run.status, 9, run.stderr);
+      return (await readStationBounds(path)).get("coops/7")?.preliminary;
+    };
+    assert.equal(await killed(`${year - 6}`, `${year - 1}`), `${year - 3}-01-01T00:00:00Z`);
+    assert.equal(await killed(`${year - 8}`, `${year - 6}`), late);
+  });
+
+  it("gives a lowered station its value back when it had no year to fetch", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);
+    const good = (time: number) => ({ time, level: 2, flag: Flag.good });
+    await writeObservations(
+      seriesPath(lake, "levels", "coops", "7", 2024),
+      [...Array(12).keys()]
+        .map((m) => good(Date.UTC(2024, m, 1)))
+        .concat(good(Date.UTC(2024, 11, 31))),
+      "STND",
+    );
+    const path = boundsPath(lake, "coops");
+    const late = "2026-02-01T00:00:00Z";
+    await writeStationBounds(path, [{ id: "coops/7", first: late, last: late, preliminary: late }]);
+    const run = backfillCoops(lake, ["all", "2024", "2025"]);
+    assert.equal(run.status, 0, run.stderr);
+    assert.doesNotMatch(run.stderr, /^fetch /m);
+    assert.equal((await readStationBounds(path)).get("coops/7")?.preliminary, late);
+  });
+
+  it("refetches every station with preliminary values, active or not, and reads them again", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const lake = join(root, "lake");
+    const station = (id: string, status: "active" | "inactive", since: string | null = null) =>
+      ({
+        id: `coops/${id}`,
+        source: "coops",
+        source_id: id,
+        datum: "STND",
+        products: ["levels"],
+        status,
+        live: false,
+        interval_s: 360,
+        kind: "coastal",
+        commercial_use: true,
+        epochs: [
+          {
+            id: 1,
+            datum: "STND",
+            since,
+            until: null,
+            seen: null,
+            reference: null,
+            reference_since: null,
+            datums: {},
+            to_current: 0,
+            state: "open",
+          },
+        ],
+      }) as LakeStation;
+    await writeStationList(stationListPath(lake, "coops"), [
+      station("1", "inactive"),
+      station("2", "active"),
+      station("3", "inactive"),
+      station("4", "inactive"),
+      station("5", "inactive", "2024-06-01T00:00:00Z"),
+      // Held for a datum change, so skipped, and not listed.
+      {
+        ...station("6", "inactive"),
+        epochs: [
+          ...station("6", "inactive").epochs,
+          { ...station("6", "inactive").epochs[0]!, id: 2, state: "held" },
+        ],
+      } as LakeStation,
+    ]);
+    // Station 5's epoch starts after a preliminary row its directory holds, which compaction doesn't count.
+    await writeObservations(
+      seriesPath(lake, "levels", "coops", "5", 2024),
+      [
+        { time: Date.UTC(2024, 1, 1), level: 2, flag: Flag.preliminary },
+        { time: Date.UTC(2024, 7, 1), level: 2, flag: Flag.preliminary },
+      ],
+      "STND",
+    );
+    // Station 4's years from the cutoff on are complete and final. Its 2021 is
+    // still preliminary, but before the years the refetch and compaction look in.
+    const good = (time: number) => ({ time, level: 2, flag: Flag.good });
+    await writeObservations(
+      seriesPath(lake, "levels", "coops", "4", 2021),
+      [{ time: Date.UTC(2021, 4, 1), level: 2, flag: Flag.preliminary }],
+      "STND",
+    );
+    for (const year of [2023, 2024, 2025])
+      await writeObservations(
+        seriesPath(lake, "levels", "coops", "4", year),
+        [...Array(12).keys()]
+          .map((m) => good(Date.UTC(year, m, 1)))
+          .concat(good(Date.UTC(year, 11, 31))),
+        "STND",
+      );
+    const file = seriesPath(lake, "levels", "coops", "1", 2024);
+    await writeObservations(
+      file,
+      [{ time: Date.UTC(2024, 2, 15), level: 2, flag: Flag.preliminary }],
+      "STND",
+    );
+    const path = boundsPath(lake, "coops");
+    await writeStationBounds(path, [
+      {
+        id: "coops/1",
+        first: "2024-03-15T00:00:00Z",
+        last: "2024-03-15T00:00:00Z",
+        preliminary: "2024-03-15T00:00:00Z",
+      },
+      {
+        id: "coops/2",
+        first: "2020-01-01T00:00:00Z",
+        last: "2026-11-01T00:00:00Z",
+        preliminary: null,
+      },
+      {
+        id: "coops/3",
+        first: "2019-05-01T00:00:00Z",
+        last: "2019-05-01T00:00:00Z",
+        preliminary: "2019-05-01T00:00:00Z",
+      },
+      {
+        id: "coops/4",
+        first: "2021-01-01T00:00:00Z",
+        last: "2025-12-31T00:00:00Z",
+        preliminary: "2021-05-01T00:00:00Z",
+      },
+      {
+        id: "coops/6",
+        first: "2019-05-01T00:00:00Z",
+        last: "2019-05-01T00:00:00Z",
+        preliminary: "2019-05-01T00:00:00Z",
+      },
+      {
+        id: "coops/5",
+        first: "2024-06-01T00:00:00Z",
+        last: "2024-08-01T00:00:00Z",
+        preliminary: "2024-08-01T00:00:00Z",
+      },
+    ]);
+    const summary = join(root, "summary.md");
+    const backfill = (...flags: string[]) =>
+      spawnSync(
+        process.execPath,
+        [
+          "--import",
+          "./test/fixtures/coops-verified.ts",
+          "scripts/ingest.ts",
+          "backfill",
+          "coops",
+          "preliminary",
+          "2023",
+          "2026",
+          "--concurrency",
+          "1",
+          ...flags,
+        ],
+        {
+          encoding: "utf8",
+          env: {
+            ...process.env,
+            WATER_LEVELS_LAKE: lake,
+            WATER_LEVELS_CACHE: join(root, "cache"),
+            GITHUB_STEP_SUMMARY: summary,
+          },
+        },
+      );
+    const run = backfill();
+    assert.equal(run.status, 0, run.stderr);
+    // Only the inactive stations with a preliminary value since the cutoff are fetched.
+    const asked = new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]));
+    assert.deepEqual([...asked], ["1", "5"]);
+    // From its preliminary value's month to the end of its last year.
+    const months = [...run.stderr.matchAll(/station=1&.*begin_date=(\d{6})/g)].map((m) => m[1]);
+    assert.deepEqual([months[0], months.at(-1)], ["202403", "202412"]);
+    assert.ok(
+      (await readObservations(file)).every((r) => r.source_flag === Flag.good),
+      "the verified values replace the preliminary one",
+    );
+    // Read again from its files, it has none left; the others keep theirs.
+    const after = await readStationBounds(path);
+    assert.deepEqual(after.get("coops/1"), {
+      first: "2024-03-15T00:00:00Z",
+      last: "2024-03-15T00:00:00Z",
+      preliminary: null,
+      screened: true,
+    });
+    // Its files end before the cutoff, so it's listed once and its value cleared.
+    assert.equal(after.get("coops/3")?.preliminary, null);
+    // With nothing left to fetch, its files are still read again, from the cutoff on.
+    assert.equal(after.get("coops/4")?.preliminary, null);
+    assert.equal(after.get("coops/5")?.preliminary, null);
+    assert.equal(after.get("coops/2")?.last, "2026-11-01T00:00:00Z");
+    // The one past the cutoff is listed on the run's page.
+    assert.match(readFileSync(summary, "utf8"), /coops\/3 since 2019-05-01T00:00:00Z/);
+    assert.doesNotMatch(readFileSync(summary, "utf8"), /coops\/6/);
+
+    // Skipping every written year would skip the preliminary ones.
+    const skipping = backfill("--skip-written");
+    assert.equal(skipping.status, 1);
+    assert.match(skipping.stderr, /--skip-written and `preliminary` contradict each other/);
+
+    // Bounds an older build wrote, without the column, would pick nothing; it says so instead.
+    await writeStations(path, [
+      { id: "coops/1", first: null, last: null } as unknown as LakeStation,
+    ]);
+    const old = backfill();
+    assert.equal(old.status, 1);
+    assert.match(old.stderr, /predate preliminary values; run `compact coops --rebuild-bounds`/);
+  });
+
+  it("keeps the preliminary values it read every 100 stations, though the run is killed", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const lake = join(root, "lake");
+    const ids = [...Array(101).keys()].map((i) => String(1000 + i));
+    await writeStationList(
+      stationListPath(lake, "coops"),
+      ids.map(
+        (id) =>
+          ({
+            id: `coops/${id}`,
+            source: "coops",
+            source_id: id,
+            datum: "STND",
+            products: ["levels"],
+            status: "inactive",
+            live: false,
+            interval_s: 360,
+            kind: "coastal",
+            commercial_use: true,
+            epochs: [
+              {
+                id: 1,
+                datum: "STND",
+                since: null,
+                until: null,
+                seen: null,
+                reference: null,
+                reference_since: null,
+                datums: {},
+                to_current: 0,
+                state: "open",
+              },
+            ],
+          }) as LakeStation,
+      ),
+    );
+    const path = boundsPath(lake, "coops");
+    // One month each to fetch, December 2024, which the fetch verifies.
+    await writeStationBounds(
+      path,
+      ids.map((id) => ({
+        id: `coops/${id}`,
+        first: "2024-12-01T00:00:00Z",
+        last: "2024-12-01T00:00:00Z",
+        preliminary: "2024-12-01T00:00:00Z",
+      })),
+    );
+    const run = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "./test/fixtures/coops-verified.ts",
+        "scripts/ingest.ts",
+        "backfill",
+        "coops",
+        "preliminary",
+        "2023",
+        "2026",
+        "--concurrency",
+        "1",
+      ],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          WATER_LEVELS_LAKE: lake,
+          WATER_LEVELS_CACHE: join(root, "cache"),
+          EXIT_AFTER: "101",
+        },
+      },
+    );
+    assert.equal(run.status, 9, run.stderr);
+    const after = [...(await readStationBounds(path)).values()].map((b) => b.preliminary);
+    assert.equal(after.filter((p) => p === null).length, 100);
+  });
+
   it("stops, and fails the run, once CO-OPS blocks it", async () => {
     const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
     const lake = join(root, "lake");
@@ -388,6 +971,17 @@ describe("backfill script", () => {
         }) as LakeStation,
     );
     await writeStationList(stationListPath(lake, "coops"), stations);
+    // Every station but 5 has a known value, later than the run's fetches.
+    const late = "2026-02-01T00:00:00Z";
+    await writeStationBounds(
+      boundsPath(lake, "coops"),
+      ["1", "2", "3", "4"].map((id) => ({
+        id: `coops/${id}`,
+        first: late,
+        last: late,
+        preliminary: late,
+      })),
+    );
     const run = spawnSync(
       process.execPath,
       [
@@ -413,6 +1007,10 @@ describe("backfill script", () => {
     const asked = [...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]);
     assert.ok(asked.length > 0, run.stderr);
     assert.ok(!asked.includes("4") && !asked.includes("5"), `asked ${asked}`);
+    // A station the run never reached gets its value back; one with no row gets none.
+    const after = await readStationBounds(boundsPath(lake, "coops"));
+    assert.equal(after.get("coops/4")?.preliminary, late);
+    assert.equal(after.has("coops/5"), false);
   });
 });
 

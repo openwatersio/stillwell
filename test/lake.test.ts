@@ -232,7 +232,7 @@ describe("lake files", () => {
     assert.deepEqual(await readStationList(path), [station]);
   });
 
-  it("reads back the first and last the lake filled in", async () => {
+  it("reads back the first and last the lake filled in, and an unknown preliminary from a file without one", async () => {
     const path = join(root, "bounds/stations.parquet");
     assert.deepEqual(await readStationBounds(path), new Map());
     const station = {
@@ -247,8 +247,12 @@ describe("lake files", () => {
     assert.deepEqual(
       await readStationBounds(path),
       new Map([
-        ["test:1", { first: "2001-02-03T04:05:06Z", last: null }],
-        ["test:2", { first: null, last: null }],
+        // Undefined, not null: a file without the column doesn't say there are none.
+        [
+          "test:1",
+          { first: "2001-02-03T04:05:06Z", last: null, preliminary: undefined, screened: null },
+        ],
+        ["test:2", { first: null, last: null, preliminary: undefined, screened: null }],
       ]),
     );
   });
