@@ -2162,7 +2162,7 @@ describe("usgs", () => {
       time: string,
       value: string | null,
       approval_status: string,
-      qualifier: string[] | null = null,
+      qualifier: (string | null)[] | null = null,
     ) => ({
       type: "Feature",
       id: time,
@@ -2176,7 +2176,8 @@ describe("usgs", () => {
       const text = url.includes("cursor=")
         ? collection([
             value("2024-01-01T00:30:00+00:00", "-1.00", "Provisional"),
-            value("2024-01-01T00:35:00+00:00", "1.00", "Approved", ["ESTIMATED"]),
+            value("2024-01-01T00:35:00+00:00", "1.00", "Approved", ["ESTIMATED", null]),
+            value("2024-01-01T00:40:00+00:00", "2.00", "Approved", [null]),
             value("2024-01-01T00:45:00+00:00", "3.10", "Provisional", ["ICE"]),
             value("2024-01-01T00:50:00+00:00", "3.10", "Approved", ["SEASONAL", "BACKWATER"]),
             value("2024-01-01T01:00:00+00:00", "3.20", "Approved"),
@@ -2202,6 +2203,7 @@ describe("usgs", () => {
         ["2024-01-01T00:00:00.000Z", 0.7529, Flag.good],
         ["2024-01-01T00:30:00.000Z", -0.3048, Flag.preliminary],
         ["2024-01-01T00:35:00.000Z", 0.3048, Flag.interpolated],
+        ["2024-01-01T00:40:00.000Z", 0.6096, Flag.good],
         ["2024-01-01T00:45:00.000Z", 0.9449, Flag.suspect],
         ["2024-01-01T00:50:00.000Z", 0.9449, Flag.good],
       ],
@@ -2223,7 +2225,7 @@ describe("usgs", () => {
               time: "2024-01-01T00:40:00+00:00",
               value: "9.00",
               approval_status: "Provisional",
-              qualifier: ["DIFFDATUM"],
+              qualifier: [null, "DIFFDATUM"],
             },
             geometry: null,
           },
