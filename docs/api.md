@@ -13,8 +13,9 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
   - `station`: the source's own reference, unconverted. A source's datum keeps the source's name and isn't assumed to be the tides API's datum of the same name: RWS's offshore platforms report against RWS's own MSL, so `datum=MSL` there converts through the station's offsets like anywhere else, and is a 400 until one is known, while `datum=station` returns RWS's MSL as is.
   - A datum the station has no offset for is a 400 error, never a silent fallback.
 - **Flags** on every value: `good`, `preliminary`, `suspect`, `bad`, `interpolated`. Real-time values are `preliminary` until the source verifies them. `bad` values are left out unless `includeBad=true`.
-- **Licenses.** Only stations whose terms allow commercial use (`commercial_use`) are served; the lake also holds stations that don't, for research. Each station carries its license, and every response that returns data lists the attribution lines its stations require. Displaying them is a condition of use.
+- **Licenses.** Until tokens exist, only stations whose terms allow commercial use (`commercial_use`) are served; the public lake also holds stations that don't. The API's terms cover access to the service; the data keeps each station's license. Each station carries its license, and every response that returns data lists the attribution lines its stations require. Displaying them is a condition of use.
 - **Not for navigation.** Every data response includes `notice`. Observations are preliminary, and a gauge can fail without warning.
+- **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/water-levels](https://github.com/openwatersio/water-levels).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
 - **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the source is unavailable and nothing is cached.
@@ -203,6 +204,7 @@ WHERE flag <= 2; -- good, interpolated and preliminary
 
 ## Not in the API
 
-- Non-commercial sources (IOC, the restricted GESLA contributors, BODC) until tokens and plans exist. They're in the lake for research and for fitting tide-database constants where the operator agrees.
+- Stations with `commercial_use` false, such as the UHSLC gauges whose contributors bar commercial use, until tokens and plans exist; then non-commercial users get them. They're in the public lake already.
+- Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private lake for research and for fitting tide-database constants where the operator agrees.
 - CHS data in any form. Its license bars third-party transfer and commercial derivatives; Slackwater fetches it on the device.
 - Data from vessels. See [plan.md](plan.md#out-of-scope).

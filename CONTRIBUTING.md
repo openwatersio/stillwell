@@ -180,6 +180,10 @@ node scripts/canary.ts <source> --record
 - **A station's files keep one datum.** Adapters refuse values in any datum but the station's, and backfill refuses to write into a file recorded in another. When a source moves a station to another reference, the next `ingest stations` opens a datum epoch whose values go to files of their own; a change soon after the last one, or back to an earlier reference, is held, and the run exits nonzero, until a person decides in the source's `overrides` ([docs/stations.md](docs/stations.md)).
 - **`.cache/` hides upstream changes.** A historical fetch is served from the cache once it has run, keyed by URL and request body, so delete `.cache/`, or point `WATER_LEVELS_CACHE` at an empty directory, when you need to see what the service returns now.
 
+## License and CLA
+
+The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor License Agreement](CLA.md) before a pull request can merge; the CLA workflow asks on your first one. The CLA lets Open Water Software, LLC move code into MIT packages, such as shared math another project imports, and offer other licenses, while an OSI-approved license stays public. Code another project needs to import belongs in an MIT package, not here, or that project becomes AGPL.
+
 ## Shared conventions
 
 Open Waters' [repository standards](https://github.com/openwatersio/.github/blob/main/REPOSITORY_STANDARDS.md) and [marketing guidance](https://github.com/openwatersio/.github/blob/main/docs/agents/marketing.md) apply here.
