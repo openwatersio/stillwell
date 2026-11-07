@@ -6,6 +6,7 @@ import { join, relative } from "node:path";
 import { describe, it } from "node:test";
 import {
   earliestPreliminary,
+  epochSpans,
   orderStations,
   parseShard,
   parseStationList,
@@ -990,3 +991,96 @@ describe("backfill script", () => {
     assert.equal(after.has("coops/5"), false);
   });
 });
+
+describe("epochSpans", () => {
+  const epochs = [
+    { ...base(1), since: null, until: "2005-01-01T00:00:00Z", state: "closed" as const },
+    { ...base(2), since: "2005-01-01T00:00:00Z", until: null, state: "open" as const },
+  ];
+  const range = [new Date("1990-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z")] as const;
+  const spans = (archive?: "current" | "previous") =>
+    epochSpans(epochs, ...range, archive).map((s) => [
+      s.epoch.id,
+      s.from.toISOString().slice(0, 4),
+      s.to.toISOString().slice(0, 4),
+    ]);
+
+  it("writes the current epoch from its start", () => {
+    assert.deepEqual(spans(), [[2, "2005", "2026"]]);
+  });
+
+  it("writes closed epochs too where the source serves them in their own reference", () => {
+    assert.deepEqual(spans("previous"), [
+      [1, "1990", "2005"],
+      [2, "2005", "2026"],
+    ]);
+  });
+
+  it("never writes a current epoch before the reference it names, split or not", () => {
+    const unsplit = [
+      { ...base(1), since: null, until: null, state: "open" as const },
+      { ...base(2), datum: "MSL", since: null, until: null, state: "rejected" as const },
+    ];
+    unsplit[0]!.reference_since = "2005-01-01T00:00:00Z";
+    assert.deepEqual(
+      epochSpans(unsplit, ...range, "previous").map((s) => [s.epoch.id, s.from.toISOString()]),
+      [[1, "2005-01-01T00:00:00.000Z"]],
+    );
+  });
+
+  it("keeps a closed epoch out of the current one's span", () => {
+    const recorded = [
+      { ...base(1), since: null, until: "2015-01-01T00:00:00Z", state: "closed" as const },
+      { ...base(2), since: null, until: null, state: "open" as const },
+    ];
+    recorded[1]!.reference_since = "2005-01-01T00:00:00Z";
+    assert.deepEqual(
+      epochSpans(recorded, ...range, "previous").map((s) => [
+        s.epoch.id,
+        s.from.toISOString().slice(0, 4),
+        s.to.toISOString().slice(0, 4),
+      ]),
+      [
+        [1, "1990", "2005"],
+        [2, "2005", "2026"],
+      ],
+    );
+  });
+
+  it("leaves out a closed epoch under another label, which the source no longer serves", () => {
+    const moved = [
+      {
+        ...base(1),
+        datum: "MSL",
+        since: null,
+        until: "2010-01-01T00:00:00Z",
+        state: "closed" as const,
+      },
+      { ...base(2), since: "2010-01-01T00:00:00Z", until: null, state: "open" as const },
+    ];
+    assert.deepEqual(
+      epochSpans(moved, ...range, "previous").map((s) => s.epoch.id),
+      [2],
+    );
+  });
+});
+
+function base(id: number): {
+  id: number;
+  datum: string;
+  seen: null;
+  reference: null;
+  reference_since: string | null;
+  datums: Record<string, number>;
+  to_current: null;
+} {
+  return {
+    id,
+    datum: "NAP",
+    seen: null,
+    reference: null,
+    reference_since: null,
+    datums: {},
+    to_current: null,
+  };
+}

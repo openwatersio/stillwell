@@ -29,8 +29,8 @@
  * the cutoff, when it's earlier) to `end`, and lists the ones past the
  * cutoff. After fetching a station's levels, backfill reads its earliest
  * preliminary value again into stations/bounds/<source>.parquet.
- * Skipping looks only at the current epoch's files, so a new epoch starts its
- * years over. `recent` fetches the last hours for every live station and merges them into
+ * Skipping looks only at the files of the epoch a year is written to, so a
+ * new epoch starts its years over. `recent` fetches the last hours for every live station and merges them into
  * recent/<source>.parquet. `compact` folds
  * the last `--days` whole UTC days of that window into each station's year
  * files, each row into its datum epoch's, then writes each station's first and
@@ -42,7 +42,8 @@
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
  * and `recent` write the current epoch, never before its start, and skip a
- * station whose new epoch waits on a person. `backfill all` skips inactive
+ * station whose new epoch waits on a person. For a source with `archive:
+ * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
  * stations; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
  *
@@ -55,6 +56,7 @@ import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import {
   earliestPreliminary,
+  epochSpans,
   orderStations,
   parseShard,
   parseStationList,
@@ -100,6 +102,7 @@ import {
   refreshSource,
 } from "../src/refresh.ts";
 import type {
+  Epoch,
   LakeStation,
   Observation,
   Product,
@@ -359,12 +362,10 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     });
     return saving;
   };
-  // Where a station's fetch starts: nothing from before the current epoch,
-  // since those values are in another reference.
-  const fetchFrom = (station: LakeStation): Date => {
-    const begin = ranges?.get(station.id)?.[0] ?? start;
-    const since = Date.parse(currentSince(station) ?? "");
-    return Number.isNaN(since) ? begin : new Date(Math.max(begin.getTime(), since));
+  // The epochs a station's fetch writes, each with its part of the range (`epochSpans`).
+  const spansOf = (station: LakeStation) => {
+    const [begin, until] = ranges?.get(station.id) ?? [start, end];
+    return epochSpans(station.epochs, begin, until, source.metadata.archive);
   };
   // A source that blocks this client fails every request after, so the run
   // stops rather than go on through its stations.
@@ -382,9 +383,12 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       for (const station of batch) {
         if (!station.products.includes("levels")) continue;
         // A station with no row is new to compaction, which reads its files.
+        // Only the current epoch's values count, so only its span lowers.
+        const span = spansOf(station).find((s) => s.epoch.id === epochOf(station));
         const known = bounds.get(station.id)?.preliminary;
-        const from = fetchFrom(station).getTime();
-        if (known === undefined || (known && Date.parse(known) <= from)) continue;
+        const from = span?.from.getTime();
+        if (from === undefined || known === undefined || (known && Date.parse(known) <= from))
+          continue;
         prior.set(station.id, known ? Date.parse(known) : null);
         lowered.set(station.id, { preliminary: from });
       }
@@ -403,47 +407,49 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     const fetched = new Set<string>();
     await pool(batch, positive("concurrency"), async (station) => {
       if (stopped) return;
-      const until = ranges?.get(station.id)?.[1] ?? end;
-      const from_ = fetchFrom(station);
+      const spans = spansOf(station);
+      const current = epochOf(station);
       let levels: string | undefined;
-      for (const product of station.products) {
-        if (stopped) break;
-        // One read per series tells which years are done, rather than one per year;
-        // --skip-written needs a listing, and a read of years from 2026 on.
-        let plan;
-        try {
-          const dir = seriesDir(
-            lakeFor(station),
-            product,
-            station.source,
-            station.source_id,
-            epochOf(station),
-          );
-          plan = await yearsToFetch(dir, from_, until, mode, now);
-          // A station picked for its preliminary value is read again even with no year
-          // left to fetch, so one the source finalized drops out.
-          if (product === "levels" && (plan.fetch.length || ranges)) levels = dir;
-        } catch (error) {
-          failed.push(
-            `${station.id} ${product}: ${error instanceof Error ? error.message : error}`,
-          );
-          continue;
-        }
-        skipped += plan.skipped;
-        for (const [from, to] of plan.fetch) {
+      for (const product of station.products)
+        for (const { epoch, from: since, to: until } of spans) {
           if (stopped) break;
-          const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
-          if (product === "levels") fetched.add(station.id);
+          // One read per series tells which years are done, rather than one per year;
+          // --skip-written needs a listing, and a read of years from 2026 on.
+          let plan;
+          const ownEpoch = product === "levels" && epoch.id === current;
           try {
-            const written = await backfillYear(source, station, product, from, to);
-            if (written !== undefined) console.log(`${label}: ${written} rows`);
+            const dir = seriesDir(
+              lakeFor(station),
+              product,
+              station.source,
+              station.source_id,
+              epoch.id,
+            );
+            plan = await yearsToFetch(dir, since, until, mode, now);
+            // A station picked for its preliminary value is read again even with no year
+            // left to fetch, so one the source finalized drops out.
+            if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
           } catch (error) {
-            // A failed year writes nothing, so its file keeps what it had.
-            if (error instanceof Blocked) stopped ??= error;
-            else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+            failed.push(
+              `${station.id} ${product}: ${error instanceof Error ? error.message : error}`,
+            );
+            continue;
+          }
+          skipped += plan.skipped;
+          for (const [from, to] of plan.fetch) {
+            if (stopped) break;
+            const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
+            if (ownEpoch) fetched.add(station.id);
+            try {
+              const written = await backfillYear(source, station, product, from, to, epoch);
+              if (written !== undefined) console.log(`${label}: ${written} rows`);
+            } catch (error) {
+              // A failed year writes nothing, so its file keeps what it had.
+              if (error instanceof Blocked) stopped ??= error;
+              else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+            }
           }
         }
-      }
       // Whatever the fetches did, the files now say where the preliminary values start.
       // Bounds an older build wrote are left alone, so there's nothing to read for.
       if (levels && !legacy)
@@ -504,14 +510,17 @@ async function backfillYear(
   product: Product,
   from: Date,
   to: Date,
+  epoch: Epoch,
 ): Promise<number | undefined> {
+  // The epoch's own datum, which a closed epoch keeps when the station's moves on.
+  station = { ...station, datum: epoch.datum };
   const path = seriesPath(
     lakeFor(station),
     product,
     station.source,
     station.source_id,
     from.getUTCFullYear(),
-    epochOf(station),
+    epoch.id,
   );
   const range = [from.getTime(), to.getTime()] as const;
   if (product === "levels" || product === "predictions") {
@@ -629,11 +638,6 @@ function positive(name: "concurrency" | "hours" | "keep-days"): number {
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
   return value;
-}
-
-/** Where a station's current epoch starts, or null for one with no known start. */
-function currentSince(station: LakeStation): string | null {
-  return station.epochs.filter((e) => e.state === "open").at(-1)?.since ?? null;
 }
 
 /** A station by its ID or its source's own code. */
