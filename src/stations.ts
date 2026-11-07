@@ -84,10 +84,11 @@ export function mergeStationList(
           from: old.datum,
           to: s.datum ?? old.datum,
           reason: next.reason,
-          // The epoch a person would decide on: the held one, or else the newest.
+          // The epoch a person would decide on: the one the change names, the held one, or else the newest.
           key: epochKey(
             s.id,
-            (next.epochs.find((e) => e.state === "held") ?? next.epochs.at(-1)!).since,
+            (next.decide ?? next.epochs.find((e) => e.state === "held") ?? next.epochs.at(-1)!)
+              .since,
           ),
         });
     } else

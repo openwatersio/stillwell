@@ -3,8 +3,8 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--no-publish]
  *   node scripts/ingest.ts publish
- *   node scripts/ingest.ts backfill <source> <station,...|all> <start> <end>
- *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written]
+ *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
+ *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *
@@ -24,8 +24,13 @@
  * provisional years again each time. `--first` names a file of station IDs to
  * run before the rest, and `--shard 2/8` takes the second of eight sets of
  * stations, split by a hash of their IDs, so separate jobs can split them.
- * Skipping looks only at the current epoch's files, so a new epoch starts its
- * years over. `recent` fetches the last hours for every live station and merges them into
+ * `preliminary` in place of the stations takes every station, active or not,
+ * whose bounds hold a preliminary value, from that value's month (or `start`,
+ * the cutoff, when it's earlier) to `end`, and lists the ones past the
+ * cutoff. After fetching a station's levels, backfill reads its earliest
+ * preliminary value again into stations/bounds/<source>.parquet.
+ * Skipping looks only at the files of the epoch a year is written to, so a
+ * new epoch starts its years over. `recent` fetches the last hours for every live station and merges them into
  * recent/<source>.parquet. `compact` folds
  * the last `--days` whole UTC days of that window into each station's year
  * files, each row into its datum epoch's, then writes each station's first and
@@ -37,7 +42,8 @@
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
  * and `recent` write the current epoch, never before its start, and skip a
- * station whose new epoch waits on a person. `backfill all` skips inactive
+ * station whose new epoch waits on a person. For a source with `archive:
+ * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
  * stations; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
  *
@@ -50,9 +56,12 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import {
+  earliestPreliminary,
+  epochSpans,
   orderStations,
   parseShard,
   parseStationList,
+  preliminaryRuns,
   shard,
   yearsToFetch,
 } from "../src/backfill.ts";
@@ -60,13 +69,16 @@ import { useDiskCache } from "../src/cache.ts";
 import { Blocked } from "../src/http.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
+  chunks,
   compactRecent,
   formatSummary,
   lastDays,
   pool,
   qcFor,
+  REFETCH_YEARS,
   refuseOtherDatum,
   updateRecent,
+  writePreliminary,
   type RunSummary,
 } from "../src/lake/recent.ts";
 import { appendFile, readFile } from "node:fs/promises";
@@ -74,12 +86,13 @@ import { isHeld } from "../src/epochs.ts";
 import {
   readExtremes,
   readObservations,
+  readStationBounds,
   setConnections,
   writeExtremes,
   publishedSources,
   writeObservations,
 } from "../src/lake/parquet.ts";
-import { seriesDir, seriesPath, stationsPath } from "../src/lake/paths.ts";
+import { boundsPath, seriesDir, seriesPath, stationsPath } from "../src/lake/paths.ts";
 import { qc, withSourceFlag } from "../src/qc.ts";
 import {
   describeReport,
@@ -90,6 +103,7 @@ import {
   refreshSource,
 } from "../src/refresh.ts";
 import type {
+  Epoch,
   LakeStation,
   Observation,
   Product,
@@ -143,6 +157,7 @@ const { positionals, values } = parseArgs({
     shard: { type: "string" },
     refetch: { type: "boolean", default: false },
     "skip-written": { type: "boolean", default: false },
+    "skip-unscreened": { type: "boolean", default: false },
     "rebuild-bounds": { type: "boolean", default: false },
   },
 });
@@ -256,20 +271,61 @@ async function publish(lake: string): Promise<void> {
 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
-  const list = await listOf(lakeOfSource(source.metadata), sourceId);
-  const named =
-    ids === "all"
-      ? list.filter((s) => s.status === "active")
-      : ids.split(",").map((id) => find(list, sourceId, id));
+  const lake = lakeOfSource(source.metadata);
+  const list = await listOf(lake, sourceId);
+  // `preliminary` takes each station from its earliest preliminary value, active or not.
+  let ranges: Map<string, [Date, Date]> | undefined;
+  // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.
+  let behind: string[] = [];
+  let named: LakeStation[];
+  const bounds = await readStationBounds(boundsPath(lake, sourceId));
+  // Bounds an older build wrote have no `preliminary`, and backfill leaves them alone.
+  const legacy = [...bounds.values()].some((b) => b.preliminary === undefined);
+  if (ids === "preliminary") {
+    if (legacy)
+      throw new Error(
+        `${sourceId}'s bounds predate preliminary values; run \`compact ${sourceId} --rebuild-bounds\` first`,
+      );
+    const { runs, past, unscreened } = preliminaryRuns(
+      // A held station is skipped, so it isn't listed either.
+      (values.shard ? shard(list, ...parseShard(values.shard)) : list).filter(
+        (s) => !isHeld(s.epochs),
+      ),
+      bounds,
+      start,
+      end,
+      values["skip-unscreened"],
+    );
+    if (unscreened.length)
+      console.log(
+        `${sourceId}: skipped ${unscreened.length} stations with a year of record and no value the source screened`,
+      );
+    named = runs.map((r) => r.station);
+    ranges = new Map(runs.map((r) => [r.station.id, [r.from, r.to]]));
+    await reportPast(sourceId, start, past);
+    // Their files end before the cutoff, which no read looks behind, so they're listed once.
+    behind = past.map((p) => p.id).filter((id) => !ranges!.has(id));
+  } else
+    named =
+      ids === "all"
+        ? list.filter((s) => s.status === "active")
+        : ids.split(",").map((id) => find(list, sourceId, id));
   // A station whose new epoch waits on a person gets nothing, in either datum.
   let wanted = named.filter((s) => {
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
     return !isHeld(s.epochs);
   });
-  if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
-  if (values.shard) wanted = shard(wanted, ...parseShard(values.shard));
+  if (values.shard && ids !== "all" && ids !== "preliminary")
+    throw new Error("--shard splits `all` or `preliminary`, not named stations");
+  // `preliminary` took its shard before picking stations, so the cutoff list is the shard's too.
+  if (values.shard && ids === "all") wanted = shard(wanted, ...parseShard(values.shard));
   if (values["skip-written"] && values.refetch)
     throw new Error("--skip-written and --refetch contradict each other");
+  // Skipping every written year would skip the very years holding preliminary values.
+  if (values["skip-unscreened"] && ids !== "preliminary")
+    throw new Error("--skip-unscreened goes with `preliminary`");
+  if (values["skip-written"] && ids === "preliminary")
+    throw new Error("--skip-written and `preliminary` contradict each other");
   if (values.first) {
     const text = await readFile(values.first, "utf8");
     const first = parseStationList(text, sourceId, /\.csv$/i.test(values.first));
@@ -290,52 +346,180 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
 
   const failed: string[] = [];
   let skipped = 0;
+  // Each station's earliest preliminary value, read again after its levels
+  // were fetched, written to the bounds after each batch of 100 stations, so
+  // a run stopped by its time limit keeps most of them.
+  let preliminary = new Map<string, { preliminary: number | null; screened?: boolean }>(
+    behind.map((id) => [id, { preliminary: null }]),
+  );
+  // Compaction and the read below look for preliminary values from this year on;
+  // a `preliminary` run from an earlier start reads from there, so it sees what it fetched.
+  const cutoffYear = new Date(now).getUTCFullYear() - REFETCH_YEARS;
+  const fromYear = ranges ? Math.min(cutoffYear, start.getUTCFullYear()) : cutoffYear;
+  const cutoff = Date.UTC(cutoffYear, 0, 1);
+  let saving = Promise.resolve();
+  const save = () => {
+    const found = preliminary;
+    preliminary = new Map();
+    saving = saving.then(async () => {
+      if (!found.size) return;
+      try {
+        if (!(await writePreliminary(lake, sourceId, found)))
+          console.log(
+            `${sourceId}: bounds predate preliminary values; run \`compact ${sourceId} --rebuild-bounds\` to record them`,
+          );
+      } catch (error) {
+        failed.push(`bounds: ${error instanceof Error ? error.message : error}`);
+      }
+    });
+    return saving;
+  };
+  // The epochs a station's fetch writes, each with its part of the range (`epochSpans`).
+  const spansOf = (station: LakeStation) => {
+    const [begin, until] = ranges?.get(station.id) ?? [start, end];
+    return epochSpans(station.epochs, begin, until, source.metadata.archive);
+  };
   // A source that blocks this client fails every request after, so the run
   // stops rather than go on through its stations.
   let stopped: Blocked | undefined;
-  await pool(wanted, positive("concurrency"), async (station) => {
-    if (stopped) return;
-    // Nothing from before the current epoch: those values are in another reference.
-    const since = Date.parse(currentSince(station) ?? "");
-    const from_ = Number.isNaN(since) ? start : new Date(Math.max(start.getTime(), since));
-    for (const product of station.products) {
-      // One read per series tells which years are done, rather than one per year;
-      // --skip-written needs a listing, and a read of years from 2026 on.
-      let plan;
+  for (const batch of chunks(wanted, 100)) {
+    if (stopped) break;
+    // Before a batch, a station's value is lowered to where its fetch starts,
+    // since the fetch may write preliminary values from there. A run killed
+    // partway leaves it too early, which the next refetch reads again, rather
+    // than too late, which nothing would correct. A `preliminary` run fetches
+    // from the value itself, so it has nothing to lower.
+    const prior = new Map<string, number | null>();
+    const lowered = new Map<string, { preliminary: number }>();
+    if (!ranges && !legacy)
+      for (const station of batch) {
+        if (!station.products.includes("levels")) continue;
+        // A station with no row is new to compaction, which reads its files.
+        // Only the current epoch's values count, so only its span lowers.
+        // No read looks before the cutoff, so neither does the lowered value, and a
+        // fetch that ends before it needs none.
+        const span = spansOf(station).find((s) => s.epoch.id === epochOf(station));
+        const known = bounds.get(station.id)?.preliminary;
+        const from = span ? Math.max(span.from.getTime(), cutoff) : Infinity;
+        if (
+          !span ||
+          from >= span.to.getTime() ||
+          known === undefined ||
+          (known && Date.parse(known) <= from)
+        )
+          continue;
+        prior.set(station.id, known ? Date.parse(known) : null);
+        lowered.set(station.id, { preliminary: from });
+      }
+    if (lowered.size)
       try {
-        const dir = seriesDir(
-          lakeFor(station),
-          product,
-          station.source,
-          station.source_id,
-          epochOf(station),
-        );
-        plan = await yearsToFetch(dir, from_, end, mode, now);
+        await writePreliminary(lake, sourceId, lowered);
       } catch (error) {
-        failed.push(`${station.id} ${product}: ${error instanceof Error ? error.message : error}`);
+        // Fetched unlowered, a killed run could leave these too late; they wait for the next run.
+        failed.push(
+          `bounds: ${error instanceof Error ? error.message : error}; skipped ${batch.length} stations`,
+        );
         continue;
       }
-      skipped += plan.skipped;
-      for (const [from, to] of plan.fetch) {
-        if (stopped) return;
-        const label = `${station.id} ${product} ${from.getUTCFullYear()}`;
-        try {
-          const written = await backfillYear(source, station, product, from, to);
-          if (written !== undefined) console.log(`${label}: ${written} rows`);
-        } catch (error) {
-          // A failed year writes nothing, so its file keeps what it had.
-          if (error instanceof Blocked) stopped ??= error;
-          else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+    // Lowered stations that fetched no year of levels, having none to fetch or
+    // stopping first, get their value back.
+    const fetched = new Set<string>();
+    await pool(batch, positive("concurrency"), async (station) => {
+      if (stopped) return;
+      const spans = spansOf(station);
+      const current = epochOf(station);
+      let levels: string | undefined;
+      for (const product of station.products)
+        for (const { epoch, from: since, to: until } of spans) {
+          if (stopped) break;
+          // One read per series tells which years are done, rather than one per year;
+          // --skip-written needs a listing, and a read of years from 2026 on.
+          let plan;
+          const ownEpoch = product === "levels" && epoch.id === current;
+          try {
+            const dir = seriesDir(
+              lakeFor(station),
+              product,
+              station.source,
+              station.source_id,
+              epoch.id,
+            );
+            plan = await yearsToFetch(dir, since, until, mode, now);
+            // A station picked for its preliminary value is read again even with no year
+            // left to fetch, so one the source finalized drops out.
+            if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
+          } catch (error) {
+            failed.push(
+              `${station.id} ${product}: ${error instanceof Error ? error.message : error}`,
+            );
+            continue;
+          }
+          skipped += plan.skipped;
+          for (const [from, to] of plan.fetch) {
+            if (stopped) break;
+            const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
+            if (ownEpoch) fetched.add(station.id);
+            try {
+              const written = await backfillYear(source, station, product, from, to, epoch);
+              if (written !== undefined) console.log(`${label}: ${written} rows`);
+            } catch (error) {
+              // A failed year writes nothing, so its file keeps what it had.
+              if (error instanceof Blocked) stopped ??= error;
+              else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+            }
+          }
         }
-      }
-    }
-  });
+      // Whatever the fetches did, the files now say where the preliminary values start.
+      // Bounds an older build wrote are left alone, so there's nothing to read for.
+      if (levels && !legacy)
+        try {
+          // Within the current epoch, the rows compaction counts.
+          const epoch = station.epochs.find((e) => e.id === epochOf(station))!;
+          const window: [number, number] = [
+            epoch.since ? Date.parse(epoch.since) : -Infinity,
+            epoch.until ? Date.parse(epoch.until) : Infinity,
+          ];
+          preliminary.set(station.id, await earliestPreliminary(levels, window, fromYear));
+        } catch (error) {
+          failed.push(
+            `${station.id} preliminary: ${error instanceof Error ? error.message : error}`,
+          );
+        }
+    });
+    for (const [id, time] of prior)
+      if (!fetched.has(id) && !preliminary.has(id)) preliminary.set(id, { preliminary: time });
+    await save();
+  }
+  // Values set before any batch, such as the stations behind the cutoff.
+  await save();
   const why = { written: "already written", complete: "already complete", none: "" }[mode];
   if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
   console.log(`${sourceId}: ${failed.length} failed`);
   if (stopped) console.error(`${sourceId}: stopped: ${stopped.message}`);
   for (const f of failed) console.error(`  ${f}`);
   if (failed.length || stopped) process.exitCode = 1;
+}
+
+/**
+ * Print the stations whose values are still preliminary from before `cutoff`,
+ * which `backfill … preliminary` doesn't fetch again from there, and add them to the workflow
+ * run's page.
+ */
+async function reportPast(
+  sourceId: string,
+  cutoff: Date,
+  past: { id: string; preliminary: string }[],
+): Promise<void> {
+  if (!past.length) return;
+  // The run's page holds 1 MiB, so a long list is cut short there and here.
+  const lines = [
+    `${sourceId}: ${past.length} stations hold values still preliminary from before ${cutoff.toISOString().slice(0, 10)}, past the cutoff:`,
+    ...past.slice(0, 1000).map((p) => `  ${p.id} since ${p.preliminary}`),
+    ...(past.length > 1000 ? [`  and ${past.length - 1000} more`] : []),
+  ];
+  console.log(lines.join("\n"));
+  const page = process.env.GITHUB_STEP_SUMMARY;
+  if (page) await appendFile(page, ["```", ...lines, "```", ""].join("\n"));
 }
 
 /** Returns how many rows the year's file now holds, or undefined when nothing changed. */
@@ -345,14 +529,17 @@ async function backfillYear(
   product: Product,
   from: Date,
   to: Date,
+  epoch: Epoch,
 ): Promise<number | undefined> {
+  // The epoch's own datum, which a closed epoch keeps when the station's moves on.
+  station = { ...station, datum: epoch.datum };
   const path = seriesPath(
     lakeFor(station),
     product,
     station.source,
     station.source_id,
     from.getUTCFullYear(),
-    epochOf(station),
+    epoch.id,
   );
   const range = [from.getTime(), to.getTime()] as const;
   if (product === "levels" || product === "predictions") {
@@ -472,11 +659,6 @@ function positive(name: "concurrency" | "hours" | "keep-days"): number {
   return value;
 }
 
-/** Where a station's current epoch starts, or null for one with no known start. */
-function currentSince(station: LakeStation): string | null {
-  return station.epochs.filter((e) => e.state === "open").at(-1)?.since ?? null;
-}
-
 /** A station by its ID or its source's own code. */
 function find(list: LakeStation[], sourceId: string, id: string): LakeStation {
   const station = list.find((s) => s.id === id || s.id === `${sourceId}/${id}`);
@@ -492,7 +674,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds]",
   );
   process.exit(1);
 }

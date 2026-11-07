@@ -1,7 +1,14 @@
 import { Blocked } from "../http.ts";
 import { qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
-import type { Epoch, LakeStation, Observation, Source, Station } from "../schema.ts";
+import {
+  Flag,
+  type Epoch,
+  type LakeStation,
+  type Observation,
+  type Source,
+  type Station,
+} from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
 import {
   checkRecent,
@@ -11,6 +18,7 @@ import {
   readRecent,
   readStationBounds,
   readTimeBounds,
+  type StationBounds,
   recentStations,
   writeObservations,
   writeRecent,
@@ -284,7 +292,7 @@ export async function compactRecent({
   const stations = all.filter((s) => pathOf.has(s.id));
   summary.stations = stations.filter(levels).length + summary.failed.length;
   // The span of each year file this run read whole, by `spanKey`, for the bounds.
-  const spans = new Map<string, Span | null>();
+  const spans = new Map<string, FileBounds | null>();
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -395,6 +403,19 @@ export async function compactRecent({
 
 type Span = [number, number];
 
+/**
+ * How many years before the current one the monthly refetch reaches back
+ * (`backfill … preliminary` from January of that year, in monthly.yml), and
+ * so how far back compaction looks for a station's first preliminary value.
+ */
+export const REFETCH_YEARS = 3;
+
+/**
+ * A year file's earliest and latest counted row, its earliest preliminary one
+ * or null, and whether any is one the source screened.
+ */
+type FileBounds = [number, number, number | null, boolean];
+
 /** A station's year file in one epoch, as `updateBounds` names it. */
 function spanKey(station: Pick<Station, "source_id">, epoch: number, year: number): string {
   return `${encodeURIComponent(station.source_id)} ${epoch} ${year}`;
@@ -414,23 +435,35 @@ function epochWindow(epochs: Epoch[], id: number): Span | null {
   ];
 }
 
-/** The earliest and latest of `rows` inside `window`, or null when none are. */
-function spanOf(rows: { time: number }[], window: Span | null): Span | null {
+/**
+ * The earliest and latest of `rows` inside `window`, and the earliest there
+ * the source sent as preliminary, or null when none are inside.
+ */
+function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
   if (!window) return null;
   // A loop, not Math.min(...): a one-minute year file has too many rows to spread.
-  let [first, last] = [Infinity, -Infinity];
-  for (const { time } of rows)
+  let [first, last, preliminary, screened] = [Infinity, -Infinity, Infinity, false];
+  for (const { time, flag, source_flag } of rows)
     if (time >= window[0] && time < window[1]) {
       if (time < first) first = time;
       if (time > last) last = time;
+      // As readTimeBounds: without `source_flag`, only a good or interpolated flag is the source's.
+      if (source_flag === undefined ? flag < Flag.preliminary : source_flag !== Flag.preliminary)
+        screened = true;
+      if ((source_flag ?? flag) === Flag.preliminary && time < preliminary) preliminary = time;
     }
-  return first <= last ? [first, last] : null;
+  return first <= last
+    ? [first, last, preliminary < Infinity ? preliminary : null, screened]
+    : null;
 }
 
 /**
  * Write each station's first and last level to the source's bounds in
  * `lake`, over the rows its epochs count: each epoch's files within its
  * `[since, until)`, and none of a held epoch's or one the list doesn't have.
+ * Beside them goes the earliest value in the current epoch the source sent as
+ * preliminary, which the monthly refetch fetches again from; backfill writes
+ * only the current epoch, so earlier epochs' values can't be refetched.
  *
  * A listing of the source's files gives each station's first and last year.
  * The files of those years come from `spans`, which compaction read whole
@@ -440,6 +473,14 @@ function spanOf(rows: { time: number }[], window: Span | null): Span | null {
  * year on that compaction didn't fold, where backfills of a new station's
  * first weeks and a station that isn't live land. A first run, or `rebuild`,
  * reads every station's end years.
+ *
+ * The earliest preliminary value is the one already known, or else one in a
+ * file compaction folded, whichever is earlier; backfill, which can finalize
+ * it, writes its own (`writePreliminary`). A station new to the bounds, or
+ * every station on a rebuild, has the current epoch's files read from
+ * `REFETCH_YEARS` before this year on until one holds a preliminary value,
+ * which for a station with none is at most four files. A bounds file an older build wrote without the column
+ * keeps none until a rebuild.
  *
  * shortcut: a backfill within a station's first or last year, when that year
  * is before last year, isn't seen, nor are rows an epoch's widened span takes
@@ -457,7 +498,7 @@ export async function updateBounds({
   lake: string;
   source: string;
   stations: LakeStation[];
-  spans: Map<string, Span | null>;
+  spans: Map<string, FileBounds | null>;
   /** The year compaction ran up to. */
   year: number;
   rebuild?: boolean;
@@ -466,6 +507,9 @@ export async function updateBounds({
   const path = boundsPath(lake, source);
   const had = await readStationBounds(path);
   const known = rebuild ? new Map<string, never>() : had;
+  // Bounds an older build wrote, without `preliminary`, stay without it until
+  // a rebuild: filling it in reads nearly every file, too long for a nightly run.
+  const legacy = [...known.values()].some((b) => b.preliminary === undefined);
   // Files by station directory, then year: epoch 1's beside later epochs' directories.
   const listed = new Map<string, Map<number, { epoch: number; file: string }[]>>();
   for (const [pattern, depth] of [
@@ -488,9 +532,12 @@ export async function updateBounds({
 
   // Each end of each station: its counted years from that end inward, and
   // the bound kept there, if any.
-  type File = { file: string; key: string; window: Span };
-  type End = { id: string; pick: 0 | 1; years: File[][]; at: number; value?: number };
+  type File = { file: string; key: string; window: Span; epoch: number };
+  // Pick 0 is first, 1 last, and 2 the earliest preliminary, over the current epoch alone.
+  type End = { id: string; pick: 0 | 1 | 2; years: File[][]; at: number; value?: number | null };
   const ends: End[] = [];
+  // Each station's current-epoch files, for `screened`.
+  const own = new Map<string, File[]>();
   for (const station of stations) {
     const dir = encodeURIComponent(station.source_id);
     const counted = new Map<number, File[]>();
@@ -500,10 +547,33 @@ export async function updateBounds({
         if (window)
           counted.set(year, [
             ...(counted.get(year) ?? []),
-            { file, key: spanKey(station, epoch, year), window },
+            { file, key: spanKey(station, epoch, year), window, epoch },
           ]);
       }
     const ascending = [...counted.keys()].sort((x, y) => x - y);
+    const current = station.epochs.filter((e) => e.state === "open").at(-1);
+    const window = current && epochWindow(station.epochs, current.id);
+    // Earlier years are never refetched, so their values aren't looked for.
+    const years = ascending
+      .filter((y) => y >= thisYear - REFETCH_YEARS)
+      .map((y) => counted.get(y)!.filter((f) => f.epoch === current?.id))
+      .filter((files) => files.length);
+    own.set(
+      station.id,
+      ascending.flatMap((y) => counted.get(y)!.filter((f) => f.epoch === current?.id)),
+    );
+    const preliminary: End = { id: station.id, pick: 2, years, at: 0 };
+    const prior = known.get(station.id)?.preliminary;
+    const time = prior ? Date.parse(prior) : NaN;
+    // One from an earlier epoch says nothing of this one's files, so they're read like a new station's.
+    const stale = prior && !(window && time >= window[0] && time < window[1]);
+    if (prior !== undefined && !stale) {
+      // Known, and kept unless a file folded this run holds an earlier one.
+      const times = years.flat().flatMap((f) => spans.get(f.key)?.[2] ?? []);
+      if (prior) times.push(time);
+      preliminary.value = times.length ? Math.min(...times) : null;
+    }
+    if (!legacy) ends.push(preliminary);
     for (const pick of [0, 1] as const) {
       const years = (pick === 0 ? ascending : ascending.toReversed()).map((y) => counted.get(y)!);
       const end: End = { id: station.id, pick, years, at: 0 };
@@ -534,28 +604,85 @@ export async function updateBounds({
     });
     for (const e of open) {
       const times = e.years[e.at]!.flatMap((f) => spans.get(f.key)?.[e.pick] ?? []);
-      if (times.length) e.value = e.pick === 0 ? Math.min(...times) : Math.max(...times);
+      if (times.length) e.value = e.pick === 1 ? Math.max(...times) : Math.min(...times);
       else e.at++;
     }
     open = open.filter((e) => e.value === undefined && e.at < e.years.length);
   }
 
-  const iso = (time: number) => new Date(time).toISOString().replace(/\.\d+Z$/, "Z");
   const found = Map.groupBy(ends, (e) => e.id);
-  const bounds: { id: string; first: string; last: string }[] = [];
+  const bounds: ({ id: string } & StationBounds)[] = [];
   for (const station of stations) {
-    const [first, last] = found.get(station.id)!.map((e) => e.value);
-    if (first !== undefined && last !== undefined)
-      bounds.push({ id: station.id, first: iso(first), last: iso(last) });
+    const picked = found.get(station.id)!;
+    const [first, last] = picked.filter((e) => e.pick !== 2).map((e) => e.value);
+    const preliminary = picked.find((e) => e.pick === 2)?.value;
+    // Screened if any file read this run says so, else as known; once screened, always.
+    const prior = had.get(station.id)?.screened ?? null;
+    const screened = own.get(station.id)!.some((f) => spans.get(f.key)?.[3]) ? true : prior;
+    if (typeof first === "number" && typeof last === "number")
+      bounds.push({
+        id: station.id,
+        first: iso(first),
+        last: iso(last),
+        preliminary: typeof preliminary === "number" ? iso(preliminary) : null,
+        screened,
+      });
   }
   // A station not in this run, such as one whose lake can't be named, keeps
   // what it had; so does one with no counted rows, unless this is a rebuild.
   const here = new Set(stations.map((s) => s.id));
   const bounded = new Set(bounds.map((b) => b.id));
   for (const [id, b] of had)
-    if (!bounded.has(id) && (!rebuild || !here.has(id)) && b.first && b.last)
-      bounds.push({ id, first: b.first, last: b.last });
-  await writeStationBounds(path, bounds);
+    if (!bounded.has(id) && (!rebuild || !here.has(id))) bounds.push({ id, ...b });
+  await writeStationBounds(path, bounds, !legacy);
+}
+
+/**
+ * Set the earliest preliminary value of the stations a backfill read, by ID,
+ * and whether they hold a value the source screened, where given, in the
+ * source's bounds in `lake`, keeping every other station's bounds and their
+ * first and last. A station with no row and none gets no row. Returns
+ * false, writing nothing, when the bounds have no `preliminary` column yet,
+ * since writing one would mark every other station as having none;
+ * `compact --rebuild-bounds` fills them in first.
+ */
+export async function writePreliminary(
+  lake: string,
+  source: string,
+  found: Map<string, { preliminary: number | null; screened?: boolean }>,
+): Promise<boolean> {
+  const path = boundsPath(lake, source);
+  const bounds = await readStationBounds(path);
+  if ([...bounds.values()].some((b) => b.preliminary === undefined)) return false;
+  let changed = false;
+  for (const [id, { preliminary: time, screened }] of found) {
+    const preliminary = time === null ? null : iso(time);
+    const had = bounds.get(id);
+    if (!had && preliminary === null) continue;
+    if (
+      (had?.preliminary ?? null) === preliminary &&
+      (screened === undefined || (had?.screened ?? null) === screened)
+    )
+      continue;
+    bounds.set(id, {
+      first: null,
+      last: null,
+      ...had,
+      preliminary,
+      ...(screened === undefined ? {} : { screened }),
+    });
+    changed = true;
+  }
+  if (changed)
+    await writeStationBounds(
+      path,
+      [...bounds].map(([id, b]) => ({ id, ...b })),
+    );
+  return true;
+}
+
+function iso(time: number): string {
+  return new Date(time).toISOString().replace(/\.\d+Z$/, "Z");
 }
 
 /**
@@ -640,7 +767,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
   return lines.join("\n") + "\n";
 }
 
-function* chunks<T>(items: T[], size: number): Generator<T[]> {
+export function* chunks<T>(items: T[], size: number): Generator<T[]> {
   for (let i = 0; i < items.length; i += size) yield items.slice(i, i + size);
 }
 

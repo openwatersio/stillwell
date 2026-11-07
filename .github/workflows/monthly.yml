@@ -2,8 +2,9 @@ name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
 # rebuild stations.parquet and sources.json, and keep the scheduled workflows
-# enabled. On the 9th, refetch CO-OPS, USGS and UHSLC years that may hold values
-# the source has verified since. Ingest hourly starts a refresh of one source, at
+# enabled. On the 9th, refetch every station's values that were still
+# preliminary, from the earliest, so the ones the source has finalized since
+# replace them. Ingest hourly starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
@@ -36,7 +37,7 @@ on:
         type: boolean
         default: false
       refetch:
-        description: "Refetch CO-OPS, USGS and UHSLC years with unverified values, instead of refreshing lists"
+        description: "Refetch preliminary values, instead of refreshing lists"
         type: boolean
         default: false
 
@@ -68,9 +69,10 @@ jobs:
           fi
           sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
-            refetch=$(jq -c 'map(select(. == "coops" or . == "usgs" or . == "uhslc"))' <<< "$sources")
+            # PEGELONLINE never finalizes a value, in its feed or its downloads.
+            refetch=$(jq -c 'map(select(. != "pegelonline"))' <<< "$sources")
             if [ "$refetch" = "[]" ]; then
-              echo "::error::Only coops, usgs and uhslc are refetched"
+              echo "::error::PEGELONLINE isn't refetched"
               exit 1
             fi
             echo "sources=[]" >> "$GITHUB_OUTPUT"
@@ -152,9 +154,16 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
-  # Backfill fetches again every ended year whose file holds preliminary values
-  # (yearDone in src/backfill.ts) and every part of a year still under way, so
-  # values the source has verified since replace the ones compaction wrote.
+  # Backfill takes every station whose bounds hold a preliminary value, active
+  # or not, and fetches again from that value's month on, skipping ended years
+  # with none (yearDone in src/backfill.ts), so values the source has finalized
+  # since replace the ones compaction wrote. It then reads each station's
+  # earliest preliminary value again into the bounds. Values preliminary from
+  # before the cutoff, January three years back (REFETCH_YEARS in
+  # src/lake/recent.ts), aren't fetched again, though their stations' later
+  # years are; the run's page lists a station once its value falls behind it.
+  # Backfill refuses bounds an older build wrote, without the column, until
+  # `compact <source> --rebuild-bounds` from the Ingest workflow fills it in.
   refetch:
     needs: plan
     if: needs.plan.outputs.refetch != '[]'
@@ -177,26 +186,29 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      # CO-OPS verifies a month a month or two after it ends: last year, and
-      # this year up to this month, up to about 50 requests a station at one
-      # a second, about 4 hours for 300 stations in December.
-      # USGS approves months to years later: the last two ended years, a year a
-      # request at one every 3.7 seconds, too many for one run across 11,000
-      # stations, so each month takes a twelfth of them, about 1,200 stations
-      # and 2.5 hours, and each station comes round once a year. The current year is left to compaction.
-      # UHSLC releases research-quality data a year or two behind, replacing
-      # fast-delivery values, and none of its series is live: the last two
-      # ended years and this one, where backfill skips ended years with no
-      # preliminary values, so about 320 FD series a year or three each.
+      # CO-OPS verifies a month a month or two after it ends, so most stations
+      # start at last month or this one, a request a month at one a second; one
+      # never verified is fetched from the cutoff on, 36 requests or more.
+      # USGS approves months to years later, a year a request at one every 3.7
+      # seconds, too many for one run across 11,000 stations, so each month
+      # takes a twelfth of them, at most about 1,200 stations and up to three
+      # years each, about 3.7 hours at most, and each station comes round once
+      # a year; the current year is left to compaction. RWS and USACE ask a
+      # year a request. Some USACE offices screen nothing, so their values stay
+      # preliminary for good; --skip-unscreened leaves out a station with a
+      # year of record and no value its source screened, but for January's run. BSH sends no
+      # preliminary values, so its job finds nothing to fetch.
       - run: |
           year=$(date -u +%Y)
           month=$(date -u +%m)
           case "$SOURCE" in
-            coops) set -- coops all $((year - 1)) "$year-$month-01" ;;
-            usgs) set -- usgs all $((year - 2)) "$year" --shard "$((10#$month))/12" ;;
-            uhslc) set -- uhslc all $((year - 2)) $((year + 1)) ;;
+            usgs) set -- "$year" --shard "$((10#$month))/12" ;;
+            # Every January takes them all, so a station whose office began
+            # screening since, or a new epoch's, is read again and can rejoin.
+            usace) set -- "$year-$month-01" $([ "$month" != 01 ] && echo --skip-unscreened) ;;
+            *) set -- "$year-$month-01" ;;
           esac
-          node scripts/ingest.ts backfill "$@"
+          node scripts/ingest.ts backfill "$SOURCE" preliminary $((year - 3)) "$@"
         env:
           SOURCE: ${{ matrix.source }}
           WATER_LEVELS_LAKE: s3://water-levels

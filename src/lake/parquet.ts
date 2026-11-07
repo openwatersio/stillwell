@@ -505,34 +505,62 @@ function isoOf(value: unknown): string | null {
 
 /**
  * Each station's `first` and `last` from a file with `id`, `first` and
- * `last`, such as a source's bounds; none when the file doesn't exist yet.
+ * `last`, such as a source's bounds, and its earliest `preliminary` value;
+ * none when the file doesn't exist yet. `preliminary` is undefined in a file
+ * without the column, such as one an older build wrote, so it isn't taken
+ * for known to have none.
  */
-export async function readStationBounds(
-  path: string,
-): Promise<Map<string, Pick<Station, "first" | "last">>> {
+export async function readStationBounds(path: string): Promise<Map<string, StationBounds>> {
   const rows = await read(
     path,
-    `SELECT id, strftime(first, '%Y-%m-%dT%H:%M:%SZ') AS first, strftime(last, '%Y-%m-%dT%H:%M:%SZ') AS last`,
+    // `screened` and `preliminary` are missing from files written before them.
+    `SELECT COLUMNS(lambda c: c IN ('id', 'screened')), strftime(COLUMNS(lambda c: c IN ('first', 'last', 'preliminary')), '%Y-%m-%dT%H:%M:%SZ')`,
     "id",
   );
   return new Map(
     rows.map((r) => [
       String(r.id),
-      { first: (r.first as string | null) ?? null, last: (r.last as string | null) ?? null },
+      {
+        first: (r.first as string | null) ?? null,
+        last: (r.last as string | null) ?? null,
+        preliminary: "preliminary" in r ? ((r.preliminary as string | null) ?? null) : undefined,
+        screened: (r.screened as boolean | null | undefined) ?? null,
+      },
     ]),
   );
 }
 
-/** A source's bounds, `stations/bounds/<source>.parquet`: `id`, `first` and `last`, sorted by ID. */
+/**
+ * A station's row in its source's bounds: its first and last level, and the
+ * earliest value in its current epoch the source sent as preliminary, which
+ * the monthly refetch fetches again from (`backfill … preliminary`).
+ */
+export type StationBounds = Pick<Station, "first" | "last"> & {
+  preliminary?: string | null;
+  /** Whether the current epoch holds a value the source screened; null when not yet known. */
+  screened?: boolean | null;
+};
+
+/**
+ * A source's bounds, `stations/bounds/<source>.parquet`: `id`, `first`, `last`
+ * `screened` and, unless `preliminary` is false, `preliminary`, sorted by ID.
+ */
 export async function writeStationBounds(
   path: string,
-  bounds: { id: string; first: string; last: string }[],
+  bounds: ({ id: string } & Partial<StationBounds>)[],
+  preliminary = true,
 ): Promise<void> {
-  const columns = { id: "VARCHAR", first: "TIMESTAMPTZ", last: "TIMESTAMPTZ" };
+  const columns: Record<string, string> = {
+    id: "VARCHAR",
+    first: "TIMESTAMPTZ",
+    last: "TIMESTAMPTZ",
+  };
+  if (preliminary) columns.preliminary = "TIMESTAMPTZ";
+  columns.screened = "BOOLEAN";
   await viaJson(
     path,
     bounds,
-    `SELECT id, first, last FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
+    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
     "FORMAT parquet, COMPRESSION zstd",
   );
 }
@@ -548,11 +576,13 @@ export function listFiles(pattern: string): Promise<string[]> {
 
 /**
  * Each series file's earliest and latest `time` inside its `window`, `[from,
- * until)` in milliseconds, by its path as given; a file with none there has no entry.
+ * until)` in milliseconds, the earliest there the source sent as
+ * preliminary (null when none), and whether any there the source screened,
+ * by its path as given; a file with none there has no entry.
  */
 export async function readTimeBounds(
   files: { file: string; window: [number, number] }[],
-): Promise<Map<string, [number, number]>> {
+): Promise<Map<string, [number, number, number | null, boolean]>> {
   if (!files.length) return new Map();
   // Infinity isn't SQL; these are past any time a level has.
   const ms = (t: number) => String(Math.max(-8.64e15, Math.min(8.64e15, t)));
@@ -560,10 +590,15 @@ export async function readTimeBounds(
     .map((f) => `(${quote(f.file)}, ${ms(f.window[0])}, ${ms(f.window[1])})`)
     .join(", ");
   const inside = "epoch_ms(p.time) >= w.lo AND epoch_ms(p.time) < w.hi";
+  const preliminary = `${inside} AND coalesce(p.source_flag, p.flag) = ${Flag.preliminary}`;
+  // Without `source_flag`, a suspect or bad flag may be QC's alone, so only a
+  // good or interpolated one says the source screened it.
+  const screened = `${inside} AND CASE WHEN p.source_flag IS NULL THEN p.flag < ${Flag.preliminary} ELSE p.source_flag != ${Flag.preliminary} END`;
   const rows = await serial(async () => {
     const db = await connection();
     const reader = await db.runAndReadAll(
-      `SELECT p.filename, count(w.path) AS asked, epoch_ms(min(p.time) FILTER (WHERE ${inside})) AS first, epoch_ms(max(p.time) FILTER (WHERE ${inside})) AS last FROM read_parquet([${files.map((f) => quote(f.file)).join(", ")}], filename = true) p LEFT JOIN (VALUES ${windows}) w(path, lo, hi) ON p.filename = w.path GROUP BY p.filename`,
+      // The empty row names `source_flag`, so files written before it existed read it as null.
+      `SELECT p.filename, count(w.path) AS asked, epoch_ms(min(p.time) FILTER (WHERE ${inside})) AS first, epoch_ms(max(p.time) FILTER (WHERE ${inside})) AS last, epoch_ms(min(p.time) FILTER (WHERE ${preliminary})) AS preliminary, count(*) FILTER (WHERE ${screened}) AS screened FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${files.map((f) => quote(f.file)).join(", ")}], filename = true, union_by_name = true)) p LEFT JOIN (VALUES ${windows}) w(path, lo, hi) ON p.filename = w.path GROUP BY p.filename`,
     );
     return reader.getRowObjects();
   });
@@ -573,7 +608,15 @@ export async function readTimeBounds(
   return new Map(
     rows
       .filter((r) => r.first !== null)
-      .map((r) => [String(r.filename), [Number(r.first), Number(r.last)]]),
+      .map((r) => [
+        String(r.filename),
+        [
+          Number(r.first),
+          Number(r.last),
+          r.preliminary === null ? null : Number(r.preliminary),
+          Number(r.screened) > 0,
+        ],
+      ]),
   );
 }
 
