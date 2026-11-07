@@ -17,6 +17,7 @@ import { fetchText, setTransport } from "../src/http.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
+import * as ea from "../src/sources/ea/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -34,6 +35,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
   // San Francisco; live, so no metadata request for its dates.
   coops: () => coops.levels("9414290", start, end, { live: true }),
+  // Newlyn, from the readings API.
+  ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),

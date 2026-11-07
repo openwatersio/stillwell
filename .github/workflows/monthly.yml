@@ -67,12 +67,13 @@ jobs:
               exit 0
             fi
           fi
-          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
+          sources=$(printf '%s\n' ${SOURCES:-bsh coops ea pegelonline rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
-            # PEGELONLINE never finalizes a value, in its feed or its downloads.
-            refetch=$(jq -c 'map(select(. != "pegelonline"))' <<< "$sources")
+            # PEGELONLINE never finalizes a value, in its feed or its downloads,
+            # and the EA never revises one.
+            refetch=$(jq -c 'map(select(. != "pegelonline" and . != "ea"))' <<< "$sources")
             if [ "$refetch" = "[]" ]; then
-              echo "::error::PEGELONLINE isn't refetched"
+              echo "::error::PEGELONLINE and the EA aren't refetched"
               exit 1
             fi
             echo "sources=[]" >> "$GITHUB_OUTPUT"

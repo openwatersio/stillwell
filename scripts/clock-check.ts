@@ -7,7 +7,7 @@
  * series. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error
  * hides in that lag; the K1 lag, from K1's phase in a fit of the year, shows it.
  *
- *   node scripts/clock-check.ts <year> <source/id>=<ticon record>...
+ *   node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...
  *   node scripts/clock-check.ts 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd
  *
  * A positive lag means the observations run late against the prediction: the
@@ -32,13 +32,18 @@ const MINUTE_MS = 60_000;
 /** Lags tried, every 10 minutes up to 3 hours either way. */
 const LAGS = Array.from({ length: 37 }, (_, i) => (i - 18) * 10);
 
-const [year, ...pairs] = process.argv.slice(2);
-if (!year || !pairs.length)
-  throw new Error("Usage: node scripts/clock-check.ts <year> <source/id>=<ticon record>...");
+const [period, ...pairs] = process.argv.slice(2);
+if (!period || !pairs.length)
+  throw new Error(
+    "Usage: node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...",
+  );
 useDiskCache();
 
-const start = new Date(Date.UTC(Number(year), 0, 1));
-const end = new Date(Date.UTC(Number(year) + 1, 0, 1));
+// A year, or a range of ISO dates for a source that keeps less than one.
+const [from, to] = period.split("/");
+const start = new Date(to ? Date.parse(from!) : Date.UTC(Number(from), 0, 1));
+const end = new Date(to ? Date.parse(to) : Date.UTC(Number(from) + 1, 0, 1));
+if (!(start < end)) throw new Error(`Not a year or start/end: ${period}`);
 console.log("| Station | TICON record | Values | r at 0 | Best lag | r at best | K1 lag |");
 console.log("| --- | --- | --: | --: | --: | --: | --: |");
 let flagged = false;

@@ -5,6 +5,7 @@ import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
+import * as ea from "../src/sources/ea/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -2752,5 +2753,173 @@ describe("uhslc", () => {
       uhslc.levels("001", new Date("2020-01-01Z"), new Date("2020-01-02Z")),
       /chart datum/,
     );
+  });
+});
+
+describe("ea", () => {
+  /** A day file with another gauge's reading only. */
+  const OTHER_GAUGE =
+    "dateTime,measure,value\n2025-11-11T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E70039-level-tidal_level-Mean-15_min-mAOD,1.0\n";
+
+  beforeEach(() => ea.forgetArchive());
+
+  it("lists each tide gauge's mAOD series, or its chart datum series where it has no other", async () => {
+    serve([[/id\/stations\?type=TideGauge/, fixture("ea-stations.json")]]);
+    const stations = await ea.stations();
+    assert.deepEqual(
+      stations.map((s) => [s.id, s.name, s.datum, s.country_code, s.measure]),
+      [
+        ["ea/E70039", "Lowestoft", "AOD", "GB", "E70039-level-tidal_level-Mean-15_min-mAOD"],
+        ["ea/E70239", "Jersey", "AOD", "JE", "E70239-level-tidal_level-Mean-15_min-mAOD"],
+        ["ea/E71924", "Bournemouth", "CD", "GB", "E71924-level-tidal_level-Mean-15_min-m"],
+        ["ea/E72239", "Newlyn", "AOD", "GB", "E72239-level-tidal_level-Mean-15_min-mAOD"],
+        [
+          "ea/E73439-anglian",
+          "Heysham",
+          "AOD",
+          "GB",
+          "E73439-anglian-level-tidal_level-Mean-15_min-mAOD",
+        ],
+      ],
+    );
+    assert.equal(stations[0]!.interval_s, 900);
+    assert.equal(stations[0]!.commercial_use, true);
+  });
+
+  it("reads tide gauges' readings from a day's archive file", () => {
+    const day = ea.parseArchive(fixture("ea-archive.csv"));
+    // River gauges and other parameters aren't kept.
+    assert.deepEqual(
+      [...day.keys()],
+      ["E72239-level-tidal_level-Mean-15_min-mAOD", "E72224-level-tidal_level-Mean-15_min-m"],
+    );
+    // A blank value and two readings joined by "|" are dropped.
+    assert.deepEqual(day.get("E72239-level-tidal_level-Mean-15_min-mAOD"), [
+      Date.parse("2025-11-10T00:00:00Z"),
+      -0.5,
+      Date.parse("2025-11-10T00:15:00Z"),
+      -0.683,
+      Date.parse("2025-11-10T00:30:00Z"),
+      -0.846,
+    ]);
+  });
+
+  it("reads older days from the archive, once a run, and recent ones from the API", async () => {
+    const asked: string[] = [];
+    const today = Math.floor(Date.now() / 86_400_000) * 86_400_000;
+    const recent = new Date(today - 86_400_000).toISOString();
+    setTransport(async (url) => {
+      asked.push(url.replace(/^.*flood-monitoring/, ""));
+      if (/readings-2025-11-10\.csv$/.test(url)) return fixture("ea-archive.csv");
+      if (/readings-2025-11-\d\d\.csv$/.test(url)) return OTHER_GAUGE;
+      if (/\/readings\?since=/.test(url))
+        return JSON.stringify({ items: [{ dateTime: recent, value: 1.25 }] });
+      throw new Error(`GET ${url} returned 404`);
+    });
+    const measure = "E72239-level-tidal_level-Mean-15_min-mAOD";
+    const old = await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-12Z"));
+    assert.equal(old.length, 3);
+    assert.equal(old[0]!.flag, Flag.preliminary);
+    await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z"));
+    // The second station's call reuses the day it read.
+    assert.deepEqual(asked, [
+      "/archive/readings-2025-11-10.csv",
+      "/archive/readings-2025-11-11.csv",
+    ]);
+    const now = await ea.levels(measure, new Date(today - 2 * 86_400_000), new Date(today));
+    assert.deepEqual(
+      now.map((v) => [new Date(v.time).toISOString(), v.level]),
+      [[recent, 1.25]],
+    );
+  });
+
+  it("reads no archive file for a start within the API's days", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      return JSON.stringify({ items: [] });
+    });
+    const now = Date.now();
+    await ea.levels(
+      "E72239-level-tidal_level-Mean-15_min-mAOD",
+      new Date(now - 12 * 3_600_000),
+      new Date(now),
+    );
+    assert.equal(asked.length, 1);
+    assert.match(asked[0]!, /\/readings\?since=/);
+  });
+
+  it("drops the API's readings in a month the archive is missing a day of", async () => {
+    const today = Math.floor(Date.now() / 86_400_000) * 86_400_000;
+    const split = today - 28 * 86_400_000;
+    // The day before the split, a day earlier still if that crosses into another month.
+    const before = new Date(split - 86_400_000);
+    setTransport(async (url) => {
+      if (/\/archive\//.test(url)) throw new Error(`GET ${url} returned 404`);
+      return JSON.stringify({ items: [{ dateTime: new Date(split).toISOString(), value: 1 }] });
+    });
+    const values = await ea.levels(
+      "E72239-level-tidal_level-Mean-15_min-mAOD",
+      before,
+      new Date(split + 3_600_000),
+    );
+    const sameMonth = before.getUTCMonth() === new Date(split).getUTCMonth();
+    assert.equal(values.length, sameMonth ? 0 : 1);
+  });
+
+  it("fails on a day file that isn't the CSV or holds no tide gauge reading", async () => {
+    for (const body of ["<html>Service unavailable</html>", "dateTime,measure,value\n"]) {
+      ea.forgetArchive();
+      setTransport(async () => body);
+      await assert.rejects(
+        ea.levels(
+          "E72239-level-tidal_level-Mean-15_min-mAOD",
+          new Date("2025-11-10Z"),
+          new Date("2025-11-11Z"),
+        ),
+        /isn't the CSV|no tide gauge readings/,
+      );
+    }
+  });
+
+  it("gives nothing for the split's month when the API answers empty", async () => {
+    const today = Math.floor(Date.now() / 86_400_000) * 86_400_000;
+    const split = today - 28 * 86_400_000;
+    setTransport(async (url) => {
+      if (/\/archive\//.test(url))
+        return OTHER_GAUGE.replace(
+          "2025-11-11T00:00:00Z",
+          new Date(split - 86_400_000).toISOString(),
+        ).replace("E70039", "E72239");
+      return JSON.stringify({ items: [] });
+    });
+    const values = await ea.levels(
+      "E72239-level-tidal_level-Mean-15_min-mAOD",
+      new Date(split - 86_400_000),
+      new Date(today),
+    );
+    const sameMonth = new Date(split - 86_400_000).getUTCMonth() === new Date(split).getUTCMonth();
+    assert.equal(values.length, sameMonth ? 0 : 1);
+  });
+
+  it("gives nothing for a month with a day the archive no longer holds", async () => {
+    setTransport(async (url) => {
+      // October 28th is missing, after the 25th was read.
+      if (/readings-2025-10-28\.csv$/.test(url)) throw new Error(`GET ${url} returned 404`);
+      if (/readings-2025-11-10\.csv$/.test(url)) return fixture("ea-archive.csv");
+      // October 25th has a reading, which its month's missing day drops.
+      if (/readings-2025-10-25\.csv$/.test(url))
+        return fixture("ea-archive.csv").replaceAll("2025-11-10T", "2025-10-25T");
+      if (/readings-2025-1[01]-\d\d\.csv$/.test(url)) return OTHER_GAUGE;
+      throw new Error(`GET ${url} returned 404`);
+    });
+    const values = await ea.levels(
+      "E72239-level-tidal_level-Mean-15_min-mAOD",
+      new Date("2025-10-20Z"),
+      new Date("2025-11-12Z"),
+    );
+    // October lost its first days, so it gives nothing and the lake keeps what it has;
+    // November's first day gives its readings.
+    assert.equal(values.length, 3);
   });
 });

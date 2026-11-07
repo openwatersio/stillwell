@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        source: [coops, pegelonline, rws, uhslc, usace, usgs]
+        source: [coops, ea, pegelonline, rws, uhslc, usace, usgs]
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so a compaction never reads recent/ while the hourly
     # run replaces it, or rewrites a year file a backfill is writing.

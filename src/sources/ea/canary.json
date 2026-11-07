@@ -1,0 +1,21 @@
+{
+  "/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD/readings": {
+    "$": "object",
+    "$.@context": "string",
+    "$.items": "array",
+    "$.items[]": "object",
+    "$.items[].@id": "string",
+    "$.items[].dateTime": "string",
+    "$.items[].measure": "string",
+    "$.items[].value": "number",
+    "$.meta": "object",
+    "$.meta.comment": "string",
+    "$.meta.documentation": "string",
+    "$.meta.hasFormat": "array",
+    "$.meta.hasFormat[]": "string",
+    "$.meta.licence": "string",
+    "$.meta.limit": "number",
+    "$.meta.publisher": "string",
+    "$.meta.version": "string"
+  }
+}

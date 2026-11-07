@@ -1,0 +1,12 @@
+dateTime,measure,value
+2025-11-10T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E21326-rainfall-tipping_bucket_raingauge-t-15_min-mm,0.460
+2025-11-10T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/4205-level-stage-i-15_min-mASD,0.059
+2025-11-10T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/531166-level-downstage-i-15_min-mAOD,49.367
+2025-11-10T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD,-0.500
+2025-11-10T00:00:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72224-level-tidal_level-Mean-15_min-m,2.550
+2025-11-10T00:15:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD,-0.683
+2025-11-10T00:15:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72224-level-tidal_level-Mean-15_min-m,2.367
+2025-11-10T00:30:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD,-0.846
+2025-11-10T00:30:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72224-level-tidal_level-Mean-15_min-m,2.204
+2025-11-10T00:30:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD,
+2025-11-10T00:45:00Z,http://environment.data.gov.uk/flood-monitoring/id/measures/E72239-level-tidal_level-Mean-15_min-mAOD,0.512|0.514
