@@ -90,7 +90,8 @@ for (const pair of pairs) {
   // A range too short to fit K1 can't see a 12-hour error, which shows only as
   // a lag of about 25 minutes in a semidiurnal tide, so a smaller lag fails.
   const k1 = phaseLag(observed, ticon.harmonic_constituents);
-  const short = end.getTime() - start.getTime() < 183 * 86_400_000;
+  const times = observed.map((o) => o.time);
+  const short = Math.max(...times) - Math.min(...times) < 183 * 86_400_000;
   const late = Math.abs(best.lag) >= (short ? 20 : 30);
   // K1's phase is less certain where the diurnal tide is small, so it flags
   // only what the cross-correlation can't see: several hours.

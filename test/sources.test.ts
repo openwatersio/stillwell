@@ -2884,6 +2884,22 @@ describe("ea", () => {
         /isn't the CSV|no tide gauge readings/,
       );
     }
+    // The next station doesn't download a malformed day again.
+    let asked = 0;
+    setTransport(async () => {
+      asked++;
+      return "dateTime,measure,value\n";
+    });
+    ea.forgetArchive();
+    for (let i = 0; i < 2; i++)
+      await assert.rejects(
+        ea.levels(
+          "E72239-level-tidal_level-Mean-15_min-mAOD",
+          new Date("2025-11-10Z"),
+          new Date("2025-11-11Z"),
+        ),
+      );
+    assert.equal(asked, 1);
   });
 
   it("gives nothing for the split's month when the API answers empty", async () => {

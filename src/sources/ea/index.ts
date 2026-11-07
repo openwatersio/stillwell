@@ -188,7 +188,10 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
     // An answer that's empty, or starts more than a day late, as when the API
     // isn't serving the measure or keeps fewer days, would leave the split's
     // month without the days between.
-    if (!times.length || Math.min(...times) > split + DAY_MS) missing.add(monthOf(split));
+    // Only where the archive gave the days before; a range within the API's
+    // days, as compaction's, has no other copy to keep.
+    if (split > start.getTime() && (!times.length || Math.min(...times) > split + DAY_MS))
+      missing.add(monthOf(split));
   }
   return out.filter((o) => !missing.has(monthOf(o.time)));
 }
@@ -218,8 +221,11 @@ export function archiveDay(day: number): Promise<Day> {
   if (!parsed) {
     parsed = fetchDay(day);
     days.set(day, parsed);
-    // A failed day is asked again by the next station rather than failing them all.
-    parsed.catch(() => days.delete(day));
+    // A day that failed to download is asked again by the next station; one
+    // that came back in the wrong shape would only fail again, so it's kept.
+    parsed.catch((error) => {
+      if (!(error instanceof ArchiveShapeError)) days.delete(day);
+    });
   }
   return parsed;
 }
@@ -235,18 +241,23 @@ async function fetchDay(day: number): Promise<Day> {
     // a day the EA never publishes doesn't block the rest of the year.
     if (!/returned 404$/.test((error as Error).message)) throw error;
     if (day > Date.now() - ARCHIVE_DAYS * DAY_MS)
-      console.error(`EA archive has no ${date}, inside the year it keeps; its month is left out`);
+      console.error(
+        `::error::EA archive has no ${date}, inside the year it keeps; its month is left out`,
+      );
     else console.warn(`EA archive has no ${date}; its month is left out`);
     return null;
   }
   // A file in another shape, or without a single tide gauge reading, fails
   // rather than read as a day with nothing, which would drop its month quietly.
   if (!csv.startsWith("dateTime,measure,value"))
-    throw new Error(`EA archive ${date} isn't the CSV it was`);
+    throw new ArchiveShapeError(`EA archive ${date} isn't the CSV it was`);
   const parsed = parseArchive(csv);
-  if (!parsed.size) throw new Error(`EA archive ${date} has no tide gauge readings`);
+  if (!parsed.size) throw new ArchiveShapeError(`EA archive ${date} has no tide gauge readings`);
   return parsed;
 }
+
+/** A day file that downloaded but can't be read. */
+class ArchiveShapeError extends Error {}
 
 /** A day file's tide gauge levels by measure ID, as alternating times and levels. */
 export function parseArchive(csv: string): Map<string, number[]> {
