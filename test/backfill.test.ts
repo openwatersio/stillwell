@@ -553,7 +553,10 @@ describe("backfill script", () => {
       ids.map((id) => coopsStation(id, "active")),
     );
     const path = boundsPath(lake, "coops");
-    const late = "2026-02-01T00:00:00Z";
+    // Relative to now: lowering goes no earlier than the cutoff, three years back.
+    const year = new Date().getUTCFullYear();
+    const late = `${year}-02-01T00:00:00Z`;
+    const fetchFrom = `${year - 2}-12-01`;
     await writeStationBounds(
       path,
       ids.map((id) => ({
@@ -561,11 +564,11 @@ describe("backfill script", () => {
         first: late,
         last: late,
         // The last one's is already earlier than its fetch, so it isn't raised.
-        preliminary: id === "2101" ? "2020-01-01T00:00:00Z" : late,
+        preliminary: id === "2101" ? `${year - 6}-01-01T00:00:00Z` : late,
       })),
     );
     // One request each; the process dies at the second batch's first station.
-    const run = backfillCoops(lake, ["all", "2024-12-01", "2025-01-01", "--concurrency", "1"], {
+    const run = backfillCoops(lake, ["all", fetchFrom, `${year - 1}`, "--concurrency", "1"], {
       EXIT_AFTER: "101",
     });
     assert.equal(run.status, 9, run.stderr);
@@ -574,7 +577,7 @@ describe("backfill script", () => {
     assert.equal(after.filter((p) => p === null).length, 100);
     assert.deepEqual(
       after.filter((p) => p !== null),
-      ["2024-12-01T00:00:00Z", "2020-01-01T00:00:00Z"],
+      [`${fetchFrom}T00:00:00Z`, `${year - 6}-01-01T00:00:00Z`],
     );
   });
 
@@ -633,6 +636,24 @@ describe("backfill script", () => {
         .sort(),
     );
     assert.ok(asked.length > 0 && asked.length < stations.length);
+  });
+
+  it("lowers no earlier than the cutoff, and not for a fetch that ends before it", async () => {
+    const year = new Date().getUTCFullYear();
+    const late = `${year}-02-01T00:00:00Z`;
+    const killed = async (from: string, to: string) => {
+      const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+      await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);
+      const path = boundsPath(lake, "coops");
+      await writeStationBounds(path, [
+        { id: "coops/7", first: late, last: late, preliminary: late },
+      ]);
+      const run = backfillCoops(lake, ["all", from, to], { EXIT_AFTER: "1" });
+      assert.equal(run.status, 9, run.stderr);
+      return (await readStationBounds(path)).get("coops/7")?.preliminary;
+    };
+    assert.equal(await killed(`${year - 6}`, `${year - 1}`), `${year - 3}-01-01T00:00:00Z`);
+    assert.equal(await killed(`${year - 8}`, `${year - 6}`), late);
   });
 
   it("gives a lowered station its value back when it had no year to fetch", async () => {
@@ -817,7 +838,8 @@ describe("backfill script", () => {
       preliminary: null,
       screened: true,
     });
-    assert.equal(after.get("coops/3")?.preliminary, "2019-05-01T00:00:00Z");
+    // Its files end before the cutoff, so it's listed once and its value cleared.
+    assert.equal(after.get("coops/3")?.preliminary, null);
     // With nothing left to fetch, its files are still read again, from the cutoff on.
     assert.equal(after.get("coops/4")?.preliminary, null);
     assert.equal(after.get("coops/5")?.preliminary, null);

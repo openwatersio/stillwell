@@ -274,6 +274,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const list = await listOf(lake, sourceId);
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
+  // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.
+  let behind: string[] = [];
   let named: LakeStation[];
   const bounds = await readStationBounds(boundsPath(lake, sourceId));
   // Bounds an older build wrote have no `preliminary`, and backfill leaves them alone.
@@ -300,6 +302,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     named = runs.map((r) => r.station);
     ranges = new Map(runs.map((r) => [r.station.id, [r.from, r.to]]));
     await reportPast(sourceId, start, past);
+    // Their files end before the cutoff, which no read looks behind, so they're listed once.
+    behind = past.map((p) => p.id).filter((id) => !ranges!.has(id));
   } else
     named =
       ids === "all"
@@ -344,7 +348,14 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // Each station's earliest preliminary value, read again after its levels
   // were fetched, written to the bounds after each batch of 100 stations, so
   // a run stopped by its time limit keeps most of them.
-  let preliminary = new Map<string, { preliminary: number | null; screened?: boolean }>();
+  let preliminary = new Map<string, { preliminary: number | null; screened?: boolean }>(
+    behind.map((id) => [id, { preliminary: null }]),
+  );
+  // Compaction and the read below look for preliminary values from this year on;
+  // a `preliminary` run from an earlier start reads from there, so it sees what it fetched.
+  const cutoffYear = new Date(now).getUTCFullYear() - REFETCH_YEARS;
+  const fromYear = ranges ? Math.min(cutoffYear, start.getUTCFullYear()) : cutoffYear;
+  const cutoff = Date.UTC(cutoffYear, 0, 1);
   let saving = Promise.resolve();
   const save = () => {
     const found = preliminary;
@@ -384,10 +395,17 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         if (!station.products.includes("levels")) continue;
         // A station with no row is new to compaction, which reads its files.
         // Only the current epoch's values count, so only its span lowers.
+        // No read looks before the cutoff, so neither does the lowered value, and a
+        // fetch that ends before it needs none.
         const span = spansOf(station).find((s) => s.epoch.id === epochOf(station));
         const known = bounds.get(station.id)?.preliminary;
-        const from = span?.from.getTime();
-        if (from === undefined || known === undefined || (known && Date.parse(known) <= from))
+        const from = span ? Math.max(span.from.getTime(), cutoff) : Infinity;
+        if (
+          !span ||
+          from >= span.to.getTime() ||
+          known === undefined ||
+          (known && Date.parse(known) <= from)
+        )
           continue;
         prior.set(station.id, known ? Date.parse(known) : null);
         lowered.set(station.id, { preliminary: from });
@@ -460,8 +478,6 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             epoch.since ? Date.parse(epoch.since) : -Infinity,
             epoch.until ? Date.parse(epoch.until) : Infinity,
           ];
-          // From the years compaction looks in, so the two agree.
-          const fromYear = new Date(now).getUTCFullYear() - REFETCH_YEARS;
           preliminary.set(station.id, await earliestPreliminary(levels, window, fromYear));
         } catch (error) {
           failed.push(
@@ -473,6 +489,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       if (!fetched.has(id) && !preliminary.has(id)) preliminary.set(id, { preliminary: time });
     await save();
   }
+  // Values set before any batch, such as the stations behind the cutoff.
+  await save();
   const why = { written: "already written", complete: "already complete", none: "" }[mode];
   if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
   console.log(`${sourceId}: ${failed.length} failed`);
