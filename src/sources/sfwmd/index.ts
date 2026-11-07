@@ -381,9 +381,13 @@ export function parse(text: string, dbkey: string): Observation[] {
       throw new Error(`DBHYDRO ${dbkey} sent a row for ${id} ${parameter}`);
     // `M` marks a missing reading, which normally carries no value.
     if (!value || code === "M") continue;
-    const time = Date.parse(`${timestamp!.replace(" ", "T")}Z`) - EST_MS;
+    const local = timestamp!.replace(" ", "T");
+    const utc = Date.parse(`${local}Z`);
+    // Date.parse rolls an impossible day, such as 30 February, into the next month.
+    const real = !Number.isNaN(utc) && new Date(utc).toISOString().startsWith(local);
+    const time = utc - EST_MS;
     const feet = Number(value);
-    if (Number.isNaN(time) || !Number.isFinite(feet))
+    if (!real || !Number.isFinite(feet))
       throw new Error(`DBHYDRO ${dbkey} sent a bad row: ${line}`);
     out.push({
       time,
