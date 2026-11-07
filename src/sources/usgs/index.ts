@@ -32,6 +32,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Geological Survey",
+  // Provisional values are approved months to years later.
+  hourly: true,
+  finalizes: true,
   terms: "Provisional data are subject to revision until USGS approves them.",
 };
 

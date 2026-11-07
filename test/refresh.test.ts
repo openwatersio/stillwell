@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir, rm } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, it } from "node:test";
@@ -18,10 +18,11 @@ import {
   boundsPath,
   recentPath,
   seriesPath,
+  sourcesPath,
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
-import { publishStations, Refused, refreshSource } from "../src/refresh.ts";
+import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
 import {
   Flag,
   type ListedStation,
@@ -42,6 +43,8 @@ const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Test",
+  hourly: true,
+  finalizes: true,
 };
 
 const listed = (code: string, fields: Partial<ListedStation> = {}): ListedStation => ({
@@ -351,6 +354,11 @@ describe("publishStations", () => {
     ]);
     assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { count: 2 });
     assert.deepEqual(await publishedSources(stationsPath(lake)), ["test"]);
+    // sources.json carries a source's terms, not which jobs ingest runs for it.
+    const [published] = JSON.parse(await readFile(sourcesPath(lake), "utf8"));
+    assert.equal(published.license.id, "CC0-1.0");
+    for (const key of ["hourly", "finalizes", "qc", "utc_offsets", "archive"])
+      assert.ok(!(key in published), key);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
@@ -375,5 +383,26 @@ describe("publishStations", () => {
     assert.deepEqual(await publishedSources(stationsPath(lake)), []);
     // A new source with no list yet doesn't hold up the others.
     assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), { count: 0 });
+  });
+});
+
+describe("startedListOf", () => {
+  let lake: string;
+  beforeEach(async () => {
+    lake = await mkdtemp(join(tmpdir(), "lake-"));
+  });
+  afterEach(() => rm(lake, { recursive: true }));
+
+  it("is null for a source whose list was never started, and fails for one that's lost", async () => {
+    assert.equal(await startedListOf(lake, "test"), null);
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    assert.equal((await startedListOf(lake, "test"))!.length, 1);
+    await rm(stationListPath(lake, "test"));
+    await assert.rejects(startedListOf(lake, "test"), /history for test but no list/);
+  });
+
+  it("fails for a lake with the source's series but no list or history", async () => {
+    await writeRecent(recentPath(lake, "test"), []);
+    await assert.rejects(startedListOf(lake, "test"), /test series but no list or history/);
   });
 });

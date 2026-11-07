@@ -191,18 +191,20 @@ export async function publishStations(
   await writeJsonArray(
     sourcesPath(lake),
     listed.map((s) => ({
-      // QC settings, offsets and archive are ingest's business, not part of a source's terms.
-      ...Object.fromEntries(
-        Object.entries(s.metadata).filter(
-          ([key]) => key !== "qc" && key !== "utc_offsets" && key !== "archive",
-        ),
-      ),
+      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
       stations: stations.filter((st) => st.source === s.metadata.id && st.status === "active")
         .length,
     })),
   );
   return { count: stations.length };
 }
+
+/**
+ * Metadata that is ingest's business, not part of a source's terms, so
+ * `sources.json` leaves it out: QC settings, offsets, the archive's reference,
+ * and which scheduled jobs run for the source.
+ */
+const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "finalizes"]);
 
 /** A source's list from the lake, or an error naming what to run. */
 export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {
@@ -213,6 +215,21 @@ export async function listOf(lake: string, sourceId: string): Promise<LakeStatio
       `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
     );
   return list;
+}
+
+/**
+ * A source's list from the lake, or null for a source whose list was never
+ * started, such as one registered since the last Monthly refresh. A list that
+ * existed and is gone, or series with no list, are still errors.
+ */
+export async function startedListOf(lake: string, sourceId: string): Promise<LakeStation[] | null> {
+  const list = await readStationList(stationListPath(lake, sourceId));
+  if (list) return list;
+  if (await hasHistory(lake, sourceId)) throw new Error(lostList(lake, sourceId));
+  // The refresh refuses such a lake too, so waiting for it would wait for good.
+  if (await hasSeries(lake, sourceId))
+    throw new Error(`the lake has ${sourceId} series but no list or history for it`);
+  return null;
 }
 
 /** Whether `lake` holds any of a source's values: series files in any epoch, or a recent window. */

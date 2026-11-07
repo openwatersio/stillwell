@@ -167,6 +167,17 @@ export interface SourceMetadata {
    * start go to an epoch of their own, which backfill fills too.
    */
   archive?: "current" | "previous";
+  /**
+   * Whether the source publishes values within hours, so hourly ingest polls
+   * its live stations into recent/. A source that delivers later, as UHSLC's
+   * monthly fast-delivery files do, is left to backfill and the refetch.
+   */
+  hourly: boolean;
+  /**
+   * Whether values the source first publishes as preliminary become final
+   * later, so the monthly refetch fetches them again until they do.
+   */
+  finalizes: boolean;
   /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
   qc?: QcOptions;
   /**

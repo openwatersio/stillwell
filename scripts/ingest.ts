@@ -99,6 +99,7 @@ import {
   hasHistory,
   epochOf,
   listOf,
+  startedListOf,
   publishStations,
   refreshSource,
 } from "../src/refresh.ts";
@@ -569,14 +570,29 @@ async function backfillYear(
   return merged.length;
 }
 
+/**
+ * A source registered since the last Monthly refresh has no list yet, so the
+ * scheduled jobs that pick it up have nothing to do until that refresh starts it.
+ */
+async function notStarted(sourceId: string): Promise<void> {
+  const note = `${sourceId}: no station list yet; the Monthly workflow starts it, or dispatch Monthly with \`sources: ${sourceId}\` to start it now`;
+  console.log(note);
+  // On a run's page too, so a lake that lost everything doesn't pass unseen.
+  if (process.env.GITHUB_ACTIONS) console.log(`::warning title=No station list::${note}`);
+  const page = process.env.GITHUB_STEP_SUMMARY;
+  if (page) await appendFile(page, `${note}\n`);
+}
+
 async function recent(sourceId: string): Promise<void> {
   const now = Date.now();
+  const source = sourceOf(sourceId);
+  const stations = await startedListOf(lakeOfSource(source.metadata), sourceId);
+  if (!stations) return await notStarted(sourceId);
   const summary = await reporting(`recent ${sourceId}`, async () => {
     const [hours, keepDays] = [positive("hours"), positive("keep-days")];
-    const source = sourceOf(sourceId);
     return updateRecent({
       source,
-      stations: await listOf(lakeOfSource(source.metadata), sourceId),
+      stations,
       lakeFor,
       concurrency: positive("concurrency"),
       since: new Date(now - hours * 3_600_000),
@@ -600,6 +616,9 @@ async function recent(sourceId: string): Promise<void> {
 
 async function compact(sourceId: string, days: number): Promise<void> {
   let live = 0;
+  const source = sourceOf(sourceId);
+  const started = await startedListOf(lakeOfSource(source.metadata), sourceId);
+  if (!started) return await notStarted(sourceId);
   const summary = await reporting(`compact ${sourceId}`, async () => {
     // The window keeps 7 days back from its last hourly run, which is partway
     // into the seventh day, so 6 is the most whole days it holds.
@@ -607,8 +626,7 @@ async function compact(sourceId: string, days: number): Promise<void> {
       throw new Error("--days must be a whole number from 1 to 6, the whole days the window holds");
     const concurrency = positive("concurrency");
     setConnections(concurrency);
-    const source = sourceOf(sourceId);
-    const stations = await listOf(lakeOfSource(source.metadata), sourceId);
+    const stations = started;
     live = stations.filter(
       (s) => s.live && s.status === "active" && s.products.includes("levels"),
     ).length;

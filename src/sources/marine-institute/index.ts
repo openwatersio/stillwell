@@ -29,6 +29,10 @@ export const metadata: SourceMetadata = {
   attribution: "Marine Institute",
   terms:
     "CC BY 4.0: credit the Marine Institute, link to the license and say if the data was changed. The Marine Institute accepts no responsibility for errors, omissions or misleading information in the data, or for loss or damage from its use. Changes in the lake: quality flags added and missing values dropped.",
+  // Values reach ERDDAP 10 to 30 minutes after they're measured.
+  hourly: true,
+  // The institute checks values later, turning QC flag 0 into 1.
+  finalizes: true,
 };
 
 /** Ordnance Datum Malin, which every gauge reports, and Lowest Astronomical Tide. */

@@ -37,6 +37,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "University of Hawaii Sea Level Center (UHSLC)",
+  // Fast-delivery files arrive monthly, and research-quality values replace them a year or two later.
+  hourly: false,
+  finalizes: true,
   terms:
     "The data may be used and redistributed for free but is not intended for legal use, since it may contain inaccuracies; no warranty. Cite Caldwell, Merrifield and Thompson (2015), doi:10.7289/V5V40S7W, and for fast-delivery data the date through which it was obtained. Fast-delivery values are preliminary and are replaced by research-quality values about once a year.",
 };

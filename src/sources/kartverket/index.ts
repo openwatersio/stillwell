@@ -33,6 +33,10 @@ export const metadata: SourceMetadata = {
     "Licensed under CC BY 4.0. The Norwegian Mapping Authority, Hydrographic Service must be credited. Kartverket asks users not to poll the API excessively. Kartverket doesn't mark which values it has quality-controlled, so values from the last year are treated as preliminary. Changes in the lake: levels converted from centimeters to meters, and quality flags added.",
   // The API serves a station's whole record against its current chart datum.
   archive: "current",
+  // Values arrive 10 to 20 minutes after they're measured.
+  hourly: true,
+  // Values count as final once they're a year old, so the refetch reads them again until then.
+  finalizes: true,
 };
 
 /** The datum Kartverket's gauges are read against; the only one every station has. */
