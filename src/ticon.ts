@@ -79,7 +79,6 @@ const BODC_NOTE =
 /** Contributors whose records all go to one planned source. */
 const DIRECT: Record<string, { source: string; status: Status; note?: string }> = {
   smhi: { source: "smhi", status: "planned" },
-  refmar: { source: "refmar", status: "planned" },
   mi_c: { source: "marine-institute", status: "planned" },
   mi_r: {
     source: "marine-institute",
@@ -157,6 +156,9 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   }
 
   if (contributor === "rws" || contributor === "rws_hist") return nearest(record, "rws", lists.rws);
+
+  // REFMAR records carry the gauge's SHOM id.
+  if (contributor === "refmar") return byCode(record, "refmar", code, "planned", lists);
 
   if (contributor === "nhs")
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);

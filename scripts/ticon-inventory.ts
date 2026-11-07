@@ -88,14 +88,21 @@ const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.
   /\/$/,
   "",
 );
-// A source missing from the lake would mark every record it replaces unmatched.
-// A source that bars republishing has its list only in the restricted lake, so it's left out.
+// A source that bars republishing has its list only in the restricted lake, so
+// it's left out. A source missing from the lake would mark every record it
+// replaces unmatched, so that stops the run, except for a source none of whose
+// records the last inventory found ready: a new adapter before its first
+// refresh, whose records keep the planned ids their codes give.
+const previous = await readFile(join(ROOT, "docs/ticon-replacement.csv"), "utf8");
 const lists: Record<string, Station[]> = {};
 for (const [source, { metadata }] of Object.entries(sources)) {
   if (!metadata.license.redistribution) continue;
   const list = await readStationList(stationListPath(LAKE, source));
-  if (!list) throw new Error(`No station list for ${source} in ${LAKE}`);
-  lists[source] = list;
+  if (list) lists[source] = list;
+  // replacement_source, replacement_id, distance_km, status
+  else if (new RegExp(`,${source},${source}/[^,]*,[^,]*,ready,`).test(previous))
+    throw new Error(`No station list for ${source} in ${LAKE}`);
+  else console.warn(`No station list for ${source} in ${LAKE} yet; its records stay planned`);
 }
 
 const rows = adoptSiblings(
@@ -227,12 +234,12 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 
 ## How records are matched
 
-- **Codes in the id.** TICON ids end in \`<code>-<country>-<contributor>\`. NOAA, USGS, Norwegian (\`nhs\`) and SMHI records carry the originator's station code, so they map to \`coops\`, \`usgs\` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), \`kartverket\` and \`smhi\`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
+- **Codes in the id.** TICON ids end in \`<code>-<country>-<contributor>\`. NOAA, USGS, REFMAR, Norwegian (\`nhs\`) and SMHI records carry the originator's station code, so they map to \`coops\`, \`usgs\` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), \`kartverket\`, \`refmar\` and \`smhi\`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
 - **Declared provenance.** UHSLC and JODC records use tide-database's \`sources/ticon/provenance.ts\`, so a relay of a NOAA, Kartverket, JMA or JODC gauge goes to that originator, as tide-database already treats it. Other UHSLC records go to UHSLC itself.
-- **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (\`mi_c\`) records, and CMEMS records in countries whose feed has an adapter match an active station with levels: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently.
+- **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (\`mi_c\`) records, and CMEMS records in countries whose feed has a list in the lake (France's once REFMAR's is there) match an active station with levels: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently.
 - **Same station.** A record still unmatched takes the match of another record in its tide-database station file, since tide-database merges records only when they're the same gauge.
 - **UK gauges.** BODC's and NOC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the lake; one that matches none stays \`restricted\`.
-- **CMEMS elsewhere.** CMEMS records in countries whose feed has no adapter yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.
+- **CMEMS elsewhere.** CMEMS records in countries whose feed has no list in the lake yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.
 - **Irish river gauges.** Marine Institute river (\`mi_r\`) records are \`unmatched\`: their dataset names no datum, so the adapter doesn't list them.
 - **Contributor.** The rest map by contributor to a planned source, with its license status from the plan's internal [sources research](https://github.com/openwatersio/planning/blob/main/water-levels/research/sources.md#commercial-clearance). A record's own \`commercial_use\` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
 
