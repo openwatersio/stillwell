@@ -74,7 +74,7 @@ const NATIONAL: Record<string, { source: string; status: Status }> = {
 };
 
 const BODC_NOTE =
-  "BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists";
+  "BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead";
 
 /** Contributors whose records all go to one planned source. */
 const DIRECT: Record<string, { source: string; status: Status; note?: string }> = {
@@ -215,6 +215,23 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
       status: "license",
       note: "Japanese originals also fix GESLA's year-end truncation",
     };
+  }
+
+  // The National Tide Gauge Network's records come from BODC, which needs
+  // permission for commercial use; the EA serves its own readings of the same
+  // gauges openly, so they match by position once the EA's list is there.
+  if (
+    (contributor === "bodc" ||
+      contributor === "noc" ||
+      (contributor === "cmems" && ["gbr", "jey", "imn"].includes(iso3))) &&
+    lists.ea
+  ) {
+    // A record no EA gauge matches, such as a Channel Coastal Observatory or
+    // overseas gauge, stays with the rules below.
+    const match = nearest(record, "ea", lists.ea, {
+      note: "The EA's real-time readings of the gauge",
+    });
+    if (match.status === "ready") return match;
   }
 
   if (contributor === "cmems") {

@@ -12,6 +12,7 @@ describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
     assert.deepEqual(sourcesFor("hourly"), [
       "coops",
+      "ea",
       "kartverket",
       "marine-institute",
       "pegelonline",
@@ -23,6 +24,7 @@ describe("sourcesFor", () => {
     ]);
     assert.deepEqual(sourcesFor("compact"), [
       "coops",
+      "ea",
       "kartverket",
       "marine-institute",
       "pegelonline",

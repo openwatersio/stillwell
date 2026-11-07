@@ -329,6 +329,22 @@ describe("TICON replacements", () => {
     assert.deepEqual([cmems.source, cmems.status], [bodc.source, bodc.status]);
   });
 
+  it("matches BODC and UK CMEMS records to the EA's gauge once its list is there", () => {
+    const at = { lat: 57.144, lon: -2.08 };
+    assert.equal(replacement(record("aberdeen-abe-gbr-bodc", at), {}).status, "restricted");
+    const lists = { ea: [station("ea/E70739", "Aberdeen", 57.14406, -2.08013)] };
+    for (const id of ["aberdeen-abe-gbr-bodc", "aberdeen-abe-gbr-cmems"]) {
+      const match = replacement(record(id, at), lists);
+      assert.deepEqual([match.id, match.status], ["ea/E70739", "ready"]);
+    }
+    // A BODC record of a gauge the EA doesn't run stays restricted.
+    const ascension = replacement(
+      record("ascension-asc-gbr-noc", { lat: -7.9, lon: -14.4 }),
+      lists,
+    );
+    assert.deepEqual([ascension.source, ascension.status], ["bodc", "restricted"]);
+  });
+
   it("matches an unmatched record through its tide-database station", () => {
     const rows = adoptSiblings([
       {

@@ -17,6 +17,7 @@ import { fetchText, setTransport } from "../src/http.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
+import * as ea from "../src/sources/ea/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
@@ -39,6 +40,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
   // San Francisco; live, so no metadata request for its dates.
   coops: () => coops.levels("9414290", start, end, { live: true }),
+  // Newlyn, from the readings API.
+  ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
   // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
   dmi: () => dmi.levels("30017", start, end),
   // Vardø, since 1989.
