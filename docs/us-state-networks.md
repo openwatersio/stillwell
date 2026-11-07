@@ -43,4 +43,4 @@ See [the adapter's README](../src/sources/sfwmd/README.md). DBHYDRO states no li
 - **Access:** an AQUARIUS WebPortal behind a provisional-data click-through; the AQUARIUS Publish API answers 401. No public service.
 - **Data:** times in UTC, real-time stage in NAVD88 since July 2023, provisional. The district's USGS-run gauges are in NWIS already.
 - **Terms:** "Data are provisional and subject to revision… intended for resource management use", with no statement on redistribution.
-- **Next:** ask the district (data requests to Craig Freeman, craig.freeman@nwfwater.com) for access and terms.
+- **Next:** ask the district, through the data-request contact its portal names, for access and terms.

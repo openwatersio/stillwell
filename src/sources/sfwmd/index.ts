@@ -121,10 +121,10 @@ export interface CatalogSeries {
 }
 
 /**
- * An SFWMD station as listed: `history` is the derived series, read from
- * `history_start` to where the catalog says it ends; `series` the telemetry
- * series, over [`series_start`, `series_end`) when the catalog was read, read before and after it, or for everything when
- * there's no derived one. `record_start` is the first day either has, and
+ * An SFWMD station as listed. `series` is the telemetry series, which starts
+ * at `series_start` and, once the station is inactive, ends at `series_end`.
+ * `history` is the derived series, over [`history_start`, `history_end`) as
+ * the catalog gives it. `record_start` is the first day either has, and
  * `record_end`, for an inactive station, the day after the last, so a backfill
  * asks for nothing outside them.
  */
@@ -197,7 +197,10 @@ export function toStation(location: string, series: CatalogSeries[]): SfwmdStati
   const live = series
     .filter((s) => s.recorder !== "ONEP")
     .sort(
-      (a, b) => (b.endDate ?? 0) - (a.endDate ?? 0) || (a.startDate ?? 0) - (b.startDate ?? 0),
+      // A series with no end date is still running.
+      (a, b) =>
+        (b.endDate ?? Number.MAX_SAFE_INTEGER) - (a.endDate ?? Number.MAX_SAFE_INTEGER) ||
+        (a.startDate ?? 0) - (b.startDate ?? 0),
     )[0];
   const main = live ?? derived;
   // Only a derived series with no end: nothing to read, and the station goes unlisted.
@@ -245,7 +248,8 @@ export function toStation(location: string, series: CatalogSeries[]): SfwmdStati
     source_url: `https://insightsdata.sfwmd.gov/#/shared-reports?timeseriesIds=${main.timeseriesId}&reportType=timeseries&format=json&period=3days&datum=NAVD88&module=continuous`,
     series: main.timeseriesId,
     series_start: iso(main.startDate),
-    series_end: iso(main.endDate == null ? null : main.endDate + DAY_MS),
+    // Only a closed series' end is kept; an active one's moves every month.
+    series_end: active || main.endDate == null ? null : iso(main.endDate + DAY_MS),
     history: history?.timeseriesId ?? null,
     history_start: iso(history?.startDate),
     history_end: iso(history?.endDate),
@@ -273,12 +277,13 @@ function titleCase(text: string): string {
 }
 
 /**
- * Levels in meters NAVD88 over [start, end): the derived series from
- * `history_start` to `history_end`, and the telemetry series before and after
- * it. Where telemetry ended first, the derived series runs to the end. When the
- * range spans `history_end` and one side comes back empty though its series
- * covers that part, it fails: the lake replaces each month that has values, so
- * half an answer would delete the other half's month.
+ * Levels in meters NAVD88 over [start, end): the derived series between
+ * `history_start` and `history_end`, and the telemetry series before and after
+ * it. The lake replaces each UTC month that has values, so the series switch
+ * only at the start of a month: a month the derived series covers in part,
+ * where telemetry covers it too, comes from telemetry, and a series that sends
+ * nothing for a month leaves that month in the lake as it was. Where telemetry
+ * ended before the derived series did, the derived series runs to the end.
  */
 export async function levels(station: Series, start: Date, end: Date): Promise<Observation[]> {
   if (station.record_start)
@@ -286,30 +291,39 @@ export async function levels(station: Series, start: Date, end: Date): Promise<O
   if (station.record_end) end = new Date(Math.min(end.getTime(), Date.parse(station.record_end)));
   const [from, to] = [start.getTime(), end.getTime()];
   if (from >= to) return [];
+  if (!station.history) return read(station.series, from, to);
+  const seriesStart = Date.parse(station.series_start ?? "9999-01-01T00:00:00Z");
   const seriesEnd = Date.parse(station.series_end ?? "9999-01-01T00:00:00Z");
   const historyStart = Date.parse(station.history_start ?? "1900-01-01T00:00:00Z");
   const historyEnd = Date.parse(station.history_end ?? "1900-01-01T00:00:00Z");
-  const split = !station.history ? -Infinity : seriesEnd <= historyEnd ? Infinity : historyEnd;
-  // Telemetry from before the derived series starts.
-  const early =
-    station.history && from < historyStart
-      ? await read(station.series, from, Math.min(to, historyStart))
-      : [];
-  const before =
-    from < split && to > historyStart
-      ? await read(station.history!, Math.max(from, historyStart), Math.min(to, split))
-      : null;
-  const after = to > split ? await read(station.series, Math.max(from, split), to) : null;
-  // Telemetry that starts after the range, or ended before it, has nothing to give.
-  const telemetryDue =
-    to > Date.parse(station.series_start ?? "1900-01-01T00:00:00Z") &&
-    Math.max(from, split) < seriesEnd;
-  if (before && after && (!before.length ? after.length > 0 : !after.length && telemetryDue))
-    throw new Error(
-      `DBHYDRO sent nothing for ${before.length ? station.series : station.history} beside ${before.length ? station.history : station.series}`,
-    );
-  return early.concat(before ?? [], after ?? []);
+  // Telemetry from before the derived series starts takes that first month too.
+  const early = seriesStart < historyStart ? monthAfter(historyStart) : historyStart;
+  // Telemetry takes the month the derived series ends in, unless it starts later in it.
+  const late =
+    seriesEnd <= historyEnd
+      ? Infinity
+      : Math.max(
+          monthOf(historyEnd),
+          monthAfter(Date.parse(station.series_start ?? "1900-01-01T00:00:00Z")),
+        );
+  let out: Observation[] = [];
+  for (const [dbkey, a, b] of [
+    [station.series, from, Math.min(to, early)],
+    [station.history, Math.max(from, early), Math.min(to, late)],
+    [station.series, Math.max(from, late), to],
+  ] as const)
+    if (a < b) out = out.concat(await read(dbkey, a, b));
+  return out;
 }
+
+/** The start of the UTC month `time` falls in. */
+const monthOf = (time: number) =>
+  Date.UTC(new Date(time).getUTCFullYear(), new Date(time).getUTCMonth(), 1);
+/** The first start of a UTC month at or after `time`. */
+const monthAfter = (time: number) =>
+  monthOf(time) === time
+    ? time
+    : Date.UTC(new Date(time).getUTCFullYear(), new Date(time).getUTCMonth() + 1, 1);
 
 /**
  * One series over [from, to), asked for by whole EST days, one request per UTC

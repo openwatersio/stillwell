@@ -186,49 +186,6 @@ describe("sfwmd", () => {
     );
   });
 
-  it("reads telemetry from before the derived series starts", async () => {
-    serve([
-      [/AP159/, () => zipOf(csv("AP159", ["1992-03-01 12:00:00,1.0, ,A"]))],
-      [/IY320/, () => zipOf(csv("IY320", ["1990-03-01 12:00:00,2.0, ,A"]))],
-    ]);
-    // G56_T's telemetry starts in 1985, its derived series in 1991.
-    const station = {
-      series: "IY320",
-      series_start: "1985-05-31T05:00:00Z",
-      history: "AP159",
-      history_start: "1991-09-02T05:00:00Z",
-      history_end: "2026-05-07T05:00:00Z",
-    };
-    const levels = await sfwmd.levels(station, new Date("1990-01-01Z"), new Date("1993-01-01Z"));
-    assert.deepEqual(
-      levels.map((l) => l.level),
-      [0.61, 0.305],
-    );
-    assert.deepEqual(
-      requests.map(([url]) =>
-        /timeseriesIds=(\w+).*startDate=(\d+)&endDate=(\d+)/.exec(url)!.slice(1),
-      ),
-      [
-        ["IY320", "19891231", "19901231"],
-        ["IY320", "19901231", "19910901"],
-        ["AP159", "19910902", "19911231"],
-        ["AP159", "19911231", "19921231"],
-      ],
-    );
-  });
-
-  it("fails when telemetry that should cover the range comes back empty beside derived values", async () => {
-    serve([
-      [/AP159/, () => zipOf(csv("AP159", ["2024-01-16 12:00:00,1.0, ,A"]))],
-      [/IY320/, () => EMPTY],
-    ]);
-    const station = { series: "IY320", history: "AP159", history_end: "2024-01-17T05:00:00Z" };
-    await assert.rejects(
-      sfwmd.levels(station, new Date("2024-01-16T05:00:00Z"), new Date("2024-01-18T05:00:00Z")),
-      /nothing for IY320 beside AP159/,
-    );
-  });
-
   it("returns each reading once across a year boundary", async () => {
     serve([
       [
@@ -275,52 +232,94 @@ describe("sfwmd", () => {
     });
   });
 
-  it("reads the derived series before history_end and telemetry after", async () => {
+  it("switches from the derived series to telemetry at the start of history_end's month", async () => {
     serve([
       [/AP159/, () => zipOf(csv("AP159", ["2024-01-16 12:00:00,1.0, ,A"]))],
-      [/IY320/, () => zipOf(csv("IY320", ["2024-01-17 12:00:00,2.0, ,P"]))],
+      [/IY320/, () => zipOf(csv("IY320", ["2024-02-16 12:00:00,2.0, ,P"]))],
     ]);
-    const station = { series: "IY320", history: "AP159", history_end: "2024-01-17T05:00:00Z" };
-    const levels = await sfwmd.levels(
-      station,
-      new Date("2024-01-16T05:00:00Z"),
-      new Date("2024-01-18T05:00:00Z"),
+    const station = { series: "IY320", history: "AP159", history_end: "2024-02-10T05:00:00Z" };
+    const levels = await sfwmd.levels(station, new Date("2024-01-01Z"), new Date("2024-03-01Z"));
+    assert.deepEqual(
+      requests.map(([url]) =>
+        /timeseriesIds=(\w+).*startDate=(\d+)&endDate=(\d+)/.exec(url)!.slice(1),
+      ),
+      [
+        ["AP159", "20231231", "20240131"],
+        ["IY320", "20240131", "20240229"],
+      ],
+    );
+    assert.deepEqual(levels, [
+      { time: Date.parse("2024-01-16T17:00:00Z"), level: 0.305, flag: Flag.good },
+      { time: Date.parse("2024-02-16T17:00:00Z"), level: 0.61, flag: Flag.preliminary },
+    ]);
+  });
+
+  it("keeps the derived series until the month after telemetry starts", async () => {
+    serve([
+      [/AP159/, () => zipOf(csv("AP159", ["2026-04-10 12:00:00,1.0, ,A"]))],
+      [/IY320/, () => zipOf(csv("IY320", ["2026-05-10 12:00:00,2.0, ,P"]))],
+    ]);
+    // A new telemetry dbkey that starts after the derived series ends.
+    const station = {
+      series: "IY320",
+      series_start: "2026-04-25T05:00:00Z",
+      history: "AP159",
+      history_end: "2026-04-20T05:00:00Z",
+    };
+    await sfwmd.levels(station, new Date("2026-01-01Z"), new Date("2026-06-01Z"));
+    assert.deepEqual(
+      requests.map(([url]) =>
+        /timeseriesIds=(\w+).*startDate=(\d+)&endDate=(\d+)/.exec(url)!.slice(1),
+      ),
+      [
+        ["AP159", "20251231", "20260430"],
+        ["IY320", "20260430", "20260531"],
+      ],
+    );
+  });
+
+  it("leaves the months of a series that sends nothing to the lake", async () => {
+    serve([
+      [/AP159/, () => EMPTY],
+      [/IY320/, () => zipOf(csv("IY320", ["2024-02-16 12:00:00,2.0, ,P"]))],
+    ]);
+    const station = { series: "IY320", history: "AP159", history_end: "2024-02-10T05:00:00Z" };
+    const levels = await sfwmd.levels(station, new Date("2024-01-01Z"), new Date("2024-03-01Z"));
+    // January has no values, so a merge keeps the lake's January.
+    assert.deepEqual(
+      levels.map((l) => new Date(l.time).toISOString()),
+      ["2024-02-16T17:00:00.000Z"],
+    );
+  });
+
+  it("reads telemetry from before the derived series starts, to the next month's start", async () => {
+    serve([
+      [/AP159/, () => zipOf(csv("AP159", ["1992-03-01 12:00:00,1.0, ,A"]))],
+      [/IY320/, () => zipOf(csv("IY320", ["1990-03-01 12:00:00,2.0, ,A"]))],
+    ]);
+    // G56_T's telemetry starts in 1985, its derived series in September 1991.
+    const station = {
+      series: "IY320",
+      series_start: "1985-05-31T05:00:00Z",
+      history: "AP159",
+      history_start: "1991-09-02T05:00:00Z",
+      history_end: "2026-05-07T05:00:00Z",
+    };
+    const levels = await sfwmd.levels(station, new Date("1990-01-01Z"), new Date("1993-01-01Z"));
+    assert.deepEqual(
+      levels.map((l) => l.level),
+      [0.61, 0.305],
     );
     assert.deepEqual(
       requests.map(([url]) =>
         /timeseriesIds=(\w+).*startDate=(\d+)&endDate=(\d+)/.exec(url)!.slice(1),
       ),
       [
-        ["AP159", "20240116", "20240116"],
-        ["IY320", "20240117", "20240117"],
+        ["IY320", "19891231", "19901231"],
+        ["IY320", "19901231", "19910930"],
+        ["AP159", "19910930", "19911231"],
+        ["AP159", "19911231", "19921231"],
       ],
-    );
-    assert.deepEqual(levels, [
-      { time: Date.parse("2024-01-16T17:00:00Z"), level: 0.305, flag: Flag.good },
-      { time: Date.parse("2024-01-17T17:00:00Z"), level: 0.61, flag: Flag.preliminary },
-    ]);
-    requests = [];
-    const derived = await sfwmd.levels(
-      station,
-      new Date("2024-01-16T05:00:00Z"),
-      new Date("2024-01-17T05:00:00Z"),
-    );
-    assert.equal(derived.length, 1);
-    assert.deepEqual(
-      requests.map(([url]) => /timeseriesIds=(\w+)/.exec(url)![1]),
-      ["AP159"],
-    );
-  });
-
-  it("fails when one side of history_end comes back empty and the other doesn't", async () => {
-    serve([
-      [/AP159/, () => EMPTY],
-      [/IY320/, () => zipOf(csv("IY320", ["2024-01-17 12:00:00,2.0, ,P"]))],
-    ]);
-    const station = { series: "IY320", history: "AP159", history_end: "2024-01-17T05:00:00Z" };
-    await assert.rejects(
-      sfwmd.levels(station, new Date("2024-01-16T05:00:00Z"), new Date("2024-01-18T05:00:00Z")),
-      /nothing for AP159 beside IY320/,
     );
   });
 
