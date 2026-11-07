@@ -116,11 +116,12 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
         (t) => t.station_number === number && t.parameter === p && t.output_interval === "RAW",
       );
       if (!t?.start_time || !t.end_time) continue;
-      if (await hasData(number, p)) {
+      const problem = await fileProblem(number, p);
+      if (!problem) {
         trace = t;
         break;
       }
-      console.warn(`WDL's ${p} file for ${number} is empty`);
+      console.warn(`WDL's ${p} file for ${number} ${problem}`);
     }
     if (!trace) continue;
     const parameter = trace.parameter as Parameter;
@@ -163,19 +164,29 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** Whether a station's file has a data row, from its first KB; an empty file has none. */
-async function hasData(number: string, parameter: Parameter): Promise<boolean> {
+/**
+ * Why a station's file can't be read, from its first KB, or null if it can: an
+ * empty file, or one whose header names another station, as B95580's names
+ * B95500.
+ */
+async function fileProblem(number: string, parameter: Parameter): Promise<string | null> {
+  let head: string;
   try {
-    const head = await getText(urlOf(number, parameter), {
+    head = await getText(urlOf(number, parameter), {
       fresh: true,
       headers: { range: "bytes=0-1023" },
     });
-    return /^\d\d\/\d\d\/\d{4} \d\d:\d\d:\d\d,/m.test(head);
   } catch (error) {
-    if (/\b416\b/.test(String(error))) return false;
+    if (/\b416\b/.test(String(error))) return "is empty";
     throw error;
   }
+  const station = headerStation(head);
+  if (station && station !== number) return `names station ${station}`;
+  return /^\d\d\/\d\d\/\d{4} \d\d:\d\d:\d\d,/m.test(head) ? null : "has no data";
 }
+
+/** The station a file's header names, `"Time","B95050Q"`, with or without quotes or a BOM. */
+const headerStation = (head: string) => /^\uFEFF?"?Time"?,"?([^",\r\n]*)/.exec(head)?.[1];
 
 const urlOf = (number: string, parameter: Parameter) =>
   `${FILES}/${number}/por/${number}_${parameter}_RAW.csv`;
@@ -275,6 +286,9 @@ function checkVariable(number: string, parameter: Parameter): Promise<void> {
 }
 
 function variableOk(text: string, number: string, parameter: Parameter): void {
+  const station = headerStation(text);
+  if (station && station !== number)
+    throw new Error(`WDL's file for ${number} names station ${station}`);
   const variable = /\d+\.\d+ - ([^,\r\n]+)/.exec(text)?.[1];
   // An empty file, which some listed traces are, has no notes and no values.
   if (text.trim() && !PARAMETERS[parameter].variable.test(variable ?? ""))
