@@ -1,3 +1,12 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "bkeepers",
+      "id": 173,
+      "comment_id": 6708334348,
+      "created_at": "2026-11-07T14:40:43Z",
+      "repoId": 1444289873,
+      "pullRequestNo": 39
+    }
+  ]
 }
