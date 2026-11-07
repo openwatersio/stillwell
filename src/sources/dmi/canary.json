@@ -1,0 +1,29 @@
+{
+  "/v2/oceanObs/collections/observation/items": {
+    "$": "object",
+    "$.features": "array",
+    "$.features[]": "object",
+    "$.features[].geometry": "object",
+    "$.features[].geometry.coordinates": "array",
+    "$.features[].geometry.coordinates[]": "number",
+    "$.features[].geometry.type": "string",
+    "$.features[].id": "string",
+    "$.features[].properties": "object",
+    "$.features[].properties.created": "string",
+    "$.features[].properties.observed": "string",
+    "$.features[].properties.parameterId": "string",
+    "$.features[].properties.qcStatus": "string",
+    "$.features[].properties.stationId": "string",
+    "$.features[].properties.value": "number",
+    "$.features[].type": "string",
+    "$.links": "array",
+    "$.links[]": "object",
+    "$.links[].href": "string",
+    "$.links[].rel": "string",
+    "$.links[].title": "string",
+    "$.links[].type": "string",
+    "$.numberReturned": "number",
+    "$.timeStamp": "string",
+    "$.type": "string"
+  }
+}
