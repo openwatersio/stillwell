@@ -1,0 +1,36 @@
+{
+  "table": {
+    "columnNames": [
+      "station_id",
+      "longitude",
+      "latitude"
+    ],
+    "columnTypes": [
+      "String",
+      "float",
+      "float"
+    ],
+    "columnUnits": [
+      null,
+      "degrees_east",
+      "degrees_north"
+    ],
+    "rows": [
+      [
+        "Ballycotton Harbour",
+        -8.0007,
+        51.8278
+      ],
+      [
+        "Galway Port 2",
+        -9.047911,
+        53.26926
+      ],
+      [
+        "Kinvara - Unreferenced",
+        -8.93758,
+        53.14052
+      ]
+    ]
+  }
+}
