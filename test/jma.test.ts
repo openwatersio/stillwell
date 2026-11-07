@@ -179,10 +179,10 @@ describe("jma", () => {
 
   it("refuses a station list month it can't read", async () => {
     serve([
-      [/station_history\.php$/, fixture("jma-history.html").replace("1955年1月", "1955年")],
+      [/station_history\.php$/, fixture("jma-history.html").replace("1955年1月", "1955年13月")],
       [/genbo\/station\.php$/, fixture("jma-stations.html")],
     ]);
-    await assert.rejects(jma.stations(), /has 1955年 for a month/);
+    await assert.rejects(jma.stations(), /has 1955年13月 for a month/);
   });
 
   it("refuses a file for another station or month", () => {
@@ -207,6 +207,12 @@ describe("jma", () => {
     assert.throws(
       () => jma.parse(`${day1}\n${day1}`, "CC", Date.UTC(2024, 11, 1), Flag.good),
       /a day twice/,
+    );
+    // A file cut short is missing days at the end.
+    assert.throws(
+      () =>
+        jma.parse(text.split("\n").slice(0, 20).join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good),
+      /has 20 of 31 days/,
     );
   });
 

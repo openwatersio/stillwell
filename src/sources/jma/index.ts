@@ -193,7 +193,8 @@ function rows(html: string): string[][] {
 function monthStart(text: string, after = 0): number | null {
   if (text === "-") return null;
   const m = /^(\d{4})年(\d{1,2})月$/.exec(text);
-  if (!m) throw new Error(`JMA's station list has ${text} for a month`);
+  if (!m || Number(m[2]) < 1 || Number(m[2]) > 12)
+    throw new Error(`JMA's station list has ${text} for a month`);
   return Date.UTC(Number(m[1]), Number(m[2]) - 1 + after, 1) - JST_MS;
 }
 
@@ -382,6 +383,11 @@ export function parse(text: string, code: string, month: number, flag: Flag): Ob
       });
     }
   }
+  // Every day has a line, blank where nothing was measured, so a short file was cut off.
+  if (seen.size !== days)
+    throw new Error(
+      `JMA ${code}'s file for ${d.toISOString().slice(0, 7)} has ${seen.size} of ${days} days`,
+    );
   return out;
 }
 
