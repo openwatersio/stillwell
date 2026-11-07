@@ -1,0 +1,24 @@
+{
+  "/ogcapi/v1/collections/continuous/items": {
+    "$": "object",
+    "$.features": "array",
+    "$.features[]": "object",
+    "$.features[].geometry": "null",
+    "$.features[].id": "string",
+    "$.features[].properties": "object",
+    "$.features[].properties.approval_status": "string",
+    "$.features[].properties.qualifier": "null",
+    "$.features[].properties.time": "string",
+    "$.features[].properties.value": "string",
+    "$.features[].type": "string",
+    "$.links": "array",
+    "$.links[]": "object",
+    "$.links[].href": "string",
+    "$.links[].rel": "string",
+    "$.links[].title": "string",
+    "$.links[].type": "string",
+    "$.numberReturned": "number",
+    "$.timeStamp": "string",
+    "$.type": "string"
+  }
+}
