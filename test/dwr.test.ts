@@ -157,12 +157,22 @@ describe("dwr", () => {
     assert.equal(stations.length, 3);
   });
 
-  it("refuses to read a file whose header names another station", async () => {
-    serve([[/B95050Q/, () => fixture("dwr-B95050Q-head.csv").replace('"B95050Q"', '"B95500"')]]);
-    await assert.rejects(
-      dwr.levels(fishermans, new Date("2015-01-01Z"), new Date("2016-01-01Z")),
-      /names station B95500/,
-    );
+  it("refuses to read a file whose header names another station, in any header form", async () => {
+    const head = fixture("dwr-B95050Q-head.csv");
+    for (const header of [
+      '"Time","B95500"',
+      '\uFEFF"Time","B95500"',
+      "Time,B95500",
+      "\uFEFFTime,B95500",
+    ]) {
+      dwr.forgetFiles();
+      serve([[/B95050Q/, () => head.replace('"Time","B95050Q"', header)]]);
+      await assert.rejects(
+        dwr.levels(fishermans, new Date("2015-01-01Z"), new Date("2016-01-01Z")),
+        /names station B95500/,
+        header,
+      );
+    }
   });
 
   it("refuses an empty station or trace list", async () => {
