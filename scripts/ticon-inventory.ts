@@ -241,7 +241,7 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 - **UK gauges.** BODC's and NOC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the lake; one that matches none stays \`restricted\`.
 - **CMEMS elsewhere.** CMEMS records in countries whose feed has no list in the lake yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.
 - **Irish river gauges.** Marine Institute river (\`mi_r\`) records are \`unmatched\`: their dataset names no datum, so the adapter doesn't list them.
-- **Contributor.** The rest map by contributor to a planned source, with its license status from the plan's internal [sources research](https://github.com/openwatersio/planning/blob/main/water-levels/research/sources.md#commercial-clearance). A record's own \`commercial_use\` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
+- **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own \`commercial_use\` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
 
 "Ready" means a station matched, not that its history is in the lake: German records also need a PEGELONLINE backfill, which reaches 2000 at most gauges. "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
 `;

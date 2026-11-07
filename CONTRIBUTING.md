@@ -182,7 +182,7 @@ node scripts/canary.ts <source> --record
 
 ## License and CLA
 
-The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor License Agreement](CLA.md) before a pull request can merge; the CLA workflow asks on your first one. The CLA lets Open Water Software, LLC move code into MIT packages, such as shared math another project imports, and offer other licenses, while an OSI-approved license stays public. Code another project needs to import belongs in an MIT package, not here, or that project becomes AGPL.
+The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor License Agreement](CLA.md) before we merge their pull request; the CLA workflow asks on your first one. The CLA lets Open Water Software, LLC move code into MIT packages, such as shared math another project imports, and offer other licenses, while an OSI-approved license stays public. Code another project needs to import belongs in an MIT package, not here, or that project becomes AGPL.
 
 ## Shared conventions
 
