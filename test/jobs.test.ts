@@ -11,6 +11,7 @@ import type { Source } from "../src/schema.ts";
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
     assert.deepEqual(sourcesFor("hourly"), [
+      "cdec",
       "coops",
       "ea",
       "kartverket",
@@ -24,6 +25,7 @@ describe("sourcesFor", () => {
       "usgs",
     ]);
     assert.deepEqual(sourcesFor("compact"), [
+      "cdec",
       "coops",
       "dwr",
       "ea",

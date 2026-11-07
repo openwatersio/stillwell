@@ -90,8 +90,6 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   fmi: { source: "fmi", status: "license", note: "FMI's sea-level terms not confirmed" },
   crms: { source: "crms", status: "license", note: "Louisiana CRMS terms to check" },
   cdwr: { source: "dwr", status: "planned" },
-  // TICON's `cdwr` records named by a CDEC code rather than a DWR number.
-  cdec: { source: "cdec", status: "license", note: "A CDEC station; no CDEC adapter yet" },
   sfwmd: { source: "sfwmd", status: "planned" },
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
@@ -259,12 +257,11 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
   // DWR records carry its station number, which TICON writes without the trailing Q
-  // of the NAVD88 stations; the rest name CDEC stations.
+  // of the NAVD88 stations; the rest carry a CDEC code. CDEC leaves out the
+  // stations USGS runs, so their records go unmatched once its list exists.
   if (contributor === "cdwr") {
-    if (!/^[a-z]\d{5}q?$/.test(code)) {
-      const cdec = DIRECT.cdec!;
-      return { source: cdec.source, id: null, status: cdec.status, note: cdec.note };
-    }
+    if (!/^[a-z]\d{5}q?$/.test(code))
+      return byCode(record, "cdec", code.toUpperCase(), "planned", lists);
     const number = code.toUpperCase().replace(/Q$/, "");
     const id = TIDAL.has(`${number}Q`) ? `${number}Q` : number;
     return byCode(record, "dwr", id, "planned", lists);

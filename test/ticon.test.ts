@@ -75,7 +75,7 @@ describe("TICON replacements", () => {
     assert.deepEqual([missing.id, missing.status], [null, "unmatched"]);
   });
 
-  it("maps a California record by its DWR number, and leaves CDEC's out", () => {
+  it("maps a California record by its DWR number or its CDEC code", () => {
     const lists = {
       dwr: [
         station("dwr/B95339Q", "Clifton Court Intake", 37.83, -121.55),
@@ -88,8 +88,13 @@ describe("TICON replacements", () => {
     assert.equal(ferry.id, "dwr/B95340");
     // Before the list is in the lake, the id comes from the adapter's own list, with its Q.
     assert.equal(replacement(record("x-b95339-usa-cdwr"), {}).id, "dwr/B95339Q");
-    const beldon = replacement(record("beldon_landing-bdl-usa-cdwr"), lists);
-    assert.deepEqual([beldon.source, beldon.status], ["cdec", "license"]);
+    // A CDEC code goes to CDEC, by code.
+    const beldon = replacement(record("beldon_landing-bdl-usa-cdwr"), {});
+    assert.deepEqual([beldon.id, beldon.status], ["cdec/BDL", "planned"]);
+    const withCdec = { cdec: [station("cdec/BDL", "Beldon Landing", 38.19, -121.97)] };
+    assert.equal(replacement(record("beldon_landing-bdl-usa-cdwr"), withCdec).status, "ready");
+    // One USGS runs isn't in CDEC's list.
+    assert.equal(replacement(record("rio_vista-ryi-usa-cdwr"), withCdec).status, "unmatched");
   });
 
   it("maps a REFMAR record to its gauge's SHOM id", () => {
