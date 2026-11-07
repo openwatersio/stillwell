@@ -1,0 +1,42 @@
+[
+ {
+  "shom_id": "6118",
+  "name": "AMBES",
+  "longitude": -0.603517,
+  "latitude": 45.040483,
+  "state": "OK",
+  "reseau": "REFMAR",
+  "alertCustom": false,
+  "delai_alerte": "06:00"
+ },
+ {
+  "shom_id": "6326",
+  "name": "BASSINS_A_FLOT",
+  "longitude": -0.55301667,
+  "latitude": 44.86328333,
+  "state": "HIDDEN",
+  "reseau": "REFMAR",
+  "alertCustom": false,
+  "delai_alerte": "06:00"
+ },
+ {
+  "shom_id": "3",
+  "name": "BREST",
+  "longitude": -4.49503994,
+  "latitude": 48.38290024,
+  "state": "OK",
+  "reseau": "RONIM",
+  "alertCustom": false,
+  "delai_alerte": "03:00"
+ },
+ {
+  "shom_id": "16",
+  "name": "CHALEIX_NOUMEA",
+  "longitude": 166.436742,
+  "latitude": -22.291478,
+  "state": "OLD",
+  "reseau": "REFMAR",
+  "alertCustom": false,
+  "delai_alerte": "06:00"
+ }
+]

@@ -42,11 +42,11 @@ aero_trading-9338-can-meds,Aero_Trading,Canada,meds,true,true,ca/aero-trading,tr
 aguadilla-9759412-usa-noaa,Aguadilla,United States,noaa,true,false,pr/aguadilla,true,2006-06-20,2012-10-30,noaa/9759412,coops,coops/9759412,0,ready,
 aguadilla_pr-263a-usa-uhslc_rq,Aguadilla_PR,United States,uhslc_rq,true,false,pr/aguadilla,true,2006-06-20,2012-10-30,noaa/9759412,coops,coops/9759412,0.17,ready,UHSLC relay of noaa/9759412
 aigio-aig-grc-cmems,Aigio,Greece,cmems,true,true,gr/aigio,false,2016-12-03,2024-06-23,,cmems,,,restricted,GESLA lists CMEMS as research only
-aiguillon_sur_mer-6257-fra-refmar,Aiguillon_Sur_Mer,France,refmar,true,true,fr/aiguillon-sur-mer,true,2013-12-09,2015-02-16,,refmar,,,planned,
+aiguillon_sur_mer-6257-fra-refmar,Aiguillon_Sur_Mer,France,refmar,true,true,fr/aiguillon-sur-mer,true,2013-12-09,2015-02-16,,refmar,refmar/6257,,planned,
 aiguillonsurmertg_60minute-aig-fra-cmems,AiguillonSurMerTG_60minute,France,cmems,true,false,fr/aiguillon-sur-mer,false,2013-12-09,2015-02-16,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 aiw_at_highway_544_at_socastee_sc-2110725-usa-usgs,Aiw_At_Highway_544_At_Socastee_Sc,United States,usgs,true,false,us/aiw-at-highway-544-at-socastee-sc,true,2007-10-01,2025-05-01,,usgs,usgs/02110725,0,ready,
 aiw_at_highway_9_at_nixons_crossroads_sc-2110777-usa-usgs,Aiw_At_Highway_9_At_Nixons_Crossroads_Sc,United States,usgs,true,true,us/aiw-at-highway-9-at-nixons-crossroads-sc,true,2007-10-01,2025-05-01,,usgs,usgs/02110777,0,ready,
-ajaccio_aspretto-300-fra-refmar,Ajaccio_Aspretto,France,refmar,true,true,fr/ajaccio-aspretto,true,1981-07-26,2025-03-31,,refmar,,,planned,
+ajaccio_aspretto-300-fra-refmar,Ajaccio_Aspretto,France,refmar,true,true,fr/ajaccio-aspretto,true,1981-07-26,2025-03-31,,refmar,refmar/300,,planned,
 ajacciotg_60minute-aja-fra-cmems,AjaccioTG_60minute,France,cmems,true,false,fr/ajaccio,false,1981-07-26,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 akabane-ma81-jpn-jodc_jma,Akabane,Japan,jodc_jma,true,false,jp/akabane,true,2007-03-31,2023-12-31,jma/I4,jma,jma/I4,,license,JODC relay of jma/I4
 akita-2002-jpn-jodc_pahb,Akita,Japan,jodc_pahb,true,true,jp/akita,true,2010-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
@@ -101,7 +101,7 @@ alvarado_flotador-22-mex-unam,Alvarado_Flotador,Mexico,unam,true,false,mx/alvara
 alvarado_radar-22-mex-unam,Alvarado_Radar,Mexico,unam,true,false,mx/alvarado-radar,true,2021-04-01,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
 amaliahaven-amlahvn-nld-rws,Amaliahaven,Netherlands,rws,true,true,nl/amaliahaven,true,2013-04-24,2015-01-03,,rws,rws/maasvlakte.amaliahaven,0,ready,
 amami-ma73-jpn-jodc_jma,Amami,Japan,jodc_jma,true,false,jp/amami,true,1996-12-31,2023-12-31,jma/O9,jma,jma/O9,,license,JODC relay of jma/O9
-ambes-6118-fra-refmar,Ambes,France,refmar,true,true,fr/ambes,true,2006-02-01,2015-12-30,,refmar,,,planned,
+ambes-6118-fra-refmar,Ambes,France,refmar,true,true,fr/ambes,true,2006-02-01,2015-12-30,,refmar,refmar/6118,,planned,
 ambestg_60minute-amb-fra-cmems,AmbesTG_60minute,France,cmems,true,false,fr/ambes,false,2006-02-01,2015-12-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ambleside_bc-7780-can-meds,Ambleside_BC,Canada,meds,true,true,ca/ambleside,true,2018-02-26,2024-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 ambon-133-idn-uhslc_fd,Ambon,Indonesia,uhslc_fd,true,true,id/ambon,true,2008-10-01,2025-01-12,,uhslc,uhslc/133,6.78,ready,
@@ -155,7 +155,7 @@ aranmore-ara-irl-cmems,Aranmore,Ireland,cmems,true,false,ie/aranmore,false,2008-
 aranmore_island_leabgarrow-ara-irl-mi_c,Aranmore_Island_Leabgarrow,Ireland,mi_c,true,true,ie/aranmore-island-leabgarrow,true,2008-05-21,2025-07-23,,marine-institute,,,planned,
 aransas-8775241-usa-noaa,Aransas,United States,noaa,true,false,us/aransas,true,2016-12-20,2025-06-30,noaa/8775241,coops,coops/8775241,0,ready,
 aransas_wildlife_refuge-8774230-usa-noaa,Aransas_Wildlife_Refuge,United States,noaa,true,false,us/aransas-wildlife-refuge,true,2012-11-01,2025-06-30,noaa/8774230,coops,coops/8774230,0,ready,
-arcachon_eyrac-190-fra-refmar,Arcachon_Eyrac,France,refmar,true,true,fr/arcachon-eyrac,true,1967-11-28,2025-03-31,,refmar,,,planned,
+arcachon_eyrac-190-fra-refmar,Arcachon_Eyrac,France,refmar,true,true,fr/arcachon-eyrac,true,1967-11-28,2025-03-31,,refmar,refmar/190,,planned,
 arcachoneyractg_60minute-arc-fra-cmems,ArcachonEyracTG_60minute,France,cmems,true,false,fr/arcachon-eyrac,false,1967-11-28,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 arecibo-9757809-usa-noaa,Arecibo,United States,noaa,true,false,pr/arecibo,true,2008-08-28,2017-12-31,noaa/9757809,coops,coops/9757809,0,ready,
 arecibo_pr-735a-pri-uhslc_rq,Arecibo_PR,Puerto Rico,uhslc_rq,true,false,pr/arecibo,true,2008-08-28,2017-12-31,noaa/9757809,coops,coops/9757809,0.07,ready,UHSLC relay of noaa/9757809
@@ -206,7 +206,7 @@ auasi-404-asm-uhslc_fd,Auasi,American Samoa,uhslc_fd,true,true,as/auasi,true,202
 aucilla_river_nr_mouth_near_nutall_rise_fl-2326550-usa-usgs,Aucilla_River_Nr_Mouth_Near_Nutall_Rise_Fl,United States,usgs,true,true,us/aucilla-river-nr-mouth-near-nutall-rise-fl,true,2021-11-18,2024-10-01,,usgs,usgs/02326550,0,ready,
 auckland-070a-nzl-uhslc_rq,Auckland,New Zealand,uhslc_rq,true,false,nz/auckland,true,1984-05-01,1988-12-31,,uhslc,uhslc/070a,0.03,ready,
 auckland-auct-nzl-ttw,Auckland,New Zealand,ttw,true,true,nz/auckland-ticon-auckland-auct-nzl-ttw,true,2009-03-26,2024-12-31,,ttw,,,license,Terms not reviewed
-audierne_port-6305-fra-refmar,Audierne_Port,France,refmar,true,true,fr/audierne-port,true,2018-09-11,2025-03-31,,refmar,,,planned,
+audierne_port-6305-fra-refmar,Audierne_Port,France,refmar,true,true,fr/audierne-port,true,2018-09-11,2025-03-31,,refmar,refmar/6305,,planned,
 audiernetg_60minute-aud-fra-cmems,AudierneTG_60minute,France,cmems,true,false,fr/audierne,false,2018-09-11,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 aukfield_platform-aukfpfm-nld-rws,Aukfield_platform,Netherlands,rws,true,true,nl/aukfield-platform,true,1984-09-29,2006-09-16,,rws,,,unmatched,
 aulds_cove-1570-can-meds,Aulds_Cove,Canada,meds,true,true,ca/aulds-cove,true,1953-01-01,1989-06-03,,chs,,,restricted,CHS license bars commercial derivatives
@@ -289,13 +289,13 @@ barth-9650030-deu-wsv,Barth,Germany,wsv,true,false,de/barth,true,2000-01-01,2025
 base_prat-730-chl-uhslc_fd,Base_Prat,Chile,uhslc_fd,true,false,cl/base-prat,true,2010-03-09,2025-02-28,,uhslc,uhslc/730,0.53,ready,
 base_prat-730a-chl-uhslc_rq,Base_Prat,Chile,uhslc_rq,true,true,cl/base-prat,true,1984-03-08,2002-12-31,,uhslc,uhslc/730a,0.04,ready,
 base_prat-730b-chl-uhslc_rq,Base_Prat,Chile,uhslc_rq,true,false,cl/base-prat,true,2009-02-14,2018-12-31,,uhslc,uhslc/730,0.03,ready,
-bassens-6119-fra-refmar,Bassens,France,refmar,true,true,fr/bassens,true,2006-05-08,2015-12-31,,refmar,,,planned,
+bassens-6119-fra-refmar,Bassens,France,refmar,true,true,fr/bassens,true,2006-05-08,2015-12-31,,refmar,refmar/6119,,planned,
 bassenstg_60minute-bas-fra-cmems,BassensTG_60minute,France,cmems,true,false,fr/bassens,false,2006-05-08,2015-12-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 batemans_bay_princess_jetty-216410-aus-bom,Batemans_Bay_Princess_Jetty,Australia,bom,true,true,au/batemans-bay-princess-jetty,true,1995-06-30,2023-12-31,,bom,,,license,BOM license not stated
 bath-bath-nld-rws_hist,Bath,Netherlands,rws_hist,true,false,nl/bath-north-brabant,true,1971-01-01,2018-09-07,,rws,rws/rilland.bath,0.04,ready,
 batiscan-3345-can-meds,Batiscan,Canada,meds,true,true,ca/batiscan,true,1914-05-15,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 bay_waveland_yacht_club-8747437-usa-noaa,Bay_Waveland_Yacht_Club,United States,noaa,true,false,us/st-louis-bay-entrance,true,1978-05-31,2025-06-30,noaa/8747437,coops,coops/8747437,0.17,ready,
-bayonne_boucau-94-fra-refmar,Bayonne_Boucau,France,refmar,true,true,fr/bayonne-boucau,true,1967-05-23,2025-03-31,,refmar,,,planned,
+bayonne_boucau-94-fra-refmar,Bayonne_Boucau,France,refmar,true,true,fr/bayonne-boucau,true,1967-05-23,2025-03-31,,refmar,refmar/94,,planned,
 bayonneboucautg_60minute-bay-fra-cmems,BayonneBoucauTG_60minute,France,cmems,true,false,fr/bayonne-boucau,false,1967-05-23,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 bayonnepontblanctg_05minute-bay-fra-cmems,BayonnePontBlancTG_05minute,France,cmems,true,true,fr/bayonne-pont-blanc,false,2009-03-04,2025-05-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 bayou_boeuf_at_railroad_bridge_at_amelia_la-73814675-usa-usgs,Bayou_Boeuf_At_Railroad_Bridge_At_Amelia_La,United States,usgs,true,false,us/bayou-boeuf-at-railroad-bridge-at-amelia-la,true,2007-10-01,2024-05-14,,usgs,usgs/073814675,0,ready,
@@ -408,7 +408,7 @@ bonilla_island_bc-9227-can-meds,Bonilla_Island_BC,Canada,meds,true,true,ca/bonil
 booby_island-336-aus-uhslc_fd,Booby_Island,Australia,uhslc_fd,true,true,au/booby-island,true,1988-01-01,2025-05-31,,uhslc,uhslc/336,0.85,restricted,The contributor's terms bar commercial use
 booby_island-336a-aus-uhslc_rq,Booby_Island,Australia,uhslc_rq,true,false,au/booby-island,true,1988-01-01,2021-12-31,,uhslc,uhslc/336,0.03,restricted,The contributor's terms bar commercial use
 booby_island-58230-aus-bom,Booby_Island,Australia,bom,true,false,au/booby-island-ticon-booby-island-58230-aus-bom,true,1970-02-17,2022-12-30,,bom,,,license,BOM license not stated
-bordeaux-196-fra-refmar,Bordeaux,France,refmar,true,true,fr/bordeaux,true,1975-02-06,2015-12-31,,refmar,,,planned,
+bordeaux-196-fra-refmar,Bordeaux,France,refmar,true,true,fr/bordeaux,true,1975-02-06,2015-12-31,,refmar,refmar/196,,planned,
 bordeauxtg_60minute-bor-fra-cmems,BordeauxTG_60minute,France,cmems,true,false,fr/bordeaux,false,1975-02-06,2015-12-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 borgfeld-4940010-deu-wsv,Borgfeld,Germany,wsv,true,true,de/borgfeld,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940010,0.18,ready,history needs a PEGELONLINE backfill
 borkum_fischerbalje-bor-deu-bfg,Borkum_Fischerbalje,Germany,bfg,true,false,de/borkum-fischerbalje,true,1996-10-01,2024-06-12,,pegelonline,pegelonline/9340020,0.01,ready,history needs a PEGELONLINE backfill
@@ -420,9 +420,9 @@ boston_charlestown_navy_yard_massachussets-8443838-usa-da_sat,Boston_Charlestown
 boston_light-8444162-usa-noaa,Boston_Light,United States,noaa,true,false,us/boston-light,true,2000-08-25,2004-03-10,noaa/8444162,coops,coops/8444162,0,ready,
 boston_ma-741a-usa-uhslc_rq,Boston_MA,United States,uhslc_rq,true,false,us/boston,true,1921-05-03,2021-12-31,noaa/8443970,coops,coops/8443970,0.19,ready,UHSLC relay of noaa/8443970
 botany_bay-60390-aus-bom,Botany_Bay,Australia,bom,true,true,au/botany-bay-new-south-wales,true,1981-04-27,2022-12-31,,bom,,,license,BOM license not stated
-boulogne_sur_mer-111-fra-refmar,Boulogne_Sur_Mer,France,refmar,true,true,fr/boulogne-sur-mer,true,1941-11-21,2025-03-31,,refmar,,,planned,
+boulogne_sur_mer-111-fra-refmar,Boulogne_Sur_Mer,France,refmar,true,true,fr/boulogne-sur-mer,true,1941-11-21,2025-03-31,,refmar,refmar/111,,planned,
 boulognesurmertg_60minute-bou-fra-cmems,BoulogneSurMerTG_60minute,France,cmems,true,false,fr/boulogne-sur-mer,false,1941-11-21,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-bourcefranc_le_chapus-155-fra-refmar,Bourcefranc_Le_Chapus,France,refmar,true,true,fr/bourcefranc-le-chapus,true,1878-03-11,2021-08-12,,refmar,,,planned,
+bourcefranc_le_chapus-155-fra-refmar,Bourcefranc_Le_Chapus,France,refmar,true,true,fr/bourcefranc-le-chapus,true,1878-03-11,2021-08-12,,refmar,refmar/155,,planned,
 bournemouth-bou-gbr-bodc,Bournemouth,United Kingdom,bodc,true,true,gb/bournemouth,true,1996-06-20,2013-10-27,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 bournemouth-bou-gbr-cmems,Bournemouth,United Kingdom,cmems,true,false,gb/bournemouth,false,1996-06-20,2025-06-30,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 boutiliers_point-482-can-meds,Boutiliers_Point,Canada,meds,true,true,ca/boutiliers-point,true,1968-01-01,1983-06-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -446,7 +446,7 @@ bremer_bay-bbbre01-aus-bom,Bremer_Bay,Australia,bom,true,true,au/bremer-bay,true
 bremerhaventg-bre-deu-cmems,BremerhavenTG,Germany,cmems,true,false,de/bremerhaven,false,2014-01-02,2025-06-30,,pegelonline,pegelonline/4990010,0.01,ready,CMEMS record of a gauge the national feed publishes
 bremervrdeuw-5980010-deu-wsv,Bremervrdeuw,Germany,wsv,true,true,de/bremervrdeuw,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980010,0.19,ready,history needs a PEGELONLINE backfill
 breskens-bresks-nld-rws_hist,Breskens,Netherlands,rws_hist,true,false,nl/breskens,true,1973-12-31,1987-01-02,,rws,rws/breskens,0,ready,
-brest-3-fra-refmar,Brest,France,refmar,true,false,fr/brest,true,1846-01-04,2025-03-31,,refmar,,,planned,
+brest-3-fra-refmar,Brest,France,refmar,true,false,fr/brest,true,1846-01-04,2025-03-31,,refmar,refmar/3,,planned,
 brest-822-fra-uhslc_fd,Brest,France,uhslc_fd,true,true,fr/brest-brittany,true,1846-01-04,2025-06-30,,uhslc,uhslc/822,0.37,ready,
 brest-822a-fra-uhslc_rq,Brest,France,uhslc_rq,true,false,fr/brest-brittany,true,1846-01-04,2018-12-31,,uhslc,uhslc/822,0.03,ready,
 bresttg_60minute-bre-fra-cmems,BrestTG_60minute,France,cmems,true,false,fr/brest-ticon-bresttg-60minute-bre-fra-cmems,false,1846-01-04,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -539,7 +539,7 @@ calabash_river-cal-usa-ncdem,Calabash_River,United States,ncdem,true,true,us/cal
 calahootchieriver_markh-markh-usa-sfwmd,CalahootchieRiver_MarkH,United States,sfwmd,true,true,us/calahootchie-river-mark-h,true,1992-01-22,2022-09-28,,sfwmd,,,license,South Florida WMD terms to check
 calahootchieriver_s79_t-s79_t-usa-sfwmd,CalahootchieRiver_S79_T,United States,sfwmd,true,true,us/calahootchie-river-s79,true,1998-05-17,2024-06-23,,sfwmd,,,license,South Florida WMD terms to check
 calahootchieriver_vali_75-vali7-usa-sfwmd,CalahootchieRiver_VALI_75,United States,sfwmd,true,true,us/calahootchie-river-vali-75,true,2005-12-15,2024-06-23,,sfwmd,,,license,South Florida WMD terms to check
-calais-55-fra-refmar,Calais,France,refmar,true,true,fr/calais,true,1941-05-04,2025-03-31,,refmar,,,planned,
+calais-55-fra-refmar,Calais,France,refmar,true,true,fr/calais,true,1941-05-04,2025-03-31,,refmar,refmar/55,,planned,
 calaistg_60minute-cal-fra-cmems,CalaisTG_60minute,France,cmems,true,false,fr/calais,false,1941-05-04,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 calcasieu_pass-8768094-usa-noaa,Calcasieu_Pass,United States,noaa,true,false,us/calcasieu-pass,true,2002-08-11,2025-06-30,noaa/8768094,coops,coops/8768094,0,ready,
 calcasieu_river_at_cameron_la-8017118-usa-usgs,Calcasieu_River_At_Cameron_La,United States,usgs,true,true,us/calcasieu-river-at-cameron-la,true,2007-10-01,2025-05-01,,usgs,usgs/08017118,0,ready,
@@ -631,14 +631,14 @@ celestun-861a-mex-uhslc_rq,Celestun,Mexico,uhslc_rq,true,true,mx/celestun-yucata
 celestun_flotador-4-mex-unam,Celestun_Flotador,Mexico,unam,true,false,mx/celestun-flotador,true,2021-04-01,2024-02-21,,unam,,,license,UNAM Servicio Mareográfico terms to check
 celestun_radar-4-mex-unam,Celestun_Radar,Mexico,unam,true,false,mx/celestun-radar,true,2021-04-01,2024-02-21,,unam,,,license,UNAM Servicio Mareográfico terms to check
 cendering-320a-mys-uhslc_rq,Cendering,Malaysia,uhslc_rq,true,true,my/cendering,true,1984-10-31,2023-01-15,,uhslc,uhslc/320a,0.03,ready,
-centuri-807-fra-refmar,Centuri,France,refmar,true,true,fr/centuri,true,2010-10-21,2025-03-31,,refmar,,,planned,
+centuri-807-fra-refmar,Centuri,France,refmar,true,true,fr/centuri,true,2010-10-21,2025-03-31,,refmar,refmar/807,,planned,
 centuritg_60minute-cen-fra-cmems,CenturiTG_60minute,France,cmems,true,false,fr/centuri,false,2010-10-21,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ceuta-207-esp-uhslc_fd,Ceuta,Spain,uhslc_fd,true,true,es/ceuta,true,1944-03-01,2024-09-24,,uhslc,uhslc/207,0.03,ready,
 ceuta-207a-esp-uhslc_rq,Ceuta,Spain,uhslc_rq,true,false,es/ceuta,true,1944-03-01,2017-12-31,,uhslc,uhslc/207,0.03,ready,
 ceuta-ceta-esp-ieo,Ceuta,Spain,ieo,true,true,es/ceuta-ticon-ceuta-ceta-esp-ieo,true,1944-03-01,2016-12-31,,redmar,,,license,
 chabahar-915-irn-uhslc_fd,Chabahar,Iran,uhslc_fd,true,true,ir/chabahar,true,2007-10-31,2019-06-23,,uhslc,uhslc/915,0.04,ready,
 chabahar-915a-irn-uhslc_rq,Chabahar,Iran,uhslc_rq,true,false,ir/chabahar,true,2007-10-31,2016-12-31,,uhslc,uhslc/915,0.04,ready,
-chaleix_noumea-16-fra-refmar,Chaleix_Noumea,France,refmar,true,true,fr/chaleix-noumea,true,1967-02-24,2005-06-30,,refmar,,,planned,
+chaleix_noumea-16-fra-refmar,Chaleix_Noumea,France,refmar,true,true,fr/chaleix-noumea,true,1967-02-24,2005-06-30,,refmar,refmar/16,,planned,
 chaleixnoumeatg_60minute-cha-fra-cmems,ChaleixNoumeaTG_60minute,France,cmems,true,false,fr/chaleix-noumea,false,1967-02-24,2005-06-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 champerico-670a-gtm-uhslc_rq,Champerico,Guatemala,uhslc_rq,true,true,gt/champerico,true,1971-01-01,1975-06-14,,uhslc,uhslc/670a,0.03,ready,
 champlain-3350-can-meds,Champlain,Canada,meds,true,true,ca/champlain,true,1962-07-01,1996-11-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -665,7 +665,7 @@ chatham_river_near_the_watson_place_fl-2290888-usa-usgs,Chatham_River_Near_The_W
 cheesequake_creek-8531223-usa-noaa,Cheesequake_Creek,United States,noaa,true,false,us/cheesequake-creek,true,1975-12-12,1977-01-10,noaa/8531223,coops,coops/8531223,0,ready,
 chehalis_river_near_montesano_wa-12035100-usa-usgs,Chehalis_River_Near_Montesano_Wa,United States,usgs,true,true,us/chehalis-river-near-montesano-wa,true,2007-10-01,2025-05-01,,usgs,usgs/12035100,0,ready,
 cheniere_caminada-8761826-usa-noaa,Cheniere_Caminada,United States,noaa,true,false,us/caminada-pass-bridge,true,1986-10-27,1988-02-02,noaa/8761826,coops,coops/8761826,0,ready,
-cherbourg-13-fra-refmar,Cherbourg,France,refmar,true,true,fr/cherbourg,true,1943-03-31,2025-03-31,,refmar,,,planned,
+cherbourg-13-fra-refmar,Cherbourg,France,refmar,true,true,fr/cherbourg,true,1943-03-31,2025-03-31,,refmar,refmar/13,,planned,
 cherbourgtg_60minute-che-fra-cmems,CherbourgTG_60minute,France,cmems,true,false,fr/cherbourg,false,1943-03-31,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 cherry_point-9449424-usa-noaa,Cherry_Point,United States,noaa,true,false,us/cherry-point,true,1971-11-20,2025-06-30,noaa/9449424,coops,coops/9449424,0.08,ready,
 ches_bay_at_mouth_of_susq_r_at_havre_de_grace_md-1580620-usa-usgs,Ches_Bay_At_Mouth_Of_Susq_R_At_Havre_De_Grace_Md,United States,usgs,true,false,us/ches-bay-at-mouth-of-susq-r-at-havre-de-grace-md,true,2012-10-29,2025-04-30,,usgs,usgs/01580620,0,ready,
@@ -696,7 +696,7 @@ churchill-5010-can-meds,Churchill,Canada,meds,true,false,ca/churchill,true,1940-
 chuuk-054-fsm-uhslc_fd,Chuuk,Federated States of Micronesia,uhslc_fd,true,false,fm/chuuk,true,2022-01-01,2025-06-30,,uhslc,uhslc/054,0.08,ready,
 chuuk-054a-fsm-uhslc_rq,Chuuk,Federated States of Micronesia,uhslc_rq,true,false,fm/chuuk,true,1947-10-01,1991-12-31,noaa/1840000,coops,coops/1840000,0.5,ready,UHSLC relay of noaa/1840000
 chuuk-1840000-usa-noaa,Chuuk,United States,noaa,true,false,fm/chuuk,true,1975-12-22,1995-07-24,noaa/1840000,coops,coops/1840000,0,ready,
-ciboure-6270-fra-refmar,Ciboure,France,refmar,true,true,fr/ciboure,true,2015-05-21,2019-11-05,,refmar,,,planned,
+ciboure-6270-fra-refmar,Ciboure,France,refmar,true,true,fr/ciboure,true,2015-05-21,2019-11-05,,refmar,refmar/6270,,planned,
 cibouretg_60minute-cib-fra-cmems,CiboureTG_60minute,France,cmems,true,false,fr/ciboure,false,2018-01-01,2019-11-05,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 cilacap-162a-idn-uhslc_rq,Cilacap,Indonesia,uhslc_rq,true,true,id/cilacap,true,1984-03-31,2004-03-31,,uhslc,uhslc/162a,0.05,ready,
 cilicap-162-idn-uhslc_fd,Cilicap,Indonesia,uhslc_fd,true,false,id/cilicap,true,2018-04-01,2025-06-30,,uhslc,uhslc/162,2.93,ready,
@@ -718,7 +718,7 @@ cleveland_oh-9063063-usa-noaa,Cleveland_Oh,United States,noaa,true,true,us/cleve
 clifton_court_intake-b95339-usa-cdwr,Clifton_Court_Intake,United States,cdwr,true,true,us/clifton-court-intake,true,2020-03-11,2025-05-14,,cdec,,,license,California CDEC terms to check
 clipperton-391c-fra-uhslc_rq,Clipperton,France,uhslc_rq,true,true,fr/clipperton,true,2007-04-09,2008-05-28,,uhslc,,,unmatched,No uhslc/391c in the list
 clipperton-391d-fra-uhslc_rq,Clipperton,France,uhslc_rq,true,false,fr/clipperton,true,2011-08-16,2012-10-16,,uhslc,,,unmatched,No uhslc/391d in the list
-clipperton-797-fra-refmar,Clipperton,France,refmar,true,true,fr/clipperton-ticon-clipperton-797-fra-refmar,true,2007-04-09,2012-10-16,,refmar,,,planned,
+clipperton-797-fra-refmar,Clipperton,France,refmar,true,true,fr/clipperton-ticon-clipperton-797-fra-refmar,true,2007-04-09,2012-10-16,,refmar,refmar/797,,planned,
 clump_point-59168-aus-bom,Clump_Point,Australia,bom,true,true,au/clump-point,true,1985-12-17,2022-12-19,,bom,,,license,BOM license not stated
 coast_guard_sector_mobile-8736897-usa-noaa,Coast_Guard_Sector_Mobile,United States,noaa,true,false,us/coast-guard-sector-mobile,true,2007-08-08,2025-06-30,noaa/8736897,coops,coops/8736897,0.13,ready,
 coates_point-8533055-usa-noaa,Coates_Point,United States,noaa,true,false,us/coates-point,true,1976-05-01,1977-12-01,noaa/8533055,coops,coops/8533055,0,ready,
@@ -754,7 +754,7 @@ columbia_slough_at_portland_or-14211820-usa-usgs,Columbia_Slough_At_Portland_Or,
 combahee_river_near_greenpond_sc-2176150-usa-usgs,Combahee_River_Near_Greenpond_Sc,United States,usgs,true,false,us/combahee-river-near-greenpond-sc,true,2022-11-17,2025-04-30,,usgs,usgs/02176150,0,ready,
 combahee_river_near_yemassee_sc-2176000-usa-usgs,Combahee_River_Near_Yemassee_Sc,United States,usgs,true,true,us/combahee-river-near-yemassee-sc,true,2021-09-10,2025-04-30,,usgs,usgs/02176000,0,ready,
 comox_bc-7965-can-meds,Comox_BC,Canada,meds,true,true,ca/comox,true,1948-06-01,1969-06-28,,chs,,,restricted,CHS license bars commercial derivatives
-concarneau-160-fra-refmar,Concarneau,France,refmar,true,true,fr/concarneau,true,1999-06-29,2025-05-15,,refmar,,,planned,
+concarneau-160-fra-refmar,Concarneau,France,refmar,true,true,fr/concarneau,true,1999-06-29,2025-05-15,,refmar,refmar/160,,planned,
 concarneautg_60minute-con-fra-cmems,ConcarneauTG_60minute,France,cmems,true,false,fr/concarneau,false,1999-06-29,2025-05-15,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 conimicut_light-8452944-usa-noaa,Conimicut_Light,United States,noaa,true,false,us/conimicut-light,true,1999-10-17,2025-06-30,noaa/8452944,coops,coops/8452944,0,ready,
 connecticut_river_at_essex_ct-1194750-usa-usgs,Connecticut_River_At_Essex_Ct,United States,usgs,true,true,us/connecticut-river-at-essex-ct,true,2010-02-20,2025-04-30,,usgs,usgs/01194750,0,ready,
@@ -779,7 +779,7 @@ coosawhatchie_river_at_i95_near_ridgeland_sc-21765182-usa-usgs,Coosawhatchie_Riv
 copano_bay-8774513-usa-noaa,Copano_Bay,United States,noaa,true,false,us/copano-bay,true,2015-06-01,2017-10-06,noaa/8774513,coops,coops/8774513,0.55,ready,
 copper_islands_bc-9724-can-meds,Copper_Islands_BC,Canada,meds,true,true,ca/copper-islands,true,1957-06-29,2017-07-21,,chs,,,restricted,CHS license bars commercial derivatives
 coquille_river_at_coquille_or-14327055-usa-usgs,Coquille_River_At_Coquille_Or,United States,usgs,true,false,us/coquille-river-at-coquille-or,true,2012-09-30,2025-05-01,,usgs,usgs/14327055,0,ready,
-cordemais-397-fra-refmar,Cordemais,France,refmar,true,true,fr/cordemais,true,1986-01-01,2021-06-30,,refmar,,,planned,
+cordemais-397-fra-refmar,Cordemais,France,refmar,true,true,fr/cordemais,true,1986-01-01,2021-06-30,,refmar,refmar/397,,planned,
 cordemaistg_60minute-cor-fra-cmems,CordemaisTG_60minute,France,cmems,true,false,fr/cordemais,false,1986-01-01,2025-05-14,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 cordova-9454050-usa-noaa,Cordova,United States,noaa,true,false,us/cordova,true,1978-09-01,2025-06-30,noaa/9454050,coops,coops/9454050,0.11,ready,
 cordova_alaska-583a-usa-uhslc_rq,Cordova_Alaska,United States,uhslc_rq,true,false,us/cordova,true,1949-05-15,1953-03-01,noaa/9454050,coops,coops/9454050,0.03,ready,UHSLC relay of noaa/9454050
@@ -1209,7 +1209,7 @@ deeneplaat-deenpt-nld-rws_hist,Deeneplaat,Netherlands,rws_hist,true,false,nl/dee
 deep_creek_at_spuds_fl-2245260-usa-usgs,Deep_Creek_At_Spuds_Fl,United States,usgs,true,true,us/deep-creek-at-spuds-fl,true,2007-10-03,2025-05-01,,usgs,usgs/02245260,0,ready,
 degaussing_structure-8720214-usa-noaa,Degaussing_Structure,United States,noaa,true,false,us/mayport-naval-station-degausing-structure,true,1995-09-19,1998-10-31,noaa/8720214,coops,coops/8720214,0,ready,
 degerby-deg-fin-cmems,Degerby,Finland,cmems,true,false,fi/degerby,false,1971-01-01,2025-07-01,,fmi,,,license,CMEMS record of a gauge the national feed publishes
-degrad_des_cannes-241-fra-refmar,Degrad_Des_Cannes,France,refmar,true,true,fr/degrad-des-cannes,true,1989-12-28,2022-04-11,,refmar,,,planned,
+degrad_des_cannes-241-fra-refmar,Degrad_Des_Cannes,France,refmar,true,true,fr/degrad-des-cannes,true,1989-12-28,2022-04-11,,refmar,refmar/241,,planned,
 degraddescannestg_60minute-deg-fra-cmems,DegradDesCannesTG_60minute,France,cmems,true,false,fr/degrad-des-cannes,false,1989-12-28,2022-04-11,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 delaware_city-8551762-usa-noaa,Delaware_City,United States,noaa,true,false,us/delaware-city,true,2001-10-16,2025-06-30,noaa/8551762,coops,coops/8551762,0.08,ready,
 delaware_river_at_del_mem_bridge_at_wilmington_de-1482100-usa-usgs,Delaware_River_At_Del_Mem_Bridge_At_Wilmington_De,United States,usgs,true,true,us/delaware-river-at-del-mem-bridge-at-wilmington-de,true,2020-06-26,2025-04-30,,usgs,usgs/01482100,0,ready,
@@ -1228,7 +1228,7 @@ denoeverbuitentg-den-nld-cmems,DenOeverBuitenTG,Netherlands,cmems,true,true,nl/d
 denoevertg-den-nld-cmems,DenOeverTG,Netherlands,cmems,true,false,nl/den-oever,false,2014-07-30,2025-06-30,,rws,,,unmatched,Ambiguous between rws/denoever.waddenzee.voorhaven and rws/denoever.ijsselmeer.binnenhaven
 derby-dydby01-aus-bom,Derby,Australia,bom,true,true,au/derby,true,1982-04-25,2016-12-04,,bom,,,license,BOM license not stated
 deschaillons-3335-can-meds,Deschaillons,Canada,meds,true,true,ca/deschaillons-sur-saint-laurent,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
-deshaies-673-fra-refmar,Deshaies,France,refmar,true,true,fr/deshaies,true,1999-01-07,2007-11-20,,refmar,,,planned,
+deshaies-673-fra-refmar,Deshaies,France,refmar,true,true,fr/deshaies,true,1999-01-07,2007-11-20,,refmar,refmar/673,,planned,
 deshaiestg_60minute-des-fra-cmems,DeshaiesTG_60minute,France,cmems,true,false,fr/deshaies,false,1999-01-07,2007-11-20,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 deshimatsu-9005-jpn-jodc_pahb,Deshimatsu,Japan,jodc_pahb,true,true,jp/deshimatsu,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 detour_on_lake_huron_mi-9075098-usa-noaa,Detour_On_Lake_Huron_Mi,United States,noaa,true,true,us/detour-on-lake-huron-mi,true,1970-01-01,1976-12-31,noaa/9075098,coops,coops/9075098,0,ready,
@@ -1241,9 +1241,9 @@ diego_garcia-104d-gbr-uhslc_rq,Diego_Garcia,United Kingdom,uhslc_rq,true,false,g
 diego_garcia-2431000-usa-noaa,Diego_Garcia,United States,noaa,true,false,io/diego-garcia,true,1992-02-12,1995-12-31,noaa/2431000,coops,coops/2431000,0,ready,
 diego_ramirez-599a-chl-uhslc_rq,Diego_Ramirez,Chile,uhslc_rq,true,true,cl/diego-ramirez,true,1991-02-25,1997-09-30,,uhslc,uhslc/599a,0.03,ready,
 diego_ramirez_island-9952000-usa-noaa,Diego_Ramirez_Island,United States,noaa,true,false,us/diego-ramirez-island,true,1993-03-12,1994-09-18,noaa/9952000,coops,coops/9952000,0,ready,
-dielette-628-fra-refmar,Dielette,France,refmar,true,true,fr/dielette,true,1996-04-11,2025-03-31,,refmar,,,planned,
+dielette-628-fra-refmar,Dielette,France,refmar,true,true,fr/dielette,true,1996-04-11,2025-03-31,,refmar,refmar/628,,planned,
 dielettetg_60minute-die-fra-cmems,DieletteTG_60minute,France,cmems,true,false,fr/dielette,false,1996-04-11,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-dieppe-24-fra-refmar,Dieppe,France,refmar,true,true,fr/dieppe,true,1954-01-01,2025-03-31,,refmar,,,planned,
+dieppe-24-fra-refmar,Dieppe,France,refmar,true,true,fr/dieppe,true,1954-01-01,2025-03-31,,refmar,refmar/24,,planned,
 dieppetg_60minute-die-fra-cmems,DieppeTG_60minute,France,cmems,true,false,fr/dieppe-normandy,false,1954-01-01,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 digby-325-can-meds,Digby,Canada,meds,true,true,ca/digby,true,1967-11-01,2006-08-17,,chs,,,restricted,CHS license bars commercial derivatives
 dingle-din-irl-cmems,Dingle,Ireland,cmems,true,false,ie/dingle,false,2019-01-07,2025-06-30,,marine-institute,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -1256,7 +1256,7 @@ djibouti-119-dji-uhslc_fd,Djibouti,Djibouti,uhslc_fd,true,false,dj/djibouti,true
 djibouti-119a-dji-uhslc_rq,Djibouti,Djibouti,uhslc_rq,true,true,dj/djibouti,true,2007-02-20,2016-05-16,,uhslc,uhslc/119,0.03,ready,
 dock_e-8741041-usa-noaa,Dock_E,United States,noaa,true,false,us/dock-e,true,2008-01-22,2018-02-13,noaa/8741041,coops,coops/8741041,0,ready,
 dog_river_bridge-8735391-usa-noaa,Dog_River_Bridge,United States,noaa,true,false,us/dog-river-bridge,true,2011-07-01,2025-06-30,noaa/8735391,coops,coops/8735391,0,ready,
-donges-396-fra-refmar,Donges,France,refmar,true,true,fr/donges,true,1982-12-18,2011-06-23,,refmar,,,planned,
+donges-396-fra-refmar,Donges,France,refmar,true,true,fr/donges,true,1982-12-18,2011-06-23,,refmar,refmar/396,,planned,
 dongestg_60minute-don-fra-cmems,DongesTG_60minute,France,cmems,true,false,fr/donges,false,1982-12-18,2011-06-23,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 dongfang-637a-chn-uhslc_rq,Dongfang,China,uhslc_rq,true,true,cn/dongfang,true,1975-01-01,1997-12-31,,uhslc,uhslc/637a,0.03,ready,
 donna_bay_at_highway_41_at_nokomis_fl-2299730-usa-usgs,Donna_Bay_At_Highway_41_At_Nokomis_Fl,United States,usgs,true,true,us/donna-bay-at-highway-41-at-nokomis-fl,true,2017-07-19,2025-05-01,,usgs,usgs/02299730,0,ready,
@@ -1281,14 +1281,14 @@ dukegat-3990020-deu-wsv,Dukegat,Germany,wsv,true,true,de/dukegat,true,2000-01-13
 duluth_mn-9099064-usa-noaa,Duluth_Mn,United States,noaa,true,true,us/duluth,true,1970-01-01,2025-07-01,noaa/9099064,coops,coops/9099064,0,ready,
 dumbarton_bridge-9414509-usa-noaa,Dumbarton_Bridge,United States,noaa,true,false,us/dumbarton-highway-bridge,true,1996-03-15,2011-09-30,noaa/9414509,coops,coops/9414509,0,ready,
 dumbarton_railroad_bridge-9414510-usa-noaa,Dumbarton_Railroad_Bridge,United States,noaa,true,true,us/dumbarton-railroad-bridge,true,1983-05-11,1985-05-09,noaa/9414510,coops,coops/9414510,0,ready,
-dumont_d_urville-108-fra-refmar,Dumont_D_Urville,France,refmar,true,false,fr/dumont-d-urville,true,1952-05-01,2024-01-15,,refmar,,,planned,
+dumont_d_urville-108-fra-refmar,Dumont_D_Urville,France,refmar,true,false,fr/dumont-d-urville,true,1952-05-01,2024-01-15,,refmar,refmar/108,,planned,
 dumont_durville-189-ata-uhslc_fd,Dumont_dUrville,Antarctica,uhslc_fd,true,true,aq/dumont-d-urville-ticon-dumont-durville-189-ata-uhslc-fd,true,2008-01-16,2023-02-28,,uhslc,uhslc/189,0.03,ready,
 dumont_durville-189a-ata-uhslc_rq,Dumont_dUrville,Antarctica,uhslc_rq,true,false,aq/dumont-d-urville-ticon-dumont-durville-189-ata-uhslc-fd,true,2008-01-16,2010-08-19,,uhslc,uhslc/189,0.03,ready,
 dumontdurvilletg_60minute-dum-fra-cmems,DumontDUrvilleTG_60minute,France,cmems,true,false,fr/dumont-d-urville-ticon-dumontdurvilletg-60minute-dum-fra-cmems,false,1952-05-01,2024-01-15,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 dundalk-dun-irl-cmems,Dundalk,Ireland,cmems,true,true,ie/dundalk,false,2008-04-03,2013-01-15,,marine-institute,,,to_match,CMEMS record of a gauge the national feed publishes
 dundee_creek_tributary_at_chase_md-1585149-usa-usgs,Dundee_Creek_Tributary_At_Chase_Md,United States,usgs,true,true,us/dundee-creek-tributary-at-chase-md,true,2023-12-05,2025-04-30,,usgs,usgs/01585149,0,ready,
 dungeness-8679758-usa-noaa,Dungeness,United States,noaa,true,false,us/seacamp-dock,true,1978-11-14,1987-03-04,noaa/8679758,coops,coops/8679758,0,ready,
-dunkerque-2-fra-refmar,Dunkerque,France,refmar,true,true,fr/dunkerque,true,1956-06-07,2025-03-31,,refmar,,,planned,
+dunkerque-2-fra-refmar,Dunkerque,France,refmar,true,true,fr/dunkerque,true,1956-06-07,2025-03-31,,refmar,refmar/2,,planned,
 dunkerquetg_60minute-dun-fra-cmems,DunkerqueTG_60minute,France,cmems,true,false,fr/dunkerque,false,1956-06-07,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 dunmore-dun-irl-cmems,Dunmore,Ireland,cmems,true,false,ie/dunmore,false,2013-12-24,2025-06-30,,marine-institute,,,to_match,CMEMS record of a gauge the national feed publishes
 dunmore_east_harbour-dun-irl-mi_c,Dunmore_East_Harbour,Ireland,mi_c,true,true,ie/dunmore-east-harbour,true,2012-04-23,2025-07-23,,marine-institute,,,planned,
@@ -1308,7 +1308,7 @@ duwamish_river_at_golf_course_at_tukwila_wa-12113390-usa-usgs,Duwamish_River_At_
 dwarsgat-9460020-deu-wsv,Dwarsgat,Germany,wsv,true,true,de/dwarsgat,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460020,0.19,ready,history needs a PEGELONLINE backfill
 dzaoudzi-155-fra-uhslc_fd,Dzaoudzi,France,uhslc_fd,true,true,fr/dzaoudzi,true,1963-10-17,2024-12-14,,uhslc,uhslc/155,0.24,ready,
 dzaoudzi-155a-fra-uhslc_rq,Dzaoudzi,France,uhslc_rq,true,false,fr/dzaoudzi,true,1963-10-17,2018-12-31,,uhslc,uhslc/155,0.05,ready,
-dzaoudzi-30-fra-refmar,Dzaoudzi,France,refmar,true,false,fr/dzaoudzi-ticon-dzaoudzi-30-fra-refmar,true,1963-10-16,2024-10-27,,refmar,,,planned,
+dzaoudzi-30-fra-refmar,Dzaoudzi,France,refmar,true,false,fr/dzaoudzi-ticon-dzaoudzi-30-fra-refmar,true,1963-10-16,2024-10-27,,refmar,refmar/30,,planned,
 e4_bron_sjov-35185-swe-smhi,E4_Bron_Sjov,Sweden,smhi,true,true,se/e4-bron-sjov,true,2011-10-27,2025-07-02,,smhi,,,planned,
 e4bronsodertalje-e4b-swe-cmems,E4BronSodertalje,Sweden,cmems,true,false,se/e4bron-sodertalje,false,2019-07-01,2025-06-30,,smhi,,,to_match,CMEMS record of a gauge the national feed publishes
 eagle_point-8771013-usa-noaa,Eagle_Point,United States,noaa,true,false,us/eagle-point,true,1993-08-01,2025-06-30,noaa/8771013,coops,coops/8771013,0.18,ready,
@@ -1471,7 +1471,7 @@ forsmark-2179-swe-smhi,Forsmark,Sweden,smhi,true,true,se/forsmark,true,1975-08-0
 forsmark-for-swe-cmems,Forsmark,Sweden,cmems,true,false,se/forsmark,false,1975-08-06,2025-07-01,,smhi,,,to_match,CMEMS record of a gauge the national feed publishes
 forster-209402-aus-bom,Forster,Australia,bom,true,true,au/forster,true,1986-03-26,2023-12-31,,bom,,,license,BOM license not stated
 fort_churchill-5008-can-meds,Fort_Churchill,Canada,meds,true,true,ca/fort-churchill,true,1972-01-01,1974-10-01,,chs,,,restricted,CHS license bars commercial derivatives
-fort_de_france-126-fra-refmar,Fort_De_France,France,refmar,true,false,fr/fort-de-france,true,1976-10-30,2025-05-27,,refmar,,,planned,
+fort_de_france-126-fra-refmar,Fort_De_France,France,refmar,true,false,fr/fort-de-france,true,1976-10-30,2025-05-27,,refmar,refmar/126,,planned,
 fort_de_france-271-fra-uhslc_fd,Fort_de_France,France,uhslc_fd,true,true,fr/fort-de-france-martinique,true,1976-10-30,2025-06-30,,uhslc,uhslc/271,0.44,ready,
 fort_de_france-271a-fra-uhslc_rq,Fort_de_France,France,uhslc_rq,true,false,fr/fort-de-france-martinique,true,1976-10-30,2018-12-31,,uhslc,uhslc/271,0.05,ready,
 fort_denison-333-aus-uhslc_fd,Fort_Denison,Australia,uhslc_fd,true,true,au/fort-denison,true,1965-01-01,2025-05-31,,uhslc,uhslc/333,0.8,restricted,The contributor's terms bar commercial use
@@ -1479,7 +1479,7 @@ fort_denison-333a-aus-uhslc_rq,Fort_Denison,Australia,uhslc_rq,true,false,au/for
 fort_gratiot_mi-9014098-usa-noaa,Fort_Gratiot_Mi,United States,noaa,true,false,us/fort-gratiot-mi,true,1970-01-01,2025-07-01,noaa/9014098,coops,coops/9014098,0,ready,
 fort_hamilton_new_york_1-8517942-usa-da_sat,Fort_Hamilton_New_York_1,United States,da_sat,true,true,us/fort-hamilton-new-york-1,true,1893-01-01,1936-12-30,,da_sat,,,license,Terms not reviewed
 fort_hamilton_new_york_2-8517942-usa-da_sat,Fort_Hamilton_New_York_2,United States,da_sat,true,false,us/fort-hamilton-new-york-2,true,1951-11-28,1953-01-01,,da_sat,,,license,Terms not reviewed
-fort_medoc-6117-fra-refmar,Fort_Medoc,France,refmar,true,true,fr/fort-medoc,true,2006-05-11,2015-12-30,,refmar,,,planned,
+fort_medoc-6117-fra-refmar,Fort_Medoc,France,refmar,true,true,fr/fort-medoc,true,2006-05-11,2015-12-30,,refmar,refmar/6117,,planned,
 fort_myers-8725520-usa-noaa,Fort_Myers,United States,noaa,true,false,us/fort-myers,true,1969-04-16,2025-06-30,noaa/8725520,coops,coops/8725520,0.03,ready,
 fort_point-8423898-usa-noaa,Fort_Point,United States,noaa,true,false,us/fort-point-portsmouth-nh,true,2003-07-03,2019-10-26,noaa/8423898,coops,coops/8423898,0.1,ready,
 fort_pulaski-8670870-usa-noaa,Fort_Pulaski,United States,noaa,true,false,us/fort-pulaski,true,1935-07-01,2025-06-30,noaa/8670870,coops,coops/8670870,0.26,ready,
@@ -1494,7 +1494,7 @@ fortaleza_uscgs-283a-bra-uhslc_rq,Fortaleza_USCGS,Brazil,uhslc_rq,true,true,br/f
 fortdefrancetg_60minute-for-fra-cmems,FortDeFranceTG_60minute,France,cmems,true,false,fr/fort-de-france-ticon-fortdefrancetg-60minute-for-fra-cmems,false,1976-10-30,2025-05-27,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 forteau_bay-2590-can-meds,Forteau_Bay,Canada,meds,true,true,ca/forteau-bay,true,1898-09-25,1916-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 fortmedoctg_60minute-for-fra-cmems,FortMedocTG_60minute,France,cmems,true,false,fr/fort-medoc,false,2006-05-11,2015-12-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-fos_sur_mer-719-fra-refmar,Fos_Sur_Mer,France,refmar,true,true,fr/fos-sur-mer,true,2006-01-31,2023-09-29,,refmar,,,planned,
+fos_sur_mer-719-fra-refmar,Fos_Sur_Mer,France,refmar,true,true,fr/fos-sur-mer,true,2006-01-31,2023-09-29,,refmar,refmar/719,,planned,
 fossurmertg_60minute-fos-fra-cmems,FosSurMerTG_60minute,France,cmems,true,false,fr/fos-sur-mer,false,2006-01-31,2023-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 foster_creek_at_goose_creek_sc-21720612-usa-usgs,Foster_Creek_At_Goose_Creek_Sc,United States,usgs,true,true,us/foster-creek-at-goose-creek-sc,true,2013-10-31,2015-05-22,,usgs,usgs/021720612,0,ready,
 fourmile_run_above_highway_1_at_alexandria_va-1652545-usa-usgs,Fourmile_Run_Above_Highway_1_At_Alexandria_Va,United States,usgs,true,true,us/fourmile-run-above-highway-1-at-alexandria-va,true,2007-10-01,2025-04-30,,usgs,usgs/01652545,0,ready,
@@ -1795,7 +1795,7 @@ helsinki_kaivopuisto-132310-fin-fmi,Helsinki_Kaivopuisto,Finland,fmi,true,true,f
 heltermaa-hel-est-cmems,Heltermaa,Estonia,cmems,true,true,ee/heltermaa,false,2017-01-01,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
 hendersoncreek_southwestflorida_hc1_t-hc1_t-usa-sfwmd,HendersonCreek_SouthWestFlorida_HC1_T,United States,sfwmd,true,true,us/henderson-creek-south-west-florida-hc1,true,1983-06-26,2001-01-05,,sfwmd,,,license,South Florida WMD terms to check
 henslung_cove-9958-can-meds,Henslung_Cove,Canada,meds,true,true,ca/henslung-cove,true,1983-06-09,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
-herbaudiere-198-fra-refmar,Herbaudiere,France,refmar,true,true,fr/herbaudiere,true,1985-05-11,2025-03-31,,refmar,,,planned,
+herbaudiere-198-fra-refmar,Herbaudiere,France,refmar,true,true,fr/herbaudiere,true,1985-05-11,2025-03-31,,refmar,refmar/198,,planned,
 herbaudieretg_60minute-her-fra-cmems,HerbaudiereTG_60minute,France,cmems,true,false,fr/herbaudiere,false,1985-05-11,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 herbrumhafendamm-3770030-deu-wsv,Herbrumhafendamm,Germany,wsv,true,true,de/herbrumhafendamm,true,2001-10-30,2025-07-11,,pegelonline,pegelonline/3770030,0.18,ready,history needs a PEGELONLINE backfill
 herne_bay-hby-gbr-cco,Herne_Bay,United Kingdom,cco,true,true,gb/herne-bay,true,1996-03-19,2025-05-31,,cco,,,license,Terms not reviewed
@@ -1809,7 +1809,7 @@ heysham-hey-gbr-bodc,Heysham,United Kingdom,bodc,true,true,gb/heysham,true,1964-
 heysham-hey-gbr-cmems,Heysham,United Kingdom,cmems,true,false,gb/heysham,false,1990-01-01,2025-06-30,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 hiagari-9011-jpn-jodc_pahb,Hiagari,Japan,jodc_pahb,true,true,jp/hiagari,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 hidden_river_near_homosassa_fl-2310675-usa-usgs,Hidden_River_Near_Homosassa_Fl,United States,usgs,true,false,us/hidden-river-near-homosassa-fl,true,2020-12-01,2025-05-06,,usgs,usgs/02310675,0,ready,
-hienghene-429-fra-refmar,Hienghene,France,refmar,true,true,fr/hienghene,true,1983-12-13,2025-03-31,,refmar,,,planned,
+hienghene-429-fra-refmar,Hienghene,France,refmar,true,true,fr/hienghene,true,1983-12-13,2025-03-31,,refmar,refmar/429,,planned,
 hienghenetg_60minute-hie-fra-cmems,HiengheneTG_60minute,France,cmems,true,false,fr/hienghene,false,1983-12-13,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 high_island-8770808-usa-noaa,High_Island,United States,noaa,true,false,us/high-island-icww,true,2012-12-01,2025-06-30,noaa/8770808,coops,coops/8770808,0,ready,
 hill_slough-hsl-usa-cdwr,Hill_Slough,United States,cdwr,true,true,us/hill-slough,true,2020-09-24,2025-05-24,,cdec,,,license,California CDEC terms to check
@@ -1831,7 +1831,7 @@ hirtshalstg-hir-dnk-cmems,HirtshalsTG,Denmark,cmems,true,true,dk/hirtshals,false
 hiva_oa-017-fra-uhslc_fd,Hiva_Oa,France,uhslc_fd,true,false,fr/hiva-oa,true,2010-09-05,2025-06-30,,uhslc,uhslc/017,1.04,ready,
 hiva_oa-017a-fra-uhslc_rq,Hiva_Oa,France,uhslc_rq,true,false,fr/hiva-oa,true,1977-10-29,1980-10-02,,uhslc,uhslc/017a,0.03,ready,
 hiva_oa-017b-fra-uhslc_rq,Hiva_Oa,France,uhslc_rq,true,false,fr/hiva-oa,true,2010-09-05,2017-09-04,,uhslc,uhslc/017,0,ready,
-hiva_oa-495-fra-refmar,Hiva_Oa,France,refmar,true,true,fr/hiva-oa-marquesas-islands,true,1977-10-29,2017-08-09,,refmar,,,planned,
+hiva_oa-495-fra-refmar,Hiva_Oa,France,refmar,true,true,fr/hiva-oa-marquesas-islands,true,1977-10-29,2017-08-09,,refmar,refmar/495,,planned,
 hivaoatg_60minute-hiv-fra-cmems,HivaOaTG_60minute,France,cmems,true,false,fr/hiva-oa-marquesas-islands,false,1977-10-29,2017-08-09,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 hobart-339a-aus-uhslc_rq,Hobart,Australia,uhslc_rq,true,true,au/hobart,true,1985-03-29,2021-12-31,,uhslc,uhslc/339a,0.04,restricted,The contributor's terms bar commercial use
 hobart-61220-aus-bom,Hobart,Australia,bom,true,false,au/hobart-tasmania,true,1960-05-31,2022-12-31,,bom,,,license,BOM license not stated
@@ -1907,7 +1907,7 @@ howth_water_level_1-how-irl-mi_c,Howth_Water_Level_1,Ireland,mi_c,true,false,ie/
 howth_water_level_2-how-irl-mi_c,Howth_Water_Level_2,Ireland,mi_c,true,false,ie/howth-water-level-2,true,2020-11-20,2025-07-23,,marine-institute,,,planned,
 hrakleio-hra-grc-cmems,Hrakleio,Greece,cmems,true,true,gr/hrakleio,false,2016-12-13,2024-06-23,,cmems,,,restricted,GESLA lists CMEMS as research only
 hrnum-9570050-deu-wsv,Hrnum,Germany,wsv,true,true,de/hornum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570050,0.2,ready,history needs a PEGELONLINE backfill
-huahine-587-fra-refmar,Huahine,France,refmar,true,true,fr/huahine,true,1989-07-05,2013-11-29,,refmar,,,planned,
+huahine-587-fra-refmar,Huahine,France,refmar,true,true,fr/huahine,true,1989-07-05,2013-11-29,,refmar,refmar/587,,planned,
 huahinetg_60minute-hua-fra-cmems,HuahineTG_60minute,France,cmems,true,false,fr/huahine,false,1989-07-05,2013-11-29,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 huatulco-409-mex-unam_hist,Huatulco,Mexico,unam_hist,true,true,mx/huatulco,true,2010-10-30,2015-09-03,,unam,,,license,UNAM Servicio Mareográfico terms to check
 huatulco_nivelcbs-13-mex-unam,Huatulco_NivelCBS,Mexico,unam,true,false,mx/huatulco-nivel-cbs,true,2021-04-01,2024-04-01,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -1950,14 +1950,14 @@ ijmuiden_semafoor-ijmdsmfr-nld-rws_hist,Ijmuiden_semafoor,Netherlands,rws_hist,t
 ijmuiden_stroommeetpaal-ijmdsmpl-nld-rws,IJmuiden_stroommeetpaal,Netherlands,rws,true,true,nl/i-jmuiden-stroommeetpaal,true,2002-10-30,2023-12-30,,rws,rws/ijgeul.1,0,ready,
 ijmuiden_zuidelijk_havenhoofd-ijmdzdlhvhd-nld-rws_hist,Ijmuiden_zuidelijk_havenhoofd,Netherlands,rws_hist,true,false,nl/ijmuiden-zuidelijk-havenhoofd,true,1976-01-01,1987-03-08,,rws,rws/ijmuiden.havenhoofd.zuid,0,ready,
 ijmuidentg-ijm-nld-cmems,IjmuidenTG,Netherlands,cmems,true,false,nl/ijmuiden,false,2014-07-30,2025-06-30,,rws,rws/ijmuiden.buitenhaven,0.04,ready,CMEMS record of a gauge the national feed publishes
-ile_d_aix-189-fra-refmar,Ile_D_Aix,France,refmar,true,true,fr/ile-d-aix,true,1973-01-09,2024-11-06,,refmar,,,planned,
+ile_d_aix-189-fra-refmar,Ile_D_Aix,France,refmar,true,true,fr/ile-d-aix,true,1973-01-09,2024-11-06,,refmar,refmar/189,,planned,
 ile_dentree-1966-can-meds,Ile_Dentree,Canada,meds,true,true,ca/ile-d-entree,true,1985-06-11,2007-07-01,,chs,,,restricted,CHS license bars commercial derivatives
-ile_possession_crozet-173-fra-refmar,Ile_Possession_Crozet,France,refmar,true,true,fr/ile-possession-crozet,true,1995-11-19,1997-02-16,,refmar,,,planned,
-ile_rousse-802-fra-refmar,Ile_Rousse,France,refmar,true,true,fr/ile-rousse,true,2013-04-17,2025-03-31,,refmar,,,planned,
-ile_royale-749-fra-refmar,Ile_Royale,France,refmar,true,true,fr/ile-royale,true,1989-05-16,2025-03-31,,refmar,,,planned,
+ile_possession_crozet-173-fra-refmar,Ile_Possession_Crozet,France,refmar,true,true,fr/ile-possession-crozet,true,1995-11-19,1997-02-16,,refmar,refmar/173,,planned,
+ile_rousse-802-fra-refmar,Ile_Rousse,France,refmar,true,true,fr/ile-rousse,true,2013-04-17,2025-03-31,,refmar,refmar/802,,planned,
+ile_royale-749-fra-refmar,Ile_Royale,France,refmar,true,true,fr/ile-royale,true,1989-05-16,2025-03-31,,refmar,refmar/749,,planned,
 ile_royale-850a-fra-uhslc_rq,Ile_Royale,France,uhslc_rq,true,false,fr/ile-royale-guyane,true,1989-05-16,2018-12-31,,uhslc,uhslc/850a,0,ready,
-ile_royale_anse_legoff-127-fra-refmar,Ile_Royale_Anse_Legoff,France,refmar,true,false,fr/ile-royale-anse-legoff,true,1989-05-15,2007-12-06,,refmar,,,planned,
-ile_saint_paul-194-fra-refmar,Ile_Saint_Paul,France,refmar,true,true,fr/ile-saint-paul,true,1994-10-25,2006-12-24,,refmar,,,planned,
+ile_royale_anse_legoff-127-fra-refmar,Ile_Royale_Anse_Legoff,France,refmar,true,false,fr/ile-royale-anse-legoff,true,1989-05-15,2007-12-06,,refmar,refmar/127,,planned,
+ile_saint_paul-194-fra-refmar,Ile_Saint_Paul,France,refmar,true,true,fr/ile-saint-paul,true,1994-10-25,2006-12-24,,refmar,refmar/194,,planned,
 iledaixtg_60minute-ile-fra-cmems,IleDAixTG_60minute,France,cmems,true,false,fr/ile-d-aix,false,1973-01-09,2024-11-06,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ilemiquelontg_01minute-ile-fra-cmems,IleMiquelonTG_01minute,France,cmems,true,true,fr/ile-miquelon,false,2022-09-12,2023-12-07,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ilepossessioncrozettg_60minute-ile-fra-cmems,IlePossessionCrozetTG_60minute,France,cmems,true,false,fr/ile-possession-crozet-ticon-ilepossessioncrozettg-60minute-ile-fra-cmems,false,1995-11-19,2013-04-27,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -1965,7 +1965,7 @@ ileroussetg_60minute-ile-fra-cmems,IleRousseTG_60minute,France,cmems,true,false,
 ileroyaleanselegofftg_60minute-ile-fra-cmems,IleRoyaleAnseLegoffTG_60minute,France,cmems,true,false,fr/ile-royale-anse-legoff,false,1989-05-15,2007-12-06,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ilesaintpaultg_60minute-ile-fra-cmems,IleSaintPaulTG_60minute,France,cmems,true,false,fr/ile-saint-paul,false,1994-10-25,2023-04-24,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ilesdusaluttg_60minute-ile-fra-cmems,IlesDuSalutTG_60minute,France,cmems,true,true,fr/iles-du-salut,false,1989-05-16,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-ilet_la_mere-535-fra-refmar,Ilet_La_Mere,France,refmar,true,true,fr/ilet-la-mere,true,1978-01-01,2018-06-26,,refmar,,,planned,
+ilet_la_mere-535-fra-refmar,Ilet_La_Mere,France,refmar,true,true,fr/ilet-la-mere,true,1978-01-01,2018-06-26,,refmar,refmar/535,,planned,
 iletlameretg_60minute-ile-fra-cmems,IletLaMereTG_60minute,France,cmems,true,false,fr/ilet-la-mere,false,1978-01-01,2018-06-26,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 ilfracombe-ilf-gbr-bodc,Ilfracombe,United Kingdom,bodc,true,true,gb/ilfracombe,true,1968-01-30,2025-05-31,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 ilfracombe-ilf-gbr-cmems,Ilfracombe,United Kingdom,cmems,true,false,gb/ilfracombe,false,1990-01-01,2025-06-30,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
@@ -2157,7 +2157,7 @@ kent_point-8572467-usa-noaa,Kent_Point,United States,noaa,true,false,us/kent-poi
 keppel_harbour-327a-sgp-uhslc_rq,Keppel_Harbour,Singapore,uhslc_rq,true,false,sg/keppel-harbour,true,1981-08-13,1990-01-31,,uhslc,uhslc/327a,0.05,ready,
 kerguelen-180-fra-uhslc_fd,Kerguelen,France,uhslc_fd,true,true,fr/kerguelen,true,2006-01-01,2023-09-30,,uhslc,uhslc/180,0,ready,
 kerguelen-180a-fra-uhslc_rq,Kerguelen,France,uhslc_rq,true,false,fr/kerguelen,true,1993-04-05,2012-12-31,,uhslc,uhslc/180,0,ready,
-kerguelen-23-fra-refmar,Kerguelen,France,refmar,true,true,fr/kerguelen-kerguelen,true,1962-04-01,2003-03-26,,refmar,,,planned,
+kerguelen-23-fra-refmar,Kerguelen,France,refmar,true,true,fr/kerguelen-kerguelen,true,1962-04-01,2003-03-26,,refmar,refmar/23,,planned,
 kerguelentg_60minute-ker-fra-cmems,KerguelenTG_60minute,France,cmems,true,false,fr/kerguelen-kerguelen,false,1962-04-01,2013-06-03,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 kerkyra-ker-grc-cmems,Kerkyra,Greece,cmems,true,true,gr/kerkyra,false,2018-09-14,2025-05-01,,cmems,,,restricted,GESLA lists CMEMS as research only
 ketchikan-9450460-usa-noaa,Ketchikan,United States,noaa,true,false,us/ketchikan,true,1918-10-12,2025-06-30,noaa/9450460,coops,coops/9450460,0,ready,
@@ -2281,9 +2281,9 @@ l_cornwallis_i-705a-can-uhslc_rq,L_Cornwallis_I,Canada,uhslc_rq,true,true,ca/lit
 l_pontchartrain_at_crossover_4_near_mandeville_la-301200090072400-usa-usgs,L_Pontchartrain_At_Crossover_4_Near_Mandeville_La,United States,usgs,true,true,us/l-pontchartrain-at-crossover-4-near-mandeville-la,true,2016-05-04,2025-05-01,,usgs,usgs/301200090072400,0,ready,
 la_coruna-830-esp-uhslc_fd,La_Coruna,Spain,uhslc_fd,true,true,es/la-coruna,true,1943-03-01,2024-03-20,,uhslc,uhslc/830,0.03,ready,
 la_coruna-830a-esp-uhslc_rq,La_Coruna,Spain,uhslc_rq,true,false,es/la-coruna,true,1943-03-01,2017-12-31,,uhslc,uhslc/830,0.03,ready,
-la_cotiniere-736-fra-refmar,La_Cotiniere,France,refmar,true,true,fr/la-cotiniere,true,2006-06-19,2010-06-17,,refmar,,,planned,
-la_desirade-515-fra-refmar,La_Desirade,France,refmar,true,true,fr/la-desirade,true,1987-02-24,2011-06-29,,refmar,,,planned,
-la_figueirette-846-fra-refmar,La_Figueirette,France,refmar,true,true,fr/la-figueirette,true,2011-05-26,2025-03-31,,refmar,,,planned,
+la_cotiniere-736-fra-refmar,La_Cotiniere,France,refmar,true,true,fr/la-cotiniere,true,2006-06-19,2010-06-17,,refmar,refmar/736,,planned,
+la_desirade-515-fra-refmar,La_Desirade,France,refmar,true,true,fr/la-desirade,true,1987-02-24,2011-06-29,,refmar,refmar/515,,planned,
+la_figueirette-846-fra-refmar,La_Figueirette,France,refmar,true,true,fr/la-figueirette,true,2011-05-26,2025-03-31,,refmar,refmar/846,,planned,
 la_grande_rivierepq-64680-can-meds,La_Grande_RivierePq,Canada,meds,true,true,ca/la-grande-riviere,true,1977-08-26,1978-09-13,,chs,,,restricted,CHS license bars commercial derivatives
 la_guaira-247a-ven-uhslc_rq,La_Guaira,Venezuela,uhslc_rq,true,true,ve/la-guaira,true,1985-01-01,1994-12-31,,uhslc,uhslc/247a,0.05,ready,
 la_jolla-9410230-usa-noaa,La_Jolla,United States,noaa,true,false,us/la-jolla,true,1924-08-01,2025-06-30,noaa/9410230,coops,coops/9410230,0,ready,
@@ -2296,7 +2296,7 @@ la_paz-671-mex-unam_hist,La_paz,Mexico,unam_hist,true,false,mx/la-paz,true,1952-
 la_paz-671a-mex-uhslc_rq,La_Paz,Mexico,uhslc_rq,true,true,mx/la-paz-ticon-la-paz-671a-mex-uhslc-rq,true,1952-01-02,1983-12-01,,uhslc,uhslc/671a,0.03,ready,
 la_prairie-15470-can-meds,La_Prairie,Canada,meds,true,false,ca/la-prairie,true,1967-11-01,1996-04-23,,chs,,,restricted,CHS license bars commercial derivatives
 la_push-9442396-usa-noaa,La_Push,United States,noaa,true,false,us/la-push,true,2002-09-24,2025-06-30,noaa/9442396,coops,coops/9442396,0.09,ready,
-la_rochelle_la_pallice-34-fra-refmar,La_Rochelle_La_Pallice,France,refmar,true,true,fr/la-rochelle-la-pallice,true,1941-05-19,2025-03-31,,refmar,,,planned,
+la_rochelle_la_pallice-34-fra-refmar,La_Rochelle_La_Pallice,France,refmar,true,true,fr/la-rochelle-la-pallice,true,1941-05-19,2025-03-31,,refmar,refmar/34,,planned,
 la_salle_ontario-11985-can-meds,La_Salle_Ontario,Canada,meds,true,true,ca/la-salle,true,1961-11-01,1994-05-27,,chs,,,restricted,CHS license bars commercial derivatives
 la_union-086a-slv-uhslc_rq,La_Union,El Salvador,uhslc_rq,true,true,sv/la-union,true,1954-01-01,1980-11-11,,uhslc,uhslc/086a,0.05,ready,
 la_union-086b-slv-uhslc_rq,La_Union,El Salvador,uhslc_rq,true,false,sv/la-union-la-union,true,2001-01-01,2010-12-31,,uhslc,uhslc/086b,0.05,ready,
@@ -2321,7 +2321,7 @@ lake_worth_icw-8722669-usa-noaa,Lake_Worth_Icw,United States,noaa,true,false,us/
 lake_worth_pier-8722670-usa-noaa,Lake_Worth_Pier,United States,noaa,true,false,us/lake-worth-pier,true,1970-04-15,2025-06-30,noaa/8722670,coops,coops/8722670,0,ready,
 lakeport_mi-9075002-usa-noaa,Lakeport_Mi,United States,noaa,true,true,us/lakeport,true,1970-01-01,2025-07-01,noaa/9075002,coops,coops/9075002,0,ready,
 lakes_entrance_inner_bullock_island-6057a-aus-bom,Lakes_Entrance_Inner_Bullock_Island,Australia,bom,true,true,au/lakes-entrance-inner-bullock-island,true,1974-02-07,2022-12-31,,bom,,,license,BOM license not stated
-lamena-191-fra-refmar,Lamena,France,refmar,true,true,fr/lamena,true,1975-02-04,2015-12-29,,refmar,,,planned,
+lamena-191-fra-refmar,Lamena,France,refmar,true,true,fr/lamena,true,1975-02-04,2015-12-29,,refmar,refmar/191,,planned,
 lamenatg_60minute-lam-fra-cmems,LamenaTG_60minute,France,cmems,true,false,fr/lamena,false,1975-02-04,2015-12-29,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 lameshur_bay-9751381-usa-noaa,Lameshur_Bay,United States,noaa,true,false,vi/lameshur-bay,true,2006-08-03,2025-06-30,noaa/9751381,coops,coops/9751381,0,ready,
 lameshur_bay_vi-214a-usa-uhslc_rq,Lameshur_Bay_VI,United States,uhslc_rq,true,false,vi/lameshur-bay,true,2006-08-03,2022-12-31,noaa/9751381,coops,coops/9751381,0.19,ready,UHSLC relay of noaa/9751381
@@ -2373,15 +2373,15 @@ lazarocardenas_nivelcbs-15-mex-unam,LazaroCardenas_NivelCBS,Mexico,unam,true,fal
 lazarocardenas_nivelpls-15-mex-unam,LazaroCardenas_NivelPLS,Mexico,unam,true,false,mx/lazaro-cardenas-nivel-pls,true,2021-04-01,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
 lazarocardenas_radar-15-mex-unam,LazaroCardenas_Radar,Mexico,unam,true,false,mx/lazaro-cardenas-radar,true,2021-04-08,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
 lbeckbauhof-9620090-deu-wsv,Lbeckbauhof,Germany,wsv,true,true,de/lubeck-bauhof,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9620090,0,ready,history needs a PEGELONLINE backfill
-le_conquet-152-fra-refmar,Le_Conquet,France,refmar,true,true,fr/le-conquet,true,1970-12-22,2025-03-31,,refmar,,,planned,
-le_crouesty-185-fra-refmar,Le_Crouesty,France,refmar,true,true,fr/le-crouesty,true,1996-03-15,2025-03-31,,refmar,,,planned,
-le_havre-4-fra-refmar,Le_Havre,France,refmar,true,true,fr/le-havre,true,1938-01-04,2024-12-31,,refmar,,,planned,
-le_marquis-669-fra-refmar,Le_Marquis,France,refmar,true,true,fr/le-marquis,true,2006-05-04,2015-12-31,,refmar,,,planned,
-le_pellerin-398-fra-refmar,Le_Pellerin,France,refmar,true,true,fr/le-pellerin,true,1986-01-01,2021-06-30,,refmar,,,planned,
-le_precheur-833-fra-refmar,Le_Precheur,France,refmar,true,true,fr/le-precheur,true,2010-01-01,2011-08-07,,refmar,,,planned,
-le_robert-224-fra-refmar,Le_Robert,France,refmar,true,true,fr/le-robert,true,1976-12-13,1984-12-31,,refmar,,,planned,
+le_conquet-152-fra-refmar,Le_Conquet,France,refmar,true,true,fr/le-conquet,true,1970-12-22,2025-03-31,,refmar,refmar/152,,planned,
+le_crouesty-185-fra-refmar,Le_Crouesty,France,refmar,true,true,fr/le-crouesty,true,1996-03-15,2025-03-31,,refmar,refmar/185,,planned,
+le_havre-4-fra-refmar,Le_Havre,France,refmar,true,true,fr/le-havre,true,1938-01-04,2024-12-31,,refmar,refmar/4,,planned,
+le_marquis-669-fra-refmar,Le_Marquis,France,refmar,true,true,fr/le-marquis,true,2006-05-04,2015-12-31,,refmar,refmar/669,,planned,
+le_pellerin-398-fra-refmar,Le_Pellerin,France,refmar,true,true,fr/le-pellerin,true,1986-01-01,2021-06-30,,refmar,refmar/398,,planned,
+le_precheur-833-fra-refmar,Le_Precheur,France,refmar,true,true,fr/le-precheur,true,2010-01-01,2011-08-07,,refmar,refmar/833,,planned,
+le_robert-224-fra-refmar,Le_Robert,France,refmar,true,true,fr/le-robert,true,1976-12-13,1984-12-31,,refmar,refmar/224,,planned,
 le_robert-270a-fra-uhslc_rq,Le_Robert,France,uhslc_rq,true,true,fr/le-robert-ticon-le-robert-270a-fra-uhslc-rq,true,1976-12-13,1984-12-31,,uhslc,uhslc/270a,0.05,ready,
-leava-501-fra-refmar,Leava,France,refmar,true,true,fr/leava,true,1986-07-11,2024-10-22,,refmar,,,planned,
+leava-501-fra-refmar,Leava,France,refmar,true,true,fr/leava,true,1986-07-11,2024-10-22,,refmar,refmar/501,,planned,
 leava_futuna_island-453-fra-uhslc_fd,Leava_Futuna_Island,France,uhslc_fd,true,true,fr/leava-futuna-island,true,2019-04-15,2024-12-31,,uhslc,uhslc/453,0,ready,
 leavatg_60minute-lea-fra-cmems,LeavaTG_60minute,France,cmems,true,false,fr/leava,false,1986-07-11,2024-10-22,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 lebrusctg_10minute-leb-fra-cmems,LeBruscTG_10minute,France,cmems,true,true,fr/le-brusc,false,2016-07-18,2019-04-22,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -2409,7 +2409,7 @@ lerwick-293-gbr-uhslc_fd,Lerwick,United Kingdom,uhslc_fd,true,false,gb/lerwick,t
 lerwick-293a-gbr-uhslc_rq,Lerwick,United Kingdom,uhslc_rq,true,false,gb/lerwick,true,1959-01-01,2016-11-27,,uhslc,uhslc/293,0,restricted,The contributor's terms bar commercial use
 lerwick-ler-gbr-bodc,Lerwick,United Kingdom,bodc,true,true,gb/lerwick-scotland,true,1959-01-01,2025-05-31,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 lerwick-ler-gbr-cmems,Lerwick,United Kingdom,cmems,true,false,gb/lerwick-scotland,false,1990-01-01,2025-06-30,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
-les_sables_d_olonne-62-fra-refmar,Les_Sables_D_Olonne,France,refmar,true,true,fr/les-sables-d-olonne,true,1965-07-06,2025-03-31,,refmar,,,planned,
+les_sables_d_olonne-62-fra-refmar,Les_Sables_D_Olonne,France,refmar,true,true,fr/les-sables-d-olonne,true,1965-07-06,2025-03-31,,refmar,refmar/62,,planned,
 lessablesdolonnetg_60minute-les-fra-cmems,LesSablesDOlonneTG_60minute,France,cmems,true,false,fr/les-sables-d-olonne,false,1965-07-06,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 leuchtturmalteweser-9460040-deu-wsv,Leuchtturmalteweser,Germany,wsv,true,true,de/leuchtturmalteweser,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460040,0.19,ready,history needs a PEGELONLINE backfill
 lewes-8557380-usa-noaa,Lewes,United States,noaa,true,false,us/lewes,true,1919-02-01,2025-06-30,noaa/8557380,coops,coops/8557380,0.01,ready,
@@ -2425,7 +2425,7 @@ lichteilandgoeree1tg-lic-nld-cmems,LichteilandGoeree1TG,Netherlands,cmems,true,f
 lichteilandgoeree2tg-lic-nld-cmems,LichteilandGoeree2TG,Netherlands,cmems,true,false,nl/lichteiland-goeree,false,2021-09-13,2025-06-30,,rws,rws/goeree.lichteiland,0.13,ready,CMEMS record of a gauge the national feed publishes
 lielupe-lie-lva-cmems,Lielupe,Latvia,cmems,true,false,lv/lielupe,false,2020-11-25,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
 liepaja-lie-lva-cmems,Liepaja,Latvia,cmems,true,false,lv/liepaja,false,2020-11-25,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
-lifou-109-fra-refmar,Lifou,France,refmar,true,true,fr/lifou,true,1969-09-08,2024-12-31,,refmar,,,planned,
+lifou-109-fra-refmar,Lifou,France,refmar,true,true,fr/lifou,true,1969-09-08,2024-12-31,,refmar,refmar/109,,planned,
 lifoutg_60minute-lif-fra-cmems,LifouTG_60minute,France,cmems,true,false,fr/lifou,false,1969-09-08,2024-12-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 lile_aux_grues-3180-can-meds,Lile_Aux_Grues,Canada,meds,true,true,ca/l-isle-aux-grues,true,1967-05-17,2010-07-01,,chs,,,restricted,CHS license bars commercial derivatives
 lime_tree_bay-9751401-usa-noaa,Lime_Tree_Bay,United States,noaa,true,false,vi/lime-tree-bay,true,1982-02-02,2025-06-30,noaa/9751401,coops,coops/9751401,0,ready,
@@ -2567,7 +2567,7 @@ majuro-005a-mhl-uhslc_rq,Majuro,Marshall Islands,uhslc_rq,true,false,mh/majuro,t
 majuro-005b-mhl-uhslc_rq,Majuro,Marshall Islands,uhslc_rq,true,false,mh/majuro,true,1993-05-14,2021-12-31,,uhslc,uhslc/005,0.05,restricted,The contributor's terms bar commercial use
 majuro-67680-mhl-bom,Majuro,Marshall Islands,bom,true,false,mh/majuro-ticon-majuro-67680-mhl-bom,true,1993-05-14,2019-12-31,,bom,,,license,BOM license not stated
 makemo-454-pyf-uhslc_fd,Makemo,French Polynesia,uhslc_fd,true,true,pf/makemo,true,2019-01-01,2025-06-30,,uhslc,uhslc/454,0,ready,
-makemo-586-fra-refmar,Makemo,France,refmar,true,true,fr/makemo-france,true,1990-06-27,2021-04-08,,refmar,,,planned,
+makemo-586-fra-refmar,Makemo,France,refmar,true,true,fr/makemo-france,true,1990-06-27,2021-04-08,,refmar,refmar/586,,planned,
 makemotg_60minute-mak-fra-cmems,MakemoTG_60minute,France,cmems,true,false,fr/makemo-france,false,1990-06-27,2021-04-08,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 makurazaki-ma43-jpn-jodc_jma,Makurazaki,Japan,jodc_jma,true,false,jp/makurazaki,true,1965-06-30,2023-12-31,jma/MK,jma,jma/MK,,license,JODC relay of jma/MK
 malaga-mala-esp-ieo,Malaga,Spain,ieo,true,true,es/malaga,true,1944-01-01,2012-12-31,,redmar,,,license,
@@ -2625,7 +2625,7 @@ mar_del_plata-729a-arg-uhslc_rq,Mar_del_Plata,Argentina,uhslc_rq,true,false,ar/m
 mar_del_plata-729b-arg-uhslc_rq,Mar_del_Plata,Argentina,uhslc_rq,true,false,ar/mar-del-plata,true,2010-03-24,2018-12-31,,uhslc,uhslc/729,3.89,ready,
 marblehead_oh-9063079-usa-noaa,Marblehead_Oh,United States,noaa,true,true,us/marblehead,true,1970-01-01,2025-07-01,noaa/9063079,coops,coops/9063079,0,ready,
 marcus_hook-8540433-usa-noaa,Marcus_Hook,United States,noaa,true,false,us/marcus-hook,true,1981-09-10,2025-06-30,noaa/8540433,coops,coops/8540433,0.02,ready,
-mare-418-fra-refmar,Mare,France,refmar,true,true,fr/mare,true,1982-10-26,2025-03-31,,refmar,,,planned,
+mare-418-fra-refmar,Mare,France,refmar,true,true,fr/mare,true,1982-10-26,2025-03-31,,refmar,refmar/418,,planned,
 mare_island-9415218-usa-noaa,Mare_Island,United States,noaa,true,false,us/mare-island,true,1996-06-26,2012-10-28,noaa/9415218,coops,coops/9415218,0,ready,
 mare_island_strait-9415165-usa-noaa,Mare_Island_Strait,United States,noaa,true,false,us/vallejo,true,1977-04-05,1978-10-17,noaa/9415165,coops,coops/9415165,0,ready,
 maretg_60minute-mar-fra-cmems,MareTG_60minute,France,cmems,true,false,fr/mare,false,1982-10-26,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -2635,10 +2635,10 @@ marina_di_campo-mar-ita-ispra,Marina_di_Campo,Italy,ispra,true,true,it/marina-di
 marintg-mar-esp-cmems,MarinTG,Spain,cmems,true,true,es/marin,false,2010-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 marion_island-920-zaf-uhslc_fd,Marion_Island,South Africa,uhslc_fd,true,true,za/marion-island,true,2007-09-27,2025-05-01,,uhslc,,,restricted,SANHO's data
 marmaris-mar-tur-cmems,MARMARIS,Turkiye,cmems,true,true,tr/marmaris,false,2020-12-06,2022-11-28,,cmems,,,restricted,GESLA lists CMEMS as research only
-marollegat-marlgt-nld-rws,Marollegat,Netherlands,rws,true,true,nl/marollegat,true,1983-01-01,1991-12-31,,rws,rws/marollegat,0,ready,
+marollegat-marlgt-nld-rws,Marollegat,Netherlands,rws,true,true,nl/marollegat,true,1983-01-01,1991-12-31,,rws,rws/marollegat,0.14,ready,
 marquette_cg_mi-9099018-usa-noaa,Marquette_CG_Mi,United States,noaa,true,true,us/marquette-cg,true,1980-01-01,2025-07-01,noaa/9099018,coops,coops/9099018,0,ready,
 marsden_point-398a-nzl-uhslc_rq,Marsden_Point,New Zealand,uhslc_rq,true,false,nz/marsden-point,true,1975-10-20,2019-12-31,linz/079,linz,linz/079,,license,UHSLC relay of linz/079
-marseille-524-fra-refmar,Marseille,France,refmar,true,false,fr/marseille,true,1849-11-01,2025-03-27,,refmar,,,planned,
+marseille-524-fra-refmar,Marseille,France,refmar,true,false,fr/marseille,true,1849-11-01,2025-03-27,,refmar,refmar/524,,planned,
 marseille-824-fra-uhslc_fd,Marseille,France,uhslc_fd,true,true,fr/marseille-ticon-marseille-824-fra-uhslc-fd,true,1849-11-01,2025-06-30,,uhslc,uhslc/824,2.43,ready,
 marseille-824a-fra-uhslc_rq,Marseille,France,uhslc_rq,true,false,fr/marseille-ticon-marseille-824a-fra-uhslc-rq,true,1849-11-01,2018-12-31,,uhslc,uhslc/824,0.04,ready,
 marseilletg_60minute-mar-fra-cmems,MarseilleTG_60minute,France,cmems,true,false,fr/marseille,false,1849-11-01,2025-03-27,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -2655,7 +2655,7 @@ masirah-113-omn-uhslc_fd,Masirah,Oman,uhslc_fd,true,true,om/masirah,true,1996-12
 masirah-113a-omn-uhslc_rq,Masirah,Oman,uhslc_rq,true,false,om/masirah,true,1996-12-07,2018-12-31,,uhslc,uhslc/113,0.05,ready,
 massacre_bay_ak-550a-usa-uhslc_rq,Massacre_Bay_AK,United States,uhslc_rq,true,true,us/massacre-bay,true,1943-01-01,1966-12-31,,uhslc,uhslc/550a,0.03,ready,
 masset_bc-9910-can-meds,Masset_BC,Canada,meds,true,true,ca/masset,true,1963-06-09,2023-12-26,,chs,,,restricted,CHS license bars commercial derivatives
-mata_utu-276-fra-refmar,Mata_Utu,France,refmar,true,true,fr/mata-utu,true,1977-08-13,2024-10-20,,refmar,,,planned,
+mata_utu-276-fra-refmar,Mata_Utu,France,refmar,true,true,fr/mata-utu,true,1977-08-13,2024-10-20,,refmar,refmar/276,,planned,
 matagorda_bay_entrance_channel-8773767-usa-noaa,Matagorda_Bay_Entrance_Channel,United States,noaa,true,false,us/matagorda-bay-entrance-channel,true,2016-06-18,2025-06-30,noaa/8773767,coops,coops/8773767,0,ready,
 matagorda_city-8773146-usa-noaa,Matagorda_City,United States,noaa,true,false,us/east-matagorda,true,2012-11-15,2025-06-30,noaa/8773146,coops,coops/8773146,0.01,ready,
 matapeake-8572770-usa-noaa,Matapeake,United States,noaa,true,false,us/matapeake,true,1979-01-01,1984-08-24,noaa/8572770,coops,coops/8572770,0,ready,
@@ -2755,7 +2755,7 @@ millport-mil-gbr-bodc,Millport,United Kingdom,bodc,true,true,gb/millport,true,19
 millport-mil-gbr-cmems,Millport,United Kingdom,cmems,true,false,gb/millport,false,1990-01-01,2025-06-30,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 milner_bay_groote_eylandt-63511-aus-bom,Milner_Bay_Groote_Eylandt,Australia,bom,true,false,au/milner-bay-groote-eylandt,true,1966-01-01,2022-12-31,,bom,,,license,BOM license not stated
 milwaukee_wi-9087057-usa-noaa,Milwaukee_Wi,United States,noaa,true,true,us/milwaukee,true,1970-01-01,2025-07-01,noaa/9087057,coops,coops/9087057,0,ready,
-mimizan-6144-fra-refmar,Mimizan,France,refmar,true,true,fr/mimizan,true,2015-05-21,2025-03-31,,refmar,,,planned,
+mimizan-6144-fra-refmar,Mimizan,France,refmar,true,true,fr/mimizan,true,2015-05-21,2025-03-31,,refmar,refmar/6144,,planned,
 mimizantg_60minute-mim-fra-cmems,MimizanTG_60minute,France,cmems,true,false,fr/mimizan,false,2015-05-21,2024-12-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 mina_sulman-182a-bhr-uhslc_rq,Mina_Sulman,Bahrain,uhslc_rq,true,true,bh/mina-sulman,true,1979-01-01,2007-11-05,,uhslc,uhslc/182a,0.03,ready,
 minamidaito-ma82-jpn-jodc_jma,Minamidaito,Japan,jodc_jma,true,false,jp/minamidaito,true,2007-03-31,2023-12-31,jma/DJ,jma,jma/DJ,,license,JODC relay of jma/DJ
@@ -2804,7 +2804,7 @@ mombasa-101-ken-uhslc_fd,Mombasa,Kenya,uhslc_fd,true,true,ke/mombasa,true,1986-0
 mombasa-101a-ken-uhslc_rq,Mombasa,Kenya,uhslc_rq,true,false,ke/mombasa,true,1986-06-17,2018-12-31,,uhslc,uhslc/101,0.04,ready,
 mona_is_pr-267a-usa-uhslc_rq,Mona_Is_PR,United States,uhslc_rq,true,false,do/mona-island,true,2006-09-18,2022-12-31,noaa/9759938,coops,coops/9759938,0.08,ready,UHSLC relay of noaa/9759938
 mona_island-9759938-usa-noaa,Mona_Island,United States,noaa,true,false,do/mona-island,true,2006-09-18,2025-06-30,noaa/9759938,coops,coops/9759938,0.08,ready,
-monaco_fontvieille-22-fra-refmar,Monaco_Fontvieille,France,refmar,true,true,fr/monaco-fontvieille,true,1960-01-01,2025-03-31,,refmar,,,planned,
+monaco_fontvieille-22-fra-refmar,Monaco_Fontvieille,France,refmar,true,true,fr/monaco-fontvieille,true,1960-01-01,2025-03-31,,refmar,refmar/22,,planned,
 monacotg_60minute-mon-fra-cmems,MonacoTG_60minute,France,cmems,true,false,fr/monaco,false,1960-01-01,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 monbetsu-hd01-jpn-jodc_jcg,Monbetsu,Japan,jodc_jcg,true,true,jp/monbetsu,true,1955-11-30,2008-03-30,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 monbetsuko-1609-jpn-jodc_pahb,Monbetsuko,Japan,jodc_pahb,true,false,jp/monbetsuko,true,2010-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
@@ -2819,7 +2819,7 @@ monterey_ca-555a-usa-uhslc_rq,Monterey_CA,United States,uhslc_rq,true,false,us/m
 montezuma_slough_at_roaring_river_slough-e33680-usa-cdwr,Montezuma_Slough_At_Roaring_River_Slough,United States,cdwr,true,false,us/montezuma-slough-at-roaring-river-slough,true,1982-10-01,1984-10-01,,cdec,,,license,California CDEC terms to check
 montezuma_slough_national_steel_s64-e33670-usa-cdwr,Montezuma_Slough_National_Steel_S64,United States,cdwr,true,true,us/montezuma-slough-national-steel-s64,true,2005-04-21,2025-05-24,,cdec,,,license,California CDEC terms to check
 montgomeryslough_oakisland-mon-usa-ncdem,MontgomerySlough_OakIsland,United States,ncdem,true,true,us/montgomery-slough-oak-island,true,2022-08-12,2025-05-09,,ncdem,,,license,North Carolina DEM terms to check
-montoir_de_bretagne-6106-fra-refmar,Montoir_De_Bretagne,France,refmar,true,true,fr/montoir-de-bretagne,true,2011-09-09,2021-06-30,,refmar,,,planned,
+montoir_de_bretagne-6106-fra-refmar,Montoir_De_Bretagne,France,refmar,true,true,fr/montoir-de-bretagne,true,2011-09-09,2021-06-30,,refmar,refmar/6106,,planned,
 montoirdebretagnetg_60minute-mon-fra-cmems,MontoirDeBretagneTG_60minute,France,cmems,true,false,fr/montoir-de-bretagne,false,2011-09-09,2021-06-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 montreal_jetee_1-15520-can-meds,Montreal_Jetee_1,Canada,meds,true,false,ca/montreal-jetee-1,true,1913-05-29,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 mooloolaba-59950-aus-bom,Mooloolaba,Australia,bom,true,true,au/mooloolaba,true,1979-07-23,2022-12-31,,bom,,,license,BOM license not stated
@@ -2890,8 +2890,8 @@ nanaimo_harbour_bc-7917-can-meds,Nanaimo_Harbour_BC,Canada,meds,true,true,ca/nan
 nanaoko-0106-jpn-jodc_pahb,Nanaoko,Japan,jodc_pahb,true,true,jp/nanaoko,true,2000-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 nanoose_bay_bc-7930-can-meds,Nanoose_Bay_BC,Canada,meds,true,true,ca/nanoose-bay,true,1976-04-09,1993-09-01,,chs,,,restricted,CHS license bars commercial derivatives
 nansemond_river_at_route_460_at_suffolk_va-2042822-usa-usgs,Nansemond_River_At_Route_460_At_Suffolk_Va,United States,usgs,true,true,us/nansemond-river-at-route-460-at-suffolk-va,true,2015-03-05,2025-04-30,,usgs,usgs/02042822,0,ready,
-nantes_salorges-6143-fra-refmar,Nantes_Salorges,France,refmar,true,true,fr/nantes-salorges,true,2011-06-01,2021-06-29,,refmar,,,planned,
-nantes_usine_brulee-399-fra-refmar,Nantes_Usine_Brulee,France,refmar,true,true,fr/nantes-usine-brulee,true,1987-01-01,2021-06-30,,refmar,,,planned,
+nantes_salorges-6143-fra-refmar,Nantes_Salorges,France,refmar,true,true,fr/nantes-salorges,true,2011-06-01,2021-06-29,,refmar,refmar/6143,,planned,
+nantes_usine_brulee-399-fra-refmar,Nantes_Usine_Brulee,France,refmar,true,true,fr/nantes-usine-brulee,true,1987-01-01,2021-06-30,,refmar,refmar/399,,planned,
 nantessalorgestg_60minute-nan-fra-cmems,NantesSalorgesTG_60minute,France,cmems,true,false,fr/nantes-salorges,false,2011-06-01,2021-06-29,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 nantesusinebruleetg_60minute-nan-fra-cmems,NantesUsineBruleeTG_60minute,France,cmems,true,false,fr/nantes-usine-brulee,false,1987-01-01,2021-06-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 nanticoke_river_at_sharptown_md-1488110-usa-usgs,Nanticoke_River_At_Sharptown_Md,United States,usgs,true,false,us/nanticoke-river-at-sharptown-md,true,2007-10-01,2013-10-01,,usgs,usgs/01488110,0,ready,
@@ -2986,7 +2986,7 @@ newport_tarsaghaun-nta-irl-mi_r,Newport_Tarsaghaun,Ireland,mi_r,true,false,ie/ne
 newport_yellow_river-nye-irl-mi_r,Newport_Yellow_River,Ireland,mi_r,true,false,ie/newport-yellow-river,true,2018-11-24,2025-07-23,,marine-institute,,,planned,
 newriver_gumbranch-new-usa-ncdem,NewRiver_GumBranch,United States,ncdem,true,false,us/new-river-gum-branch,true,2015-03-13,2025-05-12,,ncdem,,,license,North Carolina DEM terms to check
 nezugaseki-gs07-jpn-jodc_giaj,Nezugaseki,Japan,jodc_giaj,true,true,jp/nezugaseki,true,1955-02-22,2023-12-16,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
-nice-339-fra-refmar,Nice,France,refmar,true,true,fr/nice,true,1981-07-04,2025-03-31,,refmar,,,planned,
+nice-339-fra-refmar,Nice,France,refmar,true,true,fr/nice,true,1981-07-04,2025-03-31,,refmar,refmar/339,,planned,
 nicetg_60minute-nic-fra-cmems,NiceTG_60minute,France,cmems,true,false,fr/nice,false,1981-07-04,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 niederblockland-4940020-deu-wsv,Niederblockland,Germany,wsv,true,true,de/niederblockland,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940020,0.18,ready,history needs a PEGELONLINE backfill
 nieuwe_statenzijl-nieuwstzl-nld-rws_hist,Nieuwe_Statenzijl,Netherlands,rws_hist,true,false,nl/nieuwe-statenzijl,true,1979-01-01,2018-09-07,,rws,rws/nieuwestatenzijl.dollard,0,ready,
@@ -3055,11 +3055,11 @@ nueces_rv_nr_odem_tx-8211502-usa-usgs,Nueces_Rv_Nr_Odem_Tx,United States,usgs,tr
 nuku_alofa-038a-ton-uhslc_rq,Nuku_alofa,Tonga,uhslc_rq,true,true,to/nuku-alofa,true,1990-06-20,2021-12-31,,uhslc,uhslc/038,0,restricted,The contributor's terms bar commercial use
 nuku_hiva-031-fra-uhslc_fd,Nuku_Hiva,France,uhslc_fd,true,true,fr/nuku-hiva,true,1982-04-01,2025-06-30,,uhslc,uhslc/031,2.28,ready,
 nuku_hiva-031a-fra-uhslc_rq,Nuku_Hiva,France,uhslc_rq,true,false,fr/nuku-hiva,true,1982-04-01,2018-12-31,,uhslc,uhslc/031,2.28,ready,
-nuku_hiva-795-fra-refmar,Nuku_Hiva,France,refmar,true,true,fr/nuku-hiva-marquesas-islands,true,1959-07-01,2007-05-18,,refmar,,,planned,
+nuku_hiva-795-fra-refmar,Nuku_Hiva,France,refmar,true,true,fr/nuku-hiva-marquesas-islands,true,1959-07-01,2007-05-18,,refmar,refmar/795,,planned,
 nukualofa-038-ton-uhslc_fd,Nukualofa,Tonga,uhslc_fd,true,true,to/nukualofa-tukutonga-tongatapu,true,1990-06-20,2025-05-31,,uhslc,uhslc/038,1.56,restricted,The contributor's terms bar commercial use
 nukualofa-66600-ton-bom,Nukualofa,Tonga,bom,true,false,to/nukualofa-popua-tongatapu,true,1993-01-21,2022-12-31,,bom,,,license,BOM license not stated
 nukuhivatg_60minute-nuk-fra-cmems,NukuHivaTG_60minute,France,cmems,true,false,fr/nuku-hiva-marquesas-islands,false,1959-07-01,2007-05-18,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-numbo_noumea-659-fra-refmar,Numbo_Noumea,France,refmar,true,false,fr/numbo-noumea,true,2001-07-29,2025-03-31,,refmar,,,planned,
+numbo_noumea-659-fra-refmar,Numbo_Noumea,France,refmar,true,false,fr/numbo-noumea,true,2001-07-29,2025-03-31,,refmar,refmar/659,,planned,
 nut_island-8444525-usa-noaa,Nut_Island,United States,noaa,true,false,us/nut-island,true,2000-08-25,2001-11-05,noaa/8444525,coops,coops/8444525,0,ready,
 nuuk_godthaab-820-dnk-uhslc_fd,Nuuk_Godthaab,Denmark,uhslc_fd,true,true,gl/nuuk-godthaab,true,2014-07-04,2025-05-31,,uhslc,uhslc/820,0,ready,
 ny_alesund-nya-nor-nhs,Ny_alesund,Norway,nhs,true,false,no/ny-alesund,true,1976-08-31,2025-07-28,kartverket/NYA,kartverket,kartverket/NYA,,planned,
@@ -3172,14 +3172,14 @@ oude_westereems-oudwtes-nld-rws_hist,Oude_Westereems,Netherlands,rws_hist,true,f
 oudeschild-oudsd-nld-rws,Oudeschild,Netherlands,rws,true,true,nl/oudeschild,true,1971-01-01,2022-12-30,,rws,rws/texel.oudeschild,0,ready,
 oudeschild-oudsd-nld-rws_hist,Oudeschild,Netherlands,rws_hist,true,false,nl/oudeschild,true,1971-01-01,2018-09-07,,rws,rws/texel.oudeschild,0,ready,
 oudeschildtg-oud-nld-cmems,OudeSchildTG,Netherlands,cmems,true,false,nl/oude-schild,false,2014-08-01,2025-05-31,,rws,rws/texel.oudeschild,0.13,ready,CMEMS record of a gauge the national feed publishes
-ouinne-334-fra-refmar,Ouinne,France,refmar,true,true,fr/ouinne,true,1981-08-30,2025-03-31,,refmar,,,planned,
+ouinne-334-fra-refmar,Ouinne,France,refmar,true,true,fr/ouinne,true,1981-08-30,2025-03-31,,refmar,refmar/334,,planned,
 ouinnetg_60minute-oui-fra-cmems,OuinneTG_60minute,France,cmems,true,false,fr/ouinne,false,1981-08-30,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
-ouistreham-311-fra-refmar,Ouistreham,France,refmar,true,true,fr/ouistreham,true,1980-03-14,2025-03-31,,refmar,,,planned,
+ouistreham-311-fra-refmar,Ouistreham,France,refmar,true,true,fr/ouistreham,true,1980-03-14,2025-03-31,,refmar,refmar/311,,planned,
 ouistrehamtg_60minute-oui-fra-cmems,OuistrehamTG_60minute,France,cmems,true,false,fr/ouistreham,false,1980-03-14,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 oulu-oul-fin-cmems,Oulu,Finland,cmems,true,false,fi/oulu,false,1971-01-01,2025-07-01,,fmi,,,license,CMEMS record of a gauge the national feed publishes
 oulu_toppila-134248-fin-fmi,Oulu_Toppila,Finland,fmi,true,true,fi/oulu-toppila,true,1971-01-07,2025-06-02,,fmi,,,license,FMI's sea-level terms not confirmed
 oura-ma47-jpn-jodc_jma,Oura,Japan,jodc_jma,true,false,jp/oura,true,1967-12-31,2023-12-31,jma/OU,jma,jma/OU,,license,JODC relay of jma/OU
-ouvea-380-fra-refmar,Ouvea,France,refmar,true,true,fr/ouvea,true,1981-04-06,2025-03-31,,refmar,,,planned,
+ouvea-380-fra-refmar,Ouvea,France,refmar,true,true,fr/ouvea,true,1981-04-06,2025-03-31,,refmar,refmar/380,,planned,
 ouveatg_60minute-ouv-fra-cmems,OuveaTG_60minute,France,cmems,true,false,fr/ouvea,false,1981-04-06,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 over-5950010-deu-wsv,Over,Germany,wsv,true,true,de/over,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5950010,0,ready,history needs a PEGELONLINE backfill
 owase-ma24-jpn-jodc_jma,Owase,Japan,jodc_jma,true,false,jp/owase,true,1966-11-07,2023-12-31,jma/OW,jma,jma/OW,,license,JODC relay of jma/OW
@@ -3200,7 +3200,7 @@ pago_bay_guam-037a-usa-uhslc_rq,Pago_Bay_Guam,United States,uhslc_rq,true,false,
 pago_pago-056-asm-uhslc_fd,Pago_Pago,American Samoa,uhslc_fd,true,false,as/pago-pago,true,1948-09-08,2025-06-30,,uhslc,uhslc/056,0.05,ready,
 pago_pago-056a-asm-uhslc_rq,Pago_Pago,American Samoa,uhslc_rq,true,false,as/pago-pago,true,1948-09-08,2019-12-31,noaa/1770000,coops,coops/1770000,0.82,ready,UHSLC relay of noaa/1770000
 pago_pago-1770000-usa-noaa,Pago_Pago,United States,noaa,true,false,as/pago-pago,true,1977-12-01,2025-06-30,noaa/1770000,coops,coops/1770000,0.38,ready,
-paimboeuf-6095-fra-refmar,Paimboeuf,France,refmar,true,true,fr/paimboeuf,true,2011-09-01,2021-06-30,,refmar,,,planned,
+paimboeuf-6095-fra-refmar,Paimboeuf,France,refmar,true,true,fr/paimboeuf,true,2011-09-01,2021-06-30,,refmar,refmar/6095,,planned,
 paimboeuftg_60minute-pai-fra-cmems,PaimboeufTG_60minute,France,cmems,true,false,fr/paimboeuf,false,2011-09-01,2021-06-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 paita-678a-per-uhslc_rq,Paita,Peru,uhslc_rq,true,false,pe/paita,true,1981-01-01,1984-08-07,,uhslc,uhslc/678a,0.05,ready,
 paita-678b-per-uhslc_rq,Paita,Peru,uhslc_rq,true,true,pe/paita,true,1988-01-01,2016-12-31,,uhslc,uhslc/678b,0.05,ready,
@@ -3225,7 +3225,7 @@ panama_city_beach-8729210-usa-noaa,Panama_City_Beach,United States,noaa,true,fal
 papeete-015-fra-uhslc_fd,Papeete,France,uhslc_fd,true,true,fr/papeete,true,1975-06-08,2025-06-30,,uhslc,uhslc/015,1.08,ready,
 papeete-015a-fra-uhslc_rq,Papeete,France,uhslc_rq,true,false,fr/papeete,true,1969-05-01,1975-05-31,,uhslc,uhslc/015a,0.05,ready,
 papeete-015b-fra-uhslc_rq,Papeete,France,uhslc_rq,true,false,fr/papeete,true,1975-06-08,2018-12-31,,uhslc,uhslc/015,1.08,ready,
-papeete-383-fra-refmar,Papeete,France,refmar,true,false,fr/papeete-iles-du-vent,true,1975-06-09,2023-10-06,,refmar,,,planned,
+papeete-383-fra-refmar,Papeete,France,refmar,true,false,fr/papeete-iles-du-vent,true,1975-06-09,2023-10-06,,refmar,refmar/383,,planned,
 papeetetg_60minute-pap-fra-cmems,PapeeteTG_60minute,France,cmems,true,false,fr/papeete-iles-du-vent,false,1975-07-27,2023-10-06,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 papeeteuhslctg_01minute-pap-fra-cmems,PapeeteUhslcTG_01minute,France,cmems,true,false,fr/papeete-uhslc,false,2008-06-23,2024-03-18,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 papenburg-3790010-deu-wsv,Papenburg,Germany,wsv,true,true,de/papenburg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3790010,0.18,ready,history needs a PEGELONLINE backfill
@@ -3247,8 +3247,8 @@ patchogue-8514322-usa-noaa,Patchogue,United States,noaa,true,false,us/patchogue,
 patonga-212440-aus-bom,Patonga,Australia,bom,true,true,au/patonga,true,1992-06-03,2023-12-31,,bom,,,license,BOM license not stated
 patos_island_wa-7505-can-meds,Patos_Island_Wa,Canada,meds,true,true,us/patos-island-wa,true,1967-12-07,1969-06-01,,chs,,,restricted,CHS license bars commercial derivatives
 patricia_bay_bc-7277-can-meds,Patricia_Bay_BC,Canada,meds,true,true,ca/patricia-bay,true,1966-07-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
-pauillac-192-fra-refmar,Pauillac,France,refmar,true,true,fr/pauillac,true,1975-02-04,1996-05-18,,refmar,,,planned,
-pauillac_trompeloup-779-fra-refmar,Pauillac_Trompeloup,France,refmar,true,true,fr/pauillac-trompeloup,true,2006-04-19,2015-12-30,,refmar,,,planned,
+pauillac-192-fra-refmar,Pauillac,France,refmar,true,true,fr/pauillac,true,1975-02-04,1996-05-18,,refmar,refmar/192,,planned,
+pauillac_trompeloup-779-fra-refmar,Pauillac_Trompeloup,France,refmar,true,true,fr/pauillac-trompeloup,true,2006-04-19,2015-12-30,,refmar,refmar/779,,planned,
 pauillactrompelouptg_60minute-pau-fra-cmems,PauillacTrompeloupTG_60minute,France,cmems,true,false,fr/pauillac-trompeloup,false,2006-04-19,2015-12-30,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 pawleys_inlet-8662071-usa-noaa,Pawleys_Inlet,United States,noaa,true,false,us/ward-s-dock,true,1975-07-18,1976-12-21,noaa/8662071,coops,coops/8662071,0,ready,
 pawleys_island_pier-8662006-usa-noaa,Pawleys_Island_Pier,United States,noaa,true,false,us/pawleys-island-pier,true,1975-08-07,1977-02-15,noaa/8662006,coops,coops/8662006,0,ready,
@@ -3332,13 +3332,13 @@ point_petre_ontario-13750-can-meds,Point_Petre_Ontario,Canada,meds,true,false,ca
 point_reyes-9415020-usa-noaa,Point_Reyes,United States,noaa,true,false,us/point-reyes,true,1973-11-01,2025-06-30,noaa/9415020,coops,coops/9415020,0,ready,
 point_richards_corio_bay-60757-aus-bom,Point_Richards_Corio_Bay,Australia,bom,true,true,au/point-richards-corio-bay,true,1999-02-13,2022-12-31,,bom,,,license,BOM license not stated
 point_tupper-576-can-meds,Point_Tupper,Canada,meds,true,true,ca/point-tupper,true,1971-01-01,1992-04-08,,chs,,,restricted,CHS license bars commercial derivatives
-pointe_a_pitre-125-fra-refmar,Pointe_A_Pitre,France,refmar,true,false,fr/pointe-a-pitre,true,1983-01-04,2025-03-31,,refmar,,,planned,
+pointe_a_pitre-125-fra-refmar,Pointe_A_Pitre,France,refmar,true,false,fr/pointe-a-pitre,true,1983-01-04,2025-03-31,,refmar,refmar/125,,planned,
 pointe_au_pere-2980-can-meds,Pointe_Au_Pere,Canada,meds,true,true,ca/pointe-au-pere,true,1897-01-25,1984-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 pointe_au_pic-3045-can-meds,Pointe_Au_Pic,Canada,meds,true,true,ca/pointe-au-pic,true,1965-09-12,2007-06-20,,chs,,,restricted,CHS license bars commercial derivatives
 pointe_aux_trembles-15630-can-meds,Pointe_Aux_Trembles,Canada,meds,true,false,ca/pointe-aux-trembles,true,1935-08-01,1997-06-09,,chs,,,restricted,CHS license bars commercial derivatives
 pointe_claire-15330-can-meds,Pointe_Claire,Canada,meds,true,false,ca/pointe-claire,true,1915-05-24,2021-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 pointe_des_cascades-15220-can-meds,Pointe_Des_Cascades,Canada,meds,true,false,ca/pointe-des-cascades,true,1957-01-01,2021-01-01,,chs,,,restricted,CHS license bars commercial derivatives
-pointe_des_galets-110-fra-refmar,Pointe_Des_Galets,France,refmar,true,false,fr/pointe-des-galets,true,1967-02-27,2025-03-31,,refmar,,,planned,
+pointe_des_galets-110-fra-refmar,Pointe_Des_Galets,France,refmar,true,false,fr/pointe-des-galets,true,1967-02-27,2025-03-31,,refmar,refmar/110,,planned,
 pointe_noire-234-cog-uhslc_fd,Pointe_Noire,Republic of the Congo,uhslc_fd,true,false,cg/pointe-noire,true,2008-09-10,2014-06-29,,uhslc,uhslc/234,2.62,ready,
 pointe_noire-234a-cog-uhslc_rq,Pointe_Noire,Republic of the Congo,uhslc_rq,true,false,cg/pointe-noire,true,1980-01-01,1988-09-29,,uhslc,uhslc/234a,0,ready,
 pointe_noire-234b-cog-uhslc_rq,Pointe_Noire,Republic of the Congo,uhslc_rq,true,true,cg/pointe-noire-ticon-pointe-noire-234b-cog-uhslc-rq,true,2008-09-10,2015-04-18,,uhslc,uhslc/234,0.05,ready,
@@ -3351,7 +3351,7 @@ pomorie-pom-bgr-cmems,Pomorie,Bulgaria,cmems,true,true,bg/pomorie,false,2011-03-
 ponce_de_leon_inlet_south-8721147-usa-noaa,Ponce_De_Leon_Inlet_South,United States,noaa,true,false,us/ponce-de-leon-inlet,true,2006-03-17,2025-06-30,noaa/8721147,coops,coops/8721147,0.08,ready,
 ponquogue_point-8512451-usa-noaa,Ponquogue_Point,United States,noaa,true,false,us/ponquoque-point,true,1989-06-28,2014-03-01,noaa/8512451,coops,coops/8512451,0,ready,
 pont_champlain-15497-can-meds,Pont_Champlain,Canada,meds,true,false,ca/pont-champlain,true,1964-01-01,1969-12-12,,chs,,,restricted,CHS license bars commercial derivatives
-pont_du_brault-6269-fra-refmar,Pont_Du_Brault,France,refmar,true,true,fr/pont-du-brault,true,2013-12-10,2015-02-16,,refmar,,,planned,
+pont_du_brault-6269-fra-refmar,Pont_Du_Brault,France,refmar,true,true,fr/pont-du-brault,true,2013-12-10,2015-02-16,,refmar,refmar/6269,,planned,
 ponta_delgada-211-prt-uhslc_fd,Ponta_Delgada,Portugal,uhslc_fd,true,true,pt/ponta-delgada,true,1978-05-19,2025-06-30,,uhslc,uhslc/211,0.16,ready,
 ponta_delgada-211a-prt-uhslc_rq,Ponta_Delgada,Portugal,uhslc_rq,true,false,pt/ponta-delgada,true,1978-05-19,2018-12-31,,uhslc,uhslc/211,0.09,ready,
 pontdubraulttg_60minute-pon-fra-cmems,PontDuBraultTG_60minute,France,cmems,true,false,fr/pont-du-brault,false,2013-12-10,2015-02-16,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -3380,10 +3380,10 @@ port_arthur-8770475-usa-noaa,Port_Arthur,United States,noaa,true,false,us/port-a
 port_aux_basques-273-can-uhslc_fd,Port_aux_basques,Canada,uhslc_fd,true,true,ca/port-aux-basques,true,1997-03-01,2023-06-01,,uhslc,uhslc/273,0.04,ready,
 port_aux_basques-665-can-meds,Port_Aux_Basques,Canada,meds,true,false,ca/port-aux-basques,true,1935-08-12,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 port_blair-908-ind-uhslc_fd,Port_Blair,India,uhslc_fd,true,true,in/port-blair,true,2022-11-01,2025-06-30,,uhslc,uhslc/908,0,ready,
-port_bloc-15-fra-refmar,Port_Bloc,France,refmar,true,true,fr/port-bloc,true,1959-04-19,2025-03-31,,refmar,,,planned,
-port_bloc_gpm-297-fra-refmar,Port_Bloc_Gpm,France,refmar,true,false,fr/port-bloc-gpm,true,1941-05-18,2015-12-30,,refmar,,,planned,
+port_bloc-15-fra-refmar,Port_Bloc,France,refmar,true,true,fr/port-bloc,true,1959-04-19,2025-03-31,,refmar,refmar/15,,planned,
+port_bloc_gpm-297-fra-refmar,Port_Bloc_Gpm,France,refmar,true,false,fr/port-bloc-gpm,true,1941-05-18,2015-12-30,,refmar,refmar/297,,planned,
 port_bolivar-8771328-usa-noaa,Port_Bolivar,United States,noaa,true,false,us/port-bolivar,true,1996-01-01,2001-05-29,noaa/8771328,coops,coops/8771328,0,ready,
-port_camargue-804-fra-refmar,Port_Camargue,France,refmar,true,true,fr/port-camargue,true,2009-08-22,2012-12-31,,refmar,,,planned,
+port_camargue-804-fra-refmar,Port_Camargue,France,refmar,true,true,fr/port-camargue,true,2009-08-22,2012-12-31,,refmar,refmar/804,,planned,
 port_canaveral_fl-774a-usa-uhslc_rq,Port_Canaveral_FL,United States,uhslc_rq,true,false,us/port-canaveral-trident-pier,true,1994-10-21,2021-12-31,noaa/8721604,coops,coops/8721604,0.09,ready,UHSLC relay of noaa/8721604
 port_chalmers-669a-nzl-uhslc_rq,Port_Chalmers,New Zealand,uhslc_rq,true,false,nz/port-chalmers-otago,true,1985-06-11,2019-12-30,linz/030,linz,linz/030,,license,UHSLC relay of linz/030
 port_chalmers-otat-nzl-ttw,Port_Chalmers,New Zealand,ttw,true,true,nz/port-chalmers-ticon-port-chalmers-otat-nzl-ttw,true,2010-03-01,2024-12-31,,ttw,,,license,Terms not reviewed
@@ -3397,7 +3397,7 @@ port_elizabeth-184a-zaf-uhslc_rq,Port_Elizabeth,South Africa,uhslc_rq,true,false
 port_elizabeth-8530882-usa-noaa,Port_Elizabeth,United States,noaa,true,false,us/port-elizabeth,true,1979-08-01,1982-05-27,noaa/8530882,coops,coops/8530882,0,ready,
 port_ellen_islay-isl-gbr-bodc,Port_Ellen_Islay,United Kingdom,bodc,true,true,gb/port-ellen-islay,true,1979-06-28,2011-02-07,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
 port_eri_isle_of_man-iom-gbr-bodc,Port_Eri_Isle_of_Man,United Kingdom,bodc,true,true,gb/port-eri-isle-of-man,true,1992-05-20,2025-05-31,,bodc,,,restricted,BODC needs permission for commercial use; match to UK EA's own gauge when that adapter exists
-port_ferreol-847-fra-refmar,Port_Ferreol,France,refmar,true,true,fr/port-ferreol,true,2012-03-29,2025-03-31,,refmar,,,planned,
+port_ferreol-847-fra-refmar,Port_Ferreol,France,refmar,true,true,fr/port-ferreol,true,2012-03-29,2025-03-31,,refmar,refmar/847,,planned,
 port_fourchon-8762075-usa-noaa,Port_Fourchon,United States,noaa,true,false,us/port-fourchon,true,2003-07-21,2025-06-30,noaa/8762075,coops,coops/8762075,0.01,ready,
 port_giles-61685-aus-bom,Port_Giles,Australia,bom,true,true,au/port-giles,true,1981-12-31,2022-12-31,,bom,,,license,BOM license not stated
 port_hardy_bc-8408-can-meds,Port_Hardy_BC,Canada,meds,true,true,ca/port-hardy,true,1964-06-04,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3412,7 +3412,7 @@ port_isabel_tx-772a-usa-uhslc_rq,Port_Isabel_TX,United States,uhslc_rq,true,fals
 port_jefferson-8514560-usa-noaa,Port_Jefferson,United States,noaa,true,false,us/port-jefferson,true,1957-09-17,1992-10-01,noaa/8514560,coops,coops/8514560,0,ready,
 port_kembla-342a-aus-uhslc_rq,Port_Kembla,Australia,uhslc_rq,true,true,au/port-kembla,true,1991-07-05,2021-12-31,,uhslc,uhslc/342a,0.04,restricted,The contributor's terms bar commercial use
 port_kembla-60420-aus-bom,Port_Kembla,Australia,bom,true,false,au/port-kembla-new-south-wales,true,1957-11-13,2022-12-31,,bom,,,license,BOM license not stated
-port_la_nouvelle-803-fra-refmar,Port_La_Nouvelle,France,refmar,true,true,fr/port-la-nouvelle,true,2009-08-22,2025-03-31,,refmar,,,planned,
+port_la_nouvelle-803-fra-refmar,Port_La_Nouvelle,France,refmar,true,true,fr/port-la-nouvelle,true,2009-08-22,2025-03-31,,refmar,refmar/803,,planned,
 port_lambton_ontario-11950-can-meds,Port_Lambton_Ontario,Canada,meds,true,false,ca/port-lambton-ontario,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 port_lavaca-8773259-usa-noaa,Port_Lavaca,United States,noaa,true,false,us/port-lavaca,true,2015-06-01,2025-06-30,noaa/8773259,coops,coops/8773259,0,ready,
 port_lincoln-61900-aus-bom,Port_Lincoln,Australia,bom,true,true,au/port-lincoln,true,1964-06-05,2022-12-31,,bom,,,license,BOM license not stated
@@ -3453,8 +3453,8 @@ port_stanley_ontario-12400-can-meds,Port_Stanley_Ontario,Canada,meds,true,true,c
 port_stanvac-100a-aus-uhslc_rq,Port_Stanvac,Australia,uhslc_rq,true,true,au/port-stanvac,true,1992-06-23,2010-11-30,,uhslc,uhslc/100a,0.04,restricted,The contributor's terms bar commercial use
 port_stanvac-61583-aus-bom,Port_Stanvac,Australia,bom,true,false,au/port-stanvac-south-australia,true,1980-02-28,2010-11-30,,bom,,,license,BOM license not stated
 port_townsend-9444900-usa-noaa,Port_Townsend,United States,noaa,true,false,us/port-townsend,true,1972-01-19,2025-06-30,noaa/9444900,coops,coops/9444900,0.19,ready,
-port_tudy-71-fra-refmar,Port_Tudy,France,refmar,true,true,fr/port-tudy,true,1966-08-11,2025-03-31,,refmar,,,planned,
-port_vendres-75-fra-refmar,Port_Vendres,France,refmar,true,true,fr/port-vendres,true,1981-12-29,2025-03-31,,refmar,,,planned,
+port_tudy-71-fra-refmar,Port_Tudy,France,refmar,true,true,fr/port-tudy,true,1966-08-11,2025-03-31,,refmar,refmar/71,,planned,
+port_vendres-75-fra-refmar,Port_Vendres,France,refmar,true,true,fr/port-vendres,true,1981-12-29,2025-03-31,,refmar,refmar/75,,planned,
 port_victoria-111a-syc-uhslc_rq,Port_Victoria,Seychelles,uhslc_rq,true,true,sc/port-victoria,true,1975-06-17,1984-10-15,,uhslc,uhslc/111a,0.05,ready,
 port_victoria-111b-syc-uhslc_rq,Port_Victoria,Seychelles,uhslc_rq,true,false,sc/port-victoria,true,1986-05-28,1992-12-31,,uhslc,uhslc/111b,0.05,ready,
 port_vila-046-vut-uhslc_fd,Port_Vila,Vanuatu,uhslc_fd,true,true,vu/port-vila,true,1993-01-15,2025-05-31,,uhslc,uhslc/046,0.92,restricted,The contributor's terms bar commercial use
@@ -3598,7 +3598,7 @@ ramsay_island_bc-9746-can-meds,Ramsay_Island_BC,Canada,meds,true,true,ca/ramsay-
 ramspolbrugtg-ram-nld-cmems,RamspolbrugTG,Netherlands,cmems,true,false,nl/ramspolbrug,false,2014-08-01,2025-06-30,,rws,rws/ramspolbrug.ramsdiep,0.2,ready,CMEMS record of a gauge the national feed publishes
 rancocas_creek_at_bridgeboro_nj-1467024-usa-usgs,Rancocas_Creek_At_Bridgeboro_Nj,United States,usgs,true,false,us/rancocas-creek-at-bridgeboro-nj,true,2019-10-01,2025-05-01,,usgs,usgs/01467024,0,ready,
 randers-ran-dnk-cmems,Randers,Denmark,cmems,true,true,dk/randers,false,2011-12-28,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-rangiroa-78-fra-refmar,Rangiroa,France,refmar,true,true,fr/rangiroa,true,1966-09-19,2024-10-20,,refmar,,,planned,
+rangiroa-78-fra-refmar,Rangiroa,France,refmar,true,true,fr/rangiroa,true,1966-09-19,2024-10-20,,refmar,refmar/78,,planned,
 rangiroa_atoll-455-fra-uhslc_fd,Rangiroa_Atoll,France,uhslc_fd,true,false,fr/rangiroa-atoll,true,2019-01-01,2025-06-30,,uhslc,uhslc/455,0,ready,
 rangiroatg_60minute-ran-fra-cmems,RangiroaTG_60minute,France,cmems,true,false,fr/rangiroa,false,1966-09-19,2024-10-20,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rappahannock_bend-8635257-usa-noaa,Rappahannock_Bend,United States,noaa,true,false,us/park-turn,true,2007-01-20,2009-02-12,noaa/8635257,coops,coops/8635257,0,ready,
@@ -3639,7 +3639,7 @@ reykjavik-reyk-isl-icg,Reykjavik,Iceland,icg,true,true,is/reykjavik-capital-regi
 reynolds_channel_at_point_lookout_ny-1310740-usa-usgs,Reynolds_Channel_At_Point_Lookout_Ny,United States,usgs,true,false,us/reynolds-channel-at-point-lookout-ny,true,1997-12-24,2025-05-01,,usgs,usgs/01310740,0.02,ready,
 rhodes_port-rho-grc-cmems,Rhodes_Port,Greece,cmems,true,true,gr/rhodes-port,false,2021-01-01,2022-07-14,,cmems,,,restricted,GESLA lists CMEMS as research only
 ribetg-rib-dnk-cmems,RibeTG,Denmark,cmems,true,true,dk/ribe,false,2015-01-12,2025-06-30,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-richard-150-fra-refmar,Richard,France,refmar,true,true,fr/richard,true,1967-04-05,2015-12-29,,refmar,,,planned,
+richard-150-fra-refmar,Richard,France,refmar,true,true,fr/richard,true,1967-04-05,2015-12-29,,refmar,refmar/150,,planned,
 richards_bay-188-zaf-uhslc_fd,Richards_Bay,South Africa,uhslc_fd,true,true,za/richards-bay,true,1977-06-08,2018-10-31,,uhslc,,,restricted,SANHO's data
 richards_bay-188a-zaf-uhslc_rq,Richards_Bay,South Africa,uhslc_rq,true,false,za/richards-bay,true,1977-06-08,2016-12-29,,uhslc,,,restricted,SANHO's data
 richardson-9449982-usa-noaa,Richardson,United States,noaa,true,false,us/richardson,true,1997-06-05,2000-04-30,noaa/9449982,coops,coops/9449982,0,ready,
@@ -3649,8 +3649,8 @@ richmond_river_locks-8638495-usa-noaa,Richmond_River_Locks,United States,noaa,tr
 rigolets_at_hwy_90_near_slidell_la-301001089442600-usa-usgs,Rigolets_At_Hwy_90_Near_Slidell_La,United States,usgs,true,true,us/rigolets-at-hwy-90-near-slidell-la,true,2007-10-01,2025-05-01,,usgs,usgs/301001089442600,0,ready,
 rikitea-016-fra-uhslc_fd,Rikitea,France,uhslc_fd,true,true,fr/rikitea,true,1969-10-05,2025-04-30,,uhslc,uhslc/016,1.42,ready,
 rikitea-016a-fra-uhslc_rq,Rikitea,France,uhslc_rq,true,false,fr/rikitea,true,1969-10-05,2018-12-31,,uhslc,uhslc/016,1.42,ready,
-rikitea-2969-fra-refmar,Rikitea,France,refmar,true,true,fr/rikitea-tuamotu-gambier-islands,true,2010-01-01,2017-09-04,,refmar,,,planned,
-rikitea_warf-43-fra-refmar,Rikitea_Warf,France,refmar,true,true,fr/rikitea-warf,true,1965-02-28,2024-09-17,,refmar,,,planned,
+rikitea-2969-fra-refmar,Rikitea,France,refmar,true,true,fr/rikitea-tuamotu-gambier-islands,true,2010-01-01,2017-09-04,,refmar,refmar/2969,,planned,
+rikitea_warf-43-fra-refmar,Rikitea_Warf,France,refmar,true,true,fr/rikitea-warf,true,1965-02-28,2024-09-17,,refmar,refmar/43,,planned,
 rikiteatg_60minute-rik-fra-cmems,RikiteaTG_60minute,France,cmems,true,false,fr/rikitea-tuamotu-gambier-islands,false,2010-01-01,2017-09-04,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rikiteawharftg_60minute-rik-fra-cmems,RikiteaWharfTG_60minute,France,cmems,true,false,fr/rikitea-wharf,false,1965-02-28,2024-09-17,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rimouski-2985-can-meds,Rimouski,Canada,meds,true,true,ca/rimouski,true,1984-07-08,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3706,7 +3706,7 @@ rmn_vieste-rmn-ita-cmems,RMN_Vieste,Italy,cmems,true,false,it/vieste,false,1998-
 roanoke_river_at_nc_45_nr_westover_nc-208114150-usa-usgs,Roanoke_River_At_Nc_45_Nr_Westover_Nc,United States,usgs,true,true,us/roanoke-river-at-nc-45-nr-westover-nc,true,2007-10-01,2025-04-30,,usgs,usgs/0208114150,0,ready,
 roaring_river-ror-usa-cdwr,Roaring_River,United States,cdwr,true,true,us/roaring-river,true,1987-01-01,2011-10-07,,cdec,,,license,California CDEC terms to check
 robbensdsteert-9460010-deu-wsv,Robbensdsteert,Germany,wsv,true,true,de/robbensdsteert,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460010,0.19,ready,history needs a PEGELONLINE backfill
-rochefort-118-fra-refmar,Rochefort,France,refmar,true,true,fr/rochefort,true,1993-12-21,2008-09-09,,refmar,,,planned,
+rochefort-118-fra-refmar,Rochefort,France,refmar,true,true,fr/rochefort,true,1993-12-21,2008-09-09,,refmar,refmar/118,,planned,
 rocheforttg_60minute-roc-fra-cmems,RochefortTG_60minute,France,cmems,true,false,fr/rochefort,false,1993-12-21,2008-09-09,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rocher_neptune-3071-can-meds,Rocher_Neptune,Canada,meds,true,true,ca/rocher-de-neptune,true,1998-05-26,2017-11-09,,chs,,,restricted,CHS license bars commercial derivatives
 rochester_ny-9052058-usa-noaa,Rochester_Ny,United States,noaa,true,true,us/rochester,true,1961-03-01,2025-07-01,noaa/9052058,coops,coops/9052058,0,ready,
@@ -3739,7 +3739,7 @@ rorvik-803-nor-uhslc_fd,Rorvik,Norway,uhslc_fd,true,false,no/rorvik,true,1969-08
 rorvik-803a-nor-uhslc_rq,Rorvik,Norway,uhslc_rq,true,false,no/rorvik,true,1969-08-19,2018-12-31,kartverket/RVK,kartverket,kartverket/RVK,,planned,UHSLC relay of kartverket/RVK
 rorvik-rvk-nor-nhs,Rorvik,Norway,nhs,true,false,no/rorvik,true,1969-08-19,2025-07-28,kartverket/RVK,kartverket,kartverket/RVK,,planned,
 rorviktg-ror-nor-cmems,RorvikTG,Norway,cmems,true,false,no/rorvik,false,1969-08-19,2025-06-30,,kartverket,,,to_match,CMEMS record of a gauge the national feed publishes
-roscoff-54-fra-refmar,Roscoff,France,refmar,true,true,fr/roscoff,true,1973-04-07,2025-04-13,,refmar,,,planned,
+roscoff-54-fra-refmar,Roscoff,France,refmar,true,true,fr/roscoff,true,1973-04-07,2025-04-13,,refmar,refmar/54,,planned,
 roscofftg_60minute-ros-fra-cmems,RoscoffTG_60minute,France,cmems,true,false,fr/roscoff,false,1973-04-07,2025-04-13,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rose_harbour_bc-9713-can-meds,Rose_Harbour_BC,Canada,meds,true,true,ca/rose-harbour,true,2014-03-25,2020-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 roseau-786-dom-uhslc_fd,Roseau,Dominican Republic,uhslc_fd,true,true,dm/roseau,true,2011-05-17,2025-06-30,,uhslc,uhslc/786,1.8,ready,
@@ -3757,7 +3757,7 @@ rothera-rot-gbr-noc,Rothera,United Kingdom,noc,true,false,gb/rothera-ticon-rothe
 rotterdam-rottdm-nld-rws_hist,Rotterdam,Netherlands,rws_hist,true,false,nl/rotterdam,true,1936-01-01,2018-09-07,,rws,,,unmatched,Ambiguous between rws/rotterdam.nieuwemaas.boerengat and rws/rotterdam.brienenoordbrug
 rotterdamtg-rot-nld-cmems,RotterdamTG,Netherlands,cmems,true,true,nl/rotterdam,false,2015-06-28,2025-05-31,,rws,,,unmatched,Ambiguous between rws/rotterdam.nieuwemaas.boerengat and rws/rotterdam.brienenoordbrug
 rowland_bridge-row-usa-cm,Rowland_Bridge,United States,cm,true,true,us/rowland-bridge,true,2018-12-18,2024-12-05,,cm,,,license,Terms not reviewed
-royan-308-fra-refmar,Royan,France,refmar,true,true,fr/royan,true,1991-09-05,2011-04-07,,refmar,,,planned,
+royan-308-fra-refmar,Royan,France,refmar,true,true,fr/royan,true,1991-09-05,2011-04-07,,refmar,refmar/308,,planned,
 royantg_60minute-roy-fra-cmems,RoyanTG_60minute,France,cmems,true,false,fr/royan,false,1991-09-05,2011-04-07,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 rozenburgsesluis_noordzijde-rozbssnzde-nld-rws_hist,Rozenburgsesluis_noordzijde,Netherlands,rws_hist,true,false,nl/rozenburgsesluis-noordzijde,true,1972-01-01,1983-12-07,,rws,rws/botlek.rozenburgsesluis.calandkanaal,0,ready,
 rudee_inlet-8639207-usa-noaa,Rudee_Inlet,United States,noaa,true,false,us/rudee-inlet,true,2005-07-18,2009-02-05,noaa/8639207,coops,coops/8639207,0,ready,
@@ -3826,23 +3826,23 @@ saguntotg-sag-esp-cmems,SaguntoTG,Spain,cmems,true,true,es/sagunto,false,2007-09
 saigo-ma54-jpn-jodc_jma,Saigo,Japan,jodc_jma,true,false,jp/saigo,true,1960-12-31,2023-12-31,jma/SA,jma,jma/SA,,license,JODC relay of jma/SA
 saint_francois_io-3100-can-meds,Saint_Francois_IO,Canada,meds,true,true,ca/saint-francois-i-o,true,1962-01-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 saint_george_new_york-8519112-usa-da_sat,Saint_George_New_York,United States,da_sat,true,false,us/saint-george,true,1917-11-03,1919-02-17,,da_sat,,,license,Terms not reviewed
-saint_gildas-36-fra-refmar,Saint_Gildas,France,refmar,true,true,fr/saint-gildas,true,1962-06-07,2017-06-27,,refmar,,,planned,
-saint_jean_de_luz_socoa-95-fra-refmar,Saint_Jean_De_Luz_Socoa,France,refmar,true,true,fr/saint-jean-de-luz-socoa,true,1942-11-21,2025-03-31,,refmar,,,planned,
+saint_gildas-36-fra-refmar,Saint_Gildas,France,refmar,true,true,fr/saint-gildas,true,1962-06-07,2017-06-27,,refmar,refmar/36,,planned,
+saint_jean_de_luz_socoa-95-fra-refmar,Saint_Jean_De_Luz_Socoa,France,refmar,true,true,fr/saint-jean-de-luz-socoa,true,1942-11-21,2025-03-31,,refmar,refmar/95,,planned,
 saint_jean_io-3105-can-meds,Saint_Jean_IO,Canada,meds,true,true,ca/saint-jean-i-o,true,1966-08-08,2011-08-01,,chs,,,restricted,CHS license bars commercial derivatives
 saint_jean_port_joli-3170-can-meds,Saint_Jean_Port_Joli,Canada,meds,true,true,ca/saint-jean-port-joli,true,1917-08-01,1980-03-01,,chs,,,restricted,CHS license bars commercial derivatives
 saint_john-65-can-meds,Saint_John,Canada,meds,true,true,ca/saint-john,true,1896-05-15,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 saint_joseph_de_la_rive-3057-can-meds,Saint_Joseph_De_La_Rive,Canada,meds,true,true,ca/saint-joseph-de-la-rive,true,1967-06-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 saint_laurent_io-3110-can-meds,Saint_Laurent_IO,Canada,meds,true,true,ca/saint-laurent-i-o,true,1966-08-08,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
-saint_malo-410-fra-refmar,Saint_Malo,France,refmar,true,true,fr/saint-malo,true,1986-04-10,2025-03-31,,refmar,,,planned,
+saint_malo-410-fra-refmar,Saint_Malo,France,refmar,true,true,fr/saint-malo,true,1986-04-10,2025-03-31,,refmar,refmar/410,,planned,
 saint_marks_river_at_san_marcosde_apalachee_statepark-11352-usa-nwfwmd,Saint_Marks_River_at_San_Marcosde_Apalachee_StatePark,United States,nwfwmd,true,true,us/saint-marks-river-at-san-marcosde-apalachee-state-park,true,2008-04-22,2025-07-14,,nwfwmd,,,license,Northwest Florida WMD terms to check
-saint_martin-159-fra-refmar,Saint_Martin,France,refmar,true,true,fr/saint-martin,true,1971-06-15,2017-09-06,,refmar,,,planned,
-saint_nazaire-37-fra-refmar,Saint_Nazaire,France,refmar,true,true,fr/saint-nazaire,true,1821-05-25,2025-03-31,,refmar,,,planned,
+saint_martin-159-fra-refmar,Saint_Martin,France,refmar,true,true,fr/saint-martin,true,1971-06-15,2017-09-06,,refmar,refmar/159,,planned,
+saint_nazaire-37-fra-refmar,Saint_Nazaire,France,refmar,true,true,fr/saint-nazaire,true,1821-05-25,2025-03-31,,refmar,refmar/37,,planned,
 saint_paul-179-fra-uhslc_fd,Saint_Paul,France,uhslc_fd,true,false,fr/saint-paul,true,1994-10-25,2022-01-22,,uhslc,uhslc/179,0.04,ready,
 saint_paul-179a-fra-uhslc_rq,Saint_Paul,France,uhslc_rq,true,true,fr/saint-paul,true,1994-10-25,2006-12-24,,uhslc,uhslc/179,0.04,ready,
-saint_quay_portrieux-506-fra-refmar,Saint_Quay_Portrieux,France,refmar,true,true,fr/saint-quay-portrieux,true,1987-11-12,2025-03-31,,refmar,,,planned,
+saint_quay_portrieux-506-fra-refmar,Saint_Quay_Portrieux,France,refmar,true,true,fr/saint-quay-portrieux,true,1987-11-12,2025-03-31,,refmar,refmar/506,,planned,
 sainte_anne_de_bellevue-16005-can-meds,Sainte_Anne_De_Bellevue,Canada,meds,true,true,ca/sainte-anne-de-bellevue,true,1962-01-01,2021-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 sainte_anne_des_monts-2935-can-meds,Sainte_Anne_Des_Monts,Canada,meds,true,true,ca/sainte-anne-des-monts,true,1967-12-11,1997-09-16,,chs,,,restricted,CHS license bars commercial derivatives
-sainte_marie-832-fra-refmar,Sainte_Marie,France,refmar,true,true,fr/sainte-marie,true,2011-10-19,2025-03-31,,refmar,,,planned,
+sainte_marie-832-fra-refmar,Sainte_Marie,France,refmar,true,true,fr/sainte-marie,true,2011-10-19,2025-03-31,,refmar,refmar/832,,planned,
 saintemarietg_60minute-sai-fra-cmems,SainteMarieTG_60minute,France,cmems,true,false,fr/sainte-marie,false,2011-10-19,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 saintgildastg_60minute-sai-fra-cmems,SaintGildasTG_60minute,France,cmems,true,false,fr/saint-gildas,false,1962-06-07,2017-06-27,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 saintlouismourillontg_10minute-sai-fra-cmems,SaintLouisMourillonTG_10minute,France,cmems,true,true,fr/saint-louis-mourillon,false,2015-12-18,2017-10-26,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
@@ -4017,7 +4017,7 @@ sendaiko-0112-jpn-jodc_pahb,Sendaiko,Japan,jodc_pahb,true,true,jp/sendaiko,true,
 sept_iles-2780-can-meds,Sept_Iles,Canada,meds,true,true,ca/sept-iles,true,1972-04-28,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 sesuit_harbor_tide_gage_at_dennis_ma-414507070091400-usa-usgs,Sesuit_Harbor_Tide_Gage_At_Dennis_Ma,United States,usgs,true,false,us/sesuit-harbor-tide-gage-at-dennis-ma,true,2015-01-09,2025-05-01,,usgs,usgs/414507070091400,0,ready,
 setanako-1603-jpn-jodc_pahb,Setanako,Japan,jodc_pahb,true,true,jp/setanako,true,2010-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
-sete-250-fra-refmar,Sete,France,refmar,true,true,fr/sete,true,1956-04-23,2025-03-31,,refmar,,,planned,
+sete-250-fra-refmar,Sete,France,refmar,true,true,fr/sete,true,1956-04-23,2025-03-31,,refmar,refmar/250,,planned,
 setetg_60minute-set-fra-cmems,SeteTG_60minute,France,cmems,true,false,fr/sete-occitanie,false,1956-05-01,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 settlement_point-257-bhs-uhslc_fd,Settlement_Point,The Bahamas,uhslc_fd,true,true,bs/settlement-point-west-grand-bahama,true,2002-06-04,2025-06-30,,uhslc,uhslc/257,1.59,ready,
 settlement_point-257a-bhs-uhslc_rq,Settlement_Point,The Bahamas,uhslc_rq,true,false,bs/settlement-point-ticon-settlement-point-257a-bhs-uhslc-rq,true,1985-10-19,2002-05-31,,uhslc,uhslc/257a,0.03,ready,
@@ -4113,7 +4113,7 @@ snohomish_river_at_snohomish_wa-12155500-usa-usgs,Snohomish_River_At_Snohomish_W
 snow_hill-8571359-usa-noaa,Snow_Hill,United States,noaa,true,false,us/snow-hill,true,2005-04-08,2010-12-06,noaa/8571359,coops,coops/8571359,0,ready,
 socorro-090-mex-uhslc_fd,Socorro,Mexico,uhslc_fd,true,false,mx/socorro,true,1992-05-05,1997-09-22,,uhslc,uhslc/090,0.05,ready,
 socorro-090a-mex-uhslc_rq,Socorro,Mexico,uhslc_rq,true,false,mx/socorro,true,1957-03-01,1959-07-04,,uhslc,uhslc/090,0.05,ready,
-solenzara-710-fra-refmar,Solenzara,France,refmar,true,true,fr/solenzara,true,1977-04-16,2025-03-31,,refmar,,,planned,
+solenzara-710-fra-refmar,Solenzara,France,refmar,true,true,fr/solenzara,true,1977-04-16,2025-03-31,,refmar,refmar/710,,planned,
 solenzaratg_60minute-sol-fra-cmems,SolenzaraTG_60minute,France,cmems,true,false,fr/solenzara,false,1977-04-16,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 solomons_island-8577330-usa-noaa,Solomons_Island,United States,noaa,true,false,us/solomons-island,true,1979-07-01,2025-06-30,noaa/8577330,coops,coops/8577330,0.1,ready,
 soma-gs18-jpn-jodc_giaj,Soma,Japan,jodc_giaj,true,true,jp/soma,true,1973-04-30,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
@@ -4377,7 +4377,7 @@ thevenard-128-aus-uhslc_fd,Thevenard,Australia,uhslc_fd,true,true,au/thevenard,t
 thevenard-128a-aus-uhslc_rq,Thevenard,Australia,uhslc_rq,true,false,au/thevenard,true,1992-03-19,2021-12-31,,uhslc,uhslc/128,0,restricted,The contributor's terms bar commercial use
 thevenard-62000-aus-bom,Thevenard,Australia,bom,true,false,au/thevenard-ticon-thevenard-62000-aus-bom,true,1964-06-19,2022-12-31,,bom,,,license,BOM license not stated
 thiessow-9670067-deu-wsv,Thiessow,Germany,wsv,true,true,de/thiessow,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670067,0,ready,history needs a PEGELONLINE backfill
-thio-46-fra-refmar,Thio,France,refmar,true,true,fr/thio,true,1967-06-09,2024-11-21,,refmar,,,planned,
+thio-46-fra-refmar,Thio,France,refmar,true,true,fr/thio,true,1967-06-09,2024-11-21,,refmar,refmar/46,,planned,
 thiotg_60minute-thi-fra-cmems,ThioTG_60minute,France,cmems,true,false,fr/thio,false,1967-06-09,2024-08-13,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 three_mile_slough_at_san_joaquin_river-b95060-usa-cdwr,Three_Mile_Slough_At_San_Joaquin_River,United States,cdwr,true,false,us/three-mile-slough-at-san-joaquin-river,true,1982-10-01,2025-05-24,,cdec,,,license,California CDEC terms to check
 threemile_harbor_entrance-8511171-usa-noaa,Threemile_Harbor_Entrance,United States,noaa,true,false,us/threemile-harbor-entrance,true,1988-05-15,1990-08-08,noaa/8511171,coops,coops/8511171,0,ready,
@@ -4427,7 +4427,7 @@ topsail_beach-top-usa-ncdem,Topsail_Beach,United States,ncdem,true,true,us/topsa
 toronto_ontario-13320-can-meds,Toronto_Ontario,Canada,meds,true,true,ca/toronto,true,1960-01-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 torsmindekysttg-tor-dnk-cmems,TorsmindeKystTG,Denmark,cmems,true,false,dk/thorsminde-kyst,false,2015-01-12,2025-06-30,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 tosashimizu-ma39-jpn-jodc_jma,Tosashimizu,Japan,jodc_jma,true,false,jp/tosashimizu,true,1960-12-31,2023-12-31,jma/TS,jma,jma/TS,,license,JODC relay of jma/TS
-toulon-68-fra-refmar,Toulon,France,refmar,true,true,fr/toulon,true,1961-01-01,2025-03-31,,refmar,,,planned,
+toulon-68-fra-refmar,Toulon,France,refmar,true,true,fr/toulon,true,1961-01-01,2025-03-31,,refmar,refmar/68,,planned,
 toulontg_60minute-tou-fra-cmems,ToulonTG_60minute,France,cmems,true,true,fr/toulon-ticon-toulontg-60minute-tou-fra-cmems,false,1961-01-01,2025-03-31,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 town_creek-tow-usa-ncdem,Town_Creek,United States,ncdem,true,true,us/town-creek,true,2021-10-01,2025-04-30,,ncdem,,,license,North Carolina DEM terms to check
 town_point_wharf-8573903-usa-noaa,Town_Point_Wharf,United States,noaa,true,false,us/town-point-wharf,true,1980-01-01,1994-06-24,noaa/8573903,coops,coops/8573903,0,ready,
@@ -4468,7 +4468,7 @@ tsawwassen_bc-7590-can-meds,Tsawwassen_BC,Canada,meds,true,true,ca/tsawwassen,tr
 tsuruga-4004-jpn-jodc_pahb,Tsuruga,Japan,jodc_pahb,true,true,jp/tsuruga,true,2010-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 tsushima-ma72-jpn-jodc_jma,Tsushima,Japan,jodc_jma,true,true,jp/tsushima,true,1996-12-31,2010-03-26,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 tsushimahidakatsu-ma85-jpn-jodc_jma,Tsushimahidakatsu,Japan,jodc_jma,true,false,jp/tsushimahidakatsu,true,2010-04-30,2023-12-31,jma/N5,jma,jma/N5,,license,JODC relay of jma/N5
-tubuai-113-fra-refmar,Tubuai,France,refmar,true,true,fr/tubuai,true,2009-05-19,2024-03-17,,refmar,,,planned,
+tubuai-113-fra-refmar,Tubuai,France,refmar,true,true,fr/tubuai,true,2009-05-19,2024-03-17,,refmar,refmar/113,,planned,
 tubuai-456-fra-uhslc_fd,Tubuai,France,uhslc_fd,true,true,fr/tubuai-ticon-tubuai-456-fra-uhslc-fd,true,2019-03-01,2025-06-30,,uhslc,uhslc/456,0,ready,
 tubuaitg_60minute-tub-fra-cmems,TubuaiTG_60minute,France,cmems,true,false,fr/tubuai-ticon-tubuaitg-60minute-tub-fra-cmems,false,2009-05-19,2024-03-17,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 tuktoyaktuk-6485-can-meds,Tuktoyaktuk,Canada,meds,true,true,ca/tuktoyaktuk,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -4531,7 +4531,7 @@ vaasa-vaa-fin-cmems,Vaasa,Finland,cmems,true,false,fi/vaasa,false,1971-01-01,202
 vaasa_vaskiluoto-134223-fin-fmi,Vaasa_Vaskiluoto,Finland,fmi,true,true,fi/vaasa-vaskiluoto,true,1971-01-07,2025-06-02,,fmi,,,license,FMI's sea-level terms not confirmed
 vaca_key-8723970-usa-noaa,Vaca_Key,United States,noaa,true,false,us/vaca-key,true,1975-08-21,2025-06-30,noaa/8723970,coops,coops/8723970,0,ready,
 vahemadal-vah-est-cmems,Vahemadal,Estonia,cmems,true,true,ee/vahemadal,false,2015-02-23,2018-01-29,,cmems,,,restricted,GESLA lists CMEMS as research only
-vairao-317-fra-refmar,Vairao,France,refmar,true,true,fr/vairao,true,1973-08-11,2024-09-29,,refmar,,,planned,
+vairao-317-fra-refmar,Vairao,France,refmar,true,true,fr/vairao,true,1973-08-11,2024-09-29,,refmar,refmar/317,,planned,
 vairaotg_60minute-vai-fra-cmems,VairaoTG_60minute,France,cmems,true,false,fr/vairao,false,1973-08-11,2024-09-29,,refmar,,,to_match,CMEMS record of a gauge the national feed publishes
 valdez-9454240-usa-noaa,Valdez,United States,noaa,true,false,us/valdez,true,1973-04-16,2025-06-30,noaa/9454240,coops,coops/9454240,0.11,ready,
 valdez_ak-562a-usa-uhslc_rq,Valdez_AK,United States,uhslc_rq,true,false,us/valdez,true,1973-04-16,2021-12-31,noaa/9454240,coops,coops/9454240,0,ready,UHSLC relay of noaa/9454240
