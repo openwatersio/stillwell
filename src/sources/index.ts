@@ -3,6 +3,7 @@ import { source as bsh } from "./bsh/index.ts";
 import { source as coops } from "./coops/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
+import { source as jma } from "./jma/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
 import { source as marineInstitute } from "./marine-institute/index.ts";
 import { source as pegelonline } from "./pegelonline/index.ts";
@@ -20,6 +21,7 @@ export const sources: Record<string, Source> = {
   coops,
   dwr,
   ea,
+  jma,
   kartverket,
   "marine-institute": marineInstitute,
   pegelonline,

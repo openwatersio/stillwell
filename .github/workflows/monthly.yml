@@ -220,9 +220,17 @@ jobs:
             # Every January takes them all, so a station whose office began
             # screening since, or a new epoch's, is read again and can rejoin.
             usace | refmar) set -- "$year-$month-01" $([ "$month" != 01 ] && echo --skip-unscreened) ;;
+            # JMA isn't hourly, so this is also what brings its new values: every
+            # open station from two months back, whose final file is out by now,
+            # to this month's provisional one.
+            jma)
+              # A station that fails doesn't keep the rest from their refetch.
+              node scripts/ingest.ts backfill jma all "$(date -u -d "$year-$month-01 -2 months" +%F)" "$(date -u -d "$year-$month-01 +1 month" +%F)" || status=1
+              set -- "$year-$month-01" ;;
             *) set -- "$year-$month-01" ;;
           esac
           node scripts/ingest.ts backfill "$SOURCE" "$which" "$from" "$@"
+          exit "${status:-0}"
         env:
           SOURCE: ${{ matrix.source }}
           WATER_LEVELS_LAKE: s3://water-levels

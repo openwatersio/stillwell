@@ -95,6 +95,20 @@ export const NOTICES: Record<string, Notice> = {
 };
 
 /**
+ * The `Originator #` field, the station number the contributor gives the
+ * gauge, such as CO-OPS's `1612340` at Honolulu; null when it's empty or
+ * says there's none.
+ */
+export function originatorOf(text: string): string | null {
+  const match = /Originator\s*#\s*:[ \t]*(.*?)(?:\s{2,}|\s+NODC\b|$)/m.exec(
+    text.replace(/\r/g, ""),
+  );
+  const value = match?.[1]!.trim() ?? "";
+  // A blank field runs straight into the next one, "NODC #".
+  return /^(|none|n\/?a|unknown|-+|\?+)$|^NODC\b/i.test(value) ? null : value;
+}
+
+/**
  * The `Contributor` field's first line, with the next line when the name runs
  * on to it; "unconfirmed" is no contributor. UHSLC's own name comes in several
  * spellings.

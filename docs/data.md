@@ -38,7 +38,8 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum), `STND` (CO-OPS station datum), `GZ` (gauge zero at USACE and California DWR), `GAGE` (USGS gage datum), `ZH` (REFMAR chart datum), `ZI` (a REFMAR gauge's unknown instrument zero), `AOD` (ordnance datum: Newlyn in Great Britain, the local one in Northern Ireland, the Isle of Man and Jersey) or `CD` (chart datum, at four EA gauges).
 - **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
-- **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.
+- **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
+- **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
 - **`status`**: `active` or `inactive`.
 - **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
 
@@ -67,19 +68,27 @@ GROUP BY source ORDER BY source;
 A gauge by name, with its links to other sources:
 
 ```sql
-SELECT id, name, datum, products, same_as
+SELECT id, name, products, same_as, preferred
 FROM 'https://water-levels.openwaters.io/stations.parquet'
 WHERE name ILIKE '%cuxhaven%';
 ```
 
 ```
-┌─────────────────────┬─────────────────────────────┬─────────┬───────────────────────────────────┬───────────────────────┐
-│         id          │            name             │  datum  │             products              │        same_as        │
-│       varchar       │           varchar           │ varchar │             varchar[]             │       varchar[]       │
-├─────────────────────┼─────────────────────────────┼─────────┼───────────────────────────────────┼───────────────────────┤
-│ bsh/506P            │ Cuxhaven, Steubenhöft, Elbe │ PNP     │ [predictions, predicted_extremes] │ [pegelonline/5990020] │
-│ pegelonline/5990020 │ CUXHAVEN STEUBENHÖFT        │ PNP     │ [levels]                          │ [bsh/506P]            │
-└─────────────────────┴─────────────────────────────┴─────────┴───────────────────────────────────┴───────────────────────┘
+┌─────────────────────┬─────────────────────────────┬───────────────────────────────────┬───────────────────────┬─────────────────────┐
+│         id          │            name             │             products              │        same_as        │      preferred      │
+│       varchar       │           varchar           │             varchar[]             │       varchar[]       │       varchar       │
+├─────────────────────┼─────────────────────────────┼───────────────────────────────────┼───────────────────────┼─────────────────────┤
+│ bsh/506P            │ Cuxhaven, Steubenhöft, Elbe │ [predictions, predicted_extremes] │ [pegelonline/5990020] │ pegelonline/5990020 │
+│ pegelonline/5990020 │ CUXHAVEN STEUBENHÖFT        │ [levels]                          │ [bsh/506P]            │ pegelonline/5990020 │
+└─────────────────────┴─────────────────────────────┴───────────────────────────────────┴───────────────────────┴─────────────────────┘
+```
+
+One station per gauge, so a map or a count doesn't show a gauge once for each source that carries it:
+
+```sql
+SELECT count(*) AS gauges
+FROM 'https://water-levels.openwaters.io/stations.parquet'
+WHERE list_contains(products, 'levels') AND preferred = id;
 ```
 
 The nearest stations with observed levels to a point, here the mouth of the Nieuwe Waterweg:

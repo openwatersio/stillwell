@@ -27,6 +27,7 @@ describe("sourcesFor", () => {
       "coops",
       "dwr",
       "ea",
+      "jma",
       "kartverket",
       "marine-institute",
       "pegelonline",
@@ -42,6 +43,7 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("refetch"), [
       "coops",
       "dwr",
+      "jma",
       "kartverket",
       "marine-institute",
       "refmar",

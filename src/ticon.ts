@@ -117,7 +117,7 @@ const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
   jhod: { source: "jodc", status: "license" },
-  jma: { source: "jma", status: "license" },
+  jma: { source: "jma", status: "planned" },
   linz: { source: "linz", status: "license" },
 };
 
@@ -382,11 +382,17 @@ const COMMON = new Set([
 ]);
 
 function fold(name: string): string {
-  return name
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/([aou])e/g, "$1");
+  return (
+    name
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      // Letters NFKD leaves whole, as in Måløy.
+      .replace(/ø/g, "o")
+      .replace(/æ/g, "ae")
+      .replace(/ß/g, "ss")
+      .replace(/([aou])e/g, "$1")
+  );
 }
 
 /**
@@ -394,7 +400,7 @@ function fold(name: string): string {
  * CMEMS's "KielHoltenauTG". `identifying` counts those of four letters or more,
  * or short codes with a digit such as "A12", that aren't in `COMMON`.
  */
-function nameScore(a: string, b: string): { identifying: number; total: number } {
+export function nameScore(a: string, b: string): { identifying: number; total: number } {
   const words = (s: string) =>
     fold(s)
       .split(/[^a-z0-9]+/)
@@ -418,7 +424,7 @@ export function sharesWord(a: string, b: string): boolean {
   return nameScore(a, b).identifying > 0;
 }
 
-function km(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+export function km(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
   const rad = Math.PI / 180;
   const dLat = (b.lat - a.lat) * rad;
   const dLon = (b.lon - a.lon) * rad;

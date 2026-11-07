@@ -20,6 +20,7 @@ import * as coops from "../src/sources/coops/index.ts";
 import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
+import * as jma from "../src/sources/jma/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -58,6 +59,19 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
   // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
   dmi: () => dmi.levels("30017", start, end),
+  // Kushimoto, since 1924: a week of provisional values, which arrive a day or
+  // two late, and three days of final ones a year back. Its paths name the month
+  // and its text has no shape, so it's in UNRECORDED and only has to return values.
+  jma: async () => {
+    const latest = await jma.levels("KS", new Date(end.getTime() - 7 * DAY_MS), end);
+    const final = await jma.levels(
+      "KS",
+      new Date(start.getTime() - 365 * DAY_MS),
+      new Date(end.getTime() - 365 * DAY_MS),
+    );
+    // Either set alone would pass a path JMA moved, whose 404s read as no file.
+    return latest.length && final.length ? [...latest, ...final] : [];
+  },
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
   // Ballycotton, since 2010.
@@ -120,6 +134,9 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   usgs: () => usgs.levels("9361fa9f474443a4b2391c1f1a63ca4b", start, end),
 };
 
+/** Sources whose request paths name the month, so a recording would fail the next one. */
+const UNRECORDED = new Set(["jma"]);
+
 const args = process.argv.slice(2);
 const record = args.includes("--record");
 const named = args.filter((a) => !a.startsWith("--"));
@@ -143,6 +160,10 @@ for (const id of named.length ? named : Object.keys(probes)) {
     const live = Object.fromEntries(Object.entries(shapes).map(([path, s]) => [path, merge(...s)]));
     if (record) {
       if (!values.length) throw new Error("no values, so nothing to record");
+      if (UNRECORDED.has(id)) {
+        console.log(`${id}: not recorded; its paths name the month`);
+        continue;
+      }
       writeFileSync(file, `${JSON.stringify(live, null, 2)}\n`);
       console.log(`${id}: recorded ${Object.keys(live).length} responses, ${values.length} values`);
       continue;
@@ -151,7 +172,7 @@ for (const id of named.length ? named : Object.keys(probes)) {
     const recorded: Record<string, Shape> = existsSync(file)
       ? JSON.parse(readFileSync(file, "utf8"))
       : {};
-    if (!Object.keys(recorded).length)
+    if (!Object.keys(recorded).length && !UNRECORDED.has(id))
       console.log(
         `${id}: no recorded shape; check this one and record it\n${JSON.stringify(live, null, 2)}`,
       );
