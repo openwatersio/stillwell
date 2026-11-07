@@ -53,7 +53,7 @@ jobs:
       fail-fast: false
       matrix:
         # BSH publishes predictions only, so it has no live stations.
-        source: [coops, pegelonline, rws, usace, usgs]
+        source: [coops, kartverket, marine-institute, pegelonline, rws, smhi, usace, usgs]
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so no two rewrite one file at once.
     concurrency:

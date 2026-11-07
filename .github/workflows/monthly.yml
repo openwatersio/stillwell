@@ -67,7 +67,7 @@ jobs:
               exit 0
             fi
           fi
-          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
+          sources=$(printf '%s\n' ${SOURCES:-bsh coops kartverket marine-institute pegelonline rws smhi uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
             # PEGELONLINE never finalizes a value, in its feed or its downloads.
             refetch=$(jq -c 'map(select(. != "pegelonline"))' <<< "$sources")

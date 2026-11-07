@@ -1,0 +1,32 @@
+﻿Stationsnamn;Stationsid;Stationens latitud;Stationens longitud
+Arkö;2545;58.4831;16.9637
+
+Parameternamn;Enhet
+Havsvattenstånd;cm
+
+Datum Tid (UTC);Havsvattenstånd;Kvalitet;Mätdjup (m);;Tidsutsnitt
+2026-11-06 00:00:00;17.4;G;0;;Tidsperiod (fr.o.m.) = 2014-04-02 07:00:00 (UTC)
+2026-11-06 01:00:00;16.0;G;0;;Tidsperiod (t.o.m.) = 2026-11-07 01:00:00 (UTC)
+2026-11-06 02:00:00;14.8;G;0;;
+2026-11-06 03:00:00;15.3;G;0;;Höjdsystem: RH2000
+2026-11-06 04:00:00;12.7;G;0;;
+2026-11-06 05:00:00;9.8;G;0;;Kvalitetskoderna:
+2026-11-06 06:00:00;8.6;G;0;;Grön (G) = Kontrollerade och godkända värden.
+2026-11-06 07:00:00;8.2;G;0;;Gul (Y) = Misstänkta eller aggregerade värden. Grovt kontrollerade arkivdata och okontrollerade realtidsdata (senaste 2 tim).
+2026-11-06 08:00:00;8.0;G;0;;Orange (O) = Okontrollerade värden.
+2026-11-06 09:00:00;4.5;G;0;;
+2026-11-06 10:00:00;3.1;G;0;;Orsaker till saknade data:
+2026-11-06 11:00:00;3.7;G;0;;  stationen eller givaren har varit ur funktion.
+2026-11-06 12:00:00;3.4;G;0;;  kvalitetskontrollerna har felmarkerat data (röd kvalitetskod). Efterföljande manuell granskning godkänner, rättar eller underkänner data.
+2026-11-06 13:00:00;3.1;G;0
+2026-11-06 14:00:00;4.1;G;0
+2026-11-06 15:00:00;4.1;G;0
+2026-11-06 16:00:00;3.5;G;0
+2026-11-06 17:00:00;3.2;G;0
+2026-11-06 18:00:00;2.8;G;0
+2026-11-06 19:00:00;2.5;G;0
+2026-11-06 20:00:00;2.3;G;0
+2026-11-06 21:00:00;2.4;G;0
+2026-11-06 22:00:00;2.3;G;0
+2026-11-06 23:00:00;2.8;G;0
+2026-11-07 00:00:00;2.2;G;0

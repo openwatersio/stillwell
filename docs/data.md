@@ -25,7 +25,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
 - **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only makes a flag worse. `flag <= 2` keeps everything not flagged as a problem.
-- **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. It's null in predictions and in values written before it was kept, and files written before then don't have the column.
+- **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. Where a source doesn't mark which values it has checked, the adapter decides: Kartverket's values count as verified once they're a year old, and SMHI's from this month and the last count as preliminary whatever SMHI marks them, since it corrects them monthly. It's null in predictions and in values written before it was kept, and files written before then don't have the column.
 - **`received`** is when ingest first saw a value arrive. It's empty for backfilled history.
 - **`type`** is `high` or `low`. RWS's observed extremes give both lows of a double low water, so two lows can come in a row. BSH's predicted extremes also carry its `transit` number and `event` index.
 

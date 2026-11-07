@@ -1,0 +1,27 @@
+<tide>
+<stationdata>
+<location name="Bergen" code="BGO" latitude="60.398046" longitude="5.320487">
+<data type="observation" unit="cm" reflevelcode="CD">
+<waterlevel value="139.3" time="1990-01-01T00:00:00+00:00" flag="obs"/>
+<waterlevel value="140.8" time="1990-01-01T00:10:00+00:00" flag="obs"/>
+<waterlevel value="141.7" time="1990-01-01T00:20:00+00:00" flag="obs"/>
+<waterlevel value="142.2" time="1990-01-01T00:30:00+00:00" flag="obs"/>
+<waterlevel value="142.1" time="1990-01-01T00:40:00+00:00" flag="obs"/>
+<waterlevel value="141.3" time="1990-01-01T00:50:00+00:00" flag="obs"/>
+<waterlevel value="140.3" time="1990-01-01T01:00:00+00:00" flag="obs"/>
+<waterlevel value="138.9" time="1990-01-01T01:10:00+00:00" flag="obs"/>
+<waterlevel value="136.8" time="1990-01-01T01:20:00+00:00" flag="obs"/>
+<waterlevel value="134.1" time="1990-01-01T01:30:00+00:00" flag="obs"/>
+<waterlevel value="131.2" time="1990-01-01T01:40:00+00:00" flag="obs"/>
+<waterlevel value="128.2" time="1990-01-01T01:50:00+00:00" flag="obs"/>
+<waterlevel value="124.9" time="1990-01-01T02:00:00+00:00" flag="obs"/>
+<waterlevel value="121.8" time="1990-01-01T02:10:00+00:00" flag="obs"/>
+<waterlevel value="118.8" time="1990-01-01T02:20:00+00:00" flag="obs"/>
+<waterlevel value="114.5" time="1990-01-01T02:30:00+00:00" flag="obs"/>
+<waterlevel value="110.2" time="1990-01-01T02:40:00+00:00" flag="obs"/>
+<waterlevel value="106.4" time="1990-01-01T02:50:00+00:00" flag="obs"/>
+<waterlevel value="101.8" time="1990-01-01T03:00:00+00:00" flag="obs"/>
+</data>
+</location>
+</stationdata>
+</tide>
