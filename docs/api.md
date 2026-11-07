@@ -85,12 +85,15 @@ One station in full: the fields above plus
   },
   "attribution": "NOAA National Ocean Service",
   "same_as": [],
+  "preferred": "coops/9447130",
   "source_url": "https://tidesandcurrents.noaa.gov/stationhome.html?id=9447130",
   "min_interval_s": 360
 }
 ```
 
 `datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The lake stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when those offsets are measured against the gauge zero, and `unknown` when tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends.
+
+`same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](data.md#stations)). `preferred` doesn't look at `commercial_use`, so until tokens exist it can name a station the API doesn't serve.
 
 ### `GET /water-levels/stations/{source}/{id}/live`
 
