@@ -33,6 +33,10 @@ export const metadata: SourceMetadata = {
   terms:
     "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the lake: levels converted from centimeters to meters, and quality flags added; values from the current and previous calendar months are marked preliminary.",
   archive: "current",
+  // `latest-day` has values within about an hour of their time.
+  hourly: true,
+  // SMHI corrects each month's values, so the refetch reads them again.
+  finalizes: true,
 };
 
 /** Göta älv gauges upriver of the harbor mouth. */

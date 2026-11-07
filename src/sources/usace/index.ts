@@ -35,6 +35,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Army Corps of Engineers",
+  // Offices that screen do so after the fact; the refetch skips stations never screened.
+  hourly: true,
+  finalizes: true,
   // Central and Eastern time, standard or daylight.
   utc_offsets: [-6, -4],
   // Navigation pools sit nearly flat for months, then rise meters in a flood,
