@@ -8,6 +8,8 @@ import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
+import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
+import { contributorOf, NOTICES } from "../src/sources/uhslc/notices.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
@@ -2276,7 +2278,21 @@ describe("uhslc", () => {
     assert.equal(stations.find((s) => s.id === "uhslc/329")!.country_code, "HK");
     // Longitudes come as 0 to 360.
     assert.equal(stations.find((s) => s.id === "uhslc/230a")!.lon < 0, true);
-    assert.equal(pohnpei.commercial_use, false);
+    // Pohnpei's FD series carries version C, whose file points to BOM's
+    // copyright notice; version A is Scripps's, with UHSLC's terms alone.
+    assert.deepEqual(
+      [pohnpei.contributor, pohnpei.commercial_use, pohnpei.attribution],
+      [
+        "National Tidal Centre, Bureau of Meteorology",
+        false,
+        "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+      ],
+    );
+    const pohnpeiA = stations.find((s) => s.id === "uhslc/001a")!;
+    assert.deepEqual(
+      [pohnpeiA.contributor, pohnpeiA.commercial_use, pohnpeiA.attribution],
+      ["Scripps Institute of Oceanography", true, "University of Hawaii Sea Level Center (UHSLC)"],
+    );
   });
 
   it("reads millimeters as meters, RQ as good and FD as preliminary, skipping missing values", async () => {
@@ -2372,6 +2388,96 @@ describe("uhslc", () => {
       [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
     ]);
     await assert.rejects(uhslc.stations(), /research-quality stations and record spans disagree/);
+  });
+
+  it("keeps the strictest terms and every credit across a version change", async () => {
+    // Pohnpei's FD series moves from version C (BOM's, non-commercial) to one
+    // starting where B does (UHSLC's own, no notice).
+    const fdSpans = JSON.parse(fixture("uhslc-fd-spans.json"));
+    fdSpans.table.rows.find((r: unknown[]) => r[0] === 1)[1] = "1974-04-22T12:00:00Z";
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, fixture("uhslc-rq-spans.json")],
+      [/global_daily_fast\.json/, JSON.stringify(fdSpans)],
+    ]);
+    const lake = { id: "uhslc/001", source_id: "001", status: "active" as const, version: "C" };
+    // The refresh that sees the change, and the next, whose list names both versions' epochs.
+    for (const epochs of [[{ reference: "C" }], [{ reference: "C" }, { reference: "B" }]]) {
+      const pohnpei = (await uhslc.stations([{ ...lake, epochs }])).find(
+        (s) => s.id === "uhslc/001",
+      )!;
+      assert.deepEqual(
+        [pohnpei.version, pohnpei.commercial_use, pohnpei.attribution],
+        [
+          "B",
+          false,
+          "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+        ],
+      );
+    }
+  });
+
+  it("keeps the lake's version when a dropped row leaves none matching", async () => {
+    const rq = JSON.parse(fixture("uhslc-rq-stations.json"));
+    const versionAt = rq.table.columnNames.indexOf("version");
+    // ERDDAP mid-reload: Pohnpei's version C row is missing from the hourly list.
+    rq.table.rows = rq.table.rows.filter((r: unknown[]) => !(r[0] === 1 && r[versionAt] === "C"));
+    const spans = JSON.parse(fixture("uhslc-rq-spans.json"));
+    spans.table.rows = spans.table.rows.filter((r: unknown[]) => !(r[0] === 1 && r[1] === "C"));
+    serve([
+      [/global_hourly_rqds\.json/, JSON.stringify(rq)],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, JSON.stringify(spans)],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    const previous = [
+      { id: "uhslc/001", source_id: "001", status: "active" as const, version: "C" },
+    ];
+    const pohnpei = (await uhslc.stations(previous)).find((s) => s.id === "uhslc/001")!;
+    assert.deepEqual([pohnpei.version, pohnpei.reference], ["C", { id: "C", since: null }]);
+  });
+
+  it("refuses a list that looks partial against the lake's", async () => {
+    serve([
+      [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, fixture("uhslc-rq-spans.json")],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    const listed = await uhslc.stations();
+    // The same list again is fine.
+    assert.equal((await uhslc.stations(listed)).length, listed.length);
+    // Six FD series gone at once is a partial list.
+    const extra = ["101", "102", "103", "104", "105", "106"].map((n) => ({
+      ...listed[0]!,
+      id: `uhslc/${n}`,
+      source_id: n,
+    }));
+    await assert.rejects(uhslc.stations([...listed, ...extra]), /stopped listing 6/);
+  });
+
+  it("keeps the FD series on the version it starts with", async () => {
+    const spans = JSON.parse(fixture("uhslc-rq-spans.json"));
+    // Pohnpei version D is out, but the FD series still starts with C.
+    spans.table.rows.push([1, "D", "2020-01-01T12:00:00Z"], [1, "D", "2024-12-31T12:00:00Z"]);
+    const rq = JSON.parse(fixture("uhslc-rq-stations.json"));
+    rq.table.rows.push(
+      [...rq.table.rows.find((r: unknown[]) => r[0] === 1)].map((v, i) =>
+        i === rq.table.columnNames.indexOf("version") ? "D" : v,
+      ),
+    );
+    serve([
+      [/global_hourly_rqds\.json/, JSON.stringify(rq)],
+      [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
+      [/global_daily_rqds\.json/, JSON.stringify(spans)],
+      [/global_daily_fast\.json/, fixture("uhslc-fd-spans.json")],
+    ]);
+    const stations = await uhslc.stations();
+    // The FD series stays on C, and D is listed on its own until it carries D.
+    assert.equal(stations.find((s) => s.id === "uhslc/001")!.version, "C");
+    // Nobody has read D's documentation file, so its terms are unknown.
+    assert.equal(stations.find((s) => s.id === "uhslc/001d")!.commercial_use, false);
   });
 
   it("waits for a version the daily set doesn't have yet", async () => {
@@ -2474,6 +2580,49 @@ describe("uhslc", () => {
     assert.equal(uhslc.final(table([["2020-12-31T23:00:00Z", 1, 3]]), end), false);
     // RQ that stops in September may be extended by the next release.
     assert.equal(uhslc.final(table([["2020-09-30T23:00:00Z", 1, 4]]), end), false);
+  });
+
+  it("names only notices that exist in every scanned record", () => {
+    const missing = Object.entries(CONTRIBUTORS).filter(([, r]) => r.notice && !NOTICES[r.notice]);
+    assert.deepEqual(missing, []);
+  });
+
+  it("reads a documentation file's contributor", () => {
+    const file = (lines: string) => `              Station  : X\r\n${lines}`;
+    assert.equal(
+      contributorOf(
+        file(
+          "              Contributor  : National Ocean Service (NOS)   \r\n                             NOAA\r\n",
+        ),
+      ),
+      "National Ocean Service (NOS)",
+    );
+    assert.equal(
+      contributorOf(
+        file(
+          "              Contributor  : UH Sea Level Center (1971-)\n                             1000 Pope Rd.\n",
+        ),
+      ),
+      "University of Hawaii Sea Level Center",
+    );
+    // A span of years labels the name on the next line.
+    assert.equal(
+      contributorOf(
+        file(
+          "              Contributor  :   For 1984-1988:\n                             Royal New Zealand Navy - Hydrographic Office\n",
+        ),
+      ),
+      "Royal New Zealand Navy - Hydrographic Office",
+    );
+    assert.equal(
+      contributorOf(
+        file(
+          "              Contributor  : Servicio Hidrografico y Oceanografico de la\n                             Armada (SHOA)\n",
+        ),
+      ),
+      "Servicio Hidrografico y Oceanografico de la Armada (SHOA)",
+    );
+    assert.equal(contributorOf(file("              Contributor  : unconfirmed\n\n")), null);
   });
 
   it("refuses levels from another reference", async () => {

@@ -374,7 +374,7 @@ export async function compactRecent({
       });
     }
   }
-  // A source's stations share its terms, so this is one lake. A failure goes
+  // A source's stations share its lake, so this is one lake. A failure goes
   // first, so the summary's list of failures shows it.
   for (const [lake, members] of Map.groupBy(stations, (s) => lakeFor(s)))
     try {

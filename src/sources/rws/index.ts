@@ -32,6 +32,7 @@ export const metadata: SourceMetadata = {
     name: "CC0 1.0",
     url: "https://rijkswaterstaatdata.nl/waterdata/",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: "Rijkswaterstaat",
   terms: "No uptime guarantee; fair use, at most 160,000 values per request.",

@@ -142,7 +142,19 @@ export interface SourceMetadata {
   id: string;
   name: string;
   url: string;
-  license: { id: string; name: string; url: string; commercial_use: boolean };
+  license: {
+    id: string;
+    name: string;
+    url: string;
+    /** The default for the source's stations; a station's own terms can differ. */
+    commercial_use: boolean;
+    /**
+     * Whether the terms let anyone republish the data, which the public lake
+     * does. A source that withholds it keeps its list and series in the
+     * restricted lake. This, not `commercial_use`, decides the lake.
+     */
+    redistribution: boolean;
+  };
   attribution: string;
   /** Anything a user of the data should know about the terms. */
   terms?: string;

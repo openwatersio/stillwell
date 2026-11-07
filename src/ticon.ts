@@ -169,13 +169,40 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
       const note = `${relay} relay of ${record.declared}`;
       return { ...match, note: match.note ? `${note}; ${match.note}` : note };
     }
-    if (relay === "UHSLC")
-      return {
-        source: "uhslc",
-        id: `uhslc/${code}`,
-        status: "license",
-        note: "UHSLC to confirm commercial redistribution",
-      };
+    if (relay === "UHSLC") {
+      // A station's latest research-quality version is part of its FD series,
+      // `uhslc/<number>`, whose `version` names it.
+      const [, number, version] = /^(\d{3})([a-z])$/.exec(code) ?? [];
+      const carried = lists.uhslc?.some(
+        (s) =>
+          s.source_id === number &&
+          usable(s) &&
+          (s as Station & { version?: string }).version === version?.toUpperCase(),
+      );
+      // An FD record whose series UHSLC no longer serves is its latest version's.
+      const latest = /^\d{3}$/.test(code)
+        ? lists.uhslc
+            ?.filter((s) => s.source_id.startsWith(code) && usable(s))
+            .filter((s, _, all) => !all.some((o) => o.source_id === code))
+            .map((s) => s.source_id)
+            .sort()
+            .at(-1)
+        : undefined;
+      const match = byCode(record, "uhslc", carried ? number! : (latest ?? code), "planned", lists);
+      // UHSLC serves South Africa's gauges only with SANHO's permission, so the
+      // adapter leaves them out; TICON also files Namibia's Lüderitz there, which UHSLC serves.
+      if (iso3 === "zaf" && match.status !== "ready")
+        return { source: "uhslc", id: null, status: "restricted", note: "SANHO's data" };
+      // A contributor's terms can bar commercial use at a station UHSLC serves openly.
+      const listed = lists.uhslc?.find((s) => s.id === match.id);
+      if (match.status === "ready" && listed && !listed.commercial_use)
+        return {
+          ...match,
+          status: "restricted",
+          note: "The contributor's terms bar commercial use",
+        };
+      return match;
+    }
     return {
       source: "jodc",
       id: null,

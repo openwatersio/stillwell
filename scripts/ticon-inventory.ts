@@ -89,10 +89,10 @@ const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.
   "",
 );
 // A source missing from the lake would mark every record it replaces unmatched.
-// A restricted source's list is only in the restricted lake, so it's left out.
+// A source that bars republishing has its list only in the restricted lake, so it's left out.
 const lists: Record<string, Station[]> = {};
 for (const [source, { metadata }] of Object.entries(sources)) {
-  if (!metadata.license.commercial_use) continue;
+  if (!metadata.license.redistribution) continue;
   const list = await readStationList(stationListPath(LAKE, source));
   if (!list) throw new Error(`No station list for ${source} in ${LAKE}`);
   lists[source] = list;

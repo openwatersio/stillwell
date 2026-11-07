@@ -32,6 +32,7 @@ export const metadata: SourceMetadata = {
     name: "U.S. Government work, public domain",
     url: "https://tidesandcurrents.noaa.gov/disclaimers.html",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: "NOAA National Ocean Service, CO-OPS",
   terms: "Preliminary data are unverified and may change once CO-OPS verifies them.",

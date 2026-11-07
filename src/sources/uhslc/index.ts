@@ -10,6 +10,8 @@ import {
   type Station,
 } from "../../schema.ts";
 import { countryOf } from "../coops/index.ts";
+import { CONTRIBUTORS } from "./contributors.ts";
+import { NOTICES } from "./notices.ts";
 
 /**
  * University of Hawaii Sea Level Center (UHSLC) hourly tide gauge records,
@@ -29,9 +31,10 @@ export const metadata: SourceMetadata = {
     id: "LicenseRef-UHSLC",
     name: "UHSLC data terms: free use and redistribution, not for legal use",
     url: "https://uhslc.soest.hawaii.edu/datainfo/",
-    // The terms allow free redistribution but don't say whether commercial use is
-    // allowed; UHSLC hasn't answered yet, so the series stay in the restricted lake.
-    commercial_use: false,
+    // UHSLC's terms let anyone use and redistribute the data free, with no
+    // limit on purpose, as tide-database already does through TICON.
+    commercial_use: true,
+    redistribution: true,
   },
   attribution: "University of Hawaii Sea Level Center (UHSLC)",
   terms:
@@ -68,19 +71,25 @@ const COUNTRY_CODES: Record<number, string> = {
 const HOUR_MS = 3_600_000;
 /** Daily records without an hourly series a list may hold before it looks partial. */
 const DAILY_ONLY = 5;
-const MARGIN_MS = 31 * 86_400_000;
+const DAY_MS = 86_400_000;
+const MARGIN_MS = 31 * DAY_MS;
 
 /**
  * A UHSLC station as listed. `version` is the RQ version the series carries
  * (for the FD series, its latest RQ version, null without one), and
  * `record_start` and `record_end` the first and last days UHSLC has, which a
- * backfill keeps to. They're kept in the lake's list only.
+ * backfill keeps to. `contributor` is the agency UHSLC's documentation names,
+ * null where it names none. They're kept in the lake's list only.
  */
 export type UhslcStation = ListedStation & {
   version: string | null;
+  contributor: string | null;
   record_start: string | null;
   record_end: string | null;
 };
+
+/** A station as the lake's list holds it, with the references of its epochs. */
+type Listed = Partial<UhslcStation> & { epochs?: { reference: string | null }[] };
 
 interface Table {
   table: { columnNames: string[]; rows: (string | number | null)[][] };
@@ -103,7 +112,7 @@ function url(dataset: string, variables: string, constraints: string[] = []): st
  * UHSLC couldn't tie to the same benchmark, and every version of a station
  * with no FD series.
  */
-export async function stations(): Promise<UhslcStation[]> {
+export async function stations(previous: Listed[] = []): Promise<UhslcStation[]> {
   const columns = "uhslc_id,station_name,station_country,station_country_code,latitude,longitude";
   // Station rows are subset variables ERDDAP answers at once; the spans come
   // from the daily sets, since the hourly RQ one times out.
@@ -148,40 +157,60 @@ export async function stations(): Promise<UhslcStation[]> {
   const included = (r: Record<string, unknown>) =>
     !EXCLUDED_COUNTRIES.has(Number(r.station_country_code));
 
-  const latest = new Map<number, string>();
-  for (const r of rq) {
-    const id = Number(r.uhslc_id);
-    const version = String(r.version);
-    if (version > (latest.get(id) ?? "")) latest.set(id, version);
-  }
+  const versionsOf = new Map<number, string[]>();
+  for (const r of rq)
+    versionsOf.set(Number(r.uhslc_id), [
+      ...(versionsOf.get(Number(r.uhslc_id)) ?? []),
+      String(r.version),
+    ]);
+  const before = new Map(previous.map((s) => [s.id, s]));
+  const carried = new Map<number, string>();
   const listed: UhslcStation[] = [];
   for (const r of fd.filter(included)) {
     const id = Number(r.uhslc_id);
-    const version = latest.get(id) ?? null;
-    // A new RQ version is a new benchmark, so it opens a datum epoch from the
-    // version's start, which a backfill then fills. The daily spans can start a
-    // day after the hourly record, so it's dated a day early.
-    const start = version ? rqSpans.get(`${id}${version}`)![0] : null;
     const span = fdSpans.get(`${id}`);
+    const versions = (versionsOf.get(id) ?? []).sort().reverse();
+    const startOf = (v: string) => rqSpans.get(`${id}${v}`)![0];
+    // The FD series carries the RQ version it starts with: the latest, except
+    // while the FD set and the RQ sets reload apart after a release. With none
+    // matching, the station keeps the version the lake's list has, or on its
+    // first listing takes the latest.
+    const version =
+      versions.find(
+        (v) => span && Math.abs(Date.parse(startOf(v)) - Date.parse(span[0])) <= 2 * DAY_MS,
+      ) ??
+      kept(id, versions, before.get(`uhslc/${pad(id)}`)?.version) ??
+      versions[0] ??
+      null;
+    if (version) carried.set(id, version);
+    const start = version && versions.includes(version) ? startOf(version) : null;
     listed.push({
       ...toStation(r, pad(id), span),
       version,
-      reference: start ? { id: version!, since: dayBefore(start) } : null,
+      // A new RQ version is a new benchmark, so it opens a datum epoch from the
+      // version's start, which a backfill then fills. The daily spans can start
+      // a day after the hourly record, so it's dated a day early.
+      reference: version ? { id: version, since: start ? dayBefore(start) : null } : null,
       // An FD series still reporting grows on every refresh, so it gets an end
       // only once it has stopped for a year, which a backfill then keeps to.
-      record_end: span && Date.parse(span[1]) < Date.now() - 365 * 86_400_000 ? span[1] : null,
+      record_end: span && Date.parse(span[1]) < Date.now() - 365 * DAY_MS ? span[1] : null,
     });
   }
-  const current = new Set(fd.map((r) => Number(r.uhslc_id)));
   for (const r of rq.filter(included)) {
     const id = Number(r.uhslc_id);
     const version = String(r.version);
-    if (current.has(id) && version === latest.get(id)) continue;
+    if (carried.get(id) === version) continue;
     listed.push({
       ...toStation(r, `${pad(id)}${version.toLowerCase()}`, rqSpans.get(`${id}${version}`)),
       version,
     });
   }
+  unscanned.length = 0;
+  for (const s of listed) withTerms(s, before.get(s.id));
+  if (unscanned.length)
+    console.error(
+      `  uhslc: no contributor scanned for ${unscanned.join(", ")}; tagged non-commercial until \`npm run uhslc:contributors\` reads their files`,
+    );
   // Every series from one UHSLC station number is the same gauge site.
   const byNumber = new Map<string, string[]>();
   for (const s of listed) byNumber.set(number(s), [...(byNumber.get(number(s)) ?? []), s.id]);
@@ -190,6 +219,7 @@ export async function stations(): Promise<UhslcStation[]> {
       .get(number(s))!
       .filter((id) => id !== s.id)
       .sort();
+  refuseRegression(previous, listed);
   return listed.sort((a, b) => a.id.localeCompare(b.id));
 
   function toStation(
@@ -223,10 +253,91 @@ export async function stations(): Promise<UhslcStation[]> {
       min_interval_s: null,
       source_url: `https://uhslc.soest.hawaii.edu/stations/?stn=${sourceId.slice(0, 3)}#levels`,
       version: null,
+      contributor: null,
       record_start: span?.[0] ?? null,
       record_end: span?.[1] ?? null,
     };
   }
+}
+
+/**
+ * ERDDAP caught mid-reload can drop rows from a list. FD series stop only a
+ * few at a time, so a list where many do is refused and the lake keeps the one
+ * it has; taken at its word, it would retire them for good. A real clean-up
+ * that large needs `FD_STOPPED` raised for one refresh.
+ */
+function refuseRegression(previous: Listed[], listed: UhslcStation[]): void {
+  const now = new Set(listed.map((s) => s.id));
+  const gone = previous.filter(
+    (s) => s.status === "active" && s.source_id?.length === 3 && !now.has(s.id!),
+  ).length;
+  if (gone > FD_STOPPED)
+    throw new Error(`UHSLC stopped listing ${gone} fast-delivery series at once; try again later`);
+}
+
+/** FD series one refresh may lose before the list looks partial. */
+const FD_STOPPED = 5;
+
+/**
+ * A station's contributor, and the terms its documentation file adds to
+ * UHSLC's: its commercial-use tag and the contributor's credit. An FD series
+ * takes its RQ version's file; one with no RQ version has none, and keeps
+ * UHSLC's terms. See docs/uhslc-contributors.md.
+ */
+function withTerms(station: UhslcStation, previous?: Listed): void {
+  const fd = station.source_id.length === 3;
+  // An FD series's earlier epochs hold its earlier versions' values, so it
+  // takes the strictest terms and every credit of each version its epochs name.
+  const versions = fd
+    ? [station.version, ...(previous?.epochs ?? []).map((e) => e.reference)]
+    : [station.version];
+  const keys = [
+    ...new Set(
+      versions
+        .filter((v): v is string => !!v)
+        .map((v) => (fd ? `${station.source_id}${v.toLowerCase()}` : station.source_id)),
+    ),
+  ];
+  station.contributor = keys.length ? (CONTRIBUTORS[keys[0]!]?.contributor ?? null) : null;
+  const credits = [metadata.attribution];
+  for (const key of keys) {
+    const record = CONTRIBUTORS[key];
+    // A version released since the last scan may have a file nobody has read,
+    // so its terms are unknown and it isn't tagged for commercial use until a
+    // rescan. A record the scan found no file for has UHSLC's terms.
+    if (!record) {
+      unscanned.push(key);
+      station.commercial_use = false;
+      continue;
+    }
+    if (!record.notice) continue;
+    const notice = NOTICES[record.notice];
+    // A notice renamed or removed since the scan leaves its terms unknown.
+    if (!notice) {
+      unscanned.push(key);
+      station.commercial_use = false;
+      continue;
+    }
+    if (!notice.commercial_use) station.commercial_use = false;
+    const credit = notice.credit ?? record.contributor;
+    if (credit && !credits.includes(credit)) credits.push(credit);
+  }
+  station.attribution = credits.join("; ");
+}
+
+const unscanned: string[] = [];
+
+/**
+ * The lake's version for an FD series none of whose versions starts where it
+ * does. Meant for a row ERDDAP left out mid-reload; when the version is still
+ * listed, the FD series has moved somewhere unexpected, which is reported.
+ */
+function kept(id: number, versions: string[], version?: string | null): string | null | undefined {
+  if (version && versions.includes(version))
+    console.error(
+      `  uhslc: ${pad(id)}'s FD series no longer starts where version ${version} or any other does; keeping ${version}`,
+    );
+  return version;
 }
 
 function number(station: Pick<Station, "source_id">): string {

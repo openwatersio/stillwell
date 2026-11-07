@@ -17,6 +17,7 @@
     "evaluate:bsh": "node scripts/evaluate-bsh.ts",
     "evaluate:rws": "node scripts/evaluate-rws.ts",
     "clock-check": "node scripts/clock-check.ts",
+    "uhslc:contributors": "node scripts/uhslc-contributors.ts",
     "test": "node --test 'test/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "lint": "prettier --check .",

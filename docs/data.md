@@ -1,8 +1,8 @@
 # Using the water-levels bucket
 
-Every public series in the lake is Parquet at `https://water-levels.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Non-commercial sources aren't here; they go to a separate private lake.
+Every public series in the lake is Parquet at `https://water-levels.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Data whose source bars republishing isn't here; it goes to a separate private lake. Non-commercial data a source lets anyone republish is here, with `commercial_use` false on its stations.
 
-Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every source here allows commercial use.
+Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
 
 So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
 
@@ -40,7 +40,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series.
 - **`status`**: `active` or `inactive`.
-- **`commercial_use`**, **`license`** and **`attribution`**: the source's terms.
+- **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
 
 The examples below use the DuckDB CLI (`brew install duckdb`), and each one reads straight from the bucket.
 

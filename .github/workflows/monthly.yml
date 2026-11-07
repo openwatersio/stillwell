@@ -2,8 +2,8 @@ name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
 # rebuild stations.parquet and sources.json, and keep the scheduled workflows
-# enabled. On the 9th, refetch CO-OPS and USGS years that may hold values the
-# source has verified since. Ingest hourly starts a refresh of one source, at
+# enabled. On the 9th, refetch CO-OPS, USGS and UHSLC years that may hold values
+# the source has verified since. Ingest hourly starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
@@ -36,7 +36,7 @@ on:
         type: boolean
         default: false
       refetch:
-        description: "Refetch CO-OPS and USGS years with unverified values, instead of refreshing lists"
+        description: "Refetch CO-OPS, USGS and UHSLC years with unverified values, instead of refreshing lists"
         type: boolean
         default: false
 
@@ -66,11 +66,11 @@ jobs:
               exit 0
             fi
           fi
-          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws usace usgs} | jq -Rnc '[inputs | select(. != "")]')
+          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
           if [ "$REFETCH" = true ]; then
-            refetch=$(jq -c 'map(select(. == "coops" or . == "usgs"))' <<< "$sources")
+            refetch=$(jq -c 'map(select(. == "coops" or . == "usgs" or . == "uhslc"))' <<< "$sources")
             if [ "$refetch" = "[]" ]; then
-              echo "::error::Only coops and usgs are refetched"
+              echo "::error::Only coops, usgs and uhslc are refetched"
               exit 1
             fi
             echo "sources=[]" >> "$GITHUB_OUTPUT"
@@ -184,12 +184,17 @@ jobs:
       # request at one every 3.7 seconds, too many for one run across 11,000
       # stations, so each month takes a twelfth of them, about 1,200 stations
       # and 2.5 hours, and each station comes round once a year. The current year is left to compaction.
+      # UHSLC releases research-quality data a year or two behind, replacing
+      # fast-delivery values, and none of its series is live: the last two
+      # ended years and this one, where backfill skips ended years with no
+      # preliminary values, so about 320 FD series a year or three each.
       - run: |
           year=$(date -u +%Y)
           month=$(date -u +%m)
           case "$SOURCE" in
             coops) set -- coops all $((year - 1)) "$year-$month-01" ;;
             usgs) set -- usgs all $((year - 2)) "$year" --shard "$((10#$month))/12" ;;
+            uhslc) set -- uhslc all $((year - 2)) $((year + 1)) ;;
           esac
           node scripts/ingest.ts backfill "$@"
         env:

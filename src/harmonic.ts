@@ -97,6 +97,30 @@ export function timeline(model: HarmonicModel, times: number[]): Sample[] {
   }));
 }
 
+/**
+ * How late `samples` run against `reference`, in hours, from `name`'s phase in
+ * a fit of the samples: a clock Δt late moves a constituent's phase by its
+ * speed times Δt. K1 tells a 12-hour error from none, which the semidiurnal
+ * tide, repeating every 12.42 hours, can't. Wrapped to half the period.
+ */
+export function phaseLag(
+  samples: Sample[],
+  reference: HarmonicConstituent[],
+  name = "K1",
+): number | null {
+  const key = keys.get(name.toUpperCase());
+  const expected = reference.find((c) => keys.get(c.name.toUpperCase()) === key);
+  // A shorter record can't separate K1 from P1, which pulls K1's phase.
+  const days = (samples.at(-1)!.time - samples[0]!.time) / 86_400_000;
+  if (!key || !expected || days < 183) return null;
+  const fitted = fit(samples, [...STANDARD.slice(0, 8), name]).constituents.find(
+    (c) => keys.get(c.name.toUpperCase()) === key,
+  );
+  if (!fitted) return null;
+  const degrees = ((((fitted.phase - expected.phase) % 360) + 540) % 360) - 180;
+  return degrees / engineConstituents[key]!.speed;
+}
+
 /** Every turning point of the predicted curve, as Slackwater reports them. */
 export function extremes(model: HarmonicModel, start: number, end: number): Extreme[] {
   const predictor = createTidePredictor(model.constituents, { offset: model.offset });
