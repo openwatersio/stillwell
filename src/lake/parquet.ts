@@ -375,6 +375,7 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   attribution: "VARCHAR",
   tide_station: "VARCHAR",
   same_as: "VARCHAR[]",
+  preferred: "VARCHAR",
   status: "VARCHAR",
   live: "BOOLEAN",
   min_interval_s: "INTEGER",
@@ -397,7 +398,7 @@ export async function writeStations(path: string, stations: LakeStation[]): Prom
 
 /** What a source's list holds besides the shared columns, kept as JSON in `extra`. */
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
-  Object.entries(STATION_COLUMNS).filter(([key]) => key !== "first" && key !== "last"),
+  Object.entries(STATION_COLUMNS).filter(([key]) => !["first", "last", "preferred"].includes(key)),
 );
 
 /**

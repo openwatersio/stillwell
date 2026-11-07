@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { LakeStation, ListedStation, Station } from "../src/schema.ts";
 import { seriesPath } from "../src/lake/paths.ts";
-import { linkBothWays, mergeStationList } from "../src/stations.ts";
+import { mergeStationList } from "../src/stations.ts";
 
 const base = {
   source: "rws",
@@ -270,14 +270,5 @@ describe("seriesPath", () => {
       seriesPath("data", "levels", "rws", "hoekvanholland", 2026),
       "data/obs/rws/hoekvanholland/2026.parquet",
     );
-  });
-});
-
-describe("linkBothWays", () => {
-  it("adds the reverse of every link", () => {
-    const linked = linkBothWays([station("a", { same_as: ["pegelonline/1"] }), station("b")]);
-    assert.deepEqual(linked[0]!.same_as, ["pegelonline/1"]);
-    const reverse = linkBothWays([station("a", { same_as: ["rws/b"] }), station("b")]);
-    assert.deepEqual(reverse[1]!.same_as, ["rws/a"]);
   });
 });

@@ -352,7 +352,10 @@ describe("publishStations", () => {
     await writeStations(boundsPath(lake, "test"), [
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
-    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { count: 2 });
+    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), {
+      count: 2,
+      links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
+    });
     assert.deepEqual(await publishedSources(stationsPath(lake)), ["test"]);
     // sources.json carries a source's terms, not which jobs ingest runs for it.
     const [published] = JSON.parse(await readFile(sourcesPath(lake), "utf8"));
@@ -363,12 +366,13 @@ describe("publishStations", () => {
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
-      { id: "test/a", first: "2001", same_as: ["test/b"], epochs: "1" },
-      { id: "test/b", first: null, same_as: ["test/a"], epochs: "1" },
+      // The longer record in the lake is preferred.
+      { id: "test/a", first: "2001", same_as: ["test/b"], preferred: "test/a", epochs: "1" },
+      { id: "test/b", first: null, same_as: ["test/a"], preferred: "test/a", epochs: "1" },
     ]);
   });
 
@@ -382,7 +386,10 @@ describe("publishStations", () => {
     assert.equal(await exists(stationsPath(lake)), false);
     assert.deepEqual(await publishedSources(stationsPath(lake)), []);
     // A new source with no list yet doesn't hold up the others.
-    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), { count: 0 });
+    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), {
+      count: 0,
+      links: { pairs: {}, dropped: [], skipped: [], large: [] },
+    });
   });
 });
 
