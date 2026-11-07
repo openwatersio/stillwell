@@ -178,7 +178,9 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **European originators**: REFMAR (adapter done; backfill running), UK EA (43 tide gauges, backfilled from its year-long archive). These also run hourly from phase 4 on.
 - [x] **SFWMD** (`sfwmd`): stage at the 43 tidal gauges TICON keeps from South Florida's DBHYDRO, in NAVD88, running hourly, from DBHYDRO's reviewed series back to 1974 and its telemetry after. See [the adapter's README](../src/sources/sfwmd/README.md).
 - [ ] Backfill SFWMD through the Ingest workflow.
-- [ ] **Other US state networks**: California DWR, then CRMS, NWFWMD and NCDEM, whose terms or access need a decision first. [us-state-networks.md](us-state-networks.md) has the findings.
+- [x] **California DWR** (`dwr`): 15-minute stage at the 51 Delta gauges TICON keeps that DWR's Water Data Library has a file for, in NAVD88 or above gauge zero, back to 1975, read from last January on every month. See [the adapter's README](../src/sources/dwr/README.md).
+- [ ] Backfill California DWR through the Ingest workflow.
+- [ ] **Other US state networks**: CDEC's own stations, then CRMS, NWFWMD and NCDEM, whose terms or access need a decision first. [us-state-networks.md](us-state-networks.md) has the findings.
 - [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
 - [ ] **GESLA 4.1** as the fallback for years an originator can't supply, from the existing R2 mirror, with tide-database's clock fixes and per-contributor licenses. Never where the originator has the same years.

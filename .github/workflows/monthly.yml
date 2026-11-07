@@ -163,7 +163,7 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # Backfill takes every station whose bounds hold a preliminary value, active
-  # or not, and fetches again from that value's month on, skipping ended years
+  # or not (California DWR excepted, below), and fetches again from that value's month on, skipping ended years
   # with none (yearDone in src/backfill.ts), so values the source has finalized
   # since replace the ones compaction wrote. It then reads each station's
   # earliest preliminary value again into the bounds. Values preliminary from
@@ -206,18 +206,23 @@ jobs:
       # preliminary for good; --skip-unscreened leaves out a station with a
       # year of record and no value its source screened, but for January's run.
       # REFMAR's partner gauges often have only raw values, so it skips them the
-      # same way.
+      # same way. California DWR's files run days to months behind and nothing
+      # else fetches them, so every active DWR station is read again from
+      # January of last year to today, finished years included.
       - run: |
           year=$(date -u +%Y)
           month=$(date -u +%m)
+          which=preliminary
+          from=$((year - 3))
           case "$SOURCE" in
             usgs) set -- "$year" --shard "$((10#$month))/12" ;;
+            dwr) which=all from=$((year - 1)) && set -- "$(date -u +%F)" --refetch ;;
             # Every January takes them all, so a station whose office began
             # screening since, or a new epoch's, is read again and can rejoin.
             usace | refmar) set -- "$year-$month-01" $([ "$month" != 01 ] && echo --skip-unscreened) ;;
             *) set -- "$year-$month-01" ;;
           esac
-          node scripts/ingest.ts backfill "$SOURCE" preliminary $((year - 3)) "$@"
+          node scripts/ingest.ts backfill "$SOURCE" "$which" "$from" "$@"
         env:
           SOURCE: ${{ matrix.source }}
           WATER_LEVELS_LAKE: s3://water-levels

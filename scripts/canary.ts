@@ -17,6 +17,7 @@ import { fetchText, setTransport } from "../src/http.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
+import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
@@ -41,6 +42,18 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
   // San Francisco; live, so no metadata request for its dates.
   coops: () => coops.levels("9414290", start, end, { live: true }),
+  // Fisherman's Cut in the Delta, from the tail of its file, which runs a day or two behind.
+  dwr: () =>
+    dwr.levels(
+      {
+        source_id: "B95050Q",
+        parameter: "WaterSurfaceElevationNAVD88",
+        datum: "NAVD88",
+        record_start: "2015-10-01T08:00:00.000Z",
+      },
+      new Date(start.getTime() - 7 * DAY_MS),
+      end,
+    ),
   // Newlyn, from the readings API.
   ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
   // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
