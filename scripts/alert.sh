@@ -25,10 +25,18 @@ conclusions() {
 }
 
 current=$(conclusions "$GITHUB_RUN_ID")
+# With no matrix jobs, the gate couldn't pick the workflow's sources
+# (scripts/sources.ts), so nothing ran for any source: one issue for the
+# workflow, closed by the next run that has its jobs again.
+stuck="$GITHUB_WORKFLOW can't pick its sources"
+stuck_open=$(gh issue list --repo "$repo" --state open --limit 200 --json number,title \
+  --jq "map(select(.title == \"$stuck\"))[0].number // empty")
 if [ -z "$current" ]; then
-  echo "No \`$job (<source>)\` jobs in this run; was the matrix job renamed?" >&2
+  echo "No \`$job (<source>)\` jobs in this run, so its gate couldn't pick the sources, or the matrix job was renamed" >&2
+  [ -n "$stuck_open" ] || gh issue create --repo "$repo" --title "$stuck" --body "[This run]($run_url) had no \`$job\` jobs, so nothing ran for any source. Its \`gate\` job picks the sources with \`scripts/sources.ts\`; its log says why that failed. This issue closes on its own when a run has the jobs again."
   exit 1
 fi
+[ -z "$stuck_open" ] || gh issue close "$stuck_open" --repo "$repo" --comment "This run had its jobs again: [run]($run_url)."
 # Runs on main before this one, dispatched or scheduled, newest first, until
 # each source has one whose job started: up to 100 runs, for a source whose
 # jobs keep waiting behind a long backfill. A backup that skipped is one of

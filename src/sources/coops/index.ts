@@ -35,6 +35,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "NOAA National Ocean Service, CO-OPS",
+  // Preliminary 6-minute values are verified a month or two later.
+  hourly: true,
+  finalizes: true,
   terms: "Preliminary data are unverified and may change once CO-OPS verifies them.",
 };
 

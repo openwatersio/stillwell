@@ -36,6 +36,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Rijkswaterstaat",
+  // Unchecked values are checked later.
+  hourly: true,
+  finalizes: true,
   terms: "No uptime guarantee; fair use, at most 160,000 values per request.",
   // Values from before the 2005 NAP revision come in the old NAP.
   archive: "previous",
