@@ -35,6 +35,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE",
+  // Raw values only: neither the feed nor the download ever finalizes them.
+  hourly: true,
+  finalizes: false,
   // Central European time, standard or summer.
   utc_offsets: [1, 2],
   terms: "Raw, unchecked values.",

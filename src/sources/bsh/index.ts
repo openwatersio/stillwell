@@ -39,6 +39,9 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: ATTRIBUTION,
+  // Predictions only, published a year ahead; nothing to poll or finalize.
+  hourly: false,
+  finalizes: false,
   terms:
     "A calendar year's predictions may be published online only from 1 August of the year before.",
 };
