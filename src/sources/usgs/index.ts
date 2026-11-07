@@ -314,7 +314,7 @@ interface Value {
   time: string;
   value: string | null;
   approval_status: string | null;
-  qualifier: string[] | string | null;
+  qualifier: (string | null)[] | string | null;
 }
 
 /**
@@ -465,7 +465,10 @@ const OTHER_DATUM = new Set(["DIFFDATUM", "DATUMCHANGE"]);
 
 function qualifiers(v: Pick<Value, "qualifier">): string[] {
   const q = v.qualifier;
-  return (q === null ? [] : Array.isArray(q) ? q : [q]).map((s) => s.toUpperCase());
+  // A list can hold nulls, as at 01097480 in 2008.
+  return (Array.isArray(q) ? q : [q])
+    .filter((s): s is string => typeof s === "string")
+    .map((s) => s.toUpperCase());
 }
 
 /**
