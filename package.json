@@ -1,7 +1,7 @@
 {
   "name": "water-levels",
   "description": "Observed and predicted water levels from tide and river gauges, as Parquet",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/openwatersio/water-levels.git"
