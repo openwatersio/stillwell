@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[],"timeStamp":"2026-11-07T01:39:28Z","numberReturned":0,"links":[{"href":"https://opendataapi.dmi.dk/v2/oceanObs/collections/observation/items?stationId=30017&parameterId=sealev_dvr&datetime=2024-01-15T15:00:00.000Z/2024-01-15T17:59:59.999Z&limit=10&offset=18","rel":"self","type":"application/geo+json","title":"This document"}]}
