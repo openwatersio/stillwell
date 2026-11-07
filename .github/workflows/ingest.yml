@@ -3,6 +3,7 @@ name: Ingest
 # Run any ingest command against the R2 lake by hand, e.g.
 # `backfill rws hoekvanholland 2024 2025`. Ingest hourly and Compact daily run
 # `recent` and `compact` on a schedule.
+run-name: Ingest ${{ inputs.args }}
 on:
   workflow_dispatch:
     inputs:
