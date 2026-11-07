@@ -215,6 +215,8 @@ export async function history(
           getText(`${SITE}${downloadUrl}`, { fresh: true, base64: true }),
         );
         const files = await unzip(zip);
+        // An empty zip is a failed download, so it's prepared again like a bad one.
+        if (!files.size) throw new Error(`PEGELONLINE ${station} download is empty`);
         endRefusals();
         return files;
       } catch (error) {
@@ -334,7 +336,8 @@ export async function unzip(base64: string): Promise<Map<string, string>> {
   const view = new DataView(zip.buffer);
   let end = zip.length - 22;
   while (end > 0 && view.getUint32(end, true) !== 0x06054b50) end--;
-  if (end <= 0) throw new Error("not a zip");
+  // An empty zip is that record alone, at 0.
+  if (end < 0 || view.getUint32(end, true) !== 0x06054b50) throw new Error("not a zip");
   const files = new Map<string, string>();
   let p = view.getUint32(end + 16, true);
   for (let i = view.getUint16(end + 10, true); i > 0; i--) {
