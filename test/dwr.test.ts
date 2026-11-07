@@ -318,6 +318,10 @@ describe("dwr", () => {
       () => dwr.parse("13/01/1998 00:15:00,        1.00,      1,", "B95325"),
       /bad row/,
     );
+    assert.throws(
+      () => dwr.parse("02/30/1998 00:15:00,        1.00,      1,", "B95325"),
+      /bad row/,
+    );
   });
 
   it("reads a station from stations.parquet by the file its source_url names", async () => {

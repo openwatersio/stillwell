@@ -355,9 +355,12 @@ export function parse(text: string, number: string): Observation[] {
     const flag = flagOf(Number(m[6]));
     if (flag === null) continue;
     const feet = Number(value);
-    const time = Date.parse(`${m[3]}-${m[1]}-${m[2]}T${m[4]}Z`) - PST_MS;
-    if (!Number.isFinite(feet) || Number.isNaN(time))
-      throw new Error(`WDL ${number} sent a bad row: ${m[0]}`);
+    const local = `${m[3]}-${m[1]}-${m[2]}T${m[4]}`;
+    const utc = Date.parse(`${local}Z`);
+    // Date.parse rolls an impossible day, such as 30 February, into the next month.
+    const real = !Number.isNaN(utc) && new Date(utc).toISOString().startsWith(local);
+    const time = utc - PST_MS;
+    if (!Number.isFinite(feet) || !real) throw new Error(`WDL ${number} sent a bad row: ${m[0]}`);
     out.push({
       time,
       level: Math.round(feet * FEET * 1000) / 1000 + 0,
