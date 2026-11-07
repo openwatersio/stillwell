@@ -51,28 +51,25 @@ export const CODES = [
 ];
 
 /**
- * Stations whose river stage CDEC's own pages put in NAVD88: a gauge zero of
- * 0.0 ft NAVD 88, or a note that says so. Where a note gives the date the
- * station moved to NAVD88, it's kept, and nothing before it is read: GSS and
- * SUT were on an arbitrary datum until 1 October 2005, and MAL and MRZ show
- * NGVD29 until 1 October 2006. Every other station is stage above an unnamed
- * gauge zero, `GZ`.
+ * The days stations moved to NAVD88, by their pages' notes; nothing before is
+ * read. GSS and SUT were on an arbitrary datum until 1 October 2005, and MAL
+ * and MRZ show NGVD29 until 1 October 2006.
  */
-export const NAVD88: Record<string, string | null> = {
-  BDL: null,
-  CYG: null,
+export const NAVD88_SINCE: Record<string, string> = {
   GSS: "2005-10-01",
-  GYS: null,
-  HSL: null,
-  HUN: null,
-  IBS: null,
   MAL: "2006-10-01",
   MRZ: "2006-10-01",
-  PEL: null,
-  SNC: null,
   SUT: "2005-10-01",
-  VOL: null,
 };
+
+/** Datums a station's page gives only in a note, with no gauge-zero table. */
+export const NOTED: Record<string, string> = {
+  // "Datum of this station is NAVD88."
+  BDL: "NAVD88",
+};
+
+/** The datums a gauge-zero table names, as the lake labels them. */
+const DATUMS: Record<string, string> = { "NAVD 88": "NAVD88", "NGVD 29": "NGVD29" };
 
 /** A CDEC station as listed, with the first day read and, once closed, the day after the last. */
 export type CdecStation = ListedStation & {
@@ -86,8 +83,8 @@ export interface Meta {
   lat: number;
   lon: number;
   operator: string;
-  /** The datum the gauge-zero table names, such as `NAVD 88` or `NGVD 29`, or null where there's none. */
-  zeroDatum: string | null;
+  /** The gauge zero's elevation in feet and the datum the table names, such as `NAVD 88`, or null where there's no table. */
+  zero: { feet: number; datum: string } | null;
   /** 15-minute river stage (sensor 1, event), as `MM/DD/YYYY` dates; `to` is null while current. */
   stage: { from: string; to: string | null } | null;
 }
@@ -102,12 +99,7 @@ export async function stations(): Promise<ListedStation[]> {
     );
     // USGS's gauges are in `usgs`; one it runs with another agency is too.
     if (/USGS|Geological/i.test(meta.operator) || !meta.stage) continue;
-    const navd88 = code in NAVD88;
-    // The hand-kept list must agree with the page, or a datum change would go unnoticed.
-    if (meta.zeroDatum && /NAVD ?88/.test(meta.zeroDatum) !== navd88)
-      throw new Error(
-        `CDEC's page for ${code} gives its zero in ${meta.zeroDatum}, but the adapter lists it in ${navd88 ? "NAVD88" : "GZ"}`,
-      );
+    const { datum, datums } = datumOf(code, meta.zero);
     const from = Math.max(local(meta.stage.from), navd88Since(code));
     const active = meta.stage.to === null;
     out.push({
@@ -121,8 +113,8 @@ export async function stations(): Promise<ListedStation[]> {
       kind: "estuary",
       // Petaluma's gauge reports about every 9 minutes; the rest every 15.
       interval_s: code === "PTB" ? null : 900,
-      datum: navd88 ? "NAVD88" : "GZ",
-      datums: {},
+      datum,
+      datums,
       products: ["levels"],
       first: null,
       last: null,
@@ -147,9 +139,30 @@ function local(date: string, days = 0): number {
   return fromPacific(Date.UTC(Number(y), Number(m) - 1, Number(d) + days));
 }
 
+/**
+ * A station's datum, from its page. A gauge zero of 0.0 ft in a named datum
+ * puts the stage in that datum; any other puts it above the gauge's zero,
+ * `GZ`, with the zero's elevation as the offset to the named datum. A station
+ * with no table takes a datum its notes give, or `GZ`. A change in what the
+ * page says changes the station's datum, which opens a datum epoch at the
+ * next refresh, or holds it for a person to check.
+ */
+export function datumOf(
+  code: string,
+  zero: Meta["zero"],
+): { datum: string; datums: Record<string, number> } {
+  const named = zero && DATUMS[zero.datum];
+  if (zero && !named)
+    throw new Error(`CDEC's page for ${code} names an unknown datum, ${zero.datum}`);
+  if (zero && zero.feet === 0) return { datum: named!, datums: {} };
+  if (zero)
+    return { datum: "GZ", datums: { [named!]: Math.round(zero.feet * FEET * 1000) / 1000 } };
+  return { datum: NOTED[code] ?? "GZ", datums: {} };
+}
+
 /** When a station's stage began in NAVD88, as an instant; 0 where it always was, or isn't. */
 export function navd88Since(code: string): number {
-  const since = NAVD88[code];
+  const since = NAVD88_SINCE[code];
   if (!since) return 0;
   const [y, m, d] = since.split("-");
   return local(`${m}/${d}/${y}`);
@@ -190,11 +203,10 @@ export function parseMeta(html: string, code: string): Meta {
       };
   }
   // The gauge-zero table's first row: the zero's elevation and its datum.
-  const zero = /<th>Zero[\s\S]*?<\/table>/.exec(html)?.[0];
-  const zeroDatum = zero
-    ? (/<td>\s*-?[\d.]+'\s*([A-Z]+ ?\d+)\s*<\/td>/.exec(zero)?.[1] ?? null)
-    : null;
-  return { name: titleCase(name), lat, lon, operator, zeroDatum, stage };
+  const table = /<th>Zero[\s\S]*?<\/table>/.exec(html)?.[0];
+  const row = table && /<td>\s*(-?[\d.]+)'\s*([A-Z]+ ?\d+)\s*<\/td>/.exec(table);
+  const zero = row ? { feet: Number(row[1]), datum: row[2]!.replace(/\s+/g, " ") } : null;
+  return { name: titleCase(name), lat, lon, operator, zero, stage };
 }
 
 const decode = (text: string) => text.replace(/&amp;/g, "&").replace(/&#39;/g, "'");

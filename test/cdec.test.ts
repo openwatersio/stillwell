@@ -96,15 +96,29 @@ describe("cdec", () => {
     );
   });
 
-  it("refuses a page whose gauge-zero datum disagrees with the adapter's list", async () => {
-    // GSS's page with its zero in NGVD 29, though the adapter lists it in NAVD88.
+  it("lists each station in the datum its page gives", async () => {
+    assert.deepEqual(cdec.parseMeta(fixture("cdec-meta-MRZ.html"), "MRZ").zero, {
+      feet: 0,
+      datum: "NAVD 88",
+    });
+    // A zero of 0.0 ft puts stage in that datum; any other is stage above it.
+    assert.deepEqual(cdec.datumOf("MRZ", { feet: 0, datum: "NAVD 88" }), {
+      datum: "NAVD88",
+      datums: {},
+    });
+    assert.deepEqual(cdec.datumOf("SDC", { feet: 5, datum: "NGVD 29" }), {
+      datum: "GZ",
+      datums: { NGVD29: 1.524 },
+    });
+    // No table: a datum the notes give, or gauge zero.
+    assert.deepEqual(cdec.datumOf("BDL", null), { datum: "NAVD88", datums: {} });
+    assert.deepEqual(cdec.datumOf("HOL", null), { datum: "GZ", datums: {} });
+    assert.throws(() => cdec.datumOf("HOL", { feet: 0, datum: "MLLW 1" }), /unknown datum, MLLW 1/);
+    // A page that moves GSS to NGVD 29 moves the station, for the refresh to open or hold an epoch.
     const gss = fixture("cdec-meta-GSS.html").replace("NAVD 88", "NGVD 29");
-    assert.equal(cdec.parseMeta(gss, "GSS").zeroDatum, "NGVD 29");
     serve((url) => (/station_id=GSS/.test(url) ? gss : NO_STAGE));
-    await assert.rejects(
-      cdec.stations(),
-      /GSS gives its zero in NGVD 29, but the adapter lists it in NAVD88/,
-    );
+    const [listed] = await cdec.stations();
+    assert.deepEqual([listed!.id, listed!.datum], ["cdec/GSS", "NGVD29"]);
   });
 
   it("merges a station's 15-minute stage rows", () => {
