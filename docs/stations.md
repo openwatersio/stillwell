@@ -135,7 +135,7 @@ history/stations/<source>/<time>.parquet     the source's list as each refresh s
 history/stations/<source>/<time>.json        what that refresh changed
 ```
 
-- **`stations/<source>.parquet`** has the `stations.parquet` columns except `first`/`last`, plus `epochs` and an `extra` JSON column for the source's own fields (USACE `series`, CO-OPS `established`/`removed`, PEGELONLINE `history_since`, UHSLC `version`/`record_start`/`record_end`, SMHI and the Marine Institute `record_start`/`record_end`, Kartverket `record_start`, REFMAR `first_observation`, SFWMD `series`/`series_start`/`series_end`/`history`/`history_start`/`history_end`/`record_start`/`record_end`). Reading a list spreads `extra` back onto each station, so adapters, `backfill` and `recent` see those fields as they do today. USACE's `zero_since` becomes the current epoch's `since`.
+- **`stations/<source>.parquet`** has the `stations.parquet` columns except `first`/`last`, plus `epochs` and an `extra` JSON column for the source's own fields (USACE `series`, CO-OPS `established`/`removed`, PEGELONLINE `history_since`, UHSLC `version`/`record_start`/`record_end`, SMHI, JMA and the Marine Institute `record_start`/`record_end`, Kartverket `record_start`, REFMAR `first_observation`, SFWMD `series`/`series_start`/`series_end`/`history`/`history_start`/`history_end`/`record_start`/`record_end`). Reading a list spreads `extra` back onto each station, so adapters, `backfill` and `recent` see those fields as they do today. USACE's `zero_since` becomes the current epoch's `since`.
 - **`stations.parquet`** and `sources.json` are rebuilt from the per-source lists and bounds; a source joins `sources.json` with its first list. All the state is in those, so the published file can always be rebuilt. Each of them is written only by jobs in its source's group: the refresh and a restore write the list, and compaction and backfill write the bounds.
 - **`<time>`** is the refresh's start time to the second, so a re-run never overwrites an earlier snapshot.
 - **Restricted sources.** A source's `license.redistribution` decides which lake holds its list, history and series: a source whose terms bar republishing goes to the restricted lake, which keeps its own `stations.parquet`. `commercial_use` is a tag on each station, which can differ from its source's default, and doesn't move a station between lakes.
@@ -170,11 +170,41 @@ The R2 lake was seeded once from the committed lists, with a command since remov
 
 **Rolling the code back** to a build from before the lake lists (before openwatersio/water-levels#7) isn't supported. A revert brings back the station files as they were at the switch, which go stale from then on, and that build knows nothing of epochs, so it could write a new epoch's values into epoch 1's files under the same label. Roll forward instead. If an old build does run, the lake lists still bound what the new build reads afterwards: epoch 1's `until` leaves out anything written after it. `recent` isn't covered: the old build rewrites it without the `epoch` column, so its rows read back as epoch 1, and a station in a later epoch loses up to a week of recent values.
 
+## Gauges in more than one source
+
+Many gauges are in more than one source: UHSLC carries copies of CO-OPS, REFMAR, Kartverket, SMHI and other agencies' gauges, REFMAR some of UHSLC's, BSH lists PEGELONLINE's gauges for its predictions, and USACE districts publish many USGS gauges. `stations.parquet` links the stations that share a gauge with `same_as`, and names the one to use for its observed levels with `preferred`. Both are worked out each time the file is built, in `linkGauges` (`src/same-as.ts`). A source's list keeps only its adapter's own links in `same_as`, so a better rule or a person's decision reaches every station at the next `publish`, while an adapter's new links wait for its next station refresh. `preferred` is worked out again on every build too, so it moves when a series stops reporting or another's record grows longer.
+
+**Matching.** A link comes from one of four places:
+
+1. **An ID the source gives**, which its adapter writes to `same_as`. BSH names each gauge's PEGELONLINE series, and UHSLC's documentation files give the originator's station number, which the adapter turns into a CO-OPS station where the contributor is NOS. Other contributors' numbers aren't their lake source's IDs: SHOM's aren't REFMAR's, and Kartverket, SMHI, DMI and BfG give only NODC numbers. A source also links its own series of one gauge, such as UHSLC's versions and RWS's twins. A link to a station no list has is dropped, as is one to another source's station more than 10 km away, which is taken as a wrong ID. Both are reported.
+2. **Nearness and name**, for two stations of different sources within 100 m whose names share an identifying word (`nameScore` in `src/ticon.ts`, the TICON inventory's), and that name the same side of any dam, lock or barrier: pool or tailwater, PEGELONLINE's `OP` and `UP`, `BP` and `AP`, or a compass word ending the name, such as a control structure's "- East". Never name alone, and never two stations of one source, whose neighbors (a gauge and its backup, two sides of a lock) are its adapter's to link. Nor does it link CO-OPS with USGS or USACE: each agency runs its own gauges, so two of them at one pier are separate instruments that check each other, and only an ID or a person links them.
+3. **A copy's best match.** UHSLC rounds its positions, so its copy of a gauge can sit a kilometer from the original. A station that copies another agency's gauge (see the preferred series below), and whose adapter didn't already name the original by a link that held, is linked to the station in each other source within 2 km, of the same kind where both say, that shares the most words with its name, the nearest among equals. Two equally named candidates more than 100 m apart leave it unlinked, unless their source links them as one gauge. The kind keeps a coastal copy at Sitka off USGS's Indian River at Sitka.
+4. **A person's decision** in `LINKS`, in `src/same-as.ts` with a note on why.
+
+Linked stations form a group, and each lists every other in `same_as`, so a link through a third station counts: a CO-OPS gauge that UHSLC copies is linked to every UHSLC version of it. Links join groups in the order above, a person's first and the nearest first within each kind, and two rules keep groups apart:
+
+- a link by nearness or copy never puts two stations of one source in a group, since one of them is likelier another gauge close by: CO-OPS lists several stations at some piers, and USACE a pool and a lock beside one USGS gauge;
+- no link joins two stations a person put in `UNLINKS`, even through a third station.
+
+**The preferred series** is the group's best by these, in order:
+
+1. a person's choice in `PREFER`;
+2. it has observed levels (a BSH prediction gauge doesn't);
+3. its terms allow commercial use, so the API can serve it before tokens exist;
+4. it is active and still reporting, with a value in the last year, so a live series wins over a version that ended;
+5. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC, and so is a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs;
+6. the longer record in the lake;
+7. the finer interval;
+8. the lower ID, so equals always break the same way.
+
+A station with no links is its own preferred series. A series that allows commercial use wins over one that doesn't, even one still reporting, so `preferred` can name a stopped series when the gauge's live one is non-commercial. `publish` prints the links made by source pair and how, the links and decisions it dropped (to no such station, or an ID more than 10 km off), the links the two rules above skipped, and any group of more than eight stations, which is likelier a bad link than one gauge. An older build's `publish` writes `stations.parquet` without `preferred`, so a rollback breaks queries on it until the next build publishes again.
+
 ## Where it lives
 
 - `src/epochs.ts`: opening, holding and deciding epochs, and `to_current`.
 - `src/stations.ts`: `mergeStationList`, which opens epochs rather than marking a station inactive.
 - `src/refresh.ts`: a source's refresh with its guards and report, and the rebuild of `stations.parquet` and `sources.json`.
+- `src/same-as.ts`: `same_as` and `preferred` across sources, with a person's decisions on them.
 - `src/lake/`: epoch paths, the `epoch` column in `recent`, readers and writers for the lists, bounds and history, and an HTTPS reader for the public bucket.
 - `scripts/ingest.ts`: `stations`, `backfill` and `recent` read the lists from the lake, write the current epoch, and skip held stations; `backfill` writes closed epochs too for an `archive: "previous"` source (`epochSpans` in `src/backfill.ts`).
 - `Source.overrides` (`src/schema.ts`): a person's decisions on a source's epochs, keyed by station and epoch start. Each epoch event in the report prints the key.

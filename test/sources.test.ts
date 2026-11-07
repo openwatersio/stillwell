@@ -11,7 +11,7 @@ import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
-import { contributorOf, NOTICES } from "../src/sources/uhslc/notices.ts";
+import { contributorOf, NOTICES, originatorOf } from "../src/sources/uhslc/notices.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
@@ -2706,6 +2706,36 @@ describe("uhslc", () => {
   it("names only notices that exist in every scanned record", () => {
     const missing = Object.entries(CONTRIBUTORS).filter(([, r]) => r.notice && !NOTICES[r.notice]);
     assert.deepEqual(missing, []);
+  });
+
+  it("reads a documentation file's originator number", () => {
+    assert.equal(
+      originatorOf("              GLOSS #  : 108  Originator #:1612340   NODC #: 72151701\r\n"),
+      "1612340",
+    );
+    assert.equal(
+      originatorOf("              GLOSS #  : 108  Originator #: none   NODC #: 1\n"),
+      null,
+    );
+    assert.equal(originatorOf("              GLOSS #  : 108\n"), null);
+    assert.equal(originatorOf("  GLOSS #  : 115  Originator #:        NODC #: 10156801\n"), null);
+  });
+
+  it("links a series to its CO-OPS station where NOS contributed it", () => {
+    const nos = "National Ocean Service (NOS)";
+    assert.equal(
+      uhslc.originatorStation({ contributor: nos, originator: "1612340" }),
+      "coops/1612340",
+    );
+    // Other contributors' numbers aren't their lake source's IDs.
+    assert.equal(
+      uhslc.originatorStation({
+        contributor: "Service Hydrographique Et Oceanographique",
+        originator: "620",
+      }),
+      null,
+    );
+    assert.equal(uhslc.originatorStation({ contributor: nos, originator: "ID070007" }), null);
   });
 
   it("reads a documentation file's contributor", () => {

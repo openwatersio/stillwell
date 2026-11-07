@@ -29,7 +29,8 @@ import {
   PRODUCTS,
 } from "./lake/paths.ts";
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
-import { linkBothWays, mergeStationList, type EpochChange } from "./stations.ts";
+import { linkGauges, type LinkReport } from "./same-as.ts";
+import { mergeStationList, type EpochChange } from "./stations.ts";
 
 /** What a refresh changed, written beside its snapshot. */
 export interface RefreshReport {
@@ -165,14 +166,16 @@ async function renumberAboveFiles(
  * has no list, because it went missing, stops the rebuild, which would
  * otherwise drop its stations from what the lake publishes; it returns the
  * missing ones. A source in neither is new, and
- * joins once it has a list.
+ * joins once it has a list. Stations sharing a gauge are linked and given a
+ * preferred series as the file is built (`src/same-as.ts`), and the result
+ * says what was linked.
  */
 export async function publishStations(
   lake: string,
   all: Source[],
   expected: string[],
-): Promise<{ count: number } | { missing: string[] }> {
-  let stations: LakeStation[] = [];
+): Promise<{ count: number; links: LinkReport } | { missing: string[] }> {
+  const stations: LakeStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
   for (const source of all) {
@@ -186,17 +189,16 @@ export async function publishStations(
     stations.push(...list.map((s) => ({ ...s, ...bounds.get(s.id) })));
   }
   if (missing.length || !listed.length) return { missing };
-  stations = linkBothWays(stations);
-  await writeStations(stationsPath(lake), stations);
+  const { stations: linked, report } = linkGauges(stations);
+  await writeStations(stationsPath(lake), linked);
   await writeJsonArray(
     sourcesPath(lake),
     listed.map((s) => ({
       ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
-      stations: stations.filter((st) => st.source === s.metadata.id && st.status === "active")
-        .length,
+      stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
-  return { count: stations.length };
+  return { count: linked.length, links: report };
 }
 
 /**

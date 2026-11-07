@@ -379,6 +379,12 @@ describe("sharesWord", () => {
     assert.ok(sharesWord("WarnemuendeTG", "WARNEMÜNDE"));
   });
 
+  it("spells out letters that don't decompose", () => {
+    assert.ok(sharesWord("Maloy", "Måløy"));
+    assert.ok(sharesWord("Hornbaek", "Hornbæk"));
+    assert.ok(sharesWord("Strasse", "Straße"));
+  });
+
   it("ignores directions and harbor words", () => {
     assert.ok(!sharesWord("Rak noord", "Hollandsdiep noordwest"));
     assert.ok(!sharesWord("Oude haven", "Nieuwe haven"));

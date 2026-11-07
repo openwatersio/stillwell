@@ -261,8 +261,20 @@ async function publish(lake: string): Promise<void> {
     if (published.has(metadata.id) || (await hasHistory(lake, metadata.id)))
       expected.push(metadata.id);
   const result = await publishStations(lake, held, expected);
-  if ("count" in result) console.log(`${stationsPath(lake)}: ${result.count} stations`);
-  else {
+  if ("count" in result) {
+    console.log(`${stationsPath(lake)}: ${result.count} stations`);
+    const { pairs, dropped, skipped, large } = result.links;
+    for (const [pair, counts] of Object.entries(pairs).sort())
+      console.log(
+        `  same_as ${pair}: ${Object.entries(counts)
+          .map(([how, n]) => `${n} by ${how}`)
+          .join(", ")}`,
+      );
+    for (const d of dropped) console.log(`  same_as dropped: ${d.from} to ${d.to}, ${d.reason}`);
+    for (const k of skipped)
+      console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
+    for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
+  } else {
     console.error(
       `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
     );

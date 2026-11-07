@@ -112,14 +112,3 @@ export function mergeStationList(
   ].sort((a, b) => a.id.localeCompare(b.id));
   return { stations, changes };
 }
-
-/** Make `same_as` links run both ways, whichever list recorded them. */
-export function linkBothWays<T extends Station>(stations: T[]): T[] {
-  const links = new Map<string, Set<string>>();
-  for (const s of stations)
-    for (const other of s.same_as) {
-      links.set(s.id, (links.get(s.id) ?? new Set()).add(other));
-      links.set(other, (links.get(other) ?? new Set()).add(s.id));
-    }
-  return stations.map((s) => ({ ...s, same_as: [...(links.get(s.id) ?? [])].sort() }));
-}

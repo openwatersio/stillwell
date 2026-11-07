@@ -87,6 +87,8 @@ const MARGIN_MS = 31 * DAY_MS;
 export type UhslcStation = ListedStation & {
   version: string | null;
   contributor: string | null;
+  /** The contributor's own number for the gauge, from the documentation file. */
+  originator: string | null;
   record_start: string | null;
   record_end: string | null;
 };
@@ -214,14 +216,15 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
     console.error(
       `  uhslc: no contributor scanned for ${unscanned.join(", ")}; tagged non-commercial until \`npm run uhslc:contributors\` reads their files`,
     );
-  // Every series from one UHSLC station number is the same gauge site.
+  // Every series from one UHSLC station number is the same gauge site, and
+  // so is the originator's own series where its number is a lake station's ID.
   const byNumber = new Map<string, string[]>();
   for (const s of listed) byNumber.set(number(s), [...(byNumber.get(number(s)) ?? []), s.id]);
   for (const s of listed)
-    s.same_as = byNumber
-      .get(number(s))!
-      .filter((id) => id !== s.id)
-      .sort();
+    s.same_as = [
+      ...byNumber.get(number(s))!.filter((id) => id !== s.id),
+      ...[originatorStation(s)].filter((id) => id !== null),
+    ].sort();
   refuseRegression(previous, listed);
   return listed.sort((a, b) => a.id.localeCompare(b.id));
 
@@ -257,6 +260,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
       source_url: `https://uhslc.soest.hawaii.edu/stations/?stn=${sourceId.slice(0, 3)}#levels`,
       version: null,
       contributor: null,
+      originator: null,
       record_start: span?.[0] ?? null,
       record_end: span?.[1] ?? null,
     };
@@ -302,6 +306,7 @@ function withTerms(station: UhslcStation, previous?: Listed): void {
     ),
   ];
   station.contributor = keys.length ? (CONTRIBUTORS[keys[0]!]?.contributor ?? null) : null;
+  station.originator = keys.length ? (CONTRIBUTORS[keys[0]!]?.originator ?? null) : null;
   const credits = [metadata.attribution];
   for (const key of keys) {
     const record = CONTRIBUTORS[key];
@@ -329,6 +334,20 @@ function withTerms(station: UhslcStation, previous?: Listed): void {
 }
 
 const unscanned: string[] = [];
+
+/**
+ * The originator's own station for a series, where its contributor numbers
+ * gauges as a lake source does: NOS's are CO-OPS station IDs. Other
+ * contributors' numbers (SHOM's, JMA's codes) aren't their lake source's IDs,
+ * so those gauges are matched by nearness and name (src/same-as.ts).
+ */
+export function originatorStation(
+  s: Pick<UhslcStation, "contributor" | "originator">,
+): string | null {
+  if (/^National Ocean Service\b/.test(s.contributor ?? "") && /^\d{7}$/.test(s.originator ?? ""))
+    return `coops/${s.originator}`;
+  return null;
+}
 
 /**
  * The lake's version for an FD series none of whose versions starts where it
