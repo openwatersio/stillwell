@@ -161,6 +161,12 @@ describe("cdec", () => {
       cdec.stations(fetched as never),
       /GSS no longer shows its 15-minute stage/,
     );
+    const usgs = fixture("cdec-meta-GSS.html").replace(
+      "<td>US Bureau of Reclamation</td>",
+      "<td>USBR/USGS</td>",
+    );
+    serve((url) => (/station_id=GSS/.test(url) ? usgs : NO_STAGE));
+    await assert.rejects(cdec.stations(fetched as never), /GSS now names USBR\/USGS/);
     const msl = fixture("cdec-meta-GSS.html").replace(/0\.0' NAVD 88/, "0.0' MSL");
     assert.deepEqual(cdec.parseMeta(msl, "GSS").zero, { feet: 0, datum: "MSL" });
     serve((url) => (/station_id=GSS/.test(url) ? msl : NO_STAGE));

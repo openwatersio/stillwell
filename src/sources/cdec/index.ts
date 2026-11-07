@@ -97,11 +97,13 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const out: CdecStation[] = [];
   for (const code of CODES) {
     let meta: Meta;
+    let found: ReturnType<typeof datumOf> | null;
     try {
       meta = parseMeta(
         await getText(`${API}/staMeta?station_id=${code}`, { fresh: true, pace }),
         code,
       );
+      found = meta.stage ? datumOf(code, meta.zero) : null;
     } catch (error) {
       // A page for a code the last list left out (USGS's, or one with no
       // 15-minute stage) can go without failing the rest; a listed one can't.
@@ -111,15 +113,20 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
       }
       throw error;
     }
-    // USGS's gauges are in `usgs`; one it runs with another agency is too.
-    if (/USGS|Geological/i.test(meta.operator)) continue;
     const listed = before.get(code);
+    // USGS's gauges are in `usgs`; one it runs with another agency is too. A
+    // listed station that USGS now shares fails, rather than go quietly inactive.
+    if (/USGS|Geological/i.test(meta.operator)) {
+      if (listed)
+        throw new Error(`CDEC's page for ${code} now names ${meta.operator} as its operator`);
+      continue;
+    }
     if (!meta.stage) {
       // A listed station's stage row gone missing is likelier a changed page than a gauge without stage.
       if (listed) throw new Error(`CDEC's page for ${code} no longer shows its 15-minute stage`);
       continue;
     }
-    let { datum, datums, reference } = datumOf(code, meta.zero);
+    let { datum, datums, reference } = found!;
     // A page that loses its gauge-zero table says nothing of the datum this
     // time, so the station keeps the one it was listed with, as `datum: null`
     // means; a template change or a gap is likelier than a gauge losing its datum.
