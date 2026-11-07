@@ -65,8 +65,14 @@ export interface Station {
   attribution: string;
   /** tide-database station (`source/id`) for the same gauge. */
   tide_station: string | null;
-  /** Other lake series from the same physical gauge. */
+  /** Other lake series from the same physical gauge, by `src/same-as.ts`. */
   same_as: string[];
+  /**
+   * The series to use for the gauge's observed levels among this one and its
+   * `same_as`, the station's own ID when it's the one. Set as
+   * `stations.parquet` is built, never by an adapter.
+   */
+  preferred?: string;
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */
   live: boolean;
