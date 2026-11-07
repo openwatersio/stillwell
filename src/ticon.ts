@@ -154,6 +154,9 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
 
   if (contributor === "rws" || contributor === "rws_hist") return nearest(record, "rws", lists.rws);
 
+  // REFMAR records carry the gauge's SHOM id.
+  if (contributor === "refmar") return byCode(record, "refmar", code, "planned", lists);
+
   if (contributor === "nhs")
     return { source: "kartverket", id: `kartverket/${code.toUpperCase()}`, status: "planned" };
 

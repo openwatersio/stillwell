@@ -18,6 +18,7 @@ import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
+import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
@@ -36,6 +37,17 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   coops: () => coops.levels("9414290", start, end, { live: true }),
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
+  // Brest: its record, which carries the datum and owners, three days of raw
+  // values, and three of validated ones a year back.
+  refmar: async () => [
+    await refmar.gauge("3"),
+    ...(await refmar.levels({ source_id: "3", first_observation: null }, start, end)),
+    ...(await refmar.levels(
+      { source_id: "3", first_observation: null },
+      new Date(start.getTime() - 365 * DAY_MS),
+      new Date(end.getTime() - 365 * DAY_MS),
+    )),
+  ],
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
   // Honolulu: its FD series ten weeks back, since FD values arrive 4 to 6
   // weeks late, and three days of its research-quality version A.

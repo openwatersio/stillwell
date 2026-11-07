@@ -176,7 +176,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [x] **UHSLC** (`uhslc`) research-quality and fast-delivery, from ERDDAP (968 records): each FD series is one station carrying its latest RQ version, RQ replacing FD as UHSLC releases it, and each other RQ version a station of its own. Hong Kong's times are moved an hour later until UHSLC fixes them, and SANHO's South African stations are left out. Every station UHSLC serves openly is in the public lake, with commercial use tagged per contributor from UHSLC's documentation files ([uhslc-contributors.md](uhslc-contributors.md)); data a source withholds until permission is given stays out. See [the adapter's README](../src/sources/uhslc/README.md).
 - [ ] Backfill UHSLC through the Ingest workflow.
 - [ ] **RWS** history back to 1990 at tide gauges, plus extremes (`GETETM2`, `GETETBRKD2`).
-- [ ] **European originators**: REFMAR, SMHI, Kartverket, Marine Institute, DMI, UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
+- [ ] **European originators**: REFMAR (adapter done; backfill to run), SMHI, Kartverket, Marine Institute, DMI, UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
 - [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
