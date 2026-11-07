@@ -411,6 +411,10 @@ describe("sfwmd", () => {
       () => sfwmd.parse(csv("AP159", ["2024-01-17 07:44:12,--, ,P"]), "AP159"),
       /bad row/,
     );
+    assert.throws(
+      () => sfwmd.parse(csv("AP159", ["2024-02-30 07:44:12,1.0, ,P"]), "AP159"),
+      /bad row/,
+    );
   });
 
   it("decodes packed degrees", () => {
