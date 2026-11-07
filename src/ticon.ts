@@ -217,7 +217,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   if (
     (contributor === "bodc" ||
       contributor === "noc" ||
-      (contributor === "cmems" && iso3 === "gbr")) &&
+      (contributor === "cmems" && ["gbr", "jey", "imn"].includes(iso3))) &&
     lists.ea
   ) {
     // A record no EA gauge matches, such as a Channel Coastal Observatory or

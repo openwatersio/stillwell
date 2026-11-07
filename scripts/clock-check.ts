@@ -87,10 +87,13 @@ for (const pair of pairs) {
   const scores = LAGS.map((lag) => ({ lag, r: r(lag) }));
   const best = scores.reduce((a, b) => (b.r > a.r ? b : a));
   const atZero = scores.find((s) => s.lag === 0)!;
-  const late = Math.abs(best.lag) >= 30;
+  // A range too short to fit K1 can't see a 12-hour error, which shows only as
+  // a lag of about 25 minutes in a semidiurnal tide, so a smaller lag fails.
+  const k1 = phaseLag(observed, ticon.harmonic_constituents);
+  const short = end.getTime() - start.getTime() < 183 * 86_400_000;
+  const late = Math.abs(best.lag) >= (short ? 20 : 30);
   // K1's phase is less certain where the diurnal tide is small, so it flags
   // only what the cross-correlation can't see: several hours.
-  const k1 = phaseLag(observed, ticon.harmonic_constituents);
   const off = k1 !== null && Math.abs(k1) >= 3;
   flagged ||= late || off;
   const bold = (flag: boolean, text: string) => (flag ? `**${text}**` : text);

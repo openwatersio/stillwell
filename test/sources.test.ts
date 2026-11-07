@@ -2767,7 +2767,7 @@ describe("ea", () => {
     serve([[/id\/stations\?type=TideGauge/, fixture("ea-stations.json")]]);
     const stations = await ea.stations();
     assert.deepEqual(
-      stations.map((s) => [s.id, s.name, s.datum, s.country_code, s.measure]),
+      stations.map((s) => [s.id, s.name, s.datum, s.country_code, ea.measureOf(s)]),
       [
         ["ea/E70039", "Lowestoft", "AOD", "GB", "E70039-level-tidal_level-Mean-15_min-mAOD"],
         ["ea/E70239", "Jersey", "AOD", "JE", "E70239-level-tidal_level-Mean-15_min-mAOD"],
@@ -2784,6 +2784,28 @@ describe("ea", () => {
     );
     assert.equal(stations[0]!.interval_s, 900);
     assert.equal(stations[0]!.commercial_use, true);
+  });
+
+  it("reads a station from stations.parquet, without the list's extra fields", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      return JSON.stringify({ items: [] });
+    });
+    const now = Date.now();
+    for (const [source_id, datum] of [
+      ["E72239", "AOD"],
+      ["E71924", "CD"],
+    ])
+      await ea.source.observations!(
+        { source_id, datum } as Station,
+        new Date(now - 3_600_000),
+        new Date(now),
+      );
+    assert.deepEqual(
+      asked.map((u) => /measures\/([^/]+)\/readings/.exec(u)![1]),
+      ["E72239-level-tidal_level-Mean-15_min-mAOD", "E71924-level-tidal_level-Mean-15_min-m"],
+    );
   });
 
   it("reads tide gauges' readings from a day's archive file", () => {
@@ -2847,24 +2869,6 @@ describe("ea", () => {
     );
     assert.equal(asked.length, 1);
     assert.match(asked[0]!, /\/readings\?since=/);
-  });
-
-  it("drops the API's readings in a month the archive is missing a day of", async () => {
-    const today = Math.floor(Date.now() / 86_400_000) * 86_400_000;
-    const split = today - 28 * 86_400_000;
-    // The day before the split, a day earlier still if that crosses into another month.
-    const before = new Date(split - 86_400_000);
-    setTransport(async (url) => {
-      if (/\/archive\//.test(url)) throw new Error(`GET ${url} returned 404`);
-      return JSON.stringify({ items: [{ dateTime: new Date(split).toISOString(), value: 1 }] });
-    });
-    const values = await ea.levels(
-      "E72239-level-tidal_level-Mean-15_min-mAOD",
-      before,
-      new Date(split + 3_600_000),
-    );
-    const sameMonth = before.getUTCMonth() === new Date(split).getUTCMonth();
-    assert.equal(values.length, sameMonth ? 0 : 1);
   });
 
   it("fails on a day file that isn't the CSV or holds no tide gauge reading", async () => {

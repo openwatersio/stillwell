@@ -17,6 +17,8 @@ import {
  */
 const API = "https://environment.data.gov.uk/flood-monitoring";
 const DAY_MS = 86_400_000;
+/** Days back the archive's files are sure to reach; it kept about 380 in November 2026. */
+const ARCHIVE_DAYS = 350;
 /** Whole days back the readings API still answers for, two short of what it keeps. */
 const API_DAYS = 28;
 
@@ -36,8 +38,13 @@ export const metadata: SourceMetadata = {
   terms: "Real-time readings, not quality-controlled.",
 };
 
-/** A tide gauge with the measure its levels are read from, kept in the lake's list. */
-export type EaStation = ListedStation & { measure: string };
+/**
+ * The measure a station's levels are read from, from its notation and datum,
+ * so a station from `stations.parquet`, without the list's extra fields, has it.
+ */
+export function measureOf(station: { source_id: string; datum: string | null }): string {
+  return `${station.source_id}-level-tidal_level-Mean-15_min-${station.datum === "CD" ? "m" : "mAOD"}`;
+}
 
 interface ApiMeasure {
   "@id": string;
@@ -68,7 +75,7 @@ const UNITS: Record<string, string> = { mAOD: "AOD", m: "CD" };
  * only where it has no mAOD one (Avonmouth, Bournemouth, Hinkley Point and
  * Immingham). Series in millimeters copy one in meters.
  */
-export async function stations(): Promise<EaStation[]> {
+export async function stations(): Promise<ListedStation[]> {
   const { items } = await getJson<{ items: ApiStation[] }>(
     `${API}/id/stations?type=TideGauge&_limit=1000`,
     { fresh: true },
@@ -78,15 +85,22 @@ export async function stations(): Promise<EaStation[]> {
     // hourly ingest read the same one.
     const measure = [s.measures ?? []]
       .flat()
+      // The mAOD series first, where a station has both.
+      .sort((a, b) => Number(b.unitName === "mAOD") - Number(a.unitName === "mAOD"))
       .find((m) => TIDE_GAUGE.test(`${m["@id"]},`) && UNITS[m.unitName ?? ""]);
-    return measure ? [{ s, measure, datum: UNITS[measure.unitName!]! }] : [];
+    const datum = measure && UNITS[measure.unitName!]!;
+    // Only a series named as `measureOf` names it, so a listed station reads the series it lists.
+    return measure &&
+      measure["@id"].endsWith(`/${measureOf({ source_id: s.notation, datum: datum! })}`)
+      ? [{ s, measure, datum: datum! }]
+      : [];
   });
   // A gauge's twins share its label, or a position within about 2 km.
   const aod = tidal.filter((g) => g.datum === "AOD").map((g) => g.s);
   const near = (a: ApiStation, b: ApiStation) =>
     labelOf(a) === labelOf(b) ||
     [a.lat, a.long].every((v, i) => Math.abs(firstOf(v) - firstOf([b.lat, b.long][i])) < 0.02);
-  const listed: EaStation[] = [];
+  const listed: ListedStation[] = [];
   for (const { s, measure, datum } of tidal) {
     const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]);
     const name = labelOf(s);
@@ -114,7 +128,6 @@ export async function stations(): Promise<EaStation[]> {
       min_interval_s: 900,
       // Check for Flooding's page is keyed by the River Levels on the Internet ID.
       source_url: s.RLOIid ? `https://check-for-flooding.service.gov.uk/station/${s.RLOIid}` : null,
-      measure: measure["@id"].split("/").at(-1)!,
     });
   }
   // An empty list is a broken response; taken at its word, it would retire every station.
@@ -141,7 +154,11 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
   // A start within the API's days reads no archive file, not even its own day's.
   for (let day = dayOf(start.getTime()); start.getTime() < until && day < until; day += DAY_MS) {
     if (missing.has(monthOf(day))) continue;
-    const file = await archiveDay(day);
+    const today = archiveDay(day);
+    // The next few days download while this one is read, rather than one at a time.
+    for (let ahead = day + DAY_MS; ahead < Math.min(day + 4 * DAY_MS, until); ahead += DAY_MS)
+      archiveDay(ahead).catch(() => {});
+    const file = await today;
     if (!file) {
       missing.add(monthOf(day));
       continue;
@@ -156,15 +173,18 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
       `${API}/id/measures/${measure}/readings?since=${new Date(split).toISOString()}&_sorted&_limit=10000`,
       { fresh: true },
     );
-    const fromApi = items.filter((r) => typeof r.value === "number").length;
+    const times = items
+      .filter((r) => typeof r.value === "number")
+      .map((r) => Date.parse(r.dateTime));
     for (const r of items.toReversed()) {
       const time = Date.parse(r.dateTime);
       if (typeof r.value === "number" && time >= split && time < end.getTime())
         out.push(reading(time, r.value));
     }
-    // An empty answer, as when the API isn't serving the measure, would leave
-    // the split's month with only its archive days.
-    if (!fromApi) missing.add(monthOf(split));
+    // An answer that's empty, or starts more than a day late, as when the API
+    // isn't serving the measure or keeps fewer days, would leave the split's
+    // month without the days between.
+    if (!times.length || Math.min(...times) > split + DAY_MS) missing.add(monthOf(split));
   }
   return out.filter((o) => !missing.has(monthOf(o.time)));
 }
@@ -206,9 +226,13 @@ async function fetchDay(day: number): Promise<Day> {
   try {
     csv = await getText(`${API}/archive/readings-${date}.csv`, { fresh: true });
   } catch (error) {
-    // The archive keeps about a year; a day outside it answers 404.
+    // The archive keeps about a year; a day outside it answers 404. One well
+    // inside it is a gap, reported loudly, but still only drops its month, so
+    // a day the EA never publishes doesn't block the rest of the year.
     if (!/returned 404$/.test((error as Error).message)) throw error;
-    console.warn(`EA archive has no ${date}; its month is left out`);
+    if (day > Date.now() - ARCHIVE_DAYS * DAY_MS)
+      console.error(`EA archive has no ${date}, inside the year it keeps; its month is left out`);
+    else console.warn(`EA archive has no ${date}; its month is left out`);
     return null;
   }
   // A file in another shape, or without a single tide gauge reading, fails
@@ -260,5 +284,5 @@ export function forgetArchive(): void {
 export const source: Source = {
   metadata,
   stations,
-  observations: (s: Station, start, end) => levels((s as EaStation).measure, start, end),
+  observations: (s: Station, start, end) => levels(measureOf(s), start, end),
 };
