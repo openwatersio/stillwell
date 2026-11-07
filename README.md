@@ -79,7 +79,7 @@ An implementation of the harmonic representation of inequalities (HRoI), the met
 
 ## License
 
-The code is © Open Water Software, LLC and contributors, and licensed under [AGPL-3.0](LICENSE). Code from before the change to the AGPL also carries the [MIT notice](LICENSE-MIT) it was released under. Contributions need the [CLA](CLA.md), which you're asked to sign on your first pull request. The AGPL covers the code only, not the data.
+The code is © Open Water Software, LLC and contributors, and licensed under [AGPL-3.0](LICENSE). Contributions need the [CLA](CLA.md), which you're asked to sign on your first pull request. The AGPL covers the code only, not the data.
 
 The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited to "Open Waters" and to each station's `attribution`, except the stations with `commercial_use` false, which keep their contributor's terms. That includes the copies in `test/fixtures/` and `docs/results/`. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY: those in the table above are public domain, CC0, or licenses and terms that allow reuse with credit, and their credit is part of `attribution`. Anything more a source asks for, such as a citation, is in `sources.json`. Some UHSLC contributors have terms stricter than UHSLC's, listed in [docs/uhslc-contributors.md](docs/uhslc-contributors.md); those whose terms bar passing the data on are being asked for permission.
 
