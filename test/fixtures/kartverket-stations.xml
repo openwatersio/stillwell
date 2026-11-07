@@ -1,0 +1,9 @@
+<tide xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://api.sehavniva.no/stationinfo.xsd">
+<meta licenseurl="http://kartverket.no/data/lisens/"/>
+<stationinfo>
+<location name="Bergen" code="BGO" latitude="60.398046" longitude="5.320487" type="PERM"/>
+<location name="Ny-Ålesund" code="NYA" latitude="78.928545" longitude="11.938015" type="PERM"/>
+<location name="Vardø" code="VAW" latitude="70.374978" longitude="31.104015" type="PERM"/>
+</stationinfo>
+</tide>

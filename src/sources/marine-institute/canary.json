@@ -1,0 +1,15 @@
+{
+  "/erddap/tabledap/IrishNationalTideGaugeNetwork.json": {
+    "$": "object",
+    "$.table": "object",
+    "$.table.columnNames": "array",
+    "$.table.columnNames[]": "string",
+    "$.table.columnTypes": "array",
+    "$.table.columnTypes[]": "string",
+    "$.table.columnUnits": "array",
+    "$.table.columnUnits[]": "null | string",
+    "$.table.rows": "array",
+    "$.table.rows[]": "array",
+    "$.table.rows[][]": "number | string"
+  }
+}

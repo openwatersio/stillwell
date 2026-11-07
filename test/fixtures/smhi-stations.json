@@ -1,0 +1,188 @@
+{
+ "key": "6",
+ "title": "Havsvattenstånd",
+ "summary": "",
+ "unit": "cm",
+ "link": [
+  {
+   "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6.json",
+   "rel": "parameter",
+   "type": "application/json"
+  },
+  {
+   "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6.xml",
+   "rel": "parameter",
+   "type": "application/xml"
+  },
+  {
+   "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6.atom",
+   "rel": "parameter",
+   "type": "application/atom+xml"
+  },
+  {
+   "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/metadata.json",
+   "rel": "metadata",
+   "type": "application/json"
+  },
+  {
+   "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/metadata.xml",
+   "rel": "metadata",
+   "type": "application/xml"
+  }
+ ],
+ "stationSet": [
+  {
+   "key": "all",
+   "updated": 1794016800000,
+   "title": "Havsvattenstånd - Alla Stationer",
+   "summary": "Data från alla aktiva mätstationer för senaste timmen i en fil.",
+   "link": [
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station-set/all.json",
+     "rel": "stationSet",
+     "type": "application/json"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station-set/all.xml",
+     "rel": "stationSet",
+     "type": "application/xml"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station-set/all.atom",
+     "rel": "stationSet",
+     "type": "application/atom+xml"
+    }
+   ]
+  }
+ ],
+ "station": [
+  {
+   "key": "2545",
+   "updated": 1794013200000,
+   "title": "Havsvattenstånd - Arkö",
+   "summary": "Latitud: 58.4831 Longitud: 16.9637",
+   "link": [
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2545.json",
+     "rel": "station",
+     "type": "application/json"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2545.xml",
+     "rel": "station",
+     "type": "application/xml"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2545.atom",
+     "rel": "station",
+     "type": "application/atom+xml"
+    }
+   ],
+   "id": 2545,
+   "name": "Arkö",
+   "owner": "SMHI",
+   "latitude": 58.4831,
+   "longitude": 16.9637,
+   "active": true,
+   "from": 1396422000000,
+   "to": 1794013200000,
+   "mobile": false
+  },
+  {
+   "key": "33092",
+   "updated": 1368622800000,
+   "title": "Havsvattenstånd - Göteborg-Götaälvbron",
+   "summary": "Latitud: 57.7147 Longitud: 11.9669",
+   "link": [
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33092.json",
+     "rel": "station",
+     "type": "application/json"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33092.xml",
+     "rel": "station",
+     "type": "application/xml"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33092.atom",
+     "rel": "station",
+     "type": "application/atom+xml"
+    }
+   ],
+   "id": 33092,
+   "name": "Göteborg-Götaälvbron",
+   "owner": "GBG",
+   "latitude": 57.7147,
+   "longitude": 11.9669,
+   "active": false,
+   "from": 1287561600000,
+   "to": 1368622800000,
+   "mobile": false
+  },
+  {
+   "key": "33094",
+   "updated": 1794013200000,
+   "title": "Havsvattenstånd - Göteborg-Lärjeholm",
+   "summary": "Latitud: 57.7658 Longitud: 12.0056",
+   "link": [
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33094.json",
+     "rel": "station",
+     "type": "application/json"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33094.xml",
+     "rel": "station",
+     "type": "application/xml"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/33094.atom",
+     "rel": "station",
+     "type": "application/atom+xml"
+    }
+   ],
+   "id": 33094,
+   "name": "Göteborg-Lärjeholm",
+   "owner": "GBG",
+   "latitude": 57.7658,
+   "longitude": 12.0056,
+   "active": true,
+   "from": 1282906800000,
+   "to": 1794013200000,
+   "mobile": false
+  },
+  {
+   "key": "2088",
+   "updated": 1794013200000,
+   "title": "Havsvattenstånd - Kungsholmsfort",
+   "summary": "Latitud: 56.1052 Longitud: 15.5893",
+   "link": [
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2088.json",
+     "rel": "station",
+     "type": "application/json"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2088.xml",
+     "rel": "station",
+     "type": "application/xml"
+    },
+    {
+     "href": "https://opendata-download-ocobs.smhi.se/api/version/1.0/parameter/6/station/2088.atom",
+     "rel": "station",
+     "type": "application/atom+xml"
+    }
+   ],
+   "id": 2088,
+   "name": "Kungsholmsfort",
+   "owner": "SMHI",
+   "latitude": 56.1052,
+   "longitude": 15.5893,
+   "active": true,
+   "from": -2621894400000,
+   "to": 1794013200000,
+   "mobile": false
+  }
+ ]
+}

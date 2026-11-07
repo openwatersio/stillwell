@@ -1,0 +1,11 @@
+{
+  "table": {
+    "columnNames": ["station_id", "time", "Water_Level_LAT", "Water_Level_OD_Malin"],
+    "columnTypes": ["String", "String", "float", "float"],
+    "columnUnits": [null, "UTC", "metres", "metres"],
+    "rows": [
+      ["Galway Port 2", "2024-02-26T11:10:00Z", null, -1.818],
+      ["Galway Port 2", "2026-11-07T01:25:00Z", null, 0.841]
+    ]
+  }
+}

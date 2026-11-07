@@ -1,0 +1,11 @@
+{
+  "table": {
+    "columnNames": ["station_id", "time", "Water_Level_LAT", "Water_Level_OD_Malin"],
+    "columnTypes": ["String", "String", "float", "float"],
+    "columnUnits": [null, "UTC", "metres", "metres"],
+    "rows": [
+      ["Kinvara - Unreferenced", "2018-10-03T19:10:00Z", null, -2.61],
+      ["Kinvara - Unreferenced", "2026-05-24T22:15:00Z", null, -2.59]
+    ]
+  }
+}

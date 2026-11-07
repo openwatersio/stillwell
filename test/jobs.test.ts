@@ -10,18 +10,40 @@ import type { Source } from "../src/schema.ts";
 
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
-    assert.deepEqual(sourcesFor("hourly"), ["coops", "ea", "pegelonline", "rws", "usace", "usgs"]);
+    assert.deepEqual(sourcesFor("hourly"), [
+      "coops",
+      "ea",
+      "kartverket",
+      "marine-institute",
+      "pegelonline",
+      "rws",
+      "smhi",
+      "usace",
+      "usgs",
+    ]);
     assert.deepEqual(sourcesFor("compact"), [
       "coops",
       "ea",
+      "kartverket",
+      "marine-institute",
       "pegelonline",
       "rws",
+      "smhi",
       "uhslc",
       "usace",
       "usgs",
     ]);
     assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
-    assert.deepEqual(sourcesFor("refetch"), ["coops", "rws", "uhslc", "usace", "usgs"]);
+    assert.deepEqual(sourcesFor("refetch"), [
+      "coops",
+      "kartverket",
+      "marine-institute",
+      "rws",
+      "smhi",
+      "uhslc",
+      "usace",
+      "usgs",
+    ]);
   });
 
   it("keeps to the sources named, and refuses one that isn't registered", () => {

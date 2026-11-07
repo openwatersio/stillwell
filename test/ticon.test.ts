@@ -192,6 +192,46 @@ describe("TICON replacements", () => {
     assert.deepEqual([dutch.status, dutch.id], ["to_match", null]);
   });
 
+  it("matches SMHI records by station number and Marine Institute records by place", () => {
+    const smhi = replacement(record("arko-2545-swe-smhi"), {});
+    assert.deepEqual([smhi.id, smhi.status], ["smhi/2545", "planned"]);
+    const listed = replacement(record("arko-2545-swe-smhi", { lat: 58.48, lon: 16.96 }), {
+      smhi: [station("smhi/2545", "Arkö", 58.48, 16.96)],
+    });
+    assert.deepEqual([listed.id, listed.status], ["smhi/2545", "ready"]);
+    const irish = replacement(
+      record("ballycotton_harbour-bal-irl-mi_c", {
+        name: "Ballycotton_Harbour",
+        lat: 51.83,
+        lon: -8.0,
+      }),
+      {
+        "marine-institute": [
+          station("marine-institute/ballycotton", "Ballycotton Harbour", 51.83, -8.0),
+        ],
+      },
+    );
+    assert.deepEqual([irish.id, irish.status], ["marine-institute/ballycotton", "ready"]);
+    // River gauges aren't in the coastal list, however close a coastal gauge is.
+    const river = replacement(
+      record("wolftone_bridge-wol-irl-mi_r", { name: "Wolftone_Bridge", lat: 53.27, lon: -9.05 }),
+      {
+        "marine-institute": [station("marine-institute/galway-port", "Galway Port", 53.27, -9.05)],
+      },
+    );
+    assert.deepEqual([river.id, river.status], [null, "unmatched"]);
+  });
+
+  it("checks Kartverket records against its list once there is one", () => {
+    const bergen = record("bergen-bgo-nor-nhs", { lat: 60.4, lon: 5.3 });
+    assert.deepEqual(replacement(bergen, {}).status, "planned");
+    const listed = replacement(bergen, {
+      kartverket: [station("kartverket/BGO", "Bergen", 60.4, 5.3)],
+    });
+    assert.deepEqual([listed.id, listed.status], ["kartverket/BGO", "ready"]);
+    assert.equal(replacement(bergen, { kartverket: [] }).status, "unmatched");
+  });
+
   it("doesn't count an inactive PEGELONLINE station as ready", () => {
     const gone = {
       ...station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3),

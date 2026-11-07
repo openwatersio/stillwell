@@ -18,8 +18,11 @@ import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
+import * as kartverket from "../src/sources/kartverket/index.ts";
+import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
+import * as smhi from "../src/sources/smhi/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
@@ -37,9 +40,25 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   coops: () => coops.levels("9414290", start, end, { live: true }),
   // Newlyn, from the readings API.
   ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
+  // Vardø, since 1989.
+  kartverket: () => kartverket.levels("VAW", start, end),
+  // Ballycotton, since 2010.
+  "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
+  // Smögen's latest day, and three days of the closed gauge at Götaälvbron in Gothenburg,
+  // whose whole archive is about 100 KB; a recent range would download Smögen's.
+  smhi: async () => {
+    const latest = await smhi.levels("2111", new Date(end.getTime() - 18 * 3_600_000), end);
+    // The archive alone would pass a live feed that returns nothing.
+    return latest.length
+      ? [
+          ...latest,
+          ...(await smhi.levels("33092", new Date("2012-01-01Z"), new Date("2012-01-04Z"))),
+        ]
+      : [];
+  },
   // Honolulu: its FD series ten weeks back, since FD values arrive 4 to 6
   // weeks late, and three days of its research-quality version A.
   uhslc: async () => [

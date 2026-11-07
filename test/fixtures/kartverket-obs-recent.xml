@@ -1,0 +1,20 @@
+<tide>
+<stationdata>
+<location name="Bergen" code="BGO" latitude="60.398046" longitude="5.320487">
+<data type="observation" unit="cm" reflevelcode="CD">
+<waterlevel value="34.7" time="2026-11-05T00:00:00+00:00" flag="obs"/>
+<waterlevel value="33.4" time="2026-11-05T00:10:00+00:00" flag="obs"/>
+<waterlevel value="32.4" time="2026-11-05T00:20:00+00:00" flag="obs"/>
+<waterlevel value="31.7" time="2026-11-05T00:30:00+00:00" flag="obs"/>
+<waterlevel value="31.2" time="2026-11-05T00:40:00+00:00" flag="obs"/>
+<waterlevel value="31.1" time="2026-11-05T00:50:00+00:00" flag="obs"/>
+<waterlevel value="31.5" time="2026-11-05T01:00:00+00:00" flag="obs"/>
+<waterlevel value="32.4" time="2026-11-05T01:10:00+00:00" flag="obs"/>
+<waterlevel value="33.7" time="2026-11-05T01:20:00+00:00" flag="obs"/>
+<waterlevel value="35.3" time="2026-11-05T01:30:00+00:00" flag="obs"/>
+<waterlevel value="37.2" time="2026-11-05T01:40:00+00:00" flag="obs"/>
+<waterlevel value="39.4" time="2026-11-05T01:50:00+00:00" flag="obs"/>
+</data>
+</location>
+</stationdata>
+</tide>
