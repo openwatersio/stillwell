@@ -358,8 +358,9 @@ export function parse(text: string, code: string, month: number, flag: Flag): Ob
   const days = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
   const seen = new Set<number>();
   const out: Observation[] = [];
-  for (const line of text.split(/\r?\n/)) {
-    if (!line.trim()) continue;
+  const lines = text.split(/\r?\n/).filter((line) => line.trim());
+  const dayOf = (line: string) => Number(line.slice(76, 78));
+  for (const [i, line] of lines.entries()) {
     const stamp = line.slice(72, 80);
     if (
       stamp.slice(0, 4).replace(/ /g, "0") !== `${yy}${mm}`.replace(/ /g, "0") ||
@@ -368,9 +369,22 @@ export function parse(text: string, code: string, month: number, flag: Flag): Ob
       throw new Error(
         `JMA ${code}'s file for ${d.toISOString().slice(0, 7)} has a line for ${stamp}`,
       );
-    const day = Number(stamp.slice(4, 6));
-    if (!(day >= 1 && day <= days) || seen.has(day))
-      throw new Error(`JMA ${code}: not a day, or a day twice: ${stamp}`);
+    let day = dayOf(line);
+    if (!(day >= 1 && day <= days) || seen.has(day)) {
+      // A mistyped day between two lines stamped two days apart is the day between
+      // them: Sakai's 22 October 1980 is stamped the 20th. A copy of another line
+      // is a repeat, not a mistyped day.
+      const before = i > 0 ? dayOf(lines[i - 1]!) : NaN;
+      const after = i + 1 < lines.length ? dayOf(lines[i + 1]!) : NaN;
+      const values = line.slice(0, 72);
+      if (
+        after - before !== 2 ||
+        seen.has(before + 1) ||
+        lines.some((other, j) => j !== i && other.slice(0, 72) === values)
+      )
+        throw new Error(`JMA ${code}: not a day, or a day twice: ${stamp}`);
+      day = before + 1;
+    }
     seen.add(day);
     for (let hour = 0; hour < 24; hour++) {
       const cell = line.slice(hour * 3, hour * 3 + 3).trim();
