@@ -167,6 +167,11 @@ describe("cdec", () => {
     );
     serve((url) => (/station_id=GSS/.test(url) ? usgs : NO_STAGE));
     await assert.rejects(cdec.stations(fetched as never), /GSS now names USBR\/USGS/);
+    // A USGS page's own tables aren't read, as VON's "0.0' USED" flood-guidance row.
+    const von = usgs.replace(/0\.0' NAVD 88/, "0.0' USED");
+    serve((url) => (/station_id=GSS/.test(url) ? von : NO_STAGE));
+    // It's left out without reading that row, so the only error is the empty list.
+    await assert.rejects(cdec.stations(), /listed none of its stations/);
     const msl = fixture("cdec-meta-GSS.html").replace(/0\.0' NAVD 88/, "0.0' MSL");
     assert.deepEqual(cdec.parseMeta(msl, "GSS").zero, { feet: 0, datum: "MSL" });
     serve((url) => (/station_id=GSS/.test(url) ? msl : NO_STAGE));

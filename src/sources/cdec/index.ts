@@ -103,7 +103,9 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
         await getText(`${API}/staMeta?station_id=${code}`, { fresh: true, pace }),
         code,
       );
-      found = meta.stage ? datumOf(code, meta.zero) : null;
+      // USGS's pages aren't read for a datum, since their stations are left out.
+      found =
+        meta.stage && !/USGS|Geological/i.test(meta.operator) ? datumOf(code, meta.zero) : null;
     } catch (error) {
       // A page for a code the last list left out (USGS's, or one with no
       // 15-minute stage) can go without failing the rest; a listed one can't.
