@@ -1,6 +1,6 @@
 # Implementation plan
 
-How this repo becomes the water-level lake and API ([api.md](api.md) has the API design) described in the [planning evaluation](https://github.com/openwatersio/planning/tree/main/water-levels) ([architecture](https://github.com/openwatersio/planning/blob/main/water-levels/architecture.md), [sources](https://github.com/openwatersio/planning/blob/main/water-levels/research/sources.md)): observed, predicted, residual and modeled water levels for tide, lake and river gauges, in one schema with a datum and a license per station, stored as Parquet on R2, served at `api.openwaters.io` and published as open bulk snapshots. Links to `openwatersio/planning` go to Open Waters' internal planning repo, which isn't public.
+How this repo becomes the water-level lake and API ([api.md](api.md) has the API design): observed, predicted, residual and modeled water levels for tide, lake and river gauges, in one schema with a datum and a license per station, stored as Parquet on R2, served at `api.openwaters.io` and published as open bulk snapshots.
 
 It also replaces GESLA and TICON as tide-database's source of observations. TICON's constants and GESLA's records have carried too many errors (local time labeled as UTC at WSV and RWS, Hong Kong an hour early, JODC year-end truncation, swapped constituent definitions), and they update about once a year. tide-database should re-fit harmonics and reduce datums from records fetched from each originator, with correct UTC clocks, QC flags and provenance, refreshed continuously.
 
@@ -40,10 +40,10 @@ Each consumer, what it needs from the lake, and which path serves it. "Live" is 
 Recommended answers. The plan below assumes them; each can change without reshaping the work.
 
 1. **Non-commercial data, such as the UHSLC gauges whose contributors bar commercial use, stays out of the API until tokens exist.** Data a source lets anyone republish goes in the public lake whatever its commercial terms, and `stations.parquet` carries `commercial_use` per station for the API and products to filter on; only data whose source bars republishing goes in a separate private lake for research and QC. That removes the entitlement dependency from the first public API, and the predicate is already in the data when tokens arrive.
-2. **The API is open and unauthenticated at launch**, like tides, with the same per-IP rate limits. Tokens and the commercial tier come with the tides plan from [planning#31](https://github.com/openwatersio/planning/pull/31), not before.
+2. **The API is open and unauthenticated at launch**, like tides, with the same per-IP rate limits. Tokens and the commercial tier come when the tides API gets them, not before.
 3. **Paths follow the gateway's convention**: `/water-levels/...`, not `/v1/water-levels/...`.
 4. **IDs are `<source>/<source_id>`** (`coops/9447130`, `usgs/07022000`, `rws/hoekvanholland`), the same form as tide-database's station IDs and the API's `/stations/{source}/{id}` paths. Source codes never contain a slash; a station's own code may, and is URL-encoded in file paths. Each source's station list lives in the lake, `stations/<source>.parquet`, with a snapshot and report of every refresh in `history/`, so a new source adds only code and no ingest run changes the repo; decisions a person makes about a source's stations live in its adapter's `overrides`. A station the source stops listing stays, inactive. A station's levels are kept per datum epoch: when the source moves it to another reference, its new values go to files of their own, and `stations.parquet` says how each epoch converts into the current one ([stations.md](stations.md)). Adapters refuse values in any datum but the station's, and each series file records its datum so backfill never writes into a file in another. Each station carries `tide_station` with the tide-database `source/id` when one exists. The link also runs the other way: tide-database station records carry their lake series ID, and subordinate stations their reference gauge's, so an offline app knows which stations have observations without asking. Links join the same physical gauge, never the nearest one.
-5. **Bulk snapshots ship with the public API**, quarterly, with a Zenodo DOI, in two parts: the stations with `commercial_use` true, and the rest, leaving out any station with data, in any epoch, from a contributor that hasn't answered a permission request, or whose terms are unknown (`unscanned` or `unreviewed`), since a published deposit can't be withdrawn. Each part's Zenodo license is "other", pointing to the README's license section, since only what Open Waters adds is CC BY 4.0 and each station keeps its source's terms.
+5. **Bulk snapshots ship with the public API**, quarterly, with a Zenodo DOI, in two parts: the stations with `commercial_use` true, and the rest, leaving out any station with data, in any epoch, from a contributor that hasn't answered a permission request, or whose terms are unknown (`unscanned` or `unreviewed`), since a published deposit can't be withdrawn. The commercial part is CC BY 4.0, with `sources.json` in the deposit so each source's license and terms travel with it; the rest's Zenodo license is "other", pointing to the README's license section, since each of its stations keeps its contributor's terms.
 6. **The API worker lives in this repo** and is bound into the gateway as `WATER_LEVELS`, so adapters, schema and reader change together.
 7. **Decided: tide-database keeps the harmonic fitting and datum reduction, and reads the lake instead of GESLA.** Its fitting (`packages/harmonic-analysis`), constituent-name handling and datum rules (`docs/datums.md`) are already validated; porting them here would duplicate them. This repo's job is to be a better GESLA: originator records, fresh, in UTC, flagged, with provenance. Residuals from the lake against tide-database's published constants then flag stations whose constants or clocks are wrong.
 8. **Constants fitted from restricted observations can still ship** where the operator agrees, as VLIZ did for IOC-derived constituents. So restricted series feed tide-database fits even though the API doesn't serve them.
@@ -111,15 +111,11 @@ Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT,
 
 ## Phases
 
-Ordered so crowd-depth and tide-database get what they need first, as the evaluation's [What to build first](https://github.com/openwatersio/planning/blob/main/water-levels/architecture.md#what-to-build-first) asks, then the public product. Estimates are one person's working days, about 61 in all.
+Ordered so crowd-depth and tide-database get what they need first, then the public product. Estimates are one person's working days, about 61 in all.
 
-### Phase 0: Update the planning docs (1 day)
+### Phase 0: Update the internal evaluation (1 day)
 
-The planning evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes.
-
-- [ ] `planning/water-levels/README.md`: add the TICON replacement and live Slackwater levels to the internal value, the build estimate (about 60 days, not four to six weeks), the decisions this plan settles, and a link to this repo.
-- [ ] `planning/water-levels/architecture.md`: the live path and why (the R2 write cost of polling per station), the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private lake for restricted series, the two-way station links with tide-database, what's out of scope, and a link to [api.md](api.md) in place of its API section.
-- [ ] From then on, a decision that changes this plan updates the planning docs in the same week.
+The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: the TICON replacement and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the live path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private lake for restricted series, and the two-way station links with tide-database.
 
 ### Phase 1: Foundations (4 days)
 
@@ -228,7 +224,7 @@ Done when a Slackwater station page for a CO-OPS, RWS or PEGELONLINE gauge shows
 
 ### Phase 10: API (8 days)
 
-The rest of the API in the same Worker, reading R2 through a binding with `hyparquet` (pure JavaScript, range reads). Gated on the evaluation's [day-90 go or no-go](https://github.com/openwatersio/planning/blob/main/water-levels/README.md#next-90-days) on a public API; the live endpoint in phase 9 isn't, since Slackwater needs it either way.
+The rest of the API in the same Worker, reading R2 through a binding with `hyparquet` (pure JavaScript, range reads). Gated on a go or no-go decision on a public API, 90 days in; the live endpoint in phase 9 isn't, since Slackwater needs it either way.
 
 - [ ] `GET /water-levels/stations` with the tides API's `query`, `latitude`, `longitude`, `maxDistance`, `maxResults` and `bbox`, plus `kind`, `source` and `tide_station`, from `stations.parquet` held in memory.
 - [ ] `GET /water-levels/stations/{source}/{id}`: metadata, datums, license, attribution and freshness.
