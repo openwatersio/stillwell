@@ -248,6 +248,31 @@ describe("copyPairs", () => {
     assert.deepEqual(stations[0]!.same_as, ["coops/9457292"]);
   });
 
+  it("guesses for a copy whose named original a person unlinked", () => {
+    UNLINKS.push({ a: "uhslc/039a", b: "coops/1111111", note: "test" });
+    try {
+      const { stations } = linkGauges([
+        station("uhslc/039a", { name: "Kodiak Island", ...nhs, same_as: ["coops/1111111"] }),
+        station("coops/1111111", { name: "Elsewhere", lat: m(900), kind: "coastal" }),
+        station("coops/9457292", { name: "Kodiak Island", lat: m(800), kind: "coastal" }),
+      ]);
+      assert.deepEqual(stations[0]!.same_as, ["coops/9457292"]);
+    } finally {
+      UNLINKS.pop();
+    }
+  });
+
+  it("breaks an exact tie by ID, whatever the list order", () => {
+    const copy = station("uhslc/1", { name: "Kodiak", ...nhs });
+    const a = station("coops/b", { name: "Kodiak", lat: m(500), lon: m(40), kind: "coastal" });
+    const b = station("coops/a", { name: "Kodiak", lat: m(500), lon: m(-40), kind: "coastal" });
+    for (const list of [
+      [copy, a, b],
+      [copy, b, a],
+    ])
+      assert.deepEqual(ids(list.map((s) => ({ ...s }))), ["uhslc/1 coops/a"]);
+  });
+
   it("leaves a copy whose adapter named the original", () => {
     const { stations } = linkGauges([
       station("uhslc/057", { name: "Honolulu", ...nhs, same_as: ["coops/1612340"] }),

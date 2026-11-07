@@ -128,8 +128,9 @@ export function linkGauges<T extends Station>(
   for (const [a, b] of nearPairs(stations)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no guess.
   const named = new Set<string>();
+  const unlinked = new Set(UNLINKS.map(({ a, b }) => pairKey(a, b)));
   for (const [key, how] of edges)
-    if (how === "id") {
+    if (how === "id" && !unlinked.has(key)) {
       const [a, b] = key.split("\n").map((id) => byId.get(id)!) as [T, T];
       if (a.source !== b.source) named.add(a.id).add(b.id);
     }
@@ -326,7 +327,7 @@ export function copyPairs<T extends Station>(
           c.d <= COPY_KM && alike(copy, c.s) && !(copy.kind && c.s.kind && copy.kind !== c.s.kind),
       );
     for (const [, matches] of Map.groupBy(candidates, (c) => c.s.source)) {
-      matches.sort((x, y) => y.words - x.words || x.d - y.d);
+      matches.sort((x, y) => y.words - x.words || x.d - y.d || x.s.id.localeCompare(y.s.id));
       const [best, ...rest] = matches as [(typeof matches)[0], ...typeof matches];
       // A rival the source already links to the best match is the same gauge.
       const linked = (r: (typeof rest)[0]) =>
