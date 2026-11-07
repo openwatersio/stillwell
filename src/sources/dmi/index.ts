@@ -11,8 +11,8 @@ import {
 
 /**
  * Danish Meteorological Institute (DMI) tide gauge observations, from its
- * open Oceanographic Observation API (OGC API Features, GeoJSON). The gauges
- * are DMI's, the Danish Coastal Authority's, and municipalities' and ports'.
+ * open Oceanographic Observation API (OGC API Features, GeoJSON): DMI's and
+ * the Danish Coastal Authority's gauges, which DMI's terms cover.
  * See README.md.
  */
 const API = "https://opendataapi.dmi.dk/v2/oceanObs/collections";
@@ -124,10 +124,14 @@ export async function stations(): Promise<DmiStation[]> {
     if (!periods.every((f) => COVERED.has(f.properties.owner))) continue;
     // `sea_reg` is DVR90 only where the Coastal Authority owned every period that carries it.
     const regOwners = periods.filter((f) => f.properties.parameterId.includes("sea_reg"));
-    const parameter = parameterOf(
-      regOwners.every((f) => f.properties.owner === COASTAL_AUTHORITY) ? COASTAL_AUTHORITY : "DMI",
-      new Set(periods.flatMap((f) => f.properties.parameterId)),
-    );
+    // The latest period's parameters, so a move to another one reaches `seriesChanged`;
+    // every period's when the latest gives none this reads, so a gap doesn't drop the station.
+    const owner = regOwners.every((f) => f.properties.owner === COASTAL_AUTHORITY)
+      ? COASTAL_AUTHORITY
+      : "DMI";
+    const parameter =
+      parameterOf(owner, new Set(p.parameterId)) ??
+      parameterOf(owner, new Set(periods.flatMap((f) => f.properties.parameterId)));
     if (!parameter || !latest.geometry) continue;
     const [lon, lat] = latest.geometry.coordinates;
     const ended = p.status !== "Active" || !!p.operationTo || !!p.validTo;
@@ -136,7 +140,10 @@ export async function stations(): Promise<DmiStation[]> {
       .map((f) => f.properties.operationFrom)
       .filter((d): d is string => !!d)
       .sort();
-    const credit = OWNER_CREDITS[p.owner];
+    // The record holds every period's values, so it carries every owner's credit.
+    const credits = [...new Set(periods.map((f) => OWNER_CREDITS[f.properties.owner]))].filter(
+      (c): c is string => !!c,
+    );
     // An inactive period with no end date says nothing of when values stop.
     const recordEnd = (p.operationTo ?? p.validTo)?.slice(0, 10) ?? null;
     listed.push({
@@ -156,7 +163,7 @@ export async function stations(): Promise<DmiStation[]> {
       products: ["levels"],
       first: null,
       last: null,
-      ...(credit ? { attribution: `${metadata.attribution}; ${credit}` } : {}),
+      attribution: [metadata.attribution, ...credits].join("; "),
       tide_station: null,
       same_as: [],
       status: ended ? "inactive" : "active",
@@ -239,7 +246,10 @@ export async function levels(
       out.push({ time, level: Math.round(p.value * 10) / 1000, flag: flagOf(p) });
     }
   }
-  return out.sort((x, y) => x.time - y.time);
+  // Paging by offset over a range that's still growing can repeat a value.
+  return out
+    .sort((x, y) => x.time - y.time)
+    .filter((o, i, all) => i === 0 || o.time !== all[i - 1]!.time);
 }
 
 /** qcResult 6 is "data is erroneous"; 1 to 5 are failed value, step and consistency checks. */

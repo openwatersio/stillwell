@@ -135,6 +135,19 @@ describe("dmi levels", () => {
   const start = new Date("2024-01-15T15:00:00Z");
   const end = new Date("2024-01-15T18:00:00Z");
 
+  it("keeps one value a time when paging repeats it", async () => {
+    // A new value arriving between pages shifts the offsets, so page 2 repeats page 1's last.
+    const page1 = JSON.parse(fixture("dmi-levels-1.json"));
+    const page2 = JSON.parse(fixture("dmi-levels-2.json"));
+    page2.features.unshift(page1.features.at(-1));
+    serve([
+      [/offset=18/, fixture("dmi-levels-3.json")],
+      [/offset=10/, JSON.stringify(page2)],
+      [/observation\/items/, JSON.stringify(page1)],
+    ]);
+    assert.equal((await dmi.levels("30017", start, end)).length, 18);
+  });
+
   it("reads centimeters as meters, sorted, through every page", async () => {
     const requests = serve([
       [/offset=18/, fixture("dmi-levels-3.json")],
@@ -278,6 +291,32 @@ describe("dmi owners and series", () => {
     assert.equal(
       stations.find((s) => s.id === "dmi/20052"),
       undefined,
+    );
+  });
+
+  it("reads the latest period's parameter, and credits every owner of the record", async () => {
+    serveList(
+      stationList([
+        { stationId: "20060", parameterId: ["sealev_dvr"], validFrom: "2000-01-01T00:00:00Z" },
+        { stationId: "20060", parameterId: ["sealev_ln"] },
+        {
+          stationId: "20061",
+          owner: "Kystdirektoratet / Coastal Authority",
+          parameterId: ["sealev_dvr"],
+          validFrom: "2000-01-01T00:00:00Z",
+        },
+        { stationId: "20061", owner: "DMI", parameterId: ["sealev_dvr"] },
+        { stationId: "20062", parameterId: ["sealev_dvr"], validFrom: "2000-01-01T00:00:00Z" },
+        { stationId: "20062", parameterId: ["tw"] },
+      ]),
+    );
+    const stations = await dmi.stations();
+    assert.equal(stations.find((s) => s.id === "dmi/20060")!.parameter, "sealev_ln");
+    // A latest period that lists nothing this reads falls back to every period's.
+    assert.equal(stations.find((s) => s.id === "dmi/20062")!.parameter, "sealev_dvr");
+    assert.equal(
+      stations.find((s) => s.id === "dmi/20061")!.attribution,
+      "Danish Meteorological Institute (DMI); Danish Coastal Authority (Kystdirektoratet)",
     );
   });
 
