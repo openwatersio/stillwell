@@ -219,7 +219,8 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
- * person's choice; one with levels; one still reporting; the originator's
+ * person's choice; one with levels; one whose terms allow commercial use, so
+ * the API can serve it before tokens exist; one still reporting; the originator's
  * over a redistributor's; the longer record in the lake; the finer interval;
  * then the lower ID, so equals always break the same way.
  */
@@ -234,6 +235,7 @@ export function rank(a: Station, b: Station, now = new Date()): number {
   const tests: [boolean | number, boolean | number][] = [
     [a.id in PREFER, b.id in PREFER],
     [levels(a), levels(b)],
+    [a.commercial_use, b.commercial_use],
     [reporting(a), reporting(b)],
     [!redistributed(a), !redistributed(b)],
     [span(a), span(b)],

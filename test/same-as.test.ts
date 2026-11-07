@@ -299,7 +299,20 @@ describe("rank", () => {
   const record = (first: string, last: string) => ({ first, last });
   const live = record("2001-12-17T00:00:00Z", "2026-10-01T00:00:00Z");
 
-  it("prefers a series with levels, then one still reporting", () => {
+  it("prefers a series with levels, then one whose terms allow commercial use", () => {
+    // A BOM-contributed UHSLC copy is non-commercial; its live original wins on terms alone.
+    assert.equal(
+      best(station("uhslc/001", { commercial_use: false, ...live }), station("refmar/9", live)),
+      "refmar/9",
+    );
+    // Even over a live series: the API serves only commercial terms until tokens exist.
+    assert.equal(
+      best(station("dmi/1", { commercial_use: false, ...live }), station("uhslc/837a")),
+      "uhslc/837a",
+    );
+  });
+
+  it("then one still reporting", () => {
     assert.equal(
       best(station("bsh/1", { products: ["predictions"] }), station("pegelonline/1")),
       "pegelonline/1",

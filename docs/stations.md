@@ -190,13 +190,14 @@ Linked stations form a group, and each lists every other in `same_as`, so a link
 
 1. a person's choice in `PREFER`;
 2. it has observed levels (a BSH prediction gauge doesn't);
-3. it is active and still reporting, with a value in the last year, so a live series wins over a version that ended;
-4. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC;
-5. the longer record in the lake;
-6. the finer interval;
-7. the lower ID, so equals always break the same way.
+3. its terms allow commercial use, so the API can serve it before tokens exist;
+4. it is active and still reporting, with a value in the last year, so a live series wins over a version that ended;
+5. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC;
+6. the longer record in the lake;
+7. the finer interval;
+8. the lower ID, so equals always break the same way.
 
-A station with no links is its own preferred series. `preferred` doesn't look at `commercial_use`, so a reader who needs commercial terms filters on them before picking. `publish` prints the links made by source pair and how, the links and decisions it dropped (to no such station, or an ID more than 10 km off), the links the two rules above skipped, and any group of more than eight stations, which is likelier a bad link than one gauge. An older build's `publish` writes `stations.parquet` without `preferred`, so a rollback breaks queries on it until the next build publishes again.
+A station with no links is its own preferred series. A series that allows commercial use wins over one that doesn't, even one still reporting, so `preferred` can name a stopped series when the gauge's live one is non-commercial. `publish` prints the links made by source pair and how, the links and decisions it dropped (to no such station, or an ID more than 10 km off), the links the two rules above skipped, and any group of more than eight stations, which is likelier a bad link than one gauge. An older build's `publish` writes `stations.parquet` without `preferred`, so a rollback breaks queries on it until the next build publishes again.
 
 ## Where it lives
 
