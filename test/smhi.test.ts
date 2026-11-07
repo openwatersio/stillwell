@@ -193,6 +193,12 @@ describe("smhi", () => {
     assert.ok(
       (await smhi.levels("2545", ...range, { record_end: "2026-11-05T06:00:00.000Z" })).length,
     );
+    // A station that closed at the previous UTC midnight gets the slack too.
+    smhi.forgetArchives();
+    serve([[/corrected-archive/, text.slice(0, text.indexOf("2026-11-05 22:00:00"))]]);
+    assert.ok(
+      (await smhi.levels("2545", ...range, { record_end: "2026-11-06T00:00:00.000Z" })).length,
+    );
   });
 
   it("refuses an archive cut within its last day, read after the station's year", async () => {

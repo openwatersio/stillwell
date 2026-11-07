@@ -207,7 +207,7 @@ function complete(archive: Parsed, sourceId: string, recordEnd?: string | null):
   const midnight = Math.floor(Date.now() / DAY_MS) * DAY_MS - DAY_MS;
   const end = recordEnd ? Date.parse(recordEnd) : null;
   const final =
-    end !== null && end < midnight && archive.through !== null && archive.through >= end;
+    end !== null && end <= midnight && archive.through !== null && archive.through >= end;
   const due = end !== null ? Math.min(end, midnight) : midnight;
   if (archive.last < due - (final ? FINAL_SLACK_MS : HOUR_MS))
     throw new Error(
