@@ -346,6 +346,13 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   console.log(`${sourceId}: backfilling ${wanted.length} stations`);
 
   const failed: string[] = [];
+  // Each failure prints as it happens too, since a run killed by its time limit
+  // never reaches the summary.
+  const fail = (what: string, error: unknown) => {
+    const line = `${what}: ${error instanceof Error ? error.message : error}`;
+    failed.push(line);
+    console.error(`failed: ${line}`);
+  };
   let skipped = 0;
   // Each station's earliest preliminary value, read again after its levels
   // were fetched, written to the bounds after each batch of 100 stations, so
@@ -370,7 +377,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             `${sourceId}: bounds predate preliminary values; run \`compact ${sourceId} --rebuild-bounds\` to record them`,
           );
       } catch (error) {
-        failed.push(`bounds: ${error instanceof Error ? error.message : error}`);
+        fail("bounds", error);
       }
     });
     return saving;
@@ -417,9 +424,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         await writePreliminary(lake, sourceId, lowered);
       } catch (error) {
         // Fetched unlowered, a killed run could leave these too late; they wait for the next run.
-        failed.push(
-          `bounds: ${error instanceof Error ? error.message : error}; skipped ${batch.length} stations`,
-        );
+        fail(`bounds (skipped ${batch.length} stations)`, error);
         continue;
       }
     // Lowered stations that fetched no year of levels, having none to fetch or
@@ -450,9 +455,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
           } catch (error) {
-            failed.push(
-              `${station.id} ${product}: ${error instanceof Error ? error.message : error}`,
-            );
+            fail(`${station.id} ${product}`, error);
             continue;
           }
           skipped += plan.skipped;
@@ -466,7 +469,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             } catch (error) {
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
-              else failed.push(`${label}: ${error instanceof Error ? error.message : error}`);
+              else fail(label, error);
             }
           }
         }
@@ -482,9 +485,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           ];
           preliminary.set(station.id, await earliestPreliminary(levels, window, fromYear));
         } catch (error) {
-          failed.push(
-            `${station.id} preliminary: ${error instanceof Error ? error.message : error}`,
-          );
+          fail(`${station.id} preliminary`, error);
         }
     });
     for (const [id, time] of prior)

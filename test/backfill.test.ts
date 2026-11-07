@@ -1003,6 +1003,8 @@ describe("backfill script", () => {
     );
     assert.equal(run.status, 1, run.stderr);
     assert.match(run.stderr, /^coops: stopped: /m);
+    // A failed year prints when it fails, not only in the summary a killed run never reaches.
+    assert.match(run.stderr, /^failed: coops\/1 levels 2024: /m);
     // Three holds in a row stop the run before the last stations send anything.
     const asked = [...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]);
     assert.ok(asked.length > 0, run.stderr);
