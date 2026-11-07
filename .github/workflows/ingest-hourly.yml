@@ -27,8 +27,10 @@ jobs:
     timeout-minutes: 5
     permissions:
       actions: read
+      contents: read
     outputs:
       run: ${{ steps.gate.outputs.run }}
+      sources: ${{ steps.sources.outputs.sources }}
     steps:
       - id: gate
         run: |
@@ -47,13 +49,26 @@ jobs:
           ATTEMPT: ${{ github.run_attempt }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+      # The sources come from each adapter's metadata (src/sources/jobs.ts).
+      # The registry imports no packages (test/jobs.test.ts checks), so it
+      # needs Node but not npm ci.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+      - id: sources
+        run: |
+          sources=$(node scripts/sources.ts hourly)
+          echo "sources=$sources" >> "$GITHUB_OUTPUT"
 
   recent:
     strategy:
       fail-fast: false
       matrix:
-        # BSH publishes predictions only, so it has no live stations.
-        source: [coops, ea, pegelonline, rws, usace, usgs]
+        # Sources that publish within hours (`hourly` in their metadata).
+        source: ${{ fromJSON(needs.gate.outputs.sources) }}
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so no two rewrite one file at once.
     concurrency:

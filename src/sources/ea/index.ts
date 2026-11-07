@@ -36,6 +36,10 @@ export const metadata: SourceMetadata = {
   attribution:
     "This uses Environment Agency flood and river level data from the real-time data API (Beta)",
   terms: "Real-time readings, not quality-controlled.",
+  // The readings API has each reading within the hour.
+  hourly: true,
+  // The EA never quality-controls or revises a reading, so none becomes final.
+  finalizes: false,
 };
 
 /**

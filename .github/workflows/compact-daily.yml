@@ -36,8 +36,10 @@ jobs:
     timeout-minutes: 5
     permissions:
       actions: read
+      contents: read
     outputs:
       run: ${{ steps.gate.outputs.run }}
+      sources: ${{ steps.sources.outputs.sources }}
     steps:
       - id: gate
         run: |
@@ -56,12 +58,26 @@ jobs:
           ATTEMPT: ${{ github.run_attempt }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+      # The sources come from each adapter's metadata (src/sources/jobs.ts).
+      # The registry imports no packages (test/jobs.test.ts checks), so it
+      # needs Node but not npm ci.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+      - id: sources
+        run: |
+          sources=$(node scripts/sources.ts compact)
+          echo "sources=$sources" >> "$GITHUB_OUTPUT"
 
   compact:
     strategy:
       fail-fast: false
       matrix:
-        source: [coops, ea, pegelonline, rws, uhslc, usace, usgs]
+        # Every source with observed levels.
+        source: ${{ fromJSON(needs.gate.outputs.sources) }}
     # The source's one group for every job that writes its files, manual
     # Ingest runs included, so a compaction never reads recent/ while the hourly
     # run replaces it, or rewrites a year file a backfill is writing.
