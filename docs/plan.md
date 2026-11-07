@@ -177,7 +177,9 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **DMI** (`dmi`): the adapter reads DMI's open oceanographic API, CC BY 4.0, back to 1889, but waits on DMI's station endpoint, which lists only Skagen; once it lists every gauge, register the source, which its metadata then schedules, refresh the list and backfill (see [its README](../src/sources/dmi/README.md)).
 - [ ] **European originators**: REFMAR (adapter done; backfill running), UK EA (43 tide gauges, backfilled from its year-long archive). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
-- [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
+- [x] **JMA** (`jma`): hourly levels above each station's observation datum (DL) at 90 gauges, 70 open, back to 1924, from JMA's historical, final and provisional files, in JST converted to UTC, under the Public Data License 1.0 (CC BY 4.0 compatible), in the public lake. See [the adapter's README](../src/sources/jma/README.md).
+- [ ] Backfill JMA through the Ingest workflow.
+- [ ] **JODC** and **UNAM**: both need permission before their data can be republished. JODC's terms forbid passing its data to third parties without permission, and UNAM's site allows only non-profit, unaltered reproduction, publishes only a 5-day window and names no datum. Then the case-by-case rest.
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
 - [ ] **GESLA 4.1** as the fallback for years an originator can't supply, from the existing R2 mirror, with tide-database's clock fixes and per-contributor licenses. Never where the originator has the same years.
 - [ ] Restricted series (Copernicus in situ, IOC, restricted GESLA contributors) into the private lake.
@@ -276,6 +278,6 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, G
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
 - Permission to republish from the UHSLC contributors whose own terms are stricter than UHSLC's: the Bureau of Meteorology and CSIRO, the Tide Gauge Inspectorate, the South African Navy Hydrographic Office (Walvis Bay) and DMI ([uhslc-contributors.md](uhslc-contributors.md)). Their stations are public on UHSLC's terms until they answer. Nothing can take a station out yet: a refusal needs an override that keeps ingest from listing the station again, and a way to delete its series, its rows in `recent/` and its `history/` snapshots.
 - Whether WSV or BfG will supply PEGELONLINE's archive before 2000, and whether they're content with scripted use of the raw-data download for a full backfill.
-- Terms for the US state networks, JMA and JODC, UNAM and BOM.
+- Terms for the US state networks, BOM, and permission from JODC and UNAM.
 - CHS: its reply on [tide-database#320](https://github.com/openwatersio/slackwater-database/issues/320) says any commercial use, derivatives included, needs a separate license, and it isn't taking new commercial requests while its licensing program (including the Value-Added Reseller Licence) is reviewed. Apply when the new options appear.
 - The 304 TICON `meds` records are Canadian gauge data that tide-database marks CC BY 4.0 with commercial use, on TICON's label. Check whether CHS's terms reach them, the same question GESLA's license page raises.

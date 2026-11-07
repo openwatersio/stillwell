@@ -114,7 +114,7 @@ const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
   jhod: { source: "jodc", status: "license" },
-  jma: { source: "jma", status: "license" },
+  jma: { source: "jma", status: "planned" },
   linz: { source: "linz", status: "license" },
 };
 
