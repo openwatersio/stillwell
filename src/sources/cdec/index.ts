@@ -90,16 +90,39 @@ export interface Meta {
 }
 
 /** Every station in `CODES` that an operator other than USGS runs and that has 15-minute stage. */
-export async function stations(): Promise<ListedStation[]> {
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
+  const before = new Map(previous.map((s) => [s.source_id, s as Partial<ListedStation>]));
   const out: CdecStation[] = [];
   for (const code of CODES) {
-    const meta = parseMeta(
-      await getText(`${API}/staMeta?station_id=${code}`, { fresh: true, pace }),
-      code,
-    );
+    let meta: Meta;
+    try {
+      meta = parseMeta(
+        await getText(`${API}/staMeta?station_id=${code}`, { fresh: true, pace }),
+        code,
+      );
+    } catch (error) {
+      // A page for a code the last list left out (USGS's, or one with no
+      // 15-minute stage) can go without failing the rest; a listed one can't.
+      if (before.size && !before.has(code)) {
+        console.warn(`Skipping CDEC ${code}, not listed before: ${error}`);
+        continue;
+      }
+      throw error;
+    }
     // USGS's gauges are in `usgs`; one it runs with another agency is too.
     if (/USGS|Geological/i.test(meta.operator) || !meta.stage) continue;
-    const { datum, datums } = datumOf(code, meta.zero);
+    const listed = before.get(code);
+    let { datum, datums, reference } = datumOf(code, meta.zero);
+    // A page that loses its gauge-zero table keeps the station as it was, since
+    // a template change or a gap is likelier than a datum the station dropped.
+    if (!meta.zero && listed?.reference && listed.reference.id !== "none" && listed.datum) {
+      console.warn(
+        `CDEC's page for ${code} has no gauge-zero table; keeping ${listed.reference.id}`,
+      );
+      datum = listed.datum;
+      datums = listed.datums ?? {};
+      reference = listed.reference.id;
+    }
     const from = Math.max(local(meta.stage.from), navd88Since(code));
     const active = meta.stage.to === null;
     out.push({
@@ -115,6 +138,8 @@ export async function stations(): Promise<ListedStation[]> {
       interval_s: code === "PTB" ? null : 900,
       datum,
       datums,
+      // The gauge-zero row, so a moved zero under the same label opens an epoch.
+      reference: { id: reference, since: null },
       products: ["levels"],
       first: null,
       last: null,
@@ -150,14 +175,17 @@ function local(date: string, days = 0): number {
 export function datumOf(
   code: string,
   zero: Meta["zero"],
-): { datum: string; datums: Record<string, number> } {
-  const named = zero && DATUMS[zero.datum];
-  if (zero && !named)
-    throw new Error(`CDEC's page for ${code} names an unknown datum, ${zero.datum}`);
-  if (zero && zero.feet === 0) return { datum: named!, datums: {} };
-  if (zero)
-    return { datum: "GZ", datums: { [named!]: Math.round(zero.feet * FEET * 1000) / 1000 } };
-  return { datum: NOTED[code] ?? "GZ", datums: {} };
+): { datum: string; datums: Record<string, number>; reference: string } {
+  if (!zero) return { datum: NOTED[code] ?? "GZ", datums: {}, reference: "none" };
+  const named = DATUMS[zero.datum];
+  if (!named) throw new Error(`CDEC's page for ${code} names an unknown datum, ${zero.datum}`);
+  const reference = `${zero.feet} ft ${named}`;
+  if (zero.feet === 0) return { datum: named, datums: {}, reference };
+  return {
+    datum: "GZ",
+    datums: { [named]: Math.round(zero.feet * FEET * 1000) / 1000 },
+    reference,
+  };
 }
 
 /** When a station's stage began in NAVD88, as an instant; 0 where it always was, or isn't. */
@@ -315,10 +343,13 @@ export function parse(text: string, code: string): Observation[] {
     if (!new Date(wall).toISOString().startsWith(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}`))
       throw new Error(`CDEC ${code} sent a bad row: ${line}`);
     const time = fromPacific(wall);
+    // A wall time in the hour skipped when daylight saving starts doesn't exist.
+    if (time + offsetAt(time) !== wall) continue;
     // On the day daylight saving ends, CDEC sends the repeated hour once, as
-    // standard time, but its 00:45 reading is daylight time in some years
-    // (2023) and standard in others (2024, 2025), so it's dropped.
-    if (+m[4]! === 0 && +m[5]! === 45 && offsetAt(time) > offsetAt(time + 2 * 3_600_000)) continue;
+    // standard time, but its 00:45 reading is daylight time in some years and
+    // standard in others (2014, 2015, 2022, 2024, 2025), so readings from
+    // 00:45 to 01:00 that day are dropped.
+    if (+m[4]! === 0 && +m[5]! >= 45 && offsetAt(time) > offsetAt(time + 2 * 3_600_000)) continue;
     byTime.set(time, {
       time,
       level: Math.round(feet * FEET * 1000) / 1000 + 0,

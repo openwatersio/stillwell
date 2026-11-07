@@ -105,20 +105,48 @@ describe("cdec", () => {
     assert.deepEqual(cdec.datumOf("MRZ", { feet: 0, datum: "NAVD 88" }), {
       datum: "NAVD88",
       datums: {},
+      reference: "0 ft NAVD88",
     });
     assert.deepEqual(cdec.datumOf("SDC", { feet: 5, datum: "NGVD 29" }), {
       datum: "GZ",
       datums: { NGVD29: 1.524 },
+      reference: "5 ft NGVD29",
     });
     // No table: a datum the notes give, or gauge zero.
-    assert.deepEqual(cdec.datumOf("BDL", null), { datum: "NAVD88", datums: {} });
-    assert.deepEqual(cdec.datumOf("HOL", null), { datum: "GZ", datums: {} });
+    assert.deepEqual(cdec.datumOf("BDL", null), { datum: "NAVD88", datums: {}, reference: "none" });
+    assert.deepEqual(cdec.datumOf("HOL", null), { datum: "GZ", datums: {}, reference: "none" });
     assert.throws(() => cdec.datumOf("HOL", { feet: 0, datum: "MLLW 1" }), /unknown datum, MLLW 1/);
     // A page that moves GSS to NGVD 29 moves the station, for the refresh to open or hold an epoch.
     const gss = fixture("cdec-meta-GSS.html").replace("NAVD 88", "NGVD 29");
     serve((url) => (/station_id=GSS/.test(url) ? gss : NO_STAGE));
     const [listed] = await cdec.stations();
     assert.deepEqual([listed!.id, listed!.datum], ["cdec/GSS", "NGVD29"]);
+  });
+
+  it("reports the gauge zero as the reference, and keeps it when a page loses its table", async () => {
+    serve((url) => (/station_id=GSS/.test(url) ? fixture("cdec-meta-GSS.html") : NO_STAGE));
+    const [gss] = await cdec.stations();
+    assert.deepEqual(gss!.reference, { id: "0 ft NAVD88", since: null });
+    // The same page without its gauge-zero table: GSS stays as it was listed.
+    const bare = fixture("cdec-meta-GSS.html").replace(/<th>Zero[\s\S]*?<\/table>/, "</table>");
+    serve((url) => (/station_id=GSS/.test(url) ? bare : NO_STAGE));
+    const [kept] = await cdec.stations([gss as never]);
+    assert.deepEqual(
+      [kept!.datum, kept!.reference],
+      ["NAVD88", { id: "0 ft NAVD88", since: null }],
+    );
+  });
+
+  it("skips a bad page only for a code the last list left out", async () => {
+    const gssPage = fixture("cdec-meta-GSS.html");
+    serve((url) =>
+      /station_id=GSS/.test(url) ? gssPage : /station_id=RYI/.test(url) ? "<html>" : NO_STAGE,
+    );
+    await assert.rejects(cdec.stations(), /RYI has no name/);
+    const [gss] = await cdec.stations([{ source_id: "GSS" } as never]);
+    assert.equal(gss!.id, "cdec/GSS");
+    serve((url) => (/station_id=GSS/.test(url) ? "<html>" : NO_STAGE));
+    await assert.rejects(cdec.stations([{ source_id: "GSS" } as never]), /GSS has no name/);
   });
 
   it("merges a station's 15-minute stage rows", () => {
@@ -246,6 +274,20 @@ describe("cdec", () => {
       [],
     );
     assert.equal(requests.length, 0);
+  });
+
+  it("drops a stamp in the hour skipped when daylight saving starts", () => {
+    const header =
+      "STATION_ID,DURATION,SENSOR_NUMBER,SENSOR_TYPE,DATE TIME,OBS DATE,VALUE,DATA_FLAG,UNITS";
+    const rows = [
+      header,
+      "MRZ,E,1,RIV STG,20260308 0215,20260308 0215,9.0, ,FEET",
+      "MRZ,E,1,RIV STG,20260308 0315,20260308 0315,1.0, ,FEET",
+    ].join("\n");
+    assert.deepEqual(
+      cdec.parse(rows, "MRZ").map((o) => [iso(o.time), o.level]),
+      [["2026-03-08T10:15:00.000Z", 0.305]],
+    );
   });
 
   it("skips missing readings and refuses bad rows", () => {
