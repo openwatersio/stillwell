@@ -1,0 +1,6 @@
+County,station_short_name,station_name,cdec_id,positional_accuracy,dwr_gw_site_code,station_type,longitude,comments,lldatum,station_number,last_modified_date,latitude,last_modified_by,source,date_data_refers_to
+Sacramento,IST,Sacramento River at Sacramento (I Street),IST,"GPS, 10m",,Surface Water,-121.505000000,,NAD83,A02100,2026-05-04,38.588611110,DWR Hydstra User,DWR Hydstra,2026-11-06
+Unknown,Sac. @ Collinsville,Sacramento River at Collinsville,,Unknown,,Surface Water,-121.855000000,,NAD27,B91110,2024-05-30,38.073611110,DWR Hydstra User,DWR Hydstra,2026-11-06
+Contra Costa,Fisherman's Cut,Fisherman's Cut,FCT,"GPS, 10m",,Tide Station,-121.647900000,,WGS84,B95050Q,2026-03-13,38.065600000,DWR Hydstra User,DWR Hydstra,2026-11-06
+San Joaquin,Doughty Cut abv Gran,Doughty Cut above Grantline Canal,DGL,Unknown,,Tide Station,-121.425555560,,NAD83,B95325,2024-01-17,37.814722220,DWR Hydstra User,DWR Hydstra,2026-11-06
+San Joaquin,Doughty Cut abv GLC,Doughty Cut above Grant Line Canal - WQ,,"GPS, 10m",,Water Quality,-121.425208900,,NAD83,B9532500,2024-01-17,37.814716900,DWR Hydstra User,DWR Hydstra,2026-11-06

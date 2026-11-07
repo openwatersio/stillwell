@@ -452,9 +452,14 @@ describe("pegelonline", () => {
     let downloads = 0;
     setTransport(async (url) => {
       if (/stations\/\d+\.json/.test(url)) return JSON.stringify({ uuid: "aad49293" });
-      // Two of every three files come back broken.
-      if (/gast\/download\?/.test(url))
-        return ++downloads % 3 ? btoa("not a zip") : zip.toString("base64");
+      // Two of every three files come back broken: one not a zip, one an empty zip.
+      if (/gast\/download\?/.test(url)) {
+        const n = ++downloads % 3;
+        if (n === 1) return btoa("not a zip");
+        if (n === 2)
+          return Buffer.from([0x50, 0x4b, 5, 6, ...new Array(18).fill(0)]).toString("base64");
+        return zip.toString("base64");
+      }
       prepared.push(Date.now());
       return JSON.stringify({ downloadUrl: `/gast/download?filename=${prepared.length}.zip` });
     });

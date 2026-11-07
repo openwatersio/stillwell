@@ -376,7 +376,13 @@ describe("preliminaryRuns with skipUnscreened", () => {
 describe("monthly refetch", () => {
   it("reaches back as far as compaction looks for preliminary values", () => {
     const workflow = readFileSync(".github/workflows/monthly.yml", "utf8");
-    assert.match(workflow, new RegExp(`preliminary \\$\\(\\(year - ${REFETCH_YEARS}\\)\\)`));
+    assert.match(workflow, new RegExp(`from=\\$\\(\\(year - ${REFETCH_YEARS}\\)\\)`));
+    assert.match(workflow, /backfill "\$SOURCE" "\$which" "\$from" "\$@"/);
+    // California DWR, which nothing else fetches, reads every active station from last January.
+    assert.match(
+      workflow,
+      /dwr\) which=all from=\$\(\(year - 1\)\) && set -- "\$\(date -u \+%F\)" --refetch ;;/,
+    );
   });
 });
 
