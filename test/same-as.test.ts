@@ -108,6 +108,20 @@ describe("linkGauges's limits", () => {
     ]);
   });
 
+  it("never puts CO-OPS and USGS in one group, even through a copy of both", () => {
+    const { stations, report } = linkGauges([
+      station("uhslc/X", { name: "Kodiak", contributor: null, same_as: ["coops/1"] }),
+      station("coops/1", { name: "Kodiak", lat: m(300) }),
+      station("usgs/2", { name: "Kodiak Harbor", lat: m(50) }),
+    ]);
+    assert.deepEqual(stations[1]!.same_as, ["uhslc/X"]);
+    assert.deepEqual(stations[2]!.same_as, []);
+    assert.deepEqual(
+      report.skipped.map((k) => k.reason),
+      ["would join coops and usgs, which run separate gauges"],
+    );
+  });
+
   it("keeps a pair a person unlinked apart, even through a third station", () => {
     UNLINKS.push({ a: "a/1", b: "b/1", note: "test" });
     try {
@@ -381,8 +395,12 @@ describe("rank", () => {
       ),
       "rws/b",
     );
-    // USACE relays USGS's gauges, so beside one it's the copy, whatever its interval.
-    assert.equal(best(station("usgs/b"), station("usace/a", { interval_s: 900 })), "usgs/b");
+    // USACE relays USGS's gauges, so in a group with one it's the copy, whatever its interval.
+    const linked = linkGauges([
+      station("usgs/b", { name: "Calhoun" }),
+      station("usace/a", { name: "Calhoun", interval_s: 900, lat: m(30) }),
+    ]).stations;
+    assert.equal(linked[1]!.preferred, "usgs/b");
     assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
     assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.

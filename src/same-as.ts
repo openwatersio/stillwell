@@ -68,9 +68,10 @@ export function redistributed(s: Station): boolean {
  */
 const COPIES: Record<string, string> = { usace: "usgs" };
 
-/** Whether `a` is the copy of `b`'s gauge, rather than its own agency's series. */
-function copyOf(a: Station, b: Station): boolean {
-  return redistributed(a) || COPIES[a.source] === b.source;
+/** The stations in a group that copy another member's gauge, by `COPIES`. */
+function copiesIn(group: Station[]): Set<string> {
+  const sources = new Set(group.map((s) => s.source));
+  return new Set(group.filter((s) => sources.has(COPIES[s.source] ?? "")).map((s) => s.id));
 }
 
 /**
@@ -203,11 +204,16 @@ export function linkGauges<T extends Station>(
       skipped.push({ a: a.id, b: b.id, how, reason: `UNLINKS ${unlinked.join(" ")}` });
       continue;
     }
+    // Checked across the whole of both groups, so a third station can't bridge them.
     if (how === "near" || how === "copy") {
-      const sa = new Set(ga.map((s) => s.source));
-      const shared = gb.find((s) => sa.has(s.source));
-      if (shared) {
-        skipped.push({ a: a.id, b: b.id, how, reason: `would join two ${shared.source} stations` });
+      const clash = ga.flatMap((x) => gb.filter((y) => separate(x, y)).map((y) => [x, y]))[0];
+      if (clash) {
+        const [x, y] = clash as [T, T];
+        const reason =
+          x.source === y.source
+            ? `would join two ${x.source} stations`
+            : `would join ${x.source} and ${y.source}, which run separate gauges`;
+        skipped.push({ a: a.id, b: b.id, how, reason });
         continue;
       }
     }
@@ -219,7 +225,8 @@ export function linkGauges<T extends Station>(
   const preferredOf = new Map<string, string>();
   const large: string[][] = [];
   for (const [r, group] of members) {
-    preferredOf.set(r, group.reduce((best, s) => (rank(s, best, now) < 0 ? s : best)).id);
+    const copies = copiesIn(group);
+    preferredOf.set(r, group.reduce((best, s) => (rank(s, best, now, copies) < 0 ? s : best)).id);
     if (group.length > LARGE) large.push(group.map((s) => s.id).sort());
   }
   return {
@@ -244,11 +251,17 @@ function pairKey(a: string, b: string): string {
  * Negative when `a` is the better series for the gauge's observed levels: a
  * person's choice; one with levels; one whose terms allow commercial use, so
  * the API can serve it before tokens exist; one still reporting; the
- * originator's over a copy (a redistributor's, or a `COPIES` source's beside
- * its original); the longer record in the lake; the finer interval; then the
+ * originator's over a copy (a redistributor's, or one of `copies`, the
+ * group's `COPIES` stations); the longer record in the lake; the finer interval; then the
  * lower ID, so equals always break the same way.
  */
-export function rank(a: Station, b: Station, now = new Date()): number {
+export function rank(
+  a: Station,
+  b: Station,
+  now = new Date(),
+  copies: Set<string> = new Set(),
+): number {
+  const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
   const reporting = (s: Station) =>
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
@@ -261,7 +274,7 @@ export function rank(a: Station, b: Station, now = new Date()): number {
     [levels(a), levels(b)],
     [a.commercial_use, b.commercial_use],
     [reporting(a), reporting(b)],
-    [!copyOf(a, b), !copyOf(b, a)],
+    [!copy(a), !copy(b)],
     [span(a), span(b)],
     [-(a.interval_s ?? Infinity), -(b.interval_s ?? Infinity)],
   ];

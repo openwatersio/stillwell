@@ -39,7 +39,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
-- **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. It picks a station whose terms allow commercial use wherever the gauge has one, and an inactive station can be preferred when no series of its gauge still reports.
+- **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
 - **`status`**: `active` or `inactive`.
 - **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
 
@@ -88,7 +88,7 @@ One station per gauge, so a map or a count doesn't show a gauge once for each so
 ```sql
 SELECT count(*) AS gauges
 FROM 'https://water-levels.openwaters.io/stations.parquet'
-WHERE status = 'active' AND list_contains(products, 'levels') AND preferred = id;
+WHERE list_contains(products, 'levels') AND preferred = id;
 ```
 
 The nearest stations with observed levels to a point, here the mouth of the Nieuwe Waterweg:
