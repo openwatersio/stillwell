@@ -21,7 +21,7 @@ const iso = (t: number) => new Date(t).toISOString();
 
 /** A page laid out as CDEC's are, for a station with no 15-minute stage. */
 const NO_STAGE =
-  "<html><h2>NO STAGE</h2><tr><td><b>Latitude</b></td><td>38.1&#176</td><td><b>Longitude</b></td><td>-121.5&#176</td></tr><tr><td><b>Operator</b></td><td>CA Dept of Water Resources</td></tr>The following data types are available online.</html>";
+  "<html><h2>NO STAGE</h2><tr><td><b>Latitude</b></td><td>38.1&#176</td><td><b>Longitude</b></td><td>-121.5&#176</td></tr><tr><td><b>Operator</b></td><td>CA Dept of Water Resources</td></tr>The following data types are available online.<table></table></html>";
 
 describe("cdec", () => {
   cdec.pacing.requestMs = 0;
@@ -83,6 +83,11 @@ describe("cdec", () => {
     // Cut before its sensors, it mustn't read as a station with no stage.
     assert.throws(
       () => cdec.parseMeta(mrz.slice(0, mrz.indexOf("The following data types")), "MRZ"),
+      /no sensor table/,
+    );
+    // Cut just after the heading, before the table ends.
+    assert.throws(
+      () => cdec.parseMeta(mrz.slice(0, mrz.indexOf("The following data types") + 200), "MRZ"),
       /no sensor table/,
     );
     assert.throws(
@@ -173,7 +178,7 @@ describe("cdec", () => {
     );
     assert.match(
       requests[0]![0],
-      /Stations=MRZ&SensorNums=1&dur_code=E&Start=2025-11-01&End=2025-11-04/,
+      /Stations=MRZ&SensorNums=1&dur_code=E&Start=2025-11-01&End=2025-11-03/,
     );
     // 2025-11-01 00:00 PDT, 4.18 ft.
     assert.deepEqual(levels[0], {
@@ -189,6 +194,18 @@ describe("cdec", () => {
     assert.ok(levels.every((l, i) => i === 0 || l.time > levels[i - 1]!.time));
     // 193 rows, 1 November 00:00 to 3 November 00:00, less that 00:45 and the last, at the range end.
     assert.equal(levels.length, 191);
+  });
+
+  it("asks to the next Pacific day across the end of daylight saving", async () => {
+    serve(() => fixture("cdec-MRZ-dst.csv"));
+    // To Pacific midnight starting 3 November 2025, a 25-hour day after 2 November's start.
+    const levels = await cdec.levels(
+      { source_id: "MRZ" },
+      new Date("2025-11-02T07:00:00Z"),
+      new Date("2025-11-03T08:00:00Z"),
+    );
+    assert.match(requests[0]![0], /Start=2025-11-02&End=2025-11-03/);
+    assert.equal(iso(levels.at(-1)!.time), "2025-11-03T07:45:00.000Z");
   });
 
   it("asks a calendar year at a time, and nothing outside the record", async () => {
@@ -231,6 +248,14 @@ describe("cdec", () => {
     );
     assert.throws(
       () => cdec.parse(rows("MRZ,E,1,RIV STG,20250230 0000,20250230 0000,1.0, ,FEET"), "MRZ"),
+      /bad row/,
+    );
+    assert.throws(
+      () => cdec.parse(rows("MRZ,E,1,RIV STG,20251301 0000,20251301 0000,1.0, ,FEET"), "MRZ"),
+      /bad row/,
+    );
+    assert.throws(
+      () => cdec.parse(rows("MRZ,E,1,RIV STG,20250101 0060,20250101 0060,1.0, ,FEET"), "MRZ"),
       /bad row/,
     );
     assert.throws(

@@ -166,7 +166,8 @@ export function parseMeta(html: string, code: string): Meta {
   if (!name || !operator || !Number.isFinite(lat) || !Number.isFinite(lon) || !lat || !lon)
     throw new Error(`CDEC's page for ${code} has no name, operator or position`);
   // A page cut short, or laid out anew, mustn't read as a station without stage.
-  if (!/The following data types are available online/.test(html))
+  const sensors = html.split("The following data types are available online")[1];
+  if (!sensors || !/<\/table>/i.test(sensors))
     throw new Error(`CDEC's page for ${code} has no sensor table`);
   // Each sensor row: description, number, duration link, collection, then its
   // dates. A station can have several 15-minute rows, one per way the data came
@@ -256,7 +257,7 @@ export async function levels(
     const until = Math.min(to, Date.UTC(new Date(t).getUTCFullYear() + 1, 0, 1));
     // Pacific dates; End runs to the start of its day, so it's the day after.
     const csv = await getText(
-      `${API}/req/CSVDataServlet?Stations=${code}&SensorNums=1&dur_code=E&Start=${pacificDate(t)}&End=${pacificDate(until + DAY_MS)}`,
+      `${API}/req/CSVDataServlet?Stations=${code}&SensorNums=1&dur_code=E&Start=${pacificDate(t)}&End=${dayAfter(pacificDate(until - 1))}`,
       // CDEC may revise any reading, so nothing is cached.
       { fresh: true, pace },
     );
@@ -264,6 +265,12 @@ export async function levels(
     t = until;
   }
   return out;
+}
+
+/** The calendar day after a `YYYY-MM-DD` date, whatever its length in Pacific time. */
+function dayAfter(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y!, m! - 1, d! + 1)).toISOString().slice(0, 10);
 }
 
 /** The Pacific date an instant falls on, `YYYY-MM-DD`. */
@@ -292,8 +299,8 @@ export function parse(text: string, code: string): Observation[] {
     const feet = Number(value);
     if (!m || !Number.isFinite(feet)) throw new Error(`CDEC ${code} sent a bad row: ${line}`);
     const wall = Date.UTC(+m[1]!, +m[2]! - 1, +m[3]!, +m[4]!, +m[5]!);
-    // Date.UTC rolls an impossible day into the next month, so check it reads back.
-    if (new Date(wall).getUTCDate() !== +m[3]!)
+    // Date.UTC rolls an impossible date or time into the next, so check it reads back.
+    if (!new Date(wall).toISOString().startsWith(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}`))
       throw new Error(`CDEC ${code} sent a bad row: ${line}`);
     const time = fromPacific(wall);
     // On the day daylight saving ends, CDEC sends the repeated hour once, as
