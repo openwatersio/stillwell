@@ -178,7 +178,7 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **RWS** history back to 1990 at tide gauges, plus extremes (`GETETM2`, `GETETBRKD2`).
 - [x] **Kartverket** (`kartverket`), **SMHI** (`smhi`) and the **Marine Institute** (`marine-institute`): observed levels from each originator's API, CC BY 4.0, in the public lake, running hourly. Kartverket's API reaches back to the late 1980s, so its earlier record (Bergen from 1915) needs GESLA or CMEMS; SMHI's hourly RH2000 record reaches 1886; the Marine Institute's coastal network starts in 2006, and its river gauges (TICON's `mi_r`) are left out, since they name no datum. See each adapter's README.
 - [ ] Backfill Kartverket, SMHI and the Marine Institute through the Ingest workflow.
-- [ ] **European originators**: DMI, REFMAR, UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
+- [ ] **European originators**: DMI, REFMAR (adapter done; backfill to run), UK EA (archive for the 88 `TideGauge` stations). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
 - [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.

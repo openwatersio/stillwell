@@ -75,6 +75,16 @@ describe("TICON replacements", () => {
     assert.deepEqual([missing.id, missing.status], [null, "unmatched"]);
   });
 
+  it("maps a REFMAR record to its gauge's SHOM id", () => {
+    const brest = record("brest-3-fra-refmar", { lat: 48.38, lon: -4.5 });
+    assert.deepEqual(
+      [replacement(brest, {}).id, replacement(brest, {}).status],
+      ["refmar/3", "planned"],
+    );
+    const lists = { refmar: [station("refmar/3", "BREST", 48.38, -4.5)] };
+    assert.equal(replacement(brest, lists).status, "ready");
+  });
+
   it("sends a UHSLC relay to the originator tide-database's provenance declares", () => {
     const relay = record("honolulu-057a-usa-uhslc_rq", { declared: "noaa/1612340" });
     assert.deepEqual(replacement(relay, {}), {

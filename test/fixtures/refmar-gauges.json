@@ -1,0 +1,137 @@
+{
+ "3": {
+  "shom_id": "3",
+  "name": "BREST",
+  "longitude": -4.49503994,
+  "latitude": 48.38290024,
+  "state": "OK",
+  "reseau": "RONIM",
+  "alertCustom": false,
+  "delai_alerte": "03:00",
+  "events": [
+   {
+    "id": "118",
+    "tide_gauge_id": "3",
+    "content": "\n\tLes données validées jusqu'au 10/01/2011 sont disponibles sur le serveur FTP\n",
+    "creation_date": "2011-07-08T09:49:03.000Z",
+    "due_date": "2011-01-14T00:00:00.000Z"
+   }
+  ],
+  "organismes": [
+   {
+    "nom": "Shom",
+    "logo": "https://services.data.shom.fr/static/logo/DDM/logo_SHOM.png",
+    "url": "https://www.shom.fr"
+   },
+   {
+    "nom": "Marine nationale",
+    "logo": "https://services.data.shom.fr/static/logo/DDM/logo_Marine_nationale.png",
+    "url": "https://www.defense.gouv.fr/marine"
+   }
+  ],
+  "verticalRef": {
+   "nom_ref": "IGN69",
+   "zero_hydro": "zero_hydrographique",
+   "zh_ref": "-3.635"
+  },
+  "collocalisation": "https://www.sonel.org/?page=gps&idStation=642",
+  "date_prem_obs": "1846-01-04",
+  "descriptif_capteur": "https://refmar.shom.fr/maregraphe-radar-ondes-guidees-bm100a",
+  "fuseau_horaire": "0",
+  "gestionnaire": "Shom",
+  "id_ram": "Brest",
+  "info_maregraphe": "https://refmar.shom.fr/donnees/3",
+  "journal_de_bord": "https://refmar.shom.fr/donnees/3",
+  "niveau_moyen": "4.14",
+  "npbma": "0.25",
+  "nphma": "7.93",
+  "sect_geographique": "FH",
+  "spm": "BREST",
+  "ville_d_hebergement": "Brest"
+ },
+ "6118": {
+  "shom_id": "6118",
+  "name": "AMBES",
+  "longitude": -0.603517,
+  "latitude": 45.040483,
+  "state": "OK",
+  "reseau": "REFMAR",
+  "alertCustom": false,
+  "delai_alerte": "06:00",
+  "events": [
+   {
+    "id": "2087",
+    "tide_gauge_id": "6118",
+    "content": "Durant les dernières semaines, le GPM de Bordeaux a remplacé la centrale d''acquisition sur la base d''automates WAGO.\nLes données sont désormais transmises en 4G en plus d''une transmission par radio.",
+    "creation_date": "2024-12-20T15:01:26.000Z",
+    "due_date": "2024-12-20T01:00:00.000Z"
+   }
+  ],
+  "organismes": [
+   {
+    "nom": "GPM Bordeaux",
+    "logo": "https://services.data.shom.fr/static/logo/DDM/logo_GPM_Bordeaux.png",
+    "url": "https://www.bordeaux-port.fr/"
+   }
+  ],
+  "verticalRef": {
+   "zero_hydro": "zero_hydrographique"
+  },
+  "fuseau_horaire": "0",
+  "gestionnaire": "Grand Port Maritime Bordeaux",
+  "info_maregraphe": "https://refmar.shom.fr/donnees/6118",
+  "journal_de_bord": "https://refmar.shom.fr/donnees/6118",
+  "sect_geographique": "FH",
+  "ville_d_hebergement": "Ambès"
+ },
+ "16": {
+  "shom_id": "16",
+  "name": "CHALEIX_NOUMEA",
+  "longitude": 166.436742,
+  "latitude": -22.291478,
+  "state": "OLD",
+  "reseau": "REFMAR",
+  "alertCustom": false,
+  "delai_alerte": "06:00",
+  "events": [
+   {
+    "id": "1295",
+    "tide_gauge_id": "16",
+    "content": "Depuis 2005, l'observation du niveau de la mer à Nouméa est réalisée sur le site de Numbo. En conséquence, le site n'est plus équipé de marégraphe depuis cette date.",
+    "creation_date": "2019-01-17T09:59:51.000Z",
+    "due_date": "2005-07-01T02:00:00.000Z"
+   }
+  ],
+  "organismes": [
+   {
+    "nom": "Shom",
+    "logo": "https://services.data.shom.fr/static/logo/DDM/logo_SHOM.png",
+    "url": "https://www.shom.fr"
+   },
+   {
+    "nom": "UHSLC",
+    "logo": "https://services.data.shom.fr/static/logo/DDM/logo_UHSLC.png",
+    "url": "https://uhslc.soest.hawaii.edu/"
+   }
+  ],
+  "verticalRef": {
+   "nom_ref": "NGNC",
+   "zero_hydro": "zero_hydrographique",
+   "zh_ref": "-0.835"
+  },
+  "collocalisation": "https://www.sonel.org/spip.php?page=gps&idStation=759",
+  "date_prem_obs": "1967-02-24",
+  "descriptif_capteur": "https://refmar.shom.fr/maregraphe-radar-ondes-guidees-bm100a",
+  "fuseau_horaire": "0",
+  "gestionnaire": "Shom",
+  "id_ram": "Nouméa - Chaleix",
+  "info_maregraphe": "https://refmar.shom.fr/donnees/16",
+  "journal_de_bord": "https://refmar.shom.fr/donnees/16",
+  "niveau_moyen": "0.95",
+  "npbma": "0.09",
+  "nphma": "1.79",
+  "sect_geographique": "NC",
+  "spm": "NOUMEA",
+  "ville_d_hebergement": "Chaleix Nouméa"
+ }
+}

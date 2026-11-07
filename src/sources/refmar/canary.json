@@ -1,0 +1,11 @@
+{
+  "/maregraphie/observation/json/3": {
+    "$": "object",
+    "$.data": "array",
+    "$.data[]": "object",
+    "$.data[].idsource": "number",
+    "$.data[].idstation": "number",
+    "$.data[].timestamp": "string",
+    "$.data[].value": "number"
+  }
+}

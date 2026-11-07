@@ -20,6 +20,7 @@ import * as coops from "../src/sources/coops/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
+import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as smhi from "../src/sources/smhi/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -43,6 +44,15 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
+  // Brest: three days of raw values, and three of validated ones a year back.
+  refmar: async () => [
+    ...(await refmar.levels({ source_id: "3", first_observation: null }, start, end)),
+    ...(await refmar.levels(
+      { source_id: "3", first_observation: null },
+      new Date(start.getTime() - 365 * DAY_MS),
+      new Date(end.getTime() - 365 * DAY_MS),
+    )),
+  ],
   rws: () => rws.levels("hoekvanholland", start, end, { fresh: true }),
   // Smögen's latest day, and three days of the closed gauge at Götaälvbron in Gothenburg,
   // whose whole archive is about 100 KB; a recent range would download Smögen's.
