@@ -29,6 +29,7 @@ export const metadata: SourceMetadata = {
     name: "U.S. Government work, public domain",
     url: "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: "U.S. Geological Survey",
   terms: "Provisional data are subject to revision until USGS approves them.",

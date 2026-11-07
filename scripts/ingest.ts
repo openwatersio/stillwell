@@ -48,9 +48,10 @@
  * the station's, and backfill refuses a file whose `datum` column names another.
  *
  * The lake is WATER_LEVELS_LAKE: a directory (default `data`) or an `s3://` URL.
- * Its bucket is public, so a source whose license bars commercial use keeps
+ * Its bucket is public, so a source whose terms bar republishing its data keeps
  * its list and series in WATER_LEVELS_RESTRICTED_LAKE instead, which must be a
- * separate lake, and ingest refuses to write one without it.
+ * separate lake, and ingest refuses to write one without it. Commercial use is
+ * a tag on each station for readers to filter on; it doesn't move a station.
  */
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -115,22 +116,22 @@ import { sourceOf, sources } from "../src/sources/index.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
 
-/** Where a station's series go: the public lake, or the private one when its license is restricted. */
-function lakeFor(station: Pick<Station, "id" | "commercial_use">): string {
-  if (station.commercial_use) return LAKE;
+/** Where a station's series go: its source's lake. */
+function lakeFor(station: Pick<Station, "source">): string {
+  return lakeOfSource(sourceOf(station.source).metadata);
+}
+
+/** The public lake, or the private one for a source whose terms bar republishing. */
+function lakeOfSource(metadata: SourceMetadata): string {
+  if (metadata.license.redistribution) return LAKE;
   const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
   if (!restricted)
     throw new Error(
-      `${station.id} bars commercial use; set WATER_LEVELS_RESTRICTED_LAKE to a private lake`,
+      `${metadata.id} bars republishing its data; set WATER_LEVELS_RESTRICTED_LAKE to a private lake`,
     );
   if (overlaps(restricted, LAKE))
     throw new Error("WATER_LEVELS_RESTRICTED_LAKE must be a separate bucket or directory");
   return restricted;
-}
-
-/** The lake that holds a source's list, by its terms; every station in it shares them. */
-function lakeOfSource(metadata: SourceMetadata): string {
-  return lakeFor({ id: metadata.id, commercial_use: metadata.license.commercial_use });
 }
 
 /** Whether two lakes share a bucket, or one directory holds the other. */

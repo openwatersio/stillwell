@@ -36,6 +36,7 @@ export const metadata: SourceMetadata = {
     name: "BSH Entgeltverzeichnis digitale Daten, Anlage 4",
     url: "https://www.bsh.de/DE/Das_BSH/Gebuehren_Preise/Gebuehren_und_Preise/_Anlagen/Downloads/Entgeltverzeichnis-digitale-Daten.pdf",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: ATTRIBUTION,
   terms:

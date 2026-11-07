@@ -42,7 +42,11 @@ describe("fetchText", () => {
       calls++;
       return new Response("nope", { status: 404 });
     }) as typeof fetch;
-    await assert.rejects(fetchText("https://example.test/"), /returned 404/);
+    await assert.rejects(fetchText("https://example.test/"), (error: Error & { body?: string }) => {
+      assert.match(error.message, /returned 404$/);
+      assert.equal(error.body, "nope");
+      return true;
+    });
     assert.equal(calls, 1);
   });
 });

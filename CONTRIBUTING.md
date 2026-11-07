@@ -9,7 +9,7 @@ src/sources/<source>/  one adapter per source, each with a README on that servic
 src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the lake's layout and the evaluations
@@ -40,7 +40,9 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                          |
 | `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent` and `compact`, described below. |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                   |
+| `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                     |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.   |
+| `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.              |
 
 CI also checks that `package-lock.json` regenerates from `package.json` and that every package resolves from the npm registry.
 
@@ -66,7 +68,11 @@ node scripts/ingest.ts backfill bsh 506P 2026 2028
 node scripts/ingest.ts backfill pegelonline 5990020 2000 2027
 ```
 
-Backfill skips a year whose file is already complete: a past year, asked for whole, whose file has values in every month, runs into the year's last week and holds no preliminary values (`yearDone` in `src/backfill.ts`). So a run cut short, such as by the Ingest workflow's 6-hour cap, doesn't fetch those years again, and `--refetch` fetches every year anyway. A station's first and last years, and years with a missing month, are never complete, so they're fetched every run too. That rule still fetches every year with preliminary values on each run, so a campaign of many runs, such as the USGS record, passes `--skip-written` to skip every whole, ended year that has a file at all, from a listing of each station's files, and ends at the current year so it never fetches a year still under way. Compaction writes the current year's file for every live station each night, so from 2026 on (`COMPACTED_SINCE`) a year's file counts as written only if it has values in every month or holds values backfill wrote, which takes a read of those years. Compaction began in November 2026, so that year's files need a backfill before `--skip-written` trusts them. Otherwise it skips a file whatever it holds, so a year an earlier run wrote only part of, such as `backfill bsh 506P 2026 2028` above, needs `--refetch` or a run without `--skip-written` to fill in. A year a source returns nothing for writes no file, so it's fetched again each run; USGS and CO-OPS ask only within each series' dates, but USACE doesn't yet, so start a USACE backfill near its series' first year.
+```bash
+node scripts/ingest.ts backfill uhslc 001,329 1960 2026
+```
+
+Backfill skips a year whose file is already complete: a past year, asked for whole, whose file has values in every month, runs into the year's last week and holds no preliminary values (`yearDone` in `src/backfill.ts`). So a run cut short, such as by the Ingest workflow's 6-hour cap, doesn't fetch those years again, and `--refetch` fetches every year anyway. A station's first and last years, and years with a missing month, are never complete, so they're fetched every run too. That rule still fetches every year with preliminary values on each run, so a campaign of many runs, such as the USGS record, passes `--skip-written` to skip every whole, ended year that has a file at all, from a listing of each station's files, and ends at the current year so it never fetches a year still under way. Compaction writes the current year's file for every live station each night, so from 2026 on (`COMPACTED_SINCE`) a year's file counts as written only if it has values in every month or holds values backfill wrote, which takes a read of those years. Compaction began in November 2026, so that year's files need a backfill before `--skip-written` trusts them. Otherwise it skips a file whatever it holds, so a year an earlier run wrote only part of, such as `backfill bsh 506P 2026 2028` above, needs `--refetch` or a run without `--skip-written` to fill in. A year a source returns nothing for writes no file, so it's fetched again each run; USGS, CO-OPS and UHSLC ask only within each series' dates, but USACE doesn't yet, so start a USACE backfill near its series' first year.
 
 `preliminary` in place of the station IDs takes every station, active or not, whose bounds hold a preliminary value, and fetches it from that value's month, or from the start date when that's later, to the end date or the end of the year of its last value, whichever is sooner. The start date is the cutoff: a station whose recorded value is before it is listed, in the output and on the run's page, and fetched only from the cutoff on, if it has values after it. Compaction and backfill look for preliminary values only from three years before this one, the Monthly cutoff, so a station is listed when its value falls behind the cutoff at the turn of a year, or after a killed backfill left it lowered to where its fetch began. Its next read then moves the value to the earliest from the cutoff on, or clears it; a station whose files end before the cutoff has its value cleared there and then. So older values still preliminary are listed once and then left. A `preliminary` run with an earlier start than the cutoff reads from that start, so it sees what it fetched. `--skip-unscreened` leaves out a station with at least a year of record in its current epoch and no value its source screened, kept in the bounds as `screened`, which compaction and backfill set from the files they read (backfill from the cutoff year on). A value counts as screened when its `source_flag` isn't preliminary, or, in a file from before `source_flag`, when its flag is good or interpolated, since a suspect or bad one there may be QC's alone. The Monthly refetch passes it for USACE, some of whose offices screen nothing, except in January, so once a year every station is read again and one whose office began screening rejoins. After fetching a station's levels, and for every station `preliminary` picks, backfill reads its earliest preliminary value in the current epoch again into the bounds, every 100 stations so a run stopped by its time limit keeps most of them, and one the source has finalized drops out. Other backfills first lower each 100 stations' values to where their fetches start, but no earlier than the cutoff year, behind which nothing looks, so a run killed partway leaves them too early, which the next refetch corrects, rather than too late:
 
@@ -100,12 +106,12 @@ Both print a summary (stations updated, stale, failed and waiting on a held datu
 
 These environment variables choose where it writes:
 
-| Variable                                                  | Means                                                                                                                                                     |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WATER_LEVELS_LAKE`                                       | The lake: a directory, `data` by default, or an `s3://` URL.                                                                                              |
-| `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for stations whose license bars commercial use. Ingest refuses to write one without it, and refuses one that is the public lake. |
-| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                         |
-| `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                  |
+| Variable                                                  | Means                                                                                                                                                          |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WATER_LEVELS_LAKE`                                       | The lake: a directory, `data` by default, or an `s3://` URL.                                                                                                   |
+| `WATER_LEVELS_RESTRICTED_LAKE`                            | A separate, private lake for sources whose terms bar republishing their data. Ingest refuses to write one without it, and refuses one that is the public lake. |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Credentials for an `s3://` lake such as R2, the same variables crowd-depth reads. `S3_REGION` defaults to `auto`.                                              |
+| `WATER_LEVELS_CACHE`                                      | The response cache, `.cache` by default.                                                                                                                       |
 
 Write to R2 only through the Ingest and Monthly workflows. A run from your own machine shares no concurrency group with the scheduled jobs, so it and Ingest hourly or Compact daily can each rewrite a file the other just read, and one's values are lost. That includes the bounds file, which backfill and compaction both rewrite whole.
 
@@ -117,7 +123,15 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 npm run ticon:inventory
 ```
 
-Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every source refreshed), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+Reads a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the lake's station lists (`WATER_LEVELS_LAKE`, default the public bucket over HTTPS, so a local lake needs every public source refreshed; restricted sources are left out), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which lake source can replace each TICON record tide-database ships, and how far along each one is.
+
+## Clock check
+
+```bash
+npm run clock-check -- 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd uhslc/057=honolulu-1612340-usa-noaa
+```
+
+Cross-correlates a year of each station's levels, fetched through its adapter with the station as the lake's list has it (`WATER_LEVELS_LAKE`, default the public bucket, or the adapter's own list when the lake has none), against the prediction from a TICON record's constants in a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`), at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check, which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A TICON record fitted to the same series only shows a clock that changed since, so check against another originator's record for the same gauge where TICON has one. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error, such as New Zealand or Fiji local time labeled UTC, looks like a lag of under half an hour there; the K1 column, from K1's phase in a fit of the year against TICON's, shows it, and fails the check at 3 hours or more.
 
 ## Evaluations
 
@@ -133,7 +147,7 @@ Each writes `docs/results/<source>.json` and prints a Markdown table for [docs/h
 
 ## Adding a source
 
-Each source is a directory in `src/sources/` that exports a `Source` (defined in `src/schema.ts`), registered in `src/sources/index.ts`, with a README on the service's endpoints, limits, datums and license. Record real responses into `test/fixtures/` for its tests rather than calling the service. Check the source's license before writing anything to the public lake: a station whose license bars commercial use goes to the restricted lake, and its `commercial_use` must say so.
+Each source is a directory in `src/sources/` that exports a `Source` (defined in `src/schema.ts`), registered in `src/sources/index.ts`, with a README on the service's endpoints, limits, datums and license. Record real responses into `test/fixtures/` for its tests rather than calling the service. Check the source's terms before writing anything to the public lake. The lake republishes the data, so its `license.redistribution` decides the lake: a source whose terms bar republishing goes to the restricted lake. Commercial use is a separate tag, `commercial_use`, which the API and products filter on: the source's default, set per station where the terms differ, such as a contributor's own terms in a source that relays other agencies' data. Data the source itself withholds until its owner grants permission isn't listed at all.
 
 ## Ingest on R2
 
@@ -153,7 +167,7 @@ node scripts/canary.ts usgs --record
 
 ## Gotchas
 
-- **Everything in the public lake is public.** The bucket serves every file in it, so restricted series go only to `WATER_LEVELS_RESTRICTED_LAKE`, and ingest refuses to write one without it. Don't work around that refusal.
+- **Everything in the public lake is public.** The bucket serves every file in it, so a source whose terms bar republishing writes only to `WATER_LEVELS_RESTRICTED_LAKE`, and ingest refuses to write one without it. Don't work around that refusal.
 - **A station's files keep one datum.** Adapters refuse values in any datum but the station's, and backfill refuses to write into a file recorded in another. When a source moves a station to another reference, the next `ingest stations` opens a datum epoch whose values go to files of their own; a change soon after the last one, or back to an earlier reference, is held, and the run exits nonzero, until a person decides in the source's `overrides` ([docs/stations.md](docs/stations.md)).
 - **`.cache/` hides upstream changes.** A historical fetch is served from the cache once it has run, keyed by URL and request body, so delete `.cache/`, or point `WATER_LEVELS_CACHE` at an empty directory, when you need to see what the service returns now.
 

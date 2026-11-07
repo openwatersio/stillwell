@@ -32,6 +32,7 @@ export const metadata: SourceMetadata = {
     name: "U.S. Government work, public domain",
     url: "https://www.law.cornell.edu/uscode/text/33/2342",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: "U.S. Army Corps of Engineers",
   // Central and Eastern time, standard or daylight.

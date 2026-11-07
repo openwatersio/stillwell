@@ -32,6 +32,7 @@ export const metadata: SourceMetadata = {
     name: "Datenlizenz Deutschland – Zero – Version 2.0",
     url: "https://www.pegelonline.wsv.de/gast/nutzungsbedingungen",
     commercial_use: true,
+    redistribution: true,
   },
   attribution: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE",
   // Central European time, standard or summer.

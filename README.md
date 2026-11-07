@@ -6,7 +6,7 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 
 - **One schema.** Times are UTC and levels are meters. Quality flags run from 0, good, to 4, bad, whatever scale the source used.
 - **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes.
-- **Licenses.** Every station carries its source's license and attribution, and the public data includes only sources that allow commercial use.
+- **Licenses.** Every station carries its license, attribution and whether its terms allow commercial use. The public data holds what its sources let anyone republish.
 - **Links between sources.** When two sources cover the same gauge, such as BSH's predictions and PEGELONLINE's observations at Cuxhaven, their stations link to each other.
 
 ## Sources
@@ -19,10 +19,11 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 | [NOAA CO-OPS](https://tidesandcurrents.noaa.gov/) (`coops`)          | Observed 6-minute and hourly levels and verified high and low waters at about 2,900 current and historical stations, nearly all in the US, including the Great Lakes                                         | Station datum (STND), with offsets to MLLW, MSL, NAVD88 and, on the Great Lakes, IGLD | [U.S. Government work, public domain](https://tidesandcurrents.noaa.gov/disclaimers.html)                                                                                                                         |
 | [USACE CWMS](https://cwms-data.usace.army.mil/cwms-data/) (`usace`)  | Stage at about 1,350 Corps gauges, pools and tailwaters on the Mississippi, Ohio, Missouri and their tributaries                                                                                             | Gauge zero (GZ), with offsets to NGVD29 or NAVD88 where CWMS gives them               | [U.S. Government work, public domain](https://www.law.cornell.edu/uscode/text/33/2342)                                                                                                                            |
 | [USGS Water Data](https://waterdata.usgs.gov/) (`usgs`)              | Observed gage height and water-surface elevations at about 14,000 river, lake, estuary and coastal gauges across the US, since 2007 at most                                                                  | Gage datum (GAGE), with offsets to NAVD88 or NGVD29, or NAVD88 or NGVD29 directly     | [U.S. Government work, public domain](https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits)                                                                                          |
+| [UHSLC](https://uhslc.soest.hawaii.edu/data/) (`uhslc`)              | Hourly sea level at about 590 tide gauges worldwide, back to 1846: each station's research-quality record with fast-delivery values after it, and its older research-quality versions apart                  | Station zero (ZERO)                                                                   | [Free use and redistribution, not for legal use](https://uhslc.soest.hawaii.edu/datainfo/); cite Caldwell et al. (2015). Commercial use and credit per contributor ([table](docs/uhslc-contributors.md))          |
 
 [`stations.parquet`](https://water-levels.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://water-levels.openwaters.io/sources.json) gives each source's license and the attribution it asks for.
 
-More European agencies come next, including the UK Environment Agency, Kartverket, SMHI, DMI, the Irish Marine Institute and REFMAR. [docs/plan.md](docs/plan.md) has the order. Sources that bar commercial use, such as IOC's sea level monitoring facility, parts of GESLA and the Canadian Hydrographic Service, aren't in the public data.
+More European agencies come next, including the UK Environment Agency, Kartverket, SMHI, DMI, the Irish Marine Institute and REFMAR. [docs/plan.md](docs/plan.md) has the order. Data whose source doesn't let anyone republish it, such as IOC's sea level monitoring facility and parts of GESLA, isn't in the public data. Data a source does let anyone republish is there, with `commercial_use` false on each station whose terms bar commercial use.
 
 ## Getting the data
 

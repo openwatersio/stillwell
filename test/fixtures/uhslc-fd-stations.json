@@ -1,0 +1,60 @@
+{
+ "table": {
+  "columnNames": [
+   "uhslc_id",
+   "station_name",
+   "station_country",
+   "station_country_code",
+   "latitude",
+   "longitude",
+   "reference_datum"
+  ],
+  "columnTypes": [
+   "short",
+   "String",
+   "String",
+   "short",
+   "float",
+   "float",
+   "String"
+  ],
+  "columnUnits": [
+   null,
+   null,
+   null,
+   null,
+   "degrees_north",
+   "degrees_east",
+   null
+  ],
+  "rows": [
+   [
+    1,
+    "Pohnpei",
+    "Micronesia, Federated States of",
+    583,
+    6.9783,
+    158.1967,
+    "station zero"
+   ],
+   [
+    181,
+    "Durban",
+    "South Africa",
+    710,
+    -29.8667,
+    31.05,
+    "station zero"
+   ],
+   [
+    329,
+    "Quarry Bay",
+    "Hong Kong",
+    344,
+    22.3,
+    114.2167,
+    "station zero"
+   ]
+  ]
+ }
+}

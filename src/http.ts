@@ -27,6 +27,15 @@ export interface RequestOptions extends RequestInit {
  */
 export class Blocked extends Error {}
 
+/** A request the source refused, with the body it answered, for a source that says why there. */
+export class HttpError extends Error {
+  readonly body: string;
+  constructor(message: string, body: string) {
+    super(message);
+    this.body = body;
+  }
+}
+
 export type Transport = (url: string, options: RequestOptions) => Promise<string>;
 
 let transport: Transport = fetchText;
@@ -80,6 +89,7 @@ async function fetchWithRetry(
   for (let attempt = 1; ; attempt++) {
     let status: number | string;
     let retryAfter = 0;
+    let body = "";
     await pace?.();
     try {
       // A year of RWS data is about 15 MB and can take a minute.
@@ -90,6 +100,7 @@ async function fetchWithRetry(
       if (response.ok) return await response.text();
       status = response.status;
       retryAfter = Number(response.headers.get("retry-after")) || 0;
+      body = await response.text().catch(() => "");
     } catch (error) {
       if (error instanceof Error && error.name === "TimeoutError") status = "timeout";
       // Node's fetch reports a failed or dropped connection as a TypeError,
@@ -106,8 +117,9 @@ async function fetchWithRetry(
       retryAfter > 60 ||
       !(typeof status === "string" || [429, 500, 502, 503, 504].includes(status))
     )
-      throw new Error(
+      throw new HttpError(
         `${init.method ?? "GET"} ${url} returned ${status}${retryAfter ? ` (retry after ${retryAfter} s)` : ""}`,
+        body,
       );
     const wait = Math.max(retryAfter, 2 ** attempt);
     if (status === 429) throttled?.(wait);

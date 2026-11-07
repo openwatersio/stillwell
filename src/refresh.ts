@@ -82,7 +82,6 @@ export async function refreshSource(
   if (stray) throw new Refused(`${stray.id} isn't a ${id} station with a code`);
   const shrunk = shrankSharply(previous, fetched);
   if (shrunk) throw new Refused(shrunk);
-  refuseMixedTerms(source.metadata, fetched);
 
   const options_ = {
     now: options.now,
@@ -254,15 +253,6 @@ export function shrankSharply(previous: Station[], fetched: ListedStation[]): st
   ] as const)
     if (before >= 20 && now < before / 2) return `lists ${now} ${what}, down from ${before}`;
   return null;
-}
-
-/** A source's list lives in one lake, so every station in it shares the source's terms. */
-function refuseMixedTerms(metadata: SourceMetadata, fetched: (ListedStation | Station)[]): void {
-  const other = fetched.find((s) => s.commercial_use !== metadata.license.commercial_use);
-  if (other)
-    throw new Refused(
-      `${other.id} has commercial_use ${other.commercial_use}, unlike its source; split the source in two`,
-    );
 }
 
 const COMPARED = (s: LakeStation) => {

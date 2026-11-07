@@ -34,7 +34,13 @@ const metadata: SourceMetadata = {
   id: "test",
   name: "Test",
   url: "https://example.org",
-  license: { id: "CC0-1.0", name: "CC0", url: "https://example.org", commercial_use: true },
+  license: {
+    id: "CC0-1.0",
+    name: "CC0",
+    url: "https://example.org",
+    commercial_use: true,
+    redistribution: true,
+  },
   attribution: "Test",
 };
 
@@ -183,11 +189,10 @@ describe("refreshSource", () => {
     );
   });
 
-  it("refuses a station whose terms differ from its source's", async () => {
-    await assert.rejects(
-      refreshSource(lake, sourceOf([listed("a", { commercial_use: false })]), { now: NOW }),
-      /split the source in two/,
-    );
+  it("lists a station whose commercial use differs from its source's default", async () => {
+    await refreshSource(lake, sourceOf([listed("a", { commercial_use: false })]), { now: NOW });
+    const [a] = (await readStationList(stationListPath(lake, "test")))!;
+    assert.equal(a!.commercial_use, false);
   });
 
   it("refuses many datum changes at once until a person accepts them", async () => {

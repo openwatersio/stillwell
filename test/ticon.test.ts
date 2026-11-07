@@ -86,6 +86,39 @@ describe("TICON replacements", () => {
     assert.equal(replacement(record("abashiri-347a-jpn-uhslc_rq"), {}).id, "uhslc/347a");
   });
 
+  it("finds a UHSLC version in its FD series when that series carries it", () => {
+    const lists = {
+      uhslc: [
+        { ...station("uhslc/001", "Pohnpei", 6.98, 158.2), source_id: "001", version: "C" },
+        { ...station("uhslc/001a", "Pohnpei", 6.98, 158.23), source_id: "001a", version: "A" },
+      ],
+    };
+    const ids = [
+      "pohnpei-001-fsm-uhslc_fd",
+      "pohnpei-001a-fsm-uhslc_rq",
+      "pohnpei-001c-fsm-uhslc_rq",
+    ]
+      .map((id) => replacement(record(id, { lat: 6.98, lon: 158.2 }), lists))
+      .map((r) => [r.id, r.status]);
+    assert.deepEqual(ids, [
+      ["uhslc/001", "ready"],
+      ["uhslc/001a", "ready"],
+      ["uhslc/001", "ready"],
+    ]);
+    // An FD record whose FD series is gone is its latest version's.
+    const ended = { uhslc: [{ ...station("uhslc/281a", "Cananeia", -25, -48), version: "A" }] };
+    assert.equal(replacement(record("cananeia-281-bra-uhslc_fd"), ended).id, "uhslc/281a");
+    // A contributor's terms that bar commercial use keep a listed station from being cleared.
+    const bom = {
+      uhslc: [
+        { ...station("uhslc/001", "Pohnpei", 6.98, 158.2), version: "C", commercial_use: false },
+      ],
+    };
+    assert.equal(replacement(record("pohnpei-001c-fsm-uhslc_rq"), bom).status, "restricted");
+    // SANHO's gauges aren't listed.
+    assert.equal(replacement(record("durban-181a-zaf-uhslc_rq"), lists).status, "restricted");
+  });
+
   it("matches WSV records by PEGELONLINE number", () => {
     const lists = { pegelonline: [station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3)] };
     const match = replacement(

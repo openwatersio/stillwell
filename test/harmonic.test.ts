@@ -30,6 +30,31 @@ describe("harmonic", () => {
   });
 });
 
+describe("phaseLag", () => {
+  const reference = [
+    { name: "M2", amplitude: 1, phase: 40 },
+    { name: "K1", amplitude: 0.3, phase: 200 },
+  ];
+  const year = (late: number): Sample[] => {
+    const model = { constituents: reference, offset: 0, rms: 0 };
+    const times: number[] = [];
+    for (let t = Date.UTC(2020, 0, 1); t < Date.UTC(2021, 0, 1); t += 3_600_000) times.push(t);
+    // Stamped `late` hours after the level it carries was measured.
+    return harmonic
+      .timeline(
+        model,
+        times.map((t) => t - late * 3_600_000),
+      )
+      .map((p, i) => ({ time: times[i]!, level: p.level }));
+  };
+
+  it("sees an hour, and the 12 hours the semidiurnal tide hides", () => {
+    assert.ok(Math.abs(harmonic.phaseLag(year(0), reference)!) < 0.05);
+    assert.ok(Math.abs(harmonic.phaseLag(year(-1), reference)! + 1) < 0.05);
+    assert.ok(Math.abs(Math.abs(harmonic.phaseLag(year(12), reference)!) - 12) < 0.2);
+  });
+});
+
 describe("compareExtremes", () => {
   it("matches one to one within the window and by type", () => {
     const reference = [
