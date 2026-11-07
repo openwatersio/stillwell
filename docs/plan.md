@@ -165,7 +165,7 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 - [ ] Now and then refetch approved USGS years and verified CO-OPS months too, with `--refetch`: USGS still fills gaps and revises values after approval, and the disk cache keeps an approved page for good. Nothing in the lake says which approved years changed, so this is a whole-record campaign, about 200,000 USGS requests or nine days at USGS's rate, and it stays a manual Ingest run until there's a cheaper signal.
 - [x] A run summary per job (stations updated, stale, failed, values written) on the run's page in Actions.
 - [x] An issue opened automatically when a source's `recent` or `compact` job fails in two runs on `main` in a row, closed when it next succeeds.
-- [x] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps. USGS waits on a `USGS_API_KEY` repository secret, and checks only that USGS returns values until its shape is recorded.
+- [x] `canary.yml`, weekly: one small live request per adapter against a recorded shape, so upstream changes show up as a failing check instead of silent gaps. USGS reads its key from the `USGS_API_KEY` repository secret.
 
 Done when every source's `recent/` is under 2 hours old and the year files fill in daily without anyone touching them.
 
@@ -177,9 +177,9 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] Backfill UHSLC through the Ingest workflow.
 - [ ] **RWS** history back to 1990 at tide gauges, plus extremes (`GETETM2`, `GETETBRKD2`).
 - [x] **Kartverket** (`kartverket`), **SMHI** (`smhi`) and the **Marine Institute** (`marine-institute`): observed levels from each originator's API, CC BY 4.0, in the public lake, running hourly. Kartverket's API reaches back to the late 1980s, so its earlier record (Bergen from 1915) needs GESLA or CMEMS; SMHI's hourly RH2000 record reaches 1886; the Marine Institute's coastal network starts in 2006, and its river gauges (TICON's `mi_r`) are left out, since they name no datum. See each adapter's README.
-- [ ] Backfill Kartverket, SMHI and the Marine Institute through the Ingest workflow.
+- [x] Backfill Kartverket, SMHI and the Marine Institute through the Ingest workflow.
 - [ ] **DMI** (`dmi`): the adapter reads DMI's open oceanographic API, CC BY 4.0, back to 1889, but waits on DMI's station endpoint, which lists only Skagen; once it lists every gauge, register the source, which its metadata then schedules, refresh the list and backfill (see [its README](../src/sources/dmi/README.md)).
-- [ ] **European originators**: REFMAR (adapter done; backfill to run), UK EA (adapter done for its 43 tide gauges, backfill from its year-long archive to run). These also run hourly from phase 4 on.
+- [ ] **European originators**: REFMAR (adapter done; backfill running), UK EA (43 tide gauges, backfilled from its year-long archive). These also run hourly from phase 4 on.
 - [ ] **US state networks**: CRMS, CDEC, SFWMD, NWFWMD, NCDEM.
 - [ ] **JMA and JODC**, **UNAM**, then the case-by-case rest.
 - [ ] **WSV history**: backfill PEGELONLINE from its raw-data download, which goes back to 2000 at 94 of the 137 gauges on the North Sea and tidal rivers (each station's `history_since`). For years before 2000, and gauges with a later start or no history, ask WSV or BfG for the archive, or use GESLA's WSV years with tide-database's Europe/Berlin correction.
