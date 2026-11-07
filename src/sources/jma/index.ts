@@ -378,6 +378,7 @@ export function parse(text: string, code: string, month: number, flag: Flag): Ob
       const after = i + 1 < lines.length ? dayOf(lines[i + 1]!) : NaN;
       const values = line.slice(0, 72);
       if (
+        !(before >= 1 && after <= days) ||
         after - before !== 2 ||
         seen.has(before + 1) ||
         lines.some((other, j) => j !== i && other.slice(0, 72) === values)

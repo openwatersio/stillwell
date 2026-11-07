@@ -226,6 +226,17 @@ describe("jma", () => {
         ),
       /a day twice/,
     );
+    // Neighbors outside the month don't place a line: stamped 31, 0, 33, 2 to 29,
+    // the second line would be read as the 32nd and the third as the 1st.
+    const stamp = (line: string, day: number) =>
+      `${line.slice(0, 76)}${String(day).padStart(2, " ")}${line.slice(78)}`;
+    const chain = [31, 0, 33, ...Array.from({ length: 28 }, (_, i) => i + 2)].map((day, i) =>
+      stamp(lines[i]!, day),
+    );
+    assert.throws(
+      () => jma.parse(chain.join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good),
+      /not a day/,
+    );
     // A copy of the 20th, stamped the 20th where the 21st belongs, is a repeat.
     const copied = [...lines];
     copied[20] = lines[19]!;
