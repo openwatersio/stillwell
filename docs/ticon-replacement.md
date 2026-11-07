@@ -6,12 +6,12 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | All listed | Meaning |
 | --- | --- | --- | --- |
-| ready | 1076 | 2380 | An adapter exists and the record matched one of its stations |
-| planned | 180 | 245 | Cleared source, adapter in the plan |
-| to_match | 89 | 297 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
+| ready | 1325 | 2914 | An adapter exists and the record matched one of its stations |
+| planned | 1 | 3 | Cleared source, adapter in the plan |
+| to_match | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
 | license | 710 | 1251 | The source's terms need confirming first |
-| unmatched | 22 | 45 | An adapter exists, but no station matched, or two matched equally; check by hand |
-| restricted | 450 | 620 | The source forbids it; stays on TICON |
+| unmatched | 44 | 80 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| restricted | 404 | 538 | The source forbids it; stays on TICON |
 
 ## By replacement source
 
@@ -24,26 +24,27 @@ Accepted records only, in the order to build adapters: most records first.
 | chs | 256 | restricted 256 | meds |
 | crms | 164 | license 164 | crms |
 | pegelonline | 147 | ready 146, unmatched 1 | cmems, wsv |
-| refmar | 124 | planned 95, to_match 29 | cmems, refmar |
+| refmar | 124 | ready 123, unmatched 1 | cmems, refmar |
 | jodc | 111 | license 111 | jodc_giaj, jodc_jcg, jodc_jma, jodc_pahb |
 | bom | 96 | license 96 | bom |
 | rws | 87 | ready 71, unmatched 16 | cmems, rws |
 | cmems | 80 | restricted 80 | cmems |
 | cdec | 75 | license 75 | cdwr |
-| smhi | 70 | planned 62, to_match 8 | cmems, smhi |
+| smhi | 70 | ready 61, unmatched 9 | cmems, smhi |
 | coops | 67 | ready 67 | noaa, uhslc_rq |
 | redmar | 55 | license 55 | cmems, ieo |
-| bodc | 54 | restricted 54 | bodc, cmems, noc |
+| ea | 46 | ready 46 | bodc, cmems |
 | dmi | 44 | planned 1, to_match 43 | cmems, dmi |
 | sfwmd | 42 | license 42 | sfwmd |
 | ispra | 37 | license 37 | cmems, ispra |
-| marine-institute | 31 | planned 22, to_match 9 | cmems, mi_c, mi_r |
+| marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
 | unam | 22 | license 22 | unam, unam_hist |
 | ncdem | 22 | license 22 | ncdem |
 | ttw | 19 | license 19 | ttw |
 | fmi | 16 | license 16 | cmems, fmi |
 | cco | 15 | license 15 | cco |
 | cm | 12 | license 12 | cm |
+| bodc | 8 | restricted 8 | bodc, cmems, noc |
 | nwfwmd | 8 | license 8 | nwfwmd |
 | da_sat | 7 | license 7 | da_sat |
 | eseas | 3 | license 3 | eseas |
