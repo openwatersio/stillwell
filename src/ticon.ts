@@ -1,4 +1,5 @@
 import type { Station } from "./schema.ts";
+import { TIDAL } from "./sources/dwr/index.ts";
 
 /**
  * Which lake source can replace each TICON record in tide-database. TICON ids
@@ -88,7 +89,9 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   dmi: { source: "dmi", status: "planned" },
   fmi: { source: "fmi", status: "license", note: "FMI's sea-level terms not confirmed" },
   crms: { source: "crms", status: "license", note: "Louisiana CRMS terms to check" },
-  cdwr: { source: "cdec", status: "license", note: "California CDEC terms to check" },
+  cdwr: { source: "dwr", status: "planned" },
+  // TICON's `cdwr` records named by a CDEC code rather than a DWR number.
+  cdec: { source: "cdec", status: "license", note: "A CDEC station; no CDEC adapter yet" },
   sfwmd: { source: "sfwmd", status: "planned" },
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
@@ -255,6 +258,17 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   const direct = DIRECT[contributor];
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
+  // DWR records carry its station number, which TICON writes without the trailing Q
+  // of the NAVD88 stations; the rest name CDEC stations.
+  if (contributor === "cdwr") {
+    if (!/^[a-z]\d{5}q?$/.test(code)) {
+      const cdec = DIRECT.cdec!;
+      return { source: cdec.source, id: null, status: cdec.status, note: cdec.note };
+    }
+    const number = code.toUpperCase().replace(/Q$/, "");
+    const id = TIDAL.has(`${number}Q`) ? `${number}Q` : number;
+    return byCode(record, "dwr", id, "planned", lists);
+  }
   if (direct?.status === "planned" && lists[direct.source])
     return nearest(record, direct.source, lists[direct.source]);
   if (direct) return { source: direct.source, id: null, status: direct.status, note: direct.note };
