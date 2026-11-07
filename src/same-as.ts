@@ -12,8 +12,9 @@ import { km, nameScore } from "./ticon.ts";
  *   `ID_KM` away is dropped and reported, as a wrong ID.
  * - **nearness and name**: two stations of different sources within `NEAR_KM`
  *   whose names share an identifying word and name the same side of any dam or
- *   lock. Never name alone, and never within one source, since a source's own
- *   neighbors (two sides of a lock, a gauge and its backup) are its to link.
+ *   lock. Never name alone, never within one source, since a source's own
+ *   neighbors (two sides of a lock, a gauge and its backup) are its to link,
+ *   and never across a `SEPARATE` pair.
  * - **a copy's best match**: a redistributor rounds positions, so a station
  *   that copies another agency's gauge, and whose adapter didn't name the
  *   original by a link that held, is linked to the station in each other source within `COPY_KM`
@@ -59,6 +60,28 @@ const REDISTRIBUTED: Record<string, (s: Station & { contributor?: string | null 
 
 export function redistributed(s: Station): boolean {
   return REDISTRIBUTED[s.source]?.(s) ?? false;
+}
+
+/**
+ * Sources whose series is the copy when they share a gauge with another:
+ * USACE districts relay the satellite transmissions of gauges USGS runs.
+ */
+const COPIES: Record<string, string> = { usace: "usgs" };
+
+/** Whether `a` is the copy of `b`'s gauge, rather than its own agency's series. */
+function copyOf(a: Station, b: Station): boolean {
+  return redistributed(a) || COPIES[a.source] === b.source;
+}
+
+/**
+ * Source pairs whose agencies each run their own gauges, so two of their
+ * stations at one pier are separate instruments that check each other, never
+ * one gauge. Only an ID or a person links them.
+ */
+const SEPARATE = new Set(["coops~usgs", "coops~usace"]);
+
+function separate(a: Station, b: Station): boolean {
+  return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));
 }
 
 /** Farthest apart two stations matched by nearness and name can be. */
@@ -220,9 +243,10 @@ function pairKey(a: string, b: string): string {
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
  * person's choice; one with levels; one whose terms allow commercial use, so
- * the API can serve it before tokens exist; one still reporting; the originator's
- * over a redistributor's; the longer record in the lake; the finer interval;
- * then the lower ID, so equals always break the same way.
+ * the API can serve it before tokens exist; one still reporting; the
+ * originator's over a copy (a redistributor's, or a `COPIES` source's beside
+ * its original); the longer record in the lake; the finer interval; then the
+ * lower ID, so equals always break the same way.
  */
 export function rank(a: Station, b: Station, now = new Date()): number {
   const levels = (s: Station) => s.products.includes("levels");
@@ -237,7 +261,7 @@ export function rank(a: Station, b: Station, now = new Date()): number {
     [levels(a), levels(b)],
     [a.commercial_use, b.commercial_use],
     [reporting(a), reporting(b)],
-    [!redistributed(a), !redistributed(b)],
+    [!copyOf(a, b), !copyOf(b, a)],
     [span(a), span(b)],
     [-(a.interval_s ?? Infinity), -(b.interval_s ?? Infinity)],
   ];
@@ -301,7 +325,7 @@ export function nearPairs<T extends Station>(stations: T[]): [T, T][] {
     const a = located[i]!;
     for (let j = i + 1; j < located.length && located[j]!.lat - a.lat <= window; j++) {
       const b = located[j]!;
-      if (a.source !== b.source && km(a, b) <= NEAR_KM && alike(a, b)) pairs.push([a, b]);
+      if (!separate(a, b) && km(a, b) <= NEAR_KM && alike(a, b)) pairs.push([a, b]);
     }
   }
   return pairs;
@@ -321,7 +345,7 @@ export function copyPairs<T extends Station>(
   const window = COPY_KM / 111;
   for (const copy of stations.filter((s) => redistributed(s) && !named.has(s.id))) {
     const candidates = stations
-      .filter((s) => s.source !== copy.source && Math.abs(s.lat - copy.lat) <= window)
+      .filter((s) => !separate(copy, s) && Math.abs(s.lat - copy.lat) <= window)
       .map((s) => ({ s, d: km(copy, s), words: nameScore(copy.name, s.name).total }))
       .filter(
         // A town's name is shared by its streams, so a coastal copy matches no river.

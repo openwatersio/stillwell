@@ -150,6 +150,24 @@ describe("nearPairs", () => {
     assert.ok(!pair({ name: "Narrows" }, { name: "WOLF CREEK NEAR BLUEFIELD" }));
   });
 
+  it("never pairs CO-OPS with USGS or USACE, whose gauges at one pier are separate instruments", () => {
+    const at = (id: string, name: string, lat = 0) => station(id, { name, lat });
+    assert.deepEqual(
+      nearPairs([
+        at("coops/8665530", "Charleston"),
+        at("usgs/021720711", "COOPER RIVER AT CHARLESTON, SC", m(18)),
+      ]),
+      [],
+    );
+    assert.deepEqual(
+      nearPairs([
+        at("coops/8765251", "Cypremort Point"),
+        at("usace/MVN.Cyremort_Point", "Cypremort Point, LA", m(20)),
+      ]),
+      [],
+    );
+  });
+
   it("never pairs two stations of one source", () => {
     const pairs = nearPairs([
       station("rws/a", { name: "Knock" }),
@@ -358,16 +376,18 @@ describe("rank", () => {
     );
     assert.equal(
       best(
-        station("usace/a", { ...record("2000-01-01T00:00:00Z", "2026-10-01T00:00:00Z") }),
-        station("usgs/b", { ...record("1990-01-01T00:00:00Z", "2026-10-01T00:00:00Z") }),
+        station("rws/a", { ...record("2000-01-01T00:00:00Z", "2026-10-01T00:00:00Z") }),
+        station("rws/b", { ...record("1990-01-01T00:00:00Z", "2026-10-01T00:00:00Z") }),
       ),
-      "usgs/b",
+      "rws/b",
     );
-    assert.equal(best(station("usgs/b"), station("usace/a", { interval_s: 900 })), "usace/a");
-    assert.equal(best(station("usgs/b"), station("usace/a")), "usace/a");
+    // USACE relays USGS's gauges, so beside one it's the copy, whatever its interval.
+    assert.equal(best(station("usgs/b"), station("usace/a", { interval_s: 900 })), "usgs/b");
+    assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
+    assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.
-    const bad = station("usgs/b", record("not a date", "nor this"));
-    assert.equal(best(bad, station("usace/a")), "usace/a");
-    assert.equal(best(station("usace/a"), bad), "usace/a");
+    const bad = station("rws/b", record("not a date", "nor this"));
+    assert.equal(best(bad, station("rws/a")), "rws/a");
+    assert.equal(best(station("rws/a"), bad), "rws/a");
   });
 });
