@@ -80,7 +80,11 @@ const BODC_NOTE =
 const DIRECT: Record<string, { source: string; status: Status; note?: string }> = {
   smhi: { source: "smhi", status: "planned" },
   mi_c: { source: "marine-institute", status: "planned" },
-  mi_r: { source: "marine-institute", status: "planned" },
+  mi_r: {
+    source: "marine-institute",
+    status: "unmatched",
+    note: "A river gauge; the Marine Institute's river dataset names no datum, so it isn't listed",
+  },
   dmi: { source: "dmi", status: "planned" },
   fmi: { source: "fmi", status: "license", note: "FMI's sea-level terms not confirmed" },
   crms: { source: "crms", status: "license", note: "Louisiana CRMS terms to check" },
@@ -157,7 +161,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   if (contributor === "refmar") return byCode(record, "refmar", code, "planned", lists);
 
   if (contributor === "nhs")
-    return { source: "kartverket", id: `kartverket/${code.toUpperCase()}`, status: "planned" };
+    return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 
   // A UHSLC or JODC relay of a gauge another source publishes goes to that
   // source, as tide-database's provenance declares.
@@ -232,6 +236,10 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   }
 
   const direct = DIRECT[contributor];
+  // SMHI's records carry its station number; the others match by place once the list exists.
+  if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
+  if (direct?.status === "planned" && lists[direct.source])
+    return nearest(record, direct.source, lists[direct.source]);
   if (direct) return { source: direct.source, id: null, status: direct.status, note: direct.note };
   return { source: contributor, id: null, status: "license", note: "Terms not reviewed" };
 }

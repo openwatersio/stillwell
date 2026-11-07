@@ -49,10 +49,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      contents: read
     outputs:
       sources: ${{ steps.plan.outputs.sources }}
       refetch: ${{ steps.plan.outputs.refetch }}
     steps:
+      # The sources come from each adapter's metadata (src/sources/jobs.ts).
+      # The registry imports no packages (test/jobs.test.ts checks), so it
+      # needs Node but not npm ci.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
       - id: plan
         run: |
           set -f
@@ -67,17 +77,15 @@ jobs:
               exit 0
             fi
           fi
-          sources=$(printf '%s\n' ${SOURCES:-bsh coops pegelonline refmar rws uhslc usace usgs} | jq -Rnc '[inputs | select(. != "")]')
+          # Every source, or those named; the refetch takes the ones whose
+          # values become final (`finalizes` in their metadata), and fails
+          # when none of those named does.
           if [ "$REFETCH" = true ]; then
-            # PEGELONLINE never finalizes a value, in its feed or its downloads.
-            refetch=$(jq -c 'map(select(. != "pegelonline"))' <<< "$sources")
-            if [ "$refetch" = "[]" ]; then
-              echo "::error::PEGELONLINE isn't refetched"
-              exit 1
-            fi
+            refetch=$(node scripts/sources.ts refetch $SOURCES)
             echo "sources=[]" >> "$GITHUB_OUTPUT"
             echo "refetch=$refetch" >> "$GITHUB_OUTPUT"
           else
+            sources=$(node scripts/sources.ts lists $SOURCES)
             echo "sources=$sources" >> "$GITHUB_OUTPUT"
             echo "refetch=[]" >> "$GITHUB_OUTPUT"
           fi
@@ -198,8 +206,7 @@ jobs:
       # preliminary for good; --skip-unscreened leaves out a station with a
       # year of record and no value its source screened, but for January's run.
       # REFMAR's partner gauges often have only raw values, so it skips them the
-      # same way; the rest are a request or two a month from the cutoff. BSH sends no
-      # preliminary values, so its job finds nothing to fetch.
+      # same way.
       - run: |
           year=$(date -u +%Y)
           month=$(date -u +%m)

@@ -29,6 +29,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "REFMAR, Shom (doi:10.17183/REFMAR)",
+  // Raw values arrive within minutes, from the 1-minute series.
+  hourly: true,
+  // SHOM validates raw values weeks to months later.
+  finalizes: true,
   terms:
     "Cite the source as REFMAR with the network's DOI (doi:10.17183/REFMAR#RONIM for Shom's gauges, #PARTENAIRES for its partners') and the date of the last update, and credit each gauge's owner.",
 };

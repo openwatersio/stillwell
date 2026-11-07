@@ -1,0 +1,11 @@
+{
+  "table": {
+    "columnNames": ["station_id", "time", "Water_Level_LAT", "Water_Level_OD_Malin"],
+    "columnTypes": ["String", "String", "float", "float"],
+    "columnUnits": [null, "UTC", "metres", "metres"],
+    "rows": [
+      ["Ballycotton Harbour", "2010-10-07T15:06:00Z", 3.908, 1.419],
+      ["Ballycotton Harbour", "2026-11-07T01:25:00Z", 3.113, 0.653]
+    ]
+  }
+}
