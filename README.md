@@ -78,4 +78,14 @@ An implementation of the harmonic representation of inequalities (HRoI), the met
 
 ## License
 
-The code is [MIT](LICENSE). The data isn't covered by that license: each source's water levels and station metadata, including the copies in `test/fixtures/` and `docs/results/`, stay under that source's own license and attribution, in the table above and in `sources.json`. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
+The code is [MIT](LICENSE). The data isn't covered by that license.
+
+What Open Waters adds to the data, such as the shared schema, quality flags, datum epochs and links between stations, is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited as "Open Waters water levels". Each station's water levels and metadata, including the copies in `test/fixtures/` and `docs/results/`, stay under its source's own license and attribution, in the table above, in `sources.json` and in each station's `license`, `commercial_use` and `attribution`. Some stations in the public data don't allow commercial use, so a commercial user reads only the stations with `commercial_use` true:
+
+```sql
+SELECT id, name, attribution
+FROM 'https://water-levels.openwaters.io/stations.parquet'
+WHERE commercial_use;
+```
+
+The hosted API's terms cover access to the service, not the data, which keeps these licenses wherever it comes from. `docs/ticon-replacement.csv` and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms. BSH's data needs its source notice wherever it's shown, which for this repo's copies is: Datenquelle: Gezeitenvorausberechnungen ©, Bundesamt für Seeschifffahrt und Hydrographie.
