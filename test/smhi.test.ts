@@ -162,6 +162,39 @@ describe("smhi", () => {
     assert.ok(levels.length);
   });
 
+  it("reads a closed station's final archive whose last hours have no values", async () => {
+    // Landsort's archive ends at 09:00, though its note and the list give 12:00.
+    const text = fixture("smhi-archive.csv");
+    const final = text.slice(0, text.indexOf("2026-11-05 01:00:00"));
+    const range = [new Date("2026-11-04Z"), new Date("2026-11-06Z")] as const;
+    serve([[/corrected-archive/, final]]);
+    const levels = await smhi.levels("2545", ...range, { record_end: "2026-11-05T03:00:00.000Z" });
+    assert.ok(levels.length);
+    // A stale copy's note ends with its own rows, so it gets only the hour's slack.
+    smhi.forgetArchives();
+    serve([
+      [
+        /corrected-archive/,
+        final.replace("t.o.m.) = 2026-11-07 01:00:00", "t.o.m.) = 2026-11-05 00:00:00"),
+      ],
+    ]);
+    await assert.rejects(
+      smhi.levels("2545", ...range, { record_end: "2026-11-05T03:00:00.000Z" }),
+      /archive ends at 2026-11-05T00:00:00.000Z, before 2026-11-05T03:00:00/,
+    );
+    // More than six hours short is cut, whatever its note says.
+    smhi.forgetArchives();
+    serve([[/corrected-archive/, final]]);
+    await assert.rejects(
+      smhi.levels("2545", ...range, { record_end: "2026-11-05T07:00:00.000Z" }),
+      /archive ends at 2026-11-05T00:00:00.000Z, before 2026-11-05T07:00:00/,
+    );
+    smhi.forgetArchives();
+    assert.ok(
+      (await smhi.levels("2545", ...range, { record_end: "2026-11-05T06:00:00.000Z" })).length,
+    );
+  });
+
   it("refuses an archive cut within its last day, read after the station's year", async () => {
     mock.timers.setTime(Date.parse("2027-03-01T00:00:00Z"));
     const text = fixture("smhi-archive.csv");

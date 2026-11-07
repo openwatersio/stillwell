@@ -43,6 +43,8 @@ export const metadata: SourceMetadata = {
 const ESTUARY = new Set([33092, 33093, 33094, 33095, 33097]);
 
 const HOUR_MS = 3_600_000;
+/** How far a closed station's final archive may end before its listed end. */
+const FINAL_SLACK_MS = 6 * HOUR_MS;
 const DAY_MS = 86_400_000;
 
 /** An SMHI station as listed, with the first and last hours SMHI has, which a backfill keeps to. */
@@ -192,13 +194,22 @@ function archiveOf(sourceId: string, datum: string): Promise<Parsed> {
  * `latest-day` takes over, or for a closed station to the end the station list
  * gives; SMHI builds an active station's archive to today's midnight. One that
  * ends sooner was cut short, or is a stale copy, and backfill would take its
- * missing hours as gone and delete them from the lake. The archive's own
- * `t.o.m.` note can't tell: it follows the file's last row.
+ * missing hours as gone and delete them from the lake. A stale copy's
+ * `t.o.m.` note ends with its own rows, so the note can't show one is current.
+ *
+ * A closed station's last hours can have no rows at all: Landsort (2073)
+ * ends at 09:00 though its note and the station list both give 12:00. An
+ * archive whose note reaches the listed end, which a stale copy's can't, gets
+ * `FINAL_SLACK_MS` for that. The note sits in the header, so a download cut
+ * later still carries it; the slack is kept to a few hours for that reason.
  */
 function complete(archive: Parsed, sourceId: string, recordEnd?: string | null): void {
   const midnight = Math.floor(Date.now() / DAY_MS) * DAY_MS - DAY_MS;
-  const due = recordEnd ? Math.min(Date.parse(recordEnd), midnight) : midnight;
-  if (archive.last < due - HOUR_MS)
+  const end = recordEnd ? Date.parse(recordEnd) : null;
+  const final =
+    end !== null && end < midnight && archive.through !== null && archive.through >= end;
+  const due = end !== null ? Math.min(end, midnight) : midnight;
+  if (archive.last < due - (final ? FINAL_SLACK_MS : HOUR_MS))
     throw new Error(
       `SMHI ${sourceId}'s archive ends at ${new Date(archive.last).toISOString()}, before ${new Date(due).toISOString()}`,
     );
