@@ -12,14 +12,18 @@ const fixture = (name: string) =>
 let requests: [string, RequestOptions][] = [];
 
 /** Answer requests by the first route whose pattern the URL matches. */
-function serve(routes: [RegExp, (options: RequestOptions) => string][]): void {
+function serve(routes: [RegExp, (options: RequestOptions, url: string) => string][]): void {
   setTransport(async (url, options) => {
     requests.push([url, options]);
     const route = routes.find(([pattern]) => pattern.test(url));
     if (!route) throw new Error(`GET ${url} returned 404`);
-    return route[1](options);
+    return route[1](options, url);
   });
 }
+
+/** Fisherman's Cut's file head, as the station in `url` would have it. */
+const headFor = (_: RequestOptions, url: string) =>
+  fixture("dwr-B95050Q-head.csv").replace('"B95050Q"', `"${/por\/([A-Z0-9]+)_/.exec(url)![1]}"`);
 
 const rangeOf = (options: RequestOptions) =>
   (options.headers as Record<string, string> | undefined)?.range ?? null;
@@ -51,13 +55,13 @@ describe("dwr", () => {
       [/station-trace-download-links\.csv$/, () => fixture("dwr-traces.csv")],
       [
         /B95325_StreamLevel/,
-        () =>
-          fixture("dwr-B95050Q-head.csv").replace(
+        (options, url) =>
+          headFor(options, url).replace(
             "287.00 - Water Surface Elevation (NAVD88)",
             "233.00 - Corrected Stage",
           ),
       ],
-      [/wdlcontinuous/, () => fixture("dwr-B95050Q-head.csv")],
+      [/wdlcontinuous/, headFor],
     ]);
     const stations = (await dwr.stations()) as dwr.DwrStation[];
     assert.deepEqual(
@@ -107,7 +111,7 @@ describe("dwr", () => {
           throw new Error("GET … returned 416");
         },
       ],
-      [/wdlcontinuous/, () => fixture("dwr-B95050Q-head.csv")],
+      [/wdlcontinuous/, headFor],
     ]);
     const stations = await dwr.stations();
     assert.ok(!stations.some((s) => s.id === "dwr/B95325"));
@@ -128,12 +132,47 @@ describe("dwr", () => {
           throw new Error("GET … returned 416");
         },
       ],
-      [/wdlcontinuous/, () => fixture("dwr-B95050Q-head.csv")],
+      [/wdlcontinuous/, headFor],
     ]);
     const station = ((await dwr.stations()) as dwr.DwrStation[]).find(
       (s) => s.id === "dwr/B95325",
     )!;
     assert.deepEqual([station.parameter, station.datum], ["StreamLevel", "GZ"]);
+  });
+
+  it("leaves out a station whose file names another station", async () => {
+    serve([
+      [/stations\.csv$/, () => fixture("dwr-stations.csv")],
+      [/station-trace-download-links\.csv$/, () => fixture("dwr-traces.csv")],
+      // WDL's file for B95580 carries B95500's header, with no notes.
+      [
+        /B95325_StreamLevel/,
+        () =>
+          '"Time","B95500",\r\n"and",821.00,\r\n"Date","Point","Qual"\r\n10/01/1988 00:00:00,"",    151\r\n',
+      ],
+      [/wdlcontinuous/, headFor],
+    ]);
+    const stations = await dwr.stations();
+    assert.ok(!stations.some((s) => s.id === "dwr/B95325"));
+    assert.equal(stations.length, 3);
+  });
+
+  it("refuses to read a file whose header names another station, in any header form", async () => {
+    const head = fixture("dwr-B95050Q-head.csv");
+    for (const header of [
+      '"Time","B95500"',
+      '\uFEFF"Time","B95500"',
+      "Time,B95500",
+      "\uFEFFTime,B95500",
+    ]) {
+      dwr.forgetFiles();
+      serve([[/B95050Q/, () => head.replace('"Time","B95050Q"', header)]]);
+      await assert.rejects(
+        dwr.levels(fishermans, new Date("2015-01-01Z"), new Date("2016-01-01Z")),
+        /names station B95500/,
+        header,
+      );
+    }
   });
 
   it("refuses an empty station or trace list", async () => {
@@ -288,7 +327,7 @@ describe("dwr", () => {
           throw new Error("GET … returned 416");
         },
       ],
-      [/wdlcontinuous/, () => fixture("dwr-B95050Q-head.csv")],
+      [/wdlcontinuous/, headFor],
     ]);
     // Listed in NAVD88, it's left out for the month rather than moved to stage.
     const previous = [{ source_id: "B95325", parameter: "WaterSurfaceElevationNAVD88" }] as never;
