@@ -236,7 +236,7 @@ function revisedNap(station: Station): boolean {
 /**
  * Codes RWS lists for the same gauge, a few meters apart. Checked by hand:
  * nearness alone isn't enough, since the two sides of a lock sit meters apart
- * at different levels.
+ * at different levels. Erratum `rws-ameland-westgat-twice`.
  */
 const TWINS = [["ameland.westgat", "amelandwestgat"]];
 

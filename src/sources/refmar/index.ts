@@ -95,7 +95,7 @@ const RAW_1MIN_FROM = Date.UTC(2005, 0, 1);
  * in 2020 (r 0.36) and 2024 (r 0.15), and within 10 minutes again in 2025
  * (r 0.93) (clock check, November 2026). No steady offset fits, so 2020 to
  * 2024 is flagged whole, keeping SHOM's own flag as `source_flag`. Remove once
- * SHOM corrects it.
+ * SHOM corrects it. Erratum `refmar-pointe-a-pitre-clock`.
  */
 const SUSPECT: Record<string, [number, number][]> = {
   125: [[Date.UTC(2020, 0, 1), Date.UTC(2025, 0, 1)]],

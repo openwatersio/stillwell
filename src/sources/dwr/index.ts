@@ -167,7 +167,7 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
 /**
  * Why a station's file can't be read, from its first KB, or null if it can: an
  * empty file, or one whose header names another station, as B95580's names
- * B95500.
+ * B95500 (erratum `dwr-b95580-another-header`).
  */
 async function fileProblem(number: string, parameter: Parameter): Promise<string | null> {
   let head: string;
