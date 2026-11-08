@@ -73,7 +73,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The errata in `src/errata.ts` that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, open `source-error` issues, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */

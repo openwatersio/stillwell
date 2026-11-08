@@ -23,7 +23,7 @@ import {
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
-import { ERRATA, type Erratum } from "../src/errata.ts";
+import type { Erratum } from "../src/errata.ts";
 import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
 import {
   Flag,
@@ -355,7 +355,7 @@ describe("publishStations", () => {
     await writeStations(boundsPath(lake, "test"), [
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
-    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), {
+    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"], []), {
       count: 2,
       links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
       unknownErrata: [],
@@ -400,10 +400,15 @@ describe("publishStations", () => {
   it("tags each station with its errata, and names a listed station the lake lacks", async () => {
     await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
     const erratum = (id: string, source: string, stations: string[] | null): Erratum => ({
-      ...ERRATA[0]!,
       id,
       source,
       stations,
+      since: null,
+      until: null,
+      error: "",
+      handling: "kept",
+      lake: "",
+      issue: 1,
     });
     const errata = [
       erratum("test-a", "test", ["test/a", "test/gone"]),
@@ -429,15 +434,17 @@ describe("publishStations", () => {
 
   it("publishes nothing while a source it should hold has no list", async () => {
     const other: Source = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
-    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), { missing: ["test"] });
+    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"], []), {
+      missing: ["test"],
+    });
     await writeStationList(stationListPath(lake, "test"), []);
-    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test", "other"]), {
+    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test", "other"], []), {
       missing: ["other"],
     });
     assert.equal(await exists(stationsPath(lake)), false);
     assert.deepEqual(await publishedSources(stationsPath(lake)), []);
     // A new source with no list yet doesn't hold up the others.
-    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), {
+    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"], []), {
       count: 0,
       links: { pairs: {}, dropped: [], skipped: [], large: [] },
       unknownErrata: [],

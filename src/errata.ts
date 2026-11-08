@@ -1,28 +1,31 @@
 /**
  * Errors in what a source publishes, found while ingesting it: values on the
  * wrong clock or day, positions far from the gauge, metadata that contradicts
- * the data, two endpoints that disagree. Each has an issue labeled
- * `source-error` that tracks the report to the agency, and the adapter cites
- * its ID (`erratum \`<id>\``) where it works around it or, where the lake keeps
- * the data as served, in its README. `stations.parquet` lists each station's
- * errata in `errata`, and `errata.json` publishes the list, so a user can see
- * which values the lake changed and why. See CONTRIBUTING.md.
+ * the data, two endpoints that disagree. Each is an open issue labeled
+ * `source-error`, written with the issue form in
+ * `.github/ISSUE_TEMPLATE/source-error.yml`, which also tracks the report to
+ * the agency. The adapter cites its ID (`erratum \`<id>\``) where it works
+ * around it or, where the lake keeps the data as served, in its README.
+ * `publish` reads the open issues, lists each station's errata in the
+ * `errata` column of `stations.parquet`, and writes them to `errata.json`, so
+ * a user can see which values the lake changed and why. Closing the issue,
+ * once the agency has fixed the data and the lake has refetched it, takes the
+ * erratum out at the next publish. See CONTRIBUTING.md.
  */
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { getJson } from "./http.ts";
 
 /** What the lake does about an erratum. */
-export type Handling =
-  /** Values or metadata changed to what the source should have published. */
-  | "corrected"
-  /** Values kept, flagged `suspect` or worse. */
-  | "flagged"
-  /** Stations or values left out. */
-  | "dropped"
-  /** The adapter refuses the file, so its values are missing until it's fixed. */
-  | "refused"
-  /** The lake doesn't use the wrong part, so nothing in it is affected. */
-  | "avoided"
-  /** Kept as the source serves it. */
-  | "kept";
+export const HANDLING = ["corrected", "flagged", "dropped", "refused", "avoided", "kept"] as const;
+/**
+ * `corrected`: values or metadata changed to what the source should have
+ * published. `flagged`: values kept, flagged `suspect` or worse. `dropped`:
+ * stations or values left out. `refused`: the adapter refuses the file, so its
+ * values are missing until it's fixed. `avoided`: the lake doesn't use the
+ * wrong part, so nothing in it is affected. `kept`: kept as the source serves it.
+ */
+export type Handling = (typeof HANDLING)[number];
 
 export interface Erratum {
   /** `<source>-<what>`, never reused. */
@@ -41,256 +44,287 @@ export interface Erratum {
    */
   since: string | null;
   until: string | null;
-  /** What the source publishes wrong, and how it was found. */
+  /** What the source publishes wrong. */
   error: string;
   handling: Handling;
   /** What the lake does about it. */
   lake: string;
-  /** The `source-error` issue in this repository. */
+  /** The `source-error` issue it's written in. */
   issue: number;
-  /** When and how the agency was told; null until it is. */
-  reported: { date: string; via: string } | null;
-  /** When the agency fixed it, so the workaround can go; null while it stands. */
-  fixed: string | null;
 }
 
-export const ERRATA: Erratum[] = [
-  {
-    id: "dwr-b95580-another-header",
-    source: "dwr",
-    stations: [],
-    since: null,
-    until: null,
-    error:
-      "WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).",
-    handling: "dropped",
-    lake: "A station is left out of the list when none of its files is usable, and a file that names another station isn't, so B95580 isn't in the lake until WDL fixes it.",
-    issue: 67,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "jma-saigo-1980-day-stamp",
-    source: "jma",
-    stations: ["jma/SA"],
-    since: "1980-10-21",
-    until: "1980-10-23",
-    error:
-      "JMA's historical file for Saigo in October 1980 stamps its 22nd line as the 20th, between lines stamped the 21st and 23rd.",
-    handling: "corrected",
-    lake: "The line is read as the 22nd, since the lines on either side are stamped the 21st and 23rd.",
-    issue: 58,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "pegelonline-download-api-differ",
-    source: "pegelonline",
-    stations: ["pegelonline/5990020", "pegelonline/9530020"],
-    since: null,
-    until: null,
-    error:
-      "At Cuxhaven Steubenhöft and Husum, PEGELONLINE's raw-data download and its REST API give different levels for the same minutes, by up to 6 and 8 cm, though both are labeled unchecked raw data on the same gauge zero.",
-    handling: "kept",
-    lake: "History comes from the download and the last 31 days from the REST API, so the series can step by a few centimeters where one hands over to the other.",
-    issue: 26,
-    reported: { date: "2026-11-07", via: "pegelonline@itzbund.de" },
-    fixed: null,
-  },
-  {
-    id: "pegelonline-cuxhaven-2025-revised",
-    source: "pegelonline",
-    stations: ["pegelonline/5990020"],
-    since: "2025-05-13",
-    until: "2025-06-25",
-    error:
-      "PEGELONLINE's download for Cuxhaven sits 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, so the WSV changed values it still labels raw and unchecked.",
-    handling: "kept",
-    lake: "Kept as the download serves it.",
-    issue: 26,
-    reported: { date: "2026-11-07", via: "pegelonline@itzbund.de" },
-    fixed: null,
-  },
-  {
-    id: "marine-institute-coverage-start",
-    source: "marine-institute",
-    stations: null,
-    since: null,
-    until: null,
-    error:
-      "The dataset's `time_coverage_start` says 2000, but no gauge has values before October 2006.",
-    handling: "avoided",
-    lake: "Backfills start from each gauge's first value, not the dataset's coverage.",
-    issue: 59,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "marine-institute-lat-2026",
-    source: "marine-institute",
-    stations: [
-      "marine-institute/aranmore-island-leabgarrow",
-      "marine-institute/ballycotton-harbour",
-      "marine-institute/ballyglass-harbour",
-      "marine-institute/buncranna",
-      "marine-institute/castletownbere-port",
-      "marine-institute/dingle-harbour",
-      "marine-institute/dublin-port",
-      "marine-institute/dunmore-east-harbour",
-      "marine-institute/galway-port",
-      "marine-institute/howth-water-level-1",
-      "marine-institute/inishmore",
-      "marine-institute/killybegs-port",
-      "marine-institute/kilrush-lough",
-      "marine-institute/malin-head-portmore-pier",
-      "marine-institute/rosslare",
-      "marine-institute/skerries-harbour",
-      "marine-institute/sligo",
-      "marine-institute/union-hall-harbor",
-      "marine-institute/wexford-harbour",
-    ],
-    since: "2026-03-24",
-    until: null,
-    error:
-      "On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.",
-    handling: "kept",
-    lake: "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
-    issue: 60,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "uhslc-hong-kong-hour-early",
-    source: "uhslc",
-    stations: ["uhslc/329", "uhslc/329a"],
-    since: null,
-    until: null,
-    error:
-      "UHSLC stamps its Hong Kong (Quarry Bay) hourly heights an hour early in every version and the fast-delivery series: the height labeled T was measured at T + 1 h UTC (tide-database#360, confirmed by the clock check).",
-    handling: "corrected",
-    lake: "Every value is moved an hour later.",
-    issue: 63,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "refmar-pointe-a-pitre-clock",
-    source: "refmar",
-    stations: ["refmar/125"],
-    since: "2020-01-01",
-    until: "2025-01-01",
-    error:
-      "SHOM's Pointe-à-Pitre levels run 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly fit at all in 2020 and 2024, with no steady offset; 2025 fits again.",
-    handling: "flagged",
-    lake: "2020 to 2024 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
-    issue: 61,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "rws-ameland-westgat-twice",
-    source: "rws",
-    stations: ["rws/ameland.westgat", "rws/amelandwestgat"],
-    since: null,
-    until: null,
-    error:
-      "RWS lists the Ameland Westgat gauge twice, as `ameland.westgat` and `amelandwestgat`, a few meters apart.",
-    handling: "kept",
-    lake: "Both are kept as served, and linked in `same_as` as one gauge.",
-    issue: 62,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "usace-baton-rouge-position",
-    source: "usace",
-    stations: ["usace/MVN.Baton_Rouge"],
-    since: null,
-    until: null,
-    error:
-      "The New Orleans District places its Baton Rouge gauge at 29.43° N, about 110 km south of the gauge, which the Vicksburg District places at 30.45° N.",
-    handling: "kept",
-    lake: "Kept at MVN's position, so it isn't linked to MVK's copy.",
-    issue: 64,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "usace-placeholder-positions",
-    source: "usace",
-    stations: [],
-    since: null,
-    until: null,
-    error:
-      "Some CWMS locations sit at 0,0 or at a placeholder such as 9.09,9.09 (Anoka), and a few have the longitude's sign dropped (Buck Creek, Pine Bluff), which puts them in Asia.",
-    handling: "dropped",
-    lake: "Locations outside the contiguous US are left out.",
-    issue: 65,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "usace-zero-elevation",
-    source: "usace",
-    stations: ["usace/MVK.Baton_Rouge"],
-    since: null,
-    until: null,
-    error:
-      "Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off. CWMS doesn't say which other zeros are real, so only Baton Rouge is listed.",
-    handling: "avoided",
-    lake: "An elevation of exactly 0 is ignored, so those gauges have no NGVD29 or NAVD88 offset.",
-    issue: 66,
-    reported: null,
-    fixed: null,
-  },
-  {
-    id: "usace-lwrp-corrections-disagree",
-    source: "usace",
-    stations: [],
-    since: null,
-    until: null,
-    error:
-      "The New Orleans District's NAVD88 corrections for lower Mississippi gauges disagree between sources: at Donaldsonville the description gives −0.74 ft, rivergages −1.18 ft and the `rev-NAVD88` series −0.70 ft. Which of the district's gauges carry a correction is in prose only, so none is listed.",
-    handling: "avoided",
-    lake: "No LWRP or NAVD88 correction is published for these gauges until the district confirms which is right.",
-    issue: 10,
-    reported: null,
-    fixed: null,
-  },
-];
+export const REPO = "openwatersio/water-levels";
+export const LABEL = "source-error";
 
-const REPO = "https://github.com/openwatersio/water-levels";
+/** The issue form's headings, by field. */
+const FIELDS = {
+  error: "What's wrong",
+  id: "Erratum ID",
+  source: "Source",
+  stations: "Stations",
+  since: "Values since",
+  until: "Values until",
+  handling: "Handling",
+  lake: "What the lake does",
+  evidence: "Evidence",
+  report: "Report to the agency",
+} as const;
+
+/** What the form writes for a field left blank. */
+const BLANK = "_No response_";
+
+/**
+ * The erratum an issue body written with the form holds, or an Error saying
+ * what's missing or malformed. `sources` are the registered source IDs.
+ */
+export function parseErratum(issue: number, body: string, sources: string[]): Erratum {
+  const headings = new Set<string>(Object.values(FIELDS));
+  const sections = new Map<string, string>();
+  let current: string | null = null;
+  // A line is a field's heading only if it's one of the form's, so the
+  // evidence can use headings of its own.
+  for (const line of body.replace(/\r\n/g, "\n").split("\n")) {
+    const heading = /^### (.+?)\s*$/.exec(line)?.[1];
+    if (heading && headings.has(heading) && !sections.has(heading)) {
+      sections.set((current = heading), "");
+      continue;
+    }
+    if (current) sections.set(current, `${sections.get(current)}${line}\n`);
+  }
+  const field = (name: keyof typeof FIELDS): string | null => {
+    const text = sections.get(FIELDS[name])?.trim();
+    if (text === undefined) throw new Error(`#${issue}: no "### ${FIELDS[name]}" heading`);
+    return text === "" || text === BLANK ? null : text;
+  };
+  const required = (name: keyof typeof FIELDS): string => {
+    const text = field(name);
+    if (text === null) throw new Error(`#${issue}: "${FIELDS[name]}" is blank`);
+    return text;
+  };
+  const day = (name: "since" | "until"): string | null => {
+    const text = field(name);
+    // A real day: Date rolls 2026-02-30 over to March, so it must come back the same.
+    const ms = text === null ? NaN : Date.parse(`${text}T00:00:00Z`);
+    const real =
+      /^\d{4}-\d{2}-\d{2}$/.test(text ?? "") &&
+      new Date(ms || 0).toISOString().slice(0, 10) === text;
+    if (text !== null && (Number.isNaN(ms) || !real))
+      throw new Error(`#${issue}: "${FIELDS[name]}" is ${text}, not YYYY-MM-DD`);
+    return text;
+  };
+
+  const source = required("source");
+  if (!sources.includes(source)) throw new Error(`#${issue}: no source ${source}`);
+  const id = required("id").replace(/`/g, "");
+  if (!new RegExp(`^${source}-[a-z0-9-]+$`).test(id))
+    throw new Error(`#${issue}: erratum ID ${id} isn't ${source}-<what>`);
+  const listed = required("stations")
+    .split("\n")
+    .map((line) =>
+      line
+        .replace(/^\s*[-*]\s*/, "")
+        .replace(/`/g, "")
+        .trim(),
+    )
+    .filter(Boolean);
+  const every = listed.length === 1 && /^every station$/i.test(listed[0]!);
+  const none = listed.length === 1 && /^none listed$/i.test(listed[0]!);
+  const stations = every ? null : none ? [] : listed;
+  for (const s of stations ?? [])
+    if (!s.startsWith(`${source}/`)) throw new Error(`#${issue}: station ${s} isn't ${source}'s`);
+  const [since, until] = [day("since"), day("until")];
+  if (since && until && since >= until)
+    throw new Error(`#${issue}: "${FIELDS.since}" isn't before "${FIELDS.until}"`);
+  const handling = required("handling");
+  if (!(HANDLING as readonly string[]).includes(handling))
+    throw new Error(`#${issue}: handling ${handling} isn't one of ${HANDLING.join(", ")}`);
+  return {
+    id,
+    source,
+    stations,
+    since,
+    until,
+    error: required("error"),
+    handling: handling as Handling,
+    lake: required("lake"),
+    issue,
+  };
+}
+
+interface Issue {
+  number: number;
+  body: string | null;
+  author_association: string;
+  pull_request?: unknown;
+}
+
+/**
+ * Who can open an issue that counts. The issue form labels whatever anyone
+ * files with it, so a `source-error` issue from anyone else is a report for a
+ * maintainer to read, not an erratum; and only its author and maintainers can
+ * edit an issue, so the body stays theirs.
+ */
+const TRUSTED = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+
+/** An issue that doesn't parse, or reuses another's ID. */
+export interface Problem {
+  issue: number;
+  message: string;
+}
+
+async function issuesOf(state: "open" | "closed"): Promise<Issue[]> {
+  const token = process.env.GITHUB_TOKEN;
+  const headers: Record<string, string> = {
+    accept: "application/vnd.github+json",
+    ...(token ? { authorization: `Bearer ${token}` } : {}),
+  };
+  const issues: Issue[] = [];
+  for (let page = 1; ; page++) {
+    const batch = await getJson<Issue[]>(
+      `https://api.github.com/repos/${REPO}/issues?labels=${LABEL}&state=${state}&per_page=100&page=${page}`,
+      { fresh: true, headers },
+    );
+    issues.push(...batch.filter((i) => !i.pull_request));
+    if (batch.length < 100) break;
+  }
+  return issues.sort((a, b) => a.number - b.number);
+}
+
+/**
+ * The erratum IDs of maintainers' closed `source-error` issues, each with the
+ * oldest that has it, which a newer issue may not reuse. A closed duplicate
+ * opened after the original doesn't take the original's ID.
+ */
+export async function closedIds(): Promise<Map<string, number>> {
+  const ids = new Map<string, number>();
+  for (const { number, body, author_association } of await issuesOf("closed")) {
+    if (!TRUSTED.has(author_association)) continue;
+    const id = /^### Erratum ID\s*\n+\s*`?([a-z0-9-]+)`?\s*$/m.exec(body ?? "")?.[1];
+    // The oldest holds the ID; issuesOf sorts by number.
+    if (id && !ids.has(id)) ids.set(id, number);
+  }
+  return ids;
+}
+
+/**
+ * The errata in the repository's open `source-error` issues opened by a
+ * maintainer; each such issue that doesn't parse or reuses an ID, open or
+ * closed, which is left out; and the others, by number. A token in GITHUB_TOKEN raises
+ * GitHub's rate limit; the repository is public, so none is needed.
+ */
+export async function openErrata(
+  sources: string[],
+): Promise<{ errata: Erratum[]; problems: Problem[]; ignored: number[] }> {
+  const errata: Erratum[] = [];
+  const problems: Problem[] = [];
+  const ignored: number[] = [];
+  const closed = await closedIds();
+  for (const { number, body, author_association } of await issuesOf("open")) {
+    if (!TRUSTED.has(author_association)) {
+      ignored.push(number);
+      continue;
+    }
+    try {
+      const e = parseErratum(number, body ?? "", sources);
+      const twin = errata.find((other) => other.id === e.id);
+      if (twin) throw new Error(`#${number}: erratum ID ${e.id} is #${twin.issue}'s too`);
+      if ((closed.get(e.id) ?? Infinity) < number)
+        throw new Error(`#${number}: erratum ID ${e.id} is closed #${closed.get(e.id)}'s`);
+      errata.push(e);
+    } catch (error) {
+      problems.push({ issue: number, message: (error as Error).message });
+    }
+  }
+  return { errata, problems, ignored };
+}
+
+/**
+ * What publish writes, from the open issues and the errata it published last.
+ * An issue that doesn't parse, or whose author no longer counts, keeps its
+ * last published erratum, as does one the code still cites (`cited`) that
+ * no open issue holds; a fetch that failed keeps the whole last list. `notes`
+ * say what was kept and why. With every issue read and nothing cited, no open
+ * issue means no errata.
+ */
+export function settle(
+  fetched: { errata: Erratum[]; problems: Problem[]; ignored: number[] } | Error,
+  previous: Erratum[],
+  cited: Set<string> = new Set(),
+): { errata: Erratum[]; notes: string[] } {
+  if (fetched instanceof Error)
+    return {
+      errata: previous,
+      notes: [
+        `the issues couldn't be read (${fetched.message}); kept the ${previous.length} errata published last`,
+      ],
+    };
+  const errata = [...fetched.errata];
+  const notes: string[] = [];
+  const keep = (issue: number, why: string, always: boolean) => {
+    const last = previous.find((e) => e.issue === issue);
+    if (last && !errata.some((e) => e.id === last.id)) errata.push(last);
+    if (last || always)
+      notes.push(`${why}${last ? `; kept ${last.id} as published last` : "; left out"}`);
+  };
+  for (const p of fetched.problems) keep(p.issue, p.message, true);
+  // A stranger's new issue is only a report, but one that was an erratum shouldn't vanish unnoticed.
+  for (const n of fetched.ignored) keep(n, `#${n}: not opened by a maintainer`, false);
+  // Code that still works around an erratum still needs it published, so an
+  // issue closed too soon, or missing from a bad answer, doesn't drop it.
+  for (const e of previous)
+    if (cited.has(e.id) && !errata.some((other) => other.id === e.id)) {
+      errata.push(e);
+      notes.push(
+        `${e.id} is cited in the code, but no open issue holds it; kept as published last`,
+      );
+    }
+  return { errata: errata.sort((a, b) => a.issue - b.issue), notes };
+}
+
+/** The errata `errata.json` holds, as `published` wrote them. */
+export function fromPublished(rows: unknown[]): Erratum[] {
+  return (rows as (Omit<Erratum, "issue"> & { issue: string })[]).map((r) => ({
+    id: r.id,
+    source: r.source,
+    stations: r.stations,
+    since: r.since,
+    until: r.until,
+    error: r.error,
+    handling: r.handling,
+    lake: r.lake,
+    issue: Number(/\/issues\/(\d+)$/.exec(r.issue)?.[1]),
+  }));
+}
 
 /** `errata.json`: each erratum with its issue's URL. */
-export function published(errata: Erratum[] = ERRATA): object[] {
-  return errata.map(({ issue, ...e }) => ({ ...e, issue: `${REPO}/issues/${issue}` }));
+export function published(errata: Erratum[]): object[] {
+  return errata.map(({ issue, ...e }) => ({
+    ...e,
+    issue: `https://github.com/${REPO}/issues/${issue}`,
+  }));
 }
 
 /** The IDs of the errata that affect a station. */
-export function errataOf(station: { id: string; source: string }, errata = ERRATA): string[] {
+export function errataOf(station: { id: string; source: string }, errata: Erratum[]): string[] {
   return errata
     .filter((e) => e.source === station.source && (!e.stations || e.stations.includes(station.id)))
     .map((e) => e.id);
 }
 
-/** `docs/errata.md`, from the list; `npm run errata` writes it. */
-export function render(errata: Erratum[] = ERRATA): string {
-  const lines = [
-    "# Source errata",
-    "",
-    "Errors in what a source publishes, and what the lake does about each one. `stations.parquet` lists the errata that affect each station in `errata`, and [`errata.json`](https://water-levels.openwaters.io/errata.json) has this list. Each links to an issue that tracks the report to the agency. This file is generated from [src/errata.ts](../src/errata.ts) by `npm run errata`; see [CONTRIBUTING.md](../CONTRIBUTING.md#source-errata) to add one.",
-    "",
-    "| Erratum | Source | Stations | Values | Lake | Reported | Issue |",
-    "| --- | --- | --- | --- | --- | --- | --- |",
-  ];
-  const span = (e: Erratum) =>
-    e.since || e.until
-      ? `${e.since?.slice(0, 10) ?? "…"} to ${e.until?.slice(0, 10) ?? "now"}`
-      : "all";
-  for (const e of errata)
-    lines.push(
-      `| [${e.id}](#${e.id}) | ${e.source} | ${e.stations ? e.stations.map((s) => `\`${s}\``).join(", ") || "none listed" : "every station"} | ${span(e)} | ${e.handling} | ${e.fixed ? `fixed ${e.fixed}` : (e.reported?.date ?? "no")} | [#${e.issue}](${REPO}/issues/${e.issue}) |`,
+/** The erratum IDs cited under `dir`, with the files that cite each. */
+export function citedIn(dir: string): Map<string, string[]> {
+  const files = (d: string): string[] =>
+    readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? files(join(d, e.name)) : [join(d, e.name)],
     );
-  for (const e of errata) lines.push("", `## ${e.id}`, "", e.error, "", `**Lake:** ${e.lake}`);
-  return `${lines.join("\n")}\n`;
+  const cited = new Map<string, string[]>();
+  for (const file of files(dir))
+    for (const id of citations(readFileSync(file, "utf8")))
+      cited.set(id, [...(cited.get(id) ?? []), file]);
+  return cited;
+}
+
+/** Erratum IDs cited in a file's text, as erratum `<id>`. */
+export function citations(text: string): string[] {
+  return [...text.matchAll(/[Ee]rratum\s+(?:\*\s+)?`([a-z0-9-]+)`/g)].map((m) => m[1]!);
 }
