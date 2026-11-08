@@ -77,8 +77,8 @@ export const ERRATA: Erratum[] = [
     until: "1980-10-23",
     error:
       "JMA's historical file for Saigo in October 1980 stamps its 22nd line as the 20th, between lines stamped the 21st and 23rd.",
-    handling: "refused",
-    lake: "The file is refused as having a day twice, so Saigo's 1980 is missing from the lake.",
+    handling: "corrected",
+    lake: "The line is read as the 22nd, since the lines on either side are stamped the 21st and 23rd.",
     issue: 58,
     reported: null,
     fixed: null,

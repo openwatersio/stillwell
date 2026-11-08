@@ -5,7 +5,7 @@ Errors in what a source publishes, and what the lake does about each one. `stati
 | Erratum | Source | Stations | Values | Lake | Reported | Issue |
 | --- | --- | --- | --- | --- | --- | --- |
 | [dwr-b95580-another-header](#dwr-b95580-another-header) | dwr | none listed | all | dropped | no | [#67](https://github.com/openwatersio/water-levels/issues/67) |
-| [jma-saigo-1980-day-stamp](#jma-saigo-1980-day-stamp) | jma | `jma/SA` | 1980-10-21 to 1980-10-23 | refused | no | [#58](https://github.com/openwatersio/water-levels/issues/58) |
+| [jma-saigo-1980-day-stamp](#jma-saigo-1980-day-stamp) | jma | `jma/SA` | 1980-10-21 to 1980-10-23 | corrected | no | [#58](https://github.com/openwatersio/water-levels/issues/58) |
 | [pegelonline-download-api-differ](#pegelonline-download-api-differ) | pegelonline | `pegelonline/5990020`, `pegelonline/9530020` | all | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [pegelonline-cuxhaven-2025-revised](#pegelonline-cuxhaven-2025-revised) | pegelonline | `pegelonline/5990020` | 2025-05-13 to 2025-06-25 | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [marine-institute-coverage-start](#marine-institute-coverage-start) | marine-institute | every station | all | avoided | no | [#59](https://github.com/openwatersio/water-levels/issues/59) |
@@ -28,7 +28,7 @@ WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the
 
 JMA's historical file for Saigo in October 1980 stamps its 22nd line as the 20th, between lines stamped the 21st and 23rd.
 
-**Lake:** The file is refused as having a day twice, so Saigo's 1980 is missing from the lake.
+**Lake:** The line is read as the 22nd, since the lines on either side are stamped the 21st and 23rd.
 
 ## pegelonline-download-api-differ
 

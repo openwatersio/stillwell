@@ -208,12 +208,58 @@ describe("jma", () => {
       () => jma.parse(`${day1}\n${day1}`, "CC", Date.UTC(2024, 11, 1), Flag.good),
       /a day twice/,
     );
+    const lines = text.split("\n");
+    const restamp = (i: number, from: string, to: string) => {
+      const copy = [...lines];
+      copy[i] = copy[i]!.replace(from, to);
+      assert.notEqual(copy[i], lines[i]);
+      return copy;
+    };
+    // The last line has one neighbor, so a stamp repeated there is refused.
+    assert.throws(
+      () =>
+        jma.parse(
+          restamp(30, "241231CC", "241230CC").join("\n"),
+          "CC",
+          Date.UTC(2024, 11, 1),
+          Flag.good,
+        ),
+      /a day twice/,
+    );
+    // Neighbors outside the month don't place a line: stamped 31, 0, 33, 2 to 29,
+    // the second line would be read as the 32nd and the third as the 1st.
+    const stamp = (line: string, day: number) =>
+      `${line.slice(0, 76)}${String(day).padStart(2, " ")}${line.slice(78)}`;
+    const chain = [31, 0, 33, ...Array.from({ length: 28 }, (_, i) => i + 2)].map((day, i) =>
+      stamp(lines[i]!, day),
+    );
+    assert.throws(
+      () => jma.parse(chain.join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good),
+      /not a day/,
+    );
+    // A copy of the 20th, stamped the 20th where the 21st belongs, is a repeat.
+    const copied = [...lines];
+    copied[20] = lines[19]!;
+    assert.throws(
+      () => jma.parse(copied.join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good),
+      /a day twice/,
+    );
     // A file cut short is missing days at the end.
     assert.throws(
       () =>
         jma.parse(text.split("\n").slice(0, 20).join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good),
       /has 20 of 31 days/,
     );
+  });
+
+  it("reads a mistyped day between two in sequence as the day between them", () => {
+    const text = fixture("jma-final-202412CC.txt");
+    const good = jma.parse(text, "CC", Date.UTC(2024, 11, 1), Flag.good);
+    // As in Saigo's October 1980 file, the 22nd is stamped the 20th.
+    const lines = text.split("\n");
+    lines[21] = lines[21]!.replace("241222CC", "241220CC");
+    assert.notEqual(lines[21], text.split("\n")[21]);
+    assert.deepEqual(jma.parse(lines.join("\n"), "CC", Date.UTC(2024, 11, 1), Flag.good), good);
   });
 
   it("refuses another datum", async () => {
