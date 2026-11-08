@@ -29,8 +29,9 @@ export interface Erratum {
   id: string;
   source: string;
   /**
-   * Lake station IDs it affects; null for every station of the source, and
-   * empty where the stations aren't in the lake or aren't known one by one.
+   * Lake station IDs known to be affected; null for every station of the
+   * source. Partial or empty where the source doesn't say which stations, or
+   * they aren't in the lake; `error` says which.
    */
   stations: string[] | null;
   /**
@@ -63,7 +64,7 @@ export const ERRATA: Erratum[] = [
     error:
       "WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).",
     handling: "dropped",
-    lake: "A station whose file names another station is left out of the list, so B95580 isn't in the lake until WDL fixes it.",
+    lake: "A station is left out of the list when none of its files is usable, and a file that names another station isn't, so B95580 isn't in the lake until WDL fixes it.",
     issue: 67,
     reported: null,
     fixed: null,
@@ -152,8 +153,8 @@ export const ERRATA: Erratum[] = [
     until: null,
     error:
       "On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.",
-    handling: "avoided",
-    lake: "Levels are in OD Malin, and LAT is only the current offset in `datums`.",
+    handling: "kept",
+    lake: "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
     issue: 60,
     reported: null,
     fixed: null,
@@ -235,7 +236,7 @@ export const ERRATA: Erratum[] = [
     since: null,
     until: null,
     error:
-      "Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off.",
+      "Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off. CWMS doesn't say which other zeros are real, so only Baton Rouge is listed.",
     handling: "avoided",
     lake: "An elevation of exactly 0 is ignored, so those gauges have no NGVD29 or NAVD88 offset.",
     issue: 66,
@@ -249,7 +250,7 @@ export const ERRATA: Erratum[] = [
     since: null,
     until: null,
     error:
-      "The New Orleans District's NAVD88 corrections for lower Mississippi gauges disagree between sources: at Donaldsonville the description gives −0.74 ft, rivergages −1.18 ft and the `rev-NAVD88` series −0.70 ft.",
+      "The New Orleans District's NAVD88 corrections for lower Mississippi gauges disagree between sources: at Donaldsonville the description gives −0.74 ft, rivergages −1.18 ft and the `rev-NAVD88` series −0.70 ft. Which of the district's gauges carry a correction is in prose only, so none is listed.",
     handling: "avoided",
     lake: "No LWRP or NAVD88 correction is published for these gauges until the district confirms which is right.",
     issue: 10,

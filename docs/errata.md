@@ -9,7 +9,7 @@ Errors in what a source publishes, and what the lake does about each one. `stati
 | [pegelonline-download-api-differ](#pegelonline-download-api-differ) | pegelonline | `pegelonline/5990020`, `pegelonline/9530020` | all | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [pegelonline-cuxhaven-2025-revised](#pegelonline-cuxhaven-2025-revised) | pegelonline | `pegelonline/5990020` | 2025-05-13 to 2025-06-25 | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [marine-institute-coverage-start](#marine-institute-coverage-start) | marine-institute | every station | all | avoided | no | [#59](https://github.com/openwatersio/water-levels/issues/59) |
-| [marine-institute-lat-2026](#marine-institute-lat-2026) | marine-institute | `marine-institute/aranmore-island-leabgarrow`, `marine-institute/ballycotton-harbour`, `marine-institute/ballyglass-harbour`, `marine-institute/buncranna`, `marine-institute/castletownbere-port`, `marine-institute/dingle-harbour`, `marine-institute/dublin-port`, `marine-institute/dunmore-east-harbour`, `marine-institute/galway-port`, `marine-institute/howth-water-level-1`, `marine-institute/inishmore`, `marine-institute/killybegs-port`, `marine-institute/kilrush-lough`, `marine-institute/malin-head-portmore-pier`, `marine-institute/rosslare`, `marine-institute/skerries-harbour`, `marine-institute/sligo`, `marine-institute/union-hall-harbor`, `marine-institute/wexford-harbour` | 2026-03-24 to now | avoided | no | [#60](https://github.com/openwatersio/water-levels/issues/60) |
+| [marine-institute-lat-2026](#marine-institute-lat-2026) | marine-institute | `marine-institute/aranmore-island-leabgarrow`, `marine-institute/ballycotton-harbour`, `marine-institute/ballyglass-harbour`, `marine-institute/buncranna`, `marine-institute/castletownbere-port`, `marine-institute/dingle-harbour`, `marine-institute/dublin-port`, `marine-institute/dunmore-east-harbour`, `marine-institute/galway-port`, `marine-institute/howth-water-level-1`, `marine-institute/inishmore`, `marine-institute/killybegs-port`, `marine-institute/kilrush-lough`, `marine-institute/malin-head-portmore-pier`, `marine-institute/rosslare`, `marine-institute/skerries-harbour`, `marine-institute/sligo`, `marine-institute/union-hall-harbor`, `marine-institute/wexford-harbour` | 2026-03-24 to now | kept | no | [#60](https://github.com/openwatersio/water-levels/issues/60) |
 | [uhslc-hong-kong-hour-early](#uhslc-hong-kong-hour-early) | uhslc | `uhslc/329`, `uhslc/329a` | all | corrected | no | [#63](https://github.com/openwatersio/water-levels/issues/63) |
 | [refmar-pointe-a-pitre-clock](#refmar-pointe-a-pitre-clock) | refmar | `refmar/125` | 2020-01-01 to 2025-01-01 | flagged | no | [#61](https://github.com/openwatersio/water-levels/issues/61) |
 | [rws-ameland-westgat-twice](#rws-ameland-westgat-twice) | rws | `rws/ameland.westgat`, `rws/amelandwestgat` | all | kept | no | [#62](https://github.com/openwatersio/water-levels/issues/62) |
@@ -22,7 +22,7 @@ Errors in what a source publishes, and what the lake does about each one. `stati
 
 WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).
 
-**Lake:** A station whose file names another station is left out of the list, so B95580 isn't in the lake until WDL fixes it.
+**Lake:** A station is left out of the list when none of its files is usable, and a file that names another station isn't, so B95580 isn't in the lake until WDL fixes it.
 
 ## jma-saigo-1980-day-stamp
 
@@ -52,7 +52,7 @@ The dataset's `time_coverage_start` says 2000, but no gauge has values before Oc
 
 On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.
 
-**Lake:** Levels are in OD Malin, and LAT is only the current offset in `datums`.
+**Lake:** Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.
 
 ## uhslc-hong-kong-hour-early
 
@@ -86,12 +86,12 @@ Some CWMS locations sit at 0,0 or at a placeholder such as 9.09,9.09 (Anoka), an
 
 ## usace-zero-elevation
 
-Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off.
+Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off. CWMS doesn't say which other zeros are real, so only Baton Rouge is listed.
 
 **Lake:** An elevation of exactly 0 is ignored, so those gauges have no NGVD29 or NAVD88 offset.
 
 ## usace-lwrp-corrections-disagree
 
-The New Orleans District's NAVD88 corrections for lower Mississippi gauges disagree between sources: at Donaldsonville the description gives −0.74 ft, rivergages −1.18 ft and the `rev-NAVD88` series −0.70 ft.
+The New Orleans District's NAVD88 corrections for lower Mississippi gauges disagree between sources: at Donaldsonville the description gives −0.74 ft, rivergages −1.18 ft and the `rev-NAVD88` series −0.70 ft. Which of the district's gauges carry a correction is in prose only, so none is listed.
 
 **Lake:** No LWRP or NAVD88 correction is published for these gauges until the district confirms which is right.

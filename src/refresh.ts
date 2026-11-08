@@ -171,8 +171,7 @@ async function renumberAboveFiles(
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its errata, and
- * `errata.json` the whole list (`src/errata.ts`), whichever sources the lake
- * holds; the result names any station an erratum lists that a source in the
+ * `errata.json` those of the sources the lake holds (`src/errata.ts`); the result names any station an erratum lists that a source in the
  * lake doesn't, a typo or a station since removed.
  */
 export async function publishStations(
@@ -205,9 +204,10 @@ export async function publishStations(
       stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
-  await writeJsonArray(errataPath(lake), published(errata));
-  const ids = new Set(linked.map((s) => s.id));
+  // A lake's errata are its own sources', so a restricted source's stay out of the public lake.
   const held = new Set(listed.map((s) => s.metadata.id));
+  await writeJsonArray(errataPath(lake), published(errata.filter((e) => held.has(e.source))));
+  const ids = new Set(linked.map((s) => s.id));
   const unknownErrata = errata.flatMap((e) =>
     held.has(e.source)
       ? (e.stations ?? []).filter((id) => !ids.has(id)).map((id) => `${e.id} ${id}`)

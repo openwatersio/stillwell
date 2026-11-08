@@ -23,7 +23,7 @@ import {
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
-import { ERRATA, published as errataJson, type Erratum } from "../src/errata.ts";
+import { ERRATA, type Erratum } from "../src/errata.ts";
 import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
 import {
   Flag,
@@ -391,8 +391,8 @@ describe("publishStations", () => {
         epochs: "1",
       },
     ]);
-    // errata.json is the whole list, whichever sources the lake holds.
-    assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), errataJson());
+    // errata.json holds the errata of the sources the lake holds, here none.
+    assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), []);
   });
 
   it("tags each station with its errata, and names a listed station the lake lacks", async () => {
@@ -406,7 +406,7 @@ describe("publishStations", () => {
     const errata = [
       erratum("test-a", "test", ["test/a", "test/gone"]),
       erratum("test-every", "test", null),
-      // Another source's station isn't this lake's to report.
+      // Another source's isn't this lake's to report or publish.
       erratum("other-x", "other", ["other/x"]),
     ];
     const result = await publishStations(lake, [sourceOf([])], ["test"], errata);
@@ -421,7 +421,7 @@ describe("publishStations", () => {
     ]);
     assert.deepEqual(
       JSON.parse(await readFile(errataPath(lake), "utf8")).map((e: Erratum) => e.id),
-      ["test-a", "test-every", "other-x"],
+      ["test-a", "test-every"],
     );
   });
 

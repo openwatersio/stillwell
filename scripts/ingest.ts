@@ -275,7 +275,9 @@ async function publish(lake: string): Promise<void> {
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     for (const e of result.unknownErrata)
-      console.log(`  erratum lists a station not in the lake: ${e}`);
+      console.error(`  erratum lists a station not in the lake: ${e}`);
+    // A typo in src/errata.ts tags nothing, so fail the run to say so.
+    if (result.unknownErrata.length) process.exitCode = 1;
   } else {
     console.error(
       `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,

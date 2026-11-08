@@ -168,7 +168,7 @@ When a source publishes something wrong, such as values on the wrong clock or da
 3. Cite its ID as ``erratum `<id>` `` where the adapter works around it, or in its README where the lake keeps the data as served. `test/errata.test.ts` fails on an entry its adapter doesn't cite, and on a citation of an ID the list doesn't have.
 4. Run `npm run errata` to rewrite [docs/errata.md](docs/errata.md).
 
-`publish` puts each station's errata in the `errata` column of `stations.parquet`, and the list in `errata.json`. Reports go to the agency in its own language, one message per agency covering its open errata, and only once a person has approved the text; set `reported` once one is sent. When the agency fixes the data, set `fixed`, remove the workaround, and refetch what it touched.
+`publish` puts each station's errata in the `errata` column of `stations.parquet`, and the list in `errata.json`. Reports go to the agency in its own language, one message per agency covering its open errata, and only once a person has approved the text; set `reported` once one is sent, naming the channel (the agency's contact form or published address), never a person's name or address, since `errata.json` is public. When the agency fixes the data, set `fixed`, remove the workaround, and refetch what it touched.
 
 ## Ingest on R2
 
