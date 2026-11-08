@@ -43,7 +43,9 @@ const DAY_MS = 86_400_000;
  *
  * A year the source returns nothing for writes no file, so it is fetched again
  * on every run in either mode; adapters that bound requests to each series'
- * dates (USGS, CO-OPS) send no request for those years.
+ * dates (USGS, CO-OPS) send no request for those years outside them. Within
+ * them, `--skip-written` records the years it found empty and skips them for
+ * 30 days (`src/empty-years.ts`).
  */
 export function yearDone(file: YearFile | undefined, from: Date, to: Date, now: number): boolean {
   if (!wholeEndedYear(from, to, now)) return false;
@@ -86,7 +88,7 @@ export function yearWritten(
  */
 export const COMPACTED_SINCE = 2026;
 
-function wholeEndedYear(from: Date, to: Date, now: number): boolean {
+export function wholeEndedYear(from: Date, to: Date, now: number): boolean {
   const year = from.getUTCFullYear();
   const end = Date.UTC(year + 1, 0, 1);
   return from.getTime() === Date.UTC(year, 0, 1) && to.getTime() === end && end <= now;
@@ -167,7 +169,8 @@ export function parseShard(value: string): [number, number] {
  * Which years of one station's series backfill fetches over [start, end), and
  * how many it skips: `complete` skips what `yearDone` calls done, from one read
  * of the series directory; `written` skips what `yearWritten` does, from a
- * listing, plus a read of years from `COMPACTED_SINCE` on; `none` fetches every year. A failed read throws, so the
+ * listing, plus a read of years from `COMPACTED_SINCE` on, and returns the
+ * years the listing found (`listed`); `none` fetches every year. A failed read throws, so the
  * caller fails the series rather than fetch every year again.
  */
 export async function yearsToFetch(
@@ -176,22 +179,22 @@ export async function yearsToFetch(
   end: Date,
   mode: "complete" | "written" | "none",
   now: number,
-): Promise<{ fetch: [Date, Date][]; skipped: number }> {
+): Promise<{ fetch: [Date, Date][]; skipped: number; listed?: Set<number> }> {
   const all = [...years(start, end)];
   // No whole ended year asked for means nothing to skip, so nothing to read.
   if (!all.some(([from, to]) => wholeEndedYear(from, to, now))) mode = "none";
   let done: (from: Date, to: Date) => boolean = () => false;
+  let listed: Set<number> | undefined;
   if (mode === "written") {
-    const listed = await listYears(dir);
+    const found = await listYears(dir);
+    listed = found;
     // Only the years compaction may have written need a read.
     const read = all
       .filter(([from, to]) => wholeEndedYear(from, to, now))
       .map(([from]) => from.getUTCFullYear())
-      .filter((y) => y >= COMPACTED_SINCE && listed.has(y));
-    const files = read.length
-      ? await readYearFiles(dir, read, listed)
-      : new Map<number, YearFile>();
-    done = (from, to) => yearWritten(listed, from, to, now, files.get(from.getUTCFullYear()));
+      .filter((y) => y >= COMPACTED_SINCE && found.has(y));
+    const files = read.length ? await readYearFiles(dir, read, found) : new Map<number, YearFile>();
+    done = (from, to) => yearWritten(found, from, to, now, files.get(from.getUTCFullYear()));
   } else if (mode === "complete") {
     const asked = all.filter(([from, to]) => wholeEndedYear(from, to, now));
     const files = await readYearFiles(
@@ -201,7 +204,7 @@ export async function yearsToFetch(
     done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
   }
   const fetch = all.filter(([from, to]) => !done(from, to));
-  return { fetch, skipped: all.length - fetch.length };
+  return { fetch, skipped: all.length - fetch.length, listed };
 }
 
 /** [start, end) split at UTC year boundaries. */

@@ -63,8 +63,10 @@ import {
   parseStationList,
   preliminaryRuns,
   shard,
+  wholeEndedYear,
   yearsToFetch,
 } from "../src/backfill.ts";
+import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { citedIn, fromPublished, openErrata, settle } from "../src/errata.ts";
 import { Blocked } from "../src/http.ts";
@@ -389,6 +391,21 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     console.error(`failed: ${line}`);
   };
   let skipped = 0;
+  // Years a skip-written campaign found empty lately, skipped rather than asked again.
+  // Only a source whose empty answer means no data, not an outage, keeps a
+  // record. One that can't be read is neither used nor written over this run.
+  const empty =
+    mode === "written" && source.metadata.empty_means_none
+      ? await readEmptyYears(lake, sourceId, now).catch((error: Error) => {
+          console.error(
+            `${sourceId}: asking for every year, recording none; the empty-years record: ${error.message}`,
+          );
+          return undefined;
+        })
+      : undefined;
+  let emptyFound = false;
+  let emptySkipped = 0;
+  let emptyRecorded = 0;
   // Each station's earliest preliminary value, read again after its levels
   // were fetched, written to the bounds after each batch of 100 stations, so
   // a run stopped by its time limit keeps most of them.
@@ -401,6 +418,21 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   const fromYear = ranges ? Math.min(cutoffYear, start.getUTCFullYear()) : cutoffYear;
   const cutoff = Date.UTC(cutoffYear, 0, 1);
   let saving = Promise.resolve();
+  // Saved at most every 5 minutes after a station that found one, and after
+  // each batch, since a CO-OPS run can end at its time limit before its first
+  // batch of 100 does; a run killed between saves loses only those minutes.
+  let emptySaved = Date.now();
+  const saveEmpty = (force = false) => {
+    if (!empty || !emptyFound) return saving;
+    if (!force && Date.now() - emptySaved < 5 * 60_000) return saving;
+    emptySaved = Date.now();
+    const record = new Map(empty);
+    emptyFound = false;
+    saving = saving.then(() =>
+      writeEmptyYears(lake, sourceId, record, now).catch((error) => fail("empty years", error)),
+    );
+    return saving;
+  };
   const save = () => {
     const found = preliminary;
     preliminary = new Map();
@@ -496,11 +528,27 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           skipped += plan.skipped;
           for (const [from, to] of plan.fetch) {
             if (stopped) break;
+            const key = emptyKey(station.id, product, epoch.id, from.getUTCFullYear());
+            if (empty?.has(key)) {
+              emptySkipped++;
+              continue;
+            }
             const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
             if (ownEpoch) fetched.add(station.id);
             try {
               const written = await backfillYear(source, station, product, from, to, epoch);
-              if (written !== undefined) console.log(`${label}: ${written} rows`);
+              if (written === "empty") {
+                // A year with a file keeps being asked for, so an outage never blocks its refill.
+                if (
+                  empty &&
+                  wholeEndedYear(from, to, now) &&
+                  !plan.listed?.has(from.getUTCFullYear())
+                ) {
+                  empty.set(key, new Date(now).toISOString());
+                  emptyFound = true;
+                  emptyRecorded++;
+                }
+              } else if (written !== undefined) console.log(`${label}: ${written} rows`);
             } catch (error) {
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
@@ -522,7 +570,9 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         } catch (error) {
           fail(`${station.id} preliminary`, error);
         }
+      await saveEmpty();
     });
+    await saveEmpty(true);
     for (const [id, time] of prior)
       if (!fetched.has(id) && !preliminary.has(id)) preliminary.set(id, { preliminary: time });
     await save();
@@ -531,6 +581,11 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   await save();
   const why = { written: "already written", complete: "already complete", none: "" }[mode];
   if (why) console.log(`${sourceId}: skipped ${skipped} years ${why}`);
+  if (emptySkipped)
+    console.log(`${sourceId}: skipped ${emptySkipped} years found empty in the last 30 days`);
+  // A jump here, against the years written, is the sign of an outage answering with nothing.
+  if (emptyRecorded)
+    console.log(`${sourceId}: recorded ${emptyRecorded} years with no file that came back empty`);
   console.log(`${sourceId}: ${failed.length} failed`);
   if (stopped) console.error(`${sourceId}: stopped: ${stopped.message}`);
   for (const f of failed) console.error(`  ${f}`);
@@ -559,7 +614,10 @@ async function reportPast(
   if (page) await appendFile(page, ["```", ...lines, "```", ""].join("\n"));
 }
 
-/** Returns how many rows the year's file now holds, or undefined when nothing changed. */
+/**
+ * Returns how many rows the year's file now holds, undefined when nothing
+ * changed, or `empty` when the source returned nothing for the year.
+ */
 async function backfillYear(
   source: Source,
   station: LakeStation,
@@ -567,7 +625,7 @@ async function backfillYear(
   from: Date,
   to: Date,
   epoch: Epoch,
-): Promise<number | undefined> {
+): Promise<number | "empty" | undefined> {
   // The epoch's own datum, which a closed epoch keeps when the station's moves on.
   station = { ...station, datum: epoch.datum };
   const path = seriesPath(
@@ -585,7 +643,7 @@ async function backfillYear(
     let rows = await get(station, from, to);
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
-    if (!rows.length) return undefined;
+    if (!rows.length) return "empty";
     await refuseOtherDatum(path, station);
     if (product === "levels") rows = qc(withSourceFlag(rows), qcFor(source, station));
     const existing = await readObservations(path);
@@ -597,7 +655,7 @@ async function backfillYear(
   const get = product === "extremes" ? source.extremes : source.predictedExtremes;
   if (!get) return undefined;
   const rows = await get(station, from, to);
-  if (!rows.length) return undefined;
+  if (!rows.length) return "empty";
   await refuseOtherDatum(path, station);
   const existing = await readExtremes(path);
   const merged = mergeFetched<PublishedExtreme>(existing, rows, ...range);

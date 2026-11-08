@@ -131,6 +131,7 @@ New paths beside the ones in [data.md](data.md). `<station>` is the URL-encoded 
 ```
 stations/<source>.parquet                    one source's list: every station it has listed, with epochs
 stations/bounds/<source>.parquet             first, last, earliest preliminary and screened per station, by compaction and backfill
+stations/empty/<source>.json                 years with no file a --skip-written backfill found empty, kept 30 days
 history/stations/<source>/<time>.parquet     the source's list as each refresh started
 history/stations/<source>/<time>.json        what that refresh changed
 ```
