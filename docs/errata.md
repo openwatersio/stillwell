@@ -4,18 +4,25 @@ Errors in what a source publishes, and what the lake does about each one. `stati
 
 | Erratum | Source | Stations | Values | Lake | Reported | Issue |
 | --- | --- | --- | --- | --- | --- | --- |
+| [dwr-b95580-another-header](#dwr-b95580-another-header) | dwr | none listed | all | dropped | no | [#67](https://github.com/openwatersio/water-levels/issues/67) |
 | [jma-saigo-1980-day-stamp](#jma-saigo-1980-day-stamp) | jma | `jma/SA` | 1980-10-21 to 1980-10-23 | refused | no | [#58](https://github.com/openwatersio/water-levels/issues/58) |
 | [pegelonline-download-api-differ](#pegelonline-download-api-differ) | pegelonline | `pegelonline/5990020`, `pegelonline/9530020` | all | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [pegelonline-cuxhaven-2025-revised](#pegelonline-cuxhaven-2025-revised) | pegelonline | `pegelonline/5990020` | 2025-05-13 to 2025-06-25 | kept | no | [#26](https://github.com/openwatersio/water-levels/issues/26) |
 | [marine-institute-coverage-start](#marine-institute-coverage-start) | marine-institute | every station | all | avoided | no | [#59](https://github.com/openwatersio/water-levels/issues/59) |
-| [marine-institute-lat-2026](#marine-institute-lat-2026) | marine-institute | every station | 2026-03-24 to now | avoided | no | [#60](https://github.com/openwatersio/water-levels/issues/60) |
+| [marine-institute-lat-2026](#marine-institute-lat-2026) | marine-institute | `marine-institute/aranmore-island-leabgarrow`, `marine-institute/ballycotton-harbour`, `marine-institute/ballyglass-harbour`, `marine-institute/buncranna`, `marine-institute/castletownbere-port`, `marine-institute/dingle-harbour`, `marine-institute/dublin-port`, `marine-institute/dunmore-east-harbour`, `marine-institute/galway-port`, `marine-institute/howth-water-level-1`, `marine-institute/inishmore`, `marine-institute/killybegs-port`, `marine-institute/kilrush-lough`, `marine-institute/malin-head-portmore-pier`, `marine-institute/rosslare`, `marine-institute/skerries-harbour`, `marine-institute/sligo`, `marine-institute/union-hall-harbor`, `marine-institute/wexford-harbour` | 2026-03-24 to now | avoided | no | [#60](https://github.com/openwatersio/water-levels/issues/60) |
 | [uhslc-hong-kong-hour-early](#uhslc-hong-kong-hour-early) | uhslc | `uhslc/329`, `uhslc/329a` | all | corrected | no | [#63](https://github.com/openwatersio/water-levels/issues/63) |
 | [refmar-pointe-a-pitre-clock](#refmar-pointe-a-pitre-clock) | refmar | `refmar/125` | 2020-01-01 to 2025-01-01 | flagged | no | [#61](https://github.com/openwatersio/water-levels/issues/61) |
-| [rws-ameland-westgat-twice](#rws-ameland-westgat-twice) | rws | `rws/ameland.westgat`, `rws/amelandwestgat` | all | corrected | no | [#62](https://github.com/openwatersio/water-levels/issues/62) |
+| [rws-ameland-westgat-twice](#rws-ameland-westgat-twice) | rws | `rws/ameland.westgat`, `rws/amelandwestgat` | all | kept | no | [#62](https://github.com/openwatersio/water-levels/issues/62) |
 | [usace-baton-rouge-position](#usace-baton-rouge-position) | usace | `usace/MVN.Baton_Rouge` | all | kept | no | [#64](https://github.com/openwatersio/water-levels/issues/64) |
 | [usace-placeholder-positions](#usace-placeholder-positions) | usace | none listed | all | dropped | no | [#65](https://github.com/openwatersio/water-levels/issues/65) |
-| [usace-zero-elevation](#usace-zero-elevation) | usace | none listed | all | avoided | no | [#66](https://github.com/openwatersio/water-levels/issues/66) |
+| [usace-zero-elevation](#usace-zero-elevation) | usace | `usace/MVK.Baton_Rouge` | all | avoided | no | [#66](https://github.com/openwatersio/water-levels/issues/66) |
 | [usace-lwrp-corrections-disagree](#usace-lwrp-corrections-disagree) | usace | none listed | all | avoided | no | [#10](https://github.com/openwatersio/water-levels/issues/10) |
+
+## dwr-b95580-another-header
+
+WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).
+
+**Lake:** A station whose file names another station is left out of the list, so B95580 isn't in the lake until WDL fixes it.
 
 ## jma-saigo-1980-day-stamp
 
@@ -63,7 +70,7 @@ SHOM's Pointe-à-Pitre levels run 60 to 70 minutes late in 2023 against UHSLC's,
 
 RWS lists the Ameland Westgat gauge twice, as `ameland.westgat` and `amelandwestgat`, a few meters apart.
 
-**Lake:** Both are kept and linked in `same_as`.
+**Lake:** Both are kept as served, and linked in `same_as` as one gauge.
 
 ## usace-baton-rouge-position
 

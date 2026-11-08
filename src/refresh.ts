@@ -30,7 +30,7 @@ import {
   PRODUCTS,
 } from "./lake/paths.ts";
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
-import { errataOf, published } from "./errata.ts";
+import { ERRATA, errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 
@@ -170,13 +170,17 @@ async function renumberAboveFiles(
  * missing ones. A source in neither is new, and
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
- * says what was linked.
+ * says what was linked. Each station carries the IDs of its errata, and
+ * `errata.json` the whole list (`src/errata.ts`), whichever sources the lake
+ * holds; the result names any station an erratum lists that a source in the
+ * lake doesn't, a typo or a station since removed.
  */
 export async function publishStations(
   lake: string,
   all: Source[],
   expected: string[],
-): Promise<{ count: number; links: LinkReport } | { missing: string[] }> {
+  errata: Erratum[] = ERRATA,
+): Promise<{ count: number; links: LinkReport; unknownErrata: string[] } | { missing: string[] }> {
   const stations: LakeStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
@@ -192,7 +196,7 @@ export async function publishStations(
   }
   if (missing.length || !listed.length) return { missing };
   const { stations: linked, report } = linkGauges(stations);
-  for (const station of linked) station.errata = errataOf(station);
+  for (const station of linked) station.errata = errataOf(station, errata);
   await writeStations(stationsPath(lake), linked);
   await writeJsonArray(
     sourcesPath(lake),
@@ -201,8 +205,15 @@ export async function publishStations(
       stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
-  await writeJsonArray(errataPath(lake), published());
-  return { count: linked.length, links: report };
+  await writeJsonArray(errataPath(lake), published(errata));
+  const ids = new Set(linked.map((s) => s.id));
+  const held = new Set(listed.map((s) => s.metadata.id));
+  const unknownErrata = errata.flatMap((e) =>
+    held.has(e.source)
+      ? (e.stations ?? []).filter((id) => !ids.has(id)).map((id) => `${e.id} ${id}`)
+      : [],
+  );
+  return { count: linked.length, links: report, unknownErrata };
 }
 
 /**

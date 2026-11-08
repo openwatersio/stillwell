@@ -95,6 +95,7 @@ Bucket `water-levels`, public read at `water-levels.openwaters.io`. Series whose
 ```
 stations.parquet                                 one row per series
 sources.json                                     license and attribution per source
+errata.json                                      errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                          last 7 days, every live public station and any since retired, sorted by station then time
 obs/<source>/<station>/<year>.parquet            time, level_m, flag, source_flag, received, datum
 extremes/<source>/<station>/<year>.parquet       the source's observed high and low waters: time, level_m, type, flag, datum

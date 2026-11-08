@@ -33,7 +33,11 @@ export interface Erratum {
    * empty where the stations aren't in the lake or aren't known one by one.
    */
   stations: string[] | null;
-  /** The UTC days of values it affects, `since` to before `until`; null for an open end or none. */
+  /**
+   * The UTC days of values the error is in, `since` to before `until`; null
+   * for an open end or none. What the lake lacks or changed as a result can
+   * be wider, and `lake` says so.
+   */
   since: string | null;
   until: string | null;
   /** What the source publishes wrong, and how it was found. */
@@ -50,6 +54,20 @@ export interface Erratum {
 }
 
 export const ERRATA: Erratum[] = [
+  {
+    id: "dwr-b95580-another-header",
+    source: "dwr",
+    stations: [],
+    since: null,
+    until: null,
+    error:
+      "WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).",
+    handling: "dropped",
+    lake: "A station whose file names another station is left out of the list, so B95580 isn't in the lake until WDL fixes it.",
+    issue: 67,
+    reported: null,
+    fixed: null,
+  },
   {
     id: "jma-saigo-1980-day-stamp",
     source: "jma",
@@ -109,7 +127,27 @@ export const ERRATA: Erratum[] = [
   {
     id: "marine-institute-lat-2026",
     source: "marine-institute",
-    stations: null,
+    stations: [
+      "marine-institute/aranmore-island-leabgarrow",
+      "marine-institute/ballycotton-harbour",
+      "marine-institute/ballyglass-harbour",
+      "marine-institute/buncranna",
+      "marine-institute/castletownbere-port",
+      "marine-institute/dingle-harbour",
+      "marine-institute/dublin-port",
+      "marine-institute/dunmore-east-harbour",
+      "marine-institute/galway-port",
+      "marine-institute/howth-water-level-1",
+      "marine-institute/inishmore",
+      "marine-institute/killybegs-port",
+      "marine-institute/kilrush-lough",
+      "marine-institute/malin-head-portmore-pier",
+      "marine-institute/rosslare",
+      "marine-institute/skerries-harbour",
+      "marine-institute/sligo",
+      "marine-institute/union-hall-harbor",
+      "marine-institute/wexford-harbour",
+    ],
     since: "2026-03-24",
     until: null,
     error:
@@ -156,8 +194,8 @@ export const ERRATA: Erratum[] = [
     until: null,
     error:
       "RWS lists the Ameland Westgat gauge twice, as `ameland.westgat` and `amelandwestgat`, a few meters apart.",
-    handling: "corrected",
-    lake: "Both are kept and linked in `same_as`.",
+    handling: "kept",
+    lake: "Both are kept as served, and linked in `same_as` as one gauge.",
     issue: 62,
     reported: null,
     fixed: null,
@@ -193,7 +231,7 @@ export const ERRATA: Erratum[] = [
   {
     id: "usace-zero-elevation",
     source: "usace",
-    stations: [],
+    stations: ["usace/MVK.Baton_Rouge"],
     since: null,
     until: null,
     error:

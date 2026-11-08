@@ -196,6 +196,12 @@ node scripts/canary.ts <source> --record
 
 The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor License Agreement](CLA.md) before we merge their pull request; the CLA workflow asks on your first one. The CLA lets Open Water Software, LLC move code into MIT packages, such as shared math another project imports, and offer other licenses, while an OSI-approved license stays public. Code another project needs to import belongs in an MIT package, not here, or that project becomes AGPL.
 
+## Review checks
+
+The traps this project has fallen into, for the openwaters-review skill and anyone reviewing a change:
+
+- A change that works around something a source publishes wrong, such as a clock shift, a skipped or refused file, a fixed position or a flagged span, adds an erratum to `src/errata.ts` and cites it (see [Source errata](#source-errata)). A workaround with no erratum hides the error from users of the lake and from the agency.
+
 ## Shared conventions
 
 Open Waters' [repository standards](https://github.com/openwatersio/.github/blob/main/REPOSITORY_STANDARDS.md) and [marketing guidance](https://github.com/openwatersio/.github/blob/main/docs/agents/marketing.md) apply here.
