@@ -1115,6 +1115,22 @@ describe("coops", () => {
     assert.deepEqual([levels, asked], [[], ["water_level"]]);
   });
 
+  it("asks for a leap year's high and low waters in two halves", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      const q = new URL(url).searchParams;
+      asked.push(`${q.get("begin_date")}-${q.get("end_date")}`);
+      return JSON.stringify({ data: [] });
+    });
+    const station = { established: "1899-01-01T00:00:00Z", removed: null };
+    await coops.extremes("9461380", new Date("1944-01-01Z"), new Date("1946-01-01Z"), station);
+    assert.deepEqual(asked, [
+      "19440101 00:00-19440630 23:59",
+      "19440701 00:00-19441231 23:59",
+      "19450101 00:00-19451231 23:59",
+    ]);
+  });
+
   it("asks a live station for years after an old removed date", async () => {
     let asked = 0;
     setTransport(async () => {
