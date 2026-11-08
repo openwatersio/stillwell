@@ -276,7 +276,8 @@ async function publish(lake: string): Promise<void> {
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     for (const e of result.unknownErrata)
       console.error(`  erratum lists a station not in the lake: ${e}`);
-    // A typo in src/errata.ts tags nothing, so fail the run to say so.
+    // A typo in src/errata.ts tags nothing, so fail the run to say so, after
+    // publishing: holding back every source's list for it would cost more.
     if (result.unknownErrata.length) process.exitCode = 1;
   } else {
     console.error(
