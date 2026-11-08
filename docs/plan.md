@@ -180,7 +180,9 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] Backfill SFWMD through the Ingest workflow.
 - [x] **California DWR** (`dwr`): 15-minute stage at the 50 Delta gauges TICON keeps that DWR's Water Data Library has a file for, in NAVD88 or above gauge zero, back to 1975, read from last January on every month. See [the adapter's README](../src/sources/dwr/README.md).
 - [ ] Backfill California DWR through the Ingest workflow.
-- [ ] **Other US state networks**: CDEC's own stations ([#50](https://github.com/openwatersio/water-levels/issues/50)), CRMS ([#49](https://github.com/openwatersio/water-levels/issues/49)), FIMAN ([#51](https://github.com/openwatersio/water-levels/issues/51)) and NWFWMD ([#52](https://github.com/openwatersio/water-levels/issues/52)), whose terms or access need settling first.
+- [x] **CDEC** (`cdec`): 15-minute river stage at the 41 Delta gauges TICON names by CDEC code that an operator other than USGS runs, NAVD88 at 13 and gauge zero at the rest, running hourly. See [the adapter's README](../src/sources/cdec/README.md).
+- [ ] Backfill CDEC through the Ingest workflow.
+- [ ] **Other US state networks**: CRMS ([#49](https://github.com/openwatersio/water-levels/issues/49)), FIMAN ([#51](https://github.com/openwatersio/water-levels/issues/51)) and NWFWMD ([#52](https://github.com/openwatersio/water-levels/issues/52)), whose terms or access need settling first.
 - [x] **JMA** (`jma`): hourly levels above each station's observation datum (DL) at 90 gauges, 70 open, back to 1924, from JMA's historical, final and provisional files, in JST converted to UTC, under the Public Data License 1.0 (CC BY 4.0 compatible), in the public lake. See [the adapter's README](../src/sources/jma/README.md).
 - [ ] Backfill JMA through the Ingest workflow.
 - [ ] **JODC** and **UNAM**: both need permission before their data can be republished. JODC's terms forbid passing its data to third parties without permission, and UNAM's site allows only non-profit, unaltered reproduction, publishes only a 5-day window and names no datum. Then the case-by-case rest.
