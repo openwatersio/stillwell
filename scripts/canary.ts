@@ -16,6 +16,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
+import * as cdec from "../src/sources/cdec/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
@@ -41,6 +42,8 @@ const start = new Date(end.getTime() - 3 * DAY_MS);
 const probes: Record<string, () => Promise<unknown[]>> = {
   // Cuxhaven's predicted highs and lows: the year's smaller file.
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
+  // Martinez, on the Carquinez Strait.
+  cdec: () => cdec.levels({ source_id: "MRZ" }, start, end),
   // San Francisco; live, so no metadata request for its dates.
   coops: () => coops.levels("9414290", start, end, { live: true }),
   // Fisherman's Cut in the Delta, from the tail of its file, which runs a day or two behind.
