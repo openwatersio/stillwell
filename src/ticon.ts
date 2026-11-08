@@ -120,7 +120,7 @@ const DECLARED: Record<string, { source: string; status: Status }> = {
 };
 
 const PEGELONLINE_NOTE =
-  "PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`";
+  "PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`";
 
 /**
  * Picks the replacement for one record. `lists` holds the lake's station lists
