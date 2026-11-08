@@ -45,6 +45,7 @@ const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Test",
+  contact: { url: "https://example.org/contact" },
   hourly: true,
   finalizes: true,
 };
@@ -363,6 +364,7 @@ describe("publishStations", () => {
     // sources.json carries a source's terms, not which jobs ingest runs for it.
     const [published] = JSON.parse(await readFile(sourcesPath(lake), "utf8"));
     assert.equal(published.license.id, "CC0-1.0");
+    assert.deepEqual(published.contact, { url: "https://example.org/contact" });
     for (const key of ["hourly", "finalizes", "qc", "utc_offsets", "archive"])
       assert.ok(!(key in published), key);
     const db = await (await DuckDBInstance.create(":memory:")).connect();

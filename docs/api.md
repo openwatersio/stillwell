@@ -26,7 +26,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 
 ### `GET /water-levels/sources`
 
-Each source with its operator, license, attribution line, terms URL, how often it updates, and how many stations it has.
+Each source with its operator, license, attribution line, terms URL, where to report an error in its data, how often it updates, and how many stations it has.
 
 ### `GET /water-levels/stations`
 

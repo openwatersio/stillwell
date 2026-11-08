@@ -73,7 +73,7 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  metadata: SourceMetadata; // id, name, url, license, attribution, terms, qc
+  metadata: SourceMetadata; // id, name, url, license, attribution, contact, terms, qc
   stations(previous?: Station[]): Promise<ListedStation[]>; // datum null when the source didn't say; previous is the lake's list
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed
@@ -94,7 +94,7 @@ Bucket `water-levels`, public read at `water-levels.openwaters.io`. Series whose
 
 ```
 stations.parquet                                 one row per series
-sources.json                                     license and attribution per source
+sources.json                                     license, attribution and contact per source
 errata.json                                      errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                          last 7 days, every live public station and any since retired, sorted by station then time
 obs/<source>/<station>/<year>.parquet            time, level_m, flag, source_flag, received, datum

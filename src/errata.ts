@@ -94,7 +94,7 @@ export const ERRATA: Erratum[] = [
     handling: "kept",
     lake: "History comes from the download and the last 31 days from the REST API, so the series can step by a few centimeters where one hands over to the other.",
     issue: 26,
-    reported: null,
+    reported: { date: "2026-11-07", via: "pegelonline@itzbund.de" },
     fixed: null,
   },
   {
@@ -108,7 +108,7 @@ export const ERRATA: Erratum[] = [
     handling: "kept",
     lake: "Kept as the download serves it.",
     issue: 26,
-    reported: null,
+    reported: { date: "2026-11-07", via: "pegelonline@itzbund.de" },
     fixed: null,
   },
   {

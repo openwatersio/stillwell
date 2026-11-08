@@ -30,7 +30,7 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 | [California DWR Water Data Library](https://wdl.water.ca.gov/ContinuousData.aspx) (`dwr`)                            | 15-minute stage at 50 tidal gauges in the Sacramento–San Joaquin Delta, 45 of them active, back to 1975                                                                                                                       | NAVD88 at 16 gauges, gauge zero (GZ) at the rest                                                                                | California public records, [no license stated](https://water.ca.gov/Conditions-of-Use)                                                                                                                            |
 | [SFWMD DBHYDRO](https://www.sfwmd.gov/science-data/dbhydro) (`sfwmd`)                                                | Stage at 43 tidal structure tailwaters, estuaries and bays in South Florida, 37 of them active, back to 1974 at the oldest                                                                                                    | NAVD88                                                                                                                          | Florida public records, [no license stated](https://www.sfwmd.gov/disclaimer)                                                                                                                                     |
 
-[`stations.parquet`](https://water-levels.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://water-levels.openwaters.io/sources.json) gives each source's license and the attribution it asks for.
+[`stations.parquet`](https://water-levels.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://water-levels.openwaters.io/sources.json) gives each source's license, the attribution it asks for, and where to report an error in its data (`contact`).
 
 More European agencies come next, including DMI. [docs/plan.md](docs/plan.md) has the order. Data whose source doesn't let anyone republish it, such as IOC's sea level monitoring facility and parts of GESLA, isn't in the public data. Data a source does let anyone republish is there, with `commercial_use` false on each station whose terms bar commercial use.
 
@@ -50,7 +50,7 @@ Files are laid out by product, source, station and year:
 
 ```
 stations.parquet                                      one row per station
-sources.json                                          license and attribution per source
+sources.json                                          license, attribution and contact per source
 errata.json                                           errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                               the last 7 days for every station of a source
 obs/<source>/<station>/<year>.parquet                 observed levels
