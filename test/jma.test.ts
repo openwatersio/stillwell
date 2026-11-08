@@ -255,7 +255,7 @@ describe("jma", () => {
   it("reads a mistyped day between two in sequence as the day between them", () => {
     const text = fixture("jma-final-202412CC.txt");
     const good = jma.parse(text, "CC", Date.UTC(2024, 11, 1), Flag.good);
-    // As in Sakai's October 1980 file, the 22nd is stamped the 20th.
+    // As in Saigo's October 1980 file, the 22nd is stamped the 20th.
     const lines = text.split("\n");
     lines[21] = lines[21]!.replace("241222CC", "241220CC");
     assert.notEqual(lines[21], text.split("\n")[21]);

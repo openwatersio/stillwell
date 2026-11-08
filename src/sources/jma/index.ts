@@ -372,7 +372,7 @@ export function parse(text: string, code: string, month: number, flag: Flag): Ob
     let day = dayOf(line);
     if (!(day >= 1 && day <= days) || seen.has(day)) {
       // A mistyped day between two lines stamped two days apart is the day between
-      // them: Sakai's 22 October 1980 is stamped the 20th. A copy of another line
+      // them: Saigo's 22 October 1980 is stamped the 20th. A copy of another line
       // is a repeat, not a mistyped day.
       const before = i > 0 ? dayOf(lines[i - 1]!) : NaN;
       const after = i + 1 < lines.length ? dayOf(lines[i + 1]!) : NaN;
