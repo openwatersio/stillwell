@@ -17,6 +17,12 @@ export interface RequestOptions extends RequestInit {
   base64?: boolean;
   /** Seconds to wait for each attempt, 300 by default. */
   timeout?: number;
+  /**
+   * Refuse an answer that isn't the `range` asked for (206), before reading
+   * its body, where the whole file would be too large to read by mistake.
+   * Azure answers an open-ended range (DWR's) with the whole file.
+   */
+  partial?: boolean;
 }
 
 /**
@@ -58,7 +64,7 @@ export async function getJson<T>(url: string, options?: RequestOptions): Promise
  */
 export async function fetchText(
   url: string,
-  { fresh: _, keep: __, pace, throttled, base64, timeout, ...init }: RequestOptions = {},
+  { fresh: _, keep: __, pace, throttled, base64, timeout, partial, ...init }: RequestOptions = {},
 ): Promise<string> {
   return fetchWithRetry(
     url,
@@ -67,6 +73,8 @@ export async function fetchText(
     throttled,
     base64,
     timeout,
+    4,
+    partial,
   );
 }
 
@@ -85,6 +93,7 @@ async function fetchWithRetry(
   base64 = false,
   timeout = 300,
   attempts = 4,
+  partial = false,
 ): Promise<string> {
   for (let attempt = 1; ; attempt++) {
     let status: number | string;
@@ -94,9 +103,7 @@ async function fetchWithRetry(
     try {
       // A year of RWS data is about 15 MB and can take a minute.
       const response = await fetch(url, { ...init, signal: AbortSignal.timeout(timeout * 1000) });
-      // A server that ignores Range answers 200 with the whole file, which
-      // for a large archive would be read into memory before anyone noticed.
-      if (response.status === 200 && new Headers(init.headers).has("range")) {
+      if (partial && response.status === 200) {
         await response.body?.cancel();
         throw new HttpError(`${init.method ?? "GET"} ${url} ignored its Range header`, "");
       }

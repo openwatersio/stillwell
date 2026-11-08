@@ -39,7 +39,7 @@ describe("fetchText", () => {
         ),
       )) as typeof fetch;
     await assert.rejects(
-      fetchText("https://example.test/", { headers: { range: "bytes=0-9" } }),
+      fetchText("https://example.test/", { headers: { range: "bytes=0-9" }, partial: true }),
       /ignored its Range header/,
     );
     assert.equal(read, false);

@@ -528,6 +528,8 @@ async function range(url: string, from: number, to: number): Promise<Buffer> {
     await getText(url, {
       headers: { range: `bytes=${from}-${to - 1}` },
       base64: true,
+      // A whole 7.9 GB zip sent for a range mustn't be read.
+      partial: true,
       // The URL is signed anew each time, and the cache keys by URL and body, not the range.
       fresh: true,
     }),
