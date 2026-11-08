@@ -66,4 +66,4 @@ Accepted records only, in the order to build adapters: most records first.
 - **Irish river gauges.** Marine Institute river (`mi_r`) records are `unmatched`: their dataset names no datum, so the adapter doesn't list them.
 - **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own `commercial_use` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
 
-"Ready" means a station matched, not that its history is in the lake: German records also need a PEGELONLINE backfill, which reaches 2000 at most gauges. "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
+"Ready" means a station matched. German records' PEGELONLINE history reaches back to 2000 at most, so earlier years come from GESLA's copies (`gesla`). "Planned" and "license" ids are built from codes and not yet checked against the source's station list.

@@ -92,9 +92,9 @@ alofi-598a-niu-uhslc_rq,Alofi,Niue,uhslc_rq,true,false,nu/alofi,true,2015-08-06,
 alotau-069a-png-uhslc_rq,Alotau,Papua New Guinea,uhslc_rq,true,true,pg/alotau,true,1984-09-22,1995-02-24,,uhslc,uhslc/069a,0,ready,
 alpena_mi-9075065-usa-noaa,Alpena_Mi,United States,noaa,true,true,us/alpena,true,2006-05-02,2025-07-01,noaa/9075065,coops,coops/9075065,0,ready,
 altamaha_river_near_everett_city_ga-2226160-usa-usgs,Altamaha_River_Near_Everett_City_Ga,United States,usgs,true,false,us/altamaha-river-near-everett-city-ga,true,2008-02-22,2025-05-01,,usgs,usgs/02226160,0,ready,
-altengamme-5930070-deu-wsv,Altengamme,Germany,wsv,true,true,de/altengamme,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5930070,0,ready,history needs a PEGELONLINE backfill
+altengamme-5930070-deu-wsv,Altengamme,Germany,wsv,true,true,de/altengamme,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5930070,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 altewesertg-alt-deu-cmems,AlteWeserTG,Germany,cmems,true,false,de/alte-weser,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9460040,0.01,ready,CMEMS record of a gauge the national feed publishes
-althagen-9650024-deu-wsv,Althagen,Germany,wsv,true,false,de/althagen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650024,0,ready,history needs a PEGELONLINE backfill
+althagen-9650024-deu-wsv,Althagen,Germany,wsv,true,false,de/althagen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650024,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 althagentg-alt-deu-cmems,AlthagenTG,Germany,cmems,true,false,de/althagen-mecklenburg-vorpommern,false,2020-12-12,2025-06-30,,pegelonline,pegelonline/9650024,0.57,ready,CMEMS record of a gauge the national feed publishes
 alvarado-400-mex-unam_hist,Alvarado,Mexico,unam_hist,true,true,mx/alvarado-paso-nacional-veracruz,true,1956-01-01,2016-12-31,,unam,,,license,UNAM Servicio Mareográfico terms to check
 alvarado_flotador-22-mex-unam,Alvarado_Flotador,Mexico,unam,true,false,mx/alvarado-flotador,true,2021-04-01,2024-01-01,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -129,7 +129,7 @@ andratx-and-esp-cmems,ANDRATX,Spain,cmems,true,true,es/andratx,false,2011-06-30,
 anewa_bay-048a-png-uhslc_rq,Anewa_Bay,Papua New Guinea,uhslc_rq,true,true,pg/anewa-bay,true,1968-08-05,1977-12-31,,uhslc,uhslc/048a,0.05,ready,
 angra_heroismo-215a-prt-uhslc_rq,Angra_Heroismo,Portugal,uhslc_rq,true,false,pt/angra-heroismo,true,1957-07-04,1962-08-28,,uhslc,uhslc/215a,0,ready,
 angra_heroismo-215b-prt-uhslc_rq,Angra_Heroismo,Portugal,uhslc_rq,true,true,pt/angra-heroismo,true,1976-07-31,1986-03-15,,uhslc,uhslc/215b,0,ready,
-anklam-9660001-deu-wsv,Anklam,Germany,wsv,true,true,de/anklam,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9660001,0,ready,history needs a PEGELONLINE backfill
+anklam-9660001-deu-wsv,Anklam,Germany,wsv,true,true,de/anklam,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9660001,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 annapolis-8575512-usa-noaa,Annapolis,United States,noaa,true,false,us/annapolis,true,1928-08-06,2025-06-30,noaa/8575512,coops,coops/8575512,0.15,ready,
 antalya-ant-tur-cmems,ANTALYA,Turkiye,cmems,true,false,tr/antalya-antalya,false,2020-11-26,2022-11-29,,cmems,,,restricted,GESLA lists CMEMS as research only
 antalya-ant-tur-eseas,Antalya,Turkiye,eseas,true,true,tr/antalya,true,1935-06-08,1948-07-28,,eseas,,,license,Terms not reviewed
@@ -232,8 +232,8 @@ baiedulazarettg_10minute-bai-fra-cmems,BaieDuLazaretTG_10minute,France,cmems,tru
 bailey_creek_at_dock_landing_rd_at_chesapeake_va-204288905-usa-usgs,Bailey_Creek_At_Dock_Landing_Rd_At_Chesapeake_Va,United States,usgs,true,true,us/bailey-creek-at-dock-landing-rd-at-chesapeake-va,true,2015-04-14,2025-04-30,,usgs,usgs/0204288905,0,ready,
 bajor-414a-idn-uhslc_rq,Bajor,Indonesia,uhslc_rq,true,true,id/bajor,true,1943-01-05,1944-11-30,,uhslc,uhslc/414a,0.05,ready,
 bakar-bak-hrv-uz,Bakar,Croatia,uz,true,true,hr/bakar,false,1929-12-05,2021-12-31,,gesla,,,restricted,GESLA lists UZ as research only
-bakea-9510063-deu-wsv,Bakea,Germany,wsv,true,true,de/bakea,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510063,0.19,ready,history needs a PEGELONLINE backfill
-bakez-9510066-deu-wsv,Bakez,Germany,wsv,true,false,de/bakez,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510066,0.19,ready,history needs a PEGELONLINE backfill
+bakea-9510063-deu-wsv,Bakea,Germany,wsv,true,true,de/bakea,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510063,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+bakez-9510066-deu-wsv,Bakez,Germany,wsv,true,false,de/bakez,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510066,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 balboa-302-pan-uhslc_fd,Balboa,Panama,uhslc_fd,true,true,pa/balboa-panama,true,1907-06-19,2018-03-31,,uhslc,uhslc/302,0.34,ready,
 balboa-302a-pan-uhslc_rq,Balboa,Panama,uhslc_rq,true,false,pa/balboa-panama,true,1907-06-19,2018-12-31,,uhslc,uhslc/302,0.03,ready,
 balchik-bal-bgr-cmems,Balchik,Bulgaria,cmems,true,true,bg/balchik,false,2015-05-01,2021-11-30,,cmems,,,restricted,GESLA lists CMEMS as research only
@@ -268,7 +268,7 @@ barbers_point_hi-547a-usa-uhslc_rq,Barbers_Point_HI,United States,uhslc_rq,true,
 barbuda-9761115-usa-noaa,Barbuda,United States,noaa,true,false,ag/barbuda,true,2011-06-10,2015-10-07,noaa/9761115,coops,coops/9761115,0,ready,
 barcelona_ny-9063032-usa-noaa,Barcelona_Ny,United States,noaa,true,false,us/barcelona,true,1960-08-30,2019-10-20,noaa/9063032,coops,coops/9063032,0,ready,
 barcelonatg-bar-esp-cmems,BarcelonaTG,Spain,cmems,true,true,es/barcelona-catalonia,false,1993-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
-barhft-9650040-deu-wsv,Barhft,Germany,wsv,true,true,de/barhft,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650040,0,ready,history needs a PEGELONLINE backfill
+barhft-9650040-deu-wsv,Barhft,Germany,wsv,true,true,de/barhft,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650040,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 barhoefttg-bar-deu-cmems,BarhoeftTG,Germany,cmems,true,true,de/barhoeft,false,2020-12-12,2025-06-30,,pegelonline,pegelonline/9650040,0.58,ready,CMEMS record of a gauge the national feed publishes
 bari-bar-ita-ispra,Bari,Italy,ispra,true,true,it/bari,true,1979-02-17,2025-07-06,,ispra,,,license,
 barmouth-bar-gbr-cmems,Barmouth,United Kingdom,cmems,true,true,gb/barmouth,false,1991-10-11,2025-06-30,,ea,ea/E73239,0.84,ready,The EA's real-time readings of the gauge
@@ -285,7 +285,7 @@ barnegat_pier-8533141-usa-noaa,Barnegat_Pier,United States,noaa,true,false,us/ba
 barron_river_at_everglades_city_fl-2290928-usa-usgs,Barron_River_At_Everglades_City_Fl,United States,usgs,true,true,us/barron-river-at-everglades-city-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02290928,0,ready,
 barseback-2099-swe-smhi,Barseback,Sweden,smhi,true,true,se/barseback,true,1982-04-26,2025-07-02,,smhi,smhi/2099,0,ready,
 barseback-bar-swe-cmems,Barseback,Sweden,cmems,true,false,se/barseback,false,1982-04-26,2025-07-01,,smhi,smhi/2099,0,ready,CMEMS record of a gauge the national feed publishes
-barth-9650030-deu-wsv,Barth,Germany,wsv,true,false,de/barth,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650030,0,ready,history needs a PEGELONLINE backfill
+barth-9650030-deu-wsv,Barth,Germany,wsv,true,false,de/barth,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650030,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 base_prat-730-chl-uhslc_fd,Base_Prat,Chile,uhslc_fd,true,false,cl/base-prat,true,2010-03-09,2025-02-28,,uhslc,uhslc/730,0.53,ready,
 base_prat-730a-chl-uhslc_rq,Base_Prat,Chile,uhslc_rq,true,true,cl/base-prat,true,1984-03-08,2002-12-31,,uhslc,uhslc/730a,0.04,ready,
 base_prat-730b-chl-uhslc_rq,Base_Prat,Chile,uhslc_rq,true,false,cl/base-prat,true,2009-02-14,2018-12-31,,uhslc,uhslc/730,0.03,ready,
@@ -330,7 +330,7 @@ bella_coola_bc-8937-can-meds,Bella_Coola_BC,Canada,meds,true,true,ca/bella-coola
 belle_river_ontario-11965-can-meds,Belle_River_Ontario,Canada,meds,true,false,ca/belle-river,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 belledune-2145-can-meds,Belledune,Canada,meds,true,true,ca/belledune,true,1964-07-15,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 bells_mill_crk_at_bells_mill_rd_at_chesapeake_va-204288539-usa-usgs,Bells_Mill_Crk_At_Bells_Mill_Rd_At_Chesapeake_Va,United States,usgs,true,true,us/bells-mill-crk-at-bells-mill-rd-at-chesapeake-va,true,2015-04-15,2025-04-30,,usgs,usgs/0204288539,0,ready,
-belum-5980060-deu-wsv,Belum,Germany,wsv,true,true,de/belum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980060,0.19,ready,history needs a PEGELONLINE backfill
+belum-5980060-deu-wsv,Belum,Germany,wsv,true,true,de/belum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980060,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 bennett_aos_dock-8661989-usa-noaa,Bennett_Aos_Dock,United States,noaa,true,false,us/bennet-s-dock,true,1975-08-01,1977-02-15,noaa/8661989,coops,coops/8661989,0,ready,
 benoa-163-idn-uhslc_fd,Benoa,Indonesia,uhslc_fd,true,true,id/benoa,true,2006-01-24,2025-06-30,,uhslc,uhslc/163,0.16,ready,
 benoa-163a-idn-uhslc_rq,Benoa,Indonesia,uhslc_rq,true,false,id/benoa,true,1988-04-29,2004-12-29,,uhslc,uhslc/163a,0,ready,
@@ -351,7 +351,7 @@ bermuda-2695540-usa-noaa,Bermuda,United States,noaa,true,false,bm/st-georges-isl
 bermuda_biological_station-2695535-usa-noaa,Bermuda_Biological_Station,United States,noaa,true,false,bm/ferry-reach-biological-station,true,1968-01-10,2025-06-30,noaa/2695535,coops,coops/2695535,0.07,ready,
 berwick-8764044-usa-noaa,Berwick,United States,noaa,true,false,us/tesoro-marine-terminal,true,2003-07-25,2025-06-30,noaa/8764044,coops,coops/8764044,0,ready,
 bethany_beach_canal_at_bethany_beach_de-1484689-usa-usgs,Bethany_Beach_Canal_At_Bethany_Beach_De,United States,usgs,true,true,us/bethany-beach-canal-at-bethany-beach-de,true,2023-09-22,2025-05-01,,usgs,usgs/01484689,0,ready,
-bhvalterleuchtturm-4990010-deu-wsv,Bhvalterleuchtturm,Germany,wsv,true,true,de/bhvalterleuchtturm,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4990010,0.19,ready,history needs a PEGELONLINE backfill
+bhvalterleuchtturm-4990010-deu-wsv,Bhvalterleuchtturm,Germany,wsv,true,true,de/bhvalterleuchtturm,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4990010,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 big_bay_stuart_island-8060-can-meds,Big_Bay_Stuart_Island,Canada,meds,true,true,ca/big-bay-stuart-island,true,1950-09-09,1951-09-15,,chs,,,restricted,CHS license bars commercial derivatives
 big_lagoon-8729909-usa-noaa,Big_Lagoon,United States,noaa,true,false,us/big-lagoon,true,1977-01-21,1994-03-30,noaa/8729909,coops,coops/8729909,0,ready,
 bilbaotg-bil-esp-cmems,BilbaoTG,Spain,cmems,true,true,es/bilbao,false,1992-07-02,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
@@ -410,10 +410,10 @@ booby_island-336a-aus-uhslc_rq,Booby_Island,Australia,uhslc_rq,true,false,au/boo
 booby_island-58230-aus-bom,Booby_Island,Australia,bom,true,false,au/booby-island-ticon-booby-island-58230-aus-bom,true,1970-02-17,2022-12-30,,bom,,,license,BOM license not stated
 bordeaux-196-fra-refmar,Bordeaux,France,refmar,true,true,fr/bordeaux,true,1975-02-06,2015-12-31,,refmar,refmar/196,0,ready,
 bordeauxtg_60minute-bor-fra-cmems,BordeauxTG_60minute,France,cmems,true,false,fr/bordeaux,false,1975-02-06,2015-12-31,,refmar,refmar/196,0,ready,CMEMS record of a gauge the national feed publishes
-borgfeld-4940010-deu-wsv,Borgfeld,Germany,wsv,true,true,de/borgfeld,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940010,0.18,ready,history needs a PEGELONLINE backfill
-borkum_fischerbalje-bor-deu-bfg,Borkum_Fischerbalje,Germany,bfg,true,false,de/borkum-fischerbalje,true,1996-10-01,2024-06-12,,pegelonline,pegelonline/9340020,0.01,ready,history needs a PEGELONLINE backfill
-borkumfischerbalje-9340020-deu-wsv,Borkumfischerbalje,Germany,wsv,true,true,de/borkumfischerbalje,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9340020,0.18,ready,history needs a PEGELONLINE backfill
-borkumsdstrand-9340030-deu-wsv,Borkumsdstrand,Germany,wsv,true,true,de/borkumsdstrand,true,2000-01-03,2025-07-13,,pegelonline,pegelonline/9340030,0.18,ready,history needs a PEGELONLINE backfill
+borgfeld-4940010-deu-wsv,Borgfeld,Germany,wsv,true,true,de/borgfeld,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+borkum_fischerbalje-bor-deu-bfg,Borkum_Fischerbalje,Germany,bfg,true,false,de/borkum-fischerbalje,true,1996-10-01,2024-06-12,,pegelonline,pegelonline/9340020,0.01,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+borkumfischerbalje-9340020-deu-wsv,Borkumfischerbalje,Germany,wsv,true,true,de/borkumfischerbalje,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9340020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+borkumsdstrand-9340030-deu-wsv,Borkumsdstrand,Germany,wsv,true,true,de/borkumsdstrand,true,2000-01-03,2025-07-13,,pegelonline,pegelonline/9340030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 borkumtg-bor-deu-cmems,BorkumTG,Germany,cmems,true,false,de/borkum,false,2014-01-02,2025-06-30,,pegelonline,pegelonline/9340020,0.05,ready,CMEMS record of a gauge the national feed publishes
 boston-8443970-usa-noaa,Boston,United States,noaa,true,false,us/boston,true,1921-05-03,2025-06-30,noaa/8443970,coops,coops/8443970,0.28,ready,
 boston_charlestown_navy_yard_massachussets-8443838-usa-da_sat,Boston_Charlestown_Navy_Yard_Massachussets,United States,da_sat,true,false,us/boston-charlestown-navy-yard,true,1867-09-01,1877-01-01,,da_sat,,,license,Terms not reviewed
@@ -430,7 +430,7 @@ bowen-59320-aus-bom,Bowen,Australia,bom,true,true,au/bowen,true,1986-11-19,2022-
 boynton_beach-8722706-usa-noaa,Boynton_Beach,United States,noaa,true,false,us/boynton-beach,true,1970-04-16,1973-11-02,noaa/8722706,coops,coops/8722706,0,ready,
 bozyazi-boz-tur-cmems,BOZYAZI,Turkiye,cmems,true,true,tr/bozyazi,false,2020-12-07,2022-11-29,,cmems,,,restricted,GESLA lists CMEMS as research only
 bradmoor_island-9414811-usa-noaa,Bradmoor_Island,United States,noaa,true,false,us/bradmoor-island,true,2004-04-01,2005-07-31,noaa/9414811,coops,coops/9414811,0,ready,
-brake-4970020-deu-wsv,Brake,Germany,wsv,true,true,de/brake,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970020,0.18,ready,history needs a PEGELONLINE backfill
+brake-4970020-deu-wsv,Brake,Germany,wsv,true,true,de/brake,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 brandywine_shoal_light-8555889-usa-noaa,Brandywine_Shoal_Light,United States,noaa,true,false,us/brandywine-shoal-light,true,1984-03-18,2025-06-30,noaa/8555889,coops,coops/8555889,0.05,ready,
 brays_bayou-bra-usa-hct,Brays_Bayou,United States,hct,true,false,us/brays-bayou,true,1987-07-29,2024-10-19,,hct,,,license,Terms not reviewed
 brays_bayou_at_gessner_dr_houston_tx-8074810-usa-usgs,Brays_Bayou_At_Gessner_Dr_Houston_Tx,United States,usgs,true,false,us/brays-bayou-at-gessner-dr-houston-tx,true,2007-10-01,2025-04-30,,usgs,usgs/08074810,0,ready,
@@ -440,11 +440,11 @@ brazos_rv_at_giww_flood_gates_nr_freeport_tx-8117300-usa-usgs,Brazos_Rv_At_Giww_
 brazos_rv_nr_rosharon_tx-8116650-usa-usgs,Brazos_Rv_Nr_Rosharon_Tx,United States,usgs,true,false,us/brazos-rv-nr-rosharon-tx,true,2007-10-01,2025-04-30,,usgs,usgs/08116650,0,ready,
 brazos_rv_nr_west_columbia_tx-8116850-usa-usgs,Brazos_Rv_Nr_West_Columbia_Tx,United States,usgs,true,false,us/brazos-rv-nr-west-columbia-tx,true,2017-07-12,2025-04-30,,usgs,usgs/08116850,0,ready,
 bregaillontg_10minute-bre-fra-cmems,BregaillonTG_10minute,France,cmems,true,true,fr/bregaillon,false,2013-10-17,2018-04-09,,refmar,refmar/5051,0,ready,CMEMS record of a gauge the national feed publishes
-breitenberg-5970038-deu-wsv,Breitenberg,Germany,wsv,true,true,de/breitenberg,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970038,0,ready,history needs a PEGELONLINE backfill
+breitenberg-5970038-deu-wsv,Breitenberg,Germany,wsv,true,true,de/breitenberg,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970038,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 brementg-bre-deu-cmems,BremenTG,Germany,cmems,true,false,de/bremen,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/4910060,0.03,ready,CMEMS record of a gauge the national feed publishes
 bremer_bay-bbbre01-aus-bom,Bremer_Bay,Australia,bom,true,true,au/bremer-bay,true,1998-09-11,2022-12-31,,bom,,,license,BOM license not stated
 bremerhaventg-bre-deu-cmems,BremerhavenTG,Germany,cmems,true,false,de/bremerhaven,false,2014-01-02,2025-06-30,,pegelonline,pegelonline/4990010,0.01,ready,CMEMS record of a gauge the national feed publishes
-bremervrdeuw-5980010-deu-wsv,Bremervrdeuw,Germany,wsv,true,true,de/bremervrdeuw,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980010,0.19,ready,history needs a PEGELONLINE backfill
+bremervrdeuw-5980010-deu-wsv,Bremervrdeuw,Germany,wsv,true,true,de/bremervrdeuw,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980010,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 breskens-bresks-nld-rws_hist,Breskens,Netherlands,rws_hist,true,false,nl/breskens,true,1973-12-31,1987-01-02,,rws,rws/breskens,0,ready,
 brest-3-fra-refmar,Brest,France,refmar,true,false,fr/brest,true,1846-01-04,2025-03-31,,refmar,refmar/3,0,ready,
 brest-822-fra-uhslc_fd,Brest,France,uhslc_fd,true,true,fr/brest-brittany,true,1846-01-04,2025-06-30,,uhslc,uhslc/822,0.37,ready,
@@ -468,7 +468,7 @@ broad_river_near_the_cutoff_fl-2290878-usa-usgs,Broad_River_Near_The_Cutoff_Fl,U
 brockville_ontario-14400-can-meds,Brockville_Ontario,Canada,meds,true,true,ca/brockville,true,1980-05-06,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 brofjorden-bro-swe-cmems,Brofjorden,Sweden,cmems,true,false,se/brofjorden,false,2019-07-01,2025-07-01,,smhi,smhi/35109,0.01,ready,CMEMS record of a gauge the national feed publishes
 brofjorden_sjov-35109-swe-smhi,Brofjorden_Sjov,Sweden,smhi,true,true,se/brofjorden-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35109,0.01,ready,
-brokdorf-5970050-deu-wsv,Brokdorf,Germany,wsv,true,true,de/brokdorf,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970050,0,ready,history needs a PEGELONLINE backfill
+brokdorf-5970050-deu-wsv,Brokdorf,Germany,wsv,true,true,de/brokdorf,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970050,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 bronstg-bro-dnk-cmems,BronsTG,Denmark,cmems,true,false,dk/brons,false,2015-01-12,2025-05-31,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 broome-166-aus-uhslc_fd,Broome,Australia,uhslc_fd,true,true,au/broome,true,1986-07-12,2025-05-31,,uhslc,uhslc/166,0.23,restricted,The contributor's terms bar commercial use
 broome-166a-aus-uhslc_rq,Broome,Australia,uhslc_rq,true,false,au/broome,true,1986-07-12,2021-12-31,,uhslc,uhslc/166,0.05,restricted,The contributor's terms bar commercial use
@@ -482,11 +482,11 @@ brouwershavensegat8tg-bro-nld-cmems,Brouwershavensegat8TG,Netherlands,cmems,true
 brouwershavensegattg-bro-nld-cmems,BrouwershavensegatTG,Netherlands,cmems,true,false,nl/brouwershavensegat-zeeland,false,2021-09-13,2025-06-30,,rws,rws/brouwersdam.brouwershavensegat.2,0.11,ready,CMEMS record of a gauge the national feed publishes
 broward_river_bl_biscayne_blvd_nr_jacksonville_fl-2246751-usa-usgs,Broward_River_Bl_Biscayne_Blvd_Nr_Jacksonville_Fl,United States,usgs,true,true,us/broward-river-bl-biscayne-blvd-nr-jacksonville-fl,true,2015-09-29,2025-04-30,,usgs,usgs/02246751,0,ready,
 bruinisse_zijpe-bruinse-nld-rws_hist,Bruinisse_Zijpe,Netherlands,rws_hist,true,false,nl/bruinisse-zijpe,true,1936-01-01,1986-04-05,,rws,rws/bruinisse,0,ready,
-brunsbttelmpm-5970094-deu-wsv,Brunsbttelmpm,Germany,wsv,true,true,de/brunsbttelmpm,true,2018-09-13,2025-07-12,,pegelonline,pegelonline/5970094,0.19,ready,history needs a PEGELONLINE backfill
+brunsbttelmpm-5970094-deu-wsv,Brunsbttelmpm,Germany,wsv,true,true,de/brunsbttelmpm,true,2018-09-13,2025-07-12,,pegelonline,pegelonline/5970094,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 brunswick_heads-202403-aus-bom,Brunswick_Heads,Australia,bom,true,true,au/brunswick-heads,true,1986-02-25,2023-12-31,,bom,,,license,BOM license not stated
 brunswick_river_at_st_simons_island_ga-2226180-usa-usgs,Brunswick_River_At_St_Simons_Island_Ga,United States,usgs,true,true,us/brunswick-river-at-st-simons-island-ga,true,2007-10-01,2025-05-01,,usgs,usgs/02226180,0,ready,
 bruraviktg-bru-nor-cmems,BruravikTG,Norway,cmems,true,false,no/bruravik,false,2022-11-25,2025-06-30,,kartverket,kartverket/BRJ,0,ready,CMEMS record of a gauge the national feed publishes
-bsum-9510095-deu-wsv,Bsum,Germany,wsv,true,true,de/busum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510095,0.19,ready,history needs a PEGELONLINE backfill
+bsum-9510095-deu-wsv,Bsum,Germany,wsv,true,true,de/busum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510095,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 bucksport-8661139-usa-noaa,Bucksport,United States,noaa,true,false,us/bucksport,true,1986-02-04,1990-12-28,noaa/8661139,coops,coops/8661139,0,ready,
 buenaventura-085a-col-uhslc_rq,Buenaventura,Colombia,uhslc_rq,true,true,co/buenaventura,true,1953-05-12,2014-12-31,,uhslc,uhslc/085a,0.03,ready,
 buenos_aires-285a-arg-uhslc_rq,Buenos_Aires,Argentina,uhslc_rq,true,true,ar/buenos-aires,true,1905-01-01,1961-12-31,,uhslc,uhslc/285a,0.03,ready,
@@ -512,8 +512,8 @@ burnie-344a-aus-uhslc_rq,Burnie,Australia,uhslc_rq,true,false,au/burnie,true,199
 burnie-60910-aus-bom,Burnie,Australia,bom,true,true,au/burnie-tasmania,true,1952-07-15,2022-12-31,,bom,,,license,BOM license not stated
 burwell_bay-8638421-usa-noaa,Burwell_Bay,United States,noaa,true,false,us/burwell-bay,true,1971-06-09,1972-06-29,noaa/8638421,coops,coops/8638421,0,ready,
 busselton_port_geographe-bsgeo01-aus-bom,Busselton_Port_Geographe,Australia,bom,true,true,au/busselton-port-geographe,true,2002-06-12,2022-12-31,,bom,,,license,BOM license not stated
-buttelerhrne-4960060-deu-wsv,Buttelerhrne,Germany,wsv,true,true,de/buttelerhorne,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960060,0.18,ready,history needs a PEGELONLINE backfill
-buxtehude-5950080-deu-wsv,Buxtehude,Germany,wsv,true,true,de/buxtehude,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5950080,0,ready,history needs a PEGELONLINE backfill
+buttelerhrne-4960060-deu-wsv,Buttelerhrne,Germany,wsv,true,true,de/buttelerhorne,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960060,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+buxtehude-5950080-deu-wsv,Buxtehude,Germany,wsv,true,true,de/buxtehude,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5950080,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 bypass_canal_at_intl_parkway_near_mapleton_va-2042928-usa-usgs,Bypass_Canal_At_Intl_Parkway_Near_Mapleton_Va,United States,usgs,true,true,us/bypass-canal-at-intl-parkway-near-mapleton-va,true,2018-02-27,2025-04-30,,usgs,usgs/02042928,0,ready,
 c_and_d_canal_nr_delaware_city_de-1482695-usa-usgs,C_And_D_Canal_Nr_Delaware_City_De,United States,usgs,true,true,us/c-and-d-canal-nr-delaware-city-de,true,2020-06-20,2025-04-30,,usgs,usgs/01482695,0,ready,
 cabo_san_lucas-034-mex-uhslc_fd,Cabo_San_Lucas,Mexico,uhslc_fd,true,true,mx/cabo-san-lucas,true,1973-06-12,2014-09-14,,uhslc,uhslc/034,0.03,ready,
@@ -802,7 +802,7 @@ coyote_c_nr_alviso_ca-372750122012701-usa-usgs,Coyote_C_Nr_Alviso_Ca,United Stat
 coyote_creek-9414575-usa-noaa,Coyote_Creek,United States,noaa,true,false,us/coyote-creek,true,1983-11-03,2018-10-31,noaa/9414575,coops,coops/9414575,0,ready,
 coyote_creek_tam_valley-coy-usa-cm,Coyote_Creek_Tam_Valley,United States,cm,true,true,us/coyote-creek-tam-valley,true,2021-09-24,2024-12-05,,cm,,,license,Terms not reviewed
 crabtree_swamp_at_conway_sc-2110701-usa-usgs,Crabtree_Swamp_At_Conway_Sc,United States,usgs,true,true,us/crabtree-swamp-at-conway-sc,true,2014-01-10,2025-04-30,,usgs,usgs/02110701,0,ready,
-cranz-5950070-deu-wsv,Cranz,Germany,wsv,true,true,de/cranz,true,2000-11-01,2025-07-12,,pegelonline,pegelonline/5950070,0,ready,history needs a PEGELONLINE backfill
+cranz-5950070-deu-wsv,Cranz,Germany,wsv,true,true,de/cranz,true,2000-11-01,2025-07-12,,pegelonline,pegelonline/5950070,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 crescent_beach-8720651-usa-noaa,Crescent_Beach,United States,noaa,true,false,us/crescent-beach-matanzas-river,true,1999-04-01,2005-01-31,noaa/8720651,coops,coops/8720651,0,ready,
 crescent_city-9419750-usa-noaa,Crescent_City,United States,noaa,true,false,us/crescent-city,true,1933-04-11,2025-06-30,noaa/9419750,coops,coops/9419750,0,ready,
 crescent_city_ca-556-usa-uhslc_fd,Crescent_City_CA,United States,uhslc_fd,true,false,us/crescent-city,true,1933-04-11,2025-06-30,,uhslc,uhslc/556,0.02,ready,
@@ -1167,13 +1167,13 @@ cutler_farris_wharf-8411060-usa-noaa,Cutler_Farris_Wharf,United States,noaa,true
 cutler_naval_base-8411250-usa-noaa,Cutler_Naval_Base,United States,noaa,true,false,us/cutler-naval-radio-station,true,1979-03-01,2010-11-11,noaa/8411250,coops,coops/8411250,0,ready,
 cuxhaven-825-deu-uhslc_fd,Cuxhaven,Germany,uhslc_fd,true,true,de/cuxhaven,true,1917-12-29,2025-06-30,,uhslc,uhslc/825,0.04,ready,
 cuxhaven-825a-deu-uhslc_rq,Cuxhaven,Germany,uhslc_rq,true,false,de/cuxhaven,true,1917-12-29,2023-07-11,,uhslc,uhslc/825,0.04,ready,
-cuxhaven_steubenhoft-cux-deu-bfg,Cuxhaven_Steubenhoft,Germany,bfg,true,false,de/cuxhaven-steubenhoft,true,1917-12-29,2024-06-19,,pegelonline,pegelonline/5990020,0.01,ready,history needs a PEGELONLINE backfill
-cuxhavensteubenhft-5990020-deu-wsv,Cuxhavensteubenhft,Germany,wsv,true,false,de/cuxhavensteubenhft,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5990020,0.19,ready,history needs a PEGELONLINE backfill
+cuxhaven_steubenhoft-cux-deu-bfg,Cuxhaven_Steubenhoft,Germany,bfg,true,false,de/cuxhaven-steubenhoft,true,1917-12-29,2024-06-19,,pegelonline,pegelonline/5990020,0.01,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+cuxhavensteubenhft-5990020-deu-wsv,Cuxhavensteubenhft,Germany,wsv,true,false,de/cuxhavensteubenhft,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5990020,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 cuxhaventg-cux-deu-cmems,CuxhavenTG,Germany,cmems,true,false,de/cuxhaven-ticon-cuxhaventg-cux-deu-cmems,false,2014-05-05,2025-06-30,,pegelonline,pegelonline/5990020,0.01,ready,CMEMS record of a gauge the national feed publishes
 cygnus_cordelia_slough-cyg-usa-cdwr,Cygnus_Cordelia_Slough,United States,cdwr,true,true,us/cygnus-cordelia-slough,true,2010-04-29,2025-05-24,,cdec,cdec/CYG,0,ready,
 cypremort_point-8765251-usa-noaa,Cypremort_Point,United States,noaa,true,false,us/cypremort-point,true,2005-08-08,2010-11-10,noaa/8765251,coops,coops/8765251,0,ready,
 d151tg-d15-nld-cmems,D151TG,Netherlands,cmems,true,true,nl/d151,false,2014-07-30,2025-06-30,,rws,rws/d15,1.01,ready,CMEMS record of a gauge the national feed publishes
-dagebll-9570040-deu-wsv,Dagebll,Germany,wsv,true,true,de/dagebll,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570040,0.2,ready,history needs a PEGELONLINE backfill
+dagebll-9570040-deu-wsv,Dagebll,Germany,wsv,true,true,de/dagebll,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570040,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 dagebuelltg-dag-deu-cmems,DagebuellTG,Germany,cmems,true,false,de/dagebuell,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9570040,0.05,ready,CMEMS record of a gauge the national feed publishes
 dahlgren-8635027-usa-noaa,Dahlgren,United States,noaa,true,false,us/dahlgren,true,2015-09-23,2025-06-30,noaa/8635027,coops,coops/8635027,0,ready,
 dainikaiho-3002-jpn-jodc_pahb,Dainikaiho,Japan,jodc_pahb,true,true,jp/dainikaiho,true,2010-12-31,2020-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
@@ -1269,7 +1269,7 @@ dover-dov-gbr-cmems,Dover,United Kingdom,cmems,true,false,gb/dover-england,false
 draghallan-2062-swe-smhi,Draghallan,Sweden,smhi,true,true,se/draghallan,true,1897-10-10,1969-06-01,,smhi,,,unmatched,No smhi/2062 in the list
 draghallan-dra-swe-cmems,Draghallan,Sweden,cmems,true,false,se/draghallan,false,1897-10-10,1969-06-01,,smhi,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name"
 dragor-dra-dnk-cmems,Dragor,Denmark,cmems,true,true,dk/dragor,false,2011-07-06,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-dreyschloot-3880010-deu-wsv,Dreyschloot,Germany,wsv,true,false,de/dreyschloot,true,2000-01-21,2025-07-13,,pegelonline,pegelonline/3880010,0.18,ready,history needs a PEGELONLINE backfill
+dreyschloot-3880010-deu-wsv,Dreyschloot,Germany,wsv,true,false,de/dreyschloot,true,2000-01-21,2025-07-13,,pegelonline,pegelonline/3880010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 drogden-dro-dnk-cmems,Drogden,Denmark,cmems,true,true,dk/drogden,false,1992-03-16,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 dry_dock_mi-9014087-usa-noaa,Dry_Dock_Mi,United States,noaa,true,true,us/dry-dock,true,1970-01-01,2025-07-01,noaa/9014087,coops,coops/9014087,0,ready,
 dublin_port-dub-irl-mi_c,Dublin_Port,Ireland,mi_c,true,true,ie/dublin-port,true,2007-03-20,2025-07-23,,marine-institute,marine-institute/dublin-port,0,ready,
@@ -1277,7 +1277,7 @@ dublinport-dub-irl-cmems,DublinPort,Ireland,cmems,true,false,ie/dublin-port,fals
 duck-8651370-usa-noaa,Duck,United States,noaa,true,false,us/duck,true,1978-06-01,2025-06-30,noaa/8651370,coops,coops/8651370,0,ready,
 duck_pier_nc-260-usa-uhslc_fd,Duck_Pier_NC,United States,uhslc_fd,true,false,us/duck,true,1978-06-01,2025-06-30,,uhslc,uhslc/260,0.6,ready,
 duck_pier_nc-260a-usa-uhslc_rq,Duck_Pier_NC,United States,uhslc_rq,true,false,us/duck,true,1978-06-01,2021-12-31,noaa/8651370,coops,coops/8651370,0.04,ready,UHSLC relay of noaa/8651370
-dukegat-3990020-deu-wsv,Dukegat,Germany,wsv,true,true,de/dukegat,true,2000-01-13,2025-07-13,,pegelonline,pegelonline/3990020,0.18,ready,history needs a PEGELONLINE backfill
+dukegat-3990020-deu-wsv,Dukegat,Germany,wsv,true,true,de/dukegat,true,2000-01-13,2025-07-13,,pegelonline,pegelonline/3990020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 duluth_mn-9099064-usa-noaa,Duluth_Mn,United States,noaa,true,true,us/duluth,true,1970-01-01,2025-07-01,noaa/9099064,coops,coops/9099064,0,ready,
 dumbarton_bridge-9414509-usa-noaa,Dumbarton_Bridge,United States,noaa,true,false,us/dumbarton-highway-bridge,true,1996-03-15,2011-09-30,noaa/9414509,coops,coops/9414509,0,ready,
 dumbarton_railroad_bridge-9414510-usa-noaa,Dumbarton_Railroad_Bridge,United States,noaa,true,true,us/dumbarton-railroad-bridge,true,1983-05-11,1985-05-09,noaa/9414510,coops,coops/9414510,0,ready,
@@ -1305,7 +1305,7 @@ dutch_harbor_ak-041b-usa-uhslc_rq,Dutch_Harbor_AK,United States,uhslc_rq,true,fa
 dutch_slough_at_jersey_island-dsj-usa-cdwr,Dutch_Slough_At_Jersey_Island,United States,cdwr,true,false,us/dutch-slough-at-jersey-island,true,2003-09-19,2025-05-24,,cdec,,,unmatched,No cdec/DSJ in the list
 dutch_slough_bl_jersey_island_rd_a_jersey_island-11313433-usa-usgs,Dutch_Slough_Bl_Jersey_Island_Rd_A_Jersey_Island,United States,usgs,true,true,us/dutch-slough-bl-jersey-island-rd-a-jersey-island,true,2007-10-01,2025-05-06,,usgs,usgs/11313433,0,ready,
 duwamish_river_at_golf_course_at_tukwila_wa-12113390-usa-usgs,Duwamish_River_At_Golf_Course_At_Tukwila_Wa,United States,usgs,true,true,us/duwamish-river-at-golf-course-at-tukwila-wa,true,2013-11-26,2025-04-30,,usgs,usgs/12113390,0,ready,
-dwarsgat-9460020-deu-wsv,Dwarsgat,Germany,wsv,true,true,de/dwarsgat,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460020,0.19,ready,history needs a PEGELONLINE backfill
+dwarsgat-9460020-deu-wsv,Dwarsgat,Germany,wsv,true,true,de/dwarsgat,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460020,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 dzaoudzi-155-fra-uhslc_fd,Dzaoudzi,France,uhslc_fd,true,true,fr/dzaoudzi,true,1963-10-17,2024-12-14,,uhslc,uhslc/155,0.24,ready,
 dzaoudzi-155a-fra-uhslc_rq,Dzaoudzi,France,uhslc_rq,true,false,fr/dzaoudzi,true,1963-10-17,2018-12-31,,uhslc,uhslc/155,0.05,ready,
 dzaoudzi-30-fra-refmar,Dzaoudzi,France,refmar,true,false,fr/dzaoudzi-ticon-dzaoudzi-30-fra-refmar,true,1963-10-16,2024-10-27,,refmar,refmar/30,0,ready,
@@ -1338,7 +1338,7 @@ eastport_me-740a-usa-uhslc_rq,Eastport_ME,United States,uhslc_rq,true,false,us/e
 eatons_neck-8515786-usa-noaa,Eatons_Neck,United States,noaa,true,false,us/eatons-neck,true,1995-04-25,2007-05-02,noaa/8515786,coops,coops/8515786,0,ready,
 eb_elizabeth_river_at_rt_165_at_virginia_beach_va-204288721-usa-usgs,Eb_Elizabeth_River_At_Rt_165_At_Virginia_Beach_Va,United States,usgs,true,true,us/eb-elizabeth-river-at-rt-165-at-virginia-beach-va,true,2016-04-21,2025-04-30,,usgs,usgs/0204288721,0,ready,
 eckernfoerdetg-eck-deu-cmems,EckernfoerdeTG,Germany,cmems,true,false,de/eckernfoerde,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610045,0.07,ready,CMEMS record of a gauge the national feed publishes
-eckernfrde-9610045-deu-wsv,Eckernfrde,Germany,wsv,true,true,de/eckernfrde,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610045,0,ready,history needs a PEGELONLINE backfill
+eckernfrde-9610045-deu-wsv,Eckernfrde,Germany,wsv,true,true,de/eckernfrde,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610045,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 econfina_rv_at_econfina_rv_state_park_nr_perry_fl-2326050-usa-usgs,Econfina_Rv_At_Econfina_Rv_State_Park_Nr_Perry_Fl,United States,usgs,true,true,us/econfina-rv-at-econfina-rv-state-park-nr-perry-fl,true,2021-03-05,2025-04-30,,usgs,usgs/02326050,0,ready,
 edamtg-eda-nld-cmems,EdamTG,Netherlands,cmems,true,false,nl/edam,false,2014-07-30,2025-06-30,,rws,rws/edam,0.11,ready,CMEMS record of a gauge the national feed publishes
 eden-60530-aus-bom,Eden,Australia,bom,true,true,au/eden,true,1957-11-04,2022-12-31,,bom,,,license,BOM license not stated
@@ -1349,8 +1349,8 @@ eemshaven-eemshvn-nld-rws_hist,Eemshaven,Netherlands,rws_hist,true,false,nl/eems
 eemshaven_doekegat-eemshvdkgt-nld-rws_hist,Eemshaven_Doekegat,Netherlands,rws_hist,true,false,nl/eemshaven-doekegat,true,1983-01-01,1986-12-31,,rws,rws/eemshaven.doekegat,0,ready,
 eemshaventg-eem-nld-cmems,EemshavenTG,Netherlands,cmems,true,true,nl/eemshaven-ticon-eemshaventg-eem-nld-cmems,false,2014-07-30,2024-09-11,,rws,,,unmatched,Ambiguous between rws/eemshaven.doekegat and rws/eemshaven.haven
 eemsmeetpaaltg-eem-nld-cmems,EemsMeetpaalTG,Netherlands,cmems,true,true,nl/eems-meetpaal,false,2021-09-13,2025-06-30,,rws,rws/eemshaven.waddenzee,0.13,ready,CMEMS record of a gauge the national feed publishes
-eidersperrwerkap-9530010-deu-wsv,Eidersperrwerkap,Germany,wsv,true,true,de/eidersperrwerkap,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9530010,0,ready,history needs a PEGELONLINE backfill
-eidersperrwerkbp-9520081-deu-wsv,Eidersperrwerkbp,Germany,wsv,true,true,de/eidersperrwerkbp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520081,0,ready,history needs a PEGELONLINE backfill
+eidersperrwerkap-9530010-deu-wsv,Eidersperrwerkap,Germany,wsv,true,true,de/eidersperrwerkap,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9530010,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+eidersperrwerkbp-9520081-deu-wsv,Eidersperrwerkbp,Germany,wsv,true,true,de/eidersperrwerkbp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520081,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 eidersptg-eid-deu-cmems,EiderSPTG,Germany,cmems,true,false,de/eider-sp,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9530010,0.01,ready,CMEMS record of a gauge the national feed publishes
 eierland-eield-nld-rws_hist,Eierland,Netherlands,rws_hist,true,false,nl/eierland,true,1981-01-01,1983-02-01,,rws,rws/eierland,0,ready,
 eisma-eis-est-cmems,Eisma,Estonia,cmems,true,true,ee/eisma,false,2017-02-07,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
@@ -1359,14 +1359,14 @@ el_porvenir-739a-pan-uhslc_rq,El_Porvenir,Panama,uhslc_rq,true,false,pa/el-porve
 elfin_cove-9452634-usa-noaa,Elfin_Cove,United States,noaa,true,false,us/elfin-cove,true,1991-03-24,2025-06-30,noaa/9452634,coops,coops/9452634,0,ready,
 elhierrotg-elh-esp-cmems,ElHierroTG,Spain,cmems,true,true,es/el-hierro,false,2004-05-20,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 elizabeth_riv_at_midtown_tunnel_at_norfolk_va-204288831-usa-usgs,Elizabeth_Riv_At_Midtown_Tunnel_At_Norfolk_Va,United States,usgs,true,true,us/elizabeth-riv-at-midtown-tunnel-at-norfolk-va,true,2020-02-19,2025-04-30,,usgs,usgs/0204288831,0,ready,
-elmshornhafen-5970022-deu-wsv,Elmshornhafen,Germany,wsv,true,true,de/elmshornhafen,true,2014-07-02,2025-07-13,,pegelonline,pegelonline/5970022,0,ready,history needs a PEGELONLINE backfill
-elsfleth-4970010-deu-wsv,Elsfleth,Germany,wsv,true,true,de/elsfleth,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970010,0.18,ready,history needs a PEGELONLINE backfill
-elsflethohrt-4960080-deu-wsv,Elsflethohrt,Germany,wsv,true,true,de/elsflethohrt,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960080,0.18,ready,history needs a PEGELONLINE backfill
-emdenneueseeschleuse-3970010-deu-wsv,Emdenneueseeschleuse,Germany,wsv,true,true,de/emdenneueseeschleuse,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3970010,0.18,ready,history needs a PEGELONLINE backfill
+elmshornhafen-5970022-deu-wsv,Elmshornhafen,Germany,wsv,true,true,de/elmshornhafen,true,2014-07-02,2025-07-13,,pegelonline,pegelonline/5970022,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+elsfleth-4970010-deu-wsv,Elsfleth,Germany,wsv,true,true,de/elsfleth,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+elsflethohrt-4960080-deu-wsv,Elsflethohrt,Germany,wsv,true,true,de/elsflethohrt,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960080,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+emdenneueseeschleuse-3970010-deu-wsv,Emdenneueseeschleuse,Germany,wsv,true,true,de/emdenneueseeschleuse,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3970010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 emdentg-emd-deu-cmems,EmdenTG,Germany,cmems,true,false,de/emden,false,2014-01-02,2025-06-30,,pegelonline,pegelonline/3970010,0.01,ready,CMEMS record of a gauge the national feed publishes
 empire-8761193-usa-noaa,Empire,United States,noaa,true,true,us/empire,true,1996-09-23,1999-01-19,noaa/8761193,coops,coops/8761193,0,ready,
 empire_waterway_south_of_empire_la-7380260-usa-usgs,Empire_Waterway_South_Of_Empire_La,United States,usgs,true,true,us/empire-waterway-south-of-empire-la,true,2017-11-02,2025-05-01,,usgs,usgs/07380260,0,ready,
-emshrn-9340010-deu-wsv,Emshrn,Germany,wsv,true,true,de/emshorn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9340010,0.18,ready,history needs a PEGELONLINE backfill
+emshrn-9340010-deu-wsv,Emshrn,Germany,wsv,true,true,de/emshorn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9340010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 enewetok-006a-mhl-uhslc_rq,Enewetok,Marshall Islands,uhslc_rq,true,true,mh/enewetok,true,1951-04-24,1971-12-31,,uhslc,uhslc/006a,0.03,ready,
 enewetok-006b-mhl-uhslc_rq,Enewetok,Marshall Islands,uhslc_rq,true,false,mh/enewetok,true,1974-08-05,1979-08-08,,uhslc,uhslc/006b,0.03,ready,
 engelsmanplaat_noord-engmpnd-nld-rws_hist,Engelsmanplaat_noord,Netherlands,rws_hist,true,false,nl/engelsmanplaat-noord,true,1981-01-01,1992-11-30,,rws,rws/engelsmanplaat.noord,0,ready,
@@ -1395,7 +1395,7 @@ esquimalt_harbour_bc-7109-can-meds,Esquimalt_Harbour_BC,Canada,meds,true,true,ca
 esquimalt_lagoon_bc-7107-can-meds,Esquimalt_Lagoon_BC,Canada,meds,true,true,ca/esquimalt-lagoon-bc,true,1972-09-28,1984-01-02,,chs,,,restricted,CHS license bars commercial derivatives
 essexville_mi-9075034-usa-noaa,Essexville_Mi,United States,noaa,true,false,us/essexville,true,1962-01-01,1978-12-01,noaa/9075034,coops,coops/9075034,0,ready,
 essexville_mi-9075035-usa-noaa,Essexville_Mi,United States,noaa,true,true,us/essexville-mi,true,1977-08-15,2025-07-01,noaa/9075035,coops,coops/9075035,0,ready,
-esteinneressperrwerkbp-5950081-deu-wsv,Esteinneressperrwerkbp,Germany,wsv,true,true,de/esteinneressperrwerkbp,true,2008-03-12,2025-07-12,,pegelonline,pegelonline/5950081,0,ready,history needs a PEGELONLINE backfill
+esteinneressperrwerkbp-5950081-deu-wsv,Esteinneressperrwerkbp,Germany,wsv,true,true,de/esteinneressperrwerkbp,true,2008-03-12,2025-07-12,,pegelonline,pegelonline/5950081,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 estuaire_de_la_saint_charles-3246-can-meds,Estuaire_De_La_Saint_Charles,Canada,meds,true,true,ca/estuaire-de-la-saint-charles,true,1971-09-30,2010-04-23,,chs,,,restricted,CHS license bars commercial derivatives
 etaplesvigicruestg_06minute-eta-fra-cmems,EtaplesVigicruesTG_06minute,France,cmems,true,true,fr/etaples-vigicrues,false,2015-02-01,2021-10-12,,refmar,refmar/6413,0,ready,CMEMS record of a gauge the national feed publishes
 eugene_island-8764311-usa-noaa,Eugene_Island,United States,noaa,true,false,us/eugene-island,true,1967-05-17,2005-08-16,noaa/8764311,coops,coops/8764311,0,ready,
@@ -1410,7 +1410,7 @@ exmouthtg-exm-gbr-cmems,ExmouthTG,United Kingdom,cmems,true,false,gb/exmouth-eng
 exuma_cays-256a-bhs-uhslc_rq,Exuma_Cays,The Bahamas,uhslc_rq,true,true,bs/exuma-cays,true,1992-03-23,1993-04-23,,uhslc,uhslc/256a,0.03,ready,
 f3platformtg-f3p-nld-cmems,F3platformTG,Netherlands,cmems,true,true,nl/f3platform,false,2014-08-01,2025-06-30,,rws,rws/f3,0.53,ready,CMEMS record of a gauge the national feed publishes
 faaborg-faa-dnk-cmems,Faaborg,Denmark,cmems,true,true,dk/faaborg,false,2014-01-01,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-fahrenholzup-5940060-deu-wsv,Fahrenholzup,Germany,wsv,true,true,de/fahrenholzup,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5940060,0,ready,history needs a PEGELONLINE backfill
+fahrenholzup-5940060-deu-wsv,Fahrenholzup,Germany,wsv,true,true,de/fahrenholzup,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5940060,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 fairport_oh-9063053-usa-noaa,Fairport_Oh,United States,noaa,true,true,us/fairport,true,1975-06-05,2025-07-01,noaa/9063053,coops,coops/9063053,0,ready,
 fairview_terminal-9348-can-meds,Fairview_Terminal,Canada,meds,true,true,ca/fairview-terminal,true,2014-10-10,2016-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 fajardo-9753216-usa-noaa,Fajardo,United States,noaa,true,false,pr/fajardo,true,2008-10-06,2017-09-20,noaa/9753216,coops,coops/9753216,0,ready,
@@ -1430,7 +1430,7 @@ fanning-012c-kir-uhslc_rq,Fanning,Kiribati,uhslc_rq,true,false,ki/fanning-ticon-
 faraday-700-ata-uhslc_fd,Faraday,Antarctica,uhslc_fd,true,true,aq/faraday,true,1959-10-15,2025-06-30,,uhslc,uhslc/700,0.01,ready,
 faraday-700a-ata-uhslc_rq,Faraday,Antarctica,uhslc_rq,true,false,aq/faraday,true,1959-10-15,2018-12-31,,uhslc,uhslc/700,0.01,ready,
 fare_ute_point-1732417-usa-noaa,Fare_Ute_Point,United States,noaa,true,false,pf/papeete-harbor,true,1996-01-01,2002-09-05,noaa/1732417,coops,coops/1732417,0,ready,
-farge-4950020-deu-wsv,Farge,Germany,wsv,true,true,de/farge,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4950020,0.18,ready,history needs a PEGELONLINE backfill
+farge-4950020-deu-wsv,Farge,Germany,wsv,true,true,de/farge,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4950020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 farm_river_at_route_142_bridge_near_east_haven_ct-411532072510801-usa-usgs,Farm_River_At_Route_142_Bridge_Near_East_Haven_Ct,United States,usgs,true,true,us/farm-river-at-route-142-bridge-near-east-haven-ct,true,2023-06-01,2025-04-01,,usgs,usgs/411532072510801,0,ready,
 felixstowe-fel-gbr-bodc,Felixstowe,United Kingdom,bodc,true,true,gb/felixstowe,true,1982-01-01,2011-02-02,,bodc,,,restricted,"BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead"
 felixstowe-fel-gbr-cmems,Felixstowe,United Kingdom,cmems,true,false,gb/felixstowe,false,1990-01-01,2011-02-03,,bodc,,,restricted,"BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead"
@@ -1457,7 +1457,7 @@ fishguard-fis-gbr-bodc,Fishguard,United Kingdom,bodc,true,true,gb/fishguard,true
 fishguard-fis-gbr-cmems,Fishguard,United Kingdom,cmems,true,false,gb/fishguard,false,1990-01-01,2025-06-30,,ea,ea/E73139,0.39,ready,The EA's real-time readings of the gauge
 fishing_rock-rfrt-nzl-ttw,Fishing_Rock,New Zealand,ttw,true,true,nz/fishing-rock,true,2009-05-29,2024-12-31,,ttw,,,license,Terms not reviewed
 flax_pond_at_old_field_ny-1304057-usa-usgs,Flax_Pond_At_Old_Field_Ny,United States,usgs,true,true,us/flax-pond-at-old-field-ny,true,2007-12-20,2025-05-01,,usgs,usgs/01304057,0,ready,
-flensburg-9610010-deu-wsv,Flensburg,Germany,wsv,true,true,de/flensburg,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610010,0,ready,history needs a PEGELONLINE backfill
+flensburg-9610010-deu-wsv,Flensburg,Germany,wsv,true,true,de/flensburg,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610010,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 flensburgtg-fle-deu-cmems,FlensburgTG,Germany,cmems,true,false,de/flensburg-schleswig-holstein,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610010,0.12,ready,CMEMS record of a gauge the national feed publishes
 flinten16_sjov-35136-swe-smhi,Flinten16_Sjov,Sweden,smhi,true,true,se/flinten16-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35136,0,ready,
 flinten7_sjov-35137-swe-smhi,Flinten7_Sjov,Sweden,smhi,true,true,se/flinten7-sjov,true,2017-03-24,2025-07-02,,smhi,smhi/35137,0,ready,
@@ -1515,8 +1515,8 @@ french_frigate-014b-usa-uhslc_rq,French_Frigate,United States,uhslc_rq,true,fals
 french_quarter_creek_near_huger_sc-21720368-usa-usgs,French_Quarter_Creek_Near_Huger_Sc,United States,usgs,true,true,us/french-quarter-creek-near-huger-sc,true,2018-08-15,2025-05-01,,usgs,usgs/021720368,0,ready,
 freshwater_canal_locks-8766072-usa-noaa,Freshwater_Canal_Locks,United States,noaa,true,false,us/freshwater-canal-locks,true,2005-08-25,2025-06-30,noaa/8766072,coops,coops/8766072,0,ready,
 friday_harbor-9449880-usa-noaa,Friday_Harbor,United States,noaa,true,false,us/friday-harbor,true,1934-01-19,2025-06-30,noaa/9449880,coops,coops/9449880,0.03,ready,
-friedrichstadtstrassenbrcke-9520060-deu-wsv,Friedrichstadtstrassenbrcke,Germany,wsv,true,true,de/friedrichstadtstrassenbrcke,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520060,0.2,ready,history needs a PEGELONLINE backfill
-friedrichstadttreene-9520061-deu-wsv,Friedrichstadttreene,Germany,wsv,true,false,de/friedrichstadttreene,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520061,0.2,ready,history needs a PEGELONLINE backfill
+friedrichstadtstrassenbrcke-9520060-deu-wsv,Friedrichstadtstrassenbrcke,Germany,wsv,true,true,de/friedrichstadtstrassenbrcke,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520060,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+friedrichstadttreene-9520061-deu-wsv,Friedrichstadttreene,Germany,wsv,true,false,de/friedrichstadttreene,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520061,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 fripps_inlet-8668498-usa-noaa,Fripps_Inlet,United States,noaa,true,false,us/fripps-inlet,true,2003-08-27,2008-03-13,noaa/8668498,coops,coops/8668498,0,ready,
 frog_creek_near_rubonia_fl-2300082-usa-usgs,Frog_Creek_Near_Rubonia_Fl,United States,usgs,true,false,us/frog-creek-near-rubonia-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02300082,0,ready,
 frontera_radar-6-mex-unam,Frontera_Radar,Mexico,unam,true,true,mx/frontera-radar,true,2021-04-01,2024-06-01,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -1602,7 +1602,7 @@ giww_at_houma_la-7381331-usa-usgs,Giww_At_Houma_La,United States,usgs,true,true,
 giww_east_storm_surge_barrier_at_new_orleans_la-73802339-usa-usgs,Giww_East_Storm_Surge_Barrier_At_New_Orleans_La,United States,usgs,true,true,us/giww-east-storm-surge-barrier-at-new-orleans-la,true,2017-03-08,2025-05-01,,usgs,usgs/073802339,0,ready,
 giww_west_of_bayou_lafourche_at_larose_la-7381235-usa-usgs,Giww_West_Of_Bayou_Lafourche_At_Larose_La,United States,usgs,true,true,us/giww-west-of-bayou-lafourche-at-larose-la,true,2007-10-01,2019-10-24,,usgs,usgs/07381235,1.02,ready,
 gladstone-59750-aus-bom,Gladstone,Australia,bom,true,true,au/gladstone,true,1978-01-05,2022-12-31,,bom,,,license,BOM license not stated
-glckstadt-5970035-deu-wsv,Glckstadt,Germany,wsv,true,true,de/glckstadt,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970035,0.19,ready,history needs a PEGELONLINE backfill
+glckstadt-5970035-deu-wsv,Glckstadt,Germany,wsv,true,true,de/glckstadt,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970035,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 gloucester_point-8637624-usa-noaa,Gloucester_Point,United States,noaa,true,false,us/gloucester-point,true,1976-02-01,2003-09-18,noaa/8637624,coops,coops/8637624,0,ready,
 gobo-ma68-jpn-jodc_jma,Gobo,Japan,jodc_jma,true,false,jp/gobo,true,2005-06-30,2023-12-31,jma/GB,jma,jma/GB,0.23,ready,JODC relay of jma/GB
 goderich_ontario-11860-can-meds,Goderich_Ontario,Canada,meds,true,true,ca/goderich,true,1914-05-16,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -1655,7 +1655,7 @@ grant_line_canal_east-b95320-usa-cdwr,Grant_Line_Canal_East,United States,cdwr,t
 grant_line_canal_near_clifton_court_forebay-b95295-usa-cdwr,Grant_Line_Canal_Near_Clifton_Court_Forebay,United States,cdwr,true,true,us/grant-line-canal-near-clifton-court-forebay,true,2014-11-14,2025-05-24,,dwr,dwr/B95295,0,ready,
 grant_line_cn_nr_tracy_ca-11313240-usa-usgs,Grant_Line_Cn_Nr_Tracy_Ca,United States,usgs,true,true,us/grant-line-cn-nr-tracy-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313240,0,ready,
 grantline_canal_at_tracy_road_bridge-b95300-usa-cdwr,Grantline_Canal_At_Tracy_Road_Bridge,United States,cdwr,true,true,us/grantline-canal-at-tracy-road-bridge,true,1982-10-01,2025-02-21,,dwr,dwr/B95300,0,ready,
-grauerortreede-5970026-deu-wsv,Grauerortreede,Germany,wsv,true,true,de/grauerortreede,true,2020-06-08,2025-07-12,,pegelonline,pegelonline/5970026,0.19,ready,history needs a PEGELONLINE backfill
+grauerortreede-5970026-deu-wsv,Grauerortreede,Germany,wsv,true,true,de/grauerortreede,true,2020-06-08,2025-07-12,,pegelonline,pegelonline/5970026,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 graveline_bayou_entrance-8742205-usa-noaa,Graveline_Bayou_Entrance,United States,noaa,true,false,us/graveline-bayou-entrance,true,1980-10-30,1981-11-01,noaa/8742205,coops,coops/8742205,0,ready,
 graveline_bayou_near_gautier_ms-2480287-usa-usgs,Graveline_Bayou_Near_Gautier_Ms,United States,usgs,true,true,us/graveline-bayou-near-gautier-ms,true,2014-08-15,2023-07-11,,usgs,usgs/02480287,0,ready,
 great_bay-8534319-usa-noaa,Great_Bay,United States,noaa,true,false,us/tuckerton,true,1980-07-01,2023-06-30,noaa/8534319,coops,coops/8534319,0,ready,
@@ -1674,19 +1674,19 @@ green_river_at_200th_street_at_kent_wa-12113344-usa-usgs,Green_River_At_200Th_St
 greens_bayou-gre-usa-hct,Greens_Bayou,United States,hct,true,false,us/greens-bayou,true,2004-02-26,2024-10-19,,hct,,,license,Terms not reviewed
 greens_bayou_at_ley_rd_houston_tx-8076700-usa-usgs,Greens_Bayou_At_Ley_Rd_Houston_Tx,United States,usgs,true,true,us/greens-bayou-at-ley-rd-houston-tx,true,2007-10-01,2025-05-01,,usgs,usgs/08076700,0,ready,
 greenwich_harbor_at_grass_island_at_greenwich_ct-12112296-usa-usgs,Greenwich_Harbor_At_Grass_Island_At_Greenwich_Ct,United States,usgs,true,true,us/greenwich-harbor-at-grass-island-at-greenwich-ct,true,2015-01-15,2025-04-30,,usgs,usgs/012112296,0,ready,
-greifswald_wiek-gre-deu-bfg,Greifswald_Wiek,Germany,bfg,true,false,de/greifswald-wiek,true,1996-07-01,2024-06-12,,pegelonline,pegelonline/9650073,0,ready,history needs a PEGELONLINE backfill
-greifswaldoie-9690078-deu-wsv,Greifswaldoie,Germany,wsv,true,true,de/greifswaldoie,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690078,0,ready,history needs a PEGELONLINE backfill
+greifswald_wiek-gre-deu-bfg,Greifswald_Wiek,Germany,bfg,true,false,de/greifswald-wiek,true,1996-07-01,2024-06-12,,pegelonline,pegelonline/9650073,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+greifswaldoie-9690078-deu-wsv,Greifswaldoie,Germany,wsv,true,true,de/greifswaldoie,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690078,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 greifswaldtg-gre-deu-cmems,GreifswaldTG,Germany,cmems,true,true,de/greifswald,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9650073,0.84,ready,CMEMS record of a gauge the national feed publishes
-greifswaldwieck-9650073-deu-wsv,Greifswaldwieck,Germany,wsv,true,true,de/greifswaldwieck,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650073,0,ready,history needs a PEGELONLINE backfill
+greifswaldwieck-9650073-deu-wsv,Greifswaldwieck,Germany,wsv,true,true,de/greifswaldwieck,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650073,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 grena-gre-dnk-cmems,Grena,Denmark,cmems,true,true,dk/grena,false,1991-01-14,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 grenville-16045-can-meds,Grenville,Canada,meds,true,true,ca/grenville,true,1962-01-01,1983-01-25,,chs,,,restricted,CHS license bars commercial derivatives
-grnhude-5970037-deu-wsv,Grnhude,Germany,wsv,true,true,de/grnhude,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970037,0,ready,history needs a PEGELONLINE backfill
+grnhude-5970037-deu-wsv,Grnhude,Germany,wsv,true,true,de/grnhude,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970037,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 grondines-3325-can-meds,Grondines,Canada,meds,true,true,ca/grondines,true,1956-04-25,1994-08-01,,chs,,,restricted,CHS license bars commercial derivatives
 groote_eylandt-145a-aus-uhslc_rq,Groote_Eylandt,Australia,uhslc_rq,true,true,au/groote-eylandt,true,1993-09-22,2021-12-31,,uhslc,uhslc/145a,0.03,restricted,The contributor's terms bar commercial use
 gros_cacouna-3125-can-meds,Gros_Cacouna,Canada,meds,true,true,ca/gros-cacouna,true,1983-06-01,1996-09-13,,chs,,,restricted,CHS license bars commercial derivatives
 gros_cap_ontario-10920-can-meds,Gros_Cap_Ontario,Canada,meds,true,true,ca/gros-cap,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 grosse_pointe_yc_mi-9034051-usa-noaa,Grosse_Pointe_Yc_Mi,United States,noaa,true,false,us/grosse-pointe-yc-mi,true,1952-06-27,1970-04-15,noaa/9034051,coops,coops/9034051,0,ready,
-grosseweserbrcke-4910050-deu-wsv,Grosseweserbrcke,Germany,wsv,true,true,de/grosseweserbrcke,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4910050,0.18,ready,history needs a PEGELONLINE backfill
+grosseweserbrcke-4910050-deu-wsv,Grosseweserbrcke,Germany,wsv,true,true,de/grosseweserbrcke,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4910050,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 guadalupe-036a-mex-uhslc_rq,Guadalupe,Mexico,uhslc_rq,true,true,mx/guadalupe,true,1977-07-23,1985-12-31,,uhslc,uhslc/036a,0.03,ready,
 guadalupe_river_at_gold_st-gua-usa-cm,Guadalupe_River_at_Gold_St,United States,cm,true,true,us/guadalupe-river-at-gold-st,true,2021-07-15,2024-12-05,,cm,,,license,Terms not reviewed
 guadalupe_rv_nr_bloomington_tx-8177520-usa-usgs,Guadalupe_Rv_Nr_Bloomington_Tx,United States,usgs,true,false,us/guadalupe-rv-nr-bloomington-tx,true,2007-10-01,2025-04-30,,usgs,usgs/08177520,0,ready,
@@ -1774,18 +1774,18 @@ havre_boucher-1576-can-meds,Havre_Boucher,Canada,meds,true,true,ca/havre-boucher
 havre_de_grace-8574070-usa-noaa,Havre_De_Grace,United States,noaa,true,false,us/havre-de-grace,true,1978-05-01,2005-09-08,noaa/8574070,coops,coops/8574070,0,ready,
 havregpmrouentg_05minute-hav-fra-cmems,HavreGPMRouenTG_05minute,France,cmems,true,true,fr/havre-gpm-rouen,false,2013-07-25,2025-05-31,,refmar,refmar/6194,0,ready,CMEMS record of a gauge the national feed publishes
 hay_point-59511-aus-bom,Hay_Point,Australia,bom,true,true,au/hay-point,true,1969-08-11,2022-12-31,,bom,,,license,BOM license not stated
-hechthausen-5980030-deu-wsv,Hechthausen,Germany,wsv,true,true,de/hechthausen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980030,0.19,ready,history needs a PEGELONLINE backfill
+hechthausen-5980030-deu-wsv,Hechthausen,Germany,wsv,true,true,de/hechthausen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5980030,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 hedel-hedl-nld-rws_hist,Hedel,Netherlands,rws_hist,true,false,nl/hedel,true,1808-12-03,1990-08-10,,rws,rws/hedel,0,ready,
 heeia-423-usa-uhslc_fd,Heeia,United States,uhslc_fd,true,true,us/heeia,true,2023-02-05,2025-06-30,,uhslc,uhslc/423,0.11,ready,
 heesbeen-heesbn-nld-rws_hist,Heesbeen,Netherlands,rws_hist,true,false,nl/heesbeen,true,1814-02-06,2018-09-07,,rws,rws/heesbeen,0,ready,
-heiligenhafen-9610070-deu-wsv,Heiligenhafen,Germany,wsv,true,true,de/heiligenhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610070,0,ready,history needs a PEGELONLINE backfill
+heiligenhafen-9610070-deu-wsv,Heiligenhafen,Germany,wsv,true,true,de/heiligenhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610070,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 heiligenhafentg-hei-deu-cmems,HeiligenhafenTG,Germany,cmems,true,false,de/heiligenhafen-schleswig-holstein,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610070,0.14,ready,CMEMS record of a gauge the national feed publishes
 heimsjo-hei-nor-nhs,Heimsjo,Norway,nhs,true,false,no/heimsjoen,true,1928-01-01,2025-07-28,kartverket/HEI,kartverket,kartverket/HEI,0,ready,
 heimsjoetg-hei-nor-cmems,HeimsjoeTG,Norway,cmems,true,false,no/heimsjoe,false,1928-01-01,2025-06-30,,kartverket,kartverket/HEI,0,ready,CMEMS record of a gauge the national feed publishes
 helgeroa-hro-nor-nhs,Helgeroa,Norway,nhs,true,false,no/helgeroa,true,1965-04-24,2025-07-28,kartverket/HRO,kartverket,kartverket/HRO,0,ready,
 helgeroatg-hel-nor-cmems,HelgeroaTG,Norway,cmems,true,false,no/helgeroa,false,1965-04-24,2025-06-30,,kartverket,kartverket/HRO,0,ready,CMEMS record of a gauge the national feed publishes
-helgolandbinnenhafen-9510070-deu-wsv,Helgolandbinnenhafen,Germany,wsv,true,true,de/helgolandbinnenhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510070,0.19,ready,history needs a PEGELONLINE backfill
-helgolandsdhafen-9510075-deu-wsv,Helgolandsdhafen,Germany,wsv,true,true,de/helgolandsdhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510075,0.19,ready,history needs a PEGELONLINE backfill
+helgolandbinnenhafen-9510070-deu-wsv,Helgolandbinnenhafen,Germany,wsv,true,true,de/helgolandbinnenhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510070,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+helgolandsdhafen-9510075-deu-wsv,Helgolandsdhafen,Germany,wsv,true,true,de/helgolandsdhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510075,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 helgolandtg-hel-deu-cmems,HelgolandTG,Germany,cmems,true,false,de/helgoland,false,2014-01-01,2025-06-30,,pegelonline,pegelonline/9510070,0.01,ready,CMEMS record of a gauge the national feed publishes
 hellevoetsluis-hellvss-nld-rws_hist,Hellevoetsluis,Netherlands,rws_hist,true,false,nl/hellevoetsluis,true,1817-04-22,2018-09-07,,rws,rws/hellevoetsluis,0,ready,
 helsingborg-hel-swe-cmems,Helsingborg,Sweden,cmems,true,false,se/helsingborg,false,2019-07-01,2025-07-01,,smhi,smhi/35110,0.42,ready,CMEMS record of a gauge the national feed publishes
@@ -1797,13 +1797,13 @@ hendersoncreek_southwestflorida_hc1_t-hc1_t-usa-sfwmd,HendersonCreek_SouthWestFl
 henslung_cove-9958-can-meds,Henslung_Cove,Canada,meds,true,true,ca/henslung-cove,true,1983-06-09,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 herbaudiere-198-fra-refmar,Herbaudiere,France,refmar,true,true,fr/herbaudiere,true,1985-05-11,2025-03-31,,refmar,refmar/198,0,ready,
 herbaudieretg_60minute-her-fra-cmems,HerbaudiereTG_60minute,France,cmems,true,false,fr/herbaudiere,false,1985-05-11,2025-03-31,,refmar,refmar/198,0.05,ready,CMEMS record of a gauge the national feed publishes
-herbrumhafendamm-3770030-deu-wsv,Herbrumhafendamm,Germany,wsv,true,true,de/herbrumhafendamm,true,2001-10-30,2025-07-11,,pegelonline,pegelonline/3770030,0.18,ready,history needs a PEGELONLINE backfill
+herbrumhafendamm-3770030-deu-wsv,Herbrumhafendamm,Germany,wsv,true,true,de/herbrumhafendamm,true,2001-10-30,2025-07-11,,pegelonline,pegelonline/3770030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 herne_bay-hby-gbr-cco,Herne_Bay,United Kingdom,cco,true,true,gb/herne-bay,true,1996-03-19,2025-05-31,,cco,,,license,Terms not reviewed
 hernebaytg-her-gbr-cmems,HerneBayTG,United Kingdom,cmems,true,false,gb/herne-bay,false,1997-01-01,2025-06-30,,bodc,,,restricted,"BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead"
 herring_r_at_chequessett_neck_rd_at_wellfleet_ma-11058798-usa-usgs,Herring_R_At_Chequessett_Neck_Rd_At_Wellfleet_Ma,United States,usgs,true,true,us/herring-r-at-chequessett-neck-rd-at-wellfleet-ma,true,2017-09-27,2022-10-24,,usgs,usgs/011058798,0,ready,
 herwijnen-herwnn-nld-rws_hist,Herwijnen,Netherlands,rws_hist,true,false,nl/herwijnen,true,1876-01-03,1991-05-31,,rws,rws/herwijnen,0,ready,
 hesnaes-hes-dnk-cmems,Hesnaes,Denmark,cmems,true,true,dk/hesnaes,false,1991-10-15,2023-10-20,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-hetlingen-5970010-deu-wsv,Hetlingen,Germany,wsv,true,true,de/hetlingen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970010,0,ready,history needs a PEGELONLINE backfill
+hetlingen-5970010-deu-wsv,Hetlingen,Germany,wsv,true,true,de/hetlingen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970010,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 heusden-heusdn-nld-rws_hist,Heusden,Netherlands,rws_hist,true,false,nl/heusden,true,1984-03-21,1985-03-31,,rws,rws/heusden,0,ready,
 heysham-hey-gbr-bodc,Heysham,United Kingdom,bodc,true,true,gb/heysham,true,1964-01-01,2025-04-29,,ea,ea/E73439-anglian,0,ready,The EA's real-time readings of the gauge
 heysham-hey-gbr-cmems,Heysham,United Kingdom,cmems,true,false,gb/heysham,false,1990-01-01,2025-06-30,,ea,ea/E73439-anglian,0.29,ready,The EA's real-time readings of the gauge
@@ -1848,7 +1848,7 @@ holland_cut_near_bethel_island-hol-usa-cdwr,Holland_Cut_Near_Bethel_Island,Unite
 holland_cut_nr_bethel_island_ca-11313431-usa-usgs,Holland_Cut_Nr_Bethel_Island_Ca,United States,usgs,true,true,us/holland-cut-nr-bethel-island-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313431,0,ready,
 holland_mi-9087031-usa-noaa,Holland_Mi,United States,noaa,true,true,us/holland,true,1970-01-01,2025-07-01,noaa/9087031,coops,coops/9087031,0,ready,
 hollandsebrugtg-hol-nld-cmems,HollandseBrugTG,Netherlands,cmems,true,false,nl/hollandse-brug,false,2014-07-30,2025-06-30,,rws,rws/almere.hollandsebrug,0.16,ready,CMEMS record of a gauge the national feed publishes
-hollersiel-4960050-deu-wsv,Hollersiel,Germany,wsv,true,true,de/hollersiel,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960050,0.18,ready,history needs a PEGELONLINE backfill
+hollersiel-4960050-deu-wsv,Hollersiel,Germany,wsv,true,true,de/hollersiel,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960050,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 hollingsworth_point-8743081-usa-noaa,Hollingsworth_Point,United States,noaa,true,false,us/hollingsworth-point,true,1979-09-01,1980-12-17,noaa/8743081,coops,coops/8743081,0,ready,
 holmsund-hol-swe-cmems,Holmsund,Sweden,cmems,true,true,se/holmsund,false,2019-07-01,2025-07-01,,smhi,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name"
 holmsund_sjov-35124-swe-smhi,Holmsund_Sjov,Sweden,smhi,true,true,se/holmsund-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35124,2.58,ready,
@@ -1879,7 +1879,7 @@ honolulu_hawaii-057a-usa-uhslc_rq,Honolulu_Hawaii,United States,uhslc_rq,true,fa
 honolulu_hawaii-057b-usa-uhslc_rq,Honolulu_Hawaii,United States,uhslc_rq,true,false,us/honolulu,true,1905-01-01,2021-12-31,noaa/1612340,coops,coops/1612340,0.48,ready,UHSLC relay of noaa/1612340
 honolulu_kewalo-026a-usa-uhslc_rq,Honolulu_Kewalo,United States,uhslc_rq,true,true,us/honolulu-kewalo,true,1978-01-24,1986-02-18,,uhslc,uhslc/026a,0.03,ready,
 honolulu_pier_45-027a-usa-uhslc_rq,Honolulu_Pier_45,United States,uhslc_rq,true,true,us/honolulu-pier-45,true,1985-10-26,1990-12-31,,uhslc,uhslc/027a,0.03,ready,
-hooksielplate-9430020-deu-wsv,Hooksielplate,Germany,wsv,true,true,de/hooksielplate,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9430020,0.19,ready,history needs a PEGELONLINE backfill
+hooksielplate-9430020-deu-wsv,Hooksielplate,Germany,wsv,true,true,de/hooksielplate,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9430020,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 hope_bay_bc-7360-can-meds,Hope_Bay_BC,Canada,meds,true,true,ca/hope-bay,true,1961-04-19,2016-09-22,,chs,,,restricted,CHS license bars commercial derivatives
 hopedale-1405-can-meds,Hopedale,Canada,meds,true,true,ca/hopedale,true,1950-06-29,1984-07-27,,chs,,,restricted,CHS license bars commercial derivatives
 hopewell-8638481-usa-noaa,Hopewell,United States,noaa,true,false,us/city-point,true,2010-07-01,2012-06-20,noaa/8638481,coops,coops/8638481,0,ready,
@@ -1887,7 +1887,7 @@ hornbaek-838a-dnk-uhslc_rq,Hornbaek,Denmark,uhslc_rq,true,true,dk/hornbaek,true,
 hornbaek-hor-dnk-cmems,Hornbaek,Denmark,cmems,true,false,dk/hornbaek,false,1991-10-10,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 hornbaek-hor-dnk-dmi,Hornbaek,Denmark,dmi,true,false,dk/hornbaek,true,1891-01-01,2025-07-01,,dmi,,,planned,
 hornby_island-7953-can-meds,Hornby_Island,Canada,meds,true,true,ca/hornby-island,true,1967-09-21,1971-10-08,,chs,,,restricted,CHS license bars commercial derivatives
-horneburg-5960020-deu-wsv,Horneburg,Germany,wsv,true,true,de/horneburg,true,2008-12-18,2025-07-13,,pegelonline,pegelonline/5960020,0,ready,history needs a PEGELONLINE backfill
+horneburg-5960020-deu-wsv,Horneburg,Germany,wsv,true,true,de/horneburg,true,2008-12-18,2025-07-13,,pegelonline,pegelonline/5960020,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 horns_hook-8518668-usa-noaa,Horns_Hook,United States,noaa,true,false,us/horns-hook,true,1979-09-28,2005-10-14,noaa/8518668,coops,coops/8518668,0,ready,
 horsborngat-horsbgt-nld-rws_hist,Horsborngat,Netherlands,rws_hist,true,false,nl/horsborngat,true,1981-01-01,1987-12-30,,rws,rws/horsborngat,0,ready,
 horsepen_bayou_bay_area_boulevard_250-hor-usa-hct,Horsepen_Bayou_Bay_Area_Boulevard_250,United States,hct,true,false,us/horsepen-bayou-bay-area-boulevard-250,true,2009-10-09,2024-08-28,,hct,,,license,Terms not reviewed
@@ -1906,7 +1906,7 @@ howth2-how-irl-cmems,Howth2,Ireland,cmems,true,false,ie/howth-leinster,false,202
 howth_water_level_1-how-irl-mi_c,Howth_Water_Level_1,Ireland,mi_c,true,false,ie/howth-water-level-1,true,2018-01-19,2025-07-23,,marine-institute,marine-institute/howth-water-level-1,0,ready,
 howth_water_level_2-how-irl-mi_c,Howth_Water_Level_2,Ireland,mi_c,true,false,ie/howth-water-level-2,true,2020-11-20,2025-07-23,,marine-institute,marine-institute/howth-water-level-1,0,ready,
 hrakleio-hra-grc-cmems,Hrakleio,Greece,cmems,true,true,gr/hrakleio,false,2016-12-13,2024-06-23,,cmems,,,restricted,GESLA lists CMEMS as research only
-hrnum-9570050-deu-wsv,Hrnum,Germany,wsv,true,true,de/hornum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570050,0.2,ready,history needs a PEGELONLINE backfill
+hrnum-9570050-deu-wsv,Hrnum,Germany,wsv,true,true,de/hornum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570050,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 huahine-587-fra-refmar,Huahine,France,refmar,true,true,fr/huahine,true,1989-07-05,2013-11-29,,refmar,refmar/587,0,ready,
 huahinetg_60minute-hua-fra-cmems,HuahineTG_60minute,France,cmems,true,false,fr/huahine,false,1989-07-05,2013-11-29,,refmar,refmar/587,0,ready,CMEMS record of a gauge the national feed publishes
 huatulco-409-mex-unam_hist,Huatulco,Mexico,unam_hist,true,true,mx/huatulco,true,2010-10-30,2015-09-03,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -1927,12 +1927,12 @@ huelvatg-hue-esp-cmems,HuelvaTG,Spain,cmems,true,true,es/huelva,false,1996-09-13
 huibertgat-huibgt-nld-rws_hist,Huibertgat,Netherlands,rws_hist,true,false,nl/huibertgat,true,1973-01-01,2018-09-07,,rws,rws/huibertgat,0,ready,
 huibertgattg-hui-nld-cmems,HuibertgatTG,Netherlands,cmems,true,true,nl/huibertgat-friesland,false,2014-06-04,2025-06-30,,rws,rws/huibertgat,0.43,ready,CMEMS record of a gauge the national feed publishes
 humboldt_bay_ca-576a-usa-uhslc_rq,Humboldt_Bay_CA,United States,uhslc_rq,true,false,us/humboldt-bay-north-spit,true,1977-08-17,2021-12-31,noaa/9418767,coops,coops/9418767,0.03,ready,UHSLC relay of noaa/9418767
-hundsmhlen-4960020-deu-wsv,Hundsmhlen,Germany,wsv,true,false,de/hundsmhlen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960020,0.18,ready,history needs a PEGELONLINE backfill
+hundsmhlen-4960020-deu-wsv,Hundsmhlen,Germany,wsv,true,false,de/hundsmhlen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 hunger_harbour_bc-9570-can-meds,Hunger_Harbour_BC,Canada,meds,true,true,ca/hunger-harbour,true,1962-05-07,2009-09-10,,chs,,,restricted,CHS license bars commercial derivatives
-huntebrck-4960070-deu-wsv,Huntebrck,Germany,wsv,true,true,de/huntebrck,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960070,0.18,ready,history needs a PEGELONLINE backfill
+huntebrck-4960070-deu-wsv,Huntebrck,Germany,wsv,true,true,de/huntebrck,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960070,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 hunter_cut_at_montezuma_slough-hun-usa-cdwr,Hunter_Cut_At_Montezuma_Slough,United States,cdwr,true,true,us/hunter-cut-at-montezuma-slough,true,2018-06-08,2025-05-24,,cdec,cdec/HUN,0,ready,
 hunter_spr_run_at_beach_lane_at_crystal_river_fl-2310743-usa-usgs,Hunter_Spr_Run_At_Beach_Lane_At_Crystal_River_Fl,United States,usgs,true,true,us/hunter-spr-run-at-beach-lane-at-crystal-river-fl,true,2017-01-26,2025-05-01,,usgs,usgs/02310743,0,ready,
-husum-9530020-deu-wsv,Husum,Germany,wsv,true,true,de/husum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9530020,0.2,ready,history needs a PEGELONLINE backfill
+husum-9530020-deu-wsv,Husum,Germany,wsv,true,true,de/husum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9530020,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 husumtg-hus-deu-cmems,HusumTG,Germany,cmems,true,false,de/husum-schleswig-holstein,false,2014-01-01,2025-06-30,,pegelonline,pegelonline/9530020,0.03,ready,CMEMS record of a gauge the national feed publishes
 hvidesandekysttg-hvi-dnk-cmems,HvideSandeKystTG,Denmark,cmems,true,false,dk/hvide-sande-kyst,false,2015-01-12,2025-06-30,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 i_10_bonnet_carre_floodway-8762483-usa-noaa,I_10_Bonnet_Carre_Floodway,United States,noaa,true,true,us/i-10-bonnet-carre-floodway,true,2015-04-30,2020-06-30,noaa/8762483,coops,coops/8762483,0.01,ready,
@@ -1971,7 +1971,7 @@ ilfracombe-ilf-gbr-bodc,Ilfracombe,United Kingdom,bodc,true,true,gb/ilfracombe,t
 ilfracombe-ilf-gbr-cmems,Ilfracombe,United Kingdom,cmems,true,false,gb/ilfracombe,false,1990-01-01,2025-06-30,,ea,ea/E72439,0.69,ready,The EA's real-time readings of the gauge
 ilha_fiscal_rj-280-bra-uhslc_fd,Ilha_Fiscal_RJ,Brazil,uhslc_fd,true,true,br/ilha-fiscal-rj,true,1963-02-02,2013-04-30,,uhslc,uhslc/280,0.03,ready,
 ilha_fiscal_rj-280a-bra-uhslc_rq,Ilha_Fiscal_RJ,Brazil,uhslc_rq,true,false,br/ilha-fiscal-rj,true,1963-02-02,2013-12-31,,uhslc,uhslc/280,0.03,ready,
-ilmenausperrwerkap-5940080-deu-wsv,Ilmenausperrwerkap,Germany,wsv,true,true,de/ilmenausperrwerkap,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5940080,0,ready,history needs a PEGELONLINE backfill
+ilmenausperrwerkap-5940080-deu-wsv,Ilmenausperrwerkap,Germany,wsv,true,true,de/ilmenausperrwerkap,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5940080,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 ilulissat-298a-dnk-uhslc_rq,Ilulissat,Denmark,uhslc_rq,true,true,gl/ilulissat,true,1992-07-01,1997-06-23,,uhslc,uhslc/298a,0.03,ready,
 imbituba-718a-bra-uhslc_rq,Imbituba,Brazil,uhslc_rq,true,true,br/imbituba,true,2001-08-22,2010-12-31,,uhslc,uhslc/718a,0,ready,
 immingham-imm-gbr-bodc,Immingham,United Kingdom,bodc,true,true,gb/immingham,true,1953-01-28,2023-07-17,,ea,ea/E71124,0,ready,The EA's real-time readings of the gauge
@@ -2026,7 +2026,7 @@ italian_slough_headwater_near_byron-b95283-usa-cdwr,Italian_Slough_Headwater_Nea
 itea-ite-grc-cmems,Itea,Greece,cmems,true,true,gr/itea,false,2016-12-13,2024-06-23,,cmems,,,restricted,GESLA lists CMEMS as research only
 ito-gs19-jpn-jodc_giaj,Ito,Japan,jodc_giaj,true,true,jp/ito,true,1973-06-30,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 ittoqqortoormiit-809-dnk-uhslc_fd,Ittoqqortoormiit,Denmark,uhslc_fd,true,true,gl/ittoqqortoormiit,true,2007-10-15,2025-05-31,,uhslc,uhslc/809,0,ready,
-itzehoehafen-5970042-deu-wsv,Itzehoehafen,Germany,wsv,true,true,de/itzehoehafen,true,2015-09-14,2025-07-12,,pegelonline,pegelonline/5970042,0,ready,history needs a PEGELONLINE backfill
+itzehoehafen-5970042-deu-wsv,Itzehoehafen,Germany,wsv,true,true,de/itzehoehafen,true,2015-09-14,2025-07-12,,pegelonline,pegelonline/5970042,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 iwanaiko-0137-jpn-jodc_pahb,Iwanaiko,Japan,jodc_pahb,true,true,jp/iwanaiko,true,1982-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 iwasaki-ma61-jpn-jodc_jma,Iwasaki,Japan,jodc_jma,true,true,jp/iwasaki,true,1964-12-31,1969-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 izuhara-hd23-jpn-jodc_jcg,Izuhara,Japan,jodc_jcg,true,false,jp/izuhara,true,1948-12-31,2024-12-30,jhod/0158,jodc,jodc/0158,,license,JODC relay of jhod/0158
@@ -2040,7 +2040,7 @@ jackson_bay-65180-nzl-bom,Jackson_Bay,New Zealand,bom,true,true,nz/jackson-bay,t
 jackson_river_at_ranch_road_nr_apalachicola_fl-2359223-usa-usgs,Jackson_River_At_Ranch_Road_Nr_Apalachicola_Fl,United States,usgs,true,true,us/jackson-river-at-ranch-road-nr-apalachicola-fl,true,2020-09-15,2025-05-01,,usgs,usgs/02359223,0,ready,
 jacksonville_beach-8720291-usa-noaa,Jacksonville_Beach,United States,noaa,true,false,us/jacksonville-beach,true,1995-10-03,1999-07-01,noaa/8720291,coops,coops/8720291,0,ready,
 jacksonville_nc-jac-usa-ncdem,Jacksonville_NC,United States,ncdem,true,true,us/jacksonville-nc,true,2018-03-01,2025-04-30,,ncdem,,,license,North Carolina DEM terms to check
-jadeweserport-9430050-deu-wsv,Jadeweserport,Germany,wsv,true,true,de/jadeweserport,true,2017-08-24,2025-07-13,,pegelonline,pegelonline/9430050,0.18,ready,history needs a PEGELONLINE backfill
+jadeweserport-9430050-deu-wsv,Jadeweserport,Germany,wsv,true,true,de/jadeweserport,true,2017-08-24,2025-07-13,,pegelonline,pegelonline/9430050,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 jakarta-161a-idn-uhslc_rq,Jakarta,Indonesia,uhslc_rq,true,true,id/jakarta,true,1984-01-01,2004-09-18,,uhslc,uhslc/161a,0.03,ready,
 jamaica_bay_at_inwood_ny-1311850-usa-usgs,Jamaica_Bay_At_Inwood_Ny,United States,usgs,true,false,us/jamaica-bay-at-inwood-ny,true,2002-07-15,2025-05-01,,usgs,usgs/01311850,0.03,ready,
 james_river_abv_weyanoke_point_nr_charles_city_va-2042222-usa-usgs,James_River_Abv_Weyanoke_Point_Nr_Charles_City_Va,United States,usgs,true,true,us/james-river-abv-weyanoke-point-nr-charles-city-va,true,2014-07-03,2017-10-11,,usgs,usgs/02042222,0,ready,
@@ -2104,7 +2104,7 @@ kaohsiung-340-twn-uhslc_fd,Kaohsiung,Taiwan,uhslc_fd,true,true,tw/kaohsiung,true
 kaohsiung-340a-chn-uhslc_rq,Kaohsiung,China,uhslc_rq,true,true,cn/kaohsiung-takao,true,1980-01-01,2016-12-31,,uhslc,uhslc/340,0.03,ready,
 kapingamarangi-029-fsm-uhslc_fd,Kapingamarangi,Federated States of Micronesia,uhslc_fd,true,true,fm/kapingamarangi,true,1978-09-08,2025-06-30,,uhslc,uhslc/029,3.98,ready,
 kapingamarangi-029a-fsm-uhslc_rq,Kapingamarangi,Federated States of Micronesia,uhslc_rq,true,false,fm/kapingamarangi,true,1978-09-08,2018-12-10,,uhslc,uhslc/029,3.98,ready,
-kappeln-9610035-deu-wsv,Kappeln,Germany,wsv,true,true,de/kappeln,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610035,0,ready,history needs a PEGELONLINE backfill
+kappeln-9610035-deu-wsv,Kappeln,Germany,wsv,true,true,de/kappeln,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610035,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 kappelntg-kap-deu-cmems,KappelnTG,Germany,cmems,true,false,de/kappeln,false,2020-12-12,2025-06-30,,pegelonline,pegelonline/9610035,0.01,ready,CMEMS record of a gauge the national feed publishes
 kapsali-kap-grc-cmems,Kapsali,Greece,cmems,true,true,gr/kapsali,false,2013-06-19,2022-05-11,,cmems,,,restricted,GESLA lists CMEMS as research only
 karachi-147-pak-uhslc_fd,Karachi,Pakistan,uhslc_fd,true,true,pk/karachi,true,2007-01-31,2025-05-25,,uhslc,uhslc/147,1.53,ready,
@@ -2113,10 +2113,10 @@ karachi-147b-pak-uhslc_rq,Karachi,Pakistan,uhslc_rq,true,false,pk/karachi,true,2
 karatsu-9023-jpn-jodc_pahb,Karatsu,Japan,jodc_pahb,true,true,jp/karatsu,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 karita-9018-jpn-jodc_pahb,Karita,Japan,jodc_pahb,true,true,jp/karita,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 kariya-gs17-jpn-jodc_giaj,Kariya,Japan,jodc_giaj,true,true,jp/kariya,true,1972-01-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
-karlshagen-9690085-deu-wsv,Karlshagen,Germany,wsv,true,true,de/karlshagen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690085,0,ready,history needs a PEGELONLINE backfill
+karlshagen-9690085-deu-wsv,Karlshagen,Germany,wsv,true,true,de/karlshagen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690085,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 karlshamn-kar-swe-cmems,Karlshamn,Sweden,cmems,true,false,se/karlshamn,false,2019-07-01,2025-07-01,,smhi,smhi/35131,0.05,ready,CMEMS record of a gauge the national feed publishes
 karlshamn_sjov-35131-swe-smhi,Karlshamn_Sjov,Sweden,smhi,true,true,se/karlshamn-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35131,0.04,ready,
-karnin-9690084-deu-wsv,Karnin,Germany,wsv,true,true,de/karnin,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690084,0,ready,history needs a PEGELONLINE backfill
+karnin-9690084-deu-wsv,Karnin,Germany,wsv,true,true,de/karnin,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690084,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 karrebaeksminde-kar-dnk-cmems,Karrebaeksminde,Denmark,cmems,true,true,dk/karrebaeksminde,false,2014-01-01,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 karumba-63580-aus-bom,Karumba,Australia,bom,true,true,au/karumba,true,1985-01-01,2022-12-31,,bom,,,license,BOM license not stated
 kashimako-0101-jpn-jodc_pahb,Kashimako,Japan,jodc_pahb,true,true,jp/kashimako,true,1977-12-31,2020-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
@@ -2172,7 +2172,7 @@ key_west_fl-242-usa-uhslc_fd,Key_West_FL,United States,uhslc_fd,true,false,us/ke
 key_west_fl-242a-usa-uhslc_rq,Key_West_FL,United States,uhslc_rq,true,false,us/key-west,true,1913-01-19,2021-12-31,noaa/8724580,coops,coops/8724580,0.3,ready,UHSLC relay of noaa/8724580
 khal_10-135a-bgd-uhslc_rq,Khal_10,Bangladesh,uhslc_rq,true,true,bd/chattogram,true,1982-01-01,1992-12-31,,uhslc,uhslc/135a,0.05,ready,
 khepupara-139a-bgd-uhslc_rq,Khepupara,Bangladesh,uhslc_rq,true,true,bd/khepupara,true,1987-01-01,2000-12-31,,uhslc,uhslc/139a,0.05,ready,
-kielholtenau-9610066-deu-wsv,Kielholtenau,Germany,wsv,true,true,de/kielholtenau,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9610066,0,ready,history needs a PEGELONLINE backfill
+kielholtenau-9610066-deu-wsv,Kielholtenau,Germany,wsv,true,true,de/kielholtenau,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9610066,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 kielholtenautg-kie-deu-cmems,KielHoltenauTG,Germany,cmems,true,true,de/kiel-holtenau,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610066,3.27,ready,CMEMS record of a gauge the national feed publishes
 kieltg-kie-deu-cmems,KielTG,Germany,cmems,true,false,de/kiel,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610050,0.14,ready,CMEMS record of a gauge the national feed publishes
 kihnu-kih-est-cmems,Kihnu,Estonia,cmems,true,false,ee/kihnu,false,2022-07-19,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
@@ -2199,8 +2199,8 @@ kivalina-9491253-usa-noaa,Kivalina,United States,noaa,true,false,us/kivalina,tru
 klagshamn-2095-swe-smhi,Klagshamn,Sweden,smhi,true,true,se/klagshamn,true,1929-11-13,2025-07-02,,smhi,smhi/2095,0,ready,
 klagshamn-kla-swe-cmems,Klagshamn,Sweden,cmems,true,false,se/klagshamn,false,1929-11-13,2025-07-01,,smhi,smhi/2095,0,ready,CMEMS record of a gauge the national feed publishes
 klaipeda-kla-ltu-cmems,Klaipeda,Lithuania,cmems,true,true,lt/klaipeda,false,2006-02-07,2014-08-31,,cmems,,,restricted,GESLA lists CMEMS as research only
-kloster-9670050-deu-wsv,Kloster,Germany,wsv,true,true,de/kloster,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670050,0,ready,history needs a PEGELONLINE backfill
-knock-3990010-deu-wsv,Knock,Germany,wsv,true,true,de/knock,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3990010,0.18,ready,history needs a PEGELONLINE backfill
+kloster-9670050-deu-wsv,Kloster,Germany,wsv,true,true,de/kloster,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670050,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+knock-3990010-deu-wsv,Knock,Germany,wsv,true,true,de/knock,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3990010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 knysna-186-zaf-uhslc_fd,Knysna,South Africa,uhslc_fd,true,true,za/knysna,true,1966-01-01,2018-10-31,,uhslc,,,restricted,SANHO's data
 knysna-186a-zaf-uhslc_rq,Knysna,South Africa,uhslc_rq,true,false,za/knysna-western-cape,true,1966-01-01,2016-12-31,,uhslc,,,restricted,SANHO's data
 ko_lak-328-tha-uhslc_fd,Ko_Lak,Thailand,uhslc_fd,true,true,th/ko-lak,true,1985-01-01,2025-02-28,,uhslc,uhslc/328,0.03,ready,
@@ -2217,7 +2217,7 @@ kodiak_island-9457292-usa-noaa,Kodiak_Island,United States,noaa,true,false,us/ko
 koege-koe-dnk-cmems,Koege,Denmark,cmems,true,true,dk/koege,false,2011-12-21,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 kogo-9025-jpn-jodc_pahb,Kogo,Japan,jodc_pahb,true,true,jp/kogo,true,2010-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 kolka-kol-lva-cmems,Kolka,Latvia,cmems,true,true,lv/kolka,false,2005-01-27,2025-06-27,,cmems,,,restricted,GESLA lists CMEMS as research only
-kollmar-5970025-deu-wsv,Kollmar,Germany,wsv,true,true,de/kollmar,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970025,0,ready,history needs a PEGELONLINE backfill
+kollmar-5970025-deu-wsv,Kollmar,Germany,wsv,true,true,de/kollmar,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970025,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 komatsushima-ma36-jpn-jodc_jma,Komatsushima,Japan,jodc_jma,true,false,jp/komatsushima,true,1963-12-31,2023-12-31,jma/KM,jma,jma/KM,0.93,ready,JODC relay of jma/KM
 kop_van_het_land-kopvhld-nld-rws_hist,Kop_van_het_Land,Netherlands,rws_hist,true,false,nl/kop-van-het-land,true,1970-11-01,1985-06-02,,rws,rws/kopvanhetland,0,ready,
 koper_10minute-kop-svn-cmems,KOPER_10minute,Slovenia,cmems,true,false,si/koper-urban-municipality-of-koper,false,2006-01-01,2015-12-24,,cmems,,,restricted,GESLA lists CMEMS as research only
@@ -2229,16 +2229,16 @@ kornwerderzandtg-kor-nld-cmems,KornwerderzandTG,Netherlands,cmems,true,true,nl/k
 koroni-kor-grc-cmems,Koroni,Greece,cmems,true,true,gr/koroni,false,2013-06-17,2022-05-11,,cmems,,,restricted,GESLA lists CMEMS as research only
 korotiti_bay-gbit-nzl-ttw,Korotiti_Bay,New Zealand,ttw,true,true,nz/korotiti-bay,true,2010-07-30,2024-12-31,,ttw,,,license,Terms not reviewed
 korsor-kor-dnk-cmems,Korsor,Denmark,cmems,true,true,dk/korsor,false,2005-01-01,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-koserow-9690093-deu-wsv,Koserow,Germany,wsv,true,true,de/koserow,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690093,0,ready,history needs a PEGELONLINE backfill
+koserow-9690093-deu-wsv,Koserow,Germany,wsv,true,true,de/koserow,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690093,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 kota_kinabalu-386a-mys-uhslc_rq,Kota_Kinabalu,Malaysia,uhslc_rq,true,true,my/kota-kinabalu,true,1987-06-23,2023-01-06,,uhslc,uhslc/386a,0.05,ready,
 kozushima-hd09-jpn-jodc_jcg,Kozushima,Japan,jodc_jcg,true,false,jp/kozushima,true,1964-01-31,2024-12-30,jhod/0056,jodc,jodc/0056,,license,JODC relay of jhod/0056
 krabbersgatsluizennoordtg-kra-nld-cmems,KrabbersgatsluizenNoordTG,Netherlands,cmems,true,false,nl/krabbersgatsluizen-noord,false,2014-07-30,2025-06-30,,rws,,,unmatched,Ambiguous between rws/krabbersgat.ijsselmeer and rws/krabbersgat.markermeer
 krabbersgatsluizenzuidtg-kra-nld-cmems,KrabbersgatsluizenZuidTG,Netherlands,cmems,true,false,nl/krabbersgatsluizen-zuid,false,2014-08-01,2025-06-30,,rws,,,unmatched,Ambiguous between rws/krabbersgat.markermeer and rws/krabbersgat.ijsselmeer
 krammer-krammr-nld-rws_hist,Krammer,Netherlands,rws_hist,true,false,nl/krammer,true,1971-01-01,1988-12-31,,rws,rws/krammer,0,ready,
 krammersluizen_west-krammszwt-nld-rws_hist,Krammersluizen_west,Netherlands,rws_hist,true,false,nl/krammersluizen-west,true,1988-12-31,2018-09-07,,rws,rws/krammersluizen.west,0,ready,
-krautsandreede-5970031-deu-wsv,Krautsandreede,Germany,wsv,true,true,de/krautsandreede,true,2020-06-09,2025-07-13,,pegelonline,pegelonline/5970031,0.19,ready,history needs a PEGELONLINE backfill
-krckausperrwerkap-5970024-deu-wsv,Krckausperrwerkap,Germany,wsv,true,true,de/krckausperrwerkap,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970024,0,ready,history needs a PEGELONLINE backfill
-krckausperrwerkbp-5970023-deu-wsv,Krckausperrwerkbp,Germany,wsv,true,false,de/krckausperrwerkbp,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970023,0,ready,history needs a PEGELONLINE backfill
+krautsandreede-5970031-deu-wsv,Krautsandreede,Germany,wsv,true,true,de/krautsandreede,true,2020-06-09,2025-07-13,,pegelonline,pegelonline/5970031,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+krckausperrwerkap-5970024-deu-wsv,Krckausperrwerkap,Germany,wsv,true,true,de/krckausperrwerkap,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970024,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+krckausperrwerkbp-5970023-deu-wsv,Krckausperrwerkbp,Germany,wsv,true,false,de/krckausperrwerkbp,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5970023,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 kreekrak_noord-kreekrnd-nld-rws_hist,Kreekrak_noord,Netherlands,rws_hist,true,false,nl/kreekrak-noord,true,1975-02-28,2014-07-08,,rws,rws/kreekrak.noord,0,ready,
 kreekrak_oude_diensthaven-kreekroddhvn-nld-rws_hist,Kreekrak_oude_diensthaven,Netherlands,rws_hist,true,false,nl/kreekrak-oude-diensthaven,true,1972-05-01,1975-06-25,,rws,rws/kreekrakoudediensthaven,0,ready,
 krimpen_ad_ijssel-krimpadijsl-nld-rws_hist,Krimpen_ad_IJssel,Netherlands,rws_hist,true,false,nl/krimpen-ad-i-jssel,true,1971-01-01,2018-09-07,,rws,rws/krimpenaandeijssel.hollandscheijssel,0.04,ready,
@@ -2335,9 +2335,9 @@ landsort_norra-2507-swe-smhi,Landsort_Norra,Sweden,smhi,true,true,se/landsort-no
 landsortnorra-lan-swe-cmems,LandsortNorra,Sweden,cmems,true,false,se/landsort-norra,false,2004-10-14,2025-07-01,,smhi,smhi/2507,0.02,ready,CMEMS record of a gauge the national feed publishes
 lanexa-8638445-usa-noaa,Lanexa,United States,noaa,true,false,us/lanexa,true,2007-10-10,2009-07-29,noaa/8638445,coops,coops/8638445,0,ready,
 langara_point-9964-can-meds,Langara_Point,Canada,meds,true,true,ca/langara-point,true,1973-02-23,2007-02-11,,chs,,,restricted,CHS license bars commercial derivatives
-langballigau-9610015-deu-wsv,Langballigau,Germany,wsv,true,true,de/langballigau,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610015,0,ready,history needs a PEGELONLINE backfill
+langballigau-9610015-deu-wsv,Langballigau,Germany,wsv,true,true,de/langballigau,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610015,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 langballigautg-lan-deu-cmems,LangballigauTG,Germany,cmems,true,false,de/langballigau-schleswig-holstein,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610015,0.06,ready,CMEMS record of a gauge the national feed publishes
-langeoog-9390010-deu-wsv,Langeoog,Germany,wsv,true,true,de/langeoog,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9390010,0.18,ready,history needs a PEGELONLINE backfill
+langeoog-9390010-deu-wsv,Langeoog,Germany,wsv,true,true,de/langeoog,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9390010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 langkawi-142-mys-uhslc_fd,Langkawi,Malaysia,uhslc_fd,true,true,my/langkawi,true,1985-11-29,2025-06-30,,uhslc,uhslc/142,0.29,ready,
 langkawi-142a-mys-uhslc_rq,Langkawi,Malaysia,uhslc_rq,true,false,my/langkawi,true,1985-11-29,2018-12-31,,uhslc,uhslc/142,0,ready,
 langosteiratg-lan-esp-cmems,LangosteiraTG,Spain,cmems,true,true,es/langosteira,false,2012-11-09,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
@@ -2357,7 +2357,7 @@ las_palmas-217d-esp-uhslc_rq,Las_Palmas,Spain,uhslc_rq,true,false,es/las-palmas,
 laspalmastg-las-esp-cmems,LasPalmasTG,Spain,cmems,true,true,es/las-palmas-ticon-laspalmastg-las-esp-cmems,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 laspezia-las-ita-ispra,LaSpezia,Italy,ispra,true,true,it/la-spezia,true,2010-01-01,2025-07-06,,ispra,,,license,
 lauderdale_by_the_sea-8722899-usa-noaa,Lauderdale_By_The_Sea,United States,noaa,true,false,us/lauderdale-by-the-sea,true,1973-06-25,1975-06-01,noaa/8722899,coops,coops/8722899,0,ready,
-lauterbach-9670063-deu-wsv,Lauterbach,Germany,wsv,true,true,de/lauterbach,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670063,0,ready,history needs a PEGELONLINE backfill
+lauterbach-9670063-deu-wsv,Lauterbach,Germany,wsv,true,true,de/lauterbach,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670063,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 lautoka-402-fji-uhslc_fd,Lautoka,Fiji,uhslc_fd,true,true,fj/lautoka,true,1992-10-24,2025-05-31,,uhslc,uhslc/402,0.79,restricted,The contributor's terms bar commercial use
 lautoka-402a-fji-uhslc_rq,Lautoka,Fiji,uhslc_rq,true,false,fj/lautoka,true,1992-10-24,2021-12-22,,uhslc,uhslc/402,0.03,restricted,The contributor's terms bar commercial use
 lautoka-67070-fji-bom,Lautoka,Fiji,bom,true,false,fj/lautoka-ticon-lautoka-67070-fji-bom,true,1992-10-24,2022-12-31,,bom,,,license,BOM license not stated
@@ -2372,7 +2372,7 @@ lazarocardenas_flotador-15-mex-unam,LazaroCardenas_Flotador,Mexico,unam,true,fal
 lazarocardenas_nivelcbs-15-mex-unam,LazaroCardenas_NivelCBS,Mexico,unam,true,false,mx/lazaro-cardenas-nivel-cbs,true,2021-06-23,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
 lazarocardenas_nivelpls-15-mex-unam,LazaroCardenas_NivelPLS,Mexico,unam,true,false,mx/lazaro-cardenas-nivel-pls,true,2021-04-01,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
 lazarocardenas_radar-15-mex-unam,LazaroCardenas_Radar,Mexico,unam,true,false,mx/lazaro-cardenas-radar,true,2021-04-08,2024-05-28,,unam,,,license,UNAM Servicio Mareográfico terms to check
-lbeckbauhof-9620090-deu-wsv,Lbeckbauhof,Germany,wsv,true,true,de/lubeck-bauhof,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9620090,0,ready,history needs a PEGELONLINE backfill
+lbeckbauhof-9620090-deu-wsv,Lbeckbauhof,Germany,wsv,true,true,de/lubeck-bauhof,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9620090,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 le_conquet-152-fra-refmar,Le_Conquet,France,refmar,true,true,fr/le-conquet,true,1970-12-22,2025-03-31,,refmar,refmar/152,0,ready,
 le_crouesty-185-fra-refmar,Le_Crouesty,France,refmar,true,true,fr/le-crouesty,true,1996-03-15,2025-03-31,,refmar,refmar/185,0,ready,
 le_havre-4-fra-refmar,Le_Havre,France,refmar,true,true,fr/le-havre,true,1938-01-04,2024-12-31,,refmar,refmar/4,0,ready,
@@ -2387,8 +2387,8 @@ leavatg_60minute-lea-fra-cmems,LeavaTG_60minute,France,cmems,true,false,fr/leava
 lebrusctg_10minute-leb-fra-cmems,LeBruscTG_10minute,France,cmems,true,true,fr/le-brusc,false,2016-07-18,2019-04-22,,refmar,refmar/5116,0,ready,CMEMS record of a gauge the national feed publishes
 leconquettg_60minute-lec-fra-cmems,LeConquetTG_60minute,France,cmems,true,false,fr/le-conquet,false,1970-12-22,2025-03-31,,refmar,refmar/152,0.02,ready,CMEMS record of a gauge the national feed publishes
 lecrouestytg_60minute-lec-fra-cmems,LeCrouestyTG_60minute,France,cmems,true,false,fr/le-crouesty,false,1996-03-15,2025-03-31,,refmar,refmar/185,0.03,ready,CMEMS record of a gauge the national feed publishes
-ledasperrwerkup-3880050-deu-wsv,Ledasperrwerkup,Germany,wsv,true,true,de/ledasperrwerkup,true,2000-11-23,2025-07-13,,pegelonline,pegelonline/3880050,0.18,ready,history needs a PEGELONLINE backfill
-leerort-3910010-deu-wsv,Leerort,Germany,wsv,true,true,de/leerort,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3910010,0.18,ready,history needs a PEGELONLINE backfill
+ledasperrwerkup-3880050-deu-wsv,Ledasperrwerkup,Germany,wsv,true,true,de/ledasperrwerkup,true,2000-11-23,2025-07-13,,pegelonline,pegelonline/3880050,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+leerort-3910010-deu-wsv,Leerort,Germany,wsv,true,true,de/leerort,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3910010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 leeville-8762084-usa-noaa,Leeville,United States,noaa,true,false,us/leeville,true,1989-04-15,1991-01-03,noaa/8762084,coops,coops/8762084,0,ready,
 legaspi-371-phl-uhslc_fd,Legaspi,Philippines,uhslc_fd,true,true,ph/legaspi,true,1984-01-01,2025-06-30,,uhslc,uhslc/371,0.92,ready,
 legaspi-371a-phl-uhslc_rq,Legaspi,Philippines,uhslc_rq,true,false,ph/legaspi,true,1984-01-01,2017-09-04,,uhslc,uhslc/371,0.15,ready,
@@ -2411,11 +2411,11 @@ lerwick-ler-gbr-bodc,Lerwick,United Kingdom,bodc,true,true,gb/lerwick-scotland,t
 lerwick-ler-gbr-cmems,Lerwick,United Kingdom,cmems,true,false,gb/lerwick-scotland,false,1990-01-01,2025-06-30,,ea,ea/E74439,0.12,ready,The EA's real-time readings of the gauge
 les_sables_d_olonne-62-fra-refmar,Les_Sables_D_Olonne,France,refmar,true,true,fr/les-sables-d-olonne,true,1965-07-06,2025-03-31,,refmar,refmar/62,0,ready,
 lessablesdolonnetg_60minute-les-fra-cmems,LesSablesDOlonneTG_60minute,France,cmems,true,false,fr/les-sables-d-olonne,false,1965-07-06,2025-03-31,,refmar,refmar/62,0.03,ready,CMEMS record of a gauge the national feed publishes
-leuchtturmalteweser-9460040-deu-wsv,Leuchtturmalteweser,Germany,wsv,true,true,de/leuchtturmalteweser,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460040,0.19,ready,history needs a PEGELONLINE backfill
+leuchtturmalteweser-9460040-deu-wsv,Leuchtturmalteweser,Germany,wsv,true,true,de/leuchtturmalteweser,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460040,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 lewes-8557380-usa-noaa,Lewes,United States,noaa,true,false,us/lewes,true,1919-02-01,2025-06-30,noaa/8557380,coops,coops/8557380,0.01,ready,
 lewes_de-747a-usa-uhslc_rq,Lewes_DE,United States,uhslc_rq,true,false,us/lewes,true,1919-02-01,2021-12-31,noaa/8557380,coops,coops/8557380,0.11,ready,UHSLC relay of noaa/8557380
 lewisetta-8635750-usa-noaa,Lewisetta,United States,noaa,true,false,us/lewisetta,true,1970-11-05,2025-06-30,noaa/8635750,coops,coops/8635750,0.1,ready,
-lhort-5960010-deu-wsv,Lhort,Germany,wsv,true,true,de/lhort,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5960010,0,ready,history needs a PEGELONLINE backfill
+lhort-5960010-deu-wsv,Lhort,Germany,wsv,true,true,de/lhort,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5960010,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 lianyungang-639a-chn-uhslc_rq,Lianyungang,China,uhslc_rq,true,true,cn/lianyungang,true,1975-01-01,1997-12-31,,uhslc,uhslc/639a,0.03,ready,
 liberty_cut_a_little_holland_tract_nr_courtland_ca-11455146-usa-usgs,Liberty_Cut_A_Little_Holland_Tract_Nr_Courtland_Ca,United States,usgs,true,true,us/liberty-cut-a-little-holland-tract-nr-courtland-ca,true,2014-09-16,2018-11-06,,usgs,usgs/11455146,0,ready,
 liberty_island_at_approx_cntr_s_end-lib-usa-cdwr,Liberty_Island_At_Approx_Cntr_S_End,United States,cdwr,true,false,us/liberty-island-at-approx-cntr-s-end,true,2010-12-20,2025-05-24,,cdec,,,unmatched,No cdec/LIB in the list
@@ -2434,7 +2434,7 @@ limon-268-cri-uhslc_fd,Limon,Costa Rica,uhslc_fd,true,true,cr/limon,true,2009-10
 limon-268a-cri-uhslc_rq,Limon,Costa Rica,uhslc_rq,true,false,cr/limon,true,1970-01-02,1981-03-01,,uhslc,uhslc/268a,0.03,ready,
 limon-268b-cri-uhslc_rq,Limon,Costa Rica,uhslc_rq,true,false,cr/limon,true,2009-10-15,2018-12-31,,uhslc,uhslc/268,0.09,ready,
 linnville_bayou_at_fm_521_nr_cedar_lane_tx-8117858-usa-usgs,Linnville_Bayou_At_Fm_521_Nr_Cedar_Lane_Tx,United States,usgs,true,true,us/linnville-bayou-at-fm-521-nr-cedar-lane-tx,true,2022-05-24,2025-04-30,,usgs,usgs/08117858,0,ready,
-listaufsylt-9570070-deu-wsv,Listaufsylt,Germany,wsv,true,true,de/listaufsylt,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570070,0.2,ready,history needs a PEGELONLINE backfill
+listaufsylt-9570070-deu-wsv,Listaufsylt,Germany,wsv,true,true,de/listaufsylt,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570070,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 listtg-lis-deu-cmems,ListTG,Germany,cmems,true,false,de/list,false,2014-01-26,2025-06-30,,pegelonline,pegelonline/9570070,0.06,ready,CMEMS record of a gauge the national feed publishes
 little_annemessex_river_at_crisfield_md-1485755-usa-usgs,Little_Annemessex_River_At_Crisfield_Md,United States,usgs,true,false,us/little-annemessex-river-at-crisfield-md,true,2018-06-26,2025-04-30,,usgs,usgs/01485755,0,ready,
 little_assawoman_bay_at_fenwick_island_de-1484701-usa-usgs,Little_Assawoman_Bay_At_Fenwick_Island_De,United States,usgs,true,false,us/little-assawoman-bay-at-fenwick-island-de,true,2007-10-01,2014-10-01,,usgs,usgs/01484701,0,ready,
@@ -2512,7 +2512,7 @@ lox_river_at_outlet_of_kitchings_creek_fl-265929080091800-usa-usgs,Lox_River_At_
 loxahatchee_river_at_mile_91_near_jupiter_fl-265906080093500-usa-usgs,Loxahatchee_River_At_Mile_91_Near_Jupiter_Fl,United States,usgs,true,true,us/loxahatchee-river-at-mile-91-near-jupiter-fl,true,2007-10-01,2025-04-30,,usgs,usgs/265906080093500,0,ready,
 loxahatchee_river_pennock_point_channel_marker_2-265656080063500-usa-usgs,Loxahatchee_River_Pennock_Point_Channel_Marker_2,United States,usgs,true,true,us/loxahatchee-river-pennock-point-channel-marker-2,true,2008-08-13,2011-10-14,,usgs,usgs/265656080063500,0,ready,
 loxahatchee_rv_500_ft_ds_of_us_1_at_jupiter_fl-2277744-usa-usgs,Loxahatchee_Rv_500_Ft_Ds_Of_Us_1_At_Jupiter_Fl,United States,usgs,true,false,us/loxahatchee-rv-500-ft-ds-of-us-1-at-jupiter-fl,true,2022-03-23,2025-04-30,,usgs,usgs/02277744,0,ready,
-ltkiel-9610050-deu-wsv,Ltkiel,Germany,wsv,true,true,de/ltkiel,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610050,0,ready,history needs a PEGELONLINE backfill
+ltkiel-9610050-deu-wsv,Ltkiel,Germany,wsv,true,true,de/ltkiel,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610050,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 luanda-236a-ago-uhslc_rq,Luanda,Angola,uhslc_rq,true,true,ao/luanda,true,1972-01-01,1975-06-30,,uhslc,uhslc/236a,0.05,ready,
 lubang-655-phl-uhslc_fd,Lubang,Philippines,uhslc_fd,true,true,ph/lubang,true,2010-06-11,2025-06-30,,uhslc,uhslc/655,0.15,ready,
 lubang-655a-phl-uhslc_rq,Lubang,Philippines,uhslc_rq,true,false,ph/lubang,true,2010-06-11,2018-12-31,,uhslc,uhslc/655,0.05,ready,
@@ -2629,7 +2629,7 @@ mare-418-fra-refmar,Mare,France,refmar,true,true,fr/mare,true,1982-10-26,2025-03
 mare_island-9415218-usa-noaa,Mare_Island,United States,noaa,true,false,us/mare-island,true,1996-06-26,2012-10-28,noaa/9415218,coops,coops/9415218,0,ready,
 mare_island_strait-9415165-usa-noaa,Mare_Island_Strait,United States,noaa,true,false,us/vallejo,true,1977-04-05,1978-10-17,noaa/9415165,coops,coops/9415165,0,ready,
 maretg_60minute-mar-fra-cmems,MareTG_60minute,France,cmems,true,false,fr/mare,false,1982-10-26,2025-03-31,,refmar,refmar/418,0,ready,CMEMS record of a gauge the national feed publishes
-marienleuchte-9610075-deu-wsv,Marienleuchte,Germany,wsv,true,true,de/marienleuchte,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610075,0,ready,history needs a PEGELONLINE backfill
+marienleuchte-9610075-deu-wsv,Marienleuchte,Germany,wsv,true,true,de/marienleuchte,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610075,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 marienleuchtetg-mar-deu-cmems,MarienleuchteTG,Germany,cmems,true,false,de/marienleuchte,false,2019-03-17,2025-06-30,,pegelonline,pegelonline/9610075,0.04,ready,CMEMS record of a gauge the national feed publishes
 marina_di_campo-mar-ita-ispra,Marina_di_Campo,Italy,ispra,true,true,it/marina-di-campo,true,2011-07-21,2025-07-06,,ispra,,,license,
 marintg-mar-esp-cmems,MarinTG,Spain,cmems,true,true,es/marin,false,2010-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
@@ -2696,7 +2696,7 @@ mckay_creek_near_largo_fl-2309110-usa-usgs,Mckay_Creek_Near_Largo_Fl,United Stat
 mdts-mdts-usa-sfwmd,MDTS,United States,sfwmd,true,true,us/north-key-largo-ticon-mdts-mdts-usa-sfwmd,true,1991-11-22,2016-01-08,,sfwmd,,,unmatched,
 melbourne_williamstown-60780-aus-bom,Melbourne_Williamstown,Australia,bom,true,true,au/melbourne-williamstown,true,1966-01-28,2022-12-31,,bom,,,license,BOM license not stated
 melillatg-mel-esp-cmems,MelillaTG,Spain,cmems,true,true,es/melilla,false,2008-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
-mellumplate-9420010-deu-wsv,Mellumplate,Germany,wsv,true,true,de/mellumplate,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9420010,0.19,ready,history needs a PEGELONLINE backfill
+mellumplate-9420010-deu-wsv,Mellumplate,Germany,wsv,true,true,de/mellumplate,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9420010,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 melville_bay_gove_harbour-63480-aus-bom,Melville_Bay_Gove_Harbour,Australia,bom,true,true,au/melville-bay-gove-harbour,true,1965-10-06,2007-08-05,,bom,,,license,BOM license not stated
 menemsha_harbor-8448725-usa-noaa,Menemsha_Harbor,United States,noaa,true,false,us/menemsha-harbor,true,1994-06-13,2012-08-31,noaa/8448725,coops,coops/8448725,0.05,ready,
 meneng-158a-idn-uhslc_rq,Meneng,Indonesia,uhslc_rq,true,true,id/meneng,true,1987-06-14,1990-04-11,,uhslc,uhslc/158a,0.05,ready,
@@ -2778,7 +2778,7 @@ mississippi_sound_at_usgs_st_joseph_island_light-301104089253400-usa-usgs,Missis
 mississippi_sound_near_grand_pass-300722089150100-usa-usgs,Mississippi_Sound_Near_Grand_Pass,United States,usgs,true,true,us/mississippi-sound-near-grand-pass,true,2008-08-28,2025-05-01,,usgs,usgs/300722089150100,0,ready,
 misumi-ma46-jpn-jodc_jma,Misumi,Japan,jodc_jma,true,true,jp/misumi,true,1960-12-31,2013-01-07,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 mitajirinaknosekiko-8413-jpn-jodc_pahb,Mitajirinaknosekiko,Japan,jodc_pahb,true,false,jp/mitajirinaknosekiko,true,2011-03-31,2013-08-05,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
-mittelgrund-9510132-deu-wsv,Mittelgrund,Germany,wsv,true,true,de/mittelgrund,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510132,0.19,ready,history needs a PEGELONLINE backfill
+mittelgrund-9510132-deu-wsv,Mittelgrund,Germany,wsv,true,true,de/mittelgrund,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510132,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 miyakejima-357a-jpn-uhslc_rq,Miyakejima,Japan,uhslc_rq,true,false,jp/miyakejima,true,1964-01-31,2018-12-31,jhod/0057,jodc,jodc/0057,,license,UHSLC relay of jhod/0057
 miyakejima-hd10-jpn-jodc_jcg,Miyakejima,Japan,jodc_jcg,true,false,jp/miyakejima,true,1964-01-31,2024-12-30,jhod/0057,jodc,jodc/0057,,license,JODC relay of jhod/0057
 miyakeshima-ma71-jpn-jodc_jma,Miyakeshima,Japan,jodc_jma,true,false,jp/miyakejima-tsubota,true,1997-03-14,2023-12-31,jma/MJ,jma,jma/MJ,0.98,ready,JODC relay of jma/MJ
@@ -2940,8 +2940,8 @@ nemuroko-0133-jpn-jodc_pahb,Nemuroko,Japan,jodc_pahb,true,true,jp/nemuroko,true,
 neponset_river_at_milton_village_ma-11055566-usa-usgs,Neponset_River_At_Milton_Village_Ma,United States,usgs,true,true,us/neponset-river-at-milton-village-ma,true,2007-10-01,2025-05-06,,usgs,usgs/011055566,0,ready,
 nes-nes-nld-rws_hist,Nes,Netherlands,rws_hist,true,false,nl/nes,true,1971-01-01,2018-09-07,,rws,rws/ameland.nes,0.04,ready,
 nestg-nes-nld-cmems,NesTG,Netherlands,cmems,true,true,nl/nes-friesland,false,2014-07-30,2025-05-31,,rws,rws/ameland.nes,0.18,ready,CMEMS record of a gauge the national feed publishes
-neuendorfhafen-9670046-deu-wsv,Neuendorfhafen,Germany,wsv,true,true,de/neuendorfhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670046,0,ready,history needs a PEGELONLINE backfill
-neustadt-9610080-deu-wsv,Neustadt,Germany,wsv,true,true,de/neustadt-bay-of-lubeck,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610080,0,ready,history needs a PEGELONLINE backfill
+neuendorfhafen-9670046-deu-wsv,Neuendorfhafen,Germany,wsv,true,true,de/neuendorfhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670046,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+neustadt-9610080-deu-wsv,Neustadt,Germany,wsv,true,true,de/neustadt-bay-of-lubeck,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610080,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 neustadttg-neu-deu-cmems,NeustadtTG,Germany,cmems,true,true,de/neustadt-neustadter-bucht,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9610080,1.18,ready,CMEMS record of a gauge the national feed publishes
 neuville-3280-can-meds,Neuville,Canada,meds,true,true,ca/neuville,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 new_brighton_pier-nbrt-nzl-ttw,New_Brighton_Pier,New Zealand,ttw,true,true,nz/new-brighton-pier,true,2021-05-26,2023-12-31,,ttw,,,license,Terms not reviewed
@@ -2988,7 +2988,7 @@ newriver_gumbranch-new-usa-ncdem,NewRiver_GumBranch,United States,ncdem,true,fal
 nezugaseki-gs07-jpn-jodc_giaj,Nezugaseki,Japan,jodc_giaj,true,true,jp/nezugaseki,true,1955-02-22,2023-12-16,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 nice-339-fra-refmar,Nice,France,refmar,true,true,fr/nice,true,1981-07-04,2025-03-31,,refmar,refmar/339,0,ready,
 nicetg_60minute-nic-fra-cmems,NiceTG_60minute,France,cmems,true,false,fr/nice,false,1981-07-04,2025-03-31,,refmar,refmar/339,0.02,ready,CMEMS record of a gauge the national feed publishes
-niederblockland-4940020-deu-wsv,Niederblockland,Germany,wsv,true,true,de/niederblockland,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940020,0.18,ready,history needs a PEGELONLINE backfill
+niederblockland-4940020-deu-wsv,Niederblockland,Germany,wsv,true,true,de/niederblockland,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 nieuwe_statenzijl-nieuwstzl-nld-rws_hist,Nieuwe_Statenzijl,Netherlands,rws_hist,true,false,nl/nieuwe-statenzijl,true,1979-01-01,2018-09-07,,rws,rws/nieuwestatenzijl.dollard,0,ready,
 nieuwestatenzijltg-nie-nld-cmems,NieuweStatenzijlTG,Netherlands,cmems,true,true,nl/nieuwe-statenzijl-lower-saxony,false,2014-07-30,2025-06-30,,rws,rws/nieuwestatenzijl.dollard,0.13,ready,CMEMS record of a gauge the national feed publishes
 nieuwpoorttg-nie-bel-cmems,NieuwpoortTG,Belgium,cmems,true,true,be/nieuwpoort,false,2014-08-01,2024-05-31,,cmems,,,restricted,GESLA lists CMEMS as research only
@@ -2999,20 +2999,20 @@ nikolski-9462450-usa-noaa,Nikolski,United States,noaa,true,false,us/nikolski,tru
 nishinoomote-363-jpn-uhslc_fd,Nishinoomote,Japan,uhslc_fd,true,false,jp/nishinoomote,true,1965-04-21,2025-06-30,,uhslc,uhslc/363,0.46,ready,
 nishinoomote-363a-jpn-uhslc_rq,Nishinoomote,Japan,uhslc_rq,true,false,jp/nishinoomote,true,1965-04-21,2018-12-31,jhod/0177,jodc,jodc/0177,,license,UHSLC relay of jhod/0177
 nishinoomote-hd21-jpn-jodc_jcg,Nishinoomote,Japan,jodc_jcg,true,false,jp/nishinoomote,true,1965-04-21,2024-12-30,jhod/0177,jodc,jodc/0177,,license,JODC relay of jhod/0177
-nokbrunsbttel-5970091-deu-wsv,Nokbrunsbttel,Germany,wsv,true,true,de/nokbrunsbttel,true,2007-01-15,2025-07-12,,pegelonline,pegelonline/5970091,0.19,ready,history needs a PEGELONLINE backfill
-nokkielaussen-5650068-deu-wsv,Nokkielaussen,Germany,wsv,true,true,de/nokkielaussen,true,2015-06-29,2025-07-12,,pegelonline,pegelonline/5650068,0.2,ready,history needs a PEGELONLINE backfill
-nokkielbinnen-5979020-deu-wsv,Nokkielbinnen,Germany,wsv,true,true,de/nokkielbinnen,true,2015-06-27,2025-07-12,,pegelonline,pegelonline/5979020,0.2,ready,history needs a PEGELONLINE backfill
+nokbrunsbttel-5970091-deu-wsv,Nokbrunsbttel,Germany,wsv,true,true,de/nokbrunsbttel,true,2007-01-15,2025-07-12,,pegelonline,pegelonline/5970091,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+nokkielaussen-5650068-deu-wsv,Nokkielaussen,Germany,wsv,true,true,de/nokkielaussen,true,2015-06-29,2025-07-12,,pegelonline,pegelonline/5650068,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+nokkielbinnen-5979020-deu-wsv,Nokkielbinnen,Germany,wsv,true,true,de/nokkielbinnen,true,2015-06-27,2025-07-12,,pegelonline,pegelonline/5979020,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 nome-9468756-usa-noaa,Nome,United States,noaa,true,false,us/nome,true,1992-10-01,2025-06-30,noaa/9468756,coops,coops/9468756,0,ready,
 nome_ak-595-usa-uhslc_fd,Nome_AK,United States,uhslc_fd,true,false,us/nome,true,1992-10-01,2025-06-30,,uhslc,uhslc/595,0,ready,
 nome_ak-595a-usa-uhslc_rq,Nome_AK,United States,uhslc_rq,true,false,us/nome,true,1992-10-01,2021-12-31,noaa/9468756,coops,coops/9468756,0.76,ready,UHSLC relay of noaa/9468756
 nooksack_river_at_ferndale_wa-12213100-usa-usgs,Nooksack_River_At_Ferndale_Wa,United States,usgs,true,false,us/nooksack-river-at-ferndale-wa,true,2007-10-01,2025-04-30,,usgs,usgs/12213100,0,ready,
 nooksack_river_at_marine_dr_br_nr_bellingham_wa-12213145-usa-usgs,Nooksack_River_At_Marine_Dr_Br_Nr_Bellingham_Wa,United States,usgs,true,true,us/nooksack-river-at-marine-dr-br-nr-bellingham-wa,true,2015-10-07,2017-10-13,,usgs,usgs/12213145,0,ready,
 noordwijk_meetpost-noordwmpt-nld-rws_hist,Noordwijk_meetpost,Netherlands,rws_hist,true,false,nl/noordwijk-meetpost,true,1982-09-02,2006-07-05,,rws,rws/noordwijk.meetpost,0.12,ready,
-nordenham-4970040-deu-wsv,Nordenham,Germany,wsv,true,true,de/nordenham,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/4970040,0,ready,history needs a PEGELONLINE backfill
-norderneyriffgat-9360010-deu-wsv,Norderneyriffgat,Germany,wsv,true,true,de/norderneyriffgat,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9360010,0.18,ready,history needs a PEGELONLINE backfill
+nordenham-4970040-deu-wsv,Nordenham,Germany,wsv,true,true,de/nordenham,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/4970040,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+norderneyriffgat-9360010-deu-wsv,Norderneyriffgat,Germany,wsv,true,true,de/norderneyriffgat,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9360010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 norderneytg-nor-deu-cmems,NorderneyTG,Germany,cmems,true,false,de/norderney,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9360010,0.42,ready,CMEMS record of a gauge the national feed publishes
-nordfeldoberwasser-9520040-deu-wsv,Nordfeldoberwasser,Germany,wsv,true,true,de/nordfeldoberwasser,true,2000-01-01,2025-07-11,,pegelonline,pegelonline/9520040,0.2,ready,history needs a PEGELONLINE backfill
-nordfeldunterwasser-9520050-deu-wsv,Nordfeldunterwasser,Germany,wsv,true,true,de/nordfeldunterwasser,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520050,0.2,ready,history needs a PEGELONLINE backfill
+nordfeldoberwasser-9520040-deu-wsv,Nordfeldoberwasser,Germany,wsv,true,true,de/nordfeldoberwasser,true,2000-01-01,2025-07-11,,pegelonline,pegelonline/9520040,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+nordfeldunterwasser-9520050-deu-wsv,Nordfeldunterwasser,Germany,wsv,true,true,de/nordfeldunterwasser,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520050,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 nordrerose-nor-dnk-cmems,NordreRose,Denmark,cmems,true,true,dk/nordre-rose,false,1992-09-30,2019-01-02,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 norfolk_island-062a-aus-uhslc_rq,Norfolk_Island,Australia,uhslc_rq,true,false,au/norfolk-island,true,1985-11-13,1987-12-31,,uhslc,uhslc/062a,0.03,ready,
 norfolk_island-062b-aus-uhslc_rq,Norfolk_Island,Australia,uhslc_rq,true,true,au/norfolk-island,true,1994-02-01,1999-12-31,,uhslc,uhslc/062b,0.04,ready,
@@ -3127,7 +3127,7 @@ old_river_near_tracy-olr-usa-cdwr,Old_River_Near_Tracy,United States,cdwr,true,t
 old_river_near_tracy_blvd_bridge-b95380-usa-cdwr,Old_River_Near_Tracy_Blvd_Bridge,United States,cdwr,true,true,us/old-river-near-tracy-blvd-bridge,true,1982-10-01,2025-05-24,,dwr,dwr/B95380,0,ready,
 old_river_upstream_of_mountain_house_creek-b95370q-usa-cdwr,Old_River_Upstream_Of_Mountain_House_Creek,United States,cdwr,true,true,us/old-river-upstream-of-mountain-house-creek,true,2015-10-01,2025-05-24,,dwr,dwr/B95370Q,0,ready,
 old_rv_cutoff_nr_moss_bluff_tx-8067215-usa-usgs,Old_Rv_Cutoff_Nr_Moss_Bluff_Tx,United States,usgs,true,false,us/old-rv-cutoff-nr-moss-bluff-tx,true,2007-10-01,2022-10-01,,usgs,usgs/08067215,0,ready,
-oldenburgdrielake-4960030-deu-wsv,Oldenburgdrielake,Germany,wsv,true,true,de/oldenburgdrielake,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960030,0.18,ready,history needs a PEGELONLINE backfill
+oldenburgdrielake-4960030-deu-wsv,Oldenburgdrielake,Germany,wsv,true,true,de/oldenburgdrielake,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 omaezaki-ma20-jpn-jodc_jma,Omaezaki,Japan,jodc_jma,true,false,jp/omaezaki,true,1960-12-31,2023-12-31,jma/OM,jma,jma/OM,1.06,ready,JODC relay of jma/OM
 ominato-hd04-jpn-jodc_jcg,Ominato,Japan,jodc_jcg,true,true,jp/ominato,true,1952-05-31,2008-03-25,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 onahama-ma12-jpn-jodc_jma,Onahama,Japan,jodc_jma,true,false,jp/onahama,true,1961-12-31,2023-12-31,jma/ON,jma,jma/ON,0.85,ready,JODC relay of jma/ON
@@ -3158,16 +3158,16 @@ oshawa_ontario-13450-can-meds,Oshawa_Ontario,Canada,meds,true,false,ca/oshawa,tr
 oshoro-gs04-jpn-jodc_giaj,Oshoro,Japan,jodc_giaj,true,true,jp/oshoro,true,1932-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 oskarshamn-2085-swe-smhi,Oskarshamn,Sweden,smhi,true,true,se/oskarshamn,true,1960-09-15,2025-07-02,,smhi,smhi/2085,0.39,ready,
 oskarshamn-osk-swe-cmems,Oskarshamn,Sweden,cmems,true,false,se/oskarshamn,false,1960-09-15,2025-07-01,,smhi,smhi/2085,0.39,ready,CMEMS record of a gauge the national feed publishes
-oslebshausen-4910060-deu-wsv,Oslebshausen,Germany,wsv,true,true,de/oslebshausen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4910060,0.18,ready,history needs a PEGELONLINE backfill
+oslebshausen-4910060-deu-wsv,Oslebshausen,Germany,wsv,true,true,de/oslebshausen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4910060,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 oslo-osl-nor-nhs,Oslo,Norway,nhs,true,false,no/oslo,true,1914-02-03,2025-07-28,kartverket/OSL,kartverket,kartverket/OSL,0,ready,
 oslotg-osl-nor-cmems,OsloTG,Norway,cmems,true,false,no/oslo,false,1914-02-03,2025-06-30,,kartverket,kartverket/OSL,0,ready,CMEMS record of a gauge the national feed publishes
-osteriffmpm-5970096-deu-wsv,Osteriffmpm,Germany,wsv,true,true,de/osteriffmpm,true,2013-05-09,2025-07-12,,pegelonline,pegelonline/5970096,0.19,ready,history needs a PEGELONLINE backfill
+osteriffmpm-5970096-deu-wsv,Osteriffmpm,Germany,wsv,true,true,de/osteriffmpm,true,2013-05-09,2025-07-12,,pegelonline,pegelonline/5970096,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 oswego_ny-9052030-usa-noaa,Oswego_Ny,United States,noaa,true,true,us/oswego,true,1962-06-01,2025-07-01,noaa/9052030,coops,coops/9052030,0,ready,
 otaru-ma77-jpn-jodc_jma,Otaru,Japan,jodc_jma,true,false,jp/otaru,true,1996-12-31,2023-12-31,jma/B3,jma,jma/B3,2.76,ready,JODC relay of jma/B3
 otaruko-0138-jpn-jodc_pahb,Otaruko,Japan,jodc_pahb,true,true,jp/otaruko,true,1982-12-31,2013-03-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 oterdum-otdm-nld-rws_hist,Oterdum,Netherlands,rws_hist,true,false,nl/oterdum,true,1983-01-01,1986-12-31,,rws,rws/oterdum,0,ready,
 otranto-otr-ita-ispra,Otranto,Italy,ispra,true,true,it/otranto,true,1987-02-03,2025-07-06,,ispra,,,license,
-otterndorfmpm-5990011-deu-wsv,Otterndorfmpm,Germany,wsv,true,true,de/otterndorfmpm,true,2013-05-28,2025-07-12,,pegelonline,pegelonline/5990011,0.19,ready,history needs a PEGELONLINE backfill
+otterndorfmpm-5990011-deu-wsv,Otterndorfmpm,Germany,wsv,true,true,de/otterndorfmpm,true,2013-05-28,2025-07-12,,pegelonline,pegelonline/5990011,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 oude_westereems-oudwtes-nld-rws_hist,Oude_Westereems,Netherlands,rws_hist,true,false,nl/oude-westereems,true,1981-01-01,1983-12-31,,rws,rws/oudewestereems,0,ready,
 oudeschild-oudsd-nld-rws,Oudeschild,Netherlands,rws,true,true,nl/oudeschild,true,1971-01-01,2022-12-30,,rws,rws/texel.oudeschild,0,ready,
 oudeschild-oudsd-nld-rws_hist,Oudeschild,Netherlands,rws_hist,true,false,nl/oudeschild,true,1971-01-01,2018-09-07,,rws,rws/texel.oudeschild,0,ready,
@@ -3181,7 +3181,7 @@ oulu_toppila-134248-fin-fmi,Oulu_Toppila,Finland,fmi,true,true,fi/oulu-toppila,t
 oura-ma47-jpn-jodc_jma,Oura,Japan,jodc_jma,true,false,jp/oura,true,1967-12-31,2023-12-31,jma/OU,jma,jma/OU,0.82,ready,JODC relay of jma/OU
 ouvea-380-fra-refmar,Ouvea,France,refmar,true,true,fr/ouvea,true,1981-04-06,2025-03-31,,refmar,refmar/380,0,ready,
 ouveatg_60minute-ouv-fra-cmems,OuveaTG_60minute,France,cmems,true,false,fr/ouvea,false,1981-04-06,2025-03-31,,refmar,refmar/380,0,ready,CMEMS record of a gauge the national feed publishes
-over-5950010-deu-wsv,Over,Germany,wsv,true,true,de/over,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5950010,0,ready,history needs a PEGELONLINE backfill
+over-5950010-deu-wsv,Over,Germany,wsv,true,true,de/over,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5950010,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 owase-ma24-jpn-jodc_jma,Owase,Japan,jodc_jma,true,false,jp/owase,true,1966-11-07,2023-12-31,jma/OW,jma,jma/OW,1.02,ready,JODC relay of jma/OW
 owen_bay_bc-8120-can-meds,Owen_Bay_BC,Canada,meds,true,true,ca/owen-bay,true,1953-08-01,2011-09-27,,chs,,,restricted,CHS license bars commercial derivatives
 owenga-chit-nzl-ttw,Owenga,New Zealand,ttw,true,true,nz/owenga,true,2007-12-17,2024-12-31,,ttw,,,license,Terms not reviewed
@@ -3228,7 +3228,7 @@ papeete-015b-fra-uhslc_rq,Papeete,France,uhslc_rq,true,false,fr/papeete,true,197
 papeete-383-fra-refmar,Papeete,France,refmar,true,false,fr/papeete-iles-du-vent,true,1975-06-09,2023-10-06,,refmar,refmar/383,0,ready,
 papeetetg_60minute-pap-fra-cmems,PapeeteTG_60minute,France,cmems,true,false,fr/papeete-iles-du-vent,false,1975-07-27,2023-10-06,,refmar,refmar/383,0,ready,CMEMS record of a gauge the national feed publishes
 papeeteuhslctg_01minute-pap-fra-cmems,PapeeteUhslcTG_01minute,France,cmems,true,false,fr/papeete-uhslc,false,2008-06-23,2024-03-18,,refmar,refmar/6385,0,ready,CMEMS record of a gauge the national feed publishes
-papenburg-3790010-deu-wsv,Papenburg,Germany,wsv,true,true,de/papenburg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3790010,0.18,ready,history needs a PEGELONLINE backfill
+papenburg-3790010-deu-wsv,Papenburg,Germany,wsv,true,true,de/papenburg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3790010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 paradise_cut-b95410q-usa-cdwr,Paradise_Cut,United States,cdwr,true,true,us/paradise-cut,true,2015-10-01,2025-05-24,,dwr,dwr/B95410Q,0,ready,
 pari-159a-idn-uhslc_rq,Pari,Indonesia,uhslc_rq,true,true,id/pari,true,1987-05-30,1990-01-21,,uhslc,uhslc/159a,0.03,ready,
 pariacabotg_10minute-par-fra-cmems,PariacaboTG_10minute,France,cmems,true,true,fr/pariacabo,false,2020-06-18,2022-11-04,,refmar,refmar/171,0,ready,CMEMS record of a gauge the national feed publishes
@@ -3265,7 +3265,7 @@ peel_inlet-plpee01-aus-bom,Peel_Inlet,Australia,bom,true,true,au/peel-inlet-west
 pelee_point_east-12122-can-meds,Pelee_Point_East,Canada,meds,true,true,ca/pelee-point-east,true,1964-06-17,1976-10-30,,chs,,,restricted,CHS license bars commercial derivatives
 pelican_point_at_roaring_river-pel-usa-cdwr,Pelican_Point_At_Roaring_River,United States,cdwr,true,false,us/pelican-point-at-roaring-river,true,2013-11-13,2025-05-24,,cdec,cdec/PEL,0,ready,
 pellicer_creek_near_espanola_fl-2247222-usa-usgs,Pellicer_Creek_Near_Espanola_Fl,United States,usgs,true,true,us/pellicer-creek-near-espanola-fl,true,2007-10-01,2025-04-30,,usgs,usgs/02247222,0,ready,
-pellwormanleger-9550021-deu-wsv,Pellwormanleger,Germany,wsv,true,true,de/pellwormanleger,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9550021,0.2,ready,history needs a PEGELONLINE backfill
+pellwormanleger-9550021-deu-wsv,Pellwormanleger,Germany,wsv,true,true,de/pellwormanleger,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9550021,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 pemba-192-moz-uhslc_fd,Pemba,Mozambique,uhslc_fd,true,true,mz/pemba,true,2007-04-19,2013-06-28,,uhslc,uhslc/192,0.2,ready,
 pemba-192b-moz-uhslc_rq,Pemba,Mozambique,uhslc_rq,true,false,mz/pemba,true,1982-12-14,1984-11-30,,uhslc,uhslc/192b,0.05,ready,
 pemba-192c-moz-uhslc_rq,Pemba,Mozambique,uhslc_rq,true,false,mz/pemba,true,2007-04-19,2013-06-28,,uhslc,uhslc/192,0.05,ready,
@@ -3300,8 +3300,8 @@ pilots_station_east-8760922-usa-noaa,Pilots_Station_East,United States,noaa,true
 pilottown-8760721-usa-noaa,Pilottown,United States,noaa,true,false,us/pilottown,true,1980-12-19,2025-06-30,noaa/8760721,coops,coops/8760721,0.12,ready,
 pine_island_bayou_abv_bi_pump_plant_beaumont_tx-8041749-usa-usgs,Pine_Island_Bayou_Abv_Bi_Pump_Plant_Beaumont_Tx,United States,usgs,true,true,us/pine-island-bayou-abv-bi-pump-plant-beaumont-tx,true,2007-10-01,2025-04-30,,usgs,usgs/08041749,0,ready,
 pine_log_creek_at_gully_branch_road-11345-usa-nwfwmd,Pine_Log_Creek_at_Gully_Branch_Road,United States,nwfwmd,true,true,us/pine-log-creek-at-gully-branch-road,true,2007-03-07,2016-10-18,,nwfwmd,,,license,Northwest Florida WMD terms to check
-pinnausperrwerkap-5970019-deu-wsv,Pinnausperrwerkap,Germany,wsv,true,false,de/pinnausperrwerkap,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970019,0,ready,history needs a PEGELONLINE backfill
-pinnausperrwerkbp-5970018-deu-wsv,Pinnausperrwerkbp,Germany,wsv,true,true,de/pinnausperrwerkbp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970018,0,ready,history needs a PEGELONLINE backfill
+pinnausperrwerkap-5970019-deu-wsv,Pinnausperrwerkap,Germany,wsv,true,false,de/pinnausperrwerkap,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970019,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+pinnausperrwerkbp-5970018-deu-wsv,Pinnausperrwerkbp,Germany,wsv,true,true,de/pinnausperrwerkbp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970018,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 pisco-683a-per-uhslc_rq,Pisco,Peru,uhslc_rq,true,false,pe/pisco,true,1985-01-15,1990-04-01,,uhslc,uhslc/683a,0.05,ready,
 pisco-683b-per-uhslc_rq,Pisco,Peru,uhslc_rq,true,true,pe/pisco,true,1991-01-01,2014-12-31,,uhslc,uhslc/683b,0.05,ready,
 pithlachascotee_r_at_main_st_at_new_port_richey_fl-2310308-usa-usgs,Pithlachascotee_R_At_Main_St_At_New_Port_Richey_Fl,United States,usgs,true,true,us/pithlachascotee-r-at-main-st-at-new-port-richey-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02310308,0.01,ready,
@@ -3314,7 +3314,7 @@ plimiri-pli-grc-cmems,Plimiri,Greece,cmems,true,true,gr/plimiri,false,2015-11-11
 plum_island_plum_gut_harbor-8511236-usa-noaa,Plum_Island_Plum_Gut_Harbor,United States,noaa,true,false,us/plum-gut-harbor,true,1963-01-01,1990-07-27,noaa/8511236,coops,coops/8511236,0,ready,
 pluz-pluz-esp-ieo,Pluz,Spain,ieo,true,false,es/pluz,true,1949-04-17,2016-12-31,,redmar,,,license,
 plymouth-ply-gbr-cmems,Plymouth,United Kingdom,cmems,true,false,gb/plymouth-england,false,1991-03-14,2025-06-30,,ea,ea/E72139,0,ready,The EA's real-time readings of the gauge
-pogum-3950020-deu-wsv,Pogum,Germany,wsv,true,true,de/pogum,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3950020,0.18,ready,history needs a PEGELONLINE backfill
+pogum-3950020-deu-wsv,Pogum,Germany,wsv,true,true,de/pogum,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3950020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 pohnpei-001-fsm-uhslc_fd,Pohnpei,Federated States of Micronesia,uhslc_fd,true,true,fm/pohnpei,true,2001-12-16,2025-05-31,,uhslc,uhslc/001,0.05,restricted,The contributor's terms bar commercial use
 pohnpei-001a-fsm-uhslc_rq,Pohnpei,Federated States of Micronesia,uhslc_rq,true,false,fm/pohnpei-ticon-pohnpei-001a-fsm-uhslc-rq,true,1969-05-08,1971-02-28,,uhslc,uhslc/001a,0.05,ready,
 pohnpei-001b-fsm-uhslc_rq,Pohnpei,Federated States of Micronesia,uhslc_rq,true,false,fm/pohnpei-ticon-pohnpei-001a-fsm-uhslc-rq,true,1974-04-21,2004-12-31,,uhslc,uhslc/001b,0.05,ready,
@@ -3618,7 +3618,7 @@ ravenna-rav-ita-ispra,Ravenna,Italy,ispra,true,true,it/ravenna,true,1975-01-01,2
 razernijpolder-raznpdr-nld-rws_hist,Razernijpolder,Netherlands,rws_hist,true,false,nl/razernijpolder,true,1971-01-01,1981-01-01,,rws,rws/razernijpolder,0,ready,
 rea_point-6835-can-meds,Rea_Point,Canada,meds,true,true,ca/rea-point,true,1975-08-11,1976-08-11,,chs,,,restricted,CHS license bars commercial derivatives
 realitos_peninsula-8779280-usa-noaa,Realitos_Peninsula,United States,noaa,true,false,us/realitos-pennisula,true,2012-10-01,2025-06-30,noaa/8779280,coops,coops/8779280,0.01,ready,
-rechtenfleth-4970030-deu-wsv,Rechtenfleth,Germany,wsv,true,true,de/rechtenfleth,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970030,0.18,ready,history needs a PEGELONLINE backfill
+rechtenfleth-4970030-deu-wsv,Rechtenfleth,Germany,wsv,true,true,de/rechtenfleth,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4970030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 recife_uscgs-712a-bra-uhslc_rq,Recife_USCGS,Brazil,uhslc_rq,true,true,br/recife-uscgs,true,1955-01-01,1968-04-30,,uhslc,uhslc/712a,0.03,ready,
 red_bay_point-8720503-usa-noaa,Red_Bay_Point,United States,noaa,true,false,us/red-bay-point,true,1997-03-26,2016-10-07,noaa/8720503,coops,coops/8720503,0,ready,
 red_dog_dock-9491094-usa-noaa,Red_Dog_Dock,United States,noaa,true,false,us/red-dog-dock,true,2003-08-30,2025-06-30,noaa/9491094,coops,coops/9491094,0,ready,
@@ -3628,7 +3628,7 @@ reedy_point-8551910-usa-noaa,Reedy_Point,United States,noaa,true,false,us/reedy-
 reggio_calabria-reg-ita-ispra,Reggio_Calabria,Italy,ispra,true,true,it/reggio-calabria,true,1999-11-04,2025-07-06,,ispra,,,license,
 rehoboth_bay_at_dewey_beach_de-1484670-usa-usgs,Rehoboth_Bay_At_Dewey_Beach_De,United States,usgs,true,true,us/rehoboth-bay-at-dewey-beach-de,true,2007-10-01,2014-10-01,,usgs,usgs/01484670,0,ready,
 reihoku-ma84-jpn-jodc_jma,Reihoku,Japan,jodc_jma,true,false,jp/reihoku,true,2010-06-30,2023-12-31,jma/RH,jma,jma/RH,0.35,ready,JODC relay of jma/RH
-reithrne-4960040-deu-wsv,Reithrne,Germany,wsv,true,true,de/reithorne,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960040,0.18,ready,history needs a PEGELONLINE backfill
+reithrne-4960040-deu-wsv,Reithrne,Germany,wsv,true,true,de/reithorne,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960040,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 repentigny-15668-can-meds,Repentigny,Canada,meds,true,false,ca/repentigny,true,1961-11-01,1976-03-27,,chs,,,restricted,CHS license bars commercial derivatives
 resolute-5560-can-meds,Resolute,Canada,meds,true,true,ca/resolute,true,1957-10-01,1977-06-12,,chs,,,restricted,CHS license bars commercial derivatives
 reunion-164-fra-uhslc_fd,Reunion,France,uhslc_fd,true,true,fr/reunion,true,1967-02-28,2025-06-30,,uhslc,uhslc/164,1.57,ready,
@@ -3663,7 +3663,7 @@ ringhals-rin-swe-cmems,Ringhals,Sweden,cmems,true,false,se/ringhals,false,1967-1
 rio_de_janeiro_cg-709a-bra-uhslc_rq,Rio_de_Janeiro_CG,Brazil,uhslc_rq,true,true,br/rio-de-janeiro-cg,true,1955-01-01,1968-12-31,,uhslc,uhslc/709a,0.05,ready,
 rio_grande-714a-bra-uhslc_rq,Rio_Grande,Brazil,uhslc_rq,true,true,br/rio-grande,true,1981-06-27,2003-12-31,,uhslc,uhslc/714a,4.23,ready,
 rio_vista_bridge_usgs-srv-usa-cdwr,Rio_Vista_Bridge_Usgs,United States,cdwr,true,false,us/rio-vista-bridge-usgs,true,2003-12-31,2025-05-24,,cdec,,,unmatched,No cdec/SRV in the list
-ritterhude-4940030-deu-wsv,Ritterhude,Germany,wsv,true,true,de/ritterhude,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940030,0.18,ready,history needs a PEGELONLINE backfill
+ritterhude-4940030-deu-wsv,Ritterhude,Germany,wsv,true,true,de/ritterhude,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 river_tolka-riv-irl-mi_r,River_Tolka,Ireland,mi_r,true,true,ie/river-tolka,true,2019-02-13,2025-07-23,,marine-institute,,,unmatched,"A river gauge; the Marine Institute's river dataset names no datum, so it isn't listed"
 rivi_a475re_du_loup-3130-can-meds,Rivi_A475re_Du_Loup,Canada,meds,true,true,ca/riviere-du-loup,true,1900-08-01,1980-12-01,,chs,,,restricted,CHS license bars commercial derivatives
 riviere_au_renard-2330-can-meds,Riviere_Au_Renard,Canada,meds,true,true,ca/riviere-au-renard,true,1969-01-14,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3705,7 +3705,7 @@ rmn_venice-rmn-ita-cmems,RMN_Venice,Italy,cmems,true,false,it/venice-veneto,fals
 rmn_vieste-rmn-ita-cmems,RMN_Vieste,Italy,cmems,true,false,it/vieste,false,1998-08-27,2025-04-30,,ispra,,,license,CMEMS record of a gauge the national feed publishes
 roanoke_river_at_nc_45_nr_westover_nc-208114150-usa-usgs,Roanoke_River_At_Nc_45_Nr_Westover_Nc,United States,usgs,true,true,us/roanoke-river-at-nc-45-nr-westover-nc,true,2007-10-01,2025-04-30,,usgs,usgs/0208114150,0,ready,
 roaring_river-ror-usa-cdwr,Roaring_River,United States,cdwr,true,true,us/roaring-river,true,1987-01-01,2011-10-07,,cdec,,,unmatched,No cdec/ROR in the list
-robbensdsteert-9460010-deu-wsv,Robbensdsteert,Germany,wsv,true,true,de/robbensdsteert,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460010,0.19,ready,history needs a PEGELONLINE backfill
+robbensdsteert-9460010-deu-wsv,Robbensdsteert,Germany,wsv,true,true,de/robbensdsteert,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460010,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 rochefort-118-fra-refmar,Rochefort,France,refmar,true,true,fr/rochefort,true,1993-12-21,2008-09-09,,refmar,refmar/118,0,ready,
 rocheforttg_60minute-roc-fra-cmems,RochefortTG_60minute,France,cmems,true,false,fr/rochefort,false,1993-12-21,2008-09-09,,refmar,refmar/118,0,ready,CMEMS record of a gauge the national feed publishes
 rocher_neptune-3071-can-meds,Rocher_Neptune,Canada,meds,true,true,ca/rocher-de-neptune,true,1998-05-26,2017-11-09,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3761,7 +3761,7 @@ royan-308-fra-refmar,Royan,France,refmar,true,true,fr/royan,true,1991-09-05,2011
 royantg_60minute-roy-fra-cmems,RoyanTG_60minute,France,cmems,true,false,fr/royan,false,1991-09-05,2011-04-07,,refmar,refmar/308,0,ready,CMEMS record of a gauge the national feed publishes
 rozenburgsesluis_noordzijde-rozbssnzde-nld-rws_hist,Rozenburgsesluis_noordzijde,Netherlands,rws_hist,true,false,nl/rozenburgsesluis-noordzijde,true,1972-01-01,1983-12-07,,rws,rws/botlek.rozenburgsesluis.calandkanaal,0,ready,
 rudee_inlet-8639207-usa-noaa,Rudee_Inlet,United States,noaa,true,false,us/rudee-inlet,true,2005-07-18,2009-02-05,noaa/8639207,coops,coops/8639207,0,ready,
-ruden-9690077-deu-wsv,Ruden,Germany,wsv,true,true,de/ruden,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690077,0,ready,history needs a PEGELONLINE backfill
+ruden-9690077-deu-wsv,Ruden,Germany,wsv,true,true,de/ruden,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9690077,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 rumoiko-0132-jpn-jodc_pahb,Rumoiko,Japan,jodc_pahb,true,true,jp/rumoiko,true,1982-12-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 russian_r_a_highway_1_bridge_nr_jenner_ca-11467270-usa-usgs,Russian_R_A_Highway_1_Bridge_Nr_Jenner_Ca,United States,usgs,true,true,us/russian-r-a-highway-1-bridge-nr-jenner-ca,true,2018-04-27,2025-04-30,,usgs,usgs/11467270,0,ready,
 rustico-1915-can-meds,Rustico,Canada,meds,true,true,ca/rustico,true,1972-06-23,1996-03-07,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3959,7 +3959,7 @@ sao_tome-225a-stp-uhslc_rq,Sao_Tome,Sao Tome and Principe,uhslc_rq,true,false,st
 saragassa_canal_at_crystal_river_fl-2310740-usa-usgs,Saragassa_Canal_At_Crystal_River_Fl,United States,usgs,true,true,us/saragassa-canal-at-crystal-river-fl,true,2016-06-23,2025-05-01,,usgs,usgs/02310740,0,ready,
 sargent-8772985-usa-noaa,Sargent,United States,noaa,true,false,us/sargent,true,2012-12-01,2025-06-30,noaa/8772985,coops,coops/8772985,0.04,ready,
 sasebo-hd19-jpn-jodc_jcg,Sasebo,Japan,jodc_jcg,true,false,jp/sasebo,true,1950-07-31,2024-12-30,jhod/0154,jodc,jodc/0154,,license,JODC relay of jhod/0154
-sassnitz-9670065-deu-wsv,Sassnitz,Germany,wsv,true,true,de/sassnitz,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670065,0,ready,history needs a PEGELONLINE backfill
+sassnitz-9670065-deu-wsv,Sassnitz,Germany,wsv,true,true,de/sassnitz,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670065,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 sassnitztg-sas-deu-cmems,SassnitzTG,Germany,cmems,true,true,de/sassnitz-ticon-sassnitztg-sas-deu-cmems,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9670065,0.54,ready,CMEMS record of a gauge the national feed publishes
 satilla_river_at_us_17_at_woodbine_ga-2228070-usa-usgs,Satilla_River_At_Us_17_At_Woodbine_Ga,United States,usgs,true,true,us/satilla-river-at-us-17-at-woodbine-ga,true,2009-11-20,2025-05-01,,usgs,usgs/02228070,0,ready,
 saugatuck_river_at_route_1_at_westport_ct-1209510-usa-usgs,Saugatuck_River_At_Route_1_At_Westport_Ct,United States,usgs,true,true,us/saugatuck-river-at-route-1-at-westport-ct,true,2014-01-03,2025-04-30,,usgs,usgs/01209510,0,ready,
@@ -3981,7 +3981,7 @@ sayreville-8531390-usa-noaa,Sayreville,United States,noaa,true,false,us/sayrevil
 scarborough-sca-gbr-cco,Scarborough,United Kingdom,cco,true,true,gb/scarborough,true,2012-01-01,2025-05-31,,cco,,,license,Terms not reviewed
 scarboroughtg-sca-gbr-cmems,ScarboroughTG,United Kingdom,cmems,true,false,gb/scarborough,false,2013-06-13,2025-06-30,,bodc,,,restricted,"BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead"
 schaar_van_de_noord-schaarvdnd-nld-rws,Schaar_van_de_Noord,Netherlands,rws,true,true,nl/schaar-van-de-noord,true,1997-11-19,2023-12-31,,rws,rws/schaarvandenoord,0,ready,
-scharhrn-9510060-deu-wsv,Scharhrn,Germany,wsv,true,true,de/scharhorn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510060,0.19,ready,history needs a PEGELONLINE backfill
+scharhrn-9510060-deu-wsv,Scharhrn,Germany,wsv,true,true,de/scharhorn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510060,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 schellingwoudetg-sch-nld-cmems,SchellingwoudeTG,Netherlands,cmems,true,false,nl/schellingwoude,false,2014-08-04,2025-06-30,,rws,rws/schellingwoude.h1,0.6,ready,CMEMS record of a gauge the national feed publishes
 scheveningen-schevngn-nld-rws,Scheveningen,Netherlands,rws,true,true,nl/scheveningen,true,1946-01-01,2022-12-30,,rws,rws/scheveningen,0,ready,
 scheveningen-schevngn-nld-rws_hist,Scheveningen,Netherlands,rws_hist,true,false,nl/scheveningen,true,1946-01-01,2018-09-07,,rws,rws/scheveningen,0,ready,
@@ -3989,14 +3989,14 @@ scheveningentg-sch-nld-cmems,ScheveningenTG,Netherlands,cmems,true,false,nl/sche
 schiermonnikoog-schiermnog-nld-rws,Schiermonnikoog,Netherlands,rws,true,true,nl/schiermonnikoog,true,1971-01-01,2022-12-30,,rws,rws/schiermonnikoog.waddenzee,0,ready,
 schiermonnikoog-schiermnog-nld-rws_hist,Schiermonnikoog,Netherlands,rws_hist,true,false,nl/schiermonnikoog,true,1971-01-01,2018-09-07,,rws,rws/schiermonnikoog.waddenzee,0,ready,
 schiermonnikoogwaddentg-sch-nld-cmems,SchiermonnikoogWaddenTG,Netherlands,cmems,true,false,nl/schiermonnikoog-wadden,false,2014-08-04,2025-06-30,,rws,rws/schiermonnikoog.waddenzee,0.23,ready,CMEMS record of a gauge the national feed publishes
-schillig-9430030-deu-wsv,Schillig,Germany,wsv,true,true,de/schillig,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9430030,0.19,ready,history needs a PEGELONLINE backfill
-schleimndesp-9610025-deu-wsv,Schleimndesp,Germany,wsv,true,true,de/schleimunde-sp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610025,0,ready,history needs a PEGELONLINE backfill
+schillig-9430030-deu-wsv,Schillig,Germany,wsv,true,true,de/schillig,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9430030,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+schleimndesp-9610025-deu-wsv,Schleimndesp,Germany,wsv,true,true,de/schleimunde-sp,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9610025,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 schleimuendetg-sch-deu-cmems,SchleimuendeTG,Germany,cmems,true,false,de/schleimuende,false,2014-02-04,2025-06-30,,pegelonline,pegelonline/9610025,0.18,ready,CMEMS record of a gauge the national feed publishes
 schleswigtg-sch-deu-cmems,SchleswigTG,Germany,cmems,true,true,de/schleswig,false,2020-12-12,2025-06-30,,pegelonline,pegelonline/9610040,0.01,ready,CMEMS record of a gauge the national feed publishes
 schoonhoven-schoonhvn-nld-rws,Schoonhoven,Netherlands,rws,true,true,nl/schoonhoven,true,1876-01-03,2022-12-30,,rws,rws/schoonhoven,0.15,ready,
 schoonhoven-schoonhvn-nld-rws_hist,Schoonhoven,Netherlands,rws_hist,true,false,nl/schoonhoven,true,1876-01-03,2018-09-07,,rws,rws/schoonhoven,0.15,ready,
 schoonhoventg-sch-nld-cmems,SchoonhovenTG,Netherlands,cmems,true,false,nl/schoonhoven-ticon-schoonhoventg-sch-nld-cmems,false,2015-06-28,2025-06-30,,rws,rws/schoonhoven,0.26,ready,CMEMS record of a gauge the national feed publishes
-schulau-5950090-deu-wsv,Schulau,Germany,wsv,true,true,de/schulau,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5950090,0,ready,history needs a PEGELONLINE backfill
+schulau-5950090-deu-wsv,Schulau,Germany,wsv,true,true,de/schulau,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5950090,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 sciacca-sci-ita-ispra,Sciacca,Italy,ispra,true,true,it/sciacca-secca-grande-sicily,true,2012-06-21,2025-07-06,,ispra,,,license,
 scott_base-663a-nzl-uhslc_rq,Scott_Base,New Zealand,uhslc_rq,true,true,nz/scott-base,true,2001-01-15,2017-06-13,,uhslc,uhslc/663a,0.01,ready,
 scott_base_antarctica-scot-nzl-ttw,Scott_Base_Antarctica,New Zealand,ttw,true,false,nz/scott-base-antarctica,true,2016-01-05,2024-12-31,,ttw,,,license,Terms not reviewed
@@ -4145,7 +4145,7 @@ southwest_creek-sou-usa-ncdem,Southwest_Creek,United States,ncdem,true,true,us/s
 southwestern_louisiana_canal_e_of_leeville_la-7380245-usa-usgs,Southwestern_Louisiana_Canal_E_Of_Leeville_La,United States,usgs,true,true,us/southwestern-louisiana-canal-e-of-leeville-la,true,2019-11-26,2025-05-01,,usgs,usgs/07380245,0,ready,
 spencers_island-242-can-meds,Spencers_Island,Canada,meds,true,true,ca/spencers-island,true,1980-11-05,2008-07-21,,chs,,,restricted,CHS license bars commercial derivatives
 spi_brazos_santiago-8779749-usa-noaa,Spi_Brazos_Santiago,United States,noaa,true,false,us/south-padre-island,true,2016-12-14,2025-06-30,noaa/8779749,coops,coops/8779749,0.01,ready,
-spiekeroog-9410010-deu-wsv,Spiekeroog,Germany,wsv,true,true,de/spiekeroog,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9410010,0.18,ready,history needs a PEGELONLINE backfill
+spiekeroog-9410010-deu-wsv,Spiekeroog,Germany,wsv,true,true,de/spiekeroog,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9410010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 spijkenisse-spijknse-nld-rws,Spijkenisse,Netherlands,rws,true,true,nl/spijkenisse,true,1971-01-01,2022-12-30,,rws,rws/spijkenisse.oudemaas,0,ready,
 spijkenisse-spijknse-nld-rws_hist,Spijkenisse,Netherlands,rws_hist,true,false,nl/spijkenisse,true,1971-01-01,2018-09-07,,rws,rws/spijkenisse.oudemaas,0,ready,
 spijkenissetg-spi-nld-cmems,SpijkenisseTG,Netherlands,cmems,true,false,nl/spijkenisse-ticon-spijkenissetg-spi-nld-cmems,false,2014-08-04,2025-06-30,,rws,,,unmatched,Ambiguous between rws/spijkenisse.oudemaas and rws/spijkenisse.oudemaas.brug
@@ -4196,8 +4196,8 @@ st_marys_river_at_i_95_near_kingsland_ga-2231254-usa-usgs,St_Marys_River_At_I_95
 st_petersburg-8726520-usa-noaa,St_Petersburg,United States,noaa,true,false,us/st-petersburg,true,1925-10-01,2025-06-30,noaa/8726520,coops,coops/8726520,0,ready,
 st_petersburg_fl-759a-usa-uhslc_rq,St_Petersburg_FL,United States,uhslc_rq,true,false,us/st-petersburg,true,1946-12-18,2021-12-31,noaa/8726520,coops,coops/8726520,0.07,ready,UHSLC relay of noaa/8726520
 st_simons_island-8677344-usa-noaa,St_Simons_Island,United States,noaa,true,false,us/st-simons-light,true,1999-07-01,2008-11-10,noaa/8677344,coops,coops/8677344,0,ready,
-stadersand-5970013-deu-wsv,Stadersand,Germany,wsv,true,true,de/stadersand,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970013,0,ready,history needs a PEGELONLINE backfill
-stahlbrode-9650070-deu-wsv,Stahlbrode,Germany,wsv,true,true,de/stahlbrode,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650070,0,ready,history needs a PEGELONLINE backfill
+stadersand-5970013-deu-wsv,Stadersand,Germany,wsv,true,true,de/stadersand,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970013,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+stahlbrode-9650070-deu-wsv,Stahlbrode,Germany,wsv,true,true,de/stahlbrode,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650070,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 stanley-sta-gbr-noc,Stanley,United Kingdom,noc,true,true,gb/stanley,true,1992-10-28,2014-01-31,,bodc,,,restricted,"BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead"
 stanovan_bc-7747-can-meds,Stanovan_BC,Canada,meds,true,true,ca/stanovan-bc,true,1963-08-24,2002-01-18,,chs,,,restricted,CHS license bars commercial derivatives
 starling_creek_at_port_of_saxis_at_saxis_va-1484938-usa-usgs,Starling_Creek_At_Port_Of_Saxis_At_Saxis_Va,United States,usgs,true,false,us/starling-creek-at-port-of-saxis-at-saxis-va,true,2015-08-27,2025-04-30,,usgs,usgs/01484938,0,ready,
@@ -4238,7 +4238,7 @@ stornoway-sto-gbr-cmems,Stornoway,United Kingdom,cmems,true,false,gb/stornoway-s
 stortemelk-stortmk-nld-rws_hist,Stortemelk,Netherlands,rws_hist,true,false,nl/stortemelk,true,1981-01-01,1982-07-12,,rws,rws/stortemelk,0,ready,
 stpaulitg-stp-deu-cmems,StPauliTG,Germany,cmems,true,true,de/st-pauli,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/5952050,0.22,ready,CMEMS record of a gauge the national feed publishes
 stpetersburg-stp-rus-cmems,StPetersburg,Russia,cmems,true,true,ru/st-petersburg-st-petersburg,false,2004-07-21,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
-stralsund-9650043-deu-wsv,Stralsund,Germany,wsv,true,true,de/stralsund,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650043,0,ready,history needs a PEGELONLINE backfill
+stralsund-9650043-deu-wsv,Stralsund,Germany,wsv,true,true,de/stralsund,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650043,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 stralsundtg-str-deu-cmems,StralsundTG,Germany,cmems,true,true,de/stralsund-ticon-stralsundtg-str-deu-cmems,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9650043,1.68,ready,CMEMS record of a gauge the national feed publishes
 streefkerk-streefkk-nld-rws_hist,Streefkerk,Netherlands,rws_hist,true,false,nl/streefkerk,true,1971-01-01,1992-12-31,,rws,rws/streefkerk,0,ready,
 strombolicchio-str-ita-ispra,Strombolicchio,Italy,ispra,true,true,it/strombolicchio,true,2013-10-05,2025-07-04,,ispra,,,license,
@@ -4356,7 +4356,7 @@ tenerife2tg-ten-esp-cmems,Tenerife2TG,Spain,cmems,true,false,es/tenerife-ticon-t
 tenerife3tg-ten-esp-cmems,Tenerife3TG,Spain,cmems,true,true,es/tenerife-puerto-de-la-cruz-canary-islands,false,2019-11-02,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 tenerife4tg-ten-esp-cmems,Tenerife4TG,Spain,cmems,true,true,es/tenerife-playa-de-las-americas-canary-islands,false,2019-11-01,2025-03-10,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 tenerifetg-ten-esp-cmems,TenerifeTG,Spain,cmems,true,false,es/tenerife-ticon-tenerifetg-ten-esp-cmems,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
-terborg-3910020-deu-wsv,Terborg,Germany,wsv,true,true,de/terborg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3910020,0.18,ready,history needs a PEGELONLINE backfill
+terborg-3910020-deu-wsv,Terborg,Germany,wsv,true,true,de/terborg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3910020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 termisa-284a-bra-uhslc_rq,Termisa,Brazil,uhslc_rq,true,true,br/termisa,true,1993-07-01,1995-04-30,,uhslc,uhslc/284a,0.03,ready,
 terneuzen-ternzn-nld-rws,Terneuzen,Netherlands,rws,true,true,nl/terneuzen,true,1930-10-01,2022-12-30,,rws,rws/terneuzen,0,ready,
 terneuzen-ternzn-nld-rws_hist,Terneuzen,Netherlands,rws_hist,true,false,nl/terneuzen,true,1930-10-01,2018-09-07,,rws,rws/terneuzen,0,ready,
@@ -4376,7 +4376,7 @@ thessaloniki-the-grc-cmems,Thessaloniki,Greece,cmems,true,true,gr/thessaloniki,f
 thevenard-128-aus-uhslc_fd,Thevenard,Australia,uhslc_fd,true,true,au/thevenard,true,1992-03-19,2025-05-31,,uhslc,uhslc/128,0,restricted,The contributor's terms bar commercial use
 thevenard-128a-aus-uhslc_rq,Thevenard,Australia,uhslc_rq,true,false,au/thevenard,true,1992-03-19,2021-12-31,,uhslc,uhslc/128,0,restricted,The contributor's terms bar commercial use
 thevenard-62000-aus-bom,Thevenard,Australia,bom,true,false,au/thevenard-ticon-thevenard-62000-aus-bom,true,1964-06-19,2022-12-31,,bom,,,license,BOM license not stated
-thiessow-9670067-deu-wsv,Thiessow,Germany,wsv,true,true,de/thiessow,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670067,0,ready,history needs a PEGELONLINE backfill
+thiessow-9670067-deu-wsv,Thiessow,Germany,wsv,true,true,de/thiessow,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670067,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 thio-46-fra-refmar,Thio,France,refmar,true,true,fr/thio,true,1967-06-09,2024-11-21,,refmar,refmar/46,0,ready,
 thiotg_60minute-thi-fra-cmems,ThioTG_60minute,France,cmems,true,false,fr/thio,false,1967-06-09,2024-08-13,,refmar,refmar/46,0,ready,CMEMS record of a gauge the national feed publishes
 three_mile_slough_at_san_joaquin_river-b95060-usa-cdwr,Three_Mile_Slough_At_San_Joaquin_River,United States,cdwr,true,false,us/three-mile-slough-at-san-joaquin-river,true,1982-10-01,2025-05-24,,dwr,dwr/B95060,0,ready,
@@ -4390,11 +4390,11 @@ thursday_island-h057022b-aus-bom,Thursday_Island,Australia,bom,true,true,au/thur
 thyboronkysttg-thy-dnk-cmems,ThyboronKystTG,Denmark,cmems,true,false,dk/thyboron-kyst,false,2015-01-12,2025-06-30,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 tickfaw_river_near_springfield_la-7376300-usa-usgs,Tickfaw_River_Near_Springfield_La,United States,usgs,true,false,us/tickfaw-river-near-springfield-la,true,2021-08-26,2025-03-12,,usgs,usgs/07376300,0,ready,
 timaru-665a-nzl-uhslc_rq,Timaru,New Zealand,uhslc_rq,true,false,nz/timaru,true,1987-03-02,2019-12-31,linz/034,linz,linz/034,,license,UHSLC relay of linz/034
-timmendorfpoel-9630007-deu-wsv,Timmendorfpoel,Germany,wsv,true,true,de/timmendorfpoel,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9630007,0,ready,history needs a PEGELONLINE backfill
+timmendorfpoel-9630007-deu-wsv,Timmendorfpoel,Germany,wsv,true,true,de/timmendorfpoel,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9630007,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 timmendorfpoeltg-tim-deu-cmems,TimmendorfPoelTG,Germany,cmems,true,false,de/timmendorf-poel,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9630007,0.36,ready,CMEMS record of a gauge the national feed publishes
 tinian-698a-mnp-uhslc_rq,Tinian,Northern Mariana Islands,uhslc_rq,true,true,mp/tinian,true,1991-01-01,1997-08-01,,uhslc,uhslc/698,0.03,ready,
 tioman-323a-mys-uhslc_rq,Tioman,Malaysia,uhslc_rq,true,true,my/tioman,true,1985-11-13,2020-03-11,,uhslc,uhslc/323a,0.03,ready,
-tnning-9520070-deu-wsv,Tnning,Germany,wsv,true,true,de/tnning,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520070,0.2,ready,history needs a PEGELONLINE backfill
+tnning-9520070-deu-wsv,Tnning,Germany,wsv,true,true,de/tnning,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9520070,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 toba-ma23-jpn-jodc_jma,Toba,Japan,jodc_jma,true,false,jp/toba,true,1964-12-31,2023-12-31,jma/TB,jma,jma/TB,0.77,ready,JODC relay of jma/TB
 tobermory-tob-gbr-bodc,Tobermory,United Kingdom,bodc,true,true,gb/tobermory,true,1990-01-01,2024-05-24,,ea,ea/E74239,0,ready,The EA's real-time readings of the gauge
 tobermory-tob-gbr-cmems,Tobermory,United Kingdom,cmems,true,false,gb/tobermory,false,1990-01-01,2025-06-30,,ea,ea/E74239,0.07,ready,The EA's real-time readings of the gauge
@@ -4439,9 +4439,9 @@ toyama-349-jpn-uhslc_fd,Toyama,Japan,uhslc_fd,true,false,jp/toyama,true,1967-04-
 toyama-349a-jpn-uhslc_rq,Toyama,Japan,uhslc_rq,true,false,jp/toyama,true,1967-04-30,2023-12-31,jma/TY,jma,jma/TY,1.45,ready,UHSLC relay of jma/TY
 toyama-ma56-jpn-jodc_jma,Toyama,Japan,jodc_jma,true,false,jp/toyama,true,1967-04-30,2023-12-31,jma/TY,jma,jma/TY,0.87,ready,JODC relay of jma/TY
 tpts_navd88-tpts-usa-sfwmd,TPTS_NAVD88,United States,sfwmd,true,true,us/north-key-largo-ticon-tpts-navd88-tpts-usa-sfwmd,true,1998-05-17,2021-04-24,,sfwmd,,,unmatched,
-travemnde-9620085-deu-wsv,Travemnde,Germany,wsv,true,true,de/travemunde-wsv,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9620085,0,ready,history needs a PEGELONLINE backfill
+travemnde-9620085-deu-wsv,Travemnde,Germany,wsv,true,true,de/travemunde-wsv,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9620085,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 travemuendetg-tra-deu-cmems,TravemuendeTG,Germany,cmems,true,true,de/travemuende,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9620085,0.56,ready,CMEMS record of a gauge the national feed publishes
-travemunde-tra-deu-bfg,Travemunde,Germany,bfg,true,false,de/travemunde,true,1949-11-01,2024-06-14,,pegelonline,pegelonline/9620085,0,ready,history needs a PEGELONLINE backfill
+travemunde-tra-deu-bfg,Travemunde,Germany,bfg,true,false,de/travemunde,true,1949-11-01,2024-06-14,,pegelonline,pegelonline/9620085,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 tregde-804-nor-uhslc_fd,Tregde,Norway,uhslc_fd,true,false,no/tregde,true,1927-10-05,2025-06-30,,uhslc,uhslc/804,0.02,ready,
 tregde-804a-nor-uhslc_rq,Tregde,Norway,uhslc_rq,true,false,no/tregde,true,1927-10-05,2018-12-31,kartverket/TRG,kartverket,kartverket/TRG,1.01,ready,UHSLC relay of kartverket/TRG
 tregde-trg-nor-nhs,Tregde,Norway,nhs,true,false,no/tregde,true,1927-10-05,2025-07-28,kartverket/TRG,kartverket,kartverket/TRG,0,ready,
@@ -4495,8 +4495,8 @@ ucluelet_bc-8595-can-meds,Ucluelet_BC,Canada,meds,true,true,ca/ucluelet,true,196
 udbyhoej-udb-dnk-cmems,Udbyhoej,Denmark,cmems,true,true,dk/udbyhoej,false,2012-01-03,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 uddevalla-2541-swe-smhi,Uddevalla,Sweden,smhi,true,true,se/uddevalla,true,2014-04-02,2025-07-02,,smhi,smhi/2541,0.75,ready,
 uddevalla-udd-swe-cmems,Uddevalla,Sweden,cmems,true,false,se/uddevalla-vaestra-goetaland,false,2010-12-15,2025-07-01,,smhi,smhi/2541,0.75,ready,CMEMS record of a gauge the national feed publishes
-ueckermnde-9690088-deu-wsv,Ueckermnde,Germany,wsv,true,true,de/ueckermunde,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9690088,0,ready,history needs a PEGELONLINE backfill
-uetersen-5970016-deu-wsv,Uetersen,Germany,wsv,true,true,de/uetersen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970016,0,ready,history needs a PEGELONLINE backfill
+ueckermnde-9690088-deu-wsv,Ueckermnde,Germany,wsv,true,true,de/ueckermunde,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9690088,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+uetersen-5970016-deu-wsv,Uetersen,Germany,wsv,true,true,de/uetersen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970016,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 ulladulla-216471-aus-bom,Ulladulla,Australia,bom,true,true,au/ulladulla,true,2008-01-24,2023-12-31,,bom,,,license,BOM license not stated
 ullapool-ull-gbr-bodc,Ullapool,United Kingdom,bodc,true,true,gb/ullapool,true,1966-01-01,2022-04-19,,ea,ea/E70439,0.01,ready,The EA's real-time readings of the gauge
 ullapool-ull-gbr-cmems,Ullapool,United Kingdom,cmems,true,false,gb/ullapool,false,1990-01-01,2025-06-30,,ea,ea/E70439,0.07,ready,The EA's real-time readings of the gauge
@@ -4558,7 +4558,7 @@ vastervik-vas-swe-cmems,Vastervik,Sweden,cmems,true,false,se/vastervik,false,201
 vastervik_sjov-35151-swe-smhi,Vastervik_Sjov,Sweden,smhi,true,true,se/vastervik-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35151,0.04,ready,
 vaughns_landing-8720059-usa-noaa,Vaughns_Landing,United States,noaa,true,false,us/vaughns-landing,true,2008-02-28,2011-07-28,noaa/8720059,coops,coops/8720059,0,ready,
 vedbaek-ved-dnk-cmems,Vedbaek,Denmark,cmems,true,true,dk/vedbaek,false,2011-12-21,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
-vegesack-4950010-deu-wsv,Vegesack,Germany,wsv,true,true,de/vegesack,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4950010,0.18,ready,history needs a PEGELONLINE backfill
+vegesack-4950010-deu-wsv,Vegesack,Germany,wsv,true,true,de/vegesack,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4950010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 venezia-ven-ita-ispra,Venezia,Italy,ispra,true,true,it/venezia,true,1986-08-28,2025-07-06,,ispra,,,license,
 venezia-vene-ita-cv,Venezia,Italy,cv,true,false,it/venezia-veneto,false,1983-01-01,2023-12-31,,gesla,,,restricted,GESLA lists CV as research only
 venice-8760849-usa-noaa,Venice,United States,noaa,true,true,us/venice,true,1996-10-29,1998-12-12,noaa/8760849,coops,coops/8760849,0,ready,
@@ -4656,18 +4656,18 @@ walvis_bay-220a-nam-uhslc_rq,Walvis_Bay,Namibia,uhslc_rq,true,false,na/walvis-ba
 wando_river_above_mt_pleasant_sc-21720698-usa-usgs,Wando_River_Above_Mt_Pleasant_Sc,United States,usgs,true,true,us/wando-river-above-mt-pleasant-sc,true,1992-07-29,2025-05-01,,usgs,usgs/021720698,0,ready,
 wando_river_at_cainhoy_below_wando_sc-217206962-usa-usgs,Wando_River_At_Cainhoy_Below_Wando_Sc,United States,usgs,true,true,us/wando-river-at-cainhoy-below-wando-sc,true,2017-06-08,2025-05-01,,usgs,usgs/0217206962,0,ready,
 wanganui-075a-nzl-uhslc_rq,Wanganui,New Zealand,uhslc_rq,true,true,nz/wanganui,true,1984-09-01,1985-12-31,,uhslc,uhslc/075a,0.03,ready,
-wangeroogenord-9420030-deu-wsv,Wangeroogenord,Germany,wsv,true,true,de/wangeroogenord,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9420030,0.19,ready,history needs a PEGELONLINE backfill
+wangeroogenord-9420030-deu-wsv,Wangeroogenord,Germany,wsv,true,true,de/wangeroogenord,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9420030,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 wangeroogetg-wan-deu-cmems,WangeroogeTG,Germany,cmems,true,false,de/wangerooge,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9420030,0.04,ready,CMEMS record of a gauge the national feed publishes
-wangeroogewest-9420040-deu-wsv,Wangeroogewest,Germany,wsv,true,true,de/wangeroogewest,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9420040,0.19,ready,history needs a PEGELONLINE backfill
+wangeroogewest-9420040-deu-wsv,Wangeroogewest,Germany,wsv,true,true,de/wangeroogewest,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9420040,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 wardcreek_nearotway-war-usa-ncdem,WardCreek_NearOtway,United States,ncdem,true,true,us/ward-creek-near-otway,true,2022-08-12,2025-05-13,,ncdem,,,license,North Carolina DEM terms to check
 ware_river_at_ware_river_yacht_club_nr_naxera_va-1670060-usa-usgs,Ware_River_At_Ware_River_Yacht_Club_Nr_Naxera_Va,United States,usgs,true,true,us/ware-river-at-ware-river-yacht-club-nr-naxera-va,true,2018-09-11,2025-04-30,,usgs,usgs/01670060,0,ready,
 wares_wharf-8635985-usa-noaa,Wares_Wharf,United States,noaa,true,false,us/wares-wharf,true,2007-01-17,2009-07-28,noaa/8635985,coops,coops/8635985,0,ready,
 waretown_barnegat_bay-8533541-usa-noaa,Waretown_Barnegat_Bay,United States,noaa,true,false,us/waretown,true,1976-06-01,1980-01-20,noaa/8533541,coops,coops/8533541,0,ready,
-warnemnde-9640015-deu-wsv,Warnemnde,Germany,wsv,true,true,de/warnemunde-wsv,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9640015,0,ready,history needs a PEGELONLINE backfill
+warnemnde-9640015-deu-wsv,Warnemnde,Germany,wsv,true,true,de/warnemunde-wsv,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9640015,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 warnemuendetg-war-deu-cmems,WarnemuendeTG,Germany,cmems,true,true,de/warnemuende,false,2014-01-19,2025-06-30,,pegelonline,pegelonline/9640015,1.27,ready,CMEMS record of a gauge the national feed publishes
-warnemunde-war-deu-bfg,Warnemunde,Germany,bfg,true,false,de/warnemunde,true,1998-11-01,2024-06-14,,pegelonline,pegelonline/9640015,0,ready,history needs a PEGELONLINE backfill
+warnemunde-war-deu-bfg,Warnemunde,Germany,bfg,true,false,de/warnemunde,true,1998-11-01,2024-06-14,,pegelonline,pegelonline/9640015,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 washington-8594900-usa-noaa,Washington,United States,noaa,true,false,us/washington,true,1924-11-10,2025-06-30,noaa/8594900,coops,coops/8594900,0.04,ready,
-wasserhorst-4930010-deu-wsv,Wasserhorst,Germany,wsv,true,true,de/wasserhorst,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4930010,0.18,ready,history needs a PEGELONLINE backfill
+wasserhorst-4930010-deu-wsv,Wasserhorst,Germany,wsv,true,true,de/wasserhorst,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4930010,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 watch_hill_cove_tide_gage_westerly_ri-411838071513000-usa-usgs,Watch_Hill_Cove_Tide_Gage_Westerly_Ri,United States,usgs,true,true,us/watch-hill-cove-tide-gage-westerly-ri,true,2015-08-04,2025-04-30,,usgs,usgs/411838071513000,0,ready,
 watson_creek_at_manasquan_nj-1408048-usa-usgs,Watson_Creek_At_Manasquan_Nj,United States,usgs,true,true,us/watson-creek-at-manasquan-nj,true,2013-06-28,2025-05-01,,usgs,usgs/01408048,0,ready,
 watsonville_slough-wat-usa-cm,Watsonville_Slough,United States,cm,true,true,us/watsonville-slough,true,2020-05-05,2024-08-19,,cm,,,license,Terms not reviewed
@@ -4678,8 +4678,8 @@ wb_elizabeth_river_at_route_17_near_portsmouth_va-2042893-usa-usgs,Wb_Elizabeth_
 wcoco_t_navd88-wcoco-usa-sfwmd,WCOCO_T_NAVD88,United States,sfwmd,true,true,us/wcoco,true,1991-11-22,2015-10-08,,sfwmd,sfwmd/COCO1_T,0.57,ready,
 weeki_wachee_river_nr_weeki_wachee_springs_fl-2310545-usa-usgs,Weeki_Wachee_River_Nr_Weeki_Wachee_Springs_Fl,United States,usgs,true,true,us/weeki-wachee-river-nr-weeki-wachee-springs-fl,true,2011-01-21,2013-04-08,,usgs,usgs/02310545,0,ready,
 weeks_bay-8732828-usa-noaa,Weeks_Bay,United States,noaa,true,false,us/weeks-bay,true,2007-08-23,2020-12-31,noaa/8732828,coops,coops/8732828,0,ready,
-weener-3790020-deu-wsv,Weener,Germany,wsv,true,true,de/weener,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3790020,0.18,ready,history needs a PEGELONLINE backfill
-wehrgeesthachtup-5930062-deu-wsv,Wehrgeesthachtup,Germany,wsv,true,true,de/wehrgeesthachtup,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5930062,0.19,ready,history needs a PEGELONLINE backfill
+weener-3790020-deu-wsv,Weener,Germany,wsv,true,true,de/weener,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3790020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+wehrgeesthachtup-5930062-deu-wsv,Wehrgeesthachtup,Germany,wsv,true,true,de/wehrgeesthachtup,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5930062,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 weipa_humbug_point-63620-aus-bom,Weipa_Humbug_Point,Australia,bom,true,true,au/weipa-humbug-point,true,1965-12-27,2022-12-31,,bom,,,license,BOM license not stated
 welaka-8720832-usa-noaa,Welaka,United States,noaa,true,false,us/welaka,true,1997-10-01,2004-05-04,noaa/8720832,coops,coops/8720832,0,ready,
 welcome_bay_bc-7990-can-meds,Welcome_Bay_BC,Canada,meds,true,true,ca/welcome-bay,true,1958-05-27,1959-05-31,,chs,,,restricted,CHS license bars commercial derivatives
@@ -4692,7 +4692,7 @@ werkendam_binnen_steurgat-werkdbnn-nld-rws_hist,Werkendam_binnen_Steurgat,Nether
 werkendam_buiten-werkdbtn-nld-rws,Werkendam_buiten,Netherlands,rws,true,true,nl/werkendam-buiten,true,1970-11-01,2022-12-30,,rws,rws/werkendam.nieuwemerwede,0,ready,
 werkendam_buiten-werkdbtn-nld-rws_hist,Werkendam_buiten,Netherlands,rws_hist,true,false,nl/werkendam-buiten,true,1970-11-01,2018-09-07,,rws,rws/werkendam.nieuwemerwede,0,ready,
 werkendambuitentg-wer-nld-cmems,WerkendamBuitenTG,Netherlands,cmems,true,false,nl/werkendam-buiten-ticon-werkendambuitentg-wer-nld-cmems,false,2015-06-28,2025-06-30,,rws,,,unmatched,Ambiguous between rws/werkendam.nieuwemerwede and rws/werkendam.binnen
-weserwehruw-4910040-deu-wsv,Weserwehruw,Germany,wsv,true,true,de/weserwehruw,true,2000-01-01,2025-07-11,,pegelonline,pegelonline/4910040,0.18,ready,history needs a PEGELONLINE backfill
+weserwehruw-4910040-deu-wsv,Weserwehruw,Germany,wsv,true,true,de/weserwehruw,true,2000-01-01,2025-07-11,,pegelonline,pegelonline/4910040,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 west_bank_1-8762482-usa-noaa,West_Bank_1,United States,noaa,true,true,us/west-bank-1,true,2003-05-16,2025-05-31,noaa/8762482,coops,coops/8762482,0,ready,
 west_bay_harbour-wbh-gbr-cco,West_Bay_Harbour,United Kingdom,cco,true,true,gb/west-bay-harbour,true,2008-02-01,2025-05-31,,cco,,,license,Terms not reviewed
 west_canal_clifton_court_intake-b95338-usa-cdwr,West_Canal_Clifton_Court_Intake,United States,cdwr,true,false,us/west-canal-clifton-court-intake,true,2015-10-07,2025-05-24,,dwr,dwr/B95338Q,0,ready,
@@ -4733,8 +4733,8 @@ white_beach-8728694-usa-noaa,White_Beach,United States,noaa,true,false,us/white-
 white_city-8728853-usa-noaa,White_City,United States,noaa,true,false,us/white-city,true,2008-10-27,2011-03-10,noaa/8728853,coops,coops/8728853,0,ready,
 whiteoak_bayou_at_main_st_houston_tx-8074598-usa-usgs,Whiteoak_Bayou_At_Main_St_Houston_Tx,United States,usgs,true,true,us/whiteoak-bayou-at-main-st-houston-tx,true,2007-10-01,2025-04-30,,usgs,usgs/08074598,0,ready,
 whittier-9454949-usa-noaa,Whittier,United States,noaa,true,false,us/whittier,true,1992-08-15,2008-01-30,noaa/9454949,coops,coops/9454949,0,ready,
-whvaltervorhafen-9440020-deu-wsv,Whvaltervorhafen,Germany,wsv,true,true,de/whvaltervorhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9440020,0.18,ready,history needs a PEGELONLINE backfill
-whvneuervorhafen-9440030-deu-wsv,Whvneuervorhafen,Germany,wsv,true,true,de/whvneuervorhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9440030,0.18,ready,history needs a PEGELONLINE backfill
+whvaltervorhafen-9440020-deu-wsv,Whvaltervorhafen,Germany,wsv,true,true,de/whvaltervorhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9440020,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
+whvneuervorhafen-9440030-deu-wsv,Whvneuervorhafen,Germany,wsv,true,true,de/whvneuervorhafen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9440030,0.18,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 whyalla-61840-aus-bom,Whyalla,Australia,bom,true,true,au/whyalla,true,1974-03-03,2022-12-31,,bom,,,license,BOM license not stated
 wiah_point_bc-9940-can-meds,Wiah_Point_BC,Canada,meds,true,true,ca/wiah-point,true,1957-06-01,2019-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 wick-wic-gbr-bodc,Wick,United Kingdom,bodc,true,true,gb/wick,true,1965-01-01,2025-05-31,,ea,ea/E70639,0,ready,The EA's real-time readings of the gauge
@@ -4765,14 +4765,14 @@ wismartg-wis-deu-cmems,WismarTG,Germany,cmems,true,true,de/wismar,false,2014-01-
 withlacoochee_r_at_chambers_is_near_yankeetown_fl-2313272-usa-usgs,Withlacoochee_R_At_Chambers_Is_Near_Yankeetown_Fl,United States,usgs,true,true,us/withlacoochee-r-at-chambers-is-near-yankeetown-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02313272,0,ready,
 withlacoochee_r_bl_inglis_dam_nr_dunnellon_fla-2313231-usa-usgs,Withlacoochee_R_Bl_Inglis_Dam_Nr_Dunnellon_Fla,United States,usgs,true,true,us/withlacoochee-r-bl-inglis-dam-nr-dunnellon-fla,true,2014-10-01,2025-05-01,,usgs,usgs/02313231,0,ready,
 withlacoochee_r_bypass_channel_nr_inglis_fla-2313250-usa-usgs,Withlacoochee_R_Bypass_Channel_Nr_Inglis_Fla,United States,usgs,true,false,us/withlacoochee-r-bypass-channel-nr-inglis-fla,true,2007-10-01,2025-05-01,,usgs,usgs/02313250,0,ready,
-wittdn-9570010-deu-wsv,Wittdn,Germany,wsv,true,true,de/wittdn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570010,0.2,ready,history needs a PEGELONLINE backfill
+wittdn-9570010-deu-wsv,Wittdn,Germany,wsv,true,true,de/wittdn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570010,0.2,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 wittduentg-wit-deu-cmems,WittduenTG,Germany,cmems,true,false,de/wittduen,false,2014-01-01,2025-06-30,,pegelonline,pegelonline/9570010,0.03,ready,CMEMS record of a gauge the national feed publishes
-wittowerfhre-9670055-deu-wsv,Wittowerfhre,Germany,wsv,true,true,de/wittower-fahre,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670055,0,ready,history needs a PEGELONLINE backfill
+wittowerfhre-9670055-deu-wsv,Wittowerfhre,Germany,wsv,true,true,de/wittower-fahre,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9670055,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 wladyslawowo-wla-pol-cmems,Wladyslawowo,Poland,cmems,true,false,pl/wladyslawowo,false,2020-11-01,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
 wladyslawowo-wla-pol-eseas,Wladyslawowo,Poland,eseas,true,true,pl/wladyslawowo,true,1962-01-01,2003-01-01,,eseas,,,license,Terms not reviewed
 wolf_river_at_belle_ferry_road_near_long_beach_ms-2481521-usa-usgs,Wolf_River_At_Belle_Ferry_Road_Near_Long_Beach_Ms,United States,usgs,true,true,us/wolf-river-at-belle-ferry-road-near-long-beach-ms,true,2016-12-15,2025-05-01,,usgs,usgs/02481521,0,ready,
 wolftone_bridge-wol-irl-mi_r,Wolftone_Bridge,Ireland,mi_r,true,true,ie/wolftone-bridge,true,2018-11-24,2025-06-29,,marine-institute,,,unmatched,"A river gauge; the Marine Institute's river dataset names no datum, so it isn't listed"
-wolgast-9650080-deu-wsv,Wolgast,Germany,wsv,true,true,de/wolgast,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650080,0,ready,history needs a PEGELONLINE backfill
+wolgast-9650080-deu-wsv,Wolgast,Germany,wsv,true,true,de/wolgast,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9650080,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 wood_islands-1680-can-meds,Wood_Islands,Canada,meds,true,true,ca/wood-islands,true,2004-03-02,2007-06-30,,chs,,,restricted,CHS license bars commercial derivatives
 woodbridge_creek_1-8531156-usa-noaa,Woodbridge_Creek_1,United States,noaa,true,false,us/woodbridge-creek,true,1975-12-12,1977-01-14,noaa/8531156,coops,coops/8531156,0,ready,
 woodlawn_beach-8729736-usa-noaa,Woodlawn_Beach,United States,noaa,true,false,us/woodlawn-beach,true,1984-11-07,1986-05-11,noaa/8729736,coops,coops/8729736,0,ready,
@@ -4825,7 +4825,7 @@ zeballos_bc-8670-can-meds,Zeballos_BC,Canada,meds,true,true,ca/zeballos,true,198
 zeebruggetg-zee-bel-cmems,ZeebruggeTG,Belgium,cmems,true,true,be/zeebrugge,false,2014-08-04,2024-05-31,,cmems,,,restricted,GESLA lists CMEMS as research only
 zeebruggewielingendoktg-zee-bel-cmems,ZeebruggeWielingendokTG,Belgium,cmems,true,true,be/zeebrugge-wielingendok,false,2021-10-28,2024-05-31,,cmems,,,restricted,GESLA lists CMEMS as research only
 zeelandbrug_noord-zeelbnd-nld-rws,Zeelandbrug_noord,Netherlands,rws,true,true,nl/zeelandbrug-noord,true,1982-01-01,1991-02-27,,rws,rws/zeelandbrug.noord,0,ready,
-zehnerloch-9510010-deu-wsv,Zehnerloch,Germany,wsv,true,true,de/zehnerloch,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510010,0.19,ready,history needs a PEGELONLINE backfill
+zehnerloch-9510010-deu-wsv,Zehnerloch,Germany,wsv,true,true,de/zehnerloch,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510010,0.19,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 zhapo-635a-chn-uhslc_rq,Zhapo,China,uhslc_rq,true,true,cn/zhapo,true,1975-01-01,1997-12-31,,uhslc,uhslc/635a,0.05,ready,
 zierikzee-zierze-nld-rws_hist,Zierikzee,Netherlands,rws_hist,true,false,nl/zierikzee,true,1936-01-01,1987-01-02,,rws,rws/zierikzee,0,ready,
 zihuatanejo-509-mex-unam_hist,Zihuatanejo,Mexico,unam_hist,true,false,mx/zihuatanejo,true,2011-03-03,2013-12-30,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -4833,7 +4833,7 @@ zihuatanejo_flotador-21-mex-unam,Zihuatanejo_Flotador,Mexico,unam,true,false,mx/
 zihuatanejo_nivelcbs-21-mex-unam,Zihuatanejo_NivelCBS,Mexico,unam,true,false,mx/zihuatanejo-nivel-cbs,true,2021-06-25,2024-04-01,,unam,,,license,UNAM Servicio Mareográfico terms to check
 zihuatanejo_radar-21-mex-unam,Zihuatanejo_Radar,Mexico,unam,true,false,mx/zihuatanejo-radar,true,2021-06-25,2024-05-01,,unam,,,license,UNAM Servicio Mareográfico terms to check
 zihuatenajo_gro-687a-mex-uhslc_rq,Zihuatenajo_Gro,Mexico,uhslc_rq,true,true,mx/zihuatenajo-gro,true,2011-03-03,2013-07-10,,uhslc,uhslc/687a,0.05,ready,
-zollenspieker-5930090-deu-wsv,Zollenspieker,Germany,wsv,true,true,de/zollenspieker,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5930090,0,ready,history needs a PEGELONLINE backfill
+zollenspieker-5930090-deu-wsv,Zollenspieker,Germany,wsv,true,true,de/zollenspieker,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5930090,0,ready,PEGELONLINE's history starts in 2000 at most; earlier years are in `gesla`
 zuidland-zuidld-nld-rws_hist,Zuidland,Netherlands,rws_hist,true,false,nl/zuidland,true,1970-11-01,1980-04-16,,rws,rws/zuidland.spui,0.34,ready,
 zuidoord-zuidod-nld-rws_hist,Zuidoord,Netherlands,rws_hist,true,false,nl/zuidoord,true,1980-03-31,1981-06-17,,rws,rws/zuidoord,0,ready,
 zwartsluistg-zwa-nld-cmems,ZwartsluisTG,Netherlands,cmems,true,true,nl/zwartsluis,false,2014-08-04,2025-06-30,,rws,rws/zwartsluis.binnen,0.04,ready,CMEMS record of a gauge the national feed publishes
