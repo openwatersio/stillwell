@@ -28,6 +28,7 @@ import {
 } from "../src/lake/parquet.ts";
 import { boundsPath, seriesDir, seriesPath, stationListPath } from "../src/lake/paths.ts";
 import { REFETCH_YEARS } from "../src/lake/recent.ts";
+import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { Flag, type LakeStation, type Station } from "../src/schema.ts";
 
 const DAY = 86_400_000;
@@ -680,6 +681,57 @@ describe("backfill script", () => {
     assert.equal(run.status, 0, run.stderr);
     assert.doesNotMatch(run.stderr, /^fetch /m);
     assert.equal((await readStationBounds(path)).get("coops/7")?.preliminary, late);
+  });
+
+  it("with --skip-written, skips a year it found empty, for 30 days", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    await writeStationList(stationListPath(lake, "coops"), [coopsStation("9", "active")]);
+    const asked = (run: { stderr: string }, year: number) =>
+      new RegExp(`^fetch .*begin_date=${year}`, "m").test(run.stderr);
+    const args = ["9", "2020", "2023", "--concurrency", "1"];
+    const first = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    assert.equal(first.status, 0, first.stderr);
+    assert.ok(asked(first, 2021));
+    const record = await readEmptyYears(lake, "coops", Date.now());
+    assert.deepEqual([...record.keys()], ["coops/9 levels 1 2021"]);
+
+    // The next run skips it, and the years it wrote.
+    const second = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    assert.equal(second.status, 0, second.stderr);
+    assert.doesNotMatch(second.stderr, /^fetch /m);
+    assert.match(second.stdout, /coops: skipped 1 years found empty in the last 30 days/);
+
+    assert.match(first.stdout, /coops: recorded 1 years with no file that came back empty/);
+
+    // A record it can't read is neither used nor written over.
+    const broken = join(lake, "stations", "empty", "coops.json");
+    const saved = readFileSync(broken, "utf8");
+    writeFileSync(broken, "not json");
+    const unreadable = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    assert.equal(unreadable.status, 0, unreadable.stderr);
+    assert.match(unreadable.stderr, /asking for every year, recording none/);
+    assert.ok(asked(unreadable, 2021));
+    assert.equal(readFileSync(broken, "utf8"), "not json");
+    writeFileSync(broken, saved);
+
+    // A plain backfill asks again.
+    const plain = backfillCoops(lake, args, { EMPTY_YEARS: "2021" });
+    assert.equal(plain.status, 0, plain.stderr);
+    assert.ok(asked(plain, 2021));
+
+    // Past 30 days, an entry is dropped and the year is asked for again.
+    const old = new Date(Date.now() - 31 * 86_400_000).toISOString();
+    await writeEmptyYears(
+      lake,
+      "coops",
+      new Map([["coops/9 levels 1 2021", old]]),
+      Date.now() - 31 * 86_400_000,
+    );
+    assert.equal((await readEmptyYears(lake, "coops", Date.now())).size, 0);
+    const later = backfillCoops(lake, [...args, "--skip-written"]);
+    assert.equal(later.status, 0, later.stderr);
+    assert.ok(asked(later, 2021));
+    assert.equal((await readEmptyYears(lake, "coops", Date.now())).size, 0);
   });
 
   it("refetches every station with preliminary values, active or not, and reads them again", async () => {

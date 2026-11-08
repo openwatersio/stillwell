@@ -192,6 +192,12 @@ export interface SourceMetadata {
    * later, so the monthly refetch fetches them again until they do.
    */
   finalizes: boolean;
+  /**
+   * Whether the adapter answers an outage with an error, never with no values,
+   * so a year it returns nothing for has none. A `--skip-written` backfill
+   * then records such years and skips them for 30 days (`src/empty-years.ts`).
+   */
+  empty_means_none?: boolean;
   /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
   qc?: QcOptions;
   /**

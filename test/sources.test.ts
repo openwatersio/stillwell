@@ -1131,6 +1131,15 @@ describe("coops", () => {
     ]);
   });
 
+  it('reads only "No data was found" as no data, and fails an answer with neither', async () => {
+    const station = { established: "1899-01-01T00:00:00Z", removed: null };
+    const span = [new Date("2010-05-01Z"), new Date("2010-06-01Z")] as const;
+    setTransport(async () => JSON.stringify({ error: { message: "No data was found." } }));
+    assert.deepEqual(await coops.levels("9447130", ...span, station), []);
+    setTransport(async () => JSON.stringify({ metadata: { id: "9447130" } }));
+    await assert.rejects(coops.levels("9447130", ...span, station), /no data in the answer/);
+  });
+
   it("asks a live station for years after an old removed date", async () => {
     let asked = 0;
     setTransport(async () => {

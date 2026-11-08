@@ -223,7 +223,14 @@ export async function publishStations(
  * `sources.json` leaves it out: QC settings, offsets, the archive's reference,
  * and which scheduled jobs run for the source.
  */
-const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "finalizes"]);
+const INGEST_ONLY = new Set([
+  "qc",
+  "utc_offsets",
+  "archive",
+  "hourly",
+  "finalizes",
+  "empty_means_none",
+]);
 
 /** A source's list from the lake, or an error naming what to run. */
 export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {

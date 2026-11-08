@@ -8,6 +8,7 @@ import type { Product } from "../schema.ts";
  *   errata.json                                         errors in what sources publish, and what the lake does about them
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
+ *   stations/empty/<source>.json                        years a `--skip-written` backfill found nothing in, for 30 days
  *   history/stations/<source>/<time>.parquet            the list as each refresh started
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   recent/<source>.parquet                             last 7 days, every live station and any since retired
@@ -90,6 +91,10 @@ export function stationListPath(root: string, source: string): string {
 
 export function boundsPath(root: string, source: string): string {
   return `${root}/stations/bounds/${source}.parquet`;
+}
+
+export function emptyYearsPath(root: string, source: string): string {
+  return `${root}/stations/empty/${source}.json`;
 }
 
 /** A refresh's snapshot of the list, and with `.json`, its report. */

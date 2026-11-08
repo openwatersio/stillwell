@@ -42,6 +42,8 @@ export const metadata: SourceMetadata = {
   // Preliminary 6-minute values are verified a month or two later.
   hourly: true,
   finalizes: true,
+  // `rowsOf` returns nothing only for "No data was found"; any other error body or status throws.
+  empty_means_none: true,
   terms: "Preliminary data are unverified and may change once CO-OPS verifies them.",
 };
 
@@ -345,7 +347,10 @@ async function rowsOf(product: string, id: string, from: Date, to: Date): Promis
     if (/No data was found/i.test(body.error.message)) return [];
     throw new Error(`CO-OPS ${product} ${id}: ${body.error.message.trim()}`);
   }
-  return body.data ?? [];
+  // Only "No data was found" means none (`empty_means_none`); a body with
+  // neither data nor an error, as a gateway might send, is an outage.
+  if (!Array.isArray(body.data)) throw new Error(`CO-OPS ${product} ${id}: no data in the answer`);
+  return body.data;
 }
 
 // When the station operated, so a backfill doesn't ask for decades it wasn't
