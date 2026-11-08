@@ -19,9 +19,11 @@ import {
   recentPath,
   seriesPath,
   sourcesPath,
+  errataPath,
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
+import { ERRATA, type Erratum } from "../src/errata.ts";
 import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
 import {
   Flag,
@@ -355,6 +357,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"]), {
       count: 2,
       links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
+      unknownErrata: [],
     });
     assert.deepEqual(await publishedSources(stationsPath(lake)), ["test"]);
     // sources.json carries a source's terms, not which jobs ingest runs for it.
@@ -366,14 +369,60 @@ describe("publishStations", () => {
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
       // The longer record in the lake is preferred.
-      { id: "test/a", first: "2001", same_as: ["test/b"], preferred: "test/a", epochs: "1" },
-      { id: "test/b", first: null, same_as: ["test/a"], preferred: "test/a", epochs: "1" },
+      {
+        id: "test/a",
+        first: "2001",
+        same_as: ["test/b"],
+        preferred: "test/a",
+        errata: [],
+        epochs: "1",
+      },
+      {
+        id: "test/b",
+        first: null,
+        same_as: ["test/a"],
+        preferred: "test/a",
+        errata: [],
+        epochs: "1",
+      },
     ]);
+    // errata.json holds the errata of the sources the lake holds, here none.
+    assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), []);
+  });
+
+  it("tags each station with its errata, and names a listed station the lake lacks", async () => {
+    await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
+    const erratum = (id: string, source: string, stations: string[] | null): Erratum => ({
+      ...ERRATA[0]!,
+      id,
+      source,
+      stations,
+    });
+    const errata = [
+      erratum("test-a", "test", ["test/a", "test/gone"]),
+      erratum("test-every", "test", null),
+      // Another source's isn't this lake's to report or publish.
+      erratum("other-x", "other", ["other/x"]),
+    ];
+    const result = await publishStations(lake, [sourceOf([])], ["test"], errata);
+    assert.deepEqual("count" in result && result.unknownErrata, ["test-a test/gone"]);
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    const rows = (
+      await db.runAndReadAll(`SELECT id, errata FROM '${stationsPath(lake)}' ORDER BY id`)
+    ).getRowObjectsJson();
+    assert.deepEqual(rows, [
+      { id: "test/a", errata: ["test-a", "test-every"] },
+      { id: "test/b", errata: ["test-every"] },
+    ]);
+    assert.deepEqual(
+      JSON.parse(await readFile(errataPath(lake), "utf8")).map((e: Erratum) => e.id),
+      ["test-a", "test-every"],
+    );
   });
 
   it("publishes nothing while a source it should hold has no list", async () => {
@@ -389,6 +438,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"]), {
       count: 0,
       links: { pairs: {}, dropped: [], skipped: [], large: [] },
+      unknownErrata: [],
     });
   });
 });

@@ -1,7 +1,7 @@
 name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
-# rebuild stations.parquet and sources.json, and keep the scheduled workflows
+# rebuild stations.parquet, sources.json and errata.json, and keep the scheduled workflows
 # enabled. On the 9th, refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
 # replace them. Ingest hourly starts a refresh of one source, at

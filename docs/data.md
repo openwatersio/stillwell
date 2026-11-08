@@ -11,6 +11,7 @@ So far the bucket holds the station lists that have been published to it and one
 ```
 stations.parquet                                      one row per station
 sources.json                                          license and attribution per source
+errata.json                                           errors in what sources publish, and what the lake does about them
 stations/<source>.parquet                             one source's list, as ingest keeps it
 history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
 recent/<source>.parquet                               last 7 days: station, time, level_m, flag, source_flag, received, epoch
@@ -40,6 +41,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
 - **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
+- **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. [errata.md](errata.md) says what each is and what the lake does about it, and [`errata.json`](https://water-levels.openwaters.io/errata.json) has the same list: which stations and span of values each is in, whether the lake corrected, flagged, dropped, refused, avoided or kept them, and whether the agency has been told.
 - **`status`**: `active` or `inactive`.
 - **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
 

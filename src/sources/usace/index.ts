@@ -192,7 +192,8 @@ const GROUNDWATER = /piezometer|-OW\d+[A-Z]?$/i;
 /**
  * Whether a location's position is in the contiguous US, where all nine offices
  * are. Some locations sit at 0,0 or at a placeholder such as 9.09,9.09, and a
- * few have the longitude's sign dropped, which puts them in Asia.
+ * few have the longitude's sign dropped, which puts them in Asia (erratum
+ * `usace-placeholder-positions`).
  */
 function placed(l: CatalogLocation): boolean {
   const { latitude: lat, longitude: lon } = l;
@@ -256,7 +257,7 @@ function toStation(
  * The gauge zero's elevation, as the height to add to a stage to refer it to
  * the vertical datum CWMS names for the location. Local and unnamed datums are
  * left out, and so is an elevation of exactly 0, which some offices give a
- * location they have no elevation for.
+ * location they have no elevation for (erratum `usace-zero-elevation`).
  */
 export function datumsOf(l: CatalogLocation): Record<string, number> {
   const named = (l["vertical-datum"] ?? "").replace(/[\s-]|\(.*\)/g, "").toUpperCase();

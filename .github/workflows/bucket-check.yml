@@ -43,6 +43,10 @@ jobs:
               sources = json.load(response)
           print(f"sources.json with urllib: {len(sources)} sources")
           assert len(sources) > 0
+          with urllib.request.urlopen(f"{base}/errata.json") as response:
+              errata = json.load(response)
+          print(f"errata.json with urllib: {len(errata)} errata")
+          assert len(errata) > 0
           rows = duckdb.sql(
               f"SELECT count(*) FROM '{base}/obs/rws/hoekvanholland/2024.parquet'"
           ).fetchone()[0]

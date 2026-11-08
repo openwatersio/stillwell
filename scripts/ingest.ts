@@ -9,8 +9,8 @@
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
- * after snapshotting the previous one to history/, then writes stations.parquet
- * and sources.json, unless `--no-publish`; `publish` writes only those two. It
+ * after snapshotting the previous one to history/, then writes stations.parquet,
+ * sources.json and errata.json, unless `--no-publish`; `publish` writes only those. It
  * changes no file in the repo. A new source's first refresh starts its list.
  * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
@@ -240,7 +240,7 @@ function lakesOf(source: Source): string[] {
 }
 
 /**
- * Rebuild `stations.parquet` and `sources.json` for `lake`, unless a source
+ * Rebuild `stations.parquet`, `sources.json` and `errata.json` for `lake`, unless a source
  * that has had a list there, by the published file or its history, has none.
  */
 async function publish(lake: string): Promise<void> {
@@ -274,6 +274,11 @@ async function publish(lake: string): Promise<void> {
     for (const k of skipped)
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
+    for (const e of result.unknownErrata)
+      console.error(`  erratum lists a station not in the lake: ${e}`);
+    // A typo in src/errata.ts tags nothing, so fail the run to say so, after
+    // publishing: holding back every source's list for it would cost more.
+    if (result.unknownErrata.length) process.exitCode = 1;
   } else {
     console.error(
       `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
