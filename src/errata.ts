@@ -70,6 +70,23 @@ const FIELDS = {
   report: "Report to the agency",
 } as const;
 
+/**
+ * An issue for a source this build doesn't register, such as one whose
+ * adapter is still in a pull request. It's that source's erratum, not this
+ * build's, so it's left out without failing anything.
+ */
+export class UnknownSource extends Error {
+  readonly issue: number;
+  readonly source: string;
+  /** The erratum, read with its source let through; set by `openErrata`. */
+  erratum?: Erratum;
+  constructor(issue: number, source: string) {
+    super(`#${issue}: no source ${source}`);
+    this.issue = issue;
+    this.source = source;
+  }
+}
+
 /** What the form writes for a field left blank. */
 const BLANK = "_No response_";
 
@@ -114,7 +131,9 @@ export function parseErratum(issue: number, body: string, sources: string[]): Er
   };
 
   const source = required("source");
-  if (!sources.includes(source)) throw new Error(`#${issue}: no source ${source}`);
+  if (!/^[a-z0-9-]+$/.test(source))
+    throw new Error(`#${issue}: source ${source} isn't a source ID`);
+  if (!sources.includes(source)) throw new UnknownSource(issue, source);
   const id = required("id").replace(/`/g, "");
   if (!new RegExp(`^${source}-[a-z0-9-]+$`).test(id))
     throw new Error(`#${issue}: erratum ID ${id} isn't ${source}-<what>`);
@@ -212,12 +231,16 @@ export async function closedIds(): Promise<Map<string, number>> {
  * closed, which is left out; and the others, by number. A token in GITHUB_TOKEN raises
  * GitHub's rate limit; the repository is public, so none is needed.
  */
-export async function openErrata(
-  sources: string[],
-): Promise<{ errata: Erratum[]; problems: Problem[]; ignored: number[] }> {
+export async function openErrata(sources: string[]): Promise<{
+  errata: Erratum[];
+  problems: Problem[];
+  ignored: number[];
+  unregistered: UnknownSource[];
+}> {
   const errata: Erratum[] = [];
   const problems: Problem[] = [];
   const ignored: number[] = [];
+  const unregistered: UnknownSource[] = [];
   const closed = await closedIds();
   for (const { number, body, author_association } of await issuesOf("open")) {
     if (!TRUSTED.has(author_association)) {
@@ -225,17 +248,31 @@ export async function openErrata(
       continue;
     }
     try {
-      const e = parseErratum(number, body ?? "", sources);
-      const twin = errata.find((other) => other.id === e.id);
+      let unknown: UnknownSource | undefined;
+      let e: Erratum;
+      try {
+        e = parseErratum(number, body ?? "", sources);
+      } catch (error) {
+        if (!(error instanceof UnknownSource)) throw error;
+        // Every other field is still checked, with the source let through.
+        unknown = error;
+        e = parseErratum(number, body ?? "", [...sources, error.source]);
+      }
+      const twin = [...errata, ...unregistered.map((u) => u.erratum!)].find(
+        (other) => other.id === e.id,
+      );
       if (twin) throw new Error(`#${number}: erratum ID ${e.id} is #${twin.issue}'s too`);
       if ((closed.get(e.id) ?? Infinity) < number)
         throw new Error(`#${number}: erratum ID ${e.id} is closed #${closed.get(e.id)}'s`);
-      errata.push(e);
+      if (unknown) {
+        unknown.erratum = e;
+        unregistered.push(unknown);
+      } else errata.push(e);
     } catch (error) {
       problems.push({ issue: number, message: (error as Error).message });
     }
   }
-  return { errata, problems, ignored };
+  return { errata, problems, ignored, unregistered };
 }
 
 /**
@@ -247,7 +284,9 @@ export async function openErrata(
  * issue means no errata.
  */
 export function settle(
-  fetched: { errata: Erratum[]; problems: Problem[]; ignored: number[] } | Error,
+  fetched:
+    | { errata: Erratum[]; problems: Problem[]; ignored: number[]; unregistered?: UnknownSource[] }
+    | Error,
   previous: Erratum[],
   cited: Set<string> = new Set(),
 ): { errata: Erratum[]; notes: string[] } {
@@ -269,10 +308,25 @@ export function settle(
   for (const p of fetched.problems) keep(p.issue, p.message, true);
   // A stranger's new issue is only a report, but one that was an erratum shouldn't vanish unnoticed.
   for (const n of fetched.ignored) keep(n, `#${n}: not opened by a maintainer`, false);
+  // One whose source this build no longer registers, or mistyped in an edit,
+  // can't be published for a source the lake doesn't hold, but shouldn't vanish unnoticed.
+  for (const u of fetched.unregistered ?? []) {
+    const last = previous.find((e) => e.issue === u.issue);
+    if (last)
+      notes.push(
+        `#${u.issue}: no source ${u.source} in this build; ${last.id}, published last, is left out`,
+      );
+  }
   // Code that still works around an erratum still needs it published, so an
   // issue closed too soon, or missing from a bad answer, doesn't drop it.
+  // An unregistered source's erratum is reported above, not kept, though cited.
+  const unregistered = new Set((fetched.unregistered ?? []).map((u) => u.issue));
   for (const e of previous)
-    if (cited.has(e.id) && !errata.some((other) => other.id === e.id)) {
+    if (
+      cited.has(e.id) &&
+      !unregistered.has(e.issue) &&
+      !errata.some((other) => other.id === e.id)
+    ) {
       errata.push(e);
       notes.push(
         `${e.id} is cited in the code, but no open issue holds it; kept as published last`,

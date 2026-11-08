@@ -6,6 +6,7 @@ import {
   type StationBounds,
   type YearFile,
 } from "./lake/parquet.ts";
+import { csvFields } from "./csv.ts";
 import type { Epoch, LakeStation, SourceMetadata, Station } from "./schema.ts";
 
 const DAY_MS = 86_400_000;
@@ -118,22 +119,6 @@ export function parseStationList(text: string, sourceId: string, csv: boolean): 
     ids.push(slash >= 0 ? line : `${sourceId}/${line}`);
   }
   return [...new Set(ids)];
-}
-
-/** A CSV line's fields, with quoted fields unquoted and empty fields kept. */
-function csvFields(line: string): string[] {
-  const fields = [""];
-  let quoted = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i]!;
-    if (quoted && c === '"' && line[i + 1] === '"') {
-      fields[fields.length - 1] += '"';
-      i++;
-    } else if (c === '"') quoted = !quoted;
-    else if (c === "," && !quoted) fields.push("");
-    else fields[fields.length - 1] += c;
-  }
-  return fields;
 }
 
 /** The stations named in `first`, in its order, then the rest in theirs. */
