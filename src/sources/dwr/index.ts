@@ -37,6 +37,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "California Department of Water Resources",
+  contact: { email: "wdlweb@water.ca.gov", url: "https://wdl.water.ca.gov/ContactUs.aspx" },
   terms:
     "DWR publishes the Water Data Library without a license or a restriction on reuse. Its conditions of use disclaim any guarantee of accuracy, completeness or timeliness, and DWR edits its data after publishing it. Changes in the lake: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added; values from the last four calendar months are marked preliminary.",
   // Files are rewritten daily and run a day or more behind, too late for the

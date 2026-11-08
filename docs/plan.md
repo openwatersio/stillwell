@@ -73,7 +73,7 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  metadata: SourceMetadata; // id, name, url, license, attribution, terms, qc
+  metadata: SourceMetadata; // id, name, url, license, attribution, contact, terms, qc
   stations(previous?: Station[]): Promise<ListedStation[]>; // datum null when the source didn't say; previous is the lake's list
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed
@@ -94,7 +94,7 @@ Bucket `water-levels`, public read at `water-levels.openwaters.io`. Series whose
 
 ```
 stations.parquet                                 one row per series
-sources.json                                     license and attribution per source
+sources.json                                     license, attribution and contact per source
 errata.json                                      errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                          last 7 days, every live public station and any since retired, sorted by station then time
 obs/<source>/<station>/<year>.parquet            time, level_m, flag, source_flag, received, datum
@@ -106,7 +106,7 @@ models/gtsm/<point>.parquet                      surge reanalysis at coastal poi
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year
 ```
 
-`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `preferred` (the series to use among a gauge's `same_as`), `errata` (errors found in what the source publishes for the station, from `src/errata.ts`, set on every publish), `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` come from the lake, through the bounds compaction writes, and are null for a station with no observations yet. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
+`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `preferred` (the series to use among a gauge's `same_as`), `errata` (errors found in what the source publishes for the station, from the open `source-error` issues, set on every publish), `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` come from the lake, through the bounds compaction writes, and are null for a station with no observations yet. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
 
 Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `source_flag` (UTINYINT, the source's flag before QC, null where it wasn't kept), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
 

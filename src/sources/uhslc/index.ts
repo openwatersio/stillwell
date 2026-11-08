@@ -37,6 +37,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "University of Hawaii Sea Level Center (UHSLC)",
+  contact: { url: "https://uhslc.soest.hawaii.edu/contact/" },
   // Fast-delivery files arrive monthly, and research-quality values replace them a year or two later.
   hourly: false,
   finalizes: true,
