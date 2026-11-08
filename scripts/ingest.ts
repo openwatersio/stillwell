@@ -216,11 +216,12 @@ async function refreshStations(ids: string[]): Promise<void> {
       lines[0] += `; ${active} active, ${stations.length - active} inactive`;
       for (const line of lines) console.log(line);
       summary.push(...lines);
-      // A station waiting on a person, or newly retired by the source itself
-      // (a USACE gauge whose series CWMS withdrew), fails the run so it's seen.
+      // A station waiting on a person, newly retired by the source itself (a
+      // USACE gauge whose series CWMS withdrew), or moved from a corrected
+      // position fails the run so it's seen.
       for (const e of report.epochs)
         if (e.event === "held" || e.event === "waiting") process.exitCode = 1;
-      if (report.withdrawn.length) process.exitCode = 1;
+      if (report.withdrawn.length || report.positions.length) process.exitCode = 1;
     } catch (error) {
       // One source failing keeps its list and doesn't stop the others.
       const why = error instanceof Error ? error.message : String(error);

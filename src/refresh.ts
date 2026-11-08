@@ -4,6 +4,7 @@
  */
 import { isDeepStrictEqual } from "node:util";
 import { currentEpoch } from "./epochs.ts";
+import { correctPositions } from "./positions.ts";
 import {
   exists,
   anyFile,
@@ -44,6 +45,8 @@ export interface RefreshReport {
   withdrawn: string[];
   changed: { id: string; fields: string[] }[];
   epochs: EpochChange[];
+  /** `POSITIONS` entries whose station the source has moved, kept where the source puts it. */
+  positions: string[];
 }
 
 export interface RefreshOptions {
@@ -79,7 +82,7 @@ export async function refreshSource(
     );
   const previous = stored ?? [];
 
-  const fetched = await source.stations(previous);
+  const { stations: fetched, stale } = correctPositions(await source.stations(previous));
   if (!fetched.length) throw new Refused("listed no stations");
   const stray = fetched.find((s) => s.source !== id || !s.source_id);
   if (stray) throw new Refused(`${stray.id} isn't a ${id} station with a code`);
@@ -106,7 +109,10 @@ export async function refreshSource(
     );
 
   const listedInactive = new Set(fetched.filter((s) => s.status === "inactive").map((s) => s.id));
-  const report = reportOf(id, options.now, previous, stations, changes, listedInactive);
+  const report = {
+    ...reportOf(id, options.now, previous, stations, changes, listedInactive),
+    positions: stale,
+  };
   // The list it read goes to history before it's replaced. A new source's
   // snapshot, its empty list, goes after its first list instead, so a run cut
   // short between the two can't leave history with no list to refuse on.
@@ -320,6 +326,7 @@ function reportOf(
     withdrawn: [],
     changed: [],
     epochs,
+    positions: [],
   };
   for (const station of stations) {
     const old = before.get(station.id);
@@ -356,5 +363,7 @@ export function describeReport(report: RefreshReport): string[] {
     lines.push(
       `  ${e.id}: epoch ${e.event}, ${e.from} to ${e.to}${e.reason ? ` (${e.reason})` : ""}; overrides key "${e.key}"`,
     );
+  for (const p of report.positions)
+    lines.push(`  ${p}; check its entry in POSITIONS (src/positions.ts)`);
   return lines;
 }
