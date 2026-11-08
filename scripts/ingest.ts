@@ -268,6 +268,11 @@ async function publish(lake: string): Promise<void> {
   const fetched = await openErrata(Object.keys(sources)).catch((error: Error) => error);
   const cited = new Set(citedIn(fileURLToPath(new URL("../src", import.meta.url))).keys());
   const { errata, notes } = settle(fetched, previous, cited);
+  if (!(fetched instanceof Error))
+    for (const u of fetched.unregistered)
+      console.log(
+        `  erratum #${u.issue} is for ${u.source}, which this build doesn't register: a typo, or a source still in a pull request; left out`,
+      );
   if (!(fetched instanceof Error) && fetched.ignored.length)
     console.log(
       `  source-error issues not from a maintainer, left out: #${fetched.ignored.join(", #")}`,
