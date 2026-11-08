@@ -29,6 +29,7 @@ describe("sourcesFor", () => {
       "coops",
       "dwr",
       "ea",
+      "gesla",
       "jma",
       "kartverket",
       "marine-institute",

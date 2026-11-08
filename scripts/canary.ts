@@ -20,6 +20,7 @@ import * as cdec from "../src/sources/cdec/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
+import * as gesla from "../src/sources/gesla/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
@@ -60,6 +61,16 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     ),
   // Newlyn, from the readings API.
   ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
+  // A static release, so its metadata, from one iCloud share, then a record's
+  // first days from the other: Honolulu Pier 45, one of the smallest.
+  gesla: async () => [
+    ...(await gesla.stations()).slice(0, 1),
+    ...(await gesla.levels(
+      { source_id: "honolulu_pier_45-027a-usa-uhslc_rq", kind: "coastal" },
+      new Date("1985-10-26Z"),
+      new Date("1985-10-29Z"),
+    )),
+  ],
   // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
   dmi: () => dmi.levels("30017", start, end),
   // Kushimoto, since 1924: a week of provisional values, which arrive a day or
@@ -137,8 +148,11 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   usgs: () => usgs.levels("9361fa9f474443a4b2391c1f1a63ca4b", start, end),
 };
 
-/** Sources whose request paths name the month, so a recording would fail the next one. */
-const UNRECORDED = new Set(["jma"]);
+/**
+ * Sources whose request paths change, so a recording would fail the next one:
+ * JMA's name the month, and GESLA's iCloud links are signed anew each time.
+ */
+const UNRECORDED = new Set(["gesla", "jma"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
@@ -164,7 +178,7 @@ for (const id of named.length ? named : Object.keys(probes)) {
     if (record) {
       if (!values.length) throw new Error("no values, so nothing to record");
       if (UNRECORDED.has(id)) {
-        console.log(`${id}: not recorded; its paths name the month`);
+        console.log(`${id}: not recorded; its paths change from run to run`);
         continue;
       }
       writeFileSync(file, `${JSON.stringify(live, null, 2)}\n`);
