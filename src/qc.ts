@@ -11,8 +11,14 @@ export interface QcOptions {
    * some datums (NN, NAVD88) put inland gauges hundreds of meters up.
    */
   limit_m?: number;
-  /** A level unchanged for this long is suspect. Rivers and lakes can sit still for hours. */
+  /** A level unchanged for this long is suspect. Rivers and lakes can sit still for days. */
   flatline_s?: number;
+  /**
+   * The flatline limit where a series moves in whole centimeters, where a calm
+   * day can hold one value for hours. Judged from the changes in the three days
+   * either side of each run, since a gauge's resolution can change mid-year.
+   */
+  centimeter_flatline_s?: number;
   /** The smallest jump from its neighbors that counts as a spike, in meters. */
   spike_m?: number;
   /**
@@ -36,7 +42,13 @@ export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
 /** Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and outliers. */
 export function qc<T extends Observation>(
   rows: T[],
-  { limit_m = 20, flatline_s = 6 * 3600, spike_m = 0.25, outliers = true }: QcOptions = {},
+  {
+    limit_m = 20,
+    flatline_s = 6 * 3600,
+    centimeter_flatline_s = 0,
+    spike_m = 0.25,
+    outliers = true,
+  }: QcOptions = {},
 ): T[] {
   const sorted = [...rows].sort((a, b) => a.time - b.time);
   const out = sorted
@@ -50,11 +62,17 @@ export function qc<T extends Observation>(
     if (!Number.isFinite(r.level) || Math.abs(r.level - middle) > limit_m) worsen(i, Flag.bad);
   });
 
-  // Flatlines: runs of one value lasting at least `flatline_s`.
+  // Flatlines: runs of one value lasting at least `flatline_s`, or
+  // `centimeter_flatline_s` where the level moves in whole centimeters around them.
   for (let i = 0; i < out.length;) {
     let j = i;
     while (j + 1 < out.length && out[j + 1]!.level === out[i]!.level) j++;
-    if (j - i >= 3 && out[j]!.time - out[i]!.time >= flatline_s * 1000)
+    const span = out[j]!.time - out[i]!.time;
+    if (
+      j - i >= 3 &&
+      span >= flatline_s * 1000 &&
+      (span >= centimeter_flatline_s * 1000 || !wholeCentimeters(out, i, j))
+    )
       for (let k = i; k <= j; k++) worsen(k, Flag.suspect);
     i = j + 1;
   }
@@ -93,6 +111,26 @@ export function qc<T extends Observation>(
   }
 
   return out;
+}
+
+const DAY_MS = 86_400_000;
+
+/**
+ * Whether most of the changes within three days of the run `out[i..j]` are whole
+ * centimeters. Fewer than 24 changes can't tell, so they count as finer.
+ */
+function wholeCentimeters(out: Observation[], i: number, j: number): boolean {
+  let changes = 0;
+  let whole = 0;
+  const count = (k: number) => {
+    const d = Math.abs(out[k]!.level - out[k - 1]!.level) * 100;
+    if (!(d > 0)) return;
+    changes++;
+    if (Math.abs(d - Math.round(d)) < 1e-6) whole++;
+  };
+  for (let k = i; k > 0 && out[i]!.time - out[k - 1]!.time <= 3 * DAY_MS; k--) count(k);
+  for (let k = j + 1; k < out.length && out[k]!.time - out[j]!.time <= 3 * DAY_MS; k++) count(k);
+  return changes >= 24 && whole > changes / 2;
 }
 
 function median(values: number[]): number | undefined {

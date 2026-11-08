@@ -38,6 +38,9 @@ export const metadata: SourceMetadata = {
   hourly: true,
   // SMHI corrects each month's values, so the refetch reads them again.
   finalizes: true,
+  // Until 2004 most of SMHI's gauges report whole centimeters, which on calm
+  // Baltic days hold one value for up to a day and a half.
+  qc: { centimeter_flatline_s: 48 * 3600 },
 };
 
 /** Göta älv gauges upriver of the harbor mouth. */

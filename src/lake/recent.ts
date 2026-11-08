@@ -725,8 +725,8 @@ export async function refuseOtherDatum(
  * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
  * or more, so they get two days before a flatline counts as suspect. And they
  * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. Tide gauges never sit
- * still that long, and keep the defaults.
+ * outside their own range isn't suspect for that alone. Tide gauges keep their
+ * source's settings.
  */
 export function qcFor(source: Source, station: Station): QcOptions {
   const still = station.kind === "river" || station.kind === "lake";
