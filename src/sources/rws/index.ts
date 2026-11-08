@@ -36,6 +36,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Rijkswaterstaat",
+  contact: { url: "https://rijkswaterstaatdata.nl/contact/" },
   // Unchecked values are checked later.
   hourly: true,
   finalizes: true,

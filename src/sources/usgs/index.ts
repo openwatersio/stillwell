@@ -32,6 +32,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Geological Survey",
+  contact: { email: "wdfn@usgs.gov", url: "https://waterdata.usgs.gov/questions-comments/" },
   // Provisional values are approved months to years later.
   hourly: true,
   finalizes: true,

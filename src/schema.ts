@@ -73,7 +73,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The errata in `src/errata.ts` that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, open `source-error` issues, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */
@@ -164,6 +164,12 @@ export interface SourceMetadata {
     redistribution: boolean;
   };
   attribution: string;
+  /**
+   * Where to report an error in the source's data: the agency's published
+   * mailbox or contact form, at least one of them. Never a person's own
+   * address, since `sources.json` publishes it.
+   */
+  contact: { email: string; url?: string } | { email?: string; url: string };
   /** Anything a user of the data should know about the terms. */
   terms?: string;
   /**

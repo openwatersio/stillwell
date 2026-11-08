@@ -35,6 +35,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV), PEGELONLINE",
+  contact: { email: "pegelonline@itzbund.de", url: "https://pegelonline.wsv.de/adminmail" },
   // Raw values only: neither the feed nor the download ever finalizes them.
   hourly: true,
   finalizes: false,

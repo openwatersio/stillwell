@@ -624,6 +624,23 @@ export async function readTimeBounds(
   );
 }
 
+/** A JSON array `writeJsonArray` wrote, or null where there's none. */
+export async function readJsonArray(path: string): Promise<unknown[] | null> {
+  if (!isRemote(path) && !existsSync(path)) return null;
+  return serial(async () => {
+    const db = await connection();
+    try {
+      const reader = await db.runAndReadAll(
+        `SELECT to_json(t)::VARCHAR AS row FROM read_json(${quote(path)}, format = 'array') t`,
+      );
+      return reader.getRowObjects().map((r) => JSON.parse(String(r.row)) as unknown);
+    } catch (error) {
+      if (isRemote(path) && isMissing(error)) return null;
+      throw error;
+    }
+  });
+}
+
 /** A JSON array, through DuckDB so it can go to R2 like everything else. */
 export async function writeJsonArray(path: string, rows: object[]): Promise<void> {
   await viaJson(

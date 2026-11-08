@@ -35,6 +35,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "NOAA National Ocean Service, CO-OPS",
+  contact: {
+    email: "Tide.Predictions@noaa.gov",
+    url: "https://tidesandcurrents.noaa.gov/contact.html",
+  },
   // Preliminary 6-minute values are verified a month or two later.
   hourly: true,
   finalizes: true,

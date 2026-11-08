@@ -40,7 +40,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                          |
 | `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent` and `compact`, described below. |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                   |
-| `npm run errata`                  | Rewrite `docs/errata.md` from `src/errata.ts`.                                                   |
+| `npm run errata`                  | Check the open `source-error` issues against the erratum IDs the code cites.                     |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                     |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.   |
 | `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.              |
@@ -148,7 +148,7 @@ Each writes `docs/results/<source>.json` and prints a Markdown table for [docs/h
 
 ## Adding a source
 
-Each source is a directory in `src/sources/` that exports a `Source` (defined in `src/schema.ts`), registered in `src/sources/index.ts`, with a README on the service's endpoints, limits, datums and license. Record real responses into `test/fixtures/` for its tests rather than calling the service. Check the source's terms before writing anything to the public lake. The lake republishes the data, so its `license.redistribution` decides the lake: a source whose terms bar republishing goes to the restricted lake. Commercial use is a separate tag, `commercial_use`, which the API and products filter on: the source's default, set per station where the terms differ, such as a contributor's own terms in a source that relays other agencies' data. Data the source itself withholds until its owner grants permission isn't listed at all.
+Each source is a directory in `src/sources/` that exports a `Source` (defined in `src/schema.ts`), registered in `src/sources/index.ts`, with a README on the service's endpoints, limits, datums and license. Its metadata's `contact` says where to report an error in the data: the agency's own mailbox or contact form, never a person's address, with the page that publishes it in the README. Record real responses into `test/fixtures/` for its tests rather than calling the service. Check the source's terms before writing anything to the public lake. The lake republishes the data, so its `license.redistribution` decides the lake: a source whose terms bar republishing goes to the restricted lake. Commercial use is a separate tag, `commercial_use`, which the API and products filter on: the source's default, set per station where the terms differ, such as a contributor's own terms in a source that relays other agencies' data. Data the source itself withholds until its owner grants permission isn't listed at all.
 
 Registering the source is all the scheduled workflows need. Each picks its sources from the adapters' metadata (`src/sources/jobs.ts`, printed by `node scripts/sources.ts <job>`), so none lists them by hand, apart from the monthly refetch's own arguments for some sources:
 
@@ -161,14 +161,12 @@ Only sources whose `license.redistribution` is true are scheduled, since the wor
 
 ## Source errata
 
-When a source publishes something wrong, such as values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree, record it as an erratum, whether the adapter works around it or not:
+When a source publishes something wrong, such as values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree, record it as an erratum, whether the adapter works around it or not. The [open `source-error` issues](https://github.com/openwatersio/water-levels/issues?q=is%3Aissue+is%3Aopen+label%3Asource-error) are the list of errata; nothing else holds it.
 
-1. Open an issue with the **Source error** template, which labels it `source-error`. It holds the evidence and tracks the report to the agency.
-2. Add an entry to `ERRATA` in [src/errata.ts](src/errata.ts) with the issue's number: the stations and span it affects, what's wrong, and what the lake does about it (`corrected`, `flagged`, `dropped`, `refused`, `avoided` or `kept`).
-3. Cite its ID as ``erratum `<id>` `` where the adapter works around it, or in its README where the lake keeps the data as served. `test/errata.test.ts` fails on an entry its adapter doesn't cite, and on a citation of an ID the list doesn't have.
-4. Run `npm run errata` to rewrite [docs/errata.md](docs/errata.md).
+1. Open an issue with the **Source error** form, which labels it `source-error`. Only an issue opened by a maintainer (an owner, collaborator, or org member whose membership is public, since GitHub reports a private one as a contributor) is an erratum: the form labels anyone's issue, so one from anyone else is a report to read, and a maintainer who agrees opens one of their own. Its fields are the erratum: an ID (`<source>-<what>`, never reused), the source, the stations and span of values it affects, what's wrong, and what the lake does about it (`corrected`, `flagged`, `dropped`, `refused`, `avoided` or `kept`). The evidence goes under its own heading, and the checklist tracks the report to the agency. Keep the form's `###` headings when editing the issue, since `publish` finds the fields by them.
+2. Cite the ID as ``erratum `<id>` `` where the adapter works around it, or in its README where the lake keeps the data as served. `npm run errata`, which CI runs, fails on a citation no open issue holds, on an issue it can't read, and on an ID a closed issue has, and warns of an erratum its adapter doesn't cite yet.
 
-`publish` puts each station's errata in the `errata` column of `stations.parquet`, and the list in `errata.json`. Reports go to the agency in its own language, one message per agency covering its open errata, and only once a person has approved the text; set `reported` once one is sent, naming the channel (the agency's contact form or published address), never a person's name or address, since `errata.json` is public. When the agency fixes the data, set `fixed`, remove the workaround, and refetch what it touched.
+`publish` reads the open issues, puts each station's errata in the `errata` column of `stations.parquet`, and writes the list to `errata.json`. An issue it can't read keeps the erratum it had in the last `errata.json`, as does an erratum the code still cites that no open issue holds, and if GitHub can't be reached, or no issue parses, the last list stands; either fails the run, after publishing, to say so. Reports go to the agency in its own language, one message per agency covering its open errata, to the channel in the adapter's `metadata.contact`, and only once a person has approved the text; note on the issue when and where it went, naming the channel (the agency's contact form or published address), never a person. When the agency fixes the data, remove the workaround, refetch what it touched, and close the issue: the next publish drops the erratum.
 
 ## Ingest on R2
 
@@ -200,7 +198,7 @@ The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor Licens
 
 The traps this project has fallen into, for the openwaters-review skill and anyone reviewing a change:
 
-- A change that works around something a source publishes wrong, such as a clock shift, a skipped or refused file, a fixed position or a flagged span, adds an erratum to `src/errata.ts` and cites it (see [Source errata](#source-errata)). A workaround with no erratum hides the error from users of the lake and from the agency.
+- A change that works around something a source publishes wrong, such as a clock shift, a skipped or refused file, a fixed position or a flagged span, opens a `source-error` issue for it and cites its erratum ID (see [Source errata](#source-errata)). A workaround with no erratum hides the error from users of the lake and from the agency.
 
 ## Shared conventions
 
