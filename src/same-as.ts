@@ -25,7 +25,8 @@ import { km, nameScore } from "./ticon.ts";
  *
  * Linked stations form a group, and each lists every other in `same_as`. A
  * link by nearness or copy that would put two stations of one source in a
- * group is skipped, since one of them is likelier another gauge nearby, and
+ * group is skipped, since one of them is likelier another gauge nearby
+ * (except for an `ASSEMBLED` source), and
  * no link may join two stations a person put in `UNLINKS`. Both are reported.
  * `preferred` names the group's series to use for observed levels, by `rank`.
  */
@@ -56,6 +57,8 @@ const REDISTRIBUTED: Record<string, (s: Station & { contributor?: string | null 
   uhslc: (s) => s.contributor !== "University of Hawaii Sea Level Center",
   // REFMAR republishes some of UHSLC's under names ending in "UHSLC".
   refmar: (s) => /\bUHSLC\b/.test(s.name),
+  // GESLA assembles other agencies' records.
+  gesla: () => true,
 };
 
 export function redistributed(s: Station): boolean {
@@ -73,6 +76,13 @@ function copiesIn(group: Station[]): Set<string> {
   const sources = new Set(group.map((s) => s.source));
   return new Set(group.filter((s) => sources.has(COPIES[s.source] ?? "")).map((s) => s.id));
 }
+
+/**
+ * Sources that assemble other agencies' records, often several of one gauge
+ * (GESLA has NOAA's, UHSLC's and CMEMS's copies of many), so two of their
+ * stations in a group are two copies, not two gauges, and don't keep groups apart.
+ */
+const ASSEMBLED = new Set(["gesla"]);
 
 /**
  * Source pairs whose agencies each run their own gauges, so two of their
@@ -140,6 +150,8 @@ export function linkGauges<T extends Station>(
       dropped.push({ from: a, to: b, reason: "UNLINKS names no such station" });
   for (const id of Object.keys(PREFER))
     if (!byId.has(id)) dropped.push({ from: id, to: id, reason: "PREFER names no such station" });
+  /** The stations whose own `same_as` named another source's, by pair. */
+  const namers = new Map<string, Set<string>>();
   for (const s of stations)
     for (const other of s.same_as) {
       const target = byId.get(other);
@@ -147,17 +159,22 @@ export function linkGauges<T extends Station>(
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });
-      else add(s.id, other, "id");
+      else {
+        add(s.id, other, "id");
+        if (target.source !== s.source)
+          (
+            namers.get(pairKey(s.id, other)) ??
+            namers.set(pairKey(s.id, other), new Set()).get(pairKey(s.id, other))!
+          ).add(s.id);
+      }
     }
   for (const [a, b] of nearPairs(stations)) add(a.id, b.id, "near");
-  // A copy whose adapter named its original, by a link that held, needs no guess.
+  // A copy whose adapter named its original, by a link that held, needs no
+  // guess. Only the station that named it: one another source's copy names,
+  // as GESLA names UHSLC's series, may still be a copy to match.
   const named = new Set<string>();
   const unlinked = new Set(UNLINKS.map(({ a, b }) => pairKey(a, b)));
-  for (const [key, how] of edges)
-    if (how === "id" && !unlinked.has(key)) {
-      const [a, b] = key.split("\n").map((id) => byId.get(id)!) as [T, T];
-      if (a.source !== b.source) named.add(a.id).add(b.id);
-    }
+  for (const [key, ids] of namers) if (!unlinked.has(key)) for (const id of ids) named.add(id);
   for (const [a, b] of copyPairs(stations, named)) add(a.id, b.id, "copy");
 
   // Union-find, with each group's members kept so a merge can be refused.
@@ -206,7 +223,9 @@ export function linkGauges<T extends Station>(
     }
     // Checked across the whole of both groups, so a third station can't bridge them.
     if (how === "near" || how === "copy") {
-      const clash = ga.flatMap((x) => gb.filter((y) => separate(x, y)).map((y) => [x, y]))[0];
+      const clash = ga.flatMap((x) =>
+        gb.filter((y) => separate(x, y) && !ASSEMBLED.has(x.source)).map((y) => [x, y]),
+      )[0];
       if (clash) {
         const [x, y] = clash as [T, T];
         const reason =
@@ -250,7 +269,8 @@ function pairKey(a: string, b: string): string {
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
  * person's choice; one with levels; one whose terms allow commercial use, so
- * the API can serve it before tokens exist; one still reporting; the
+ * the API can serve it before tokens exist; one not from an assembled
+ * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the
  * group's `COPIES` stations); the longer record in the lake; the finer interval; then the
  * lower ID, so equals always break the same way.
@@ -273,6 +293,7 @@ export function rank(
     [a.id in PREFER, b.id in PREFER],
     [levels(a), levels(b)],
     [a.commercial_use, b.commercial_use],
+    [!ASSEMBLED.has(a.source), !ASSEMBLED.has(b.source)],
     [reporting(a), reporting(b)],
     [!copy(a), !copy(b)],
     [span(a), span(b)],
