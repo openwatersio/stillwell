@@ -24,7 +24,14 @@ import {
   stationsPath,
 } from "../src/lake/paths.ts";
 import type { Erratum } from "../src/errata.ts";
-import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
+import { POSITIONS } from "../src/positions.ts";
+import {
+  describeReport,
+  publishStations,
+  Refused,
+  refreshSource,
+  startedListOf,
+} from "../src/refresh.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import {
   Flag,
@@ -93,6 +100,28 @@ describe("refreshSource", () => {
     lake = await mkdtemp(join(tmpdir(), "lake-"));
   });
   afterEach(() => rm(lake, { recursive: true }));
+
+  it("moves the stations POSITIONS names, and reports one the source has moved", async () => {
+    const uhslc = (fields: Partial<ListedStation>[]): Source => ({
+      metadata: { ...metadata, id: "uhslc" },
+      stations: async () =>
+        Object.entries(POSITIONS)
+          .filter(([id]) => id.startsWith("uhslc/"))
+          .map(([id, { served }], i) =>
+            listed(id.slice(6), { id, source: "uhslc", ...served, ...fields[i] }),
+          ),
+    });
+    const { stations } = await refreshSource(lake, uhslc([]), { now: NOW });
+    assert.deepEqual(
+      stations.find((s) => s.id === "uhslc/290a")!.lat,
+      POSITIONS["uhslc/290a"]!.at.lat,
+    );
+    const moved = await refreshSource(lake, uhslc([{ lat: 0 }]), { now: LATER });
+    const id = Object.keys(POSITIONS).find((k) => k.startsWith("uhslc/"))!;
+    assert.equal(moved.stations.find((s) => s.id === id)!.lat, 0);
+    assert.match(moved.report.positions.join(), new RegExp(`^${id} is now at 0,`));
+    assert.match(describeReport(moved.report).join("\n"), /check its entry in POSITIONS/);
+  });
 
   it("writes a source's first list, then snapshots it before the next", async () => {
     const first = await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });

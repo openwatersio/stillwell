@@ -12,9 +12,9 @@ Each source's station list lives in the lake, not in git. A new source adds only
 
 The lists hold three kinds of thing, and none of them needs git:
 
-- **What the source says**: name, position, products, intervals, datums. The next refresh fetches it again.
+- **What the source says**: name, position, products, intervals, datums. The next refresh fetches it again, and moves the few stations a source places away from their gauge (below).
 - **State a refresh carries forward**: stations the source stopped listing (kept inactive so an ID is never reused), datums the source left out this time, CO-OPS `established`/`removed`, and USACE `series`. This is state, and the lake can hold it.
-- **What a person decided**: `tide_station` and hand-entered gauge zero dates. As of 2026-11-04 no station has a hand-set `tide_station`, and the zero dates already live in code (`src/sources/usace/zeros.ts`). Decisions like these go in code, where a PR reviews them.
+- **What a person decided**: `tide_station`, hand-entered gauge zero dates, and positions corrected in `POSITIONS` (`src/positions.ts`). As of 2026-11-04 no station has a hand-set `tide_station`, and the zero dates already live in code (`src/sources/usace/zeros.ts`). Decisions like these go in code, where a PR reviews them.
 
 ## Datum epochs
 
@@ -144,7 +144,7 @@ history/stations/<source>/<time>.json        what that refresh changed
 ## A refresh
 
 1. Read the previous list from the lake.
-2. Fetch with `stations(previous)`, as now.
+2. Fetch with `stations(previous)`, as now, and move the stations `POSITIONS` (`src/positions.ts`) names to where their gauge is. Each entry is a station its source places away from its gauge, the position the source serves, and the gauge's position from another source, such as PSMSL, IOC's sea level monitoring, the gauge's operator, or the source's own other series of the gauge, with a note naming it and the erratum it works around. Most are GESLA's copies of UHSLC series, which keep metadata UHSLC has since corrected. An entry applies only while the source still lists the station at the position it names: a source that moves the station keeps its own position, and the refresh reports the entry in its change report and fails the run, as a held epoch does, so a person checks it. A station the source stops listing keeps its corrected position, as it keeps the rest of the station. A version UHSLC splits off a corrected series, as a new station, takes UHSLC's position until an entry names it.
 3. Merge with `mergeStationList`, and open, hold or close epochs as above.
 4. Apply the source's `overrides`: confirm or reject an epoch, end the one before it earlier, or give its `to_current`.
 5. Run the guards. Any one of these keeps the previous list and exits nonzero:
@@ -155,7 +155,7 @@ history/stations/<source>/<time>.json        what that refresh changed
    - the lake has no list or history for the source but does have its values, in series files or a recent window. A list started from the fetch would forget what the old one carried forward;
    - more stations opened an epoch than the source's limit, by default 5 stations or 2%, whichever is larger. That's likelier an adapter bug than gauge work. A person who has checked it reruns with `--accept-epochs` (the Monthly workflow's `accept_epochs`), so a real batch of changes doesn't hold up the source for good.
 6. Copy the previous list to history, then write the new list. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
-7. Write the change report next to the snapshot, and add it to the job summary: stations added, retired and changed field by field, plus epochs opened, held and rejected.
+7. Write the change report next to the snapshot, and add it to the job summary: stations added, retired and changed field by field, epochs opened, held and rejected, and `POSITIONS` entries whose station the source moved.
 
 **Jobs.** The Monthly workflow refreshes each list in a job of its own, in the source's `lake-<source>` group, which `backfill`, `recent` and compaction of that source share, and the Ingest workflow refuses `stations`, so no two jobs write one list at once. A final job rebuilds `stations.parquet` with `publish`, in the `lake` group, from whatever lists the lake holds, so a source whose refresh failed or was cancelled keeps its last list there. Within a group, GitHub cancels a pending job when a newer one queues, so a refresh queued behind a long backfill is cancelled by the next hourly run, shows as cancelled in the run, and is rerun from Actions. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
 
