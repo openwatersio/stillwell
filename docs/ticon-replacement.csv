@@ -322,7 +322,7 @@ bedford_institute-491-can-meds,Bedford_Institute,Canada,meds,true,true,ca/bedfor
 bedwell_hbr_bc-7350-can-meds,Bedwell_Hbr_BC,Canada,meds,true,true,ca/bedwell-harbour,true,2001-10-19,2009-11-24,,chs,,,restricted,CHS license bars commercial derivatives
 beggars_bridge_creek_near_dawley_corners_va-204300267-usa-usgs,Beggars_Bridge_Creek_Near_Dawley_Corners_Va,United States,usgs,true,false,us/beggars-bridge-creek-near-dawley-corners-va,true,2016-04-19,2024-10-18,,usgs,usgs/0204300267,0,ready,
 beihai-636a-chn-uhslc_rq,Beihai,China,uhslc_rq,true,true,cn/beihai,true,1975-01-01,1997-12-31,,uhslc,uhslc/636a,0.05,ready,
-beldon_landing-bdl-usa-cdwr,Beldon_Landing,United States,cdwr,true,true,us/beldon-landing,true,1988-09-22,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+beldon_landing-bdl-usa-cdwr,Beldon_Landing,United States,cdwr,true,true,us/beldon-landing,true,1988-09-22,2025-05-24,,cdec,cdec/BDL,0,ready,
 belem_uscgs-229a-bra-uhslc_rq,Belem_USCGS,Brazil,uhslc_rq,true,true,br/belem-uscgs,true,1955-01-01,1968-12-31,,uhslc,uhslc/229a,0,ready,
 belize-781a-blz-uhslc_rq,Belize,Belize,uhslc_rq,true,true,bz/belize,true,1964-01-01,1967-10-02,,uhslc,uhslc/781a,0.03,ready,
 bella_bella_bc-8976-can-meds,Bella_Bella_BC,Canada,meds,true,true,ca/bella-bella,true,1906-01-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -380,7 +380,7 @@ black_river_near_dunbar_sc-2136270-usa-usgs,Black_River_Near_Dunbar_Sc,United St
 black_river_near_plantersville_sc-2136300-usa-usgs,Black_River_Near_Plantersville_Sc,United States,usgs,true,true,us/black-river-near-plantersville-sc,true,2023-05-23,2025-04-30,,usgs,usgs/02136300,0,ready,
 black_rock_canal_ny-9063017-usa-noaa,Black_Rock_Canal_Ny,United States,noaa,true,true,us/black-rock-canal,true,1970-01-01,1975-11-03,noaa/9063017,coops,coops/9063017,0,ready,
 blackburn_canal_near_venice_fl-2299692-usa-usgs,Blackburn_Canal_Near_Venice_Fl,United States,usgs,true,true,us/blackburn-canal-near-venice-fl,true,2007-10-01,2013-10-21,,usgs,usgs/02299692,0,ready,
-blacklock_ne1-bll-usa-cdwr,Blacklock_Ne1,United States,cdwr,true,true,us/blacklock-ne1,true,2005-01-07,2019-07-29,,cdec,,,license,A CDEC station; no CDEC adapter yet
+blacklock_ne1-bll-usa-cdwr,Blacklock_Ne1,United States,cdwr,true,true,us/blacklock-ne1,true,2005-01-07,2019-07-29,,cdec,,,unmatched,No cdec/BLL in the list
 blackwater_river-8729753-usa-noaa,Blackwater_River,United States,noaa,true,false,us/hawkins-rec-park,true,1976-03-10,1993-11-02,noaa/8729753,coops,coops/8729753,0,ready,
 blackwater_river_milton-11992-usa-nwfwmd,Blackwater_River_Milton,United States,nwfwmd,true,true,us/blackwater-river-milton,true,2010-12-11,2021-03-03,,nwfwmd,,,license,Northwest Florida WMD terms to check
 blackwater_river_near_goodland_fl-255654081350200-usa-usgs,Blackwater_River_Near_Goodland_Fl,United States,usgs,true,true,us/blackwater-river-near-goodland-fl,true,2010-07-09,2015-10-20,,usgs,usgs/255654081350200,0,ready,
@@ -521,8 +521,8 @@ cabo_san_lucas-034-mex-unam_hist,Cabo_San_Lucas,Mexico,unam_hist,true,false,mx/c
 cabo_san_lucas-034a-mex-uhslc_rq,Cabo_San_Lucas,Mexico,uhslc_rq,true,false,mx/cabo-san-lucas,true,1973-06-12,2003-08-31,,uhslc,uhslc/034,0.03,ready,
 cache_slough_a_s_liberty_island_nr_rio_vista_ca-11455315-usa-usgs,Cache_Slough_A_S_Liberty_Island_Nr_Rio_Vista_Ca,United States,usgs,true,true,us/cache-slough-a-s-liberty-island-nr-rio-vista-ca,true,2015-02-01,2025-04-29,,usgs,usgs/11455315,0,ready,
 cache_slough_ab_ryer_island_ferry_nr_rio_vista_ca-11455385-usa-usgs,Cache_Slough_Ab_Ryer_Island_Ferry_Nr_Rio_Vista_Ca,United States,usgs,true,true,us/cache-slough-ab-ryer-island-ferry-nr-rio-vista-ca,true,2018-06-02,2025-05-01,,usgs,usgs/11455385,0,ready,
-cache_slough_above_ryer_island_ferry-ryf-usa-cdwr,Cache_Slough_Above_Ryer_Island_Ferry,United States,cdwr,true,false,us/cache-slough-above-ryer-island-ferry,true,2018-12-14,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
-cache_slough_at_ryer_island-ryi-usa-cdwr,Cache_Slough_At_Ryer_Island,United States,cdwr,true,true,us/cache-slough-at-ryer-island,true,2006-05-17,2019-04-29,,cdec,,,license,A CDEC station; no CDEC adapter yet
+cache_slough_above_ryer_island_ferry-ryf-usa-cdwr,Cache_Slough_Above_Ryer_Island_Ferry,United States,cdwr,true,false,us/cache-slough-above-ryer-island-ferry,true,2018-12-14,2025-05-24,,cdec,cdec/RYF,0,ready,
+cache_slough_at_ryer_island-ryi-usa-cdwr,Cache_Slough_At_Ryer_Island,United States,cdwr,true,true,us/cache-slough-at-ryer-island,true,2006-05-17,2019-04-29,,cdec,,,unmatched,No cdec/RYI in the list
 cache_slough_nr_hastings_tract_nr_rio_vista_ca-11455280-usa-usgs,Cache_Slough_Nr_Hastings_Tract_Nr_Rio_Vista_Ca,United States,usgs,true,true,us/cache-slough-nr-hastings-tract-nr-rio-vista-ca,true,2018-08-10,2023-01-07,,usgs,usgs/11455280,0,ready,
 caddadup-dvcad01-aus-bom,Caddadup,Australia,bom,true,true,au/caddadup,true,1994-09-16,2019-12-31,,bom,,,license,BOM license not stated
 cadiz-cadi-esp-ieo,Cadiz,Spain,ieo,true,true,es/cadiz,true,1961-01-01,2016-12-31,,redmar,,,license,
@@ -1170,7 +1170,7 @@ cuxhaven-825a-deu-uhslc_rq,Cuxhaven,Germany,uhslc_rq,true,false,de/cuxhaven,true
 cuxhaven_steubenhoft-cux-deu-bfg,Cuxhaven_Steubenhoft,Germany,bfg,true,false,de/cuxhaven-steubenhoft,true,1917-12-29,2024-06-19,,pegelonline,pegelonline/5990020,0.01,ready,history needs a PEGELONLINE backfill
 cuxhavensteubenhft-5990020-deu-wsv,Cuxhavensteubenhft,Germany,wsv,true,false,de/cuxhavensteubenhft,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5990020,0.19,ready,history needs a PEGELONLINE backfill
 cuxhaventg-cux-deu-cmems,CuxhavenTG,Germany,cmems,true,false,de/cuxhaven-ticon-cuxhaventg-cux-deu-cmems,false,2014-05-05,2025-06-30,,pegelonline,pegelonline/5990020,0.01,ready,CMEMS record of a gauge the national feed publishes
-cygnus_cordelia_slough-cyg-usa-cdwr,Cygnus_Cordelia_Slough,United States,cdwr,true,true,us/cygnus-cordelia-slough,true,2010-04-29,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+cygnus_cordelia_slough-cyg-usa-cdwr,Cygnus_Cordelia_Slough,United States,cdwr,true,true,us/cygnus-cordelia-slough,true,2010-04-29,2025-05-24,,cdec,cdec/CYG,0,ready,
 cypremort_point-8765251-usa-noaa,Cypremort_Point,United States,noaa,true,false,us/cypremort-point,true,2005-08-08,2010-11-10,noaa/8765251,coops,coops/8765251,0,ready,
 d151tg-d15-nld-cmems,D151TG,Netherlands,cmems,true,true,nl/d151,false,2014-07-30,2025-06-30,,rws,rws/d15,1.01,ready,CMEMS record of a gauge the national feed publishes
 dagebll-9570040-deu-wsv,Dagebll,Germany,wsv,true,true,de/dagebll,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9570040,0.2,ready,history needs a PEGELONLINE backfill
@@ -1218,7 +1218,7 @@ delaware_river_at_penns_landing_philadelphia_pa-1467200-usa-usgs,Delaware_River_
 delaware_river_at_riverton_nj-1467059-usa-usgs,Delaware_River_At_Riverton_Nj,United States,usgs,true,true,us/delaware-river-at-riverton-nj,true,2019-05-21,2024-10-17,,usgs,usgs/01467059,0,ready,
 delfzijl-delfzl-nld-rws_hist,Delfzijl,Netherlands,rws_hist,true,false,nl/delfzijl,true,1879-01-01,2018-09-08,,rws,,,unmatched,Ambiguous between rws/delfzijl and rws/delfzijl.oudeeemskanaal.spuisluis
 delfzijltg-del-nld-cmems,DelfzijlTG,Netherlands,cmems,true,true,nl/delfzijl-groningen,false,2014-06-03,2025-06-30,,rws,,,unmatched,Ambiguous between rws/delfzijl and rws/delfzijl.oudeeemskanaal.spuisluis
-delta_cross_channel_btw_sac_and_snodgrass-dlc-usa-cdwr,Delta_Cross_Channel_Btw_Sac_And_Snodgrass,United States,cdwr,true,false,us/delta-cross-channel-btw-sac-and-snodgrass,true,2003-09-25,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+delta_cross_channel_btw_sac_and_snodgrass-dlc-usa-cdwr,Delta_Cross_Channel_Btw_Sac_And_Snodgrass,United States,cdwr,true,false,us/delta-cross-channel-btw-sac-and-snodgrass,true,2003-09-25,2025-05-24,,cdec,cdec/DLC,0,ready,
 delta_cross_channel_nr_walnut_grove-11336600-usa-usgs,Delta_Cross_Channel_Nr_Walnut_Grove,United States,usgs,true,true,us/delta-cross-channel-nr-walnut-grove,true,2007-10-01,2025-04-30,,usgs,usgs/11336600,0,ready,
 den_helder-denhdr-nld-rws_hist,Den_Helder,Netherlands,rws_hist,true,false,nl/den-helder,true,1932-01-01,2018-09-08,,rws,rws/denhelder.marsdiep,0,ready,
 den_oever_buiten-denovbtn-nld-rws_hist,Den_Oever_buiten,Netherlands,rws_hist,true,false,nl/den-oever-buiten,true,1921-01-01,2018-09-07,,rws,rws/denoever.waddenzee.voorhaven,0,ready,
@@ -1302,7 +1302,7 @@ durden_creek_nr_cape_coral_fl-2293252-usa-usgs,Durden_Creek_Nr_Cape_Coral_Fl,Uni
 dutch_harbor_ak-041-usa-uhslc_fd,Dutch_Harbor_AK,United States,uhslc_fd,true,false,us/unalaska,true,1982-01-01,2025-06-30,,uhslc,uhslc/041,0.09,ready,
 dutch_harbor_ak-041a-usa-uhslc_rq,Dutch_Harbor_AK,United States,uhslc_rq,true,false,us/unalaska,true,1950-01-01,1955-06-09,noaa/9462620,coops,coops/9462620,0.23,ready,UHSLC relay of noaa/9462620
 dutch_harbor_ak-041b-usa-uhslc_rq,Dutch_Harbor_AK,United States,uhslc_rq,true,false,us/unalaska,true,1982-01-01,2021-12-31,noaa/9462620,coops,coops/9462620,0.23,ready,UHSLC relay of noaa/9462620
-dutch_slough_at_jersey_island-dsj-usa-cdwr,Dutch_Slough_At_Jersey_Island,United States,cdwr,true,false,us/dutch-slough-at-jersey-island,true,2003-09-19,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+dutch_slough_at_jersey_island-dsj-usa-cdwr,Dutch_Slough_At_Jersey_Island,United States,cdwr,true,false,us/dutch-slough-at-jersey-island,true,2003-09-19,2025-05-24,,cdec,,,unmatched,No cdec/DSJ in the list
 dutch_slough_bl_jersey_island_rd_a_jersey_island-11313433-usa-usgs,Dutch_Slough_Bl_Jersey_Island_Rd_A_Jersey_Island,United States,usgs,true,true,us/dutch-slough-bl-jersey-island-rd-a-jersey-island,true,2007-10-01,2025-05-06,,usgs,usgs/11313433,0,ready,
 duwamish_river_at_golf_course_at_tukwila_wa-12113390-usa-usgs,Duwamish_River_At_Golf_Course_At_Tukwila_Wa,United States,usgs,true,true,us/duwamish-river-at-golf-course-at-tukwila-wa,true,2013-11-26,2025-04-30,,usgs,usgs/12113390,0,ready,
 dwarsgat-9460020-deu-wsv,Dwarsgat,Germany,wsv,true,true,de/dwarsgat,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460020,0.19,ready,history needs a PEGELONLINE backfill
@@ -1423,7 +1423,7 @@ falkenberg_2_sjov-35213-swe-smhi,Falkenberg_2_Sjov,Sweden,smhi,true,true,se/falk
 fall_river-8447386-usa-noaa,Fall_River,United States,noaa,true,false,us/fall-river,true,1999-10-17,2025-06-30,noaa/8447386,coops,coops/8447386,0,ready,
 false_bay_bc-7982-can-meds,False_Bay_BC,Canada,meds,true,true,ca/false-bay,true,1969-09-24,2016-06-09,,chs,,,restricted,CHS license bars commercial derivatives
 false_r_nr_oakley_ca-11313440-usa-usgs,False_R_Nr_Oakley_Ca,United States,usgs,true,true,us/false-r-nr-oakley-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313440,0,ready,
-false_river_near_oakley-fal-usa-cdwr,False_River_Near_Oakley,United States,cdwr,true,false,us/false-river-near-oakley,true,2007-02-09,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+false_river_near_oakley-fal-usa-cdwr,False_River_Near_Oakley,United States,cdwr,true,false,us/false-river-near-oakley,true,2007-02-09,2025-05-24,,cdec,cdec/FAL,0,ready,
 fanning-012a-kir-uhslc_rq,Fanning,Kiribati,uhslc_rq,true,false,ki/fanning,true,1957-08-10,1958-11-09,,uhslc,uhslc/012a,0.05,ready,
 fanning-012b-kir-uhslc_rq,Fanning,Kiribati,uhslc_rq,true,true,ki/fanning-line-islands,true,1972-12-12,1987-08-20,,uhslc,uhslc/012b,0.05,ready,
 fanning-012c-kir-uhslc_rq,Fanning,Kiribati,uhslc_rq,true,false,ki/fanning-ticon-fanning-012c-kir-uhslc-rq,true,1988-10-04,1990-12-31,,uhslc,uhslc/012c,0.03,ready,
@@ -1577,7 +1577,7 @@ gen_dynamics_pier-8664022-usa-noaa,Gen_Dynamics_Pier,United States,noaa,true,fal
 genova-gen-ita-ispra,Genova,Italy,ispra,true,true,it/genova,true,1998-12-11,2025-07-06,,ispra,,,license,
 georgetown-60950-aus-bom,Georgetown,Australia,bom,true,true,au/georgetown-tasmania,true,1965-07-07,2005-12-31,,bom,,,license,BOM license not stated
 georgiana_slough_at_mokelumne_river-b94100-usa-cdwr,Georgiana_Slough_At_Mokelumne_River,United States,cdwr,true,true,us/georgiana-slough-at-mokelumne-river,true,1982-10-01,2025-05-24,,dwr,dwr/B94100,0,ready,
-georgiana_slough_at_sacramento_river-gss-usa-cdwr,Georgiana_Slough_At_Sacramento_River,United States,cdwr,true,false,us/georgiana-slough-at-sacramento-river,true,2003-09-19,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+georgiana_slough_at_sacramento_river-gss-usa-cdwr,Georgiana_Slough_At_Sacramento_River,United States,cdwr,true,false,us/georgiana-slough-at-sacramento-river,true,2003-09-19,2025-05-24,,cdec,cdec/GSS,0,ready,
 georgiana_slough_nr_sacramento_r-11447903-usa-usgs,Georgiana_Slough_Nr_Sacramento_R,United States,usgs,true,false,us/georgiana-slough-nr-sacramento-r,true,2007-10-01,2025-04-30,,usgs,usgs/11447903,0,ready,
 geraldton-62290-aus-bom,Geraldton,Australia,bom,true,true,au/geraldton,true,1963-10-31,2022-12-31,,bom,,,license,BOM license not stated
 geting-326a-mys-uhslc_rq,Geting,Malaysia,uhslc_rq,true,true,my/geting,true,1986-12-16,2017-11-07,,uhslc,uhslc/326a,0.05,ready,
@@ -1615,7 +1615,7 @@ goleta_slough-gol-usa-cm,Goleta_Slough,United States,cm,true,true,us/goleta-slou
 gomeratg-gom-esp-cmems,GomeraTG,Spain,cmems,true,true,es/gomera,false,2007-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 gonoura-9027-jpn-jodc_pahb,Gonoura,Japan,jodc_pahb,true,true,jp/gonoura,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 goods_island-58200-aus-bom,Goods_Island,Australia,bom,true,true,au/goods-island,true,1974-07-18,2022-12-31,,bom,,,license,BOM license not stated
-goodyear_slough-gys-usa-cdwr,Goodyear_Slough,United States,cdwr,true,true,us/goodyear-slough,true,1994-08-15,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+goodyear_slough-gys-usa-cdwr,Goodyear_Slough,United States,cdwr,true,true,us/goodyear-slough,true,1994-08-15,2025-05-24,,cdec,cdec/GYS,0,ready,
 goodyear_slough_at_lake_herman_road-e33510-usa-cdwr,Goodyear_Slough_At_Lake_Herman_Road,United States,cdwr,true,true,us/goodyear-slough-at-lake-herman-road,true,1982-10-01,1999-03-12,,dwr,,,unmatched,No dwr/E33510 in the list
 goose_creek_sh_99-goo-usa-hct,Goose_Creek_SH_99,United States,hct,true,false,us/goose-creek-sh-99,true,2012-02-07,2024-08-19,,hct,,,license,Terms not reviewed
 gordon_floridawestcoast-gordo-usa-sfwmd,Gordon_FloridaWestCoast,United States,sfwmd,true,true,us/gordon-florida-west-coast,true,1980-09-05,2024-06-23,,sfwmd,sfwmd/GORDON_2_T,0.02,ready,
@@ -1812,7 +1812,7 @@ hidden_river_near_homosassa_fl-2310675-usa-usgs,Hidden_River_Near_Homosassa_Fl,U
 hienghene-429-fra-refmar,Hienghene,France,refmar,true,true,fr/hienghene,true,1983-12-13,2025-03-31,,refmar,refmar/429,0,ready,
 hienghenetg_60minute-hie-fra-cmems,HiengheneTG_60minute,France,cmems,true,false,fr/hienghene,false,1983-12-13,2025-03-31,,refmar,refmar/429,0,ready,CMEMS record of a gauge the national feed publishes
 high_island-8770808-usa-noaa,High_Island,United States,noaa,true,false,us/high-island-icww,true,2012-12-01,2025-06-30,noaa/8770808,coops,coops/8770808,0,ready,
-hill_slough-hsl-usa-cdwr,Hill_Slough,United States,cdwr,true,true,us/hill-slough,true,2020-09-24,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+hill_slough-hsl-usa-cdwr,Hill_Slough,United States,cdwr,true,true,us/hill-slough,true,2020-09-24,2025-05-24,,cdec,cdec/HSL,0,ready,
 hillarys-132a-aus-uhslc_rq,Hillarys,Australia,uhslc_rq,true,true,au/hillarys,true,1992-01-01,2021-12-31,,uhslc,uhslc/132a,0.03,restricted,The contributor's terms bar commercial use
 hillarys-62237-aus-bom,Hillarys,Australia,bom,true,false,au/hillarys-western-australia,true,1991-11-30,2022-12-31,,bom,,,license,BOM license not stated
 hillsborough_r_at_i_275_bridge_at_sulphur_spgs_fl-23060013-usa-usgs,Hillsborough_R_At_I_275_Bridge_At_Sulphur_Spgs_Fl,United States,usgs,true,true,us/hillsborough-r-at-i-275-bridge-at-sulphur-spgs-fl,true,2011-06-30,2025-04-30,,usgs,usgs/023060013,0,ready,
@@ -1844,7 +1844,7 @@ hog_island_channel_at_island_park_ny-1311143-usa-usgs,Hog_Island_Channel_At_Isla
 hogland-hog-rus-cmems,Hogland,Russia,cmems,true,true,ru/hogland,false,2010-04-29,2018-04-18,,cmems,,,restricted,GESLA lists CMEMS as research only
 holbaek-hol-dnk-cmems,Holbaek,Denmark,cmems,true,true,dk/holbaek,false,2011-12-22,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes
 holdenbeach_brunswickcounty-hol-usa-ncdem,HoldenBeach_BrunswickCounty,United States,ncdem,true,true,us/holden-beach-brunswick-county,true,2024-03-08,2025-05-12,,ncdem,,,license,North Carolina DEM terms to check
-holland_cut_near_bethel_island-hol-usa-cdwr,Holland_Cut_Near_Bethel_Island,United States,cdwr,true,false,us/holland-cut-near-bethel-island,true,2006-06-27,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+holland_cut_near_bethel_island-hol-usa-cdwr,Holland_Cut_Near_Bethel_Island,United States,cdwr,true,false,us/holland-cut-near-bethel-island,true,2006-06-27,2025-05-24,,cdec,cdec/HOL,0,ready,
 holland_cut_nr_bethel_island_ca-11313431-usa-usgs,Holland_Cut_Nr_Bethel_Island_Ca,United States,usgs,true,true,us/holland-cut-nr-bethel-island-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313431,0,ready,
 holland_mi-9087031-usa-noaa,Holland_Mi,United States,noaa,true,true,us/holland,true,1970-01-01,2025-07-01,noaa/9087031,coops,coops/9087031,0,ready,
 hollandsebrugtg-hol-nld-cmems,HollandseBrugTG,Netherlands,cmems,true,false,nl/hollandse-brug,false,2014-07-30,2025-06-30,,rws,rws/almere.hollandsebrug,0.16,ready,CMEMS record of a gauge the national feed publishes
@@ -1930,7 +1930,7 @@ humboldt_bay_ca-576a-usa-uhslc_rq,Humboldt_Bay_CA,United States,uhslc_rq,true,fa
 hundsmhlen-4960020-deu-wsv,Hundsmhlen,Germany,wsv,true,false,de/hundsmhlen,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960020,0.18,ready,history needs a PEGELONLINE backfill
 hunger_harbour_bc-9570-can-meds,Hunger_Harbour_BC,Canada,meds,true,true,ca/hunger-harbour,true,1962-05-07,2009-09-10,,chs,,,restricted,CHS license bars commercial derivatives
 huntebrck-4960070-deu-wsv,Huntebrck,Germany,wsv,true,true,de/huntebrck,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4960070,0.18,ready,history needs a PEGELONLINE backfill
-hunter_cut_at_montezuma_slough-hun-usa-cdwr,Hunter_Cut_At_Montezuma_Slough,United States,cdwr,true,true,us/hunter-cut-at-montezuma-slough,true,2018-06-08,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+hunter_cut_at_montezuma_slough-hun-usa-cdwr,Hunter_Cut_At_Montezuma_Slough,United States,cdwr,true,true,us/hunter-cut-at-montezuma-slough,true,2018-06-08,2025-05-24,,cdec,cdec/HUN,0,ready,
 hunter_spr_run_at_beach_lane_at_crystal_river_fl-2310743-usa-usgs,Hunter_Spr_Run_At_Beach_Lane_At_Crystal_River_Fl,United States,usgs,true,true,us/hunter-spr-run-at-beach-lane-at-crystal-river-fl,true,2017-01-26,2025-05-01,,usgs,usgs/02310743,0,ready,
 husum-9530020-deu-wsv,Husum,Germany,wsv,true,true,de/husum,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9530020,0.2,ready,history needs a PEGELONLINE backfill
 husumtg-hus-deu-cmems,HusumTG,Germany,cmems,true,false,de/husum-schleswig-holstein,false,2014-01-01,2025-06-30,,pegelonline,pegelonline/9530020,0.03,ready,CMEMS record of a gauge the national feed publishes
@@ -1938,7 +1938,7 @@ hvidesandekysttg-hvi-dnk-cmems,HvideSandeKystTG,Denmark,cmems,true,false,dk/hvid
 i_10_bonnet_carre_floodway-8762483-usa-noaa,I_10_Bonnet_Carre_Floodway,United States,noaa,true,true,us/i-10-bonnet-carre-floodway,true,2015-04-30,2020-06-30,noaa/8762483,coops,coops/8762483,0.01,ready,
 i_295_bridge-8720357-usa-noaa,I_295_Bridge,United States,noaa,true,false,us/i-295-bridge,true,1997-04-01,2025-06-30,noaa/8720357,coops,coops/8720357,0.28,ready,
 i_royal_anselegoff-851a-fra-uhslc_rq,I_Royal_AnseLegoff,France,uhslc_rq,true,false,fr/i-royal-anse-legoff,true,1989-05-16,2007-12-06,,uhslc,uhslc/851a,0.05,ready,
-ibis-ibs-usa-cdwr,Ibis,United States,cdwr,true,true,us/ibis,true,1994-07-01,2023-12-14,,cdec,,,license,A CDEC station; no CDEC adapter yet
+ibis-ibs-usa-cdwr,Ibis,United States,cdwr,true,true,us/ibis,true,1994-07-01,2023-12-14,,cdec,cdec/IBS,0,ready,
 ibizatg-ibi-esp-cmems,IbizaTG,Spain,cmems,true,true,es/ibiza,false,2003-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes
 ierapetra-ier-grc-cmems,Ierapetra,Greece,cmems,true,true,gr/ierapetra,false,2016-12-13,2024-06-23,,cmems,,,restricted,GESLA lists CMEMS as research only
 ijgeulstroompaal1tg-ijg-nld-cmems,IJgeulstroompaal1TG,Netherlands,cmems,true,false,nl/i-jgeulstroompaal,false,2014-07-30,2018-12-13,,rws,rws/ijgeul.1,0.25,ready,CMEMS record of a gauge the national feed publishes
@@ -2418,7 +2418,7 @@ lewisetta-8635750-usa-noaa,Lewisetta,United States,noaa,true,false,us/lewisetta,
 lhort-5960010-deu-wsv,Lhort,Germany,wsv,true,true,de/lhort,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/5960010,0,ready,history needs a PEGELONLINE backfill
 lianyungang-639a-chn-uhslc_rq,Lianyungang,China,uhslc_rq,true,true,cn/lianyungang,true,1975-01-01,1997-12-31,,uhslc,uhslc/639a,0.03,ready,
 liberty_cut_a_little_holland_tract_nr_courtland_ca-11455146-usa-usgs,Liberty_Cut_A_Little_Holland_Tract_Nr_Courtland_Ca,United States,usgs,true,true,us/liberty-cut-a-little-holland-tract-nr-courtland-ca,true,2014-09-16,2018-11-06,,usgs,usgs/11455146,0,ready,
-liberty_island_at_approx_cntr_s_end-lib-usa-cdwr,Liberty_Island_At_Approx_Cntr_S_End,United States,cdwr,true,false,us/liberty-island-at-approx-cntr-s-end,true,2010-12-20,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+liberty_island_at_approx_cntr_s_end-lib-usa-cdwr,Liberty_Island_At_Approx_Cntr_S_End,United States,cdwr,true,false,us/liberty-island-at-approx-cntr-s-end,true,2010-12-20,2025-05-24,,cdec,,,unmatched,No cdec/LIB in the list
 lichteiland_goeree-lichtelgre-nld-rws,Lichteiland_Goeree,Netherlands,rws,true,true,nl/lichteiland-goeree,true,1983-01-01,2023-12-31,,rws,rws/goeree.lichteiland,0,ready,
 lichteiland_goeree-lichtelgre-nld-rws_hist,Lichteiland_Goeree,Netherlands,rws_hist,true,false,nl/lichteiland-goeree,true,2001-06-30,2018-09-07,,rws,rws/goeree.lichteiland,0.13,ready,
 lichteilandgoeree1tg-lic-nld-cmems,LichteilandGoeree1TG,Netherlands,cmems,true,false,nl/lichteiland-goeree-ticon-lichteilandgoeree1tg-lic-nld-cmems,false,2015-01-01,2025-06-30,,rws,rws/goeree.lichteiland,0.24,ready,CMEMS record of a gauge the national feed publishes
@@ -2447,7 +2447,7 @@ little_egg_inlet_near_tuckerton_nj-1409335-usa-usgs,Little_Egg_Inlet_Near_Tucker
 little_lake_near_cutoff_la-7380335-usa-usgs,Little_Lake_Near_Cutoff_La,United States,usgs,true,true,us/little-lake-near-cutoff-la,true,2007-10-01,2021-08-28,,usgs,usgs/07380335,0,ready,
 little_neck_creek_at_pinewood_rd_at_va_beach_va-204295505-usa-usgs,Little_Neck_Creek_At_Pinewood_Rd_At_Va_Beach_Va,United States,usgs,true,true,us/little-neck-creek-at-pinewood-rd-at-va-beach-va,true,2016-04-15,2025-04-30,,usgs,usgs/0204295505,0,ready,
 little_potato_slough_a_terminous_ca-11336790-usa-usgs,Little_Potato_Slough_A_Terminous_Ca,United States,usgs,true,true,us/little-potato-slough-a-terminous-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11336790,0,ready,
-little_potato_slough_at_terminous-lps-usa-cdwr,Little_Potato_Slough_At_Terminous,United States,cdwr,true,false,us/little-potato-slough-at-terminous,true,2006-06-27,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+little_potato_slough_at_terminous-lps-usa-cdwr,Little_Potato_Slough_At_Terminous,United States,cdwr,true,false,us/little-potato-slough-at-terminous,true,2006-06-27,2025-05-24,,cdec,cdec/LPS,0,ready,
 little_rapids_mi-9076032-usa-noaa,Little_Rapids_Mi,United States,noaa,true,true,us/little-rapids,true,2004-06-25,2011-02-10,noaa/9076032,coops,coops/9076032,0,ready,
 little_rapids_mi-9076033-usa-noaa,Little_Rapids_Mi,United States,noaa,true,false,us/little-rapids-mi,true,2008-12-19,2025-07-01,noaa/9076033,coops,coops/9076033,0,ready,
 little_river_bc-7993-can-meds,Little_River_BC,Canada,meds,true,true,ca/little-river,true,1967-09-09,1994-04-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -2645,7 +2645,7 @@ marseilletg_60minute-mar-fra-cmems,MarseilleTG_60minute,France,cmems,true,false,
 marstrand-mar-swe-cmems,Marstrand,Sweden,cmems,true,false,se/marstrand,false,2019-07-01,2025-07-01,,smhi,smhi/35104,1.21,ready,CMEMS record of a gauge the national feed publishes
 marstrand_sjov-35104-swe-smhi,Marstrand_Sjov,Sweden,smhi,true,true,se/marstrand-sjov,true,2009-04-27,2025-07-02,,smhi,smhi/35104,1.21,ready,
 martin_bayou_at_us_98_at_springfield_fl-2359315-usa-usgs,Martin_Bayou_At_Us_98_At_Springfield_Fl,United States,usgs,true,false,us/martin-bayou-at-us-98-at-springfield-fl,true,2007-10-01,2015-07-01,,usgs,usgs/02359315,0,ready,
-martinez-mrz-usa-cdwr,Martinez,United States,cdwr,true,true,us/martinez,true,1994-07-02,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+martinez-mrz-usa-cdwr,Martinez,United States,cdwr,true,true,us/martinez,true,1994-07-02,2025-05-24,,cdec,cdec/MRZ,0,ready,
 martinez_amorco_pier-9415102-usa-noaa,Martinez_Amorco_Pier,United States,noaa,true,false,us/martinez-amorco-pier,true,2013-05-06,2025-06-30,noaa/9415102,coops,coops/9415102,0,ready,
 marviken-2076-swe-smhi,Marviken,Sweden,smhi,true,true,se/marviken,true,1964-11-16,2019-10-01,,smhi,,,unmatched,No smhi/2076 in the list
 marviken-mar-swe-cmems,Marviken,Sweden,cmems,true,false,se/marviken,false,1964-11-16,2019-10-01,,smhi,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name"
@@ -2730,9 +2730,9 @@ michipicoten_ontario-10750-can-meds,Michipicoten_Ontario,Canada,meds,true,true,c
 middelharnis-middhns-nld-rws_hist,Middelharnis,Netherlands,rws_hist,true,false,nl/middelharnis,true,1970-11-01,1992-12-31,,rws,rws/middelharnis,0,ready,
 middle_r_at_middle_river_ca-11312676-usa-usgs,Middle_R_At_Middle_River_Ca,United States,usgs,true,true,us/middle-r-at-middle-river-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11312676,0,ready,
 middle_r_nr_holt_ca-11312685-usa-usgs,Middle_R_Nr_Holt_Ca,United States,usgs,true,true,us/middle-r-nr-holt-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11312685,0,ready,
-middle_river_above_barrier-mab-usa-cdwr,Middle_River_Above_Barrier,United States,cdwr,true,true,us/middle-river-above-barrier,true,2017-09-18,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+middle_river_above_barrier-mab-usa-cdwr,Middle_River_Above_Barrier,United States,cdwr,true,true,us/middle-river-above-barrier,true,2017-09-18,2025-05-24,,cdec,cdec/MAB,0,ready,
 middle_river_at_bacon_island-b95460-usa-cdwr,Middle_River_At_Bacon_Island,United States,cdwr,true,true,us/middle-river-at-bacon-island,true,1982-10-01,2025-05-13,,dwr,,,unmatched,No dwr/B95460 in the list
-middle_river_at_bacon_island_road-bir-usa-cdwr,Middle_River_At_Bacon_Island_Road,United States,cdwr,true,false,us/middle-river-at-bacon-island-road,true,2018-03-06,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+middle_river_at_bacon_island_road-bir-usa-cdwr,Middle_River_At_Bacon_Island_Road,United States,cdwr,true,false,us/middle-river-at-bacon-island-road,true,2018-03-06,2025-05-24,,cdec,cdec/BIR,0,ready,
 middle_river_at_fish_hole_at_port_wentworth_ga-2198955-usa-usgs,Middle_River_At_Fish_Hole_At_Port_Wentworth_Ga,United States,usgs,true,true,us/middle-river-at-fish-hole-at-port-wentworth-ga,true,2014-02-28,2025-05-01,,usgs,usgs/02198955,0,ready,
 middle_river_at_ga_25_at_port_wentworth_ga-2198950-usa-usgs,Middle_River_At_Ga_25_At_Port_Wentworth_Ga,United States,usgs,true,true,us/middle-river-at-ga-25-at-port-wentworth-ga,true,2009-05-16,2025-05-01,,usgs,usgs/02198950,0,ready,
 middle_river_at_howard_road_bridge-b95530-usa-cdwr,Middle_River_At_Howard_Road_Bridge,United States,cdwr,true,true,us/middle-river-at-howard-road-bridge,true,1999-04-22,2025-05-24,,dwr,dwr/B95530,0,ready,
@@ -2740,7 +2740,7 @@ middle_river_at_middle_river-b95468-usa-cdwr,Middle_River_At_Middle_River,United
 middle_river_at_mowry_bridge-b95540-usa-cdwr,Middle_River_At_Mowry_Bridge,United States,cdwr,true,true,us/middle-river-at-mowry-bridge,true,1982-10-04,2025-05-24,,dwr,dwr/B95540,0,ready,
 middle_river_at_tracy_road_bridge-b95503-usa-cdwr,Middle_River_At_Tracy_Road_Bridge,United States,cdwr,true,true,us/middle-river-at-tracy-road-bridge,true,1987-10-01,2025-05-02,,dwr,dwr/B95503,0,ready,
 middle_river_at_union_point-b95500-usa-cdwr,Middle_River_At_Union_Point,United States,cdwr,true,true,us/middle-river-at-union-point,true,1982-11-03,2025-05-01,,dwr,,,unmatched,No dwr/B95500 in the list
-middle_river_near_holt-hlt-usa-cdwr,Middle_River_Near_Holt,United States,cdwr,true,false,us/middle-river-near-holt,true,2016-10-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+middle_river_near_holt-hlt-usa-cdwr,Middle_River_Near_Holt,United States,cdwr,true,false,us/middle-river-near-holt,true,2016-10-01,2025-05-24,,cdec,cdec/HLT,0,ready,
 middle_river_undine_road-b95541-usa-cdwr,Middle_River_Undine_Road,United States,cdwr,true,true,us/middle-river-undine-road,true,2015-10-01,2025-05-24,,dwr,dwr/B95541Q,0,ready,
 midland_ontario-11445-can-meds,Midland_Ontario,Canada,meds,true,true,ca/midland,true,2009-06-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 midway-050-usa-uhslc_fd,Midway,United States,uhslc_fd,true,false,us/sand-island,true,1947-02-08,2025-06-30,,uhslc,uhslc/050,0.04,ready,
@@ -2766,7 +2766,7 @@ minamitorishima-ma70-jpn-jodc_jma,Minamitorishima,Japan,jodc_jma,true,false,jp/m
 miner_slough-b91470q-usa-cdwr,Miner_Slough,United States,cdwr,true,true,us/miner-slough,true,2015-10-01,2025-05-24,,dwr,dwr/B91470Q,0,ready,
 miner_slough_a_hwy_84_bridge-11455165-usa-usgs,Miner_Slough_A_Hwy_84_Bridge,United States,usgs,true,true,us/miner-slough-a-hwy-84-bridge,true,2007-10-01,2020-12-11,,usgs,usgs/11455165,0,ready,
 miner_slough_at_five_points-b91475-usa-cdwr,Miner_Slough_At_Five_Points,United States,cdwr,true,true,us/miner-slough-at-five-points,true,1995-11-30,2025-05-24,,dwr,,,unmatched,No dwr/B91475 in the list
-miner_slough_at_hwy_84_bridge-hwb-usa-cdwr,Miner_Slough_At_Hwy_84_Bridge,United States,cdwr,true,false,us/miner-slough-at-hwy-84-bridge,true,2003-12-31,2020-12-11,,cdec,,,license,A CDEC station; no CDEC adapter yet
+miner_slough_at_hwy_84_bridge-hwb-usa-cdwr,Miner_Slough_At_Hwy_84_Bridge,United States,cdwr,true,false,us/miner-slough-at-hwy-84-bridge,true,2003-12-31,2020-12-11,,cdec,,,unmatched,No cdec/HWB in the list
 minicoy-153-ind-uhslc_fd,Minicoy,India,uhslc_fd,true,true,in/minicoy,true,2011-09-30,2025-02-25,,uhslc,uhslc/153,0,ready,
 miri-388a-mys-uhslc_rq,Miri,Malaysia,uhslc_rq,true,true,my/miri,true,1992-12-21,2015-12-19,,uhslc,uhslc/388a,0.05,ready,
 mississippi_river_at_buras_la-7374540-usa-usgs,Mississippi_River_At_Buras_La,United States,usgs,true,true,us/mississippi-river-at-buras-la,true,2012-09-19,2015-10-22,,usgs,usgs/07374540,0,ready,
@@ -2794,7 +2794,7 @@ moerdijk-moerdk-nld-rws_hist,Moerdijk,Netherlands,rws_hist,true,false,nl/moerdij
 moji-9010-jpn-jodc_pahb,Moji,Japan,jodc_pahb,true,true,jp/moji-shimonoseki-yamaguchi,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 moji-hd17-jpn-jodc_jcg,Moji,Japan,jodc_jcg,true,true,jp/moji-suo-nada,true,1958-10-31,2008-03-30,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 mokelumne_r_a_andrus_island_nr_terminous_ca-11336930-usa-usgs,Mokelumne_R_A_Andrus_Island_Nr_Terminous_Ca,United States,usgs,true,true,us/mokelumne-r-a-andrus-island-nr-terminous-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11336930,0,ready,
-mokelumne_r_at_san_joaquin_river-mok-usa-cdwr,Mokelumne_R_At_San_Joaquin_River,United States,cdwr,true,true,us/mokelumne-r-at-san-joaquin-river,true,2007-02-09,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+mokelumne_r_at_san_joaquin_river-mok-usa-cdwr,Mokelumne_R_At_San_Joaquin_River,United States,cdwr,true,true,us/mokelumne-r-at-san-joaquin-river,true,2007-02-09,2025-05-24,,cdec,cdec/MOK,0,ready,
 mokelumne_river_near_thornton-b94175-usa-cdwr,Mokelumne_River_Near_Thornton,United States,cdwr,true,false,us/mokelumne-river-near-thornton,true,1982-10-01,2025-05-24,,dwr,dwr/B94175,0,ready,
 mokuoloe-061-usa-uhslc_fd,Mokuoloe,United States,uhslc_fd,true,false,us/moku-o-loe,true,1957-05-01,2025-06-30,,uhslc,uhslc/061,0.03,ready,
 mokuoloe-061a-usa-uhslc_rq,Mokuoloe,United States,uhslc_rq,true,false,us/moku-o-loe,true,1957-05-01,2021-12-31,noaa/1612480,coops,coops/1612480,1.04,ready,UHSLC relay of noaa/1612480
@@ -2833,7 +2833,7 @@ morlaixvigicruestg_06minute-mor-fra-cmems,MorlaixVigicruesTG_06minute,France,cme
 mornington_island-h074011a-aus-bom,Mornington_Island,Australia,bom,true,true,au/mornington-island,true,2007-06-30,2016-12-31,,bom,,,license,BOM license not stated
 morrisburg_ontario-14660-can-meds,Morrisburg_Ontario,Canada,meds,true,true,ca/morrisburg,true,1991-04-10,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 morro_bay_coast_guard_pier-mor-usa-cm,Morro_Bay_Coast_Guard_Pier,United States,cm,true,true,us/morro-bay-coast-guard-pier,true,2021-08-10,2025-07-15,,cm,,,license,Terms not reviewed
-morrow_island_distribution_system-mrw-usa-cdwr,Morrow_Island_Distribution_System,United States,cdwr,true,false,us/morrow-island-distribution-system,true,2019-03-14,2021-08-12,,cdec,,,license,A CDEC station; no CDEC adapter yet
+morrow_island_distribution_system-mrw-usa-cdwr,Morrow_Island_Distribution_System,United States,cdwr,true,false,us/morrow-island-distribution-system,true,2019-03-14,2021-08-12,,cdec,,,unmatched,No cdec/MRW in the list
 moses_lk_galveston_bay_nr_texas_city_tx-8077650-usa-usgs,Moses_Lk_Galveston_Bay_Nr_Texas_City_Tx,United States,usgs,true,true,us/moses-lk-galveston-bay-nr-texas-city-tx,true,2007-10-01,2025-05-01,,usgs,usgs/08077650,0,ready,
 mossel_bay-185-zaf-uhslc_fd,Mossel_Bay,South Africa,uhslc_fd,true,true,za/mossel-bay,true,1964-01-01,2018-10-31,,uhslc,,,restricted,SANHO's data
 mossel_bay-185a-zaf-uhslc_rq,Mossel_Bay,South Africa,uhslc_rq,true,false,za/mossel-bay-western-cape,true,1964-01-01,2016-12-31,,uhslc,,,restricted,SANHO's data
@@ -3023,7 +3023,7 @@ north_cormorant-northcmrt-nld-rws,North_Cormorant,Netherlands,rws,true,true,nl/n
 north_fork_black_creek_at_middleburg_fl-2246010-usa-usgs,North_Fork_Black_Creek_At_Middleburg_Fl,United States,usgs,true,true,us/north-fork-black-creek-at-middleburg-fl,true,2011-10-01,2025-05-01,,usgs,usgs/02246010,0,ready,
 north_galiano_bc-7435-can-meds,North_Galiano_BC,Canada,meds,true,true,ca/north-galiano-bc,true,1972-03-04,2018-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 north_landing_river_at_marina_near_creeds_va-2043269-usa-usgs,North_Landing_River_At_Marina_Near_Creeds_Va,United States,usgs,true,true,us/north-landing-river-at-marina-near-creeds-va,true,2016-04-14,2025-04-30,,usgs,usgs/02043269,0,ready,
-north_mokelumne_r_at_w_walnut_grove_rd-nmr-usa-cdwr,North_Mokelumne_R_At_W_Walnut_Grove_Rd,United States,cdwr,true,false,us/north-mokelumne-r-at-w-walnut-grove-rd,true,2010-12-16,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+north_mokelumne_r_at_w_walnut_grove_rd-nmr-usa-cdwr,North_Mokelumne_R_At_W_Walnut_Grove_Rd,United States,cdwr,true,false,us/north-mokelumne-r-at-w-walnut-grove-rd,true,2010-12-16,2025-05-24,,cdec,cdec/NMR,0,ready,
 north_old_bridge-8531369-usa-noaa,North_Old_Bridge,United States,noaa,true,false,us/old-bridge,true,1975-12-14,1977-05-06,noaa/8531369,coops,coops/8531369,0,ready,
 north_river_upstream_of_cutoff_near_flamingo_fl-22908205-usa-usgs,North_River_Upstream_Of_Cutoff_Near_Flamingo_Fl,United States,usgs,true,true,us/north-river-upstream-of-cutoff-near-flamingo-fl,true,2007-10-01,2025-05-01,,usgs,usgs/022908205,0,ready,
 north_santee_river_nr_north_santee_sc-2171800-usa-usgs,North_Santee_River_Nr_North_Santee_Sc,United States,usgs,true,true,us/north-santee-river-nr-north-santee-sc,true,2007-10-01,2025-05-01,,usgs,usgs/02171800,0,ready,
@@ -3108,14 +3108,14 @@ old_r_a_franks_tract_nr_terminous_ca-11313452-usa-usgs,Old_R_A_Franks_Tract_Nr_T
 old_r_a_quimby_island_nr_bethel_island_ca-11313434-usa-usgs,Old_R_A_Quimby_Island_Nr_Bethel_Island_Ca,United States,usgs,true,true,us/old-r-a-quimby-island-nr-bethel-island-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313434,0,ready,
 old_r_nr_delta_mendota_canal_ca-11312968-usa-usgs,Old_R_Nr_Delta_Mendota_Canal_Ca,United States,usgs,true,true,us/old-r-nr-delta-mendota-canal-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11312968,0,ready,
 old_river_above_doughty_cut-b95390-usa-cdwr,Old_River_Above_Doughty_Cut,United States,cdwr,true,true,us/old-river-above-doughty-cut,true,2015-10-01,2025-05-24,,dwr,dwr/B95390Q,0,ready,
-old_river_as_quimbly_is_near_bethel_is-orq-usa-cdwr,Old_River_As_Quimbly_Is_Near_Bethel_Is,United States,cdwr,true,false,us/old-river-as-quimbly-is-near-bethel-is,true,2006-06-27,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+old_river_as_quimbly_is_near_bethel_is-orq-usa-cdwr,Old_River_As_Quimbly_Is_Near_Bethel_Is,United States,cdwr,true,false,us/old-river-as-quimbly-is-near-bethel-is,true,2006-06-27,2025-05-24,,cdec,cdec/ORQ,0,ready,
 old_river_at_bacon_island-b95250-usa-cdwr,Old_River_At_Bacon_Island,United States,cdwr,true,false,us/old-river-at-bacon-island,true,1987-05-05,2025-05-24,,dwr,dwr/B95250,0,ready,
-old_river_at_bacon_island-obi-usa-cdwr,Old_River_At_Bacon_Island,United States,cdwr,true,false,us/old-river-at-bacon-island-ca,true,2007-07-03,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+old_river_at_bacon_island-obi-usa-cdwr,Old_River_At_Bacon_Island,United States,cdwr,true,false,us/old-river-at-bacon-island-ca,true,2007-07-03,2025-05-24,,cdec,,,unmatched,No cdec/OBI in the list
 old_river_at_clifton_court_ferry-b95340-usa-cdwr,Old_River_At_Clifton_Court_Ferry,United States,cdwr,true,true,us/old-river-at-clifton-court-ferry,true,1982-10-01,2025-05-24,,dwr,,,unmatched,No dwr/B95340 in the list
 old_river_at_coney_island-b95290-usa-cdwr,Old_River_At_Coney_Island,United States,cdwr,true,true,us/old-river-at-coney-island,true,2004-06-20,2025-05-24,,dwr,dwr/B95290,0,ready,
-old_river_at_delta_mendota_canal-odm-usa-cdwr,Old_River_At_Delta_Mendota_Canal,United States,cdwr,true,false,us/old-river-at-delta-mendota-canal,true,2003-12-31,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
-old_river_at_franks_tract_near_terminos-osj-usa-cdwr,Old_River_At_Franks_Tract_Near_Terminos,United States,cdwr,true,false,us/old-river-at-franks-tract-near-terminos,true,2016-10-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
-old_river_at_highway_4-oh4-usa-cdwr,Old_River_At_Highway_4,United States,cdwr,true,false,us/old-river-at-highway-4,true,2016-10-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+old_river_at_delta_mendota_canal-odm-usa-cdwr,Old_River_At_Delta_Mendota_Canal,United States,cdwr,true,false,us/old-river-at-delta-mendota-canal,true,2003-12-31,2025-05-24,,cdec,,,unmatched,No cdec/ODM in the list
+old_river_at_franks_tract_near_terminos-osj-usa-cdwr,Old_River_At_Franks_Tract_Near_Terminos,United States,cdwr,true,false,us/old-river-at-franks-tract-near-terminos,true,2016-10-01,2025-05-24,,cdec,cdec/OSJ,0,ready,
+old_river_at_highway_4-oh4-usa-cdwr,Old_River_At_Highway_4,United States,cdwr,true,false,us/old-river-at-highway-4,true,2016-10-01,2025-05-24,,cdec,,,unmatched,No cdec/OH4 in the list
 old_river_barrier_near_dmc_above-b95366-usa-cdwr,Old_River_Barrier_Near_Dmc_Above,United States,cdwr,true,false,us/old-river-barrier-near-dmc-above,true,1991-10-01,2025-05-24,,dwr,dwr/B95366,0,ready,
 old_river_barrier_near_dmc_below-b95365-usa-cdwr,Old_River_Barrier_Near_Dmc_Below,United States,cdwr,true,false,us/old-river-barrier-near-dmc-below,true,1991-09-09,2025-05-24,,dwr,,,unmatched,No dwr/B95365 in the list
 old_river_clifton_court_intake-b95341-usa-cdwr,Old_River_Clifton_Court_Intake,United States,cdwr,true,false,us/old-river-clifton-court-intake,true,2015-10-01,2025-05-14,,dwr,dwr/B95341Q,0,ready,
@@ -3123,7 +3123,7 @@ old_river_head-b95400-usa-cdwr,Old_River_Head,United States,cdwr,true,false,us/o
 old_river_near_byron-b95270-usa-cdwr,Old_River_Near_Byron,United States,cdwr,true,true,us/old-river-near-byron-country-club-ca,true,1982-10-01,2025-05-24,,dwr,dwr/B95270,14.69,ready,
 old_river_near_byron_ca-11313315-usa-usgs,Old_River_Near_Byron_Ca,United States,usgs,true,true,us/old-river-near-byron-discovery-bay-ca,true,2007-10-01,2025-05-06,,usgs,usgs/11313315,0,ready,
 old_river_near_rock_slough-b95180-usa-cdwr,Old_River_Near_Rock_Slough,United States,cdwr,true,true,us/old-river-near-rock-slough,true,1982-10-01,1984-10-01,,dwr,,,unmatched,No dwr/B95180 in the list
-old_river_near_tracy-olr-usa-cdwr,Old_River_Near_Tracy,United States,cdwr,true,true,us/old-river-near-tracy,true,1985-05-02,2002-09-20,,cdec,,,license,A CDEC station; no CDEC adapter yet
+old_river_near_tracy-olr-usa-cdwr,Old_River_Near_Tracy,United States,cdwr,true,true,us/old-river-near-tracy,true,1985-05-02,2002-09-20,,cdec,,,unmatched,No cdec/OLR in the list
 old_river_near_tracy_blvd_bridge-b95380-usa-cdwr,Old_River_Near_Tracy_Blvd_Bridge,United States,cdwr,true,true,us/old-river-near-tracy-blvd-bridge,true,1982-10-01,2025-05-24,,dwr,dwr/B95380,0,ready,
 old_river_upstream_of_mountain_house_creek-b95370q-usa-cdwr,Old_River_Upstream_Of_Mountain_House_Creek,United States,cdwr,true,true,us/old-river-upstream-of-mountain-house-creek,true,2015-10-01,2025-05-24,,dwr,dwr/B95370Q,0,ready,
 old_rv_cutoff_nr_moss_bluff_tx-8067215-usa-usgs,Old_Rv_Cutoff_Nr_Moss_Bluff_Tx,United States,usgs,true,false,us/old-rv-cutoff-nr-moss-bluff-tx,true,2007-10-01,2022-10-01,,usgs,usgs/08067215,0,ready,
@@ -3263,7 +3263,7 @@ pee_dee_river_at_georgetown_sc-2136350-usa-usgs,Pee_Dee_River_At_Georgetown_Sc,U
 pee_dee_river_at_hwy_701_nr_bucksport_sc-2135200-usa-usgs,Pee_Dee_River_At_Hwy_701_Nr_Bucksport_Sc,United States,usgs,true,true,us/pee-dee-river-at-hwy-701-nr-bucksport-sc,true,2013-04-25,2025-04-30,,usgs,usgs/02135200,0,ready,
 peel_inlet-plpee01-aus-bom,Peel_Inlet,Australia,bom,true,true,au/peel-inlet-western-australia,true,1984-12-07,2022-12-31,,bom,,,license,BOM license not stated
 pelee_point_east-12122-can-meds,Pelee_Point_East,Canada,meds,true,true,ca/pelee-point-east,true,1964-06-17,1976-10-30,,chs,,,restricted,CHS license bars commercial derivatives
-pelican_point_at_roaring_river-pel-usa-cdwr,Pelican_Point_At_Roaring_River,United States,cdwr,true,false,us/pelican-point-at-roaring-river,true,2013-11-13,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+pelican_point_at_roaring_river-pel-usa-cdwr,Pelican_Point_At_Roaring_River,United States,cdwr,true,false,us/pelican-point-at-roaring-river,true,2013-11-13,2025-05-24,,cdec,cdec/PEL,0,ready,
 pellicer_creek_near_espanola_fl-2247222-usa-usgs,Pellicer_Creek_Near_Espanola_Fl,United States,usgs,true,true,us/pellicer-creek-near-espanola-fl,true,2007-10-01,2025-04-30,,usgs,usgs/02247222,0,ready,
 pellwormanleger-9550021-deu-wsv,Pellwormanleger,Germany,wsv,true,true,de/pellwormanleger,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9550021,0.2,ready,history needs a PEGELONLINE backfill
 pemba-192-moz-uhslc_fd,Pemba,Mozambique,uhslc_fd,true,true,mz/pemba,true,2007-04-19,2013-06-28,,uhslc,uhslc/192,0.2,ready,
@@ -3283,7 +3283,7 @@ penuelas_pr-243a-pri-uhslc_rq,Penuelas_PR,Puerto Rico,uhslc_rq,true,false,pr/pen
 penuelas_punta_guayanilla-9758053-usa-noaa,Penuelas_Punta_Guayanilla,United States,noaa,true,false,pr/penuelas-punta-guayanilla,true,2001-04-01,2005-02-10,noaa/9758053,coops,coops/9758053,0,ready,
 perkpolder_walsoorden-perkpdwodn-nld-rws_hist,Perkpolder_Walsoorden,Netherlands,rws_hist,true,false,nl/perkpolder-walsoorden,true,1977-12-29,1978-12-31,,rws,rws/perkpolder.walsoorden,0,ready,
 perth_barrack_street_jetty-6223a-aus-bom,Perth_Barrack_Street_Jetty,Australia,bom,true,true,au/perth-barrack-street-jetty,true,1975-12-17,2022-12-31,,bom,,,license,BOM license not stated
-petaluma_river_at_d_street_bridge-ptb-usa-cdwr,Petaluma_River_At_D_Street_Bridge,United States,cdwr,true,true,us/petaluma-river-at-d-street-bridge,true,2016-01-06,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+petaluma_river_at_d_street_bridge-ptb-usa-cdwr,Petaluma_River_At_D_Street_Bridge,United States,cdwr,true,true,us/petaluma-river-at-d-street-bridge,true,2016-01-06,2025-05-24,,cdec,cdec/PTB,0,ready,
 petaluma_river_entrance-9415252-usa-noaa,Petaluma_River_Entrance,United States,noaa,true,false,us/petaluma-river-entrance,true,1985-06-21,2014-06-30,noaa/9415252,coops,coops/9415252,0,ready,
 peter_and_paul_rocks-201a-bra-uhslc_rq,Peter_and_Paul_Rocks,Brazil,uhslc_rq,true,true,br/peter-and-paul-rocks,true,1982-11-05,1985-11-21,,uhslc,uhslc/201a,0.03,ready,
 petten-pettn-nld-rws_hist,Petten,Netherlands,rws_hist,true,false,nl/petten,true,1971-01-01,1974-09-06,,rws,rws/petten,0,ready,
@@ -3662,7 +3662,7 @@ ringhals-2105-swe-smhi,Ringhals,Sweden,smhi,true,true,se/ringhals,true,1967-11-0
 ringhals-rin-swe-cmems,Ringhals,Sweden,cmems,true,false,se/ringhals,false,1967-11-01,2025-07-01,,smhi,smhi/2105,0,ready,CMEMS record of a gauge the national feed publishes
 rio_de_janeiro_cg-709a-bra-uhslc_rq,Rio_de_Janeiro_CG,Brazil,uhslc_rq,true,true,br/rio-de-janeiro-cg,true,1955-01-01,1968-12-31,,uhslc,uhslc/709a,0.05,ready,
 rio_grande-714a-bra-uhslc_rq,Rio_Grande,Brazil,uhslc_rq,true,true,br/rio-grande,true,1981-06-27,2003-12-31,,uhslc,uhslc/714a,4.23,ready,
-rio_vista_bridge_usgs-srv-usa-cdwr,Rio_Vista_Bridge_Usgs,United States,cdwr,true,false,us/rio-vista-bridge-usgs,true,2003-12-31,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+rio_vista_bridge_usgs-srv-usa-cdwr,Rio_Vista_Bridge_Usgs,United States,cdwr,true,false,us/rio-vista-bridge-usgs,true,2003-12-31,2025-05-24,,cdec,,,unmatched,No cdec/SRV in the list
 ritterhude-4940030-deu-wsv,Ritterhude,Germany,wsv,true,true,de/ritterhude,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/4940030,0.18,ready,history needs a PEGELONLINE backfill
 river_tolka-riv-irl-mi_r,River_Tolka,Ireland,mi_r,true,true,ie/river-tolka,true,2019-02-13,2025-07-23,,marine-institute,,,unmatched,"A river gauge; the Marine Institute's river dataset names no datum, so it isn't listed"
 rivi_a475re_du_loup-3130-can-meds,Rivi_A475re_Du_Loup,Canada,meds,true,true,ca/riviere-du-loup,true,1900-08-01,1980-12-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -3704,7 +3704,7 @@ rmn_trieste-rmn-ita-cmems,RMN_Trieste,Italy,cmems,true,false,it/trieste-friuli-v
 rmn_venice-rmn-ita-cmems,RMN_Venice,Italy,cmems,true,false,it/venice-veneto,false,1998-07-16,2025-04-30,,ispra,,,license,CMEMS record of a gauge the national feed publishes
 rmn_vieste-rmn-ita-cmems,RMN_Vieste,Italy,cmems,true,false,it/vieste,false,1998-08-27,2025-04-30,,ispra,,,license,CMEMS record of a gauge the national feed publishes
 roanoke_river_at_nc_45_nr_westover_nc-208114150-usa-usgs,Roanoke_River_At_Nc_45_Nr_Westover_Nc,United States,usgs,true,true,us/roanoke-river-at-nc-45-nr-westover-nc,true,2007-10-01,2025-04-30,,usgs,usgs/0208114150,0,ready,
-roaring_river-ror-usa-cdwr,Roaring_River,United States,cdwr,true,true,us/roaring-river,true,1987-01-01,2011-10-07,,cdec,,,license,A CDEC station; no CDEC adapter yet
+roaring_river-ror-usa-cdwr,Roaring_River,United States,cdwr,true,true,us/roaring-river,true,1987-01-01,2011-10-07,,cdec,,,unmatched,No cdec/ROR in the list
 robbensdsteert-9460010-deu-wsv,Robbensdsteert,Germany,wsv,true,true,de/robbensdsteert,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9460010,0.19,ready,history needs a PEGELONLINE backfill
 rochefort-118-fra-refmar,Rochefort,France,refmar,true,true,fr/rochefort,true,1993-12-21,2008-09-09,,refmar,refmar/118,0,ready,
 rocheforttg_60minute-roc-fra-cmems,RochefortTG_60minute,France,cmems,true,false,fr/rochefort,false,1993-12-21,2008-09-09,,refmar,refmar/118,0,ready,CMEMS record of a gauge the national feed publishes
@@ -3792,33 +3792,33 @@ sabine_rv_at_intl_paper_nr_orange_tx-8030520-usa-usgs,Sabine_Rv_At_Intl_Paper_Nr
 sabine_rv_at_navy_pier_at_orange_tx-8030540-usa-usgs,Sabine_Rv_At_Navy_Pier_At_Orange_Tx,United States,usgs,true,true,us/sabine-rv-at-navy-pier-at-orange-tx,true,2009-04-16,2025-04-30,,usgs,usgs/08030540,0,ready,
 sachs_harbour-6424-can-meds,Sachs_Harbour,Canada,meds,true,true,ca/sachs-harbour,true,1971-09-03,1982-08-01,,chs,,,restricted,CHS license bars commercial derivatives
 saco_river_at_camp_ellis_near_saco_maine-432742070225401-usa-usgs,Saco_River_At_Camp_Ellis_Near_Saco_Maine,United States,usgs,true,false,us/saco-river-at-camp-ellis-near-saco-maine,true,2016-04-21,2025-05-01,,usgs,usgs/432742070225401,0,ready,
-sacramento_deep_water_shipping_canal-dws-usa-cdwr,Sacramento_Deep_Water_Shipping_Canal,United States,cdwr,true,true,us/sacramento-deep-water-shipping-canal,true,2011-01-15,2021-04-28,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_deep_water_shipping_canal-dws-usa-cdwr,Sacramento_Deep_Water_Shipping_Canal,United States,cdwr,true,true,us/sacramento-deep-water-shipping-canal,true,2011-01-15,2021-04-28,,cdec,,,unmatched,No cdec/DWS in the list
 sacramento_r_a_freeport_ca-11447650-usa-usgs,Sacramento_R_A_Freeport_Ca,United States,usgs,true,true,us/sacramento-r-a-freeport-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11447650,0,ready,
 sacramento_r_a_rio_vista_ca-11455420-usa-usgs,Sacramento_R_A_Rio_Vista_Ca,United States,usgs,true,true,us/sacramento-r-a-rio-vista-ca,true,1995-04-21,2025-05-01,,usgs,usgs/11455420,0.5,ready,
 sacramento_r_a_verona_ca-11425500-usa-usgs,Sacramento_R_A_Verona_Ca,United States,usgs,true,false,us/sacramento-r-a-verona-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11425500,0,ready,
 sacramento_r_ab_delta_cross_channel_ca-11447890-usa-usgs,Sacramento_R_Ab_Delta_Cross_Channel_Ca,United States,usgs,true,true,us/sacramento-r-ab-delta-cross-channel-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11447890,0,ready,
-sacramento_r_above_delta_cross_channel-sdc-usa-cdwr,Sacramento_R_Above_Delta_Cross_Channel,United States,cdwr,true,false,us/sacramento-r-above-delta-cross-channel,true,2018-10-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_r_above_delta_cross_channel-sdc-usa-cdwr,Sacramento_R_Above_Delta_Cross_Channel,United States,cdwr,true,false,us/sacramento-r-above-delta-cross-channel,true,2018-10-01,2025-05-24,,cdec,cdec/SDC,0,ready,
 sacramento_r_bl_georgiana_slough_ca-11447905-usa-usgs,Sacramento_R_Bl_Georgiana_Slough_Ca,United States,usgs,true,true,us/sacramento-r-bl-georgiana-slough-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11447905,0,ready,
 sacramento_r_bl_walnut_grove_br_a_walnut_grove_ca-381427121305401-usa-usgs,Sacramento_R_Bl_Walnut_Grove_Br_A_Walnut_Grove_Ca,United States,usgs,true,true,us/sacramento-r-bl-walnut-grove-br-a-walnut-grove-ca,true,2023-12-14,2025-05-06,,usgs,usgs/381427121305401,0,ready,
 sacramento_r_deep_water_ship_channel_marker_51_ca-11455338-usa-usgs,Sacramento_R_Deep_Water_Ship_Channel_Marker_51_Ca,United States,usgs,true,true,us/sacramento-r-deep-water-ship-channel-marker-51-ca,true,2020-10-21,2025-04-30,,usgs,usgs/11455338,0,ready,
 sacramento_r_deep_water_ship_channel_nr_freeport-11455095-usa-usgs,Sacramento_R_Deep_Water_Ship_Channel_Nr_Freeport,United States,usgs,true,true,us/sacramento-r-deep-water-ship-channel-nr-freeport,true,2018-08-10,2025-04-30,,usgs,usgs/11455095,0,ready,
-sacramento_river_at_bryte-bry-usa-cdwr,Sacramento_River_At_Bryte,United States,cdwr,true,true,us/sacramento-river-at-bryte,true,1984-01-01,1995-03-01,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_river_at_bryte-bry-usa-cdwr,Sacramento_River_At_Bryte,United States,cdwr,true,true,us/sacramento-river-at-bryte,true,1984-01-01,1995-03-01,,cdec,,,unmatched,No cdec/BRY in the list
 sacramento_river_at_bryte_lab-a02104-usa-cdwr,Sacramento_River_At_Bryte_Lab,United States,cdwr,true,false,us/sacramento-river-at-bryte-lab,true,1982-10-01,2025-05-24,,dwr,,,unmatched,No dwr/A02104 in the list
 sacramento_river_at_collinsville-b91110-usa-cdwr,Sacramento_River_At_Collinsville,United States,cdwr,true,true,us/sacramento-river-at-collinsville,true,1982-10-01,2025-05-24,,dwr,,,unmatched,No dwr/B91110 in the list
-sacramento_river_at_freeport-fpt-usa-cdwr,Sacramento_River_At_Freeport,United States,cdwr,true,true,us/sacramento-river-at-freeport,true,1984-01-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_river_at_freeport-fpt-usa-cdwr,Sacramento_River_At_Freeport,United States,cdwr,true,true,us/sacramento-river-at-freeport,true,1984-01-01,2025-05-24,,cdec,,,unmatched,No cdec/FPT in the list
 sacramento_river_at_hood-b91780-usa-cdwr,Sacramento_River_At_Hood,United States,cdwr,true,true,us/sacramento-river-at-hood,true,1982-10-01,1986-12-03,,dwr,,,unmatched,No dwr/B91780 in the list
 sacramento_river_at_mallard_island-e03355-usa-cdwr,Sacramento_River_At_Mallard_Island,United States,cdwr,true,false,us/sacramento-river-at-mallard-island,true,1982-10-01,1995-06-02,,dwr,,,unmatched,No dwr/E03355 in the list
-sacramento_river_at_mallard_island-mal-usa-cdwr,Sacramento_River_At_Mallard_Island,United States,cdwr,true,false,us/sacramento-river-at-mallard-island-ca,true,1987-10-05,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_river_at_mallard_island-mal-usa-cdwr,Sacramento_River_At_Mallard_Island,United States,cdwr,true,false,us/sacramento-river-at-mallard-island-ca,true,1987-10-05,2025-05-24,,cdec,cdec/MAL,0,ready,
 sacramento_river_at_rio_vista_army_base-b91210-usa-cdwr,Sacramento_River_At_Rio_Vista_Army_Base,United States,cdwr,true,true,us/sacramento-river-at-rio-vista-army-base,true,1982-10-01,1985-03-31,,dwr,,,unmatched,No dwr/B91210 in the list
 sacramento_river_at_rio_vista_bridge-b91212-usa-cdwr,Sacramento_River_At_Rio_Vista_Bridge,United States,cdwr,true,true,us/sacramento-river-at-rio-vista-bridge,true,1982-10-01,2025-05-24,,dwr,dwr/B91212,0,ready,
 sacramento_river_at_sacramento_i_street-a02100-usa-cdwr,Sacramento_River_At_Sacramento_I_Street,United States,cdwr,true,false,us/sacramento-river-at-sacramento-i-street,true,1983-10-12,2025-05-24,,dwr,dwr/A02100,0,ready,
 sacramento_river_at_snodgrass_slough-b91750-usa-cdwr,Sacramento_River_At_Snodgrass_Slough,United States,cdwr,true,true,us/sacramento-river-at-snodgrass-slough,true,1982-10-01,2025-05-24,,dwr,dwr/B91750,0,ready,
-sacramento_river_at_verona-von-usa-cdwr,Sacramento_River_At_Verona,United States,cdwr,true,false,us/sacramento-river-at-verona,true,1984-01-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_river_at_verona-von-usa-cdwr,Sacramento_River_At_Verona,United States,cdwr,true,false,us/sacramento-river-at-verona,true,1984-01-01,2025-05-24,,cdec,,,unmatched,No cdec/VON in the list
 sacramento_river_at_walnut_grove_stage-b91651-usa-cdwr,Sacramento_River_At_Walnut_Grove_Stage,United States,cdwr,true,true,us/sacramento-river-at-walnut-grove-stage,true,1982-10-01,2025-05-24,,dwr,dwr/B91651,0,ready,
-sacramento_river_below_georgiana_slough-ges-usa-cdwr,Sacramento_River_Below_Georgiana_Slough,United States,cdwr,true,false,us/sacramento-river-below-georgiana-slough,true,2006-05-17,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
-sacramento_river_bl_toland_landing-m13-usa-cdwr,Sacramento_River_Bl_Toland_Landing,United States,cdwr,true,true,us/sacramento-river-bl-toland-landing,true,2021-06-09,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_river_below_georgiana_slough-ges-usa-cdwr,Sacramento_River_Below_Georgiana_Slough,United States,cdwr,true,false,us/sacramento-river-below-georgiana-slough,true,2006-05-17,2025-05-24,,cdec,,,unmatched,No cdec/GES in the list
+sacramento_river_bl_toland_landing-m13-usa-cdwr,Sacramento_River_Bl_Toland_Landing,United States,cdwr,true,true,us/sacramento-river-bl-toland-landing,true,2021-06-09,2025-05-24,,cdec,,,unmatched,No cdec/M13 in the list
 sacramento_river_downstream_of_isleton-b91250q-usa-cdwr,Sacramento_River_Downstream_Of_Isleton,United States,cdwr,true,true,us/sacramento-river-downstream-of-isleton,true,2015-10-01,2025-05-24,,dwr,dwr/B91250Q,0,ready,
-sacramento_ship_channel_at_ryer_island-rye-usa-cdwr,Sacramento_Ship_Channel_At_Ryer_Island,United States,cdwr,true,true,us/sacramento-ship-channel-at-ryer-island,true,2010-02-08,2011-05-13,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sacramento_ship_channel_at_ryer_island-rye-usa-cdwr,Sacramento_Ship_Channel_At_Ryer_Island,United States,cdwr,true,true,us/sacramento-ship-channel-at-ryer-island,true,2010-02-08,2011-05-13,,cdec,,,unmatched,No cdec/RYE in the list
 sadeng-417-idn-uhslc_fd,Sadeng,Indonesia,uhslc_fd,true,true,id/sadeng,true,2008-07-18,2016-04-13,,uhslc,uhslc/417,34.49,ready,
 sado-ma79-jpn-jodc_jma,Sado,Japan,jodc_jma,true,false,jp/sado,true,1996-12-31,2023-12-31,jma/S0,jma,jma/S0,0.22,ready,JODC relay of jma/S0
 saeki-ma86-jpn-jodc_jma,Saeki,Japan,jodc_jma,true,false,jp/saeki,true,2010-06-30,2023-12-31,jma/X5,jma,jma/X5,0.7,ready,JODC relay of jma/X5
@@ -3896,12 +3896,12 @@ san_jacinto_rv_nr_sheldon_tx-8072050-usa-usgs,San_Jacinto_Rv_Nr_Sheldon_Tx,Unite
 san_joaquin_r_a_channel_marker_42_nr_iselton_ca-11336955-usa-usgs,San_Joaquin_R_A_Channel_Marker_42_Nr_Iselton_Ca,United States,usgs,true,true,us/san-joaquin-r-a-channel-marker-42-nr-iselton-ca,true,2022-07-27,2025-05-01,,usgs,usgs/11336955,0,ready,
 san_joaquin_r_a_jersey_point_ca-11337190-usa-usgs,San_Joaquin_R_A_Jersey_Point_Ca,United States,usgs,true,true,us/san-joaquin-r-a-jersey-point-ca,true,2007-10-01,2025-05-01,,usgs,usgs/11337190,0,ready,
 san_joaquin_r_a_prisoners_pt_nr_terminous_ca-11313460-usa-usgs,San_Joaquin_R_A_Prisoners_Pt_Nr_Terminous_Ca,United States,usgs,true,true,us/san-joaquin-r-a-prisoners-pt-nr-terminous-ca,true,2007-10-01,2025-05-01,,usgs,usgs/11313460,0,ready,
-san_joaquin_r_at_prisoners_pt_near_termino-pri-usa-cdwr,San_Joaquin_R_At_Prisoners_Pt_Near_Termino,United States,cdwr,true,false,us/san-joaquin-r-at-prisoners-pt-near-termino,true,2006-09-04,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+san_joaquin_r_at_prisoners_pt_near_termino-pri-usa-cdwr,San_Joaquin_R_At_Prisoners_Pt_Near_Termino,United States,cdwr,true,false,us/san-joaquin-r-at-prisoners-pt-near-termino,true,2006-09-04,2025-05-24,,cdec,cdec/PRI,0,ready,
 san_joaquin_r_bl_garwood_bridge_a_stockton_ca-11304810-usa-usgs,San_Joaquin_R_Bl_Garwood_Bridge_A_Stockton_Ca,United States,usgs,true,true,us/san-joaquin-r-bl-garwood-bridge-a-stockton-ca,true,1995-08-02,2025-05-06,,usgs,usgs/11304810,0,ready,
 san_joaquin_river_above_dos_reis-b95760-usa-cdwr,San_Joaquin_River_Above_Dos_Reis,United States,cdwr,true,true,us/san-joaquin-river-above-dos-reis,true,2015-10-01,2025-05-24,,dwr,dwr/B95760Q,0,ready,
 san_joaquin_river_at_antioch-b95020-usa-cdwr,San_Joaquin_River_At_Antioch,United States,cdwr,true,true,us/san-joaquin-river-at-antioch,true,1982-10-01,2025-05-24,,dwr,,,unmatched,No dwr/B95020 in the list
-san_joaquin_river_at_garwood_bridge-sjg-usa-cdwr,San_Joaquin_River_At_Garwood_Bridge,United States,cdwr,true,false,us/san-joaquin-river-at-garwood-bridge,true,2003-01-04,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
-san_joaquin_river_at_jersey_point-sjj-usa-cdwr,San_Joaquin_River_At_Jersey_Point,United States,cdwr,true,false,us/san-joaquin-river-at-jersey-point,true,2002-12-31,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+san_joaquin_river_at_garwood_bridge-sjg-usa-cdwr,San_Joaquin_River_At_Garwood_Bridge,United States,cdwr,true,false,us/san-joaquin-river-at-garwood-bridge,true,2003-01-04,2025-05-24,,cdec,cdec/SJG,0,ready,
+san_joaquin_river_at_jersey_point-sjj-usa-cdwr,San_Joaquin_River_At_Jersey_Point,United States,cdwr,true,false,us/san-joaquin-river-at-jersey-point,true,2002-12-31,2025-05-24,,cdec,,,unmatched,No cdec/SJJ in the list
 san_joaquin_river_at_rindge_pump-b95620-usa-cdwr,San_Joaquin_River_At_Rindge_Pump,United States,cdwr,true,false,us/san-joaquin-river-at-rindge-pump,true,1982-10-01,2025-05-24,,dwr,,,unmatched,No dwr/B95620 in the list
 san_joaquin_river_at_san_andreas_landing_ssa-b95100-usa-cdwr,San_Joaquin_River_At_San_Andreas_Landing_Ssa,United States,cdwr,true,true,us/san-joaquin-river-at-san-andreas-landing-ssa,true,1982-10-01,2025-05-08,,dwr,dwr/B95100,0,ready,
 san_joaquin_river_at_venice_island-b95580-usa-cdwr,San_Joaquin_River_At_Venice_Island,United States,cdwr,true,false,us/san-joaquin-river-at-venice-island,true,1982-10-01,2025-05-24,,dwr,dwr/B95580,0,ready,
@@ -4033,7 +4033,7 @@ seward_ak-560b-usa-uhslc_rq,Seward_AK,United States,uhslc_rq,true,false,us/sewar
 seward_ak-560c-usa-uhslc_rq,Seward_AK,United States,uhslc_rq,true,false,us/seward,true,1967-01-01,2021-12-31,noaa/9455090,coops,coops/9455090,0.1,ready,UHSLC relay of noaa/9455090
 sewells_point-8638610-usa-noaa,Sewells_Point,United States,noaa,true,false,us/hampton-roads-sewells-point,true,1927-07-22,2025-06-30,noaa/8638610,coops,coops/8638610,0.45,ready,
 sf_mokelumne_river_at_new_hope_bridge-b94150-usa-cdwr,Sf_Mokelumne_River_At_New_Hope_Bridge,United States,cdwr,true,true,us/sf-mokelumne-river-at-new-hope-bridge,true,1982-10-01,2025-03-25,,dwr,,,unmatched,No dwr/B94150 in the list
-shag_slough-sgg-usa-cdwr,Shag_Slough,United States,cdwr,true,true,us/shag-slough,true,2019-02-22,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+shag_slough-sgg-usa-cdwr,Shag_Slough,United States,cdwr,true,true,us/shag-slough,true,2019-02-22,2025-05-24,,cdec,cdec/SGG,0,ready,
 shag_slough_a_liberty_island_nr_courtland_ca-11455276-usa-usgs,Shag_Slough_A_Liberty_Island_Nr_Courtland_Ca,United States,usgs,true,true,us/shag-slough-a-liberty-island-nr-courtland-ca,true,2018-08-28,2025-04-30,,usgs,usgs/11455276,0,ready,
 shakett_creek_near_nokomis_fl-2299727-usa-usgs,Shakett_Creek_Near_Nokomis_Fl,United States,usgs,true,true,us/shakett-creek-near-nokomis-fl,true,2007-10-10,2024-07-31,,usgs,usgs/02299727,0,ready,
 shallotte_river_nc-sha-usa-ncdem,Shallotte_River_NC,United States,ncdem,true,true,us/shallotte-river-nc,true,2018-07-28,2025-05-08,,ncdem,,,license,North Carolina DEM terms to check
@@ -4127,7 +4127,7 @@ south_beach_or-592-usa-uhslc_fd,South_Beach_OR,United States,uhslc_fd,true,false
 south_beach_or-592a-usa-uhslc_rq,South_Beach_OR,United States,uhslc_rq,true,false,us/southbeach,true,1967-02-01,2021-12-31,noaa/9435380,coops,coops/9435380,0.16,ready,UHSLC relay of noaa/9435380
 south_capers_island-8664941-usa-noaa,South_Capers_Island,United States,noaa,true,false,us/capers-creek,true,2003-08-25,2008-03-09,noaa/8664941,coops,coops/8664941,0,ready,
 south_jamesport-8512735-usa-noaa,South_Jamesport,United States,noaa,true,false,us/south-jamesport,true,1988-05-12,2007-05-02,noaa/8512735,coops,coops/8512735,0,ready,
-south_mokelumne_r_at_w_walnut_grove_rd-smr-usa-cdwr,South_Mokelumne_R_At_W_Walnut_Grove_Rd,United States,cdwr,true,false,us/south-mokelumne-r-at-w-walnut-grove-rd,true,2010-12-20,2017-11-16,,cdec,,,license,A CDEC station; no CDEC adapter yet
+south_mokelumne_r_at_w_walnut_grove_rd-smr-usa-cdwr,South_Mokelumne_R_At_W_Walnut_Grove_Rd,United States,cdwr,true,false,us/south-mokelumne-r-at-w-walnut-grove-rd,true,2010-12-20,2017-11-16,,cdec,cdec/SMR,0,ready,
 south_padre_island_cg_station-8779748-usa-noaa,South_Padre_Island_Cg_Station,United States,noaa,true,false,us/south-padre-island-c-g-station,true,1993-06-03,2025-06-30,noaa/8779748,coops,coops/8779748,0.09,ready,
 south_pass-8760551-usa-noaa,South_Pass,United States,noaa,true,false,us/south-pass,true,1980-02-29,1999-08-31,noaa/8760551,coops,coops/8760551,0,ready,
 south_pass_la-764a-usa-uhslc_rq,South_Pass_LA,United States,uhslc_rq,true,false,us/south-pass,true,1993-03-29,1999-01-31,noaa/8760551,coops,coops/8760551,0,ready,UHSLC relay of noaa/8760551
@@ -4205,7 +4205,7 @@ stavanger-svg-nor-nhs,Stavanger,Norway,nhs,true,false,no/stavanger,true,1919-01-
 stavangertg-sta-nor-cmems,StavangerTG,Norway,cmems,true,false,no/stavanger,false,1919-01-01,2025-06-30,,kartverket,kartverket/SVG,0,ready,CMEMS record of a gauge the national feed publishes
 stavenisse-stavnse-nld-rws,Stavenisse,Netherlands,rws,true,true,nl/stavenisse,true,1971-01-01,2022-12-30,,rws,rws/stavenisse,0.32,ready,
 stavenisse-stavnse-nld-rws_hist,Stavenisse,Netherlands,rws_hist,true,false,nl/stavenisse,true,1971-01-01,2018-09-07,,rws,rws/stavenisse,0.32,ready,
-steamboat_slough_btw_sac_r_and_sutter_sl-sss-usa-cdwr,Steamboat_Slough_Btw_Sac_R_And_Sutter_Sl,United States,cdwr,true,false,us/steamboat-slough-btw-sac-r-and-sutter-sl,true,2003-09-26,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+steamboat_slough_btw_sac_r_and_sutter_sl-sss-usa-cdwr,Steamboat_Slough_Btw_Sac_R_And_Sutter_Sl,United States,cdwr,true,false,us/steamboat-slough-btw-sac-r-and-sutter-sl,true,2003-09-26,2025-05-24,,cdec,cdec/SSS,0,ready,
 steamboat_slough_near_sacramento_river-b91450q-usa-cdwr,Steamboat_Slough_Near_Sacramento_River,United States,cdwr,true,true,us/steamboat-slough-near-sacramento-river,true,2015-10-01,2025-05-24,,dwr,dwr/B91450Q,0,ready,
 steamboat_slough_nr_walnut_grove_ca-11447850-usa-usgs,Steamboat_Slough_Nr_Walnut_Grove_Ca,United States,usgs,true,true,us/steamboat-slough-nr-walnut-grove-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11447850,0,ready,
 steenbergse_sas-steenbsss-nld-rws_hist,Steenbergse_Sas,Netherlands,rws_hist,true,false,nl/steenbergse-sas,true,1940-03-01,1987-06-30,,rws,rws/steenbergsesas,0,ready,
@@ -4228,7 +4228,7 @@ stockholm-826a-swe-uhslc_rq,Stockholm,Sweden,uhslc_rq,true,false,se/stockholm-so
 stockholm-sto-swe-cmems,Stockholm,Sweden,cmems,true,false,se/stockholm,false,1889-01-01,2025-07-01,,smhi,smhi/2069,0,ready,CMEMS record of a gauge the national feed publishes
 stockholm_frihamnen-35233-swe-smhi,Stockholm_Frihamnen,Sweden,smhi,true,true,se/stockholm-frihamnen,true,2023-08-02,2025-07-02,,smhi,smhi/35233,0,ready,
 stockton_california-9414883-usa-da_sat,Stockton_California,United States,da_sat,true,false,us/stockton-california,true,1934-01-01,1954-01-01,,da_sat,,,license,Terms not reviewed
-stockton_deep_water_channel-skt-usa-cdwr,Stockton_Deep_Water_Channel,United States,cdwr,true,true,us/stockton-deep-water-channel,true,2010-02-08,2011-02-16,,cdec,,,license,A CDEC station; no CDEC adapter yet
+stockton_deep_water_channel-skt-usa-cdwr,Stockton_Deep_Water_Channel,United States,cdwr,true,true,us/stockton-deep-water-channel,true,2010-02-08,2011-02-16,,cdec,,,unmatched,No cdec/SKT in the list
 stockton_ship_channel_at_burns_cut_off-b95660-usa-cdwr,Stockton_Ship_Channel_At_Burns_Cut_Off,United States,cdwr,true,true,us/stockton-ship-channel-at-burns-cut-off,true,1982-10-01,2025-05-24,,dwr,dwr/B95660,0,ready,
 stone_harbor-8535581-usa-noaa,Stone_Harbor,United States,noaa,true,false,us/stone-harbor,true,2017-01-01,2023-06-30,noaa/8535581,coops,coops/8535581,0,ready,
 stornoway-295-gbr-uhslc_fd,Stornoway,United Kingdom,uhslc_fd,true,false,gb/stornoway,true,1976-01-01,2013-11-30,,uhslc,uhslc/295,0.04,restricted,The contributor's terms bar commercial use
@@ -4252,20 +4252,20 @@ subic_bay-382-phl-uhslc_fd,Subic_Bay,Philippines,uhslc_fd,true,true,ph/subic-bay
 subic_bay-382a-phl-uhslc_rq,Subic_Bay,Philippines,uhslc_rq,true,false,ph/subic-bay,true,2007-02-27,2018-12-31,,uhslc,uhslc/382,0.03,ready,
 sugar_cut_golden_anchor-b95415q-usa-cdwr,Sugar_Cut_Golden_Anchor,United States,cdwr,true,false,us/sugar-cut-golden-anchor,true,2015-10-01,2025-05-05,,dwr,dwr/B95415Q,0,ready,
 suisun_bay_at_benicia-e03300-usa-cdwr,Suisun_Bay_At_Benicia,United States,cdwr,true,true,us/suisun-bay-at-benicia,true,1982-10-01,1984-05-30,,dwr,,,unmatched,No dwr/E03300 in the list
-suisun_creek_at_cordelia_rd-suc-usa-cdwr,Suisun_Creek_At_Cordelia_Rd,United States,cdwr,true,true,us/suisun-creek-at-cordelia-rd,true,2010-03-08,2016-12-30,,cdec,,,license,A CDEC station; no CDEC adapter yet
+suisun_creek_at_cordelia_rd-suc-usa-cdwr,Suisun_Creek_At_Cordelia_Rd,United States,cdwr,true,true,us/suisun-creek-at-cordelia-rd,true,2010-03-08,2016-12-30,,cdec,,,unmatched,No cdec/SUC in the list
 summerstown_ontario-14940-can-meds,Summerstown_Ontario,Canada,meds,true,false,ca/summerstown,true,1962-01-13,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 sumner-sumt-nzl-ttw,Sumner,New Zealand,ttw,true,true,nz/sumner,true,2010-08-11,2016-07-27,,ttw,,,license,Terms not reviewed
 sumoto-ma32-jpn-jodc_jma,Sumoto,Japan,jodc_jma,true,false,jp/sumoto,true,1964-12-31,2023-12-31,jma/ST,jma,jma/ST,0.38,ready,JODC relay of jma/ST
 sunatsu-9012-jpn-jodc_pahb,Sunatsu,Japan,jodc_pahb,true,true,jp/sunatsu,true,2011-03-31,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 sunnyvale_east_channel_below_caribbean_drive-sun-usa-cm,Sunnyvale_East_Channel_below_Caribbean_Drive,United States,cm,true,true,us/sunnyvale-east-channel-below-caribbean-drive,true,2021-12-23,2024-08-19,,cm,,,license,Terms not reviewed
-sunrise_club-snc-usa-cdwr,Sunrise_Club,United States,cdwr,true,true,us/sunrise-club,true,1994-07-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sunrise_club-snc-usa-cdwr,Sunrise_Club,United States,cdwr,true,true,us/sunrise-club,true,1994-07-01,2025-05-24,,cdec,cdec/SNC,0,ready,
 sunset_beach-8659897-usa-noaa,Sunset_Beach,United States,noaa,true,false,us/sunset-beach-pier,true,2003-11-14,2008-03-16,noaa/8659897,coops,coops/8659897,0,ready,
 sunsetbridge_intracoastalwaterway-sun-usa-ncdem,SunsetBridge_IntracoastalWaterway,United States,ncdem,true,true,us/sunset-bridge-intracoastal-waterway,true,2019-06-26,2025-05-12,,ncdem,,,license,North Carolina DEM terms to check
 surabaya-160a-idn-uhslc_rq,Surabaya,Indonesia,uhslc_rq,true,true,id/surabaya,true,1984-01-31,2004-11-30,,uhslc,uhslc/160a,0.03,ready,
 surfcitybridge_intracoastal_waterway-sur-usa-ncdem,SurfCityBridge_IntraCoastal_Waterway,United States,ncdem,true,true,us/surf-city-bridge-intra-coastal-waterway,true,2019-08-15,2025-04-30,,ncdem,,,license,North Carolina DEM terms to check
 susa-gs16-jpn-jodc_giaj,Susa,Japan,jodc_giaj,true,true,jp/susa,true,1970-12-02,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 sutter_slough_a_courtland_ca-11447830-usa-usgs,Sutter_Slough_A_Courtland_Ca,United States,usgs,true,true,us/sutter-slough-a-courtland-ca,true,2007-10-01,2025-04-30,,usgs,usgs/11447830,0,ready,
-sutter_slough_at_courtland-sut-usa-cdwr,Sutter_Slough_At_Courtland,United States,cdwr,true,false,us/sutter-slough-at-courtland,true,2002-12-31,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+sutter_slough_at_courtland-sut-usa-cdwr,Sutter_Slough_At_Courtland,United States,cdwr,true,false,us/sutter-slough-at-courtland,true,2002-12-31,2025-05-24,,cdec,cdec/SUT,0,ready,
 suurhofbrug_noordzijde-suurhbnzde-nld-rws,Suurhofbrug_noordzijde,Netherlands,rws,true,true,nl/suurhofbrug-noordzijde,true,1999-12-21,2013-12-31,,rws,rws/suurhofbrug.noordzijde,0,ready,
 suva-018-fji-uhslc_fd,Suva,Fiji,uhslc_fd,true,false,fj/suva,true,1998-01-27,2025-05-31,,uhslc,uhslc/018,0.2,restricted,The contributor's terms bar commercial use
 suva-018a-fji-uhslc_rq,Suva,Fiji,uhslc_rq,true,false,fj/suva,true,1972-09-30,1997-11-09,,uhslc,uhslc/018a,0.05,ready,
@@ -4381,7 +4381,7 @@ thio-46-fra-refmar,Thio,France,refmar,true,true,fr/thio,true,1967-06-09,2024-11-
 thiotg_60minute-thi-fra-cmems,ThioTG_60minute,France,cmems,true,false,fr/thio,false,1967-06-09,2024-08-13,,refmar,refmar/46,0,ready,CMEMS record of a gauge the national feed publishes
 three_mile_slough_at_san_joaquin_river-b95060-usa-cdwr,Three_Mile_Slough_At_San_Joaquin_River,United States,cdwr,true,false,us/three-mile-slough-at-san-joaquin-river,true,1982-10-01,2025-05-24,,dwr,dwr/B95060,0,ready,
 threemile_harbor_entrance-8511171-usa-noaa,Threemile_Harbor_Entrance,United States,noaa,true,false,us/threemile-harbor-entrance,true,1988-05-15,1990-08-08,noaa/8511171,coops,coops/8511171,0,ready,
-threemile_slough_at_san_joaquin_river-tsl-usa-cdwr,Threemile_Slough_At_San_Joaquin_River,United States,cdwr,true,false,us/threemile-slough-at-san-joaquin-river,true,2007-04-01,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+threemile_slough_at_san_joaquin_river-tsl-usa-cdwr,Threemile_Slough_At_San_Joaquin_River,United States,cdwr,true,false,us/threemile-slough-at-san-joaquin-river,true,2007-04-01,2025-05-24,,cdec,,,unmatched,No cdec/TSL in the list
 threemile_slough_nr_rio_vista_ca-11337080-usa-usgs,Threemile_Slough_Nr_Rio_Vista_Ca,United States,usgs,true,true,us/threemile-slough-nr-rio-vista-ca,true,2007-10-01,2025-05-01,,usgs,usgs/11337080,0,ready,
 thule_pituffik-808-dnk-uhslc_fd,Thule_Pituffik,Denmark,uhslc_fd,true,true,gl/thule-pituffik,true,2006-09-18,2025-05-31,,uhslc,uhslc/808,64.57,ready,
 thunder_bay_ontario-10050-can-meds,Thunder_Bay_Ontario,Canada,meds,true,true,ca/thunder-bay,true,1907-05-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -4401,7 +4401,7 @@ tobermory-tob-gbr-cmems,Tobermory,United Kingdom,cmems,true,false,gb/tobermory,f
 tobermory_ontario-11690-can-meds,Tobermory_Ontario,Canada,meds,true,false,ca/tobermory-on,true,1962-05-18,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 tobishima-gs25-jpn-jodc_giaj,Tobishima,Japan,jodc_giaj,true,true,jp/tobishima,true,1995-03-14,2023-12-31,,jodc,,,license,Japanese originals also fix GESLA's year-end truncation
 toe_drain_a_liberty_island_nr_courtland_ca-11455140-usa-usgs,Toe_Drain_A_Liberty_Island_Nr_Courtland_Ca,United States,usgs,true,true,us/toe-drain-a-liberty-island-nr-courtland-ca,true,2015-11-10,2025-04-30,,usgs,usgs/11455140,0,ready,
-toe_drain_at_liberty_island_nr_courtland-toe-usa-cdwr,Toe_Drain_At_Liberty_Island_Nr_Courtland,United States,cdwr,true,false,us/toe-drain-at-liberty-island-nr-courtland,true,2021-06-10,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+toe_drain_at_liberty_island_nr_courtland-toe-usa-cdwr,Toe_Drain_At_Liberty_Island_Nr_Courtland,United States,cdwr,true,false,us/toe-drain-at-liberty-island-nr-courtland,true,2021-06-10,2025-05-24,,cdec,cdec/TOE,0,ready,
 tofino-542-can-uhslc_fd,Tofino,Canada,uhslc_fd,true,true,ca/tofino,true,1909-10-01,2025-06-30,,uhslc,uhslc/542,0.46,ready,
 tofino-542a-can-uhslc_rq,Tofino,Canada,uhslc_rq,true,false,ca/tofino,true,1909-10-01,2018-12-31,,uhslc,uhslc/542,0.04,ready,
 tofino_bc-8615-can-meds,Tofino_BC,Canada,meds,true,false,ca/tofino,true,1909-10-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -4480,7 +4480,7 @@ turkey_creek_at_airport_road_at_gulfport_ms-2481251-usa-usgs,Turkey_Creek_At_Air
 turkey_point_hudson_river_nerrs-8518962-usa-noaa,Turkey_Point_Hudson_River_Nerrs,United States,noaa,true,false,us/turkey-point,true,2017-07-25,2025-06-30,noaa/8518962,coops,coops/8518962,0.03,ready,
 turku-tur-fin-cmems,Turku,Finland,cmems,true,false,fi/turku,false,1971-01-01,2025-07-01,,fmi,,,license,CMEMS record of a gauge the national feed publishes
 turku_ruissalo_saaronniemi-134225-fin-fmi,Turku_Ruissalo_Saaronniemi,Finland,fmi,true,true,fi/turku-ruissalo-saaronniemi,true,1985-01-01,2025-06-02,,fmi,,,license,FMI's sea-level terms not confirmed
-turner_cut_near_holt-trn-usa-cdwr,Turner_Cut_Near_Holt,United States,cdwr,true,false,us/turner-cut-near-holt,true,2003-12-31,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+turner_cut_near_holt-trn-usa-cdwr,Turner_Cut_Near_Holt,United States,cdwr,true,false,us/turner-cut-near-holt,true,2003-12-31,2025-05-24,,cdec,cdec/TRN,0,ready,
 turner_cut_nr_holt_ca-11311300-usa-usgs,Turner_Cut_Nr_Holt_Ca,United States,usgs,true,true,us/turner-cut-nr-holt-ca,true,2005-02-24,2025-05-06,,usgs,usgs/11311300,0,ready,
 turner_river_nr_chokoloskee_island_fl-2290930-usa-usgs,Turner_River_Nr_Chokoloskee_Island_Fl,United States,usgs,true,true,us/turner-river-nr-chokoloskee-island-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02290930,0,ready,
 turtle_head-58180-aus-bom,Turtle_Head,Australia,bom,true,true,au/turtle-head,true,1989-05-11,2022-12-31,,bom,,,license,BOM license not stated
@@ -4510,7 +4510,7 @@ union_hall_harbor_2-uni-irl-mi_c,Union_Hall_Harbor_2,Ireland,mi_c,true,true,ie/u
 unionhallharbor-uni-irl-cmems,UnionHallHarbor,Ireland,cmems,true,false,ie/union-hall-harbor,false,2020-11-19,2025-06-30,,marine-institute,marine-institute/union-hall-harbor,0,ready,CMEMS record of a gauge the national feed publishes
 unnamed_dtch_on_fred_hudson_rd_at_bethany_bch_de-1484690-usa-usgs,Unnamed_Dtch_On_Fred_Hudson_Rd_At_Bethany_Bch_De,United States,usgs,true,true,us/unnamed-dtch-on-fred-hudson-rd-at-bethany-bch-de,true,2015-05-12,2025-04-30,,usgs,usgs/01484690,0,ready,
 uno-ma33-jpn-jodc_jma,Uno,Japan,jodc_jma,true,false,jp/uno,true,1964-12-31,2023-12-31,jma/UN,jma,jma/UN,0.59,ready,JODC relay of jma/UN
-upper_cache_slough-ucs-usa-cdwr,Upper_Cache_Slough,United States,cdwr,true,false,us/upper-cache-slough,true,2021-06-02,2023-01-07,,cdec,,,license,A CDEC station; no CDEC adapter yet
+upper_cache_slough-ucs-usa-cdwr,Upper_Cache_Slough,United States,cdwr,true,false,us/upper-cache-slough,true,2021-06-02,2023-01-07,,cdec,,,unmatched,No cdec/UCS in the list
 upper_gagetown-108-can-meds,Upper_Gagetown,Canada,meds,true,false,ca/upper-gagetown,true,1965-04-01,1969-08-21,,chs,,,restricted,CHS license bars commercial derivatives
 upper_iroquois_ontario-14600-can-meds,Upper_Iroquois_Ontario,Canada,meds,true,false,ca/upper-iroquois-ontario,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
 upstream_broad_river_near_everglades_city_fl-253047080555600-usa-usgs,Upstream_Broad_River_Near_Everglades_City_Fl,United States,usgs,true,false,us/upstream-broad-river-near-everglades-city-fl,true,2007-10-01,2025-05-01,,usgs,usgs/253047080555600,0,ready,
@@ -4563,7 +4563,7 @@ venezia-ven-ita-ispra,Venezia,Italy,ispra,true,true,it/venezia,true,1986-08-28,2
 venezia-vene-ita-cv,Venezia,Italy,cv,true,false,it/venezia-veneto,false,1983-01-01,2023-12-31,,gesla,,,restricted,GESLA lists CV as research only
 venice-8760849-usa-noaa,Venice,United States,noaa,true,true,us/venice,true,1996-10-29,1998-12-12,noaa/8760849,coops,coops/8760849,0,ready,
 venice_inlet_at_crows_nest_marina_at_venice_fl-2299735-usa-usgs,Venice_Inlet_At_Crows_Nest_Marina_At_Venice_Fl,United States,usgs,true,true,us/venice-inlet-at-crows-nest-marina-at-venice-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02299735,0,ready,
-venice_island-vne-usa-cdwr,Venice_Island,United States,cdwr,true,false,us/venice-island,true,1985-05-02,2002-09-20,,cdec,,,license,A CDEC station; no CDEC adapter yet
+venice_island-vne-usa-cdwr,Venice_Island,United States,cdwr,true,false,us/venice-island,true,1985-05-02,2002-09-20,,cdec,,,unmatched,No cdec/VNE in the list
 ventnor_city-8534770-usa-noaa,Ventnor_City,United States,noaa,true,false,us/ventnor-city,true,1985-06-17,1992-01-01,noaa/8534770,coops,coops/8534770,0,ready,
 ventspils-ven-lva-cmems,Ventspils,Latvia,cmems,true,true,lv/ventspils,false,2020-11-25,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only
 veracruz-250-mex-unam_hist,Veracruz,Mexico,unam_hist,true,true,mx/veracruz,true,1952-10-26,2015-12-30,,unam,,,license,UNAM Servicio Mareográfico terms to check
@@ -4579,7 +4579,7 @@ vernadsky-ver-ukr-noc,Vernadsky,Ukraine,noc,true,false,ua/vernadsky,true,1984-03
 vianadocastelotg-via-prt-cmems,VianaDoCasteloTG,Portugal,cmems,true,true,pt/viana-do-castelo,false,2012-08-01,2025-06-30,,cmems,,,restricted,GESLA lists CMEMS as research only
 victor_harbor-61490-aus-bom,Victor_Harbor,Australia,bom,true,true,au/victor-harbor,true,1964-06-13,2022-12-31,,bom,,,license,BOM license not stated
 victoria_bc-543a-can-uhslc_rq,Victoria_BC,Canada,uhslc_rq,true,true,ca/victoria,true,1909-02-18,2018-12-31,,uhslc,uhslc/543a,0,ready,
-victoria_canal_near_byron-vcu-usa-cdwr,Victoria_Canal_Near_Byron,United States,cdwr,true,false,us/victoria-canal-near-byron,true,2006-02-15,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+victoria_canal_near_byron-vcu-usa-cdwr,Victoria_Canal_Near_Byron,United States,cdwr,true,false,us/victoria-canal-near-byron,true,2006-02-15,2025-05-24,,cdec,cdec/VCU,0,ready,
 victoria_canal_nr_byron_ca-11312672-usa-usgs,Victoria_Canal_Nr_Byron_Ca,United States,usgs,true,true,us/victoria-canal-nr-byron-ca,true,2005-02-23,2025-04-30,,usgs,usgs/11312672,0,ready,
 victoria_dock-337a-sgp-uhslc_rq,Victoria_Dock,Singapore,uhslc_rq,true,true,sg/victoria-dock,true,1972-01-01,1981-12-31,,uhslc,uhslc/337a,0.05,ready,
 victoria_harbour_bc-7120-can-meds,Victoria_Harbour_BC,Canada,meds,true,true,ca/victoria,true,1909-02-18,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives
@@ -4616,7 +4616,7 @@ vlietepolder-vlietpdr-nld-rws_hist,Vlietepolder,Netherlands,rws_hist,true,false,
 vlissingen-vlis-nld-rws,Vlissingen,Netherlands,rws,true,true,nl/vlissingen,true,2023-04-25,2025-07-25,,rws,rws/vlissingen,0.21,ready,
 vlissingen-vlissgn-nld-rws_hist,Vlissingen,Netherlands,rws_hist,true,false,nl/vlissingen-ticon-vlissingen-vlissgn-nld-rws-hist,true,1863-09-03,2018-09-08,,rws,rws/vlissingen,0.28,ready,
 vlissingentg-vli-nld-cmems,VlissingenTG,Netherlands,cmems,true,true,nl/vlissingen-westerzicht-zeeland,false,2014-08-04,2025-06-30,,rws,rws/vlissingen,0.89,ready,CMEMS record of a gauge the national feed publishes
-volanti-vol-usa-cdwr,Volanti,United States,cdwr,true,true,us/volanti,true,1997-11-05,2025-05-24,,cdec,,,license,A CDEC station; no CDEC adapter yet
+volanti-vol-usa-cdwr,Volanti,United States,cdwr,true,true,us/volanti,true,1997-11-05,2025-05-24,,cdec,cdec/VOL,0,ready,
 vung_tau-383-vnm-uhslc_fd,Vung_Tau,Vietnam,uhslc_fd,true,true,vn/vung-tau,true,2007-10-15,2025-06-30,,uhslc,uhslc/383,0.1,ready,
 vung_tau-383a-vnm-uhslc_rq,Vung_Tau,Vietnam,uhslc_rq,true,false,vn/vung-tau,true,1986-01-01,2002-12-31,,uhslc,uhslc/383a,0.03,ready,
 vung_tau-383b-vnm-uhslc_rq,Vung_Tau,Vietnam,uhslc_rq,true,false,vn/vung-tau,true,2007-10-15,2018-12-31,,uhslc,uhslc/383,0.1,ready,
