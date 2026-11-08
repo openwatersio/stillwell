@@ -279,7 +279,7 @@ export async function levels(
   return within(dedupe(out), start, end);
 }
 
-/** CO-OPS's verified high and low waters over [start, end), in meters above STND, a calendar year per request. */
+/** CO-OPS's verified high and low waters over [start, end), in meters above STND, up to a calendar year per request. */
 export async function extremes(
   id: string,
   start: Date,
@@ -288,7 +288,7 @@ export async function extremes(
 ): Promise<PublishedExtreme[]> {
   const window = await operated(id, end, station);
   const out: PublishedExtreme[] = [];
-  for (const [from, to] of chunks(start, end, "year")) {
+  for (const [from, to] of [...chunks(start, end, "year")].flatMap(within365)) {
     if (!overlaps(window, from, to)) continue;
     for (const r of await rowsOf("high_low", id, from, to)) {
       const level = Number(r.v);
@@ -436,6 +436,16 @@ function* chunks(start: Date, end: Date, unit: "month" | "year"): Generator<[Dat
     yield [new Date(t), new Date(Math.min(next, end.getTime()))];
     t = next;
   }
+}
+
+/** CO-OPS refuses a high/low request over 365 days, so a leap year goes in two halves. */
+function within365([from, to]: [Date, Date]): [Date, Date][] {
+  if (to.getTime() - from.getTime() <= 365 * DAY_MS) return [[from, to]];
+  const mid = new Date(Date.UTC(from.getUTCFullYear(), 6, 1));
+  return [
+    [from, mid],
+    [mid, to],
+  ];
 }
 
 function dedupe<T extends { time: number }>(rows: T[]): T[] {
