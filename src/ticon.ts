@@ -119,7 +119,8 @@ const DECLARED: Record<string, { source: string; status: Status }> = {
   linz: { source: "linz", status: "license" },
 };
 
-const PEGELONLINE_NOTE = "history needs a PEGELONLINE backfill";
+const PEGELONLINE_NOTE =
+  "PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`";
 
 /**
  * Picks the replacement for one record. `lists` holds the lake's station lists
