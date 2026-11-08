@@ -10,9 +10,10 @@ interface Position {
  * source puts it. `served` is the source's own position, so a source that
  * moves the station itself stops the correction: the station keeps the
  * source's position, and the refresh reports the entry and fails the run so a
- * person checks it. A station the source stops listing keeps
- * its corrected position in the lake, as it keeps the rest of the station. UHSLC's are erratum `uhslc-positions`.
- * GESLA's are erratum `gesla-uhslc-positions`: its copies of UHSLC series keep
+ * person checks it. A station the source stops listing keeps its corrected
+ * position in the lake, as it keeps the rest of the station. Erratum
+ * `uhslc-positions` covers the UHSLC entries, and erratum
+ * `gesla-uhslc-positions` the GESLA ones: GESLA's copies of UHSLC series keep
  * metadata UHSLC had when GESLA copied it, and UHSLC has corrected most since.
  */
 export const POSITIONS: Record<string, { served: Position; at: Position }> = {
