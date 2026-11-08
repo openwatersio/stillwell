@@ -6,11 +6,11 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | All listed | Meaning |
 | --- | --- | --- | --- |
-| ready | 1396 | 3084 | An adapter exists and the record matched one of its stations |
+| ready | 1409 | 3119 | An adapter exists and the record matched one of its stations |
 | planned | 1 | 3 | Cleared source, adapter in the plan |
 | to_match | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
-| license | 617 | 1051 | The source's terms need confirming first |
-| unmatched | 66 | 110 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| license | 593 | 991 | The source's terms need confirming first |
+| unmatched | 77 | 135 | An adapter exists, but no station matched, or two matched equally; check by hand |
 | restricted | 404 | 538 | The source forbids it; stays on TICON |
 
 ## By replacement source
@@ -38,7 +38,7 @@ Accepted records only, in the order to build adapters: most records first.
 | sfwmd | 42 | ready 37, unmatched 5 | sfwmd |
 | ispra | 37 | license 37 | cmems, ispra |
 | marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
-| cdec | 24 | license 24 | cdwr |
+| cdec | 24 | ready 13, unmatched 11 | cdwr |
 | unam | 22 | license 22 | unam, unam_hist |
 | ncdem | 22 | license 22 | ncdem |
 | ttw | 19 | license 19 | ttw |
