@@ -94,6 +94,12 @@ async function fetchWithRetry(
     try {
       // A year of RWS data is about 15 MB and can take a minute.
       const response = await fetch(url, { ...init, signal: AbortSignal.timeout(timeout * 1000) });
+      // A server that ignores Range answers 200 with the whole file, which
+      // for a large archive would be read into memory before anyone noticed.
+      if (response.status === 200 && new Headers(init.headers).has("range")) {
+        await response.body?.cancel();
+        throw new HttpError(`${init.method ?? "GET"} ${url} ignored its Range header`, "");
+      }
       // Node's Buffer; Uint8Array.toBase64 arrives after Node 24.
       if (response.ok && base64)
         return Buffer.from(await response.arrayBuffer()).toString("base64");
