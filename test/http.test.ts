@@ -23,6 +23,28 @@ describe("fetchText", () => {
     assert.equal(calls, 3);
   });
 
+  it("refuses a whole file sent for a range, without reading it", async () => {
+    let read = false;
+    globalThis.fetch = (async () =>
+      new Response(
+        new ReadableStream(
+          {
+            pull: (c) => {
+              read = true;
+              c.enqueue(new TextEncoder().encode("x"));
+            },
+          },
+          // Pulled only when read.
+          { highWaterMark: 0 },
+        ),
+      )) as typeof fetch;
+    await assert.rejects(
+      fetchText("https://example.test/", { headers: { range: "bytes=0-9" }, partial: true }),
+      /ignored its Range header/,
+    );
+    assert.equal(read, false);
+  });
+
   it("doesn't retry a request that can't be made", async () => {
     let calls = 0;
     globalThis.fetch = (async () => {

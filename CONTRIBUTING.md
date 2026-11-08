@@ -42,6 +42,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                   |
 | `npm run errata`                  | Check the open `source-error` issues against the erratum IDs the code cites.                     |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                     |
+| `npm run gesla:contributors`      | Rewrite docs/gesla-contributors.md from GESLA 4.1's metadata and each contributor's terms.       |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.   |
 | `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.              |
 
