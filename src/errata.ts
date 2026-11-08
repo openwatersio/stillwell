@@ -319,8 +319,14 @@ export function settle(
   }
   // Code that still works around an erratum still needs it published, so an
   // issue closed too soon, or missing from a bad answer, doesn't drop it.
+  // An unregistered source's erratum is reported above, not kept, though cited.
+  const unregistered = new Set((fetched.unregistered ?? []).map((u) => u.issue));
   for (const e of previous)
-    if (cited.has(e.id) && !errata.some((other) => other.id === e.id)) {
+    if (
+      cited.has(e.id) &&
+      !unregistered.has(e.issue) &&
+      !errata.some((other) => other.id === e.id)
+    ) {
       errata.push(e);
       notes.push(
         `${e.id} is cited in the code, but no open issue holds it; kept as published last`,

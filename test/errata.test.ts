@@ -220,6 +220,18 @@ describe("errata", () => {
       settle({ errata: [one], problems: [], ignored: [], unregistered: [gone] }, previous).notes,
       ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
     );
+    // Cited in the code too, it's still left out, not kept for the citation.
+    assert.deepEqual(
+      settle(
+        { errata: [one], problems: [], ignored: [], unregistered: [gone] },
+        previous,
+        new Set(["uhslc-two"]),
+      ),
+      {
+        errata: [one],
+        notes: ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
+      },
+    );
     // Every issue closed is no errata.
     assert.deepEqual(settle({ errata: [], problems: [], ignored: [] }, previous), {
       errata: [],
