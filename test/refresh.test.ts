@@ -25,6 +25,7 @@ import {
 } from "../src/lake/paths.ts";
 import type { Erratum } from "../src/errata.ts";
 import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
+import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import {
   Flag,
   type ListedStation,
@@ -336,6 +337,35 @@ describe("refreshSource", () => {
       ],
     );
     assert.equal(stations[0]!.datum, "NAP");
+  });
+
+  it("keeps Wachendorf on one epoch, by PEGELONLINE's override (#72)", async () => {
+    const wachendorf = (reference: { id: string; since: string } | null) =>
+      listed("3500031", {
+        id: "pegelonline/3500031",
+        source: "pegelonline",
+        datum: "PNP",
+        datums: { NHN: 12.77 },
+        reference,
+      });
+    const as = (station: ListedStation): Source => ({
+      ...pegelonline.source,
+      stations: async () => [station],
+    });
+    // The first refresh to list it didn't read the zero's date; the next one did.
+    await refreshSource(lake, as(wachendorf(null)), { now: "2026-11-05T14:12:26Z" });
+    const { stations } = await refreshSource(
+      lake,
+      as(wachendorf({ id: "2026-06-18", since: "2026-06-19" })),
+      { now: "2026-11-06T22:10:13Z" },
+    );
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => [e.since, e.state]),
+      [
+        [null, "open"],
+        ["2026-06-18T23:00:00Z", "rejected"],
+      ],
+    );
   });
 });
 

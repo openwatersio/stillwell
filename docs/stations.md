@@ -3,7 +3,7 @@
 **Status: built and switched on.** This replaced the station lists once committed to the repo, and the rule that a station has one datum for its whole record. On 2026-11-05 the R2 lake was seeded from the last committed lists (19,809 stations), and the published `stations.parquet` matched one built from them, as did every station's own fields in each list's `extra` (USACE `series` and `zero_since`, CO-OPS `established` and `removed`, USGS series). Not built yet:
 
 - a `restore` command for a list snapshot;
-- `tide_station` and series pins in `overrides`, which so far holds epoch decisions only, and no adapter has one yet: the first decision adds `overrides` to its `Source`;
+- `tide_station` and series pins in `overrides`, which so far holds epoch decisions only;
 - readers outside this repo (tide-database, crowd-depth) reading `epochs`.
 
 Each source's station list lives in the lake, not in git. A new source adds only code: its adapter, README, fixtures and tests. No ingest run changes a file in the repo. A station that changes datum, once or many times, stays active: each datum epoch gets series files of its own, and `stations.parquet` says how to put the epochs together.
@@ -70,7 +70,7 @@ QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 
 A refresh opens an epoch for a station when:
 
 - the source reports another datum label;
-- the source reports a new `reference` under the same label: PEGELONLINE's `gaugeZero.validFrom` changing. A changed `gaugeZero.value` under the same `validFrom` is a re-survey of the zero's height, not a moved zero, so it only updates `datums`, like any other offset. A station's first refresh to see a `reference` records it without opening an epoch;
+- the source reports a new `reference` under the same label: PEGELONLINE's `gaugeZero.validFrom` changing. A changed `gaugeZero.value` under the same `validFrom` is a re-survey of the zero's height, not a moved zero, so it only updates `datums`, like any other offset. A station's first refresh to see a `reference` records it without opening an epoch, unless its date is less than 180 days old: the zero may have moved since the station was last checked, so the refresh opens a `held` epoch from that date for a person to decide, as at PEGELONLINE's Wachendorf ([#72](https://github.com/openwatersio/water-levels/issues/72));
 - a hand-entered reset moves a station's reference later: USACE's `zeros.ts`, whose dates the adapter reports as the station's `reference`.
 
 **When it began.** The new epoch's `since` is the first of these that exists:
