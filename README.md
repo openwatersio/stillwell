@@ -50,6 +50,7 @@ Files are laid out by product, source, station and year:
 ```
 stations.parquet                                      one row per station
 sources.json                                          license and attribution per source
+errata.json                                           errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                               the last 7 days for every station of a source
 obs/<source>/<station>/<year>.parquet                 observed levels
 extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters

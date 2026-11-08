@@ -26,9 +26,11 @@ import {
   stationListPath,
   stationsPath,
   sourcesPath,
+  errataPath,
   PRODUCTS,
 } from "./lake/paths.ts";
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
+import { errataOf, published } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 
@@ -161,7 +163,7 @@ async function renumberAboveFiles(
 }
 
 /**
- * Rebuild `stations.parquet` and `sources.json` in `lake` from the lists of
+ * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `lake` from the lists of
  * `all`, the sources it holds, and their bounds. A source in `expected` that
  * has no list, because it went missing, stops the rebuild, which would
  * otherwise drop its stations from what the lake publishes; it returns the
@@ -190,6 +192,7 @@ export async function publishStations(
   }
   if (missing.length || !listed.length) return { missing };
   const { stations: linked, report } = linkGauges(stations);
+  for (const station of linked) station.errata = errataOf(station);
   await writeStations(stationsPath(lake), linked);
   await writeJsonArray(
     sourcesPath(lake),
@@ -198,6 +201,7 @@ export async function publishStations(
       stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
+  await writeJsonArray(errataPath(lake), published());
   return { count: linked.length, links: report };
 }
 

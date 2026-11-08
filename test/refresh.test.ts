@@ -19,9 +19,11 @@ import {
   recentPath,
   seriesPath,
   sourcesPath,
+  errataPath,
   stationListPath,
   stationsPath,
 } from "../src/lake/paths.ts";
+import { published as errataJson } from "../src/errata.ts";
 import { publishStations, Refused, refreshSource, startedListOf } from "../src/refresh.ts";
 import {
   Flag,
@@ -366,14 +368,30 @@ describe("publishStations", () => {
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
       // The longer record in the lake is preferred.
-      { id: "test/a", first: "2001", same_as: ["test/b"], preferred: "test/a", epochs: "1" },
-      { id: "test/b", first: null, same_as: ["test/a"], preferred: "test/a", epochs: "1" },
+      {
+        id: "test/a",
+        first: "2001",
+        same_as: ["test/b"],
+        preferred: "test/a",
+        errata: [],
+        epochs: "1",
+      },
+      {
+        id: "test/b",
+        first: null,
+        same_as: ["test/a"],
+        preferred: "test/a",
+        errata: [],
+        epochs: "1",
+      },
     ]);
+    // errata.json is the whole list, whichever sources the lake holds.
+    assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), errataJson());
   });
 
   it("publishes nothing while a source it should hold has no list", async () => {

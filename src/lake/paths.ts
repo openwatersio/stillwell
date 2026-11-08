@@ -5,6 +5,7 @@ import type { Product } from "../schema.ts";
  *
  *   stations.parquet                                    one row per series
  *   sources.json                                        license and attribution per source
+ *   errata.json                                         errors in what sources publish, and what the lake does about them
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
  *   history/stations/<source>/<time>.parquet            the list as each refresh started
@@ -111,4 +112,8 @@ export function stationsPath(root: string): string {
 
 export function sourcesPath(root: string): string {
   return `${root}/sources.json`;
+}
+
+export function errataPath(root: string): string {
+  return `${root}/errata.json`;
 }

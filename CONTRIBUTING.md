@@ -40,6 +40,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                          |
 | `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent` and `compact`, described below. |
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                   |
+| `npm run errata`                  | Rewrite `docs/errata.md` from `src/errata.ts`.                                                   |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                     |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.   |
 | `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.              |
@@ -157,6 +158,17 @@ Registering the source is all the scheduled workflows need. Each picks its sourc
 - the monthly refetch takes the sources whose metadata sets `finalizes`, meaning values they publish as preliminary become final later. California DWR, which nothing else fetches, has its own case there: every active station again from January of last year.
 
 Only sources whose `license.redistribution` is true are scheduled, since the workflows have no restricted lake. The workflows run `scripts/sources.ts` without `npm ci`, so nothing an adapter imports may be a package; `test/jobs.test.ts` checks. Until a new source's list is in the lake, its hourly and compaction jobs skip it with a note; the Monthly refresh on the 2nd starts the list, or dispatch Monthly with `sources` set to the source after merging to start it at once. The skip shows as a warning on the run's page. A manual refetch of a source with no list yet fails; the scheduled one on the 9th comes after the refresh on the 2nd. The weekly canary's probes in `scripts/canary.ts` are still written per source.
+
+## Source errata
+
+When a source publishes something wrong, such as values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree, record it as an erratum, whether the adapter works around it or not:
+
+1. Open an issue with the **Source error** template, which labels it `source-error`. It holds the evidence and tracks the report to the agency.
+2. Add an entry to `ERRATA` in [src/errata.ts](src/errata.ts) with the issue's number: the stations and span it affects, what's wrong, and what the lake does about it (`corrected`, `flagged`, `dropped`, `refused`, `avoided` or `kept`).
+3. Cite its ID as ``erratum `<id>` `` where the adapter works around it, or in its README where the lake keeps the data as served. `test/errata.test.ts` fails on an entry its adapter doesn't cite, and on a citation of an ID the list doesn't have.
+4. Run `npm run errata` to rewrite [docs/errata.md](docs/errata.md).
+
+`publish` puts each station's errata in the `errata` column of `stations.parquet`, and the list in `errata.json`. Reports go to the agency in its own language, one message per agency covering its open errata, and only once a person has approved the text; set `reported` once one is sent. When the agency fixes the data, set `fixed`, remove the workaround, and refetch what it touched.
 
 ## Ingest on R2
 
