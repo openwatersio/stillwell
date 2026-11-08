@@ -9,6 +9,12 @@ const adapters = readdirSync(dir, { withFileTypes: true })
   .map((d) => d.name);
 
 describe("source contacts", () => {
+  it("can't be empty", () => {
+    // @ts-expect-error A contact needs an email or a URL.
+    const none: SourceMetadata["contact"] = {};
+    assert.deepEqual(none, {});
+  });
+
   for (const id of adapters)
     it(`${id} says where to report an error`, async () => {
       const { metadata } = (await import(new URL(`${id}/index.ts`, dir).href)) as {

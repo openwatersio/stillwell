@@ -169,7 +169,7 @@ export interface SourceMetadata {
    * mailbox or contact form, at least one of them. Never a person's own
    * address, since `sources.json` publishes it.
    */
-  contact: { email?: string; url?: string };
+  contact: { email: string; url?: string } | { email?: string; url: string };
   /** Anything a user of the data should know about the terms. */
   terms?: string;
   /**
