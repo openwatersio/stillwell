@@ -13,6 +13,7 @@ import {
   parseErratum,
   published,
   settle,
+  UnknownSource,
   type Erratum,
 } from "../src/errata.ts";
 import { fetchText, setTransport } from "../src/http.ts";
@@ -75,6 +76,7 @@ describe("errata", () => {
     const refused = (fields: Partial<Record<string, string>>, message: RegExp) =>
       assert.throws(() => parseErratum(7, body(fields), IDS), message);
     refused({ Source: "nowhere" }, /#7: no source nowhere/);
+    refused({ Source: "uhslc(" }, /#7: source uhslc\( isn't a source ID/);
     refused({ "Erratum ID": "usgs-hong-kong" }, /#7: erratum ID usgs-hong-kong isn't uhslc-<what>/);
     refused({ Stations: "usgs/1" }, /#7: station usgs\/1 isn't uhslc's/);
     refused({ "Values since": "1 May 2020" }, /#7: "Values since" is 1 May 2020/);
@@ -111,9 +113,28 @@ describe("errata", () => {
         // The form labels anyone's issue; a stranger's isn't an erratum.
         issue(67, body({ "Erratum ID": "uhslc-stranger" }), { author_association: "NONE" }),
         issue(68, body(), { author_association: "CONTRIBUTOR" }),
+        // A source whose adapter isn't registered yet, such as one still in a pull request.
+        issue(
+          71,
+          body({ Source: "newsource", "Erratum ID": "newsource-clock", Stations: "newsource/a" }),
+        ),
+        // Its other fields are still checked, and its ID can't be reused.
+        issue(
+          72,
+          body({
+            Source: "newsource",
+            "Erratum ID": "newsource-x",
+            Stations: "newsource/a",
+            Handling: "ignored",
+          }),
+        ),
+        issue(
+          73,
+          body({ Source: "newsource", "Erratum ID": "newsource-clock", Stations: "newsource/b" }),
+        ),
       ]);
     });
-    const { errata, problems, ignored } = await openErrata(IDS);
+    const { errata, problems, ignored, unregistered } = await openErrata(IDS);
     assert.deepEqual(
       asked.map((url) => /state=(\w+)/.exec(url)![1]),
       ["closed", "open"],
@@ -130,8 +151,18 @@ describe("errata", () => {
       { issue: 65, message: "#65: erratum ID uhslc-twice is #64's too" },
       { issue: 66, message: `#66: no "### Source" heading` },
       { issue: 69, message: "#69: erratum ID uhslc-closed is closed #9's" },
+      {
+        issue: 72,
+        message:
+          "#72: handling ignored isn't one of corrected, flagged, dropped, refused, avoided, kept",
+      },
+      { issue: 73, message: "#73: erratum ID newsource-clock is #71's too" },
     ]);
     assert.deepEqual(ignored, [67, 68]);
+    assert.deepEqual(
+      unregistered.map((u) => [u.issue, u.source, u.erratum?.id]),
+      [[71, "newsource", "newsource-clock"]],
+    );
   });
 
   it("finds the IDs of closed issues, which a new one may not reuse", async () => {
@@ -180,6 +211,25 @@ describe("errata", () => {
         notes: [
           "uhslc-two is cited in the code, but no open issue holds it; kept as published last",
         ],
+      },
+    );
+    // A published erratum whose source this build doesn't register, or was
+    // mistyped in an edit, is left out, and the run says so.
+    const gone = new UnknownSource(64, "uhslcc");
+    assert.deepEqual(
+      settle({ errata: [one], problems: [], ignored: [], unregistered: [gone] }, previous).notes,
+      ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
+    );
+    // Cited in the code too, it's still left out, not kept for the citation.
+    assert.deepEqual(
+      settle(
+        { errata: [one], problems: [], ignored: [], unregistered: [gone] },
+        previous,
+        new Set(["uhslc-two"]),
+      ),
+      {
+        errata: [one],
+        notes: ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
       },
     );
     // Every issue closed is no errata.
