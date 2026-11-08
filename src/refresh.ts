@@ -30,7 +30,7 @@ import {
   PRODUCTS,
 } from "./lake/paths.ts";
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
-import { ERRATA, errataOf, published, type Erratum } from "./errata.ts";
+import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 
@@ -170,15 +170,17 @@ async function renumberAboveFiles(
  * missing ones. A source in neither is new, and
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
- * says what was linked. Each station carries the IDs of its errata, and
- * `errata.json` those of the sources the lake holds (`src/errata.ts`); the result names any station an erratum lists that a source in the
- * lake doesn't, a typo or a station since removed.
+ * says what was linked. Each station carries the IDs of its `errata`, and
+ * `errata.json` those of the sources the lake holds (the open `source-error`
+ * issues, read by `src/errata.ts`); the
+ * result names any station an erratum lists that a source in the lake
+ * doesn't, a typo or a station since removed.
  */
 export async function publishStations(
   lake: string,
   all: Source[],
   expected: string[],
-  errata: Erratum[] = ERRATA,
+  errata: Erratum[],
 ): Promise<{ count: number; links: LinkReport; unknownErrata: string[] } | { missing: string[] }> {
   const stations: LakeStation[] = [];
   const listed: Source[] = [];

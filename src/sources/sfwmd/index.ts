@@ -37,6 +37,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "South Florida Water Management District",
+  contact: {
+    email: "DataRequests@sfwmd.gov",
+    url: "https://www.sfwmd.gov/contact/dbhydro_contact_form",
+  },
   terms:
     "SFWMD publishes DBHYDRO without a license or a restriction on reuse, as Florida public records. Its disclaimer gives the data as is, without warranty, and asks users to get it from the District's own server. Provisional values are subject to revision. Changes in the lake: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added.",
   // Telemetry arrives within minutes.

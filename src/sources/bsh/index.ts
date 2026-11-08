@@ -39,6 +39,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: ATTRIBUTION,
+  contact: { email: "gezeiten@bsh.de" },
   // Predictions only, published a year ahead; nothing to poll or finalize.
   hourly: false,
   finalizes: false,

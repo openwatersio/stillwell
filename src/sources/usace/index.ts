@@ -35,6 +35,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "U.S. Army Corps of Engineers",
+  contact: { email: "CEMVRRiverGages@usace.army.mil" },
   // Offices that screen do so after the fact; the refetch skips stations never screened.
   hourly: true,
   finalizes: true,

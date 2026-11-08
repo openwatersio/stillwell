@@ -2,7 +2,7 @@
 
 Every public series in the lake is Parquet at `https://water-levels.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Data whose source bars republishing isn't here; it goes to a separate private lake. The exception is UHSLC stations whose contributor's own terms are stricter than UHSLC's, which are public while permission is asked ([uhslc-contributors.md](uhslc-contributors.md)). Non-commercial data a source lets anyone republish is here, with `commercial_use` false on its stations.
 
-The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license and the attribution it asks for are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
+The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license, the attribution it asks for, and where to report an error in its data (`contact`) are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
 
 So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
 
@@ -10,7 +10,7 @@ So far the bucket holds the station lists that have been published to it and one
 
 ```
 stations.parquet                                      one row per station
-sources.json                                          license and attribution per source
+sources.json                                          license, attribution and contact per source
 errata.json                                           errors in what sources publish, and what the lake does about them
 stations/<source>.parquet                             one source's list, as ingest keeps it
 history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
@@ -41,7 +41,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
 - **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
-- **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. [errata.md](errata.md) says what each is and what the lake does about it, and [`errata.json`](https://water-levels.openwaters.io/errata.json) has the same list: which stations and span of values each is in, whether the lake corrected, flagged, dropped, refused, avoided or kept them, and whether the agency has been told.
+- **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. Each is an [open `source-error` issue](https://github.com/openwatersio/water-levels/issues?q=is%3Aissue+is%3Aopen+label%3Asource-error) that says what it is, what the lake does about it, and where the report to the agency stands. [`errata.json`](https://water-levels.openwaters.io/errata.json) has the same list: which stations and span of values each is in, whether the lake corrected, flagged, dropped, refused, avoided or kept them, and a link to its issue.
 - **`status`**: `active` or `inactive`.
 - **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
 

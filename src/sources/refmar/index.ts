@@ -29,6 +29,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "REFMAR, Shom (doi:10.17183/REFMAR)",
+  contact: { email: "refmar@shom.fr", url: "https://refmar.shom.fr/contact" },
   // Raw values arrive within minutes, from the 1-minute series.
   hourly: true,
   // SHOM validates raw values weeks to months later.

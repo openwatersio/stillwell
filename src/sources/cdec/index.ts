@@ -32,6 +32,10 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "California Department of Water Resources (CDEC)",
+  contact: {
+    email: "flood.webmaster@water.ca.gov",
+    url: "https://cdec.water.ca.gov/CDECContact.html",
+  },
   terms:
     "CDEC publishes its data without a license or a restriction on reuse, under DWR's conditions of use, which disclaim any guarantee of accuracy, completeness or timeliness. CDEC's data is preliminary and subject to revision. Each station credits its operator. Changes in the lake: levels converted from feet to meters and rounded to the millimeter, times converted from Pacific time to UTC, missing readings dropped, and quality flags added.",
   // Readings arrive within the hour.

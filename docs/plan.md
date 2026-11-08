@@ -73,7 +73,7 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  metadata: SourceMetadata; // id, name, url, license, attribution, terms, qc
+  metadata: SourceMetadata; // id, name, url, license, attribution, contact, terms, qc
   stations(previous?: Station[]): Promise<ListedStation[]>; // datum null when the source didn't say; previous is the lake's list
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed
@@ -94,7 +94,7 @@ Bucket `water-levels`, public read at `water-levels.openwaters.io`. Series whose
 
 ```
 stations.parquet                                 one row per series
-sources.json                                     license and attribution per source
+sources.json                                     license, attribution and contact per source
 errata.json                                      errors in what sources publish, and what the lake does about them
 recent/<source>.parquet                          last 7 days, every live public station and any since retired, sorted by station then time
 obs/<source>/<station>/<year>.parquet            time, level_m, flag, source_flag, received, datum
@@ -106,7 +106,7 @@ models/gtsm/<point>.parquet                      surge reanalysis at coastal poi
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year
 ```
 
-`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `preferred` (the series to use among a gauge's `same_as`), `errata` (errors found in what the source publishes for the station, from `src/errata.ts`, set on every publish), `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` come from the lake, through the bounds compaction writes, and are null for a station with no observations yet. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
+`stations.parquet` columns follow the architecture: `id`, `name`, `lat`, `lon`, `country_code`, `kind` (coastal, estuary, lake, river), `interval_s`, `datum`, `datums` (a map from datum name to the meters to add, such as `NHN`, `SKN`, `MSL`; phase 7 adds MSL, LAT and NAVD88 where tide-database or the source has them), `products`, `first`, `last`, `license`, `commercial_use`, `attribution`, `tide_station`, `same_as`, `preferred` (the series to use among a gauge's `same_as`), `errata` (errors found in what the source publishes for the station, from the open `source-error` issues, set on every publish), `source_url`, plus `status` (active, inactive), `live` (whether the live path supports it) and `min_interval_s` (how often the source lets us ask). `first` and `last` come from the lake, through the bounds compaction writes, and are null for a station with no observations yet. `license`, `commercial_use` and `attribution` come from the adapter's metadata unless the source lists a station with its own. Every other column comes from each source's list in the lake, which holds what the source says, what a refresh carries forward and the station's datum epochs, so only the station refresh changes them, never the hourly or daily jobs.
 
 Observation files are `time` (TIMESTAMPTZ), `level_m` (FLOAT), `flag` (UTINYINT, ordered best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad), `source_flag` (UTINYINT, the source's flag before QC, null where it wasn't kept), `received` (TIMESTAMPTZ, null for backfilled history), and `datum` (VARCHAR, the same on every row, so a file can't mix two; backfill refuses to write into a file in another datum). Source flags fold into these; QC can only make a flag worse.
 
@@ -178,11 +178,11 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **DMI** (`dmi`): the adapter reads DMI's open oceanographic API, CC BY 4.0, back to 1889, but waits on DMI's station endpoint, which lists only Skagen; once it lists every gauge, register the source, which its metadata then schedules, refresh the list and backfill (see [its README](../src/sources/dmi/README.md)).
 - [ ] **European originators**: REFMAR (adapter done; backfill running), UK EA (43 tide gauges, backfilled from its year-long archive). These also run hourly from phase 4 on.
 - [x] **SFWMD** (`sfwmd`): stage at the 43 tidal gauges TICON keeps from South Florida's DBHYDRO, in NAVD88, running hourly, from DBHYDRO's reviewed series back to 1974 and its telemetry after. See [the adapter's README](../src/sources/sfwmd/README.md).
-- [ ] Backfill SFWMD through the Ingest workflow.
+- [x] Backfill SFWMD through the Ingest workflow.
 - [x] **California DWR** (`dwr`): 15-minute stage at the 50 Delta gauges TICON keeps that DWR's Water Data Library has a file for, in NAVD88 or above gauge zero, back to 1975, read from last January on every month. See [the adapter's README](../src/sources/dwr/README.md).
-- [ ] Backfill California DWR through the Ingest workflow.
+- [x] Backfill California DWR through the Ingest workflow.
 - [x] **CDEC** (`cdec`): 15-minute river stage at the 41 Delta gauges TICON names by CDEC code that an operator other than USGS runs, NAVD88 at 13 and gauge zero at the rest, running hourly. See [the adapter's README](../src/sources/cdec/README.md).
-- [ ] Backfill CDEC through the Ingest workflow.
+- [x] Backfill CDEC through the Ingest workflow.
 - [ ] **Other US state networks**: CRMS ([#49](https://github.com/openwatersio/water-levels/issues/49)), FIMAN ([#51](https://github.com/openwatersio/water-levels/issues/51)) and NWFWMD ([#52](https://github.com/openwatersio/water-levels/issues/52)), whose terms or access need settling first.
 - [x] **JMA** (`jma`): hourly levels above each station's observation datum (DL) at 90 gauges, 70 open, back to 1924, from JMA's historical, final and provisional files, in JST converted to UTC, under the Public Data License 1.0 (CC BY 4.0 compatible), in the public lake. See [the adapter's README](../src/sources/jma/README.md).
 - [x] Backfill JMA through the Ingest workflow, then Saigo's 1980 once its mistyped day is read: `backfill jma SA 1980 1981`.
