@@ -40,7 +40,13 @@ export interface Decision {
 }
 
 /** Pairs a person found share a gauge that the rules below miss. */
-export const LINKS: Decision[] = [];
+export const LINKS: Decision[] = [
+  {
+    a: "gesla/uddevalla-udd-swe-cmems",
+    b: "smhi/2541",
+    note: "CMEMS's copy of SMHI's Uddevalla gauge: 98% of 128,161 shared hours agree within 0.5 mm. GESLA calls it a river gauge and SMHI a coastal one, so the copy rule skips it.",
+  },
+];
 
 /** Pairs a person found don't share a gauge, though a rule links them. */
 export const UNLINKS: Decision[] = [];

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, it } from "node:test";
+import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { epochKey } from "../src/epochs.ts";
 import {
@@ -25,6 +25,7 @@ import {
 } from "../src/lake/paths.ts";
 import type { Erratum } from "../src/errata.ts";
 import { POSITIONS } from "../src/positions.ts";
+import { LINKS } from "../src/same-as.ts";
 import {
   describeReport,
   publishStations,
@@ -90,6 +91,11 @@ const sourceOf = (stations: ListedStation[], overrides?: Overrides): Source => (
   overrides,
   stations: async () => stations,
 });
+
+// The real link decisions name stations these lists don't have, which would report them as dropped.
+const DECISIONS = [...LINKS];
+before(() => LINKS.splice(0));
+after(() => LINKS.push(...DECISIONS));
 
 const NOW = "2026-11-05T00:00:00Z";
 const LATER = "2026-12-05T00:00:00Z";
