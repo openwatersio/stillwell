@@ -123,9 +123,10 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
     s.reference = { id: since ?? "original", since: since ?? null };
     // A refresh that sends no offsets keeps the stored ones, so it keeps where they came from too.
     const from = committedFrom.get(s.id);
-    if (from && !s.datums_from)
+    const dropped = Object.keys(from ?? {}).filter((k) => !s.datums_from?.[k]);
+    if (dropped.length)
       console.error(
-        `  usace/${s.source_id}: its description no longer gives ${Object.keys(from).join(", ")}`,
+        `  usace/${s.source_id}: its description no longer gives ${dropped.join(", ")}`,
       );
     if (!Object.keys(s.datums).length && from) s.datums_from = from;
   }

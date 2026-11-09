@@ -28,10 +28,13 @@ const DATE = String.raw`\d{1,2} ?[A-Za-z]{3,9}\.? ?\d{2,4}|\d{1,2}/\d{1,2}/\d{4}
  * stage to refer it to NAVD88, which every example in the descriptions agrees
  * with ("add -1.403' to the gage reading", "subtract 1.21 feet").
  */
+const STATING = String.raw`(?:current )?(?:gage )?adj\w*ment (?:for vertical datum (?:relative to )?|(?:from NAVD88[ .]?\(?[\d.]+\)? )?to )NAVD88[ .]*(?:\((?<r1>[^)]*)\)|(?<r2>OPUS ?\d{4}|OPUS|\d{4}\.\d{2}))?\s*(?::|is|=)\s*`;
 const ADJUSTMENT = new RegExp(
-  String.raw`(?:current )?(?:gage )?adj\w*ment (?:for vertical datum (?:relative to )?|(?:from NAVD88[ .]?\(?[\d.]+\)? )?to )NAVD88[ .]*(?:\((?<r1>[^)]*)\)|(?<r2>OPUS ?\d{4}|OPUS|\d{4}\.\d{2}))?\s*(?::|is|=)\s*(?<value>${NUMBER})(?:\s*(?:'|ft\b|feet))*(?!\s*(?:m\b|meters?|cm))`,
+  String.raw`${STATING}(?<value>${NUMBER})(?:\s*(?:'|ft\b|feet))*(?!\s*(?:m\b|meters?|cm))`,
   "gi",
 );
+/** Any adjustment with a number, whatever its unit. */
+const STATED = new RegExp(String.raw`${STATING}[+-]?\.?\d`, "i");
 /** "Gage zero reset to vertical datum NAVD88 (2009.55) on 28Jun2015". */
 const RESET = new RegExp(
   String.raw`gau?ge(?: zero)? (?:is )?(?:re-?)?set(?: again)?(?: and transmitting)? (?:to|in) (?:vertical datum )?NAVD88 ?\((?<r>[^)]+)\) on (?<date>${DATE})`,
@@ -104,7 +107,8 @@ function adjustment(sourceId: string, text: string): Found | null | undefined {
   const distinct = found.filter(
     (f, i) => found.findIndex((g) => g.feet === f.feet && sameNote(g.note, f.note)) === i,
   );
-  if (!distinct.length) return undefined;
+  // One stated in a unit other than feet still counts as stated, so it isn't read as a reset's 0.
+  if (!distinct.length) return STATED.test(text) ? null : undefined;
   let latest = distinct[0]!;
   if (distinct.length > 1) {
     // Several adjustments, each dated on its own day: the latest is the current one.

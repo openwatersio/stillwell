@@ -1579,6 +1579,11 @@ describe("usace", () => {
       ),
       [{}, {}],
     );
+    // Nor does one in meters fall back on a reset.
+    assert.deepEqual(read("MVN.Venice", reset + "Gage adjustment to NAVD88 2009.55 = -0.30 m"), [
+      {},
+      {},
+    ]);
     // An adjustment in meters isn't taken as feet.
     assert.deepEqual(read("MVN.X", "Gage adjustment to NAVD88 2009.55 = -0.30 m"), [{}, {}]);
     // An LWRP realization that isn't recognized can't be matched to the adjustment's.
@@ -1612,21 +1617,33 @@ describe("usace", () => {
     assert.equal(isoDate("present"), null);
   });
 
-  it("keeps where a stored offset came from when the description stops giving it", async () => {
+  it("keeps where a stored offset came from when the description stops giving it, and says so", async (t) => {
     const entries = JSON.parse(fixture("usace-locations.json")).entries as usace.CatalogLocation[];
     serve([
       [/catalog\/TIMESERIES/, fixture("usace-catalog.json")],
       [
         /catalog\/LOCATIONS/,
-        JSON.stringify({ entries: entries.map((l) => ({ ...l, description: " " })) }),
+        JSON.stringify({
+          entries: entries.map((l) => (l.name === "New_Orleans" ? { ...l, description: " " } : l)),
+        }),
       ],
     ]);
-    const from = { NAVD88: { description: "Adjustment …", realization: "OPUS 2019", as_of: null } };
-    const previous = [{ id: "usace/MVN.Baton_Rouge", datums_from: from } as unknown as Station];
+    const error = t.mock.method(console, "error", () => {});
+    const note = { description: "…", realization: "2009.55", as_of: null };
+    const from = { NAVD88: note, LWRP: note };
+    const previous = ["usace/MVN.New_Orleans", "usace/MVN.Baton_Rouge"].map(
+      (id) => ({ id, datums_from: from }) as unknown as Station,
+    );
     const listed = (await usace.stations(previous)) as usace.UsaceStation[];
-    const batonRouge = listed.find((s) => s.id === "usace/MVN.Baton_Rouge")!;
-    assert.deepEqual(batonRouge.datums, {});
-    assert.deepEqual(batonRouge.datums_from, from);
+    const station = (id: string) => listed.find((s) => s.id === id)!;
+    // New Orleans' description went blank: no offsets sent, so the stored ones and their notes stay.
+    assert.deepEqual(station("usace/MVN.New_Orleans").datums, {});
+    assert.deepEqual(station("usace/MVN.New_Orleans").datums_from, from);
+    // Baton Rouge's still gives NAVD88 but not LWRP.
+    assert.deepEqual(Object.keys(station("usace/MVN.Baton_Rouge").datums_from!), ["NAVD88"]);
+    const said = error.mock.calls.map((c) => String(c.arguments[0])).join("\n");
+    assert.match(said, /usace\/MVN.New_Orleans: its description no longer gives NAVD88, LWRP/);
+    assert.match(said, /usace\/MVN.Baton_Rouge: its description no longer gives LWRP\n/);
   });
 
   it("keeps a committed series while CWMS lists it, and marks the station inactive when it doesn't", () => {
