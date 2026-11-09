@@ -1,3 +1,5 @@
+import { commitYears, markYears, reconcileYears } from "./years.ts";
+import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
@@ -21,6 +23,7 @@ import {
   type StationBounds,
   recentStations,
   writeObservations,
+  type YearStats,
   writeRecent,
   writeStationBounds,
   type StationObservation,
@@ -318,6 +321,8 @@ export async function compactRecent({
   summary.stations = stations.filter(levels).length + summary.failed.length;
   // The span of each year file this run read whole, by `spanKey`, for the bounds.
   const spans = new Map<string, FileBounds | null>();
+  // Stations whose fold the years file may not have recorded, for the reconcile to read.
+  const unmarked: string[] = [];
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -333,6 +338,18 @@ export async function compactRecent({
         ).filter((r) => r.time >= start && r.time < end),
         (r) => r.station,
       );
+      const lake = lakeFor(batch[0]!);
+      const folding = [...window.keys()];
+      const written = new Map<string, YearStats>();
+      // A batch that can't be marked still folds, since its rows age out of
+      // the window; the reconcile below reads its stations' files instead.
+      let marked: string[] = [];
+      try {
+        marked = await markYears(lake, id, folding);
+      } catch (error) {
+        summary.failed.push(`years: ${message(error)}`);
+        unmarked.push(...folding);
+      }
       await pool(batch, concurrency, async (station) => {
         const rows = window.get(station.id);
         // A live station sends something every day; one that isn't live may not.
@@ -390,7 +407,7 @@ export async function compactRecent({
               spans.set(key, span);
               continue;
             }
-            await writeObservations(file, merged, epoch.datum);
+            written.set(file, await writeObservations(file, merged, epoch.datum));
             spans.set(key, span);
             summary.files++;
             const had = new Map(existing.rows.map((r) => [r.time, r]));
@@ -405,6 +422,12 @@ export async function compactRecent({
         }
         if (changed) summary.updated++;
       });
+      try {
+        await commitYears(lake, id, marked, written);
+      } catch (error) {
+        summary.failed.push(`years: ${message(error)}`);
+        unmarked.push(...folding);
+      }
     }
   }
   // A source's stations share its lake, so this is one lake. A failure goes
@@ -422,6 +445,20 @@ export async function compactRecent({
       });
     } catch (error) {
       summary.failed.unshift(`bounds: ${message(error)}`);
+    }
+  // Rows a run that stopped partway left out of date, and files written without a row.
+  for (const lake of new Set(stations.map((s) => lakeFor(s))))
+    try {
+      const years = await reconcileYears(lake, id, {
+        keep: (station) => withheldReason(source, station) === null,
+        reread: unmarked,
+        // Enough for a stopped run's stations, and short of compaction's time limit; an unfinished `years` build goes on a night at a time.
+        limit: 5000,
+        concurrency,
+      });
+      for (const file of years?.failed ?? []) summary.failed.push(`years: can't read ${file}`);
+    } catch (error) {
+      summary.failed.unshift(`years: ${message(error)}`);
     }
   return summary;
 }

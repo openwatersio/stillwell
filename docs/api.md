@@ -198,6 +198,7 @@ predictions/<source>/<station>/<year>.parquet  published predictions (RWS, BSH)
 predicted-extremes/<source>/<station>/<year>.parquet  published predicted high and low waters
 obs/<source>/<station>/<epoch>/<year>.parquet  a later datum epoch's files, and likewise for each product
 stations/<source>.parquet, history/stations/   each source's list, and every refresh's snapshot
+stations/years/<source>.parquet                each year file of observed levels, for readers to check against
 bulk/<YYYY-Qn>/<source>.parquet                quarterly snapshots, with a DOI
 ```
 

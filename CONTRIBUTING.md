@@ -32,25 +32,25 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 
 ## Commands
 
-| Command                           | Does                                                                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `npm run check`                   | Everything CI checks: lint, typecheck and tests. Run it before pushing.                                                   |
-| `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.                                  |
-| `npm run typecheck`               | `tsc --noEmit`.                                                                                                           |
-| `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                   |
-| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify` and `withhold`, described below. |
-| `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                                            |
-| `npm run errata`                  | Check the open `source-error` issues against the erratum IDs the code cites.                                              |
-| `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                              |
-| `npm run gesla:contributors`      | Rewrite docs/gesla-contributors.md from GESLA 4.1's metadata and each contributor's terms.                                |
-| `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.                            |
-| `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.                                       |
+| Command                           | Does                                                                                                                               |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`                   | Everything CI checks: lint, typecheck and tests. Run it before pushing.                                                            |
+| `npm test`                        | The `node:test` suites in `test/`. They use recorded fixtures and make no network calls.                                           |
+| `npm run typecheck`               | `tsc --noEmit`.                                                                                                                    |
+| `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                            |
+| `npm run ingest -- <args>`        | `scripts/ingest.ts`: `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `withhold` and `years`, described below. |
+| `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                                                     |
+| `npm run errata`                  | Check the open `source-error` issues against the erratum IDs the code cites.                                                       |
+| `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                       |
+| `npm run gesla:contributors`      | Rewrite docs/gesla-contributors.md from GESLA 4.1's metadata and each contributor's terms.                                         |
+| `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.                                     |
+| `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.                                                |
 
 CI also checks that `package-lock.json` regenerates from `package.json` and that every package resolves from the npm registry.
 
 ## Running ingest
 
-`scripts/ingest.ts` has seven commands: `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify` and `withhold`. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`, unless `--no-publish`; `publish` writes only those two, from the lists in the lake. Neither changes a file in the repo. Before writing a list it copies the previous one, less any withheld stations, to `history/stations/<source>/`, with a report of the stations added, retired, removed and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs`, the Monthly workflow's `accept_epochs`, after checking them). A station the source stops listing stays, marked inactive; a withheld one leaves (see [Withheld stations](#withheld-stations)). A new source's first refresh starts its list; a source with series in the lake but no list or history is refused rather than started over. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
+`scripts/ingest.ts` has eight commands: `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `withhold` and `years`. `stations` refreshes each source's list in the lake, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`, unless `--no-publish`; `publish` writes only those two, from the lists in the lake. Neither changes a file in the repo. Before writing a list it copies the previous one, less any withheld stations, to `history/stations/<source>/`, with a report of the stations added, retired, removed and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the lake has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs`, the Monthly workflow's `accept_epochs`, after checking them). A station the source stops listing stays, marked inactive; a withheld one leaves (see [Withheld stations](#withheld-stations)). A new source's first refresh starts its list; a source with series in the lake but no list or history is refused rather than started over. A station's datum epochs, and the decisions a person makes about them in the source's `overrides`, are described in [docs/stations.md](docs/stations.md).
 
 ```bash
 node scripts/ingest.ts stations
@@ -113,6 +113,12 @@ node scripts/ingest.ts requalify smhi all 1880 2027
 ```
 
 Each year file starts over from its `source_flag` and the errata spans the source's adapter flags (its `suspect`, such as REFMAR's Pointe-à-Pitre clock, or GESLA's datum jumps, which it works out from the lake's copy of the record and refuses to when that ends more than a year inside the record's stated ends), then QC runs with the current rules, with the years either side read too, so a flatline or spike across New Year is judged whole. A file is written only when a row changed. A value from before `source_flag` was kept gets it from its flag where that's better than suspect, since QC only marks values suspect or bad; a suspect or bad one may be QC's, so its flag stays until a backfill fetches it again. Backfill QCs the whole year it writes the same way, with the years either side as they are when it runs, though the values it didn't fetch keep their flags; a year written before the one after it existed isn't judged against it again until `requalify` runs. The recent window starts its stored values over from `source_flag` each hour a fetch brings values, except within the longest flatline rule's length of its oldest value, and judges them over its 7 days; compaction folds those flags into the current year's file as they are, so `requalify` there gives flags judged over the whole year. Its summary counts as values the rows whose flag changed, so a first run that only fills in `source_flag` writes files with no values. A station with a file holding more than one datum, or a record its source can't judge, fails before any of its files is written. `--shard 2/8` splits `all` as backfill does. Run it from the Ingest workflow, which runs it in the source's group, as it does backfill.
+
+Every run that writes a year file of levels, `backfill`, `compact` and `requalify`, keeps `stations/years/<source>.parquet` in step: each year file with its hours, values by flag and a version, for readers to tell a year with no values from a file they failed to read ([docs/data.md](docs/data.md#which-years-a-station-has)). They mark each batch of stations before writing and set their files' rows after, and compaction then lists the source's files and reads any a stopped run left without a current row ([docs/stations.md](docs/stations.md#lake-layout)). A source with files but no years file gets one only from `years`, which reads every year file of levels the source has, and resumes where a run stopped by its time limit left off. `--rebuild-years` reads every file again even when the years file has them, or can't be read, which a rollback to a build that didn't keep it needs once the release is back; if it's stopped, run `years` again without the flag to finish. Run it from the Ingest workflow, which runs it in the source's group:
+
+```bash
+node scripts/ingest.ts years usgs
+```
 
 These environment variables choose where it writes:
 

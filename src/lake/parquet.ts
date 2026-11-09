@@ -92,23 +92,103 @@ async function connect(): Promise<DuckDBConnection> {
  * `datum` is the same on every row; it lets a reader, and the next write, check
  * that a file holds one datum.
  */
-export async function writeObservations(
+export function writeObservations(
   path: string,
   rows: Observation[],
   datum: string,
-): Promise<void> {
-  await copyRows(path, rows, "time, level_m, flag, source_flag, received, datum", datum, (r) => [
-    r.time,
-    r.level,
-    r.flag,
-    r.received ?? null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    r.source_flag ?? null,
-  ]);
+): Promise<YearStats> {
+  return serial(async () => {
+    const table = await createTable();
+    try {
+      await appendRows(table, rows, (r) => [
+        r.time,
+        r.level,
+        r.flag,
+        r.received ?? null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        r.source_flag ?? null,
+      ]);
+      await copyOut(
+        path,
+        table,
+        "time, level_m, flag, source_flag, received, datum",
+        datum,
+        "time_ms",
+      );
+      // The rows as copyOut wrote them, so the hash matches a read of the file.
+      const reader = await (
+        await connection()
+      ).runAndReadAll(
+        `SELECT ${YEAR_STATS} FROM (SELECT epoch_ms(time_ms::BIGINT)::TIMESTAMPTZ AS time, level_m, flag, source_flag, epoch_ms(received_ms::BIGINT)::TIMESTAMPTZ AS received FROM ${table})`,
+      );
+      return yearStats(reader.getRowObjects()[0]!);
+    } finally {
+      await dropTable(table);
+    }
+  });
+}
+
+/**
+ * A year file of levels: how many UTC hours hold a value, how many values
+ * have each flag, by flag, and `version`, a hash of its rows that changes
+ * when any value, flag or `received` does.
+ */
+export type YearStats = { hours: number; flags: number[]; version: string };
+
+// One expression for a write and a read, so both hash a file's rows alike.
+const YEAR_STATS = [
+  "count(DISTINCT floor(epoch_ms(time) / 3600000)) AS hours",
+  ...[0, 1, 2, 3, 4].map((f) => `count(*) FILTER (WHERE flag = ${f}) AS flag${f}`),
+  // The row count goes in too, since two identical rows cancel in bit_xor.
+  "md5(concat(printf('%032x', coalesce(bit_xor(md5_number(concat(epoch_ms(time), ',', level_m, ',', flag, ',', source_flag, ',', epoch_ms(received)))), 0::UHUGEINT)), ',', count(*))) AS version",
+].join(", ");
+
+/** A year file with no rows, as `YEAR_STATS` gives one. */
+export const EMPTY_YEAR: YearStats = {
+  hours: 0,
+  flags: [0, 0, 0, 0, 0],
+  // md5 of the empty bit_xor and a count of 0.
+  version: "a6d15f1ab28e5c9dfee9f3bb78c4ab5d",
+};
+
+function yearStats(r: Record<string, unknown>): YearStats {
+  return {
+    hours: Number(r.hours),
+    flags: [0, 1, 2, 3, 4].map((f) => Number(r[`flag${f}`])),
+    version: String(r.version),
+  };
+}
+
+/** Each year file's `YearStats`, by its path as given; a file with no rows has none, which `EMPTY_YEAR` stands for. */
+export async function readYearStats(files: string[]): Promise<Map<string, YearStats>> {
+  // read_parquet globs, so a path with a glob character is read alone, where
+  // grouping by file keeps out the others it matches; in a batch it could
+  // read a file twice.
+  const glob = (f: string) => /[*?[]/.test(f);
+  const stats = new Map<string, YearStats>();
+  for (const batch of [files.filter((f) => !glob(f)), ...files.filter(glob).map((f) => [f])]) {
+    if (!batch.length) continue;
+    const rows = await serial(async () => {
+      const db = await connection();
+      const reader = await db.runAndReadAll(
+        // The empty row names every column, so a file written before `source_flag` reads it as null.
+        `SELECT filename, ${YEAR_STATS} FROM (SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::FLOAT AS level_m, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received WHERE false UNION ALL BY NAME SELECT * FROM read_parquet([${batch.map(quote).join(", ")}], filename = true, union_by_name = true)) GROUP BY filename`,
+      );
+      return reader.getRowObjects();
+    });
+    for (const r of rows) {
+      const file = String(r.filename);
+      if (batch.includes(file)) stats.set(file, yearStats(r));
+      // Alone, a glob character matches other files; in a batch, a name that wasn't asked for is a path read wrong.
+      else if (batch.length > 1 || !glob(batch[0]!))
+        throw new Error(`read ${file}, which wasn't asked for`);
+    }
+  }
+  return stats;
 }
 
 export async function readObservations(path: string): Promise<Observation[]> {
@@ -592,6 +672,26 @@ export async function writeStationBounds(
     path,
     bounds,
     `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
+    "FORMAT parquet, COMPRESSION zstd",
+  );
+}
+
+/** Every row of a Parquet file, by column name; none when there's no file. */
+export function readRows(path: string): Promise<Record<string, unknown>[]> {
+  return read(path, "SELECT *", "ALL");
+}
+
+/** Rows as Parquet with the given columns and types, sorted by `order`. */
+export async function writeRows(
+  path: string,
+  rows: object[],
+  columns: Record<string, string>,
+  order: string,
+): Promise<void> {
+  await viaJson(
+    path,
+    rows,
+    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY ${order}`,
     "FORMAT parquet, COMPRESSION zstd",
   );
 }
