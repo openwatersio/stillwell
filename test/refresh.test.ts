@@ -505,8 +505,10 @@ describe("publishStations", () => {
       until: null,
       error: "",
       handling: "kept",
-      lake: "",
-      issue: 1,
+      response: "",
+      evidence: null,
+      reported: null,
+      report: null,
     });
     const errata = [
       erratum("test-a", "test", ["test/a", "test/gone"]),

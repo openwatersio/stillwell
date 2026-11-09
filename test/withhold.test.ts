@@ -372,8 +372,10 @@ describe("publishStations with withheld stations", () => {
       until: null,
       error: "",
       handling: "corrected",
-      lake: "",
-      issue: 88,
+      response: "",
+      evidence: null,
+      reported: null,
+      report: null,
     };
     const result = await publishStations(lake, [gesla.source, uhslc.source], [], [erratum]);
     assert.deepEqual("count" in result && result.unknownErrata, [

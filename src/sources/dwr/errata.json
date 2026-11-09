@@ -1,0 +1,15 @@
+{
+  "errata": [
+    {
+      "id": "dwr-b95580-another-header",
+      "stations": [],
+      "handling": "dropped",
+      "error": "WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).",
+      "response": "A station is left out of the list when none of its files is usable, and a file that names another station isn't, so B95580 isn't in the lake until WDL fixes it.",
+      "evidence": "The file's header names B95500, with variable code 821 and no notes, where B95580's own number belongs. Of all 71 WDL files the adapter reads, it's the only one. Found while backfilling California DWR; see [#55](https://github.com/openwatersio/water-levels/pull/55).",
+      "reported": "2026-11-07",
+      "report": "Sent to wdlweb@water.ca.gov on 2026-11-07. No answer yet."
+    }
+  ],
+  "retired": []
+}
