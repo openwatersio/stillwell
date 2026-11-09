@@ -15,6 +15,7 @@ import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
 import { DROPPED } from "./dropped.ts";
+import { TIDAL_RIVERS } from "./tidal-rivers.ts";
 
 /**
  * GESLA 4.1 (Global Extreme Sea Level Analysis), a static release of 6,682
@@ -483,7 +484,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
 }
 
 /** The median step between a record's first 1,000 values. */
-function medianStep(times: Float64Array): number {
+export function medianStep(times: Float64Array): number {
   const steps: number[] = [];
   for (let i = 1; i < Math.min(times.length, 1001); i++) steps.push(times[i]! - times[i - 1]!);
   return steps.length ? median(steps) : NaN;
@@ -503,7 +504,7 @@ const EDGE_DAYS = 5;
  * near the record's ends) by more than `JUMP_M`. The jumps cut the record into segments, and every segment whose
  * median is more than `JUMP_M` from the longest segment's is returned.
  * Medians over a month ride out surges and seasons; a river's floods don't,
- * so only coastal records are checked.
+ * a tidal river's included, so only coastal records are checked.
  */
 export function datumJumps(
   record: Pick<GeslaRecord, "times" | "levels" | "source">,
@@ -733,6 +734,7 @@ export const source: Source = {
   stations,
   withheld,
   observations: (s, start, end) => levels(s as GeslaStation, start, end),
+  tidal: (s) => TIDAL_RIVERS.has(s.source_id),
   // The datum jumps, from the lake's copy of the record. They're judged against
   // the record's longest segment, so a copy that misses either end is refused;
   // a year missing in the middle isn't seen. shortcut: a backfill that failed a

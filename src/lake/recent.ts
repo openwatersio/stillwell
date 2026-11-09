@@ -750,12 +750,21 @@ export async function refuseOtherDatum(
  * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
  * or more, so they get two days before a flatline counts as suspect. And they
  * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. Tide gauges keep their
- * source's settings.
+ * outside their own range isn't suspect for that alone. A river or lake the
+ * source finds tidal never holds still that long, so it keeps the source's
+ * flatline limit, but floods all the same; where its values move in whole
+ * centimeters, a small tide can sit on one for hours (as SMHI's do), so those
+ * get two days. Tide gauges keep their source's settings.
  */
 export function qcFor(source: Source, station: Station): QcOptions {
   const still = station.kind === "river" || station.kind === "lake";
-  return { ...source.metadata.qc, ...(still ? { flatline_s: 48 * 3600, outliers: false } : {}) };
+  const tidal = still && source.tidal?.(station);
+  return {
+    ...source.metadata.qc,
+    ...(still ? { outliers: false } : {}),
+    ...(still && !tidal ? { flatline_s: 48 * 3600 } : {}),
+    ...(tidal ? { centimeter_flatline_s: 48 * 3600 } : {}),
+  };
 }
 
 /** Run `work` over `items`, `concurrency` at a time. */
