@@ -59,6 +59,8 @@ const DAY_MS = 86_400_000;
 export type SmhiStation = ListedStation & {
   record_start: string | null;
   record_end: string | null;
+  /** `inferQcStart`'s answer from the archive, read once; absent until then. */
+  inferred_qc_start?: string | null;
 };
 
 interface Listing {
@@ -83,6 +85,11 @@ interface Listing {
  * a slow SMHI holds up the list by at most one read's retries past the budget. A date
  * the notes stop giving goes with a warning: SMHI may have checked those
  * values since, or reworded the note, which `qcStartOf` then needs to learn.
+ *
+ * A station whose notes give no date gets `inferQcStart`'s answer from its
+ * archive instead, with `source_qc_start_inferred` true. The archive is read
+ * for it once, within the same budget, and the answer kept as
+ * `inferred_qc_start`; a stated date takes its place whenever there is one.
  */
 export async function stations(previous: Station[] = []): Promise<SmhiStation[]> {
   const { station } = await getJson<Listing>(`${API}.json`, { fresh: true, pace });
@@ -122,28 +129,75 @@ export async function stations(previous: Station[] = []): Promise<SmhiStation[]>
     .sort((a, b) => a.id.localeCompare(b.id));
   const deadline = Date.now() + NOTES_BUDGET_MS;
   for (const s of listed) {
-    const old = before.get(s.id);
-    // A list written before the field was kept lacks it; null means looked for and not found.
-    const known = old && "source_qc_start" in old;
-    if (known) s.source_qc_start = old.source_qc_start ?? null;
-    if ((known && s.status === "inactive") || Date.now() > deadline) continue;
+    const old = before.get(s.id) as Partial<SmhiStation> | undefined;
     const active = s.status === "active";
+    // A build without the label drops it, so an unlabeled date may be inferred: it is read again, and kept unlabeled till then.
+    const unlabeled =
+      old?.source_qc_start && !("source_qc_start_inferred" in old)
+        ? old.source_qc_start
+        : undefined;
+    // A list written before the field was kept lacks it; null means looked for and not found.
+    let stated =
+      old && "source_qc_start" in old && !unlabeled
+        ? old.source_qc_start_inferred
+          ? null
+          : (old.source_qc_start ?? null)
+        : undefined;
+    let inferred = old?.inferred_qc_start;
+    const archive = (timeout: number) =>
+      getText(`${API}/station/${s.source_id}/period/corrected-archive/data.csv`, {
+        fresh: true,
+        pace,
+        timeout,
+      });
+    const inferFrom = (text: string) => {
+      const parsed = parse(text, s.source_id, DATUM);
+      // The answer is kept, so an archive cut short must not give it.
+      complete(parsed, s.source_id, s.record_end);
+      return inferQcStart(parsed.values);
+    };
     try {
-      const text = await getText(
-        `${API}/station/${s.source_id}/period/${active ? "latest-day" : "corrected-archive"}/data.csv`,
-        // A latest-day is a couple of kilobytes; a closed station's archive can be decades of hours.
-        { fresh: true, pace, timeout: active ? 30 : 120 },
-      );
-      const found = qcStartOf(text);
-      if (found === null && s.source_qc_start)
-        console.warn(
-          `SMHI ${s.source_id}'s notes no longer give the QC start ${s.source_qc_start}`,
-        );
-      if (found !== undefined) s.source_qc_start = found;
+      // A closed station's archive doesn't change, so it is read once for both.
+      if (!active && (stated === undefined || (stated === null && inferred === undefined))) {
+        if (Date.now() > deadline) continue;
+        const text = await archive(120);
+        const found = qcStartOf(text);
+        if (found !== undefined) stated = found;
+        if (stated === null) inferred = inferFrom(text);
+      }
+      if (active && Date.now() <= deadline) {
+        // A latest-day is a couple of kilobytes.
+        const text = await getText(`${API}/station/${s.source_id}/period/latest-day/data.csv`, {
+          fresh: true,
+          pace,
+          timeout: 30,
+        });
+        const found = qcStartOf(text);
+        if (found === null && (stated || unlabeled)) {
+          console.warn(
+            `SMHI ${s.source_id}'s notes no longer give the QC start ${stated ?? unlabeled}`,
+          );
+          // Inferred before SMHI's checks may have reached those values, so inferred again.
+          inferred = undefined;
+        }
+        if (found !== undefined) stated = found;
+      }
+      // shortcut: inferred once and kept, so a station SMHI starts checking later keeps null; clear `inferred_qc_start` to infer again.
+      if (active && stated === null && inferred === undefined && Date.now() <= deadline)
+        inferred = inferFrom(await archive(120));
     } catch (error) {
       // A refusal fails every request after it, so the run stops.
       if (error instanceof HttpError && / returned (403|429)\b/.test(error.message)) throw error;
       console.warn(`Keeping SMHI ${s.source_id}'s QC start: ${error}`);
+    } finally {
+      if (inferred !== undefined) s.inferred_qc_start = inferred;
+      // Unsettled while the notes or, with none stated, the archive couldn't be read.
+      if (unlabeled && (stated === undefined || (stated === null && inferred === undefined)))
+        s.source_qc_start = unlabeled;
+      else if (stated !== undefined) {
+        s.source_qc_start = stated ?? inferred ?? null;
+        s.source_qc_start_inferred = stated ? false : inferred ? true : null;
+      }
     }
   }
   return listed;
@@ -166,6 +220,46 @@ export function qcStartOf(text: string): string | null | undefined {
       ? `${date}T00:00:00Z`
       : undefined;
   return text.includes("Orsaker till saknade data") ? null : undefined;
+}
+
+const YEAR_MS = 365 * DAY_MS;
+/** A month of hourly values: a gap in checking, not a few hours awaiting review. */
+const LONG_RUN = 30 * 24;
+/** The most of a station's values since the inferred start that may be unchecked. */
+const UNCHECKED_SHARE = 0.05;
+
+/**
+ * Where SMHI's checks of a station whose notes state no date seem to start,
+ * from its archive's flags: the first `good` (G) value after the station's
+ * last run of `LONG_RUN` values or more that aren't. Most of SMHI's own
+ * stations are O to the end of 2009 and G from 1 January 2010; Uddevalla
+ * (2541) is O to January 2018. A run that ends within the last year is
+ * passed over, since SMHI may still check it: Barsebäck's Y from July 2025
+ * to April 2026, and Smögen's O since August 2026. Null where no such run
+ * ended that long ago, or where more than `UNCHECKED_SHARE` of the values
+ * from the start to a year ago aren't G, as at Flinten 16 (35136) and
+ * Måvholmsbådan (35171), whose G values don't mark checks starting.
+ */
+export function inferQcStart(values: Observation[], now = Date.now()): string | null {
+  const settled = now - YEAR_MS;
+  let start: number | null = null;
+  let run = 0;
+  for (const o of values) {
+    if (o.flag !== Flag.good) run++;
+    else {
+      // Both sides of the year's edge, so a gap across it keeps an earlier start.
+      if (run >= LONG_RUN && o.time < settled) start = o.time;
+      run = 0;
+    }
+  }
+  // A year of values to judge the start by, so a short G spell doesn't pass for checks starting.
+  if (start === null || settled - start < YEAR_MS) return null;
+  let checked = 0;
+  let unchecked = 0;
+  for (const o of values)
+    if (o.time >= start && o.time < settled) o.flag === Flag.good ? checked++ : unchecked++;
+  if (unchecked > UNCHECKED_SHARE * (checked + unchecked)) return null;
+  return new Date(start).toISOString().replace(".000Z", "Z");
 }
 
 /**

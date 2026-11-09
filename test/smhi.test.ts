@@ -146,7 +146,226 @@ describe("smhi", () => {
       "smhi/33092": null,
       "smhi/33094": "2019-07-01T00:00:00Z",
     });
-    assert.ok(!requests.some(([url]) => url.includes("corrected-archive")));
+    assert.ok(!requests.some(([url]) => url.includes("33092/period/corrected-archive")));
+  });
+
+  /** Arkö's archive, its values replaced by hourly ones to the previous UTC midnight with the quality codes `runs` gives. */
+  function archive(runs: [string, number][]): string {
+    const lines = fixture("smhi-archive.csv").split("\n");
+    const notes = lines.slice(7, 20).map((l) => l.split(";").slice(4).join(";"));
+    const codes = runs.flatMap(([q, n]) => Array<string>(n).fill(q));
+    const start = Date.parse("2026-11-07T00:00:00Z") - (codes.length - 1) * 3_600_000;
+    const rows = codes.map(
+      (q, i) =>
+        `${iso(start + i * 3_600_000)
+          .slice(0, 19)
+          .replace("T", " ")};1.0;${q};0` + (notes[i] ? `;${notes[i]}` : ""),
+    );
+    return [...lines.slice(0, 7), ...rows].join("\n");
+  }
+
+  it("infers where SMHI's checks start at a station whose notes give no date", async () => {
+    // Uddevalla's shape: years of O, then G but for a few hours, and this month's O.
+    const uddevalla = archive([
+      ["O", 2000],
+      ["G", 60_000],
+      ["O", 5],
+      ["G", 8000],
+      ["O", 200],
+    ]);
+    const routes: [RegExp, string | (() => string)][] = [
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/33094\/period\/latest-day/, fixture("smhi-latest-day-brofjorden.csv")],
+      [/33092\/period\/corrected-archive/, fixture("smhi-archive-closed.csv")],
+      [/2088\/period\/latest-day/, () => fixture("smhi-latest-day.csv").slice(0, 600)],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+      [/2545\/period\/corrected-archive/, uddevalla],
+    ];
+    serve(routes);
+    const qcStarts = (list: smhi.SmhiStation[]) =>
+      Object.fromEntries(
+        list.map((s) => [
+          s.id,
+          [s.source_qc_start, s.source_qc_start_inferred, s.inferred_qc_start],
+        ]),
+      );
+    const first = await smhi.stations();
+    assert.deepEqual(qcStarts(first), {
+      "smhi/2088": [undefined, undefined, undefined],
+      "smhi/2545": ["2019-01-26T04:00:00Z", true, "2019-01-26T04:00:00Z"],
+      // All O, so nothing marks where checks start.
+      "smhi/33092": [null, null, null],
+      // A stated date takes the place of an inferred one, and needs no archive.
+      "smhi/33094": ["2019-07-01T00:00:00Z", false, undefined],
+    });
+    assert.ok(!requests.some(([url]) => url.includes("33094/period/corrected-archive")));
+    // The answer is kept, so the archive isn't read again.
+    requests = [];
+    const second = await smhi.stations(first as unknown as Station[]);
+    assert.deepEqual(qcStarts(second), qcStarts(first));
+    assert.ok(!requests.some(([url]) => url.includes("2545/period/corrected-archive")));
+  });
+
+  it("infers nothing from an archive cut short, and reads it again", async () => {
+    const whole = archive([
+      ["O", 2000],
+      ["G", 60_000],
+    ]);
+    let text = whole.slice(0, whole.length / 2);
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+      [/2545\/period\/corrected-archive/, () => text],
+    ]);
+    const first = await smhi.stations();
+    const arko = (list: smhi.SmhiStation[]) => list.find((s) => s.id === "smhi/2545")!;
+    assert.equal(arko(first).source_qc_start, null);
+    assert.ok(!("inferred_qc_start" in arko(first)));
+    text = whole;
+    const second = await smhi.stations(first as unknown as Station[]);
+    assert.equal(arko(second).inferred_qc_start, "2020-01-03T01:00:00Z");
+  });
+
+  it("reads a closed station's archive again for a date a list kept without its label", async () => {
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/33092\/period\/corrected-archive/, fixture("smhi-archive-closed.csv")],
+    ]);
+    // A build that predates the label drops it, though the date was inferred.
+    const previous = [
+      { id: "smhi/33092", source_qc_start: "2010-01-01T00:00:00Z" },
+    ] as unknown as Station[];
+    const closed = (await smhi.stations(previous)).find((s) => s.id === "smhi/33092")!;
+    assert.ok(requests.some(([url]) => url.includes("33092/period/corrected-archive")));
+    // Its notes state no date, so the date isn't passed off as stated.
+    assert.equal(closed.source_qc_start, null);
+    assert.equal(closed.source_qc_start_inferred, null);
+  });
+
+  it("keeps an unlabeled date unlabeled until a read settles it", async () => {
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/2545\/period\/latest-day/, () => fixture("smhi-latest-day.csv").slice(0, 600)],
+    ]);
+    const previous = [
+      { id: "smhi/2545", source_qc_start: "2010-01-01T00:00:00Z" },
+      { id: "smhi/33092", source_qc_start: "2010-01-01T00:00:00Z" },
+    ] as unknown as Station[];
+    const list = await smhi.stations(previous);
+    // Arkö's notes are cut short, and 33092's archive fails.
+    for (const id of ["smhi/2545", "smhi/33092"]) {
+      const station = list.find((s) => s.id === id)!;
+      assert.equal(station.source_qc_start, "2010-01-01T00:00:00Z");
+      assert.ok(!("source_qc_start_inferred" in station), id);
+    }
+  });
+
+  it("keeps an unlabeled date when its notes state none and its archive fails", async () => {
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+    ]);
+    const previous = [
+      { id: "smhi/2545", source_qc_start: "2010-01-01T00:00:00Z" },
+    ] as unknown as Station[];
+    const arko = (await smhi.stations(previous)).find((s) => s.id === "smhi/2545")!;
+    assert.equal(arko.source_qc_start, "2010-01-01T00:00:00Z");
+    assert.ok(!("source_qc_start_inferred" in arko));
+  });
+
+  it("infers again when SMHI's notes stop giving a date", async () => {
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+      [
+        /2545\/period\/corrected-archive/,
+        archive([
+          ["O", 2000],
+          ["G", 60_000],
+        ]),
+      ],
+    ]);
+    // An answer kept from before SMHI stated a date may predate checks it has made since.
+    const previous = [
+      {
+        id: "smhi/2545",
+        source_qc_start: "2019-07-01T00:00:00Z",
+        source_qc_start_inferred: false,
+        inferred_qc_start: "2010-01-01T00:00:00Z",
+      },
+    ] as unknown as Station[];
+    const arko = (await smhi.stations(previous)).find((s) => s.id === "smhi/2545")!;
+    assert.equal(arko.source_qc_start, "2020-01-03T01:00:00Z");
+    assert.equal(arko.source_qc_start_inferred, true);
+  });
+
+  it("infers no QC start from G values that don't mark checks starting", () => {
+    const start = Date.parse("2010-01-01T00:00:00Z");
+    const values = (runs: [Flag, number][]) =>
+      runs
+        .flatMap(([flag, n]) => Array<Flag>(n).fill(flag))
+        .map((flag, i) => ({ time: start + i * 3_600_000, level: 0, flag }));
+    const { good, preliminary } = Flag;
+    // The first G after a month or more of values that aren't.
+    assert.equal(
+      smhi.inferQcStart(
+        values([
+          [preliminary, 720],
+          [good, 100_000],
+        ]),
+        RECORDED,
+      ),
+      "2010-01-31T00:00:00Z",
+    );
+    // Less than a month isn't a gap in checking.
+    assert.equal(
+      smhi.inferQcStart(
+        values([
+          [preliminary, 719],
+          [good, 100_000],
+        ]),
+        RECORDED,
+      ),
+      null,
+    );
+    // A run that ends within the last year may still be checked, as Barsebäck's Y.
+    assert.equal(
+      smhi.inferQcStart(
+        values([
+          [preliminary, 720],
+          [good, 140_000],
+          [preliminary, 2000],
+          [good, 1000],
+        ]),
+        RECORDED,
+      ),
+      "2010-01-31T00:00:00Z",
+    );
+    // O mixed in after G, as at Flinten 16: one hour in ten isn't checked.
+    const mixed = Array.from({ length: 10_000 }, (): [Flag, number][] => [
+      [good, 9],
+      [preliminary, 1],
+    ]).flat();
+    assert.equal(smhi.inferQcStart(values([[preliminary, 720], ...mixed]), RECORDED), null);
+    // A gap in the values across the year's edge keeps the start before it.
+    const gapped = [
+      ...values([
+        [preliminary, 720],
+        [good, 100_000],
+        [preliminary, 720],
+      ]),
+      { time: RECORDED - 200 * 86_400_000, level: 0, flag: good },
+    ];
+    assert.equal(smhi.inferQcStart(gapped, RECORDED), "2010-01-31T00:00:00Z");
+    // A short G spell just before the year's edge leaves too little to judge by.
+    const spell = [
+      ...values([[preliminary, 130_000]]),
+      { time: RECORDED - 366 * 86_400_000, level: 0, flag: good },
+    ];
+    assert.equal(smhi.inferQcStart(spell, RECORDED), null);
+    // All O, or no gap at all.
+    assert.equal(smhi.inferQcStart(values([[preliminary, 100_000]]), RECORDED), null);
+    assert.equal(smhi.inferQcStart(values([[good, 100_000]]), RECORDED), null);
   });
 
   it("stops reading stations' notes when SMHI refuses them", async () => {
@@ -361,8 +580,8 @@ describe("smhi", () => {
     serve([[/parameter\/6\.json/, fixture("smhi-stations.json")], ...arko]);
     await smhi.stations();
     await smhi.levels("2545", new Date("2026-11-04Z"), new Date(RECORDED));
-    // The list, each of its four stations' notes, then Arkö's archive and latest day.
-    assert.equal(requests.length, 7);
+    // The list, each of its four stations' notes, Arkö's archive for its QC start, then its archive and latest day.
+    assert.equal(requests.length, 8);
     assert.ok(requests.every(([, options]) => options.fresh === true && !options.keep));
   });
 });

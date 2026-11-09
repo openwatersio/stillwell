@@ -386,6 +386,7 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   live: "BOOLEAN",
   min_interval_s: "INTEGER",
   source_qc_start: "TIMESTAMPTZ",
+  source_qc_start_inferred: "BOOLEAN",
   source_url: "VARCHAR",
 };
 
@@ -405,12 +406,13 @@ export async function writeStations(path: string, stations: LakeStation[]): Prom
 
 /**
  * A source's list's shared columns. The rest is kept as JSON in `extra`,
- * `source_qc_start` included, so a station whose source hasn't been asked has
- * none rather than null, and its adapter knows to ask.
+ * the QC start's columns (`IN_EXTRA`) included, so a station whose source
+ * hasn't been asked has none rather than null, and its adapter knows to ask.
  */
+const IN_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
   Object.entries(STATION_COLUMNS).filter(
-    ([key]) => !["first", "last", "preferred", "errata", "source_qc_start"].includes(key),
+    ([key]) => !["first", "last", "preferred", "errata", ...IN_EXTRA].includes(key),
   ),
 );
 
@@ -422,7 +424,7 @@ export async function writeStationList(path: string, stations: LakeStation[]): P
   const rows = stations.map((s) => {
     const extra = Object.fromEntries(
       Object.entries(s).filter(
-        ([key]) => (!(key in STATION_COLUMNS) || key === "source_qc_start") && key !== "epochs",
+        ([key]) => (!(key in STATION_COLUMNS) || IN_EXTRA.includes(key)) && key !== "epochs",
       ),
     );
     return { ...s, extra: JSON.stringify(extra) };
