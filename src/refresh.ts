@@ -227,16 +227,10 @@ export async function publishStations(
 /**
  * Metadata that is ingest's business, not part of a source's terms, so
  * `sources.json` leaves it out: QC settings, offsets, the archive's reference,
- * and which scheduled jobs run for the source.
+ * and which scheduled jobs run for the source. `finalizes` stays in, since it
+ * tells a reader whether the source's `preliminary` values will ever change.
  */
-const INGEST_ONLY = new Set([
-  "qc",
-  "utc_offsets",
-  "archive",
-  "hourly",
-  "finalizes",
-  "empty_means_none",
-]);
+const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "empty_means_none"]);
 
 /** A source's list from the lake, or an error naming what to run. */
 export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {

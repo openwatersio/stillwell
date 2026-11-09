@@ -22,7 +22,9 @@ const DAY_MS = 86_400_000;
  *   preliminary CO-OPS values are fetched again until the source approves them.
  *   A month whose provisional values the source later withdraws keeps them,
  *   since a month the fetch returns nothing for keeps what it had, so that year
- *   is fetched on every run until someone removes them;
+ *   is fetched on every run until someone removes them. A year that ends by
+ *   the station's `source_qc_start` (`qcStart`) is the exception: the source
+ *   never checks those values, so they stay `preliminary` for good;
  * - it has values in every month and its last value is in the year's last 7
  *   days, so a file an earlier run wrote over part of the year, or with a month
  *   the source returned nothing for, is fetched again. A station that began or
@@ -47,9 +49,16 @@ const DAY_MS = 86_400_000;
  * them, `--skip-written` records the years it found empty and skips them for
  * 30 days (`src/empty-years.ts`).
  */
-export function yearDone(file: YearFile | undefined, from: Date, to: Date, now: number): boolean {
+export function yearDone(
+  file: YearFile | undefined,
+  from: Date,
+  to: Date,
+  now: number,
+  qcStart?: string | null,
+): boolean {
   if (!wholeEndedYear(from, to, now)) return false;
-  if (!file || file.preliminary > 0 || file.months < 12) return false;
+  const unchecked = qcStart != null && to.getTime() <= Date.parse(qcStart);
+  if (!file || (file.preliminary > 0 && !unchecked) || file.months < 12) return false;
   return file.last >= to.getTime() - 7 * DAY_MS;
 }
 
@@ -179,6 +188,7 @@ export async function yearsToFetch(
   end: Date,
   mode: "complete" | "written" | "none",
   now: number,
+  qcStart?: string | null,
 ): Promise<{ fetch: [Date, Date][]; skipped: number; listed?: Set<number> }> {
   const all = [...years(start, end)];
   // No whole ended year asked for means nothing to skip, so nothing to read.
@@ -201,7 +211,7 @@ export async function yearsToFetch(
       dir,
       asked.map(([from]) => from.getUTCFullYear()),
     );
-    done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now);
+    done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now, qcStart);
   }
   const fetch = all.filter(([from, to]) => !done(from, to));
   return { fetch, skipped: all.length - fetch.length, listed };

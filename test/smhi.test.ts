@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
-import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
+import { fetchText, HttpError, setTransport, type RequestOptions } from "../src/http.ts";
 import { qcFor } from "../src/lake/recent.ts";
 import { qc } from "../src/qc.ts";
 import { Flag, type Station } from "../src/schema.ts";
@@ -78,7 +78,10 @@ describe("smhi", () => {
   });
 
   it("lists every sea-level station with its record span", async () => {
-    serve([[/parameter\/6\.json/, fixture("smhi-stations.json")]]);
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/period\/(latest-day|corrected-archive)/, fixture("smhi-latest-day.csv")],
+    ]);
     const stations = await smhi.stations();
     assert.deepEqual(
       stations.map((s) => [s.id, s.status, s.live, s.kind, s.record_start, s.record_end]),
@@ -103,6 +106,61 @@ describe("smhi", () => {
     assert.equal(arkoStation.license, "CC-BY-4.0");
     assert.equal(arkoStation.attribution, "SMHI");
     assert.equal(requests[0]![1].fresh, true);
+  });
+
+  it("records where SMHI says its checks of each station start", async () => {
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      // Brofjorden's notes, which say its data before 1 July 2019 is unchecked, stand in for Lärjeholm's.
+      [/33094\/period\/latest-day/, fixture("smhi-latest-day-brofjorden.csv")],
+      [/33092\/period\/corrected-archive/, fixture("smhi-archive-closed.csv")],
+      [/2088\/period\/latest-day/, () => fixture("smhi-latest-day.csv").slice(0, 600)],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+    ]);
+    const qcStarts = (list: smhi.SmhiStation[]) =>
+      Object.fromEntries(list.map((s) => [s.id, s.source_qc_start]));
+    const first = await smhi.stations();
+    assert.deepEqual(qcStarts(first), {
+      // Notes cut short say nothing either way, so the station has none until they don't.
+      "smhi/2088": undefined,
+      "smhi/2545": null,
+      "smhi/33092": null,
+      "smhi/33094": "2019-07-01T00:00:00Z",
+    });
+    // A closed station's archive is read once; a failed or cut-short read keeps what was known.
+    requests = [];
+    const previous = first.map((s) =>
+      s.id === "smhi/2088" || s.id === "smhi/2545"
+        ? { ...s, source_qc_start: "2019-07-01T00:00:00Z" }
+        : s,
+    ) as unknown as Station[];
+    serve([
+      [/parameter\/6\.json/, fixture("smhi-stations.json")],
+      [/2088\/period\/latest-day/, () => fixture("smhi-latest-day.csv").slice(0, 600)],
+      [/2545\/period\/latest-day/, fixture("smhi-latest-day.csv")],
+    ]);
+    assert.deepEqual(qcStarts(await smhi.stations(previous)), {
+      "smhi/2088": "2019-07-01T00:00:00Z",
+      // Notes that stop giving a date are SMHI's word that it no longer holds.
+      "smhi/2545": null,
+      "smhi/33092": null,
+      "smhi/33094": "2019-07-01T00:00:00Z",
+    });
+    assert.ok(!requests.some(([url]) => url.includes("corrected-archive")));
+  });
+
+  it("stops reading stations' notes when SMHI refuses them", async () => {
+    setTransport(async (url) => {
+      if (/parameter\/6\.json/.test(url)) return fixture("smhi-stations.json");
+      throw new HttpError(`GET ${url} returned 403`, "");
+    });
+    await assert.rejects(smhi.stations(), / returned 403/);
+  });
+
+  it("takes no QC start from a note whose date isn't one", () => {
+    const note = (date: string) => `;;Data före ${date} är ej kvalitetskontrollerad`;
+    assert.equal(smhi.qcStartOf(note("2019-07-01")), "2019-07-01T00:00:00Z");
+    assert.equal(smhi.qcStartOf(note("2019-13-45")), undefined);
   });
 
   it("refuses an empty station list", async () => {
@@ -301,7 +359,8 @@ describe("smhi", () => {
     serve([[/parameter\/6\.json/, fixture("smhi-stations.json")], ...arko]);
     await smhi.stations();
     await smhi.levels("2545", new Date("2026-11-04Z"), new Date(RECORDED));
-    assert.equal(requests.length, 3);
+    // The list, each of its four stations' notes, then Arkö's archive and latest day.
+    assert.equal(requests.length, 7);
     assert.ok(requests.every(([, options]) => options.fresh === true && !options.keep));
   });
 });

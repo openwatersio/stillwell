@@ -1,5 +1,5 @@
 import { DatumChanged } from "../../epochs.ts";
-import { getJson, getText } from "../../http.ts";
+import { getJson, getText, HttpError } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -7,6 +7,7 @@ import {
   type Observation,
   type Source,
   type SourceMetadata,
+  type Station,
 } from "../../schema.ts";
 
 /**
@@ -43,6 +44,9 @@ export const metadata: SourceMetadata = {
   qc: { centimeter_flatline_s: 48 * 3600 },
 };
 
+/** How long `stations` spends reading stations' notes before keeping the rest as they were. */
+const NOTES_BUDGET_MS = 15 * 60_000;
+
 /** Göta älv gauges upriver of the harbor mouth. */
 const ESTUARY = new Set([33092, 33093, 33094, 33095, 33097]);
 
@@ -70,12 +74,22 @@ interface Listing {
   }[];
 }
 
-/** Every station SMHI lists for hourly sea level in RH2000, active or closed. */
-export async function stations(): Promise<SmhiStation[]> {
+/**
+ * Every station SMHI lists for hourly sea level in RH2000, active or closed,
+ * with where SMHI says its checks start (`qcStartOf`), read from an active
+ * station's `latest-day` and, once, from a closed station's archive, which
+ * doesn't change. Where a read fails, its notes are cut short, or the reads
+ * have run past `NOTES_BUDGET_MS`, the station keeps what `previous` had, so
+ * a slow SMHI holds up the list by at most one read's retries past the budget. A date
+ * the notes stop giving goes with a warning: SMHI may have checked those
+ * values since, or reworded the note, which `qcStartOf` then needs to learn.
+ */
+export async function stations(previous: Station[] = []): Promise<SmhiStation[]> {
   const { station } = await getJson<Listing>(`${API}.json`, { fresh: true, pace });
   // An empty list is a broken response; taken at its word, it would retire every station.
   if (!station?.length) throw new Error("SMHI listed no sea-level stations");
-  return station
+  const before = new Map(previous.map((s) => [s.id, s]));
+  const listed = station
     .map((s): SmhiStation => {
       const id = String(s.id);
       return {
@@ -106,6 +120,48 @@ export async function stations(): Promise<SmhiStation[]> {
       };
     })
     .sort((a, b) => a.id.localeCompare(b.id));
+  const deadline = Date.now() + NOTES_BUDGET_MS;
+  for (const s of listed) {
+    const old = before.get(s.id);
+    // A list written before the field was kept lacks it; null means looked for and not found.
+    const known = old && "source_qc_start" in old;
+    if (known) s.source_qc_start = old.source_qc_start ?? null;
+    if ((known && s.status === "inactive") || Date.now() > deadline) continue;
+    const active = s.status === "active";
+    try {
+      const text = await getText(
+        `${API}/station/${s.source_id}/period/${active ? "latest-day" : "corrected-archive"}/data.csv`,
+        // A latest-day is a couple of kilobytes; a closed station's archive can be decades of hours.
+        { fresh: true, pace, timeout: active ? 30 : 120 },
+      );
+      const found = qcStartOf(text);
+      if (found === null && s.source_qc_start)
+        console.warn(
+          `SMHI ${s.source_id}'s notes no longer give the QC start ${s.source_qc_start}`,
+        );
+      if (found !== undefined) s.source_qc_start = found;
+    } catch (error) {
+      // A refusal fails every request after it, so the run stops.
+      if (error instanceof HttpError && / returned (403|429)\b/.test(error.message)) throw error;
+      console.warn(`Keeping SMHI ${s.source_id}'s QC start: ${error}`);
+    }
+  }
+  return listed;
+}
+
+/**
+ * Where SMHI says its checks of a station start, from a CSV's notes: at some
+ * stations, "Data före 2019-07-01 är ej kvalitetskontrollerad", data before 1
+ * July 2019 hasn't been quality-controlled, and automatic checks run from
+ * then on. Taken as midnight UTC, the clock of SMHI's times. Null when the
+ * notes reach `Orsaker till saknade data`, which follows it, without one;
+ * undefined when they stop sooner, as in a `latest-day` of a few hours.
+ */
+export function qcStartOf(text: string): string | null | undefined {
+  const date = /Data före (\d{4}-\d\d-\d\d) är ej kvalitetskontrollerad/.exec(text)?.[1];
+  // stations.parquet's column is a timestamp, so a date that isn't one would fail every publish.
+  if (date) return Number.isNaN(Date.parse(date)) ? undefined : `${date}T00:00:00Z`;
+  return text.includes("Orsaker till saknade data") ? null : undefined;
 }
 
 /**
