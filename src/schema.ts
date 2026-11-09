@@ -273,6 +273,12 @@ export interface Source {
     station: Station,
     record: () => AsyncIterable<Observation[]>,
   ): Promise<[number, number][]>;
+  /**
+   * Whether a `river` or `lake` station's levels carry a tide, so a flatline
+   * there is suspect as soon as at a tide gauge (`qcFor` in
+   * `src/lake/recent.ts`).
+   */
+  tidal?(station: Station): boolean;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
   /** The source's own predicted curve over [start, end). */
