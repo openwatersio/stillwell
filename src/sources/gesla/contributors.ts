@@ -124,10 +124,9 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
       "GESLA's license table: research and consultancy. UNAM's own site allows only non-profit, unaltered reproduction; permission is being asked for (water-levels#48).",
   },
   BODC: {
-    name: "British Oceanographic Data Centre",
-    commercial_use: false,
-    terms:
-      "GESLA's license table: research and consultancy. The UK National Tide Gauge Network's terms, as on UHSLC's records of it, say users must not pass the data on to third parties; BODC has been asked for permission (water-levels#80).",
+    name: "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
+    commercial_use: true,
+    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, water-levels#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
   },
   SFWMD: {
     name: "South Florida Water Management District",

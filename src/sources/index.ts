@@ -1,4 +1,5 @@
 import type { Source } from "../schema.ts";
+import { source as bodc } from "./bodc/index.ts";
 import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as coops } from "./coops/index.ts";
@@ -19,6 +20,7 @@ import { source as usgs } from "./usgs/index.ts";
 
 /** Every adapter, by source ID. */
 export const sources: Record<string, Source> = {
+  bodc,
   bsh,
   cdec,
   coops,

@@ -1,0 +1,12 @@
+{
+  "table": {
+    "columnNames": ["time", "ASLVBG02", "FASLVBG02"],
+    "columnTypes": ["String", "float", "String"],
+    "columnUnits": ["UTC", "m", null],
+    "rows": [
+      ["2024-03-01T00:00:00.000Z", 2.01, "'M'"],
+      ["2024-03-01T00:15:00.000Z", 2.078, "'M'"],
+      ["2024-03-01T00:30:00.000Z", 2.118, "'M'"]
+    ]
+  }
+}

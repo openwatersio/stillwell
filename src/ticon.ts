@@ -69,14 +69,11 @@ const NATIONAL: Record<string, { source: string; status: Status }> = {
   irl: { source: "marine-institute", status: "planned" },
   dnk: { source: "dmi", status: "planned" },
   // UK gauges are BODC's national network; UK EA may publish some of the same.
-  gbr: { source: "bodc", status: "restricted" },
+  gbr: { source: "bodc", status: "planned" },
   fin: { source: "fmi", status: "license" },
   esp: { source: "redmar", status: "license" },
   ita: { source: "ispra", status: "license" },
 };
-
-const BODC_NOTE =
-  "BODC needs permission for commercial use; where the EA runs the gauge, its own readings match instead";
 
 /** Contributors whose records all go to one planned source. */
 const DIRECT: Record<string, { source: string; status: Status; note?: string }> = {
@@ -104,8 +101,12 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   ispra: { source: "ispra", status: "license" },
   ieo: { source: "redmar", status: "license" },
   meds: { source: "chs", status: "restricted", note: "CHS license bars commercial derivatives" },
-  bodc: { source: "bodc", status: "restricted", note: BODC_NOTE },
-  noc: { source: "bodc", status: "restricted", note: BODC_NOTE },
+  bodc: { source: "bodc", status: "planned" },
+  noc: {
+    source: "bodc",
+    status: "restricted",
+    note: "NOC's gauges outside the UK network aren't in BODC's open data",
+  },
   cmems: { source: "cmems", status: "restricted", note: "GESLA lists CMEMS as research only" },
   uz: { source: "gesla", status: "restricted", note: "GESLA lists UZ as research only" },
   cv: { source: "gesla", status: "restricted", note: "GESLA lists CV as research only" },
@@ -226,9 +227,9 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     };
   }
 
-  // The National Tide Gauge Network's records come from BODC, which needs
-  // permission for commercial use; the EA serves its own readings of the same
-  // gauges openly, so they match by position once the EA's list is there.
+  // The National Tide Gauge Network's records come from BODC, whose open
+  // record starts in 2022; the EA serves its own readings of the same gauges,
+  // so they match the EA's gauge by position first, then BODC's.
   if (
     (contributor === "bodc" ||
       contributor === "noc" ||
@@ -257,7 +258,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
           national.status === "planned" || national.status === "ready"
             ? "to_match"
             : national.status,
-        note: national.source === "bodc" ? BODC_NOTE : note,
+        note,
       };
   }
 

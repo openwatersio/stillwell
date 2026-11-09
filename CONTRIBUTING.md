@@ -186,7 +186,7 @@ Registering the source is all the scheduled workflows need. Each picks its sourc
 - hourly ingest takes the sources whose metadata sets `hourly`, meaning they publish values within hours;
 - nightly compaction takes every source with `observations`, and every hourly one;
 - the Monthly workflow refreshes every source's list;
-- the monthly refetch takes the sources whose metadata sets `finalizes`, meaning values they publish as preliminary become final later. California DWR, which nothing else fetches, has its own case there: every active station again from January of last year.
+- the monthly refetch takes the sources whose metadata sets `finalizes`, meaning values they publish as preliminary become final later. California DWR, which nothing else fetches, has its own case there: every active station again from January of last year. So does BODC, whose months arrive late and in batches: every station's last three years, finished ones included.
 
 Only sources whose `license.redistribution` is true are scheduled, since the workflows have no restricted lake. The workflows run `scripts/sources.ts` without `npm ci`, so nothing an adapter imports may be a package; `test/jobs.test.ts` checks. Until a new source's list is in the lake, its hourly and compaction jobs skip it with a note; the Monthly refresh on the 2nd starts the list, or dispatch Monthly with `sources` set to the source after merging to start it at once. The skip shows as a warning on the run's page. A manual refetch of a source with no list yet fails; the scheduled one on the 9th comes after the refresh on the 2nd. The weekly canary's probes in `scripts/canary.ts` are still written per source.
 
