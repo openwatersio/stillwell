@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, afterEach, before, beforeEach, describe, it } from "node:test";
@@ -22,10 +22,12 @@ import {
   errataPath,
   stationListPath,
   stationsPath,
+  yearsPath,
 } from "../src/lake/paths.ts";
 import type { Erratum } from "../src/errata.ts";
 import { POSITIONS } from "../src/positions.ts";
 import { LINKS } from "../src/same-as.ts";
+import { writeYears } from "../src/lake/years.ts";
 import {
   describeReport,
   publishStations,
@@ -493,6 +495,45 @@ describe("publishStations", () => {
     ]);
     // errata.json holds the errata of the sources the lake holds, here none.
     assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), []);
+  });
+
+  it("prefers a shorter record over a longer one whose values are all flagged", async () => {
+    const { stations } = await refreshSource(
+      lake,
+      sourceOf([listed("a", { same_as: ["test/b"] }), listed("b")]),
+      { now: NOW },
+    );
+    await writeStations(boundsPath(lake, "test"), [
+      { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
+      { ...stations[1]!, first: "2025-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
+    ]);
+    const year = (id: string, flags: number[]) => ({
+      id,
+      epoch: 1,
+      year: 2026,
+      hours: 1,
+      flags,
+      version: "v",
+    });
+    await writeYears(lake, "test", [
+      year("test/a", [0, 0, 0, 5, 1]),
+      year("test/b", [4, 0, 0, 0, 0]),
+    ]);
+    await publishStations(lake, [sourceOf([])], ["test"], []);
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    const rows = (
+      await db.runAndReadAll(`SELECT DISTINCT preferred FROM '${stationsPath(lake)}'`)
+    ).getRowObjectsJson();
+    assert.deepEqual(rows, [{ preferred: "test/b" }]);
+  });
+
+  it("publishes without the flag counts when the years file can't be read", async () => {
+    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await writeFile(yearsPath(lake, "test"), "not parquet");
+    assert.equal(
+      ((await publishStations(lake, [sourceOf([])], ["test"], [])) as { count: number }).count,
+      1,
+    );
   });
 
   it("tags each station with its errata, and names a listed station the lake lacks", async () => {
