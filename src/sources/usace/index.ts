@@ -285,11 +285,28 @@ export function datumsOf(l: CatalogLocation): Record<string, number> {
   const named = (l["vertical-datum"] ?? "").replace(/[\s-]|\(.*\)/g, "").toUpperCase();
   const datum = VERTICAL_DATUMS[named];
   const scale = l.unit === "ft" ? 0.3048 : l.unit === "m" ? 1 : null;
+  const fix = MISLABELED[`${l.office}.${l.name}`];
+  const served = fix && datum === fix.datum && l.unit === fix.unit && l.elevation === fix.elevation;
+  if (fix && !served)
+    console.error(
+      `  usace ${l.office}.${l.name} now gives ${l.elevation} ${l.unit} ${l["vertical-datum"]}, not ${fix.elevation} ${fix.unit} ${fix.datum}; check its entry in MISLABELED`,
+    );
   if (!datum || scale === null || typeof l.elevation !== "number" || !l.elevation) return {};
-  return { [datum]: Math.round(l.elevation * scale * 1000) / 1000 + 0 };
+  return { [served ? fix.is : datum]: Math.round(l.elevation * scale * 1000) / 1000 + 0 };
 }
 
 const VERTICAL_DATUMS: Record<string, string> = { NGVD29: "NGVD29", NAVD88: "NAVD88" };
+
+/**
+ * Elevations CWMS gives under the wrong datum, by location, with the datum,
+ * elevation and unit it serves. An entry applies only while CWMS still serves those, so
+ * a corrected catalog is taken as it is, and the refresh says so.
+ */
+const MISLABELED: Record<string, { datum: string; elevation: number; unit: string; is: string }> = {
+  // Labeled NGVD29, but it's the NAVD88 correction MVN applies in its
+  // rev-NAVD88 series, −0.26 ft (erratum `usace-red-river-datum-label`).
+  "MVN.Red_River_Ldg": { datum: "NGVD29", elevation: -0.27, unit: "ft", is: "NAVD88" },
+};
 
 /** Regular intervals CWMS stage is observed at, in seconds. */
 const INTERVALS: Record<string, number> = {
