@@ -15,6 +15,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
+import * as bodc from "../src/sources/bodc/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -41,6 +42,8 @@ const start = new Date(end.getTime() - 3 * DAY_MS);
 
 /** A few long-running gauges, each asked for a few days through its adapter. */
 const probes: Record<string, () => Promise<unknown[]>> = {
+  // Aberdeen, from a month BODC has processed: its values arrive months late.
+  bodc: () => bodc.levels("abe", new Date("2025-12-01T00:00Z"), new Date("2025-12-04T00:00Z")),
   // Cuxhaven's predicted highs and lows: the year's smaller file.
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
   // Martinez, on the Carquinez Strait.

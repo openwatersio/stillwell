@@ -67,12 +67,12 @@ export const NOTICES: Record<string, Notice> = {
   ntslf: {
     name: "National Tidal and Sea Level Facility (BODC)",
     pattern: /Users must not pass on the data to third parties/,
-    commercial_use: false,
+    commercial_use: true,
     credit:
       "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
-    url: "https://ntslf.org/",
+    url: "https://www.bodc.ac.uk/data/hosted_data_systems/sea_level/uk_tide_gauge_network/",
     terms:
-      "Users must not pass the data on to third parties but direct them to the NTSLF; publications acknowledge BODC and the Environment Agency.",
+      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, water-levels#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
   },
   ccby: {
     name: "CC BY 4.0",

@@ -277,6 +277,9 @@ export function originatorIds(
       ];
     case "WSV":
       return [`pegelonline/${code}`];
+    case "BODC":
+      // BODC's port code, which its ERDDAP datasets start with.
+      return [`bodc/${code.toLowerCase()}`];
     case "SMHI":
       return [`smhi/${code}`];
     case "REFMAR":

@@ -203,6 +203,22 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: 36.217654520392, lon: -86.820220686694 },
     at: { lat: 36.0942596, lon: -86.7938782 },
   },
+  // BODC's ERDDAP places Workington's gauge at St Ives in Cornwall, though its
+  // levels match the EA's Workington readings exactly, and gives Immingham and
+  // Newhaven -999. Each goes where the EA's list puts the same gauge: erratum
+  // `bodc-erddap-positions`.
+  "bodc/wor": {
+    served: { lat: 50.211182, lon: -5.4803309 },
+    at: { lat: 54.650691, lon: -3.56717 },
+  },
+  "bodc/imm": {
+    served: { lat: -999, lon: -999 },
+    at: { lat: 53.63039, lon: -0.18755 },
+  },
+  "bodc/nha": {
+    served: { lat: -999, lon: -999 },
+    at: { lat: 50.781775, lon: 0.057004 },
+  },
 };
 
 /** Farthest a source's position can move before its correction is out of date. */

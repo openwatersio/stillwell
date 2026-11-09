@@ -195,6 +195,7 @@ describe("gesla stations", () => {
     assert.deepEqual(gesla.originatorIds("CDWR", "B91450", -121.6), ["dwr/B91450Q"]);
     assert.deepEqual(gesla.originatorIds("CDWR", "B91212", -121.7), ["dwr/B91212"]);
     assert.deepEqual(gesla.originatorIds("CDWR", "RVB", -121.7), ["cdec/RVB"]);
+    assert.deepEqual(gesla.originatorIds("BODC", "LER", -1.1), ["bodc/ler"]);
   });
 
   it("links SFWMD's tailwaters to its `_T` series and other gauges to their own", () => {

@@ -235,6 +235,11 @@ jobs:
               # A station that fails doesn't keep the rest from their refetch.
               node scripts/ingest.ts backfill jma all "$(date -u -d "$year-$month-01 -2 months" +%F)" "$(date -u -d "$year-$month-01 +1 month" +%F)" || status=1
               set -- "$year-$month-01" ;;
+            # BODC's months arrive late and in batches, sometimes two years
+            # behind, and it fills gaps and reflags months it has published;
+            # nothing else fetches them, so every station's last three years
+            # are read again, finished ones included.
+            bodc) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
             *) set -- "$year-$month-01" ;;
           esac
           node scripts/ingest.ts backfill "$SOURCE" "$which" "$from" "$@"

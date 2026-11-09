@@ -51,7 +51,7 @@ describe("correctPositions", () => {
     for (const id of Object.keys(POSITIONS))
       assert.match(
         id,
-        /^(uhslc\/\d{3}[a-z]?|gesla\/[a-z_]+-\d{3}[a-z]?-[a-z]{3}-uhslc_(fd|rq)|usace\/(MV|LR)[A-Z]\.[A-Za-z0-9._-]+)$/,
+        /^(bodc\/[a-z]{3}|uhslc\/\d{3}[a-z]?|gesla\/[a-z_]+-\d{3}[a-z]?-[a-z]{3}-uhslc_(fd|rq)|usace\/(MV|LR)[A-Z]\.[A-Za-z0-9._-]+)$/,
       );
   });
 
