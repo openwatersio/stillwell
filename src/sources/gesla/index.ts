@@ -484,7 +484,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
 }
 
 /** The median step between a record's first 1,000 values. */
-export function medianStep(times: Float64Array): number {
+function medianStep(times: Float64Array): number {
   const steps: number[] = [];
   for (let i = 1; i < Math.min(times.length, 1001); i++) steps.push(times[i]! - times[i - 1]!);
   return steps.length ? median(steps) : NaN;
