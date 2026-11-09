@@ -11,7 +11,8 @@ import {
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
-import { NOTICES } from "../uhslc/notices.ts";
+import { withheld as uhslcWithheld } from "../uhslc/index.ts";
+import { NOTICES, type Notice } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
 import { DROPPED } from "./dropped.ts";
 
@@ -136,7 +137,10 @@ async function resolve(share: string, filename: string): Promise<{ url: string; 
   };
 }
 
-/** One station per GESLA record, from the release's metadata CSV. */
+/** The records the last `stations()` left out as withheld, by file name. */
+export const withheldFiles: string[] = [];
+
+/** One station per GESLA record, from the release's metadata CSV, less withheld records. */
 export async function stations(): Promise<GeslaStation[]> {
   const { url } = await resolve(METADATA_SHARE, "GESLA4-1_ALL.csv");
   const lines = (await getText(url, { fresh: true })).split(/\r\n?|\n/).filter(Boolean);
@@ -178,7 +182,17 @@ export async function stations(): Promise<GeslaStation[]> {
     if (!files.has(file)) throw new Error(`GESLA's metadata has no ${file}, which DROPPED names`);
     console.log(`GESLA: listing ${file} inactive, since its values are another gauge's (DROPPED)`);
   }
-  const listed = rows.map((r): GeslaStation & { code: string } => {
+  withheldFiles.length = 0;
+  const kept = rows.filter((r) => {
+    const file = r[c.file]!.trim();
+    const why = withheld(file);
+    if (why) {
+      console.log(`GESLA: leaving out ${file}: ${why}`);
+      withheldFiles.push(file);
+    }
+    return !why;
+  });
+  const listed = kept.map((r): GeslaStation & { code: string } => {
     const file = r[c.file]!.trim();
     const abbrev = r[c.contributor]!.trim();
     const contributor = CONTRIBUTORS[abbrev.toUpperCase()];
@@ -295,19 +309,45 @@ export function originatorIds(
 }
 
 /**
+ * Why a record is withheld from the lake, or null: a copy of a UHSLC record
+ * whose terms carry a contributor's refusal to let the lake republish it
+ * (`refused` in src/sources/uhslc/notices.ts), or of any version of a station
+ * number the `uhslc` adapter withholds, so a version the scan hasn't seen is
+ * covered too. GESLA's other contributors' records aren't covered. The adapter
+ * never lists or fetches one.
+ */
+export function withheld(file: string): string | null {
+  const match = /-(\d{3})[a-z]?-[a-z]{3}-uhslc_(fd|rq)$/.exec(file);
+  if (!match) return null;
+  const refused = uhslcTerms(file).refused;
+  if (refused) return `${refused.name} refused republication (${refused.refused})`;
+  return uhslcWithheld(match[1]!);
+}
+
+/**
  * A UHSLC record's terms from UHSLC's documentation files, as the `uhslc`
  * adapter tags them: a research-quality record's own file; for a
  * fast-delivery record, which UHSLC builds on its versions, the strictest
  * terms and every credit of all its number's versions, or UHSLC's own where
  * it has none. A version the scan never saw, or whose notice is gone, is
- * non-commercial. UHSLC doesn't serve South Africa's gauges, so they aren't in
- * the scan; the data is SANHO's, under its terms.
+ * non-commercial. The scan has files for only some of South Africa's gauges
+ * (181A, 184A and 221A, each with SANHO's notice), and every South African
+ * record is SANHO's, so each takes SANHO's terms. `refused` is the first
+ * notice whose contributor refused republication.
  */
-function uhslcTerms(file: string): { commercial_use: boolean; credits: string[] } {
+function uhslcTerms(file: string): {
+  commercial_use: boolean;
+  credits: string[];
+  refused: Notice | null;
+} {
   const match = /-(\d{3}[a-z]?)-([a-z]{3})-uhslc_(fd|rq)$/.exec(file);
   // A UHSLC file named some other way has terms nobody has read.
   if (!match)
-    return { commercial_use: false, credits: ["University of Hawaii Sea Level Center (UHSLC)"] };
+    return {
+      commercial_use: false,
+      credits: ["University of Hawaii Sea Level Center (UHSLC)"],
+      refused: null,
+    };
   const code = match[1]!;
   const keys =
     code.length === 4
@@ -318,7 +358,11 @@ function uhslcTerms(file: string): { commercial_use: boolean; credits: string[] 
     match[2] === "zaf"
       ? [["sanho", null]]
       : records.map((r) => [r ? r.notice : undefined, r?.contributor ?? null]);
-  const out = { commercial_use: true, credits: ["University of Hawaii Sea Level Center (UHSLC)"] };
+  const out = {
+    commercial_use: true,
+    credits: ["University of Hawaii Sea Level Center (UHSLC)"],
+    refused: null as Notice | null,
+  };
   for (const [name, contributor] of notices) {
     // undefined: a version the scan never saw; null: UHSLC's own terms.
     if (name === null) continue;
@@ -328,6 +372,7 @@ function uhslcTerms(file: string): { commercial_use: boolean; credits: string[] 
       continue;
     }
     if (!notice.commercial_use) out.commercial_use = false;
+    if (notice.refused) out.refused ??= notice;
     const credit = notice.credit ?? contributor;
     if (credit && !out.credits.includes(credit)) out.credits.push(credit);
   }
@@ -647,6 +692,8 @@ export async function levels(
   start: Date,
   end: Date,
 ): Promise<Observation[]> {
+  const refused = withheld(station.source_id);
+  if (refused) throw new Error(`GESLA's ${station.source_id} is withheld: ${refused}`);
   // The record's own span, with a margin for the clock fixes.
   if (station.record_start && Date.parse(station.record_start) - HOUR_MS >= end.getTime())
     return [];
@@ -681,6 +728,7 @@ function lowerBound(times: Float64Array, t: number): number {
 export const source: Source = {
   metadata,
   stations,
+  withheld,
   observations: (s, start, end) => levels(s as GeslaStation, start, end),
   // The datum jumps, from the lake's copy of the record. They're judged against
   // the record's longest segment, so a copy that misses either end is refused;

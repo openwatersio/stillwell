@@ -17,6 +17,7 @@ import { readStationList } from "../src/lake/parquet.ts";
 import { stationListPath } from "../src/lake/paths.ts";
 import type { Station } from "../src/schema.ts";
 import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { withoutWithheld } from "../src/refresh.ts";
 import { sources } from "../src/sources/index.ts";
 import {
   adoptSiblings,
@@ -96,10 +97,11 @@ const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.
 // refresh, whose records keep the planned ids their codes give.
 const previous = await readFile(join(ROOT, "docs/ticon-replacement.csv"), "utf8");
 const lists: Record<string, Station[]> = {};
-for (const [source, { metadata }] of Object.entries(sources)) {
-  if (!metadata.license.redistribution) continue;
+for (const [source, adapter] of Object.entries(sources)) {
+  if (!adapter.metadata.license.redistribution) continue;
   const list = await readStationList(stationListPath(LAKE, source));
-  if (list) lists[source] = list;
+  // A list not refreshed since a station was withheld still has it.
+  if (list) lists[source] = withoutWithheld(adapter, list);
   // replacement_source, replacement_id, distance_km, status
   // GESLA's list gives every record's fallback copy, so it's always needed.
   else if (

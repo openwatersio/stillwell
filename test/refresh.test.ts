@@ -558,15 +558,15 @@ describe("startedListOf", () => {
   afterEach(() => rm(lake, { recursive: true }));
 
   it("is null for a source whose list was never started, and fails for one that's lost", async () => {
-    assert.equal(await startedListOf(lake, "test"), null);
+    assert.equal(await startedListOf(lake, sourceOf([])), null);
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    assert.equal((await startedListOf(lake, "test"))!.length, 1);
+    assert.equal((await startedListOf(lake, sourceOf([])))!.length, 1);
     await rm(stationListPath(lake, "test"));
-    await assert.rejects(startedListOf(lake, "test"), /history for test but no list/);
+    await assert.rejects(startedListOf(lake, sourceOf([])), /history for test but no list/);
   });
 
   it("fails for a lake with the source's series but no list or history", async () => {
     await writeRecent(recentPath(lake, "test"), []);
-    await assert.rejects(startedListOf(lake, "test"), /test series but no list or history/);
+    await assert.rejects(startedListOf(lake, sourceOf([])), /test series but no list or history/);
   });
 });

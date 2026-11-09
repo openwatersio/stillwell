@@ -36,6 +36,10 @@ on:
         description: "Pass --accept-epochs: open every datum change, after checking them"
         type: boolean
         default: false
+      accept_withheld:
+        description: "Pass --accept-withheld: withhold more stations than the guard allows, after checking the rule"
+        type: boolean
+        default: false
       refetch:
         description: "Refetch preliminary values, instead of refreshing lists"
         type: boolean
@@ -125,10 +129,11 @@ jobs:
           cache: npm
       - run: npm ci
       # stations.parquet is rebuilt once, from every list, by the next job.
-      - run: node scripts/ingest.ts stations "$SOURCE" --no-publish ${ACCEPT_EPOCHS:+--accept-epochs}
+      - run: node scripts/ingest.ts stations "$SOURCE" --no-publish ${ACCEPT_EPOCHS:+--accept-epochs} ${ACCEPT_WITHHELD:+--accept-withheld}
         env:
           SOURCE: ${{ matrix.source }}
           ACCEPT_EPOCHS: ${{ inputs.accept_epochs && 'yes' || '' }}
+          ACCEPT_WITHHELD: ${{ inputs.accept_withheld && 'yes' || '' }}
           WATER_LEVELS_LAKE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}

@@ -1,5 +1,6 @@
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
+import { withheld } from "./sources/uhslc/index.ts";
 
 /**
  * Which lake source can replace each TICON record in tide-database. TICON ids
@@ -197,10 +198,16 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
             .at(-1)
         : undefined;
       const match = byCode(record, "uhslc", carried ? number! : (latest ?? code), "planned", lists);
-      // UHSLC serves South Africa's gauges only with SANHO's permission, so the
-      // adapter leaves them out; TICON also files Namibia's Lüderitz there, which UHSLC serves.
-      if (iso3 === "zaf" && match.status !== "ready")
-        return { source: "uhslc", id: null, status: "restricted", note: "SANHO's data" };
+      // The adapter leaves out South Africa's gauges, whose owner refused
+      // republication, and withholds any other station whose owner did, such
+      // as Walvis Bay and Lüderitz, in Namibia, a lake list not yet refreshed included.
+      if ((iso3 === "zaf" && match.status !== "ready") || withheld(code))
+        return {
+          source: "uhslc",
+          id: null,
+          status: "restricted",
+          note: "withheld: the owner refused republication",
+        };
       // A contributor's terms can bar commercial use at a station UHSLC serves openly.
       const listed = lists.uhslc?.find((s) => s.id === match.id);
       if (match.status === "ready" && listed && !listed.commercial_use)

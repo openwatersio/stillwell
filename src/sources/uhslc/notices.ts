@@ -3,8 +3,9 @@
  * documentation files (`rqds/<ocean>/doc/qa<id>.dmt`), beyond UHSLC's own.
  * `scripts/uhslc-contributors.ts` finds each one by its `pattern` and records
  * which stations carry it in `contributors.ts`. Every station UHSLC serves
- * openly goes in the public lake; a notice sets its commercial-use tag and adds
- * its contributor's credit. A station whose file has none keeps UHSLC's terms.
+ * openly goes in the public lake, unless its notice is `refused`; a notice
+ * sets its commercial-use tag and adds its contributor's credit. A station
+ * whose file has none keeps UHSLC's terms.
  */
 export interface Notice {
   /** Who the terms are from. */
@@ -17,6 +18,12 @@ export interface Notice {
   url: string | null;
   /** What the terms say, in short. */
   terms: string;
+  /**
+   * The issue recording the contributor's refusal to let the lake republish
+   * its data. Its stations, and GESLA's copies of them, are withheld: never
+   * listed, never fetched, and removed from the lake (`ingest withhold`).
+   */
+  refused?: string;
 }
 
 export const NOTICES: Record<string, Notice> = {
@@ -90,9 +97,53 @@ export const NOTICES: Record<string, Notice> = {
     credit: "South African Navy Hydrographic Office",
     url: null,
     terms:
-      "SANHO owns the data and asks for permission to use or reproduce it. UHSLC withholds its South African stations until a user agrees, so those aren't listed; it serves Walvis Bay, in Namibia, openly.",
+      "SANHO owns the data and refused permission to republish any of it, so its stations are withheld from the lake. UHSLC serves Walvis Bay, in Namibia, openly, and withholds its South African stations until a user agrees to SANHO's terms.",
+    refused: "https://github.com/openwatersio/water-levels/issues/80",
   },
 };
+
+/**
+ * UHSLC station numbers whose files don't carry a refused notice but whose
+ * gauge another source credits to the refusing contributor, by number: the
+ * notice that withholds them, and why.
+ */
+export const ALSO_WITHHELD: Record<string, { notice: string; reason: string }> = {
+  // Lüderitz, in Namibia. SANHO refused "any of our national tide gauge data" (#80).
+  "702": {
+    notice: "sanho",
+    reason: "GESLA names SANHO as originator; UHSLC's documentation names none",
+  },
+};
+
+/**
+ * The most restrictive notice a file's text, whitespace collapsed, carries: a
+ * refusal first, then one that bars commercial use; null for none.
+ */
+export function noticeOf(flat: string): string | null {
+  const rank = (n: Notice) => (n.refused ? 0 : n.commercial_use ? 2 : 1);
+  const found = Object.entries(NOTICES).filter(([, n]) => n.pattern.test(flat));
+  found.sort(([, a], [, b]) => rank(a) - rank(b));
+  return found[0]?.[0] ?? null;
+}
+
+/**
+ * Station numbers one of whose versions carries a `refused` notice in
+ * `before` but none in `after`, such as when UHSLC rewords the notice or drops
+ * the version that had it. A rescan that loses one would list the station again.
+ */
+export function lostRefusals(
+  before: Record<string, { notice: string | null } | undefined>,
+  after: Record<string, { notice: string | null } | undefined>,
+): string[] {
+  const refusing = (scan: typeof before) =>
+    new Set(
+      Object.entries(scan)
+        .filter(([, r]) => r?.notice && NOTICES[r.notice]?.refused)
+        .map(([key]) => key.slice(0, 3)),
+    );
+  const now = refusing(after);
+  return [...refusing(before)].filter((n) => !now.has(n)).sort();
+}
 
 /**
  * The `Originator #` field, the station number the contributor gives the

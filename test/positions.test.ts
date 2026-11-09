@@ -40,6 +40,13 @@ describe("correctPositions", () => {
     assert.deepEqual(stale, ["uhslc/290a is now at -51.7, -57.8667, not -52.7, -57.8667"]);
   });
 
+  it("names no station its adapter withholds", () => {
+    for (const id of Object.keys(POSITIONS)) {
+      const [source, sourceId] = [id.slice(0, id.indexOf("/")), id.slice(id.indexOf("/") + 1)];
+      assert.equal(sources[source]!.withheld?.(sourceId) ?? null, null, id);
+    }
+  });
+
   it("names stations by the IDs their adapters give", () => {
     for (const id of Object.keys(POSITIONS))
       assert.match(

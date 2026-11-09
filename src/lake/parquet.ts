@@ -461,6 +461,19 @@ export async function readStationList(path: string): Promise<LakeStation[] | nul
   });
 }
 
+/** The distinct station IDs in list files, such as a source's list and its snapshots. */
+export async function listedIds(files: string[]): Promise<string[]> {
+  if (!files.length) return [];
+  return serial(async () => {
+    const db = await connection();
+    if (files.some((f) => /^https?:/.test(f))) await db.run("INSTALL httpfs; LOAD httpfs;");
+    const reader = await db.runAndReadAll(
+      `SELECT DISTINCT id FROM read_parquet([${files.map(quote).join(", ")}], union_by_name = true) ORDER BY id`,
+    );
+    return reader.getRowObjects().map((r) => String(r.id));
+  });
+}
+
 /** Whether any file matches `pattern`, a path or a glob, local or remote. */
 export async function exists(pattern: string): Promise<boolean> {
   const literal = !/[*?[]/.test(pattern);

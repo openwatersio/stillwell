@@ -9,7 +9,7 @@ import type { Product } from "../schema.ts";
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
  *   stations/empty/<source>.json                        years a `--skip-written` backfill found nothing in, for 30 days
- *   history/stations/<source>/<time>.parquet            the list as each refresh started
+ *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   recent/<source>.parquet                             last 7 days, every live station and any since retired
  *   obs/<source>/<station>/<year>.parquet               observed levels
