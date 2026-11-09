@@ -11,7 +11,7 @@ import {
 } from "../../schema.ts";
 import { countryOf } from "../coops/index.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
-import { NOTICES } from "./notices.ts";
+import { ALSO_WITHHELD, NOTICES } from "./notices.ts";
 
 /**
  * University of Hawaii Sea Level Center (UHSLC) hourly tide gauge records,
@@ -58,10 +58,11 @@ const DATUM = "ZERO";
 const EARLY_HOURS: Record<number, number> = { 329: 1 };
 
 /**
- * The South African Navy Hydrographic Office owns and holds copyright in its
- * gauges' data and asks anyone downloading it for permission first, so
- * stations UHSLC lists in South Africa (ISO 3166-1 710) are left out, as
- * UHSLC's own download page asks before serving them.
+ * The South African Navy Hydrographic Office refused permission to republish
+ * its gauges' data. UHSLC's lists hold stations in South Africa (ISO 3166-1
+ * 710) that it withholds until a user agrees to SANHO's terms, and the scan
+ * has files for only some of them, so they're left out by country; Walvis Bay
+ * and Lüderitz, in Namibia, by `withheld`.
  */
 const EXCLUDED_COUNTRIES = new Set([710]);
 
@@ -163,6 +164,11 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
       throw new Error(`UHSLC's ${name} stations and record spans disagree; try again later`);
   const included = (r: Record<string, unknown>) =>
     !EXCLUDED_COUNTRIES.has(Number(r.station_country_code));
+  const held = (sourceId: string) => {
+    const why = withheld(sourceId);
+    if (why) console.log(`  uhslc: leaving out ${sourceId}: ${why}`);
+    return !!why;
+  };
 
   const versionsOf = new Map<number, string[]>();
   for (const r of rq)
@@ -175,6 +181,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
   const listed: UhslcStation[] = [];
   for (const r of fd.filter(included)) {
     const id = Number(r.uhslc_id);
+    if (held(pad(id))) continue;
     const span = fdSpans.get(`${id}`);
     const versions = (versionsOf.get(id) ?? []).sort().reverse();
     const startOf = (v: string) => rqSpans.get(`${id}${v}`)![0];
@@ -206,7 +213,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
   for (const r of rq.filter(included)) {
     const id = Number(r.uhslc_id);
     const version = String(r.version);
-    if (carried.get(id) === version) continue;
+    if (carried.get(id) === version || held(`${pad(id)}${version.toLowerCase()}`)) continue;
     listed.push({
       ...toStation(r, `${pad(id)}${version.toLowerCase()}`, rqSpans.get(`${id}${version}`)),
       version,
@@ -277,8 +284,13 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
  */
 function refuseRegression(previous: Listed[], listed: UhslcStation[]): void {
   const now = new Set(listed.map((s) => s.id));
+  // A withheld series leaves the list by a person's decision, not ERDDAP's.
   const gone = previous.filter(
-    (s) => s.status === "active" && s.source_id?.length === 3 && !now.has(s.id!),
+    (s) =>
+      s.status === "active" &&
+      s.source_id?.length === 3 &&
+      !now.has(s.id!) &&
+      !withheld(s.source_id),
   ).length;
   if (gone > FD_STOPPED)
     throw new Error(`UHSLC stopped listing ${gone} fast-delivery series at once; try again later`);
@@ -336,6 +348,26 @@ function withTerms(station: UhslcStation, previous?: Listed): void {
 }
 
 const unscanned: string[] = [];
+
+/**
+ * Why a station is withheld from the lake, or null: a scanned version of its
+ * station number has a documentation file whose contributor refused
+ * republication (a `refused` notice), or `ALSO_WITHHELD` names the number.
+ * Every series of the number counts, the FD series and each version, scanned
+ * or not, since they're one gauge's.
+ */
+export function withheld(sourceId: string): string | null {
+  const number = sourceId.slice(0, 3);
+  const also = ALSO_WITHHELD[number];
+  const alsoNotice = also && NOTICES[also.notice];
+  if (also && alsoNotice?.refused)
+    return `${alsoNotice.name} refused republication (${alsoNotice.refused}): ${also.reason}`;
+  for (const key of Object.keys(CONTRIBUTORS).filter((k) => k.slice(0, 3) === number)) {
+    const notice = NOTICES[CONTRIBUTORS[key]?.notice ?? ""];
+    if (notice?.refused) return `${notice.name} refused republication (${notice.refused})`;
+  }
+  return null;
+}
 
 /**
  * The originator's own station for a series, where its contributor numbers
@@ -411,6 +443,8 @@ export async function levels(
 ): Promise<Observation[]> {
   const match = /^(\d{3})([a-z])?$/.exec(sourceId);
   if (!match) throw new Error(`Not a UHSLC station: ${sourceId}`);
+  const refused = withheld(sourceId);
+  if (refused) throw new Error(`UHSLC ${sourceId} is withheld: ${refused}`);
   const id = Number(match[1]);
   const version = match[2]?.toUpperCase();
   const shift = (EARLY_HOURS[id] ?? 0) * HOUR_MS;
@@ -522,5 +556,6 @@ export function final(text: string, end: number): boolean {
 export const source: Source = {
   metadata,
   stations,
+  withheld,
   observations: (s, start, end) => levels(s.source_id, start, end, s as UhslcStation),
 };

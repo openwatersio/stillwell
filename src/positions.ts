@@ -78,12 +78,6 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: 7.45368, lon: 151.8982 },
     at: { lat: 7.44667, lon: 151.847 },
   },
-  // PSMSL lists Mossel Bay (910) at -34.1786, 22.1353, as GESLA's RQ copy has
-  // it. GESLA's FD copy is 22 km northeast.
-  "gesla/mossel_bay-185-zaf-uhslc_fd": {
-    served: { lat: -34.067, lon: 22.333 },
-    at: { lat: -34.178611, lon: 22.135278 },
-  },
 
   // GESLA's copies below keep a position UHSLC has since corrected. UHSLC's
   // current position agrees with the source named.

@@ -21,7 +21,8 @@ export interface EpochChange {
 
 /**
  * Merge a source's fresh station list into the lake's. A station the source
- * stopped listing stays, marked inactive, so its ID is never reused. What the
+ * stopped listing stays, marked inactive, so its ID is never reused. The
+ * refresh takes withheld stations out of both lists first, so they leave. What the
  * lake can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
  * it from the bounds compaction writes.
  *

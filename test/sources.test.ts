@@ -12,7 +12,14 @@ import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
-import { contributorOf, NOTICES, originatorOf } from "../src/sources/uhslc/notices.ts";
+import {
+  ALSO_WITHHELD,
+  contributorOf,
+  lostRefusals,
+  NOTICES,
+  noticeOf,
+  originatorOf,
+} from "../src/sources/uhslc/notices.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import { describedDatums, isoDate } from "../src/sources/usace/described.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
@@ -2776,6 +2783,101 @@ describe("uhslc", () => {
       [pohnpeiA.contributor, pohnpeiA.commercial_use, pohnpeiA.attribution],
       ["Scripps Institute of Oceanography", true, "University of Hawaii Sea Level Center (UHSLC)"],
     );
+  });
+
+  it("withholds Walvis Bay, whose file carries SANHO's notice, and refuses to fetch it", async () => {
+    const plus = (name: string, rows: unknown[][]) => {
+      const body = JSON.parse(fixture(name));
+      body.table.rows.push(...rows);
+      return JSON.stringify(body);
+    };
+    const walvis = [220, "Walvis Bay", "Namibia", 516, -22.95, 14.5];
+    serve([
+      [
+        /global_hourly_rqds\.json/,
+        // Version B is one the scan hasn't read.
+        plus("uhslc-rq-stations.json", [
+          [220, "A", ...walvis.slice(1), "station zero"],
+          [220, "B", ...walvis.slice(1), "station zero"],
+        ]),
+      ],
+      [/global_hourly_fast\.json/, plus("uhslc-fd-stations.json", [[...walvis, "station zero"]])],
+      [
+        /global_daily_rqds\.json/,
+        plus("uhslc-rq-spans.json", [
+          [220, "A", "1959-01-01T12:00:00Z"],
+          [220, "A", "2016-03-07T12:00:00Z"],
+          [220, "B", "2017-01-01T12:00:00Z"],
+          [220, "B", "2018-01-01T12:00:00Z"],
+        ]),
+      ],
+      [
+        /global_daily_fast\.json/,
+        plus("uhslc-fd-spans.json", [
+          [220, "1959-01-01T12:00:00Z"],
+          [220, "2016-03-07T12:00:00Z"],
+        ]),
+      ],
+    ]);
+    const listed = await uhslc.stations();
+    assert.deepEqual(
+      listed.filter((s) => s.source_id.startsWith("220")),
+      [],
+    );
+    // Its FD series and every version of its number, an unscanned one too.
+    for (const id of ["220", "220a", "220b", "220f", "181a"])
+      assert.match(uhslc.withheld(id) ?? "", /^South African Navy Hydrographic Office refused/);
+    // Lüderitz's files name no contributor, but GESLA names SANHO, so ALSO_WITHHELD lists it.
+    for (const id of ["702", "702a"])
+      assert.match(uhslc.withheld(id) ?? "", /refused .*: GESLA names SANHO as originator/);
+    for (const id of ["001", "329b"]) assert.equal(uhslc.withheld(id), null);
+    for (const [number, { notice }] of Object.entries(ALSO_WITHHELD))
+      assert.ok(NOTICES[notice]?.refused, `${number}'s notice ${notice} isn't a refusal`);
+    // A withheld series the lake still lists doesn't count toward a partial list.
+    const five = ["101", "102", "103", "104", "105"].map((n) => ({
+      ...listed[0]!,
+      id: `uhslc/${n}`,
+      source_id: n,
+    }));
+    const walvisBay = { ...listed[0]!, id: "uhslc/220", source_id: "220" };
+    assert.equal((await uhslc.stations([...listed, ...five, walvisBay])).length, listed.length);
+    await assert.rejects(
+      uhslc.levels("220", new Date("2000-01-01Z"), new Date("2001-01-01Z")),
+      /UHSLC 220 is withheld: South African Navy Hydrographic Office refused/,
+    );
+    await assert.rejects(
+      uhslc.levels("220b", new Date("2017-01-01Z"), new Date("2018-01-01Z")),
+      /UHSLC 220b is withheld/,
+    );
+  });
+
+  it("names a station number a rescan would lose its refusal for", () => {
+    const before = {
+      "220a": { notice: "sanho" },
+      "702a": { notice: null },
+      "181a": { notice: "sanho" },
+    };
+    // UHSLC reworded 220A's notice, and dropped 181A for a 181B carrying it still.
+    const after = {
+      "220a": { notice: "unreviewed" },
+      "702a": { notice: null },
+      "181b": { notice: "sanho" },
+    };
+    assert.deepEqual(lostRefusals(before, after), ["220"]);
+    assert.deepEqual(lostRefusals(before, before), []);
+    // The scan as committed keeps every refusal it has.
+    assert.deepEqual(lostRefusals(CONTRIBUTORS, CONTRIBUTORS), []);
+  });
+
+  it("takes a refusal over any other notice a file carries", () => {
+    const flat =
+      "Data supplied by the South Africa Navy Hydrographic Office; use allowed for non-commercial use";
+    assert.equal(noticeOf(flat), "sanho");
+    assert.equal(
+      noticeOf("Use is allowed for non-commercial use. Creative Commons Attribution 4.0"),
+      "dmi",
+    );
+    assert.equal(noticeOf("nothing here"), null);
   });
 
   it("reads millimeters as meters, RQ as good and FD as preliminary, skipping missing values", async () => {

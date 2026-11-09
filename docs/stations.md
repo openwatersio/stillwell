@@ -129,10 +129,10 @@ A station that keeps changing is held. A change within 180 days of the current e
 New paths beside the ones in [data.md](data.md). `<station>` is the URL-encoded `source_id`.
 
 ```
-stations/<source>.parquet                    one source's list: every station it has listed, with epochs
+stations/<source>.parquet                    one source's list: every station it has listed but withheld ones, with epochs
 stations/bounds/<source>.parquet             first, last, earliest preliminary and screened per station, by compaction and backfill
 stations/empty/<source>.json                 years with no file a --skip-written backfill found empty, kept 30 days
-history/stations/<source>/<time>.parquet     the source's list as each refresh started
+history/stations/<source>/<time>.parquet     the source's list as each refresh started, less withheld stations
 history/stations/<source>/<time>.json        what that refresh changed
 ```
 
@@ -145,21 +145,22 @@ history/stations/<source>/<time>.json        what that refresh changed
 
 1. Read the previous list from the lake.
 2. Fetch with `stations(previous)`, as now, and move the stations `POSITIONS` (`src/positions.ts`) names to where their gauge is. Each entry is a station its source places away from its gauge, the position the source serves, and the gauge's position from another source, such as PSMSL, IOC's sea level monitoring, the gauge's operator, or the source's own other series of the gauge, with a note naming it and the erratum it works around. Most are GESLA's copies of UHSLC series, which keep metadata UHSLC has since corrected. An entry applies only while the source still lists the station at the position it names: a source that moves the station keeps its own position, and the refresh reports the entry in its change report and fails the run, as a held epoch does, so a person checks it. A station the source stops listing keeps its corrected position, as it keeps the rest of the station. A version UHSLC splits off a corrected series, as a new station, takes UHSLC's position until an entry names it.
-3. Merge with `mergeStationList`, and open, hold or close epochs as above.
-4. Apply the source's `overrides`: confirm or reject an epoch, end the one before it earlier, or give its `to_current`.
-5. Run the guards. Any one of these keeps the previous list and exits nonzero:
+3. Drop withheld stations, whose owner refused republication (`withheld` on the source), from the list it read and from the fetch. They leave the list rather than stay inactive, and don't count toward the sharp-shrink guard below. More of them than 5 stations or 2% of the list, whichever is larger, is refused as likelier a wrong rule, until a person reruns with `--accept-withheld` (the Monthly workflow's `accept_withheld`).
+4. Merge with `mergeStationList`, and open, hold or close epochs as above.
+5. Apply the source's `overrides`: confirm or reject an epoch, end the one before it earlier, or give its `to_current`.
+6. Run the guards. Any one of these keeps the previous list and exits nonzero:
    - the fetch failed;
    - the list is empty;
    - it shrank sharply (`shrankSharply`);
    - the lake has no list for the source but does have its history. A list that went missing would otherwise read as an empty lake, and every station would be rebuilt from scratch;
    - the lake has no list or history for the source but does have its values, in series files or a recent window. A list started from the fetch would forget what the old one carried forward;
    - more stations opened an epoch than the source's limit, by default 5 stations or 2%, whichever is larger. That's likelier an adapter bug than gauge work. A person who has checked it reruns with `--accept-epochs` (the Monthly workflow's `accept_epochs`), so a real batch of changes doesn't hold up the source for good.
-6. Copy the previous list to history, then write the new list. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
-7. Write the change report next to the snapshot, and add it to the job summary: stations added, retired and changed field by field, epochs opened, held and rejected, and `POSITIONS` entries whose station the source moved.
+7. Copy the previous list, without withheld stations, to history, then write the new list, and drop withheld stations' rows from the source's bounds, recent window and empty-years record. A new source's first snapshot, its empty list, is written after its list, so a run cut short can't leave history with no list.
+8. Write the change report next to the snapshot, and add it to the job summary: stations added, retired, removed (withheld, with a line saying to run `ingest withhold <source>` while any still has series files) and changed field by field, epochs opened, held and rejected, and `POSITIONS` entries whose station the source moved.
 
 **Jobs.** The Monthly workflow refreshes each list in a job of its own, in the source's `lake-<source>` group, which `backfill`, `recent` and compaction of that source share, and the Ingest workflow refuses `stations`, so no two jobs write one list at once. A final job rebuilds `stations.parquet` with `publish`, in the `lake` group, from whatever lists the lake holds, so a source whose refresh failed or was cancelled keeps its last list there. Within a group, GitHub cancels a pending job when a newer one queues, so a refresh queued behind a long backfill is cancelled by the next hourly run, shows as cancelled in the run, and is rerun from Actions. Local runs (`WATER_LEVELS_LAKE=data`) have no group.
 
-**Nothing is lost by a refresh.** Before a refresh writes a list, it writes the list it read to `history/`, and the series files never change for an epoch. A bad refresh is undone by restoring the snapshot before it (below), and a bad epoch by rejecting it in the source's overrides. Some of what a list holds can't be fetched again (retired stations, USACE series pins, closed epochs' frozen offsets), so the snapshots matter, but protecting the bucket itself, from deletion or a bad credential, is a matter for the whole lake, observations included, and lives outside ingest.
+**Nothing is lost by a refresh**, except withheld stations, which are meant to go ([CONTRIBUTING.md](../CONTRIBUTING.md#withheld-stations)). Before a refresh writes a list, it writes the list it read to `history/`, and the series files never change for an epoch. A bad refresh is undone by restoring the snapshot before it (below), and a bad epoch by rejecting it in the source's overrides. Some of what a list holds can't be fetched again (retired stations, USACE series pins, closed epochs' frozen offsets), so the snapshots matter, but protecting the bucket itself, from deletion or a bad credential, is a matter for the whole lake, observations included, and lives outside ingest.
 
 **Restoring a list** copies a snapshot back to `stations/<source>.parquet` and rebuilds. The series files never change for an epoch, so any snapshot is safe to restore. A station's epochs go back to what the snapshot says, and files written under an epoch it doesn't have stay in the lake, unread. The restore runs the source's refresh straight after, before any `backfill` or `recent`, so an epoch the source or the source's `overrides` still reports opens again, under a new `id`, and is backfilled.
 

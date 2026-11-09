@@ -35,6 +35,13 @@ import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
+import {
+  dropWithheldRows,
+  tooManyWithheld,
+  withFiles,
+  withheldReason,
+  withheldStations,
+} from "./withhold.ts";
 
 /** What a refresh changed, written beside its snapshot. */
 export interface RefreshReport {
@@ -44,6 +51,10 @@ export interface RefreshReport {
   retired: string[];
   /** Retired by the source itself, listed inactive, rather than dropped from its list. */
   withdrawn: string[];
+  /** Withheld (`Source.withheld`): dropped from the list, with their rows in the bounds and recent window. */
+  removed: string[];
+  /** Removed stations whose series files are still in the lake, for `ingest withhold` to delete. */
+  unwithheld: string[];
   changed: { id: string; fields: string[] }[];
   epochs: EpochChange[];
   /** `POSITIONS` entries whose station the source has moved, kept where the source puts it. */
@@ -54,10 +65,21 @@ export interface RefreshOptions {
   now: string;
   /** Accept more epochs opening at once than the guard allows, after a person checked them. */
   acceptEpochs?: boolean;
+  /** Accept withholding more stations than `withholdLimit` allows, after a person checked the rule. */
+  acceptWithheld?: boolean;
 }
 
 /** Why a refresh kept the previous list, as an error the caller reports. */
 export class Refused extends Error {}
+
+/** A failure after the refresh wrote the new list, so the lake has it, with the refresh's report. */
+export class AfterWrite extends Error {
+  readonly report: RefreshReport;
+  constructor(message: string, report: RefreshReport) {
+    super(message);
+    this.report = report;
+  }
+}
 
 /**
  * Refresh one source's list in `lake`: fetch, merge, check, snapshot the
@@ -81,9 +103,16 @@ export async function refreshSource(
     throw new Refused(
       `the lake has ${id} series but no list or history for it; copy stations/${id}.parquet in from a snapshot or another lake, such as the public one at https://water-levels.openwaters.io, rather than start one from the fetch`,
     );
-  const previous = stored ?? [];
+  const held = (s: Pick<Station, "id">) => withheldReason(source, s.id) !== null;
+  // A withheld station leaves the list, rather than stay inactive like one the source stopped listing.
+  const removed = (stored ?? []).filter(held);
+  const previous = (stored ?? []).filter((s) => !held(s));
+  const tooMany = tooManyWithheld(id, removed.length, stored?.length ?? 0);
+  if (tooMany && !options.acceptWithheld) throw new Refused(tooMany);
 
-  const { stations: fetched, stale } = correctPositions(await source.stations(previous));
+  const listing = correctPositions(await source.stations(previous));
+  const stale = listing.stale;
+  const fetched = listing.stations.filter((s) => !held(s));
   if (!fetched.length) throw new Refused("listed no stations");
   const stray = fetched.find((s) => s.source !== id || !s.source_id);
   if (stray) throw new Refused(`${stray.id} isn't a ${id} station with a code`);
@@ -117,11 +146,19 @@ export async function refreshSource(
   );
   const report = {
     ...reportOf(id, options.now, previous, stations, changes, listedInactive),
+    removed: removed.map((s) => s.id),
+    // Every withheld station the lake has known, not only those this refresh
+    // removes, so the report keeps asking for `withhold` until it runs. Read
+    // before the snapshot, so the report it stores has them.
+    unwithheld: source.withheld
+      ? await withFiles(lake, id, (await withheldStations(lake, source, { files: false })).ids)
+      : [],
     positions: stale,
   };
-  // The list it read goes to history before it's replaced. A new source's
-  // snapshot, its empty list, goes after its first list instead, so a run cut
-  // short between the two can't leave history with no list to refuse on.
+  // The list it read goes to history before it's replaced, without withheld
+  // stations. A new source's snapshot, its empty list, goes after its first
+  // list instead, so a run cut short between the two can't leave history with
+  // no list to refuse on.
   const snapshot = async () => {
     await writeStationList(historyPath(lake, id, options.now, "parquet"), previous);
     await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
@@ -129,6 +166,14 @@ export async function refreshSource(
   if (stored) await snapshot();
   await writeStationList(listPath, stations);
   if (!stored) await snapshot();
+  try {
+    await dropWithheldRows(lake, source);
+  } catch (error) {
+    throw new AfterWrite(
+      `wrote the new list, but couldn't drop withheld stations' rows (${error instanceof Error ? error.message : String(error)}); run \`ingest withhold ${id}\``,
+      report,
+    );
+  }
   return { stations, report };
 }
 
@@ -205,7 +250,7 @@ export async function publishStations(
     }
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
-    stations.push(...list.map((s) => ({ ...s, ...bounds.get(s.id) })));
+    stations.push(...withoutWithheld(source, list).map((s) => ({ ...s, ...bounds.get(s.id) })));
   }
   if (missing.length || !listed.length) return { missing };
   const { stations: linked, report } = linkGauges(stations);
@@ -222,9 +267,13 @@ export async function publishStations(
   const held = new Set(listed.map((s) => s.metadata.id));
   await writeJsonArray(errataPath(lake), published(errata.filter((e) => held.has(e.source))));
   const ids = new Set(linked.map((s) => s.id));
+  // A withheld station is gone on purpose, though an erratum may still name it.
+  const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
   const unknownErrata = errata.flatMap((e) =>
     held.has(e.source)
-      ? (e.stations ?? []).filter((id) => !ids.has(id)).map((id) => `${e.id} ${id}`)
+      ? (e.stations ?? [])
+          .filter((id) => !ids.has(id) && !withheld(id))
+          .map((id) => `${e.id} ${id}`)
       : [],
   );
   return { count: linked.length, links: report, unknownErrata };
@@ -239,14 +288,20 @@ export async function publishStations(
 const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "empty_means_none"]);
 
 /** A source's list from the lake, or an error naming what to run. */
-export async function listOf(lake: string, sourceId: string): Promise<LakeStation[]> {
+export async function listOf(lake: string, source: Source): Promise<LakeStation[]> {
+  const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
   if (!list && (await hasHistory(lake, sourceId))) throw new Error(lostList(lake, sourceId));
   if (!list)
     throw new Error(
       `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
     );
-  return list;
+  return withoutWithheld(source, list);
+}
+
+/** A list without withheld stations, which one not refreshed since they were withheld still has. */
+export function withoutWithheld(source: Source, list: LakeStation[]): LakeStation[] {
+  return list.filter((s) => withheldReason(source, s.id) === null);
 }
 
 /**
@@ -254,9 +309,10 @@ export async function listOf(lake: string, sourceId: string): Promise<LakeStatio
  * started, such as one registered since the last Monthly refresh. A list that
  * existed and is gone, or series with no list, are still errors.
  */
-export async function startedListOf(lake: string, sourceId: string): Promise<LakeStation[] | null> {
+export async function startedListOf(lake: string, source: Source): Promise<LakeStation[] | null> {
+  const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
-  if (list) return list;
+  if (list) return withoutWithheld(source, list);
   if (await hasHistory(lake, sourceId)) throw new Error(lostList(lake, sourceId));
   // The refresh refuses such a lake too, so waiting for it would wait for good.
   if (await hasSeries(lake, sourceId))
@@ -324,6 +380,8 @@ function reportOf(
     added: [],
     retired: [],
     withdrawn: [],
+    removed: [],
+    unwithheld: [],
     changed: [],
     epochs,
     positions: [],
@@ -348,12 +406,31 @@ function reportOf(
   return report;
 }
 
+/**
+ * Whether a refresh's report needs a person, so the run fails: an epoch held
+ * or waiting, a station the source retired itself, a moved `POSITIONS` entry,
+ * or a removed station whose series files `ingest withhold` hasn't deleted.
+ */
+export function needsPerson(report: RefreshReport): boolean {
+  return (
+    report.epochs.some((e) => e.event === "held" || e.event === "waiting") ||
+    report.withdrawn.length > 0 ||
+    report.positions.length > 0 ||
+    report.unwithheld.length > 0
+  );
+}
+
 /** A report as lines for a log or a job summary. */
 export function describeReport(report: RefreshReport): string[] {
   const lines = [
-    `${report.source}: ${report.added.length} added, ${report.retired.length} retired, ${report.changed.length} changed`,
+    `${report.source}: ${report.added.length} added, ${report.retired.length} retired, ${report.changed.length} changed${report.removed.length ? `, ${report.removed.length} removed` : ""}`,
   ];
   for (const id of report.added.slice(0, 20)) lines.push(`  added ${id}`);
+  for (const id of report.removed) lines.push(`  removed ${id}, withheld from the lake`);
+  if (report.unwithheld.length)
+    lines.push(
+      `  ${report.unwithheld.length} removed stations still have series files: run \`ingest withhold ${report.source}\` to delete them`,
+    );
   for (const id of report.retired)
     lines.push(
       `  retired ${id}${report.withdrawn.includes(id) ? ", by the source; see its log above" : ""}`,

@@ -236,6 +236,14 @@ export interface Source {
   /** `previous` is the lake's list, for a source that keeps choices it made before. */
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
+   * Why a station, by its `source_id`, is withheld from the lake, or null.
+   * Withheld means its owner refused republication: the adapter never lists
+   * or fetches it, a refresh drops it from the lake's list and the bounds and
+   * recent window, publishing leaves it out, and `ingest withhold` deletes its
+   * files (src/withhold.ts).
+   */
+  withheld?(sourceId: string): string | null;
+  /**
    * Why a listed station no longer measures from what its committed record
    * does, though its datum's name is unchanged; null when it still does.
    */

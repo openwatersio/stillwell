@@ -1,13 +1,14 @@
 /**
  * Fetch from upstream sources into the lake.
  *
- *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--no-publish]
+ *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
+ *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -41,6 +42,9 @@
  * the workflow run's page. `requalify` works the flags of stations' observed
  * levels out again over the years [start, end) from the lake alone (src/lake/requalify.ts),
  * so a QC rule change reaches stored values without fetching them again.
+ * `withhold` deletes the files of a source's withheld stations, whose owner
+ * refused republication, and their rows in its bounds and recent window
+ * (src/withhold.ts); the source's next refresh drops them from its list.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -110,6 +114,8 @@ import {
   startedListOf,
   publishStations,
   refreshSource,
+  AfterWrite,
+  needsPerson,
 } from "../src/refresh.ts";
 import type {
   Epoch,
@@ -122,6 +128,7 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { sourceOf, sources } from "../src/sources/index.ts";
+import { withhold, withheldReason } from "../src/withhold.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
 
@@ -161,6 +168,7 @@ const { positionals, values } = parseArgs({
     days: { type: "string", default: "1" },
     concurrency: { type: "string", default: "4" },
     "accept-epochs": { type: "boolean", default: false },
+    "accept-withheld": { type: "boolean", default: false },
     "no-publish": { type: "boolean", default: false },
     first: { type: "string" },
     shard: { type: "string" },
@@ -203,6 +211,12 @@ switch (command) {
     await compact(source, Number(values.days));
     break;
   }
+  case "withhold": {
+    const [source] = args;
+    if (!source) usage();
+    await withholdStations(source);
+    break;
+  }
   default:
     usage();
 }
@@ -219,23 +233,28 @@ async function refreshStations(ids: string[]): Promise<void> {
       const { stations, report } = await refreshSource(lake, source, {
         now,
         acceptEpochs: values["accept-epochs"],
+        acceptWithheld: values["accept-withheld"],
       });
       const active = stations.filter((s) => s.status === "active").length;
       const lines = describeReport(report);
       lines[0] += `; ${active} active, ${stations.length - active} inactive`;
       for (const line of lines) console.log(line);
       summary.push(...lines);
-      // A station waiting on a person, newly retired by the source itself (a
-      // USACE gauge whose series CWMS withdrew), or moved from a corrected
-      // position fails the run so it's seen.
-      for (const e of report.epochs)
-        if (e.event === "held" || e.event === "waiting") process.exitCode = 1;
-      if (report.withdrawn.length || report.positions.length) process.exitCode = 1;
+      // The list is written either way; the run fails so a person sees it.
+      if (needsPerson(report)) process.exitCode = 1;
+      if (report.unwithheld.length && process.env.GITHUB_ACTIONS)
+        console.log(
+          `::warning title=Withheld files remain::${report.unwithheld.length} ${id} stations were removed from the list but still have series files; run \`ingest withhold ${id}\``,
+        );
     } catch (error) {
-      // One source failing keeps its list and doesn't stop the others.
+      // One source failing doesn't stop the others; it keeps its list unless the new one was written.
       const why = error instanceof Error ? error.message : String(error);
-      console.error(`${id}: ${why}; keeping the list in the lake`);
-      summary.push(`${id}: ${why}; keeping the list in the lake`);
+      const lines =
+        error instanceof AfterWrite
+          ? [`${id}: ${why}`, ...describeReport(error.report)]
+          : [`${id}: ${why}; keeping the list in the lake`];
+      for (const line of lines) console.error(line);
+      summary.push(...lines);
       process.exitCode = 1;
     }
   }
@@ -320,7 +339,7 @@ async function publish(lake: string): Promise<void> {
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
   const lake = lakeOfSource(source.metadata);
-  const list = await listOf(lake, sourceId);
+  const list = await listOf(lake, source);
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
   // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.
@@ -700,7 +719,7 @@ async function notStarted(sourceId: string): Promise<void> {
 async function recent(sourceId: string): Promise<void> {
   const now = Date.now();
   const source = sourceOf(sourceId);
-  const stations = await startedListOf(lakeOfSource(source.metadata), sourceId);
+  const stations = await startedListOf(lakeOfSource(source.metadata), source);
   if (!stations) return await notStarted(sourceId);
   const summary = await reporting(`recent ${sourceId}`, async () => {
     const [hours, keepDays] = [positive("hours"), positive("keep-days")];
@@ -731,7 +750,7 @@ async function recent(sourceId: string): Promise<void> {
 async function compact(sourceId: string, days: number): Promise<void> {
   let live = 0;
   const source = sourceOf(sourceId);
-  const started = await startedListOf(lakeOfSource(source.metadata), sourceId);
+  const started = await startedListOf(lakeOfSource(source.metadata), source);
   if (!started) return await notStarted(sourceId);
   const summary = await reporting(`compact ${sourceId}`, async () => {
     // The window keeps 7 days back from its last hourly run, which is partway
@@ -808,7 +827,7 @@ async function requalifyStations(
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
   const source = sourceOf(sourceId);
-  const list = await listOf(lakeOfSource(source.metadata), sourceId);
+  const list = await listOf(lakeOfSource(source.metadata), source);
   // Every station with files, inactive ones too, since their stored values are QC'd as well.
   let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
   if (values.shard) stations = shard(stations, ...parseShard(values.shard));
@@ -839,6 +858,25 @@ async function requalifyStations(
   if (summary.failed.length) process.exitCode = 1;
 }
 
+async function withholdStations(sourceId: string): Promise<void> {
+  const source = sourceOf(sourceId);
+  const lake = lakeOfSource(source.metadata);
+  const { ids, prefixes, rows } = await withhold(lake, source, {
+    accept: values["accept-withheld"],
+  });
+  const lines = [
+    `${sourceId}: ${ids.length} withheld stations, ${prefixes.length} directories deleted, rows dropped for ${rows.length}`,
+    ...ids.map((id) => `  ${id}: ${withheldReason(source, id)}`),
+  ];
+  if (ids.length)
+    lines.push(
+      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet.`,
+    );
+  for (const line of lines) console.log(line);
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+}
+
 function parseYear(value: string): number {
   if (!/^\d{4}$/.test(value)) throw new Error(`Not a year: ${value}`);
   return Number(value);
@@ -852,7 +890,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld]",
   );
   process.exit(1);
 }

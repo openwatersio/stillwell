@@ -147,8 +147,14 @@ describe("TICON replacements", () => {
       ],
     };
     assert.equal(replacement(record("pohnpei-001c-fsm-uhslc_rq"), bom).status, "restricted");
-    // SANHO's gauges aren't listed.
+    // SANHO's gauges aren't listed, and Walvis Bay, in Namibia, is withheld.
     assert.equal(replacement(record("durban-181a-zaf-uhslc_rq"), lists).status, "restricted");
+    assert.equal(replacement(record("walvis_bay-220a-nam-uhslc_rq"), lists).status, "restricted");
+    // Lüderitz is withheld too, even from a list that still has it.
+    const luderitz = {
+      uhslc: [{ ...station("uhslc/702", "Luderitz", -26.64, 15.15), version: "A" }],
+    };
+    assert.equal(replacement(record("luderitz-702a-zaf-uhslc_rq"), luderitz).status, "restricted");
   });
 
   it("matches WSV records by PEGELONLINE number", () => {

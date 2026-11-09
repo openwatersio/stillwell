@@ -33,20 +33,20 @@ jobs:
         run: |
           set -f
           # The command and sources are the words that aren't an option or
-          # its value; every ingest option takes a value but --accept-epochs, --no-publish,
+          # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --no-publish,
           # --refetch, --skip-written, --skip-unscreened and --rebuild-bounds.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --no-publish | --refetch | --skip-written | --skip-unscreened | --rebuild-bounds | --*=* | --) ;;
+              --accept-epochs | --accept-withheld | --no-publish | --refetch | --skip-written | --skip-unscreened | --rebuild-bounds | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact | requalify) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            backfill | recent | compact | requalify | withhold) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1

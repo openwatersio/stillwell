@@ -59,7 +59,10 @@ describe("gesla stations", () => {
   it("lists a station per record, with its contributor's terms and its originator", async () => {
     const list = await gesla.stations();
     const byId = new Map(list.map((s) => [s.source_id, s]));
-    assert.equal(list.length, 12);
+    // Durban's record is SANHO's, which refused republication, so it isn't listed.
+    assert.equal(list.length, 11);
+    assert.equal(byId.has("durban-181-zaf-uhslc_fd"), false);
+    assert.deepEqual(gesla.withheldFiles, ["durban-181-zaf-uhslc_fd"]);
     const cape = byId.get("cape_dor-240-can-meds")!;
     assert.deepEqual(
       [cape.id, cape.name, cape.country_code, cape.kind, cape.datum, cape.contributor],
@@ -87,11 +90,7 @@ describe("gesla stations", () => {
       seattle.attribution,
       "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); National Oceanic and Atmospheric Administration",
     );
-    // UHSLC's records take their terms from UHSLC's scan, and South Africa's are SANHO's.
-    const durban = byId.get("durban-181-zaf-uhslc_fd")!;
-    assert.equal(durban.commercial_use, false);
-    assert.match(durban.attribution, /South African Navy Hydrographic Office$/);
-    // A fast-delivery record takes every credit of its number's versions: 049a is JMA's.
+    // UHSLC's records take their terms from UHSLC's scan. A fast-delivery record takes every credit of its number's versions: 049a is JMA's.
     assert.match(
       byId.get("minamitorishima-049-jpn-uhslc_fd")!.attribution,
       /\(UHSLC\); Japan Meteorological Agency$/,
@@ -103,7 +102,6 @@ describe("gesla stations", () => {
       "bresttg_60minute-bre-fra-cmems": [],
       "cape_dor-240-can-meds": [],
       "cuxhavensteubenhft-5990020-deu-wsv": ["pegelonline/5990020"],
-      "durban-181-zaf-uhslc_fd": ["uhslc/181"],
       // A research-quality record links to GESLA's fast-delivery record of its number.
       "hong_kong-329-hkg-uhslc_fd": ["uhslc/329"],
       "hong_kong-329b-hkg-uhslc_rq": ["gesla/hong_kong-329-hkg-uhslc_fd"],
@@ -140,7 +138,6 @@ describe("gesla stations", () => {
 
   it("lists Uddevalla's record, which holds Arkö's values, with no products or links", async () => {
     const list = await gesla.stations();
-    assert.equal(list.length, 12);
     const record = list.find((s) => s.source_id === "uddevalla-2541-swe-smhi")!;
     assert.deepEqual([record.status, record.products, record.same_as], ["inactive", [], []]);
     // A backfill can still name it.
@@ -152,6 +149,36 @@ describe("gesla stations", () => {
       ),
       /holds another gauge's values/,
     );
+  });
+
+  it("withholds every UHSLC record carrying SANHO's notice, and refuses to fetch one", async () => {
+    // South Africa's records are SANHO's; Walvis Bay's carry its notice from UHSLC's scan.
+    for (const file of [
+      "durban-181-zaf-uhslc_fd",
+      "durban-181a-zaf-uhslc_rq",
+      "luderitz-702a-zaf-uhslc_rq",
+      "walvis_bay-220-nam-uhslc_fd",
+      "walvis_bay-220a-nam-uhslc_rq",
+      // A version UHSLC's scan hasn't read yet.
+      "walvis_bay-220b-nam-uhslc_rq",
+    ])
+      assert.match(gesla.withheld(file) ?? "", /^South African Navy Hydrographic Office refused/);
+    for (const file of [
+      "minamitorishima-049-jpn-uhslc_fd",
+      "brest-822a-fra-uhslc_rq",
+      "seattle-9447130-usa-noaa",
+      "uddevalla-2541-swe-smhi",
+    ])
+      assert.equal(gesla.withheld(file), null);
+    await assert.rejects(
+      gesla.levels(
+        { source_id: "durban-181-zaf-uhslc_fd", kind: "coastal" },
+        new Date("2000-01-01T00:00:00Z"),
+        new Date("2001-01-01T00:00:00Z"),
+      ),
+      /is withheld: South African Navy Hydrographic Office refused/,
+    );
+    assert.equal(requests.length, 0);
   });
 
   it("fails when a record it drops isn't in the release, as a renamed one wouldn't be", async () => {
