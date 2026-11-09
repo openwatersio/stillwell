@@ -161,6 +161,8 @@ describe("smhi", () => {
     const note = (date: string) => `;;Data före ${date} är ej kvalitetskontrollerad`;
     assert.equal(smhi.qcStartOf(note("2019-07-01")), "2019-07-01T00:00:00Z");
     assert.equal(smhi.qcStartOf(note("2019-13-45")), undefined);
+    // Date rolls this over to 3 March rather than refusing it.
+    assert.equal(smhi.qcStartOf(note("2019-02-31")), undefined);
   });
 
   it("refuses an empty station list", async () => {

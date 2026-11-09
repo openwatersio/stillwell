@@ -159,8 +159,12 @@ export async function stations(previous: Station[] = []): Promise<SmhiStation[]>
  */
 export function qcStartOf(text: string): string | null | undefined {
   const date = /Data före (\d{4}-\d\d-\d\d) är ej kvalitetskontrollerad/.exec(text)?.[1];
-  // stations.parquet's column is a timestamp, so a date that isn't one would fail every publish.
-  if (date) return Number.isNaN(Date.parse(date)) ? undefined : `${date}T00:00:00Z`;
+  // A real day, since Date rolls 2019-02-31 over to March; stations.parquet's column is a timestamp.
+  const time = date ? Date.parse(`${date}T00:00:00Z`) : NaN;
+  if (date)
+    return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === date
+      ? `${date}T00:00:00Z`
+      : undefined;
   return text.includes("Orsaker till saknade data") ? null : undefined;
 }
 
