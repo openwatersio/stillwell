@@ -378,6 +378,25 @@ describe("TICON replacements", () => {
     );
   });
 
+  it("matches a JODC record to its station, restricted until JODC allows republishing", () => {
+    const gsi = record("aburatsubo-gs01-jpn-jodc_giaj");
+    assert.deepEqual(
+      [replacement(gsi, {}).id, replacement(gsi, {}).status],
+      ["jodc/GS01", "license"],
+    );
+    const match = replacement(gsi, { jodc: [station("jodc/GS01", "Aburatsubo", 0, 0)] });
+    assert.deepEqual([match.id, match.status], ["jodc/GS01", "restricted"]);
+    // JHOD's own numbers aren't JODC's codes: 0136 is JODC's Tomakomai port gauge.
+    const tokuyama = record("tokuyama-hd15-jpn-jodc_jcg", { declared: "jhod/0136" });
+    assert.equal(replacement(tokuyama, {}).id, "jodc/HD15");
+    // UHSLC's copy waits on JODC's terms, as the Coast Guard's own record does.
+    const naze = replacement(record("naze-359a-jpn-uhslc_rq", { declared: "jhod/0180" }), {});
+    assert.deepEqual([naze.source, naze.status], ["jodc", "license"]);
+    // JODC's own code for a JMA gauge isn't JMA's.
+    const choshi = replacement(record("choshigyoko-ma64-jpn-jodc_jma"), {});
+    assert.deepEqual([choshi.source, choshi.id, choshi.status], ["jma", null, "unmatched"]);
+  });
+
   it("sends a UK gauge to BODC whether CMEMS or BODC relays it", () => {
     const cmems = replacement(record("aberdeen-abe-gbr-cmems"), {});
     const bodc = replacement(record("aberdeen-abe-gbr-bodc"), {});

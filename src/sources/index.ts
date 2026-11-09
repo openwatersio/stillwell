@@ -9,6 +9,7 @@ import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
 import { source as jma } from "./jma/index.ts";
+import { source as jodc } from "./jodc/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
 import { source as marineInstitute } from "./marine-institute/index.ts";
 import { source as pegelonline } from "./pegelonline/index.ts";
@@ -25,6 +26,7 @@ import dwrErrata from "./dwr/errata.json" with { type: "json" };
 import eaErrata from "./ea/errata.json" with { type: "json" };
 import geslaErrata from "./gesla/errata.json" with { type: "json" };
 import jmaErrata from "./jma/errata.json" with { type: "json" };
+import jodcErrata from "./jodc/errata.json" with { type: "json" };
 import marineInstituteErrata from "./marine-institute/errata.json" with { type: "json" };
 import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
 import refmarErrata from "./refmar/errata.json" with { type: "json" };
@@ -44,6 +46,7 @@ const adapters: Record<string, Source> = {
   ea,
   gesla,
   jma,
+  jodc,
   kartverket,
   "marine-institute": marineInstitute,
   pegelonline,
@@ -68,6 +71,7 @@ export const errataFiles: Record<string, unknown> = {
   ea: eaErrata,
   gesla: geslaErrata,
   jma: jmaErrata,
+  jodc: jodcErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,
   refmar: refmarErrata,

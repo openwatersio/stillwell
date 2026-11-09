@@ -118,7 +118,6 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
 const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
-  jhod: { source: "jodc", status: "license" },
   jma: { source: "jma", status: "planned" },
   linz: { source: "linz", status: "license" },
 };
@@ -170,11 +169,20 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 
   // A UHSLC or JODC relay of a gauge another source publishes goes to that
-  // source, as slackwater-database's provenance declares.
+  // source, as slackwater-database's provenance declares. JHOD's numbers (`jhod/…`)
+  // aren't JODC's codes, so JODC's own records go by the code in their id.
   if (contributor.startsWith("uhslc") || contributor.startsWith("jodc")) {
     const [prefix, id] = record.declared?.split("/") ?? [];
     const declared = prefix ? DECLARED[prefix] : undefined;
     const relay = contributor.startsWith("uhslc") ? "UHSLC" : "JODC";
+    // A UHSLC copy of a Coast Guard gauge waits on JODC's terms, as the Coast Guard's own record does.
+    if (prefix === "jhod" && relay === "UHSLC")
+      return {
+        source: "jodc",
+        id: null,
+        status: "license",
+        note: `${relay} relay of ${record.declared}; JODC's terms ask for permission to republish`,
+      };
     if (declared && id) {
       const sourceId = declared.source === "kartverket" ? id.toUpperCase() : id;
       const match = byCode(record, declared.source, sourceId, declared.status, lists);
@@ -221,12 +229,20 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
         };
       return match;
     }
-    return {
-      source: "jodc",
-      id: null,
-      status: "license",
-      note: "Japanese originals also fix GESLA's year-end truncation",
-    };
+    // JODC's own codes for JMA's gauges aren't JMA's, and the jodc source leaves them out.
+    if (code.startsWith("ma"))
+      return {
+        source: "jma",
+        id: null,
+        status: "unmatched",
+        note: "JODC relay of a JMA gauge with no JMA code declared",
+      };
+    // JODC's terms ask for permission to republish, so its records stay on
+    // TICON for commercial use until it's given (#47).
+    const match = byCode(record, "jodc", code.toUpperCase(), "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "JODC's terms ask for permission to republish" }
+      : match;
   }
 
   // The National Tide Gauge Network's records come from BODC, whose open

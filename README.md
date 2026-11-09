@@ -6,7 +6,7 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 
 - **One schema.** Times are UTC and levels are meters. Quality flags run from 0, good, to 4, bad, whatever scale the source used.
 - **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes, and to MSL, LAT and chart datum from slackwater-database where it has the gauge.
-- **Licenses.** Every station carries its license, attribution and whether its terms allow commercial use. The public store holds what its sources let anyone republish.
+- **Licenses.** Every station carries its license, attribution and whether its terms allow commercial use. The public store holds what its sources let anyone republish, and, with `commercial_use` false, what a source has been asked for permission to republish.
 - **Errata.** Errors found in what a source publishes, such as UHSLC's Hong Kong heights stamped an hour early, are listed in [`errata.json`](https://stillwell.openwaters.io/errata.json) with what the store does about each, and each station's `errata` names the ones that touch it.
 - **Links between sources.** When two sources cover the same gauge, such as BSH's predictions and PEGELONLINE's observations at Cuxhaven, their stations link to each other.
 
@@ -23,6 +23,7 @@ Each source's README gives its coverage, datums, cadence, license and quirks.
 - [Environment Agency](src/sources/ea/README.md): real-time 15-minute tidal levels around England and the UK network.
 - [GESLA](src/sources/gesla/README.md): GESLA 4.1's static release of sea level records from more than 40 agencies.
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
+- [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
 - [Kartverket](src/sources/kartverket/README.md): 10-minute levels at Norway's and Svalbard's permanent tide gauges.
 - [Marine Institute](src/sources/marine-institute/README.md): 5-minute levels from the Irish National Tide Gauge Network.
 - [PEGELONLINE](src/sources/pegelonline/README.md): observed levels at German federal gauges on the coast and the rivers.

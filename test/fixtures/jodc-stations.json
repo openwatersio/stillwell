@@ -1,0 +1,203 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       140.6936,
+       35.9295
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "0101",
+    "jname": "鹿島港",
+    "ename": "KASHIMAKO",
+    "period": "1978 - 2020",
+    "lat": "35-55.767N",
+    "lon": "140-41.617E",
+    "syear": "1978",
+    "eyear": "2020",
+    "style": {
+     "externalGraphic": "/vpage/img/NONE_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       131.5883,
+       34.0339
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "8413",
+    "jname": "三田尻中関港",
+    "ename": "MITAJIRINAKNOSEKIKO",
+    "period": "2011 - 2013",
+    "lat": "34-2.034N",
+    "lon": "131-35.298E",
+    "syear": "2011",
+    "eyear": "2013",
+    "style": {
+     "externalGraphic": "/vpage/img/NONE_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       139.6156,
+       35.16
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "GS01",
+    "jname": "油壺",
+    "ename": "ABURATSUBO",
+    "period": "1933 - 2023",
+    "lat": "35-9.600N",
+    "lon": "139-36.933E",
+    "syear": "1933",
+    "eyear": "2023",
+    "style": {
+     "externalGraphic": "/vpage/img/GS_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       143.3583,
+       44.355
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "HD01",
+    "jname": "紋別",
+    "ename": "MONBETSU",
+    "period": "1955 - 2008",
+    "lat": "44-21.300N",
+    "lon": "143-21.500E",
+    "syear": "1955",
+    "eyear": "2008",
+    "style": {
+     "externalGraphic": "/vpage/img/HD_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       39.5703,
+       -69.0078
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "HD50",
+    "jname": "昭和基地(南極)",
+    "ename": "SYOWA STATION (Antarctica)",
+    "period": "1987 - 2022",
+    "lat": "69-0.467S",
+    "lon": "039-34.217E",
+    "syear": "1987",
+    "eyear": "2022",
+    "style": {
+     "externalGraphic": "/vpage/img/HD_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "GeometryCollection",
+    "geometries": [
+     {
+      "type": "Point",
+      "coordinates": [
+       131.5833,
+       34.0333
+      ]
+     }
+    ]
+   },
+   "properties": {
+    "code": "MA67",
+    "jname": "防府",
+    "ename": "HOFU",
+    "period": "1987 - 1990",
+    "lat": "34-2.000N",
+    "lon": "131-35.000E",
+    "syear": "1987",
+    "eyear": "1990",
+    "style": {
+     "externalGraphic": "/vpage/img/MA_TIDE.png",
+     "fillColor": "#FF0000",
+     "fillOpacity": "0.9",
+     "strokeWidth": "0.0",
+     "strokeColor": "#000000",
+     "pointRadius": "5"
+    }
+   }
+  }
+ ]
+}

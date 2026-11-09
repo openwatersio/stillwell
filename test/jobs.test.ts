@@ -33,6 +33,7 @@ describe("sourcesFor", () => {
       "ea",
       "gesla",
       "jma",
+      "jodc",
       "kartverket",
       "marine-institute",
       "pegelonline",

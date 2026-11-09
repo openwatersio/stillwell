@@ -127,6 +127,23 @@ describe("linkGauges's limits", () => {
     );
   });
 
+  it("links GESLA's copy of a JODC port gauge to JODC's, not to JMA's gauge nearby", () => {
+    const hirarako = { name: "Hirarako", kind: "coastal" as const, lat: 24.8133, lon: 125.2783 };
+    const { stations, report } = linkGauges([
+      station("gesla/hirarako-0151-jpn-jodc_pahb", {
+        ...hirarako,
+        contributor: "JODC_PAHB",
+        same_as: ["jodc/0151"],
+      }),
+      station("jodc/0151", hirarako),
+      station("jma/R1", { name: "Hirara", kind: "coastal", lat: 24.8, lon: 125.2833 }),
+    ]);
+    assert.deepEqual(stations[0]!.same_as, ["jodc/0151"]);
+    // A record GESLA names by ID isn't matched as a copy.
+    assert.deepEqual(stations[2]!.same_as, []);
+    assert.deepEqual(report.skipped, []);
+  });
+
   it("keeps a GESLA record whose values are another gauge's out of every group", () => {
     const uddevalla = { name: "Uddevalla", lat: 58.3451, lon: 11.9069 };
     const { stations, report } = linkGauges(
@@ -414,6 +431,14 @@ describe("linkGauges's limits", () => {
 describe("nearPairs", () => {
   const pair = (a: Partial<Station>, b: Partial<Station>) =>
     nearPairs([station("usace/a", a), station("usgs/b", { lat: m(30), ...b })]).length === 1;
+
+  it("never pairs JMA's and JODC's gauges, which are separate instruments", () => {
+    const at = { name: "Maizuru", kind: "coastal" as const };
+    assert.equal(
+      nearPairs([station("jma/MZ", at), station("jodc/HD24", { ...at, lat: m(30) })]).length,
+      0,
+    );
+  });
 
   it("needs a shared identifying word, never name alone", () => {
     assert.ok(pair({ name: "Clay" }, { name: "ELK RIVER AT CLAY, WV" }));

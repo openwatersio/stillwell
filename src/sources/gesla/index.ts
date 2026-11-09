@@ -319,6 +319,11 @@ export function originatorIds(
     case "CRMS":
       // The site's first surface-water gauge, which GESLA's records start on.
       return /^CRMS\d{4}$/.test(upper) ? [`crms/${upper}-H01`] : [];
+    // JODC's codes; its JMA records' (`MA…`) aren't JMA's own, and JODC doesn't list them.
+    case "JODC_JCG":
+    case "JODC_GIAJ":
+    case "JODC_PAHB":
+      return [`jodc/${upper}`];
     case "UHSLC_FD":
       return [`uhslc/${code.toLowerCase()}`];
     case "UHSLC_RQ": {

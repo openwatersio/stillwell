@@ -26,6 +26,7 @@ import { header as crmsHeader } from "../src/sources/crms/export.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
+import * as jodc from "../src/sources/jodc/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -86,6 +87,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   ],
   // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
   dmi: () => dmi.levels("30017", start, end),
+  // Mitajiri-Nakanoseki's whole record, 2011 to 2013, the smallest zip (34 KB).
+  jodc: () => jodc.levels("8413", new Date("2012-01-01Z"), new Date("2012-01-04Z")),
   // Kushimoto, since 1924: a week of provisional values, which arrive a day or
   // two late, and three days of final ones a year back. Its paths name the month
   // and its text has no shape, so it's in UNRECORDED and only has to return values.
