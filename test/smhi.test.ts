@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
-import { Flag } from "../src/schema.ts";
+import { qcFor } from "../src/lake/recent.ts";
+import { qc } from "../src/qc.ts";
+import { Flag, type Station } from "../src/schema.ts";
 import * as smhi from "../src/sources/smhi/index.ts";
 
 const fixture = (name: string) =>
@@ -42,6 +44,37 @@ describe("smhi", () => {
   afterEach(() => {
     setTransport(fetchText);
     mock.timers.reset();
+  });
+
+  it("keeps a calm Baltic day's held centimeter good, but not a held millimeter", () => {
+    // A week of hourly levels, `steps` to the meter, holding 0.4 m for `held` hourly values.
+    const series = (held: number, steps: number) =>
+      Array.from({ length: 7 * 24 }, (_, i) => ({
+        time: Date.UTC(1960, 3, 25) + i * 3_600_000,
+        level:
+          i >= 48 && i < 48 + held
+            ? 0.4
+            : Math.round(steps * (0.22 + 0.08 * Math.sin(i / 10))) / steps,
+        flag: Flag.good,
+      }));
+    const flags = (held: number, steps: number) =>
+      qc(series(held, steps), qcFor(smhi, { kind: "coastal" } as Station)).map((r) => r.flag);
+    // Landsort's whole centimeters held one value for up to 34 hours on calm days.
+    assert.ok(flags(48, 100).every((f) => f === Flag.good)); // 47 hours
+    assert.equal(flags(49, 100)[60], Flag.suspect); // 48 hours: a stuck gauge
+    // Since 2004 SMHI reports millimeters, which a calm day doesn't hold.
+    assert.equal(flags(9, 1000)[50], Flag.suspect);
+    // A few whole-centimeter changes around a long hold don't say which it is.
+    const short = series(9, 100).slice(36, 66);
+    assert.equal(qc(short, qcFor(smhi, { kind: "coastal" } as Station))[15]!.flag, Flag.suspect);
+    // Most gauges switched in the middle of 2004, so each hold is judged by its own weeks.
+    const switched = [...series(30, 100), ...series(9, 1000)].map((r, i) => ({
+      ...r,
+      time: Date.UTC(2004, 5, 1) + i * 3_600_000,
+    }));
+    const marked = qc(switched, qcFor(smhi, { kind: "coastal" } as Station));
+    assert.equal(marked[60]!.flag, Flag.good);
+    assert.equal(marked[7 * 24 + 50]!.flag, Flag.suspect);
   });
 
   it("lists every sea-level station with its record span", async () => {
