@@ -138,7 +138,7 @@ describe("linkGauges's limits", () => {
         }),
         station("gesla/uddevalla-udd-swe-cmems", { ...uddevalla, lat: 58.3475, lon: 11.8948 }),
         station("uhslc/9", { same_as: ["gesla/uddevalla-2541-swe-smhi"] }),
-        // A gauge REFMAR hides serves nothing too, but its values are its own.
+        // REFMAR lists a gauge it hides with no products, but its values are its own.
         station("refmar/3", { name: "Brest", lat: 48.38, lon: -4.5, products: [] }),
         station("gesla/brest-3-fra-refmar", {
           name: "Brest",

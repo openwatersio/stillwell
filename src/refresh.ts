@@ -112,7 +112,7 @@ export async function refreshSource(
   // A GESLA record dropped for holding another gauge's values was a person's decision, not the source's.
   const listedInactive = new Set(
     fetched
-      .filter((s) => s.status === "inactive" && !DROPPED.has(s.id.replace(/^gesla\//, "")))
+      .filter((s) => s.status === "inactive" && !(s.source === "gesla" && DROPPED.has(s.source_id)))
       .map((s) => s.id),
   );
   const report = {
