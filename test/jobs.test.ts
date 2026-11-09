@@ -21,6 +21,7 @@ describe("sourcesFor", () => {
       "rws",
       "sfwmd",
       "smhi",
+      "unam",
       "usace",
       "usgs",
     ]);
@@ -42,6 +43,7 @@ describe("sourcesFor", () => {
       "sfwmd",
       "smhi",
       "uhslc",
+      "unam",
       "usace",
       "usgs",
     ]);

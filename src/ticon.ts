@@ -2,6 +2,7 @@ import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
+import { seriesOf } from "./sources/unam/index.ts";
 
 /**
  * Which store source can replace each TICON record in slackwater-database.
@@ -94,11 +95,10 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
   bom: { source: "bom", status: "license", note: "BOM license not stated" },
-  unam: { source: "unam", status: "license", note: "UNAM Servicio Mareográfico terms to check" },
   unam_hist: {
     source: "unam",
     status: "license",
-    note: "UNAM Servicio Mareográfico terms to check",
+    note: "SMN sends its historical records only on request, asked for in #48",
   },
   ispra: { source: "ispra", status: "license" },
   ieo: { source: "redmar", status: "license" },
@@ -303,6 +303,18 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
             : national.status,
         note,
       };
+  }
+
+  // SMN's records name the sensor and station number; its terms allow only
+  // non-profit reproduction, so a match stays on TICON for commercial use (#48).
+  if (contributor === "unam") {
+    const series = seriesOf(record.id);
+    if (!series)
+      return { source: "unam", id: null, status: "unmatched", note: "No SMN sensor in the id" };
+    const match = byCode(record, "unam", series, "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "SMN's terms allow only non-profit use" }
+      : match;
   }
 
   const direct = DIRECT[contributor];

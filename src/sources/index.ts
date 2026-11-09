@@ -18,6 +18,7 @@ import { source as rws } from "./rws/index.ts";
 import { source as sfwmd } from "./sfwmd/index.ts";
 import { source as smhi } from "./smhi/index.ts";
 import { source as uhslc } from "./uhslc/index.ts";
+import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
@@ -55,6 +56,7 @@ const adapters: Record<string, Source> = {
   sfwmd,
   smhi,
   uhslc,
+  unam,
   usace,
   usgs,
 };

@@ -31,6 +31,7 @@ Each source's README gives its coverage, datums, cadence, license and quirks.
 - [Rijkswaterstaat](src/sources/rws/README.md): observed levels, high and low waters and astronomical tide in the Netherlands and the Caribbean Netherlands.
 - [SFWMD](src/sources/sfwmd/README.md): stage at tidal structures, estuaries and bays in South Florida.
 - [SMHI](src/sources/smhi/README.md): hourly sea level at Swedish gauges.
+- [SMN, UNAM](src/sources/unam/README.md): one-minute sea levels from each sensor at 26 Mexican tide gauges, from the last 5 days SMN serves.
 - [UHSLC](src/sources/uhslc/README.md): hourly sea level at tide gauges worldwide, research-quality and fast-delivery.
 - [USACE](src/sources/usace/README.md): stage at Corps gauges, pools and tailwaters on the Mississippi, Ohio, Missouri and their tributaries.
 - [USGS](src/sources/usgs/README.md): gage height and water-surface elevations at river, lake, estuary and coastal gauges across the US.
