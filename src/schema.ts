@@ -235,6 +235,19 @@ export interface Source {
    * and throws rather than return values in another, so a file never mixes two.
    */
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
+  /**
+   * Spans of a station's values that the lake's own errata flag `suspect`,
+   * worked out from the source's levels and flags alone, so requalify flags
+   * them again without fetching. `record` reads the values of one epoch that
+   * the caller holds, a year at a time, which can be only part of it, such as
+   * the recent window; one that needs the whole record throws when it isn't.
+   * The adapter flags the same spans in what it fetches, keeping
+   * `source_flag` the source's.
+   */
+  suspect?(
+    station: Station,
+    record: () => AsyncIterable<Observation[]>,
+  ): Promise<[number, number][]>;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
   /** The source's own predicted curve over [start, end). */

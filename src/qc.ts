@@ -29,6 +29,9 @@ export interface QcOptions {
   outliers?: boolean;
 }
 
+/** How long a level unchanged is suspect, where a source's settings don't say. */
+export const FLATLINE_S = 6 * 3600;
+
 /**
  * Rows as a source sent them, with `source_flag` set to their flag before QC
  * can make it worse. Only freshly fetched rows get this: a stored row's flag
@@ -36,44 +39,81 @@ export interface QcOptions {
  * itself, such as REFMAR's suspect spans, sets `source_flag` to the source's.
  */
 export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
-  return rows.map((r) => ({ ...r, source_flag: r.source_flag ?? r.flag }));
+  // Levels to the 0.1 mm the lake reads back, so a fetched value equals its stored copy, as a flatline needs.
+  return rows.map((r) => ({
+    ...r,
+    level: Math.round(r.level * 10_000) / 10_000,
+    source_flag: r.source_flag ?? r.flag,
+  }));
 }
 
-/** Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and outliers. */
+/**
+ * Rows with `flag` worked out again from what the source said, `source_flag`,
+ * and the spans the lake's errata flag `suspect`, so QC starts over and a rule
+ * that loosens clears what it flagged before. A row written before
+ * `source_flag` was kept gets it from its flag when that's better than
+ * suspect, since QC and errata only ever mark a value suspect or bad, so the
+ * flag is the source's; a suspect or bad one may be QC's, so it stays.
+ */
+export function fromSource<T extends Observation>(
+  rows: T[],
+  suspect: [number, number][] = [],
+): T[] {
+  return rows.map((r) => {
+    const source = r.source_flag ?? (r.flag < Flag.suspect ? r.flag : undefined);
+    const marked = suspect.some(([from, to]) => r.time >= from && r.time < to);
+    const flag = Math.max(source ?? r.flag, marked ? Flag.suspect : 0) as Flag;
+    return source === undefined ? { ...r, flag } : { ...r, flag, source_flag: source };
+  });
+}
+
+/**
+ * Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and
+ * outliers. `context` is values from either side, such as the neighboring
+ * years, so a flatline or spike across the edge is judged whole; they take no
+ * part in the medians and spreads the rules measure against, and aren't
+ * returned.
+ */
 export function qc<T extends Observation>(
   rows: T[],
   {
     limit_m = 20,
-    flatline_s = 6 * 3600,
+    flatline_s = FLATLINE_S,
     centimeter_flatline_s = 0,
     spike_m = 0.25,
     outliers = true,
   }: QcOptions = {},
+  context: Observation[] = [],
 ): T[] {
-  const sorted = [...rows].sort((a, b) => a.time - b.time);
-  const out = sorted
-    .filter((r, i) => i === 0 || r.time !== sorted[i - 1]!.time)
-    .map((r) => ({ ...r }));
+  const out = unique(rows).map((r) => ({ ...r }));
   if (!out.length) return out;
-  const worsen = (i: number, flag: Flag) => (out[i]!.flag = Math.max(out[i]!.flag, flag) as Flag);
+  const own = new Set<Observation>(out);
+  const times = new Set(out.map((r) => r.time));
+  const all = unique([
+    ...out,
+    ...context.filter((r) => !times.has(r.time) && Number.isFinite(r.level)),
+  ]);
+  const worsen = (r: Observation, flag: Flag) => {
+    if (own.has(r)) r.flag = Math.max(r.flag, flag) as Flag;
+  };
 
   const middle = median(out.filter((r) => Number.isFinite(r.level)).map((r) => r.level)) ?? 0;
-  out.forEach((r, i) => {
-    if (!Number.isFinite(r.level) || Math.abs(r.level - middle) > limit_m) worsen(i, Flag.bad);
+  out.forEach((r) => {
+    if (!Number.isFinite(r.level) || Math.abs(r.level - middle) > limit_m) worsen(r, Flag.bad);
   });
 
   // Flatlines: runs of one value lasting at least `flatline_s`, or
   // `centimeter_flatline_s` where the level moves in whole centimeters around them.
-  for (let i = 0; i < out.length;) {
+  for (let i = 0; i < all.length;) {
     let j = i;
-    while (j + 1 < out.length && out[j + 1]!.level === out[i]!.level) j++;
-    const span = out[j]!.time - out[i]!.time;
+    while (j + 1 < all.length && all[j + 1]!.level === all[i]!.level) j++;
+    const span = all[j]!.time - all[i]!.time;
     if (
       j - i >= 3 &&
       span >= flatline_s * 1000 &&
-      (span >= centimeter_flatline_s * 1000 || !wholeCentimeters(out, i, j))
+      (span >= centimeter_flatline_s * 1000 || !wholeCentimeters(all, i, j))
     )
-      for (let k = i; k <= j; k++) worsen(k, Flag.suspect);
+      for (let k = i; k <= j; k++) worsen(all[k]!, Flag.suspect);
     i = j + 1;
   }
 
@@ -81,22 +121,22 @@ export function qc<T extends Observation>(
   // The threshold scales with how far values normally sit from that median, so
   // noisy gauges get more room than smooth ones, but never less than `spike_m`.
   const spacing = median(out.slice(1).map((r, i) => r.time - out[i]!.time)) ?? 0;
-  const residuals = out.map((r, i) => {
+  const residuals = all.map((r, i) => {
     // Neighbors on both sides, so a slope at an edge or a gap doesn't look like a spike.
     const before: number[] = [];
     const after: number[] = [];
-    for (let k = i - 1; k >= 0 && r.time - out[k]!.time <= 3 * spacing; k--)
-      before.push(out[k]!.level);
-    for (let k = i + 1; k < out.length && out[k]!.time - r.time <= 3 * spacing; k++)
-      after.push(out[k]!.level);
+    for (let k = i - 1; k >= 0 && r.time - all[k]!.time <= 3 * spacing; k--)
+      before.push(all[k]!.level);
+    for (let k = i + 1; k < all.length && all[k]!.time - r.time <= 3 * spacing; k++)
+      after.push(all[k]!.level);
     return before.length && after.length ? r.level - median([...before, ...after])! : undefined;
   });
   const threshold = Math.max(
     spike_m,
-    8 * mad(residuals.filter((d): d is number => d !== undefined)),
+    8 * mad(residuals.filter((d, i): d is number => d !== undefined && own.has(all[i]!))),
   );
   residuals.forEach((d, i) => {
-    if (d !== undefined && Math.abs(d) > threshold) worsen(i, Flag.suspect);
+    if (d !== undefined && Math.abs(d) > threshold) worsen(all[i]!, Flag.suspect);
   });
 
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
@@ -105,8 +145,8 @@ export function qc<T extends Observation>(
     const levels = out.map((r) => r.level);
     const center = median(levels)!;
     const outlier = Math.max(10 * mad(levels), 4 * spike_m);
-    out.forEach((r, i) => {
-      if (Math.abs(r.level - center) > outlier) worsen(i, Flag.suspect);
+    out.forEach((r) => {
+      if (Math.abs(r.level - center) > outlier) worsen(r, Flag.suspect);
     });
   }
 
@@ -131,6 +171,12 @@ function wholeCentimeters(out: Observation[], i: number, j: number): boolean {
   for (let k = i; k > 0 && out[i]!.time - out[k - 1]!.time <= 3 * DAY_MS; k--) count(k);
   for (let k = j + 1; k < out.length && out[k]!.time - out[j]!.time <= 3 * DAY_MS; k++) count(k);
   return changes >= 24 && whole > changes / 2;
+}
+
+/** Sorted by time, keeping the first of each timestamp. */
+function unique<T extends { time: number }>(rows: T[]): T[] {
+  const sorted = [...rows].sort((a, b) => a.time - b.time);
+  return sorted.filter((r, i) => i === 0 || r.time !== sorted[i - 1]!.time);
 }
 
 function median(values: number[]): number | undefined {

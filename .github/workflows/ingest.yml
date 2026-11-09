@@ -46,7 +46,7 @@ jobs:
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            backfill | recent | compact | requalify) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1
