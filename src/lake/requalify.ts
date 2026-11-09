@@ -92,5 +92,10 @@ export function judgeFetched(
   opts: QcOptions,
   context: Observation[],
 ): Observation[] {
-  return qc(mergeFetched(existing, withSourceFlag(fetched), start, end), opts, context);
+  const merged = mergeFetched(existing, withSourceFlag(fetched), start, end);
+  const times = new Set(fetched.map((r) => r.time));
+  const stored = new Map(existing.map((r) => [r.time, r.flag]));
+  return qc(merged, opts, context).map((r) =>
+    times.has(r.time) ? r : { ...r, flag: stored.get(r.time) ?? r.flag },
+  );
 }

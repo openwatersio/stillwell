@@ -120,7 +120,12 @@ export async function readObservationFile(
   path: string,
 ): Promise<{ rows: Observation[]; datums: string[] }> {
   // Every column, since a file written before `source_flag` was kept has none.
-  const rows = await read(path, OBSERVATION_COLUMNS);
+  // read_parquet globs, so a station ID with a glob character reads only its own file.
+  const glob = /[*?[]/.test(path);
+  const rows = (await read(path, OBSERVATION_COLUMNS, "time", "", "", glob)).filter(
+    (r) => !glob || posix.normalize(String(r.filename)) === posix.normalize(path),
+  );
+  for (const r of rows) delete r.filename;
   const datums = new Set<string>();
   return {
     rows: rows.map((r) => {
@@ -780,8 +785,9 @@ function read(
   order = "time",
   alias = "",
   where = "",
+  filename = false,
 ): Promise<Record<string, unknown>[]> {
-  return serial(() => readNow(path, select, order, alias, where));
+  return serial(() => readNow(path, select, order, alias, where, filename));
 }
 
 async function readNow(
@@ -790,13 +796,14 @@ async function readNow(
   order: string,
   alias: string,
   where: string,
+  filename: boolean,
 ): Promise<Record<string, unknown>[]> {
   if (!isRemote(path) && !existsSync(path)) return [];
   const db = await connection();
   if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
   try {
     const reader = await db.runAndReadAll(
-      `${select} FROM read_parquet(${quote(path)}) ${alias} ${where} ORDER BY ${order}`,
+      `${select} FROM read_parquet(${quote(path)}${filename ? ", filename = true" : ""}) ${alias} ${where} ORDER BY ${order}`,
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {

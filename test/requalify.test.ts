@@ -268,6 +268,47 @@ describe("judgeFetched", () => {
       feb.map((r) => r.flag),
       [Flag.suspect, Flag.suspect, Flag.suspect],
     );
+    // January's half of the run wasn't fetched, so it keeps its flag until requalify.
+    const jan = judged.filter((r) => r.time >= still[0] && r.time < Date.UTC(2025, 1, 1));
+    assert.ok(jan.length === 4 && jan.every((r) => r.flag === Flag.good));
     assert.ok(feb.every((r) => r.source_flag === Flag.good));
+  });
+});
+
+describe("readObservations", () => {
+  it("reads a station ID with a glob character from its own file alone", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const rows = (level: number) => [{ time: NEW_YEAR, level, flag: Flag.good }];
+    await writeObservations(seriesPath(root, "levels", "test", "a*", 2025), rows(1), "NAP");
+    await writeObservations(seriesPath(root, "levels", "test", "ab", 2025), rows(2), "NAP");
+    const own = await readObservations(seriesPath(root, "levels", "test", "a*", 2025));
+    assert.deepEqual(
+      own.map((r) => r.level),
+      [1],
+    );
+  });
+});
+
+describe("updateRecent with a whole-centimeter flatline rule", () => {
+  it("keeps marks within that rule's length of the window's start", async () => {
+    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const path = recentPath(root, "test");
+    const NOW = Date.UTC(2026, 10, 5, 12);
+    const window = withSourceFlag(hourly(NOW - 72 * HOUR, NOW - HOUR));
+    // 20 hours in: past the 6-hour rule's edge, inside the 48-hour one's.
+    window[20]!.flag = Flag.suspect;
+    await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
+    await updateRecent({
+      source: source(
+        { centimeter_flatline_s: 48 * 3600 },
+        { observations: async () => hourly(NOW - HOUR, NOW) },
+      ),
+      stations: [station],
+      lakeFor: () => root,
+      since: new Date(NOW - 2 * HOUR),
+      now: NOW,
+    });
+    const after = await readRecent(path);
+    assert.equal(after.find((r) => r.time === window[20]!.time)!.flag, Flag.suspect);
   });
 });

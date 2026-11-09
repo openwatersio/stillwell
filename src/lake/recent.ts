@@ -216,7 +216,12 @@ export async function updateRecent({
           if (got.length) {
             const had = window.current;
             const opts = qcFor(source, station);
-            const edge = (had[0]?.time ?? 0) + (opts.flatline_s ?? FLATLINE_S) * 1000;
+            // The longest run any flatline rule needs to see.
+            const longest = Math.max(
+              opts.flatline_s ?? FLATLINE_S,
+              opts.centimeter_flatline_s ?? 0,
+            );
+            const edge = (had[0]?.time ?? 0) + longest * 1000;
             // A source that can't judge a part of its record keeps the flags stored.
             const suspect = await source
               .suspect?.(station, async function* () {
