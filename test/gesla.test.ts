@@ -136,6 +136,22 @@ describe("gesla stations", () => {
     await assert.rejects(gesla.stations(), /lists 11 records in 12 rows, not 12/);
   });
 
+  it("leaves out Uddevalla's record, which holds Arkö's values", async () => {
+    // GESLA 4.1's row, as served.
+    const uddevalla =
+      'uddevalla-2541-swe-smhi,Uddevalla,2541,SWE,SMHI,Swedish Meteorological and Hydrological Institute,"https://www.smhi.se/data/oceanografi/ladda-ner-oceanografiska-observationer/#param=sealevelMinutes,stations=all",smhi@smhi.se,Swedish Meteorological and Hydrological Institute,"https://www.smhi.se/data/oceanografi/ladda-ner-oceanografiska-observationer/#param=sealevelMinutes,stations=all",smhi@smhi.se,  58.34750000,  11.89480000,Unspecified,2014/04/02 08:00:00,2026/06/17 00:00:00,13,0,RH 2000 (Swedish National Height System 2000),Unspecified,Unspecified,-99.9999,River,No obvious issues,https://d2lyy96te42c83.cloudfront.net/v4-1/uddevalla-2541-swe-smhi\r';
+    const withUddevalla = metadata + uddevalla;
+    gesla.release.records = 12;
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", withUddevalla.length)
+        : withUddevalla,
+    );
+    const ids = (await gesla.stations()).map((s) => s.source_id);
+    assert.equal(ids.length, 11);
+    assert.ok(!ids.includes("uddevalla-2541-swe-smhi"));
+  });
+
   it("links DWR's NAVD88 series, whose Q GESLA drops", () => {
     assert.deepEqual(gesla.originatorIds("CDWR", "B91450", -121.6), ["dwr/B91450Q"]);
     assert.deepEqual(gesla.originatorIds("CDWR", "B91212", -121.7), ["dwr/B91212"]);

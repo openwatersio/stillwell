@@ -74,6 +74,12 @@ const WSV_SHIFT_MS = 30 * 60_000;
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
+/**
+ * Records left out of the list. Uddevalla's holds Arkö's values, row for row
+ * (erratum `gesla-uddevalla-is-arko`).
+ */
+const DROPPED = new Set(["uddevalla-2541-swe-smhi"]);
+
 /** A GESLA record as listed, with the fields of its metadata row kept in the lake's list. */
 export type GeslaStation = ListedStation & {
   /** `CONTRIBUTOR (ABBREVIATED)`, such as `NOAA` or `UHSLC_RQ`. */
@@ -172,7 +178,8 @@ export async function stations(): Promise<GeslaStation[]> {
     );
   const bad = rows.findIndex((r) => r.length !== header.length + 1);
   if (bad >= 0) throw new Error(`GESLA's metadata row ${bad + 2} has ${rows[bad]!.length} fields`);
-  const listed = rows.map((r): GeslaStation & { code: string } => {
+  const kept = rows.filter((r) => !DROPPED.has(r[c.file]!.trim()));
+  const listed = kept.map((r): GeslaStation & { code: string } => {
     const file = r[c.file]!.trim();
     const abbrev = r[c.contributor]!.trim();
     const contributor = CONTRIBUTORS[abbrev.toUpperCase()];
