@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
+import { qcFor } from "../src/lake/recent.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
+import { TIDE_M, tidal } from "../src/sources/gesla/tidal.ts";
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
@@ -461,5 +463,73 @@ describe("datumJumps", () => {
 
   it("leaves a shift smaller than JUMP_M alone", () => {
     assert.deepEqual(gesla.datumJumps(series(200, 2, gesla.JUMP_M * 0.9, 100)), []);
+  });
+});
+
+describe("tidal", () => {
+  const HOUR = 3_600_000;
+  /** Hourly levels over `days`, from 2020, of `level(hour)`, with GESLA's flags all good. */
+  const record = (days: number, level: (h: number) => number) => {
+    const times = Float64Array.from(
+      { length: days * 24 },
+      (_, h) => Date.UTC(2020, 0, 1) + h * HOUR,
+    );
+    return {
+      times,
+      levels: Float64Array.from(times, (_, h) => level(h)),
+      source: new Uint8Array(times.length),
+    };
+  };
+  const wave = (amplitude: number, periodHours: number) => (h: number) =>
+    amplitude * Math.cos((2 * Math.PI * h) / periodHours);
+  // A pooled river: flat, then a three-week flood of two meters.
+  const flood = (h: number) => (h > 2000 && h < 2500 ? 2 : 0);
+
+  it("finds a semidiurnal tide, or a diurnal one, of TIDE_M", () => {
+    assert.equal(tidal(record(90, wave(TIDE_M + 0.01, 12.4206012))), true);
+    assert.equal(tidal(record(90, wave(TIDE_M + 0.01, 25.8193417))), true);
+  });
+
+  it("finds none in a pooled river's floods, a smaller tide, or a daily schedule", () => {
+    assert.equal(tidal(record(180, flood)), false);
+    assert.equal(tidal(record(90, wave(TIDE_M - 0.02, 12.4206012))), false);
+    // A dam's releases each day and half day, which a solar S2 and K1 would read as a tide.
+    assert.equal(tidal(record(90, (h) => wave(0.5, 24)(h) + wave(0.3, 12)(h))), false);
+  });
+
+  it("says no under 30 days, and leaves out values GESLA says not to use", () => {
+    assert.equal(tidal(record(20, wave(1, 12.4206012))), false);
+    // A year of daily values, which alias M2 to a 15-day period.
+    const daily = record(366, wave(1, 12.4206012));
+    const kept = (_: number, i: number) => i % 24 === 0;
+    assert.equal(
+      tidal({
+        times: daily.times.filter(kept),
+        levels: daily.levels.filter(kept),
+        source: daily.source.filter(kept),
+      }),
+      false,
+    );
+    const unused = record(90, wave(1, 12.4206012));
+    unused.source.fill(Flag.suspect);
+    assert.equal(tidal(unused), false);
+  });
+});
+
+describe("gesla qc", () => {
+  const record = (source_id: string, kind: "river" | "lake") => ({ source_id, kind }) as Station;
+
+  it("gives a tidal river record a tide gauge's flatline limit, and a pooled one two days", () => {
+    // Hudson at Albany is in TIDAL_RIVERS; Ashland Avenue, on the Niagara, isn't. Both flood.
+    const albany = qcFor(
+      gesla.source,
+      record("hudson_river_at_albany_ny-1359139-usa-usgs", "river"),
+    );
+    const ashland = qcFor(gesla.source, record("ashland_ave_ny-9063007-usa-noaa", "river"));
+    assert.equal(albany.flatline_s, undefined);
+    assert.equal(albany.centimeter_flatline_s, 48 * 3600);
+    assert.equal(ashland.flatline_s, 48 * 3600);
+    assert.equal(albany.outliers, false);
+    assert.equal(ashland.outliers, false);
   });
 });
