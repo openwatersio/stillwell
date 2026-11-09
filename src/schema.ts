@@ -78,6 +78,14 @@ export interface Station {
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */
   live: boolean;
+  /**
+   * Where the source says its quality checks of this station's values start,
+   * as a UTC instant: it never checked the values before it and never will,
+   * so a `preliminary` one from before it is final as it stands, having
+   * passed only the lake's QC. Null or absent where the source states no
+   * such date. Absent in a source's list means the adapter hasn't asked yet.
+   */
+  source_qc_start?: string | null;
   /** How often the source lets us ask for this station, in seconds. */
   min_interval_s: number | null;
   source_url: string | null;
@@ -190,6 +198,9 @@ export interface SourceMetadata {
   /**
    * Whether values the source first publishes as preliminary become final
    * later, so the monthly refetch fetches them again until they do.
+   * `sources.json` publishes it, telling readers that a false source's
+   * `preliminary` values stay so, so it follows what the source does, never
+   * only what a refetch costs.
    */
   finalizes: boolean;
   /**

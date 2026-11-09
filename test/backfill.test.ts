@@ -55,6 +55,13 @@ describe("yearDone", () => {
     assert.equal(yearDone({ ...DONE, preliminary: 1 }, Y2024, Y2025, NOW), false);
   });
 
+  it("skips preliminary values from before the source's QC start, which it never checks", () => {
+    const file = { ...DONE, preliminary: 1 };
+    assert.equal(yearDone(file, Y2024, Y2025, NOW, "2025-01-01T00:00:00Z"), true);
+    // A year the checks start in may still have values the source will check.
+    assert.equal(yearDone(file, Y2024, Y2025, NOW, "2024-07-01T00:00:00Z"), false);
+  });
+
   it("fetches the current year, however complete its file", () => {
     const from = new Date(Date.UTC(2026, 0, 1));
     const to = new Date(Date.UTC(2027, 0, 1));

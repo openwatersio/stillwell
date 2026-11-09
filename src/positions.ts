@@ -170,6 +170,45 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: -15.967, lon: -5.7 },
     at: { lat: -15.9167, lon: -5.7167 },
   },
+
+  // USACE gauges the CWMS catalog places away from the same gauge in another
+  // district's catalog or at USGS: erratum `usace-baton-rouge-position` for
+  // Baton Rouge, and erratum `usace-positions` for the rest.
+  // MVK's Baton Rouge and USGS 07374000, at Port Allen Lock. MVN's is 113 km south.
+  "usace/MVN.Baton_Rouge": {
+    served: { lat: 29.4291638, lon: -91.2069388 },
+    at: { lat: 30.4456667, lon: -91.1915556 },
+  },
+  // USGS 07275900. MVK's latitude is 3° off, in Illinois.
+  "usace/MVK.Olive_Branch": {
+    served: { lat: 37.907500000365, lon: -89.753330556055 },
+    at: { lat: 34.9075, lon: -89.7533333 },
+  },
+  // USGS 07274000. MVK's latitude is 2° off, near Jackson.
+  "usace/MVK.Oxford": {
+    served: { lat: 32.27333, lon: -89.52139 },
+    at: { lat: 34.2733333, lon: -89.5213889 },
+  },
+  // USGS 073814675, at the railroad bridge in Amelia. MVN's is 54 km east.
+  "usace/MVN.Bayou_Boeuf-Amelia": {
+    served: { lat: 29.8691, lon: -90.5949917 },
+    at: { lat: 29.6683333, lon: -91.0997222 },
+  },
+  // USGS 073815450. MVN gives it Chicot Pass near West Fork's position, 20 km north.
+  "usace/MVN.Chicot_Pass-Myette": {
+    served: { lat: 30.0680139, lon: -91.4740361 },
+    at: { lat: 29.8927041, lon: -91.4456662 },
+  },
+  // USGS 03418000. LRN's is 15 km west of Hilham.
+  "usace/LRN.RoaringR_Hilham": {
+    served: { lat: 36.340921356638, lon: -85.590229592095 },
+    at: { lat: 36.3408945, lon: -85.4263596 },
+  },
+  // USGS 03431100, at Glendale Lane. LRN's is 14 km north.
+  "usace/LRN.WFBrownsCr_Glen": {
+    served: { lat: 36.217654520392, lon: -86.820220686694 },
+    at: { lat: 36.0942596, lon: -86.7938782 },
+  },
 };
 
 /** Farthest a source's position can move before its correction is out of date. */

@@ -385,6 +385,7 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   status: "VARCHAR",
   live: "BOOLEAN",
   min_interval_s: "INTEGER",
+  source_qc_start: "TIMESTAMPTZ",
   source_url: "VARCHAR",
 };
 
@@ -402,10 +403,14 @@ export async function writeStations(path: string, stations: LakeStation[]): Prom
   );
 }
 
-/** What a source's list holds besides the shared columns, kept as JSON in `extra`. */
+/**
+ * A source's list's shared columns. The rest is kept as JSON in `extra`,
+ * `source_qc_start` included, so a station whose source hasn't been asked has
+ * none rather than null, and its adapter knows to ask.
+ */
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
   Object.entries(STATION_COLUMNS).filter(
-    ([key]) => !["first", "last", "preferred", "errata"].includes(key),
+    ([key]) => !["first", "last", "preferred", "errata", "source_qc_start"].includes(key),
   ),
 );
 
@@ -416,7 +421,9 @@ const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
 export async function writeStationList(path: string, stations: LakeStation[]): Promise<void> {
   const rows = stations.map((s) => {
     const extra = Object.fromEntries(
-      Object.entries(s).filter(([key]) => !(key in STATION_COLUMNS) && key !== "epochs"),
+      Object.entries(s).filter(
+        ([key]) => (!(key in STATION_COLUMNS) || key === "source_qc_start") && key !== "epochs",
+      ),
     );
     return { ...s, extra: JSON.stringify(extra) };
   });

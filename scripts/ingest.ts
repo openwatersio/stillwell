@@ -527,7 +527,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               station.source_id,
               epoch.id,
             );
-            plan = await yearsToFetch(dir, since, until, mode, now);
+            plan = await yearsToFetch(dir, since, until, mode, now, station.source_qc_start);
             // A station picked for its preliminary value is read again even with no year
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
