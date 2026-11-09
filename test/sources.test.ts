@@ -3202,6 +3202,15 @@ describe("uhslc", () => {
     assert.equal(uhslc.originatorStation({ contributor: nos, originator: "ID070007" }), null);
   });
 
+  it("links a series to its JMA station by the code JMA or JODC gives", () => {
+    const jma = "Japan Meteorological Agency";
+    const jodc = "Japan Oceanographic Data Center";
+    assert.equal(uhslc.originatorStation({ contributor: jma, originator: "CC" }), "jma/CC");
+    assert.equal(uhslc.originatorStation({ contributor: jodc, originator: "HA" }), "jma/HA");
+    // JODC's HD numbers aren't JMA codes.
+    assert.equal(uhslc.originatorStation({ contributor: jodc, originator: "HD50" }), null);
+  });
+
   it("reads a documentation file's contributor", () => {
     const file = (lines: string) => `              Station  : X\r\n${lines}`;
     assert.equal(

@@ -371,15 +371,23 @@ export function withheld(sourceId: string): string | null {
 
 /**
  * The originator's own station for a series, where its contributor numbers
- * gauges as a lake source does: NOS's are CO-OPS station IDs. Other
- * contributors' numbers (SHOM's, JMA's codes) aren't their lake source's IDs,
- * so those gauges are matched by nearness and name (src/same-as.ts).
+ * gauges as a lake source does: NOS's are CO-OPS station IDs, and the
+ * two-letter codes JMA and JODC give are JMA's (JODC's `HD` numbers aren't).
+ * Other contributors' numbers (SHOM's, the TGI's) aren't their lake source's
+ * IDs, so those gauges are matched by nearness and name (src/same-as.ts).
  */
 export function originatorStation(
   s: Pick<UhslcStation, "contributor" | "originator">,
 ): string | null {
-  if (/^National Ocean Service\b/.test(s.contributor ?? "") && /^\d{7}$/.test(s.originator ?? ""))
-    return `coops/${s.originator}`;
+  const contributor = s.contributor ?? "";
+  const originator = s.originator ?? "";
+  if (/^National Ocean Service\b/.test(contributor) && /^\d{7}$/.test(originator))
+    return `coops/${originator}`;
+  if (
+    /^Japan (Meteorological Agency|Oceanographic Data Center)$/.test(contributor) &&
+    /^[A-Z0-9]{2}$/.test(originator)
+  )
+    return `jma/${originator}`;
   return null;
 }
 

@@ -191,11 +191,38 @@ describe("linkGauges's limits", () => {
       station("smhi/2541", { name: "Uddevalla", lat: 58.3451, lon: 11.9069, kind: "coastal" }),
     ];
     assert.equal(linkGauges(list, NOW).stations[0]!.same_as.length, 0);
-    LINKS.push(...DECISIONS);
+    LINKS.push(...DECISIONS.filter((d) => d.b === "smhi/2541"));
     try {
       const { stations, report } = linkGauges(list, NOW);
       assert.deepEqual(stations[0]!.same_as, ["smhi/2541"]);
       assert.equal(stations[0]!.preferred, "smhi/2541");
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
+  it("links the gauges a person matched that no rule does", () => {
+    const list = [
+      station("bodc/dev", { name: "Devonport", lat: 50.36839, lon: -4.18525 }),
+      station("ea/E72139", { name: "Plymouth", lat: 50.368401, lon: -4.185217 }),
+      station("uhslc/805", { name: "Vardo", lat: 70.3333, lon: 31.1, contributor: "NHS" }),
+      station("kartverket/VAW", { name: "Vardø", lat: 70.374978, lon: 31.104015 }),
+      station("uhslc/850a", { name: "Ile Royale", lat: 5.285, lon: -52.585, contributor: "SHOM" }),
+      station("refmar/749", { name: "ILE ROYALE", lat: 5.284333, lon: -52.5865 }),
+      station("refmar/127", { name: "ILE ROYALE ANSE LEGOFF", lat: 5.28833333, lon: -52.5866667 }),
+    ];
+    const pairs = (linked: Station[]) =>
+      linked.flatMap((s) => s.same_as.filter((o) => s.id < o).map((o) => `${s.id}~${o}`));
+    assert.deepEqual(pairs(linkGauges(list, NOW).stations), []);
+    LINKS.push(...DECISIONS.filter((d) => d.b !== "smhi/2541"));
+    try {
+      const { stations, report } = linkGauges(list, NOW);
+      assert.deepEqual(pairs(stations).sort(), [
+        "bodc/dev~ea/E72139",
+        "kartverket/VAW~uhslc/805",
+        "refmar/749~uhslc/850a",
+      ]);
       assert.deepEqual(report.dropped, []);
     } finally {
       LINKS.splice(0);

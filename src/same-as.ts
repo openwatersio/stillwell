@@ -46,6 +46,21 @@ export const LINKS: Decision[] = [
     b: "smhi/2541",
     note: "CMEMS's copy of SMHI's Uddevalla gauge: 98% of 128,161 shared hours agree within 0.5 mm. GESLA calls it a river gauge and SMHI a coastal one, so the copy rule skips it.",
   },
+  {
+    a: "bodc/dev",
+    b: "ea/E72139",
+    note: "One National Tide Gauge Network gauge, 3 m apart, which BODC names Devonport and the EA Plymouth. The EA's readings less BODC's equal NTSLF's chart datum offset to the centimeter (see the BODC README). The names share no word, so nearness doesn't link them.",
+  },
+  {
+    a: "uhslc/805",
+    b: "kartverket/VAW",
+    note: "UHSLC's copy of the Norwegian Hydrographic Service's Vardø gauge, which UHSLC rounds to 70°20′N 31°06′E, 4.6 km from Kartverket's position and beyond the copy rule's 2 km.",
+  },
+  {
+    a: "uhslc/850a",
+    b: "refmar/749",
+    note: "UHSLC's copy of SHOM's Ile Royale gauge, SHOM number 540 in UHSLC's documentation file. UHSLC keeps Ile Royale Anse Legoff (545) apart as 851, as REFMAR keeps 127 apart from 749, but both REFMAR names share Ile Royale's words, so the copy rule leaves it in doubt.",
+  },
 ];
 
 /** Pairs a person found don't share a gauge, though a rule links them. */
