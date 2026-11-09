@@ -48,7 +48,7 @@ for (const [id, { metadata }] of Object.entries(sources)) {
         e.error,
         `Stations: ${e.stations === null ? "every station" : e.stations.join(", ") || "none listed"}${span(e.since, e.until) ? `; values ${span(e.since, e.until)}` : ""}.`,
         e.evidence ?? "",
-        `What we do meanwhile: ${e.lake}`,
+        `What we do meanwhile: ${e.response}`,
       ]
         .filter(Boolean)
         .join("\n\n") + "\n",

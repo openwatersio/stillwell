@@ -5,7 +5,7 @@
       "stations": ["uhslc/329", "uhslc/329a"],
       "handling": "corrected",
       "error": "UHSLC stamps its Hong Kong (Quarry Bay) hourly heights an hour early in every version and the fast-delivery series: the height labeled T was measured at T + 1 h UTC ([openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360), confirmed by the clock check).",
-      "lake": "Every value is moved an hour later.",
+      "response": "Every value is moved an hour later.",
       "evidence": "Found in [openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360) and confirmed by `scripts/clock-check.ts`: Quarry Bay fits other records best an hour later, in every version and the fast-delivery series.",
       "reported": "2026-10-24",
       "report": "Sent to srdata@soest.hawaii.edu on 2026-10-24, with a follow-up on 2026-11-07. No answer yet."
@@ -15,7 +15,7 @@
       "stations": ["uhslc/290a", "uhslc/290", "uhslc/914", "uhslc/316", "uhslc/548", "uhslc/054a"],
       "handling": "corrected",
       "error": "UHSLC's station metadata places six series several kilometers from their gauge, one of them in the open sea.",
-      "lake": "The station refresh moves each station to the gauge's position from another source, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while UHSLC still serves the position it was written against; if UHSLC moves the station, it keeps UHSLC's position and the refresh reports the entry and fails the run until a person checks it.",
+      "response": "The station refresh moves each station to the gauge's position from another source, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while UHSLC still serves the position it was written against; if UHSLC moves the station, it keeps UHSLC's position and the refresh reports the entry and fails the run until a person checks it.",
       "evidence": "| Station | UHSLC | Gauge | Off by | Source of the gauge's position |\n| --- | --- | --- | --: | --- |\n| Port Stanley 290A, 1964–1974 | -52.7, -57.8667 | -51.690339, -57.864931 | 112 km | PSMSL Stanley (1082), 1964–1974 |\n| Port Stanley 290, 1992 on | -51.75, -57.9333 | -51.692358, -57.820514 | 10 km | PSMSL Stanley II (1796), 1992 on |\n| Meulaboh 914 | 4.316667, 96.21667 | 4.1274865, 96.131854 | 23 km | IOC sea level monitoring (meul) |\n| Acapulco 316 | 16.8417, -99.8517 | 16.8379333, -99.903 | 5.5 km | IOC (acap2); UHSLC's own 316A and 316B, and UNAM's records, are within 1 km of it |\n| Kaumalapau 548 | 20.78, -156.9 | 20.79, -156.995 | 10 km | CO-OPS Kaumalapau Harbor (1614465); UHSLC's position is inland on Lanai |\n| Chuuk 054A, 1947–1991 | 7.45368, 151.8982 | 7.44667, 151.847 | 5.7 km | NOAA's Moen Island gauge (CO-OPS 1840000); UHSLC's position is its current gauge's |\n\nUHSLC's 290A position sits 112 km south of Stanley in the South Atlantic. slackwater-database tracks the same positions in TICON's copies of these series in [openwatersio/slackwater-database#375](https://github.com/openwatersio/slackwater-database/issues/375)."
     }
   ],

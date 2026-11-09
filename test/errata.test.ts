@@ -23,7 +23,7 @@ const entry = (fields: Record<string, unknown> = {}) => ({
   until: "2021-01-01",
   handling: "corrected",
   error: "UHSLC's Hong Kong heights are an hour early.",
-  lake: "Shifted an hour later.",
+  response: "Shifted an hour later.",
   ...fields,
 });
 const file = (entries: object[], retired: string[] = []) => ({ errata: entries, retired });
@@ -73,7 +73,7 @@ describe("parseErrata", () => {
         until: "2021-01-01",
         error: "UHSLC's Hong Kong heights are an hour early.",
         handling: "corrected",
-        lake: "Shifted an hour later.",
+        response: "Shifted an hour later.",
         evidence: null,
         reported: null,
         report: null,
@@ -101,7 +101,7 @@ describe("parseErrata", () => {
     refused({ since: "2021-01-01", until: "2020-01-01" });
     refused({ handling: "fixed" });
     refused({ error: "" });
-    refused({ lake: undefined });
+    refused({ response: undefined });
     refused({ reported: "last week" });
     refused({}, ["uhslc-hong-kong-hour-early"]);
     // A misspelled until would leave the span open.

@@ -38,7 +38,7 @@ export interface Erratum {
   /**
    * The UTC days of values the error is in, `since` to before `until`; null
    * for an open end or none. What the lake lacks or changed as a result can
-   * be wider, and `lake` says so.
+   * be wider, and `response` says so.
    */
   since: string | null;
   until: string | null;
@@ -46,7 +46,7 @@ export interface Erratum {
   error: string;
   handling: Handling;
   /** What the lake does about it. */
-  lake: string;
+  response: string;
   /** How it was found and how sure it is. */
   evidence: string | null;
   /** The day it was first reported to the agency; null until then. */
@@ -64,7 +64,7 @@ const FIELDS = new Set([
   "until",
   "handling",
   "error",
-  "lake",
+  "response",
   "evidence",
   "reported",
   "report",
@@ -132,7 +132,7 @@ export function parseErrata(
       until,
       error: text("error", true)!,
       handling: handling as Handling,
-      lake: text("lake", true)!,
+      response: text("response", true)!,
       evidence: text("evidence", false),
       reported: day("reported"),
       report: text("report", false),

@@ -5,7 +5,7 @@
       "stations": "every station",
       "handling": "avoided",
       "error": "The dataset's `time_coverage_start` says 2000, but no gauge has values before October 2006.",
-      "lake": "Backfills start from each gauge's first value, not the dataset's coverage.",
+      "response": "Backfills start from each gauge's first value, not the dataset's coverage.",
       "evidence": "The ERDDAP dataset's global `time_coverage_start` attribute; the earliest value at any gauge, found while backfilling, is October 2006 at Skerries Harbour.",
       "reported": "2026-11-08",
       "report": "Sent to the Marine Institute on 2026-11-08; they replied they'll work through it after a period of leave. Text in [#59](https://github.com/openwatersio/water-levels/issues/59)."
@@ -36,7 +36,7 @@
       "since": "2026-03-24",
       "handling": "kept",
       "error": "On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.",
-      "lake": "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
+      "response": "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
       "evidence": "LAT less OD Malin is constant at each gauge from 2008 until 24 March 2026, then moves by 1 to 5 cm. See [the adapter's README](https://github.com/openwatersio/water-levels/blob/main/src/sources/marine-institute/README.md).",
       "reported": "2026-11-08",
       "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/water-levels/issues/59); they replied they'll work through it after a period of leave."

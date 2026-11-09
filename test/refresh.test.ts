@@ -505,7 +505,7 @@ describe("publishStations", () => {
       until: null,
       error: "",
       handling: "kept",
-      lake: "",
+      response: "",
       evidence: null,
       reported: null,
       report: null,

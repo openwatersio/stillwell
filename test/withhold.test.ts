@@ -372,7 +372,7 @@ describe("publishStations with withheld stations", () => {
       until: null,
       error: "",
       handling: "corrected",
-      lake: "",
+      response: "",
       evidence: null,
       reported: null,
       report: null,

@@ -7,7 +7,7 @@
       "until": "2025-01-01",
       "handling": "flagged",
       "error": "SHOM's Pointe-à-Pitre levels run 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly fit at all in 2020 and 2024, with no steady offset; 2025 fits again.",
-      "lake": "2020 to 2024 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
+      "response": "2020 to 2024 is flagged `suspect`, keeping SHOM's own flag as `source_flag`.",
       "evidence": "`scripts/clock-check.ts`, November 2026: within 10 minutes of UHSLC's record in 2015, 2018, 2021, 2022 and 2025; 60 to 70 minutes late in 2023 against UHSLC's, CMEMS's and REFMAR's own TICON records; r 0.36 in 2020 and 0.15 in 2024.",
       "reported": "2026-11-06",
       "report": "Sent to refmar@shom.fr on 2026-11-06, in French, with the yearly results above. No answer yet."
