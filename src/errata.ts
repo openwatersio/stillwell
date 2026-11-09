@@ -1,7 +1,7 @@
 /**
  * Errors in what a source publishes, found while ingesting it: values on the
  * wrong clock or day, positions far from the gauge, metadata that contradicts
- * the data, two endpoints that disagree. Each source's are in
+ * the data, two endpoints that disagree. Each source's errata are in
  * `src/sources/<source>/errata.json`, which the adapter registry imports,
  * reviewed with the code that handles them. A `flagged` erratum with stations and a span is flagged `suspect` by
  * `withErrata` wherever the lake fetches or requalifies those values; other
@@ -143,10 +143,12 @@ export function parseErrata(
 
 /**
  * Every source's errata, from each one's `errata.json`, by source ID, and what
- * is wrong with them: a file that doesn't parse is left out whole, and an ID
- * two entries share or one retired anywhere leaves out the later entry. The
- * registry reads them as it loads, so a bad file must cost only its own
- * errata, not every job; the tests and `publish` fail on the problems.
+ * is wrong with them: a file whose entries break the rules is left out whole,
+ * and an ID two entries share or one retired anywhere leaves out the later
+ * entry. The registry reads them as it loads, so such a file must cost only
+ * its own errata, not every job; the tests and `publish` fail on the problems.
+ * A file that isn't JSON at all fails the registry's import, which Prettier's
+ * check and the tests catch before it merges.
  */
 export function readErrata(files: Record<string, unknown>): {
   errata: Erratum[];
