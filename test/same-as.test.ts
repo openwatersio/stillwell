@@ -229,6 +229,37 @@ describe("linkGauges's limits", () => {
     }
   });
 
+  it("links BODC's Portbury to the EA's Avonmouth Portbury and prefers the EA's readings", () => {
+    const list = [
+      // A longer record than the EA's, but every value flagged.
+      station("bodc/ptb", {
+        name: "Portbury",
+        lat: 51.4992,
+        lon: -2.727,
+        first: "2022-04-01T00:00:00Z",
+        last: "2026-10-31T00:00:00Z",
+      }),
+      station("ea/E72624", {
+        name: "Avonmouth Portbury",
+        lat: 51.50291,
+        lon: -2.6988,
+        first: "2025-11-01T00:00:00Z",
+        last: "2026-10-31T00:00:00Z",
+      }),
+    ];
+    assert.deepEqual(linkGauges(list, NOW).stations[0]!.same_as, []);
+    LINKS.push(...DECISIONS.filter((d) => d.a === "bodc/ptb"));
+    try {
+      assert.equal(linkGauges(list, NOW).stations[0]!.preferred, "bodc/ptb");
+      const { stations, report } = linkGauges(list, NOW, new Map([["bodc/ptb", 0]]));
+      assert.deepEqual(stations[0]!.same_as, ["ea/E72624"]);
+      assert.equal(stations[0]!.preferred, "ea/E72624");
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
   it("reports a person's decision that names no station", () => {
     LINKS.push({ a: "a/1", b: "gone/1", note: "test" });
     PREFER["gone/2"] = "test";

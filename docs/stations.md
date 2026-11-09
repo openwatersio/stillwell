@@ -176,7 +176,7 @@ The R2 lake was seeded once from the committed lists, with a command since remov
 
 ## Gauges in more than one source
 
-Many gauges are in more than one source: UHSLC carries copies of CO-OPS, REFMAR, Kartverket, SMHI and other agencies' gauges, REFMAR some of UHSLC's, BSH lists PEGELONLINE's gauges for its predictions, and USACE districts publish many USGS gauges. `stations.parquet` links the stations that share a gauge with `same_as`, and names the one to use for its observed levels with `preferred`. Both are worked out each time the file is built, in `linkGauges` (`src/same-as.ts`). A source's list keeps only its adapter's own links in `same_as`, so a better rule or a person's decision reaches every station at the next `publish`, while an adapter's new links wait for its next station refresh. `preferred` is worked out again on every build too, so it moves when a series stops reporting or another's record grows longer.
+Many gauges are in more than one source: UHSLC carries copies of CO-OPS, REFMAR, Kartverket, SMHI and other agencies' gauges, REFMAR some of UHSLC's, BSH lists PEGELONLINE's gauges for its predictions, and USACE districts publish many USGS gauges. `stations.parquet` links the stations that share a gauge with `same_as`, and names the one to use for its observed levels with `preferred`. Both are worked out each time the file is built, in `linkGauges` (`src/same-as.ts`). A source's list keeps only its adapter's own links in `same_as`, so a better rule or a person's decision reaches every station at the next `publish`, while an adapter's new links wait for its next station refresh. `preferred` is worked out again on every build too, so it moves when a series stops reporting, another's record grows longer, or the share of a record's values flagged suspect or bad changes.
 
 **Matching.** A link comes from one of four places:
 
@@ -200,7 +200,7 @@ A GESLA record whose values are another gauge's (`DROPPED` in `src/sources/gesla
 4. it isn't a GESLA record, which is the fallback for a gauge no other series covers;
 5. it is active and still reporting, with a value in the last year, so a live series wins over a version that ended;
 6. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC, and so is a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs;
-7. the longer record in the lake;
+7. the longer record in the lake, its span from `first` to `last` times its share of values not flagged suspect or bad, from the source's years file (`stations/years/<source>.parquet`), or its whole span where the source has none or it can't be read;
 8. the finer interval;
 9. the lower ID, so equals always break the same way.
 
