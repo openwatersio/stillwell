@@ -33,6 +33,7 @@ import {
 import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
+import { DROPPED } from "./sources/gesla/dropped.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 
 /** What a refresh changed, written beside its snapshot. */
@@ -108,7 +109,12 @@ export async function refreshSource(
       `${opened.length} stations changed datum at once (limit ${limit}): ${opened.map((c) => c.id).join(", ")}; check them and rerun with --accept-epochs`,
     );
 
-  const listedInactive = new Set(fetched.filter((s) => s.status === "inactive").map((s) => s.id));
+  // A GESLA record dropped for holding another gauge's values was a person's decision, not the source's.
+  const listedInactive = new Set(
+    fetched
+      .filter((s) => s.status === "inactive" && !DROPPED.has(s.id.replace(/^gesla\//, "")))
+      .map((s) => s.id),
+  );
   const report = {
     ...reportOf(id, options.now, previous, stations, changes, listedInactive),
     positions: stale,
