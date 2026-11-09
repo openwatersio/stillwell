@@ -1473,12 +1473,20 @@ describe("usace", () => {
     assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: -0.3 }), { NGVD29: -0.091 });
     assert.deepEqual(usace.datumsOf({ ...redRiver, unit: "m" }), { NGVD29: -0.27 });
     assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: 0 }), {});
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: undefined }), {});
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: -0.2700000001 }), { NAVD88: -0.082 });
     // Each change, including a dropped elevation, is reported for a person to check the entry.
-    assert.equal(error.mock.callCount(), 3);
-    assert.match(
-      String(error.mock.calls[2]!.arguments[0]),
-      /MVN.Red_River_Ldg now gives 0 ft NGVD29/,
-    );
+    const said = error.mock.calls.map((c) => String(c.arguments[0]));
+    for (const given of [
+      "-0.3 ft NGVD29",
+      "-0.27 m NGVD29",
+      "0 ft NGVD29",
+      "no elevation ft NGVD29",
+    ])
+      assert.ok(
+        said.some((s) => s.includes(`MVN.Red_River_Ldg now gives ${given},`)),
+        given,
+      );
   });
 
   it("reads the NAVD88 adjustment and LWRP offset from a New Orleans description", () => {
