@@ -8,6 +8,7 @@ import {
   type SourceMetadata,
   type Station,
 } from "../../schema.ts";
+import { describedDatums, type DatumNote } from "./described.ts";
 import { ZERO_SINCE } from "./zeros.ts";
 
 /**
@@ -16,7 +17,8 @@ import { ZERO_SINCE } from "./zeros.ts";
  *
  * A station is a CWMS location, and its levels are one `Stage.Inst` series
  * there, in meters above the gauge's zero (`GZ`). Where CWMS gives the gauge
- * zero's elevation in NGVD29 or NAVD88, `datums` carries it.
+ * zero's elevation in NGVD29 or NAVD88, or the location's description gives
+ * its adjustment to NAVD88 or the 2007 LWRP, `datums` carries it.
  */
 const API = "https://cwms-data.usace.army.mil/cwms-data";
 
@@ -68,6 +70,7 @@ export interface CatalogLocation {
   name: string;
   "public-name"?: string;
   "long-name"?: string;
+  description?: string;
   kind?: string;
   latitude?: number;
   longitude?: number;
@@ -82,9 +85,14 @@ export interface CatalogLocation {
  * A USACE station as listed, with the CWMS series its levels come from and,
  * where the gauge zero moved partway through it, the first day on the zero in
  * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the lake's
- * list only; `stations.parquet` doesn't carry them.
+ * list only; `stations.parquet` doesn't carry them. So is `datums_from`,
+ * which says where each offset read from the description came from.
  */
-export type UsaceStation = ListedStation & { series: string; zero_since?: string };
+export type UsaceStation = ListedStation & {
+  series: string;
+  zero_since?: string;
+  datums_from?: Record<string, DatumNote>;
+};
 
 /**
  * Every location in the offices with an observed stage series, one series
@@ -94,10 +102,12 @@ export type UsaceStation = ListedStation & { series: string; zero_since?: string
 export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const committed = new Map<string, string>();
   const committedSince = new Map<string, string>();
+  const committedFrom = new Map<string, Record<string, DatumNote>>();
   for (const s of previous) {
-    const { series, zero_since } = s as Partial<UsaceStation>;
+    const { series, zero_since, datums_from } = s as Partial<UsaceStation>;
     if (series) committed.set(s.id, series);
     if (zero_since) committedSince.set(s.id, zero_since);
+    if (datums_from) committedFrom.set(s.id, datums_from);
   }
   const out: UsaceStation[] = [];
   for (const office of OFFICES) {
@@ -111,6 +121,13 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
     if (since) s.zero_since = since;
     // A new zero date is a moved gauge zero under the same label, so a new datum epoch.
     s.reference = { id: since ?? "original", since: since ?? null };
+    // A refresh that sends no offsets keeps the stored ones, so it keeps where they came from too.
+    const from = committedFrom.get(s.id);
+    if (from && !s.datums_from)
+      console.error(
+        `  usace/${s.source_id}: its description no longer gives ${Object.keys(from).join(", ")}`,
+      );
+    if (!Object.keys(s.datums).length && from) s.datums_from = from;
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -229,6 +246,7 @@ function toStation(
   now: number,
 ): UsaceStation {
   name ??= series!.name;
+  const described = describedDatums(id, l.description);
   return {
     ...stationDefaults(metadata),
     id: `usace/${id}`,
@@ -240,7 +258,8 @@ function toStation(
     kind: l.kind?.startsWith("STREAM") ? "river" : null,
     interval_s: INTERVALS[name.split(".")[3]!] ?? null,
     datum: DATUM,
-    datums: datumsOf(l),
+    // The description's adjustment names its survey's realization, so it wins over the catalog's elevation.
+    datums: { ...datumsOf(l), ...described.datums },
     products: ["levels"],
     first: null,
     last: null,
@@ -251,6 +270,7 @@ function toStation(
     min_interval_s: null,
     source_url: `${API}/timeseries?office=${office}&name=${encodeURIComponent(name)}`,
     series: name,
+    ...(Object.keys(described.notes).length ? { datums_from: described.notes } : {}),
   };
 }
 
