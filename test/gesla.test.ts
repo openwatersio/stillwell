@@ -34,6 +34,7 @@ const resolved = (url: string, size: number) =>
 
 beforeEach(() => {
   requests = [];
+  gesla.forgetZipUrl();
   gesla.release.bytes = zip.length;
   gesla.release.records = 12;
   setTransport(async (url, options) => {
@@ -372,6 +373,145 @@ describe("gesla levels", () => {
       new Date("1961-01-01Z"),
     );
     assert.deepEqual([levels, requests], [[], []]);
+  });
+});
+
+describe("gesla zip url", () => {
+  const zipResolves = () =>
+    requests.filter(
+      ([url, o]) =>
+        url.includes("records/resolve") && !String(o.body).includes("02fFab01rq4LdVcwRCf5QCyCQ"),
+    ).length;
+  /**
+   * The fixture transport, with the zip's URL signed until `e`. While
+   * `fail.next` is set, reads fail; while `fail.resolves` is, resolves do; a
+   * read waits on `fail.hold` when it's set.
+   */
+  function signedUntil(
+    e: number,
+    fail: { next: number; resolves?: number; hold?: Promise<void>; held?: () => void } = {
+      next: 0,
+    },
+  ) {
+    let n = 0;
+    setTransport(async (url, options) => {
+      requests.push([url, options]);
+      if (url.includes("records/resolve")) {
+        if (fail.resolves) {
+          fail.resolves--;
+          throw new Error("POST records/resolve returned a network error (ETIMEDOUT)");
+        }
+        // Each resolve signs a URL of its own, as CloudKit does.
+        return resolved(`https://cvws.example/B/zip/\${f}?o=${++n}&e=${e}`, zip.length);
+      }
+      if (url.startsWith("https://cvws.example/B/zip/")) {
+        if (fail.hold) {
+          const hold = fail.hold;
+          fail.hold = undefined;
+          fail.held?.();
+          await hold;
+          throw new Error(`GET ${url} returned 403`);
+        }
+        if (fail.next > 0) {
+          fail.next--;
+          throw new Error(`GET ${url} returned 403`);
+        }
+        const r = /^bytes=(\d+)-(\d+)$/.exec((options.headers as Record<string, string>).range)!;
+        return zip.subarray(Number(r[1]), Number(r[2]) + 1).toString("base64");
+      }
+      throw new Error(`GET ${url} returned 404`);
+    });
+  }
+  const now = () => Math.floor(Date.now() / 1000);
+
+  it("resolves the zip's URL once for many records while it's signed", async () => {
+    signedUntil(now() + 900);
+    for (const file of [
+      "cape_dor-240-can-meds",
+      "cuxhavensteubenhft-5990020-deu-wsv",
+      "hong_kong-329b-hkg-uhslc_rq",
+    ])
+      assert.ok((await gesla.readRecord(file)).length > 0);
+    assert.equal(zipResolves(), 1);
+  });
+
+  it("resolves it again once it's within a minute of expiring", async () => {
+    signedUntil(now() + 30);
+    await gesla.readRecord("cape_dor-240-can-meds");
+    await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq");
+    // Every ranged read gets a URL of its own, none of them one about to expire.
+    const reads = requests.filter(([url]) => url.startsWith("https://cvws.example/B/zip/")).length;
+    assert.ok(reads >= 4);
+    assert.equal(zipResolves(), reads);
+  });
+
+  it("resolves it again when a signed read fails, and reads on", async () => {
+    const fail = { next: 0 };
+    signedUntil(now() + 900, fail);
+    await gesla.readRecord("cape_dor-240-can-meds");
+    fail.next = 1;
+    assert.ok((await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq")).length > 0);
+    assert.equal(zipResolves(), 2);
+  });
+
+  it("shares one resolve among workers reading at once", async () => {
+    signedUntil(now() + 900);
+    await Promise.all([
+      gesla.readRecord("cape_dor-240-can-meds"),
+      gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv"),
+      gesla.readRecord("hong_kong-329b-hkg-uhslc_rq"),
+    ]);
+    assert.equal(zipResolves(), 1);
+  });
+
+  it("reports a failed resolve as itself, and the next worker resolves again", async () => {
+    signedUntil(now() + 900);
+    // The central directory, read first, is kept for the run.
+    await gesla.readRecord("cape_dor-240-can-meds");
+    gesla.forgetZipUrl();
+    requests = [];
+    signedUntil(now() + 900, { next: 0, resolves: 1 });
+    const [a, b] = await Promise.allSettled([
+      gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv"),
+      gesla.readRecord("hong_kong-329b-hkg-uhslc_rq"),
+    ]);
+    assert.equal(a.status, "rejected");
+    assert.match(String((a as PromiseRejectedResult).reason), /ETIMEDOUT/);
+    assert.equal(b.status, "fulfilled");
+    assert.equal(zipResolves(), 2);
+  });
+
+  it("stops at a share that holds another release, and checks again on the next resolve", async () => {
+    signedUntil(now() + 900);
+    const bytes = gesla.release.bytes;
+    gesla.release.bytes = bytes + 1;
+    await assert.rejects(gesla.readRecord("cape_dor-240-can-meds"), /a new release\?/);
+    await assert.rejects(gesla.readRecord("cape_dor-240-can-meds"), /a new release\?/);
+    assert.equal(zipResolves(), 2);
+    gesla.release.bytes = bytes;
+  });
+
+  it("keeps a newer URL when a read on an older one fails late", async () => {
+    let release!: () => void;
+    const fail: { next: number; hold?: Promise<void>; held?: () => void } = { next: 0 };
+    signedUntil(now() + 900, fail);
+    // The central directory, read first, is kept for the run.
+    await gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv");
+    gesla.forgetZipUrl();
+    requests = [];
+    fail.hold = new Promise<void>((r) => (release = r));
+    const holding = new Promise<void>((r) => (fail.held = r));
+    // Resolves URL 2; its first read waits, then fails.
+    const late = gesla.readRecord("cape_dor-240-can-meds");
+    await holding;
+    // Another worker meanwhile finds it failed and resolves URL 3.
+    gesla.forgetZipUrl();
+    await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq");
+    assert.equal(zipResolves(), 2);
+    release();
+    // The late failure forgets URL 2 only, and retries on URL 3.
+    assert.ok((await late).length > 0);
+    assert.equal(zipResolves(), 2);
   });
 });
 

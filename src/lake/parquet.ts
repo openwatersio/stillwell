@@ -28,8 +28,9 @@ let laneCount = 1;
 const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
 /**
- * How many DuckDB connections run lake work at once, 1 by default. Compaction
- * raises it, since each year file on R2 is mostly waiting on the network.
+ * How many DuckDB connections run lake work at once, 1 by default. Backfill,
+ * compaction, requalify and `years` raise it to their concurrency, since each
+ * year file on R2 is mostly waiting on the network.
  */
 export function setConnections(count: number): void {
   laneCount = Math.max(1, Math.floor(count));

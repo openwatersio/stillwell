@@ -368,6 +368,8 @@ async function publish(lake: string): Promise<void> {
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
   const lake = lakeOfSource(source.metadata);
+  // Each worker writes its stations' years; on one connection they'd wait on each other's uploads.
+  setConnections(positive("concurrency"));
   const list = await listOf(lake, source);
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;

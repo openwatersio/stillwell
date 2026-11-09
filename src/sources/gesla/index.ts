@@ -586,7 +586,7 @@ async function range(url: string, from: number, to: number): Promise<Buffer> {
       base64: true,
       // A whole 7.9 GB zip sent for a range mustn't be read.
       partial: true,
-      // The URL is signed anew each time, and the cache keys by URL and body, not the range.
+      // The URL is signed for minutes only, and the cache keys by URL and body, not the range.
       fresh: true,
     }),
     "base64",
@@ -596,22 +596,74 @@ async function range(url: string, from: number, to: number): Promise<Buffer> {
   return bytes;
 }
 
-async function zip(): Promise<string> {
-  const { url, size } = await resolve(ZIP_SHARE, "GESLA4.1.zip");
-  if (size !== release.bytes)
-    throw new Error(`GESLA's 4.1 share holds ${size} bytes, not ${release.bytes}; a new release?`);
-  return url;
+/**
+ * The zip's signed URL, shared by every read until a minute before its `e`,
+ * the expiry in Unix seconds: CloudKit signs for 15 minutes. Resolving it for
+ * every record would call CloudKit thousands of times a run, and it times out
+ * under that load.
+ */
+type Signed = Promise<{ url: string; expires: number }>;
+let signed: Signed | undefined;
+const MARGIN_MS = 60_000;
+/** How long a URL with no `e` is kept. */
+const UNSTATED_MS = 5 * 60_000;
+
+/**
+ * The shared URL, or a new one when it's unset or near its expiry: workers
+ * that find it so together share one resolve. A failed resolve fails the
+ * worker that started it, and the workers waiting on it start another.
+ */
+async function zip(): Promise<{ url: string; from: Signed }> {
+  for (;;) {
+    const current = signed;
+    if (current) {
+      const held = await current.catch(() => undefined);
+      if (held && Date.now() < held.expires) return { url: held.url, from: current };
+      // Another worker replaced it meanwhile, or its resolve failed: start over.
+      if (signed !== current) continue;
+    }
+    const next: Signed = resolve(ZIP_SHARE, "GESLA4.1.zip").then(({ url, size }) => {
+      if (size !== release.bytes)
+        throw new Error(
+          `GESLA's 4.1 share holds ${size} bytes, not ${release.bytes}; a new release?`,
+        );
+      const e = Number(new URL(url).searchParams.get("e"));
+      return { url, expires: e > 0 ? e * 1000 - MARGIN_MS : Date.now() + UNSTATED_MS };
+    });
+    signed = next;
+    const got = await next.catch((error: unknown) => {
+      if (signed === next) signed = undefined;
+      throw error;
+    });
+    return { url: got.url, from: next };
+  }
+}
+
+/** Forgets the zip's signed URL, so the next read resolves a new one: only `from`, if given, so a failure on an old URL keeps a newer one. */
+export function forgetZipUrl(from?: Signed): void {
+  if (!from || signed === from) signed = undefined;
+}
+
+/** A range of the zip, resolving the URL again once if the signed one fails. */
+async function zipRange(from: number, to: number): Promise<Buffer> {
+  const first = await zip();
+  try {
+    return await range(first.url, from, to);
+  } catch {
+    // An expired or revoked signature reads as an HTTP error, like any other failure.
+    forgetZipUrl(first.from);
+    return range((await zip()).url, from, to);
+  }
 }
 
 /** Reads the zip's (ZIP64) central directory. */
 async function readIndex(): Promise<Map<string, { offset: number; size: number }>> {
-  const url = await zip();
-  const tail = await range(url, Math.max(0, release.bytes - 65_536), release.bytes);
+  const tail = await zipRange(Math.max(0, release.bytes - 65_536), release.bytes);
   const at = tail.lastIndexOf(Buffer.from("PK\x06\x06", "latin1"));
   if (at < 0) throw new Error("GESLA's zip has no ZIP64 end of central directory");
   const dirSize = Number(tail.readBigUInt64LE(at + 40));
   const dirOffset = Number(tail.readBigUInt64LE(at + 48));
-  const dir = await range(url, dirOffset, dirOffset + dirSize);
+  const dir = await zipRange(dirOffset, dirOffset + dirSize);
   const out = new Map<string, { offset: number; size: number }>();
   for (let p = 0; p + 46 <= dir.length && dir.readUInt32LE(p) === 0x02014b50;) {
     if (dir.readUInt16LE(p + 10) !== 8)
@@ -651,14 +703,13 @@ export async function readRecord(file: string): Promise<string> {
   });
   const entry = (await index).get(file);
   if (!entry) throw new Error(`GESLA's zip has no record ${file}`);
-  const url = await zip();
   // The local header's name and extra field can differ in length from the
   // central directory's, so it's read first.
-  const header = await range(url, entry.offset, entry.offset + 30);
+  const header = await zipRange(entry.offset, entry.offset + 30);
   if (header.readUInt32LE(0) !== 0x04034b50)
     throw new Error(`GESLA's zip has no record at ${file}'s offset`);
   const start = entry.offset + 30 + header.readUInt16LE(26) + header.readUInt16LE(28);
-  const deflated = await range(url, start, start + entry.size);
+  const deflated = await zipRange(start, start + entry.size);
   const stream = new Blob([new Uint8Array(deflated)])
     .stream()
     .pipeThrough(new DecompressionStream("deflate-raw"));
