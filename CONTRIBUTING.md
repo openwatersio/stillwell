@@ -9,7 +9,7 @@ src/sources/<source>/  one adapter per source, each with a README on that servic
 src/lake/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
-scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check and the HRoI evaluations
+scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the lake's layout and the evaluations
@@ -45,6 +45,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run gesla:contributors`      | Rewrite docs/gesla-contributors.md from GESLA 4.1's metadata and each contributor's terms.                                         |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.                                     |
 | `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.                                                |
+| `npm run cross-check -- <args>`   | `scripts/cross-check.ts`: compare a region's gauges with each other and with their own tide, described below.                      |
 
 CI also checks that `package-lock.json` regenerates from `package.json` and that every package resolves from the npm registry.
 
@@ -170,6 +171,21 @@ npm run clock-check -- 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd uhslc/057=honol
 ```
 
 Cross-correlates a year of each station's levels, or the dates given as `<start>/<end>` in place of the year for a source that keeps less (the EA's readings API keeps 30 days), fetched through its adapter with the station as the lake's list has it (`WATER_LEVELS_LAKE`, default the public bucket, or the adapter's own list when the lake has none), against the prediction from a TICON record's constants in a tide-database checkout (`TIDE_DATABASE`, default `../slackwater-database`), at lags of up to 3 hours in 10-minute steps, and prints a Markdown table of the best lag. It exits nonzero when a series fits best 30 minutes or more off, or has fewer than 30 days of values to check, which is how local time labeled UTC, or Hong Kong's early stamps, show up. A positive lag means the stamps run late. A TICON record fitted to the same series only shows a clock that changed since, so check against another originator's record for the same gauge where TICON has one. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error, such as New Zealand or Fiji local time labeled UTC, looks like a lag of under half an hour there; the K1 column, from K1's phase in a fit of the year against TICON's, shows it, and fails the check at 3 hours or more. Values spanning under 183 days are too short to fit K1, so it shows `no K1`, and a lag of 20 minutes or more fails, since that's where a 12-hour error shows.
+
+## Cross-station checks
+
+```bash
+npm run cross-check -- 53.2,6.5,55.3,9.2 2000 2027 pegelonline,gesla
+```
+
+Reads hourly values (the value within 10 minutes of each hour, `flag` good or preliminary) for every station with levels in a box (`minLat,minLon,maxLat,maxLon`), between two years with the second exclusive, from the sources named or all of them, leaving out stations whose `kind` is `river` or `lake`. It reads the lake at `WATER_LEVELS_LAKE`, the public bucket by default, or a local directory (not `s3://`), caches each series in `.cache/cross-check/<lake>/`, a directory per lake, and reads a station again when its `first`, `last` or epoch span changes (delete the directory to read it all again, such as after a `requalify`), and prints a Markdown report for a person to judge. It changes nothing in the lake. It reads a station's first datum epoch only, within that epoch's span, and the report lists the stations that have later epochs, whose later values go unchecked, and those left out: with under 60 days of values, or with values but too few near the hour, such as GESLA's WSV records of hourly means, stamped at the half hour. Those records' years are checked only through PEGELONLINE's copy of the gauge. Stations linked by `same_as` count as one gauge, represented by the `preferred` one where it has values here, otherwise the longest; years only another copy holds are left out of the checks that use one station per gauge. Every station is timed, compared with its copies and checked for steps; the copied-month check and the neighbors for steps use one station per gauge. It looks for errors that QC of one station at a time can't see:
+
+- **Months holding another gauge's data.** Every pair of gauges with 6 or more months in common, month by month: same-hour correlation and the RMS of their difference once the month's mean difference is removed. A month counts when it is under 3 cm RMS and a quarter of the pair's usual RMS, and, for a pair that usually agrees within 3 cm, identical to 2 mm. Pairs that usually agree within a centimeter are listed as gauges `same_as` may be missing, and not checked for copies.
+- **Copies of one gauge that disagree.** Each pair of a gauge's stations, month by month, where the RMS reaches 3 cm.
+- **Tide timing.** A harmonic fit of the station's whole span (the leading 40 constituents of the standard set, without long-period ones), then the least squares coefficient of the semidiurnal and diurnal bands' time derivatives in observed minus predicted, for each 15-day window. It reports runs of two or more windows that depart from the station's median by 8 minutes or four times its scatter, whichever is more. A clock error moves both bands by the same minutes. Lags past about half an hour come out smaller than they are. Stations with under 6 windows, or whose scatter is over 20 minutes and so have too little tide to time, are listed and skipped, and the diurnal band is left blank where its tide is under 5 cm.
+- **Level steps.** Daily means from 20 or more hours, each station less its 4 nearest gauges within 150 km, and a step where the medians of the 30 daily values either side, spanning at most 120 days, differ by 8 cm or more and by three times the spread of the values about them. A step counts for the station when two or more neighbors show it within 5 days with the same sign, and more of them do than don't among those with the values to show it. Stations with fewer than 2 such gauges are listed and skipped.
+
+Gauges whose daily mean follows river flow, a sluice or a canal's management (in the German Bight the Eider, the Kiel Canal, the Leda and the tidal Ems) step against every neighbor, so their steps need a look at the gauge before they count.
 
 ## Evaluations
 
