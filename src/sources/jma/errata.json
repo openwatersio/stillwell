@@ -1,0 +1,17 @@
+{
+  "errata": [
+    {
+      "id": "jma-saigo-1980-day-stamp",
+      "stations": ["jma/SA"],
+      "since": "1980-10-21",
+      "until": "1980-10-23",
+      "handling": "corrected",
+      "error": "JMA's historical file for Saigo in October 1980 stamps its 22nd line as the 20th, between lines stamped the 21st and 23rd.",
+      "lake": "The line is read as the 22nd, since the lines on either side are stamped the 21st and 23rd.",
+      "evidence": "The file is `sea_lev_var/1980/198010/hry198010SA.txt`. Its 22nd line, stamped `801020SA`, sits between lines stamped `801021SA` and `801023SA`; the backfill of 1924–2026 failed on it with \"not a day, or a day twice\". [#57](https://github.com/openwatersio/water-levels/pull/57) reads it as the 22nd.",
+      "reported": "2026-11-08",
+      "report": "Submitted through JMA's web feedback form on 2026-11-08. No answer yet. Text in [#58](https://github.com/openwatersio/water-levels/issues/58)."
+    }
+  ],
+  "retired": []
+}

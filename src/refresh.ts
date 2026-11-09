@@ -232,9 +232,8 @@ async function renumberAboveFiles(
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
- * `errata.json` those of the sources the lake holds (the open `source-error`
- * issues, read by `src/errata.ts`); the
- * result names any station an erratum lists that a source in the lake
+ * `errata.json` those of the sources the lake holds (each source's
+ * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the lake
  * doesn't, a typo or a station since removed.
  */
 export async function publishStations(

@@ -78,7 +78,6 @@ import {
 } from "../src/backfill.ts";
 import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { useDiskCache } from "../src/cache.ts";
-import { citedIn, fromPublished, openErrata, settle } from "../src/errata.ts";
 import { Blocked } from "../src/http.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
@@ -95,11 +94,9 @@ import {
   type RunSummary,
 } from "../src/lake/recent.ts";
 import { appendFile, readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import { isHeld } from "../src/epochs.ts";
 import {
   readExtremes,
-  readJsonArray,
   readObservations,
   readStationBounds,
   setConnections,
@@ -110,14 +107,7 @@ import {
 } from "../src/lake/parquet.ts";
 import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
-import {
-  boundsPath,
-  errataPath,
-  seriesDir,
-  seriesPath,
-  stationsPath,
-  yearsPath,
-} from "../src/lake/paths.ts";
+import { boundsPath, seriesDir, seriesPath, stationsPath, yearsPath } from "../src/lake/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -139,7 +129,7 @@ import type {
   SourceMetadata,
   Station,
 } from "../src/schema.ts";
-import { sourceOf, sources } from "../src/sources/index.ts";
+import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
@@ -323,20 +313,6 @@ async function publish(lake: string): Promise<void> {
   for (const { metadata } of held)
     if (published.has(metadata.id) || (await hasHistory(lake, metadata.id)))
       expected.push(metadata.id);
-  // The issues are the errata; what was published last stands in for any that can't be read.
-  const previous = fromPublished((await readJsonArray(errataPath(lake))) ?? []);
-  const fetched = await openErrata(Object.keys(sources)).catch((error: Error) => error);
-  const cited = new Set(citedIn(fileURLToPath(new URL("../src", import.meta.url))).keys());
-  const { errata, notes } = settle(fetched, previous, cited);
-  if (!(fetched instanceof Error))
-    for (const u of fetched.unregistered)
-      console.log(
-        `  erratum #${u.issue} is for ${u.source}, which this build doesn't register: a typo, or a source still in a pull request; left out`,
-      );
-  if (!(fetched instanceof Error) && fetched.ignored.length)
-    console.log(
-      `  source-error issues not from a maintainer, left out: #${fetched.ignored.join(", #")}`,
-    );
   const result = await publishStations(lake, held, expected, errata);
   if ("count" in result) {
     console.log(`${stationsPath(lake)}: ${result.count} stations`);
@@ -353,10 +329,11 @@ async function publish(lake: string): Promise<void> {
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     for (const e of result.unknownErrata)
       console.error(`  erratum lists a station not in the lake: ${e}`);
-    for (const n of notes) console.error(`  errata: ${n}`);
-    // A typo in an erratum's issue tags nothing, so fail the run to say so,
-    // after publishing: holding back every source's list for it would cost more.
-    if (result.unknownErrata.length || notes.length) process.exitCode = 1;
+    for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
+    // A typo in an erratum's stations tags nothing, and a bad errata file leaves
+    // its errata out, so fail the run to say so, after publishing: holding back
+    // every source's list for it would cost more.
+    if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;
   } else {
     console.error(
       `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
