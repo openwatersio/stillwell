@@ -5,100 +5,30 @@ body:
   - type: markdown
     attributes:
       value: |
-        Each open issue with this label is an erratum. Publish reads the fields below into `errata.json` and the `errata` column of `stations.parquet`, finding each field by its heading, so keep the headings when editing the issue. Close the issue once the agency has fixed the data and the lake has refetched it. See [CONTRIBUTING.md](https://github.com/openwatersio/water-levels/blob/main/CONTRIBUTING.md#source-errata).
+        Tell us about values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree. A maintainer who agrees records it as an erratum in the source's `errata.json` and closes this issue. See [CONTRIBUTING.md](https://github.com/openwatersio/water-levels/blob/main/CONTRIBUTING.md#source-errata).
   - type: textarea
     id: error
     attributes:
       label: What's wrong
-      description: What the source publishes wrong, in a sentence or two. Published as the erratum's `error`.
-    validations:
-      required: true
-  - type: input
-    id: id
-    attributes:
-      label: Erratum ID
-      description: "`<source>-<what>`, never reused. The adapter cites it as erratum `<id>` where it works around the error, or in its README where the lake keeps the data as served."
-      placeholder: usace-baton-rouge-position
-    validations:
-      required: true
-  - type: dropdown
-    id: source
-    attributes:
-      label: Source
-      options:
-        - bodc
-        - bsh
-        - cdec
-        - coops
-        - dwr
-        - ea
-        - gesla
-        - jma
-        - kartverket
-        - marine-institute
-        - pegelonline
-        - refmar
-        - rws
-        - sfwmd
-        - smhi
-        - uhslc
-        - usace
-        - usgs
+      description: What the source publishes wrong.
     validations:
       required: true
   - type: textarea
     id: stations
     attributes:
       label: Stations
-      description: 'The lake station IDs known to be affected, one per line. "every station" for all of the source''s; "none listed" where the source doesn''t say which or they aren''t in the lake, and What''s wrong says which.'
-      placeholder: usace/MVN.Baton_Rouge
+      description: The lake station IDs affected, one per line, such as `uhslc/329`, or the source's name if you don't know them.
     validations:
       required: true
   - type: input
-    id: since
+    id: span
     attributes:
-      label: Values since
-      description: The first UTC day of values the error is in, YYYY-MM-DD. Blank for an open start or an error in metadata.
-  - type: input
-    id: until
-    attributes:
-      label: Values until
-      description: The UTC day after the last one the error is in, YYYY-MM-DD. Blank while it goes on or for an error in metadata.
-  - type: dropdown
-    id: handling
-    attributes:
-      label: Handling
-      description: "corrected: changed to what the source should have published. flagged: kept, flagged suspect or worse. dropped: stations or values left out. refused: the adapter refuses the file. avoided: the lake doesn't use the wrong part. kept: as served."
-      options:
-        - corrected
-        - flagged
-        - dropped
-        - refused
-        - avoided
-        - kept
-    validations:
-      required: true
-  - type: textarea
-    id: lake
-    attributes:
-      label: What the lake does
-      description: In a sentence or two. Published as the erratum's `lake`.
-    validations:
-      required: true
+      label: Values affected
+      description: The dates of the values that are wrong, if they're only some.
   - type: textarea
     id: evidence
     attributes:
       label: Evidence
-      description: How it was found and how sure it is, such as the file or response, a comparison with another record, or a clock check. Link fixtures or runs.
+      description: How you found it, such as a comparison with another record or the source's own documentation.
     validations:
       required: true
-  - type: checkboxes
-    id: report
-    attributes:
-      label: Report to the agency
-      description: To the channel in the adapter's `metadata.contact`, in the agency's language.
-      options:
-        - label: Draft the report in the agency's language, with the evidence
-        - label: A person approves and sends it; note the date and channel here
-        - label: Record the agency's answer here
-        - label: Once fixed, remove the workaround, refetch what it touched, and close this issue

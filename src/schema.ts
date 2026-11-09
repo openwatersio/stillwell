@@ -73,7 +73,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, open `source-error` issues, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */
@@ -262,7 +262,8 @@ export interface Source {
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /**
    * Spans of a station's values that the lake's own errata flag `suspect`,
-   * worked out from the source's levels and flags alone, so requalify flags
+   * beyond the spans its `errata.json` names, which the registry adds, worked
+   * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
    * the recent window; one that needs the whole record throws when it isn't.

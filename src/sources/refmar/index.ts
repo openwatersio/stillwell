@@ -88,20 +88,6 @@ const UNDATED_DEFAULT = 2010;
 /** Raw 1-minute values start in the 2000s; a month before this isn't asked for them. */
 const RAW_1MIN_FROM = Date.UTC(2005, 0, 1);
 
-/**
- * Spans whose clock SHOM's values can't be trusted on, flagged `suspect` so
- * fits and products skip them. Pointe-à-Pitre fits UHSLC's record within 10
- * minutes in 2015, 2018, 2021 and 2022, but 60 to 70 minutes late in 2023
- * against UHSLC's, CMEMS's and REFMAR's own TICON records, and hardly at all
- * in 2020 (r 0.36) and 2024 (r 0.15), and within 10 minutes again in 2025
- * (r 0.93) (clock check, November 2026). No steady offset fits, so 2020 to
- * 2024 is flagged whole, keeping SHOM's own flag as `source_flag`. Remove once
- * SHOM corrects it. Erratum `refmar-pointe-a-pitre-clock`.
- */
-const SUSPECT: Record<string, [number, number][]> = {
-  125: [[Date.UTC(2020, 0, 1), Date.UTC(2025, 0, 1)]],
-};
-
 /** Gauge states SHOM publishes: working, irregular, stopped, broken, in maintenance. */
 const PUBLISHED = new Set(["OK", "ASYNC", "OLD", "KO", "PB"]);
 
@@ -303,17 +289,10 @@ export async function levels(
     const next = await rowsOf(station.source_id, [VALIDATED, HOURLY], stop, nextMonth(stop));
     if (next.length) lastGood = Infinity;
   }
-  const suspect = SUSPECT[station.source_id] ?? [];
-  return out
-    .filter(
-      (o) =>
-        o.flag === Flag.good || firstGood === undefined || o.time < firstGood || o.time > lastGood,
-    )
-    .map((o) =>
-      suspect.some(([from, to]) => o.time >= from && o.time < to)
-        ? { ...o, flag: Math.max(o.flag, Flag.suspect) as Flag, source_flag: o.flag }
-        : o,
-    );
+  return out.filter(
+    (o) =>
+      o.flag === Flag.good || firstGood === undefined || o.time < firstGood || o.time > lastGood,
+  );
 }
 
 async function month(id: string, from: number, to: number): Promise<Observation[]> {
@@ -402,5 +381,4 @@ export const source: Source = {
     if (!s.products.includes("levels")) throw new Error(`REFMAR ${s.source_id} isn't published`);
     return levels(s as RefmarStation, start, end);
   },
-  suspect: async (s) => SUSPECT[s.source_id] ?? [],
 };
