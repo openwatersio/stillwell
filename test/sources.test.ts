@@ -7,6 +7,7 @@ import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
+import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -630,6 +631,103 @@ describe("pegelonline", () => {
     assert.equal(listed.length, 8);
     assert.ok(listed.every((s) => !("history_since" in s)));
     assert.equal(asked, 5);
+  });
+});
+
+describe("pegelonline kuestendaten", () => {
+  const zip = () =>
+    readFileSync(new URL("fixtures/kuestendaten-5952050.zip", import.meta.url)).toString("base64");
+  const hour = [new Date("2024-03-31T00:00:00Z"), new Date("2024-03-31T02:00:00Z")] as const;
+  beforeEach(() => {
+    kuestendaten.reset();
+    kuestendaten.pacing.delayMs = 0;
+  });
+
+  it("reads HPA's history from kuestendaten.de, shifting UTC+1 to UTC", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      return zip();
+    });
+    const station = { source_id: "5952050", datum: "PNP", history_since: null };
+    const rows = await pegelonline.source.observations!(station as unknown as Station, ...hour);
+    // 02:00 UTC+1 is empty in the file, and summer time doesn't apply.
+    assert.deepEqual(
+      rows.map((r) => [new Date(r.time).toISOString().slice(11, 16), r.level, r.flag]),
+      [
+        ["00:58", 6.06, Flag.preliminary],
+        ["00:59", 6.05, Flag.preliminary],
+        ["01:01", 6.03, Flag.preliminary],
+        ["01:02", 6.02, Flag.preliminary],
+        ["01:03", 6.01, Flag.preliminary],
+      ],
+    );
+    // Downloaded once, and from a range alone.
+    const later = await kuestendaten.levels("5952050", new Date("2024-03-31T01:02:00Z"), hour[1]);
+    assert.equal(later.length, 2);
+    assert.equal(asked.length, 1);
+    assert.match(asked[0]!, /wiski\/HAMBURG_ST\._PAULI!Wasserstand%20\(PNP\)\.zip$/);
+  });
+
+  it("refuses a file for another gauge, or with a status nobody has explained", async () => {
+    setTransport(async () => zip());
+    await assert.rejects(kuestendaten.levels("5952060", ...hour), /file is for 5952050/);
+    const files = await pegelonline.unzip(zip());
+    const [[name, text]] = [...files];
+    const status = text!.replace("605\t240", "605\t200");
+    // Not worth a zip writer: swap the parser's input for the edited text.
+    const entry = new Map([[name!, () => new Blob([status]).stream()]]);
+    await assert.rejects(
+      kuestendaten.parseEntries(entry, "5952050"),
+      /status 200 at 2024-03-31 01:59:00/,
+    );
+  });
+
+  it("refuses another datum and asks nothing for a range before the files", async () => {
+    setTransport(async () => assert.fail("no download"));
+    await assert.rejects(kuestendaten.levels("5952050", ...hour, "NN"), /in PNP, not NN/);
+    const old = [new Date("1990-01-01T00:00:00Z"), new Date("1999-01-01T00:00:00Z")] as const;
+    assert.deepEqual(await kuestendaten.levels("5952050", ...old, "PNP"), []);
+  });
+
+  it("fails a gauge's every range after one failed download, and paces each attempt", async () => {
+    let asked = 0;
+    let paced = false;
+    setTransport(async (_url, options) => {
+      asked++;
+      paced = typeof options.pace === "function";
+      throw new Error("GET zip returned 404");
+    });
+    await assert.rejects(kuestendaten.levels("5952050", ...hour), /404/);
+    await assert.rejects(kuestendaten.levels("5952050", ...hour), /404/);
+    assert.equal(asked, 1);
+    assert.ok(paced);
+  });
+
+  it("starts each request delayMs after the last", async () => {
+    kuestendaten.pacing.delayMs = 50;
+    const started: number[] = [];
+    setTransport(async (_url, options) => {
+      // Two attempts, as a retry would make.
+      for (let i = 0; i < 2; i++) {
+        await options.pace!();
+        started.push(Date.now());
+      }
+      return zip();
+    });
+    await kuestendaten.levels("5952050", ...hour);
+    assert.ok(started[1]! - started[0]! >= 45, `${started[1]! - started[0]!} ms apart`);
+  });
+
+  it("lists HPA's gauges with history from 1999-11-01 and HPA's credit", async () => {
+    const [first] = JSON.parse(fixture("pegelonline-stations.json"));
+    serve([
+      [/stations\.json/, JSON.stringify([{ ...first, number: "5952050" }])],
+      [/download\/modal/, fixture("pegelonline-modal.html").replaceAll("2000-01-01", "2026-10-09")],
+    ]);
+    const [listed] = await pegelonline.stations();
+    assert.equal(listed!.history_since, "1999-11-01");
+    assert.match(listed!.attribution, /PEGELONLINE; Hamburg Port Authority, .*kuestendaten\.de/);
   });
 });
 

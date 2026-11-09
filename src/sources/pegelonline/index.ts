@@ -10,12 +10,13 @@ import {
   type SourceMetadata,
   type Station,
 } from "../../schema.ts";
+import * as kuestendaten from "./kuestendaten.ts";
 
 /**
  * PEGELONLINE, the WSV's gauge service: raw water levels in centimeters above
  * gauge zero (PNP), at 1-minute resolution at tide gauges. The REST API keeps
  * 31 days; the station pages' raw-data download reaches back to 2000 at most
- * federal gauges.
+ * federal gauges, and kuestendaten.de holds the Hamburg Port Authority's.
  */
 const API = "https://www.pegelonline.wsv.de/webservices/rest-api/v2";
 const SITE = "https://pegelonline.wsv.de";
@@ -91,6 +92,10 @@ export async function stations(previous: Station[] = []): Promise<PegelonlineSta
   for (const s of await list()) {
     const station: PegelonlineStation = toStation(s);
     let since = known.get(station.id);
+    if (kuestendaten.GAUGES[s.number]) {
+      since = kuestendaten.SINCE;
+      station.attribution = `${metadata.attribution}; ${kuestendaten.ATTRIBUTION}`;
+    }
     // A date is kept; a null is asked again, since a new gauge's record grows and
     // WSV can add history. A failed request leaves it as it was, to try again at
     // the next refresh, and five stop the asking, so a site that's down can't
@@ -328,18 +333,27 @@ export function resetPacing(): void {
   blocked = undefined;
 }
 
-/**
- * The text files in a zip, by name, from its central directory: PEGELONLINE's
- * local headers leave the sizes to a descriptor after the data.
- */
+/** The text files in a zip, by name. */
 export async function unzip(base64: string): Promise<Map<string, string>> {
+  const files = new Map<string, string>();
+  for (const [name, bytes] of zipEntries(base64))
+    files.set(name, await new Response(bytes()).text());
+  return files;
+}
+
+/**
+ * Each file in a zip, by name, as a stream of its uncompressed bytes, from its
+ * central directory: PEGELONLINE's local headers leave the sizes to a
+ * descriptor after the data.
+ */
+export function zipEntries(base64: string): Map<string, () => ReadableStream<Uint8Array>> {
   const zip = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
   const view = new DataView(zip.buffer);
   let end = zip.length - 22;
   while (end > 0 && view.getUint32(end, true) !== 0x06054b50) end--;
   // An empty zip is that record alone, at 0.
   if (end < 0 || view.getUint32(end, true) !== 0x06054b50) throw new Error("not a zip");
-  const files = new Map<string, string>();
+  const files = new Map<string, () => ReadableStream<Uint8Array>>();
   let p = view.getUint32(end + 16, true);
   for (let i = view.getUint16(end + 10, true); i > 0; i--) {
     const method = view.getUint16(p + 10, true);
@@ -352,10 +366,10 @@ export async function unzip(base64: string): Promise<Map<string, string>> {
     const offset = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
     const data = zip.subarray(offset, offset + size);
     if (method !== 0 && method !== 8) throw new Error(`zip method ${method}`);
-    const stream = new Blob([data]).stream();
-    const bytes =
-      method === 8 ? stream.pipeThrough(new DecompressionStream("deflate-raw")) : stream;
-    files.set(name, await new Response(bytes).text());
+    files.set(name, () => {
+      const stream = new Blob([data]).stream();
+      return method === 8 ? stream.pipeThrough(new DecompressionStream("deflate-raw")) : stream;
+    });
     p += 46 + nameLength! + extraLength! + commentLength!;
   }
   return files;
@@ -459,6 +473,9 @@ export const source: Source = {
 async function observations(s: Station, start: Date, end: Date): Promise<Observation[]> {
   const rest = Date.now() - REST_DAYS * DAY_MS;
   if (start.getTime() >= rest) return levels(s.source_id, start, end, s.datum);
+  // HPA's gauges offer only 31 days here; their history is on kuestendaten.de.
+  if (kuestendaten.GAUGES[s.source_id])
+    return kuestendaten.levels(s.source_id, start, end, s.datum);
   const since = (s as Partial<PegelonlineStation>).history_since;
   // Unset until a refresh asks; without it, a backfill would ask for years the gauge doesn't have.
   if (since === undefined)
