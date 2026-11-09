@@ -13,6 +13,7 @@ stations.parquet                                      one row per station
 sources.json                                          license, attribution, contact and `finalizes` per source
 errata.json                                           errors in what sources publish, and what the lake does about them
 stations/<source>.parquet                             one source's list, as ingest keeps it
+stations/years/<source>.parquet                       every year file of observed levels: id, epoch, year, hours, values by flag, version
 history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
 recent/<source>.parquet                               last 7 days: station, time, level_m, flag, source_flag, received, epoch
 obs/<source>/<station>/<year>.parquet                 observed levels: time, level_m, flag, source_flag, received, datum
@@ -257,7 +258,40 @@ SET VARIABLE files = (
 SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction writes each night; they reach it when `stations.parquet` is next rebuilt, and are empty for a station with no observations yet.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet`, below, lists them. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction writes each night; they reach it when `stations.parquet` is next rebuilt, and are empty for a station with no observations yet.
+
+## Which years a station has
+
+A year with no values has no file, so a missing file and a failed download look alike. `stations/years/<source>.parquet` settles it: one row per year file of observed levels the source has, in every epoch, with
+
+- **`id`**, **`epoch`** and **`year`**: the station's `id` from `stations.parquet`, the datum epoch whose files hold it (1 for the plain path), and the year;
+- **`hours`**: how many UTC hours hold at least one value, of any flag;
+- **`good`**, **`interpolated`**, **`preliminary`**, **`suspect`** and **`bad`**: how many values have each `flag`;
+- **`version`**: a hash of the file's rows, which changes when any row's `time`, `level_m`, `flag`, `source_flag` or `received` does, and only then.
+
+A year between a station's first and last rows with no row of its own has no values. A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights. The file covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels keeps it, and compaction checks each night that every file has a row and every row a file, so it's current but for those marks, as long as nothing else writes the files; `stations.parquet` lags it by up to a rebuild. A source has no years file until the lake builds one for it, so a missing one means not built yet, not a source with no files.
+
+The years of one station, with how much of each its source hasn't checked:
+
+```sql
+SELECT epoch, year, hours, good + interpolated AS checked, preliminary, suspect + bad AS flagged, version
+FROM 'https://water-levels.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland'
+ORDER BY epoch, year;
+```
+
+The paths of every year with a file, to pass to `read_parquet` as in [Reading many files](#reading-many-files):
+
+```sql
+SELECT list('https://water-levels.openwaters.io/obs/' || id ||
+  CASE WHEN epoch = 1 THEN '' ELSE '/' || epoch END || '/' || year || '.parquet' ORDER BY epoch, year)
+FROM 'https://water-levels.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland' AND year IS NOT NULL;
+```
+
+That works for an `id` whose `source_id` needs no URL-encoding; one with a `/`, space or other reserved character needs its `source_id` encoded in the path.
+
+**Caching.** To keep a local copy of a year, read its row in the years file first, then download the file and store the row's `version` beside it, and download it again only when the years file shows a different one. Read in that order, a download that lands just after a run rewrote the file holds newer rows than the version stored with it, which costs one more download next time, never a stale copy; read the other way round, it can store an old version beside new rows. Don't cache a station's years while it's marked. A file's HTTP `ETag` works as well for a conditional request, with `If-None-Match`, but treat it as an opaque tag to compare with the last one seen, not as a checksum: an object uploaded in several parts has an `ETag` that isn't its MD5.
 
 ## Datum epochs
 

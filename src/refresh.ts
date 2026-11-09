@@ -34,6 +34,7 @@ import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
+import { writeYears } from "./lake/years.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 import {
   dropWithheldRows,
@@ -164,6 +165,9 @@ export async function refreshSource(
     await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
   };
   if (stored) await snapshot();
+  // A new source has no files yet, so its years start empty and every run keeps
+  // them. Before its list, so a failure here leaves it new for the next refresh.
+  if (!stored) await writeYears(lake, id, []);
   await writeStationList(listPath, stations);
   if (!stored) await snapshot();
   try {
