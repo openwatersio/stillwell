@@ -13,6 +13,7 @@ import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import { contributorOf, NOTICES, originatorOf } from "../src/sources/uhslc/notices.ts";
 import * as usace from "../src/sources/usace/index.ts";
+import { describedDatums, isoDate } from "../src/sources/usace/described.ts";
 import { ZERO_SINCE } from "../src/sources/usace/zeros.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
@@ -1308,11 +1309,13 @@ describe("usace", () => {
       mvn.map((s) => [s.id, s.series, s.datum, s.datums, s.interval_s, s.live, s.kind]),
       [
         // Forecasts, statistics, the LWRP year and the NAVD88 copies are left out.
+        // NAVD88 and LWRP come from the descriptions; CWMS's elevation of 0 is a blank.
+        // Baton Rouge's LWRP offset is against another realization than its NAVD88 adjustment.
         [
           "usace/MVN.Baton_Rouge",
           "Baton_Rouge.Stage.Inst.1Hour.0.rev",
           "GZ",
-          {},
+          { NAVD88: -0.216 },
           3600,
           true,
           "river",
@@ -1321,25 +1324,39 @@ describe("usace", () => {
           "usace/MVN.Donaldsonville",
           "Donaldsonville.Stage.Inst.1Hour.0.rev",
           "GZ",
-          {},
+          { NAVD88: -0.226, LWRP: -0.652 },
           3600,
           true,
           "river",
         ],
-        // A local datum isn't one we can refer to.
+        // CWMS's local datum isn't one we can refer to; the description's NAVD88 is.
         [
           "usace/MVN.New_Orleans",
           "New_Orleans.Stage.Inst.1Hour.0.rev",
           "GZ",
-          {},
+          { NAVD88: -0.293, LWRP: -0.475 },
           3600,
           true,
           "river",
         ],
-        // An elevation of 0 is as often a blank as a gauge set at the datum.
-        ["usace/MVN.Reserve", "Reserve.Stage.Inst.1Hour.0.rev", "GZ", {}, 3600, true, "river"],
+        [
+          "usace/MVN.Reserve",
+          "Reserve.Stage.Inst.1Hour.0.rev",
+          "GZ",
+          { NAVD88: -0.265, LWRP: -0.57 },
+          3600,
+          true,
+          "river",
+        ],
       ],
     );
+    assert.deepEqual(mvn[0]!.datums_from, {
+      NAVD88: {
+        description: "Adjustment for vertical datum NAVD88 (OPUS 2019): -0.71 ft",
+        realization: "OPUS 2019",
+        as_of: null,
+      },
+    });
     assert.equal(mvn[3]!.name, "Mississippi River at Reserve (01260)");
   });
 
@@ -1443,6 +1460,190 @@ describe("usace", () => {
     });
     assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "LOCAL" }), {});
     assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "COE1912" }), {});
+  });
+
+  it("reads the NAVD88 adjustment and LWRP offset from a New Orleans description", () => {
+    const read = (id: string, text: string) => {
+      const { datums, notes } = describedDatums(id, text);
+      return [
+        datums,
+        Object.fromEntries(Object.entries(notes).map(([k, n]) => [k, [n.realization, n.as_of]])),
+      ];
+    };
+    // Morgan City: the stated adjustment, in feet, added to the stage.
+    assert.deepEqual(
+      read(
+        "MVN.Morgan_City",
+        "Natural flow is affected by tides.  Adjustment for vertical datum NAVD88 (OPUS 2021):  -1.403 ft. (e.g.add -1.403' to the gage reading to get to NAVD88)",
+      ),
+      [{ NAVD88: -0.428 }, { NAVD88: ["OPUS 2021", null] }],
+    );
+    // "Current adjustment … is", a misspelling, and a positive value.
+    assert.deepEqual(
+      read(
+        "MVN.X",
+        "Current adjsutment to NAVD88 2009.55 is 0.074' (e.g. add 0.074' to gage data)",
+      ),
+      [{ NAVD88: 0.023 }, { NAVD88: ["2009.55", null] }],
+    );
+    // Of several dated adjustments, the latest.
+    assert.deepEqual(
+      read(
+        "MVN.SWPass_BHP",
+        "Adjustment for vertical datum NAVD88 (OPUS 2022): -0.48 ft. as of 22Sep2022(e.g. for data relative to NAVD88 since 22Sep2022, subtract 0.48 ft)Adjustment for vertical datum NAVD88 (2009.55): 0.00 ft. as of 29Jun2015 Gage reset to vertical datum NAVD88 (2004.65) on 19Aug2010.",
+      ),
+      [{ NAVD88: -0.146 }, { NAVD88: ["OPUS 2022", "2022-09-22"] }],
+    );
+    // "Adjustment valid as of" after the example.
+    assert.deepEqual(
+      read(
+        "MVN.Bayou_Boeuf-Amelia",
+        "Adjustment for vertical datum NAVD88: -1.40' ft.(e.g. add -1.40' to gage data to adjust to NAVD88.) Adjustment valid as of 04/14/2025",
+      ),
+      [{ NAVD88: -0.427 }, { NAVD88: [null, "2025-04-14"] }],
+    );
+    // Several undated adjustments that differ, for different gages at one site: none.
+    assert.deepEqual(
+      read(
+        "MVN.SaltWatBarrier_E",
+        "For transmitted gage data, the adjustment to NAVD88 OPUS is -1.87'For the staffs recessed in the lock walls, the adjustment to NAVD88 OPUS is -2.11'",
+      ),
+      [{}, {}],
+    );
+    // A placeholder value, and an adjustment to another datum, aren't read.
+    assert.deepEqual(read("MVN.X", "Adjustment for vertical datum NAVD88: -x.xx ft."), [{}, {}]);
+    assert.deepEqual(
+      read("MVN.X", "gage adjustment from NAVD88 (2004.65) to NGVD29 (1983) assumed to = 0.0'"),
+      [{}, {}],
+    );
+    // A zero reset to NAVD88 before the station's ZERO_SINCE date is 0 there, plus LWRP.
+    assert.ok(ZERO_SINCE["MVN.Venice"]!.since > "2015-06-28");
+    assert.deepEqual(
+      read(
+        "MVN.Venice",
+        "Gage zero reset to vertical datum NAVD88 (2009.55) on 28Jun2015. All prior historic stage data is relative to NGVD29.  To adjust the prior historic data (from 03Jun1987 to 28Jun2015 only) to NAVD88 (2009.55), add -1.84 feet.To adjust NAVD88 (2009.55) values to 2007 Low Water Reference Plane (LWRP) datum relative to NAVD88, add -0.1 ft.",
+      ),
+      [
+        { NAVD88: 0, LWRP: -0.03 },
+        { NAVD88: ["2009.55", "2015-06-28"], LWRP: ["2009.55", null] },
+      ],
+    );
+    // Nor a reset other than the one ZERO_SINCE dates.
+    assert.deepEqual(read("MVN.Venice", "Gage zero reset to NAVD88 (2004.65) on 19Aug2010."), [
+      {},
+      {},
+    ]);
+    // Not without a ZERO_SINCE date, which says every value read is on that zero.
+    assert.deepEqual(read("MVN.X", "Gage zero reset to NAVD88 (2009.55) on 28Jun2015."), [{}, {}]);
+    // Nor when the gauge has since diverged from it.
+    assert.deepEqual(
+      read(
+        "MVN.Empire",
+        "Gage reset to NAVD88 (2009.55) on 01Jul2015. Gage data from 26Sep18 to present diverged, so subtract 0.12 feet to adjust to NAVD88 (2009.55).",
+      ),
+      [{}, {}],
+    );
+    // An LWRP offset stated twice, as "add -0.5" and "subtract 0.5", is read once.
+    assert.deepEqual(
+      read(
+        "MVN.IHNC_Lock",
+        "Current adjustment from NAVD88 2004.65 to NAVD88 2009.55 is -0.22' (e.g. add -0.22' to gage data to adjust to NAVD88 2009.55).To adjust NAVD88 (2009.55) values to 2007 Low Water Reference Plane (LWRP) datum relative to NAVD88, add -0.5 ft. To adjust NAVD88 (2009.55) values to 2007 Low Water Reference Plane (LWRP) datum relative to NAVD88, subtract 0.5 ft.",
+      ),
+      [
+        { NAVD88: -0.067, LWRP: -0.219 },
+        { NAVD88: ["2009.55", null], LWRP: ["2009.55", null] },
+      ],
+    );
+    // Adjustments that can't be told apart give none, and don't fall back on a reset.
+    const reset = "Gage zero reset to vertical datum NAVD88 (2009.55) on 28Jun2015. ";
+    assert.deepEqual(
+      read(
+        "MVN.Venice",
+        reset +
+          "the adjustment to NAVD88 OPUS is -1.87'. For the staffs, the adjustment to NAVD88 OPUS is -2.11'",
+      ),
+      [{}, {}],
+    );
+    assert.deepEqual(
+      read(
+        "MVN.X",
+        "Adjustment for vertical datum NAVD88: -0.5 ft. as of 01Jan2020. Adjustment for vertical datum NAVD88: -0.6 ft. as of 01Jan2020",
+      ),
+      [{}, {}],
+    );
+    // One dated before the zero's reset is for the old zero.
+    assert.deepEqual(
+      read(
+        "MVN.Venice",
+        "Adjustment for vertical datum NAVD88 (2004.65): -0.8 ft. as of 01Jan2010",
+      ),
+      [{}, {}],
+    );
+    // Nor does one in meters fall back on a reset.
+    assert.deepEqual(read("MVN.Venice", reset + "Gage adjustment to NAVD88 2009.55 = -0.30 m"), [
+      {},
+      {},
+    ]);
+    // An adjustment in meters isn't taken as feet.
+    assert.deepEqual(read("MVN.X", "Gage adjustment to NAVD88 2009.55 = -0.30 m"), [{}, {}]);
+    // An LWRP realization that isn't recognized can't be matched to the adjustment's.
+    assert.deepEqual(
+      read(
+        "MVN.X",
+        "Adjustment for vertical datum NAVD88 (OPUS2019 GEOID12B): -0.71 ft. To adjust NAVD88 (OPUS2010 GEOID09) values to 2007 Low Water Reference Plane (LWRP) datum relative to NAVD88, add -2.5ft.",
+      ),
+      [{ NAVD88: -0.216 }, { NAVD88: [null, null] }],
+    );
+    // Other districts' descriptions aren't read.
+    assert.deepEqual(read("MVK.X", "Adjustment for vertical datum NAVD88: -0.5 ft."), [{}, {}]);
+    // Red River Landing's description is Knox Landing's.
+    const knox =
+      "Adjustment for vertical datum NAVD88:  -0.08 ft. (add -0.08' to stage data to convert to NAVD88) To adjust NAVD88 values to 2007 Low Water Reference Plane (LWRP) datum relative to NAVD88, add -14.8'.";
+    assert.deepEqual(read("MVN.Knox_Ldg", knox)[0], { NAVD88: -0.024, LWRP: -4.535 });
+    assert.deepEqual(read("MVN.Red_River_Ldg", knox), [{}, {}]);
+  });
+
+  it("reads a description's dates", () => {
+    assert.equal(isoDate("28Jun2015"), "2015-06-28");
+    assert.equal(isoDate("01JUL2008"), "2008-07-01");
+    assert.equal(isoDate("08 Aug 2022"), "2022-08-08");
+    assert.equal(isoDate("26Sep18"), "2018-09-26");
+    assert.equal(isoDate("14Jun88"), "1988-06-14");
+    assert.equal(isoDate("01Jan27"), "2027-01-01");
+    assert.equal(isoDate("10/11/2011"), "2011-10-11");
+    assert.equal(isoDate("Nov. 22, 2021"), "2021-11-22");
+    assert.equal(isoDate("Oct 15, 2008"), "2008-10-15");
+    assert.equal(isoDate("31Feb2015"), null);
+    assert.equal(isoDate("present"), null);
+  });
+
+  it("keeps where a stored offset came from when the description stops giving it, and says so", async (t) => {
+    const entries = JSON.parse(fixture("usace-locations.json")).entries as usace.CatalogLocation[];
+    serve([
+      [/catalog\/TIMESERIES/, fixture("usace-catalog.json")],
+      [
+        /catalog\/LOCATIONS/,
+        JSON.stringify({
+          entries: entries.map((l) => (l.name === "New_Orleans" ? { ...l, description: " " } : l)),
+        }),
+      ],
+    ]);
+    const error = t.mock.method(console, "error", () => {});
+    const note = { description: "…", realization: "2009.55", as_of: null };
+    const from = { NAVD88: note, LWRP: note };
+    const previous = ["usace/MVN.New_Orleans", "usace/MVN.Baton_Rouge"].map(
+      (id) => ({ id, datums_from: from }) as unknown as Station,
+    );
+    const listed = (await usace.stations(previous)) as usace.UsaceStation[];
+    const station = (id: string) => listed.find((s) => s.id === id)!;
+    // New Orleans' description went blank: no offsets sent, so the stored ones and their notes stay.
+    assert.deepEqual(station("usace/MVN.New_Orleans").datums, {});
+    assert.deepEqual(station("usace/MVN.New_Orleans").datums_from, from);
+    // Baton Rouge's still gives NAVD88 but not LWRP.
+    assert.deepEqual(Object.keys(station("usace/MVN.Baton_Rouge").datums_from!), ["NAVD88"]);
+    const said = error.mock.calls.map((c) => String(c.arguments[0])).join("\n");
+    assert.match(said, /usace\/MVN.New_Orleans: its description no longer gives NAVD88, LWRP/);
+    assert.match(said, /usace\/MVN.Baton_Rouge: its description no longer gives LWRP\n/);
   });
 
   it("keeps a committed series while CWMS lists it, and marks the station inactive when it doesn't", () => {

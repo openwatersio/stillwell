@@ -24,6 +24,15 @@ describe("correctPositions", () => {
     assert.deepEqual(stations.at(-1), { id: "uhslc/001", lat: 1, lon: 2 });
   });
 
+  it("moves MVN's Baton Rouge to MVK's gauge", () => {
+    const { stations, stale } = correctPositions(served("usace"));
+    assert.deepEqual(stale, []);
+    assert.deepEqual(
+      stations.find((s) => s.id === "usace/MVN.Baton_Rouge"),
+      { id: "usace/MVN.Baton_Rouge", lat: 30.4456667, lon: -91.1915556 },
+    );
+  });
+
   it("keeps a position the source has moved, and names the entry", () => {
     const list = served("uhslc").map((s) => (s.id === "uhslc/290a" ? { ...s, lat: -51.7 } : s));
     const { stations, stale } = correctPositions(list);
@@ -33,7 +42,10 @@ describe("correctPositions", () => {
 
   it("names stations by the IDs their adapters give", () => {
     for (const id of Object.keys(POSITIONS))
-      assert.match(id, /^(uhslc\/\d{3}[a-z]?|gesla\/[a-z_]+-\d{3}[a-z]?-[a-z]{3}-uhslc_(fd|rq))$/);
+      assert.match(
+        id,
+        /^(uhslc\/\d{3}[a-z]?|gesla\/[a-z_]+-\d{3}[a-z]?-[a-z]{3}-uhslc_(fd|rq)|usace\/(MV|LR)[A-Z]\.[A-Za-z0-9._-]+)$/,
+      );
   });
 
   it("names lake sources' stations, each moved more than the source's rounding", () => {
