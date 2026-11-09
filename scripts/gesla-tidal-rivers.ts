@@ -24,8 +24,8 @@ async function read(file: string, attempt = 1): Promise<string> {
   try {
     return await readRecord(file);
   } catch (error) {
-    if (!(error instanceof HttpError)) throw new Error(`${file}: ${String(error)}`);
-    if (attempt >= 5) throw new Error(`${file}: ${String(error)}`);
+    const refused = error instanceof HttpError && / returned 401\b/.test(error.message);
+    if (!refused || attempt >= 5) throw new Error(`${file}: ${String(error)}`);
     await new Promise((resolve) => setTimeout(resolve, 30_000 * attempt));
     return read(file, attempt + 1);
   }
