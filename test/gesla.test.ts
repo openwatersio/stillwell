@@ -150,6 +150,15 @@ describe("gesla stations", () => {
     const ids = (await gesla.stations()).map((s) => s.source_id);
     assert.equal(ids.length, 11);
     assert.ok(!ids.includes("uddevalla-2541-swe-smhi"));
+    // The lake's list keeps it, inactive, so a backfill can still name it.
+    await assert.rejects(
+      gesla.levels(
+        { source_id: "uddevalla-2541-swe-smhi", kind: "river" },
+        new Date("2020-01-01T00:00:00Z"),
+        new Date("2021-01-01T00:00:00Z"),
+      ),
+      /left out of the lake/,
+    );
   });
 
   it("links DWR's NAVD88 series, whose Q GESLA drops", () => {

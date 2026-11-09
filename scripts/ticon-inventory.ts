@@ -115,7 +115,8 @@ const rows = adoptSiblings(
 );
 // GESLA names its files as TICON names its records, so a record's GESLA 4.1
 // copy is `gesla/<id>` where 4.1 kept the name (it renamed or dropped RWS's).
-const gesla = new Map(lists.gesla!.map((s) => [s.id, s]));
+// GESLA's release is static, so its only inactive stations are records the adapter leaves out.
+const gesla = new Map(lists.gesla!.filter((s) => s.status === "active").map((s) => [s.id, s]));
 const geslaOf = (record: TiconRecord) => gesla.get(`gesla/${record.id}`);
 await writeFile(join(ROOT, "docs/ticon-replacement.csv"), csv(rows));
 await writeFile(join(ROOT, "docs/ticon-replacement.md"), summary(rows));

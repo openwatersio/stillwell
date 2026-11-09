@@ -651,6 +651,8 @@ export async function levels(
   if (station.record_start && Date.parse(station.record_start) - HOUR_MS >= end.getTime())
     return [];
   if (station.record_end && Date.parse(station.record_end) + HOUR_MS < start.getTime()) return [];
+  if (DROPPED.has(station.source_id))
+    throw new Error(`GESLA's ${station.source_id} is left out of the lake (see DROPPED)`);
   const r = await record(station);
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {

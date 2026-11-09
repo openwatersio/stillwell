@@ -61,6 +61,15 @@ const REDISTRIBUTED: Record<string, (s: Station & { contributor?: string | null 
   gesla: () => true,
 };
 
+/**
+ * Stations kept out of every group, by source. GESLA's release is static, so
+ * an inactive record is one its adapter leaves out for holding another
+ * gauge's values (`DROPPED` in src/sources/gesla/index.ts).
+ */
+const UNLINKABLE: Record<string, (s: Station) => boolean> = {
+  gesla: (s) => s.status === "inactive",
+};
+
 export function redistributed(s: Station): boolean {
   return REDISTRIBUTED[s.source]?.(s) ?? false;
 }
@@ -134,12 +143,14 @@ export function linkGauges<T extends Station>(
   now = new Date(),
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
+  const alone = new Set(stations.filter((s) => UNLINKABLE[s.source]?.(s)).map((s) => s.id));
+  const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
   const dropped: LinkReport["dropped"] = [];
   const skipped: LinkReport["skipped"] = [];
   const add = (a: string, b: string, how: How) => {
     const key = pairKey(a, b);
-    if (a !== b && !edges.has(key)) edges.set(key, how);
+    if (a !== b && !edges.has(key) && !alone.has(a) && !alone.has(b)) edges.set(key, how);
   };
 
   for (const { a, b } of LINKS)
@@ -152,7 +163,7 @@ export function linkGauges<T extends Station>(
     if (!byId.has(id)) dropped.push({ from: id, to: id, reason: "PREFER names no such station" });
   /** The stations whose own `same_as` named another source's, by pair. */
   const namers = new Map<string, Set<string>>();
-  for (const s of stations)
+  for (const s of linkable)
     for (const other of s.same_as) {
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
@@ -168,14 +179,14 @@ export function linkGauges<T extends Station>(
           ).add(s.id);
       }
     }
-  for (const [a, b] of nearPairs(stations)) add(a.id, b.id, "near");
+  for (const [a, b] of nearPairs(linkable)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no
   // guess. Only the station that named it: one another source's copy names,
   // as GESLA names UHSLC's series, may still be a copy to match.
   const named = new Set<string>();
   const unlinked = new Set(UNLINKS.map(({ a, b }) => pairKey(a, b)));
   for (const [key, ids] of namers) if (!unlinked.has(key)) for (const id of ids) named.add(id);
-  for (const [a, b] of copyPairs(stations, named)) add(a.id, b.id, "copy");
+  for (const [a, b] of copyPairs(linkable, named)) add(a.id, b.id, "copy");
 
   // Union-find, with each group's members kept so a merge can be refused.
   const parent = new Map<string, string>();

@@ -122,6 +122,27 @@ describe("linkGauges's limits", () => {
     );
   });
 
+  it("keeps a GESLA record its adapter left out, such as Uddevalla's, out of every group", () => {
+    const uddevalla = { name: "Uddevalla", lat: 58.3451, lon: 11.9069 };
+    const { stations } = linkGauges(
+      [
+        station("smhi/2541", uddevalla),
+        station("gesla/uddevalla-2541-swe-smhi", {
+          ...uddevalla,
+          lat: 58.3475,
+          lon: 11.8948,
+          status: "inactive",
+          same_as: ["smhi/2541"],
+        }),
+        station("gesla/uddevalla-udd-swe-cmems", { ...uddevalla, lat: 58.3475, lon: 11.8948 }),
+      ],
+      NOW,
+    );
+    const byId = new Map(stations.map((s) => [s.id, s]));
+    assert.deepEqual(byId.get("gesla/uddevalla-2541-swe-smhi")!.same_as, []);
+    assert.deepEqual(byId.get("smhi/2541")!.same_as, ["gesla/uddevalla-udd-swe-cmems"]);
+  });
+
   it("keeps a pair a person unlinked apart, even through a third station", () => {
     UNLINKS.push({ a: "a/1", b: "b/1", note: "test" });
     try {
