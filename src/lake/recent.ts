@@ -1,5 +1,5 @@
 import { Blocked } from "../http.ts";
-import { qc, withSourceFlag, type QcOptions } from "../qc.ts";
+import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
@@ -209,12 +209,37 @@ export async function updateRecent({
             ? (answer ?? []).filter((o) => o.time >= window.from)
             : await source.observations!(station, new Date(window.from), new Date(now));
           // QC the whole window, so spikes and flatlines are judged against their neighbors.
+          // What we had starts again from the source's flags, so a mark can clear,
+          // except within a flatline's length of the window's start, where a run
+          // that began before it can't be seen whole, and compaction folds those days.
           // Nothing new keeps what we had, rather than clearing the last hours.
-          if (got.length)
-            merged = qc(
-              mergeFetched(window.current, withSourceFlag(got), window.from, now, now),
-              qcFor(source, station),
+          if (got.length) {
+            const had = window.current;
+            const opts = qcFor(source, station);
+            // The longest run any flatline rule needs to see.
+            const longest = Math.max(
+              opts.flatline_s ?? FLATLINE_S,
+              opts.centimeter_flatline_s ?? 0,
             );
+            const edge = (had[0]?.time ?? 0) + longest * 1000;
+            // A source that can't judge a part of its record keeps the flags stored.
+            const suspect = await source
+              .suspect?.(station, async function* () {
+                yield had;
+              })
+              .catch(() => null);
+            const start =
+              suspect === null
+                ? had
+                : [
+                    ...had.filter((r) => r.time < edge),
+                    ...fromSource(
+                      had.filter((r) => r.time >= edge),
+                      suspect,
+                    ),
+                  ];
+            merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), opts);
+          }
         } catch (error) {
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);

@@ -7,6 +7,7 @@
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
+ *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -37,7 +38,9 @@
  * last level to stations/bounds/<source>.parquet (`updateBounds` in
  * src/lake/recent.ts); `--rebuild-bounds` reads every station's again rather
  * than keep the ones it knows. Both print a summary, and add it to
- * the workflow run's page.
+ * the workflow run's page. `requalify` works the flags of stations' observed
+ * levels out again over the years [start, end) from the lake alone (src/lake/requalify.ts),
+ * so a QC rule change reaches stored values without fetching them again.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -97,8 +100,8 @@ import {
   publishedSources,
   writeObservations,
 } from "../src/lake/parquet.ts";
+import { judgeFetched, requalify } from "../src/lake/requalify.ts";
 import { boundsPath, errataPath, seriesDir, seriesPath, stationsPath } from "../src/lake/paths.ts";
-import { qc, withSourceFlag } from "../src/qc.ts";
 import {
   describeReport,
   hasHistory,
@@ -186,6 +189,12 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     await recent(source);
+    break;
+  }
+  case "requalify": {
+    const [source, ids, start, end] = args;
+    if (!source || !ids || !start || !end) usage();
+    await requalifyStations(source, ids, parseYear(start), parseYear(end));
     break;
   }
   case "compact": {
@@ -646,9 +655,19 @@ async function backfillYear(
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return "empty";
     await refuseOtherDatum(path, station);
-    if (product === "levels") rows = qc(withSourceFlag(rows), qcFor(source, station));
     const existing = await readObservations(path);
-    const merged = mergeFetched(existing, rows, ...range);
+    let merged = mergeFetched(existing, rows, ...range);
+    if (product === "levels") {
+      const year = from.getUTCFullYear();
+      const near = (y: number) =>
+        readObservations(
+          seriesPath(lakeFor(station), product, station.source, station.source_id, y, epoch.id),
+        );
+      merged = judgeFetched(existing, rows, ...range, qcFor(source, station), [
+        ...(await near(year - 1)),
+        ...(await near(year + 1)),
+      ]);
+    }
     if (!merged.length || sameRows(existing, merged)) return undefined;
     await writeObservations(path, merged, station.datum);
     return merged.length;
@@ -779,6 +798,52 @@ function find(list: LakeStation[], sourceId: string, id: string): LakeStation {
   return station;
 }
 
+async function requalifyStations(
+  sourceId: string,
+  ids: string,
+  start: number,
+  end: number,
+): Promise<void> {
+  if (start >= end)
+    throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
+  if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
+  const source = sourceOf(sourceId);
+  const list = await listOf(lakeOfSource(source.metadata), sourceId);
+  // Every station with files, inactive ones too, since their stored values are QC'd as well.
+  let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
+  if (values.shard) stations = shard(stations, ...parseShard(values.shard));
+  setConnections(positive("concurrency"));
+  const summary = await reporting(`requalify ${sourceId} ${start}–${end}`, async () => {
+    const s: RunSummary = {
+      title: `requalify ${sourceId} ${start}–${end}`,
+      stations: stations.length,
+      updated: 0,
+      stale: [],
+      failed: [],
+      waiting: [],
+      values: 0,
+      files: 0,
+    };
+    await pool(stations, positive("concurrency"), async (station) => {
+      try {
+        const { files, changed } = await requalify(source, station, lakeFor(station), start, end);
+        if (files) s.updated++;
+        s.files += files;
+        s.values += changed;
+      } catch (error) {
+        s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+      }
+    });
+    return s;
+  });
+  if (summary.failed.length) process.exitCode = 1;
+}
+
+function parseYear(value: string): number {
+  if (!/^\d{4}$/.test(value)) throw new Error(`Not a year: ${value}`);
+  return Number(value);
+}
+
 function parseDate(value: string): Date {
   const date = new Date(/^\d{4}$/.test(value) ? `${value}-01-01T00:00:00Z` : value);
   if (Number.isNaN(date.getTime())) throw new Error(`Not a date: ${value}`);
@@ -787,7 +852,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N]",
   );
   process.exit(1);
 }

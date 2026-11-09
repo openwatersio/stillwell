@@ -673,4 +673,37 @@ export const source: Source = {
   metadata,
   stations,
   observations: (s, start, end) => levels(s as GeslaStation, start, end),
+  // The datum jumps, from the lake's copy of the record. They're judged against
+  // the record's longest segment, so a copy that misses either end is refused;
+  // a year missing in the middle isn't seen. shortcut: a backfill that failed a
+  // middle year can shift the longest segment; check each year once GESLA's empty years are recorded.
+  suspect: async (s, record) => {
+    if (s.kind !== "coastal") return [];
+    const [times, levels, source]: number[][] = [[], [], []];
+    for await (const rows of record())
+      for (const r of rows) {
+        times.push(r.time);
+        levels.push(r.level);
+        source.push(r.source_flag ?? r.flag);
+      }
+    // A year's margin, since a record's stated ends can fall in null lines the lake never holds.
+    const { record_start, record_end } = s as GeslaStation;
+    const YEAR_MS = 366 * DAY_MS;
+    const held = times.length
+      ? `${new Date(times[0]!).toISOString()} to ${new Date(times.at(-1)!).toISOString()}`
+      : "nothing";
+    if (
+      !times.length ||
+      (record_start && times[0]! > Date.parse(record_start) + YEAR_MS) ||
+      (record_end && times.at(-1)! < Date.parse(record_end) - YEAR_MS)
+    )
+      throw new Error(
+        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}); backfill it first`,
+      );
+    return datumJumps({
+      times: Float64Array.from(times),
+      levels: Float64Array.from(levels),
+      source: Uint8Array.from(source),
+    });
+  },
 };

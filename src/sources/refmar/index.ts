@@ -402,4 +402,5 @@ export const source: Source = {
     if (!s.products.includes("levels")) throw new Error(`REFMAR ${s.source_id} isn't published`);
     return levels(s as RefmarStation, start, end);
   },
+  suspect: async (s) => SUSPECT[s.source_id] ?? [],
 };
