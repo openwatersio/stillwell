@@ -208,6 +208,9 @@ The code is [AGPL-3.0](LICENSE). Every contributor signs the [Contributor Licens
 The traps this project has fallen into, for the openwaters-review skill and anyone reviewing a change:
 
 - A change that works around something a source publishes wrong, such as a clock shift, a skipped or refused file, a fixed position or a flagged span, opens a `source-error` issue for it and cites its erratum ID (see [Source errata](#source-errata)). A workaround with no erratum hides the error from users of the lake and from the agency.
+- A lake path built from a station ID is read with DuckDB's `read_parquet` or `glob`, which treat `*`, `?` and `[` as wildcards, and `encodeURIComponent` leaves `*` alone. A new read of such a path keeps only the rows or files from that exact path (`filename = true`, as `readObservationFile` and `readYearFiles` do), so an ID like `a*` doesn't read another station's files.
+- QC has more than one flatline limit (`flatline_s`, and `centimeter_flatline_s` for SMHI's whole-centimeter series). Code that reasons about how far a run can reach, such as the recent window's edge, uses the longest that applies, not the default.
+- A write changes only the values its run is about. Backfill rewrites the values it fetched and compaction the days it folds; QC that reads more of the year, for its medians or a run across the edge, leaves the flags of the rest as they were. Only `requalify` changes stored flags it didn't fetch.
 
 ## Shared conventions
 
