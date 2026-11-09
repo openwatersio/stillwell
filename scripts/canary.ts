@@ -153,7 +153,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 
 /**
  * Sources whose request paths change, so a recording would fail the next one:
- * JMA's name the month, and GESLA's iCloud links are signed anew each time.
+ * JMA's name the month, and GESLA's iCloud links are signed anew every 15 minutes.
  */
 const UNRECORDED = new Set(["gesla", "jma"]);
 
