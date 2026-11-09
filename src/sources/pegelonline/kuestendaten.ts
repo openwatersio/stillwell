@@ -100,7 +100,8 @@ function lowerBound(sorted: Int32Array, length: number, value: number): number {
  * Reads a zip's one file, a header of `key : value` lines, a `====` rule, a
  * column line, tab-separated rows of time, level and status, and another rule
  * before the row count. Refuses a file for another gauge, in another unit or
- * time zone, or with a status other than 240, whose meaning nobody has said.
+ * time zone, with a status other than 240, whose meaning nobody has said, on
+ * any row, or with fewer rows than its footer counts.
  */
 export function parse(zip: string, station: string): Promise<Series> {
   return parseEntries(zipEntries(zip), station);
@@ -113,11 +114,17 @@ export async function parseEntries(
   const entries = [...files.values()];
   if (entries.length !== 1) throw new Error(`kuestendaten.de ${station}: ${entries.length} files`);
   const header = new Map<string, string>();
-  let part = "header" as "header" | "columns" | "rows" | "done";
+  let part = "header" as "header" | "columns" | "rows" | "footer";
+  let rows = 0;
+  let declared: number | undefined;
   let out: Series | undefined;
   const fail = (why: string) => new Error(`kuestendaten.de ${station}: ${why}`);
   const line = (text: string) => {
-    if (part === "done") return;
+    if (part === "footer") {
+      const count = /^Anzahl Datens\S+ im Abfragezeitraum\s*:\s*(\d+)\s*$/.exec(text)?.[1];
+      if (count) declared = Number(count);
+      return;
+    }
     if (text.startsWith("====")) {
       if (part === "header") {
         if (header.get("Messstellennummer") !== station)
@@ -133,7 +140,7 @@ export async function parseEntries(
         const size = last - first + 1;
         out = { minutes: new Int32Array(size), cm: new Float32Array(size), length: 0 };
         part = "columns";
-      } else part = "done";
+      } else part = "footer";
       return;
     }
     if (part === "header") {
@@ -145,10 +152,11 @@ export async function parseEntries(
       part = "rows";
       return;
     }
+    rows++;
     const [time, value, status] = text.split("\t");
+    if (status !== "240") throw fail(`status ${status} at ${time}`);
     // A minute with no value, which the files have a few of.
     if (!value) return;
-    if (status !== "240") throw fail(`status ${status} at ${time}`);
     const minute = minuteOf(time!);
     const level = Number(value);
     if (Number.isNaN(minute) || !Number.isFinite(level))
@@ -167,7 +175,9 @@ export async function parseEntries(
     for (const l of lines) line(l.replace(/\r$/, ""));
   }
   line(rest + decoder.decode());
-  if (part !== "done" || !out) throw fail("file ends early");
+  // The footer's count catches a file cut short between its rules.
+  if (part !== "footer" || !out || declared !== rows)
+    throw fail(`file ends early: ${rows} rows of ${declared ?? "an unknown number"}`);
   return out;
 }
 

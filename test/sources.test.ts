@@ -681,6 +681,15 @@ describe("pegelonline kuestendaten", () => {
       kuestendaten.parseEntries(entry, "5952050"),
       /status 200 at 2024-03-31 01:59:00/,
     );
+    const read = (text: string) =>
+      kuestendaten.parseEntries(new Map([[name!, () => new Blob([text]).stream()]]), "5952050");
+    // An empty value still carries its status.
+    await assert.rejects(
+      read(text!.replace("\t\t240", "\t\t200")),
+      /status 200 at 2024-03-31 02:00/,
+    );
+    // A row missing between the rules, against the footer's count.
+    await assert.rejects(read(text!.replace(/^2024-03-31 02:01.*\n/m, "")), /5 rows of 6/);
   });
 
   it("refuses another datum and asks nothing for a range before the files", async () => {
