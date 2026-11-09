@@ -232,6 +232,23 @@ describe("lake files", () => {
     assert.deepEqual(await readStationList(path), [station]);
   });
 
+  it("keeps a source's QC start in a list, absent where the adapter hasn't asked", async () => {
+    const path = join(root, "stations/test.parquet");
+    const asked = { ...listed, epochs: [epoch], source_qc_start: "2019-07-01T00:00:00Z" };
+    const none = { ...asked, id: "test:2", source_qc_start: null };
+    const unasked = { ...listed, id: "test:3", epochs: [epoch] };
+    await writeStationList(path, [asked, none, unasked] as LakeStation[]);
+    const read = await readStationList(path);
+    assert.deepEqual(
+      read!.map((s) => ["source_qc_start" in s, s.source_qc_start]),
+      [
+        [true, "2019-07-01T00:00:00Z"],
+        [true, null],
+        [false, undefined],
+      ],
+    );
+  });
+
   it("reads back the first and last the lake filled in, and an unknown preliminary from a file without one", async () => {
     const path = join(root, "bounds/stations.parquet");
     assert.deepEqual(await readStationBounds(path), new Map());

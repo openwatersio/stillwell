@@ -1,0 +1,32 @@
+﻿Stationsnamn;Stationsid;Stationens latitud;Stationens longitud
+Brofjorden;35109;58.336;11.4047
+
+Parameternamn;Enhet
+Havsvattenstånd;cm
+
+Datum Tid (UTC);Havsvattenstånd;Kvalitet;Mätdjup (m);;Tidsutsnitt
+2026-11-08 02:00:00;-4.7;G;0;;Tidsperiod (fr.o.m.) = 2009-04-27 12:00:00 (UTC)
+2026-11-08 03:00:00;-0.8;G;0;;Tidsperiod (t.o.m.) = 2026-11-09 03:00:00 (UTC)
+2026-11-08 04:00:00;-3.9;G;0;;
+2026-11-08 05:00:00;-8.5;G;0;;Höjdsystem: RH2000
+2026-11-08 06:00:00;-13.5;G;0;;
+2026-11-08 07:00:00;-19.9;G;0;;Kvalitetskontroll:
+2026-11-08 08:00:00;-22.7;G;0;;Data före 2019-07-01 är ej kvalitetskontrollerad och felaktiga värden kan förekomma.
+2026-11-08 09:00:00;-23.1;G;0;;Efter detta datum har data genomgått en automatisk kvalitetskontroll.
+2026-11-08 10:00:00;-16.4;G;0;;
+2026-11-08 11:00:00;-10.3;G;0;;Kvalitetskoderna:
+2026-11-08 12:00:00;-6.3;G;0;;Grön (G) = Kontrollerade och godkända värden.
+2026-11-08 13:00:00;-3.2;G;0;;Gul (Y) = Misstänkta eller aggregerade värden. Grovt kontrollerade arkivdata och okontrollerade realtidsdata (senaste 2 tim).
+2026-11-08 14:00:00;3.2;G;0;;Orange (O) = Okontrollerade värden.
+2026-11-08 15:00:00;6.5;G;0;;
+2026-11-08 16:00:00;3.7;G;0;;Orsaker till saknade data:
+2026-11-08 17:00:00;-1.2;G;0;;  stationen eller givaren har varit ur funktion.
+2026-11-08 18:00:00;-6.9;G;0;;  kvalitetskontrollerna har felmarkerat data (röd kvalitetskod). Efterföljande manuell granskning godkänner, rättar eller underkänner data.
+2026-11-08 19:00:00;-12.7;G;0
+2026-11-08 20:00:00;-18.0;G;0
+2026-11-08 21:00:00;-19.2;G;0
+2026-11-08 22:00:00;-15.6;G;0
+2026-11-08 23:00:00;-10.8;G;0
+2026-11-09 00:00:00;-7.1;G;0
+2026-11-09 01:00:00;-5.7;G;0
+2026-11-09 02:00:00;-1.0;G;0

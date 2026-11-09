@@ -408,7 +408,10 @@ describe("publishStations", () => {
   it("publishes every list with its bounds, epochs and links", async () => {
     const { stations } = await refreshSource(
       lake,
-      sourceOf([listed("a", { same_as: ["test/b"] }), listed("b")]),
+      sourceOf([
+        listed("a", { same_as: ["test/b"], source_qc_start: "2019-07-01T00:00:00Z" }),
+        listed("b"),
+      ]),
       { now: NOW },
     );
     await writeStations(boundsPath(lake, "test"), [
@@ -424,13 +427,15 @@ describe("publishStations", () => {
     const [published] = JSON.parse(await readFile(sourcesPath(lake), "utf8"));
     assert.equal(published.license.id, "CC0-1.0");
     assert.deepEqual(published.contact, { url: "https://example.org/contact" });
-    for (const key of ["hourly", "finalizes", "qc", "utc_offsets", "archive"])
+    for (const key of ["hourly", "qc", "utc_offsets", "archive"])
       assert.ok(!(key in published), key);
+    // A reader tells preliminary values that will change from ones that won't by it.
+    assert.equal(published.finalizes, true);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs, strftime(source_qc_start, '%Y-%m-%d %H:%M') AS source_qc_start FROM '${stationsPath(lake)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
@@ -442,6 +447,8 @@ describe("publishStations", () => {
         preferred: "test/a",
         errata: [],
         epochs: "1",
+        // Kept through the source's list, where it rides in `extra`.
+        source_qc_start: "2019-07-01 00:00",
       },
       {
         id: "test/b",
@@ -450,6 +457,7 @@ describe("publishStations", () => {
         preferred: "test/a",
         errata: [],
         epochs: "1",
+        source_qc_start: null,
       },
     ]);
     // errata.json holds the errata of the sources the lake holds, here none.

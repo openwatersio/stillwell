@@ -4,7 +4,7 @@ import type { Product } from "../schema.ts";
  * The lake's layout, under a root that is a local directory or an `s3://` URL:
  *
  *   stations.parquet                                    one row per series
- *   sources.json                                        license, attribution and contact per source
+ *   sources.json                                        license, attribution, contact and finalizes per source
  *   errata.json                                         errors in what sources publish, and what the lake does about them
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
