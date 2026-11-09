@@ -1547,7 +1547,7 @@ describe("usace", () => {
     assert.deepEqual([old!.live, old!.datums, old!.kind], [false, {}, null]);
   });
 
-  it("refers gauge zero to NGVD29 or NAVD88, whatever CWMS calls them", () => {
+  it("refers gauge zero to NGVD29 or NAVD88, whatever CWMS calls them", (t) => {
     const vicksburg = {
       office: "MVK",
       name: "Vicksburg",
@@ -1567,6 +1567,33 @@ describe("usace", () => {
     });
     assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "LOCAL" }), {});
     assert.deepEqual(usace.datumsOf({ ...vicksburg, "vertical-datum": "COE1912" }), {});
+    const error = t.mock.method(console, "error", () => {});
+    // Red River Landing's NGVD29 elevation is its NAVD88 correction, until CWMS changes it.
+    const redRiver = {
+      office: "MVN",
+      name: "Red_River_Ldg",
+      elevation: -0.27,
+      unit: "ft",
+      "vertical-datum": "NGVD29",
+    };
+    assert.deepEqual(usace.datumsOf(redRiver), { NAVD88: -0.082 });
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: -0.3 }), { NGVD29: -0.091 });
+    assert.deepEqual(usace.datumsOf({ ...redRiver, unit: "m" }), { NGVD29: -0.27 });
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: 0 }), {});
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: undefined }), {});
+    assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: -0.2700000001 }), { NAVD88: -0.082 });
+    // Each change, including a dropped elevation, is reported for a person to check the entry.
+    const said = error.mock.calls.map((c) => String(c.arguments[0]));
+    for (const given of [
+      "-0.3 ft NGVD29",
+      "-0.27 m NGVD29",
+      "0 ft NGVD29",
+      "no elevation ft NGVD29",
+    ])
+      assert.ok(
+        said.some((s) => s.includes(`MVN.Red_River_Ldg now gives ${given},`)),
+        given,
+      );
   });
 
   it("reads the NAVD88 adjustment and LWRP offset from a New Orleans description", () => {
