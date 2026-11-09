@@ -234,17 +234,22 @@ describe("lake files", () => {
 
   it("keeps a source's QC start in a list, absent where the adapter hasn't asked", async () => {
     const path = join(root, "stations/test.parquet");
-    const asked = { ...listed, epochs: [epoch], source_qc_start: "2019-07-01T00:00:00Z" };
-    const none = { ...asked, id: "test:2", source_qc_start: null };
+    const asked = {
+      ...listed,
+      epochs: [epoch],
+      source_qc_start: "2019-07-01T00:00:00Z",
+      source_qc_start_inferred: true,
+    };
+    const none = { ...asked, id: "test:2", source_qc_start: null, source_qc_start_inferred: null };
     const unasked = { ...listed, id: "test:3", epochs: [epoch] };
     await writeStationList(path, [asked, none, unasked] as LakeStation[]);
     const read = await readStationList(path);
     assert.deepEqual(
-      read!.map((s) => ["source_qc_start" in s, s.source_qc_start]),
+      read!.map((s) => ["source_qc_start" in s, s.source_qc_start, s.source_qc_start_inferred]),
       [
-        [true, "2019-07-01T00:00:00Z"],
-        [true, null],
-        [false, undefined],
+        [true, "2019-07-01T00:00:00Z", true],
+        [true, null, null],
+        [false, undefined, undefined],
       ],
     );
   });

@@ -434,7 +434,11 @@ describe("publishStations", () => {
     const { stations } = await refreshSource(
       lake,
       sourceOf([
-        listed("a", { same_as: ["test/b"], source_qc_start: "2019-07-01T00:00:00Z" }),
+        listed("a", {
+          same_as: ["test/b"],
+          source_qc_start: "2019-07-01T00:00:00Z",
+          source_qc_start_inferred: true,
+        }),
         listed("b"),
       ]),
       { now: NOW },
@@ -460,7 +464,7 @@ describe("publishStations", () => {
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs, strftime(source_qc_start, '%Y-%m-%d %H:%M') AS source_qc_start FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs, strftime(source_qc_start, '%Y-%m-%d %H:%M') AS source_qc_start, source_qc_start_inferred FROM '${stationsPath(lake)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
@@ -474,6 +478,7 @@ describe("publishStations", () => {
         epochs: "1",
         // Kept through the source's list, where it rides in `extra`.
         source_qc_start: "2019-07-01 00:00",
+        source_qc_start_inferred: true,
       },
       {
         id: "test/b",
@@ -483,6 +488,7 @@ describe("publishStations", () => {
         errata: [],
         epochs: "1",
         source_qc_start: null,
+        source_qc_start_inferred: null,
       },
     ]);
     // errata.json holds the errata of the sources the lake holds, here none.

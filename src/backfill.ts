@@ -23,8 +23,9 @@ const DAY_MS = 86_400_000;
  *   A month whose provisional values the source later withdraws keeps them,
  *   since a month the fetch returns nothing for keeps what it had, so that year
  *   is fetched on every run until someone removes them. A year that ends by
- *   the station's `source_qc_start` (`qcStart`) is the exception: the source
- *   never checks those values, so they stay `preliminary` for good;
+ *   the station's `source_qc_start` (`qcStart`), stated or inferred, is the
+ *   exception: the source won't check those values, so they stay
+ *   `preliminary` for good;
  * - it has values in every month and its last value is in the year's last 7
  *   days, so a file an earlier run wrote over part of the year, or with a month
  *   the source returned nothing for, is fetched again. A station that began or

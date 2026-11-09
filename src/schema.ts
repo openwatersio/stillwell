@@ -79,13 +79,19 @@ export interface Station {
   /** Whether the live endpoint serves this station. */
   live: boolean;
   /**
-   * Where the source says its quality checks of this station's values start,
-   * as a UTC instant: it never checked the values before it and never will,
-   * so a `preliminary` one from before it is final as it stands, having
-   * passed only the lake's QC. Null or absent where the source states no
-   * such date. Absent in a source's list means the adapter hasn't asked yet.
+   * Where the source's quality checks of this station's values start, as a
+   * UTC instant, stated by the source or inferred from its flags
+   * (`source_qc_start_inferred`): it won't check the `preliminary` values
+   * before it, so one is final as it stands, having passed only the lake's
+   * QC. Null or absent where none is known. Absent in a source's list means
+   * the adapter hasn't asked yet.
    */
   source_qc_start?: string | null;
+  /**
+   * Whether `source_qc_start` is inferred from the source's own flags rather
+   * than stated by the source: true or false with a date, null without one.
+   */
+  source_qc_start_inferred?: boolean | null;
   /** How often the source lets us ask for this station, in seconds. */
   min_interval_s: number | null;
   source_url: string | null;
