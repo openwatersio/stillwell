@@ -143,11 +143,17 @@ export type YearStats = { hours: number; flags: number[]; version: string };
 const YEAR_STATS = [
   "count(DISTINCT floor(epoch_ms(time) / 3600000)) AS hours",
   ...[0, 1, 2, 3, 4].map((f) => `count(*) FILTER (WHERE flag = ${f}) AS flag${f}`),
-  "printf('%032x', coalesce(bit_xor(md5_number(concat(epoch_ms(time), ',', level_m, ',', flag, ',', source_flag, ',', epoch_ms(received)))), 0::UHUGEINT)) AS version",
+  // The row count goes in too, since two identical rows cancel in bit_xor.
+  "md5(concat(printf('%032x', coalesce(bit_xor(md5_number(concat(epoch_ms(time), ',', level_m, ',', flag, ',', source_flag, ',', epoch_ms(received)))), 0::UHUGEINT)), ',', count(*))) AS version",
 ].join(", ");
 
 /** A year file with no rows, as `YEAR_STATS` gives one. */
-export const EMPTY_YEAR: YearStats = { hours: 0, flags: [0, 0, 0, 0, 0], version: "0".repeat(32) };
+export const EMPTY_YEAR: YearStats = {
+  hours: 0,
+  flags: [0, 0, 0, 0, 0],
+  // md5 of the empty bit_xor and a count of 0.
+  version: "a6d15f1ab28e5c9dfee9f3bb78c4ab5d",
+};
 
 function yearStats(r: Record<string, unknown>): YearStats {
   return {

@@ -50,6 +50,13 @@ describe("year stats", () => {
       "NAP",
     );
     const flagged = await writeObservations(file, rows(5), "NAP");
+    // A repeated row doesn't cancel out.
+    const [first] = rows(1);
+    const repeated = await writeObservations(file, [first!, first!, ...rows(4).slice(1)], "NAP");
+    assert.notEqual(
+      repeated.version,
+      (await writeObservations(file, rows(4).slice(1), "NAP")).version,
+    );
     assert.equal(same.version, written.version);
     assert.notEqual(flagged.version, written.version);
   });
