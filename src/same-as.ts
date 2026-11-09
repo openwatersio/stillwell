@@ -1,4 +1,5 @@
 import type { Station } from "./schema.ts";
+import { DROPPED } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -134,16 +135,21 @@ export function linkGauges<T extends Station>(
   now = new Date(),
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
+  // GESLA's records whose values are another gauge's join no group.
+  const alone = new Set([...DROPPED].map((file) => `gesla/${file}`).filter((id) => byId.has(id)));
+  const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
   const dropped: LinkReport["dropped"] = [];
   const skipped: LinkReport["skipped"] = [];
   const add = (a: string, b: string, how: How) => {
     const key = pairKey(a, b);
-    if (a !== b && !edges.has(key)) edges.set(key, how);
+    if (a !== b && !edges.has(key) && !alone.has(a) && !alone.has(b)) edges.set(key, how);
   };
 
   for (const { a, b } of LINKS)
-    if (byId.has(a) && byId.has(b)) add(a, b, "manual");
+    if (alone.has(a) || alone.has(b))
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+    else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
     if (!byId.has(a) || !byId.has(b))
@@ -152,10 +158,12 @@ export function linkGauges<T extends Station>(
     if (!byId.has(id)) dropped.push({ from: id, to: id, reason: "PREFER names no such station" });
   /** The stations whose own `same_as` named another source's, by pair. */
   const namers = new Map<string, Set<string>>();
-  for (const s of stations)
+  for (const s of linkable)
     for (const other of s.same_as) {
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
+      else if (alone.has(other))
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });
@@ -168,14 +176,14 @@ export function linkGauges<T extends Station>(
           ).add(s.id);
       }
     }
-  for (const [a, b] of nearPairs(stations)) add(a.id, b.id, "near");
+  for (const [a, b] of nearPairs(linkable)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no
   // guess. Only the station that named it: one another source's copy names,
   // as GESLA names UHSLC's series, may still be a copy to match.
   const named = new Set<string>();
   const unlinked = new Set(UNLINKS.map(({ a, b }) => pairKey(a, b)));
   for (const [key, ids] of namers) if (!unlinked.has(key)) for (const id of ids) named.add(id);
-  for (const [a, b] of copyPairs(stations, named)) add(a.id, b.id, "copy");
+  for (const [a, b] of copyPairs(linkable, named)) add(a.id, b.id, "copy");
 
   // Union-find, with each group's members kept so a merge can be refused.
   const parent = new Map<string, string>();

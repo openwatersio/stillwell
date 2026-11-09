@@ -284,6 +284,25 @@ describe("refreshSource", () => {
     assert.deepEqual([report.retired, report.withdrawn], [["test/a", "test/b"], ["test/a"]]);
   });
 
+  it("doesn't count a GESLA record it drops for another gauge's values as withdrawn", async () => {
+    const uddevalla = {
+      id: "gesla/uddevalla-2541-swe-smhi",
+      source: "gesla",
+      source_id: "uddevalla-2541-swe-smhi",
+    };
+    const gesla = (station: ListedStation): Source => ({
+      ...sourceOf([station]),
+      metadata: { ...metadata, id: "gesla" },
+    });
+    await refreshSource(lake, gesla(listed("a", uddevalla)), { now: NOW });
+    const { report } = await refreshSource(
+      lake,
+      gesla(listed("a", { ...uddevalla, status: "inactive", products: [] })),
+      { now: LATER },
+    );
+    assert.deepEqual([report.retired, report.withdrawn], [["gesla/uddevalla-2541-swe-smhi"], []]);
+  });
+
   it("numbers a new epoch above files for a product the station no longer lists", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
     await writeObservations(
