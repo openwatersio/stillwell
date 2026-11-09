@@ -98,13 +98,14 @@ describe("bodc", () => {
               ["2024-03-06T00:15:00Z", -0.001, "'M'"],
               ["2024-03-06T00:30:00Z", 0, "''"],
               ["2024-03-06T00:45:00Z", -0.002, "'M'"],
+              ["2024-03-06T01:00:00Z", 0, "'L'"],
             ],
           },
         }),
       ],
     ]);
     assert.deepEqual(
-      (await bodc.levels("ler", new Date("2024-03-06T00:00Z"), new Date("2024-03-06T01:00Z"))).map(
+      (await bodc.levels("ler", new Date("2024-03-06T00:00Z"), new Date("2024-03-06T02:00Z"))).map(
         (o) => [o.level, o.flag],
       ),
       [
@@ -112,6 +113,8 @@ describe("bodc", () => {
         [-0.001, Flag.bad],
         [0, Flag.good],
         [-0.002, Flag.suspect],
+        // Another letter isn't BODC's placeholder.
+        [0, Flag.suspect],
       ],
     );
   });

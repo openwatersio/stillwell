@@ -95,7 +95,14 @@ describe("the source's years", () => {
   it("give each station's share of values not flagged suspect or bad", async () => {
     const root = lake();
     assert.deepEqual(await usableShares(root, "test"), new Map());
-    await writeObservations(seriesPath(root, "levels", "test", "a", 2023), rows(3), "NAP");
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2023),
+      [...rows(1), ...rows(1, Flag.interpolated), ...rows(1, Flag.preliminary)].map((o, i) => ({
+        ...o,
+        time: T + i * HOUR,
+      })),
+      "NAP",
+    );
     await writeObservations(
       seriesPath(root, "levels", "test", "a", 2024),
       rows(1, Flag.suspect),
@@ -114,6 +121,9 @@ describe("the source's years", () => {
         ["test/b", 0],
       ]),
     );
+    // A station being written has no share until its rows are current.
+    await markYears(root, "test", ["test/b"]);
+    assert.deepEqual(await usableShares(root, "test"), new Map([["test/a", 0.75]]));
   });
 
   it("are built by a rebuild, and left alone by other runs until then", async () => {

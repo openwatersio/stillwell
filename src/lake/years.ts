@@ -92,12 +92,16 @@ const FLAGS = ["good", "interpolated", "preliminary", "suspect", "bad"];
 
 /**
  * Each station's share of its levels not flagged suspect or bad, over every
- * year file the source's years file counts; none for a source without one.
+ * year file the source's years file counts; none for a source without one,
+ * or for a station marked as being written.
  */
 export async function usableShares(lake: string, source: string): Promise<Map<string, number>> {
+  const rows = [...((await readYears(lake, source))?.values() ?? [])];
+  // A marked station's rows may be out of date mid-rewrite, so its share is unknown.
+  const marked = new Set(rows.filter((r) => r.year === null).map((r) => r.id));
   const totals = new Map<string, [number, number]>();
-  for (const { id, flags } of (await readYears(lake, source))?.values() ?? []) {
-    if (!flags) continue;
+  for (const { id, flags } of rows) {
+    if (!flags || marked.has(id)) continue;
     const [usable, all] = totals.get(id) ?? [0, 0];
     totals.set(id, [
       usable + flags[0]! + flags[1]! + flags[2]!,

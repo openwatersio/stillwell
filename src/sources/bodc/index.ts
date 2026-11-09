@@ -227,7 +227,7 @@ export async function levels(
       const level = r[LEVEL];
       if (typeof level !== "number" || flag === null) continue;
       // An improbable 0 or -1 mm stands in for no reading, at some gauges for years (see README.md).
-      if (flag === Flag.suspect && Math.abs(level) <= 0.001) flag = Flag.bad;
+      if (qualifier(r[`F${LEVEL}`]) === "M" && Math.abs(level) <= 0.001) flag = Flag.bad;
       // Times come a few milliseconds off the quarter hour: erratum `bodc-erddap-times`.
       const time = Math.round(Date.parse(String(r.time)) / 60_000) * 60_000;
       if (time >= a && time < b) out.push({ time, level, flag });
@@ -241,13 +241,18 @@ export async function levels(
  * and `T` interpolated. Any other letter is taken as suspect.
  */
 export function flagOf(raw: Cell): Flag | null {
-  const f = String(raw ?? "")
-    .replace(/'/g, "")
-    .trim();
+  const f = qualifier(raw);
   if (f === "") return Flag.good;
   if (f === "N") return null;
   if (f === "T") return Flag.interpolated;
   return Flag.suspect;
+}
+
+/** BODC's qualifier without its quotes. */
+function qualifier(raw: Cell): string {
+  return String(raw ?? "")
+    .replace(/'/g, "")
+    .trim();
 }
 
 /** [from, to) split at UTC calendar years. */
