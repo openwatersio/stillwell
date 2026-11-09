@@ -6,14 +6,14 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1409 | 1357 | 3119 | An adapter exists and the record matched one of its stations |
+| ready | 1409 | 1356 | 3119 | An adapter exists and the record matched one of its stations |
 | planned | 1 | 1 | 3 | Cleared source, adapter in the plan |
 | to_match | 43 | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
 | license | 593 | 593 | 991 | The source's terms need confirming first |
 | unmatched | 77 | 73 | 135 | An adapter exists, but no station matched, or two matched equally; check by hand |
 | restricted | 404 | 404 | 538 | The source forbids it; stays on TICON |
 
-The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. Meanwhile 2471 of the 2527 accepted records have a GESLA 4.1 copy listed in the lake (`gesla_id` in the CSV; its backfill is still running), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
+The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. Meanwhile 2470 of the 2527 accepted records have a GESLA 4.1 copy listed in the lake (`gesla_id` in the CSV; its backfill is still running), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
 
 ## By replacement source
 

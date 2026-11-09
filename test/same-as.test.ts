@@ -122,6 +122,47 @@ describe("linkGauges's limits", () => {
     );
   });
 
+  it("keeps a GESLA record whose values are another gauge's out of every group", () => {
+    const uddevalla = { name: "Uddevalla", lat: 58.3451, lon: 11.9069 };
+    const { stations, report } = linkGauges(
+      [
+        station("smhi/2541", uddevalla),
+        station("gesla/uddevalla-2541-swe-smhi", {
+          ...uddevalla,
+          lat: 58.3475,
+          lon: 11.8948,
+          status: "inactive",
+          products: [],
+          // As a list from before the record was dropped has it.
+          same_as: ["smhi/2541"],
+        }),
+        station("gesla/uddevalla-udd-swe-cmems", { ...uddevalla, lat: 58.3475, lon: 11.8948 }),
+        station("uhslc/9", { same_as: ["gesla/uddevalla-2541-swe-smhi"] }),
+        // REFMAR lists a gauge it hides with no products, but its values are its own.
+        station("refmar/3", { name: "Brest", lat: 48.38, lon: -4.5, products: [] }),
+        station("gesla/brest-3-fra-refmar", {
+          name: "Brest",
+          lat: 48.38,
+          lon: -4.5,
+          same_as: ["refmar/3"],
+        }),
+      ],
+      NOW,
+    );
+    const byId = new Map(stations.map((s) => [s.id, s]));
+    assert.deepEqual(byId.get("refmar/3")!.same_as, ["gesla/brest-3-fra-refmar"]);
+    assert.deepEqual(
+      report.dropped.map((d) => [d.from, d.to, d.reason]),
+      [["uhslc/9", "gesla/uddevalla-2541-swe-smhi", "a GESLA record in DROPPED"]],
+    );
+    assert.deepEqual(byId.get("gesla/uddevalla-2541-swe-smhi")!.same_as, []);
+    assert.deepEqual(byId.get("smhi/2541")!.same_as, ["gesla/uddevalla-udd-swe-cmems"]);
+    assert.equal(
+      byId.get("gesla/uddevalla-2541-swe-smhi")!.preferred,
+      "gesla/uddevalla-2541-swe-smhi",
+    );
+  });
+
   it("keeps a pair a person unlinked apart, even through a third station", () => {
     UNLINKS.push({ a: "a/1", b: "b/1", note: "test" });
     try {

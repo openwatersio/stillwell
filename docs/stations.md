@@ -187,6 +187,8 @@ Linked stations form a group, and each lists every other in `same_as`, so a link
 - a link by nearness or copy never puts two stations of one source in a group, since one of them is likelier another gauge close by: CO-OPS lists several stations at some piers, and USACE a pool and a lock beside one USGS gauge. GESLA is the exception: it holds several agencies' copies of many gauges, so two of its records in a group are two copies, not two gauges;
 - no link joins two stations a person put in `UNLINKS`, even through a third station.
 
+A GESLA record whose values are another gauge's (`DROPPED` in `src/sources/gesla/dropped.ts`) joins no group, and is its own preferred series. A link to it, from an adapter's `same_as` or from `LINKS`, is dropped and reported.
+
 **The preferred series** is the group's best by these, in order:
 
 1. a person's choice in `PREFER`;

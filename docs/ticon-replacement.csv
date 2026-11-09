@@ -4493,7 +4493,7 @@ ubeko-8412-jpn-jodc_pahb,Ubeko,Japan,jodc_pahb,true,true,jp/ubeko,true,2011-03-3
 uchiura-ma18-jpn-jodc_jma,Uchiura,Japan,jodc_jma,true,false,jp/uchiura,true,1960-12-31,2023-12-31,jma/UC,jma,jma/UC,0.64,ready,JODC relay of jma/UC,gesla/uchiura-ma18-jpn-jodc_jma,false
 ucluelet_bc-8595-can-meds,Ucluelet_BC,Canada,meds,true,true,ca/ucluelet,true,1969-11-04,2024-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/ucluelet_bc-8595-can-meds,false
 udbyhoej-udb-dnk-cmems,Udbyhoej,Denmark,cmems,true,true,dk/udbyhoej,false,2012-01-03,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/udbyhoej-udb-dnk-cmems,false
-uddevalla-2541-swe-smhi,Uddevalla,Sweden,smhi,true,true,se/uddevalla,true,2014-04-02,2025-07-02,,smhi,smhi/2541,0.75,ready,,gesla/uddevalla-2541-swe-smhi,true
+uddevalla-2541-swe-smhi,Uddevalla,Sweden,smhi,true,true,se/uddevalla,true,2014-04-02,2025-07-02,,smhi,smhi/2541,0.75,ready,,,
 uddevalla-udd-swe-cmems,Uddevalla,Sweden,cmems,true,false,se/uddevalla-vaestra-goetaland,false,2010-12-15,2025-07-01,,smhi,smhi/2541,0.75,ready,CMEMS record of a gauge the national feed publishes,gesla/uddevalla-udd-swe-cmems,false
 ueckermnde-9690088-deu-wsv,Ueckermnde,Germany,wsv,true,true,de/ueckermunde,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/9690088,0,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/ueckermnde-9690088-deu-wsv,true
 uetersen-5970016-deu-wsv,Uetersen,Germany,wsv,true,true,de/uetersen,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/5970016,0,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/uetersen-5970016-deu-wsv,true
