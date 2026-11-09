@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { after, before, describe, it } from "node:test";
 import type { Station } from "../src/schema.ts";
 import { copyPairs, linkGauges, LINKS, nearPairs, PREFER, rank, UNLINKS } from "../src/same-as.ts";
 
 const NOW = new Date("2026-11-01T00:00:00Z");
+
+// The real decisions name stations these tests don't list, which would report them as dropped.
+const DECISIONS = [...LINKS];
+before(() => LINKS.splice(0));
+after(() => LINKS.push(...DECISIONS));
 
 /** A station at `source/id`, by default at 0,0 with levels and no record yet. */
 const station = (
@@ -176,6 +181,24 @@ describe("linkGauges's limits", () => {
       assert.equal(report.skipped.length, 2);
     } finally {
       UNLINKS.pop();
+    }
+  });
+
+  it("links GESLA's CMEMS copy of Uddevalla to SMHI's gauge, which the copy rule skips", () => {
+    const uddevalla = { name: "Uddevalla", lat: 58.3475, lon: 11.8948, kind: "river" as const };
+    const list = [
+      station("gesla/uddevalla-udd-swe-cmems", uddevalla),
+      station("smhi/2541", { name: "Uddevalla", lat: 58.3451, lon: 11.9069, kind: "coastal" }),
+    ];
+    assert.equal(linkGauges(list, NOW).stations[0]!.same_as.length, 0);
+    LINKS.push(...DECISIONS);
+    try {
+      const { stations, report } = linkGauges(list, NOW);
+      assert.deepEqual(stations[0]!.same_as, ["smhi/2541"]);
+      assert.equal(stations[0]!.preferred, "smhi/2541");
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
     }
   });
 
