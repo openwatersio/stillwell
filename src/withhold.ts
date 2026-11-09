@@ -1,7 +1,7 @@
 /**
  * Stations withheld from the lake because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
- * rows from its bounds, recent window and empty-years record, and publishing
+ * rows from its bounds, years, recent window and empty-years record, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a lake that still holds them.
  */
@@ -32,6 +32,7 @@ import {
   stationListPath,
 } from "./lake/paths.ts";
 import type { Source } from "./schema.ts";
+import { dropYears } from "./lake/years.ts";
 
 /** Why a station, by its lake ID, is withheld, or null; null for another source's station. */
 export function withheldReason(source: Source, id: string): string | null {
@@ -41,8 +42,8 @@ export function withheldReason(source: Source, id: string): string | null {
 }
 
 /**
- * Drop withheld stations' rows from the source's bounds, recent window and
- * empty-years record in `lake`, rewriting only a file that holds one. Returns
+ * Drop withheld stations' rows from the source's bounds, years, recent window
+ * and empty-years record in `lake`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(lake: string, source: Source): Promise<string[]> {
@@ -85,6 +86,8 @@ export async function dropWithheldRows(lake: string, source: Source): Promise<st
       empty.filter((r) => !held(stationOf(r.key))),
     );
   }
+  // Last, so the values themselves are gone even if this file can't be written.
+  for (const station of await dropYears(lake, id, held)) dropped.add(station);
   return [...dropped].sort();
 }
 
@@ -239,7 +242,7 @@ export function tooManyWithheld(source: string, count: number, known: number): s
 
 /**
  * Remove a source's withheld stations from `lake`: delete their series files,
- * then drop their rows from the bounds, recent window and empty-years record.
+ * then drop their rows from the bounds, years, recent window and empty-years record.
  * Their list rows go at the source's next refresh. Refuses more stations than
  * `withholdLimit` allows unless `accept`, and a lake it can't delete from.
  */

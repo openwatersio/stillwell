@@ -60,6 +60,7 @@ extremes/<source>/<station>/<year>.parquet            the source's observed high
 predictions/<source>/<station>/<year>.parquet         the source's predicted curve
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
 stations/<source>.parquet                             one source's station list, as ingest keeps it
+stations/years/<source>.parquet                       every year file of observed levels, with its hours, values by flag and version
 history/stations/<source>/                            each station refresh's previous list and report
 ```
 

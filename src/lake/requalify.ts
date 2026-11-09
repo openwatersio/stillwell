@@ -1,7 +1,13 @@
 import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import type { LakeStation, Observation, Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
-import { listYears, readDatums, readObservationFile, writeObservations } from "./parquet.ts";
+import {
+  listYears,
+  readDatums,
+  readObservationFile,
+  writeObservations,
+  type YearStats,
+} from "./parquet.ts";
 import { seriesDir } from "./paths.ts";
 import { qcFor } from "./recent.ts";
 
@@ -10,8 +16,9 @@ import { qcFor } from "./recent.ts";
  * the source: each year file of levels from `start` to before `end`, in every
  * epoch, starts over from its `source_flag` and the source's errata spans
  * (`fromSource`), then QC runs with the current rules, judged with the years
- * either side, and the file is written only when a row changed. Returns the
- * files written and the rows whose flag changed.
+ * either side, and the file is written only when a row changed, its stats
+ * going in `written` by path. Returns the files written and the rows whose
+ * flag changed.
  */
 export async function requalify(
   source: Source,
@@ -19,6 +26,7 @@ export async function requalify(
   root: string,
   start: number,
   end: number,
+  written = new Map<string, YearStats>(),
 ): Promise<{ files: number; changed: number }> {
   // Every epoch's datums and errata spans first, so a file to resolve by hand,
   // or a record a source can't judge, stops the station before any is written.
@@ -70,7 +78,7 @@ export async function requalify(
       if (sameRows(had, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
-      await writeObservations(path(year), next, datums[0]!);
+      written.set(path(year), await writeObservations(path(year), next, datums[0]!));
       files++;
     }
   }

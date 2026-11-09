@@ -9,6 +9,7 @@
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
+ *   node scripts/ingest.ts years <source> [--rebuild-years]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -43,8 +44,10 @@
  * levels out again over the years [start, end) from the lake alone (src/lake/requalify.ts),
  * so a QC rule change reaches stored values without fetching them again.
  * `withhold` deletes the files of a source's withheld stations, whose owner
- * refused republication, and their rows in its bounds and recent window
+ * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
+ * `years` reads the source's year files of levels into stations/years/<source>.parquet,
+ * which backfill, compaction and requalify then keep (src/lake/years.ts).
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -103,9 +106,18 @@ import {
   writeExtremes,
   publishedSources,
   writeObservations,
+  type YearStats,
 } from "../src/lake/parquet.ts";
+import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
-import { boundsPath, errataPath, seriesDir, seriesPath, stationsPath } from "../src/lake/paths.ts";
+import {
+  boundsPath,
+  errataPath,
+  seriesDir,
+  seriesPath,
+  stationsPath,
+  yearsPath,
+} from "../src/lake/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -176,6 +188,7 @@ const { positionals, values } = parseArgs({
     "skip-written": { type: "boolean", default: false },
     "skip-unscreened": { type: "boolean", default: false },
     "rebuild-bounds": { type: "boolean", default: false },
+    "rebuild-years": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -215,6 +228,22 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     await withholdStations(source);
+    break;
+  }
+  case "years": {
+    const [source] = args;
+    if (!source) usage();
+    setConnections(positive("concurrency"));
+    const lake = lakeOfSource(sourceOf(source).metadata);
+    const years = await reconcileYears(lake, source, {
+      start: true,
+      rebuild: values["rebuild-years"],
+      keep: (id) => withheldReason(sourceOf(source), id) === null,
+      concurrency: positive("concurrency"),
+    });
+    console.log(`${source}: read ${years!.read} year files into ${yearsPath(lake, source)}`);
+    for (const file of years!.failed) console.error(`  can't read ${file}`);
+    if (years!.failed.length) process.exitCode = 1;
     break;
   }
   default:
@@ -488,6 +517,17 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   let stopped: Blocked | undefined;
   for (const batch of chunks(wanted, 100)) {
     if (stopped) break;
+    // Their rows in the source's years say they're being written until the batch
+    // ends. Before the bounds are lowered, so a batch skipped here leaves them alone.
+    const ids = batch.filter((s) => s.products.includes("levels")).map((s) => s.id);
+    const written = new Map<string, YearStats>();
+    let marked: string[];
+    try {
+      marked = await markYears(lake, sourceId, ids);
+    } catch (error) {
+      fail(`years (skipped ${batch.length} stations)`, error);
+      continue;
+    }
     // Before a batch, a station's value is lowered to where its fetch starts,
     // since the fetch may write preliminary values from there. A run killed
     // partway leaves it too early, which the next refetch reads again, rather
@@ -521,6 +561,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       } catch (error) {
         // Fetched unlowered, a killed run could leave these too late; they wait for the next run.
         fail(`bounds (skipped ${batch.length} stations)`, error);
+        await commitYears(lake, sourceId, marked, new Map()).catch((e) => fail("years", e));
         continue;
       }
     // Lowered stations that fetched no year of levels, having none to fetch or
@@ -565,8 +606,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
             if (ownEpoch) fetched.add(station.id);
             try {
-              const written = await backfillYear(source, station, product, from, to, epoch);
-              if (written === "empty") {
+              const rows = await backfillYear(source, station, product, from, to, epoch, written);
+              if (rows === "empty") {
                 // A year with a file keeps being asked for, so an outage never blocks its refill.
                 if (
                   empty &&
@@ -577,7 +618,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                   emptyFound = true;
                   emptyRecorded++;
                 }
-              } else if (written !== undefined) console.log(`${label}: ${written} rows`);
+              } else if (rows !== undefined) console.log(`${label}: ${rows} rows`);
             } catch (error) {
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
@@ -602,6 +643,11 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       await saveEmpty();
     });
     await saveEmpty(true);
+    try {
+      await commitYears(lake, sourceId, marked, written);
+    } catch (error) {
+      fail("years", error);
+    }
     for (const [id, time] of prior)
       if (!fetched.has(id) && !preliminary.has(id)) preliminary.set(id, { preliminary: time });
     await save();
@@ -645,7 +691,8 @@ async function reportPast(
 
 /**
  * Returns how many rows the year's file now holds, undefined when nothing
- * changed, or `empty` when the source returned nothing for the year.
+ * changed, or `empty` when the source returned nothing for the year. A year
+ * file of levels it writes goes in `written`, for the source's years.
  */
 async function backfillYear(
   source: Source,
@@ -654,6 +701,7 @@ async function backfillYear(
   from: Date,
   to: Date,
   epoch: Epoch,
+  written: Map<string, YearStats>,
 ): Promise<number | "empty" | undefined> {
   // The epoch's own datum, which a closed epoch keeps when the station's moves on.
   station = { ...station, datum: epoch.datum };
@@ -688,7 +736,8 @@ async function backfillYear(
       ]);
     }
     if (!merged.length || sameRows(existing, merged)) return undefined;
-    await writeObservations(path, merged, station.datum);
+    const stats = await writeObservations(path, merged, station.datum);
+    if (product === "levels") written.set(path, stats);
     return merged.length;
   }
   const get = product === "extremes" ? source.extremes : source.predictedExtremes;
@@ -843,16 +892,43 @@ async function requalifyStations(
       values: 0,
       files: 0,
     };
-    await pool(stations, positive("concurrency"), async (station) => {
+    const lake = lakeOfSource(source.metadata);
+    for (const batch of chunks(stations, 100)) {
+      const ids = batch.map((station) => station.id);
+      const written = new Map<string, YearStats>();
+      // A batch that can't be marked isn't written, so the years can't go stale.
+      let marked: string[];
       try {
-        const { files, changed } = await requalify(source, station, lakeFor(station), start, end);
-        if (files) s.updated++;
-        s.files += files;
-        s.values += changed;
+        marked = await markYears(lake, sourceId, ids);
       } catch (error) {
-        s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+        s.failed.push(
+          `years (skipped ${ids.length} stations): ${error instanceof Error ? error.message : error}`,
+        );
+        continue;
       }
-    });
+      await pool(batch, positive("concurrency"), async (station) => {
+        try {
+          const { files, changed } = await requalify(
+            source,
+            station,
+            lakeFor(station),
+            start,
+            end,
+            written,
+          );
+          if (files) s.updated++;
+          s.files += files;
+          s.values += changed;
+        } catch (error) {
+          s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+        }
+      });
+      try {
+        await commitYears(lake, sourceId, marked, written);
+      } catch (error) {
+        s.failed.push(`years: ${error instanceof Error ? error.message : error}`);
+      }
+    }
     return s;
   });
   if (summary.failed.length) process.exitCode = 1;
@@ -890,7 +966,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years]",
   );
   process.exit(1);
 }
