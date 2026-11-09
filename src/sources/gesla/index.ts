@@ -13,6 +13,7 @@ import { TIDAL } from "../dwr/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { NOTICES } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
+import { DROPPED } from "./dropped.ts";
 
 /**
  * GESLA 4.1 (Global Extreme Sea Level Analysis), a static release of 6,682
@@ -73,12 +74,6 @@ const WSV_SHIFT_MS = 30 * 60_000;
  * are. Erratum `gesla-hong-kong-hour-early`.
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
-
-/**
- * Records left out of the list. Uddevalla's holds Arkö's values, row for row
- * (erratum `gesla-uddevalla-is-arko`).
- */
-const DROPPED = new Set(["uddevalla-2541-swe-smhi"]);
 
 /** A GESLA record as listed, with the fields of its metadata row kept in the lake's list. */
 export type GeslaStation = ListedStation & {
@@ -178,8 +173,12 @@ export async function stations(): Promise<GeslaStation[]> {
     );
   const bad = rows.findIndex((r) => r.length !== header.length + 1);
   if (bad >= 0) throw new Error(`GESLA's metadata row ${bad + 2} has ${rows[bad]!.length} fields`);
-  const kept = rows.filter((r) => !DROPPED.has(r[c.file]!.trim()));
-  const listed = kept.map((r): GeslaStation & { code: string } => {
+  // A release that renames a dropped record would otherwise list it again.
+  for (const file of DROPPED) {
+    if (!files.has(file)) throw new Error(`GESLA's metadata has no ${file}, which DROPPED names`);
+    console.log(`GESLA: listing ${file} inactive, since its values are another gauge's (DROPPED)`);
+  }
+  const listed = rows.map((r): GeslaStation & { code: string } => {
     const file = r[c.file]!.trim();
     const abbrev = r[c.contributor]!.trim();
     const contributor = CONTRIBUTORS[abbrev.toUpperCase()];
@@ -224,10 +223,11 @@ export async function stations(): Promise<GeslaStation[]> {
     listed.filter((s) => s.contributor === "UHSLC_FD").map((s) => [s.code.toLowerCase(), s.id]),
   );
   return listed
-    .map(({ code, ...s }) => ({
-      ...s,
-      same_as: originatorIds(s.contributor, code, s.lon, fd, s.source_id),
-    }))
+    .map(({ code, ...s }) =>
+      DROPPED.has(s.source_id)
+        ? { ...s, products: [], status: "inactive" as const }
+        : { ...s, same_as: originatorIds(s.contributor, code, s.lon, fd, s.source_id) },
+    )
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -652,7 +652,7 @@ export async function levels(
     return [];
   if (station.record_end && Date.parse(station.record_end) + HOUR_MS < start.getTime()) return [];
   if (DROPPED.has(station.source_id))
-    throw new Error(`GESLA's ${station.source_id} is left out of the lake (see DROPPED)`);
+    throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see DROPPED)`);
   const r = await record(station);
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {

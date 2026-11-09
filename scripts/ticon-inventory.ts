@@ -16,6 +16,7 @@ import { parse } from "yaml";
 import { readStationList } from "../src/lake/parquet.ts";
 import { stationListPath } from "../src/lake/paths.ts";
 import type { Station } from "../src/schema.ts";
+import { DROPPED } from "../src/sources/gesla/dropped.ts";
 import { sources } from "../src/sources/index.ts";
 import {
   adoptSiblings,
@@ -115,8 +116,8 @@ const rows = adoptSiblings(
 );
 // GESLA names its files as TICON names its records, so a record's GESLA 4.1
 // copy is `gesla/<id>` where 4.1 kept the name (it renamed or dropped RWS's).
-// GESLA's release is static, so its only inactive stations are records the adapter leaves out.
-const gesla = new Map(lists.gesla!.filter((s) => s.status === "active").map((s) => [s.id, s]));
+// A record in DROPPED holds another gauge's values, so it stands in for nothing.
+const gesla = new Map(lists.gesla!.filter((s) => !DROPPED.has(s.source_id)).map((s) => [s.id, s]));
 const geslaOf = (record: TiconRecord) => gesla.get(`gesla/${record.id}`);
 await writeFile(join(ROOT, "docs/ticon-replacement.csv"), csv(rows));
 await writeFile(join(ROOT, "docs/ticon-replacement.md"), summary(rows));

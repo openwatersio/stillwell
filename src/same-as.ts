@@ -1,4 +1,5 @@
 import type { Station } from "./schema.ts";
+import { DROPPED } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -59,15 +60,6 @@ const REDISTRIBUTED: Record<string, (s: Station & { contributor?: string | null 
   refmar: (s) => /\bUHSLC\b/.test(s.name),
   // GESLA assembles other agencies' records.
   gesla: () => true,
-};
-
-/**
- * Stations kept out of every group, by source. GESLA's release is static, so
- * an inactive record is one its adapter leaves out for holding another
- * gauge's values (`DROPPED` in src/sources/gesla/index.ts).
- */
-const UNLINKABLE: Record<string, (s: Station) => boolean> = {
-  gesla: (s) => s.status === "inactive",
 };
 
 export function redistributed(s: Station): boolean {
@@ -143,7 +135,8 @@ export function linkGauges<T extends Station>(
   now = new Date(),
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
-  const alone = new Set(stations.filter((s) => UNLINKABLE[s.source]?.(s)).map((s) => s.id));
+  // GESLA's records whose values are another gauge's join no group.
+  const alone = new Set([...DROPPED].map((file) => `gesla/${file}`).filter((id) => byId.has(id)));
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
   const dropped: LinkReport["dropped"] = [];
@@ -154,7 +147,9 @@ export function linkGauges<T extends Station>(
   };
 
   for (const { a, b } of LINKS)
-    if (byId.has(a) && byId.has(b)) add(a, b, "manual");
+    if (alone.has(a) || alone.has(b))
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+    else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
     if (!byId.has(a) || !byId.has(b))
@@ -167,6 +162,8 @@ export function linkGauges<T extends Station>(
     for (const other of s.same_as) {
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
+      else if (alone.has(other))
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });

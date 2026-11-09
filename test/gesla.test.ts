@@ -8,7 +8,7 @@ import * as gesla from "../src/sources/gesla/index.ts";
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
- * Eleven rows of GESLA 4.1's metadata CSV, as served: CR line endings and the
+ * Twelve rows of GESLA 4.1's metadata CSV, as served: CR line endings and the
  * header's last two names run together. The zip holds three real records,
  * trimmed: Cape d'Or every 6 hours in 1965 and early 1969, a day of
  * Cuxhaven's WSV record, and a morning of Hong Kong's.
@@ -33,7 +33,7 @@ const resolved = (url: string, size: number) =>
 beforeEach(() => {
   requests = [];
   gesla.release.bytes = zip.length;
-  gesla.release.records = 11;
+  gesla.release.records = 12;
   setTransport(async (url, options) => {
     requests.push([url, options]);
     if (url.includes("records/resolve")) {
@@ -59,7 +59,7 @@ describe("gesla stations", () => {
   it("lists a station per record, with its contributor's terms and its originator", async () => {
     const list = await gesla.stations();
     const byId = new Map(list.map((s) => [s.source_id, s]));
-    assert.equal(list.length, 11);
+    assert.equal(list.length, 12);
     const cape = byId.get("cape_dor-240-can-meds")!;
     assert.deepEqual(
       [cape.id, cape.name, cape.country_code, cape.kind, cape.datum, cape.contributor],
@@ -110,6 +110,8 @@ describe("gesla stations", () => {
       "hudson_river_at_albany_ny-1359139-usa-usgs": ["usgs/01359139"],
       "minamitorishima-049-jpn-uhslc_fd": ["uhslc/049"],
       "seattle-9447130-usa-noaa": ["coops/9447130"],
+      // Its values are Arkö's, so it names no originator.
+      "uddevalla-2541-swe-smhi": [],
     });
   });
 
@@ -125,40 +127,41 @@ describe("gesla stations", () => {
   });
 
   it("refuses anything but the whole release, once", async () => {
-    gesla.release.records = 12;
-    await assert.rejects(gesla.stations(), /lists 11 records in 11 rows, not 12/);
+    gesla.release.records = 13;
+    await assert.rejects(gesla.stations(), /lists 12 records in 12 rows, not 13/);
     const doubled = metadata + metadata.split("\r")[1] + "\r";
     setTransport(async (url) =>
       url.includes("records/resolve")
         ? resolved("https://cvws.example/B/meta/${f}", doubled.length)
         : doubled,
     );
-    await assert.rejects(gesla.stations(), /lists 11 records in 12 rows, not 12/);
+    await assert.rejects(gesla.stations(), /lists 12 records in 13 rows, not 13/);
   });
 
-  it("leaves out Uddevalla's record, which holds Arkö's values", async () => {
-    // GESLA 4.1's row, as served.
-    const uddevalla =
-      'uddevalla-2541-swe-smhi,Uddevalla,2541,SWE,SMHI,Swedish Meteorological and Hydrological Institute,"https://www.smhi.se/data/oceanografi/ladda-ner-oceanografiska-observationer/#param=sealevelMinutes,stations=all",smhi@smhi.se,Swedish Meteorological and Hydrological Institute,"https://www.smhi.se/data/oceanografi/ladda-ner-oceanografiska-observationer/#param=sealevelMinutes,stations=all",smhi@smhi.se,  58.34750000,  11.89480000,Unspecified,2014/04/02 08:00:00,2026/06/17 00:00:00,13,0,RH 2000 (Swedish National Height System 2000),Unspecified,Unspecified,-99.9999,River,No obvious issues,https://d2lyy96te42c83.cloudfront.net/v4-1/uddevalla-2541-swe-smhi\r';
-    const withUddevalla = metadata + uddevalla;
-    gesla.release.records = 12;
-    setTransport(async (url) =>
-      url.includes("records/resolve")
-        ? resolved("https://cvws.example/B/meta/${f}", withUddevalla.length)
-        : withUddevalla,
-    );
-    const ids = (await gesla.stations()).map((s) => s.source_id);
-    assert.equal(ids.length, 11);
-    assert.ok(!ids.includes("uddevalla-2541-swe-smhi"));
-    // The lake's list keeps it, inactive, so a backfill can still name it.
+  it("lists Uddevalla's record, which holds Arkö's values, with no products or links", async () => {
+    const list = await gesla.stations();
+    assert.equal(list.length, 12);
+    const record = list.find((s) => s.source_id === "uddevalla-2541-swe-smhi")!;
+    assert.deepEqual([record.status, record.products, record.same_as], ["inactive", [], []]);
+    // A backfill can still name it.
     await assert.rejects(
       gesla.levels(
         { source_id: "uddevalla-2541-swe-smhi", kind: "river" },
         new Date("2020-01-01T00:00:00Z"),
         new Date("2021-01-01T00:00:00Z"),
       ),
-      /left out of the lake/,
+      /holds another gauge's values/,
     );
+  });
+
+  it("fails when a record it drops isn't in the release, as a renamed one wouldn't be", async () => {
+    const renamed = metadata.replace("uddevalla-2541-swe-smhi,", "uddevalla2-2541-swe-smhi,");
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", renamed.length)
+        : renamed,
+    );
+    await assert.rejects(gesla.stations(), /has no uddevalla-2541-swe-smhi, which DROPPED names/);
   });
 
   it("links DWR's NAVD88 series, whose Q GESLA drops", () => {
