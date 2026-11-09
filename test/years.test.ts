@@ -12,6 +12,7 @@ import {
   fileKey,
   markYears,
   reconcileYears,
+  usableShares,
   writeYears,
 } from "../src/lake/years.ts";
 import { Flag, type LakeStation, type Observation, type Source } from "../src/schema.ts";
@@ -91,6 +92,30 @@ describe("fileKey", () => {
 });
 
 describe("the source's years", () => {
+  it("give each station's share of values not flagged suspect or bad", async () => {
+    const root = lake();
+    assert.deepEqual(await usableShares(root, "test"), new Map());
+    await writeObservations(seriesPath(root, "levels", "test", "a", 2023), rows(3), "NAP");
+    await writeObservations(
+      seriesPath(root, "levels", "test", "a", 2024),
+      rows(1, Flag.suspect),
+      "NAP",
+    );
+    await writeObservations(
+      seriesPath(root, "levels", "test", "b", 2024),
+      rows(2, Flag.bad),
+      "NAP",
+    );
+    await reconcileYears(root, "test", { start: true });
+    assert.deepEqual(
+      await usableShares(root, "test"),
+      new Map([
+        ["test/a", 0.75],
+        ["test/b", 0],
+      ]),
+    );
+  });
+
   it("are built by a rebuild, and left alone by other runs until then", async () => {
     const root = lake();
     await writeObservations(seriesPath(root, "levels", "test", "a", 2023), rows(2), "NAP");
