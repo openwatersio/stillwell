@@ -215,7 +215,7 @@ describe("linkGauges's limits", () => {
     const pairs = (linked: Station[]) =>
       linked.flatMap((s) => s.same_as.filter((o) => s.id < o).map((o) => `${s.id}~${o}`));
     assert.deepEqual(pairs(linkGauges(list, NOW).stations), []);
-    LINKS.push(...DECISIONS.filter((d) => d.b !== "smhi/2541"));
+    LINKS.push(...DECISIONS.filter((d) => ["bodc/dev", "uhslc/805", "uhslc/850a"].includes(d.a)));
     try {
       const { stations, report } = linkGauges(list, NOW);
       assert.deepEqual(pairs(stations).sort(), [

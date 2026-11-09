@@ -17,7 +17,7 @@ Hourly tide levels at the Japan Meteorological Agency's 70 open tide gauges and 
 
 ## Compared with UHSLC
 
-UHSLC's research-quality set carries 16 of these stations from JMA, through 2023. JMA's own files add its 74 other stations, the final values since 2024 and the provisional ones to yesterday, and earlier years at some gauges: Chichijima from 1933 rather than 1975, Hachinohe from 1936 rather than 1980. Both are hourly.
+UHSLC's research-quality set carries 17 of these stations, 13 contributed by JMA and 4 by JODC under JMA's codes, through 2023. JMA's own files add its 74 other stations, the final values since 2024 and the provisional ones to yesterday, and earlier years at some gauges: Chichijima from 1933 rather than 1975, Hachinohe from 1936 rather than 1980. Both are hourly.
 
 ## Backfill
 
