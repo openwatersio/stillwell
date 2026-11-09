@@ -278,12 +278,10 @@ export function steps(
     .filter(({ i, size }) => {
       const before = values.slice(i - window, i);
       const after = values.slice(i, i + window);
+      const [low, high] = [median(before), median(after)];
       const spread =
         1.4826 *
-        median([
-          ...before.map((v) => Math.abs(v - median(before))),
-          ...after.map((v) => Math.abs(v - median(after))),
-        ]);
+        median([...before.map((v) => Math.abs(v - low)), ...after.map((v) => Math.abs(v - high))]);
       return Math.abs(size) >= spreadFactor * spread;
     })
     .map(({ day, size }) => ({ day, size }));

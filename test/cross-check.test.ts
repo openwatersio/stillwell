@@ -22,9 +22,11 @@ const constituents = [
   { name: "K1", amplitude: 0.3, phase: 200 },
 ];
 
-/** A year of hourly levels from `level(hour)`, with seeded noise. */
+let series = 0;
+
+/** A year of hourly levels from `level(hour)`, with noise seeded differently for each series. */
 function year(level: (h: number) => number, noise = 0.02): Hourly {
-  let seed = 1;
+  let seed = ++series;
   const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5) * 2;
   return {
     start: START,
@@ -69,7 +71,9 @@ describe("copies", () => {
 
   it("leaves records of one gauge alone when some months match exactly", () => {
     const a = year((h) => wave(M2, 1, 40)(h));
-    const b = year((h) => wave(M2, 1, 40)(h) + 1, 0.01);
+    // The same values a centimeter's noise apart, usually 0.6 cm RMS.
+    const noise = year(() => 0, 0.01);
+    const b = { start: a.start, levels: a.levels.map((v, i) => v + 1 + noise.levels[i]!) };
     const may = (Date.UTC(2020, 4, 1) / HOUR_MS - START) | 0;
     const june = (Date.UTC(2020, 5, 1) / HOUR_MS - START) | 0;
     for (let i = may; i < june; i++) b.levels[i] = a.levels[i]! + 1;
