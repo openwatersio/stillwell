@@ -1,0 +1,15 @@
+{
+  "errata": [
+    {
+      "id": "rws-ameland-westgat-twice",
+      "stations": ["rws/ameland.westgat", "rws/amelandwestgat"],
+      "handling": "kept",
+      "error": "RWS lists the Ameland Westgat gauge twice, as `ameland.westgat` and `amelandwestgat`, a few meters apart.",
+      "response": "Both are kept as served, and linked in `same_as` as one gauge.",
+      "evidence": "RWS's catalog lists both codes at 53.4916° N, 5.9412° E.",
+      "reported": "2026-11-08",
+      "report": "Submitted through Rijkswaterstaat's web contact form on 2026-11-08. It asks whether the two codes are two sensors or a duplicate, since their levels differ by about 33 cm. No answer yet. Text in [#62](https://github.com/openwatersio/water-levels/issues/62)."
+    }
+  ],
+  "retired": []
+}

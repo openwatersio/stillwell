@@ -1,0 +1,78 @@
+{
+  "errata": [
+    {
+      "id": "usace-baton-rouge-position",
+      "stations": ["usace/MVN.Baton_Rouge"],
+      "handling": "corrected",
+      "error": "The New Orleans District places its Baton Rouge gauge at 29.43° N, about 110 km south of the gauge, which the Vicksburg District places at 30.45° N.",
+      "response": "The station refresh moves it to MVK's position, 30.4457, −91.1916, which USGS 07374000 shares, listed in `POSITIONS` in `src/positions.ts`. If MVN moves the station, the refresh reports the entry and fails the run until a person checks it.",
+      "evidence": "CWMS catalogs: `MVN.Baton_Rouge` at 29.4292° N, −91.2069; `MVK.Baton_Rouge` at 30.4457° N, −91.1916. The gauge is at Baton Rouge, 30.45° N.",
+      "reported": "2026-11-07",
+      "report": "Sent to the New Orleans District (CEMVN-WATER-MANAGEMENT@usace.army.mil) on 2026-11-07, as a reply to the 2026-11-05 data request in [#10](https://github.com/openwatersio/water-levels/issues/10). No answer yet."
+    },
+    {
+      "id": "usace-placeholder-positions",
+      "stations": [],
+      "handling": "dropped",
+      "error": "Some CWMS locations sit at 0,0 or at a placeholder such as 9.09,9.09 (Anoka), and a few have the longitude's sign dropped (Buck Creek, Pine Bluff), which puts them in Asia.",
+      "response": "Locations outside the contiguous US are left out.",
+      "evidence": "CWMS location catalogs: locations at 0,0; Anoka at 9.09,9.09; Buck Creek and Pine Bluff with a positive longitude.",
+      "report": "Not reported yet. The locations are mostly MVS's and LRL's; on 2026-11-07 the New Orleans District was asked who takes them."
+    },
+    {
+      "id": "usace-zero-elevation",
+      "stations": ["usace/MVK.Baton_Rouge"],
+      "handling": "avoided",
+      "error": "Some districts give an elevation of 0 to locations they have no elevation for, the same as a gauge set at the datum: MVK gives Baton Rouge 0, where MVN's description puts it 0.71 ft off. CWMS doesn't say which other zeros are real, so only Baton Rouge is listed.",
+      "response": "An elevation of exactly 0 is ignored, so those gauges have no NGVD29 or NAVD88 offset.",
+      "evidence": "MVK's location for Baton Rouge has elevation 0 NAVD88, while MVN's description of the same gauge puts its zero 0.71 ft off.",
+      "reported": "2026-11-07",
+      "report": "MVN's part sent to the New Orleans District (CEMVN-WATER-MANAGEMENT@usace.army.mil) on 2026-11-07, asking whether 0 marks a missing elevation. MVK's Baton Rouge isn't reported to MVK yet. No answer yet."
+    },
+    {
+      "id": "usace-lwrp-corrections-disagree",
+      "stations": [
+        "usace/MVN.Baton_Rouge",
+        "usace/MVN.Morgan_City",
+        "usace/MVN.Reserve",
+        "usace/MVN.Knox_Ldg",
+        "usace/MVN.Krotz_Springs",
+        "usace/MVN.Donaldsonville",
+        "usace/MVN.Bonnet_Carre",
+        "usace/MVN.Red_River_Ldg"
+      ],
+      "handling": "kept",
+      "error": "At some New Orleans District gauges, the NAVD88 correction in the CWMS location description differs from the one MVN applies in its own `rev-NAVD88` series, or from the RiverGages station page, by more than 0.05 ft. That is more than the series' 0.1 ft rounding explains. Red River Landing's description is a copy of Knox Landing's.",
+      "response": "`datums.NAVD88`, and `datums.LWRP` where the description gives it, are the description's values, and the list's `datums_from` quotes them. Red River Landing's description isn't read, so it has neither. Each offset is applied to the whole record since the gauge's last zero reset.",
+      "evidence": "Feet. \"Applied\" is `rev-NAVD88` minus `rev`, hourly over 2026-01-01 to 2026-09-14, read 2026-11-08. RiverGages values are from [#10](https://github.com/openwatersio/water-levels/issues/10), read 2026-11-05.\n\n| Gauge | Description | Applied | RiverGages |\n| --- | --- | --- | --- |\n| Baton Rouge | −0.71 (OPUS 2019) | −0.4 | −0.71 |\n| Morgan City | −1.403 (OPUS 2021) | −1.2 | |\n| Reserve | −0.87 (2009.55) | −0.7 | −1.19 |\n| Knox Landing | −0.08 | −0.2 | −0.60 |\n| Krotz Springs | 0.00 (2004.65) | −0.1 | |\n| Donaldsonville | −0.74 (OPUS 2010) | −0.7 | −1.18 |\n| Bonnet Carré | −0.89 (2009.55) | | −0.96 |\n| Red River Landing | Knox Landing's text | −0.26 | −1.04 (OPUS) |\n\nNew Orleans, Melville, Simmesport and Donaldsonville's applied value agree with the description within 0.05 ft. The corrections change as the gauges subside and are re-surveyed, and each source quotes whichever survey it last copied.",
+      "reported": "2026-11-05",
+      "report": "Asked in the data request to the New Orleans District (CEMVN-WATER-MANAGEMENT@usace.army.mil) on 2026-11-05, described in [#10](https://github.com/openwatersio/water-levels/issues/10): every NAVD88 correction each gauge has had, with its effective date and realization. No answer yet."
+    },
+    {
+      "id": "usace-positions",
+      "stations": [
+        "usace/MVK.Olive_Branch",
+        "usace/MVK.Oxford",
+        "usace/MVN.Bayou_Boeuf-Amelia",
+        "usace/MVN.Chicot_Pass-Myette",
+        "usace/LRN.RoaringR_Hilham",
+        "usace/LRN.WFBrownsCr_Glen"
+      ],
+      "handling": "corrected",
+      "error": "The CWMS location catalog places six gauges 14 to 334 km from where USGS places the same gauge. Two have a latitude off by whole degrees, and one has another gauge's position.",
+      "response": "The station refresh moves each station to the USGS gauge's position, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while CWMS still serves the position it was written against. If CWMS moves the station, the station keeps CWMS's position, and the refresh reports the entry and fails the run until a person checks it.",
+      "evidence": "| Station | CWMS | USGS gauge | Off by |\n| --- | --- | --- | --- |\n| `MVK.Olive_Branch`, Coldwater River at Olive Branch | 37.9075, −89.7533 | 07275900, 34.9075, −89.7533 | 334 km; latitude 3° off |\n| `MVK.Oxford`, Yocona River at Oxford | 32.2733, −89.5214 | 07274000, 34.2733, −89.5214 | 222 km; latitude 2° off |\n| `MVN.Bayou_Boeuf-Amelia` | 29.8691, −90.5950 | 073814675, 29.6683, −91.0997, railroad bridge at Amelia | 54 km |\n| `MVN.Chicot_Pass-Myette`, Chicot Pass near Myette Point | 30.0680, −91.4740, the same as `MVN.Chicot_Pass` near West Fork | 073815450, 29.8927, −91.4457 | 20 km |\n| `LRN.RoaringR_Hilham`, Roaring River near Hilham | 36.3409, −85.5902 | 03418000, 36.3409, −85.4264 | 15 km |\n| `LRN.WFBrownsCr_Glen`, West Fork Browns Creek at Glendale Lane | 36.2177, −86.8202 | 03431100, 36.0943, −86.7939 | 14 km |\n\nFound by matching every USACE station's river and place names against USGS and the other districts' catalogs on 2026-11-08. MVN's Baton Rouge, 113 km south, is [#64](https://github.com/openwatersio/water-levels/issues/64).",
+      "report": "Not sent. It goes to MVK and MVN Water Management for their gauges, and to the Nashville District for LRN's."
+    },
+    {
+      "id": "usace-red-river-datum-label",
+      "stations": ["usace/MVN.Red_River_Ldg"],
+      "handling": "corrected",
+      "error": "CWMS gives Red River Landing's gauge zero an elevation of −0.27 ft and labels it NGVD29. The value is the gauge's NAVD88 correction: MVN's own `rev-NAVD88` series applies −0.26 ft there.",
+      "response": "The station refresh puts the elevation in `datums.NAVD88` (−0.082 m) instead of `datums.NGVD29`, from `MISLABELED` in `src/sources/usace/index.ts`. The entry applies only while CWMS still serves −0.27 ft labeled NGVD29; if CWMS changes either, the lake takes the catalog as served and the refresh says so.",
+      "evidence": "- CWMS `catalog/LOCATIONS` for `Red_River_Ldg` (office MVN): `elevation` −0.27, `unit` ft, `vertical-datum` NGVD29, read 2026-11-08.\n- `Red_River_Ldg.Stage.Inst.1Hour.0.rev-NAVD88` minus `Red_River_Ldg.Stage.Inst.1Hour.0.rev` is −0.26 ft at every hour compared: 42 hours in 2020 and 6,149 from 2026-01-01 to 2026-09-14.\n- MVN's other nonzero catalog elevations are NAVD88 corrections too. Harvey Lock GIWW's −0.87 ft (labeled NAVD88) matches its description's \"add -0.87' to gage data\" for NAVD88. New Orleans's −0.96 ft (labeled \"Local Datum 1\") matches its description's NAVD88 adjustment.\n- The location's description is a copy of Knox Landing's, and the RiverGages station page gives −1.04 ft (OPUS), so neither confirms it ([#76](https://github.com/openwatersio/water-levels/issues/76)).",
+      "report": "Not sent. Hold until MVN answers the data request in [#10](https://github.com/openwatersio/water-levels/issues/10) and [#76](https://github.com/openwatersio/water-levels/issues/76), which asks for each gauge's NAVD88 corrections. Then ask about this label in the same thread to the New Orleans District (CEMVN-WATER-MANAGEMENT@usace.army.mil)."
+    }
+  ],
+  "retired": []
+}
