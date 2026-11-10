@@ -108,12 +108,10 @@ found.sort();
  * span for `tidal`, and a fit of noise.
  */
 function covered(times: number[], flags: number[]): boolean {
-  const since = (times.at(-1) ?? 0) - 366 * 86_400_000;
-  const days = new Set(
-    times
-      .filter((t, i) => t > since && flags[i]! < Flag.suspect)
-      .map((t) => Math.floor(t / 86_400_000)),
-  );
+  // The year `tidal` fits, which ends at the last usable value.
+  const usable = times.filter((_, i) => flags[i]! < Flag.suspect);
+  const since = (usable.at(-1) ?? 0) - 366 * 86_400_000;
+  const days = new Set(usable.filter((t) => t > since).map((t) => Math.floor(t / 86_400_000)));
   return days.size >= COVERED_DAYS;
 }
 

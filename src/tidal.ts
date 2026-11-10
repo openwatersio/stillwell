@@ -47,7 +47,8 @@ export function tidal(record: {
  * though one that sticks more than `DRAINS_RUNS` times a year keeps it too.
  */
 export function drains(river: Observation[], tide: Observation[]): boolean {
-  const since = (river.at(-1)?.time ?? 0) - 366 * DAY_MS;
+  // The year `tidal` fits, which ends at the last usable value.
+  const since = (river.findLast((r) => r.flag < Flag.suspect)?.time ?? 0) - 366 * DAY_MS;
   const only = (i: number) =>
     river[i]!.time > since && tide[i]!.flag >= Flag.suspect && river[i]!.flag < Flag.suspect;
   let runs = 0;
