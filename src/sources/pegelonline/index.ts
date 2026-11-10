@@ -66,13 +66,15 @@ export interface ApiStation {
     unit: string;
     equidistance?: number;
     gaugeZero?: { unit: string; value: number; validFrom: string };
+    /** The WSV's own statistics for the gauge, such as MW, or MThw and MTnw where it's tidal. */
+    characteristicValues?: { shortname: string }[];
   }[];
 }
 
 /** Every station with a water-level (`W`) series, as the API lists it. */
 export async function list(): Promise<ApiStation[]> {
   const stations = await getJson<ApiStation[]>(
-    `${API}/stations.json?includeTimeseries=true&timeseries=W`,
+    `${API}/stations.json?includeTimeseries=true&timeseries=W&includeCharacteristicValues=true`,
     { fresh: true },
   );
   // Without a position there's nothing to place.
@@ -89,7 +91,17 @@ export async function stations(previous: Station[] = []): Promise<PegelonlineSta
   );
   const listed: PegelonlineStation[] = [];
   let failures = 0;
-  for (const s of await list()) {
+  const all = await list();
+  // Without them, every tidal gauge would quietly lose its kind.
+  const series = all.flatMap((s) => s.timeseries ?? []);
+  if (
+    series.length &&
+    !series.some((t) => t.characteristicValues?.some((c) => TIDAL.test(c.shortname)))
+  )
+    throw new Error(
+      "PEGELONLINE listed no tidal characteristic values, so it can't say which gauges are tidal",
+    );
+  for (const s of all) {
     const station: PegelonlineStation = toStation(s);
     let since = known.get(station.id);
     if (kuestendaten.GAUGES[s.number]) {
@@ -404,8 +416,20 @@ function unitOf(station: string): Promise<string> {
   return unit;
 }
 
-// The open sea; everything else in PEGELONLINE is a river, canal or lake.
+// The open sea, and the one lake. PEGELONLINE doesn't say which other waters
+// are rivers and which are canals, so the rest are null unless tidal.
 const SEA = new Set(["NORDSEE", "OSTSEE"]);
+const LAKES = new Set(["BODENSEE"]);
+// The tidal high and low waters (MThw, MTnw, HThw, NTnw) the WSV gives only for a gauge in tidal water.
+const TIDAL = /^[MHN]T[hn]w$/;
+
+/** Sea, then the WSV's tidal values, which mark the tidal reaches of the Elbe, Weser, Ems, Jade and their tributaries. */
+export function kindOf(s: ApiStation): Kind | null {
+  if (SEA.has(s.water.shortname)) return "coastal";
+  const w = s.timeseries?.find((t) => t.shortname === "W");
+  if (w?.characteristicValues?.some((c) => TIDAL.test(c.shortname))) return "estuary";
+  return LAKES.has(s.water.shortname) ? "lake" : null;
+}
 
 /** A station missing its W series this time lists no datum, so it keeps the one it had. */
 function toStation(s: ApiStation): ListedStation {
@@ -416,7 +440,6 @@ function toStation(s: ApiStation): ListedStation {
   // Gauge zero is given as a height in another datum, e.g. "m. ü. NHN".
   const datum = zero && /\b(NHN|NN|HN)\b/.exec(zero.unit)?.[1];
   if (levelDatum === "PNP" && datum && zero.unit.startsWith("m")) datums[datum] = zero.value;
-  const kind: Kind | null = SEA.has(s.water.shortname) ? "coastal" : null;
   // A gauge zero valid from another day is a moved zero; the day itself is left
   // out, since nobody says when in it the change came. The same date with
   // another height is a re-survey, which only changes `datums`.
@@ -435,7 +458,7 @@ function toStation(s: ApiStation): ListedStation {
     lat: s.latitude!,
     lon: s.longitude!,
     country_code: "DE",
-    kind,
+    kind: kindOf(s),
     interval_s: series?.equidistance ? series.equidistance * 60 : null,
     datum: levelDatum,
     datums,

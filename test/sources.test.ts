@@ -190,6 +190,11 @@ describe("rws stations", () => {
         ["rws/kralendijk", "NAP", ["levels"], "BQ"],
       ],
     );
+    // RWS's description says K13a is a platform, at sea; it says nothing of the others' water.
+    assert.deepEqual(
+      stations.map((s) => s.kind),
+      [null, null, "coastal", null],
+    );
     // Dutch NAP stations without an offset have their history before 2005 in
     // the old NAP; MSL and Bonaire's NAP never changed.
     assert.deepEqual(
@@ -265,8 +270,8 @@ describe("pegelonline", () => {
   it("lists stations with their datum, gauge zero and sampling interval", async () => {
     serve([[/stations\.json/, fixture("pegelonline-stations.json")]]);
     const stations = await pegelonline.stations();
-    // The third fixture station has no position, so it isn't listed.
-    assert.equal(stations.length, 2);
+    // The fourth fixture station has no position, so it isn't listed.
+    assert.equal(stations.length, 3);
     const cuxhaven = stations.find((s) => s.source_id === "5990020")!;
     assert.equal(cuxhaven.id, "pegelonline/5990020");
     assert.equal(cuxhaven.datum, "PNP");
@@ -275,9 +280,25 @@ describe("pegelonline", () => {
     assert.deepEqual(cuxhaven.reference, { id: "2019-11-01", since: "2019-11-02" });
     assert.equal(cuxhaven.interval_s, 60);
     assert.equal(cuxhaven.commercial_use, true);
-    const inland = stations.find((s) => s.source_id !== "5990020")!;
+    const inland = stations.find((s) => s.source_id === "27800090")!;
     assert.equal(inland.datum, "NN");
     assert.deepEqual(inland.datums, {});
+    // Cuxhaven is on the Elbe, with the WSV's tidal values; Waltrop's canal says nothing; Konstanz is on the Bodensee.
+    assert.deepEqual(
+      stations.map((s) => [s.source_id, s.kind]),
+      [
+        ["27800090", null],
+        ["5990020", "estuary"],
+        ["906", "lake"],
+      ],
+    );
+    assert.equal(
+      pegelonline.kindOf({
+        ...JSON.parse(fixture("pegelonline-stations.json"))[0],
+        water: { shortname: "NORDSEE" },
+      }),
+      "coastal",
+    );
   });
 
   it("scales levels by the series' unit", async () => {
@@ -311,6 +332,18 @@ describe("pegelonline", () => {
     serve([[/stations\.json/, JSON.stringify([{ ...first, timeseries: [] }])]]);
     const [listed] = await pegelonline.stations();
     assert.equal(listed!.datum, null);
+  });
+
+  it("refuses a list without characteristic values, which would drop every estuary's kind", async () => {
+    const stations = JSON.parse(fixture("pegelonline-stations.json")) as pegelonline.ApiStation[];
+    for (const s of stations) for (const t of s.timeseries ?? []) delete t.characteristicValues;
+    serve([[/stations\.json/, JSON.stringify(stations)]]);
+    await assert.rejects(pegelonline.stations(), /no tidal characteristic values/);
+    // Nor with the values there but none tidal.
+    for (const s of stations)
+      for (const t of s.timeseries ?? []) t.characteristicValues = [{ shortname: "MW" }];
+    serve([[/stations\.json/, JSON.stringify(stations)]]);
+    await assert.rejects(pegelonline.stations(), /no tidal characteristic values/);
   });
 
   it("leaves out a station with half a position", async () => {
@@ -617,8 +650,9 @@ describe("pegelonline", () => {
       { id: "pegelonline/5990020", history_since: "2001-01-01" } as unknown as Station,
     ]);
     assert.equal(listed.find((s) => s.source_id === "5990020")!.history_since, "2001-01-01");
-    assert.equal(listed.find((s) => s.source_id !== "5990020")!.history_since, "2000-01-01");
-    assert.equal(asked, 1);
+    assert.equal(listed.find((s) => s.source_id === "27800090")!.history_since, "2000-01-01");
+    // Waltrop and Konstanz.
+    assert.equal(asked, 2);
   });
 
   it("stops asking for history_since after five failures", async () => {
@@ -1051,6 +1085,15 @@ describe("coops", () => {
               greatlakes: true,
             }),
             station({ id: "1495000", name: "Esperanza, Antarctica", state: "" }),
+            // CO-OPS's `greatlakes` misses this one, but its `tideType` says Great Lakes.
+            station({
+              id: "9075199",
+              name: "Point Aux Frenes",
+              state: "MI",
+              tidal: false,
+              greatlakes: false,
+              tideType: "Great Lakes",
+            }),
           ],
         }),
       ],
@@ -1070,8 +1113,10 @@ describe("coops", () => {
       ],
       [/9063020\/datums/, JSON.stringify({ datums: [{ name: "GL_LWD", value: 173.5 }] })],
       [/1495000\/datums/, JSON.stringify({ datums: null, LAT: null })],
+      [/9075199\/datums/, JSON.stringify({ datums: null, LAT: null })],
     ]);
-    const [esperanza, buffalo, seattle] = await coops.stations();
+    const [esperanza, buffalo, frenes, seattle] = await coops.stations();
+    assert.equal(frenes!.kind, "lake");
     assert.deepEqual(
       [
         seattle!.id,
@@ -1610,6 +1655,41 @@ describe("usace", () => {
       now,
     );
     assert.deepEqual([old!.live, old!.datums, old!.kind], [false, {}, null]);
+  });
+
+  it("takes a location's kind from CWMS's location kind and the district's type", () => {
+    // Fields as CDA's catalog/LOCATIONS lists them.
+    const kind = (name: string, kind: string, type?: string) => usace.kindOf({ name, kind, type });
+    assert.deepEqual(
+      [
+        kind("Donaldsonville", "STREAM_LOCATION", "DCP"),
+        kind("Danville", "SITE", "Stream"),
+        kind("Cannelton", "SITE", "RoR Project"),
+        kind("Somewhere", "SITE", "Streamgage"),
+        // A lock and dam's tailwater CWMS calls a stream.
+        kind("BellevilleLD-Tailwater", "STREAM_LOCATION"),
+      ],
+      ["river", "river", "river", "river", "river"],
+    );
+    assert.deepEqual(
+      [
+        kind("CaveRun", "PROJECT", "Corps Reservoir"),
+        kind("SaltFk-Lake", "SITE", "Lake"),
+        kind("Mark_Twain_Lk-Salt", "SITE", "Project"),
+      ],
+      ["lake", "lake", "lake"],
+    );
+    // A tailwater typed as its dam's reservoir, a pump station, and a gauge typed only "Gage".
+    assert.deepEqual(
+      [
+        kind("Enid_Lake-Tailwater", "SITE", "RESERVOIR"),
+        kind("Mark Twain Lk TW-Salt", "SITE", "Project"),
+        kind("Sardis_TW", "SITE", "RESERVOIR"),
+        kind("CalionPump-RS", "SITE"),
+        kind("Adamsville", "SITE", "Gage"),
+      ],
+      [null, null, null, null, null],
+    );
   });
 
   it("refers gauge zero to NGVD29 or NAVD88, whatever CWMS calls them", (t) => {
