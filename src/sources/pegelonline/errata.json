@@ -31,6 +31,16 @@
       "evidence": "While comparing the lake's 2024 and 2025 Cuxhaven Steubenhöft files, which come from PEGELONLINE's raw-data download, with other records of the same gauge for [#26](https://github.com/openwatersio/water-levels/issues/26), the download sat 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, and matched it before and after. Both describe the series as unchecked raw data, so the WSV changed values after GESLA copied them without relabeling them. The comparison is in [#26's comment](https://github.com/openwatersio/water-levels/issues/26#issuecomment-6700549671).",
       "reported": "2026-11-07",
       "report": "Asked in the same message as [#26](https://github.com/openwatersio/water-levels/issues/26), to pegelonline@itzbund.de on 2026-11-07. No answer yet."
+    },
+    {
+      "id": "pegelonline-bake-z-2002-offset",
+      "stations": ["pegelonline/9510066"],
+      "since": "2002-09-30",
+      "until": "2002-10-22",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Bake Z levels sit 0.8 to 2.4 m high from 30 September to 21 October 2002.",
+      "response": "30 September to 21 October 2002 is flagged `suspect`, keeping the source's own flag as `source_flag`. The lake's QC already flags about two thirds of it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October."
     }
   ],
   "retired": []

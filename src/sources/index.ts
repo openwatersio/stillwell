@@ -19,13 +19,16 @@ import { source as uhslc } from "./uhslc/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
+import coopsErrata from "./coops/errata.json" with { type: "json" };
 import dwrErrata from "./dwr/errata.json" with { type: "json" };
+import eaErrata from "./ea/errata.json" with { type: "json" };
 import geslaErrata from "./gesla/errata.json" with { type: "json" };
 import jmaErrata from "./jma/errata.json" with { type: "json" };
 import marineInstituteErrata from "./marine-institute/errata.json" with { type: "json" };
 import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
 import refmarErrata from "./refmar/errata.json" with { type: "json" };
 import rwsErrata from "./rws/errata.json" with { type: "json" };
+import sfwmdErrata from "./sfwmd/errata.json" with { type: "json" };
 import uhslcErrata from "./uhslc/errata.json" with { type: "json" };
 import usaceErrata from "./usace/errata.json" with { type: "json" };
 
@@ -57,13 +60,16 @@ const adapters: Record<string, Source> = {
  */
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
+  coops: coopsErrata,
   dwr: dwrErrata,
+  ea: eaErrata,
   gesla: geslaErrata,
   jma: jmaErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,
   refmar: refmarErrata,
   rws: rwsErrata,
+  sfwmd: sfwmdErrata,
   uhslc: uhslcErrata,
   usace: usaceErrata,
 };
