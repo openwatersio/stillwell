@@ -492,6 +492,19 @@ describe("rank", () => {
       station("usace/a", { name: "Calhoun", interval_s: 900, lat: m(30) }),
     ]).stations;
     assert.equal(linked[1]!.preferred, "usgs/b");
+    // USGS relays a few CRMS gauges, so CPRA's series is preferred over a longer relay.
+    const relayed = linkGauges([
+      station("usgs/c", {
+        name: "CRMS0282-H01-RT",
+        same_as: ["crms/CRMS0282-H01"],
+        ...record("2000-01-01T00:00:00Z", "2026-10-01T00:00:00Z"),
+      }),
+      station("crms/CRMS0282-H01", {
+        name: "CRMS0282-H01",
+        ...record("2013-10-01T06:00:00Z", "2026-07-01T00:00:00Z"),
+      }),
+    ]).stations;
+    assert.equal(relayed[0]!.preferred, "crms/CRMS0282-H01");
     assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
     assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.

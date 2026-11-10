@@ -300,6 +300,9 @@ export function originatorIds(
       return /_t(_|$)/.test(file.split("-")[0]!)
         ? [`sfwmd/${upper.replace(/_T$/, "")}_T`]
         : [`sfwmd/${upper}`];
+    case "CRMS":
+      // The site's first surface-water gauge, which GESLA's records start on.
+      return /^CRMS\d{4}$/.test(upper) ? [`crms/${upper}-H01`] : [];
     case "UHSLC_FD":
       return [`uhslc/${code.toLowerCase()}`];
     case "UHSLC_RQ": {

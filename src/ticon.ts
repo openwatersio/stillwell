@@ -86,7 +86,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   },
   dmi: { source: "dmi", status: "planned" },
   fmi: { source: "fmi", status: "license", note: "FMI's sea-level terms not confirmed" },
-  crms: { source: "crms", status: "license", note: "Louisiana CRMS terms to check" },
+  crms: { source: "crms", status: "planned" },
   cdwr: { source: "dwr", status: "planned" },
   sfwmd: { source: "sfwmd", status: "planned" },
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
@@ -265,6 +265,17 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   const direct = DIRECT[contributor];
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
+  // CRMS records carry the site; its surface-water gauge still reporting is the
+  // latest of H01, H02 and H03, since CPRA numbers a gauge it moves anew.
+  if (contributor === "crms") {
+    const site = code.toUpperCase();
+    const gauge = lists.crms
+      ?.filter((s) => s.source_id.startsWith(`${site}-H`) && usable(s))
+      .map((s) => s.source_id)
+      .sort()
+      .at(-1);
+    return byCode(record, "crms", gauge ?? `${site}-H01`, "planned", lists);
+  }
   // DWR records carry its station number, which TICON writes without the trailing Q
   // of the NAVD88 stations; the rest carry a CDEC code. CDEC leaves out the
   // stations USGS runs, so their records go unmatched once its list exists.

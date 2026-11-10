@@ -240,6 +240,16 @@ jobs:
             # nothing else fetches them, so every station's last three years
             # are read again, finished ones included.
             bodc) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
+            # CRMS's only source is CPRA's weekly export of the whole record,
+            # read once a run and months behind, and CPRA re-adjusts recent
+            # months after field visits, so every station's last three years
+            # are read again, as BODC's are. Every station is named, since
+            # `all` skips inactive ones and CIMS retires a gauge before its
+            # last months reach the export; they cost only reads of the
+            # export the run downloads anyway.
+            crms)
+              which=$(node --input-type=module -e 'import { readStationList } from "./src/lake/parquet.ts"; const list = await readStationList(`${process.env.WATER_LEVELS_LAKE}/stations/crms.parquet`); if (!list?.length) throw new Error("no CRMS list in the lake"); console.log(list.map((s) => s.source_id).join(","))')
+              from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
             *) set -- "$year-$month-01" ;;
           esac
           node scripts/ingest.ts backfill "$SOURCE" "$which" "$from" "$@"
