@@ -121,11 +121,13 @@ Measure what the lake can tell about each station from its levels, and keep it i
 node scripts/ingest.ts analyze usgs --requalify --concurrency 8
 ```
 
-Every run that writes a year file of levels, `backfill`, `compact` and `requalify`, keeps `stations/years/<source>.parquet` in step: each year file with its hours, values by flag and a version, for readers to tell a year with no values from a file they failed to read ([docs/data.md](docs/data.md#which-years-a-station-has)). They mark each batch of stations before writing and set their files' rows after, and compaction then lists the source's files and reads any a stopped run left without a current row ([docs/stations.md](docs/stations.md#lake-layout)). A source with files but no years file gets one only from `years`, which reads every year file of levels the source has, and resumes where a run stopped by its time limit left off. `--rebuild-years` reads every file again even when the years file has them, or can't be read, which a rollback to a build that didn't keep it needs once the release is back; if it's stopped, run `years` again without the flag to finish. Run it from the Ingest workflow, which runs it in the source's group:
+Every run that writes a year file of levels, `backfill`, `compact` and `requalify`, keeps `stations/years/<source>.parquet` in step: each year file with its hours, values by flag and a version, for readers to tell a year with no values from a file they failed to read ([docs/data.md](docs/data.md#which-years-a-station-has)). They mark each batch of stations before writing and set their files' rows after, and compaction then lists the source's files and reads any a stopped run left without a current row ([docs/stations.md](docs/stations.md#lake-layout)). A source with files but no years file gets one only from `years`, which reads every year file of levels the source has, and resumes where a run stopped by its time limit left off. `--rebuild-years` reads every file again even when the years file has them, or can't be read; if it's stopped, run `years` again without the flag to finish. Run it from the Ingest workflow, which runs it in the source's group:
 
 ```bash
 node scripts/ingest.ts years usgs
 ```
+
+Compaction checks only that every year file has a row and every row a file, not that a row's version still matches its file. Anything that writes year files without keeping the years file leaves rows whose version no longer matches the file, and compaction rereads such a station only if a stopped run left it marked: a rollback to a build from before the years file, a run from an older local checkout, or a restore of `obs/` from a backup. Afterwards, once the current build is back, run `years <source> --rebuild-years` for each source whose files it wrote.
 
 These environment variables choose where it writes:
 
