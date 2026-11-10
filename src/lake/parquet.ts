@@ -28,8 +28,9 @@ let laneCount = 1;
 const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
 /**
- * How many DuckDB connections run lake work at once, 1 by default. Compaction
- * raises it, since each year file on R2 is mostly waiting on the network.
+ * How many DuckDB connections run lake work at once, 1 by default. Backfill,
+ * compaction, requalify and `years` raise it to their concurrency, since each
+ * year file on R2 is mostly waiting on the network.
  */
 export function setConnections(count: number): void {
   laneCount = Math.max(1, Math.floor(count));
@@ -467,6 +468,8 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   min_interval_s: "INTEGER",
   source_qc_start: "TIMESTAMPTZ",
   source_qc_start_inferred: "BOOLEAN",
+  tidal: "BOOLEAN",
+  tide_m: "DOUBLE",
   source_url: "VARCHAR",
 };
 
@@ -492,7 +495,8 @@ export async function writeStations(path: string, stations: LakeStation[]): Prom
 const IN_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
   Object.entries(STATION_COLUMNS).filter(
-    ([key]) => !["first", "last", "preferred", "errata", ...IN_EXTRA].includes(key),
+    ([key]) =>
+      !["first", "last", "preferred", "errata", "tidal", "tide_m", ...IN_EXTRA].includes(key),
   ),
 );
 

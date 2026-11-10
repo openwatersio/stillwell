@@ -1,0 +1,24 @@
+{
+  "errata": [
+    {
+      "id": "sfwmd-mbts-1992-datum",
+      "stations": ["sfwmd/MBTS"],
+      "until": "1992-08-20",
+      "handling": "flagged",
+      "error": "SFWMD's Manatee Bay (MBTS) levels before 20 August 1992 read about 1 m lower than on the current zero.",
+      "response": "Values before 20 August 1992 are flagged `suspect`, keeping SFWMD's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against SFWMD's MDTS and TPTS, 6 km away: the differences are −0.68 and −1.12 m before the date and +0.40 and −0.26 m after."
+    },
+    {
+      "id": "sfwmd-tpts-2001-offset",
+      "stations": ["sfwmd/TPTS"],
+      "since": "2001-03-28",
+      "until": "2001-06-22",
+      "handling": "flagged",
+      "error": "SFWMD's Thursday Point (TPTS) levels sit about 1.1 m low from 28 March to 21 June 2001.",
+      "response": "28 March to 21 June 2001 is flagged `suspect`, keeping SFWMD's own flag as `source_flag`. The lake's QC already flags about three quarters of it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against SFWMD's MBTS, 6 km away: the difference is +0.29 m before, +0.28 m after and −0.84 m over the span."
+    }
+  ],
+  "retired": []
+}

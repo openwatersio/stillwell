@@ -97,14 +97,16 @@
       "Code": "hoekvanholland",
       "Naam": "Hoek van Holland",
       "Lat": 51.98,
-      "Lon": 4.12
+      "Lon": 4.12,
+      "Omschrijving": "rechter oever kilometer 1030.1"
     },
     {
       "Locatie_MessageID": 20,
       "Code": "k13a",
       "Naam": "K13a platform",
       "Lat": 53.22,
-      "Lon": 3.22
+      "Lon": 3.22,
+      "Omschrijving": "K13a platform"
     },
     {
       "Locatie_MessageID": 30,

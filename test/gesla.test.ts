@@ -2,11 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
-import { qcFor } from "../src/lake/recent.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
-import { TIDE_M, tidal } from "../src/sources/gesla/tidal.ts";
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
@@ -34,6 +32,7 @@ const resolved = (url: string, size: number) =>
 
 beforeEach(() => {
   requests = [];
+  gesla.forgetZipUrl();
   gesla.release.bytes = zip.length;
   gesla.release.records = 12;
   setTransport(async (url, options) => {
@@ -375,6 +374,145 @@ describe("gesla levels", () => {
   });
 });
 
+describe("gesla zip url", () => {
+  const zipResolves = () =>
+    requests.filter(
+      ([url, o]) =>
+        url.includes("records/resolve") && !String(o.body).includes("02fFab01rq4LdVcwRCf5QCyCQ"),
+    ).length;
+  /**
+   * The fixture transport, with the zip's URL signed until `e`. While
+   * `fail.next` is set, reads fail; while `fail.resolves` is, resolves do; a
+   * read waits on `fail.hold` when it's set.
+   */
+  function signedUntil(
+    e: number,
+    fail: { next: number; resolves?: number; hold?: Promise<void>; held?: () => void } = {
+      next: 0,
+    },
+  ) {
+    let n = 0;
+    setTransport(async (url, options) => {
+      requests.push([url, options]);
+      if (url.includes("records/resolve")) {
+        if (fail.resolves) {
+          fail.resolves--;
+          throw new Error("POST records/resolve returned a network error (ETIMEDOUT)");
+        }
+        // Each resolve signs a URL of its own, as CloudKit does.
+        return resolved(`https://cvws.example/B/zip/\${f}?o=${++n}&e=${e}`, zip.length);
+      }
+      if (url.startsWith("https://cvws.example/B/zip/")) {
+        if (fail.hold) {
+          const hold = fail.hold;
+          fail.hold = undefined;
+          fail.held?.();
+          await hold;
+          throw new Error(`GET ${url} returned 403`);
+        }
+        if (fail.next > 0) {
+          fail.next--;
+          throw new Error(`GET ${url} returned 403`);
+        }
+        const r = /^bytes=(\d+)-(\d+)$/.exec((options.headers as Record<string, string>).range)!;
+        return zip.subarray(Number(r[1]), Number(r[2]) + 1).toString("base64");
+      }
+      throw new Error(`GET ${url} returned 404`);
+    });
+  }
+  const now = () => Math.floor(Date.now() / 1000);
+
+  it("resolves the zip's URL once for many records while it's signed", async () => {
+    signedUntil(now() + 900);
+    for (const file of [
+      "cape_dor-240-can-meds",
+      "cuxhavensteubenhft-5990020-deu-wsv",
+      "hong_kong-329b-hkg-uhslc_rq",
+    ])
+      assert.ok((await gesla.readRecord(file)).length > 0);
+    assert.equal(zipResolves(), 1);
+  });
+
+  it("resolves it again once it's within a minute of expiring", async () => {
+    signedUntil(now() + 30);
+    await gesla.readRecord("cape_dor-240-can-meds");
+    await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq");
+    // Every ranged read gets a URL of its own, none of them one about to expire.
+    const reads = requests.filter(([url]) => url.startsWith("https://cvws.example/B/zip/")).length;
+    assert.ok(reads >= 4);
+    assert.equal(zipResolves(), reads);
+  });
+
+  it("resolves it again when a signed read fails, and reads on", async () => {
+    const fail = { next: 0 };
+    signedUntil(now() + 900, fail);
+    await gesla.readRecord("cape_dor-240-can-meds");
+    fail.next = 1;
+    assert.ok((await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq")).length > 0);
+    assert.equal(zipResolves(), 2);
+  });
+
+  it("shares one resolve among workers reading at once", async () => {
+    signedUntil(now() + 900);
+    await Promise.all([
+      gesla.readRecord("cape_dor-240-can-meds"),
+      gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv"),
+      gesla.readRecord("hong_kong-329b-hkg-uhslc_rq"),
+    ]);
+    assert.equal(zipResolves(), 1);
+  });
+
+  it("reports a failed resolve as itself, and the next worker resolves again", async () => {
+    signedUntil(now() + 900);
+    // The central directory, read first, is kept for the run.
+    await gesla.readRecord("cape_dor-240-can-meds");
+    gesla.forgetZipUrl();
+    requests = [];
+    signedUntil(now() + 900, { next: 0, resolves: 1 });
+    const [a, b] = await Promise.allSettled([
+      gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv"),
+      gesla.readRecord("hong_kong-329b-hkg-uhslc_rq"),
+    ]);
+    assert.equal(a.status, "rejected");
+    assert.match(String((a as PromiseRejectedResult).reason), /ETIMEDOUT/);
+    assert.equal(b.status, "fulfilled");
+    assert.equal(zipResolves(), 2);
+  });
+
+  it("stops at a share that holds another release, and checks again on the next resolve", async () => {
+    signedUntil(now() + 900);
+    const bytes = gesla.release.bytes;
+    gesla.release.bytes = bytes + 1;
+    await assert.rejects(gesla.readRecord("cape_dor-240-can-meds"), /a new release\?/);
+    await assert.rejects(gesla.readRecord("cape_dor-240-can-meds"), /a new release\?/);
+    assert.equal(zipResolves(), 2);
+    gesla.release.bytes = bytes;
+  });
+
+  it("keeps a newer URL when a read on an older one fails late", async () => {
+    let release!: () => void;
+    const fail: { next: number; hold?: Promise<void>; held?: () => void } = { next: 0 };
+    signedUntil(now() + 900, fail);
+    // The central directory, read first, is kept for the run.
+    await gesla.readRecord("cuxhavensteubenhft-5990020-deu-wsv");
+    gesla.forgetZipUrl();
+    requests = [];
+    fail.hold = new Promise<void>((r) => (release = r));
+    const holding = new Promise<void>((r) => (fail.held = r));
+    // Resolves URL 2; its first read waits, then fails.
+    const late = gesla.readRecord("cape_dor-240-can-meds");
+    await holding;
+    // Another worker meanwhile finds it failed and resolves URL 3.
+    gesla.forgetZipUrl();
+    await gesla.readRecord("hong_kong-329b-hkg-uhslc_rq");
+    assert.equal(zipResolves(), 2);
+    release();
+    // The late failure forgets URL 2 only, and retries on URL 3.
+    assert.ok((await late).length > 0);
+    assert.equal(zipResolves(), 2);
+  });
+});
+
 describe("gesla parse", () => {
   it("maps GESLA's QC and use flags, and drops missing values", () => {
     // Real lines from Cape Dundas, Cuxhaven (WSV and BfG), Cape d'Or and Cape Disappointment.
@@ -463,73 +601,5 @@ describe("datumJumps", () => {
 
   it("leaves a shift smaller than JUMP_M alone", () => {
     assert.deepEqual(gesla.datumJumps(series(200, 2, gesla.JUMP_M * 0.9, 100)), []);
-  });
-});
-
-describe("tidal", () => {
-  const HOUR = 3_600_000;
-  /** Hourly levels over `days`, from 2020, of `level(hour)`, with GESLA's flags all good. */
-  const record = (days: number, level: (h: number) => number) => {
-    const times = Float64Array.from(
-      { length: days * 24 },
-      (_, h) => Date.UTC(2020, 0, 1) + h * HOUR,
-    );
-    return {
-      times,
-      levels: Float64Array.from(times, (_, h) => level(h)),
-      source: new Uint8Array(times.length),
-    };
-  };
-  const wave = (amplitude: number, periodHours: number) => (h: number) =>
-    amplitude * Math.cos((2 * Math.PI * h) / periodHours);
-  // A pooled river: flat, then a three-week flood of two meters.
-  const flood = (h: number) => (h > 2000 && h < 2500 ? 2 : 0);
-
-  it("finds a semidiurnal tide, or a diurnal one, of TIDE_M", () => {
-    assert.equal(tidal(record(90, wave(TIDE_M + 0.01, 12.4206012))), true);
-    assert.equal(tidal(record(90, wave(TIDE_M + 0.01, 25.8193417))), true);
-  });
-
-  it("finds none in a pooled river's floods, a smaller tide, or a daily schedule", () => {
-    assert.equal(tidal(record(180, flood)), false);
-    assert.equal(tidal(record(90, wave(TIDE_M - 0.02, 12.4206012))), false);
-    // A dam's releases each day and half day, which a solar S2 and K1 would read as a tide.
-    assert.equal(tidal(record(90, (h) => wave(0.5, 24)(h) + wave(0.3, 12)(h))), false);
-  });
-
-  it("says no under 30 days, and leaves out values GESLA says not to use", () => {
-    assert.equal(tidal(record(20, wave(1, 12.4206012))), false);
-    // A year of daily values, which alias M2 to a 15-day period.
-    const daily = record(366, wave(1, 12.4206012));
-    const kept = (_: number, i: number) => i % 24 === 0;
-    assert.equal(
-      tidal({
-        times: daily.times.filter(kept),
-        levels: daily.levels.filter(kept),
-        source: daily.source.filter(kept),
-      }),
-      false,
-    );
-    const unused = record(90, wave(1, 12.4206012));
-    unused.source.fill(Flag.suspect);
-    assert.equal(tidal(unused), false);
-  });
-});
-
-describe("gesla qc", () => {
-  const record = (source_id: string, kind: "river" | "lake") => ({ source_id, kind }) as Station;
-
-  it("gives a tidal river record a tide gauge's flatline limit, and a pooled one two days", () => {
-    // Hudson at Albany is in TIDAL_RIVERS; Ashland Avenue, on the Niagara, isn't. Both flood.
-    const albany = qcFor(
-      gesla.source,
-      record("hudson_river_at_albany_ny-1359139-usa-usgs", "river"),
-    );
-    const ashland = qcFor(gesla.source, record("ashland_ave_ny-9063007-usa-noaa", "river"));
-    assert.equal(albany.flatline_s, undefined);
-    assert.equal(albany.centimeter_flatline_s, 48 * 3600);
-    assert.equal(ashland.flatline_s, 48 * 3600);
-    assert.equal(albany.outliers, false);
-    assert.equal(ashland.outliers, false);
   });
 });

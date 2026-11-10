@@ -61,6 +61,7 @@ predictions/<source>/<station>/<year>.parquet         the source's predicted cur
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
 stations/<source>.parquet                             one source's station list, as ingest keeps it
 stations/years/<source>.parquet                       every year file of observed levels, with its hours, values by flag and version
+stations/analysis/<source>.parquet                    what the lake measures from each station's levels, such as whether they carry a tide
 history/stations/<source>/                            each station refresh's previous list and report
 ```
 

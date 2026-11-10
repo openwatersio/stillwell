@@ -1,10 +1,11 @@
 /**
  * Stations withheld from the lake because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
- * rows from its bounds, years, recent window and empty-years record, and publishing
+ * rows from its bounds, years, recent window, empty-years record and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a lake that still holds them.
  */
+import { dropAnalysis, readAnalysis } from "./lake/analysis.ts";
 import { spawn } from "node:child_process";
 import { rm } from "node:fs/promises";
 import {
@@ -42,8 +43,8 @@ export function withheldReason(source: Source, id: string): string | null {
 }
 
 /**
- * Drop withheld stations' rows from the source's bounds, years, recent window
- * and empty-years record in `lake`, rewriting only a file that holds one. Returns
+ * Drop withheld stations' rows from the source's bounds, years, recent window,
+ * empty-years record and analysis, with its history, in `lake`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(lake: string, source: Source): Promise<string[]> {
@@ -86,6 +87,7 @@ export async function dropWithheldRows(lake: string, source: Source): Promise<st
       empty.filter((r) => !held(stationOf(r.key))),
     );
   }
+  for (const station of await dropAnalysis(lake, id, held)) dropped.add(station);
   // Last, so the values themselves are gone even if this file can't be written.
   for (const station of await dropYears(lake, id, held)) dropped.add(station);
   return [...dropped].sort();
@@ -123,6 +125,7 @@ export async function withheldStations(
     ...(await listedIds(lists)),
     ...(await readStationBounds(boundsPath(lake, id))).keys(),
     ...(await recentStations(recentPath(lake, id))),
+    ...(await readAnalysis(lake, id)).keys(),
   ]);
   return {
     ids: [...known].filter((s) => withheldReason(source, s) !== null).sort(),

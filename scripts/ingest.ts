@@ -10,6 +10,7 @@
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
+ *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -48,6 +49,11 @@
  * (src/withhold.ts); the source's next refresh drops them from its list.
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
  * which backfill, compaction and requalify then keep (src/lake/years.ts).
+ * `analyze` judges the source's stations that are due from their levels in the
+ * lake, such as whether they carry a tide, into stations/analysis/<source>.parquet
+ * (src/lake/analysis.ts), `--all` every station, and lists the stations whose
+ * QC that changes; `--requalify` requalifies them, and every station after its
+ * first verdict, over every year, starting batches for `--budget` minutes.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -64,7 +70,7 @@
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
 import { resolve } from "node:path";
-import { parseArgs } from "node:util";
+import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
   earliestPreliminary,
   epochSpans,
@@ -78,7 +84,6 @@ import {
 } from "../src/backfill.ts";
 import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { useDiskCache } from "../src/cache.ts";
-import { citedIn, fromPublished, openErrata, settle } from "../src/errata.ts";
 import { Blocked } from "../src/http.ts";
 import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
@@ -95,11 +100,9 @@ import {
   type RunSummary,
 } from "../src/lake/recent.ts";
 import { appendFile, readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { isHeld } from "../src/epochs.ts";
+import { isHeld, splitStarts } from "../src/epochs.ts";
 import {
   readExtremes,
-  readJsonArray,
   readObservations,
   readStationBounds,
   setConnections,
@@ -110,14 +113,8 @@ import {
 } from "../src/lake/parquet.ts";
 import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
-import {
-  boundsPath,
-  errataPath,
-  seriesDir,
-  seriesPath,
-  stationsPath,
-  yearsPath,
-} from "../src/lake/paths.ts";
+import { analyze, markRequalified, pending, readAnalysis } from "../src/lake/analysis.ts";
+import { boundsPath, seriesDir, seriesPath, stationsPath, yearsPath } from "../src/lake/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -139,7 +136,7 @@ import type {
   SourceMetadata,
   Station,
 } from "../src/schema.ts";
-import { sourceOf, sources } from "../src/sources/index.ts";
+import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
 
 const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
@@ -189,6 +186,9 @@ const { positionals, values } = parseArgs({
     "skip-unscreened": { type: "boolean", default: false },
     "rebuild-bounds": { type: "boolean", default: false },
     "rebuild-years": { type: "boolean", default: false },
+    all: { type: "boolean", default: false },
+    requalify: { type: "boolean", default: false },
+    budget: { type: "string", default: "120" },
   },
 });
 const [command, ...args] = positionals;
@@ -244,6 +244,12 @@ switch (command) {
     console.log(`${source}: read ${years!.read} year files into ${yearsPath(lake, source)}`);
     for (const file of years!.failed) console.error(`  can't read ${file}`);
     if (years!.failed.length) process.exitCode = 1;
+    break;
+  }
+  case "analyze": {
+    const [source] = args;
+    if (!source) usage();
+    await analyzeSource(source);
     break;
   }
   default:
@@ -323,20 +329,6 @@ async function publish(lake: string): Promise<void> {
   for (const { metadata } of held)
     if (published.has(metadata.id) || (await hasHistory(lake, metadata.id)))
       expected.push(metadata.id);
-  // The issues are the errata; what was published last stands in for any that can't be read.
-  const previous = fromPublished((await readJsonArray(errataPath(lake))) ?? []);
-  const fetched = await openErrata(Object.keys(sources)).catch((error: Error) => error);
-  const cited = new Set(citedIn(fileURLToPath(new URL("../src", import.meta.url))).keys());
-  const { errata, notes } = settle(fetched, previous, cited);
-  if (!(fetched instanceof Error))
-    for (const u of fetched.unregistered)
-      console.log(
-        `  erratum #${u.issue} is for ${u.source}, which this build doesn't register: a typo, or a source still in a pull request; left out`,
-      );
-  if (!(fetched instanceof Error) && fetched.ignored.length)
-    console.log(
-      `  source-error issues not from a maintainer, left out: #${fetched.ignored.join(", #")}`,
-    );
   const result = await publishStations(lake, held, expected, errata);
   if ("count" in result) {
     console.log(`${stationsPath(lake)}: ${result.count} stations`);
@@ -353,10 +345,11 @@ async function publish(lake: string): Promise<void> {
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     for (const e of result.unknownErrata)
       console.error(`  erratum lists a station not in the lake: ${e}`);
-    for (const n of notes) console.error(`  errata: ${n}`);
-    // A typo in an erratum's issue tags nothing, so fail the run to say so,
-    // after publishing: holding back every source's list for it would cost more.
-    if (result.unknownErrata.length || notes.length) process.exitCode = 1;
+    for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
+    // A typo in an erratum's stations tags nothing, and a bad errata file leaves
+    // its errata out, so fail the run to say so, after publishing: holding back
+    // every source's list for it would cost more.
+    if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;
   } else {
     console.error(
       `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
@@ -368,6 +361,8 @@ async function publish(lake: string): Promise<void> {
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
   const lake = lakeOfSource(source.metadata);
+  // Each worker writes its stations' years; on one connection they'd wait on each other's uploads.
+  setConnections(positive("concurrency"));
   const list = await listOf(lake, source);
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
@@ -510,7 +505,13 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // The epochs a station's fetch writes, each with its part of the range (`epochSpans`).
   const spansOf = (station: LakeStation) => {
     const [begin, until] = ranges?.get(station.id) ?? [start, end];
-    return epochSpans(station.epochs, begin, until, source.metadata.archive);
+    return epochSpans(
+      station.epochs,
+      begin,
+      until,
+      source.metadata.archive,
+      splitStarts(source.overrides?.splits?.[station.id], source.metadata.utc_offsets ?? [0, 0]),
+    );
   };
   // A source that blocks this client fails every request after, so the run
   // stops rather than go on through its stations.
@@ -730,7 +731,7 @@ async function backfillYear(
         readObservations(
           seriesPath(lakeFor(station), product, station.source, station.source_id, y, epoch.id),
         );
-      merged = judgeFetched(existing, rows, ...range, qcFor(source, station), [
+      merged = judgeFetched(existing, rows, ...range, qcFor(station), [
         ...(await near(year - 1)),
         ...(await near(year + 1)),
       ]);
@@ -852,7 +853,7 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(name: "concurrency" | "hours" | "keep-days"): number {
+function positive(name: "concurrency" | "hours" | "keep-days" | "budget"): number {
   const value = Number(values[name]);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
@@ -871,7 +872,7 @@ async function requalifyStations(
   ids: string,
   start: number,
   end: number,
-): Promise<void> {
+): Promise<RunSummary> {
   if (start >= end)
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
@@ -932,6 +933,67 @@ async function requalifyStations(
     return s;
   });
   if (summary.failed.length) process.exitCode = 1;
+  return summary;
+}
+
+async function analyzeSource(sourceId: string): Promise<void> {
+  const source = sourceOf(sourceId);
+  const lake = lakeOfSource(source.metadata);
+  const list = await listOf(lake, source);
+  setConnections(positive("concurrency"));
+  const report = await analyze(lake, source, list, {
+    now: new Date(),
+    all: values.all,
+    concurrency: positive("concurrency"),
+  });
+  const lines = [
+    `analyze ${sourceId}: judged ${report.judged} stations, ${report.changed.length} change QC, ${report.failed.length} failed, ${report.warned.length} with warnings`,
+    ...report.changed.map(
+      (c) =>
+        `  ${c.id}: tidal ${c.from} → ${c.to}${c.tide_m === null ? "" : ` (M2 + O1 ${(c.tide_m * 100).toFixed(1)} cm)`}`,
+    ),
+    ...report.failed.map((f) => `  failed ${f}`),
+    ...report.warned.map((w) => `  warning ${w}`),
+  ];
+  for (const line of lines) console.log(line);
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+  if (report.failed.length) process.exitCode = 1;
+  if (!values.requalify) return;
+  // Every year of every epoch, since a station's verdict holds for its whole
+  // record; a batch at a time, each marked once done, so a run stopped partway
+  // leaves the rest pending for the next.
+  const listed = new Map(list.map((s) => [s.id, s]));
+  const analysis = await readAnalysis(lake, sourceId);
+  // Stations whose rules differ from their kind's come first; the rest are first verdicts that change nothing.
+  const differs = (id: string) =>
+    !isDeepStrictEqual(
+      qcFor({ ...listed.get(id)!, tidal: null }),
+      qcFor({ ...listed.get(id)!, ...analysis.get(id)! }),
+    );
+  const waiting = pending(analysis)
+    .filter((id) => listed.has(id))
+    .sort((a, b) => Number(differs(b)) - Number(differs(a)));
+  // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
+  const until = Date.now() + positive("budget") * 60_000;
+  for (const batch of chunks(waiting, 100)) {
+    if (Date.now() > until) {
+      console.log(
+        `analyze ${sourceId}: out of time, ${waiting.length - waiting.indexOf(batch[0]!)} stations left pending`,
+      );
+      break;
+    }
+    const summary = await requalifyStations(sourceId, batch.join(","), 0, 10_000);
+    // A failure that names no station, such as the years file's, may have skipped any of them.
+    const failed = new Set(summary.failed.map((f) => f.split(": ")[0]));
+    if ([...failed].some((id) => !batch.includes(id!))) continue;
+    await markRequalified(
+      lake,
+      sourceId,
+      batch.filter((id) => !failed.has(id)),
+      new Date(),
+    );
+  }
 }
 
 async function withholdStations(sourceId: string): Promise<void> {
@@ -966,7 +1028,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

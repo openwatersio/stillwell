@@ -1,310 +1,243 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
+import { describe, it } from "node:test";
+import { citations, citedIn } from "../src/citations.ts";
 import {
-  citations,
-  closedIds,
   errataOf,
-  fromPublished,
-  HANDLING,
-  openErrata,
-  parseErratum,
+  parseErrata,
   published,
-  settle,
-  UnknownSource,
+  readErrata,
+  spans,
+  withErrata,
   type Erratum,
 } from "../src/errata.ts";
-import { fetchText, setTransport } from "../src/http.ts";
-import { readJsonArray, writeJsonArray } from "../src/lake/parquet.ts";
-import { sources } from "../src/sources/index.ts";
+import { Flag, type Observation, type Source, type Station } from "../src/schema.ts";
+import { errata, errataFiles, errataProblems, sources } from "../src/sources/index.ts";
 
-const IDS = Object.keys(sources);
+const entry = (fields: Record<string, unknown> = {}) => ({
+  id: "uhslc-hong-kong-hour-early",
+  stations: ["uhslc/329", "uhslc/329a"],
+  since: "2020-01-01",
+  until: "2021-01-01",
+  handling: "corrected",
+  error: "UHSLC's Hong Kong heights are an hour early.",
+  response: "Shifted an hour later.",
+  ...fields,
+});
+const file = (entries: object[], retired: string[] = []) => ({ errata: entries, retired });
+const DAY = (d: string) => Date.parse(`${d}T00:00:00Z`);
 
-/** An issue body as the form writes it. */
-const body = (fields: Partial<Record<string, string>> = {}) =>
-  Object.entries({
-    "What's wrong": "UHSLC's Hong Kong heights are an hour early.",
-    "Erratum ID": "uhslc-hong-kong-hour-early",
-    Source: "uhslc",
-    Stations: "uhslc/329\nuhslc/329a",
-    "Values since": "_No response_",
-    "Values until": "_No response_",
-    Handling: "corrected",
-    "What the lake does": "Shifted an hour later.",
-    Evidence: "A clock check.\n\n### Method\n\nFitted M2 phases.",
-    "Report to the agency": "- [ ] Draft the report",
+describe("errata files", () => {
+  it("are every source's that has one, each for a registered source", () => {
+    const dir = fileURLToPath(new URL("../src/sources", import.meta.url));
+    const onDisk = readdirSync(dir).filter((d) => existsSync(join(dir, d, "errata.json")));
+    assert.deepEqual(Object.keys(errataFiles).sort(), onDisk.sort());
+    for (const source of onDisk) assert.ok(sources[source], `${source} isn't registered`);
+    assert.deepEqual(errataProblems, []);
+  });
+
+  it("leave out an ID used twice or retired anywhere, and a file that doesn't parse", () => {
+    const one = file([entry()]);
+    assert.deepEqual(readErrata({ uhslc: one }).problems, []);
+    const twice = readErrata({ uhslc: file([entry(), entry()]) });
+    assert.equal(twice.errata.length, 1);
+    assert.match(twice.problems.join(), /twice/);
+    const retired = readErrata({ uhslc: one, gesla: file([], ["uhslc-hong-kong-hour-early"]) });
+    assert.deepEqual(retired.errata, []);
+    assert.match(retired.problems.join(), /retired/);
+    // A bad file costs only its own source's errata.
+    const bad = readErrata({ uhslc: one, gesla: file([entry({ id: "uhslc-x" })]) });
+    assert.equal(bad.errata.length, 1);
+    assert.equal(bad.problems.length, 1);
+  });
+
+  it("back every split a person made with an erratum of the station's source", () => {
+    for (const [name, source] of Object.entries(sources))
+      for (const [station, splits] of Object.entries(source.overrides?.splits ?? {}))
+        for (const split of splits) {
+          assert.match(split.since, /^\d{4}-\d{2}-\d{2}$/, `${station} ${split.since}`);
+          assert.ok(!Number.isNaN(Date.parse(split.since)), `${station} ${split.since}`);
+          // A split stays once its erratum is retired, since its epochs do.
+          const { errata: own, retired } = parseErrata(name, errataFiles[name]);
+          const ids = [
+            ...own.filter((e) => e.stations?.includes(station)).map((e) => e.id),
+            ...retired,
+          ];
+          assert.ok(
+            ids.some((id) => split.note.includes(`\`${id}\``)),
+            `${station} ${split.since} cites no erratum of ${name}`,
+          );
+        }
+  });
+
+  it("hold every erratum ID the code cites", () => {
+    const ids = new Set(errata.map((e) => e.id));
+    const stray = [...citedIn(fileURLToPath(new URL("../src", import.meta.url)))].filter(
+      ([id]) => !ids.has(id),
+    );
+    assert.deepEqual(stray, []);
+  });
+});
+
+describe("parseErrata", () => {
+  it("reads an entry, with optional fields null", () => {
+    assert.deepEqual(parseErrata("uhslc", file([entry()])).errata, [
+      {
+        id: "uhslc-hong-kong-hour-early",
+        source: "uhslc",
+        stations: ["uhslc/329", "uhslc/329a"],
+        since: "2020-01-01",
+        until: "2021-01-01",
+        error: "UHSLC's Hong Kong heights are an hour early.",
+        handling: "corrected",
+        response: "Shifted an hour later.",
+        evidence: null,
+        reported: null,
+        report: null,
+      },
+    ]);
+  });
+
+  it("reads every station, and open ends", () => {
+    const [e] = parseErrata(
+      "uhslc",
+      file([entry({ stations: "every station", since: null, until: undefined })]),
+    ).errata;
+    assert.equal(e!.stations, null);
+    assert.equal(e!.since, null);
+    assert.equal(e!.until, null);
+  });
+
+  it("refuses what an erratum can't be", () => {
+    const refused = (fields: Record<string, unknown>, retired: string[] = []) =>
+      assert.throws(() => parseErrata("uhslc", file([entry(fields)], retired)));
+    refused({ id: "gesla-hong-kong" });
+    refused({ stations: ["gesla/329"] });
+    refused({ stations: "all" });
+    refused({ since: "2026-02-30" });
+    refused({ since: "2021-01-01", until: "2020-01-01" });
+    refused({ handling: "fixed" });
+    refused({ error: "" });
+    refused({ response: undefined });
+    refused({ reported: "last week" });
+    refused({}, ["uhslc-hong-kong-hour-early"]);
+    // A misspelled until would leave the span open.
+    refused({ unitl: "2021-01-01" });
+    assert.throws(() => parseErrata("uhslc", { errata: [] }));
+  });
+});
+
+describe("spans", () => {
+  const erratum = (fields: Partial<Erratum>): Erratum => ({
+    ...(parseErrata("uhslc", file([entry()])).errata[0] as Erratum),
+    handling: "flagged",
     ...fields,
-  })
-    .map(([heading, text]) => `### ${heading}\n\n${text}`)
-    .join("\n\n");
-
-afterEach(() => setTransport(fetchText));
-
-describe("errata", () => {
-  it("reads an erratum from an issue written with the form", () => {
-    assert.deepEqual(parseErratum(63, body(), IDS), {
-      id: "uhslc-hong-kong-hour-early",
-      source: "uhslc",
-      stations: ["uhslc/329", "uhslc/329a"],
-      since: null,
-      until: null,
-      error: "UHSLC's Hong Kong heights are an hour early.",
-      handling: "corrected",
-      lake: "Shifted an hour later.",
-      issue: 63,
-    });
   });
 
-  it("reads every station, none listed, dates, and stations in a list", () => {
-    const every = parseErratum(1, body({ Stations: "every station" }), IDS);
-    const none = parseErratum(1, body({ Stations: "None listed" }), IDS);
-    const listed = parseErratum(1, body({ Stations: "- `uhslc/329`\n\n- uhslc/329a" }), IDS);
-    const dated = parseErratum(
-      1,
-      body({ "Values since": "2020-01-01", "Values until": "2025-01-01" }),
-      IDS,
-    );
-    assert.deepEqual(
-      [every.stations, none.stations, listed.stations, [dated.since, dated.until]],
-      [null, [], ["uhslc/329", "uhslc/329a"], ["2020-01-01", "2025-01-01"]],
-    );
+  it("are a flagged erratum's days at the stations it names", () => {
+    assert.deepEqual(spans({ id: "uhslc/329" }, [erratum({})]), [
+      [DAY("2020-01-01"), DAY("2021-01-01")],
+    ]);
+    assert.deepEqual(spans({ id: "uhslc/1" }, [erratum({})]), []);
+    assert.deepEqual(spans({ id: "uhslc/329" }, [erratum({ since: null })]), [
+      [-Infinity, DAY("2021-01-01")],
+    ]);
   });
 
-  it("refuses an issue it can't read, naming the issue and the field", () => {
-    const refused = (fields: Partial<Record<string, string>>, message: RegExp) =>
-      assert.throws(() => parseErratum(7, body(fields), IDS), message);
-    refused({ Source: "nowhere" }, /#7: no source nowhere/);
-    refused({ Source: "uhslc(" }, /#7: source uhslc\( isn't a source ID/);
-    refused({ "Erratum ID": "usgs-hong-kong" }, /#7: erratum ID usgs-hong-kong isn't uhslc-<what>/);
-    refused({ Stations: "usgs/1" }, /#7: station usgs\/1 isn't uhslc's/);
-    refused({ "Values since": "1 May 2020" }, /#7: "Values since" is 1 May 2020/);
-    refused({ "Values until": "2026-02-30" }, /#7: "Values until" is 2026-02-30/);
-    refused({ "Values since": "2025-01-01", "Values until": "2020-01-01" }, /isn't before/);
-    refused({ Handling: "ignored" }, /#7: handling ignored isn't one of/);
-    refused({ "What the lake does": "_No response_" }, /#7: "What the lake does" is blank/);
-    assert.throws(() => parseErratum(7, "Some prose.", IDS), /#7: no "### Source" heading/);
+  it("leave an unflagged or unbounded erratum to the adapter", () => {
+    assert.deepEqual(spans({ id: "uhslc/329" }, [erratum({ handling: "kept" })]), []);
+    assert.deepEqual(spans({ id: "uhslc/329" }, [erratum({ since: null, until: null })]), []);
   });
 
-  it("reads maintainers' open issues, leaving out pull requests, and reports bad ones", async () => {
-    const asked: string[] = [];
-    const issue = (number: number, b: string | null, more: object = {}) => ({
-      number,
-      body: b,
-      author_association: "MEMBER",
-      ...more,
-    });
-    setTransport(async (url) => {
-      asked.push(url);
-      if (/state=closed/.test(url))
-        return JSON.stringify([
-          issue(9, body({ "Erratum ID": "uhslc-closed" })),
-          // A duplicate of #63 opened after it and closed doesn't take its ID.
-          issue(80, body()),
-        ]);
-      return JSON.stringify([
-        issue(69, body({ "Erratum ID": "uhslc-closed" })),
-        issue(64, body({ "Erratum ID": "uhslc-twice" })),
-        issue(63, body(), { author_association: "OWNER" }),
-        issue(70, body(), { pull_request: {} }),
-        issue(65, body({ "Erratum ID": "uhslc-twice" }), { author_association: "COLLABORATOR" }),
-        issue(66, null),
-        // The form labels anyone's issue; a stranger's isn't an erratum.
-        issue(67, body({ "Erratum ID": "uhslc-stranger" }), { author_association: "NONE" }),
-        issue(68, body(), { author_association: "CONTRIBUTOR" }),
-        // A source whose adapter isn't registered yet, such as one still in a pull request.
-        issue(
-          71,
-          body({ Source: "newsource", "Erratum ID": "newsource-clock", Stations: "newsource/a" }),
-        ),
-        // Its other fields are still checked, and its ID can't be reused.
-        issue(
-          72,
-          body({
-            Source: "newsource",
-            "Erratum ID": "newsource-x",
-            Stations: "newsource/a",
-            Handling: "ignored",
-          }),
-        ),
-        issue(
-          73,
-          body({ Source: "newsource", "Erratum ID": "newsource-clock", Stations: "newsource/b" }),
-        ),
-      ]);
-    });
-    const { errata, problems, ignored, unregistered } = await openErrata(IDS);
+  it("cover every station for one that names every station", () => {
+    assert.deepEqual(spans({ id: "uhslc/1" }, [erratum({ stations: null })]), [
+      [DAY("2020-01-01"), DAY("2021-01-01")],
+    ]);
+  });
+});
+
+describe("withErrata", () => {
+  const rows: Observation[] = [
+    { time: DAY("2019-12-31"), level: 1, flag: Flag.good },
+    { time: DAY("2020-06-01"), level: 1, flag: Flag.preliminary },
+    { time: DAY("2020-06-02"), level: 1, flag: Flag.bad },
+    { time: DAY("2021-01-01"), level: 1, flag: Flag.good },
+  ];
+  const adapter = {
+    metadata: { id: "uhslc" },
+    observations: async () => rows,
+    suspect: async () => [[1, 2]],
+  } as unknown as Source;
+  const flagged = parseErrata("uhslc", file([entry({ handling: "flagged" })])).errata;
+  const station = { id: "uhslc/329" } as Station;
+
+  it("flags fetched values in the span, keeping the source's flag", async () => {
+    const got = await withErrata(adapter, flagged).observations!(station, new Date(0), new Date());
     assert.deepEqual(
-      asked.map((url) => /state=(\w+)/.exec(url)![1]),
-      ["closed", "open"],
-    );
-    assert.ok(asked.every((url) => url.includes("labels=source-error")));
-    assert.deepEqual(
-      errata.map((e) => [e.issue, e.id]),
+      got.map((o) => [o.flag, o.source_flag]),
       [
-        [63, "uhslc-hong-kong-hour-early"],
-        [64, "uhslc-twice"],
+        [Flag.good, undefined],
+        [Flag.suspect, Flag.preliminary],
+        [Flag.bad, Flag.bad],
+        [Flag.good, undefined],
       ],
     );
-    assert.deepEqual(problems, [
-      { issue: 65, message: "#65: erratum ID uhslc-twice is #64's too" },
-      { issue: 66, message: `#66: no "### Source" heading` },
-      { issue: 69, message: "#69: erratum ID uhslc-closed is closed #9's" },
-      {
-        issue: 72,
-        message:
-          "#72: handling ignored isn't one of corrected, flagged, dropped, refused, avoided, kept",
-      },
-      { issue: 73, message: "#73: erratum ID newsource-clock is #71's too" },
+  });
+
+  it("adds the span to the adapter's own", async () => {
+    assert.deepEqual(await withErrata(adapter, flagged).suspect!(station, async function* () {}), [
+      [1, 2],
+      [DAY("2020-01-01"), DAY("2021-01-01")],
     ]);
-    assert.deepEqual(ignored, [67, 68]);
+  });
+
+  it("flags values a sweep of every station fetches", async () => {
+    const sweeping = {
+      ...adapter,
+      recent: async () =>
+        new Map<string, Observation[] | Error>([
+          ["uhslc/329", rows],
+          ["uhslc/1", new Error("down")],
+        ]),
+    } as unknown as Source;
+    const got = await withErrata(sweeping, flagged).recent!([station], new Date(0), new Date());
     assert.deepEqual(
-      unregistered.map((u) => [u.issue, u.source, u.erratum?.id]),
-      [[71, "newsource", "newsource-clock"]],
+      (got.get("uhslc/329") as Observation[]).map((o) => o.flag),
+      [Flag.good, Flag.suspect, Flag.bad, Flag.good],
+    );
+    assert.ok(got.get("uhslc/1") instanceof Error);
+  });
+
+  it("leaves a source with nothing flagged as it is", () => {
+    assert.equal(withErrata(adapter, parseErrata("uhslc", file([entry()])).errata), adapter);
+  });
+});
+
+describe("published", () => {
+  it("links each erratum to its file", () => {
+    const [row] = published(parseErrata("uhslc", file([entry()])).errata) as { url: string }[];
+    assert.equal(
+      row!.url,
+      "https://github.com/openwatersio/water-levels/blob/main/src/sources/uhslc/errata.json",
     );
   });
 
-  it("finds the IDs of closed issues, which a new one may not reuse", async () => {
-    setTransport(async (url) => {
-      assert.match(url, /state=closed/);
-      return JSON.stringify([
-        { number: 9, body: body({ "Erratum ID": "`uhslc-old`" }), author_association: "MEMBER" },
-        { number: 8, body: "## Evidence\n\nAn old template.", author_association: "MEMBER" },
-        { number: 12, body: body({ "Erratum ID": "uhslc-old" }), author_association: "MEMBER" },
-        // Anyone can open and close an issue with the form; a stranger's holds no ID.
-        { number: 7, body: body({ "Erratum ID": "uhslc-taken" }), author_association: "NONE" },
-      ]);
-    });
-    assert.deepEqual([...(await closedIds())], [["uhslc-old", 9]]);
-  });
-
-  it("keeps what was published last for an issue it can't read, or when it can't read any", () => {
-    const one = parseErratum(63, body(), IDS);
-    const two = { ...one, id: "uhslc-two", issue: 64 };
-    const three = { ...one, id: "uhslc-three", issue: 65 };
-    const four = { ...one, id: "uhslc-four", issue: 66 };
-    const previous = [one, two, four];
-    // #64 doesn't parse now and #66's author no longer counts, so both keep
-    // their last erratum; #63 changed and takes the new one.
-    const changed = { ...one, lake: "Changed." };
-    const fetched = {
-      errata: [three, changed],
-      problems: [{ issue: 64, message: "#64: bad" }],
-      ignored: [66, 70],
-    };
-    assert.deepEqual(settle(fetched, previous), {
-      errata: [changed, two, three, four],
-      notes: [
-        "#64: bad; kept uhslc-two as published last",
-        "#66: not opened by a maintainer; kept uhslc-four as published last",
-      ],
-    });
-    const none = { errata: [], problems: [{ issue: 67, message: "#67: bad" }], ignored: [] };
-    assert.deepEqual(settle(none, []).notes, ["#67: bad; left out"]);
-    assert.deepEqual(settle(new Error("timed out"), previous).errata, previous);
-    // An erratum the code still cites stays, though its issue is gone.
-    assert.deepEqual(
-      settle({ errata: [three], problems: [], ignored: [] }, previous, new Set(["uhslc-two"])),
-      {
-        errata: [two, three],
-        notes: [
-          "uhslc-two is cited in the code, but no open issue holds it; kept as published last",
-        ],
-      },
-    );
-    // A published erratum whose source this build doesn't register, or was
-    // mistyped in an edit, is left out, and the run says so.
-    const gone = new UnknownSource(64, "uhslcc");
-    assert.deepEqual(
-      settle({ errata: [one], problems: [], ignored: [], unregistered: [gone] }, previous).notes,
-      ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
-    );
-    // Cited in the code too, it's still left out, not kept for the citation.
-    assert.deepEqual(
-      settle(
-        { errata: [one], problems: [], ignored: [], unregistered: [gone] },
-        previous,
-        new Set(["uhslc-two"]),
-      ),
-      {
-        errata: [one],
-        notes: ["#64: no source uhslcc in this build; uhslc-two, published last, is left out"],
-      },
-    );
-    // Every issue closed is no errata.
-    assert.deepEqual(settle({ errata: [], problems: [], ignored: [] }, previous), {
-      errata: [],
-      notes: [],
-    });
-  });
-
-  it("reads back the errata errata.json holds", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "errata-"));
-    try {
-      const path = join(dir, "errata.json");
-      assert.equal(await readJsonArray(path), null);
-      const errata = [
-        parseErratum(63, body(), IDS),
-        parseErratum(
-          61,
-          body({
-            "Erratum ID": "uhslc-dated",
-            Stations: "every station",
-            "Values since": "2020-01-01",
-          }),
-          IDS,
-        ),
-      ];
-      await writeJsonArray(path, published(errata));
-      assert.deepEqual(fromPublished((await readJsonArray(path))!), errata);
-      await writeJsonArray(path, []);
-      assert.deepEqual(fromPublished((await readJsonArray(path))!), []);
-    } finally {
-      rmSync(dir, { recursive: true });
-    }
-  });
-
-  it("lists a station's errata: its own, and its source's for every station", () => {
-    const e = (id: string, stations: string[] | null): Erratum => ({
-      ...parseErratum(1, body(), IDS),
-      id,
-      source: "test",
-      stations,
-    });
-    const errata = [e("test-one", ["test/a"]), e("test-every", null), e("test-none", [])];
-    assert.deepEqual(errataOf({ id: "test/a", source: "test" }, errata), [
-      "test-one",
-      "test-every",
+  it("names a station's errata, including those for every station", () => {
+    const errata = parseErrata(
+      "uhslc",
+      file([entry(), entry({ id: "uhslc-all", stations: "every station" })]),
+    ).errata;
+    assert.deepEqual(errataOf({ id: "uhslc/329", source: "uhslc" }, errata), [
+      "uhslc-hong-kong-hour-early",
+      "uhslc-all",
     ]);
-    assert.deepEqual(errataOf({ id: "test/b", source: "test" }, errata), ["test-every"]);
-    assert.deepEqual(errataOf({ id: "other/a", source: "other" }, errata), []);
+    assert.deepEqual(errataOf({ id: "uhslc/1", source: "uhslc" }, errata), ["uhslc-all"]);
+    assert.deepEqual(errataOf({ id: "gesla/329", source: "gesla" }, errata), []);
   });
 
-  it("finds citations in code and docs", () => {
-    assert.deepEqual(
-      citations("see erratum `jma-saigo-1980-day-stamp`, and Erratum\n`usace-zero-elevation`."),
-      ["jma-saigo-1980-day-stamp", "usace-zero-elevation"],
-    );
-  });
-
-  it("offers every registered source and handling in the issue form", () => {
-    const form = readFileSync(
-      new URL("../.github/ISSUE_TEMPLATE/source-error.yml", import.meta.url),
-      "utf8",
-    );
-    // A dropdown's options, the "- " lines that follow its label.
-    const options = (label: string) =>
-      form
-        .split(`label: ${label}\n`)[1]!
-        .split(/options:\n/)[1]!
-        .split("\n")
-        .filter(
-          (line, i, lines) =>
-            /^ {8}- /.test(line) && lines.slice(0, i).every((l) => /^ {8}- /.test(l)),
-        )
-        .map((line) => line.trim().slice(2));
-    assert.deepEqual(options("Source"), IDS.toSorted());
-    assert.deepEqual(options("Handling"), [...HANDLING]);
+  it("finds citations in prose", () => {
+    assert.deepEqual(citations("see erratum `a-b` and Erratum\n`c-d`"), ["a-b", "c-d"]);
   });
 });

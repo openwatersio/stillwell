@@ -48,7 +48,7 @@ export async function requalify(
       })) ?? [];
     plans.push({ years, wanted, path, suspect });
   }
-  const opts = qcFor(source, station);
+  const opts = qcFor(station);
   let files = 0;
   let changed = 0;
   for (const { years, wanted, path, suspect } of plans) {

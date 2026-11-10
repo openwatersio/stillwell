@@ -34,7 +34,8 @@ import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
-import { writeYears } from "./lake/years.ts";
+import { usableShares, writeYears } from "./lake/years.ts";
+import { readAnalysis, withAnalysis } from "./lake/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 import {
   dropWithheldRows,
@@ -125,6 +126,7 @@ export async function refreshSource(
     offsets: source.metadata.utc_offsets ?? ([0, 0] as [number, number]),
     archive: source.metadata.archive,
     decisions: source.overrides?.epochs ?? {},
+    splits: source.overrides?.splits ?? {},
     seriesChanged: source.seriesChanged?.bind(source),
   };
   const { stations, changes } = mergeStationList(previous, fetched, options_);
@@ -225,16 +227,15 @@ async function renumberAboveFiles(
 
 /**
  * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `lake` from the lists of
- * `all`, the sources it holds, and their bounds. A source in `expected` that
+ * `all`, the sources it holds, their bounds, and their years files' flag counts for `rank`. A source in `expected` that
  * has no list, because it went missing, stops the rebuild, which would
  * otherwise drop its stations from what the lake publishes; it returns the
  * missing ones. A source in neither is new, and
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
- * `errata.json` those of the sources the lake holds (the open `source-error`
- * issues, read by `src/errata.ts`); the
- * result names any station an erratum lists that a source in the lake
+ * `errata.json` those of the sources the lake holds (each source's
+ * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the lake
  * doesn't, a typo or a station since removed.
  */
 export async function publishStations(
@@ -246,6 +247,7 @@ export async function publishStations(
   const stations: LakeStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
+  const usable = new Map<string, number>();
   for (const source of all) {
     const list = await readStationList(stationListPath(lake, source.metadata.id));
     if (!list) {
@@ -254,10 +256,24 @@ export async function publishStations(
     }
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
-    stations.push(...withoutWithheld(source, list).map((s) => ({ ...s, ...bounds.get(s.id) })));
+    const analysis = await readAnalysis(lake, source.metadata.id);
+    stations.push(
+      ...withoutWithheld(source, list).map((s) => ({
+        ...s,
+        ...bounds.get(s.id),
+        tidal: analysis.get(s.id)?.tidal ?? null,
+        tide_m: analysis.get(s.id)?.tide_m ?? null,
+      })),
+    );
+    // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
+    const shares = await usableShares(lake, source.metadata.id).catch((error: unknown) => {
+      console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
+      return new Map<string, number>();
+    });
+    for (const [id, share] of shares) usable.set(id, share);
   }
   if (missing.length || !listed.length) return { missing };
-  const { stations: linked, report } = linkGauges(stations);
+  const { stations: linked, report } = linkGauges(stations, new Date(), usable);
   for (const station of linked) station.errata = errataOf(station, errata);
   await writeStations(stationsPath(lake), linked);
   await writeJsonArray(
@@ -285,13 +301,13 @@ export async function publishStations(
 
 /**
  * Metadata that is ingest's business, not part of a source's terms, so
- * `sources.json` leaves it out: QC settings, offsets, the archive's reference,
+ * `sources.json` leaves it out: offsets, the archive's reference,
  * and which scheduled jobs run for the source. `finalizes` stays in, since it
  * tells a reader whether the source's `preliminary` values will ever change.
  */
-const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "empty_means_none"]);
+const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
 
-/** A source's list from the lake, or an error naming what to run. */
+/** A source's list from the lake, with each station's analysis (`withAnalysis`), or an error naming what to run. */
 export async function listOf(lake: string, source: Source): Promise<LakeStation[]> {
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
@@ -300,7 +316,7 @@ export async function listOf(lake: string, source: Source): Promise<LakeStation[
     throw new Error(
       `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
     );
-  return withoutWithheld(source, list);
+  return withAnalysis(lake, sourceId, withoutWithheld(source, list));
 }
 
 /** A list without withheld stations, which one not refreshed since they were withheld still has. */
@@ -309,14 +325,14 @@ export function withoutWithheld(source: Source, list: LakeStation[]): LakeStatio
 }
 
 /**
- * A source's list from the lake, or null for a source whose list was never
+ * A source's list from the lake, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
  * existed and is gone, or series with no list, are still errors.
  */
 export async function startedListOf(lake: string, source: Source): Promise<LakeStation[] | null> {
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
-  if (list) return withoutWithheld(source, list);
+  if (list) return withAnalysis(lake, sourceId, withoutWithheld(source, list));
   if (await hasHistory(lake, sourceId)) throw new Error(lostList(lake, sourceId));
   // The refresh refuses such a lake too, so waiting for it would wait for good.
   if (await hasSeries(lake, sourceId))
