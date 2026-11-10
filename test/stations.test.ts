@@ -81,6 +81,18 @@ describe("mergeStationList", () => {
     );
   });
 
+  it("reports a new station's split, with the earlier epoch's key", () => {
+    const { changes } = mergeStationList([], [station("a")], {
+      ...options,
+      splits: { "rws/a": [{ since: "2020-03-06", note: "the zero moved" }] },
+    });
+    assert.deepEqual(
+      changes.map((c) => [c.event, c.key]),
+      [["opened", "rws/a start"]],
+    );
+    assert.match(changes[0]!.reason!, /backfill the station from 2020-03-06/);
+  });
+
   it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
     const previous = [held("a", { tide_station: "ticon/a" }), held("b")];
     const { stations } = mergeStationList(previous, [station("a")], options);

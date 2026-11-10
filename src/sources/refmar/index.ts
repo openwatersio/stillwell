@@ -381,4 +381,58 @@ export const source: Source = {
     if (!s.products.includes("levels")) throw new Error(`REFMAR ${s.source_id} isn't published`);
     return levels(s as RefmarStation, start, end);
   },
+  // Gauges whose zero moved with no change of datum marked, found from their
+  // values (docs/stations.md, "A person's split").
+  overrides: {
+    splits: {
+      "refmar/108": [
+        {
+          since: "1997-02-28",
+          note: "Monthly medians step from about 1.1 m to 6.0 m (erratum `refmar-dumont-durville-datums`).",
+        },
+        {
+          since: "1997-12-17",
+          note: "Back to about 1.1 m (erratum `refmar-dumont-durville-datums`).",
+        },
+        {
+          since: "2000-03-03",
+          note: "Up to about 6.0 m again (erratum `refmar-dumont-durville-datums`).",
+        },
+        {
+          since: "2006-01-09",
+          note: "Down to about 5.1 m (erratum `refmar-dumont-durville-datums`).",
+        },
+        {
+          since: "2023-03-10",
+          note: "Down to about 1.3 m, today's zero (erratum `refmar-dumont-durville-datums`).",
+        },
+      ],
+      "refmar/495": [
+        {
+          since: "2020-03-06",
+          note: "Values read 1.35 m higher from this day, as the zero moved down, against UHSLC's record of the gauge (erratum `refmar-hiva-oa-uhslc-2020-datum`).",
+        },
+      ],
+      "refmar/6438": [
+        {
+          since: "2021-09-12",
+          note: "1.4 to 2.8 m from today's zero against Saint-Malo, drifting by about 0.8 m (erratum `refmar-cancale-vigicrues-2021-2025-datum`).",
+        },
+        {
+          since: "2025-01-21",
+          note: "Today's zero, which reads 0.13 m higher than the one before 2021, against Saint-Malo (erratum `refmar-cancale-vigicrues-2021-2025-datum`).",
+        },
+      ],
+    },
+    epochs: {
+      "refmar/495 start": {
+        to_current: 1.35,
+        note: "REFMAR sits 0.24 m above UHSLC's record of the gauge (uhslc/017) every year from 2010 to 2015 and 1.59 m above it from 2020; UHSLC's has no step. REFMAR's yearly medians from 1977 to 2017 stay within 0.68 to 0.91 m, so the years before UHSLC's record are on the same zero.",
+      },
+      "refmar/6438 start": {
+        to_current: 0.13,
+        note: "Cancale less Saint-Malo (refmar/410) is 0.95 m before 12 September 2021 and 1.04 to 1.11 m from 21 January 2025. The epoch between drifts by 0.8 m against Saint-Malo, so it has no offset.",
+      },
+    },
+  },
 };

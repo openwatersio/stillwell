@@ -164,9 +164,22 @@ export interface EpochDecision {
   note: string;
 }
 
+/**
+ * A day a person found a station's zero moved though the source never said,
+ * from its values, against another record of the gauge or a neighbor where
+ * the lake has one. Never removed once applied, as backfill reads it.
+ */
+export interface EpochSplit {
+  /** YYYY-MM-DD: the first local day on the new zero. */
+  since: string;
+  note: string;
+}
+
 /** Decisions a person made about a source's stations, kept in its adapter. */
 export interface Overrides {
   epochs?: Record<string, EpochDecision>;
+  /** By station: where to split its epochs, each split opening an epoch from that day. */
+  splits?: Record<string, EpochSplit[]>;
 }
 
 export interface SourceMetadata {

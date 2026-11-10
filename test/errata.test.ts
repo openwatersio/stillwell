@@ -53,6 +53,25 @@ describe("errata files", () => {
     assert.equal(bad.problems.length, 1);
   });
 
+  it("back every split a person made with an erratum of the station's source", () => {
+    for (const [name, source] of Object.entries(sources))
+      for (const [station, splits] of Object.entries(source.overrides?.splits ?? {}))
+        for (const split of splits) {
+          assert.match(split.since, /^\d{4}-\d{2}-\d{2}$/, `${station} ${split.since}`);
+          assert.ok(!Number.isNaN(Date.parse(split.since)), `${station} ${split.since}`);
+          // A split stays once its erratum is retired, since its epochs do.
+          const { errata: own, retired } = parseErrata(name, errataFiles[name]);
+          const ids = [
+            ...own.filter((e) => e.stations?.includes(station)).map((e) => e.id),
+            ...retired,
+          ];
+          assert.ok(
+            ids.some((id) => split.note.includes(`\`${id}\``)),
+            `${station} ${split.since} cites no erratum of ${name}`,
+          );
+        }
+  });
+
   it("hold every erratum ID the code cites", () => {
     const ids = new Set(errata.map((e) => e.id));
     const stray = [...citedIn(fileURLToPath(new URL("../src", import.meta.url)))].filter(

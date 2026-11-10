@@ -315,14 +315,18 @@ export async function earliestPreliminary(
  * values in the reference of their time, so its current epoch also never
  * starts before the reference it names, which a station with more than one
  * epoch records without a split; and each closed epoch under the same label,
- * as a split leaves, gets its own span. A closed epoch under another label
- * isn't, since the source serves only the station's current one.
+ * as a split leaves, gets its own span. So does each closed epoch before one a
+ * person's split opened (`splits`, the instants from `splitStarts`), whose
+ * source serves its span on the zero of its time, as it always has; the next
+ * epoch's start says so even after a decision ends this one earlier. A closed epoch under another label isn't, since the
+ * source serves only the station's current one.
  */
 export function epochSpans(
   epochs: Epoch[],
   start: Date,
   end: Date,
   archive: SourceMetadata["archive"],
+  splits: Set<string> = new Set(),
 ): { epoch: Epoch; from: Date; to: Date }[] {
   const current = currentEpoch(epochs);
   const at = (iso: string | null, fallback: number) => (iso === null ? fallback : Date.parse(iso));
@@ -331,8 +335,17 @@ export function epochSpans(
     at(current.since, -Infinity),
     previous ? at(current.reference_since, -Infinity) : -Infinity,
   );
+  // Ids run in time order; a rejected or held epoch doesn't follow anything.
+  const nextOf = (e: Epoch) =>
+    epochs.find((x) => x.id > e.id && (x.state === "open" || x.state === "closed"));
   return epochs
-    .filter((e) => e === current || (previous && e.state === "closed" && e.datum === current.datum))
+    .filter(
+      (e) =>
+        e === current ||
+        (e.state === "closed" &&
+          e.datum === current.datum &&
+          (previous || splits.has(nextOf(e)?.since ?? ""))),
+    )
     .map((epoch) => {
       const from = epoch === current ? currentStart : at(epoch.since, -Infinity);
       // A closed epoch never reaches into the current one's span, whatever its own says.
