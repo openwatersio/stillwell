@@ -58,7 +58,7 @@ describe("smhi", () => {
         flag: Flag.good,
       }));
     const flags = (held: number, steps: number) =>
-      qc(series(held, steps), qcFor(smhi, { kind: "coastal" } as Station)).map((r) => r.flag);
+      qc(series(held, steps), qcFor({ kind: "coastal" } as Station)).map((r) => r.flag);
     // Landsort's whole centimeters held one value for up to 34 hours on calm days.
     assert.ok(flags(48, 100).every((f) => f === Flag.good)); // 47 hours
     assert.equal(flags(49, 100)[60], Flag.suspect); // 48 hours: a stuck gauge
@@ -66,13 +66,13 @@ describe("smhi", () => {
     assert.equal(flags(9, 1000)[50], Flag.suspect);
     // A few whole-centimeter changes around a long hold don't say which it is.
     const short = series(9, 100).slice(36, 66);
-    assert.equal(qc(short, qcFor(smhi, { kind: "coastal" } as Station))[15]!.flag, Flag.suspect);
+    assert.equal(qc(short, qcFor({ kind: "coastal" } as Station))[15]!.flag, Flag.suspect);
     // Most gauges switched in the middle of 2004, so each hold is judged by its own weeks.
     const switched = [...series(30, 100), ...series(9, 1000)].map((r, i) => ({
       ...r,
       time: Date.UTC(2004, 5, 1) + i * 3_600_000,
     }));
-    const marked = qc(switched, qcFor(smhi, { kind: "coastal" } as Station));
+    const marked = qc(switched, qcFor({ kind: "coastal" } as Station));
     assert.equal(marked[60]!.flag, Flag.good);
     assert.equal(marked[7 * 24 + 50]!.flag, Flag.suspect);
   });

@@ -45,8 +45,8 @@ const station = {
   ],
 } as unknown as LakeStation;
 
-function source(qc: Source["metadata"]["qc"], extra: Partial<Source> = {}): Source {
-  return { metadata: { id: "test", qc } as Source["metadata"], stations: async () => [], ...extra };
+function source(extra: Partial<Source> = {}): Source {
+  return { metadata: { id: "test" } as Source["metadata"], stations: async () => [], ...extra };
 }
 
 /** Hourly tide over [from, to), with a still stretch at 0.5 m over [stillFrom, stillTo). */
@@ -114,18 +114,19 @@ describe("requalify", () => {
     await writeObservations(path(2024), strict, "NAP");
     assert.equal(strict.filter((r) => r.flag === Flag.suspect).length, 10);
 
-    const loose = source({ flatline_s: 48 * 3600 });
-    assert.deepEqual(await requalify(loose, station, root, 2024, 2025), { files: 1, changed: 9 });
+    // Still water gets 48 hours.
+    const pooled = { ...station, tidal: false };
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 1, changed: 9 });
     const after = await readObservations(path(2024));
     assert.deepEqual(
       after.filter((r) => r.flag !== Flag.good).map((r) => r.time),
       [still[0]],
     );
     // Nothing changes on a second run, so nothing is written.
-    assert.deepEqual(await requalify(loose, station, root, 2024, 2025), { files: 0, changed: 0 });
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 0, changed: 0 });
     // A stricter rule again flags them, and an erratum's span comes back from the source.
     const span: [number, number] = [Date.UTC(2024, 2, 1), Date.UTC(2024, 2, 2)];
-    const errata = source({}, { suspect: async () => [span] });
+    const errata = source({ suspect: async () => [span] });
     await requalify(errata, station, root, 2024, 2025);
     const flagged = (await readObservations(path(2024))).filter((r) => r.flag === Flag.suspect);
     assert.equal(flagged.length, 10 + 24);
@@ -151,7 +152,7 @@ describe("requalify", () => {
       all.filter((r) => r.time >= NEW_YEAR),
       "NAP",
     );
-    await requalify(source({}), station, root, 2025, 2026);
+    await requalify(source(), station, root, 2025, 2026);
     const flags = (await readObservations(path(2025))).slice(0, 5).map((r) => r.flag);
     assert.deepEqual(flags, [Flag.suspect, Flag.suspect, Flag.suspect, Flag.suspect, Flag.good]);
   });
@@ -162,19 +163,19 @@ describe("updateRecent", () => {
     const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
     const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
-    const window = withSourceFlag(hourly(NOW - 48 * HOUR, NOW - HOUR));
-    // The source said good; an earlier rule marked it suspect.
-    window[10]!.flag = Flag.suspect;
+    const window = withSourceFlag(hourly(NOW - 72 * HOUR, NOW - HOUR));
+    // The source said good; an earlier rule marked it suspect, past the longest flatline rule's 48 hours.
+    window[50]!.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source({}, { observations: async () => hourly(NOW - HOUR, NOW) }),
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
     });
     const after = await readRecent(path);
-    assert.equal(after.find((r) => r.time === window[10]!.time)!.flag, Flag.good);
+    assert.equal(after.find((r) => r.time === window[50]!.time)!.flag, Flag.good);
   });
 
   it("keeps a mark within a flatline's length of the window's start, where a run can't be seen whole", async () => {
@@ -188,7 +189,7 @@ describe("updateRecent", () => {
     for (const r of window.slice(0, 3)) r.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source({}, { observations: async () => hourly(NOW - HOUR, NOW) }),
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
@@ -299,10 +300,7 @@ describe("updateRecent with a whole-centimeter flatline rule", () => {
     window[20]!.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source(
-        { centimeter_flatline_s: 48 * 3600 },
-        { observations: async () => hourly(NOW - HOUR, NOW) },
-      ),
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),

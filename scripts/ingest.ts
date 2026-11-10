@@ -112,7 +112,7 @@ import {
 } from "../src/lake/parquet.ts";
 import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
-import { analyze } from "../src/lake/analysis.ts";
+import { analyze, markRequalified, pending, readAnalysis } from "../src/lake/analysis.ts";
 import { boundsPath, seriesDir, seriesPath, stationsPath, yearsPath } from "../src/lake/paths.ts";
 import {
   describeReport,
@@ -723,7 +723,7 @@ async function backfillYear(
         readObservations(
           seriesPath(lakeFor(station), product, station.source, station.source_id, y, epoch.id),
         );
-      merged = judgeFetched(existing, rows, ...range, qcFor(source, station), [
+      merged = judgeFetched(existing, rows, ...range, qcFor(station), [
         ...(await near(year - 1)),
         ...(await near(year + 1)),
       ]);
@@ -864,7 +864,7 @@ async function requalifyStations(
   ids: string,
   start: number,
   end: number,
-): Promise<void> {
+): Promise<RunSummary> {
   if (start >= end)
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
@@ -925,6 +925,7 @@ async function requalifyStations(
     return s;
   });
   if (summary.failed.length) process.exitCode = 1;
+  return summary;
 }
 
 async function analyzeSource(sourceId: string): Promise<void> {
@@ -949,9 +950,23 @@ async function analyzeSource(sourceId: string): Promise<void> {
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
   if (report.failed.length) process.exitCode = 1;
-  // Every year of every epoch, since a station's verdict holds for its whole record.
-  if (values.requalify && report.changed.length)
-    await requalifyStations(sourceId, report.changed.map((c) => c.id).join(","), 0, 10_000);
+  if (!values.requalify) return;
+  // Every year of every epoch, since a station's verdict holds for its whole
+  // record; a batch at a time, each marked once done, so a run stopped partway
+  // leaves the rest pending for the next.
+  const waiting = pending(await readAnalysis(lake, sourceId));
+  for (const batch of chunks(waiting, 100)) {
+    const summary = await requalifyStations(sourceId, batch.join(","), 0, 10_000);
+    // A failure that names no station, such as the years file's, may have skipped any of them.
+    const failed = new Set(summary.failed.map((f) => f.split(": ")[0]));
+    if ([...failed].some((id) => !batch.includes(id!))) continue;
+    await markRequalified(
+      lake,
+      sourceId,
+      batch.filter((id) => !failed.has(id)),
+      new Date(),
+    );
+  }
 }
 
 async function withholdStations(sourceId: string): Promise<void> {

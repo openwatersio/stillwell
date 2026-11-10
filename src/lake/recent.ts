@@ -218,7 +218,7 @@ export async function updateRecent({
           // Nothing new keeps what we had, rather than clearing the last hours.
           if (got.length) {
             const had = window.current;
-            const opts = qcFor(source, station);
+            const opts = qcFor(station);
             // The longest run any flatline rule needs to see.
             const longest = Math.max(
               opts.flatline_s ?? FLATLINE_S,
@@ -784,24 +784,23 @@ export async function refuseOtherDatum(
 }
 
 /**
- * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
- * or more, so they get two days before a flatline counts as suspect. And they
- * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. A river or lake the
- * source finds tidal never holds still that long, so it keeps the source's
- * flatline limit, but floods all the same; where its values move in whole
- * centimeters, a small tide can sit on one for hours (as SMHI's do), so those
- * get two days. Tide gauges keep their source's settings.
+ * QC's rules for a station, by whether its levels carry a tide
+ * (`Station.tidal`, from `src/lake/analysis.ts`), the same for every source.
+ * Still water, a pooled river, a lake or a sea without a tide, holds one
+ * level to the centimeter for a day or more, so it gets two days before a
+ * flatline counts as suspect; and it sits nearly flat for months and then
+ * rises meters in a flood or surge, so a level far outside its own range
+ * isn't suspect for that alone. Tidal water never holds still that long, so
+ * it keeps the six hours, except where its values move in whole centimeters
+ * and a small tide can sit on one for hours, as at Göteborg. A tidal river or
+ * lake still floods, so it keeps the outlier check off. A station with no
+ * verdict yet is judged by its kind: a river or lake as still, anything else
+ * as tidal.
  */
-export function qcFor(source: Source, station: Station): QcOptions {
-  const still = station.kind === "river" || station.kind === "lake";
-  const tidal = still && station.tidal === true;
-  return {
-    ...source.metadata.qc,
-    ...(still ? { outliers: false } : {}),
-    ...(still && !tidal ? { flatline_s: 48 * 3600 } : {}),
-    ...(tidal ? { centimeter_flatline_s: 48 * 3600 } : {}),
-  };
+export function qcFor(station: Pick<Station, "kind" | "tidal">): QcOptions {
+  const river = station.kind === "river" || station.kind === "lake";
+  if (!(station.tidal ?? !river)) return { flatline_s: 48 * 3600, outliers: false };
+  return { centimeter_flatline_s: 48 * 3600, ...(river ? { outliers: false } : {}) };
 }
 
 /** Run `work` over `items`, `concurrency` at a time. */

@@ -3,7 +3,15 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { RULES, analyze, judge, readAnalysis, withAnalysis } from "../src/lake/analysis.ts";
+import {
+  RULES,
+  analyze,
+  judge,
+  markRequalified,
+  pending,
+  readAnalysis,
+  withAnalysis,
+} from "../src/lake/analysis.ts";
 import { readJsonArray, writeObservations, writeStationBounds } from "../src/lake/parquet.ts";
 import { analysisHistoryPath, seriesPath } from "../src/lake/paths.ts";
 import { qcFor } from "../src/lake/recent.ts";
@@ -65,14 +73,17 @@ describe("judge", () => {
     const verdict = judge(source, river("4"), series(90, level));
     assert.ok(verdict.drains! > DRAINS_RUNS);
     assert.equal(verdict.tidal, false);
+    // On the coast those runs are a stuck or dry gauge, for QC to flag, not still water.
+    const coast = judge(source, river("5", { kind: "coastal" }), series(90, level));
+    assert.equal(coast.tidal, true);
   });
 });
 
 describe("qcFor", () => {
   it("gives a tidal river a tide gauge's flatline limit, and other rivers two days", () => {
-    const tidal = qcFor(source, river("1", { tidal: true }));
-    const pooled = qcFor(source, river("2", { tidal: false }));
-    const unknown = qcFor(source, river("3", { tidal: null }));
+    const tidal = qcFor(river("1", { tidal: true }));
+    const pooled = qcFor(river("2", { tidal: false }));
+    const unknown = qcFor(river("3", { tidal: null }));
     assert.equal(tidal.flatline_s, undefined);
     assert.equal(tidal.centimeter_flatline_s, 48 * 3600);
     assert.equal(pooled.flatline_s, 48 * 3600);
@@ -119,6 +130,10 @@ describe("analyze", () => {
     assert.deepEqual(history, [{ rules: RULES, changed: report.changed }]);
     const [first] = await withAnalysis(lake, "test", stations);
     assert.equal(first!.tidal, true);
+    // The tidal river waits for requalify; the pooled one's QC didn't change.
+    assert.deepEqual(pending(analysis), ["test/1"]);
+    await markRequalified(lake, "test", ["test/1"], now);
+    assert.deepEqual(pending(await readAnalysis(lake, "test")), []);
 
     // A month later nothing is due.
     const later = await analyze(lake, source, stations, { now: new Date(Date.UTC(2026, 4, 1)) });

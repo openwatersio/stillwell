@@ -37,6 +37,12 @@ export interface Analysis {
   days: number | null;
   /** Runs of the last year only a tide gauge's flatline limit flags (`drains`). */
   drains: number | null;
+  /**
+   * When the station's stored years were last requalified under its
+   * verdict: null while a verdict that changed its QC waits for `requalify`
+   * (`pending`).
+   */
+  requalified: string | null;
 }
 
 /** The rules' version. Change it with any threshold below, so `analyze` judges every station again. */
@@ -58,23 +64,25 @@ const REJUDGE_MS = 365 * 86_400_000;
 
 const DAY_MS = 86_400_000;
 
-type Verdict = Omit<Analysis, "id" | "analyzed" | "rules">;
+type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "requalified">;
 
 /**
  * Whether a station's levels carry a tide, from its last year: the lunar
  * tide (`tideOf`) is `TIDE_M` or more, on `COVERED_DAYS` days or more,
- * its water sits within `ABOVE_SEA_M` of sea level where its datum says how
- * high its gauge zero is, and no more than `DRAINS_RUNS` runs of a still
- * level are ones only a tide gauge's flatline limit flags, as at a creek that
- * drains to a sill at low water. Null, where the values can't say: under
- * `COVERED_DAYS` days, or too coarse to fit. The flags start over from the
- * source's (`fromSource`), so the verdict doesn't depend on the one QC used
- * when they were written.
+ * its water sits within `ABOVE_SEA_M` of sea level where its datums can say
+ * (`toSeaLevel`), and, away from the coast, no more than `DRAINS_RUNS` runs
+ * of a still level are ones only a tide gauge's flatline limit flags, as at a
+ * creek that drains to a sill at low water. On the coast such runs are a
+ * stuck gauge or one left dry, which QC should flag: Coruña, with a 1.25 m
+ * tide, has 732 of them in its last year in GESLA. Null, where the values
+ * can't say: under `COVERED_DAYS` days, or too coarse to fit. The flags start
+ * over from the source's (`fromSource`), so the verdict doesn't depend on the
+ * one QC used when they were written.
  */
 export function judge(source: Source, station: Station, rows: Observation[]): Verdict {
   const start = fromSource(rows);
-  const still = qc(start, qcFor(source, { ...station, tidal: false }));
-  const tide = qc(start, qcFor(source, { ...station, tidal: true }));
+  const still = qc(start, qcFor({ ...station, tidal: false }));
+  const tide = qc(start, qcFor({ ...station, tidal: true }));
   const flags = still.map((r) => r.flag);
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
@@ -85,10 +93,10 @@ export function judge(source: Source, station: Station, rows: Observation[]): Ve
   const runs = drains(still, tide);
   if (tide_m === null || days < COVERED_DAYS) return { tidal: null, tide_m, days, drains: runs };
   const middle = usable.map((r) => r.level).sort((a, b) => a - b)[usable.length >> 1] ?? 0;
-  const altitude = gaugeZero(station);
-  const aboveSea = altitude !== null && altitude + middle > ABOVE_SEA_M;
+  const offset = toSeaLevel(station);
+  const aboveSea = offset !== null && offset + middle > ABOVE_SEA_M;
   return {
-    tidal: tide_m >= TIDE_M && !aboveSea && runs <= DRAINS_RUNS,
+    tidal: tide_m >= TIDE_M && !aboveSea && (station.kind === "coastal" || runs <= DRAINS_RUNS),
     tide_m,
     days,
     drains: runs,
@@ -96,12 +104,36 @@ export function judge(source: Source, station: Station, rows: Observation[]): Ve
 }
 
 /**
- * How high a station's gauge zero sits above sea level, where its datum is
- * the gauge's own (`GAGE`) and its datums give one; null where they don't.
+ * Datums measured from sea level, as land surveys or tide gauges set it, so a
+ * level in one is a height above the sea. IGLD is the Great Lakes', which sit
+ * 75 to 183 m up.
  */
-function gaugeZero(station: Station): number | null {
-  if (station.datum !== "GAGE") return null;
-  return Object.values(station.datums ?? {})[0] ?? null;
+const SEA_LEVEL = new Set([
+  "NAVD88",
+  "NGVD29",
+  "MSL",
+  "LMSL",
+  "NHN",
+  "NN",
+  "NN2000",
+  "NAP",
+  "AOD",
+  "RH2000",
+  "IGN69",
+  "IGLD",
+  "PRVD02",
+  "ODM",
+]);
+
+/**
+ * Meters to add to a station's levels to put them above sea level: none
+ * where its datum is one (`SEA_LEVEL`), its gauge zero's height where its
+ * datums give one in such a datum, and null where they don't.
+ */
+function toSeaLevel(station: Station): number | null {
+  if (SEA_LEVEL.has(station.datum)) return 0;
+  const datum = Object.keys(station.datums ?? {}).find((d) => SEA_LEVEL.has(d));
+  return datum === undefined ? null : station.datums[datum]!;
 }
 
 /** A source's analysis by station ID; empty where there's none yet. */
@@ -120,6 +152,7 @@ export async function readAnalysis(lake: string, source: string): Promise<Map<st
         tide_m: (r.tide_m as number | null) ?? null,
         days: r.days === null ? null : Number(r.days),
         drains: r.drains === null ? null : Number(r.drains),
+        requalified: r.requalified == null ? null : new Date(r.requalified as string).toISOString(),
       },
     ]),
   );
@@ -189,26 +222,45 @@ export async function analyze(
       if (rows.some((r) => r.source_flag === undefined && r.flag >= Flag.suspect))
         throw new Error("holds flags written before source_flag was kept; requalify it first");
       const verdict = judge(source, station, rows);
+      const was = previous.get(station.id);
+      const from = was?.tidal ?? null;
+      const changed = !isDeepStrictEqual(
+        qcFor({ ...station, tidal: from }),
+        qcFor({ ...station, tidal: verdict.tidal }),
+      );
       next.set(station.id, {
         id: station.id,
         analyzed: options.now.toISOString(),
         rules: RULES,
         ...verdict,
+        // A station whose QC is unchanged is as requalified as it was; a new one needs nothing.
+        requalified: changed ? null : was ? was.requalified : options.now.toISOString(),
       });
       report.judged++;
-      const from = previous.get(station.id)?.tidal ?? null;
-      const before = qcFor(source, { ...station, tidal: from });
-      const after = qcFor(source, { ...station, tidal: verdict.tidal });
-      if (!isDeepStrictEqual(before, after))
+      if (changed)
         report.changed.push({ id: station.id, from, to: verdict.tidal, tide_m: verdict.tide_m });
     } catch (error) {
       report.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
     }
   });
   const listed = new Set(stations.map((s) => s.id));
-  await writeRows(
-    analysisPath(lake, id),
+  await writeAnalysis(
+    lake,
+    id,
     [...next.values()].filter((a) => listed.has(a.id)),
+  );
+  report.changed.sort((a, b) => a.id.localeCompare(b.id));
+  if (report.changed.length)
+    await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
+      { rules: RULES, changed: report.changed },
+    ]);
+  return report;
+}
+
+function writeAnalysis(lake: string, source: string, rows: Analysis[]): Promise<void> {
+  return writeRows(
+    analysisPath(lake, source),
+    rows,
     {
       id: "VARCHAR",
       analyzed: "TIMESTAMPTZ",
@@ -217,13 +269,31 @@ export async function analyze(
       tide_m: "DOUBLE",
       days: "INTEGER",
       drains: "INTEGER",
+      requalified: "TIMESTAMPTZ",
     },
     "id",
   );
-  report.changed.sort((a, b) => a.id.localeCompare(b.id));
-  if (report.changed.length)
-    await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
-      { rules: RULES, changed: report.changed },
-    ]);
-  return report;
+}
+
+/** Stations whose verdict changed their QC and whose stored years aren't requalified under it yet. */
+export function pending(analysis: Map<string, Analysis>): string[] {
+  return [...analysis.values()].filter((a) => a.requalified === null).map((a) => a.id);
+}
+
+/** Record that `ids`' stored years are requalified under their verdicts, as of `now`. */
+export async function markRequalified(
+  lake: string,
+  source: string,
+  ids: string[],
+  now: Date,
+): Promise<void> {
+  const done = new Set(ids);
+  const analysis = await readAnalysis(lake, source);
+  await writeAnalysis(
+    lake,
+    source,
+    [...analysis.values()].map((a) =>
+      done.has(a.id) ? { ...a, requalified: now.toISOString() } : a,
+    ),
+  );
 }

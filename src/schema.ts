@@ -225,8 +225,6 @@ export interface SourceMetadata {
    * then records such years and skips them for 30 days (`src/empty-years.ts`).
    */
   empty_means_none?: boolean;
-  /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
-  qc?: QcOptions;
   /**
    * The range of the source's local UTC offsets in hours, such as [-6, -4] for
    * US Central and Eastern time, so a date it gives can be turned into the
