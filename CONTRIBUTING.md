@@ -121,7 +121,7 @@ Every run that writes a year file of levels, `backfill`, `compact` and `requalif
 node scripts/ingest.ts years usgs
 ```
 
-Compaction checks only that every year file has a row and every row a file, not that a row's version still matches its file. Anything that writes year files without keeping the years file leaves those rows out of date, and nothing reads them again: a rollback to a build from before the years file, a run from an older local checkout, or a restore of `obs/` from a backup. Afterwards, once the current build is back, run `years <source> --rebuild-years` for each source whose files it wrote.
+Compaction checks only that every year file has a row and every row a file, not that a row's version still matches its file. Anything that writes year files without keeping the years file leaves rows whose version no longer matches the file, and compaction rereads such a station only if a stopped run left it marked: a rollback to a build from before the years file, a run from an older local checkout, or a restore of `obs/` from a backup. Afterwards, once the current build is back, run `years <source> --rebuild-years` for each source whose files it wrote.
 
 These environment variables choose where it writes:
 
