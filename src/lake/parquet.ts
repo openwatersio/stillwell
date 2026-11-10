@@ -246,8 +246,16 @@ export async function writeExtremes(
 }
 
 export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
-  const rows = await read(path, "SELECT epoch_ms(time) AS time, * EXCLUDE (time, datum)");
-  return rows.map((r) => {
+  return (await readExtremeFile(path)).rows;
+}
+
+/** A series file's extremes and the datums it holds, in one read. */
+export async function readExtremeFile(
+  path: string,
+): Promise<{ rows: PublishedExtreme[]; datums: string[] }> {
+  const rows = await read(path, "SELECT epoch_ms(time) AS time, * EXCLUDE (time)");
+  const datums = [...new Set(rows.map((r) => String(r.datum)))];
+  const extremes = rows.map((r) => {
     const e = {
       time: Number(r.time),
       level: level(r.level_m),
@@ -258,6 +266,7 @@ export async function readExtremes(path: string): Promise<PublishedExtreme[]> {
       ? e
       : { ...e, transit: Number(r.transit), event: Number(r.event) as EventIndex };
   });
+  return { rows: extremes, datums };
 }
 
 /** The datums a series file holds: one, or none when the file doesn't exist. */
@@ -383,6 +392,22 @@ const recentCells = (r: StationObservation): Cell[] => [
 
 const OBSERVATION_COLUMNS =
   "SELECT * REPLACE (epoch_ms(time) AS time, epoch_ms(received) AS received)";
+
+/**
+ * Rows `writeObservations` wrote, as a read of the file returns them: the
+ * level through its FLOAT column, times as whole milliseconds.
+ */
+export function asWritten(rows: Observation[]): Observation[] {
+  return rows.map((r) =>
+    observation({
+      time: Math.round(r.time),
+      level_m: Math.fround(r.level),
+      flag: r.flag,
+      source_flag: r.source_flag ?? null,
+      received: r.received === undefined ? null : Math.round(r.received),
+    }),
+  );
+}
 
 function observation(r: Record<string, unknown>): Observation {
   const o: Observation = { time: Number(r.time), level: level(r.level_m), flag: r.flag as Flag };

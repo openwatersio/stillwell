@@ -72,12 +72,15 @@
 import { resolve } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
+  backfillYear,
   earliestPreliminary,
   epochSpans,
   orderStations,
   parseShard,
   parseStationList,
   preliminaryRuns,
+  readerOf,
+  seriesFiles,
   shard,
   wholeEndedYear,
   yearsToFetch,
@@ -85,7 +88,6 @@ import {
 import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { Blocked } from "../src/http.ts";
-import { mergeFetched, sameRows } from "../src/lake/merge.ts";
 import {
   chunks,
   compactRecent,
@@ -94,7 +96,6 @@ import {
   pool,
   qcFor,
   REFETCH_YEARS,
-  refuseOtherDatum,
   updateRecent,
   writePreliminary,
   type RunSummary,
@@ -102,19 +103,16 @@ import {
 import { appendFile, readFile } from "node:fs/promises";
 import { isHeld, splitStarts } from "../src/epochs.ts";
 import {
-  readExtremes,
-  readObservations,
+  listYears,
   readStationBounds,
   setConnections,
-  writeExtremes,
   publishedSources,
-  writeObservations,
   type YearStats,
 } from "../src/lake/parquet.ts";
 import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
-import { judgeFetched, requalify } from "../src/lake/requalify.ts";
+import { requalify } from "../src/lake/requalify.ts";
 import { analyze, markRequalified, pending, readAnalysis } from "../src/lake/analysis.ts";
-import { boundsPath, seriesDir, seriesPath, stationsPath, yearsPath } from "../src/lake/paths.ts";
+import { boundsPath, seriesDir, stationsPath, yearsPath } from "../src/lake/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -127,10 +125,8 @@ import {
   needsPerson,
 } from "../src/refresh.ts";
 import type {
-  Epoch,
   LakeStation,
   Observation,
-  Product,
   PublishedExtreme,
   Source,
   SourceMetadata,
@@ -400,7 +396,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     named =
       ids === "all"
         ? list.filter((s) => s.status === "active")
-        : ids.split(",").map((id) => find(list, sourceId, id));
+        : // A station named twice, by either form of its ID, is walked once.
+          [...new Set(ids.split(",").map((id) => find(list, sourceId, id)))];
   // A station whose new epoch waits on a person gets nothing, in either datum.
   let wanted = named.filter((s) => {
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
@@ -579,6 +576,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           // One read per series tells which years are done, rather than one per year;
           // --skip-written needs a listing, and a read of years from 2026 on.
           let plan;
+          let files;
           const ownEpoch = product === "levels" && epoch.id === current;
           try {
             const dir = seriesDir(
@@ -589,6 +587,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               epoch.id,
             );
             plan = await yearsToFetch(dir, since, until, mode, now, station.source_qc_start);
+            if (plan.fetch.length)
+              files = seriesFiles(dir, plan.listed ?? (await listYears(dir)), readerOf(product));
             // A station picked for its preliminary value is read again even with no year
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
@@ -607,7 +607,16 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             const label = `${station.id} ${product} ${from.getUTCFullYear()}${epoch.id === current ? "" : ` (epoch ${epoch.id})`}`;
             if (ownEpoch) fetched.add(station.id);
             try {
-              const rows = await backfillYear(source, station, product, from, to, epoch, written);
+              const rows = await backfillYear(
+                source,
+                station,
+                product,
+                from,
+                to,
+                epoch,
+                files!,
+                written,
+              );
               if (rows === "empty") {
                 // A year with a file keeps being asked for, so an outage never blocks its refill.
                 if (
@@ -688,69 +697,6 @@ async function reportPast(
   console.log(lines.join("\n"));
   const page = process.env.GITHUB_STEP_SUMMARY;
   if (page) await appendFile(page, ["```", ...lines, "```", ""].join("\n"));
-}
-
-/**
- * Returns how many rows the year's file now holds, undefined when nothing
- * changed, or `empty` when the source returned nothing for the year. A year
- * file of levels it writes goes in `written`, for the source's years.
- */
-async function backfillYear(
-  source: Source,
-  station: LakeStation,
-  product: Product,
-  from: Date,
-  to: Date,
-  epoch: Epoch,
-  written: Map<string, YearStats>,
-): Promise<number | "empty" | undefined> {
-  // The epoch's own datum, which a closed epoch keeps when the station's moves on.
-  station = { ...station, datum: epoch.datum };
-  const path = seriesPath(
-    lakeFor(station),
-    product,
-    station.source,
-    station.source_id,
-    from.getUTCFullYear(),
-    epoch.id,
-  );
-  const range = [from.getTime(), to.getTime()] as const;
-  if (product === "levels" || product === "predictions") {
-    const get = product === "levels" ? source.observations : source.predictions;
-    if (!get) return undefined;
-    let rows = await get(station, from, to);
-    // An empty fetch is an outage, a year the source no longer publishes, or a
-    // datum it no longer serves; it never empties a file.
-    if (!rows.length) return "empty";
-    await refuseOtherDatum(path, station);
-    const existing = await readObservations(path);
-    let merged = mergeFetched(existing, rows, ...range);
-    if (product === "levels") {
-      const year = from.getUTCFullYear();
-      const near = (y: number) =>
-        readObservations(
-          seriesPath(lakeFor(station), product, station.source, station.source_id, y, epoch.id),
-        );
-      merged = judgeFetched(existing, rows, ...range, qcFor(station), [
-        ...(await near(year - 1)),
-        ...(await near(year + 1)),
-      ]);
-    }
-    if (!merged.length || sameRows(existing, merged)) return undefined;
-    const stats = await writeObservations(path, merged, station.datum);
-    if (product === "levels") written.set(path, stats);
-    return merged.length;
-  }
-  const get = product === "extremes" ? source.extremes : source.predictedExtremes;
-  if (!get) return undefined;
-  const rows = await get(station, from, to);
-  if (!rows.length) return "empty";
-  await refuseOtherDatum(path, station);
-  const existing = await readExtremes(path);
-  const merged = mergeFetched<PublishedExtreme>(existing, rows, ...range);
-  if (!merged.length || sameRows(existing, merged)) return undefined;
-  await writeExtremes(path, merged, station.datum);
-  return merged.length;
 }
 
 /**
