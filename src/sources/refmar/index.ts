@@ -122,7 +122,7 @@ export async function stations(previous: Station[] = []): Promise<RefmarStation[
   for (const g of listed) {
     const old = before.get(`refmar/${g.shom_id}`);
     // A state this adapter doesn't know, such as HIDDEN, isn't published.
-    // The stored record's kind isn't REFMAR's, which never gives one, but `KINDS`', so it's left for the refresh to set again.
+    // The stored record's kind comes from a `KINDS` decision, since REFMAR never gives one, so it's left for the refresh to set again.
     if (!PUBLISHED.has(g.state)) {
       gauges.push({
         ...(old ?? toStation(g)),
