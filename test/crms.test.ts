@@ -259,6 +259,12 @@ describe("crms levels", () => {
     assert.equal(requests.length, sent);
   });
 
+  it("checks the clock of a row with no elevation", async () => {
+    // CRMS0002's 2026 row has no adjusted elevation.
+    serve(zipOf(edit("CRMS0002-H01,2/1/2026,10:00:00,CST", "CRMS0002-H01,2/1/2026,10:00:00,CDT")));
+    await assert.rejects(crms.levels(station("CRMS0002-H01"), ...ALL), /not CST/);
+  });
+
   it("refuses a date or time that rolls over", async () => {
     serve(zipOf(edit("9/29/2007,09:00:00,CST", "13/29/2007,09:00:00,CST")));
     await assert.rejects(crms.levels(station("CRMS0002-H01"), ...ALL), /impossible time/);

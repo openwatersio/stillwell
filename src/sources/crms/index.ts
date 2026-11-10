@@ -189,20 +189,24 @@ export const parser: Parser = (header) => {
     // Some station IDs end in a no-break space, which trim() drops.
     const station = f[c.station]!.trim();
     const level = f[c.level];
-    if (!SURFACE.test(station) || !level) return null;
+    if (!SURFACE.test(station)) return null;
+    // Every surface-water row's clock is checked, with an elevation or without, so a changed clock fails the run.
     if (f[c.zone] !== "CST")
       throw new Error(`CRMS's ${station} has a row in ${f[c.zone]}, not CST`);
     const d = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(f[c.date]!);
     const t = /^(\d{2}):(\d{2}):(\d{2})$/.exec(f[c.time]!);
-    const feet = Number(level);
-    if (!d || !t || !Number.isFinite(feet))
-      throw new Error(`CRMS's ${station} has an unreadable row: ${f.join(",")}`);
+    if (!d || !t) throw new Error(`CRMS's ${station} has an unreadable row: ${f.join(",")}`);
     const local = Date.UTC(+d[3]!, +d[1]! - 1, +d[2]!, +t[1]!, +t[2]!, +t[3]!);
     // Date.UTC rolls 2/31 over to March and 13/1 to January; a time that rolls over is refused.
     const back = new Date(local).toISOString();
     const stated = `${d[3]}-${d[1]!.padStart(2, "0")}-${d[2]!.padStart(2, "0")}T${t[1]}:${t[2]}:${t[3]}`;
     if (back.slice(0, 19) !== stated)
       throw new Error(`CRMS's ${station} has an impossible time ${f[c.date]} ${f[c.time]}`);
+    // CPRA withdraws a value by leaving its elevation empty.
+    if (!level) return null;
+    const feet = Number(level);
+    if (!Number.isFinite(feet))
+      throw new Error(`CRMS's ${station} has an unreadable row: ${f.join(",")}`);
     const geoid = GEOIDS.indexOf(f[c.geoid]!);
     return {
       station,
