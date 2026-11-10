@@ -80,8 +80,8 @@ type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "requalified">;
  * tide (`tideOf`) is `TIDE_M` or more, on `COVERED_DAYS` days or more,
  * its water sits within `ABOVE_SEA_M` of sea level where its datums can say
  * (`toSeaLevel`), and, away from the coast, no more than `DRAINS_RUNS` runs
- * of a still level are ones only a tide gauge's flatline limit flags, as at a
- * creek that drains to a sill at low water. On the coast such runs are a
+ * of a still level are ones only the flatline rules QC gives tidal water of
+ * its tide flag, as at a creek that drains to a sill at low water. On the coast such runs are a
  * stuck gauge or one left dry, which QC should flag: Coruña, with a 1.25 m
  * tide, has 732 of them in its last year in GESLA. Null, where the values
  * can't say: under `COVERED_DAYS` days, or too coarse to fit. The flags start
@@ -100,12 +100,17 @@ export function judge(
     suspect,
   );
   const still = qc(start, { flatline_s: 48 * 3600, outliers: false });
-  // A tide gauge's flatline rule alone, so `drains` counts held levels, not outliers.
-  const tide = qc(start, { outliers: false });
   const flags = still.map((r) => r.flag);
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
   const tide_m = tideOf({ times, levels, source: flags });
+  // The flatline rules QC gives tidal water of this tide, without the outlier check,
+  // so `drains` counts only held levels QC would flag: not a small tide's whole
+  // centimeters at the turn, as at Werkendam in the Biesbosch.
+  const tide = qc(start, {
+    ...qcFor({ kind: "coastal", tidal: true, tide_m }),
+    outliers: false,
+  });
   // The year to the last usable value, as `tideOf` fits it, so a flagged tail doesn't shift one measure and not the others.
   const end = still.findLast((r) => r.flag < Flag.suspect && Number.isFinite(r.level))?.time ?? 0;
   const since = end - 366 * DAY_MS;

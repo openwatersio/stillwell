@@ -79,6 +79,14 @@ describe("judge", () => {
     assert.equal(coast.tidal, true);
   });
 
+  it("doesn't count a small tide's whole centimeters, which QC lets stand, as draining", () => {
+    // A 12 cm tide in whole centimeters, held at its low water for 8 hours every week.
+    const level = (h: number) => (h % 168 < 8 ? -0.12 : Math.round(tide(0.12)(h) * 100) / 100);
+    const verdict = judge(river("8"), series(90, level));
+    assert.equal(verdict.drains, 0);
+    assert.equal(verdict.tidal, true);
+  });
+
   it("measures every year from its last usable value", () => {
     // 90 days of tide, then 300 days the source flagged bad: the year is still the tide's.
     const rows = series(390, tide(0.5)).map((r, i) =>
