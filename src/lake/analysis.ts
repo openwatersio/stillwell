@@ -106,10 +106,12 @@ export function judge(
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
   const tide_m = tideOf({ times, levels, source: flags });
-  const since = (times.at(-1) ?? 0) - 366 * DAY_MS;
+  // The year to the last usable value, as `tideOf` fits it, so a flagged tail doesn't shift one measure and not the others.
+  const end = still.findLast((r) => r.flag < Flag.suspect && Number.isFinite(r.level))?.time ?? 0;
+  const since = end - 366 * DAY_MS;
   const usable = still.filter((r) => r.time > since && r.flag < Flag.suspect);
   const days = new Set(usable.map((r) => Math.floor(r.time / DAY_MS))).size;
-  const runs = drains(still, tide);
+  const runs = drains(still, tide, end);
   if (tide_m === null || days < COVERED_DAYS) return { tidal: null, tide_m, days, drains: runs };
   const middle = usable.map((r) => r.level).sort((a, b) => a - b)[usable.length >> 1] ?? 0;
   const offset = toSeaLevel(station);

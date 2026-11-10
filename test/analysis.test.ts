@@ -79,6 +79,16 @@ describe("judge", () => {
     assert.equal(coast.tidal, true);
   });
 
+  it("measures every year from its last usable value", () => {
+    // 90 days of tide, then 300 days the source flagged bad: the year is still the tide's.
+    const rows = series(390, tide(0.5)).map((r, i) =>
+      i >= 90 * 96 ? { ...r, flag: Flag.bad, source_flag: Flag.bad } : r,
+    );
+    const verdict = judge(river("7"), rows);
+    assert.equal(verdict.days, 90);
+    assert.equal(verdict.tidal, true);
+  });
+
   it("counts held levels, not outliers, against a tide", () => {
     // An estuary's week-long surge of 1.06 m on a 10 cm tide: its high waters cross the
     // outlier rule's line, about 1.05 m, and its low waters don't, 14 times.

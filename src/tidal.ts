@@ -38,7 +38,7 @@ export function tideOf(record: {
 }
 
 /**
- * Runs of the last year that a tide gauge's flatline limit flags and a still
+ * Runs of the year to `end` that a tide gauge's flatline limit flags and a still
  * water's two days don't, from the same values QC'd both ways. Water the tide
  * reaches only at times holds still for hours on end in between: a creek
  * drained to a sill or pool at low water, a lagoon whose mouth has closed, a
@@ -46,8 +46,12 @@ export function tideOf(record: {
  * still water's limit tells a stuck sensor apart better there. A sensor that
  * sticks more than `DRAINS_RUNS` times a year looks the same.
  */
-export function drains(still: Observation[], tide: Observation[]): number {
-  const since = (still.at(-1)?.time ?? 0) - 366 * DAY_MS;
+export function drains(
+  still: Observation[],
+  tide: Observation[],
+  end = still.at(-1)?.time ?? 0,
+): number {
+  const since = end - 366 * DAY_MS;
   const only = (i: number) =>
     still[i]!.time > since && tide[i]!.flag >= Flag.suspect && still[i]!.flag < Flag.suspect;
   let runs = 0;
