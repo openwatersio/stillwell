@@ -13,7 +13,7 @@ scripts/               ingest.ts, the weekly canary, the failure alerts, the TIC
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -193,6 +193,8 @@ Reads hourly values (the value within 10 minutes of each hour, `flag` good or pr
 
 Gauges whose daily mean follows river flow, a sluice or a canal's management (in the German Bight the Eider, the Kiel Canal, the Leda and the tidal Ems) step against every neighbor, so their steps need a look at the gauge before they count.
 
+The Monthly workflow's `cross-check` job runs the checks after each full refresh of the station lists, on the 2nd or dispatched with no `sources`, over this year and the five before in three regions: the German Bight (PEGELONLINE and GESLA), the US East Coast (CO-OPS and GESLA) and Sweden (SMHI and GESLA). Each region's report is in the run's summary and an artifact; a region that fails to read its values reports nothing, and its job can be rerun. Most GESLA records end between 2020 and 2025, so the window holds only their last years, and a station whose first datum epoch ended before the window, which is all the checks read, is listed rather than checked. Read it for findings not yet in an `errata.json`, check each against another record of the gauge or a neighbor before adding an erratum (see [Source errata](#source-errata)), and add a region as a matrix entry in `.github/workflows/monthly.yml`.
+
 ## Evaluations
 
 ```bash
@@ -241,7 +243,7 @@ When a source's job fails in two runs of either workflow on `main` in a row, dis
 
 ## Canary
 
-The Canary workflow runs `scripts/canary.ts` each Monday: one small request per adapter, through the adapter's own code and pacing, for a few days at a gauge that has run for years. It fails when an adapter returns no values, or when a response's shape (each JSON path and its types, or for BSH the code that starts each line) has lost a path or gained a type since the shape recorded in `src/sources/<source>/canary.json`. A field the source adds doesn't fail it, and neither does a null where the recording had a value or an object, or a value where it had only null. A source with no recording yet prints its shape and has only to return values. JMA is never recorded (`UNRECORDED`): its paths name the month and its plain text has no shape, so it has only to return values from both its provisional and final sets. USGS needs `USGS_API_KEY` as a repository secret, since the canary doesn't run in the `lake` environment, and is skipped without it. Once the adapter handles a change, check the new shape and record it:
+The Canary workflow runs `scripts/canary.ts` each Monday: one small request per adapter, through the adapter's own code and pacing, for a few days at a gauge that has run for years. It fails when an adapter returns no values, or when a response's shape (each JSON path and its types, or for BSH the code that starts each line) has lost a path or gained a type since the shape recorded in `src/sources/<source>/canary.json`. A field the source adds doesn't fail it, and neither does a null where the recording had a value or an object, or a value where it had only null. A source with no recording yet prints its shape and has only to return values. JMA is never recorded (`UNRECORDED`): its paths name the month and its plain text has no shape, so it has only to return values from both its provisional and final sets. The `kuestendaten` probe reads only kuestendaten.de's catalog, which lists every series on the portal, so it isn't recorded either; it fails when the catalog doesn't list a Hamburg Port Authority gauge's water-level file under the gauge's number in UTC+1, and when a file runs past `BACKFILLED_TO` in [kuestendaten.ts](src/sources/pegelonline/kuestendaten.ts): a new half-year to backfill, which stays red until the backfill runs and `BACKFILLED_TO` moves, so any other source's failure in those weeks shares the red run. USGS needs `USGS_API_KEY` as a repository secret, since the canary doesn't run in the `lake` environment, and is skipped without it. Once the adapter handles a change, check the new shape and record it:
 
 ```bash
 node scripts/canary.ts <source> --record

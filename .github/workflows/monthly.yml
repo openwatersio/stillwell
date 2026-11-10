@@ -1,8 +1,9 @@
 name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
-# rebuild stations.parquet, sources.json and errata.json, and keep the scheduled workflows
-# enabled. On the 9th, refetch every station's values that were still
+# rebuild stations.parquet, sources.json and errata.json, report the
+# cross-station checks, and keep the scheduled workflows enabled. On the 9th,
+# refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
 # replace them. Ingest hourly starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
@@ -263,6 +264,54 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+
+  # The cross-station checks (scripts/cross-check.ts) over each region's year
+  # so far and the five before: months one gauge holds another's data, clock errors and level
+  # steps that QC of one station at a time misses. Each region's report is in
+  # the job summary and an artifact, for a person to read and turn into errata
+  # (CONTRIBUTING.md). It reads the public bucket and changes nothing, so it
+  # needs no lake credentials or group. Only a full refresh runs it, once the
+  # station lists are published.
+  cross-check:
+    needs: [plan, publish]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.publish.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - region: German Bight
+            box: 53.2,6.5,55.3,9.2
+            sources: pegelonline,gesla
+          - region: US East Coast
+            box: 30,-82,45.5,-66
+            sources: coops,gesla
+          - region: Sweden
+            box: 55,10.5,66,24.5
+            sources: smhi,gesla
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - run: |
+          year=$(date -u +%Y)
+          node scripts/cross-check.ts "$BOX" $((year - 5)) $((year + 1)) "$SOURCES" > report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          BOX: ${{ matrix.box }}
+          SOURCES: ${{ matrix.sources }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: cross-check ${{ matrix.region }}
+          path: report.md
 
   # GitHub disables a public repo's scheduled workflows after 60 days without
   # a commit. Enabling a workflow through the API restarts that count, as the
