@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { fromSource, qc } from "../src/qc.ts";
 import { Flag } from "../src/schema.ts";
-import { DRAINS_RUNS, TIDE_M, drains, tidal } from "../src/tidal.ts";
+import { DRAINS_RUNS, TIDE_M, drains, tideOf } from "../src/tidal.ts";
+
+/** Whether a record carries a tide of `TIDE_M` or more. */
+const tidal = (record: Parameters<typeof tideOf>[0]) => (tideOf(record) ?? 0) >= TIDE_M;
 
 describe("tidal", () => {
   const HOUR = 3_600_000;

@@ -73,7 +73,7 @@ Every adapter implements one interface, so ingest, compaction, QC and the API ne
 
 ```ts
 interface Source {
-  metadata: SourceMetadata; // id, name, url, license, attribution, contact, terms, qc
+  metadata: SourceMetadata; // id, name, url, license, attribution, contact, terms
   stations(previous?: Station[]): Promise<ListedStation[]>; // datum null when the source didn't say; previous is the lake's list
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>; // RWS observed

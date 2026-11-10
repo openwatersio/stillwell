@@ -5,14 +5,17 @@ import { Flag, type LakeStation, type Observation, type Source, type Station } f
 import { DRAINS_RUNS, TIDE_M, drains, tideOf } from "../tidal.ts";
 import {
   exists,
+  listFiles,
+  listYears,
+  readJsonArray,
   readObservations,
   readRows,
   readStationBounds,
   writeJsonArray,
   writeRows,
 } from "./parquet.ts";
-import { analysisHistoryPath, analysisPath, boundsPath, seriesPath } from "./paths.ts";
-import { pool, qcFor } from "./recent.ts";
+import { analysisHistoryPath, analysisPath, boundsPath, seriesDir, seriesPath } from "./paths.ts";
+import { chunks, pool, qcFor } from "./recent.ts";
 
 /**
  * What the lake measures about each station from the values it holds, in
@@ -45,7 +48,10 @@ export interface Analysis {
   requalified: string | null;
 }
 
-/** The rules' version. Change it with any threshold below, so `analyze` judges every station again. */
+/**
+ * The rules' version. Change it with any threshold below or in `qcFor`, so
+ * `analyze` judges every station again and requalifies its stored years.
+ */
 export const RULES = "tidal-1";
 
 /** Days of the last year with values that a verdict needs. */
@@ -58,6 +64,9 @@ export const COVERED_DAYS = 30;
  * Colorado at Lees Ferry), and the tidal streams measured sit within 10 m.
  */
 export const ABOVE_SEA_M = 10;
+
+/** Stations `analyze` judges between writes. */
+const BATCH = 500;
 
 /** A verdict stands this long before `analyze` judges the station again. */
 const REJUDGE_MS = 365 * 86_400_000;
@@ -77,12 +86,22 @@ type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "requalified">;
  * tide, has 732 of them in its last year in GESLA. Null, where the values
  * can't say: under `COVERED_DAYS` days, or too coarse to fit. The flags start
  * over from the source's (`fromSource`), so the verdict doesn't depend on the
- * one QC used when they were written.
+ * one QC used when they were written, and `suspect`, the source's errata
+ * and adapter spans, are flagged as `requalify` flags them.
  */
-export function judge(source: Source, station: Station, rows: Observation[]): Verdict {
-  const start = fromSource(rows);
-  const still = qc(start, qcFor({ ...station, tidal: false }));
-  const tide = qc(start, qcFor({ ...station, tidal: true }));
+export function judge(
+  station: Station,
+  rows: Observation[],
+  suspect: [number, number][] = [],
+): Verdict {
+  // A suspect or bad value written before `source_flag` was kept may be QC's, so it can't start over; it's left out.
+  const start = fromSource(
+    rows.filter((r) => r.source_flag !== undefined || r.flag < Flag.suspect),
+    suspect,
+  );
+  const still = qc(start, { flatline_s: 48 * 3600, outliers: false });
+  // A tide gauge's flatline rule alone, so `drains` counts held levels, not outliers.
+  const tide = qc(start, { outliers: false });
   const flags = still.map((r) => r.flag);
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
@@ -176,6 +195,8 @@ export interface AnalysisReport {
   /** Stations whose QC options changed with their verdict, which need requalifying. */
   changed: { id: string; from: boolean | null; to: boolean | null; tide_m: number | null }[];
   failed: string[];
+  /** Stations judged with less than they should be, such as without their errata spans. */
+  warned: string[];
 }
 
 /**
@@ -208,56 +229,84 @@ export async function analyze(
     );
   });
   const next = new Map(previous);
-  const report: AnalysisReport = { judged: 0, changed: [], failed: [] };
-  await pool(due, options.concurrency ?? 8, async (station) => {
-    try {
-      const epoch = currentEpoch(station.epochs).id;
-      const year = new Date(bounds.get(station.id)!.last!).getUTCFullYear();
-      let rows: Observation[] = [];
-      for (const y of [year - 1, year])
-        rows = rows.concat(
-          await readObservations(seriesPath(lake, "levels", id, station.source_id, y, epoch)),
-        );
-      // A suspect or bad value written before `source_flag` was kept may be QC's, so its flags can't start over.
-      if (rows.some((r) => r.source_flag === undefined && r.flag >= Flag.suspect))
-        throw new Error("holds flags written before source_flag was kept; requalify it first");
-      const verdict = judge(source, station, rows);
-      const was = previous.get(station.id);
-      const from = was?.tidal ?? null;
-      const changed = !isDeepStrictEqual(
-        qcFor({ ...station, tidal: from }),
-        qcFor({ ...station, tidal: verdict.tidal }),
-      );
-      next.set(station.id, {
-        id: station.id,
-        analyzed: options.now.toISOString(),
-        rules: RULES,
-        ...verdict,
-        // A station whose QC is unchanged is as requalified as it was; a new one needs nothing.
-        requalified: changed ? null : was ? was.requalified : options.now.toISOString(),
-      });
-      report.judged++;
-      if (changed)
-        report.changed.push({ id: station.id, from, to: verdict.tidal, tide_m: verdict.tide_m });
-    } catch (error) {
-      report.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
-    }
-  });
+  const report: AnalysisReport = { judged: 0, changed: [], failed: [], warned: [] };
   const listed = new Set(stations.map((s) => s.id));
-  await writeAnalysis(
-    lake,
-    id,
-    [...next.values()].filter((a) => listed.has(a.id)),
-  );
+  // The history too, so a run stopped partway still says which stations it changed.
+  const save = async () => {
+    await writeAnalysis(
+      lake,
+      id,
+      [...next.values()].filter((a) => listed.has(a.id)),
+    );
+    if (report.changed.length)
+      await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
+        {
+          rules: RULES,
+          changed: [...report.changed].sort((a, b) => a.id.localeCompare(b.id)),
+        },
+      ]);
+  };
+  // Written every `BATCH` stations, so a run stopped partway keeps what it judged.
+  for (const batch of chunks(due, BATCH)) {
+    await pool(batch, options.concurrency ?? 8, async (station) => {
+      try {
+        const epoch = currentEpoch(station.epochs).id;
+        const year = new Date(bounds.get(station.id)!.last!).getUTCFullYear();
+        let rows: Observation[] = [];
+        for (const y of [year - 1, year])
+          rows = rows.concat(
+            await readObservations(seriesPath(lake, "levels", id, station.source_id, y, epoch)),
+          );
+        // The source's errata and adapter spans, from the epoch's whole record, as requalify reads it.
+        const dir = seriesDir(lake, "levels", id, station.source_id, epoch);
+        // One the adapter refuses, such as GESLA's for a record the lake holds only part of, is judged without them.
+        const spans =
+          (await source
+            .suspect?.(station, async function* () {
+              for (const y of [...(await listYears(dir))].sort((a, b) => a - b))
+                yield await readObservations(`${dir}/${y}.parquet`);
+            })
+            .catch((error: unknown) => {
+              report.warned.push(
+                `${station.id}: judged without its errata spans: ${error instanceof Error ? error.message : error}`,
+              );
+              return [];
+            })) ?? [];
+        const verdict = judge(station, rows, spans);
+        const was = previous.get(station.id);
+        report.judged++;
+        // Values that can't say, such as a new epoch's first weeks, don't undo a verdict.
+        if (verdict.tidal === null && was && was.tidal !== null) return;
+        const from = was?.tidal ?? null;
+        const changed = !isDeepStrictEqual(
+          qcFor({ ...station, tidal: from, tide_m: was?.tide_m ?? null }),
+          qcFor({ ...station, ...verdict }),
+        );
+        // A first verdict, or one under new rules, requalifies too: the stored years may be under rules no build has now.
+        const requalify = changed || !was || was.rules !== RULES;
+        next.set(station.id, {
+          id: station.id,
+          analyzed: options.now.toISOString(),
+          rules: RULES,
+          ...verdict,
+          requalified: requalify ? null : was!.requalified,
+        });
+        if (changed)
+          report.changed.push({ id: station.id, from, to: verdict.tidal, tide_m: verdict.tide_m });
+      } catch (error) {
+        report.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+      }
+    });
+    await save();
+  }
+  // Stations no longer listed leave even when none is due.
+  if (!due.length) await save();
   report.changed.sort((a, b) => a.id.localeCompare(b.id));
-  if (report.changed.length)
-    await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
-      { rules: RULES, changed: report.changed },
-    ]);
   return report;
 }
 
-function writeAnalysis(lake: string, source: string, rows: Analysis[]): Promise<void> {
+/** A source's analysis, `rows` sorted by ID. */
+export function writeAnalysis(lake: string, source: string, rows: Analysis[]): Promise<void> {
   return writeRows(
     analysisPath(lake, source),
     rows,
@@ -296,4 +345,37 @@ export async function markRequalified(
       done.has(a.id) ? { ...a, requalified: now.toISOString() } : a,
     ),
   );
+}
+
+/**
+ * Drop the stations `held` names from a source's analysis and its history,
+ * rewriting only a file that names one, as withholding needs. Returns the
+ * station IDs it dropped.
+ */
+export async function dropAnalysis(
+  lake: string,
+  source: string,
+  held: (station: string) => boolean,
+): Promise<string[]> {
+  const dropped = new Set<string>();
+  const analysis = await readAnalysis(lake, source);
+  const gone = [...analysis.keys()].filter(held);
+  if (gone.length) {
+    for (const station of gone) dropped.add(station);
+    await writeAnalysis(
+      lake,
+      source,
+      [...analysis.values()].filter((a) => !held(a.id)),
+    );
+  }
+  for (const file of await listFiles(analysisHistoryPath(lake, source, "*"))) {
+    const runs = ((await readJsonArray(file)) ?? []) as { changed: { id: string }[] }[];
+    if (!runs.some((r) => r.changed.some((c) => held(c.id)))) continue;
+    for (const r of runs) for (const c of r.changed) if (held(c.id)) dropped.add(c.id);
+    await writeJsonArray(
+      file,
+      runs.map((r) => ({ ...r, changed: r.changed.filter((c) => !held(c.id)) })),
+    );
+  }
+  return [...dropped].sort();
 }

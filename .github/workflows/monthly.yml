@@ -115,8 +115,9 @@ jobs:
       group: lake-${{ matrix.source }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    # CO-OPS's datums take up to 2 hours (refreshBudgetMs).
-    timeout-minutes: 180
+    # CO-OPS's datums take up to 2 hours (refreshBudgetMs), and analysis's
+    # requalify as long as it has stations pending.
+    timeout-minutes: 360
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
     permissions:
@@ -139,35 +140,14 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
-
-  # Each source's stations that are due judged from their levels in the lake
-  # (src/lake/analysis.ts), after its list so new stations are judged, and in
-  # its group, since a verdict that changes a station's QC requalifies its
-  # stored years. A run stopped partway leaves those stations pending for the
-  # next. Before publish, so stations.parquet carries the verdicts.
-  analyze:
-    needs: [plan, lists]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        source: ${{ fromJSON(needs.plan.outputs.sources) }}
-    concurrency:
-      group: lake-${{ matrix.source }}
-      cancel-in-progress: false
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    environment: lake
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .mise.toml
-          cache: npm
-      - run: npm ci
-      - run: node scripts/ingest.ts analyze "$SOURCE" --requalify --concurrency 8
+      # The stations that are due judged from their levels in the lake
+      # (src/lake/analysis.ts), after the list so new stations are judged too,
+      # and in this job so it keeps the source's group, since a verdict that
+      # changes a station's QC requalifies its stored years. It runs on the
+      # list the lake keeps when the refresh fails. A run stopped partway keeps
+      # what it judged, and leaves the rest pending for the next.
+      - if: ${{ !cancelled() }}
+        run: node scripts/ingest.ts analyze "$SOURCE" --requalify --concurrency 8
         env:
           SOURCE: ${{ matrix.source }}
           WATER_LEVELS_LAKE: s3://water-levels
@@ -177,7 +157,7 @@ jobs:
 
   # A source whose refresh or analysis failed kept its list and verdicts, so the rest still publish.
   publish:
-    needs: [plan, lists, analyze]
+    needs: [plan, lists]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
     # The group the Ingest workflow's `publish` runs take.
     concurrency:

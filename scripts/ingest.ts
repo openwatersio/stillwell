@@ -10,7 +10,7 @@
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
- *   node scripts/ingest.ts analyze <source> [--all] [--requalify]
+ *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -52,7 +52,8 @@
  * `analyze` judges the source's stations that are due from their levels in the
  * lake, such as whether they carry a tide, into stations/analysis/<source>.parquet
  * (src/lake/analysis.ts), `--all` every station, and lists the stations whose
- * QC that changes; `--requalify` requalifies them over every year.
+ * QC that changes; `--requalify` requalifies them, and every station after its
+ * first verdict, over every year, starting batches for `--budget` minutes.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -187,6 +188,7 @@ const { positionals, values } = parseArgs({
     "rebuild-years": { type: "boolean", default: false },
     all: { type: "boolean", default: false },
     requalify: { type: "boolean", default: false },
+    budget: { type: "string", default: "120" },
   },
 });
 const [command, ...args] = positionals;
@@ -845,7 +847,7 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(name: "concurrency" | "hours" | "keep-days"): number {
+function positive(name: "concurrency" | "hours" | "keep-days" | "budget"): number {
   const value = Number(values[name]);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
@@ -939,12 +941,13 @@ async function analyzeSource(sourceId: string): Promise<void> {
     concurrency: positive("concurrency"),
   });
   const lines = [
-    `analyze ${sourceId}: judged ${report.judged} stations, ${report.changed.length} change QC, ${report.failed.length} failed`,
+    `analyze ${sourceId}: judged ${report.judged} stations, ${report.changed.length} change QC, ${report.failed.length} failed, ${report.warned.length} with warnings`,
     ...report.changed.map(
       (c) =>
         `  ${c.id}: tidal ${c.from} → ${c.to}${c.tide_m === null ? "" : ` (M2 + O1 ${(c.tide_m * 100).toFixed(1)} cm)`}`,
     ),
     ...report.failed.map((f) => `  failed ${f}`),
+    ...report.warned.map((w) => `  warning ${w}`),
   ];
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -954,8 +957,17 @@ async function analyzeSource(sourceId: string): Promise<void> {
   // Every year of every epoch, since a station's verdict holds for its whole
   // record; a batch at a time, each marked once done, so a run stopped partway
   // leaves the rest pending for the next.
-  const waiting = pending(await readAnalysis(lake, sourceId));
+  const listed = new Set(list.map((s) => s.id));
+  const waiting = pending(await readAnalysis(lake, sourceId)).filter((id) => listed.has(id));
+  // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
+  const until = Date.now() + positive("budget") * 60_000;
   for (const batch of chunks(waiting, 100)) {
+    if (Date.now() > until) {
+      console.log(
+        `analyze ${sourceId}: out of time, ${waiting.length - waiting.indexOf(batch[0]!)} stations left pending`,
+      );
+      break;
+    }
     const summary = await requalifyStations(sourceId, batch.join(","), 0, 10_000);
     // A failure that names no station, such as the years file's, may have skipped any of them.
     const failed = new Set(summary.failed.map((f) => f.split(": ")[0]));
@@ -1001,7 +1013,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

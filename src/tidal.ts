@@ -37,11 +37,6 @@ export function tideOf(record: {
     .reduce((sum, c) => sum + c.amplitude, 0);
 }
 
-/** Whether a record carries a tide of `TIDE_M` or more (`tideOf`). */
-export function tidal(record: Parameters<typeof tideOf>[0]): boolean {
-  return (tideOf(record) ?? 0) >= TIDE_M;
-}
-
 /**
  * Runs of the last year that a tide gauge's flatline limit flags and a still
  * water's two days don't, from the same values QC'd both ways. Water the tide

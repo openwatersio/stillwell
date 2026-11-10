@@ -300,7 +300,7 @@ export async function publishStations(
 
 /**
  * Metadata that is ingest's business, not part of a source's terms, so
- * `sources.json` leaves it out: QC settings, offsets, the archive's reference,
+ * `sources.json` leaves it out: offsets, the archive's reference,
  * and which scheduled jobs run for the source. `finalizes` stays in, since it
  * tells a reader whether the source's `preliminary` values will ever change.
  */

@@ -11,6 +11,7 @@ import {
   pending,
   readAnalysis,
   withAnalysis,
+  writeAnalysis,
 } from "../src/lake/analysis.ts";
 import { readJsonArray, writeObservations, writeStationBounds } from "../src/lake/parquet.ts";
 import { analysisHistoryPath, seriesPath } from "../src/lake/paths.ts";
@@ -51,18 +52,18 @@ const pooled = (h: number) =>
 
 describe("judge", () => {
   it("finds a tidal river, and a pooled one", () => {
-    const tidal = judge(source, river("1"), series(90, tide(0.5)));
+    const tidal = judge(river("1"), series(90, tide(0.5)));
     assert.equal(tidal.tidal, true);
     assert.ok(Math.abs(tidal.tide_m! - 0.5) < 0.05);
     assert.equal(tidal.days, 90);
-    assert.equal(judge(source, river("2"), series(90, pooled)).tidal, false);
+    assert.equal(judge(river("2"), series(90, pooled)).tidal, false);
   });
 
   it("can't say under 30 days, and keeps out water high above the sea", () => {
-    assert.equal(judge(source, river("1"), series(20, tide(0.5))).tidal, null);
+    assert.equal(judge(river("1"), series(20, tide(0.5))).tidal, null);
     // A gage whose zero is 600 m up, as at a mountain tailwater.
     const high = river("3", { datum: "GAGE", datums: { NAVD88: 600 } });
-    const verdict = judge(source, high, series(90, tide(TIDE_M * 2)));
+    const verdict = judge(high, series(90, tide(TIDE_M * 2)));
     assert.equal(verdict.tidal, false);
     assert.ok(verdict.tide_m! >= TIDE_M);
   });
@@ -70,25 +71,45 @@ describe("judge", () => {
   it("leaves water that drains between tides still", () => {
     // Held at its low level for 8 hours every week: a creek drained to a sill.
     const level = (h: number) => (h % 168 < 8 ? -0.5 : tide(0.5)(h));
-    const verdict = judge(source, river("4"), series(90, level));
+    const verdict = judge(river("4"), series(90, level));
     assert.ok(verdict.drains! > DRAINS_RUNS);
     assert.equal(verdict.tidal, false);
     // On the coast those runs are a stuck or dry gauge, for QC to flag, not still water.
-    const coast = judge(source, river("5", { kind: "coastal" }), series(90, level));
+    const coast = judge(river("5", { kind: "coastal" }), series(90, level));
     assert.equal(coast.tidal, true);
+  });
+
+  it("counts held levels, not outliers, against a tide", () => {
+    // An estuary's week-long surge of 1.06 m on a 10 cm tide: its high waters cross the
+    // outlier rule's line, about 1.05 m, and its low waters don't, 14 times.
+    const surge = (h: number) => tide(0.1)(h) + (h > 1000 && h < 1168 ? 1.06 : 0);
+    const verdict = judge(river("6", { kind: "estuary" }), series(90, surge));
+    assert.equal(verdict.drains, 0);
+    assert.equal(verdict.tidal, true);
   });
 });
 
 describe("qcFor", () => {
-  it("gives a tidal river a tide gauge's flatline limit, and other rivers two days", () => {
-    const tidal = qcFor(river("1", { tidal: true }));
-    const pooled = qcFor(river("2", { tidal: false }));
-    const unknown = qcFor(river("3", { tidal: null }));
-    assert.equal(tidal.flatline_s, undefined);
-    assert.equal(tidal.centimeter_flatline_s, 48 * 3600);
-    assert.equal(pooled.flatline_s, 48 * 3600);
-    assert.deepEqual(unknown, pooled);
-    assert.equal(tidal.outliers, false);
+  it("gives tidal water six hours and still water two days, by verdict, then by kind", () => {
+    const still = { flatline_s: 48 * 3600, outliers: false };
+    assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), { outliers: false });
+    assert.deepEqual(qcFor(river("2", { tidal: false })), still);
+    // A tide under 30 cm can sit on one centimeter for hours; a larger one can't.
+    assert.equal(qcFor(river("3", { tidal: true, tide_m: 0.09 })).centimeter_flatline_s, 48 * 3600);
+    // A tidal river floods, so only it and a lake drop the outlier check.
+    assert.deepEqual(qcFor({ kind: "coastal", tidal: true, tide_m: 1 }), {});
+    assert.deepEqual(qcFor({ kind: "estuary", tidal: true, tide_m: 1 }), {});
+    assert.deepEqual(qcFor({ kind: null, tidal: true, tide_m: 1 }), {});
+    // A sea without a tide holds a centimeter for a day, but not a millimeter.
+    assert.deepEqual(qcFor({ kind: "coastal", tidal: false }), {
+      centimeter_flatline_s: 48 * 3600,
+      outliers: false,
+    });
+    // With no verdict: coastal and estuary water as tidal, a river, a lake or water of no kind as still.
+    assert.deepEqual(qcFor({ kind: "coastal", tidal: null }), {});
+    assert.deepEqual(qcFor({ kind: "estuary", tidal: null }), {});
+    assert.deepEqual(qcFor(river("4", { tidal: null })), still);
+    assert.deepEqual(qcFor({ kind: null, tidal: null }), still);
   });
 });
 
@@ -116,7 +137,7 @@ describe("analyze", () => {
     const report = await analyze(lake, source, stations, { now });
     assert.equal(report.judged, 2);
     assert.deepEqual(report.failed, []);
-    // A pooled river was already judged still with no verdict, so only the tidal one changes QC.
+    // A river with no verdict is judged still, so only the tidal one changes its rules.
     assert.deepEqual(
       report.changed.map((c) => [c.id, c.from, c.to]),
       [["test/1", null, true]],
@@ -130,9 +151,9 @@ describe("analyze", () => {
     assert.deepEqual(history, [{ rules: RULES, changed: report.changed }]);
     const [first] = await withAnalysis(lake, "test", stations);
     assert.equal(first!.tidal, true);
-    // The tidal river waits for requalify; the pooled one's QC didn't change.
-    assert.deepEqual(pending(analysis), ["test/1"]);
-    await markRequalified(lake, "test", ["test/1"], now);
+    // Both wait for requalify: their stored years may be under rules no build has now.
+    assert.deepEqual(pending(analysis), ["test/1", "test/2"]);
+    await markRequalified(lake, "test", ["test/1", "test/2"], now);
     assert.deepEqual(pending(await readAnalysis(lake, "test")), []);
 
     // A month later nothing is due.
@@ -143,5 +164,65 @@ describe("analyze", () => {
     const all = await analyze(lake, source, stations, { now, all: true });
     assert.equal(all.judged, 2);
     assert.deepEqual(all.changed, []);
+    assert.deepEqual(pending(await readAnalysis(lake, "test")), []);
+    // New rules requalify every station, though no verdict changes.
+    const rules = await readAnalysis(lake, "test");
+    await writeAnalysis(
+      lake,
+      "test",
+      [...rules.values()].map((a) => ({ ...a, rules: "older" })),
+    );
+    const rejudged = await analyze(lake, source, stations, { now });
+    assert.deepEqual(rejudged.changed, []);
+    assert.deepEqual(pending(await readAnalysis(lake, "test")), ["test/1", "test/2"]);
+  });
+
+  it("judges a station without the errata spans its adapter refuses, with a warning", async () => {
+    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    await writeObservations(
+      seriesPath(lake, "levels", "test", "1", 2026),
+      series(90, tide(0.5)),
+      "NAVD88",
+    );
+    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+      { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
+    ]);
+    const refusing = {
+      ...source,
+      suspect: async () => {
+        throw new Error("not its whole record");
+      },
+    } as Source;
+    const report = await analyze(lake, refusing, [river("1")], {
+      now: new Date(Date.UTC(2026, 3, 1)),
+    });
+    assert.deepEqual(report.failed, []);
+    assert.equal(report.warned.length, 1);
+    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.tidal, true);
+  });
+
+  it("keeps a verdict its latest values can't give, and leaves out flags it can't start over", async () => {
+    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    const stations = [river("1")];
+    const path = seriesPath(lake, "levels", "test", "1", 2026);
+    // A suspect value from before source_flag was kept.
+    const rows = series(90, tide(0.5));
+    rows[100] = { time: rows[100]!.time, level: 9, flag: Flag.suspect };
+    await writeObservations(path, rows, "NAVD88");
+    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+      { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
+    ]);
+    const now = new Date(Date.UTC(2026, 3, 1));
+    const first = await analyze(lake, source, stations, { now });
+    assert.deepEqual(first.failed, []);
+    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.tidal, true);
+    // A year later its values span 20 days, too few to say.
+    await writeObservations(path, series(20, tide(0.5)), "NAVD88");
+    const later = await analyze(lake, source, stations, { now: new Date(Date.UTC(2027, 3, 2)) });
+    assert.equal(later.judged, 1);
+    assert.deepEqual(later.changed, []);
+    const kept = (await readAnalysis(lake, "test")).get("test/1")!;
+    assert.equal(kept.tidal, true);
+    assert.equal(kept.analyzed, now.toISOString());
   });
 });

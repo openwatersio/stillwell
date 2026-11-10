@@ -114,8 +114,8 @@ describe("requalify", () => {
     await writeObservations(path(2024), strict, "NAP");
     assert.equal(strict.filter((r) => r.flag === Flag.suspect).length, 10);
 
-    // Still water gets 48 hours.
-    const pooled = { ...station, tidal: false };
+    // A pooled river gets 48 hours.
+    const pooled = { ...station, kind: "river" as const, tidal: false };
     assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 1, changed: 9 });
     const after = await readObservations(path(2024));
     assert.deepEqual(
@@ -163,9 +163,9 @@ describe("updateRecent", () => {
     const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
     const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
-    const window = withSourceFlag(hourly(NOW - 72 * HOUR, NOW - HOUR));
-    // The source said good; an earlier rule marked it suspect, past the longest flatline rule's 48 hours.
-    window[50]!.flag = Flag.suspect;
+    const window = withSourceFlag(hourly(NOW - 48 * HOUR, NOW - HOUR));
+    // The source said good; an earlier rule marked it suspect.
+    window[10]!.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
       source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
@@ -175,7 +175,7 @@ describe("updateRecent", () => {
       now: NOW,
     });
     const after = await readRecent(path);
-    assert.equal(after.find((r) => r.time === window[50]!.time)!.flag, Flag.good);
+    assert.equal(after.find((r) => r.time === window[10]!.time)!.flag, Flag.good);
   });
 
   it("keeps a mark within a flatline's length of the window's start, where a run can't be seen whole", async () => {
@@ -301,7 +301,8 @@ describe("updateRecent with a whole-centimeter flatline rule", () => {
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
       source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
-      stations: [station],
+      // A small tide, which gets the whole-centimeter rule.
+      stations: [{ ...station, tidal: true, tide_m: 0.1 }],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
