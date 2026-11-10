@@ -27,6 +27,7 @@ import * as jma from "../src/sources/jma/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
+import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as sfwmd from "../src/sources/sfwmd/index.ts";
@@ -93,6 +94,15 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   kartverket: () => kartverket.levels("VAW", start, end),
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
+  // Hamburg Port Authority's files on kuestendaten.de, which a backfill reads
+  // only after each half-year update: the catalog alone, not the 60 MB zips.
+  kuestendaten: async () => {
+    const entries = await kuestendaten.catalog();
+    // A new half-year's files fail the run, so its email reaches someone.
+    const update = kuestendaten.update(entries);
+    if (update) throw new Error(update);
+    return entries;
+  },
   // Cuxhaven Steubenhöft.
   pegelonline: () => pegelonline.levels("5990020", start, end),
   // Brest: three days of raw values, and three of validated ones a year back.
@@ -152,10 +162,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 };
 
 /**
- * Sources whose request paths change, so a recording would fail the next one:
- * JMA's name the month, and GESLA's iCloud links are signed anew every 15 minutes.
+ * Sources never recorded. JMA's and GESLA's request paths change, so a
+ * recording would fail the next one: JMA's name the month, and GESLA's iCloud
+ * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
+ * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["gesla", "jma"]);
+const UNRECORDED = new Set(["gesla", "jma", "kuestendaten"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
@@ -181,7 +193,7 @@ for (const id of named.length ? named : Object.keys(probes)) {
     if (record) {
       if (!values.length) throw new Error("no values, so nothing to record");
       if (UNRECORDED.has(id)) {
-        console.log(`${id}: not recorded; its paths change from run to run`);
+        console.log(`${id}: not recorded; it is in UNRECORDED`);
         continue;
       }
       writeFileSync(file, `${JSON.stringify(live, null, 2)}\n`);
