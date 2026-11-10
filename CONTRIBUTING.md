@@ -13,7 +13,7 @@ scripts/               ingest.ts, the weekly canary, the failure alerts, the TIC
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the lake's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -186,6 +186,8 @@ Reads hourly values (the value within 10 minutes of each hour, `flag` good or pr
 - **Level steps.** Daily means from 20 or more hours, each station less its 4 nearest gauges within 150 km, and a step where the medians of the 30 daily values either side, spanning at most 120 days, differ by 8 cm or more and by three times the spread of the values about them. A step counts for the station when two or more neighbors show it within 5 days with the same sign, and more of them do than don't among those with the values to show it. Stations with fewer than 2 such gauges are listed and skipped.
 
 Gauges whose daily mean follows river flow, a sluice or a canal's management (in the German Bight the Eider, the Kiel Canal, the Leda and the tidal Ems) step against every neighbor, so their steps need a look at the gauge before they count.
+
+The Monthly workflow's `cross-check` job runs the checks after each full refresh of the station lists, on the 2nd or dispatched with no `sources`, over this year and the five before in three regions: the German Bight (PEGELONLINE and GESLA), the US East Coast (CO-OPS and GESLA) and Sweden (SMHI and GESLA). Each region's report is in the run's summary and an artifact; a region that fails to read its values reports nothing, and its job can be rerun. Most GESLA records end between 2020 and 2025, so the window holds only their last years, and a station whose first datum epoch ended before the window, which is all the checks read, is listed rather than checked. Read it for findings not yet in an `errata.json`, check each against another record of the gauge or a neighbor before adding an erratum (see [Source errata](#source-errata)), and add a region as a matrix entry in `.github/workflows/monthly.yml`.
 
 ## Evaluations
 
