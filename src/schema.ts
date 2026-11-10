@@ -92,6 +92,16 @@ export interface Station {
    * than stated by the source: true or false with a date, null without one.
    */
   source_qc_start_inferred?: boolean | null;
+  /**
+   * Whether the station's levels carry a tide, measured from its last year in
+   * the lake (`stations/analysis/<source>.parquet`, `src/lake/analysis.ts`):
+   * null where they can't say, or before its first analysis. QC's flatline
+   * and outlier rules follow it (`qcFor`). Set as `stations.parquet` is built
+   * and as ingest reads a list, never by an adapter.
+   */
+  tidal?: boolean | null;
+  /** The lunar tide `tidal` is judged by, M2's and O1's amplitudes added, in meters. */
+  tide_m?: number | null;
   /** How often the source lets us ask for this station, in seconds. */
   min_interval_s: number | null;
   source_url: string | null;
@@ -274,12 +284,6 @@ export interface Source {
     station: Station,
     record: () => AsyncIterable<Observation[]>,
   ): Promise<[number, number][]>;
-  /**
-   * Whether a `river` or `lake` station's levels carry a tide, so a flatline
-   * there is suspect as soon as at a tide gauge (`qcFor` in
-   * `src/lake/recent.ts`).
-   */
-  tidal?(station: Station): boolean;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
   /** The source's own predicted curve over [start, end). */

@@ -795,7 +795,7 @@ export async function refuseOtherDatum(
  */
 export function qcFor(source: Source, station: Station): QcOptions {
   const still = station.kind === "river" || station.kind === "lake";
-  const tidal = still && source.tidal?.(station);
+  const tidal = still && station.tidal === true;
   return {
     ...source.metadata.qc,
     ...(still ? { outliers: false } : {}),

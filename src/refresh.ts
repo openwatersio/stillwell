@@ -35,6 +35,7 @@ import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
 import { usableShares, writeYears } from "./lake/years.ts";
+import { readAnalysis, withAnalysis } from "./lake/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 import {
   dropWithheldRows,
@@ -254,7 +255,15 @@ export async function publishStations(
     }
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
-    stations.push(...withoutWithheld(source, list).map((s) => ({ ...s, ...bounds.get(s.id) })));
+    const analysis = await readAnalysis(lake, source.metadata.id);
+    stations.push(
+      ...withoutWithheld(source, list).map((s) => ({
+        ...s,
+        ...bounds.get(s.id),
+        tidal: analysis.get(s.id)?.tidal ?? null,
+        tide_m: analysis.get(s.id)?.tide_m ?? null,
+      })),
+    );
     // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
     const shares = await usableShares(lake, source.metadata.id).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
@@ -297,7 +306,7 @@ export async function publishStations(
  */
 const INGEST_ONLY = new Set(["qc", "utc_offsets", "archive", "hourly", "empty_means_none"]);
 
-/** A source's list from the lake, or an error naming what to run. */
+/** A source's list from the lake, with each station's analysis (`withAnalysis`), or an error naming what to run. */
 export async function listOf(lake: string, source: Source): Promise<LakeStation[]> {
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
@@ -306,7 +315,7 @@ export async function listOf(lake: string, source: Source): Promise<LakeStation[
     throw new Error(
       `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
     );
-  return withoutWithheld(source, list);
+  return withAnalysis(lake, sourceId, withoutWithheld(source, list));
 }
 
 /** A list without withheld stations, which one not refreshed since they were withheld still has. */
@@ -315,14 +324,14 @@ export function withoutWithheld(source: Source, list: LakeStation[]): LakeStatio
 }
 
 /**
- * A source's list from the lake, or null for a source whose list was never
+ * A source's list from the lake, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
  * existed and is gone, or series with no list, are still errors.
  */
 export async function startedListOf(lake: string, source: Source): Promise<LakeStation[] | null> {
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(lake, sourceId));
-  if (list) return withoutWithheld(source, list);
+  if (list) return withAnalysis(lake, sourceId, withoutWithheld(source, list));
   if (await hasHistory(lake, sourceId)) throw new Error(lostList(lake, sourceId));
   // The refresh refuses such a lake too, so waiting for it would wait for good.
   if (await hasSeries(lake, sourceId))

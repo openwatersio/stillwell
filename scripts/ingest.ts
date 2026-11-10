@@ -10,6 +10,7 @@
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
+ *   node scripts/ingest.ts analyze <source> [--all] [--requalify]
  *
  * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
@@ -48,6 +49,10 @@
  * (src/withhold.ts); the source's next refresh drops them from its list.
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
  * which backfill, compaction and requalify then keep (src/lake/years.ts).
+ * `analyze` judges the source's stations that are due from their levels in the
+ * lake, such as whether they carry a tide, into stations/analysis/<source>.parquet
+ * (src/lake/analysis.ts), `--all` every station, and lists the stations whose
+ * QC that changes; `--requalify` requalifies them over every year.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -107,6 +112,7 @@ import {
 } from "../src/lake/parquet.ts";
 import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
+import { analyze } from "../src/lake/analysis.ts";
 import { boundsPath, seriesDir, seriesPath, stationsPath, yearsPath } from "../src/lake/paths.ts";
 import {
   describeReport,
@@ -179,6 +185,8 @@ const { positionals, values } = parseArgs({
     "skip-unscreened": { type: "boolean", default: false },
     "rebuild-bounds": { type: "boolean", default: false },
     "rebuild-years": { type: "boolean", default: false },
+    all: { type: "boolean", default: false },
+    requalify: { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -234,6 +242,12 @@ switch (command) {
     console.log(`${source}: read ${years!.read} year files into ${yearsPath(lake, source)}`);
     for (const file of years!.failed) console.error(`  can't read ${file}`);
     if (years!.failed.length) process.exitCode = 1;
+    break;
+  }
+  case "analyze": {
+    const [source] = args;
+    if (!source) usage();
+    await analyzeSource(source);
     break;
   }
   default:
@@ -913,6 +927,33 @@ async function requalifyStations(
   if (summary.failed.length) process.exitCode = 1;
 }
 
+async function analyzeSource(sourceId: string): Promise<void> {
+  const source = sourceOf(sourceId);
+  const lake = lakeOfSource(source.metadata);
+  const list = await listOf(lake, source);
+  setConnections(positive("concurrency"));
+  const report = await analyze(lake, source, list, {
+    now: new Date(),
+    all: values.all,
+    concurrency: positive("concurrency"),
+  });
+  const lines = [
+    `analyze ${sourceId}: judged ${report.judged} stations, ${report.changed.length} change QC, ${report.failed.length} failed`,
+    ...report.changed.map(
+      (c) =>
+        `  ${c.id}: tidal ${c.from} → ${c.to}${c.tide_m === null ? "" : ` (M2 + O1 ${(c.tide_m * 100).toFixed(1)} cm)`}`,
+    ),
+    ...report.failed.map((f) => `  failed ${f}`),
+  ];
+  for (const line of lines) console.log(line);
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+  if (report.failed.length) process.exitCode = 1;
+  // Every year of every epoch, since a station's verdict holds for its whole record.
+  if (values.requalify && report.changed.length)
+    await requalifyStations(sourceId, report.changed.map((c) => c.id).join(","), 0, 10_000);
+}
+
 async function withholdStations(sourceId: string): Promise<void> {
   const source = sourceOf(sourceId);
   const lake = lakeOfSource(source.metadata);
@@ -945,7 +986,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify]",
   );
   process.exit(1);
 }
