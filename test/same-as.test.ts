@@ -229,6 +229,109 @@ describe("linkGauges's limits", () => {
     }
   });
 
+  it("links the records of one gauge the cross-station checks found", () => {
+    const list = [
+      station("gesla/delfzijl-del-nld-rws", { name: "Delfzijl", lat: 53.328, lon: 6.931 }),
+      station("gesla/delfzijl-delfzl-nld-rws_hist", {
+        name: "Delfzijl",
+        lat: 53.326353,
+        lon: 6.933123,
+      }),
+      station("gesla/delfzijltg-del-nld-cmems", { name: "DelfzijlTG", lat: 53.330002, lon: 6.934 }),
+      station("gesla/eemshaven_haven-eem-nld-rws", {
+        name: "Eemshaven haven",
+        lat: 53.448702,
+        lon: 6.828392,
+      }),
+      station("gesla/eemshaventg-eem-nld-cmems", {
+        name: "EemshavenTG",
+        lat: 53.463242,
+        lon: 6.8389502,
+      }),
+      station("gesla/eemshaven_waddenzee-eem-nld-rws", {
+        name: "Eemshaven Waddenzee",
+        lat: 53.474392,
+        lon: 6.821731,
+      }),
+      station("gesla/eemsmeetpaaltg-eem-nld-cmems", {
+        name: "EemsMeetpaalTG",
+        lat: 53.475536,
+        lon: 6.8223701,
+      }),
+      station("gesla/eidersptg-eid-deu-cmems", { name: "EiderSPTG", lat: 54.265999, lon: 8.842 }),
+      station("pegelonline/9530010", { name: "EIDER-SPERRWERK AP", lat: 54.265924, lon: 8.84213 }),
+      station("gesla/degerby-deg-fin-cmems", { name: "Degerby", lat: 60.031898, lon: 20.3848 }),
+      station("gesla/foglo_degerby-134252-fin-fmi", {
+        name: "Foglo Degerby",
+        lat: 60.03,
+        lon: 20.38,
+      }),
+    ];
+    const pairs = (linked: Station[]) =>
+      linked.flatMap((s) => s.same_as.filter((o) => s.id < o).map((o) => `${s.id}~${o}`));
+    const ids = new Set(list.map((s) => s.id));
+    const ours = DECISIONS.filter((d) => ids.has(d.a) && ids.has(d.b));
+    assert.equal(ours.length, 6);
+    // Only the decisions link them: no rule links one source's own records, or these names.
+    assert.deepEqual(pairs(linkGauges(list, NOW).stations), []);
+    LINKS.push(...ours);
+    try {
+      const { stations, report } = linkGauges(list, NOW);
+      const group = (id: string) => [id, ...stations.find((s) => s.id === id)!.same_as].sort();
+      assert.deepEqual(group("gesla/delfzijltg-del-nld-cmems"), [
+        "gesla/delfzijl-del-nld-rws",
+        "gesla/delfzijl-delfzl-nld-rws_hist",
+        "gesla/delfzijltg-del-nld-cmems",
+      ]);
+      assert.ok(
+        group("gesla/eemshaventg-eem-nld-cmems").includes("gesla/eemshaven_haven-eem-nld-rws"),
+      );
+      assert.ok(
+        group("gesla/eemsmeetpaaltg-eem-nld-cmems").includes(
+          "gesla/eemshaven_waddenzee-eem-nld-rws",
+        ),
+      );
+      assert.ok(group("gesla/eidersptg-eid-deu-cmems").includes("pegelonline/9530010"));
+      assert.ok(
+        group("gesla/degerby-deg-fin-cmems").includes("gesla/foglo_degerby-134252-fin-fmi"),
+      );
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
+  it("links BODC's Portbury to the EA's Avonmouth Portbury and prefers the EA's readings", () => {
+    const list = [
+      // A longer record than the EA's, but every value flagged.
+      station("bodc/ptb", {
+        name: "Portbury",
+        lat: 51.4992,
+        lon: -2.727,
+        first: "2022-04-01T00:00:00Z",
+        last: "2026-10-31T00:00:00Z",
+      }),
+      station("ea/E72624", {
+        name: "Avonmouth Portbury",
+        lat: 51.50291,
+        lon: -2.6988,
+        first: "2025-11-01T00:00:00Z",
+        last: "2026-10-31T00:00:00Z",
+      }),
+    ];
+    assert.deepEqual(linkGauges(list, NOW).stations[0]!.same_as, []);
+    LINKS.push(...DECISIONS.filter((d) => d.a === "bodc/ptb"));
+    try {
+      assert.equal(linkGauges(list, NOW).stations[0]!.preferred, "bodc/ptb");
+      const { stations, report } = linkGauges(list, NOW, new Map([["bodc/ptb", 0]]));
+      assert.deepEqual(stations[0]!.same_as, ["ea/E72624"]);
+      assert.equal(stations[0]!.preferred, "ea/E72624");
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
   it("reports a person's decision that names no station", () => {
     LINKS.push({ a: "a/1", b: "gone/1", note: "test" });
     PREFER["gone/2"] = "test";

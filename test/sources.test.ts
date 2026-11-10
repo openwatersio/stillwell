@@ -736,6 +736,63 @@ describe("pegelonline kuestendaten", () => {
     assert.ok(started[1]! - started[0]! >= 45, `${started[1]! - started[0]!} ms apart`);
   });
 
+  it("finds each gauge's file in the catalog, and fails on one it lacks", async () => {
+    const entries = Object.entries(kuestendaten.GAUGES).map(([number, name]) => ({
+      zipFileName: `${name}!Wasserstand (PNP).zip`,
+      Messstellennummer: number,
+      Zeitzone: "Mitteleuropäische Zeit (MEZ, engl. Central European Time, CET, UTC+1)",
+      aufnahmeEnde: kuestendaten.BACKFILLED_TO,
+      aktualisiert: "2026-10-19 05:20:17",
+    }));
+    let catalog = entries;
+    setTransport(async (url) => {
+      assert.match(url, /wiski\/WISKI_datenDownload\.json$/);
+      return JSON.stringify(catalog);
+    });
+    assert.equal((await kuestendaten.catalog()).length, 6);
+    catalog = entries.map((e) =>
+      e.Messstellennummer === "5952060"
+        ? { ...e, zipFileName: "SEEMANNSHOFT!Wasserstand (PNP).zip" }
+        : e,
+    );
+    await assert.rejects(kuestendaten.catalog(), /for SEEMANNSHOEFT \(5952060\)$/);
+    catalog = entries.map((e) =>
+      e.Messstellennummer === "5952060" ? { ...e, Messstellennummer: "5952061" } : e,
+    );
+    await assert.rejects(kuestendaten.catalog(), /for SEEMANNSHOEFT \(5952060\)$/);
+    catalog = entries.map((e) => ({ ...e, Zeitzone: "UTC" }));
+    await assert.rejects(kuestendaten.catalog(), /BUNTHAUS \(5952020\), .* BLANKENESE_UF/);
+  });
+
+  it("says why the canary fails on files past the last backfill", async () => {
+    const entries = Object.entries(kuestendaten.GAUGES).map(([number, name]) => ({
+      zipFileName: `${name}!Wasserstand (PNP).zip`,
+      Messstellennummer: number,
+      Zeitzone: "Mitteleuropäische Zeit (MEZ, engl. Central European Time, CET, UTC+1)",
+      aufnahmeEnde: kuestendaten.BACKFILLED_TO,
+      aktualisiert: "2026-10-19 05:20:17",
+    }));
+    assert.equal(kuestendaten.update(entries), undefined);
+    // Past any BACKFILLED_TO, so the test outlives each bump.
+    entries[0]!.aufnahmeEnde = "9999-12-31 23:59:00";
+    const note = kuestendaten.update(entries);
+    assert.match(
+      note!,
+      /BUNTHAUS!Wasserstand \(PNP\)\.zip to 9999-12-31 23:59:00, published 2026-10-19/,
+    );
+    assert.match(note!, /issues\/125, then bump BACKFILLED_TO/);
+    assert.match(note!, /Wait for HAMBURG-HARBURG!.*BLANKENESE_UF!Wasserstand \(PNP\)\.zip too/);
+    for (const e of entries) e.aufnahmeEnde = "9999-12-31 23:59:00";
+    assert.doesNotMatch(kuestendaten.update(entries)!, /Wait for/);
+    // An end the catalog writes another way fails the check rather than miscompare.
+    setTransport(async () =>
+      JSON.stringify(entries.map((e) => ({ ...e, aufnahmeEnde: "31.12.2026" }))),
+    );
+    await assert.rejects(kuestendaten.catalog(), /with their end, for BUNTHAUS/);
+    setTransport(async () => JSON.stringify({ entries }));
+    await assert.rejects(kuestendaten.catalog(), /isn't a list/);
+  });
+
   it("lists HPA's gauges with history from 1999-11-01 and HPA's credit", async () => {
     const [first] = JSON.parse(fixture("pegelonline-stations.json"));
     serve([

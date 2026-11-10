@@ -34,7 +34,7 @@ import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
-import { writeYears } from "./lake/years.ts";
+import { usableShares, writeYears } from "./lake/years.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 import {
   dropWithheldRows,
@@ -225,7 +225,7 @@ async function renumberAboveFiles(
 
 /**
  * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `lake` from the lists of
- * `all`, the sources it holds, and their bounds. A source in `expected` that
+ * `all`, the sources it holds, their bounds, and their years files' flag counts for `rank`. A source in `expected` that
  * has no list, because it went missing, stops the rebuild, which would
  * otherwise drop its stations from what the lake publishes; it returns the
  * missing ones. A source in neither is new, and
@@ -245,6 +245,7 @@ export async function publishStations(
   const stations: LakeStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
+  const usable = new Map<string, number>();
   for (const source of all) {
     const list = await readStationList(stationListPath(lake, source.metadata.id));
     if (!list) {
@@ -254,9 +255,15 @@ export async function publishStations(
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
     stations.push(...withoutWithheld(source, list).map((s) => ({ ...s, ...bounds.get(s.id) })));
+    // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
+    const shares = await usableShares(lake, source.metadata.id).catch((error: unknown) => {
+      console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
+      return new Map<string, number>();
+    });
+    for (const [id, share] of shares) usable.set(id, share);
   }
   if (missing.length || !listed.length) return { missing };
-  const { stations: linked, report } = linkGauges(stations);
+  const { stations: linked, report } = linkGauges(stations, new Date(), usable);
   for (const station of linked) station.errata = errataOf(station, errata);
   await writeStations(stationsPath(lake), linked);
   await writeJsonArray(
