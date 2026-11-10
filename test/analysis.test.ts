@@ -105,11 +105,11 @@ describe("qcFor", () => {
       centimeter_flatline_s: 48 * 3600,
       outliers: false,
     });
-    // With no verdict: coastal and estuary water as tidal, a river, a lake or water of no kind as still.
+    // With no verdict: a river or lake as still, anything else, water of no kind included, as tidal.
     assert.deepEqual(qcFor({ kind: "coastal", tidal: null }), {});
     assert.deepEqual(qcFor({ kind: "estuary", tidal: null }), {});
+    assert.deepEqual(qcFor({ kind: null, tidal: null }), {});
     assert.deepEqual(qcFor(river("4", { tidal: null })), still);
-    assert.deepEqual(qcFor({ kind: null, tidal: null }), still);
   });
 });
 
@@ -224,5 +224,13 @@ describe("analyze", () => {
     const kept = (await readAnalysis(lake, "test")).get("test/1")!;
     assert.equal(kept.tidal, true);
     assert.equal(kept.analyzed, now.toISOString());
+    // New rules still requalify it under the verdict it keeps.
+    await markRequalified(lake, "test", ["test/1"], now);
+    await writeAnalysis(lake, "test", [
+      { ...kept, rules: "older", requalified: now.toISOString() },
+    ]);
+    await analyze(lake, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
+    const bumped = (await readAnalysis(lake, "test")).get("test/1")!;
+    assert.deepEqual([bumped.tidal, bumped.rules, bumped.requalified], [true, RULES, null]);
   });
 });

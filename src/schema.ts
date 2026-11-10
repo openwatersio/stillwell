@@ -1,4 +1,3 @@
-import type { QcOptions } from "./qc.ts";
 import type { Extreme, Sample, TransitExtreme } from "./types.ts";
 
 /**

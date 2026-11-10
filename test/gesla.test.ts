@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
-import { qcFor } from "../src/lake/recent.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";

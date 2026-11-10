@@ -123,17 +123,17 @@ export function judge(
 }
 
 /**
- * Datums measured from sea level, as land surveys or tide gauges set it, so a
- * level in one is a height above the sea. IGLD is the Great Lakes', which sit
- * 75 to 183 m up.
+ * Datums measured from mean sea level by a national survey, so a level in
+ * one is a height above the sea, in the order a station's datums are read.
+ * IGLD is the Great Lakes', which sit 75 to 183 m up. A local tidal datum
+ * such as MSL doesn't count: upriver it sits at the water, wherever that is.
  */
-const SEA_LEVEL = new Set([
+const SEA_LEVEL = [
   "NAVD88",
   "NGVD29",
-  "MSL",
-  "LMSL",
   "NHN",
   "NN",
+  "HN",
   "NN2000",
   "NAP",
   "AOD",
@@ -142,16 +142,16 @@ const SEA_LEVEL = new Set([
   "IGLD",
   "PRVD02",
   "ODM",
-]);
+];
 
 /**
  * Meters to add to a station's levels to put them above sea level: none
- * where its datum is one (`SEA_LEVEL`), its gauge zero's height where its
- * datums give one in such a datum, and null where they don't.
+ * where its datum is one (`SEA_LEVEL`), its gauge zero's height in the first
+ * such datum its datums give, and null where they give none.
  */
 function toSeaLevel(station: Station): number | null {
-  if (SEA_LEVEL.has(station.datum)) return 0;
-  const datum = Object.keys(station.datums ?? {}).find((d) => SEA_LEVEL.has(d));
+  if (SEA_LEVEL.includes(station.datum)) return 0;
+  const datum = SEA_LEVEL.find((d) => d in (station.datums ?? {}));
   return datum === undefined ? null : station.datums[datum]!;
 }
 
@@ -275,8 +275,13 @@ export async function analyze(
         const verdict = judge(station, rows, spans);
         const was = previous.get(station.id);
         report.judged++;
-        // Values that can't say, such as a new epoch's first weeks, don't undo a verdict.
-        if (verdict.tidal === null && was && was.tidal !== null) return;
+        // Values that can't say, such as a new epoch's first weeks, don't undo a
+        // verdict, though new rules still requalify the station under it.
+        if (verdict.tidal === null && was && was.tidal !== null) {
+          if (was.rules !== RULES)
+            next.set(station.id, { ...was, rules: RULES, requalified: null });
+          return;
+        }
         const from = was?.tidal ?? null;
         const changed = !isDeepStrictEqual(
           qcFor({ ...station, tidal: from, tide_m: was?.tide_m ?? null }),
@@ -324,7 +329,10 @@ export function writeAnalysis(lake: string, source: string, rows: Analysis[]): P
   );
 }
 
-/** Stations whose verdict changed their QC and whose stored years aren't requalified under it yet. */
+/**
+ * Stations whose stored years aren't requalified under their verdict yet:
+ * after a first verdict, one under new `RULES`, or one that changed their QC.
+ */
 export function pending(analysis: Map<string, Analysis>): string[] {
   return [...analysis.values()].filter((a) => a.requalified === null).map((a) => a.id);
 }

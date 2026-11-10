@@ -808,19 +808,20 @@ export const CENTIMETER_TIDE_M = 0.3;
  * or two days where its tide is under `CENTIMETER_TIDE_M` and its values move
  * in whole centimeters. A tidal river or lake still floods, so it keeps the
  * outlier check off; tidal water of any other kind, or none, keeps it. A
- * station with no verdict yet is judged by its kind: coastal or estuary water
- * as tidal, anything else as still.
+ * station with no verdict yet is judged by its kind: a river or lake as
+ * still, anything else as tidal, as a tide gauge is, since sources such as
+ * RWS and REFMAR leave their tide gauges' kind unset.
  */
 export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOptions {
-  const sea = station.kind === "coastal" || station.kind === "estuary";
-  if (!(station.tidal ?? sea))
+  const river = station.kind === "river" || station.kind === "lake";
+  if (!(station.tidal ?? !river))
     return station.kind === "coastal"
       ? { centimeter_flatline_s: 48 * 3600, outliers: false }
       : { flatline_s: 48 * 3600, outliers: false };
   const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
     ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
-    ...(station.kind === "river" || station.kind === "lake" ? { outliers: false } : {}),
+    ...(river ? { outliers: false } : {}),
   };
 }
 

@@ -70,7 +70,7 @@
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
 import { resolve } from "node:path";
-import { parseArgs } from "node:util";
+import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
   earliestPreliminary,
   epochSpans,
@@ -957,8 +957,17 @@ async function analyzeSource(sourceId: string): Promise<void> {
   // Every year of every epoch, since a station's verdict holds for its whole
   // record; a batch at a time, each marked once done, so a run stopped partway
   // leaves the rest pending for the next.
-  const listed = new Set(list.map((s) => s.id));
-  const waiting = pending(await readAnalysis(lake, sourceId)).filter((id) => listed.has(id));
+  const listed = new Map(list.map((s) => [s.id, s]));
+  const analysis = await readAnalysis(lake, sourceId);
+  // Stations whose rules differ from their kind's come first; the rest are first verdicts that change nothing.
+  const differs = (id: string) =>
+    !isDeepStrictEqual(
+      qcFor({ ...listed.get(id)!, tidal: null }),
+      qcFor({ ...listed.get(id)!, ...analysis.get(id)! }),
+    );
+  const waiting = pending(analysis)
+    .filter((id) => listed.has(id))
+    .sort((a, b) => Number(differs(b)) - Number(differs(a)));
   // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
   const until = Date.now() + positive("budget") * 60_000;
   for (const batch of chunks(waiting, 100)) {
