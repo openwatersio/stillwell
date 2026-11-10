@@ -67,6 +67,14 @@
       "error": "CO-OPS's Bradmoor Island levels sit about 1.3 m low from 9 to 30 September 2004.",
       "response": "9 to 30 September 2004 is flagged `suspect`, keeping CO-OPS's own flag as `source_flag`.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against California DWR's B91212 and B95060 (`dwr/B91212`, `dwr/B95060`), 21 and 23 km away: the differences are +0.54 to +0.63 m before and after and −0.79 and −0.73 m over the span."
+    },
+    {
+      "id": "coops-stale-limit-flag",
+      "stations": "every station",
+      "handling": "corrected",
+      "error": "CO-OPS's verified 6-minute water levels carry the limit flag (L, an expected maximum or minimum height exceeded) on ordinary values at some stations, from an acquisition check against limits that are stale there. In March 2010 it is set on 4,142 of Annapolis's (8575512) 7,440 verified values and 2,210 of the Battery's (8518750), nearly all inside the month's own 1 to 99% range, and on none of Baltimore's (8574680), San Francisco's (9414290) or Key West's (8724580).",
+      "response": "On a verified 6-minute value L alone doesn't make it `suspect`; flat (F) and rate-of-change (R) still do, and L still does on preliminary values and on hourly heights and high and low waters. Years written before this rule keep verified L values as `suspect` until a backfill with `--refetch` reads them again.",
+      "evidence": "Found November 2026 by crowd-depth's lake reader, which saw Tolchester Beach (8573364) lose 212 days of 2012 to `suspect` at levels of −0.09 to +0.57 m MLLW, and confirmed by counting L in the verified values of March 2010, 2015 and 2020 at seven stations from CO-OPS's API with `datum=MLLW`: Tolchester Beach (8573364), Baltimore (8574680), Annapolis (8575512), Chesapeake Bay Bridge Tunnel (8638610), the Battery (8518750), San Francisco (9414290) and Key West (8724580). Where L is set, at Tolchester, Annapolis, the Battery and the Bridge Tunnel, nearly every flagged value sits inside the month's own 1 to 99% range, and the count changes from year to year (Annapolis 4,142 in March 2010, none in March 2020)."
     }
   ],
   "retired": []
