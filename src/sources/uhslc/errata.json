@@ -57,6 +57,60 @@
       "error": "UHSLC's hourly Cuxhaven levels for July and August 2024 don't match the gauge's other records, even allowing for a clock offset.",
       "response": "July and August 2024 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
       "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy carries it too (erratum `gesla-cuxhaven-uhslc-2024-summer`)."
+    },
+    {
+      "id": "uhslc-esperanza-1998-datum",
+      "stations": ["uhslc/601"],
+      "until": "1998-08-31",
+      "handling": "flagged",
+      "error": "UHSLC's Esperanza research-quality levels before 31 August 1998 are on a zero 3.3 m from the record's later one.",
+      "response": "Values before 31 August 1998 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copy of UHSLC's fast-delivery Esperanza record (`gesla/esperanza-601-arg-uhslc_fd`), which keeps one zero throughout: the series less it is −3.29 m before the date and 0.0 after."
+    },
+    {
+      "id": "uhslc-milolii-2025-datum",
+      "stations": ["uhslc/431"],
+      "until": "2025-06-17",
+      "handling": "flagged",
+      "error": "UHSLC's Milolii levels before 17 June 2025 are on a zero about 1 m from the later one.",
+      "response": "Values before 17 June 2025 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's Honokohau (`uhslc/430`), 55 km away: the difference is −1.10 m before the date and −0.08 m after."
+    },
+    {
+      "id": "uhslc-inhambane-2012-datum",
+      "stations": ["uhslc/900"],
+      "until": "2012-04-21",
+      "handling": "flagged",
+      "error": "UHSLC's Inhambane levels before 21 April 2012 are on a zero about 1 m from the later one.",
+      "response": "Values before 21 April 2012 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy after it, and the fast-delivery copy sits 1.03 m from the series after it."
+    },
+    {
+      "id": "uhslc-qaqortoq-2008-datum",
+      "stations": ["uhslc/299"],
+      "handling": "kept",
+      "error": "UHSLC's Qaqortoq levels from June 2008 on are on a zero about 5 m from the record's earlier one, with no change of datum marked.",
+      "response": "The lake keeps the values as served: the lake holds no independent record of the gauge to show which zero is wrong, so nothing is flagged.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the lake lists as coastal, November 2026; the lake holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 1.59 to 1.81 m from 1991 to 1998 and 6.74 to 6.81 m from 2008 on, across a gap from 1999 to 2007. No other gauge in the lake lies within 150 km; GESLA's copies hold the same values.",
+      "since": "2008-06-01"
+    },
+    {
+      "id": "uhslc-sao-tome-2004-datum",
+      "stations": ["uhslc/225"],
+      "handling": "kept",
+      "error": "UHSLC's Sao Tome levels from 27 August 2004 on are on a zero about 5 m from the record's earlier one, with no change of datum marked.",
+      "response": "The lake keeps the values as served: the lake holds no independent record of the gauge to show which zero is wrong, so nothing is flagged.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the lake lists as coastal, November 2026; the lake holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 7.02 to 7.05 m from 1985 to 1988 and 1.76 to 1.90 m from 2004 on. No other gauge in the lake lies within 150 km; GESLA's copies hold the same values. The values on the later zero start at 17:00 UTC on 27 August 2004.",
+      "since": "2004-08-27"
+    },
+    {
+      "id": "uhslc-gibraltar-2023-datum",
+      "stations": ["uhslc/289"],
+      "handling": "kept",
+      "error": "UHSLC's Gibraltar levels from November 2023 on read about 1.5 m higher than the record's earlier ones, with no change of datum marked.",
+      "response": "The lake keeps the values as served: the lake holds no independent record of the gauge to show which zero is wrong, so nothing is flagged. A datum epoch for the record is planned.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the lake lists as coastal, November 2026; no gauge in the lake spans the 2001 to 2022 gap, so this rests on the record's own medians. Yearly medians are 0.60 to 0.67 m from 1993 to 2000 and 2.07 to 2.10 m from 2023 on. The record joins UHSLC's research-quality version B (1993 to 2000) to its fast-delivery series from November 2023, which TICON's matching places 1.8 km from version B's position, so the later series may be a relocated gauge with its own zero.",
+      "since": "2023-11-01"
     }
   ],
   "retired": []

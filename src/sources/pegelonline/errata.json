@@ -118,6 +118,16 @@
       "error": "PEGELONLINE's List auf Sylt levels have sat 8 to 20 cm lower against Hörnum and Wittdün since September 2024 than before, with no change of gauge zero.",
       "response": "The lake keeps the values as served: the offset wanders and continues, so its cause, and whether newer values are right, needs the WSV's answer.",
       "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of −23 cm on 28 August 2024 against three of four neighboring gauges. Monthly median differences against Hörnum (`pegelonline/9570050`) are within ±1.3 cm from January to August 2024 and −7 to −22 cm in every month since; against Wittdün (`pegelonline/9570010`) within ±2.6 cm before and −7 to −20 cm in every month since except October 2024. The gauge zero's only date is 2019-11-01."
+    },
+    {
+      "id": "pegelonline-bake-z-2002-offset",
+      "stations": ["pegelonline/9510066"],
+      "since": "2002-09-30",
+      "until": "2002-10-22",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Bake Z levels sit 0.8 to 2.4 m high from 30 September to 21 October 2002.",
+      "response": "30 September to 21 October 2002 is flagged `suspect`, keeping the source's own flag as `source_flag`. The lake's QC already flags about two thirds of it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October."
     }
   ],
   "retired": []
