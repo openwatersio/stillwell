@@ -1105,6 +1105,22 @@ describe("epochSpans", () => {
     ]);
   });
 
+  it("writes a closed epoch a person's split ended, whatever the source's archive", () => {
+    const ids = (starts: string[]) =>
+      epochSpans(epochs, ...range, "current", new Set(starts)).map((s) => s.epoch.id);
+    assert.deepEqual(ids(["2005-01-01T00:00:00Z"]), [1, 2]);
+    // One the source closed is on today's zero in its archive, so it isn't written.
+    assert.deepEqual(ids(["2010-01-01T00:00:00Z"]), [2]);
+    // A person's decision ending it earlier leaves the next epoch's start as the split.
+    const ended = [{ ...epochs[0]!, until: "2004-06-01T00:00:00Z" }, epochs[1]!];
+    assert.deepEqual(
+      epochSpans(ended, ...range, "current", new Set(["2005-01-01T00:00:00Z"])).map(
+        (s) => s.epoch.id,
+      ),
+      [1, 2],
+    );
+  });
+
   it("never writes a current epoch before the reference it names, split or not", () => {
     const unsplit = [
       { ...base(1), since: null, until: null, state: "open" as const },

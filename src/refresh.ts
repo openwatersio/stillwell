@@ -126,6 +126,7 @@ export async function refreshSource(
     offsets: source.metadata.utc_offsets ?? ([0, 0] as [number, number]),
     archive: source.metadata.archive,
     decisions: source.overrides?.epochs ?? {},
+    splits: source.overrides?.splits ?? {},
     seriesChanged: source.seriesChanged?.bind(source),
   };
   const { stations, changes } = mergeStationList(previous, fetched, options_);

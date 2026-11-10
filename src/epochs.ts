@@ -2,7 +2,7 @@
  * Datum epochs: when a station's reference changes, and how each epoch's
  * levels convert into the current one. docs/stations.md has the design.
  */
-import type { Epoch, EpochDecision } from "./schema.ts";
+import type { Epoch, EpochDecision, EpochSplit } from "./schema.ts";
 
 /** A source now reports a station in a datum other than its list says; a station refresh opens the epoch. */
 export class DatumChanged extends Error {
@@ -88,6 +88,8 @@ export interface EpochOptions {
   now: string;
   offsets: [number, number];
   decisions: Record<string, EpochDecision>;
+  /** A person's splits, by station (`Overrides.splits`). */
+  splits?: Record<string, EpochSplit[]>;
   /** The lowest `id` a new epoch may take, above any epoch directory in the lake. */
   nextId?: number;
   /**
@@ -109,8 +111,11 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
   const since = start ? iso(dayStart(start, options.offsets)) : null;
   const id = Math.max(1, options.nextId ?? 1);
   if (options.archive === "previous" && since && Date.parse(since) <= Date.parse(options.now))
-    return withToCurrent(splitAt(before(id, fetched.datum), since, fetched, options), options);
-  return [
+    return withToCurrent(
+      applySplits(splitAt(before(id, fetched.datum), since, fetched, options), options).epochs,
+      options,
+    );
+  const epochs: Epoch[] = [
     {
       id,
       datum: fetched.datum,
@@ -129,6 +134,59 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
       state: "open",
     },
   ];
+  return applySplits(epochs, options).opened.length ? withToCurrent(epochs, options) : epochs;
+}
+
+/** The instants a station's splits (`Overrides.splits`) open epochs at. */
+export function splitStarts(
+  splits: EpochSplit[] | undefined,
+  offsets: [number, number],
+): Set<string> {
+  return new Set((splits ?? []).map((s) => iso(dayStart(s.since, offsets))));
+}
+
+/**
+ * Split a station's current epoch at each day a person found its zero moved
+ * (`Overrides.splits`), in place: it closes there, and one from that day takes
+ * its label, reference and datums, so a source that names references sees no
+ * change on its next refresh. Each day splits once; one ahead waits for its
+ * day. A day before the current epoch's start, or any epoch's, does nothing,
+ * so epoch ids stay in time order; nor does any day while the station is held.
+ */
+function applySplits(
+  epochs: Epoch[],
+  options: EpochOptions,
+): { epochs: Epoch[]; opened: string[]; first?: Epoch } {
+  const opened: string[] = [];
+  let first: Epoch | undefined;
+  const days = [...(options.splits?.[options.station] ?? [])].sort((a, b) =>
+    a.since.localeCompare(b.since),
+  );
+  if (epochs.some((e) => e.state === "held")) return { epochs, opened };
+  for (const { since: day } of days) {
+    const at = dayStart(day, options.offsets);
+    const since = iso(at);
+    const parent = currentEpoch(epochs);
+    if (
+      at > Date.parse(options.now) ||
+      parent.state !== "open" ||
+      epochs.some((e) => e.since !== null && Date.parse(e.since) >= at)
+    )
+      continue;
+    const id = Math.max(...epochs.map((e) => e.id), (options.nextId ?? 1) - 1) + 1;
+    epochs.splice(epochs.indexOf(parent) + 1, 0, {
+      ...parent,
+      datums: { ...parent.datums },
+      id,
+      since,
+    });
+    // The old zero's last instant is the day's earliest start, as for a dated change.
+    parent.until = iso(dayStartEarliest(day, options.offsets));
+    parent.state = "closed";
+    first ??= parent;
+    opened.push(day);
+  }
+  return { epochs, opened, first };
 }
 
 /** An epoch with no start, before any reference the source names. */
@@ -335,6 +393,13 @@ export function nextEpochs(
     }
   }
 
+  const person = applySplits(epochs, options);
+  if (person.opened.length) {
+    event ??= "opened";
+    reason ??= `a person found the zero moved on ${person.opened.join(", ")}; backfill the station from ${person.opened[0]}`;
+    // A person's offset converts the epoch before the first split.
+    decide ??= person.first;
+  }
   event = applyDecisions(epochs, options) ?? event;
   // A station still waiting on a person is reported on every refresh, not only the first.
   if (!event && isHeld(epochs)) {

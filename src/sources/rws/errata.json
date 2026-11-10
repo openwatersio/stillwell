@@ -16,7 +16,7 @@
       "since": "2026-10-27",
       "handling": "kept",
       "error": "RWS's Kralendijk Plazabeach Terminal levels from 27 October 2026 on sit about 0.75 m above January and February 2026's, with no change of datum marked.",
-      "response": "The lake keeps the values as served: the shift continues in today's values and its cause needs RWS's answer.",
+      "response": "The record splits into datum epochs on 27 October 2026, and the lake keeps the values as served. No gauge nearby measures the offset, so the epoch before has none and stays out of the combined series, readable on its own zero, until RWS answers.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the lake lists as coastal, November 2026; the lake holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Monthly medians are −0.62 m in January and February 2026 and +0.12 to +0.15 m in October and November, with no values between. No other gauge in the lake lies within 150 km."
     }
   ],

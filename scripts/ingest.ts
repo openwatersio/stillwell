@@ -100,7 +100,7 @@ import {
   type RunSummary,
 } from "../src/lake/recent.ts";
 import { appendFile, readFile } from "node:fs/promises";
-import { isHeld } from "../src/epochs.ts";
+import { isHeld, splitStarts } from "../src/epochs.ts";
 import {
   readExtremes,
   readObservations,
@@ -505,7 +505,13 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // The epochs a station's fetch writes, each with its part of the range (`epochSpans`).
   const spansOf = (station: LakeStation) => {
     const [begin, until] = ranges?.get(station.id) ?? [start, end];
-    return epochSpans(station.epochs, begin, until, source.metadata.archive);
+    return epochSpans(
+      station.epochs,
+      begin,
+      until,
+      source.metadata.archive,
+      splitStarts(source.overrides?.splits?.[station.id], source.metadata.utc_offsets ?? [0, 0]),
+    );
   };
   // A source that blocks this client fails every request after, so the run
   // stops rather than go on through its stations.
