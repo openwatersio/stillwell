@@ -6,7 +6,7 @@ const DAY_MS = 86_400_000;
 /** The lunar tide, M2's and O1's amplitudes added, in meters, that makes a station tidal. */
 export const TIDE_M = 0.08;
 
-/** More runs than this, in a year, that only a tide gauge's flatline limit flags (`drains`), and water drains between tides. */
+/** More runs than this, in a year, that a tide gauge's flatline rules flag and still water's don't (`drains`), and water drains between tides. */
 export const DRAINS_RUNS = 3;
 
 /**
@@ -38,8 +38,8 @@ export function tideOf(record: {
 }
 
 /**
- * Runs of the year to `end` that a tide gauge's flatline limit flags and a still
- * water's two days don't, from the same values QC'd both ways. Water the tide
+ * Runs of the year to `end` that `tide`'s flatline rules flag and `still`'s
+ * two days don't, from the same values QC'd both ways. Water the tide
  * reaches only at times holds still for hours on end in between: a creek
  * drained to a sill or pool at low water, a lagoon whose mouth has closed, a
  * canal held by its structure, so more than `DRAINS_RUNS` of them say the

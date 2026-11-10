@@ -30,15 +30,17 @@ export interface Analysis {
   id: string;
   /** When the station was last judged, as an ISO instant. */
   analyzed: string;
-  /** `RULES` as it was then, so a change to a rule judges every station again. */
+  /** `RULES` as it was then, so a change to `qcFor`'s thresholds requalifies every station. */
   rules: string;
+  /** `JUDGE` as it was then, so a change to `judge` judges every station again; null in a row written before it was kept. */
+  judge: string | null;
   /** Whether the station's levels carry a tide (`judge`); null where its values can't say. */
   tidal: boolean | null;
   /** The lunar tide, M2's and O1's amplitudes added, in meters (`tideOf`). */
   tide_m: number | null;
   /** Days of the last year with usable values. */
   days: number | null;
-  /** Runs of the last year only a tide gauge's flatline limit flags (`drains`). */
+  /** Runs of the last year that a tide gauge's flatline rules flag and still water's don't (`drains` in `judge`). */
   drains: number | null;
   /**
    * When the station's stored years were last requalified under its
@@ -49,10 +51,17 @@ export interface Analysis {
 }
 
 /**
- * The rules' version. Change it with any threshold below or in `qcFor`, so
- * `analyze` judges every station again and requalifies its stored years.
+ * The version of QC's rules. Change it with any threshold in `qcFor`, so
+ * `analyze` judges every station again and requalifies all its stored years.
  */
 export const RULES = "tidal-1";
+
+/**
+ * The version of `judge`'s rules. Change it with any threshold or rule a
+ * verdict depends on, so `analyze` judges every station again and requalifies
+ * only those whose QC changes with their verdict.
+ */
+export const JUDGE = "drains-2";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;
@@ -73,15 +82,16 @@ const REJUDGE_MS = 365 * 86_400_000;
 
 const DAY_MS = 86_400_000;
 
-type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "requalified">;
+type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "requalified">;
 
 /**
  * Whether a station's levels carry a tide, from its last year: the lunar
  * tide (`tideOf`) is `TIDE_M` or more, on `COVERED_DAYS` days or more,
  * its water sits within `ABOVE_SEA_M` of sea level where its datums can say
  * (`toSeaLevel`), and, away from the coast, no more than `DRAINS_RUNS` runs
- * of a still level are ones only the flatline rules QC gives tidal water of
- * its tide flag, as at a creek that drains to a sill at low water. On the coast such runs are a
+ * of a still level are ones a tide gauge's flatline rules flag and still
+ * water's don't, as at a creek that drains to a sill at low water: the rules
+ * QC gives a tidal river or lake of its tide, and six hours elsewhere. On the coast such runs are a
  * stuck gauge or one left dry, which QC should flag: Coruña, with a 1.25 m
  * tide, has 732 of them in its last year in GESLA. Null, where the values
  * can't say: under `COVERED_DAYS` days, or too coarse to fit. The flags start
@@ -104,11 +114,16 @@ export function judge(
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
   const tide_m = tideOf({ times, levels, source: flags });
-  // The flatline rules QC gives tidal water of this tide, without the outlier check,
-  // so `drains` counts only held levels QC would flag: not a small tide's whole
-  // centimeters at the turn, as at Werkendam in the Biesbosch.
+  // At a river or lake, which keeps the outlier check off tidal or not, the
+  // flatline rules QC gives tidal water of this tide, so `drains` counts only
+  // holds those rules would flag: where a tide under `CENTIMETER_TIDE_M` moves in
+  // whole centimeters, they allow the two days still water gets, so a hold at
+  // low water, as at Werkendam in the Biesbosch, makes no difference to its QC
+  // and doesn't count. Elsewhere a tidal verdict also turns the outlier check
+  // on, so every hold a plain six hours flags counts.
+  const river = station.kind === "river" || station.kind === "lake";
   const tide = qc(start, {
-    ...qcFor({ kind: "coastal", tidal: true, tide_m }),
+    ...(river ? qcFor({ ...station, tidal: true, tide_m }) : {}),
     outliers: false,
   });
   // The year to the last usable value, as `tideOf` fits it, so a flagged tail doesn't shift one measure and not the others.
@@ -174,6 +189,7 @@ export async function readAnalysis(lake: string, source: string): Promise<Map<st
         id: String(r.id),
         analyzed: new Date(r.analyzed as string).toISOString(),
         rules: String(r.rules),
+        judge: r.judge == null ? null : String(r.judge),
         tidal: (r.tidal as boolean | null) ?? null,
         tide_m: (r.tide_m as number | null) ?? null,
         days: r.days === null ? null : Number(r.days),
@@ -210,7 +226,7 @@ export interface AnalysisReport {
  * Judge a source's stations that are due (`judge`), from the last two years of
  * their current epoch in the lake, and write the source's analysis, keeping
  * the rows of stations not due or not judged. A station is due with no row,
- * a row under other `RULES`, no verdict, or a verdict older than a year, or
+ * a row under other `RULES` or `JUDGE`, no verdict, or a verdict older than a year, or
  * with `all`. Writes the stations whose QC options change with the
  * new verdict to `history/analysis/<source>/<time>.json` and returns them.
  */
@@ -231,6 +247,7 @@ export async function analyze(
       options.all ||
       !p ||
       p.rules !== RULES ||
+      p.judge !== JUDGE ||
       p.tidal === null ||
       now - Date.parse(p.analyzed) > REJUDGE_MS
     );
@@ -249,6 +266,7 @@ export async function analyze(
       await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
         {
           rules: RULES,
+          judge: JUDGE,
           changed: [...report.changed].sort((a, b) => a.id.localeCompare(b.id)),
         },
       ]);
@@ -285,6 +303,7 @@ export async function analyze(
         // Values that can't say, such as a new epoch's first weeks, don't undo a
         // verdict, though new rules still requalify the station under it.
         if (verdict.tidal === null && was && was.tidal !== null) {
+          // Its old `judge` stays, so it's judged again once its values can say.
           if (was.rules !== RULES)
             next.set(station.id, { ...was, rules: RULES, requalified: null });
           return;
@@ -300,6 +319,7 @@ export async function analyze(
           id: station.id,
           analyzed: options.now.toISOString(),
           rules: RULES,
+          judge: JUDGE,
           ...verdict,
           requalified: requalify ? null : was!.requalified,
         });
@@ -326,6 +346,7 @@ export function writeAnalysis(lake: string, source: string, rows: Analysis[]): P
       id: "VARCHAR",
       analyzed: "TIMESTAMPTZ",
       rules: "VARCHAR",
+      judge: "VARCHAR",
       tidal: "BOOLEAN",
       tide_m: "DOUBLE",
       days: "INTEGER",

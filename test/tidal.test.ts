@@ -80,7 +80,7 @@ describe("drains", () => {
   };
   const days = (n: number) => Array.from({ length: n }, (_, k) => Date.UTC(2026, 0, 10 + 7 * k));
 
-  it("counts the runs only a tide gauge's limit flags, from the source's flags", () => {
+  it("counts the runs the tide's rules flag and still water's don't, from the source's flags", () => {
     assert.equal(judge(days(DRAINS_RUNS + 1)), true);
     assert.equal(judge(days(DRAINS_RUNS)), false);
   });
