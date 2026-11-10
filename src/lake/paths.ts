@@ -8,10 +8,12 @@ import type { Product } from "../schema.ts";
  *   errata.json                                         errors in what sources publish, and what the lake does about them
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
+ *   stations/analysis/<source>.parquet                  what analysis measures from each station's levels, such as whether they carry a tide
  *   stations/years/<source>.parquet                     each year file of levels: hours, values by flag and a version
  *   stations/empty/<source>.json                        years a `--skip-written` backfill found nothing in, for 30 days
  *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
+ *   history/analysis/<source>/<time>.json               stations whose QC an analysis changed
  *   recent/<source>.parquet                             last 7 days, every live station and any since retired
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
@@ -92,6 +94,15 @@ export function stationListPath(root: string, source: string): string {
 
 export function boundsPath(root: string, source: string): string {
   return `${root}/stations/bounds/${source}.parquet`;
+}
+
+export function analysisPath(root: string, source: string): string {
+  return `${root}/stations/analysis/${source}.parquet`;
+}
+
+/** The stations an `analyze` run changed QC for, and why. */
+export function analysisHistoryPath(root: string, source: string, time: string): string {
+  return `${root}/history/analysis/${source}/${time.replaceAll(":", "").replace(/\.\d+Z$/, "Z")}.json`;
 }
 
 export function yearsPath(root: string, source: string): string {

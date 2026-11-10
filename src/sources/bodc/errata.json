@@ -30,6 +30,16 @@
       "evidence": "At Lowestoft (`LOW_ukcff_3942_001`) on 1 June 2024, ERDDAP has 93 of the day's 96 quarter hours. 07:30, 15:15 and 23:00 are missing; GESLA's copy has them (07:30 is 1.956 m). Over May 2024, ERDDAP has no Lowestoft values at all, while GESLA's copy has 2,976.\n\nAt Lerwick (`LER_ukcff_4109_001`), the months present have 2,880 values in 31-day months, 2,788 in 30-day ones and 2,602 in February. These months are missing: May to December 2022, October 2023 to February 2024, May 2024, July 2024, and April to September 2025.\n\nRecords end on 2024-12-31 at 16 gauges, 2026-02-28 at 9, 2026-09-30 at 15, 2024-12-07 at Mumbles and 2025-11-30 at Workington. Checked on 2026-11-09.",
       "reported": "2026-11-09",
       "report": "Sent to BODC on 2026-11-09 in ticket BODCREQ-11479, with [#107](https://github.com/openwatersio/water-levels/issues/107), [#109](https://github.com/openwatersio/water-levels/issues/109) and [#110](https://github.com/openwatersio/water-levels/issues/110) together. No answer yet."
+    },
+    {
+      "id": "bodc-ilfracombe-2023-offsets",
+      "stations": ["bodc/ilf"],
+      "since": "2023-09-30",
+      "until": "2025-03-21",
+      "handling": "flagged",
+      "error": "BODC's Ilfracombe levels sit 0.9 to 1.6 m off GESLA's CMEMS copy of the gauge on and off from 30 September 2023 to 20 March 2025.",
+      "response": "30 September 2023 to 20 March 2025 is flagged `suspect` whole, keeping BODC's own flag as `source_flag`. The lake's QC already flags 82 to 93% of it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of the gauge (`gesla/ilfracombe-ilf-gbr-cmems`): the difference is −0.01 m before and −0.02 m after and −0.88 to −1.56 m over the spans."
     }
   ],
   "retired": []
