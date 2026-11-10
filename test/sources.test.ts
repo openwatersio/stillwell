@@ -1147,6 +1147,21 @@ describe("coops", () => {
     );
   });
 
+  it("marks a value suspect for its limit flag only while it's preliminary", () => {
+    // Verified 6-minute values keep L from an acquisition check whose limits are stale (erratum `coops-stale-limit-flag`).
+    assert.equal(coops.flagOf({ f: "0,0,0,1", q: "v" }), Flag.good);
+    assert.equal(coops.flagOf({ f: "0,0,0,1", q: "p" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "0,1,0,1", q: "v" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "0,0,1,0", q: "v" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "5,0,0,0", q: "v" }), Flag.good);
+    // Only an explicit `v` counts as verified.
+    assert.equal(coops.flagOf({ f: "0,0,0,1" }), Flag.suspect);
+    // Hourly heights and high and low waters keep L as suspect; I is interpolated.
+    assert.equal(coops.flagOf({ f: "0,1" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "1,1" }), Flag.suspect);
+    assert.equal(coops.flagOf({ f: "1,0" }), Flag.interpolated);
+  });
+
   it("reads 6-minute levels, falling back to hourly heights where there are none", async () => {
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00", removed: "" })],
@@ -1158,6 +1173,8 @@ describe("coops", () => {
             { t: "2024-01-01 00:06", v: "", f: "0,0,0,0", q: "v" },
             { t: "2024-01-01 00:12", v: "4.816", f: "1,0,0,0", q: "p" },
             { t: "2024-01-01 00:18", v: "9.9", f: "0,1,0,0", q: "p" },
+            { t: "2024-01-01 00:24", v: "4.9", f: "0,0,0,1", q: "v" },
+            { t: "2024-01-01 00:30", v: "4.95", f: "0,0,0,1", q: "p" },
           ],
         }),
       ],
@@ -1184,6 +1201,9 @@ describe("coops", () => {
         // An outlier count alone doesn't flag the value.
         ["2024-01-01T00:12:00.000Z", 4.816, Flag.preliminary],
         ["2024-01-01T00:18:00.000Z", 9.9, Flag.suspect],
+        // L alone on a verified value is erratum `coops-stale-limit-flag`; on a preliminary one it's still suspect.
+        ["2024-01-01T00:24:00.000Z", 4.9, Flag.good],
+        ["2024-01-01T00:30:00.000Z", 4.95, Flag.suspect],
       ],
     );
     const old = await coops.levels(
