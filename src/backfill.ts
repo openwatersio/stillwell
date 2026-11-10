@@ -1,13 +1,31 @@
 import { currentEpoch } from "./epochs.ts";
+import { mergeFetched, sameRows } from "./lake/merge.ts";
 import {
+  asWritten,
   listYears,
+  readExtremeFile,
+  readObservationFile,
   readTimeBounds,
   readYearFiles,
+  writeExtremes,
+  writeObservations,
+  type YearStats,
   type StationBounds,
   type YearFile,
 } from "./lake/parquet.ts";
 import { csvFields } from "./csv.ts";
-import type { Epoch, LakeStation, SourceMetadata, Station } from "./schema.ts";
+import { qcFor, refuseOtherDatum } from "./lake/recent.ts";
+import { judgeFetched } from "./lake/requalify.ts";
+import type {
+  Epoch,
+  LakeStation,
+  Observation,
+  Product,
+  PublishedExtreme,
+  Source,
+  SourceMetadata,
+  Station,
+} from "./schema.ts";
 
 const DAY_MS = 86_400_000;
 
@@ -179,8 +197,8 @@ export function parseShard(value: string): [number, number] {
  * Which years of one station's series backfill fetches over [start, end), and
  * how many it skips: `complete` skips what `yearDone` calls done, from one read
  * of the series directory; `written` skips what `yearWritten` does, from a
- * listing, plus a read of years from `COMPACTED_SINCE` on, and returns the
- * years the listing found (`listed`); `none` fetches every year. A failed read throws, so the
+ * listing, plus a read of years from `COMPACTED_SINCE` on; `none` fetches every year. Both
+ * skipping modes return the years their listing found (`listed`). A failed read throws, so the
  * caller fails the series rather than fetch every year again.
  */
 export async function yearsToFetch(
@@ -208,9 +226,11 @@ export async function yearsToFetch(
     done = (from, to) => yearWritten(found, from, to, now, files.get(from.getUTCFullYear()));
   } else if (mode === "complete") {
     const asked = all.filter(([from, to]) => wholeEndedYear(from, to, now));
+    listed = await listYears(dir);
     const files = await readYearFiles(
       dir,
       asked.map(([from]) => from.getUTCFullYear()),
+      listed,
     );
     done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now, qcStart);
   }
@@ -357,4 +377,122 @@ export function epochSpans(
       };
     })
     .filter(({ from, to }) => from < to);
+}
+
+/** A year file's rows and the datums it holds. */
+export type YearRead<T> = { rows: T[]; datums: string[] };
+
+/**
+ * One series' year files as a backfill walk reads them: each at most once, and
+ * none the walk's listing (`listed`) didn't find, so a station new to the lake
+ * costs no read. Backfill walks the years in order and QCs each with the years
+ * either side, so the year it read as one year's neighbor is the next it merges
+ * into, and the year it just wrote is the next one's context. It holds the
+ * year before the last one asked for, on.
+ *
+ * Nothing here sees another writer's change during the walk. On Actions the
+ * `lake-<source>` concurrency group keeps every writer of a source's files to
+ * one job at a time; a local run must not overlap another that writes the
+ * same source, which would race a read-then-write without the cache too.
+ */
+export function seriesFiles<T>(
+  dir: string,
+  listed: Set<number>,
+  read: (path: string) => Promise<YearRead<T>>,
+) {
+  listed = new Set(listed);
+  const held = new Map<number, Promise<YearRead<T>>>();
+  const path = (year: number) => `${dir}/${year}.parquet`;
+  return {
+    path,
+    get(year: number): Promise<YearRead<T>> {
+      for (const y of held.keys()) if (y < year - 1) held.delete(y);
+      let file = held.get(year);
+      if (!file) {
+        file = listed.has(year) ? read(path(year)) : Promise.resolve({ rows: [], datums: [] });
+        held.set(year, file);
+        // A failed read is tried again by the next year that needs it.
+        const mine = file;
+        file.catch(() => held.get(year) === mine && held.delete(year));
+      }
+      return file;
+    },
+    /** What a write left in the year's file, or `undefined` when that isn't known. */
+    wrote(year: number, file?: YearRead<T>): void {
+      listed.add(year);
+      if (file) held.set(year, Promise.resolve(file));
+      else held.delete(year);
+    },
+  };
+}
+
+export type SeriesFiles<T> = ReturnType<typeof seriesFiles<T>>;
+
+/** The reader for a product's year files. */
+export function readerOf(product: Product) {
+  return product === "levels" || product === "predictions" ? readObservationFile : readExtremeFile;
+}
+
+/**
+ * Fetch one year of a series and merge it into its file, read through
+ * `files`. Returns how many rows the year's file now holds, undefined when
+ * nothing changed, or `empty` when the source returned nothing for the year.
+ * A year file of levels it writes goes in `written`, for the source's years.
+ */
+export async function backfillYear(
+  source: Source,
+  station: LakeStation,
+  product: Product,
+  from: Date,
+  to: Date,
+  epoch: Epoch,
+  files: SeriesFiles<Observation> | SeriesFiles<PublishedExtreme>,
+  written: Map<string, YearStats>,
+): Promise<number | "empty" | undefined> {
+  // The epoch's own datum, which a closed epoch keeps when the station's moves on.
+  station = { ...station, datum: epoch.datum };
+  const year = from.getUTCFullYear();
+  const path = files.path(year);
+  const range = [from.getTime(), to.getTime()] as const;
+  if (product === "levels" || product === "predictions") {
+    const series = files as SeriesFiles<Observation>;
+    const get = product === "levels" ? source.observations : source.predictions;
+    if (!get) return undefined;
+    const rows = await get(station, from, to);
+    // An empty fetch is an outage, a year the source no longer publishes, or a
+    // datum it no longer serves; it never empties a file.
+    if (!rows.length) return "empty";
+    const { rows: existing, datums } = await series.get(year);
+    await refuseOtherDatum(path, station, datums);
+    let merged = mergeFetched(existing, rows, ...range);
+    if (product === "levels")
+      merged = judgeFetched(existing, rows, ...range, qcFor(station), [
+        ...(await series.get(year - 1)).rows,
+        ...(await series.get(year + 1)).rows,
+      ]);
+    if (!merged.length || sameRows(existing, merged)) return undefined;
+    let stats: YearStats;
+    try {
+      stats = await writeObservations(path, merged, station.datum);
+    } catch (error) {
+      series.wrote(year);
+      throw error;
+    }
+    series.wrote(year, { rows: asWritten(merged), datums: [station.datum] });
+    if (product === "levels") written.set(path, stats);
+    return merged.length;
+  }
+  const series = files as SeriesFiles<PublishedExtreme>;
+  const get = product === "extremes" ? source.extremes : source.predictedExtremes;
+  if (!get) return undefined;
+  const rows = await get(station, from, to);
+  if (!rows.length) return "empty";
+  const { rows: existing, datums } = await series.get(year);
+  await refuseOtherDatum(path, station, datums);
+  const merged = mergeFetched<PublishedExtreme>(existing, rows, ...range);
+  if (!merged.length || sameRows(existing, merged)) return undefined;
+  // No later year reads it back, so the walk forgets it.
+  series.wrote(year);
+  await writeExtremes(path, merged, station.datum);
+  return merged.length;
 }
