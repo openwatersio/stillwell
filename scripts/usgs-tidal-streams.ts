@@ -64,14 +64,18 @@ const unread: string[] = [];
 let read = 0;
 await pool(listed, 12, async ({ source_id, kind, epoch, year, altitude }) => {
   // `tidal` fits the last 366 days, which the last two year files hold; a
-  // missing file reads as none, and a station with no values in its last year
-  // is reported rather than judged, staying in the list if it's there.
+  // missing file reads as none, and a station with no values in its last year,
+  // or one it can't judge afresh, is reported rather than judged, staying in
+  // the list if it's there.
   let rows: Observation[] = [];
   for (const y of [year - 1, year])
     rows = rows.concat(
       await readObservations(seriesPath(LAKE, "levels", "usgs", source_id, y, epoch)),
     );
-  if (!rows.some((r) => new Date(r.time).getUTCFullYear() === year)) {
+  // A row written before `source_flag` was kept, flagged suspect or bad, may
+  // hold QC's flag from either limit, so its station isn't judged afresh.
+  const legacy = rows.some((r) => r.source_flag === undefined && r.flag >= Flag.suspect);
+  if (legacy || !rows.some((r) => new Date(r.time).getUTCFullYear() === year)) {
     unread.push(source_id);
     // A station listed already stays until a run can read it.
     if (TIDAL_STREAMS.has(source_id)) found.push(source_id);
@@ -142,4 +146,4 @@ console.log(`${found.length} of ${listed.length} river and lake stations are tid
 const now = new Set(found);
 console.log(`Added: ${found.filter((id) => !TIDAL_STREAMS.has(id)).join(", ") || "none"}`);
 console.log(`Dropped: ${[...TIDAL_STREAMS].filter((id) => !now.has(id)).join(", ") || "none"}`);
-console.log(`No values in their last year: ${unread.length ? unread.join(", ") : "none"}`);
+console.log(`Not judged: ${unread.length ? unread.join(", ") : "none"}`);
