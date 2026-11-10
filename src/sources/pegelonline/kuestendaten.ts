@@ -1,4 +1,4 @@
-import { getText } from "../../http.ts";
+import { getJson, getText } from "../../http.ts";
 import { Flag, type Observation } from "../../schema.ts";
 import { zipEntries } from "./index.ts";
 
@@ -28,6 +28,73 @@ export const ATTRIBUTION =
 
 /** robots.txt asks for a 60-second crawl delay. */
 export const pacing = { delayMs: 60_000 };
+
+/** Each gauge's file is `<name><SERIES>.zip`. */
+const SERIES = "!Wasserstand (PNP)";
+
+/** The catalog's fields this checks; each entry has many more. */
+interface CatalogEntry {
+  zipFileName: string;
+  Messstellennummer: string;
+  Zeitzone: string;
+  /** The file's last value, `YYYY-MM-DD HH:MM:SS` in UTC+1. */
+  aufnahmeEnde: string;
+  /** When the file was last published. */
+  aktualisiert: string;
+}
+
+/**
+ * The `aufnahmeEnde` of the files the lake was last backfilled from. Bump it
+ * after each backfill, as openwatersio/water-levels#125 lists.
+ */
+export const BACKFILLED_TO = "2026-06-30 23:59:00";
+
+/**
+ * The catalog's entry for each gauge's file, so the weekly canary sees a
+ * renamed file or a catalog in another form without downloading the zips.
+ * Throws for a gauge whose file it doesn't list under that gauge's number,
+ * in UTC+1, with a readable `aufnahmeEnde`.
+ */
+export async function catalog(): Promise<CatalogEntry[]> {
+  const entries = await getJson<CatalogEntry[]>(`${BASE}WISKI_datenDownload.json`, {
+    fresh: true,
+    pace,
+  });
+  if (!Array.isArray(entries)) throw new Error("kuestendaten.de's catalog isn't a list");
+  const found = Object.entries(GAUGES).map(([station, file]) => ({
+    station,
+    file,
+    entry: entries.find(
+      (e) =>
+        e?.zipFileName === `${file}${SERIES}.zip` &&
+        e.Messstellennummer === station &&
+        /\bUTC\+1\)/.test(e?.Zeitzone) &&
+        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(e.aufnahmeEnde),
+    ),
+  }));
+  const missing = found.filter((f) => !f.entry).map((f) => `${f.file} (${f.station})`);
+  if (missing.length)
+    throw new Error(
+      `kuestendaten.de's catalog has no UTC+1 water levels, with their end, for ${missing.join(", ")}`,
+    );
+  return found.map((f) => f.entry!);
+}
+
+/** Why the canary fails when files run past `BACKFILLED_TO`, or undefined. */
+export function update(entries: CatalogEntry[]): string | undefined {
+  // Both are `YYYY-MM-DD HH:MM:SS`, which catalog() checks, so they sort as text.
+  const newer = entries.filter((e) => e.aufnahmeEnde > BACKFILLED_TO);
+  if (!newer.length) return undefined;
+  const files = newer.map(
+    (e) => `${e.zipFileName} to ${e.aufnahmeEnde}, published ${e.aktualisiert}`,
+  );
+  // The files are published days apart, and a backfill before the last would miss it.
+  const waiting = entries.filter((e) => e.aufnahmeEnde <= BACKFILLED_TO);
+  const wait = waiting.length
+    ? ` Wait for ${waiting.map((e) => e.zipFileName).join(", ")} too.`
+    : "";
+  return `kuestendaten.de has HPA values past ${BACKFILLED_TO} (UTC+1): ${files.join("; ")}.${wait} Run the backfill in https://github.com/openwatersio/water-levels/issues/125, then bump BACKFILLED_TO.`;
+}
 
 /** A gauge's whole file: minutes since the epoch (UTC) and levels in centimeters. */
 interface Series {
@@ -60,7 +127,7 @@ export async function levels(
   if (end.getTime() <= Date.parse(SINCE) - 3_600_000) return [];
   let read = series.get(station);
   if (!read) {
-    read = getText(`${BASE}${encodeURIComponent(`${file}!Wasserstand (PNP)`)}.zip`, {
+    read = getText(`${BASE}${encodeURIComponent(`${file}${SERIES}`)}.zip`, {
       fresh: true,
       base64: true,
       pace,
