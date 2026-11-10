@@ -145,12 +145,20 @@ describe("requalify", () => {
         throw new Unjudged("the lake holds part of the record", [span]);
       },
     });
-    const { warnings } = await requalify(partial, station, root, 2024, 2025);
-    assert.deepEqual(warnings, ["the lake holds part of the record"]);
-    assert.equal(
-      (await readObservations(path(2024))).filter((r) => r.flag === Flag.suspect).length,
-      10 + 24,
+    // A value the source flagged when it was fetched, as GESLA flags a datum jump from its whole file.
+    const jump = Date.UTC(2024, 8, 1);
+    await writeObservations(
+      path(2024),
+      (await readObservations(path(2024))).map((r) =>
+        r.time === jump ? { ...r, flag: Flag.suspect, source_flag: Flag.good } : r,
+      ),
+      "NAP",
     );
+    const { warnings } = await requalify(partial, station, root, 2024, 2025);
+    assert.deepEqual(warnings, ["epoch 1: the lake holds part of the record; its flags are kept"]);
+    const kept = await readObservations(path(2024));
+    assert.equal(kept.filter((r) => r.flag === Flag.suspect).length, 10 + 24 + 1);
+    assert.equal(kept.find((r) => r.time === jump)!.flag, Flag.suspect);
     // Any other error stops the station.
     const broken = source({
       suspect: async () => {
@@ -257,7 +265,10 @@ describe("GESLA's datum jumps over the lake's copy", () => {
   });
 
   it("refuses a copy that misses an end of the record", async () => {
-    await assert.rejects(gesla.suspect!(coastal, years(Date.UTC(2002, 0, 1))), /whole record/);
+    await assert.rejects(
+      gesla.suspect!(coastal, years(Date.UTC(2002, 0, 1))),
+      (error: unknown) => error instanceof Unjudged && /whole record/.test(error.message),
+    );
   });
 });
 

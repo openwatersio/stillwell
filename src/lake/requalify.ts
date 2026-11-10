@@ -1,5 +1,5 @@
 import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { Unjudged, type LakeStation, type Observation, type Source } from "../schema.ts";
+import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
   listYears,
@@ -43,7 +43,11 @@ export async function requalify(
       if (datums.length !== 1)
         throw new Error(`${path(year)} holds ${datums.join(", ") || "no datum"}; resolve by hand`);
     }
-    // A record the source can't judge is requalified with the spans it can give, and a warning.
+    // A record the source can't judge keeps the flags it has, since some may be
+    // the source's spans worked out when they were fetched, as GESLA's datum
+    // jumps are from its whole file; it gets the spans the source can still
+    // give, and a warning.
+    let unjudged = false;
     const suspect =
       (await source
         .suspect?.(station, async function* () {
@@ -51,15 +55,16 @@ export async function requalify(
         })
         .catch((error: unknown) => {
           if (!(error instanceof Unjudged)) throw error;
-          warnings.push(error.message);
+          unjudged = true;
+          warnings.push(`epoch ${epoch.id}: ${error.message}; its flags are kept`);
           return error.spans;
         })) ?? [];
-    plans.push({ years, wanted, path, suspect });
+    plans.push({ years, wanted, path, suspect, unjudged });
   }
   const opts = qcFor(station);
   let files = 0;
   let changed = 0;
-  for (const { years, wanted, path, suspect } of plans) {
+  for (const { years, wanted, path, suspect, unjudged } of plans) {
     // Each year once, and only the three a step needs.
     const cache = new Map<number, Promise<{ rows: Observation[]; datums: string[] }>>();
     const read = (year: number) => {
@@ -82,7 +87,9 @@ export async function requalify(
       // writeObservations stamps one datum on every row; the check above is only as fresh as its read.
       if (datums.length !== 1)
         throw new Error(`${path(year)}'s datums changed while requalify ran`);
-      const next = qc(fromSource(had, suspect), opts, [...before.rows, ...after.rows]);
+      // Kept flags can only get worse, so a looser rule doesn't clear a mark there.
+      const start = unjudged ? withSpans(had, suspect) : fromSource(had, suspect);
+      const next = qc(start, opts, [...before.rows, ...after.rows]);
       if (sameRows(had, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
@@ -91,6 +98,20 @@ export async function requalify(
     }
   }
   return { files, changed, warnings };
+}
+
+/** Rows with the values in `spans` flagged at least `suspect`, keeping every other flag. */
+function withSpans(rows: Observation[], spans: [number, number][]): Observation[] {
+  return rows.map((r) =>
+    spans.some(([from, to]) => r.time >= from && r.time < to)
+      ? {
+          ...r,
+          flag: Math.max(r.flag, Flag.suspect) as Flag,
+          // A suspect or bad flag from before `source_flag` was kept may be QC's, as `fromSource` knows.
+          source_flag: r.source_flag ?? (r.flag < Flag.suspect ? r.flag : undefined),
+        }
+      : r,
+  );
 }
 
 /**

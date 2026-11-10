@@ -319,7 +319,9 @@ export function stationDefaults(
  * A source's `suspect` can't judge the part of a record the caller holds, as
  * GESLA's datum-jump check can't where the lake holds only part of a record.
  * `spans` are the ones it can still give, the source's `errata.json` spans,
- * which the registry adds. A caller judges the station with those and warns.
+ * which the registry adds. Requalify keeps the record's stored flags and adds
+ * these, and analysis judges with them, each with a warning; the recent window
+ * keeps its stored flags.
  */
 export class Unjudged extends Error {
   readonly spans: [number, number][];

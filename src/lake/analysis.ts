@@ -280,7 +280,7 @@ export async function analyze(
             .catch((error: unknown) => {
               if (!(error instanceof Unjudged)) throw error;
               report.warned.push(
-                `${station.id}: judged without some errata spans: ${error.message}`,
+                `${station.id}: judged without the spans its source can't give, such as datum jumps: ${error.message}`,
               );
               return error.spans;
             })) ?? [];
