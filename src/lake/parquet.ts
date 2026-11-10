@@ -468,6 +468,8 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   min_interval_s: "INTEGER",
   source_qc_start: "TIMESTAMPTZ",
   source_qc_start_inferred: "BOOLEAN",
+  tidal: "BOOLEAN",
+  tide_m: "DOUBLE",
   source_url: "VARCHAR",
 };
 
@@ -493,7 +495,8 @@ export async function writeStations(path: string, stations: LakeStation[]): Prom
 const IN_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
   Object.entries(STATION_COLUMNS).filter(
-    ([key]) => !["first", "last", "preferred", "errata", ...IN_EXTRA].includes(key),
+    ([key]) =>
+      !["first", "last", "preferred", "errata", "tidal", "tide_m", ...IN_EXTRA].includes(key),
   ),
 );
 

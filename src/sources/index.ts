@@ -29,6 +29,7 @@ import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
 import refmarErrata from "./refmar/errata.json" with { type: "json" };
 import rwsErrata from "./rws/errata.json" with { type: "json" };
 import sfwmdErrata from "./sfwmd/errata.json" with { type: "json" };
+import smhiErrata from "./smhi/errata.json" with { type: "json" };
 import uhslcErrata from "./uhslc/errata.json" with { type: "json" };
 import usaceErrata from "./usace/errata.json" with { type: "json" };
 
@@ -70,6 +71,7 @@ export const errataFiles: Record<string, unknown> = {
   refmar: refmarErrata,
   rws: rwsErrata,
   sfwmd: sfwmdErrata,
+  smhi: smhiErrata,
   uhslc: uhslcErrata,
   usace: usaceErrata,
 };
