@@ -4,7 +4,7 @@ Every public series in the lake is Parquet at `https://water-levels.openwaters.i
 
 The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license, the attribution it asks for, and where to report an error in its data (`contact`) are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
 
-So far the bucket holds the station lists that have been published to it and one year of data, Hoek van Holland in 2024. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC (phase 4 of [plan.md](plan.md)); older years come with backfill.
+The bucket holds every published source's station list and the year files backfilled so far; `stations/years/<source>.parquet` lists which years each series has. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC; older years come with backfill, which is still under way for some sources.
 
 ## Layout
 
