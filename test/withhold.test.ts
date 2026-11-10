@@ -16,6 +16,7 @@ import {
 } from "../src/lake/parquet.ts";
 import {
   boundsPath,
+  analysisHistoryPath,
   emptyYearsPath,
   recentPath,
   seriesPath,
@@ -34,6 +35,7 @@ import {
   startedListOf,
 } from "../src/refresh.ts";
 import type { Erratum } from "../src/errata.ts";
+import { readAnalysis, writeAnalysis } from "../src/lake/analysis.ts";
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -144,6 +146,24 @@ describe("refreshSource with withheld stations", () => {
       { key: "test/x0 levels 1 1990", seen: NOW },
       { key: "test/k12 levels 1 1990", seen: NOW },
     ]);
+    const verdict = (id: string) => ({
+      id,
+      analyzed: NOW,
+      rules: "tidal-1",
+      tidal: true,
+      tide_m: 0.5,
+      days: 366,
+      drains: 0,
+      requalified: null,
+    });
+    await writeAnalysis(lake, "test", [verdict("test/k12"), verdict("test/x0")]);
+    const history = analysisHistoryPath(lake, "test", NOW);
+    await writeJsonArray(history, [
+      {
+        rules: "tidal-1",
+        changed: ["test/k12", "test/x0"].map((id) => ({ id, from: null, to: true, tide_m: 0.5 })),
+      },
+    ]);
 
     const refused = (code: string) => code.startsWith("x");
     const kept = all.filter((s) => !refused(s.source_id));
@@ -192,6 +212,12 @@ describe("refreshSource with withheld stations", () => {
         (r: { key: string }) => r.key,
       ),
       ["test/k12 levels 1 1990"],
+    );
+    // Its analysis, and the history of it, which carry the station's measures.
+    assert.deepEqual([...(await readAnalysis(lake, "test")).keys()], ["test/k12"]);
+    assert.deepEqual(
+      JSON.parse(await readFile(history, "utf8"))[0].changed.map((c: { id: string }) => c.id),
+      ["test/k12"],
     );
   });
 
@@ -372,8 +398,10 @@ describe("publishStations with withheld stations", () => {
       until: null,
       error: "",
       handling: "corrected",
-      lake: "",
-      issue: 88,
+      response: "",
+      evidence: null,
+      reported: null,
+      report: null,
     };
     const result = await publishStations(lake, [gesla.source, uhslc.source], [], [erratum]);
     assert.deepEqual("count" in result && result.unknownErrata, [

@@ -3,6 +3,7 @@ import {
   epochKey,
   firstEpochs,
   nextEpochs,
+  splitStarts,
   type EpochEvent,
   type EpochOptions,
 } from "./epochs.ts";
@@ -92,8 +93,23 @@ export function mergeStationList(
               .since,
           ),
         });
-    } else
+    } else {
       epochs = firstEpochs({ datum: s.datum!, datums, reference }, { ...options, station: s.id });
+      // A new station a person split is reported as an existing one would be.
+      const starts = splitStarts(options.splits?.[s.id], options.offsets);
+      const days = epochs
+        .filter((e) => starts.has(e.since ?? ""))
+        .map((e) => e.since!.slice(0, 10));
+      if (days.length)
+        changes.push({
+          id: s.id,
+          event: "opened",
+          from: s.datum!,
+          to: s.datum!,
+          reason: `a person found the zero moved on ${days.join(", ")}; backfill the station from ${days[0]}`,
+          key: epochKey(s.id, epochs[0]!.since),
+        });
+    }
     const current = currentEpoch(epochs);
     merged.push({
       ...s,

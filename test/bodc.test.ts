@@ -85,6 +85,40 @@ describe("bodc", () => {
     );
   });
 
+  it("marks bad the zeros BODC flags improbable, as at Portbury", async () => {
+    serve([
+      datasets,
+      [
+        /LER_ukcff_4109_001/,
+        JSON.stringify({
+          table: {
+            columnNames: ["time", "ASLVBG02", "FASLVBG02"],
+            rows: [
+              ["2024-03-06T00:00:00Z", 0, "'M'"],
+              ["2024-03-06T00:15:00Z", -0.001, "'M'"],
+              ["2024-03-06T00:30:00Z", 0, "''"],
+              ["2024-03-06T00:45:00Z", -0.002, "'M'"],
+              ["2024-03-06T01:00:00Z", 0, "'L'"],
+            ],
+          },
+        }),
+      ],
+    ]);
+    assert.deepEqual(
+      (await bodc.levels("ler", new Date("2024-03-06T00:00Z"), new Date("2024-03-06T02:00Z"))).map(
+        (o) => [o.level, o.flag],
+      ),
+      [
+        [0, Flag.bad],
+        [-0.001, Flag.bad],
+        [0, Flag.good],
+        [-0.002, Flag.suspect],
+        // Another letter isn't BODC's placeholder.
+        [0, Flag.suspect],
+      ],
+    );
+  });
+
   it("answers a span with no values with none, and refuses another datum", async () => {
     serve([
       datasets,

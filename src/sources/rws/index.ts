@@ -135,6 +135,8 @@ interface CatalogLocation {
   Locatie_MessageID: number;
   Code: string;
   Naam: string;
+  /** Free text: a river kilometer, a former name, or "platform" at the offshore platforms. */
+  Omschrijving?: string;
   Lat: number;
   Lon: number;
 }
@@ -204,7 +206,8 @@ export async function stations(): Promise<ListedStation[]> {
         lon: l.Lon,
         // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
         country_code: l.Lon < -30 ? "BQ" : "NL",
-        kind: null,
+        // The only water RWS's catalog names is the sea of its offshore platforms.
+        kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
         interval_s: 600,
         datum: DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
         datums: {},
@@ -460,4 +463,15 @@ export const source: Source = {
       datum: s.datum,
       fresh: fresh(end),
     }),
+  // A gauge whose zero moved with no change of datum marked (docs/stations.md, "A person's split").
+  overrides: {
+    splits: {
+      "rws/kralendijk.plazabeachterminal": [
+        {
+          since: "2026-10-27",
+          note: "Monthly medians step from −0.62 m in January and February 2026 to +0.12 to +0.15 m from late October, after a gap; no gauge nearby to measure the offset (erratum `rws-kralendijk-2026-level`).",
+        },
+      ],
+    },
+  },
 };

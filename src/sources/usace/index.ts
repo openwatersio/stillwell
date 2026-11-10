@@ -1,6 +1,7 @@
 import { getJson } from "../../http.ts";
 import {
   Flag,
+  type Kind,
   stationDefaults,
   type ListedStation,
   type Observation,
@@ -43,9 +44,6 @@ export const metadata: SourceMetadata = {
   finalizes: true,
   // Central and Eastern time, standard or daylight.
   utc_offsets: [-6, -4],
-  // Navigation pools sit nearly flat for months, then rise meters in a flood,
-  // which the outlier rule would mark suspect.
-  qc: { outliers: false },
   terms:
     "Unscreened values are as the gauge reported them, and the Corps may revise them. The Corps assumes no liability for their accuracy.",
 };
@@ -72,6 +70,8 @@ export interface CatalogLocation {
   "long-name"?: string;
   description?: string;
   kind?: string;
+  /** Free text each district fills its own way: "Stream Gage", "Corps Reservoir", "RoR Project", "DCP"... */
+  type?: string;
   latitude?: number;
   longitude?: number;
   elevation?: number;
@@ -235,6 +235,22 @@ function idOf(office: string, location: string): string {
 }
 
 /**
+ * What water a location measures, from CWMS's location kind and the district's
+ * type. A project's stage is its pool, and a run-of-river project's pool is
+ * the river. A location named for a tailwater is never a lake, since five MVK
+ * tailwaters carry the type RESERVOIR of the dam they sit below; one CWMS or
+ * its district calls a stream is still a river.
+ */
+export function kindOf(l: Pick<CatalogLocation, "name" | "kind" | "type">): Kind | null {
+  const type = l.type?.trim().toLowerCase() ?? "";
+  if (l.kind?.startsWith("STREAM") || /^str(e)?am/.test(type) || type === "ror project")
+    return "river";
+  if (/tailwater|(^|[^a-z])TW([^a-z]|$)/i.test(l.name)) return null;
+  if (l.kind === "PROJECT" || /^(corps )?reservoir$|^lake$|^project$/.test(type)) return "lake";
+  return null;
+}
+
+/**
  * `series` is the catalog entry the station reads, or undefined when its
  * committed series (`name`) is no longer listed.
  */
@@ -256,7 +272,7 @@ function toStation(
     lat: l.latitude!,
     lon: l.longitude!,
     country_code: /^(US|United States)/.test(l.nation ?? "US") ? "US" : null,
-    kind: l.kind?.startsWith("STREAM") ? "river" : null,
+    kind: kindOf(l),
     interval_s: INTERVALS[name.split(".")[3]!] ?? null,
     datum: DATUM,
     // The description's adjustment names its survey's realization, so it wins over the catalog's elevation.

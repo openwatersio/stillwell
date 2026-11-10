@@ -45,7 +45,7 @@ jobs:
           assert len(sources) > 0
           with urllib.request.urlopen(f"{base}/errata.json") as response:
               errata = json.load(response)
-          # Empty once every source-error issue is closed.
+          # Empty once every erratum is retired.
           print(f"errata.json with urllib: {len(errata)} errata")
           assert isinstance(errata, list)
           rows = duckdb.sql(

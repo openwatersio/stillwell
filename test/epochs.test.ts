@@ -407,6 +407,115 @@ describe("nextEpochs, as a person decides", () => {
   });
 });
 
+describe("nextEpochs, split by a person", () => {
+  const split = (...days: string[]) => ({
+    "x/1": days.map((since) => ({ since, note: "the zero moved" })),
+  });
+
+  it("splits the epoch spanning the day, and converts the earlier one by a decision", () => {
+    const decisions = { [epochKey("x/1", null)]: { to_current: 1.35, note: "measured" } };
+    const { epochs, event, reason } = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2020-03-06"), decisions }),
+    );
+    assert.equal(event, "opened");
+    assert.match(reason!, /2020-03-06/);
+    assert.deepEqual(
+      epochs.map((e) => [e.id, e.since, e.until, e.state, e.to_current]),
+      [
+        [1, null, "2020-03-06T00:00:00Z", "closed", 1.35],
+        [2, "2020-03-06T00:00:00Z", null, "open", 0],
+      ],
+    );
+    // A second refresh finds the split made and changes nothing.
+    const again = nextEpochs(
+      epochs,
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2020-03-06"), decisions }),
+    );
+    assert.equal(again.event, null);
+    assert.equal(again.epochs.length, 2);
+  });
+
+  it("splits at several days in one refresh, leaving the middle unconverted without a decision", () => {
+    const { epochs } = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2006-01-09", "1997-02-28", "2023-03-10") }),
+    );
+    assert.deepEqual(
+      epochs.map((e) => [
+        e.id,
+        e.since?.slice(0, 10) ?? null,
+        e.until?.slice(0, 10) ?? null,
+        e.state,
+        e.to_current,
+      ]),
+      [
+        [1, null, "1997-02-28", "closed", null],
+        [2, "1997-02-28", "2006-01-09", "closed", null],
+        [3, "2006-01-09", "2023-03-10", "closed", null],
+        [4, "2023-03-10", null, "open", 0],
+      ],
+    );
+    assert.equal(currentEpoch(epochs).id, 4);
+  });
+
+  it("keeps the source's reference, so its next refresh sees no change", () => {
+    const first = nextEpochs(
+      [epoch({ reference: "B" })],
+      { datum: "PNP", datums: {}, reference: { id: "B", since: null } },
+      options({ splits: split("2020-03-06") }),
+    );
+    assert.equal(first.epochs.at(-1)!.reference, "B");
+    const next = nextEpochs(
+      first.epochs,
+      { datum: "PNP", datums: {}, reference: { id: "B", since: null } },
+      options({ splits: split("2020-03-06") }),
+    );
+    assert.equal(next.event, null);
+    assert.equal(next.epochs.length, 2);
+  });
+
+  it("never splits before an epoch's start, so ids stay in time order", () => {
+    const first = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2020-03-06") }),
+    );
+    const later = nextEpochs(
+      first.epochs,
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2020-03-06", "2015-01-01") }),
+    );
+    assert.equal(later.event, null);
+    assert.deepEqual(
+      later.epochs.map((e) => e.id),
+      [1, 2],
+    );
+  });
+
+  it("waits while the station is held", () => {
+    const fetched = { datum: "PNP", datums: {}, reference: { id: "R", since: "2027-03-02" } };
+    const held = nextEpochs([epoch()], fetched, options());
+    assert.equal(held.event, "held");
+    const split_ = nextEpochs(held.epochs, fetched, options({ splits: split("2027-04-01") }));
+    assert.equal(split_.epochs.length, held.epochs.length);
+    assert.equal(split_.event, "waiting");
+  });
+
+  it("waits for a day ahead", () => {
+    const { epochs, event } = nextEpochs(
+      [epoch()],
+      { datum: "PNP", datums: {} },
+      options({ splits: split("2028-01-01") }),
+    );
+    assert.equal(event, null);
+    assert.equal(epochs.length, 1);
+  });
+});
+
 describe("convert", () => {
   it("converts through a fixed reference, the epoch's own datum included", () => {
     assert.equal(convert(epoch({ datums: { NN: 5.2 } }), epoch({ datum: "NN" })), 5.2);

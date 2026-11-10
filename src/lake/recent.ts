@@ -218,7 +218,7 @@ export async function updateRecent({
           // Nothing new keeps what we had, rather than clearing the last hours.
           if (got.length) {
             const had = window.current;
-            const opts = qcFor(source, station);
+            const opts = qcFor(station);
             // The longest run any flatline rule needs to see.
             const longest = Math.max(
               opts.flatline_s ?? FLATLINE_S,
@@ -784,23 +784,44 @@ export async function refuseOtherDatum(
 }
 
 /**
- * Pooled rivers and lakes hold one level, to the hundredth of a foot, for a day
- * or more, so they get two days before a flatline counts as suspect. And they
- * sit nearly flat for months and then rise meters in a flood, so a level far
- * outside their own range isn't suspect for that alone. A river or lake the
- * source finds tidal never holds still that long, so it keeps the source's
- * flatline limit, but floods all the same; where its values move in whole
- * centimeters, a small tide can sit on one for hours (as SMHI's do), so those
- * get two days. Tide gauges keep their source's settings.
+ * Below this lunar tide, in meters (`Station.tide_m`), a tide gauge whose
+ * values move in whole centimeters gets still water's two days before a
+ * flatline is suspect. A smaller tide, such as Göteborg's 9 cm, can sit on
+ * one centimeter for hours at the turn; at 30 cm the level leaves it within
+ * about an hour, even a diurnal tide's, so a longer run is a stuck gauge.
+ * A change to it, or to `qcFor`'s other limits, bumps `RULES` in
+ * `src/lake/analysis.ts`, so every station's stored years are requalified.
  */
-export function qcFor(source: Source, station: Station): QcOptions {
-  const still = station.kind === "river" || station.kind === "lake";
-  const tidal = still && source.tidal?.(station);
+export const CENTIMETER_TIDE_M = 0.3;
+
+/**
+ * QC's rules for a station, by whether its levels carry a tide
+ * (`Station.tidal`, from `src/lake/analysis.ts`), the same for every source.
+ * Still water, a pooled river, a lake or a creek drained to its sill, holds
+ * one level to the centimeter for a day or more, so it gets two days before a
+ * flatline counts as suspect, and it sits nearly flat for months and then
+ * rises meters in a flood, so a level far outside its own range isn't suspect
+ * for that alone. A sea without a tide, such as the Baltic, holds a
+ * centimeter for a day on calm days too, but a millimeter for hours only when
+ * its gauge is stuck, so it keeps six hours where its values move in
+ * millimeters. Tidal water never holds still that long, so it gets six hours,
+ * or two days where its tide is under `CENTIMETER_TIDE_M` and its values move
+ * in whole centimeters. A tidal river or lake still floods, so it keeps the
+ * outlier check off; tidal water of any other kind, or none, keeps it. A
+ * station with no verdict yet is judged by its kind: a river or lake as
+ * still, anything else as tidal, as a tide gauge is, since sources such as
+ * RWS and REFMAR leave their tide gauges' kind unset.
+ */
+export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOptions {
+  const river = station.kind === "river" || station.kind === "lake";
+  if (!(station.tidal ?? !river))
+    return station.kind === "coastal"
+      ? { centimeter_flatline_s: 48 * 3600, outliers: false }
+      : { flatline_s: 48 * 3600, outliers: false };
+  const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
-    ...source.metadata.qc,
-    ...(still ? { outliers: false } : {}),
-    ...(still && !tidal ? { flatline_s: 48 * 3600 } : {}),
-    ...(tidal ? { centimeter_flatline_s: 48 * 3600 } : {}),
+    ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
+    ...(river ? { outliers: false } : {}),
   };
 }
 

@@ -34,19 +34,19 @@ jobs:
           set -f
           # The command and sources are the words that aren't an option or
           # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --no-publish,
-          # --refetch, --skip-written, --skip-unscreened, --rebuild-bounds and --rebuild-years.
+          # --refetch, --skip-written, --skip-unscreened, --rebuild-bounds, --rebuild-years, --all and --requalify.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --accept-withheld | --no-publish | --refetch | --skip-written | --skip-unscreened | --rebuild-bounds | --rebuild-years | --*=* | --) ;;
+              --accept-epochs | --accept-withheld | --no-publish | --refetch | --skip-written | --skip-unscreened | --rebuild-bounds | --rebuild-years | --all | --requalify | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact | requalify | withhold | years) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            backfill | recent | compact | requalify | withhold | years | analyze) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1
@@ -73,8 +73,6 @@ jobs:
     environment: lake
     permissions:
       contents: read
-      # `publish` reads the errata from the open source-error issues.
-      issues: read
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -94,4 +92,3 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           # USGS shares 1,000 requests an hour among keyless clients on one IP.
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
-          GITHUB_TOKEN: ${{ github.token }}

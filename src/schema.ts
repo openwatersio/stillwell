@@ -1,4 +1,3 @@
-import type { QcOptions } from "./qc.ts";
 import type { Extreme, Sample, TransitExtreme } from "./types.ts";
 
 /**
@@ -73,7 +72,7 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, open `source-error` issues, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
   /** Whether the live endpoint serves this station. */
@@ -92,6 +91,16 @@ export interface Station {
    * than stated by the source: true or false with a date, null without one.
    */
   source_qc_start_inferred?: boolean | null;
+  /**
+   * Whether the station's levels carry a tide, measured from its last year in
+   * the lake (`stations/analysis/<source>.parquet`, `src/lake/analysis.ts`):
+   * null where they can't say, or before its first analysis. QC's flatline
+   * and outlier rules follow it (`qcFor`). Set as `stations.parquet` is built
+   * and as ingest reads a list, never by an adapter.
+   */
+  tidal?: boolean | null;
+  /** The lunar tide `tidal` is judged by, M2's and O1's amplitudes added, in meters. */
+  tide_m?: number | null;
   /** How often the source lets us ask for this station, in seconds. */
   min_interval_s: number | null;
   source_url: string | null;
@@ -155,9 +164,22 @@ export interface EpochDecision {
   note: string;
 }
 
+/**
+ * A day a person found a station's zero moved though the source never said,
+ * from its values, against another record of the gauge or a neighbor where
+ * the lake has one. Never removed once applied, as backfill reads it.
+ */
+export interface EpochSplit {
+  /** YYYY-MM-DD: the first local day on the new zero. */
+  since: string;
+  note: string;
+}
+
 /** Decisions a person made about a source's stations, kept in its adapter. */
 export interface Overrides {
   epochs?: Record<string, EpochDecision>;
+  /** By station: where to split its epochs, each split opening an epoch from that day. */
+  splits?: Record<string, EpochSplit[]>;
 }
 
 export interface SourceMetadata {
@@ -215,8 +237,6 @@ export interface SourceMetadata {
    * then records such years and skips them for 30 days (`src/empty-years.ts`).
    */
   empty_means_none?: boolean;
-  /** Quality-control settings for the source's observed levels, where the defaults don't fit. */
-  qc?: QcOptions;
   /**
    * The range of the source's local UTC offsets in hours, such as [-6, -4] for
    * US Central and Eastern time, so a date it gives can be turned into the
@@ -262,7 +282,8 @@ export interface Source {
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /**
    * Spans of a station's values that the lake's own errata flag `suspect`,
-   * worked out from the source's levels and flags alone, so requalify flags
+   * beyond the spans its `errata.json` names, which the registry adds, worked
+   * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
    * the recent window; one that needs the whole record throws when it isn't.
@@ -273,12 +294,6 @@ export interface Source {
     station: Station,
     record: () => AsyncIterable<Observation[]>,
   ): Promise<[number, number][]>;
-  /**
-   * Whether a `river` or `lake` station's levels carry a tide, so a flatline
-   * there is suspect as soon as at a tide gauge (`qcFor` in
-   * `src/lake/recent.ts`).
-   */
-  tidal?(station: Station): boolean;
   /** High and low waters the source selects from its observations. */
   extremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
   /** The source's own predicted curve over [start, end). */

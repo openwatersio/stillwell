@@ -1,0 +1,106 @@
+{
+  "errata": [
+    {
+      "id": "marine-institute-coverage-start",
+      "stations": "every station",
+      "handling": "avoided",
+      "error": "The dataset's `time_coverage_start` says 2000, but no gauge has values before October 2006.",
+      "response": "Backfills start from each gauge's first value, not the dataset's coverage.",
+      "evidence": "The ERDDAP dataset's global `time_coverage_start` attribute; the earliest value at any gauge, found while backfilling, is October 2006 at Skerries Harbour.",
+      "reported": "2026-11-08",
+      "report": "Sent to the Marine Institute on 2026-11-08; they replied they'll work through it after a period of leave. Text in [#59](https://github.com/openwatersio/water-levels/issues/59)."
+    },
+    {
+      "id": "marine-institute-lat-2026",
+      "stations": [
+        "marine-institute/aranmore-island-leabgarrow",
+        "marine-institute/ballycotton-harbour",
+        "marine-institute/ballyglass-harbour",
+        "marine-institute/buncranna",
+        "marine-institute/castletownbere-port",
+        "marine-institute/dingle-harbour",
+        "marine-institute/dublin-port",
+        "marine-institute/dunmore-east-harbour",
+        "marine-institute/galway-port",
+        "marine-institute/howth-water-level-1",
+        "marine-institute/inishmore",
+        "marine-institute/killybegs-port",
+        "marine-institute/kilrush-lough",
+        "marine-institute/malin-head-portmore-pier",
+        "marine-institute/rosslare",
+        "marine-institute/skerries-harbour",
+        "marine-institute/sligo",
+        "marine-institute/union-hall-harbor",
+        "marine-institute/wexford-harbour"
+      ],
+      "since": "2026-03-24",
+      "handling": "kept",
+      "error": "On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.",
+      "response": "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
+      "evidence": "LAT less OD Malin is constant at each gauge from 2008 until 24 March 2026, then moves by 1 to 5 cm. See [the adapter's README](https://github.com/openwatersio/water-levels/blob/main/src/sources/marine-institute/README.md).",
+      "reported": "2026-11-08",
+      "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/water-levels/issues/59); they replied they'll work through it after a period of leave."
+    },
+    {
+      "id": "marine-institute-castletownbere-2026-offsets",
+      "stations": ["marine-institute/castletownbere-port"],
+      "since": "2026-02-04",
+      "until": "2026-04-26",
+      "handling": "flagged",
+      "error": "The Marine Institute's Castletownbere levels step by up to 1.3 m on and off from 4 February to 25 April 2026.",
+      "response": "4 February to 25 April 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS and Marine Institute copies of the gauge, which agree with the series to within 2 cm before and after: over the spans the series differs from them by up to 1.3 m."
+    },
+    {
+      "id": "marine-institute-kilrush-2024-offset",
+      "stations": ["marine-institute/kilrush-lough"],
+      "since": "2024-01-17",
+      "until": "2024-02-06",
+      "handling": "flagged",
+      "error": "The Marine Institute's Kilrush Lough levels sit about 5 m low from 17 January to 5 February 2024.",
+      "response": "17 January to 5 February 2024 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away: the difference is about −0.2 m before and after and −5.66 m over the span."
+    },
+    {
+      "id": "marine-institute-kilrush-2025-offsets",
+      "stations": ["marine-institute/kilrush-lough"],
+      "since": "2025-09-10",
+      "until": "2025-12-01",
+      "handling": "flagged",
+      "error": "The Marine Institute's Kilrush Lough levels step by 0.5 to 4.7 m on and off from 10 September to 30 November 2025.",
+      "response": "10 September to 30 November 2025 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Fenit (`gesla/fenit-fen-irl-cmems`) and GESLA's copies of the gauge: against Fenit the difference is −0.06 to −0.08 m outside the spans and −1.8 to −4.7 m inside them; GESLA's Marine Institute copy differs from the series by about −0.5 m on the days it has."
+    },
+    {
+      "id": "marine-institute-malin-head-2026-offset",
+      "stations": ["marine-institute/malin-head-portmore-pier"],
+      "since": "2026-08-12",
+      "until": "2026-09-20",
+      "handling": "flagged",
+      "error": "The Marine Institute's Malin Head (Portmore Pier) levels sit about 3.9 m low from 12 August to 9 September 2026 and about 1.2 m high from 10 to 19 September.",
+      "response": "12 August to 19 September 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Buncrana (`marine-institute/buncranna`), 29 km away: the difference is −0.05 m before and −0.02 to −0.03 m after, −3.92 m from 12 August and +1.18 m from 10 September."
+    },
+    {
+      "id": "marine-institute-sligo-2026-offset",
+      "stations": ["marine-institute/sligo"],
+      "since": "2026-07-22",
+      "until": "2026-07-29",
+      "handling": "flagged",
+      "error": "The Marine Institute's Sligo levels sit about 4 m low from 22 to 28 July 2026.",
+      "response": "22 to 28 July 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`. The lake's QC already flags 3 to 21 July.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Killybegs (`marine-institute/killybegs-port`), 38 km away: the difference is −0.02 to −0.06 m before and after and −4.04 m over the span."
+    },
+    {
+      "id": "marine-institute-dublin-port-2020-offset",
+      "stations": ["marine-institute/dublin-port"],
+      "since": "2020-04-22",
+      "until": "2020-05-07",
+      "handling": "flagged",
+      "error": "The Marine Institute's Dublin Port levels sit about 5.8 m low from 22 April to 6 May 2020.",
+      "response": "22 April to 6 May 2020 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Howth (`marine-institute/howth-water-level-1`), 11 km away: the difference is +0.19 m before, −0.03 m after and −5.67 m over the span. GESLA's CMEMS copy of the gauge differs from the series by −2.49 m on the one day it has in the span."
+    }
+  ],
+  "retired": []
+}

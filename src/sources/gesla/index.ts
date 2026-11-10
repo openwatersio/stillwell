@@ -15,7 +15,6 @@ import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
 import { DROPPED } from "./dropped.ts";
-import { TIDAL_RIVERS } from "./tidal-rivers.ts";
 
 /**
  * GESLA 4.1 (Global Extreme Sea Level Analysis), a static release of 6,682
@@ -788,7 +787,6 @@ export const source: Source = {
   stations,
   withheld,
   observations: (s, start, end) => levels(s as GeslaStation, start, end),
-  tidal: (s) => TIDAL_RIVERS.has(s.source_id),
   // The datum jumps, from the lake's copy of the record. They're judged against
   // the record's longest segment, so a copy that misses either end is refused;
   // a year missing in the middle isn't seen. shortcut: a backfill that failed a

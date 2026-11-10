@@ -96,7 +96,7 @@ One station in full: the fields above plus
 
 `same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](data.md#stations)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
 
-`errata` names the errors found in what the source publishes for the station, each an [open `source-error` issue](https://github.com/openwatersio/water-levels/issues?q=is%3Aissue+is%3Aopen+label%3Asource-error), such as a clock the lake corrects or a span it flags.
+`errata` names the errors found in what the source publishes for the station, each an entry in the source's [`errata.json`](https://github.com/openwatersio/water-levels/tree/main/src/sources), such as a clock the lake corrects or a span it flags.
 
 ### `GET /water-levels/stations/{source}/{id}/live`
 

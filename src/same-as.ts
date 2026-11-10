@@ -61,6 +61,41 @@ export const LINKS: Decision[] = [
     b: "refmar/749",
     note: "UHSLC's copy of SHOM's Ile Royale gauge, SHOM number 540 in UHSLC's documentation file. UHSLC keeps Ile Royale Anse Legoff (545) apart as 851, as REFMAR keeps 127 apart from 749, but both REFMAR names share Ile Royale's words, so the copy rule leaves it in doubt.",
   },
+  {
+    a: "gesla/delfzijl-delfzl-nld-rws_hist",
+    b: "gesla/delfzijl-del-nld-rws",
+    note: "GESLA's historic and current RWS records of Delfzijl, 0.2 km apart. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month, where they overlap in 2005 and 2006. One source's two records, so nearness doesn't link them.",
+  },
+  {
+    a: "gesla/delfzijltg-del-nld-cmems",
+    b: "gesla/delfzijl-del-nld-rws",
+    note: "CMEMS's copy of RWS's Delfzijl gauge, which CMEMS names as originator, 0.3 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month from 2014. One source's two records, so nearness doesn't link them.",
+  },
+  {
+    a: "gesla/eemshaventg-eem-nld-cmems",
+    b: "gesla/eemshaven_haven-eem-nld-rws",
+    note: "CMEMS's copy of RWS's Eemshaven haven gauge, 1.8 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them 0.4 cm RMS apart in a usual month. One source's two records, so nearness doesn't link them.",
+  },
+  {
+    a: "gesla/eemsmeetpaaltg-eem-nld-cmems",
+    b: "gesla/eemshaven_waddenzee-eem-nld-rws",
+    note: "CMEMS's Eems Meetpaal is RWS's Eemshaven Waddenzee gauge, 0.1 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. One source's two records, so nearness doesn't link them.",
+  },
+  {
+    a: "gesla/eidersptg-eid-deu-cmems",
+    b: "pegelonline/9530010",
+    note: "CMEMS's copy of WSA Tönning's Eider barrier gauge, at PEGELONLINE's position for Eider-Sperrwerk AP. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. GESLA's CMEMS name says no side of the barrier, where PEGELONLINE's says the outer one (AP), so nearness doesn't link them.",
+  },
+  {
+    a: "gesla/degerby-deg-fin-cmems",
+    b: "gesla/foglo_degerby-134252-fin-fmi",
+    note: "CMEMS's copy of FMI's Föglö Degerby gauge, which CMEMS names as originator, 0.3 km apart. The cross-station checks (scripts/cross-check.ts, November 2026) find them 0.9 cm RMS apart in a usual month; on the hour, 48% of 29,924 shared hours agree within 5 mm once their 11 cm datum difference is removed, so the two are processed differently, though FMI runs no other gauge there. One source's two records, so nearness doesn't link them.",
+  },
+  {
+    a: "bodc/ptb",
+    b: "ea/E72624",
+    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred.",
+  },
 ];
 
 /** Pairs a person found don't share a gauge, though a rule links them. */
@@ -155,6 +190,7 @@ const ORDER: How[] = ["manual", "id", "near", "copy"];
 export function linkGauges<T extends Station>(
   stations: T[],
   now = new Date(),
+  usable: Map<string, number> = new Map(),
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
   // GESLA's records whose values are another gauge's join no group.
@@ -275,7 +311,10 @@ export function linkGauges<T extends Station>(
   const large: string[][] = [];
   for (const [r, group] of members) {
     const copies = copiesIn(group);
-    preferredOf.set(r, group.reduce((best, s) => (rank(s, best, now, copies) < 0 ? s : best)).id);
+    preferredOf.set(
+      r,
+      group.reduce((best, s) => (rank(s, best, now, copies, usable) < 0 ? s : best)).id,
+    );
     if (group.length > LARGE) large.push(group.map((s) => s.id).sort());
   }
   return {
@@ -302,7 +341,9 @@ function pairKey(a: string, b: string): string {
  * the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the
- * group's `COPIES` stations); the longer record in the lake; the finer interval; then the
+ * group's `COPIES` stations); the longer record in the lake, its span from `first` to
+ * `last` times its share of values not flagged suspect or bad (`usable`, by ID,
+ * from the years file, or whole where unknown); the finer interval; then the
  * lower ID, so equals always break the same way.
  */
 export function rank(
@@ -310,6 +351,7 @@ export function rank(
   b: Station,
   now = new Date(),
   copies: Set<string> = new Set(),
+  usable: Map<string, number> = new Map(),
 ): number {
   const copy = (s: Station) => redistributed(s) || copies.has(s.id);
   const levels = (s: Station) => s.products.includes("levels");
@@ -317,7 +359,7 @@ export function rank(
     s.status === "active" && s.last !== null && now.getTime() - Date.parse(s.last) < REPORTING_MS;
   const span = (s: Station) => {
     const ms = s.first && s.last ? Date.parse(s.last) - Date.parse(s.first) : 0;
-    return Number.isFinite(ms) ? ms : 0;
+    return Number.isFinite(ms) ? ms * (usable.get(s.id) ?? 1) : 0;
   };
   const tests: [boolean | number, boolean | number][] = [
     [a.id in PREFER, b.id in PREFER],

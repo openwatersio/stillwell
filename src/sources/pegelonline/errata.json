@@ -1,0 +1,134 @@
+{
+  "errata": [
+    {
+      "id": "pegelonline-download-api-differ",
+      "stations": ["pegelonline/5990020", "pegelonline/9530020"],
+      "handling": "kept",
+      "error": "At Cuxhaven Steubenhöft and Husum, PEGELONLINE's raw-data download and its REST API give different levels for the same minutes, by up to 6 and 8 cm, though both are labeled unchecked raw data on the same gauge zero.",
+      "response": "History comes from the download and the last 31 days from the REST API, so the series can step by a few centimeters where one hands over to the other.",
+      "evidence": "At Cuxhaven Steubenhöft (`pegelonline/5990020`) and Husum (`pegelonline/9530020`), PEGELONLINE's raw-data download and its REST API give different water levels for the same minutes. The lake takes history from the download and recent values from the REST API, so at these two gauges the record can step by a few centimeters where one source hands over to the other.\n\n#### What was compared\n\nOn 5 November 2026, about 16 hours of 1-minute values at 14 tide gauges, downloaded the way backfill does and compared with what hourly ingest stored from the REST API:\n\n| Gauges | Equal values | Largest difference |\n|---|---|---|\n| Helgoland Binnenhafen, Kiel-Holtenau | all | 0 |\n| 9 more tide gauges from [docs/ticon-replacement.csv](docs/ticon-replacement.csv) | 92 to 99% | 1 to 2 cm |\n| Cuxhaven Steubenhöft | 24% | 6 cm |\n| Husum | 3% | 8 cm |\n\n- **Not a clock error:** both sources match best with no time shift (0 to 7% of values match at a one- or two-hour offset), and the download's timestamps carry their MEZ/MESZ offset.\n- **Not a later correction:** the REST API still returns exactly what hourly ingest stored the day before, so its values weren't revised.\n- **Same metadata:** both sides describe the series as `WASSERSTAND ROHDATEN`, unchecked, in cm, on the same gauge zero.\n- At Cuxhaven the REST value is 0 to 6 cm higher, most around high water and close to zero around low water.\n\n#### Open questions\n\nAsked PEGELONLINE (pegelonline@itzbund.de) on 2026-11-07, in German, which sensor each endpoint serves at the two gauges, whether the Husum download is about 5 cm low this autumn, and about the May to June 2025 Cuxhaven correction. No answer yet.\n\n- [ ] Which series is right? Compare an older year of the download with GESLA's WSV record and with a TICON fit at both gauges.\n- [x] If that doesn't settle it, ask WSV which series the download and the REST API serve at these gauges.\n- [ ] Check whether more gauges do this, once the backfill has written more of them.\n- [ ] If the download is the wrong one, refetch the two gauges with `--refetch` once it's fixed or once we switch sources.\n\nThe backfill goes ahead in the meantime. Files it writes for these gauges can be replaced with `--refetch`.",
+      "reported": "2026-11-07",
+      "report": "Asked in the same message as pegelonline-wachendorf-zero-date ([#75](https://github.com/openwatersio/water-levels/issues/75)), to pegelonline@itzbund.de on 2026-11-07. No answer yet."
+    },
+    {
+      "id": "pegelonline-wachendorf-zero-date",
+      "stations": ["pegelonline/3500031"],
+      "handling": "kept",
+      "error": "PEGELONLINE dates Wachendorf's gauge zero, PNP at 12.77 m above NHN, from 2026-06-18, but doesn't say whether the zero moved that day or what it was before.",
+      "response": "PEGELONLINE's overrides reject the date as a move, so Wachendorf stays on one epoch at 12.77 m. Without a raw-data download, the lake holds only the REST API's last 31 days, all after that date.",
+      "evidence": "The REST API gives the zero as 12.77 m above NHN, `validFrom` 2026-06-18. The first station refresh to list Wachendorf, on 2026-11-05, recorded 12.77 m but not the date. The next refresh read `validFrom`, saw a zero dated within 180 days of the gauge's first sighting, and held it:\n\n```\npegelonline/3500031: epoch held, PNP to PNP (first seen within 180 days of its date, so epoch 1 may hold values from before and after it); overrides key \"pegelonline/3500031 2026-06-18T23:00:00Z\"\n```\n\nBoth epochs carry the same label and height, PNP at 12.77 m above NHN. The REST API shows only the current zero, so the height before 2026-06-18 is unknown. Wachendorf has no raw-data download (`history_since` is null), so the readings can't be checked for a step on that day either.\n\n#### To resolve\n\n- [x] Ask WSV (Standort Meppen) whether Wachendorf's gauge zero changed on 2026-06-18, and if so from what height\n- [ ] If it didn't change: nothing to do but close this\n- [ ] If it changed and values from before that day are available: replace the `reject` with `confirm` and the old zero's `to_current`, then backfill the station",
+      "reported": "2026-11-08",
+      "report": "Sent to PEGELONLINE (pegelonline@itzbund.de) on 2026-11-08, in German. Answered 2026-11-09: the zero was 13.77 m above NHN until 2026-06-18 and 12.77 m after. Text in [#72](https://github.com/openwatersio/water-levels/issues/72)."
+    },
+    {
+      "id": "pegelonline-cuxhaven-2025-revised",
+      "stations": ["pegelonline/5990020"],
+      "since": "2025-05-13",
+      "until": "2025-06-25",
+      "handling": "kept",
+      "error": "PEGELONLINE's download for Cuxhaven sits 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, so the WSV changed values it still labels raw and unchecked.",
+      "response": "Kept as the download serves it, so Cuxhaven's lake values from 13 May to 24 June 2025 are the revised ones.",
+      "evidence": "While comparing the lake's 2024 and 2025 Cuxhaven Steubenhöft files, which come from PEGELONLINE's raw-data download, with other records of the same gauge for [#26](https://github.com/openwatersio/water-levels/issues/26), the download sat 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, and matched it before and after. Both describe the series as unchecked raw data, so the WSV changed values after GESLA copied them without relabeling them. The comparison is in [#26's comment](https://github.com/openwatersio/water-levels/issues/26#issuecomment-6700549671).",
+      "reported": "2026-11-07",
+      "report": "Asked in the same message as [#26](https://github.com/openwatersio/water-levels/issues/26), to pegelonline@itzbund.de on 2026-11-07. No answer yet."
+    },
+    {
+      "id": "pegelonline-wangerooge-ost-filled",
+      "stations": ["pegelonline/9420020"],
+      "since": "2007-11-05",
+      "until": "2008-04-02",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Wangerooge Ost levels from 5 November 2007 to 1 April 2008 are Wangerooge West's, less an offset that steps by 1 cm every few weeks from 8 cm to 1 cm.",
+      "response": "5 November 2007 to 1 April 2008 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026. Wangerooge Ost and West, 8 km apart, usually differ by 6 to 8 cm RMS a month. Over the span they differ by 0.0 cm RMS each day, with the mean difference falling from −8 to −1 cm in whole-centimeter steps. Against Wangerooge Nord, Ost's RMS over the span equals West's."
+    },
+    {
+      "id": "pegelonline-helgoland-suedhafen-2013-clock",
+      "stations": ["pegelonline/9510075"],
+      "since": "2013-05-29",
+      "until": "2013-07-25",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Helgoland Südhafen levels run about 19 minutes late on 29 and 30 May and from 17 June to 24 July 2013.",
+      "response": "29 May to 24 July 2013 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: the tide-timing check put the semidiurnal tide 19 minutes and the diurnal 13 minutes late from mid-June to mid-July, against about 3 minutes of scatter. Against Helgoland Binnenhafen (`pegelonline/9510070`), 0.5 km away, the daily RMS rises from about 2 cm to 8 to 14 cm on those days. GESLA's WSV copy carries it too (erratum `gesla-helgoland-suedhafen-2013-clock`)."
+    },
+    {
+      "id": "pegelonline-bake-z-2004-offset",
+      "stations": ["pegelonline/9510066"],
+      "since": "2004-11-11",
+      "until": "2005-03-08",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Bake Z levels sit 0.5 to 1 m high from 11 November 2004 to 7 March 2005, apart from a few days in December.",
+      "response": "11 November 2004 to 7 March 2005 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of −95 cm on 7 March 2005 against all four neighboring gauges. Daily means against Scharhörn (`pegelonline/9510060`) are about +5 cm before and after, and +48 to +64 cm over the span. GESLA's WSV copy carries it too (erratum `gesla-bake-z-2004-offset`)."
+    },
+    {
+      "id": "pegelonline-helgoland-binnenhafen-2000-offset",
+      "stations": ["pegelonline/9510070"],
+      "until": "2000-11-01",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Helgoland Binnenhafen levels before 1 November 2000 sit about 25 cm lower than the gauge's later ones against its neighbors, with no change of gauge zero recorded.",
+      "response": "Values before 1 November 2000 are flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of +27 cm on 29 October 2000 against three neighboring gauges. Against Bake A (`pegelonline/9510063`) the yearly median difference is −25 cm in 2000 and between −13 and +2 cm in every later year; against Bake Z it is −17 cm in 2000 and −1 to +2 cm in 2001 to 2004. Helgoland Südhafen sits as low as Binnenhafen until its own step (erratum `pegelonline-helgoland-suedhafen-2001-offset`). The gauge's zero has one date, 2019-11-01. Daily means against Südhafen move from about +4 cm to +30 cm between 30 October and 1 November 2000. GESLA's WSV copy carries it too (erratum `gesla-helgoland-binnenhafen-2000-offset`)."
+    },
+    {
+      "id": "pegelonline-helgoland-suedhafen-2001-offset",
+      "stations": ["pegelonline/9510075"],
+      "until": "2004-01-01",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Helgoland Südhafen levels before 2004 sit about 29 cm lower than the gauge's later ones against its neighbors, and May and November 2001 are a further 75 cm low and 47 cm high.",
+      "response": "Values before 2004 are flagged `suspect`, keeping the source's own flag as `source_flag`: the step falls in the 2002 and 2003 outage, so the few values left from then are flagged too.",
+      "evidence": "Against Bake A (`pegelonline/9510063`) the yearly median difference is −29 cm in 2000 and 2001 and between −13 and +1 cm from 2004 on. Against Helgoland Binnenhafen, 0.5 km away, it is −4 cm until November 2000, when Binnenhafen steps (erratum `pegelonline-helgoland-binnenhafen-2000-offset`), then −30 cm through 2001, and the two agree again from 2004. The step falls in 2002 and 2003, when almost every value is flagged. Monthly differences against Bake A are −105 cm in May 2001 and +19 cm in November 2001. Found while checking the Binnenhafen erratum; the cross-station check's 120-day limit skipped the span because of the gap. GESLA's WSV copy carries it too (erratum `gesla-helgoland-suedhafen-2001-offset`)."
+    },
+    {
+      "id": "pegelonline-mittelgrund-2012-offset",
+      "stations": ["pegelonline/9510132"],
+      "since": "2012-10-10",
+      "until": "2012-11-20",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Mittelgrund levels sit about 13 cm lower than usual against Cuxhaven from 10 October to 19 November 2012.",
+      "response": "10 October to 19 November 2012 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: steps of −19 cm on 10 October and +17 cm on 20 November 2012 against two of three neighboring gauges. The monthly median difference against Cuxhaven Steubenhöft (`pegelonline/5990020`) is −25 cm in October 2012 against −11 to −14 cm in the months around it. GESLA's WSV copy carries it too (erratum `gesla-mittelgrund-2012-offset`)."
+    },
+    {
+      "id": "pegelonline-borkum-suedstrand-2014-offset",
+      "stations": ["pegelonline/9340030"],
+      "since": "2014-12-05",
+      "until": "2015-03-12",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Borkum Südstrand levels sit about 11 cm higher than usual against Borkum Fischerbalje from 5 December 2014 to 11 March 2015.",
+      "response": "5 December 2014 to 11 March 2015 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of −11 cm on 14 March 2015 against both neighboring gauges with values then. The monthly median difference against Borkum Fischerbalje (`pegelonline/9340020`), 2 km away, is −8 to −11 cm in every month of 2014 and 2015 except December 2014 to February 2015, at +1.5 to +2.5 cm. Daily means against Fischerbalje are back near usual from 12 March 2015. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means. GESLA's WSV copy carries it too (erratum `gesla-borkum-suedstrand-2014-offset`)."
+    },
+    {
+      "id": "pegelonline-schillig-2006-offset",
+      "stations": ["pegelonline/9430030"],
+      "since": "2006-08-01",
+      "until": "2006-09-07",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Schillig levels sit about 9 cm higher than usual against Wilhelmshaven from 1 August to 6 September 2006.",
+      "response": "1 August to 6 September 2006 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of +9 cm on 28 July 2006 against two of three neighboring gauges. Monthly median differences against Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`) are −4 to −6 cm from January to July 2006 and about −3 cm from October to December, and +4 cm in August; daily means over the span are +7 to +11 cm. Daily means first sit high on 1 August. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means."
+    },
+    {
+      "id": "pegelonline-list-2024-level",
+      "stations": ["pegelonline/9570070"],
+      "since": "2024-09-01",
+      "handling": "kept",
+      "error": "PEGELONLINE's List auf Sylt levels have sat 8 to 20 cm lower against Hörnum and Wittdün since September 2024 than before, with no change of gauge zero.",
+      "response": "The lake keeps the values as served: the offset wanders and continues, so its cause, and whether newer values are right, needs the WSV's answer.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of −23 cm on 28 August 2024 against three of four neighboring gauges. Monthly median differences against Hörnum (`pegelonline/9570050`) are within ±1.3 cm from January to August 2024 and −7 to −22 cm in every month since; against Wittdün (`pegelonline/9570010`) within ±2.6 cm before and −7 to −20 cm in every month since except October 2024. The gauge zero's only date is 2019-11-01."
+    },
+    {
+      "id": "pegelonline-bake-z-2002-offset",
+      "stations": ["pegelonline/9510066"],
+      "since": "2002-09-30",
+      "until": "2002-10-22",
+      "handling": "flagged",
+      "error": "PEGELONLINE's Bake Z levels sit 0.8 to 2.4 m high from 30 September to 21 October 2002.",
+      "response": "30 September to 21 October 2002 is flagged `suspect`, keeping the source's own flag as `source_flag`. The lake's QC already flags about two thirds of it.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October."
+    }
+  ],
+  "retired": []
+}

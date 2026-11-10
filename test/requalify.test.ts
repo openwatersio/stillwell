@@ -45,8 +45,8 @@ const station = {
   ],
 } as unknown as LakeStation;
 
-function source(qc: Source["metadata"]["qc"], extra: Partial<Source> = {}): Source {
-  return { metadata: { id: "test", qc } as Source["metadata"], stations: async () => [], ...extra };
+function source(extra: Partial<Source> = {}): Source {
+  return { metadata: { id: "test" } as Source["metadata"], stations: async () => [], ...extra };
 }
 
 /** Hourly tide over [from, to), with a still stretch at 0.5 m over [stillFrom, stillTo). */
@@ -114,18 +114,19 @@ describe("requalify", () => {
     await writeObservations(path(2024), strict, "NAP");
     assert.equal(strict.filter((r) => r.flag === Flag.suspect).length, 10);
 
-    const loose = source({ flatline_s: 48 * 3600 });
-    assert.deepEqual(await requalify(loose, station, root, 2024, 2025), { files: 1, changed: 9 });
+    // A pooled river gets 48 hours.
+    const pooled = { ...station, kind: "river" as const, tidal: false };
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 1, changed: 9 });
     const after = await readObservations(path(2024));
     assert.deepEqual(
       after.filter((r) => r.flag !== Flag.good).map((r) => r.time),
       [still[0]],
     );
     // Nothing changes on a second run, so nothing is written.
-    assert.deepEqual(await requalify(loose, station, root, 2024, 2025), { files: 0, changed: 0 });
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 0, changed: 0 });
     // A stricter rule again flags them, and an erratum's span comes back from the source.
     const span: [number, number] = [Date.UTC(2024, 2, 1), Date.UTC(2024, 2, 2)];
-    const errata = source({}, { suspect: async () => [span] });
+    const errata = source({ suspect: async () => [span] });
     await requalify(errata, station, root, 2024, 2025);
     const flagged = (await readObservations(path(2024))).filter((r) => r.flag === Flag.suspect);
     assert.equal(flagged.length, 10 + 24);
@@ -151,7 +152,7 @@ describe("requalify", () => {
       all.filter((r) => r.time >= NEW_YEAR),
       "NAP",
     );
-    await requalify(source({}), station, root, 2025, 2026);
+    await requalify(source(), station, root, 2025, 2026);
     const flags = (await readObservations(path(2025))).slice(0, 5).map((r) => r.flag);
     assert.deepEqual(flags, [Flag.suspect, Flag.suspect, Flag.suspect, Flag.suspect, Flag.good]);
   });
@@ -167,7 +168,7 @@ describe("updateRecent", () => {
     window[10]!.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source({}, { observations: async () => hourly(NOW - HOUR, NOW) }),
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
@@ -188,7 +189,7 @@ describe("updateRecent", () => {
     for (const r of window.slice(0, 3)) r.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source({}, { observations: async () => hourly(NOW - HOUR, NOW) }),
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
@@ -299,11 +300,9 @@ describe("updateRecent with a whole-centimeter flatline rule", () => {
     window[20]!.flag = Flag.suspect;
     await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
     await updateRecent({
-      source: source(
-        { centimeter_flatline_s: 48 * 3600 },
-        { observations: async () => hourly(NOW - HOUR, NOW) },
-      ),
-      stations: [station],
+      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
+      // A small tide, which gets the whole-centimeter rule.
+      stations: [{ ...station, tidal: true, tide_m: 0.1 }],
       lakeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
