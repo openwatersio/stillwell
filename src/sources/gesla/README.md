@@ -87,6 +87,6 @@ Years whose flags were written under other rules follow a station's analysis onc
 node scripts/ingest.ts requalify gesla all 1800 2027 --shard 1/8
 ```
 
-`all` reads every record's files and writes those whose flags change: the stations whose analysis changed their rules, and any other year that backfill judged before the year after it was written. A coastal record whose copy in the lake misses an end of its record fails, since its datum-jump check refuses it, and is left as it was, and the run then exits non-zero.
+`all` reads every record's files and writes those whose flags change: the stations whose analysis changed their rules, and any other year that backfill judged before the year after it was written. A coastal record whose copy in the lake misses an end of its record, as nine do where GESLA's own file holds nulls, can't have its datum jumps judged, so it's requalified with its errata spans alone, and the run lists it under warnings.
 
 Years outside each record's span ask for nothing. Each record is read once per run and kept while backfill asks for its years (`KEEP`, the eight used last), the largest, Fremantle Fishing Boat Harbour, being 197 MB of text, which peaks at about 1.3 GB while it's parsed and keeps about 100 MB. A run cut short resumes with `--skip-written`.

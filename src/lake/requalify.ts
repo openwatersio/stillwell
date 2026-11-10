@@ -1,5 +1,5 @@
 import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import type { LakeStation, Observation, Source } from "../schema.ts";
+import { Unjudged, type LakeStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
   listYears,
@@ -27,10 +27,11 @@ export async function requalify(
   start: number,
   end: number,
   written = new Map<string, YearStats>(),
-): Promise<{ files: number; changed: number }> {
+): Promise<{ files: number; changed: number; warnings: string[] }> {
   // Every epoch's datums and errata spans first, so a file to resolve by hand,
-  // or a record a source can't judge, stops the station before any is written.
+  // or a source's error, stops the station before any is written.
   const plans = [];
+  const warnings: string[] = [];
   for (const epoch of station.epochs) {
     const dir = seriesDir(root, "levels", station.source, station.source_id, epoch.id);
     const years = [...(await listYears(dir))].sort((a, b) => a - b);
@@ -42,10 +43,17 @@ export async function requalify(
       if (datums.length !== 1)
         throw new Error(`${path(year)} holds ${datums.join(", ") || "no datum"}; resolve by hand`);
     }
+    // A record the source can't judge is requalified with the spans it can give, and a warning.
     const suspect =
-      (await source.suspect?.(station, async function* () {
-        for (const year of years) yield (await readObservationFile(path(year))).rows;
-      })) ?? [];
+      (await source
+        .suspect?.(station, async function* () {
+          for (const year of years) yield (await readObservationFile(path(year))).rows;
+        })
+        .catch((error: unknown) => {
+          if (!(error instanceof Unjudged)) throw error;
+          warnings.push(error.message);
+          return error.spans;
+        })) ?? [];
     plans.push({ years, wanted, path, suspect });
   }
   const opts = qcFor(station);
@@ -82,7 +90,7 @@ export async function requalify(
       files++;
     }
   }
-  return { files, changed };
+  return { files, changed, warnings };
 }
 
 /**

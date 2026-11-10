@@ -1,7 +1,14 @@
 import { isDeepStrictEqual } from "node:util";
 import { currentEpoch } from "../epochs.ts";
 import { fromSource, qc } from "../qc.ts";
-import { Flag, type LakeStation, type Observation, type Source, type Station } from "../schema.ts";
+import {
+  Flag,
+  Unjudged,
+  type LakeStation,
+  type Observation,
+  type Source,
+  type Station,
+} from "../schema.ts";
 import { DRAINS_RUNS, TIDE_M, drains, tideOf } from "../tidal.ts";
 import {
   exists,
@@ -261,7 +268,9 @@ export async function analyze(
           );
         // The source's errata and adapter spans, from the epoch's whole record, as requalify reads it.
         const dir = seriesDir(lake, "levels", id, station.source_id, epoch);
-        // One the adapter refuses, such as GESLA's for a record the lake holds only part of, is judged without them.
+        // A record the source can't judge, such as one GESLA's datum-jump check
+        // refuses where the lake holds only part of it, is judged with the spans
+        // it can give, its errata's, and a warning.
         const spans =
           (await source
             .suspect?.(station, async function* () {
@@ -269,10 +278,11 @@ export async function analyze(
                 yield await readObservations(`${dir}/${y}.parquet`);
             })
             .catch((error: unknown) => {
+              if (!(error instanceof Unjudged)) throw error;
               report.warned.push(
-                `${station.id}: judged without its errata spans: ${error instanceof Error ? error.message : error}`,
+                `${station.id}: judged without some errata spans: ${error.message}`,
               );
-              return [];
+              return error.spans;
             })) ?? [];
         const verdict = judge(station, rows, spans);
         const was = previous.get(station.id);
