@@ -135,6 +135,8 @@ interface CatalogLocation {
   Locatie_MessageID: number;
   Code: string;
   Naam: string;
+  /** Free text: a river kilometer, a former name, or "platform" at the offshore platforms. */
+  Omschrijving?: string;
   Lat: number;
   Lon: number;
 }
@@ -204,7 +206,8 @@ export async function stations(): Promise<ListedStation[]> {
         lon: l.Lon,
         // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
         country_code: l.Lon < -30 ? "BQ" : "NL",
-        kind: null,
+        // The only water RWS's catalog names is the sea of its offshore platforms.
+        kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
         interval_s: 600,
         datum: DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
         datums: {},
