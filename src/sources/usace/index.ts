@@ -43,9 +43,6 @@ export const metadata: SourceMetadata = {
   finalizes: true,
   // Central and Eastern time, standard or daylight.
   utc_offsets: [-6, -4],
-  // Navigation pools sit nearly flat for months, then rise meters in a flood,
-  // which the outlier rule would mark suspect.
-  qc: { outliers: false },
   terms:
     "Unscreened values are as the gauge reported them, and the Corps may revise them. The Corps assumes no liability for their accuracy.",
 };

@@ -1,0 +1,60 @@
+import { fit } from "./harmonic.ts";
+import { Flag, type Observation } from "./schema.ts";
+
+const DAY_MS = 86_400_000;
+
+/** The lunar tide, M2's and O1's amplitudes added, in meters, that makes a station tidal. */
+export const TIDE_M = 0.08;
+
+/** More runs than this, in a year, that only a tide gauge's flatline limit flags (`drains`), and water drains between tides. */
+export const DRAINS_RUNS = 3;
+
+/**
+ * The lunar tide a record carries, M2's and O1's amplitudes added, in meters,
+ * fitted over its last 366 days of usable values; null where those values
+ * span under 30 days, or their median step is over 3 hours, which can't
+ * resolve a tide (gaps are fine). Lunar constituents only, since a daily
+ * schedule, such as a hydropower dam's, puts power in the solar S2 and K1; O1
+ * catches the diurnal tides of the Gulf of Mexico, where M2 is small.
+ */
+export function tideOf(record: {
+  times: ArrayLike<number>;
+  levels: ArrayLike<number>;
+  /** The values' flags, as the lake's: the source's own, or after QC. */
+  source: ArrayLike<number>;
+}): number | null {
+  const samples = [];
+  for (let i = 0; i < record.times.length; i++)
+    if (record.source[i]! < Flag.suspect && Number.isFinite(record.levels[i]))
+      samples.push({ time: record.times[i]!, level: record.levels[i]! });
+  const end = samples.at(-1)?.time ?? 0;
+  const year = samples.filter((s) => s.time > end - 366 * DAY_MS);
+  if (!year.length || end - year[0]!.time < 30 * DAY_MS) return null;
+  const steps = year.slice(1).map((s, i) => s.time - year[i]!.time);
+  if (steps.sort((a, b) => a - b)[steps.length >> 1]! > 3 * 3_600_000) return null;
+  return fit(year, ["M2", "O1"])
+    .constituents.filter((c) => c.name === "M2" || c.name === "O1")
+    .reduce((sum, c) => sum + c.amplitude, 0);
+}
+
+/**
+ * Runs of the year to `end` that a tide gauge's flatline limit flags and a still
+ * water's two days don't, from the same values QC'd both ways. Water the tide
+ * reaches only at times holds still for hours on end in between: a creek
+ * drained to a sill or pool at low water, a lagoon whose mouth has closed, a
+ * canal held by its structure, so more than `DRAINS_RUNS` of them say the
+ * still water's limit tells a stuck sensor apart better there. A sensor that
+ * sticks more than `DRAINS_RUNS` times a year looks the same.
+ */
+export function drains(
+  still: Observation[],
+  tide: Observation[],
+  end = still.at(-1)?.time ?? 0,
+): number {
+  const since = end - 366 * DAY_MS;
+  const only = (i: number) =>
+    still[i]!.time > since && tide[i]!.flag >= Flag.suspect && still[i]!.flag < Flag.suspect;
+  let runs = 0;
+  for (let i = 0; i < still.length; i++) if (only(i) && (i === 0 || !only(i - 1))) runs++;
+  return runs;
+}
