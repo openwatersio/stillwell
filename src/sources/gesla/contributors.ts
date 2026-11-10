@@ -56,8 +56,10 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   },
   CRMS: {
     name: "Coastwide Reference Monitoring System, Louisiana",
-    commercial_use: false,
-    terms: unlisted("CRMS's own terms are still to check (water-levels#49)"),
+    commercial_use: true,
+    terms: unlisted(
+      "CPRA's CIMS disclaimer puts CPRA's data in the public domain and lets it be distributed or copied, asking for a credit",
+    ),
   },
   RWS: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   RWS_HIST: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },

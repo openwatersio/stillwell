@@ -315,12 +315,17 @@ export async function extremes(
  * flat (F), rate of change (R) and limit (L); for hourly heights and extremes,
  * inferred (I) and limit (L). O counts rejected samples rather than flagging
  * the value, so it's left out.
+ *
+ * On a verified 6-minute value (`q` is `v`), L alone isn't suspect: it's left
+ * from CO-OPS's acquisition check against limits that are stale at some
+ * stations (erratum `coops-stale-limit-flag`). Hourly heights and high and low
+ * waters keep L as suspect, since nothing shows their L is stale too.
  */
 export function flagOf(row: Pick<Row, "f" | "q">): Flag {
   const f = (row.f ?? "").split(",").map(Number);
   let flag: Flag = row.q === "p" ? Flag.preliminary : Flag.good;
   if (f.length === 4) {
-    if (f[1] || f[2] || f[3]) flag = Flag.suspect;
+    if (f[1] || f[2] || (row.q !== "v" && f[3])) flag = Flag.suspect;
   } else if (f.length === 2) {
     if (f[1]) flag = Flag.suspect;
     else if (f[0]) flag = Math.max(flag, Flag.interpolated) as Flag;

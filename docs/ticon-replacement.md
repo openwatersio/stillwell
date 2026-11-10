@@ -6,12 +6,12 @@ tide-database holds 4838 TICON records. 4838 are listed in its station files, an
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1408 | 1355 | 3117 | An adapter exists and the record matched one of its stations |
-| planned | 4 | 4 | 6 | Cleared source, adapter in the plan |
-| to_match | 44 | 44 | 70 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
-| license | 593 | 593 | 991 | The source's terms need confirming first |
-| unmatched | 77 | 73 | 135 | An adapter exists, but no station matched, or two matched equally; check by hand |
-| restricted | 401 | 388 | 519 | The source forbids it; stays on TICON |
+| ready | 1408 | 1355 | 3123 | An adapter exists and the record matched one of its stations |
+| planned | 165 | 165 | 331 | Cleared source, adapter in the plan |
+| to_match | 43 | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
+| license | 429 | 429 | 663 | The source's terms need confirming first |
+| unmatched | 81 | 77 | 156 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| restricted | 401 | 388 | 513 | The source forbids it; stays on TICON |
 
 The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. Meanwhile 2457 of the 2527 accepted records have a GESLA 4.1 copy listed in the lake (`gesla_id` in the CSV; its backfill is still running), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
 
@@ -24,7 +24,7 @@ Accepted records only, in the order to build adapters: most records first.
 | usgs | 435 | ready 431, unmatched 4 | usgs |
 | uhslc | 421 | ready 360, unmatched 1, restricted 60 | uhslc_fd, uhslc_rq |
 | chs | 256 | restricted 256 | meds |
-| crms | 164 | license 164 | crms |
+| crms | 164 | planned 164 | crms |
 | pegelonline | 147 | ready 146, unmatched 1 | cmems, wsv |
 | refmar | 124 | ready 123, unmatched 1 | cmems, refmar |
 | jodc | 111 | license 111 | jodc_giaj, jodc_jcg, jodc_jma, jodc_pahb |
@@ -47,7 +47,7 @@ Accepted records only, in the order to build adapters: most records first.
 | fmi | 16 | license 16 | cmems, fmi |
 | cco | 15 | license 15 | cco |
 | cm | 12 | license 12 | cm |
-| bodc | 8 | planned 3, to_match 1, restricted 4 | bodc, cmems, noc |
+| bodc | 8 | unmatched 4, restricted 4 | bodc, cmems, noc |
 | nwfwmd | 8 | license 8 | nwfwmd |
 | da_sat | 7 | license 7 | da_sat |
 | eseas | 3 | license 3 | eseas |

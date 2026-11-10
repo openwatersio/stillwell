@@ -28,6 +28,7 @@ describe("sourcesFor", () => {
       "bodc",
       "cdec",
       "coops",
+      "crms",
       "dwr",
       "ea",
       "gesla",
@@ -47,6 +48,7 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "coops",
+      "crms",
       "dwr",
       "jma",
       "kartverket",

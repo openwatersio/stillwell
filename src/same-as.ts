@@ -124,9 +124,10 @@ export function redistributed(s: Station): boolean {
 
 /**
  * Sources whose series is the copy when they share a gauge with another:
- * USACE districts relay the satellite transmissions of gauges USGS runs.
+ * USACE districts relay the satellite transmissions of gauges USGS runs, and
+ * USGS relays a few of CRMS's gauges in real time, named for them.
  */
-const COPIES: Record<string, string> = { usace: "usgs" };
+const COPIES: Record<string, string> = { usace: "usgs", usgs: "crms" };
 
 /** The stations in a group that copy another member's gauge, by `COPIES`. */
 function copiesIn(group: Station[]): Set<string> {
