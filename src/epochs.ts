@@ -174,7 +174,8 @@ function applySplits(
     )
       continue;
     const id = Math.max(...epochs.map((e) => e.id), (options.nextId ?? 1) - 1) + 1;
-    epochs.splice(epochs.indexOf(parent) + 1, 0, {
+    // Last, after any rejected epoch the current one outlived, so ids stay in time order.
+    epochs.push({
       ...parent,
       datums: { ...parent.datums },
       id,

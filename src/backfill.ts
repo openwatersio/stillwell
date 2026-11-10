@@ -335,13 +335,16 @@ export function epochSpans(
     at(current.since, -Infinity),
     previous ? at(current.reference_since, -Infinity) : -Infinity,
   );
+  // Ids run in time order; a rejected or held epoch doesn't follow anything.
+  const nextOf = (e: Epoch) =>
+    epochs.find((x) => x.id > e.id && (x.state === "open" || x.state === "closed"));
   return epochs
     .filter(
       (e) =>
         e === current ||
         (e.state === "closed" &&
           e.datum === current.datum &&
-          (previous || splits.has(epochs[epochs.indexOf(e) + 1]?.since ?? ""))),
+          (previous || splits.has(nextOf(e)?.since ?? ""))),
     )
     .map((epoch) => {
       const from = epoch === current ? currentStart : at(epoch.since, -Infinity);
