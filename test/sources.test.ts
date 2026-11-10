@@ -8,6 +8,7 @@ import * as coops from "../src/sources/coops/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
+import { sources } from "../src/sources/index.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -3643,16 +3644,21 @@ describe("refmar", () => {
         return JSON.stringify({ data: [row(3, "2025/01/01 00:00:00")] });
       return JSON.stringify({ data: [] });
     });
+    // Erratum `refmar-pointe-a-pitre-clock`, applied by the registry's wrapper.
+    const station = (id: string) =>
+      ({
+        id: `refmar/${id}`,
+        source_id: id,
+        products: ["levels"],
+        first_observation: "1983-01-04",
+      }) as unknown as Station;
     const flags = async (id: string, from: string, to: string) =>
-      (
-        await refmar.levels(
-          { source_id: id, first_observation: "1983-01-04" },
-          new Date(from),
-          new Date(to),
-        )
-      ).map((v) => [new Date(v.time).toISOString().slice(0, 4), v.flag]);
-    const [, flagged] = await refmar.levels(
-      { source_id: "125", first_observation: "1983-01-04" },
+      (await sources.refmar!.observations!(station(id), new Date(from), new Date(to))).map((v) => [
+        new Date(v.time).toISOString().slice(0, 4),
+        v.flag,
+      ]);
+    const [, flagged] = await sources.refmar!.observations!(
+      station("125"),
       new Date("2019-12-01Z"),
       new Date("2020-02-01Z"),
     );
