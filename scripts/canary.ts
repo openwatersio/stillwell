@@ -21,6 +21,8 @@ import * as cdec from "../src/sources/cdec/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
+import * as crms from "../src/sources/crms/index.ts";
+import { header as crmsHeader } from "../src/sources/crms/export.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
@@ -47,6 +49,13 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   bodc: () => bodc.levels("abe", new Date("2025-12-01T00:00Z"), new Date("2025-12-04T00:00Z")),
   // Cuxhaven's predicted highs and lows: the year's smaller file.
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
+  // The CSV's header, from the export's directory and first 64 KB, checked by
+  // the adapter's parser, then the station list: the whole 1.3 GB export is
+  // read only once a month, by the refetch.
+  crms: async () => {
+    await crmsHeader(crms.parser);
+    return crms.stations();
+  },
   // Martinez, on the Carquinez Strait.
   cdec: () => cdec.levels({ source_id: "MRZ" }, start, end),
   // San Francisco; live, so no metadata request for its dates.

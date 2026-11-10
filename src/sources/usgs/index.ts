@@ -249,6 +249,15 @@ export function kindOf(location: Pick<ApiLocation, "site_type_code">, tidal: boo
   return "river";
 }
 
+/**
+ * The CRMS gauge a USGS site relays, named for it, such as `CRMS0282-H01-RT`;
+ * a bare site, `CRMS0641`, is its first surface-water gauge.
+ */
+export function crmsOf(name: string): string[] {
+  const match = /^CRMS(\d{4})(-H0\d)?(-RT)?$/.exec(name.trim());
+  return match ? [`crms/CRMS${match[1]}${match[2] ?? "-H01"}`] : [];
+}
+
 /** US territories `monitoring-locations` lists under the United States. */
 const TERRITORIES: Record<string, string> = {
   "Puerto Rico": "PR",
@@ -288,7 +297,7 @@ function toStation(
     first: null,
     last: null,
     tide_station: null,
-    same_as: [],
+    same_as: crmsOf(location.monitoring_location_name),
     status: "active",
     live,
     min_interval_s: 900,

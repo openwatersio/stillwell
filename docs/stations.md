@@ -216,7 +216,7 @@ A GESLA record whose values are another gauge's (`DROPPED` in `src/sources/gesla
 3. its terms allow commercial use, so the API can serve it before tokens exist;
 4. it isn't a GESLA record, which is the fallback for a gauge no other series covers;
 5. it is active and still reporting, with a value in the last year, so a live series wins over a version that ended;
-6. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC, and so is a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs;
+6. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, or isn't on file, is a copy, as is a REFMAR station named for UHSLC, and so is a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs, and a USGS station beside a CRMS one, since USGS relays some CRMS gauges in real time;
 7. the longer record in the lake, its span from `first` to `last` times its share of values not flagged suspect or bad, from the source's years file (`stations/years/<source>.parquet`), or its whole span where the source has none or it can't be read;
 8. the finer interval;
 9. the lower ID, so equals always break the same way.

@@ -4,6 +4,7 @@ import { source as bodc } from "./bodc/index.ts";
 import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as coops } from "./coops/index.ts";
+import { source as crms } from "./crms/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
@@ -38,6 +39,7 @@ const adapters: Record<string, Source> = {
   bsh,
   cdec,
   coops,
+  crms,
   dwr,
   ea,
   gesla,
