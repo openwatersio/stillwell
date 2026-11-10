@@ -1,6 +1,6 @@
 /**
  * Writes src/sources/gesla/tidal-rivers.ts: GESLA 4.1's river and lake records
- * that carry a tide (`tidal` in the adapter), which QC treats as tide gauges. The
+ * that carry a tide (`tidal` in src/tidal.ts), which QC treats as tide gauges. The
  * release is static, so this runs once per release. It reads each record from
  * the release's zip, as backfill does, a few at a time.
  *
@@ -10,7 +10,7 @@ import { writeFile } from "node:fs/promises";
 import { pool } from "../src/lake/recent.ts";
 import { DROPPED } from "../src/sources/gesla/dropped.ts";
 import { parse, readRecord, stations } from "../src/sources/gesla/index.ts";
-import { tidal } from "../src/sources/gesla/tidal.ts";
+import { tidal } from "../src/tidal.ts";
 
 // QC treats only rivers and lakes as still water; DROPPED's hold another gauge's values.
 const records = (await stations())

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { Blocked, fetchText, HttpError, setTransport } from "../src/http.ts";
+import { qcFor } from "../src/lake/recent.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -2734,6 +2735,18 @@ describe("usgs", () => {
       async () => usgs.source.observations!(station as never, new Date(0), new Date(1)),
       /is in NAVD88; its USGS series is in GAGE/,
     );
+  });
+});
+
+describe("usgs qc", () => {
+  it("gives a tidal stream a tide gauge's flatline limit, and other streams two days", () => {
+    // The Colleton at Bluffton has a meter of M2; the Salt near Roosevelt fits 12 cm, 664 m up.
+    const station = (source_id: string) => ({ source_id, kind: "river" }) as Station;
+    const colleton = qcFor(usgs.source, station("021765795"));
+    const salt = qcFor(usgs.source, station("09498500"));
+    assert.equal(colleton.flatline_s, undefined);
+    assert.equal(salt.flatline_s, 48 * 3600);
+    assert.equal(colleton.outliers, false);
   });
 });
 

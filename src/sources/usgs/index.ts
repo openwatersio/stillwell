@@ -9,6 +9,7 @@ import {
   type SourceMetadata,
   type Station,
 } from "../../schema.ts";
+import { TIDAL_STREAMS } from "./tidal-streams.ts";
 
 /**
  * USGS water data through the OGC API (api.waterdata.usgs.gov/ogcapi/v1), which
@@ -236,8 +237,9 @@ function before(a: number[], b: number[]): boolean {
 /**
  * A station's kind, from what USGS itself says about the site: its site type,
  * and whether it measures a tidal-only parameter or computes daily tidal highs
- * and lows there. Whether a stream is tidal is otherwise left to whoever reads
- * the levels; a guess here would set QC's flatline rule on a hunch.
+ * and lows there. Whether a stream is tidal is otherwise measured from its
+ * levels (`TIDAL_STREAMS`), which sets QC's flatline rule but not the kind,
+ * since the copy rule in src/same-as.ts matches on kind.
  */
 export function kindOf(location: Pick<ApiLocation, "site_type_code">, tidal: boolean): Kind {
   const type = location.site_type_code ?? "";
@@ -656,4 +658,5 @@ export const source: Source = {
     return range ? levels(id, ...range) : [];
   },
   recent,
+  tidal: (s) => TIDAL_STREAMS.has(s.source_id),
 };

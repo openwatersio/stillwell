@@ -3,10 +3,11 @@ import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { qcFor } from "../src/lake/recent.ts";
+import { fromSource, qc } from "../src/qc.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
-import { TIDE_M, tidal } from "../src/sources/gesla/tidal.ts";
+import { DRAINS_RUNS, TIDE_M, drains, tidal } from "../src/tidal.ts";
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
@@ -653,6 +654,33 @@ describe("tidal", () => {
     const unused = record(90, wave(1, 12.4206012));
     unused.source.fill(Flag.suspect);
     assert.equal(tidal(unused), false);
+  });
+});
+
+describe("drains", () => {
+  // 90 days of a 50 cm M2 tide every 15 minutes, held at `at` for 8 hours from each start.
+  const series = (holds: number[], at: number) =>
+    Array.from({ length: 90 * 96 }, (_, i) => {
+      const time = Date.UTC(2026, 0, 1) + i * 900_000;
+      const held = holds.some((h) => time >= h && time < h + 8 * 3_600_000);
+      const level = held
+        ? at
+        : Math.round(500 * Math.cos((2 * Math.PI * i) / (12.4206012 * 4))) / 1000;
+      return { time, level, flag: Flag.suspect as Flag, source_flag: Flag.good as Flag };
+    });
+  const judge = (holds: number[], at = -0.4) => {
+    // Stored flags say suspect, as after a requalify under the tide gauge's limit.
+    const start = fromSource(series(holds, at));
+    return drains(
+      qc(start, { outliers: false, flatline_s: 48 * 3600 }),
+      qc(start, { outliers: false }),
+    );
+  };
+  const days = (n: number) => Array.from({ length: n }, (_, k) => Date.UTC(2026, 0, 10 + 7 * k));
+
+  it("counts the runs only a tide gauge's limit flags, from the source's flags", () => {
+    assert.equal(judge(days(DRAINS_RUNS + 1)), true);
+    assert.equal(judge(days(DRAINS_RUNS)), false);
   });
 });
 
