@@ -57,6 +57,8 @@ interface ApiStation {
   state: string | null;
   tidal: boolean;
   greatlakes: boolean;
+  /** "Great Lakes" on every Great Lakes station, and on Point Aux Frenes, which `greatlakes` misses. */
+  tideType?: string;
   details?: { established?: string; removed?: string };
 }
 
@@ -170,7 +172,7 @@ function toStation(
     lat: s.lat,
     lon: s.lng,
     country_code: countryOf(s.state),
-    kind: s.greatlakes ? "lake" : s.tidal ? "coastal" : null,
+    kind: s.greatlakes || s.tideType === "Great Lakes" ? "lake" : s.tidal ? "coastal" : null,
     // Current stations report every 6 minutes; historical ones may have only hourly heights.
     interval_s: live ? 360 : null,
     datum: DATUM,

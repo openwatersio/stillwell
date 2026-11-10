@@ -23,7 +23,47 @@
      "unit": "m. ü. NHN",
      "value": -5.033,
      "validFrom": "2019-11-01"
-    }
+    },
+    "characteristicValues": [
+     {
+      "shortname": "MThw",
+      "longname": "Mittlerer Tidehochwasserstand",
+      "unit": "cm",
+      "value": 655.0,
+      "timespanStart": "2010-11-01",
+      "timespanEnd": "2020-10-31"
+     },
+     {
+      "shortname": "MTnw",
+      "longname": "Mittlerer Tideniedrigwasserstand",
+      "unit": "cm",
+      "value": 363.0,
+      "timespanStart": "2010-11-01",
+      "timespanEnd": "2020-10-31"
+     },
+     {
+      "shortname": "HThw",
+      "longname": "Höchster Tidehochwasserstand",
+      "unit": "cm",
+      "value": 966.0,
+      "occurrences": [
+       "2013-12-06"
+      ],
+      "timespanStart": "2010-11-01",
+      "timespanEnd": "2020-10-31"
+     },
+     {
+      "shortname": "NTnw",
+      "longname": "Niedrigster Tideniedrigwasserstand",
+      "unit": "cm",
+      "value": 193.0,
+      "occurrences": [
+       "2018-03-17"
+      ],
+      "timespanStart": "2010-11-01",
+      "timespanEnd": "2020-10-31"
+     }
+    ]
    }
   ]
  },
@@ -46,7 +86,54 @@
     "shortname": "W",
     "longname": "WASSERSTAND ROHDATEN",
     "unit": "m+NN",
-    "equidistance": 1
+    "equidistance": 1,
+    "characteristicValues": []
+   }
+  ]
+ },
+ {
+  "uuid": "aa9179c1-17ef-4c61-a48a-74193fa7bfdf",
+  "number": "906",
+  "shortname": "KONSTANZ",
+  "longname": "KONSTANZ",
+  "km": 0.0,
+  "agency": "REGIERUNGSPRÄSIDIUM FREIBURG",
+  "longitude": 9.181039,
+  "latitude": 47.66075,
+  "voiceServiceNumber": "+49 228 286527 008",
+  "water": {
+   "shortname": "BODENSEE",
+   "longname": "BODENSEE"
+  },
+  "timeseries": [
+   {
+    "shortname": "W",
+    "longname": "WASSERSTAND ROHDATEN",
+    "unit": "cm",
+    "equidistance": 15,
+    "gaugeZero": {
+     "unit": "m. ü. NHN",
+     "value": 391.89,
+     "validFrom": "2004-04-14"
+    },
+    "characteristicValues": [
+     {
+      "shortname": "MNW",
+      "longname": "Mittel der Niedrigwasserstände ",
+      "unit": "cm",
+      "value": 262.0,
+      "timespanStart": "2006-11-01",
+      "timespanEnd": "2015-10-31"
+     },
+     {
+      "shortname": "MW",
+      "longname": "Mittel der Tageswasserstände ",
+      "unit": "cm",
+      "value": 341.0,
+      "timespanStart": "2006-11-01",
+      "timespanEnd": "2015-10-31"
+     }
+    ]
    }
   ]
  },
@@ -66,7 +153,8 @@
     "shortname": "W",
     "longname": "WASSERSTAND ROHDATEN",
     "unit": "cm",
-    "equidistance": 10
+    "equidistance": 10,
+    "characteristicValues": []
    }
   ]
  }
