@@ -25,11 +25,13 @@ import {
   yearsPath,
 } from "../src/lake/paths.ts";
 import type { Erratum } from "../src/errata.ts";
+import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
 import { LINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/lake/years.ts";
 import {
   describeReport,
+  needsPerson,
   publishStations,
   Refused,
   refreshSource,
@@ -38,6 +40,7 @@ import {
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import {
   Flag,
+  type Kind,
   type ListedStation,
   type Overrides,
   type Source,
@@ -129,6 +132,28 @@ describe("refreshSource", () => {
     assert.equal(moved.stations.find((s) => s.id === id)!.lat, 0);
     assert.match(moved.report.positions.join(), new RegExp(`^${id} is now at 0,`));
     assert.match(describeReport(moved.report).join("\n"), /check its entry in POSITIONS/);
+  });
+
+  it("gives the stations KINDS names their kind, and reports one the source now gives another", async () => {
+    const rws = (kind: Kind | null): Source => ({
+      metadata: { ...metadata, id: "rws" },
+      stations: async () =>
+        Object.keys(KINDS)
+          .filter((id) => id.startsWith("rws/"))
+          .map((id) => listed(id.slice(4), { id, source: "rws", kind })),
+    });
+    const { stations, report } = await refreshSource(lake, rws(null), { now: NOW });
+    assert.equal(stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "coastal");
+    assert.deepEqual(report.kinds, []);
+    const changed = await refreshSource(lake, rws("lake"), { now: LATER });
+    assert.equal(changed.stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "lake");
+    assert.match(changed.report.kinds.join(), /rws\/uithuizerwad is now lake by its source/);
+    assert.ok(needsPerson(changed.report));
+    assert.match(describeReport(changed.report).join("\n"), /remove its entry from KINDS/);
+    // The source's kind stays, and stays reported, run after run.
+    const again = await refreshSource(lake, rws("lake"), { now: "2027-01-05T00:00:00Z" });
+    assert.equal(again.stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "lake");
+    assert.match(again.report.kinds.join(), /rws\/uithuizerwad is now lake by its source/);
   });
 
   it("writes a source's first list, then snapshots it before the next", async () => {

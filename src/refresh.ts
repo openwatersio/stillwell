@@ -116,7 +116,7 @@ export async function refreshSource(
   if (tooMany && !options.acceptWithheld) throw new Refused(tooMany);
 
   const positioned = correctPositions(await source.stations(previous));
-  const kinds = decideKinds(positioned.stations);
+  const kinds = decideKinds(id, positioned.stations, previous);
   const listing = { stations: kinds.stations, stale: positioned.stale };
   const stale = listing.stale;
   const fetched = listing.stations.filter((s) => !held(s));
