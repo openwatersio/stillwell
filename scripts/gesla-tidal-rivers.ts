@@ -7,6 +7,7 @@
  *   node scripts/gesla-tidal-rivers.ts
  */
 import { writeFile } from "node:fs/promises";
+import { HttpError } from "../src/http.ts";
 import { pool } from "../src/lake/recent.ts";
 import { DROPPED } from "../src/sources/gesla/dropped.ts";
 import { parse, readRecord, stations } from "../src/sources/gesla/index.ts";
@@ -17,15 +18,27 @@ const records = (await stations())
   .filter((s) => (s.kind === "river" || s.kind === "lake") && !DROPPED.has(s.source_id))
   .map((s) => s.source_id);
 const found: string[] = [];
-let read = 0;
+let done = 0;
+/** A record's text, tried again after a pause, since iCloud refuses a request now and then (a 401); other errors fail at once. */
+async function read(file: string, attempt = 1): Promise<string> {
+  try {
+    return await readRecord(file);
+  } catch (error) {
+    const refused = error instanceof HttpError && / returned 401\b/.test(error.message);
+    if (!refused || attempt >= 5) throw new Error(`${file}: ${String(error)}`);
+    await new Promise((resolve) => setTimeout(resolve, 30_000 * attempt));
+    return read(file, attempt + 1);
+  }
+}
+
 await pool(records, 4, async (file) => {
-  const record = parse(await readRecord(file), file, null);
+  const record = parse(await read(file), file, null);
   try {
     if (tidal(record)) found.push(file);
   } catch (error) {
     throw new Error(`${file}: ${String(error)}`);
   }
-  if (++read % 50 === 0) console.log(`${read} of ${records.length} read, ${found.length} tidal`);
+  if (++done % 50 === 0) console.log(`${done} of ${records.length} read, ${found.length} tidal`);
 });
 found.sort();
 
