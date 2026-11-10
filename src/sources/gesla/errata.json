@@ -235,6 +235,151 @@
       "error": "From March 2025, GESLA 4.1's St. Pauli record (from CMEMS) has about 16% of its 10-minute values taken from a different minute than its timestamp says. Most are 1 or 2 cm off, but some are up to 42 cm off at mid-tide. GESLA flags all of them as correct and usable.",
       "response": "The lake keeps the values as GESLA serves them. The group's preferred station is `pegelonline/5952050`, which takes its history from HPA's own archive on kuestendaten.de, and that archive has the right values.",
       "evidence": "I compared GESLA's record (`stpaulitg-stp-deu-cmems`, created 2026-07-19) with HPA's 1-minute file for gauge 5952050 from kuestendaten.de (downloaded 2026-11-09, shifted from UTC+1 to UTC).\n\n- From 1999-11-01 to 2025-02-28, every one of about 1.3 million shared 10-minute times differs by exactly 5.004 m, which is the gauge zero's offset to NHN. That holds for all 12,954 times in December 2024 to February 2025 too.\n- From 2025-03-01 03:40 to the end of the record on 2026-05-31, 12,838 of 65,622 shared times differ. Of those, 10,207 are off by 1 cm, 1,991 by 2 cm, 640 by 3 to 9 cm and 101 by more than 5 cm, up to 42 cm. Every month from March 2025 to May 2026 has between 759 and 931.\n- At 11,803 of the 12,838, GESLA's value equals HPA's value from a minute within 10 minutes of the stated time, most often 1 minute before or after. The large differences come from minutes 5 to 29 away, on the steep part of the tide. 5,495 are single points with both 10-minute neighbors matching HPA exactly.\n- HPA's series is smooth around these times. Its largest 1-minute step near the 101 large differences is 3 cm. Against Seemannshöft and Blankenese, two HPA gauges downstream, HPA's St. Pauli value is the one that fits the local difference between the gauges at 100 of the 101 large differences. The median departure is 1 cm for HPA and 6 cm for GESLA.\n- Example (UTC, meters above gauge zero): on 2025-05-14 06:10, HPA has 6.12 and GESLA 5.82. Seemannshöft has 6.04, and both copies have 6.29 at 06:00 and 5.98 at 06:20.\n\nThere's no third copy to compare with. PEGELONLINE's REST API keeps 31 days, and BSH's `508P` holds predictions only."
+    },
+    {
+      "id": "gesla-goteborg-2007-hour-early",
+      "stations": ["gesla/goteborgorsh-819-swe-uhslc_fd", "gesla/goteborgorsh-819a-swe-uhslc_rq"],
+      "since": "2007-07-23",
+      "until": "2008-01-01",
+      "handling": "flagged",
+      "error": "GESLA's copies of UHSLC's Göteborg-Torshamnen (fast delivery and research quality) are stamped one hour early from 23 July to 31 December 2007, as UHSLC's own files are.",
+      "response": "23 July to 31 December 2007 is flagged `suspect` in both records, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Both records equal `uhslc/819` on every day of 2007, which is an hour early against SMHI's record of the gauge over that span (erratum `uhslc-goteborg-2007-hour-early`). GESLA rates the records usable."
+    },
+    {
+      "id": "gesla-goteborg-2011-hour-early",
+      "stations": ["gesla/goteborgorsh-819-swe-uhslc_fd", "gesla/goteborgorsh-819a-swe-uhslc_rq"],
+      "since": "2011-02-01",
+      "until": "2011-07-01",
+      "handling": "flagged",
+      "error": "GESLA's copies of UHSLC's Göteborg-Torshamnen (fast delivery and research quality) are stamped one hour early from 1 February to 30 June 2011, as UHSLC's own files are.",
+      "response": "February to June 2011 is flagged `suspect` in both records, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Both records equal `uhslc/819` on every day of 2011, which is an hour early against SMHI's record of the gauge over that span (erratum `uhslc-goteborg-2011-hour-early`)."
+    },
+    {
+      "id": "gesla-cuxhaven-uhslc-2024-march",
+      "stations": ["gesla/cuxhaven-825-deu-uhslc_fd"],
+      "since": "2024-02-29",
+      "until": "2024-04-01",
+      "handling": "flagged",
+      "error": "GESLA's copy of UHSLC's fast-delivery Cuxhaven doesn't match the gauge's other records from 29 February to 31 March 2024, as UHSLC's own file doesn't.",
+      "response": "29 February to 31 March 2024 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "The record equals `uhslc/825` over the span, which differs from PEGELONLINE's and GESLA's other Cuxhaven records by 56 cm RMS (erratum `uhslc-cuxhaven-2024-march`)."
+    },
+    {
+      "id": "gesla-cuxhaven-uhslc-2024-summer",
+      "stations": ["gesla/cuxhaven-825-deu-uhslc_fd"],
+      "since": "2024-07-01",
+      "until": "2024-09-01",
+      "handling": "flagged",
+      "error": "GESLA's copy of UHSLC's fast-delivery Cuxhaven doesn't match the gauge's other records in July and August 2024, as UHSLC's own file doesn't.",
+      "response": "July and August 2024 are flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "The record equals `uhslc/825` over the span, which differs from PEGELONLINE's and GESLA's other Cuxhaven records by 52 to 54 cm RMS (erratum `uhslc-cuxhaven-2024-summer`)."
+    },
+    {
+      "id": "gesla-buesum-cmems-spikes",
+      "stations": ["gesla/buesumtg-bue-deu-cmems"],
+      "since": "2024-02-25",
+      "until": "2025-05-05",
+      "handling": "flagged",
+      "error": "GESLA's CMEMS record of Büsum has spikes of up to 3 m and repeated values from February 2024 to early May 2025 that PEGELONLINE's record of the gauge doesn't have.",
+      "response": "25 February 2024 to 4 May 2025 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026. The record equals PEGELONLINE's Büsum (`pegelonline/9510095`) to 0.0 cm through January 2024. From 25 February 2024 it differs by 3 cm RMS on most days, from values held for several 10-minute steps, and by 34 to 101 cm on 25 February, 18 March, 22 April and 1 to 3 August 2024, from spikes of up to 3 m. From 5 May 2025 to the record's end in May 2026 it matches PEGELONLINE's again, within 2 cm RMS every day."
+    },
+    {
+      "id": "gesla-usgs-nj-2003-daylight-time",
+      "stations": [
+        "gesla/absecon_creek_at_absecon_nj-1410510-usa-usgs",
+        "gesla/barnegat_bay_at_barnegat_light_nj-1409125-usa-usgs",
+        "gesla/barnegat_bay_at_mantoloking_nj-1408168-usa-usgs",
+        "gesla/cape_may_harbor_at_cape_may_nj-1411390-usa-usgs",
+        "gesla/cohansey_river_at_greenwich_nj-1413038-usa-usgs",
+        "gesla/east_thorofare_at_ship_bottom_nj-1409146-usa-usgs"
+      ],
+      "since": "2003-04-06",
+      "until": "2003-05-10",
+      "handling": "flagged",
+      "error": "GESLA's records of six USGS tide gauges in New Jersey run an hour late from 6 April to 9 May 2003, starting the day daylight saving time began.",
+      "response": "6 April to 9 May 2003 is flagged `suspect` at the six gauges, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: the tide-timing check put all six 49 to 71 minutes late in the windows from 8 April to 8 May 2003, and nowhere near that before or after. Day by day, Cape May Harbor's tide best matches CO-OPS's Atlantic City (`coops/8534720`) at a 60-minute lag before 6 April and after 9 May, and at 120 minutes between. The lake's own USGS series of these gauges start later, so only GESLA's records hold the span."
+    },
+    {
+      "id": "gesla-eemshaven-waddenzee-2016-offset",
+      "stations": ["gesla/eemshaven_waddenzee-eem-nld-rws"],
+      "since": "2016-04-07",
+      "until": "2016-05-12",
+      "handling": "flagged",
+      "error": "GESLA's RWS record of Eemshaven Waddenzee sits 15 to 20 cm higher than usual against Delfzijl from 7 April to 11 May 2016.",
+      "response": "7 April to 11 May 2016 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/water-levels/pull/121)), November 2026: a step of +18 cm against three of three neighboring gauges on 8 April 2016 and back on 20 May. Daily means against GESLA's Delfzijl (`gesla/delfzijl-del-nld-rws`) are about −9 cm through March and from mid-May, +1 cm on 7 April, and +7 to +12 cm on most days from 14 April to 11 May, falling to −3 cm on 12 May. The step check compares 30-day medians, so its dates are a few days off; the span follows the daily means."
+    },
+    {
+      "id": "gesla-helgoland-binnenhafen-2000-offset",
+      "stations": ["gesla/helgolandbinnenhafen-9510070-deu-wsv"],
+      "until": "2000-11-01",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Helgoland Binnenhafen sits about 25 cm low before 1 November 2000, as PEGELONLINE's does.",
+      "response": "Values before 1 November 2000 are flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median, 0.2 cm standard deviation, over 305 days (erratum `pegelonline-helgoland-binnenhafen-2000-offset`)."
+    },
+    {
+      "id": "gesla-helgoland-suedhafen-2001-offset",
+      "stations": ["gesla/helgolandsdhafen-9510075-deu-wsv"],
+      "until": "2004-01-01",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Helgoland Südhafen sits about 29 cm low until its 2002 and 2003 outage, as PEGELONLINE's does.",
+      "response": "Values before 2004 are flagged `suspect`, keeping GESLA's own flag as `source_flag`: the step falls in the 2002 and 2003 outage, so the few values left from then are flagged too.",
+      "evidence": "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 407 days (erratum `pegelonline-helgoland-suedhafen-2001-offset`)."
+    },
+    {
+      "id": "gesla-helgoland-suedhafen-2013-clock",
+      "stations": ["gesla/helgolandsdhafen-9510075-deu-wsv"],
+      "since": "2013-05-29",
+      "until": "2013-07-25",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Helgoland Südhafen runs about 19 minutes late on 29 and 30 May and from 17 June to 24 July 2013, as PEGELONLINE's does.",
+      "response": "29 May to 24 July 2013 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Its hourly values equal the means of PEGELONLINE's minute values over the same hours to 0.0 cm RMS from April to August 2013, so it carries PEGELONLINE's clock error (erratum `pegelonline-helgoland-suedhafen-2013-clock`)."
+    },
+    {
+      "id": "gesla-bake-z-2004-offset",
+      "stations": ["gesla/bakez-9510066-deu-wsv"],
+      "since": "2004-11-11",
+      "until": "2005-03-08",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Bake Z sits 0.5 to 1 m high from 11 November 2004 to 7 March 2005, as PEGELONLINE's does.",
+      "response": "11 November 2004 to 7 March 2005 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm at the median over 93 days, with a few days apart (erratum `pegelonline-bake-z-2004-offset`)."
+    },
+    {
+      "id": "gesla-mittelgrund-2012-offset",
+      "stations": ["gesla/mittelgrund-9510132-deu-wsv"],
+      "since": "2012-10-10",
+      "until": "2012-11-20",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Mittelgrund sits about 13 cm low from 10 October to 19 November 2012, as PEGELONLINE's does.",
+      "response": "10 October to 19 November 2012 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 41 days (erratum `pegelonline-mittelgrund-2012-offset`)."
+    },
+    {
+      "id": "gesla-borkum-suedstrand-2014-offset",
+      "stations": ["gesla/borkumsdstrand-9340030-deu-wsv"],
+      "since": "2014-12-05",
+      "until": "2015-03-12",
+      "handling": "flagged",
+      "error": "GESLA's WSV record of Borkum Südstrand sits about 11 cm high from 5 December 2014 to 11 March 2015, as PEGELONLINE's does.",
+      "response": "5 December 2014 to 11 March 2015 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "GESLA's WSV record of the gauge, hourly means of the values PEGELONLINE serves, equals PEGELONLINE's over the span: daily means differ by 0.0 cm over 97 days (erratum `pegelonline-borkum-suedstrand-2014-offset`)."
+    },
+    {
+      "id": "gesla-eriksberg-2018-tingstadstunneln",
+      "stations": ["gesla/goteborg_eriksberg-33096-swe-smhi"],
+      "since": "2018-01-01",
+      "until": "2018-11-13",
+      "handling": "flagged",
+      "error": "GESLA's SMHI record of Göteborg-Eriksberg holds Tingstadstunneln's levels from 1 January to 12 November 2018, as SMHI's own does.",
+      "response": "1 January to 12 November 2018 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
+      "evidence": "Its daily means equal SMHI's Eriksberg (`smhi/33096`) to 0.0 cm at the median over 297 days of the span (erratum `smhi-eriksberg-2018-tingstadstunneln`). GESLA's CMEMS record of the gauge differs from SMHI's by 5 cm at the median over the span, and agrees outside it, so it may hold Eriksberg's own levels."
     }
   ],
   "retired": []
