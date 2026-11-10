@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { describe, it } from "node:test";
@@ -1331,7 +1331,7 @@ describe("backfillYear", () => {
     );
   });
 
-  it("reads a year again after its read or its write fails", async () => {
+  it("reads a year again after its read fails", async () => {
     const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
     await seed(lake);
     const reads: string[] = [];
@@ -1352,11 +1352,24 @@ describe("backfillYear", () => {
     );
     await walk(lake, 0, async () => files);
     assert.deepEqual(reads.filter((r) => r === "2002.parquet").length, 2);
-    // A write that fails leaves the year to be read again.
-    files.wrote(2004);
-    reads.length = 0;
+  });
+
+  it("reads a year again after its write fails", async () => {
+    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    await seed(lake);
+    const reads: string[] = [];
+    const counting = (path: string) => {
+      reads.push(relative(dirOf(lake), path));
+      return readObservationFile(path);
+    };
+    const files = seriesFiles(dirOf(lake), await listYears(dirOf(lake)), counting);
+    // A directory where 2004's file goes fails its write; 2003 has read 2004 as empty.
+    mkdirSync(join(dirOf(lake), "2004.parquet"));
+    await assert.rejects(walk(lake, 0, async () => files));
+    assert.ok(!reads.includes("2004.parquet"));
+    rmSync(join(dirOf(lake), "2004.parquet"), { recursive: true });
     await files.get(2004);
-    assert.deepEqual(reads, ["2004.parquet"]);
+    assert.ok(reads.includes("2004.parquet"));
   });
 
   it("reads extremes once, for their datum and rows", async () => {
