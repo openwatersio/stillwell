@@ -8,6 +8,7 @@ import {
   type Observation,
   type Source,
   type SourceMetadata,
+  Unjudged,
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
@@ -811,8 +812,8 @@ export const source: Source = {
       (record_start && times[0]! > Date.parse(record_start) + YEAR_MS) ||
       (record_end && times.at(-1)! < Date.parse(record_end) - YEAR_MS)
     )
-      throw new Error(
-        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}); backfill it first`,
+      throw new Unjudged(
+        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}), so its datum jumps go unjudged; GESLA's stated span counts the rows it marks missing, so a lake that holds every year with values can still fall short of it`,
       );
     return datumJumps({
       times: Float64Array.from(times),

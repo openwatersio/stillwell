@@ -22,7 +22,7 @@ import {
 } from "../src/lake/parquet.ts";
 import { analysisHistoryPath, seriesPath } from "../src/lake/paths.ts";
 import { qcFor } from "../src/lake/recent.ts";
-import { Flag, type LakeStation, type Observation, type Source } from "../src/schema.ts";
+import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../src/schema.ts";
 import { DRAINS_RUNS, TIDE_M, drains } from "../src/tidal.ts";
 import { fromSource, qc } from "../src/qc.ts";
 
@@ -280,7 +280,7 @@ describe("analyze", () => {
     assert.equal(row.requalified, now.toISOString());
   });
 
-  it("judges a station without the errata spans its adapter refuses, with a warning", async () => {
+  it("judges a station its source can't judge with the spans it gives, with a warning, and fails on other errors", async () => {
     const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
     await writeObservations(
       seriesPath(lake, "levels", "test", "1", 2026),
@@ -293,7 +293,7 @@ describe("analyze", () => {
     const refusing = {
       ...source,
       suspect: async () => {
-        throw new Error("not its whole record");
+        throw new Unjudged("not its whole record");
       },
     } as Source;
     const report = await analyze(lake, refusing, [river("1")], {
@@ -302,6 +302,17 @@ describe("analyze", () => {
     assert.deepEqual(report.failed, []);
     assert.equal(report.warned.length, 1);
     assert.equal((await readAnalysis(lake, "test")).get("test/1")!.tidal, true);
+    const broken = {
+      ...source,
+      suspect: async () => {
+        throw new Error("unreadable");
+      },
+    } as Source;
+    const failed = await analyze(lake, broken, [river("1")], {
+      now: new Date(Date.UTC(2026, 3, 1)),
+      all: true,
+    });
+    assert.equal(failed.failed.length, 1);
   });
 
   it("keeps a verdict its latest values can't give, and leaves out flags it can't start over", async () => {

@@ -14,7 +14,7 @@ import { updateRecent } from "../src/lake/recent.ts";
 import { judgeFetched, requalify } from "../src/lake/requalify.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
 import { source as gesla } from "../src/sources/gesla/index.ts";
-import { Flag, type LakeStation, type Observation, type Source } from "../src/schema.ts";
+import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../src/schema.ts";
 
 const HOUR = 3_600_000;
 const NEW_YEAR = Date.UTC(2025, 0, 1);
@@ -116,14 +116,22 @@ describe("requalify", () => {
 
     // A pooled river gets 48 hours.
     const pooled = { ...station, kind: "river" as const, tidal: false };
-    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 1, changed: 9 });
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
+      files: 1,
+      changed: 9,
+      warnings: [],
+    });
     const after = await readObservations(path(2024));
     assert.deepEqual(
       after.filter((r) => r.flag !== Flag.good).map((r) => r.time),
       [still[0]],
     );
     // Nothing changes on a second run, so nothing is written.
-    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), { files: 0, changed: 0 });
+    assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
+      files: 0,
+      changed: 0,
+      warnings: [],
+    });
     // A stricter rule again flags them, and an erratum's span comes back from the source.
     const span: [number, number] = [Date.UTC(2024, 2, 1), Date.UTC(2024, 2, 2)];
     const errata = source({ suspect: async () => [span] });
@@ -131,6 +139,33 @@ describe("requalify", () => {
     const flagged = (await readObservations(path(2024))).filter((r) => r.flag === Flag.suspect);
     assert.equal(flagged.length, 10 + 24);
     assert.ok(flagged.every((r) => r.source_flag !== Flag.suspect));
+    // A source that can't judge the record still gives its errata's span, with a warning.
+    const partial = source({
+      suspect: async () => {
+        throw new Unjudged("the lake holds part of the record", [span]);
+      },
+    });
+    // A value the source flagged when it was fetched, as GESLA flags a datum jump from its whole file.
+    const jump = Date.UTC(2024, 8, 1);
+    await writeObservations(
+      path(2024),
+      (await readObservations(path(2024))).map((r) =>
+        r.time === jump ? { ...r, flag: Flag.suspect, source_flag: Flag.good } : r,
+      ),
+      "NAP",
+    );
+    const { warnings } = await requalify(partial, station, root, 2024, 2025);
+    assert.deepEqual(warnings, ["epoch 1: the lake holds part of the record; its flags are kept"]);
+    const kept = await readObservations(path(2024));
+    assert.equal(kept.filter((r) => r.flag === Flag.suspect).length, 10 + 24 + 1);
+    assert.equal(kept.find((r) => r.time === jump)!.flag, Flag.suspect);
+    // Any other error stops the station.
+    const broken = source({
+      suspect: async () => {
+        throw new Error("unreadable");
+      },
+    });
+    await assert.rejects(requalify(broken, station, root, 2024, 2025), /unreadable/);
   });
 
   it("judges a year with the years either side", async () => {
@@ -230,7 +265,10 @@ describe("GESLA's datum jumps over the lake's copy", () => {
   });
 
   it("refuses a copy that misses an end of the record", async () => {
-    await assert.rejects(gesla.suspect!(coastal, years(Date.UTC(2002, 0, 1))), /whole record/);
+    await assert.rejects(
+      gesla.suspect!(coastal, years(Date.UTC(2002, 0, 1))),
+      (error: unknown) => error instanceof Unjudged && /whole record/.test(error.message),
+    );
   });
 });
 
