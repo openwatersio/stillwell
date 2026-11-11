@@ -165,7 +165,7 @@ export function qc<T extends Observation>(
   for (let i = 0; held && i < all.length;) {
     let j = i;
     while (near(j + 1, i) && all[j + 1]!.time - all[i]!.time < flatline_s * 1000) j++;
-    // A run as long as a flatline is the flatline rules', so it's passed whole.
+    // A run as long as a flatline is left to the flatline limits, so it's passed whole.
     if (near(j + 1, i)) {
       i = j + 1;
       continue;
