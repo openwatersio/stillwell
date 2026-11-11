@@ -96,6 +96,26 @@ export const LINKS: Decision[] = [
     b: "ea/E72624",
     note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred.",
   },
+  {
+    a: "gesla/rostocktg-ros-deu-cmems",
+    b: "pegelonline/9640018",
+    note: "CMEMS's copy of WSV's Rostock Mühlendamm UW gauge: 316 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 4.981 m below PEGELONLINE's gauge zero, its NHN offset. The OW gauge 80 m away differs by 147 mm RMS in the median month. 'RostockTG' names no side of the weir, so nearness links neither.",
+  },
+  {
+    a: "gesla/wangeroogetg-wan-deu-cmems",
+    b: "pegelonline/9420040",
+    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km.",
+  },
+  {
+    a: "gesla/kielholtenautg-kie-deu-cmems",
+    b: "pegelonline/9610066",
+    note: "CMEMS's copy of WSV's Kiel-Holtenau gauge: all 318 months both hold from December 1999 agree within 3 mm RMS, 4.997 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 3.3 km away, beyond the copy rule's 2 km.",
+  },
+  {
+    a: "gesla/luebecktg-lue-deu-cmems",
+    b: "pegelonline/9620090",
+    note: "CMEMS's copy of WSV's Lübeck-Bauhof gauge: 307 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.021 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 4.8 km away, beyond the copy rule's 2 km.",
+  },
 ];
 
 /** Pairs a person found don't share a gauge, though a rule links them. */
