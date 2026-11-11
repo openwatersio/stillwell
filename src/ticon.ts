@@ -1,3 +1,4 @@
+import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
@@ -247,6 +248,31 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   if (contributor === "cmems") {
     const national = NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
+    // A person who compared the series (`LINKS`) knows the gauge better than CMEMS's position
+    // does. Only a link to the national feed's station names the replacement.
+    const copy = `gesla/${record.id}`;
+    const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(
+      (id) => national && id.startsWith(`${national.source}/`),
+    );
+    if (national && ids.length > 0 && lists[national.source]) {
+      const linked = lists[national.source]!.find((s) => ids.includes(s.id) && usable(s));
+      if (linked)
+        return {
+          source: linked.source,
+          id: linked.id,
+          status: "ready",
+          distance_km: round(km(record, linked)),
+          note,
+        };
+      // The station at its position may be one the person ruled out, so a stale link waits for a
+      // person, and `to_match` keeps `adoptSiblings` from giving it a sibling's match.
+      return {
+        source: national.source,
+        id: null,
+        status: "to_match",
+        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't an active station with levels`,
+      };
+    }
     if (national && lists[national.source])
       return nearest(record, national.source, lists[national.source], { note });
     if (national)
