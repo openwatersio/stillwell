@@ -13,7 +13,7 @@ import {
   withErrata,
   type Erratum,
 } from "../src/errata.ts";
-import { Flag, type Observation, type Source, type Station } from "../src/schema.ts";
+import { Flag, Unjudged, type Observation, type Source, type Station } from "../src/schema.ts";
 import { errata, errataFiles, errataProblems, sources } from "../src/sources/index.ts";
 
 const entry = (fields: Record<string, unknown> = {}) => ({
@@ -191,6 +191,32 @@ describe("withErrata", () => {
       [1, 2],
       [DAY("2020-01-01"), DAY("2021-01-01")],
     ]);
+  });
+
+  it("keeps the span when the adapter can't judge the record, and passes other errors on", async () => {
+    const refusing = {
+      ...adapter,
+      suspect: async () => {
+        throw new Unjudged("part of the record");
+      },
+    } as unknown as Source;
+    await assert.rejects(
+      withErrata(refusing, flagged).suspect!(station, async function* () {}),
+      (error: unknown) =>
+        error instanceof Unjudged &&
+        error.message === "part of the record" &&
+        JSON.stringify(error.spans) === JSON.stringify([[DAY("2020-01-01"), DAY("2021-01-01")]]),
+    );
+    const broken = {
+      ...adapter,
+      suspect: async () => {
+        throw new Error("unreadable");
+      },
+    } as unknown as Source;
+    await assert.rejects(
+      withErrata(broken, flagged).suspect!(station, async function* () {}),
+      (error: unknown) => !(error instanceof Unjudged) && /unreadable/.test(String(error)),
+    );
   });
 
   it("flags values a sweep of every station fetches", async () => {

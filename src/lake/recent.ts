@@ -65,6 +65,8 @@ export interface RunSummary {
   datumChanged?: boolean;
   /** Stations whose values wait in the window for a person's decision on a held datum change. */
   waiting: string[];
+  /** Stations the run judged with less than it should, such as without some errata spans, with why. */
+  warned?: string[];
   /** Values new to the lake. */
   values: number;
   /** Files written. */
@@ -851,6 +853,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     ["Failed", s.failed],
     ["Stale", s.stale],
     ["Waiting on a held datum change", s.waiting],
+    ["Warnings", s.warned ?? []],
   ] as const)
     if (items.length) {
       lines.push("", `${what}${items.length > listed ? ` (first ${listed})` : ""}:`, "");

@@ -12,7 +12,7 @@
  * Once the agency fixes the data and the lake has refetched it, the entry
  * goes and its ID moves to `retired`. See CONTRIBUTING.md.
  */
-import { Flag, type Observation, type Source, type Station } from "./schema.ts";
+import { Flag, Unjudged, type Observation, type Source, type Station } from "./schema.ts";
 
 /** What the lake does about an erratum. */
 export const HANDLING = ["corrected", "flagged", "dropped", "refused", "avoided", "kept"] as const;
@@ -219,10 +219,18 @@ export function withErrata(source: Source, errata: Erratum[]): Source {
   const { suspect, observations, recent } = source;
   return {
     ...source,
-    suspect: async (station, record) => [
-      ...((await suspect?.(station, record)) ?? []),
-      ...spans(station, own),
-    ],
+    suspect: async (station, record) => {
+      let adapter: [number, number][];
+      try {
+        adapter = (await suspect?.(station, record)) ?? [];
+      } catch (error) {
+        // The errata spans hold whatever the adapter can't judge.
+        if (error instanceof Unjudged)
+          throw new Unjudged(error.message, [...error.spans, ...spans(station, own)]);
+        throw error;
+      }
+      return [...adapter, ...spans(station, own)];
+    },
     ...(observations && {
       observations: async (station: Station, start: Date, end: Date) =>
         mark(station, await observations(station, start, end)),
