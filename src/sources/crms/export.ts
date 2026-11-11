@@ -80,19 +80,31 @@ export interface Entry {
  */
 export async function entry(): Promise<Entry> {
   const tail = await get("-65536");
-  const end = tail.lastIndexOf(Buffer.from("PK\x05\x06", "latin1"));
-  if (end < 0 || end + 22 > tail.length)
-    throw new Error("CRMS's export has no end of central directory");
+  // The end record is the one whose comment runs to the file's end, since a comment can hold its signature.
+  let end = tail.length - 22;
+  while (
+    end >= 0 &&
+    !(
+      tail.readUInt32LE(end) === 0x06054b50 &&
+      end + 22 + tail.readUInt16LE(end + 20) === tail.length
+    )
+  )
+    end--;
+  if (end < 0) throw new Error("CRMS's export has no end of central directory");
   // A ZIP64 end record is found through the locator right before the end
-  // record, never by its signature, which compressed data can hold by chance.
+  // record, never by its signature alone, which compressed data can hold by chance.
   let z64 = -1;
   let dirSize = tail.readUInt32LE(end + 12);
   let dirOffset = tail.readUInt32LE(end + 16);
   if (end >= 20 && tail.readUInt32LE(end - 20) === 0x07064b50) {
-    // A 56-byte ZIP64 end record, with no extensible data, right before its locator.
-    z64 = end - 20 - 56;
-    if (z64 < 0 || tail.readUInt32LE(z64) !== 0x06064b50)
-      throw new Error("CRMS's export has a ZIP64 locator without its end record");
+    // The record ends at the locator; its size field counts the bytes after the first 12.
+    for (z64 = end - 20 - 56; z64 >= 0; z64--)
+      if (
+        tail.readUInt32LE(z64) === 0x06064b50 &&
+        z64 + 12 + Number(tail.readBigUInt64LE(z64 + 4)) === end - 20
+      )
+        break;
+    if (z64 < 0) throw new Error("CRMS's export has a ZIP64 locator without its end record");
     dirSize = Number(tail.readBigUInt64LE(z64 + 40));
     dirOffset = Number(tail.readBigUInt64LE(z64 + 48));
   } else if (dirSize === 0xffffffff || dirOffset === 0xffffffff)
