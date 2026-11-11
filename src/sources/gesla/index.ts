@@ -813,7 +813,7 @@ export const source: Source = {
       (record_end && times.at(-1)! < Date.parse(record_end) - YEAR_MS)
     )
       throw new Unjudged(
-        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}), so its datum jumps go unflagged; backfill it if GESLA serves the rest`,
+        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}), so its datum jumps go unjudged; GESLA's stated span counts the rows it marks missing, so a lake that holds every year with values can still fall short of it`,
       );
     return datumJumps({
       times: Float64Array.from(times),
