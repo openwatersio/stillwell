@@ -73,19 +73,44 @@ export interface Entry {
 }
 
 /**
- * Reads the CSV's entry from the zip's last 64 KB, which hold its ZIP64
- * central directory, then its local header for where the data starts.
+ * Reads the CSV's entry from the zip's last 64 KB, which hold its central
+ * directory, then its local header for where the data starts. The export is
+ * under 4 GB, so it ends in the classic end record, and only the CSV's entry
+ * carries 64-bit sizes; a ZIP64 end record is read if one appears.
  */
 export async function entry(): Promise<Entry> {
   const tail = await get("-65536");
-  const z64 = tail.lastIndexOf(Buffer.from("PK\x06\x06", "latin1"));
-  const locator = tail.lastIndexOf(Buffer.from("PK\x06\x07", "latin1"));
-  if (z64 < 0 || locator < z64)
-    throw new Error("CRMS's export has no ZIP64 end of central directory");
-  // The locator gives the record's offset in the file, which places the tail.
-  const tailFrom = Number(tail.readBigUInt64LE(locator + 8)) - z64;
-  const dirSize = Number(tail.readBigUInt64LE(z64 + 40));
-  const dirOffset = Number(tail.readBigUInt64LE(z64 + 48));
+  // The end record is the one whose comment runs to the file's end, since a comment can hold its signature.
+  let end = tail.length - 22;
+  while (
+    end >= 0 &&
+    !(
+      tail.readUInt32LE(end) === 0x06054b50 &&
+      end + 22 + tail.readUInt16LE(end + 20) === tail.length
+    )
+  )
+    end--;
+  if (end < 0) throw new Error("CRMS's export has no end of central directory");
+  // A ZIP64 end record is found through the locator right before the end
+  // record, never by its signature alone, which compressed data can hold by chance.
+  let z64 = -1;
+  let dirSize = tail.readUInt32LE(end + 12);
+  let dirOffset = tail.readUInt32LE(end + 16);
+  if (end >= 20 && tail.readUInt32LE(end - 20) === 0x07064b50) {
+    // The record ends at the locator; its size field counts the bytes after the first 12.
+    for (z64 = end - 20 - 56; z64 >= 0; z64--)
+      if (
+        tail.readUInt32LE(z64) === 0x06064b50 &&
+        z64 + 12 + Number(tail.readBigUInt64LE(z64 + 4)) === end - 20
+      )
+        break;
+    if (z64 < 0) throw new Error("CRMS's export has a ZIP64 locator without its end record");
+    dirSize = Number(tail.readBigUInt64LE(z64 + 40));
+    dirOffset = Number(tail.readBigUInt64LE(z64 + 48));
+  } else if (dirSize === 0xffffffff || dirOffset === 0xffffffff)
+    throw new Error("CRMS's export needs a ZIP64 end record it lacks");
+  // The directory ends where the first end record starts, which places the tail in the file.
+  const tailFrom = dirOffset + dirSize - (z64 >= 0 ? z64 : end);
   if (dirOffset < tailFrom)
     throw new Error("CRMS's export has a central directory before its tail");
   const dir = tail.subarray(dirOffset - tailFrom, dirOffset - tailFrom + dirSize);
