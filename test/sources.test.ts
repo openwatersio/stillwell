@@ -1147,7 +1147,7 @@ describe("coops", () => {
     );
   });
 
-  it("marks a value suspect for its limit flag only while it's preliminary", () => {
+  it("marks a value suspect for its limit flag only while it's preliminary or a high or low water", () => {
     // Verified 6-minute values keep L from an acquisition check whose limits are stale (erratum `coops-stale-limit-flag`).
     assert.equal(coops.flagOf({ f: "0,0,0,1", q: "v" }), Flag.good);
     assert.equal(coops.flagOf({ f: "0,0,0,1", q: "p" }), Flag.suspect);
@@ -1156,10 +1156,14 @@ describe("coops", () => {
     assert.equal(coops.flagOf({ f: "5,0,0,0", q: "v" }), Flag.good);
     // Only an explicit `v` counts as verified.
     assert.equal(coops.flagOf({ f: "0,0,0,1" }), Flag.suspect);
-    // Hourly heights and high and low waters keep L as suspect; I is interpolated.
+    // High and low waters keep L as suspect; I is interpolated.
     assert.equal(coops.flagOf({ f: "0,1" }), Flag.suspect);
     assert.equal(coops.flagOf({ f: "1,1" }), Flag.suspect);
     assert.equal(coops.flagOf({ f: "1,0" }), Flag.interpolated);
+    // Hourly heights are verified, so their L is the same stale check.
+    assert.equal(coops.flagOf({ f: "0,1" }, true), Flag.good);
+    assert.equal(coops.flagOf({ f: "1,1" }, true), Flag.interpolated);
+    assert.equal(coops.flagOf({ f: "1,0" }, true), Flag.interpolated);
   });
 
   it("reads 6-minute levels, falling back to hourly heights where there are none", async () => {
@@ -1186,7 +1190,12 @@ describe("coops", () => {
       ],
       [
         /product=hourly_height/,
-        JSON.stringify({ data: [{ t: "1990-01-01 01:00", v: "5.084", f: "1,0" }] }),
+        JSON.stringify({
+          data: [
+            { t: "1990-01-01 01:00", v: "5.084", f: "1,0" },
+            { t: "1990-01-01 02:00", v: "5.1", f: "0,1" },
+          ],
+        }),
       ],
     ]);
     const recent = await coops.levels(
@@ -1213,6 +1222,8 @@ describe("coops", () => {
     );
     assert.deepEqual(old, [
       { time: Date.UTC(1990, 0, 1, 1), level: 5.084, flag: Flag.interpolated },
+      // L alone on an hourly height is erratum `coops-stale-limit-flag` too.
+      { time: Date.UTC(1990, 0, 1, 2), level: 5.1, flag: Flag.good },
     ]);
   });
 
@@ -1244,6 +1255,7 @@ describe("coops", () => {
           data: [
             { t: "2024-01-01 02:54", v: "5.192", ty: "H ", f: "0,0" },
             { t: "2024-01-01 09:30", v: "2.709", ty: "LL", f: "0,0" },
+            { t: "2024-01-01 15:12", v: "5.4", ty: "HH", f: "0,1" },
           ],
         }),
       ],
@@ -1254,10 +1266,12 @@ describe("coops", () => {
       new Date("2024-01-02T00:00:00Z"),
     );
     assert.deepEqual(
-      extremes.map((e) => [e.type, e.level]),
+      extremes.map((e) => [e.type, e.level, e.flag]),
       [
-        ["high", 5.192],
-        ["low", 2.709],
+        ["high", 5.192, Flag.good],
+        ["low", 2.709, Flag.good],
+        // Unlike an hourly height, a high or low water keeps L as suspect.
+        ["high", 5.4, Flag.suspect],
       ],
     );
   });
