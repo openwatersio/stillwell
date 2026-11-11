@@ -3507,10 +3507,14 @@ describe("refmar", () => {
     serveGauges(gauges);
     const brestBefore = previous.find((s) => s.id === "refmar/3")!;
     // Bassins à flot was in the lake before SHOM hid it.
-    const hidden = { ...brestBefore, id: "refmar/6326", source_id: "6326" };
-    const stations = await refmar.stations([...previous, hidden] as Station[]);
+    const hidden = { ...brestBefore, id: "refmar/6326", source_id: "6326", kind: "coastal" };
+    // A kind `KINDS` gave a station in the lake isn't REFMAR's, so a kept record leaves it out.
+    const decided = previous.map((s) => (s.id === "refmar/6118" ? { ...s, kind: "coastal" } : s));
+    const stations = await refmar.stations([...decided, hidden] as Station[]);
     const of = (id: string) => stations.find((s) => s.id === id)!;
     assert.equal(of("refmar/6118").datum, "ZH");
+    assert.equal(of("refmar/6118").kind, null);
+    assert.equal(of("refmar/6326").kind, null);
     // A hidden gauge keeps its owners' credit, but loses its products.
     assert.equal(of("refmar/6326").attribution, brestBefore.attribution);
     assert.deepEqual(of("refmar/6326").products, []);

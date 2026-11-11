@@ -122,8 +122,15 @@ export async function stations(previous: Station[] = []): Promise<RefmarStation[
   for (const g of listed) {
     const old = before.get(`refmar/${g.shom_id}`);
     // A state this adapter doesn't know, such as HIDDEN, isn't published.
+    // The stored record's kind comes from a `KINDS` decision, since REFMAR never gives one, so it's left for the refresh to set again.
     if (!PUBLISHED.has(g.state)) {
-      gauges.push({ ...(old ?? toStation(g)), datum: null, products: [], live: false });
+      gauges.push({
+        ...(old ?? toStation(g)),
+        kind: null,
+        datum: null,
+        products: [],
+        live: false,
+      });
       continue;
     }
     asked++;
@@ -150,7 +157,7 @@ export async function stations(previous: Station[] = []): Promise<RefmarStation[
       station.first_observation = old.first_observation ?? null;
     if (station) gauges.push(station);
     else partial++;
-    if (!station && old) gauges.push({ ...old, live: g.state !== "OLD" });
+    if (!station && old) gauges.push({ ...old, kind: null, live: g.state !== "OLD" });
     else if (!station)
       console.warn(`REFMAR ${g.shom_id}: no full record; left out until the next refresh`);
   }

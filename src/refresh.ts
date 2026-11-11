@@ -5,6 +5,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { currentEpoch } from "./epochs.ts";
 import { correctPositions } from "./positions.ts";
+import { decideKinds } from "./kinds.ts";
 import {
   exists,
   anyFile,
@@ -61,6 +62,8 @@ export interface RefreshReport {
   epochs: EpochChange[];
   /** `POSITIONS` entries whose station the source has moved, kept where the source puts it. */
   positions: string[];
+  /** `KINDS` entries whose station the source now gives a kind of its own, which it keeps. */
+  kinds: string[];
 }
 
 export interface RefreshOptions {
@@ -112,7 +115,9 @@ export async function refreshSource(
   const tooMany = tooManyWithheld(id, removed.length, stored?.length ?? 0);
   if (tooMany && !options.acceptWithheld) throw new Refused(tooMany);
 
-  const listing = correctPositions(await source.stations(previous));
+  const positioned = correctPositions(await source.stations(previous));
+  const kinds = decideKinds(id, positioned.stations, previous);
+  const listing = { stations: kinds.stations, stale: positioned.stale };
   const stale = listing.stale;
   const fetched = listing.stations.filter((s) => !held(s));
   if (!fetched.length) throw new Refused("listed no stations");
@@ -157,6 +162,7 @@ export async function refreshSource(
       ? await withFiles(lake, id, (await withheldStations(lake, source, { files: false })).ids)
       : [],
     positions: stale,
+    kinds: kinds.stale,
   };
   // The list it read goes to history before it's replaced, without withheld
   // stations. A new source's snapshot, its empty list, goes after its first
@@ -405,6 +411,7 @@ function reportOf(
     changed: [],
     epochs,
     positions: [],
+    kinds: [],
   };
   for (const station of stations) {
     const old = before.get(station.id);
@@ -429,13 +436,15 @@ function reportOf(
 /**
  * Whether a refresh's report needs a person, so the run fails: an epoch held
  * or waiting, a station the source retired itself, a moved `POSITIONS` entry,
- * or a removed station whose series files `ingest withhold` hasn't deleted.
+ * a `KINDS` entry the source now gives a kind of its own, or a removed
+ * station whose series files `ingest withhold` hasn't deleted.
  */
 export function needsPerson(report: RefreshReport): boolean {
   return (
     report.epochs.some((e) => e.event === "held" || e.event === "waiting") ||
     report.withdrawn.length > 0 ||
     report.positions.length > 0 ||
+    report.kinds.length > 0 ||
     report.unwithheld.length > 0
   );
 }
@@ -462,5 +471,6 @@ export function describeReport(report: RefreshReport): string[] {
     );
   for (const p of report.positions)
     lines.push(`  ${p}; check its entry in POSITIONS (src/positions.ts)`);
+  for (const k of report.kinds) lines.push(`  ${k}; remove its entry from KINDS (src/kinds.ts)`);
   return lines;
 }
