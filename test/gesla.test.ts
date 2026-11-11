@@ -5,6 +5,7 @@ import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
+import geslaErrata from "../src/sources/gesla/errata.json" with { type: "json" };
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
@@ -556,6 +557,26 @@ describe("gesla clocks", () => {
     assert.deepEqual(
       [iso(hourly.times[0]!), iso(minutes.times[0]!)],
       ["2015-06-01T00:30:00.000Z", "2015-06-01T00:00:00.000Z"],
+    );
+  });
+
+  it("lists the same CRMS records as the erratum", () => {
+    const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-hour-early")!;
+    assert.deepEqual(
+      [...gesla.CRMS_EARLY].sort(),
+      (entry.stations as string[]).map((id) => id.replace(/^gesla\//, "")).sort(),
+    );
+  });
+
+  it("moves the CRMS records the erratum lists an hour later, and no others", () => {
+    const text = lines(["2012/06/01 00:00:00", "2012/06/01 01:00:00"]);
+    assert.deepEqual(
+      [
+        "crms0002-crms0002-usa-crms",
+        "crms0148-crms0148-usa-crms",
+        "crms0400-crms0400-usa-crms",
+      ].map((file) => iso(gesla.parse(text, file, null).times[0]!)),
+      ["2012-06-01T01:00:00.000Z", "2012-06-01T01:00:00.000Z", "2012-06-01T00:00:00.000Z"],
     );
   });
 
