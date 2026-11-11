@@ -202,7 +202,7 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("links the gauges LINKS matches that no rule does", () => {
+  it("links the gauges listed in LINKS that no rule matches", () => {
     const list = [
       station("bodc/dev", { name: "Devonport", lat: 50.36839, lon: -4.18525 }),
       station("ea/E72139", { name: "Plymouth", lat: 50.368401, lon: -4.185217 }),
@@ -474,7 +474,7 @@ describe("copyPairs", () => {
     assert.deepEqual(stations[0]!.same_as, ["coops/9457292"]);
   });
 
-  it("guesses for a copy whose named original UNLINKS separates", () => {
+  it("guesses for a copy whose named original is kept apart by UNLINKS", () => {
     UNLINKS.push({ a: "uhslc/039a", b: "coops/1111111", note: "test" });
     try {
       const { stations } = linkGauges([

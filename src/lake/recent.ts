@@ -249,7 +249,7 @@ export async function updateRecent({
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
           if (error instanceof Blocked) summary.blocked = true;
-          // A refresh ignores a change `overrides.epochs` rejected, matched on datum and
+          // A refresh ignores a change rejected in `overrides.epochs`, matched on datum and
           // reference as nextEpochs does, so that one doesn't ask for one; an
           // unknown reference matches none.
           if (

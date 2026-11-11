@@ -140,7 +140,7 @@ describe("updateRecent", () => {
       });
     assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, true);
     assert.equal((await run(new Error("timed out"))).datumChanged, undefined);
-    // A change overrides.epochs rejected stays rejected, however often the list is
+    // A change rejected in overrides.epochs stays rejected, however often the list is
     // refreshed, but a change to another datum or reference still asks for one.
     b.epochs.push(epoch(2, "NHN", { state: "rejected" }));
     assert.equal((await run(new DatumChanged("now in NHN", "NHN", null))).datumChanged, undefined);
