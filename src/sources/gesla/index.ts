@@ -77,6 +77,22 @@ const WSV_SHIFT_MS = 30 * 60_000;
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
+/**
+ * GESLA's copies of 40 CRMS gauges, by site, are an hour early. Erratum
+ * `gesla-crms-hour-early`, whose stations a test keeps equal to this list.
+ */
+export const CRMS_EARLY = new Set(
+  `
+  0002 0003 0006 0008 0030 0033 0034 0035 0038 0039
+  0046 0047 0056 0058 0059 0061 0063 0065 0086 0089
+  0097 0103 0108 0114 0115 0117 0118 0119 0120 0121
+  0125 0129 0131 0132 0135 0136 0139 0146 0147 0148
+`
+    .trim()
+    .split(/\s+/)
+    .map((site) => `crms${site}-crms${site}-usa-crms`),
+);
+
 /** A GESLA record as listed, with the fields of its metadata row kept in the lake's list. */
 export type GeslaStation = ListedStation & {
   /** `CONTRIBUTOR (ABBREVIATED)`, such as `NOAA` or `UHSLC_RQ`. */
@@ -432,7 +448,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   const zone = /^# TIME ZONE HOURS\s+(\S+)/m.exec(text)?.[1] ?? "0";
   if (zone !== "0" && file !== "wewak-56070-png-bom")
     throw new Error(`GESLA's ${file} is on UTC${zone}, which the adapter doesn't convert`);
-  const shift = HONG_KONG.test(file) ? HOUR_MS : 0;
+  const shift = HONG_KONG.test(file) || CRMS_EARLY.has(file) ? HOUR_MS : 0;
   // Typed arrays sized by the line count, since the largest records hold 6 million values.
   let lines = 1;
   for (let at = text.indexOf("\n"); at >= 0; at = text.indexOf("\n", at + 1)) lines++;
