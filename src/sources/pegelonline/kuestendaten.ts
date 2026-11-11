@@ -44,8 +44,8 @@ interface CatalogEntry {
 }
 
 /**
- * The `aufnahmeEnde` of the files the lake was last backfilled from. Bump it
- * after each backfill, as openwatersio/water-levels#125 lists.
+ * The `aufnahmeEnde` of the files the store was last backfilled from. Bump it
+ * after each backfill, as openwatersio/stillwell#125 lists.
  */
 export const BACKFILLED_TO = "2026-06-30 23:59:00";
 
@@ -93,7 +93,7 @@ export function update(entries: CatalogEntry[]): string | undefined {
   const wait = waiting.length
     ? ` Wait for ${waiting.map((e) => e.zipFileName).join(", ")} too.`
     : "";
-  return `kuestendaten.de has HPA values past ${BACKFILLED_TO} (UTC+1): ${files.join("; ")}.${wait} Run the backfill in https://github.com/openwatersio/water-levels/issues/125, then bump BACKFILLED_TO.`;
+  return `kuestendaten.de has HPA values past ${BACKFILLED_TO} (UTC+1): ${files.join("; ")}.${wait} Run the backfill in https://github.com/openwatersio/stillwell/issues/125, then bump BACKFILLED_TO.`;
 }
 
 /** A gauge's whole file: minutes since the epoch (UTC) and levels in centimeters. */

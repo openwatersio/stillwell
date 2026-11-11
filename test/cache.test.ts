@@ -5,8 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 
-const dir = mkdtempSync(join(tmpdir(), "water-levels-cache-"));
-process.env.WATER_LEVELS_CACHE = dir;
+const dir = mkdtempSync(join(tmpdir(), "stillwell-cache-"));
+process.env.STILLWELL_CACHE = dir;
 const { cachedText } = await import("../src/cache.ts");
 const realFetch = globalThis.fetch;
 afterEach(() => (globalThis.fetch = realFetch));

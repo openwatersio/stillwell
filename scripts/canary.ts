@@ -1,7 +1,7 @@
 /**
  * One small live request per adapter, checked against the shape recorded in
  * src/sources/<source>/canary.json, so a change upstream fails a check rather
- * than leaving gaps in the lake.
+ * than leaving gaps in the store.
  *
  *   node scripts/canary.ts [source...] [--record]
  *

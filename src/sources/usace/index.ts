@@ -84,7 +84,7 @@ export interface CatalogLocation {
 /**
  * A USACE station as listed, with the CWMS series its levels come from and,
  * where the gauge zero moved partway through it, the first day on the zero in
- * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the lake's
+ * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the store's
  * list only; `stations.parquet` doesn't carry them. So is `datums_from`,
  * which says where each offset read from the description came from.
  */
@@ -228,7 +228,7 @@ function placed(l: CatalogLocation): boolean {
 
 /**
  * `<office>.<location>`, with anything but letters, digits, `.`, `_` and `-`
- * as `_`, so an ID needs no escaping in a lake path, a URL or a shell argument.
+ * as `_`, so an ID needs no escaping in a store path, a URL or a shell argument.
  */
 function idOf(office: string, location: string): string {
   return `${office}.${location.replace(/[^A-Za-z0-9._-]/g, "_")}`;
@@ -473,7 +473,7 @@ export async function levels(
 }
 
 /**
- * A CWMS quality code as a lake flag, or null for a value CWMS marks missing.
+ * A CWMS quality code as a store flag, or null for a value CWMS marks missing.
  * The code is a bit field: bit 0 says the value was screened, bits 1 to 4 that
  * screening found it okay (2), missing (4), questionable (8) or rejected (16),
  * and bits 11 to 14 how a replaced value was replaced (1, linear interpolation),

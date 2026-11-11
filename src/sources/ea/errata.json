@@ -8,16 +8,16 @@
       "handling": "flagged",
       "error": "The EA's Holyhead levels sit about 1.5 m off from 22 January to 19 February 2026.",
       "response": "22 January to 19 February 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against BODC's record of the same gauge (`bodc/hol`): the EA's less BODC's is −3.06 m in the 90 days before and after the span, its datum difference, and −1.57 m over it. GESLA's BODC copy agrees with BODC's."
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against BODC's record of the same gauge (`bodc/hol`): the EA's less BODC's is −3.06 m in the 90 days before and after the span, its datum difference, and −1.57 m over it. GESLA's BODC copy agrees with BODC's."
     },
     {
       "id": "ea-washpile-2026-offset",
       "stations": ["ea/E71339"],
       "since": "2026-04-05",
       "handling": "flagged",
-      "error": "The EA's Washpile levels jump about 3.1 m from 5 April 2026, through the last values the lake holds, in April 2026.",
+      "error": "The EA's Washpile levels jump about 3.1 m from 5 April 2026, through the last values the store holds, in April 2026.",
       "response": "Values from 5 April 2026 on are flagged `suspect`, keeping the EA's own flag as `source_flag`, until the EA says the gauge is right again.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against three EA gauges within 115 km (`ea/E71239`, `ea/E71124`, `ea/E70039`): each difference moves by 3.1 to 3.2 m on 5 April and stays there. Monthly medians are 0.25 m in January, −0.09 m in February and 3.39 m in April."
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against three EA gauges within 115 km (`ea/E71239`, `ea/E71124`, `ea/E70039`): each difference moves by 3.1 to 3.2 m on 5 April and stays there. Monthly medians are 0.25 m in January, −0.09 m in February and 3.39 m in April."
     },
     {
       "id": "ea-dover-2026-offset",
@@ -26,8 +26,8 @@
       "until": "2026-06-19",
       "handling": "flagged",
       "error": "The EA's Dover levels sit about 4.6 m low from 29 May to 18 June 2026.",
-      "response": "29 May to 18 June 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. The lake's QC already flags the gauge's values from 19 June to 31 August.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the lake lists as coastal, and confirmed, November 2026, by daily-mean differences against REFMAR's Calais (`refmar/55`) and Boulogne-sur-Mer (`refmar/111`): the differences are −3.84 and −4.78 m before and after the span and −8.41 and −9.37 m over it."
+      "response": "29 May to 18 June 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. The store's QC already flags the gauge's values from 19 June to 31 August.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against REFMAR's Calais (`refmar/55`) and Boulogne-sur-Mer (`refmar/111`): the differences are −3.84 and −4.78 m before and after the span and −8.41 and −9.37 m over it."
     }
   ],
   "retired": []

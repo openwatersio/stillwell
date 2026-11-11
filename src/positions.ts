@@ -11,7 +11,7 @@ interface Position {
  * moves the station itself stops the correction: the station keeps the
  * source's position, and the refresh reports the entry and fails the run so a
  * person checks it. A station the source stops listing keeps its corrected
- * position in the lake, as it keeps the rest of the station. Erratum
+ * position in the store, as it keeps the rest of the station. Erratum
  * `uhslc-positions` covers the UHSLC entries, and erratum
  * `gesla-uhslc-positions` the GESLA ones: GESLA's copies of UHSLC series keep
  * metadata UHSLC had when GESLA copied it, and UHSLC has corrected most since.

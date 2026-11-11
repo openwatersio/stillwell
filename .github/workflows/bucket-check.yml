@@ -35,7 +35,7 @@ jobs:
           # With fsspec, pandas would fetch through aiohttp instead of urllib.
           assert importlib.util.find_spec("fsspec") is None
 
-          base = "https://water-levels.openwaters.io"
+          base = "https://stillwell.openwaters.io"
           stations = pd.read_parquet(f"{base}/stations.parquet")
           print(f"stations.parquet with pandas: {len(stations)} stations")
           assert len(stations) > 0

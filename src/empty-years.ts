@@ -13,8 +13,8 @@
  * `EMPTY_KEEP_DAYS`, so a later campaign asks again. Only `--skip-written` reads the record; a plain or refetching
  * backfill asks for every year as before.
  */
-import { readJsonArray, writeJsonArray } from "./lake/parquet.ts";
-import { emptyYearsPath } from "./lake/paths.ts";
+import { readJsonArray, writeJsonArray } from "./store/parquet.ts";
+import { emptyYearsPath } from "./store/paths.ts";
 
 export const EMPTY_KEEP_DAYS = 30;
 const DAY_MS = 86_400_000;
@@ -26,11 +26,11 @@ export function emptyKey(station: string, product: string, epoch: number, year: 
 
 /** The record for a source, by key, with when each was found; entries past their time are left out. */
 export async function readEmptyYears(
-  lake: string,
+  store: string,
   source: string,
   now: number,
 ): Promise<Map<string, string>> {
-  const rows = ((await readJsonArray(emptyYearsPath(lake, source))) ?? []) as {
+  const rows = ((await readJsonArray(emptyYearsPath(store, source))) ?? []) as {
     key: string;
     seen: string;
   }[];
@@ -40,7 +40,7 @@ export async function readEmptyYears(
 
 /** Write the record, dropping entries past their time. */
 export async function writeEmptyYears(
-  lake: string,
+  store: string,
   source: string,
   empty: Map<string, string>,
   now: number,
@@ -50,5 +50,5 @@ export async function writeEmptyYears(
     .filter(([, seen]) => Date.parse(seen) >= cutoff)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, seen]) => ({ key, seen }));
-  await writeJsonArray(emptyYearsPath(lake, source), rows);
+  await writeJsonArray(emptyYearsPath(store, source), rows);
 }

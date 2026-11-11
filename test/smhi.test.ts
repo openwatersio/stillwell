@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { fetchText, HttpError, setTransport, type RequestOptions } from "../src/http.ts";
-import { qcFor } from "../src/lake/recent.ts";
+import { qcFor } from "../src/store/recent.ts";
 import { qc } from "../src/qc.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as smhi from "../src/sources/smhi/index.ts";

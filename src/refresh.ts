@@ -1,5 +1,5 @@
 /**
- * Station lists in the lake: refreshing a source's list, and publishing
+ * Station lists in the store: refreshing a source's list, and publishing
  * stations.parquet from every list. docs/stations.md has the design.
  */
 import { isDeepStrictEqual } from "node:util";
@@ -16,7 +16,7 @@ import {
   writeJsonArray,
   writeStationList,
   writeStations,
-} from "./lake/parquet.ts";
+} from "./store/parquet.ts";
 import {
   boundsPath,
   epochDirs,
@@ -30,13 +30,13 @@ import {
   sourcesPath,
   errataPath,
   PRODUCTS,
-} from "./lake/paths.ts";
-import type { LakeStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
+} from "./store/paths.ts";
+import type { StoredStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
-import { usableShares, writeYears } from "./lake/years.ts";
-import { readAnalysis, withAnalysis } from "./lake/analysis.ts";
+import { usableShares, writeYears } from "./store/years.ts";
+import { readAnalysis, withAnalysis } from "./store/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
 import {
   dropWithheldRows,
@@ -56,7 +56,7 @@ export interface RefreshReport {
   withdrawn: string[];
   /** Withheld (`Source.withheld`): dropped from the list, with their rows in the bounds and recent window. */
   removed: string[];
-  /** Removed stations whose series files are still in the lake, for `ingest withhold` to delete. */
+  /** Removed stations whose series files are still in the store, for `ingest withhold` to delete. */
   unwithheld: string[];
   changed: { id: string; fields: string[] }[];
   epochs: EpochChange[];
@@ -77,7 +77,7 @@ export interface RefreshOptions {
 /** Why a refresh kept the previous list, as an error the caller reports. */
 export class Refused extends Error {}
 
-/** A failure after the refresh wrote the new list, so the lake has it, with the refresh's report. */
+/** A failure after the refresh wrote the new list, so the store has it, with the refresh's report. */
 export class AfterWrite extends Error {
   readonly report: RefreshReport;
   constructor(message: string, report: RefreshReport) {
@@ -87,26 +87,26 @@ export class AfterWrite extends Error {
 }
 
 /**
- * Refresh one source's list in `lake`: fetch, merge, check, snapshot the
+ * Refresh one source's list in `store`: fetch, merge, check, snapshot the
  * previous list and write the new one. Throws `Refused`, writing nothing, when
  * a guard fails.
  */
 export async function refreshSource(
-  lake: string,
+  store: string,
   source: Source,
   options: RefreshOptions,
-): Promise<{ stations: LakeStation[]; report: RefreshReport }> {
+): Promise<{ stations: StoredStation[]; report: RefreshReport }> {
   const id = source.metadata.id;
-  const listPath = stationListPath(lake, id);
+  const listPath = stationListPath(store, id);
   const stored = await readStationList(listPath);
-  // A list that went missing would read as an empty lake, and rebuild every station.
-  if (!stored && (await hasHistory(lake, id))) throw new Refused(lostList(lake, id));
-  // Nor is a lake with the source's series a new source: a list started from
+  // A list that went missing would read as an empty store, and rebuild every station.
+  if (!stored && (await hasHistory(store, id))) throw new Refused(lostList(store, id));
+  // Nor is a store with the source's series a new source: a list started from
   // the fetch would forget what the old one carried forward, such as USACE's
   // series picks, and write another series into the same files.
-  if (!stored && (await hasSeries(lake, id)))
+  if (!stored && (await hasSeries(store, id)))
     throw new Refused(
-      `the lake has ${id} series but no list or history for it; copy stations/${id}.parquet in from a snapshot or another lake, such as the public one at https://water-levels.openwaters.io, rather than start one from the fetch`,
+      `the store has ${id} series but no list or history for it; copy stations/${id}.parquet in from a snapshot or another store, such as the public one at https://stillwell.openwaters.io, rather than start one from the fetch`,
     );
   const held = (s: Pick<Station, "id">) => withheldReason(source, s.id) !== null;
   // A withheld station leaves the list, rather than stay inactive like one the source stopped listing.
@@ -137,7 +137,7 @@ export async function refreshSource(
   const { stations, changes } = mergeStationList(previous, fetched, options_);
   // A fetch whose stations all lack a datum merges to nothing for a new source.
   if (!stations.length) throw new Refused("listed no stations with a datum");
-  await renumberAboveFiles(lake, stations, previous);
+  await renumberAboveFiles(store, stations, previous);
   const opened = changes.filter((c) => c.event === "opened" || c.event === "held");
   // A station already held isn't a new change.
   const limit = Math.max(5, Math.floor(previous.length * 0.02));
@@ -155,11 +155,11 @@ export async function refreshSource(
   const report = {
     ...reportOf(id, options.now, previous, stations, changes, listedInactive),
     removed: removed.map((s) => s.id),
-    // Every withheld station the lake has known, not only those this refresh
+    // Every withheld station the store has known, not only those this refresh
     // removes, so the report keeps asking for `withhold` until it runs. Read
     // before the snapshot, so the report it stores has them.
     unwithheld: source.withheld
-      ? await withFiles(lake, id, (await withheldStations(lake, source, { files: false })).ids)
+      ? await withFiles(store, id, (await withheldStations(store, source, { files: false })).ids)
       : [],
     positions: stale,
     kinds: kinds.stale,
@@ -169,17 +169,17 @@ export async function refreshSource(
   // list instead, so a run cut short between the two can't leave history with
   // no list to refuse on.
   const snapshot = async () => {
-    await writeStationList(historyPath(lake, id, options.now, "parquet"), previous);
-    await writeJsonArray(historyPath(lake, id, options.now, "json"), [report]);
+    await writeStationList(historyPath(store, id, options.now, "parquet"), previous);
+    await writeJsonArray(historyPath(store, id, options.now, "json"), [report]);
   };
   if (stored) await snapshot();
   // A new source has no files yet, so its years start empty and every run keeps
   // them. Before its list, so a failure here leaves it new for the next refresh.
-  if (!stored) await writeYears(lake, id, []);
+  if (!stored) await writeYears(store, id, []);
   await writeStationList(listPath, stations);
   if (!stored) await snapshot();
   try {
-    await dropWithheldRows(lake, source);
+    await dropWithheldRows(store, source);
   } catch (error) {
     throw new AfterWrite(
       `wrote the new list, but couldn't drop withheld stations' rows (${error instanceof Error ? error.message : String(error)}); run \`ingest withhold ${id}\``,
@@ -190,14 +190,14 @@ export async function refreshSource(
 }
 
 /**
- * A new epoch takes an `id` above any epoch directory already in the lake, or
+ * A new epoch takes an `id` above any epoch directory already in the store, or
  * any epoch the recent window still has rows for, so one restored from a
  * snapshot never reuses another's files or rows.
  */
 async function renumberAboveFiles(
-  lake: string,
-  stations: LakeStation[],
-  previous: LakeStation[],
+  store: string,
+  stations: StoredStation[],
+  previous: StoredStation[],
 ): Promise<void> {
   const before = new Map(previous.map((s) => [s.id, new Set(s.epochs.map((e) => e.id))]));
   const changed = stations.filter((s) => {
@@ -211,17 +211,17 @@ async function renumberAboveFiles(
   // stations are cheaper one by one.
   const patterns =
     changed.length > 50
-      ? PRODUCTS.map((p) => sourceEpochDirs(lake, p, changed[0]!.source))
-      : changed.flatMap((s) => PRODUCTS.map((p) => epochDirs(lake, p, s.source, s.source_id)));
+      ? PRODUCTS.map((p) => sourceEpochDirs(store, p, changed[0]!.source))
+      : changed.flatMap((s) => PRODUCTS.map((p) => epochDirs(store, p, s.source, s.source_id)));
   const onDiskOf = await highestEpochs(patterns);
-  const inRecent = await recentEpochs(recentPath(lake, changed[0]!.source));
+  const inRecent = await recentEpochs(recentPath(store, changed[0]!.source));
   for (const station of changed) {
     const known = before.get(station.id) ?? new Set<number>();
     const fresh = station.epochs.filter((e) => !known.has(e.id));
     const onDisk = Math.max(
       inRecent.get(station.id) ?? 1,
       ...PRODUCTS.map(
-        (p) => onDiskOf.get(stationDir(lake, p, station.source, station.source_id)) ?? 1,
+        (p) => onDiskOf.get(stationDir(store, p, station.source, station.source_id)) ?? 1,
       ),
     );
     // A station new to the list with no later epochs on disk starts at 1.
@@ -232,37 +232,37 @@ async function renumberAboveFiles(
 }
 
 /**
- * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `lake` from the lists of
+ * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `store` from the lists of
  * `all`, the sources it holds, their bounds, and their years files' flag counts for `rank`. A source in `expected` that
  * has no list, because it went missing, stops the rebuild, which would
- * otherwise drop its stations from what the lake publishes; it returns the
+ * otherwise drop its stations from what the store publishes; it returns the
  * missing ones. A source in neither is new, and
  * joins once it has a list. Stations sharing a gauge are linked and given a
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
- * `errata.json` those of the sources the lake holds (each source's
- * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the lake
+ * `errata.json` those of the sources the store holds (each source's
+ * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
  * doesn't, a typo or a station since removed.
  */
 export async function publishStations(
-  lake: string,
+  store: string,
   all: Source[],
   expected: string[],
   errata: Erratum[],
 ): Promise<{ count: number; links: LinkReport; unknownErrata: string[] } | { missing: string[] }> {
-  const stations: LakeStation[] = [];
+  const stations: StoredStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
   const usable = new Map<string, number>();
   for (const source of all) {
-    const list = await readStationList(stationListPath(lake, source.metadata.id));
+    const list = await readStationList(stationListPath(store, source.metadata.id));
     if (!list) {
       if (expected.includes(source.metadata.id)) missing.push(source.metadata.id);
       continue;
     }
     listed.push(source);
-    const bounds = await readStationBounds(boundsPath(lake, source.metadata.id));
-    const analysis = await readAnalysis(lake, source.metadata.id);
+    const bounds = await readStationBounds(boundsPath(store, source.metadata.id));
+    const analysis = await readAnalysis(store, source.metadata.id);
     stations.push(
       ...withoutWithheld(source, list).map((s) => ({
         ...s,
@@ -272,7 +272,7 @@ export async function publishStations(
       })),
     );
     // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
-    const shares = await usableShares(lake, source.metadata.id).catch((error: unknown) => {
+    const shares = await usableShares(store, source.metadata.id).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
       return new Map<string, number>();
     });
@@ -281,17 +281,17 @@ export async function publishStations(
   if (missing.length || !listed.length) return { missing };
   const { stations: linked, report } = linkGauges(stations, new Date(), usable);
   for (const station of linked) station.errata = errataOf(station, errata);
-  await writeStations(stationsPath(lake), linked);
+  await writeStations(stationsPath(store), linked);
   await writeJsonArray(
-    sourcesPath(lake),
+    sourcesPath(store),
     listed.map((s) => ({
       ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
       stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
     })),
   );
-  // A lake's errata are its own sources', so a restricted source's stay out of the public lake.
+  // A store's errata are its own sources', so a restricted source's stay out of the public store.
   const held = new Set(listed.map((s) => s.metadata.id));
-  await writeJsonArray(errataPath(lake), published(errata.filter((e) => held.has(e.source))));
+  await writeJsonArray(errataPath(store), published(errata.filter((e) => held.has(e.source))));
   const ids = new Set(linked.map((s) => s.id));
   // A withheld station is gone on purpose, though an erratum may still name it.
   const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
@@ -313,61 +313,64 @@ export async function publishStations(
  */
 const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
 
-/** A source's list from the lake, with each station's analysis (`withAnalysis`), or an error naming what to run. */
-export async function listOf(lake: string, source: Source): Promise<LakeStation[]> {
+/** A source's list from the store, with each station's analysis (`withAnalysis`), or an error naming what to run. */
+export async function listOf(store: string, source: Source): Promise<StoredStation[]> {
   const sourceId = source.metadata.id;
-  const list = await readStationList(stationListPath(lake, sourceId));
-  if (!list && (await hasHistory(lake, sourceId))) throw new Error(lostList(lake, sourceId));
+  const list = await readStationList(stationListPath(store, sourceId));
+  if (!list && (await hasHistory(store, sourceId))) throw new Error(lostList(store, sourceId));
   if (!list)
     throw new Error(
-      `No station list for ${sourceId} in ${lake}; run \`stations ${sourceId}\` to start it`,
+      `No station list for ${sourceId} in ${store}; run \`stations ${sourceId}\` to start it`,
     );
-  return withAnalysis(lake, sourceId, withoutWithheld(source, list));
+  return withAnalysis(store, sourceId, withoutWithheld(source, list));
 }
 
 /** A list without withheld stations, which one not refreshed since they were withheld still has. */
-export function withoutWithheld(source: Source, list: LakeStation[]): LakeStation[] {
+export function withoutWithheld(source: Source, list: StoredStation[]): StoredStation[] {
   return list.filter((s) => withheldReason(source, s.id) === null);
 }
 
 /**
- * A source's list from the lake, with each station's analysis, or null for a source whose list was never
+ * A source's list from the store, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
  * existed and is gone, or series with no list, are still errors.
  */
-export async function startedListOf(lake: string, source: Source): Promise<LakeStation[] | null> {
+export async function startedListOf(
+  store: string,
+  source: Source,
+): Promise<StoredStation[] | null> {
   const sourceId = source.metadata.id;
-  const list = await readStationList(stationListPath(lake, sourceId));
-  if (list) return withAnalysis(lake, sourceId, withoutWithheld(source, list));
-  if (await hasHistory(lake, sourceId)) throw new Error(lostList(lake, sourceId));
-  // The refresh refuses such a lake too, so waiting for it would wait for good.
-  if (await hasSeries(lake, sourceId))
-    throw new Error(`the lake has ${sourceId} series but no list or history for it`);
+  const list = await readStationList(stationListPath(store, sourceId));
+  if (list) return withAnalysis(store, sourceId, withoutWithheld(source, list));
+  if (await hasHistory(store, sourceId)) throw new Error(lostList(store, sourceId));
+  // The refresh refuses such a store too, so waiting for it would wait for good.
+  if (await hasSeries(store, sourceId))
+    throw new Error(`the store has ${sourceId} series but no list or history for it`);
   return null;
 }
 
-/** Whether `lake` holds any of a source's values: series files in any epoch, or a recent window. */
-async function hasSeries(lake: string, sourceId: string): Promise<boolean> {
-  if (await exists(recentPath(lake, sourceId))) return true;
+/** Whether `store` holds any of a source's values: series files in any epoch, or a recent window. */
+async function hasSeries(store: string, sourceId: string): Promise<boolean> {
+  if (await exists(recentPath(store, sourceId))) return true;
   return anyFile(
     PRODUCTS.flatMap((p) => [
-      sourceFirstEpochFiles(lake, p, sourceId),
-      sourceEpochDirs(lake, p, sourceId),
+      sourceFirstEpochFiles(store, p, sourceId),
+      sourceEpochDirs(store, p, sourceId),
     ]),
   );
 }
 
-/** Whether a source's list has ever been written to `lake`. */
-export async function hasHistory(lake: string, sourceId: string): Promise<boolean> {
-  return exists(historyPath(lake, sourceId, "*", "parquet"));
+/** Whether a source's list has ever been written to `store`. */
+export async function hasHistory(store: string, sourceId: string): Promise<boolean> {
+  return exists(historyPath(store, sourceId, "*", "parquet"));
 }
 
-function lostList(lake: string, sourceId: string): string {
-  return `the lake has history for ${sourceId} but no list at ${stationListPath(lake, sourceId)}; copy its latest snapshot in history/ back rather than start over`;
+function lostList(store: string, sourceId: string): string {
+  return `the store has history for ${sourceId} but no list at ${stationListPath(store, sourceId)}; copy its latest snapshot in history/ back rather than start over`;
 }
 
 /** The epoch new values for a station go to. */
-export function epochOf(station: LakeStation): number {
+export function epochOf(station: StoredStation): number {
   return currentEpoch(station.epochs).id;
 }
 
@@ -386,7 +389,7 @@ export function shrankSharply(previous: Station[], fetched: ListedStation[]): st
   return null;
 }
 
-const COMPARED = (s: LakeStation) => {
+const COMPARED = (s: StoredStation) => {
   const { epochs: _, first: __, last: ___, ...fields } = s;
   return fields;
 };
@@ -394,8 +397,8 @@ const COMPARED = (s: LakeStation) => {
 function reportOf(
   source: string,
   time: string,
-  previous: LakeStation[],
-  stations: LakeStation[],
+  previous: StoredStation[],
+  stations: StoredStation[],
   epochs: EpochChange[],
   listedInactive: Set<string>,
 ): RefreshReport {
@@ -455,7 +458,7 @@ export function describeReport(report: RefreshReport): string[] {
     `${report.source}: ${report.added.length} added, ${report.retired.length} retired, ${report.changed.length} changed${report.removed.length ? `, ${report.removed.length} removed` : ""}`,
   ];
   for (const id of report.added.slice(0, 20)) lines.push(`  added ${id}`);
-  for (const id of report.removed) lines.push(`  removed ${id}, withheld from the lake`);
+  for (const id of report.removed) lines.push(`  removed ${id}, withheld from the store`);
   if (report.unwithheld.length)
     lines.push(
       `  ${report.unwithheld.length} removed stations still have series files: run \`ingest withhold ${report.source}\` to delete them`,

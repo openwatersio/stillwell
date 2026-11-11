@@ -334,7 +334,7 @@ describe("nextEpochs", () => {
     assert.equal(epochs[0]!.until, "2019-03-01T00:00:00Z");
   });
 
-  it("gives every new epoch an id above the files already in the lake", () => {
+  it("gives every new epoch an id above the files already in the store", () => {
     const { epochs } = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ nextId: 5 }));
     assert.equal(epochs[1]!.id, 5);
   });

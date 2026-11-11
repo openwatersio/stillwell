@@ -3,7 +3,7 @@ import { currentEpoch } from "../../epochs.ts";
 import {
   Flag,
   stationDefaults,
-  type LakeStation,
+  type StoredStation,
   type ListedStation,
   type Observation,
   type Source,
@@ -37,7 +37,7 @@ export const metadata: SourceMetadata = {
     url: "https://cdec.water.ca.gov/CDECContact.html",
   },
   terms:
-    "CDEC publishes its data without a license or a restriction on reuse, under DWR's conditions of use, which disclaim any guarantee of accuracy, completeness or timeliness. CDEC's data is preliminary and subject to revision. Each station credits its operator. Changes in the lake: levels converted from feet to meters and rounded to the millimeter, times converted from Pacific time to UTC, missing readings dropped, and quality flags added.",
+    "CDEC publishes its data without a license or a restriction on reuse, under DWR's conditions of use, which disclaim any guarantee of accuracy, completeness or timeliness. CDEC's data is preliminary and subject to revision. Each station credits its operator. Changes in the store: levels converted from feet to meters and rounded to the millimeter, times converted from Pacific time to UTC, missing readings dropped, and quality flags added.",
   // Readings arrive within the hour.
   hourly: true,
   // CDEC never marks a reading reviewed; DWR's reviewed record is the Water Data Library.
@@ -74,7 +74,7 @@ export const NOTED: Record<string, string> = {
   BDL: "NAVD88",
 };
 
-/** The datums a gauge-zero table names, as the lake labels them. */
+/** The datums a gauge-zero table names, as the store labels them. */
 const DATUMS: Record<string, string> = { "NAVD 88": "NAVD88", "NGVD 29": "NGVD29" };
 
 /** A CDEC station as listed, with the first day read and, once closed, the day after the last. */
@@ -97,7 +97,7 @@ export interface Meta {
 
 /** Every station in `CODES` that an operator other than USGS runs and that has 15-minute stage. */
 export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
-  const before = new Map(previous.map((s) => [s.source_id, s as Partial<LakeStation>]));
+  const before = new Map(previous.map((s) => [s.source_id, s as Partial<StoredStation>]));
   const out: CdecStation[] = [];
   for (const code of CODES) {
     let meta: Meta;

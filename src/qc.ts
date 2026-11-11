@@ -45,7 +45,7 @@ export const FLATLINE_S = 6 * 3600;
  * itself, such as REFMAR's suspect spans, sets `source_flag` to the source's.
  */
 export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
-  // Levels to the 0.1 mm the lake reads back, so a fetched value equals its stored copy, as a flatline needs.
+  // Levels to the 0.1 mm the store reads back, so a fetched value equals its stored copy, as a flatline needs.
   return rows.map((r) => ({
     ...r,
     level: Math.round(r.level * 10_000) / 10_000,
@@ -55,7 +55,7 @@ export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
 
 /**
  * Rows with `flag` worked out again from what the source said, `source_flag`,
- * and the spans the lake's errata flag `suspect`, so QC starts over and a rule
+ * and the spans the store's errata flag `suspect`, so QC starts over and a rule
  * that loosens clears what it flagged before. A row written before
  * `source_flag` was kept gets it from its flag when that's better than
  * suspect, since QC and errata only ever mark a value suspect or bad, so the
@@ -159,7 +159,7 @@ export function qc<T extends Observation>(
       near.push(all[k]!.level);
     return median(near);
   };
-  // In 0.1 mm, the lake's resolution, so a centimeter's difference is the same at any level.
+  // In 0.1 mm, the store's resolution, so a centimeter's difference is the same at any level.
   const near = (k: number, i: number) =>
     k < all.length && Math.abs(Math.round((all[k]!.level - all[i]!.level) * 10_000)) <= 100;
   for (let i = 0; held && i < all.length;) {

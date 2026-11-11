@@ -3,7 +3,7 @@
  * documentation files (`rqds/<ocean>/doc/qa<id>.dmt`), beyond UHSLC's own.
  * `scripts/uhslc-contributors.ts` finds each one by its `pattern` and records
  * which stations carry it in `contributors.ts`. Every station UHSLC serves
- * openly goes in the public lake, unless its notice is `refused`; a notice
+ * openly goes in the public store, unless its notice is `refused`; a notice
  * sets its commercial-use tag and adds its contributor's credit. A station
  * whose file has none keeps UHSLC's terms.
  */
@@ -19,9 +19,9 @@ export interface Notice {
   /** What the terms say, in short. */
   terms: string;
   /**
-   * The issue recording the contributor's refusal to let the lake republish
+   * The issue recording the contributor's refusal to let the store republish
    * its data. Its stations, and GESLA's copies of them, are withheld: never
-   * listed, never fetched, and removed from the lake (`ingest withhold`).
+   * listed, never fetched, and removed from the store (`ingest withhold`).
    */
   refused?: string;
 }
@@ -72,7 +72,7 @@ export const NOTICES: Record<string, Notice> = {
       "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     url: "https://www.bodc.ac.uk/data/hosted_data_systems/sea_level/uk_tide_gauge_network/",
     terms:
-      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, water-levels#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
+      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
   },
   ccby: {
     name: "CC BY 4.0",
@@ -97,8 +97,8 @@ export const NOTICES: Record<string, Notice> = {
     credit: "South African Navy Hydrographic Office",
     url: null,
     terms:
-      "SANHO owns the data and refused permission to republish any of it, so its stations are withheld from the lake. UHSLC serves Walvis Bay, in Namibia, openly, and withholds its South African stations until a user agrees to SANHO's terms.",
-    refused: "https://github.com/openwatersio/water-levels/issues/80",
+      "SANHO owns the data and refused permission to republish any of it, so its stations are withheld from the store. UHSLC serves Walvis Bay, in Namibia, openly, and withholds its South African stations until a user agrees to SANHO's terms.",
+    refused: "https://github.com/openwatersio/stillwell/issues/80",
   },
 };
 

@@ -5,9 +5,9 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 import { DatumChanged } from "../src/epochs.ts";
 import { Blocked, fetchText, setTransport } from "../src/http.ts";
-import { upsert } from "../src/lake/merge.ts";
+import { upsert } from "../src/store/merge.ts";
 import { DuckDBInstance } from "@duckdb/node-api";
-import { isMissing } from "../src/lake/parquet.ts";
+import { isMissing } from "../src/store/parquet.ts";
 import {
   readDatums,
   readObservations,
@@ -17,19 +17,19 @@ import {
   writeObservations,
   writeRecent,
   writeStationBounds,
-} from "../src/lake/parquet.ts";
-import { boundsPath, recentPath, seriesPath } from "../src/lake/paths.ts";
+} from "../src/store/parquet.ts";
+import { boundsPath, recentPath, seriesPath } from "../src/store/paths.ts";
 import {
   compactRecent,
   formatSummary,
   lastDays,
   updateRecent,
   writePreliminary,
-} from "../src/lake/recent.ts";
+} from "../src/store/recent.ts";
 import {
   Flag,
   type Epoch,
-  type LakeStation,
+  type StoredStation,
   type Observation,
   type Source,
   type Station,
@@ -53,11 +53,11 @@ async function firstLast(
   return new Map([...bounds].map(([id, { first, last }]) => [id, { first, last }]));
 }
 
-function lake(): string {
-  return mkdtempSync(join(tmpdir(), "water-levels-recent-"));
+function store(): string {
+  return mkdtempSync(join(tmpdir(), "stillwell-recent-"));
 }
 
-function station(id: string, extra: Partial<LakeStation> = {}): LakeStation {
+function station(id: string, extra: Partial<StoredStation> = {}): StoredStation {
   const datum = extra.datum ?? "NAP";
   return {
     epochs: [epoch(1, datum)],
@@ -72,7 +72,7 @@ function station(id: string, extra: Partial<LakeStation> = {}): LakeStation {
     kind: "coastal",
     commercial_use: true,
     ...extra,
-  } as LakeStation;
+  } as StoredStation;
 }
 
 /** A source whose per-station answers come from `answers`, by station ID. */
@@ -114,12 +114,12 @@ const at = (time: number, level: number, received?: number): Observation =>
 
 describe("updateRecent", () => {
   it("says when the source blocked this client", async () => {
-    const root = lake();
+    const root = store();
     const [a, b] = [station("a"), station("b")];
     const summary = await updateRecent({
       source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: new Blocked("refused") }),
       stations: [a, b],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -128,13 +128,13 @@ describe("updateRecent", () => {
   });
 
   it("says when a station failed because its source moved it to another datum", async () => {
-    const root = lake();
+    const root = store();
     const [a, b] = [station("a"), station("b")];
     const run = (answer: Error) =>
       updateRecent({
         source: source({ [a.id]: [at(NOW - HOUR, 0.3)], [b.id]: answer }),
         stations: [a, b],
-        lakeFor: () => root,
+        storeFor: () => root,
         since: new Date(NOW - 6 * HOUR),
         now: NOW,
       });
@@ -158,7 +158,7 @@ describe("updateRecent", () => {
   });
 
   it("merges the fetch into the window, trims it, and stamps only new values", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const a = station("a");
     await writeRecent(path, [
@@ -177,7 +177,7 @@ describe("updateRecent", () => {
     const summary = await updateRecent({
       source: source({ [a.id]: [at(NOW - 3 * HOUR, 0.25), at(NOW - HOUR, 0.3)] }),
       stations: [a],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -217,7 +217,7 @@ describe("updateRecent", () => {
   });
 
   it("keeps a failed or silent station's window, and counts it failed or stale", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const [ok, broken, quiet] = [station("ok"), station("broken"), station("quiet")];
     const old = (s: Station) => ({
@@ -237,7 +237,7 @@ describe("updateRecent", () => {
         station("retired", { status: "inactive" }),
         station("predicted", { live: false }),
       ],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -257,7 +257,7 @@ describe("updateRecent", () => {
   });
 
   it("gives a station three of its intervals before it's stale", async () => {
-    const root = lake();
+    const root = store();
     const daily = station("daily", { interval_s: 86_400 });
     await writeRecent(recentPath(root, "test"), [
       [{ ...at(NOW - 2 * DAY, 1, NOW - 2 * DAY), station: daily.id, epoch: 1 }],
@@ -265,7 +265,7 @@ describe("updateRecent", () => {
     const summary = await updateRecent({
       source: source({}),
       stations: [daily],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -273,7 +273,7 @@ describe("updateRecent", () => {
   });
 
   it("carries rows of stations it no longer fetches, until they age out", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const [live, retired, quiet, gone, moved] = [
       station("live"),
@@ -293,14 +293,14 @@ describe("updateRecent", () => {
         row(retired, 8 * DAY), // aged out
         row(quiet, 3 * HOUR),
         row(gone, 4 * HOUR), // no longer listed, so nowhere to fold it
-        row(moved, 5 * HOUR), // now restricted: never stays in the public lake
+        row(moved, 5 * HOUR), // now restricted: never stays in the public store
       ],
     ]);
-    const restricted = lake();
+    const restricted = store();
     await updateRecent({
       source: source({ [live.id]: [at(NOW - HOUR, 2)] }),
       stations: [live, retired, quiet, moved],
-      lakeFor: (s) => (s.commercial_use ? root : restricted),
+      storeFor: (s) => (s.commercial_use ? root : restricted),
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -315,7 +315,7 @@ describe("updateRecent", () => {
   });
 
   it("tags rows with their epoch, and fetches only from the current epoch's start", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const since = NOW - 3 * HOUR;
     const moved = station("moved", {
@@ -349,7 +349,7 @@ describe("updateRecent", () => {
     const summary = await updateRecent({
       source: src,
       stations: [moved, held],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 12 * HOUR),
       now: NOW,
     });
@@ -372,20 +372,20 @@ describe("updateRecent", () => {
     );
   });
 
-  it("fails a station whose lake can't be named alone", async () => {
-    const root = lake();
+  it("fails a station whose store can't be named alone", async () => {
+    const root = store();
     const [a, b] = [station("a"), station("b", { commercial_use: false })];
     const summary = await updateRecent({
       source: source({ [a.id]: [at(NOW - HOUR, 1)] }),
       stations: [a, b],
-      lakeFor: (s) => {
-        if (!s.commercial_use) throw new Error("no restricted lake");
+      storeFor: (s) => {
+        if (!s.commercial_use) throw new Error("no restricted store");
         return root;
       },
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
-    assert.deepEqual(summary.failed, ["test/b: no restricted lake"]);
+    assert.deepEqual(summary.failed, ["test/b: no restricted store"]);
     assert.deepEqual(
       (await readRecent(recentPath(root, "test"))).map((r) => r.station),
       ["test/a"],
@@ -393,7 +393,7 @@ describe("updateRecent", () => {
   });
 
   it("looks back two intervals for a station fetched on its own", async () => {
-    const root = lake();
+    const root = store();
     const asked: [string, number][] = [];
     const daily = station("daily", { interval_s: 86_400 });
     await updateRecent({
@@ -407,7 +407,7 @@ describe("updateRecent", () => {
         },
       },
       stations: [daily, station("tenminute")],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 12 * HOUR),
       now: NOW,
     });
@@ -422,7 +422,7 @@ describe("updateRecent", () => {
   });
 
   it("merges across batches of 500 stations", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const stations = Array.from({ length: 1001 }, (_, i) => station(String(i).padStart(4, "0")));
     // Before the fetched hours, so the merge keeps it.
@@ -435,7 +435,7 @@ describe("updateRecent", () => {
     const summary = await updateRecent({
       source: source(Object.fromEntries(stations.map((s) => [s.id, [at(NOW - HOUR, 2)]]))),
       stations,
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
       concurrency: 8,
@@ -452,7 +452,7 @@ describe("updateRecent", () => {
   });
 
   it("leaves the old file when a batch fails partway", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const stations = Array.from({ length: 600 }, (_, i) => station(String(i).padStart(4, "0")));
     await writeRecent(path, [
@@ -469,7 +469,7 @@ describe("updateRecent", () => {
       updateRecent({
         source: { ...source({}), recent: async () => new Breaking() },
         stations,
-        lakeFor: () => root,
+        storeFor: () => root,
         since: new Date(NOW - 6 * HOUR),
         now: NOW,
       }),
@@ -481,13 +481,13 @@ describe("updateRecent", () => {
     );
   });
 
-  it("writes restricted stations' window to their own lake", async () => {
-    const [open, restricted] = [lake(), lake()];
+  it("writes restricted stations' window to their own store", async () => {
+    const [open, restricted] = [store(), store()];
     const [a, b] = [station("a"), station("b", { commercial_use: false })];
     await updateRecent({
       source: source({ [a.id]: [at(NOW - HOUR, 1)], [b.id]: [at(NOW - HOUR, 2)] }),
       stations: [a, b],
-      lakeFor: (s) => (s.commercial_use ? open : restricted),
+      storeFor: (s) => (s.commercial_use ? open : restricted),
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -502,7 +502,7 @@ describe("updateRecent", () => {
   });
 
   it("fails on an unreadable window before the sweep spends any requests", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, "not parquet");
@@ -517,7 +517,7 @@ describe("updateRecent", () => {
           },
         },
         stations: [station("a")],
-        lakeFor: () => root,
+        storeFor: () => root,
         since: new Date(NOW - 6 * HOUR),
         now: NOW,
       }),
@@ -527,7 +527,7 @@ describe("updateRecent", () => {
   });
 
   it("keeps every station's window when a sweep throws", async () => {
-    const root = lake();
+    const root = store();
     const path = recentPath(root, "test");
     const [a, b] = [station("a"), station("b")];
     await writeRecent(path, [
@@ -541,7 +541,7 @@ describe("updateRecent", () => {
         },
       },
       stations: [a, b],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -586,12 +586,12 @@ describe("updateRecent", () => {
         ...extra,
         ...({ time_series_id: `${id}-00065`, parameter_code: "00065" } as object),
       });
-    const root = lake();
+    const root = store();
     const summary = await updateRecent({
       source: usgs.source,
       // c answers nothing; d is committed in another datum and fails alone.
       stations: [gage("a"), gage("b"), gage("c"), gage("d", { datum: "NAVD88" })],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -621,7 +621,7 @@ describe("updateRecent", () => {
     setTransport(async () =>
       JSON.stringify({ type: "FeatureCollection", features: [], links: [] }),
     );
-    const root = lake();
+    const root = store();
     const a = station("a", {
       id: "usgs/a",
       source: "usgs",
@@ -634,7 +634,7 @@ describe("updateRecent", () => {
     const summary = await updateRecent({
       source: usgs.source,
       stations: [a],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 6 * HOUR),
       now: NOW,
     });
@@ -656,7 +656,7 @@ describe("compactRecent", () => {
 
   it("folds yesterday into the year file, carrying received and keeping what it had", async () => {
     setConnections(4);
-    const root = lake();
+    const root = store();
     const a = station("a");
     const file = seriesPath(root, "levels", "test", "a", 2026);
     await writeObservations(
@@ -677,7 +677,7 @@ describe("compactRecent", () => {
       ],
     ]);
     const run = () =>
-      compactRecent({ source: source({}), stations: [a], lakeFor: () => root, start, end });
+      compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
     const summary = await run();
     assert.deepEqual(
       (await readObservations(file)).map((r) => [r.time - start, r.level, r.received]),
@@ -716,7 +716,7 @@ describe("compactRecent", () => {
   });
 
   it("writes each station's first and last over its epochs to the source's bounds", async () => {
-    const root = lake();
+    const root = store();
     const a = station("a", {
       datum: "NHN",
       epochs: [epoch(1, "NAP", { state: "closed" }), epoch(2, "NHN")],
@@ -747,7 +747,7 @@ describe("compactRecent", () => {
       compactRecent({
         source: source({}),
         stations: [a, quiet, empty],
-        lakeFor: () => root,
+        storeFor: () => root,
         start,
         end,
       });
@@ -793,7 +793,7 @@ describe("compactRecent", () => {
       compactRecent({
         source: source({}),
         stations: [a, quiet, empty, fresh],
-        lakeFor: () => root,
+        storeFor: () => root,
         start,
         end,
         rebuildBounds,
@@ -830,7 +830,7 @@ describe("compactRecent", () => {
   });
 
   it("bounds a station by the rows its epochs count", async () => {
-    const root = lake();
+    const root = store();
     const b = station("b", {
       datum: "NHN",
       epochs: [
@@ -850,7 +850,7 @@ describe("compactRecent", () => {
     await write(2020, 2, [Date.UTC(2020, 5, 20), Date.UTC(2020, 7, 1)]); // the first is before its since
     await write(2026, 3, [Date.UTC(2026, 1, 1)]); // held
     await write(2027, 9, [Date.UTC(2027, 1, 1)]); // an epoch the list doesn't have
-    await compactRecent({ source: source({}), stations: [b], lakeFor: () => root, start, end });
+    await compactRecent({ source: source({}), stations: [b], storeFor: () => root, start, end });
     assert.deepEqual((await firstLast(boundsPath(root, "test"))).get(b.id), {
       first: "2019-12-01T00:00:00Z",
       last: "2020-08-01T00:00:00Z",
@@ -858,7 +858,7 @@ describe("compactRecent", () => {
   });
 
   it("moves an end a year inward when its year holds no counted rows", async () => {
-    const root = lake();
+    const root = store();
     const c = station("c", {
       datum: "NHN",
       epochs: [
@@ -875,7 +875,7 @@ describe("compactRecent", () => {
     await write(2018, 1, Date.UTC(2018, 8, 1));
     await write(2022, 2, Date.UTC(2022, 3, 1));
     await write(2023, 1, Date.UTC(2023, 3, 1)); // after epoch 1's until
-    await compactRecent({ source: source({}), stations: [c], lakeFor: () => root, start, end });
+    await compactRecent({ source: source({}), stations: [c], storeFor: () => root, start, end });
     assert.deepEqual((await firstLast(boundsPath(root, "test"))).get(c.id), {
       first: "2018-09-01T00:00:00Z",
       last: "2022-04-01T00:00:00Z",
@@ -883,14 +883,14 @@ describe("compactRecent", () => {
   });
 
   it("keeps the bounds when the listing finds no files", async () => {
-    const root = lake();
+    const root = store();
     const path = boundsPath(root, "test");
     const had = { id: "test/a", first: "2020-01-01T00:00:00Z", last: "2020-02-01T00:00:00Z" };
     await writeStationBounds(path, [had]);
     const summary = await compactRecent({
       source: source({}),
       stations: [station("a", { live: false })],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -898,7 +898,7 @@ describe("compactRecent", () => {
     const rebuilt = await compactRecent({
       source: source({}),
       stations: [station("a", { live: false })],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
       rebuildBounds: true,
@@ -911,7 +911,7 @@ describe("compactRecent", () => {
   });
 
   it("doesn't bound a station by a value whose write failed", async () => {
-    const root = lake();
+    const root = store();
     const a = station("a");
     const file = seriesPath(root, "levels", "test", "a", 2026);
     await writeObservations(file, [at(start - DAY, 1)], "NAP");
@@ -925,7 +925,7 @@ describe("compactRecent", () => {
       const summary = await compactRecent({
         source: source({}),
         stations: [a],
-        lakeFor: () => root,
+        storeFor: () => root,
         start,
         end,
       });
@@ -941,7 +941,7 @@ describe("compactRecent", () => {
   });
 
   it("keeps each station's earliest preliminary value in its current epoch", async () => {
-    const root = lake();
+    const root = store();
     const p = station("p", {
       datum: "NHN",
       live: false,
@@ -979,7 +979,7 @@ describe("compactRecent", () => {
       compactRecent({
         source: source({}),
         stations: [p, r],
-        lakeFor: () => root,
+        storeFor: () => root,
         start,
         end,
         rebuildBounds,
@@ -1037,7 +1037,7 @@ describe("compactRecent", () => {
   });
 
   it("marks a station screened once a file it reads holds a value the source screened", async () => {
-    const root = lake();
+    const root = store();
     const s = station("s", { live: false });
     const path = boundsPath(root, "test");
     await writeObservations(
@@ -1046,7 +1046,7 @@ describe("compactRecent", () => {
       "NAP",
     );
     const run = () =>
-      compactRecent({ source: source({}), stations: [s], lakeFor: () => root, start, end });
+      compactRecent({ source: source({}), stations: [s], storeFor: () => root, start, end });
     const screened = async () => (await readStationBounds(path)).get(s.id)?.screened;
     const known = (value: boolean | null) =>
       writeStationBounds(path, [
@@ -1089,7 +1089,7 @@ describe("compactRecent", () => {
   });
 
   it("fills in a bounds file written before preliminary values on a rebuild, from old files too", async () => {
-    const root = lake();
+    const root = store();
     const q = station("q", { live: false });
     // Both written by an older build: bounds without `preliminary`, a year file without `source_flag`.
     const path = boundsPath(root, "test");
@@ -1112,7 +1112,7 @@ describe("compactRecent", () => {
       compactRecent({
         source: source({}),
         stations: [q],
-        lakeFor: () => root,
+        storeFor: () => root,
         start,
         end,
         rebuildBounds,
@@ -1130,7 +1130,7 @@ describe("compactRecent", () => {
   });
 
   it("sets the preliminary values and screening backfill read, keeping every other bound", async () => {
-    const root = lake();
+    const root = store();
     const path = boundsPath(root, "test");
     const first = "2020-01-01T00:00:00Z";
     const last = "2025-01-01T00:00:00Z";
@@ -1162,7 +1162,7 @@ describe("compactRecent", () => {
   });
 
   it("splits a range across New Year into each year's file", async () => {
-    const root = lake();
+    const root = store();
     const a = station("a");
     const newYear = Date.UTC(2026, 0, 1);
     await writeRecent(recentPath(root, "test"), [
@@ -1174,7 +1174,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [a],
-      lakeFor: () => root,
+      storeFor: () => root,
       start: newYear - DAY,
       end: newYear + DAY,
     });
@@ -1190,7 +1190,7 @@ describe("compactRecent", () => {
   });
 
   it("folds each row into its own epoch's files, in that epoch's datum", async () => {
-    const root = lake();
+    const root = store();
     const moved = station("moved", {
       datum: "NHN",
       epochs: [epoch(1, "PNP", { state: "closed" }), epoch(2, "NHN")],
@@ -1206,7 +1206,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [moved, lost],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -1228,7 +1228,7 @@ describe("compactRecent", () => {
   });
 
   it("folds a row into an epoch opened after it was tagged, by its time", async () => {
-    const root = lake();
+    const root = store();
     const opened = start + 6 * HOUR;
     const moved = station("moved", {
       datum: "NHN",
@@ -1253,7 +1253,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [moved, held],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -1282,7 +1282,7 @@ describe("compactRecent", () => {
     const later = await compactRecent({
       source: source({}),
       stations: [held],
-      lakeFor: () => root,
+      storeFor: () => root,
       start: end,
       end: end + DAY,
     });
@@ -1290,7 +1290,7 @@ describe("compactRecent", () => {
   });
 
   it("folds a station retired since its values arrived", async () => {
-    const root = lake();
+    const root = store();
     const retired = station("retired", { status: "inactive", live: false });
     await writeRecent(recentPath(root, "test"), [
       [{ ...at(start + HOUR, 1, start + HOUR), station: retired.id, epoch: 1 }],
@@ -1298,7 +1298,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [retired],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -1313,7 +1313,7 @@ describe("compactRecent", () => {
   });
 
   it("folds a station whose list dropped levels, and doesn't count it stale", async () => {
-    const root = lake();
+    const root = store();
     const [dropped, gone] = [
       station("dropped", { products: ["predictions"] }),
       station("gone", { products: ["predictions"] }),
@@ -1324,7 +1324,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [dropped, gone],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -1338,7 +1338,7 @@ describe("compactRecent", () => {
   });
 
   it("keeps a verified value QC marked suspect over the window's preliminary one", async () => {
-    const root = lake();
+    const root = store();
     const a = station("a");
     const file = seriesPath(root, "levels", "test", "a", 2026);
     const verified: Observation = {
@@ -1364,7 +1364,7 @@ describe("compactRecent", () => {
         },
       ],
     ]);
-    await compactRecent({ source: source({}), stations: [a], lakeFor: () => root, start, end });
+    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
     assert.deepEqual(
       (await readObservations(file)).map((r) => [r.level, r.flag, r.source_flag]),
       [
@@ -1375,7 +1375,7 @@ describe("compactRecent", () => {
   });
 
   it("counts a value whose source flag alone changed as written", async () => {
-    const root = lake();
+    const root = store();
     const a = station("a");
     const file = seriesPath(root, "levels", "test", "a", 2026);
     const time = start + HOUR;
@@ -1398,7 +1398,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [a],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });
@@ -1411,7 +1411,7 @@ describe("compactRecent", () => {
   });
 
   it("leaves a file in another datum as it was, and counts silent stations stale", async () => {
-    const root = lake();
+    const root = store();
     const [a, quiet, archive] = [
       station("a"),
       station("quiet"),
@@ -1425,7 +1425,7 @@ describe("compactRecent", () => {
     const summary = await compactRecent({
       source: source({}),
       stations: [a, quiet, archive],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end,
     });

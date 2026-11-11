@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { constants, createInflateRaw, crc32, inflateRawSync } from "node:zlib";
 import { csvFields } from "../../csv.ts";
 import { getText } from "../../http.ts";
+// Refuses the cache variable under its old name.
+import "../../cache.ts";
 
 /**
  * CPRA's weekly export of every CRMS station's hourly record: one zip holding
@@ -25,7 +27,7 @@ const WORKERS = 8;
 const FORMAT = 2;
 /** The share of rows, beyond 100, that may be misshapen before the export counts as a new format. */
 const MISSHAPEN_SHARE = 0.01;
-const CACHE_DIR = process.env.WATER_LEVELS_CACHE ?? ".cache";
+const CACHE_DIR = process.env.STILLWELL_CACHE ?? ".cache";
 
 /** One row the adapter keeps, as the split writes it. */
 export interface Row {
@@ -34,7 +36,7 @@ export interface Row {
   feet: number;
   /** Index into the adapter's geoids, 255 for another. */
   geoid: number;
-  /** The lake's flag for the value. */
+  /** The store's flag for the value. */
   flag: number;
 }
 

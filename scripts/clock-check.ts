@@ -16,18 +16,15 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { useDiskCache } from "../src/cache.ts";
-import { readStationList } from "../src/lake/parquet.ts";
-import { stationListPath } from "../src/lake/paths.ts";
+import { readStationList } from "../src/store/parquet.ts";
+import { stationListPath } from "../src/store/paths.ts";
 import { phaseLag, timeline } from "../src/harmonic.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import { sourceOf } from "../src/sources/index.ts";
 
 const ROOT = resolve(import.meta.dirname, "..");
 const TIDE_DATABASE = resolve(ROOT, process.env.TIDE_DATABASE ?? "../slackwater-database");
-const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.io").replace(
-  /\/$/,
-  "",
-);
+const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
 const MINUTE_MS = 60_000;
 /** Lags tried, every 10 minutes up to 3 hours either way. */
 const LAGS = Array.from({ length: 37 }, (_, i) => (i - 18) * 10);
@@ -53,12 +50,12 @@ for (const pair of pairs) {
   const [sourceId, id] = station?.split(/\/(.*)/) ?? [];
   if (!sourceId || !id || !record) throw new Error(`Not <source/id>=<ticon record>: ${pair}`);
   const source = sourceOf(sourceId);
-  // The lake's list (WATER_LEVELS_LAKE, default the public bucket) carries each
+  // The store's list (STILLWELL_STORE, default the public bucket) carries each
   // station's own fields; a source with no list there is listed by its adapter.
   if (!lists.has(sourceId))
     lists.set(
       sourceId,
-      (await readStationList(stationListPath(LAKE, sourceId))) ?? (await source.stations()),
+      (await readStationList(stationListPath(STORE, sourceId))) ?? (await source.stations()),
     );
   const listed = lists.get(sourceId)!.find((s) => s.id === station);
   if (!listed) throw new Error(`${sourceId} lists no ${station}`);

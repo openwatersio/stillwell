@@ -10,7 +10,7 @@ GitHub's `schedule` trigger runs this repo's workflows hours late, or skips them
 | `35 3 9 * *`      | Monthly with `refetch`, titled Refetch  | `40 3 9 * *`          |
 | `0 7 * * MON`     | Canary (`canary.yml`)                   | `5 7 * * MON`         |
 
-Each workflow keeps its `schedule` as a backup, five minutes after the Worker's. A scheduled run checks first whether a dispatched one on `main` already started (in the last hour, 23 hours, or day, with Monthly's matching its title, Monthly or Refetch for every source) and if so runs nothing. A failed check runs the backup. Without that check, the second run would wait in each source's `lake-<source>` group and cancel any job already waiting there, since GitHub keeps one waiting job per group. When the Worker fails, the schedule still runs, late as it may be.
+Each workflow keeps its `schedule` as a backup, five minutes after the Worker's. A scheduled run checks first whether a dispatched one on `main` already started (in the last hour, 23 hours, or day, with Monthly's matching its title, Monthly or Refetch for every source) and if so runs nothing. A failed check runs the backup. Without that check, the second run would wait in each source's `store-<source>` group and cancel any job already waiting there, since GitHub keeps one waiting job per group. When the Worker fails, the schedule still runs, late as it may be.
 
 The Bucket check workflow stays on GitHub's schedule only: it writes nothing, and a late weekly run is fine.
 
@@ -23,7 +23,7 @@ Deploy only once the workflows' checks for a dispatched run are on `main`. Witho
 1. Create a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new):
    - **Resource owner**: `openwatersio`
    - **Expiration**: the longest the org allows. Put a reminder in a calendar a week before it expires.
-   - **Repository access**: Only select repositories, `openwatersio/water-levels`
+   - **Repository access**: Only select repositories, `openwatersio/stillwell`
    - **Repository permissions**: Actions, Read and write. Metadata, Read-only, is added for you. Nothing else.
 
    GitHub sends a failed run's email to the user who started it, so the token's owner gets the failure emails for every dispatched run, Monthly's and Canary's included, which have no `alert` job.
@@ -59,7 +59,7 @@ Deploy only once the workflows' checks for a dispatched run are on `main`. Witho
 5. Check it works after the next `:12` past the hour. A run of Ingest hourly with the event `workflow_dispatch` should appear:
 
    ```bash
-   gh run list --repo openwatersio/water-levels --workflow ingest-hourly.yml --event workflow_dispatch --limit 3
+   gh run list --repo openwatersio/stillwell --workflow ingest-hourly.yml --event workflow_dispatch --limit 3
    ```
 
    The Worker's page in the Cloudflare dashboard lists each cron event under Settings, Triggers, and its log under Observability. A failed dispatch shows there with GitHub's response, such as `401 Bad credentials` for an expired token.

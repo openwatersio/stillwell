@@ -1,7 +1,7 @@
 /**
  * GESLA's contributors, by the abbreviation in its metadata's `CONTRIBUTOR
  * (ABBREVIATED)` column and each file name's last part, with the terms the
- * lake tags their records with. GESLA's license page lists, for each
+ * store tags their records with. GESLA's license page lists, for each
  * contributor, whether its data may be used for research only or for
  * research and consultancy; `commercial_use` is the stricter of that and the
  * originator's own terms where this repo has checked them. UHSLC's records
@@ -67,7 +67,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Bureau of Meteorology, © Commonwealth of Australia",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially, as on UHSLC's BOM records; BOM has been asked for permission (water-levels#80).",
+      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially, as on UHSLC's BOM records; BOM has been asked for permission (openwatersio/stillwell#80).",
   },
   WSV: {
     name: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)",
@@ -88,25 +88,25 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Japan Oceanographic Data Center; Japan Meteorological Agency",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (water-levels#47).",
+      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (openwatersio/stillwell#47).",
   },
   JODC_PAHB: {
     name: "Japan Oceanographic Data Center; Ports and Harbours Bureau",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (water-levels#47).",
+      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (openwatersio/stillwell#47).",
   },
   JODC_JCG: {
     name: "Japan Oceanographic Data Center; Japan Coast Guard",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (water-levels#47).",
+      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (openwatersio/stillwell#47).",
   },
   JODC_GIAJ: {
     name: "Japan Oceanographic Data Center; Geospatial Information Authority of Japan",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (water-levels#47).",
+      "GESLA's license table: research and consultancy. JODC's terms forbid passing its data to third parties without permission, which is being asked for (openwatersio/stillwell#47).",
   },
   SMHI: {
     name: "Swedish Meteorological and Hydrological Institute",
@@ -117,18 +117,18 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Servicio Mareográfico Nacional, Instituto de Geofísica, UNAM",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. UNAM's own site allows only non-profit, unaltered reproduction; permission is being asked for (water-levels#48).",
+      "GESLA's license table: research and consultancy. UNAM's own site allows only non-profit, unaltered reproduction; permission is being asked for (openwatersio/stillwell#48).",
   },
   UNAM_HIST: {
     name: "Servicio Mareográfico Nacional, Instituto de Geofísica, UNAM",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. UNAM's own site allows only non-profit, unaltered reproduction; permission is being asked for (water-levels#48).",
+      "GESLA's license table: research and consultancy. UNAM's own site allows only non-profit, unaltered reproduction; permission is being asked for (openwatersio/stillwell#48).",
   },
   BODC: {
     name: "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     commercial_use: true,
-    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, water-levels#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
+    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
   },
   SFWMD: {
     name: "South Florida Water Management District",
@@ -203,7 +203,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Northwest Florida Water Management District",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. NWFWMD's own terms are still to check (water-levels#52).",
+      "GESLA's license table: research and consultancy. NWFWMD's own terms are still to check (openwatersio/stillwell#52).",
   },
   NOC: {
     name: "National Oceanography Centre",
@@ -224,7 +224,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Danish Meteorological Institute",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them (water-levels#80).",
+      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them (openwatersio/stillwell#80).",
   },
   GLOSS: {
     name: "Global Sea Level Observing System",

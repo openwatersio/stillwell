@@ -8,13 +8,19 @@ import {
   readRecent,
   writeObservations,
   writeRecent,
-} from "../src/lake/parquet.ts";
-import { recentPath, seriesPath } from "../src/lake/paths.ts";
-import { updateRecent } from "../src/lake/recent.ts";
-import { judgeFetched, requalify } from "../src/lake/requalify.ts";
+} from "../src/store/parquet.ts";
+import { recentPath, seriesPath } from "../src/store/paths.ts";
+import { updateRecent } from "../src/store/recent.ts";
+import { judgeFetched, requalify } from "../src/store/requalify.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
 import { source as gesla } from "../src/sources/gesla/index.ts";
-import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../src/schema.ts";
+import {
+  Flag,
+  Unjudged,
+  type StoredStation,
+  type Observation,
+  type Source,
+} from "../src/schema.ts";
 
 const HOUR = 3_600_000;
 const NEW_YEAR = Date.UTC(2025, 0, 1);
@@ -43,7 +49,7 @@ const station = {
       state: "open",
     },
   ],
-} as unknown as LakeStation;
+} as unknown as StoredStation;
 
 function source(extra: Partial<Source> = {}): Source {
   return { metadata: { id: "test" } as Source["metadata"], stations: async () => [], ...extra };
@@ -102,7 +108,7 @@ describe("qc with context", () => {
 
 describe("requalify", () => {
   it("clears what a stricter rule flagged once the rule loosens, without fetching", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = (year: number) => seriesPath(root, "levels", "test", "1", year);
     // 10 hours still in mid-2024, which a 6-hour rule flags and a 48-hour one doesn't.
     const still: [number, number] = [Date.UTC(2024, 5, 1), Date.UTC(2024, 5, 1, 10)];
@@ -142,7 +148,7 @@ describe("requalify", () => {
     // A source that can't judge the record still gives its errata's span, with a warning.
     const partial = source({
       suspect: async () => {
-        throw new Unjudged("the lake holds part of the record", [span]);
+        throw new Unjudged("the store holds part of the record", [span]);
       },
     });
     // A value the source flagged when it was fetched, as GESLA flags a datum jump from its whole file.
@@ -155,7 +161,7 @@ describe("requalify", () => {
       "NAP",
     );
     const { warnings } = await requalify(partial, station, root, 2024, 2025);
-    assert.deepEqual(warnings, ["epoch 1: the lake holds part of the record; its flags are kept"]);
+    assert.deepEqual(warnings, ["epoch 1: the store holds part of the record; its flags are kept"]);
     const kept = await readObservations(path(2024));
     assert.equal(kept.filter((r) => r.flag === Flag.suspect).length, 10 + 24 + 1);
     assert.equal(kept.find((r) => r.time === jump)!.flag, Flag.suspect);
@@ -169,7 +175,7 @@ describe("requalify", () => {
   });
 
   it("judges a year with the years either side", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = (year: number) => seriesPath(root, "levels", "test", "1", year);
     const all = withSourceFlag(
       hourly(Date.UTC(2024, 11, 1), Date.UTC(2025, 1, 1), [
@@ -195,7 +201,7 @@ describe("requalify", () => {
 
 describe("updateRecent", () => {
   it("clears a mark an earlier hour's QC left on a stored value", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     const window = withSourceFlag(hourly(NOW - 48 * HOUR, NOW - HOUR));
@@ -205,7 +211,7 @@ describe("updateRecent", () => {
     await updateRecent({
       source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
     });
@@ -214,7 +220,7 @@ describe("updateRecent", () => {
   });
 
   it("keeps a mark within a flatline's length of the window's start, where a run can't be seen whole", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     // The window's first 3 hours are the end of a still stretch an earlier hour saw whole.
@@ -226,7 +232,7 @@ describe("updateRecent", () => {
     await updateRecent({
       source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       stations: [station],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
     });
@@ -238,7 +244,7 @@ describe("updateRecent", () => {
   });
 });
 
-describe("GESLA's datum jumps over the lake's copy", () => {
+describe("GESLA's datum jumps over the store's copy", () => {
   // Hourly over 2000–2003, with 2001 a metre up: a datum jump GESLA flags usable.
   const rows = withSourceFlag(
     hourly(Date.UTC(2000, 0, 1), Date.UTC(2004, 0, 1)).map((r) =>
@@ -252,7 +258,7 @@ describe("GESLA's datum jumps over the lake's copy", () => {
     source_id: "x",
     record_start: "2000-01-01T00:00:00Z",
     record_end: "2003-12-31T23:00:00Z",
-  } as LakeStation;
+  } as StoredStation;
   const years = (from: number) =>
     async function* () {
       yield rows.filter((r) => r.time >= from);
@@ -273,7 +279,7 @@ describe("GESLA's datum jumps over the lake's copy", () => {
 });
 
 describe("withSourceFlag", () => {
-  it("rounds levels to what the lake reads back, so a fetched value equals its stored copy", () => {
+  it("rounds levels to what the store reads back, so a fetched value equals its stored copy", () => {
     assert.equal(withSourceFlag([{ time: 0, level: 57 * 0.01, flag: Flag.good }])[0]!.level, 0.57);
   });
 });
@@ -316,7 +322,7 @@ describe("judgeFetched", () => {
 
 describe("readObservations", () => {
   it("reads a station ID with a glob character from its own file alone", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const rows = (level: number) => [{ time: NEW_YEAR, level, flag: Flag.good }];
     await writeObservations(seriesPath(root, "levels", "test", "a*", 2025), rows(1), "NAP");
     await writeObservations(seriesPath(root, "levels", "test", "ab", 2025), rows(2), "NAP");
@@ -330,7 +336,7 @@ describe("readObservations", () => {
 
 describe("updateRecent with a whole-centimeter flatline rule", () => {
   it("keeps marks within that rule's length of the window's start", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-requalify-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     const window = withSourceFlag(hourly(NOW - 72 * HOUR, NOW - HOUR));
@@ -341,7 +347,7 @@ describe("updateRecent with a whole-centimeter flatline rule", () => {
       source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
       // A small tide, which gets the whole-centimeter rule.
       stations: [{ ...station, tidal: true, tide_m: 0.1 }],
-      lakeFor: () => root,
+      storeFor: () => root,
       since: new Date(NOW - 2 * HOUR),
       now: NOW,
     });

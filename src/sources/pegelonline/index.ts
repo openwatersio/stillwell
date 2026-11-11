@@ -483,7 +483,7 @@ export const source: Source = {
     epochs: {
       "pegelonline/3500031 2026-06-18T23:00:00Z": {
         reject: true,
-        note: "Wachendorf: same zero (PNP, NHN 12.77 m) as epoch 1, which was first seen without its validFrom; the lake has no values from before it (#72)",
+        note: "Wachendorf: same zero (PNP, NHN 12.77 m) as epoch 1, which was first seen without its validFrom; the store has no values from before it (#72)",
       },
     },
   },

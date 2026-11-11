@@ -1,5 +1,5 @@
 import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../schema.ts";
+import { Flag, Unjudged, type StoredStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
   listYears,
@@ -12,7 +12,7 @@ import { seriesDir } from "./paths.ts";
 import { qcFor } from "./recent.ts";
 
 /**
- * Work a station's flags out again from what the lake holds, without asking
+ * Work a station's flags out again from what the store holds, without asking
  * the source: each year file of levels from `start` to before `end`, in every
  * epoch, starts over from its `source_flag` and the source's errata spans
  * (`fromSource`), then QC runs with the current rules, judged with the years
@@ -22,7 +22,7 @@ import { qcFor } from "./recent.ts";
  */
 export async function requalify(
   source: Source,
-  station: LakeStation,
+  station: StoredStation,
   root: string,
   start: number,
   end: number,

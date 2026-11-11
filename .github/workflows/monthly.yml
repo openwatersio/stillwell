@@ -113,7 +113,7 @@ jobs:
       matrix:
         source: ${{ fromJSON(needs.plan.outputs.sources) }}
     concurrency:
-      group: lake-${{ matrix.source }}
+      group: store-${{ matrix.source }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs), and analysis's
@@ -136,22 +136,22 @@ jobs:
           SOURCE: ${{ matrix.source }}
           ACCEPT_EPOCHS: ${{ inputs.accept_epochs && 'yes' || '' }}
           ACCEPT_WITHHELD: ${{ inputs.accept_withheld && 'yes' || '' }}
-          WATER_LEVELS_LAKE: s3://water-levels
+          STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
-      # The stations that are due judged from their levels in the lake
-      # (src/lake/analysis.ts), after the list so new stations are judged too,
+      # The stations that are due judged from their levels in the store
+      # (src/store/analysis.ts), after the list so new stations are judged too,
       # and in this job so it keeps the source's group, since a verdict that
       # changes a station's QC requalifies its stored years. It runs on the
-      # list the lake keeps when the refresh fails. A run stopped partway keeps
+      # list the store keeps when the refresh fails. A run stopped partway keeps
       # what it judged, and leaves the rest pending for the next.
       - if: ${{ !cancelled() }}
         run: node scripts/ingest.ts analyze "$SOURCE" --requalify --concurrency 8
         env:
           SOURCE: ${{ matrix.source }}
-          WATER_LEVELS_LAKE: s3://water-levels
+          STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
@@ -162,7 +162,7 @@ jobs:
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
     # The group the Ingest workflow's `publish` runs take.
     concurrency:
-      group: lake
+      group: store
       cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -178,7 +178,7 @@ jobs:
       - run: npm ci
       - run: node scripts/ingest.ts publish
         env:
-          WATER_LEVELS_LAKE: s3://water-levels
+          STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
@@ -189,7 +189,7 @@ jobs:
   # since replace the ones compaction wrote. It then reads each station's
   # earliest preliminary value again into the bounds. Values preliminary from
   # before the cutoff, January three years back (REFETCH_YEARS in
-  # src/lake/recent.ts), aren't fetched again, though their stations' later
+  # src/store/recent.ts), aren't fetched again, though their stations' later
   # years are; the run's page lists a station once its value falls behind it.
   # Backfill refuses bounds an older build wrote, without the column, until
   # `compact <source> --rebuild-bounds` from the Ingest workflow fills it in.
@@ -201,7 +201,7 @@ jobs:
       matrix:
         source: ${{ fromJSON(needs.plan.outputs.refetch) }}
     concurrency:
-      group: lake-${{ matrix.source }}
+      group: store-${{ matrix.source }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 360
@@ -261,7 +261,7 @@ jobs:
             # last months reach the export; they cost only reads of the
             # export the run downloads anyway.
             crms)
-              which=$(node --input-type=module -e 'import { readStationList } from "./src/lake/parquet.ts"; const list = await readStationList(`${process.env.WATER_LEVELS_LAKE}/stations/crms.parquet`); if (!list?.length) throw new Error("no CRMS list in the lake"); console.log(list.map((s) => s.source_id).join(","))')
+              which=$(node --input-type=module -e 'import { readStationList } from "./src/store/parquet.ts"; const list = await readStationList(`${process.env.STILLWELL_STORE}/stations/crms.parquet`); if (!list?.length) throw new Error("no CRMS list in the store"); console.log(list.map((s) => s.source_id).join(","))')
               from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
             *) set -- "$year-$month-01" ;;
           esac
@@ -269,7 +269,7 @@ jobs:
           exit "${status:-0}"
         env:
           SOURCE: ${{ matrix.source }}
-          WATER_LEVELS_LAKE: s3://water-levels
+          STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
@@ -280,7 +280,7 @@ jobs:
   # steps that QC of one station at a time misses. Each region's report is in
   # the job summary and an artifact, for a person to read and turn into errata
   # (CONTRIBUTING.md). It reads the public bucket and changes nothing, so it
-  # needs no lake credentials or group. Only a full refresh runs it, once the
+  # needs no store credentials or group. Only a full refresh runs it, once the
   # station lists are published.
   cross-check:
     needs: [plan, publish]
@@ -327,7 +327,7 @@ jobs:
   # a commit. Enabling a workflow through the API restarts that count, as the
   # keepalive-workflow action relies on, so this monthly call keeps every
   # schedule running, this one included, with no commits. One a maintainer
-  # turned off stays off. It needs no lake credentials or concurrency group.
+  # turned off stays off. It needs no store credentials or concurrency group.
   # It runs on every run titled Monthly, scheduled or dispatched.
   keepalive:
     if: github.event.schedule == '30 1 2 * *' || (github.event_name == 'workflow_dispatch' && !inputs.sources && !inputs.refetch)

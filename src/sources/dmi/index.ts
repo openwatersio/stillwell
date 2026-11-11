@@ -31,7 +31,7 @@ export const metadata: SourceMetadata = {
   attribution: "Danish Meteorological Institute (DMI)",
   contact: { email: "friedata_kontakt@dmi.dk" },
   terms:
-    "DMI's open data is licensed under CC BY 4.0: give appropriate credit, link to the license (https://creativecommons.org/licenses/by/4.0/) and indicate if changes were made. DMI says its observations are raw measurements that may be faulty, that its databases may change as errors are found, and that it gives no warranty. Changes in the lake: levels converted from centimeters to meters, and quality flags added.",
+    "DMI's open data is licensed under CC BY 4.0: give appropriate credit, link to the license (https://creativecommons.org/licenses/by/4.0/) and indicate if changes were made. DMI says its observations are raw measurements that may be faulty, that its databases may change as errors are found, and that it gives no warranty. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // Values arrive a minute or two after they're measured.
   hourly: true,
   // Hand checks stopped in 2013, so `auto` values stay as they are; a refetch would find nothing new.
@@ -68,7 +68,7 @@ const DAY_MS = 86_400_000;
  * A DMI station as listed. `parameter` is the series its levels come from,
  * `owner` the station's owner as DMI names it, and `record_start` and
  * `record_end` the days its operation starts and ends, which a backfill keeps
- * to. They're kept in the lake's list only.
+ * to. They're kept in the store's list only.
  */
 export type DmiStation = ListedStation & {
   parameter: Parameter;
@@ -224,7 +224,7 @@ export async function levels(
   > = {},
 ): Promise<Observation[]> {
   if (!/^\d+$/.test(sourceId)) throw new Error(`Not a DMI station: ${sourceId}`);
-  // A station the list dropped keeps its old fields in the lake, owner included.
+  // A station the list dropped keeps its old fields in the store, owner included.
   if (!COVERED.has(owner))
     throw new Error(`DMI ${sourceId} is owned by ${owner}, whose data DMI's terms don't cover`);
   // The datum follows from the parameter, so they disagree only in a hand-edited

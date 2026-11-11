@@ -29,7 +29,7 @@ export const metadata: SourceMetadata = {
   attribution: "Marine Institute",
   contact: { email: "data_requests@marine.ie" },
   terms:
-    "CC BY 4.0: credit the Marine Institute, link to the license and say if the data was changed. The Marine Institute accepts no responsibility for errors, omissions or misleading information in the data, or for loss or damage from its use. Changes in the lake: quality flags added and missing values dropped.",
+    "CC BY 4.0: credit the Marine Institute, link to the license and say if the data was changed. The Marine Institute accepts no responsibility for errors, omissions or misleading information in the data, or for loss or damage from its use. Changes in the store: quality flags added and missing values dropped.",
   // Values reach ERDDAP 10 to 30 minutes after they're measured.
   hourly: true,
   // The institute checks values later, turning QC flag 0 into 1.
@@ -48,7 +48,7 @@ const HOUR_MS = 3_600_000;
 /**
  * A station as listed. `record_start` and `record_end` are the first and last
  * days the network has, which a backfill keeps to; `record_end` is null while
- * the gauge still reports. Kept in the lake's list only.
+ * the gauge still reports. Kept in the store's list only.
  */
 export type MarineInstituteStation = ListedStation & {
   record_start: string | null;

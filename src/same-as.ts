@@ -3,7 +3,7 @@ import { DROPPED } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
- * Which series in the lake share a gauge, and which of them to use. A link
+ * Which series in the store share a gauge, and which of them to use. A link
  * comes from one of:
  *
  * - **an adapter**, from an ID the source gives: BSH names each gauge's
@@ -361,7 +361,7 @@ function pairKey(a: string, b: string): string {
  * the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the
- * group's `COPIES` stations); the longer record in the lake, its span from `first` to
+ * group's `COPIES` stations); the longer record in the store, its span from `first` to
  * `last` times its share of values not flagged suspect or bad (`usable`, by ID,
  * from the years file, or whole where unknown); the finer interval; then the
  * lower ID, so equals always break the same way.

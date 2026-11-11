@@ -30,7 +30,7 @@ export function mergeRange<T extends { time: number; received?: number }>(
 /**
  * `mergeRange`, except that a calendar month (UTC) with no incoming rows keeps
  * the rows it had. Sources that fetch a month per request, or answer a month
- * with "no data" during an outage, shouldn't delete what the lake already holds;
+ * with "no data" during an outage, shouldn't delete what the store already holds;
  * a value is only replaced by a fetch that covered its month.
  */
 export function mergeFetched<T extends { time: number; received?: number }>(

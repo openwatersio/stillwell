@@ -2,7 +2,7 @@ name: Canary
 
 # One small live request per adapter, checked against the shape recorded in
 # src/sources/<source>/canary.json (scripts/canary.ts), so a change upstream
-# fails here rather than leaving gaps in the lake. USGS runs only once the
+# fails here rather than leaving gaps in the store. USGS runs only once the
 # USGS_API_KEY repository secret is set.
 #
 # The Worker in workers/cron dispatches it at 07:00 on Mondays, since GitHub's

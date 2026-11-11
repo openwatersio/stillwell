@@ -131,21 +131,21 @@ describe("cdec", () => {
     serve((url) => (/station_id=GSS/.test(url) ? fixture("cdec-meta-GSS.html") : NO_STAGE));
     const fetched = await cdec.stations();
     assert.deepEqual(fetched[0]!.reference, { id: "0 ft NAVD88", since: null });
-    // The lake's list keeps the reference on the station's epoch, not the station.
+    // The store's list keeps the reference on the station's epoch, not the station.
     const options = {
       now: "2026-11-02T00:00:00Z",
       offsets: [-8, -7] as [number, number],
       decisions: {},
     };
-    const { stations: lake } = mergeStationList([], fetched, options);
-    assert.equal("reference" in lake[0]!, false);
+    const { stations: store } = mergeStationList([], fetched, options);
+    assert.equal("reference" in store[0]!, false);
     // The same page without its gauge-zero table says nothing of the datum this time.
     const bare = fixture("cdec-meta-GSS.html").replace(/<th>Zero[\s\S]*?<\/table>/, "</table>");
     serve((url) => (/station_id=GSS/.test(url) ? bare : NO_STAGE));
-    const again = await cdec.stations(lake);
+    const again = await cdec.stations(store);
     assert.deepEqual([again[0]!.datum, again[0]!.reference], [null, null]);
     // So the merge keeps GSS in NAVD88, with no new epoch.
-    const merged = mergeStationList(lake, again, { ...options, now: "2026-12-02T00:00:00Z" });
+    const merged = mergeStationList(store, again, { ...options, now: "2026-12-02T00:00:00Z" });
     assert.equal(merged.stations[0]!.datum, "NAVD88");
     assert.equal(merged.stations[0]!.epochs.length, 1);
     // A new station without a table has no reference to compare later.

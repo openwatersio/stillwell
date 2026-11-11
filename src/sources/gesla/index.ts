@@ -93,7 +93,7 @@ export const CRMS_EARLY = new Set(
     .map((site) => `crms${site}-crms${site}-usa-crms`),
 );
 
-/** A GESLA record as listed, with the fields of its metadata row kept in the lake's list. */
+/** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
   /** `CONTRIBUTOR (ABBREVIATED)`, such as `NOAA` or `UHSLC_RQ`. */
   contributor: string;
@@ -263,7 +263,7 @@ export async function stations(): Promise<GeslaStation[]> {
 }
 
 /**
- * The lake series a record copies, where GESLA's site code is that source's
+ * The store series a record copies, where GESLA's site code is that source's
  * own ID. Other records are matched by nearness and name (src/same-as.ts).
  * A UHSLC research-quality record links to GESLA's fast-delivery record of
  * the same number where there is one, which links to UHSLC's series of that
@@ -332,8 +332,8 @@ export function originatorIds(
 }
 
 /**
- * Why a record is withheld from the lake, or null: a copy of a UHSLC record
- * whose terms carry a contributor's refusal to let the lake republish it
+ * Why a record is withheld from the store, or null: a copy of a UHSLC record
+ * whose terms carry a contributor's refusal to let the store republish it
  * (`refused` in src/sources/uhslc/notices.ts), or of any version of a station
  * number the `uhslc` adapter withholds, so a version the scan hasn't seen is
  * covered too. GESLA's other contributors' records aren't covered. The adapter
@@ -420,19 +420,19 @@ function timeOf(s: string, at = 0): number {
   );
 }
 
-/** A record's values, sorted by time, with flags already the lake's. */
+/** A record's values, sorted by time, with flags already the store's. */
 export interface GeslaRecord {
   times: Float64Array;
   levels: Float64Array;
-  /** GESLA's own flags, as the lake's. */
+  /** GESLA's own flags, as the store's. */
   source: Uint8Array;
   /** `source`, worsened by the datum-jump check. */
   flags: Uint8Array;
 }
 
 /**
- * GESLA's QC flag (column 4) as the lake's flag: 0 is no QC, 1 correct (both
- * good, leaving them to the lake's own QC), 2
+ * GESLA's QC flag (column 4) as the store's flag: 0 is no QC, 1 correct (both
+ * good, leaving them to the store's own QC), 2
  * interpolated, 3 doubtful, 4 a spike or wrong; 5, missing, has no value.
  * A value its use flag (column 5) says not to use is at least suspect.
  */
@@ -804,7 +804,7 @@ export const source: Source = {
   stations,
   withheld,
   observations: (s, start, end) => levels(s as GeslaStation, start, end),
-  // The datum jumps, from the lake's copy of the record. They're judged against
+  // The datum jumps, from the store's copy of the record. They're judged against
   // the record's longest segment, so a copy that misses either end is refused;
   // a year missing in the middle isn't seen. shortcut: a backfill that failed a
   // middle year can shift the longest segment; check each year once GESLA's empty years are recorded.
@@ -817,7 +817,7 @@ export const source: Source = {
         levels.push(r.level);
         source.push(r.source_flag ?? r.flag);
       }
-    // A year's margin, since a record's stated ends can fall in null lines the lake never holds.
+    // A year's margin, since a record's stated ends can fall in null lines the store never holds.
     const { record_start, record_end } = s as GeslaStation;
     const YEAR_MS = 366 * DAY_MS;
     const held = times.length
@@ -829,7 +829,7 @@ export const source: Source = {
       (record_end && times.at(-1)! < Date.parse(record_end) - YEAR_MS)
     )
       throw new Unjudged(
-        `the lake holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}), so its datum jumps go unjudged; GESLA's stated span counts the rows it marks missing, so a lake that holds every year with values can still fall short of it`,
+        `the store holds ${held} of GESLA's ${s.source_id}, not its whole record (${record_start} to ${record_end}), so its datum jumps go unjudged; GESLA's stated span counts the rows it marks missing, so a store that holds every year with values can still fall short of it`,
       );
     return datumJumps({
       times: Float64Array.from(times),

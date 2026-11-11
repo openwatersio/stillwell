@@ -12,7 +12,7 @@ import { crmsOf } from "../src/sources/usgs/index.ts";
 import { replacement, type TiconRecord } from "../src/ticon.ts";
 
 // The split export goes to the cache, read when the module loads.
-process.env.WATER_LEVELS_CACHE = mkdtempSync(join(tmpdir(), "crms-"));
+process.env.STILLWELL_CACHE = mkdtempSync(join(tmpdir(), "crms-"));
 const crms = await import("../src/sources/crms/index.ts");
 const { forget, header, tuning } = await import("../src/sources/crms/export.ts");
 

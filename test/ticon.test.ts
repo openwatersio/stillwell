@@ -86,7 +86,7 @@ describe("TICON replacements", () => {
     assert.deepEqual([intake.id, intake.status], ["dwr/B95339Q", "ready"]);
     const ferry = replacement(record("x-b95340-usa-cdwr"), lists);
     assert.equal(ferry.id, "dwr/B95340");
-    // Before the list is in the lake, the id comes from the adapter's own list, with its Q.
+    // Before the list is in the store, the id comes from the adapter's own list, with its Q.
     assert.equal(replacement(record("x-b95339-usa-cdwr"), {}).id, "dwr/B95339Q");
     // A CDEC code goes to CDEC, by code.
     const beldon = replacement(record("beldon_landing-bdl-usa-cdwr"), {});

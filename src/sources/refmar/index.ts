@@ -46,7 +46,7 @@ const HOURLY = 4;
 
 /**
  * A REFMAR gauge with the first day SHOM gives for its record, kept in the
- * lake's list so a backfill doesn't ask for decades before it.
+ * store's list so a backfill doesn't ask for decades before it.
  */
 export type RefmarStation = ListedStation & { first_observation: string | null };
 
@@ -106,7 +106,7 @@ async function pace(): Promise<void> {
  * Every gauge the service lists. Each one's record is asked for its datum,
  * owners and first observation, one at a time. A gauge SHOM hides from its map
  * (`HIDDEN`) isn't published, so it's listed with no products and no datum: a
- * new one isn't added, and one already in the lake keeps its record but is
+ * new one isn't added, and one already in the store keeps its record but is
  * never fetched again. A record that fails, or comes back without a vertical
  * reference or owners, leaves a gauge already in `previous` as it was, and a
  * new gauge out until the next refresh.

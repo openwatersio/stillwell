@@ -4,7 +4,7 @@ import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
 
 /**
- * Which lake source can replace each TICON record in tide-database. TICON ids
+ * Which store source can replace each TICON record in tide-database. TICON ids
  * are `<place>-<code>-<iso3>-<contributor>`, where the code is often the
  * originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC id).
  */
@@ -60,7 +60,7 @@ export function parseId(id: string): { code: string; iso3: string; contributor: 
   return { contributor: parts.at(-1)!, iso3: parts.at(-2)!, code: parts.at(-3)! };
 }
 
-/** Lake sources for the countries whose CMEMS records copy a national feed. */
+/** Store sources for the countries whose CMEMS records copy a national feed. */
 const NATIONAL: Record<string, { source: string; status: Status }> = {
   nld: { source: "rws", status: "ready" },
   deu: { source: "pegelonline", status: "ready" },
@@ -113,7 +113,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   cv: { source: "gesla", status: "restricted", note: "GESLA lists CV as research only" },
 };
 
-/** tide-database source prefixes, as lake sources, with each one's status. */
+/** tide-database source prefixes, as store sources, with each one's status. */
 const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
@@ -126,7 +126,7 @@ const PEGELONLINE_NOTE =
   "PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`";
 
 /**
- * Picks the replacement for one record. `lists` holds the lake's station lists
+ * Picks the replacement for one record. `lists` holds the store's station lists
  * by source, for the sources that have adapters.
  *
  * The record's own `commercial_use` doesn't decide anything here: it describes
@@ -202,7 +202,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
       const match = byCode(record, "uhslc", carried ? number! : (latest ?? code), "planned", lists);
       // The adapter leaves out South Africa's gauges, whose owner refused
       // republication, and withholds any other station whose owner did, such
-      // as Walvis Bay and Lüderitz, in Namibia, a lake list not yet refreshed included.
+      // as Walvis Bay and Lüderitz, in Namibia, a store list not yet refreshed included.
       if ((iso3 === "zaf" && match.status !== "ready") || withheld(code))
         return {
           source: "uhslc",

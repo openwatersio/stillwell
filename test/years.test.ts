@@ -3,9 +3,9 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { readRows, readYearStats, writeObservations, writeRecent } from "../src/lake/parquet.ts";
-import { recentPath, seriesPath, yearsPath } from "../src/lake/paths.ts";
-import { compactRecent } from "../src/lake/recent.ts";
+import { readRows, readYearStats, writeObservations, writeRecent } from "../src/store/parquet.ts";
+import { recentPath, seriesPath, yearsPath } from "../src/store/paths.ts";
+import { compactRecent } from "../src/store/recent.ts";
 import {
   commitYears,
   dropYears,
@@ -14,14 +14,14 @@ import {
   reconcileYears,
   usableShares,
   writeYears,
-} from "../src/lake/years.ts";
-import { Flag, type LakeStation, type Observation, type Source } from "../src/schema.ts";
+} from "../src/store/years.ts";
+import { Flag, type StoredStation, type Observation, type Source } from "../src/schema.ts";
 
 const HOUR = 3_600_000;
 const T = Date.UTC(2024, 0, 1);
 
-function lake(): string {
-  return mkdtempSync(join(tmpdir(), "water-levels-years-"));
+function store(): string {
+  return mkdtempSync(join(tmpdir(), "stillwell-years-"));
 }
 
 const rows = (n: number, flag: Flag = Flag.good): Observation[] =>
@@ -35,7 +35,7 @@ async function years(root: string): Promise<unknown[]> {
 
 describe("year stats", () => {
   it("are the same from a write as from a read of the file", async () => {
-    const root = lake();
+    const root = store();
     const file = seriesPath(root, "levels", "test", "a", 2024);
     const written = await writeObservations(
       file,
@@ -63,7 +63,7 @@ describe("year stats", () => {
   });
 
   it("read a station whose ID holds a glob character alone", async () => {
-    const root = lake();
+    const root = store();
     const files = ["a*", "ab"].map((id) => seriesPath(root, "levels", "test", id, 2024));
     await writeObservations(files[0]!, rows(2), "NAP");
     await writeObservations(files[1]!, rows(6), "NAP");
@@ -77,7 +77,7 @@ describe("year stats", () => {
 
 describe("fileKey", () => {
   it("names a file's station, epoch and year", () => {
-    assert.deepEqual(fileKey("test", "s3://lake/obs/test/a%2Fb/2024.parquet"), {
+    assert.deepEqual(fileKey("test", "s3://store/obs/test/a%2Fb/2024.parquet"), {
       id: "test/a/b",
       epoch: 1,
       year: 2024,
@@ -93,7 +93,7 @@ describe("fileKey", () => {
 
 describe("the source's years", () => {
   it("give each station's share of values not flagged suspect or bad", async () => {
-    const root = lake();
+    const root = store();
     assert.deepEqual(await usableShares(root, "test"), new Map());
     await writeObservations(
       seriesPath(root, "levels", "test", "a", 2023),
@@ -127,7 +127,7 @@ describe("the source's years", () => {
   });
 
   it("are built by a rebuild, and left alone by other runs until then", async () => {
-    const root = lake();
+    const root = store();
     await writeObservations(seriesPath(root, "levels", "test", "a", 2023), rows(2), "NAP");
     await writeObservations(seriesPath(root, "levels", "test", "a", 2024, 2), rows(4), "MSL");
     assert.equal(await reconcileYears(root, "test"), null);
@@ -163,13 +163,13 @@ describe("the source's years", () => {
     // Nothing changed, so nothing is read again, unless asked to.
     assert.equal((await reconcileYears(root, "test"))?.read, 0);
     assert.equal((await reconcileYears(root, "test", { rebuild: true }))?.read, 2);
-    // A listing that finds nothing isn't taken for a lake emptied.
+    // A listing that finds nothing isn't taken for a store emptied.
     rmSync(join(root, "obs"), { recursive: true });
     await assert.rejects(reconcileYears(root, "test"), /no test files listed/);
   });
 
   it("mark a station while a run writes it, and a later run reads what a stopped one left", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     const a2023 = seriesPath(root, "levels", "test", "a", 2023);
     const b2023 = seriesPath(root, "levels", "test", "b", 2023);
@@ -234,7 +234,7 @@ describe("the source's years", () => {
   });
 
   it("leave out a station `keep` refuses, and read again the ones in `reread`", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     const a = seriesPath(root, "levels", "test", "a", 2023);
     await writeObservations(seriesPath(root, "levels", "test", "w", 2023), rows(2), "NAP");
@@ -256,7 +256,7 @@ describe("the source's years", () => {
   });
 
   it("read at most `limit` files, and resume from the marks left", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     for (const year of [2020, 2021, 2022])
       await writeObservations(seriesPath(root, "levels", "test", "a", year), rows(2), "NAP");
@@ -272,7 +272,7 @@ describe("the source's years", () => {
   });
 
   it("finish a station's files before another's, whatever the listing's order", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     await writeObservations(seriesPath(root, "levels", "test", "a", 2020), rows(1), "NAP");
     await writeObservations(seriesPath(root, "levels", "test", "a", 2021, 2), rows(1), "NAP");
@@ -292,7 +292,7 @@ describe("the source's years", () => {
   });
 
   it("give a file with no rows a row of zeros, as its write does", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     const file = seriesPath(root, "levels", "test", "a", 2020);
     const written = await writeObservations(file, [], "NAP");
@@ -301,8 +301,8 @@ describe("the source's years", () => {
     assert.deepEqual([row!.hours, row!.good, row!.version], [0, 0, written.version]);
   });
 
-  it("read a lake named by a relative path", async () => {
-    const root = lake();
+  it("read a store named by a relative path", async () => {
+    const root = store();
     const cwd = process.cwd();
     process.chdir(root);
     try {
@@ -317,7 +317,7 @@ describe("the source's years", () => {
   });
 
   it("go on past a file that can't be read, keeping its station marked", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     await writeObservations(seriesPath(root, "levels", "test", "a", 2020), rows(2), "NAP");
     const bad = seriesPath(root, "levels", "test", "b", 2020);
@@ -334,7 +334,7 @@ describe("the source's years", () => {
   });
 
   it("count UTC hours before 1970 as after it", async () => {
-    const root = lake();
+    const root = store();
     const file = seriesPath(root, "levels", "test", "a", 1969);
     // 22:30 and 22:59:59 share an hour, and 23:00 is the next; truncating toward 1970 would join all three.
     const end = Date.UTC(1970, 0, 1);
@@ -348,7 +348,7 @@ describe("the source's years", () => {
   });
 
   it("follow the files compaction folds", async () => {
-    const root = lake();
+    const root = store();
     await writeYears(root, "test", []);
     const a = {
       id: "test/a",
@@ -359,7 +359,7 @@ describe("the source's years", () => {
       status: "active",
       live: true,
       epochs: [{ id: 1, datum: "NAP", since: null, until: null, state: "open" }],
-    } as unknown as LakeStation;
+    } as unknown as StoredStation;
     const start = Date.UTC(2026, 10, 4);
     await writeRecent(recentPath(root, "test"), [
       [{ time: start + HOUR, level: 1, flag: Flag.good, station: a.id, epoch: 1 }],
@@ -367,7 +367,7 @@ describe("the source's years", () => {
     const summary = await compactRecent({
       source: { metadata: { id: "test" } } as Source,
       stations: [a],
-      lakeFor: () => root,
+      storeFor: () => root,
       start,
       end: start + 24 * HOUR,
     });
