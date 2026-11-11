@@ -2,8 +2,8 @@
  * Cross-station and harmonic checks over a region of the lake, for errors that
  * QC of one station at a time misses: months holding another gauge's data,
  * clock drift and jumps, and level steps. Reads hourly values from the lake's
- * year files and prints a Markdown report of what it finds for manual
- * review. It changes nothing in the lake.
+ * year files and prints a Markdown report of what it finds for a person to
+ * judge. It changes nothing in the lake.
  *
  *   node scripts/cross-check.ts <minLat,minLon,maxLat,maxLon> <from> <to> [source,...]
  *   node scripts/cross-check.ts 53.2,6.5,55.3,9.2 2000 2026 pegelonline,gesla

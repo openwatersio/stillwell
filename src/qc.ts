@@ -27,6 +27,12 @@ export interface QcOptions {
    * rise meters in a flood.
    */
   outliers?: boolean;
+  /**
+   * Whether a level held for less than a flatline, far from the levels on both
+   * sides of it, is suspect. Off for pools, which can be let up for a few hours
+   * and back down.
+   */
+  held?: boolean;
 }
 
 /** How long a level unchanged is suspect, where a source's settings don't say. */
@@ -68,8 +74,8 @@ export function fromSource<T extends Observation>(
 }
 
 /**
- * Sorts, drops repeated timestamps, and flags limits, flatlines, spikes and
- * outliers. `context` is values from either side, such as the neighboring
+ * Sorts, drops repeated timestamps, and flags limits, flatlines, spikes, held
+ * levels and outliers. `context` is values from either side, such as the neighboring
  * years, so a flatline or spike across the edge is judged whole; they take no
  * part in the medians and spreads the rules measure against, and aren't
  * returned.
@@ -82,6 +88,7 @@ export function qc<T extends Observation>(
     centimeter_flatline_s = 0,
     spike_m = 0.25,
     outliers = true,
+    held = true,
   }: QcOptions = {},
   context: Observation[] = [],
 ): T[] {
@@ -138,6 +145,45 @@ export function qc<T extends Observation>(
   residuals.forEach((d, i) => {
     if (d !== undefined && Math.abs(d) > threshold) worsen(all[i]!, Flag.suspect);
   });
+
+  // Held levels: three or more values within a centimeter of the first,
+  // shorter than a flatline, beyond the spike threshold from the levels on both
+  // sides of them, the same way, as when a gauge holds a reading while the tide
+  // moves. Within such a run the spike rule's neighbors are the run itself, so
+  // it sees only the ends. Two values can share a high water, and a run a real
+  // step ends sits level with one side, but a real level that rises and falls
+  // back that way, such as a lock basin's, is flagged too.
+  const side = (from: number, step: number, edge: number) => {
+    const near: number[] = [];
+    for (let k = from; all[k] && Math.abs(all[k]!.time - edge) <= 3 * spacing; k += step)
+      near.push(all[k]!.level);
+    return median(near);
+  };
+  // In 0.1 mm, the lake's resolution, so a centimeter's difference is the same at any level.
+  const near = (k: number, i: number) =>
+    k < all.length && Math.abs(Math.round((all[k]!.level - all[i]!.level) * 10_000)) <= 100;
+  for (let i = 0; held && i < all.length;) {
+    let j = i;
+    while (near(j + 1, i) && all[j + 1]!.time - all[i]!.time < flatline_s * 1000) j++;
+    // A run as long as a flatline is left to the flatline limits, so it's passed whole.
+    if (near(j + 1, i)) {
+      i = j + 1;
+      continue;
+    }
+    const level = median(all.slice(i, j + 1).map((r) => r.level))!;
+    const before = side(i - 1, -1, all[i]!.time);
+    const after = side(j + 1, 1, all[j]!.time);
+    if (
+      j - i >= 2 &&
+      before !== undefined &&
+      after !== undefined &&
+      Math.min(Math.abs(level - before), Math.abs(level - after)) > threshold &&
+      Math.sign(level - before) === Math.sign(level - after)
+    ) {
+      for (let k = i; k <= j; k++) worsen(all[k]!, Flag.suspect);
+      i = j + 1;
+    } else i++; // A value just before a hold, within a centimeter of it, starts no run that hides it.
+  }
 
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
   // The floor keeps a short, nearly flat window from flagging ordinary changes.

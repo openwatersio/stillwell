@@ -189,7 +189,7 @@ function local(date: string, days = 0): number {
  * `GZ`, with the zero's elevation as the offset to the named datum. A station
  * with no table takes a datum its notes give, or `GZ`. A change in what the
  * page says changes the station's datum, which opens a datum epoch at the
- * next refresh, or holds it for a decision in `overrides.epochs`.
+ * next refresh, or holds it for a person to check.
  */
 export function datumOf(
   code: string,

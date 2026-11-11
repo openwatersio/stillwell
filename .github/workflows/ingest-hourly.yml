@@ -110,7 +110,7 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
       # A station the source now reports in another datum fails until a station
-      # refresh opens its epoch, or holds it for a decision in overrides, after which recent
+      # refresh opens its epoch, or holds it for a person, after which recent
       # skips it. One refresh a day, not counting one that was cancelled, such
       # as one queued behind a long backfill. A dispatched refresh of several
       # sources, or of all of them (titled Monthly, as the Worker's on the 2nd

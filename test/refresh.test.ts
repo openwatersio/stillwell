@@ -264,7 +264,7 @@ describe("refreshSource", () => {
     assert.equal(a!.commercial_use, false);
   });
 
-  it("refuses many datum changes at once until --accept-epochs accepts them", async () => {
+  it("refuses many datum changes at once until a person accepts them", async () => {
     const stations = Array.from({ length: 10 }, (_, i) => listed(String(i)));
     await refreshSource(lake, sourceOf(stations), { now: NOW });
     const moved = stations.map((s) => ({ ...s, datum: "MSL" }));
@@ -399,7 +399,7 @@ describe("refreshSource", () => {
     assert.deepEqual([ids.get("7"), ids.get("8")], [[4], [1]]);
   });
 
-  it("applies a decision on an epoch from the source's overrides", async () => {
+  it("applies a person's decision on an epoch from the source's overrides", async () => {
     await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
     await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), { now: LATER });
     const overrides = {

@@ -484,7 +484,7 @@ function qualifiers(v: Pick<Value, "qualifier">): string[] {
 /**
  * A value measured from another datum means the gage datum moved during the
  * series, so the stored values and the new ones may not share a zero. That's
- * for a maintainer to resolve, so the fetch fails rather than mix the two.
+ * for a person to resolve, so the fetch fails rather than mix the two.
  */
 function refuseOtherDatum(v: Value, series: string): void {
   const q = qualifiers(v).find((q) => OTHER_DATUM.has(q));

@@ -129,7 +129,7 @@ describe("judge", () => {
 
 describe("qcFor", () => {
   it("gives tidal water six hours and still water two days, by verdict, then by kind", () => {
-    const still = { flatline_s: 48 * 3600, outliers: false };
+    const still = { flatline_s: 48 * 3600, outliers: false, held: false };
     assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), { outliers: false });
     assert.deepEqual(qcFor(river("2", { tidal: false })), still);
     // A tide under 30 cm can sit on one centimeter for hours; one of 30 cm or more can't.
@@ -143,6 +143,7 @@ describe("qcFor", () => {
     assert.deepEqual(qcFor({ kind: "coastal", tidal: false }), {
       centimeter_flatline_s: 48 * 3600,
       outliers: false,
+      held: false,
     });
     // With no verdict: a river or lake as still, anything else, water of no kind included, as tidal.
     assert.deepEqual(qcFor({ kind: "coastal", tidal: null }), {});

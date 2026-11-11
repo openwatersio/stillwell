@@ -22,24 +22,24 @@ import { km, nameScore } from "./ticon.ts";
  *   of the same kind (where both say) that shares the most words with it, the
  *   nearest among equals, unless an equally named one more than 100 m away,
  *   which its source doesn't link to the first, leaves it in doubt.
- * - **`LINKS`**, a hand-entered decision.
+ * - **`LINKS`**, a person's decision.
  *
  * Linked stations form a group, and each lists every other in `same_as`. A
  * link by nearness or copy that would put two stations of one source in a
  * group is skipped, since one of them is likelier another gauge nearby
  * (except for an `ASSEMBLED` source), and
- * no link may join two stations listed in `UNLINKS`. Both are reported.
+ * no link may join two stations a person put in `UNLINKS`. Both are reported.
  * `preferred` names the group's series to use for observed levels, by `rank`.
  */
 
-/** A hand-entered decision on a pair of stations, with why. */
+/** A person's decision on a pair of stations, with why. */
 export interface Decision {
   a: string;
   b: string;
   note: string;
 }
 
-/** Pairs found by manual review to share a gauge that the rules below miss. */
+/** Pairs a person found share a gauge that the rules below miss. */
 export const LINKS: Decision[] = [
   {
     a: "gesla/uddevalla-udd-swe-cmems",
@@ -96,12 +96,32 @@ export const LINKS: Decision[] = [
     b: "ea/E72624",
     note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred.",
   },
+  {
+    a: "gesla/rostocktg-ros-deu-cmems",
+    b: "pegelonline/9640018",
+    note: "CMEMS's copy of WSV's Rostock Mühlendamm UW gauge: 316 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 4.981 m below PEGELONLINE's gauge zero, its NHN offset. The OW gauge 80 m away differs by 147 mm RMS in the median month. 'RostockTG' names no side of the weir, so nearness links neither.",
+  },
+  {
+    a: "gesla/wangeroogetg-wan-deu-cmems",
+    b: "pegelonline/9420040",
+    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km.",
+  },
+  {
+    a: "gesla/kielholtenautg-kie-deu-cmems",
+    b: "pegelonline/9610066",
+    note: "CMEMS's copy of WSV's Kiel-Holtenau gauge: all 318 months both hold from December 1999 agree within 3 mm RMS, 4.997 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 3.3 km away, beyond the copy rule's 2 km.",
+  },
+  {
+    a: "gesla/luebecktg-lue-deu-cmems",
+    b: "pegelonline/9620090",
+    note: "CMEMS's copy of WSV's Lübeck-Bauhof gauge: 307 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.021 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 4.8 km away, beyond the copy rule's 2 km.",
+  },
 ];
 
-/** Pairs found by manual review not to share a gauge, though a rule links them. */
+/** Pairs a person found don't share a gauge, though a rule links them. */
 export const UNLINKS: Decision[] = [];
 
-/** Stations chosen by hand as their group's preferred series, with why. */
+/** Stations a person chose as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {};
 
 /**
@@ -145,7 +165,7 @@ const ASSEMBLED = new Set(["gesla"]);
 /**
  * Source pairs whose agencies each run their own gauges, so two of their
  * stations at one pier are separate instruments that check each other, never
- * one gauge. Only an ID or `LINKS` links them.
+ * one gauge. Only an ID or a person links them.
  */
 const SEPARATE = new Set(["coops~usgs", "coops~usace"]);
 
@@ -180,7 +200,7 @@ export interface LinkReport {
 
 const LARGE = 8;
 
-/** The order links join groups in: `LINKS` first, inferred ones last. */
+/** The order links join groups in: a person's first, inferred ones last. */
 const ORDER: How[] = ["manual", "id", "near", "copy"];
 
 /**
@@ -337,7 +357,7 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
- * choice in `PREFER`; one with levels; one whose terms allow commercial use, so
+ * person's choice; one with levels; one whose terms allow commercial use, so
  * the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the

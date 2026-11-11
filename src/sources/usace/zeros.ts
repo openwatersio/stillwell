@@ -13,7 +13,7 @@
  * the old one's water surface), and gauges that moved with no datum noted.
  */
 export const ZERO_SINCE: Record<string, { since: string; note: string }> = {
-  // Its series today ends in 2017, but a maintainer could move it to one that doesn't.
+  // Its series today ends in 2017, but a person could move it to one that doesn't.
   "MVK.Steele_Bayou": {
     since: "2019-04-01",
     note: "Steele Bayou Drainage Structure Landside. The Vertical Datum for Steele Bayou LS and RS gages were changed sometime during March 2019",

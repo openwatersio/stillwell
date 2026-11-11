@@ -1761,7 +1761,7 @@ describe("usace", () => {
     assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: 0 }), {});
     assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: undefined }), {});
     assert.deepEqual(usace.datumsOf({ ...redRiver, elevation: -0.2700000001 }), { NAVD88: -0.082 });
-    // Each change, including a dropped elevation, is reported for a maintainer to check the entry.
+    // Each change, including a dropped elevation, is reported for a person to check the entry.
     const said = error.mock.calls.map((c) => String(c.arguments[0]));
     for (const given of [
       "-0.3 ft NGVD29",
@@ -3313,7 +3313,7 @@ describe("uhslc", () => {
     assert.equal(keep!(text), true);
   });
 
-  it("reads levels in the station's own label, so a decision in overrides.epochs can let them through", async () => {
+  it("reads levels in the station's own label, so a person's decision can let them through", async () => {
     setTransport(async () =>
       JSON.stringify({
         table: {

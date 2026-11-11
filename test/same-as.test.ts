@@ -168,7 +168,7 @@ describe("linkGauges's limits", () => {
     );
   });
 
-  it("keeps a pair in UNLINKS apart, even through a third station", () => {
+  it("keeps a pair a person unlinked apart, even through a third station", () => {
     UNLINKS.push({ a: "a/1", b: "b/1", note: "test" });
     try {
       const { stations, report } = linkGauges([
@@ -202,7 +202,7 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("links the gauges listed in LINKS that no rule matches", () => {
+  it("links the gauges a person matched that no rule does", () => {
     const list = [
       station("bodc/dev", { name: "Devonport", lat: 50.36839, lon: -4.18525 }),
       station("ea/E72139", { name: "Plymouth", lat: 50.368401, lon: -4.185217 }),
@@ -332,7 +332,70 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("reports a LINKS or PREFER entry that names no station", () => {
+  it("links CMEMS's copies of WSV gauges that GESLA places too far off or names no side of", () => {
+    const list = [
+      station("gesla/rostocktg-ros-deu-cmems", { name: "RostockTG", lat: 54.083, lon: 12.155 }),
+      station("pegelonline/9640018", {
+        name: "ROSTOCK MÜHLENDAMM UW",
+        lat: 54.083064,
+        lon: 12.155109,
+      }),
+      station("pegelonline/9640002", {
+        name: "ROSTOCK MÜHLENDAMM OW",
+        lat: 54.082438,
+        lon: 12.154273,
+      }),
+      station("gesla/wangeroogetg-wan-deu-cmems", {
+        name: "WangeroogeTG",
+        lat: 53.806,
+        lon: 7.929,
+      }),
+      station("pegelonline/9420030", { name: "WANGEROOGE NORD", lat: 53.806299, lon: 7.9292 }),
+      station("pegelonline/9420040", { name: "WANGEROOGE WEST", lat: 53.776238, lon: 7.867938 }),
+      // GESLA's WSV record of the gauge, which its adapter links by number.
+      station("gesla/wangeroogewest-9420040-deu-wsv", {
+        name: "Wangeroogewest",
+        lat: 53.777821,
+        lon: 7.868833,
+        same_as: ["pegelonline/9420040"],
+      }),
+      station("gesla/kielholtenautg-kie-deu-cmems", {
+        name: "KielHoltenauTG",
+        lat: 54.383,
+        lon: 10.204,
+      }),
+      station("pegelonline/9610066", { name: "KIEL-HOLTENAU", lat: 54.372087, lon: 10.15705 }),
+      station("gesla/luebecktg-lue-deu-cmems", { name: "LuebeckTG", lat: 53.9025, lon: 10.7745 }),
+      station("pegelonline/9620090", { name: "LÜBECK-BAUHOF", lat: 53.893008, lon: 10.703065 }),
+    ];
+    const preferred = (linked: Station[]) =>
+      linked.filter((s) => s.id.endsWith("-cmems")).map((s) => `${s.id}~${s.preferred}`);
+    assert.deepEqual(
+      preferred(linkGauges(list, NOW).stations).filter((p) => p.includes("pegelonline")),
+      [],
+    );
+    const ids = new Set(list.map((s) => s.id));
+    LINKS.push(...DECISIONS.filter((d) => ids.has(d.a) && ids.has(d.b)));
+    try {
+      const { stations, report } = linkGauges(list, NOW);
+      assert.deepEqual(preferred(stations), [
+        "gesla/rostocktg-ros-deu-cmems~pegelonline/9640018",
+        "gesla/wangeroogetg-wan-deu-cmems~pegelonline/9420040",
+        "gesla/kielholtenautg-kie-deu-cmems~pegelonline/9610066",
+        "gesla/luebecktg-lue-deu-cmems~pegelonline/9620090",
+      ]);
+      const wangerooge = stations.find((s) => s.id === "gesla/wangeroogetg-wan-deu-cmems")!;
+      assert.deepEqual(wangerooge.same_as.toSorted(), [
+        "gesla/wangeroogewest-9420040-deu-wsv",
+        "pegelonline/9420040",
+      ]);
+      assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
+  it("reports a person's decision that names no station", () => {
     LINKS.push({ a: "a/1", b: "gone/1", note: "test" });
     PREFER["gone/2"] = "test";
     try {
@@ -474,7 +537,7 @@ describe("copyPairs", () => {
     assert.deepEqual(stations[0]!.same_as, ["coops/9457292"]);
   });
 
-  it("guesses for a copy whose named original is kept apart by UNLINKS", () => {
+  it("guesses for a copy whose named original a person unlinked", () => {
     UNLINKS.push({ a: "uhslc/039a", b: "coops/1111111", note: "test" });
     try {
       const { stations } = linkGauges([

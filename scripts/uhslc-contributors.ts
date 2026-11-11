@@ -12,7 +12,7 @@
  *
  * It fails rather than write a scan in which a station number that carried a
  * refused notice no longer does, since that would list the station again,
- * unless `--allow-lost-refusal` says a maintainer checked it.
+ * unless `--allow-lost-refusal` says a person checked it.
  */
 import { writeFile } from "node:fs/promises";
 import { getJson, getText } from "../src/http.ts";
@@ -39,7 +39,7 @@ const stations: Record<
   string,
   { contributor: string | null; notice: string | null; originator: string | null }
 > = {};
-/** Terms-like text no notice matched, for a maintainer to read and add to NOTICES. */
+/** Terms-like text no notice matched, for a person to read and add to NOTICES. */
 const unmatched: string[] = [];
 // ERDDAP lists some records UHSLC has no documentation file for; they're
 // recorded with no contributor, so the adapter knows they've been looked for.

@@ -278,7 +278,7 @@ jobs:
   # The cross-station checks (scripts/cross-check.ts) over each region's year
   # so far and the five before: months one gauge holds another's data, clock errors and level
   # steps that QC of one station at a time misses. Each region's report is in
-  # the job summary and an artifact, for a maintainer to read and turn into errata
+  # the job summary and an artifact, for a person to read and turn into errata
   # (CONTRIBUTING.md). It reads the public bucket and changes nothing, so it
   # needs no lake credentials or group. Only a full refresh runs it, once the
   # station lists are published.

@@ -58,7 +58,7 @@
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
  * and `recent` write the current epoch, never before its start, and skip a
- * station whose new epoch is held for `overrides.epochs`. For a source with `archive:
+ * station whose new epoch waits on a person. For a source with `archive:
  * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
  * stations; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
@@ -271,7 +271,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       lines[0] += `; ${active} active, ${stations.length - active} inactive`;
       for (const line of lines) console.log(line);
       summary.push(...lines);
-      // The list is written either way; the run fails so a maintainer sees it.
+      // The list is written either way; the run fails so a person sees it.
       if (needsPerson(report)) process.exitCode = 1;
       if (report.unwithheld.length && process.env.GITHUB_ACTIONS)
         console.log(
@@ -398,7 +398,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         ? list.filter((s) => s.status === "active")
         : // A station named twice, by either form of its ID, is walked once.
           [...new Set(ids.split(",").map((id) => find(list, sourceId, id)))];
-  // A station whose new epoch is held for `overrides.epochs` gets nothing, in either datum.
+  // A station whose new epoch waits on a person gets nothing, in either datum.
   let wanted = named.filter((s) => {
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
     return !isHeld(s.epochs);
@@ -735,7 +735,7 @@ async function recent(sourceId: string): Promise<void> {
   if (output && summary.datumChanged) await appendFile(output, "datum_changed=true\n");
   // Some stations failing or going quiet is ordinary; all of them is an outage,
   // or a broken adapter, even one that answers "no data" without an error.
-  // A source that blocked this client needs a maintainer, however many stations got through.
+  // A source that blocked this client needs a person, however many stations got through.
   if (
     summary.blocked ||
     (summary.stations && summary.failed.length + summary.stale.length >= summary.stations)
@@ -770,7 +770,7 @@ async function compact(sourceId: string, days: number): Promise<void> {
       rebuildBounds: values["rebuild-bounds"],
     });
   });
-  // A failed fold left its year file as it was; a maintainer should look. Every
+  // A failed fold left its year file as it was; a person should look. Every
   // live station silent means recent/ is missing, empty or not being updated.
   if (summary.failed.length || (live && summary.stale.length >= live)) process.exitCode = 1;
 }

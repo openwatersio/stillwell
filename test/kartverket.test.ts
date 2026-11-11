@@ -119,7 +119,7 @@ describe("kartverket", () => {
     );
     // Hourly ingest's few hours too: compaction folds them into the year files. It's a
     // DatumChanged whose reference is the refresh's reason, so Ingest hourly asks for a
-    // refresh and a change rejected in overrides.epochs matches its epoch.
+    // refresh and a change a person rejected matches its epoch.
     kartverket.forgetChecks();
     serve([
       [/stationlevels&stationcode=BGO/, fixture("kartverket-levels-BGO.xml")],

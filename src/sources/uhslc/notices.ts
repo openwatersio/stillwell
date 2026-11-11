@@ -28,7 +28,7 @@ export interface Notice {
 
 export const NOTICES: Record<string, Notice> = {
   // Terms text the scan found but no notice below matches: non-commercial until
-  // a maintainer reads it and adds a notice.
+  // a person reads it and adds a notice.
   unreviewed: {
     name: "Terms not yet reviewed",
     pattern: /(?!)/,

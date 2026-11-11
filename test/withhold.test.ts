@@ -169,7 +169,7 @@ describe("refreshSource with withheld stations", () => {
 
     const refused = (code: string) => code.startsWith("x");
     const kept = all.filter((s) => !refused(s.source_id));
-    // Twelve is more than the guard allows of 20 without --accept-withheld.
+    // Twelve is more than the guard allows of 20 without a person's say-so.
     await assert.rejects(
       refreshSource(lake, sourceOf(kept, refused), { now: LATER }),
       (error: Error) =>
@@ -508,7 +508,7 @@ describe("withhold", () => {
       /10 of the 10 test stations the lake has known are withheld, more than 5/,
     );
     assert.equal(removed, 0);
-    // --accept-withheld, after checking the rule, lets it through.
+    // A person who checked the rule lets it through.
     await withhold(lake, sourceOf([], refused), { remove, accept: true });
     assert.equal(removed, 1);
   });

@@ -284,7 +284,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
  */
 function refuseRegression(previous: Listed[], listed: UhslcStation[]): void {
   const now = new Set(listed.map((s) => s.id));
-  // A withheld series leaves the list by a hand-entered decision, not ERDDAP's.
+  // A withheld series leaves the list by a person's decision, not ERDDAP's.
   const gone = previous.filter(
     (s) =>
       s.status === "active" &&

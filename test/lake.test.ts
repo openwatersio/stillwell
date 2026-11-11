@@ -331,6 +331,87 @@ describe("qc", () => {
     assert.equal(flags[800], Flag.suspect);
   });
 
+  it("flags a reading held for an hour or two while the tide moves", () => {
+    // As GESLA's CMEMS copy of Wangerooge holds −7.45 m, and 2.27 or 2.28 m at high water.
+    const rows = tide(1000);
+    for (let i = 300; i < 308; i++) rows[i]!.level = -7.45;
+    // High water, 2 m, is at the 615th value. 2.49 − 2.48 is a hair over 0.01 in floating point.
+    for (let i = 611; i < 620; i++) rows[i]!.level = i % 2 ? 2.49 : 2.48;
+    const flags = qc(rows).map((r) => r.flag);
+    assert.ok(flags.slice(300, 308).every((f) => f === Flag.suspect));
+    assert.ok(flags.slice(611, 620).every((f) => f === Flag.suspect));
+    assert.equal(flags[296], Flag.good);
+    assert.equal(flags[623], Flag.good);
+  });
+
+  it("flags Wangerooge's high water held at 2.27 and 2.28 m", () => {
+    // GESLA's CMEMS copy, 2024-02-14 from 23:00 the day before, every 10 minutes.
+    // PEGELONLINE's copy of the gauge falls from 1.82 to 1.18 m over the held hour.
+    const levels = [
+      0.66, 0.79, 0.9, 1.03, 1.14, 1.25, 1.35, 1.48, 1.57, 1.66, 1.75, 1.81, 1.86, 1.9, 1.94, 2.06,
+      2.08, 2.07, 1.99, 1.99, 2.1, 2.27, 2.27, 2.28, 2.28, 2.28, 2.27, 2.27, 2.28, 1.08, 0.97, 0.84,
+      0.73, 0.6, 0.49, 0.36, 0.25, 0.15, 0.02, -0.09, -0.19, -0.27, -0.39, -0.5, -0.6, -0.71, -0.81,
+      -0.92,
+    ];
+    const rows = levels.map((level, i) => ({
+      time: T + i * 10 * MIN,
+      level,
+      flag: Flag.good as Flag,
+    }));
+    const flags = qc(rows).map((r) => r.flag);
+    assert.ok(flags.slice(21, 29).every((f) => f === Flag.suspect));
+    assert.ok(flags.slice(0, 15).every((f) => f === Flag.good));
+    assert.ok(flags.slice(31).every((f) => f === Flag.good));
+    // A value just before the hold, within a centimeter of it, doesn't hide it.
+    levels[20] = 2.26;
+    assert.ok(
+      qc(rows.map((r, i) => ({ ...r, level: levels[i]! })))
+        .slice(21, 29)
+        .every((r) => r.flag === Flag.suspect),
+    );
+  });
+
+  it("leaves two values level at a high water", () => {
+    // 15-minute values of a tide 4 to 12 m in range, as at Avonmouth, with a
+    // spring high water halfway between two of them.
+    const level = (i: number) => {
+      const t = i - 1441.5;
+      return (
+        (4 + 2 * Math.cos((2 * Math.PI * t) / (14.77 * 96))) * Math.cos((2 * Math.PI * t) / 49.68)
+      );
+    };
+    const rows = Array.from({ length: 2800 }, (_, i) => ({
+      time: T + i * 15 * MIN,
+      level: level(i),
+      flag: Flag.good,
+    })) as Observation[];
+    assert.ok(
+      qc(rows)
+        .filter((r) => r.level > 5)
+        .every((r) => r.flag === Flag.good),
+    );
+  });
+
+  const steps = (...held: [number, number][]) =>
+    held
+      .flatMap(([level, hours]) => Array.from({ length: hours }, () => level))
+      .map((level, i) => ({
+        time: T + i * 3_600_000,
+        level: level + (i % 2) * 0.01,
+        flag: Flag.good,
+      })) as Observation[];
+
+  it("leaves a held level between steps the same way", () => {
+    const flags = qc(steps([3, 24], [4, 5], [5, 24])).map((r) => r.flag);
+    assert.equal(flags[26], Flag.good);
+  });
+
+  it("can leave out the held-level rule, for pools let up for a few hours", () => {
+    const flags = qc(steps([3, 24], [3.5, 5], [3, 24]), { held: false }).map((r) => r.flag);
+    assert.equal(flags[26], Flag.good);
+    assert.equal(qc(steps([3, 24], [3.5, 5], [3, 24]))[26]!.flag, Flag.suspect);
+  });
+
   it("can leave out the outlier rule, for pools that sit flat and then flood", () => {
     // Six days flat at 4 m, then a 2 m rise.
     const rows = Array.from({ length: 7 * 24 }, (_, i) => ({
