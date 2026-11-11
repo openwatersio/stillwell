@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import {
+  JUDGE,
   RULES,
   analyze,
   judge,
@@ -13,11 +14,17 @@ import {
   withAnalysis,
   writeAnalysis,
 } from "../src/lake/analysis.ts";
-import { readJsonArray, writeObservations, writeStationBounds } from "../src/lake/parquet.ts";
+import {
+  readJsonArray,
+  writeObservations,
+  writeRows,
+  writeStationBounds,
+} from "../src/lake/parquet.ts";
 import { analysisHistoryPath, seriesPath } from "../src/lake/paths.ts";
 import { qcFor } from "../src/lake/recent.ts";
 import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../src/schema.ts";
-import { DRAINS_RUNS, TIDE_M } from "../src/tidal.ts";
+import { DRAINS_RUNS, TIDE_M, drains } from "../src/tidal.ts";
+import { fromSource, qc } from "../src/qc.ts";
 
 const QUARTER = 900_000;
 const M2_H = 12.4206012;
@@ -79,6 +86,27 @@ describe("judge", () => {
     assert.equal(coast.tidal, true);
   });
 
+  it("doesn't count holds that a small whole-centimeter tide's rules let stand", () => {
+    // A 12 cm tide held at its low water for 8 hours every week, as at Werkendam.
+    const held = (h: number) => (h % 168 < 8 ? -0.12 : tide(0.12)(h));
+    const whole = series(90, (h) => Math.round(held(h) * 100) / 100);
+    const verdict = judge(river("8"), whole);
+    assert.equal(verdict.drains, 0);
+    assert.equal(verdict.tidal, true);
+    // A plain six-hour limit would have counted each hold.
+    const start = fromSource(whole);
+    const still = qc(start, { flatline_s: 48 * 3600, outliers: false });
+    assert.ok(drains(still, qc(start, { outliers: false })) > DRAINS_RUNS);
+    // Where a tidal verdict would turn the outlier check on, the holds still count.
+    const unlabeled = judge(river("10", { kind: null }), whole);
+    assert.ok(unlabeled.drains! > DRAINS_RUNS);
+    assert.equal(unlabeled.tidal, false);
+    // In millimeters QC gives the same tide six hours, so the holds still count.
+    const fine = judge(river("9"), series(90, held));
+    assert.ok(fine.drains! > DRAINS_RUNS);
+    assert.equal(fine.tidal, false);
+  });
+
   it("measures every year from its last usable value", () => {
     // 90 days of tide, then 300 days the source flagged bad: the year is still the tide's.
     const rows = series(390, tide(0.5)).map((r, i) =>
@@ -104,7 +132,8 @@ describe("qcFor", () => {
     const still = { flatline_s: 48 * 3600, outliers: false };
     assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), { outliers: false });
     assert.deepEqual(qcFor(river("2", { tidal: false })), still);
-    // A tide under 30 cm can sit on one centimeter for hours; a larger one can't.
+    // A tide under 30 cm can sit on one centimeter for hours; one of 30 cm or more can't.
+    assert.equal(qcFor(river("5", { tidal: true, tide_m: 0.3 })).centimeter_flatline_s, undefined);
     assert.equal(qcFor(river("3", { tidal: true, tide_m: 0.09 })).centimeter_flatline_s, 48 * 3600);
     // A tidal river floods, so only it and a lake drop the outlier check.
     assert.deepEqual(qcFor({ kind: "coastal", tidal: true, tide_m: 1 }), {});
@@ -158,7 +187,7 @@ describe("analyze", () => {
     assert.equal(analysis.get("test/1")!.rules, RULES);
     assert.ok(!analysis.has("test/3"));
     const history = await readJsonArray(analysisHistoryPath(lake, "test", now.toISOString()));
-    assert.deepEqual(history, [{ rules: RULES, changed: report.changed }]);
+    assert.deepEqual(history, [{ rules: RULES, judge: JUDGE, changed: report.changed }]);
     const [first] = await withAnalysis(lake, "test", stations);
     assert.equal(first!.tidal, true);
     // Both wait for requalify: their stored years may be under rules no build has now.
@@ -185,6 +214,70 @@ describe("analyze", () => {
     const rejudged = await analyze(lake, source, stations, { now });
     assert.deepEqual(rejudged.changed, []);
     assert.deepEqual(pending(await readAnalysis(lake, "test")), ["test/1", "test/2"]);
+    // A new judge judges every station again, and requalifies only those whose QC changes.
+    await markRequalified(lake, "test", ["test/1", "test/2"], now);
+    const judged = await readAnalysis(lake, "test");
+    await writeAnalysis(
+      lake,
+      "test",
+      [...judged.values()].map((a) =>
+        a.id === "test/1" ? { ...a, judge: "older", tidal: false } : { ...a, judge: "older" },
+      ),
+    );
+    const rejudged2 = await analyze(lake, source, stations, { now });
+    assert.equal(rejudged2.judged, 2);
+    assert.deepEqual(
+      rejudged2.changed.map((c) => c.id),
+      ["test/1"],
+    );
+    assert.deepEqual(pending(await readAnalysis(lake, "test")), ["test/1"]);
+  });
+
+  it("judges every station again from a file written before `judge` was kept", async () => {
+    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    await writeObservations(
+      seriesPath(lake, "levels", "test", "1", 2026),
+      series(90, tide(0.5)),
+      "NAVD88",
+    );
+    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+      { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
+    ]);
+    const now = new Date(Date.UTC(2026, 3, 1));
+    // As the first build wrote it: no `judge` column.
+    await writeRows(
+      `${lake}/stations/analysis/test.parquet`,
+      [
+        {
+          id: "test/1",
+          analyzed: now.toISOString(),
+          rules: RULES,
+          tidal: true,
+          tide_m: 0.5,
+          days: 90,
+          drains: 0,
+          requalified: now.toISOString(),
+        },
+      ],
+      {
+        id: "VARCHAR",
+        analyzed: "TIMESTAMPTZ",
+        rules: "VARCHAR",
+        tidal: "BOOLEAN",
+        tide_m: "DOUBLE",
+        days: "INTEGER",
+        drains: "INTEGER",
+        requalified: "TIMESTAMPTZ",
+      },
+      "id",
+    );
+    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.judge, null);
+    const report = await analyze(lake, source, [river("1")], { now });
+    assert.equal(report.judged, 1);
+    const row = (await readAnalysis(lake, "test")).get("test/1")!;
+    assert.equal(row.judge, JUDGE);
+    // Its verdict and so its QC are unchanged, so it isn't requalified.
+    assert.equal(row.requalified, now.toISOString());
   });
 
   it("judges a station its source can't judge with the spans it gives, with a warning, and fails on other errors", async () => {

@@ -35,7 +35,7 @@ import {
   startedListOf,
 } from "../src/refresh.ts";
 import type { Erratum } from "../src/errata.ts";
-import { readAnalysis, writeAnalysis } from "../src/lake/analysis.ts";
+import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/lake/analysis.ts";
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -149,7 +149,8 @@ describe("refreshSource with withheld stations", () => {
     const verdict = (id: string) => ({
       id,
       analyzed: NOW,
-      rules: "tidal-1",
+      rules: RULES,
+      judge: JUDGE,
       tidal: true,
       tide_m: 0.5,
       days: 366,
@@ -160,7 +161,8 @@ describe("refreshSource with withheld stations", () => {
     const history = analysisHistoryPath(lake, "test", NOW);
     await writeJsonArray(history, [
       {
-        rules: "tidal-1",
+        rules: RULES,
+        judge: JUDGE,
         changed: ["test/k12", "test/x0"].map((id) => ({ id, from: null, to: true, tide_m: 0.5 })),
       },
     ]);
