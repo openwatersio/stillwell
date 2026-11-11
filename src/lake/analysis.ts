@@ -58,10 +58,11 @@ export interface Analysis {
 }
 
 /**
- * The version of QC's rules. Change it with any threshold in `qcFor`, so
- * `analyze` judges every station again and requalifies all its stored years.
+ * The version of QC's rules. Change it with any rule in `src/qc.ts` or
+ * threshold in `qcFor`, so `analyze` judges every station again and
+ * requalifies all its stored years.
  */
-export const RULES = "tidal-1";
+export const RULES = "held-1";
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a
@@ -116,7 +117,8 @@ export function judge(
     rows.filter((r) => r.source_flag !== undefined || r.flag < Flag.suspect),
     suspect,
   );
-  const still = qc(start, { flatline_s: 48 * 3600, outliers: false });
+  // Held levels aren't flatlines, so neither side judges them and they don't count as `drains`.
+  const still = qc(start, { flatline_s: 48 * 3600, outliers: false, held: false });
   const flags = still.map((r) => r.flag);
   const times = still.map((r) => r.time);
   const levels = still.map((r) => r.level);
@@ -132,6 +134,7 @@ export function judge(
   const tide = qc(start, {
     ...(river ? qcFor({ ...station, tidal: true, tide_m }) : {}),
     outliers: false,
+    held: false,
   });
   // The year to the last usable value, as `tideOf` fits it, so a flagged tail doesn't shift one measure and not the others.
   const end = still.findLast((r) => r.flag < Flag.suspect && Number.isFinite(r.level))?.time ?? 0;
