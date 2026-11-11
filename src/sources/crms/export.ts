@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { constants, createInflateRaw, crc32, inflateRawSync } from "node:zlib";
 import { csvFields } from "../../csv.ts";
 import { getText } from "../../http.ts";
+// Refuses the cache variable under its old name.
+import "../../cache.ts";
 
 /**
  * CPRA's weekly export of every CRMS station's hourly record: one zip holding
