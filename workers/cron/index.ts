@@ -7,7 +7,7 @@ export interface Env {
   GITHUB_TOKEN: string;
 }
 
-const REPO = "openwatersio/water-levels";
+const REPO = "openwatersio/stillwell";
 
 // Keys match the crons in wrangler.jsonc.
 export const DISPATCHES: Record<string, { workflow: string; inputs?: Record<string, string> }> = {

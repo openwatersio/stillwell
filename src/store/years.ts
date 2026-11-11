@@ -55,19 +55,19 @@ export function fileKey(
   }
 }
 
-/** Every year file of levels a source has in `lake`, epoch 1's and later epochs'. */
-export async function listLevelFiles(lake: string, source: string): Promise<string[]> {
+/** Every year file of levels a source has in `store`, epoch 1's and later epochs'. */
+export async function listLevelFiles(store: string, source: string): Promise<string[]> {
   return [
-    ...(await listFiles(sourceFirstEpochFiles(lake, "levels", source))),
-    ...(await listFiles(sourceEpochDirs(lake, "levels", source))),
+    ...(await listFiles(sourceFirstEpochFiles(store, "levels", source))),
+    ...(await listFiles(sourceEpochDirs(store, "levels", source))),
   ];
 }
 
 const key = (r: Pick<YearRow, "id" | "epoch" | "year">) => `${r.id} ${r.epoch} ${r.year}`;
 
 /** A source's rows by `key`, or null when it has no file yet. */
-async function readYears(lake: string, source: string): Promise<Map<string, YearRow> | null> {
-  const path = yearsPath(lake, source);
+async function readYears(store: string, source: string): Promise<Map<string, YearRow> | null> {
+  const path = yearsPath(store, source);
   if (!(await exists(path))) return null;
   const rows = await readRows(path);
   return new Map(
@@ -95,8 +95,8 @@ const FLAGS = ["good", "interpolated", "preliminary", "suspect", "bad"];
  * year file the source's years file counts; none for a source without one,
  * or for a station marked as being written.
  */
-export async function usableShares(lake: string, source: string): Promise<Map<string, number>> {
-  const rows = [...((await readYears(lake, source))?.values() ?? [])];
+export async function usableShares(store: string, source: string): Promise<Map<string, number>> {
+  const rows = [...((await readYears(store, source))?.values() ?? [])];
   // A marked station's rows may be out of date mid-rewrite, so its share is unknown.
   const marked = new Set(rows.filter((r) => r.year === null).map((r) => r.id));
   const totals = new Map<string, [number, number]>();
@@ -111,9 +111,9 @@ export async function usableShares(lake: string, source: string): Promise<Map<st
   return new Map([...totals].map(([id, [usable, all]]) => [id, all ? usable / all : 1]));
 }
 
-export async function writeYears(lake: string, source: string, rows: YearRow[]): Promise<void> {
+export async function writeYears(store: string, source: string, rows: YearRow[]): Promise<void> {
   await writeRows(
-    yearsPath(lake, source),
+    yearsPath(store, source),
     rows.map(({ flags, ...r }) => ({
       ...r,
       ...Object.fromEntries(FLAGS.map((f, i) => [f, flags?.[i] ?? null])),
@@ -136,14 +136,14 @@ export async function writeYears(lake: string, source: string, rows: YearRow[]):
  * stopped run left marked, whose files the next reconcile reads. Does nothing
  * for a source without the file, which `ingest years` starts.
  */
-export async function markYears(lake: string, source: string, ids: string[]): Promise<string[]> {
+export async function markYears(store: string, source: string, ids: string[]): Promise<string[]> {
   if (!ids.length) return [];
-  const rows = await readYears(lake, source);
+  const rows = await readYears(store, source);
   if (!rows) return [];
   const marked = ids.filter((id) => !rows.has(markKey(id)));
   if (!marked.length) return [];
   for (const id of marked) rows.set(markKey(id), { id, epoch: null, year: null });
-  await writeYears(lake, source, [...rows.values()]);
+  await writeYears(store, source, [...rows.values()]);
   return marked;
 }
 
@@ -154,24 +154,24 @@ const markKey = (id: string) => key({ id, epoch: null, year: null });
  * set, `marked`. A file it didn't write keeps its row.
  */
 export async function commitYears(
-  lake: string,
+  store: string,
   source: string,
   marked: string[],
   written: Map<string, YearStats>,
 ): Promise<void> {
   if (!marked.length && !written.size) return;
-  const rows = await readYears(lake, source);
+  const rows = await readYears(store, source);
   if (!rows) return;
   for (const id of marked) rows.delete(markKey(id));
   for (const [file, stats] of written) {
     const at = fileKey(source, file);
     if (at) rows.set(key(at), { ...at, ...stats });
   }
-  await writeYears(lake, source, [...rows.values()]);
+  await writeYears(store, source, [...rows.values()]);
 }
 
 /**
- * Bring a source's rows in line with its files in `lake`: drop rows whose
+ * Bring a source's rows in line with its files in `store`: drop rows whose
  * file is gone or whose station `keep` refuses, such as a withheld one, and
  * read the files with no row, or whose station is marked or in `reread`,
  * then clear every mark. A source without the file gets none unless `start`;
@@ -183,7 +183,7 @@ export async function commitYears(
  * couldn't, or null when the source has no file and it didn't start one.
  */
 export async function reconcileYears(
-  lake: string,
+  store: string,
   source: string,
   {
     start = false,
@@ -201,7 +201,7 @@ export async function reconcileYears(
     concurrency?: number;
   } = {},
 ): Promise<{ read: number; failed: string[] } | null> {
-  const had = await readYears(lake, source).catch((error: unknown) => {
+  const had = await readYears(store, source).catch((error: unknown) => {
     if (rebuild) return null;
     throw error;
   });
@@ -211,10 +211,10 @@ export async function reconcileYears(
     ...[...(had?.values() ?? [])].filter((r) => r.year === null).map((r) => r.id),
     ...reread,
   ]);
-  const files = await listLevelFiles(lake, source);
-  // A listing that finds nothing when there are rows is a wrong path or a failed list, not a lake emptied.
+  const files = await listLevelFiles(store, source);
+  // A listing that finds nothing when there are rows is a wrong path or a failed list, not a store emptied.
   if (!files.length && [...(had?.values() ?? [])].some((r) => r.year !== null))
-    throw new Error(`no ${source} files listed in ${lake}, yet it has years; keeping them`);
+    throw new Error(`no ${source} files listed in ${store}, yet it has years; keeping them`);
   const unread: string[] = [];
   // Files left to read, by station, so a write partway marks the unfinished ones.
   const pending = new Map<string, number>();
@@ -238,7 +238,7 @@ export async function reconcileYears(
     if (row) rows.set(key(at), row);
   }
   const save = () =>
-    writeYears(lake, source, [
+    writeYears(store, source, [
       ...rows.values(),
       ...[...pending.keys()].map((id) => ({ id, epoch: null, year: null })),
     ]);
@@ -279,15 +279,15 @@ export async function reconcileYears(
 
 /** Drop the rows of stations `drop` names; returns the IDs it dropped rows for. */
 export async function dropYears(
-  lake: string,
+  store: string,
   source: string,
   drop: (id: string) => boolean,
 ): Promise<string[]> {
-  const rows = await readYears(lake, source);
+  const rows = await readYears(store, source);
   const gone = [...(rows?.values() ?? [])].filter((r) => drop(r.id));
   if (!gone.length) return [];
   await writeYears(
-    lake,
+    store,
     source,
     [...rows!.values()].filter((r) => !drop(r.id)),
   );

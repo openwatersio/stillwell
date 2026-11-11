@@ -416,7 +416,7 @@ function unitOf(station: string): Promise<string> {
   return unit;
 }
 
-// The open sea, and the one lake. PEGELONLINE doesn't say which other waters
+// The open sea, and the one store. PEGELONLINE doesn't say which other waters
 // are rivers and which are canals, so the rest are null unless tidal.
 const SEA = new Set(["NORDSEE", "OSTSEE"]);
 const LAKES = new Set(["BODENSEE"]);
@@ -483,7 +483,7 @@ export const source: Source = {
     epochs: {
       "pegelonline/3500031 2026-06-18T23:00:00Z": {
         reject: true,
-        note: "Wachendorf: same zero (PNP, NHN 12.77 m) as epoch 1, which was first seen without its validFrom; the lake has no values from before it (#72)",
+        note: "Wachendorf: same zero (PNP, NHN 12.77 m) as epoch 1, which was first seen without its validFrom; the store has no values from before it (#72)",
       },
     },
   },

@@ -34,7 +34,7 @@ export const metadata: SourceMetadata = {
     url: "https://kartverket.no/en/about-kartverket/contact-us/contact-form",
   },
   terms:
-    "Licensed under CC BY 4.0. The Norwegian Mapping Authority, Hydrographic Service must be credited. Kartverket asks users not to poll the API excessively. Kartverket doesn't mark which values it has quality-controlled, so values from the last year are treated as preliminary. Changes in the lake: levels converted from centimeters to meters, and quality flags added.",
+    "Licensed under CC BY 4.0. The Norwegian Mapping Authority, Hydrographic Service must be credited. Kartverket asks users not to poll the API excessively. Kartverket doesn't mark which values it has quality-controlled, so values from the last year are treated as preliminary. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // The API serves a station's whole record against its current chart datum.
   archive: "current",
   // Values arrive 10 to 20 minutes after they're measured.
@@ -83,7 +83,7 @@ export async function stations(previous: Station[] = []): Promise<KartverketStat
       (xml) => elements(xml, "obstime")[0]?.first,
       (error: Error) => void console.warn(`  kartverket ${code}: no obstime: ${error.message}`),
     );
-    // Offsets that can't be read are kept from the lake's list, and so is NN2000
+    // Offsets that can't be read are kept from the store's list, and so is NN2000
     // when a reply leaves it out, so `seriesChanged` keeps its baseline. Other
     // offsets aren't, since a new epoch mustn't start with the old datum's.
     const previousDatums = known.get(`kartverket/${code}`)?.datums;
@@ -152,7 +152,7 @@ async function offsets(code: string): Promise<Record<string, number> | null> {
 }
 
 /**
- * Refuses levels once chart datum has moved against NN2000 since the lake's
+ * Refuses levels once chart datum has moved against NN2000 since the store's
  * list, which the API would serve the whole record against, until a refresh
  * opens an epoch for it. Asked once a station per process.
  */
@@ -162,7 +162,7 @@ const asked = new Map<string, Promise<Record<string, number> | null>>();
  * Throws `DatumChanged` with `seriesChanged`'s reason as the reference, so
  * Ingest hourly starts a refresh, which opens or holds the epoch, and a
  * rejected change matches its epoch and asks for none. Offsets that can't be
- * read refuse a backfill, which writes the lake's years, but only warn for
+ * read refuse a backfill, which writes the store's years, but only warn for
  * `strict` false, so an outage of `stationlevels` doesn't stop hourly ingest.
  */
 async function checkChartDatum(
@@ -196,7 +196,7 @@ async function checkChartDatum(
   // A list with no baseline gives nothing to compare with, so a backfill waits for a refresh that reads one.
   if (nn2000 === undefined) {
     if (strict)
-      throw new Error(`Kartverket ${code} has no NN2000 in the lake's list; run ingest stations`);
+      throw new Error(`Kartverket ${code} has no NN2000 in the store's list; run ingest stations`);
     return;
   }
   const reason = moved(nn2000, now.NN2000);
@@ -366,7 +366,7 @@ async function request(
  * Chart datum is tidal, so Kartverket can redefine it, and the API would then
  * serve the whole record against the new one. Its height in NN2000 moving by
  * more than a centimeter says it was, so the refresh opens or holds an epoch
- * rather than let the lake's years and new values sit on two zeros. Ny-Ålesund
+ * rather than let the store's years and new values sit on two zeros. Ny-Ålesund
  * has no NN2000, so a change there goes unseen.
  */
 export function seriesChanged(committed: Station, listed: ListedStation): string | null {

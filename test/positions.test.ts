@@ -55,7 +55,7 @@ describe("correctPositions", () => {
       );
   });
 
-  it("names lake sources' stations, each moved more than the source's rounding", () => {
+  it("names store sources' stations, each moved more than the source's rounding", () => {
     for (const [id, { served, at }] of Object.entries(POSITIONS)) {
       assert.ok(id.split("/")[0]! in sources, id);
       assert.ok(km(served, at) > 1, id);

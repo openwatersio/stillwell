@@ -104,7 +104,7 @@ interface Collection<T> {
 
 /**
  * A USGS station as listed, with the series its levels come from. They're kept
- * in the lake's station list only; `stations.parquet` doesn't carry them.
+ * in the store's station list only; `stations.parquet` doesn't carry them.
  */
 export type UsgsStation = ListedStation & {
   time_series_id: string;

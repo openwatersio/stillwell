@@ -13,23 +13,29 @@ import {
   readAnalysis,
   withAnalysis,
   writeAnalysis,
-} from "../src/lake/analysis.ts";
+} from "../src/store/analysis.ts";
 import {
   readJsonArray,
   writeObservations,
   writeRows,
   writeStationBounds,
-} from "../src/lake/parquet.ts";
-import { analysisHistoryPath, seriesPath } from "../src/lake/paths.ts";
-import { qcFor } from "../src/lake/recent.ts";
-import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../src/schema.ts";
+} from "../src/store/parquet.ts";
+import { analysisHistoryPath, seriesPath } from "../src/store/paths.ts";
+import { qcFor } from "../src/store/recent.ts";
+import {
+  Flag,
+  Unjudged,
+  type StoredStation,
+  type Observation,
+  type Source,
+} from "../src/schema.ts";
 import { DRAINS_RUNS, TIDE_M, drains } from "../src/tidal.ts";
 import { fromSource, qc } from "../src/qc.ts";
 
 const QUARTER = 900_000;
 const M2_H = 12.4206012;
 
-const river = (source_id: string, extra: Partial<LakeStation> = {}) =>
+const river = (source_id: string, extra: Partial<StoredStation> = {}) =>
   ({
     id: `test/${source_id}`,
     source: "test",
@@ -39,7 +45,7 @@ const river = (source_id: string, extra: Partial<LakeStation> = {}) =>
     kind: "river",
     epochs: [{ id: 1, datum: "NAVD88", state: "open" }],
     ...extra,
-  }) as unknown as LakeStation;
+  }) as unknown as StoredStation;
 
 const source = { metadata: { id: "test" }, stations: async () => [] } as unknown as Source;
 
@@ -155,26 +161,26 @@ describe("qcFor", () => {
 
 describe("analyze", () => {
   it("writes each station's verdict, lists those whose QC changes, and skips those not due", async () => {
-    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
     const stations = [river("1"), river("2"), river("3")];
     await writeObservations(
-      seriesPath(lake, "levels", "test", "1", 2026),
+      seriesPath(store, "levels", "test", "1", 2026),
       series(90, tide(0.5)),
       "NAVD88",
     );
     await writeObservations(
-      seriesPath(lake, "levels", "test", "2", 2026),
+      seriesPath(store, "levels", "test", "2", 2026),
       series(90, pooled),
       "NAVD88",
     );
     // Station 3 has no values, so no bounds, and isn't judged.
     const last = new Date(Date.UTC(2026, 2, 31)).toISOString();
-    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+    await writeStationBounds(`${store}/stations/bounds/test.parquet`, [
       { id: "test/1", first: "2026-01-01T00:00:00Z", last },
       { id: "test/2", first: "2026-01-01T00:00:00Z", last },
     ]);
     const now = new Date(Date.UTC(2026, 3, 1));
-    const report = await analyze(lake, source, stations, { now });
+    const report = await analyze(store, source, stations, { now });
     assert.equal(report.judged, 2);
     assert.deepEqual(report.failed, []);
     // A river with no verdict is judged still, so only the tidal one changes its rules.
@@ -182,72 +188,72 @@ describe("analyze", () => {
       report.changed.map((c) => [c.id, c.from, c.to]),
       [["test/1", null, true]],
     );
-    const analysis = await readAnalysis(lake, "test");
+    const analysis = await readAnalysis(store, "test");
     assert.equal(analysis.get("test/1")!.tidal, true);
     assert.equal(analysis.get("test/2")!.tidal, false);
     assert.equal(analysis.get("test/1")!.rules, RULES);
     assert.ok(!analysis.has("test/3"));
-    const history = await readJsonArray(analysisHistoryPath(lake, "test", now.toISOString()));
+    const history = await readJsonArray(analysisHistoryPath(store, "test", now.toISOString()));
     assert.deepEqual(history, [{ rules: RULES, judge: JUDGE, changed: report.changed }]);
-    const [first] = await withAnalysis(lake, "test", stations);
+    const [first] = await withAnalysis(store, "test", stations);
     assert.equal(first!.tidal, true);
     // Both wait for requalify: their stored years may be under rules no build has now.
     assert.deepEqual(pending(analysis), ["test/1", "test/2"]);
-    await markRequalified(lake, "test", ["test/1", "test/2"], now);
-    assert.deepEqual(pending(await readAnalysis(lake, "test")), []);
+    await markRequalified(store, "test", ["test/1", "test/2"], now);
+    assert.deepEqual(pending(await readAnalysis(store, "test")), []);
 
     // A month later nothing is due.
-    const later = await analyze(lake, source, stations, { now: new Date(Date.UTC(2026, 4, 1)) });
+    const later = await analyze(store, source, stations, { now: new Date(Date.UTC(2026, 4, 1)) });
     assert.equal(later.judged, 0);
-    assert.equal((await readAnalysis(lake, "test")).size, 2);
+    assert.equal((await readAnalysis(store, "test")).size, 2);
     // `all` judges every station again, and nothing changes.
-    const all = await analyze(lake, source, stations, { now, all: true });
+    const all = await analyze(store, source, stations, { now, all: true });
     assert.equal(all.judged, 2);
     assert.deepEqual(all.changed, []);
-    assert.deepEqual(pending(await readAnalysis(lake, "test")), []);
+    assert.deepEqual(pending(await readAnalysis(store, "test")), []);
     // New rules requalify every station, though no verdict changes.
-    const rules = await readAnalysis(lake, "test");
+    const rules = await readAnalysis(store, "test");
     await writeAnalysis(
-      lake,
+      store,
       "test",
       [...rules.values()].map((a) => ({ ...a, rules: "older" })),
     );
-    const rejudged = await analyze(lake, source, stations, { now });
+    const rejudged = await analyze(store, source, stations, { now });
     assert.deepEqual(rejudged.changed, []);
-    assert.deepEqual(pending(await readAnalysis(lake, "test")), ["test/1", "test/2"]);
+    assert.deepEqual(pending(await readAnalysis(store, "test")), ["test/1", "test/2"]);
     // A new judge judges every station again, and requalifies only those whose QC changes.
-    await markRequalified(lake, "test", ["test/1", "test/2"], now);
-    const judged = await readAnalysis(lake, "test");
+    await markRequalified(store, "test", ["test/1", "test/2"], now);
+    const judged = await readAnalysis(store, "test");
     await writeAnalysis(
-      lake,
+      store,
       "test",
       [...judged.values()].map((a) =>
         a.id === "test/1" ? { ...a, judge: "older", tidal: false } : { ...a, judge: "older" },
       ),
     );
-    const rejudged2 = await analyze(lake, source, stations, { now });
+    const rejudged2 = await analyze(store, source, stations, { now });
     assert.equal(rejudged2.judged, 2);
     assert.deepEqual(
       rejudged2.changed.map((c) => c.id),
       ["test/1"],
     );
-    assert.deepEqual(pending(await readAnalysis(lake, "test")), ["test/1"]);
+    assert.deepEqual(pending(await readAnalysis(store, "test")), ["test/1"]);
   });
 
   it("judges every station again from a file written before `judge` was kept", async () => {
-    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
     await writeObservations(
-      seriesPath(lake, "levels", "test", "1", 2026),
+      seriesPath(store, "levels", "test", "1", 2026),
       series(90, tide(0.5)),
       "NAVD88",
     );
-    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+    await writeStationBounds(`${store}/stations/bounds/test.parquet`, [
       { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
     ]);
     const now = new Date(Date.UTC(2026, 3, 1));
     // As the first build wrote it: no `judge` column.
     await writeRows(
-      `${lake}/stations/analysis/test.parquet`,
+      `${store}/stations/analysis/test.parquet`,
       [
         {
           id: "test/1",
@@ -272,23 +278,23 @@ describe("analyze", () => {
       },
       "id",
     );
-    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.judge, null);
-    const report = await analyze(lake, source, [river("1")], { now });
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.judge, null);
+    const report = await analyze(store, source, [river("1")], { now });
     assert.equal(report.judged, 1);
-    const row = (await readAnalysis(lake, "test")).get("test/1")!;
+    const row = (await readAnalysis(store, "test")).get("test/1")!;
     assert.equal(row.judge, JUDGE);
     // Its verdict and so its QC are unchanged, so it isn't requalified.
     assert.equal(row.requalified, now.toISOString());
   });
 
   it("judges a station its source can't judge with the spans it gives, with a warning, and fails on other errors", async () => {
-    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
     await writeObservations(
-      seriesPath(lake, "levels", "test", "1", 2026),
+      seriesPath(store, "levels", "test", "1", 2026),
       series(90, tide(0.5)),
       "NAVD88",
     );
-    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+    await writeStationBounds(`${store}/stations/bounds/test.parquet`, [
       { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
     ]);
     const refusing = {
@@ -297,19 +303,19 @@ describe("analyze", () => {
         throw new Unjudged("not its whole record");
       },
     } as Source;
-    const report = await analyze(lake, refusing, [river("1")], {
+    const report = await analyze(store, refusing, [river("1")], {
       now: new Date(Date.UTC(2026, 3, 1)),
     });
     assert.deepEqual(report.failed, []);
     assert.equal(report.warned.length, 1);
-    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.tidal, true);
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.tidal, true);
     const broken = {
       ...source,
       suspect: async () => {
         throw new Error("unreadable");
       },
     } as Source;
-    const failed = await analyze(lake, broken, [river("1")], {
+    const failed = await analyze(store, broken, [river("1")], {
       now: new Date(Date.UTC(2026, 3, 1)),
       all: true,
     });
@@ -317,35 +323,35 @@ describe("analyze", () => {
   });
 
   it("keeps a verdict its latest values can't give, and leaves out flags it can't start over", async () => {
-    const lake = mkdtempSync(join(tmpdir(), "water-levels-analysis-"));
+    const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
     const stations = [river("1")];
-    const path = seriesPath(lake, "levels", "test", "1", 2026);
+    const path = seriesPath(store, "levels", "test", "1", 2026);
     // A suspect value from before source_flag was kept.
     const rows = series(90, tide(0.5));
     rows[100] = { time: rows[100]!.time, level: 9, flag: Flag.suspect };
     await writeObservations(path, rows, "NAVD88");
-    await writeStationBounds(`${lake}/stations/bounds/test.parquet`, [
+    await writeStationBounds(`${store}/stations/bounds/test.parquet`, [
       { id: "test/1", first: "2026-01-01T00:00:00Z", last: "2026-03-31T00:00:00Z" },
     ]);
     const now = new Date(Date.UTC(2026, 3, 1));
-    const first = await analyze(lake, source, stations, { now });
+    const first = await analyze(store, source, stations, { now });
     assert.deepEqual(first.failed, []);
-    assert.equal((await readAnalysis(lake, "test")).get("test/1")!.tidal, true);
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.tidal, true);
     // A year later its values span 20 days, too few to say.
     await writeObservations(path, series(20, tide(0.5)), "NAVD88");
-    const later = await analyze(lake, source, stations, { now: new Date(Date.UTC(2027, 3, 2)) });
+    const later = await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 2)) });
     assert.equal(later.judged, 1);
     assert.deepEqual(later.changed, []);
-    const kept = (await readAnalysis(lake, "test")).get("test/1")!;
+    const kept = (await readAnalysis(store, "test")).get("test/1")!;
     assert.equal(kept.tidal, true);
     assert.equal(kept.analyzed, now.toISOString());
     // New rules still requalify it under the verdict it keeps.
-    await markRequalified(lake, "test", ["test/1"], now);
-    await writeAnalysis(lake, "test", [
+    await markRequalified(store, "test", ["test/1"], now);
+    await writeAnalysis(store, "test", [
       { ...kept, rules: "older", requalified: now.toISOString() },
     ]);
-    await analyze(lake, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
-    const bumped = (await readAnalysis(lake, "test")).get("test/1")!;
+    await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
+    const bumped = (await readAnalysis(store, "test")).get("test/1")!;
     assert.deepEqual([bumped.tidal, bumped.rules, bumped.requalified], [true, RULES, null]);
   });
 });

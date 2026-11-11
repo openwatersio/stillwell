@@ -246,7 +246,7 @@ describe("published", () => {
     const [row] = published(parseErrata("uhslc", file([entry()])).errata) as { url: string }[];
     assert.equal(
       row!.url,
-      "https://github.com/openwatersio/water-levels/blob/main/src/sources/uhslc/errata.json",
+      "https://github.com/openwatersio/stillwell/blob/main/src/sources/uhslc/errata.json",
     );
   });
 

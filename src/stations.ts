@@ -7,7 +7,7 @@ import {
   type EpochEvent,
   type EpochOptions,
 } from "./epochs.ts";
-import type { LakeStation, ListedStation, Station } from "./schema.ts";
+import type { StoredStation, ListedStation, Station } from "./schema.ts";
 
 /** Something a refresh did to a station's epochs, for the report. */
 export interface EpochChange {
@@ -21,10 +21,10 @@ export interface EpochChange {
 }
 
 /**
- * Merge a source's fresh station list into the lake's. A station the source
+ * Merge a source's fresh station list into the store's. A station the source
  * stopped listing stays, marked inactive, so its ID is never reused. The
  * refresh takes withheld stations out of both lists first, so they leave. What the
- * lake can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
+ * store can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
  * it from the bounds compaction writes.
  *
  * A station the source now reports against another reference opens a datum
@@ -41,7 +41,7 @@ export interface EpochChange {
  * gives no date.
  */
 export function mergeStationList(
-  previous: LakeStation[],
+  previous: StoredStation[],
   fetched: ListedStation[],
   {
     seriesChanged,
@@ -49,11 +49,11 @@ export function mergeStationList(
   }: Omit<EpochOptions, "nextId" | "station"> & {
     seriesChanged?: (previous: Station, listed: ListedStation) => string | null;
   },
-): { stations: LakeStation[]; changes: EpochChange[] } {
+): { stations: StoredStation[]; changes: EpochChange[] } {
   const byId = new Map(previous.map((s) => [s.id, s]));
   const listed = new Set<string>();
   const changes: EpochChange[] = [];
-  const merged: LakeStation[] = [];
+  const merged: StoredStation[] = [];
   for (const { reference, ...s } of fetched) {
     if (s.id !== `${s.source}/${s.source_id}` || s.source.includes("/"))
       throw new Error(`Station ${s.id} isn't <source>/<source_id>`);

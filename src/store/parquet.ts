@@ -7,15 +7,17 @@ import { DuckDBInstance, type DuckDBConnection } from "@duckdb/node-api";
 import {
   Flag,
   type Epoch,
-  type LakeStation,
+  type StoredStation,
   type Observation,
   type PublishedExtreme,
   type Station,
 } from "../schema.ts";
 import type { EventIndex } from "../types.ts";
+// Refuses the store and cache variables under their old names.
+import "../cache.ts";
 
 /**
- * Read and write the lake's Parquet files through DuckDB, on local disk or on
+ * Read and write the store's Parquet files through DuckDB, on local disk or on
  * R2. An `s3://` path uses the credentials in S3_ENDPOINT, S3_ACCESS_KEY_ID,
  * S3_SECRET_ACCESS_KEY and S3_REGION, the same variables crowd-depth reads.
  *
@@ -28,7 +30,7 @@ let laneCount = 1;
 const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
 /**
- * How many DuckDB connections run lake work at once, 1 by default. Backfill,
+ * How many DuckDB connections run store work at once, 1 by default. Backfill,
  * compaction, requalify and `years` raise it to their concurrency, since each
  * year file on R2 is mostly waiting on the network.
  */
@@ -65,7 +67,7 @@ function connection(): Promise<DuckDBConnection> {
 
 /**
  * A connection to the one in-memory instance. The instance loads httpfs and
- * creates the lake's S3 secret once, when it starts: secrets belong to the
+ * creates the store's S3 secret once, when it starts: secrets belong to the
  * instance, and connections creating one at the same moment conflict in its
  * catalog, which failed most of a 16-connection compaction's reads.
  */
@@ -77,7 +79,7 @@ async function connect(): Promise<DuckDBConnection> {
       const setup = await created.connect();
       await setup.run("INSTALL httpfs; LOAD httpfs;");
       await setup.run(
-        `CREATE SECRET lake (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
+        `CREATE SECRET store (TYPE s3, KEY_ID ${quote(process.env.S3_ACCESS_KEY_ID ?? "")}, SECRET ${quote(process.env.S3_SECRET_ACCESS_KEY ?? "")}, ENDPOINT ${quote(endpoint.replace(/^https?:\/\//, ""))}, REGION ${quote(process.env.S3_REGION ?? "auto")}, URL_STYLE 'path'${endpoint.startsWith("http://") ? ", USE_SSL false" : ""})`,
       );
     }
     return created;
@@ -502,7 +504,7 @@ const EPOCHS =
   "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, reference_since TIMESTAMPTZ, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
 
 /** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
-export async function writeStations(path: string, stations: LakeStation[]): Promise<void> {
+export async function writeStations(path: string, stations: StoredStation[]): Promise<void> {
   const columns = { ...STATION_COLUMNS, epochs: EPOCHS };
   await viaJson(
     path,
@@ -529,7 +531,7 @@ const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
  * A source's list, `stations/<source>.parquet`: the shared columns except
  * `first` and `last`, its epochs, and the source's own fields as JSON in `extra`.
  */
-export async function writeStationList(path: string, stations: LakeStation[]): Promise<void> {
+export async function writeStationList(path: string, stations: StoredStation[]): Promise<void> {
   const rows = stations.map((s) => {
     const extra = Object.fromEntries(
       Object.entries(s).filter(
@@ -547,8 +549,8 @@ export async function writeStationList(path: string, stations: LakeStation[]): P
   );
 }
 
-/** A source's list, or null when the lake has none. */
-export async function readStationList(path: string): Promise<LakeStation[] | null> {
+/** A source's list, or null when the store has none. */
+export async function readStationList(path: string): Promise<StoredStation[] | null> {
   if (!(await exists(path))) return null;
   const rows = await read(path, "SELECT to_json(t)::VARCHAR AS row", "id", "t");
   return rows.map((r) => {
@@ -566,7 +568,7 @@ export async function readStationList(path: string): Promise<LakeStation[] | nul
         reference_since: isoOf(e.reference_since),
         datums: e.datums ?? {},
       })),
-    } as LakeStation;
+    } as StoredStation;
   });
 }
 
@@ -920,7 +922,7 @@ function viaJson(path: string, rows: object[], select: string, format: string): 
 async function viaJsonNow(path: string, rows: object[], select: string, format: string) {
   const db = await connection();
   await prepare(path);
-  const dir = await mkdtemp(join(tmpdir(), "water-levels-"));
+  const dir = await mkdtemp(join(tmpdir(), "stillwell-"));
   try {
     const file = join(dir, "rows.json");
     await writeFile(file, rows.map((r) => JSON.stringify(r)).join("\n") + "\n");

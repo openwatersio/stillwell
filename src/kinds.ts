@@ -3,7 +3,7 @@ import type { Kind } from "./schema.ts";
 /**
  * Stations whose source doesn't say what water they measure, with their kind
  * and why. Analysis and QC read `kind` (`judge` in
- * `src/lake/analysis.ts`, `qcFor` in `src/lake/recent.ts`): a `coastal`
+ * `src/store/analysis.ts`, `qcFor` in `src/store/recent.ts`): a `coastal`
  * gauge that stands still while dry at low water stays tidal, and a tidal
  * `river` keeps the outlier check off, where one of no kind can't. A source
  * that gives a kind itself stops the decision: the station keeps the source's
@@ -52,7 +52,7 @@ export const KINDS: Record<string, { kind: Kind; note: string }> = {
  * Stations with `KINDS`' kind where their source gives none, and the entries
  * for `source` a person should look at: one whose source gives another kind
  * of its own, which it keeps, and one naming a station neither the source nor
- * the lake (`previous`) lists, such as a typo. An adapter that keeps a
+ * the store (`previous`) lists, such as a typo. An adapter that keeps a
  * station's stored record, as REFMAR's does when a request fails, must leave
  * out its stored kind, which may be a decision's, not the source's, or a
  * changed entry reads as the source's kind.

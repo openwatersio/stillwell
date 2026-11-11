@@ -3,7 +3,17 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fetchText, setTransport, type RequestOptions } from "./http.ts";
 
-const CACHE_DIR = process.env.WATER_LEVELS_CACHE ?? ".cache";
+// An old name left in a shell would otherwise fall back to the default store
+// unnoticed, so a `withhold` could succeed locally and leave the bucket as is.
+for (const [old, now] of [
+  ["WATER_LEVELS_LAKE", "STILLWELL_STORE"],
+  ["WATER_LEVELS_RESTRICTED_LAKE", "STILLWELL_RESTRICTED_STORE"],
+  ["WATER_LEVELS_CACHE", "STILLWELL_CACHE"],
+]) {
+  if (process.env[old] !== undefined) throw new Error(`${old} is set; it's now ${now}`);
+}
+
+const CACHE_DIR = process.env.STILLWELL_CACHE ?? ".cache";
 
 /**
  * Fetch text, keeping each response on disk keyed by URL and body. Historical

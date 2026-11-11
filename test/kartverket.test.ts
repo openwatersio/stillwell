@@ -88,7 +88,7 @@ describe("kartverket", () => {
     const vaw = (await kartverket.stations(previous)).find((s) => s.id === "kartverket/VAW")!;
     assert.equal(vaw.record_start, (previous[2] as Partial<typeof vaw>).record_start);
     assert.ok(vaw.record_start);
-    // Offsets that can't be read are kept from the lake's list.
+    // Offsets that can't be read are kept from the store's list.
     serve([
       [/stationlevels&stationcode=BGO/, "<tide><error>timeout</error></tide>"],
       ...listRoutes,
@@ -181,7 +181,7 @@ describe("kartverket", () => {
       kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z"), {
         datums: {},
       }),
-      /no NN2000 in the lake's list/,
+      /no NN2000 in the store's list/,
     );
     // Ny-Ålesund has none to give, so it backfills unchecked.
     serve([
@@ -200,7 +200,7 @@ describe("kartverket", () => {
     assert.ok(kartverket.seriesChanged(at(-1.022), at(-1.033)));
   });
 
-  it("keeps NN2000 from the lake's list when a reply leaves it out", async () => {
+  it("keeps NN2000 from the store's list when a reply leaves it out", async () => {
     serve(listRoutes);
     const previous = (await kartverket.stations()) as Station[];
     const noNn2000 = fixture("kartverket-levels-BGO.xml").replace(

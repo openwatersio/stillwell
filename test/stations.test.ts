@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { LakeStation, ListedStation, Station } from "../src/schema.ts";
-import { seriesPath } from "../src/lake/paths.ts";
+import type { StoredStation, ListedStation, Station } from "../src/schema.ts";
+import { seriesPath } from "../src/store/paths.ts";
 import { mergeStationList } from "../src/stations.ts";
 
 const base = {
@@ -35,8 +35,8 @@ const station = (id: string, fields: Partial<Station> = {}): Station => ({
   ...fields,
 });
 
-/** A station as the lake holds it, with one open epoch in its datum. */
-const held = (id: string, fields: Partial<LakeStation> = {}): LakeStation => {
+/** A station as the store holds it, with one open epoch in its datum. */
+const held = (id: string, fields: Partial<StoredStation> = {}): StoredStation => {
   const s = station(id, fields);
   return {
     ...s,
@@ -105,7 +105,7 @@ describe("mergeStationList", () => {
     );
   });
 
-  it("leaves first and last to the lake", () => {
+  it("leaves first and last to the store", () => {
     const filled = { first: "2000-01-01T00:00:00Z", last: "2026-01-01T00:00:00Z" };
     const { stations } = mergeStationList(
       [held("a", filled), held("b", filled), held("c", filled)],

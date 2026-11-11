@@ -5,7 +5,7 @@ import type { HarmonicModel } from "./harmonic.ts";
  * Checks that compare a station with its neighbors or with its own tide, for
  * errors one station's QC can't see: a month holding another gauge's data, a
  * clock that drifts or jumps, and a level step. The methods are those of the
- * SANHO audit (openwatersio/water-levels#82, #112).
+ * SANHO audit (openwatersio/stillwell#82, #112).
  */
 
 export const HOUR_MS = 3_600_000;

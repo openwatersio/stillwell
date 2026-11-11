@@ -26,7 +26,7 @@ test("every Worker cron dispatches a workflow on main", async () => {
   await worker.scheduled({ cron: "35 3 9 * *" }, { GITHUB_TOKEN: "t" });
   assert.deepEqual(calls, [
     {
-      url: "https://api.github.com/repos/openwatersio/water-levels/actions/workflows/monthly.yml/dispatches",
+      url: "https://api.github.com/repos/openwatersio/stillwell/actions/workflows/monthly.yml/dispatches",
       body: { ref: "main", inputs: { refetch: "true" } },
       auth: "Bearer t",
       type: "application/json",

@@ -1,14 +1,14 @@
 /**
- * Cross-station and harmonic checks over a region of the lake, for errors that
+ * Cross-station and harmonic checks over a region of the store, for errors that
  * QC of one station at a time misses: months holding another gauge's data,
- * clock drift and jumps, and level steps. Reads hourly values from the lake's
+ * clock drift and jumps, and level steps. Reads hourly values from the store's
  * year files and prints a Markdown report of what it finds for a person to
- * judge. It changes nothing in the lake.
+ * judge. It changes nothing in the store.
  *
  *   node scripts/cross-check.ts <minLat,minLon,maxLat,maxLon> <from> <to> [source,...]
  *   node scripts/cross-check.ts 53.2,6.5,55.3,9.2 2000 2026 pegelonline,gesla
  *
- * `to` is exclusive. Hourly values are cached in .cache/cross-check/, by lake.
+ * `to` is exclusive. Hourly values are cached in .cache/cross-check/, by store.
  */
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
@@ -28,20 +28,17 @@ import {
   type Hourly,
 } from "../src/cross-check.ts";
 import { STANDARD, fit, resolvable } from "../src/harmonic.ts";
-import { isMissing } from "../src/lake/parquet.ts";
-import { seriesPath, stationsPath } from "../src/lake/paths.ts";
+import { isMissing } from "../src/store/parquet.ts";
+import { seriesPath, stationsPath } from "../src/store/paths.ts";
 import { Flag } from "../src/schema.ts";
 
 const ROOT = resolve(import.meta.dirname, "..");
-const LAKE = (process.env.WATER_LEVELS_LAKE ?? "https://water-levels.openwaters.io").replace(
-  /\/$/,
-  "",
-);
-// One directory per lake, so another lake never reads this one's values.
+const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
+// One directory per store, so another store never reads this one's values.
 const CACHE = join(
   ROOT,
   ".cache/cross-check",
-  createHash("sha256").update(LAKE).digest("hex").slice(0, 12),
+  createHash("sha256").update(STORE).digest("hex").slice(0, 12),
 );
 /** Neighbors for level steps: the nearest this many within `NEIGHBOR_KM`. */
 const NEIGHBORS = 4;
@@ -93,7 +90,8 @@ interface Listed {
 
 const instance = await DuckDBInstance.create(":memory:");
 // Loaded once: connections loading it at the same moment conflict in the catalog.
-if (/^https?:\/\//.test(LAKE)) await (await instance.connect()).run("INSTALL httpfs; LOAD httpfs;");
+if (/^https?:\/\//.test(STORE))
+  await (await instance.connect()).run("INSTALL httpfs; LOAD httpfs;");
 const lanes: DuckDBConnection[] = [];
 for (let i = 0; i < CONNECTIONS; i++) {
   const db = await instance.connect();
@@ -108,7 +106,7 @@ const listed = (
       `SELECT id, source, source_id, name, lat, lon, epoch_ms(first) AS first, epoch_ms(last) AS last, coalesce(same_as, []) AS same_as, preferred,
          epoch_ms(list_filter(epochs, lambda e: e.id = 1)[1].since) AS since, epoch_ms(list_filter(epochs, lambda e: e.id = 1)[1].until) AS until,
          coalesce(len(list_filter(epochs, lambda e: e.id > 1)) > 0, false) AS later
-       FROM read_parquet(${quote(stationsPath(LAKE))})
+       FROM read_parquet(${quote(stationsPath(STORE))})
        WHERE list_contains(products, 'levels') AND coalesce(kind, '') NOT IN ('river', 'lake')
          AND lat BETWEEN ${minLat} AND ${maxLat} AND lon BETWEEN ${minLon} AND ${maxLon}
          AND first < make_timestamptz(${to}, 1, 1, 0, 0, 0) AND last >= make_timestamptz(${from}, 1, 1, 0, 0, 0)
@@ -152,7 +150,7 @@ await Promise.all(
 );
 const stations = listed.filter((s) => series.has(s.id));
 console.error(`${stations.length} with values`);
-// One station per gauge: the lake's preferred one, or else the longest here.
+// One station per gauge: the store's preferred one, or else the longest here.
 const primary = new Map<string, Listed>();
 for (const s of stations) {
   const held = primary.get(root(s.id));
@@ -170,7 +168,7 @@ async function load(
   db: DuckDBConnection,
   s: Listed,
 ): Promise<{ hourly: Hourly | null; values: number }> {
-  // Keyed on what the values depend on, so a new epoch span, newer values or a new format read the lake again.
+  // Keyed on what the values depend on, so a new epoch span, newer values or a new format read the store again.
   const key = [CACHE_FORMAT, from, to, s.since, s.until, s.first, s.last].join("_");
   const file = join(CACHE, `${encodeURIComponent(s.id)}_${key}.bin`);
   const save = async (values: Float64Array) => {
@@ -193,7 +191,7 @@ async function load(
   const first = Math.max(from, new Date(s.first).getUTCFullYear());
   const last = Math.min(to - 1, new Date(s.last).getUTCFullYear());
   for (let year = first; year <= last; year++) {
-    const path = seriesPath(LAKE, "levels", s.source, s.source_id, year);
+    const path = seriesPath(STORE, "levels", s.source, s.source_id, year);
     try {
       const rows = (
         await db.runAndReadAll(
@@ -246,7 +244,7 @@ const cm = (m: number) => (m * 100).toFixed(1);
 
 console.log(`# Cross-station checks, ${from} to ${to - 1}`);
 console.log(`\n${stations.length} stations in ${box}${sources ? `, ${sources.join(", ")}` : ""}.`);
-console.log(`\nRead from ${LAKE}.`);
+console.log(`\nRead from ${STORE}.`);
 const few = listed.filter((s) => !series.has(s.id) && !offHour.includes(s.id)).map((s) => s.id);
 if (few.length) console.log(`\nUnder 60 days of hourly values, so left out: ${few.join(", ")}.`);
 if (offHour.length)

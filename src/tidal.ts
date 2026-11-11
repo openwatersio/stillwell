@@ -20,7 +20,7 @@ export const DRAINS_RUNS = 3;
 export function tideOf(record: {
   times: ArrayLike<number>;
   levels: ArrayLike<number>;
-  /** The values' flags, as the lake's: the source's own, or after QC. */
+  /** The values' flags, as the store's: the source's own, or after QC. */
   source: ArrayLike<number>;
 }): number | null {
   const samples = [];

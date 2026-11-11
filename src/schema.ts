@@ -33,7 +33,7 @@ export type PublishedExtreme = (Extreme | TransitExtreme) & { flag: Flag };
 
 export type Kind = "coastal" | "estuary" | "lake" | "river";
 
-/** What a station has in the lake. */
+/** What a station has in the store. */
 export type Product = "levels" | "extremes" | "predictions" | "predicted_extremes";
 
 export interface Station {
@@ -54,8 +54,8 @@ export interface Station {
   datums: Record<string, number>;
   products: Product[];
   /**
-   * First and last observation in the lake, as ISO times; null until a lake
-   * job fills them in. Derived from the lake, never committed.
+   * First and last observation in the store, as ISO times; null until a store
+   * job fills them in. Derived from the store, never committed.
    */
   first: string | null;
   last: string | null;
@@ -64,7 +64,7 @@ export interface Station {
   attribution: string;
   /** tide-database station (`source/id`) for the same gauge. */
   tide_station: string | null;
-  /** Other lake series from the same physical gauge, by `src/same-as.ts`. */
+  /** Other store series from the same physical gauge, by `src/same-as.ts`. */
   same_as: string[];
   /**
    * The series to use for the gauge's observed levels among this one and its
@@ -81,7 +81,7 @@ export interface Station {
    * Where the source's quality checks of this station's values start, as a
    * UTC instant, stated by the source or inferred from its flags
    * (`source_qc_start_inferred`): it won't check the `preliminary` values
-   * before it, so one is final as it stands, having passed only the lake's
+   * before it, so one is final as it stands, having passed only the store's
    * QC. Null or absent where none is known. Absent in a source's list means
    * the adapter hasn't asked yet.
    */
@@ -93,7 +93,7 @@ export interface Station {
   source_qc_start_inferred?: boolean | null;
   /**
    * Whether the station's levels carry a tide, measured from its last year in
-   * the lake (`stations/analysis/<source>.parquet`, `src/lake/analysis.ts`):
+   * the store (`stations/analysis/<source>.parquet`, `src/store/analysis.ts`):
    * null where they can't say, or before its first analysis. QC's flatline
    * and outlier rules follow it (`qcFor`). Set as `stations.parquet` is built
    * and as ingest reads a list, never by an adapter.
@@ -146,8 +146,8 @@ export interface Epoch {
   state: "open" | "closed" | "held" | "rejected";
 }
 
-/** A station as the lake's lists hold it, with its datum epochs. */
-export type LakeStation = Station & { epochs: Epoch[] };
+/** A station as the store's lists hold it, with its datum epochs. */
+export type StoredStation = Station & { epochs: Epoch[] };
 
 /**
  * A decision on one epoch, keyed in `Overrides.epochs` by
@@ -167,7 +167,7 @@ export interface EpochDecision {
 /**
  * A day a station's zero moved though the source never said, found
  * from its values, against another record of the gauge or a neighbor where
- * the lake has one. Never removed once applied, as backfill reads it.
+ * the store has one. Never removed once applied, as backfill reads it.
  */
 export interface EpochSplit {
   /** YYYY-MM-DD: the first local day on the new zero. */
@@ -193,9 +193,9 @@ export interface SourceMetadata {
     /** The default for the source's stations; a station's own terms can differ. */
     commercial_use: boolean;
     /**
-     * Whether the terms let anyone republish the data, which the public lake
+     * Whether the terms let anyone republish the data, which the public store
      * does. A source that withholds it keeps its list and series in the
-     * restricted lake. This, not `commercial_use`, decides the lake.
+     * restricted store. This, not `commercial_use`, decides the store.
      */
     redistribution: boolean;
   };
@@ -253,12 +253,12 @@ export interface Source {
   metadata: SourceMetadata;
   /** Decisions made about the source's stations. */
   overrides?: Overrides;
-  /** `previous` is the lake's list, for a source that keeps choices it made before. */
+  /** `previous` is the store's list, for a source that keeps choices it made before. */
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
-   * Why a station, by its `source_id`, is withheld from the lake, or null.
+   * Why a station, by its `source_id`, is withheld from the store, or null.
    * Withheld means its owner refused republication: the adapter never lists
-   * or fetches it, a refresh drops it from the lake's list and the bounds and
+   * or fetches it, a refresh drops it from the store's list and the bounds and
    * recent window, publishing leaves it out, and `ingest withhold` deletes its
    * files (src/withhold.ts).
    */
@@ -281,13 +281,13 @@ export interface Source {
    */
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /**
-   * Spans of a station's values that the lake's own errata flag `suspect`,
+   * Spans of a station's values that the store's own errata flag `suspect`,
    * beyond the spans its `errata.json` names, which the registry adds, worked
    * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
    * the recent window; one that needs the whole record throws `Unjudged` when
-   * it isn't, or when the lake holds only part of it for good.
+   * it isn't, or when the store holds only part of it for good.
    * The adapter flags the same spans in what it fetches, keeping
    * `source_flag` the source's.
    */
@@ -317,7 +317,7 @@ export function stationDefaults(
 
 /**
  * A source's `suspect` can't judge the part of a record the caller holds, as
- * GESLA's datum-jump check can't where the lake holds only part of a record.
+ * GESLA's datum-jump check can't where the store holds only part of a record.
  * `spans` are the ones it can still give, the source's `errata.json` spans,
  * which the registry adds. Requalify keeps the record's stored flags and adds
  * these, and analysis judges with them, each with a warning; the recent window

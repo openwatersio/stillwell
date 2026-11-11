@@ -1,5 +1,5 @@
 import { currentEpoch } from "./epochs.ts";
-import { mergeFetched, sameRows } from "./lake/merge.ts";
+import { mergeFetched, sameRows } from "./store/merge.ts";
 import {
   asWritten,
   listYears,
@@ -12,13 +12,13 @@ import {
   type YearStats,
   type StationBounds,
   type YearFile,
-} from "./lake/parquet.ts";
+} from "./store/parquet.ts";
 import { csvFields } from "./csv.ts";
-import { qcFor, refuseOtherDatum } from "./lake/recent.ts";
-import { judgeFetched } from "./lake/requalify.ts";
+import { qcFor, refuseOtherDatum } from "./store/recent.ts";
+import { judgeFetched } from "./store/requalify.ts";
 import type {
   Epoch,
-  LakeStation,
+  StoredStation,
   Observation,
   Product,
   PublishedExtreme,
@@ -260,7 +260,7 @@ export function* years(start: Date, end: Date): Generator<[Date, Date]> {
  * that screens nothing, such as some USACE offices, would have it fetched
  * every month for nothing; one whose `screened` isn't known yet isn't.
  */
-export function preliminaryRuns<T extends Pick<LakeStation, "id" | "products" | "epochs">>(
+export function preliminaryRuns<T extends Pick<StoredStation, "id" | "products" | "epochs">>(
   stations: T[],
   bounds: Map<string, StationBounds>,
   start: Date,
@@ -300,7 +300,7 @@ export function preliminaryRuns<T extends Pick<LakeStation, "id" | "products" | 
 }
 
 /** Where a station's record in its current epoch starts: its first value, or the epoch's start if later. */
-function recordSince(station: Pick<LakeStation, "epochs">, first: string): number {
+function recordSince(station: Pick<StoredStation, "epochs">, first: string): number {
   const since = station.epochs.filter((e) => e.state === "open").at(-1)?.since;
   return Math.max(Date.parse(first), since ? Date.parse(since) : -Infinity);
 }
@@ -384,14 +384,14 @@ export type YearRead<T> = { rows: T[]; datums: string[] };
 
 /**
  * One series' year files as a backfill walk reads them: each at most once, and
- * none the walk's listing (`listed`) didn't find, so a station new to the lake
+ * none the walk's listing (`listed`) didn't find, so a station new to the store
  * costs no read. Backfill walks the years in order and QCs each with the years
  * either side, so the year it read as one year's neighbor is the next it merges
  * into, and the year it just wrote is the next one's context. It holds the
  * year before the last one asked for, on.
  *
  * Nothing here sees another writer's change during the walk. On Actions the
- * `lake-<source>` concurrency group keeps every writer of a source's files to
+ * `store-<source>` concurrency group keeps every writer of a source's files to
  * one job at a time; a local run must not overlap another that writes the
  * same source, which would race a read-then-write without the cache too.
  */
@@ -441,7 +441,7 @@ export function readerOf(product: Product) {
  */
 export async function backfillYear(
   source: Source,
-  station: LakeStation,
+  station: StoredStation,
   product: Product,
   from: Date,
   to: Date,

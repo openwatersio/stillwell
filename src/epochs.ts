@@ -90,7 +90,7 @@ export interface EpochOptions {
   decisions: Record<string, EpochDecision>;
   /** Splits, by station (`Overrides.splits`). */
   splits?: Record<string, EpochSplit[]>;
-  /** The lowest `id` a new epoch may take, above any epoch directory in the lake. */
+  /** The lowest `id` a new epoch may take, above any epoch directory in the store. */
   nextId?: number;
   /**
    * The source's `archive`: `current` gives a first epoch no start, since its

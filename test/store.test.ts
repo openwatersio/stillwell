@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
-import { mergeFetched, mergeRange, sameRows } from "../src/lake/merge.ts";
+import { mergeFetched, mergeRange, sameRows } from "../src/store/merge.ts";
 import {
   readDatums,
   readExtremes,
@@ -18,12 +19,12 @@ import {
   readStationList,
   writeStationList,
   writeStations,
-} from "../src/lake/parquet.ts";
-import { seriesPath } from "../src/lake/paths.ts";
+} from "../src/store/parquet.ts";
+import { seriesPath } from "../src/store/paths.ts";
 import { qc, withSourceFlag } from "../src/qc.ts";
-import { Flag, type LakeStation, type Observation, type Station } from "../src/schema.ts";
+import { Flag, type StoredStation, type Observation, type Station } from "../src/schema.ts";
 
-const root = mkdtempSync(join(tmpdir(), "water-levels-test-"));
+const root = mkdtempSync(join(tmpdir(), "stillwell-test-"));
 
 const epoch = {
   id: 1,
@@ -66,7 +67,7 @@ const listed: Station = {
 const T = Date.UTC(2026, 0, 1);
 const MIN = 60_000;
 
-describe("lake files", () => {
+describe("store files", () => {
   it("round-trips observations, with and without arrival times", async () => {
     const rows: Observation[] = [
       { time: T + 10 * MIN, level: 1.234, flag: Flag.preliminary, received: T + 12 * MIN },
@@ -179,7 +180,7 @@ describe("lake files", () => {
   });
 
   it("writes stations with datums, products, links and epochs", async () => {
-    const station: LakeStation = {
+    const station: StoredStation = {
       id: "test:1",
       source: "test",
       source_id: "1",
@@ -227,7 +228,7 @@ describe("lake files", () => {
           datums: { NGVD29: 1.2 },
         },
       ],
-    } as LakeStation;
+    } as StoredStation;
     await writeStationList(path, [station]);
     assert.deepEqual(await readStationList(path), [station]);
   });
@@ -242,7 +243,7 @@ describe("lake files", () => {
     };
     const none = { ...asked, id: "test:2", source_qc_start: null, source_qc_start_inferred: null };
     const unasked = { ...listed, id: "test:3", epochs: [epoch] };
-    await writeStationList(path, [asked, none, unasked] as LakeStation[]);
+    await writeStationList(path, [asked, none, unasked] as StoredStation[]);
     const read = await readStationList(path);
     assert.deepEqual(
       read!.map((s) => ["source_qc_start" in s, s.source_qc_start, s.source_qc_start_inferred]),
@@ -254,7 +255,7 @@ describe("lake files", () => {
     );
   });
 
-  it("reads back the first and last the lake filled in, and an unknown preliminary from a file without one", async () => {
+  it("reads back the first and last the store filled in, and an unknown preliminary from a file without one", async () => {
     const path = join(root, "bounds/stations.parquet");
     assert.deepEqual(await readStationBounds(path), new Map());
     const station = {
@@ -264,7 +265,7 @@ describe("lake files", () => {
       first: "2001-02-03T04:05:06Z",
       last: null,
       epochs: [],
-    } as unknown as LakeStation;
+    } as unknown as StoredStation;
     await writeStations(path, [station, { ...station, id: "test:2", first: null }]);
     assert.deepEqual(
       await readStationBounds(path),
@@ -474,4 +475,25 @@ describe("mergeFetched", () => {
       [1.1, 2, 3.3],
     );
   });
+});
+
+describe("the store's environment", () => {
+  for (const [old, now] of [
+    ["WATER_LEVELS_LAKE", "STILLWELL_STORE"],
+    ["WATER_LEVELS_RESTRICTED_LAKE", "STILLWELL_RESTRICTED_STORE"],
+    ["WATER_LEVELS_CACHE", "STILLWELL_CACHE"],
+  ]) {
+    it(`refuses ${old}, now ${now}`, () => {
+      const run = spawnSync(
+        process.execPath,
+        ["--input-type=module", "-e", 'await import("./src/store/parquet.ts")'],
+        {
+          env: { ...process.env, [old]: "x" },
+          encoding: "utf8",
+        },
+      );
+      assert.notEqual(run.status, 0);
+      assert.match(run.stderr, new RegExp(`${old} is set; it's now ${now}`));
+    });
+  }
 });

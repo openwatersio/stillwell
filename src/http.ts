@@ -2,7 +2,7 @@
  * HTTP for adapters. Plain `fetch` with retries, so it runs in Node and in a
  * Worker. Scripts swap in the disk cache from `src/cache.ts` with `setTransport`.
  */
-const USER_AGENT = "openwaters-water-levels (+https://github.com/openwatersio/water-levels)";
+const USER_AGENT = "openwaters-stillwell (+https://github.com/openwatersio/stillwell)";
 
 export interface RequestOptions extends RequestInit {
   /** Skip any cache, e.g. for real-time series that change every fetch. */

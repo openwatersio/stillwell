@@ -146,7 +146,7 @@ async function datums(id: string): Promise<Record<string, number>> {
 
 /**
  * A CO-OPS station as listed, with the dates it was established and removed, so
- * a backfill can skip years it wasn't there. They're kept in the lake's list
+ * a backfill can skip years it wasn't there. They're kept in the store's list
  * only; `stations.parquet` doesn't carry them.
  */
 export type CoopsStation = ListedStation & { established: string | null; removed: string | null };
@@ -268,7 +268,7 @@ export async function levels(
     const firstSixMinute = first ? timeOf(first.t) : to.getTime();
     // Hourly heights fill in only what the 6-minute record doesn't reach.
     // Only before the 6-minute era: later, a month with no 6-minute values is
-    // an outage or a gap, and hourly heights would replace the lake's 6-minute
+    // an outage or a gap, and hourly heights would replace the store's 6-minute
     // values for that month.
     const hourly =
       from.getTime() < SIX_MINUTE_ERA && firstSixMinute > from.getTime()
@@ -365,7 +365,7 @@ async function rowsOf(product: string, id: string, from: Date, to: Date): Promis
 }
 
 // When the station operated, so a backfill doesn't ask for decades it wasn't
-// there: from the lake's list when it has the dates, else from the
+// there: from the store's list when it has the dates, else from the
 // station's details. A live station's last month needs neither.
 const windows = new Map<string, Promise<[number, number]>>();
 

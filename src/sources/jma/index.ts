@@ -31,7 +31,7 @@ export const metadata: SourceMetadata = {
   attribution: "Japan Meteorological Agency",
   contact: { url: "https://ds.data.jma.go.jp/homepage.php/index.php" },
   terms:
-    "JMA's website content is under the Public Data License 1.0, compatible with CC BY 4.0, commercial use included. Credit the source as 出典：気象庁ホームページ (Source: Japan Meteorological Agency website) with the page's URL, and say the data was edited. Changes in the lake: times converted from JST to UTC, levels from centimeters to meters, and quality flags added; the current and previous month's provisional values are marked preliminary.",
+    "JMA's website content is under the Public Data License 1.0, compatible with CC BY 4.0, commercial use included. Credit the source as 出典：気象庁ホームページ (Source: Japan Meteorological Agency website) with the page's URL, and say the data was edited. Changes in the store: times converted from JST to UTC, levels from centimeters to meters, and quality flags added; the current and previous month's provisional values are marked preliminary.",
   // The historical files are shifted to each station's current observation datum.
   archive: "current",
   // Provisional values appear around noon the next day, too late for hourly ingest.
@@ -202,7 +202,7 @@ function monthStart(text: string, after = 0): number | null {
 /**
  * Every station in JMA's historical list, with its first and last months, and
  * any the current list adds. The current list gives open stations' positions;
- * a closed one's comes from `CLOSED`, or the lake's list.
+ * a closed one's comes from `CLOSED`, or the store's list.
  */
 export async function stations(previous: Station[] = []): Promise<JmaStation[]> {
   const [history, current] = await Promise.all([
@@ -303,7 +303,7 @@ export async function levels(
   }
   // A UTC month's last 9 hours come from the next JST month's file. Where its
   // own JST month brought nothing, or wasn't read, they'd count alone as a
-  // fetch of the month, and a merge would replace what the lake holds for it
+  // fetch of the month, and a merge would replace what the store holds for it
   // with them, so they're dropped.
   return out.filter((o) => {
     const d = new Date(o.time);

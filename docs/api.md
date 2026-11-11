@@ -13,9 +13,9 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
   - `station`: the source's own reference, unconverted. A source's datum keeps the source's name and isn't assumed to be the tides API's datum of the same name: RWS's offshore platforms report against RWS's own MSL, so `datum=MSL` there converts through the station's offsets like anywhere else, and is a 400 until one is known, while `datum=station` returns RWS's MSL as is.
   - A datum the station has no offset for is a 400 error, never a silent fallback.
 - **Flags** on every value: `good`, `preliminary`, `suspect`, `bad`, `interpolated`. Real-time values are `preliminary` until the source verifies them. `bad` values are left out unless `includeBad=true`.
-- **Licenses.** Until tokens exist, only stations whose terms allow commercial use (`commercial_use`) are served; the public lake also holds stations that don't. The API's terms cover access to the service. The data is CC BY 4.0, as in the [README](../README.md#license), except `commercial_use` false stations, which keep their contributor's terms. Each station carries its source's license, which still applies alongside CC BY, and every response that returns data lists the attribution lines its stations require. Displaying them is a condition of use.
+- **Licenses.** Until tokens exist, only stations whose terms allow commercial use (`commercial_use`) are served; the public store also holds stations that don't. The API's terms cover access to the service. The data is CC BY 4.0, as in the [README](../README.md#license), except `commercial_use` false stations, which keep their contributor's terms. Each station carries its source's license, which still applies alongside CC BY, and every response that returns data lists the attribution lines its stations require. Displaying them is a condition of use.
 - **Not for navigation.** Every data response includes `notice`. Observations are preliminary, and a gauge can fail without warning.
-- **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/water-levels](https://github.com/openwatersio/water-levels).
+- **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
 - **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the source is unavailable and nothing is cached.
@@ -92,11 +92,11 @@ One station in full: the fields above plus
 }
 ```
 
-`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The lake stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when those offsets are measured against the gauge zero, and `unknown` when tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends.
+`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when those offsets are measured against the gauge zero, and `unknown` when tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends.
 
 `same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](data.md#stations)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
 
-`errata` names the errors found in what the source publishes for the station, each an entry in the source's [`errata.json`](https://github.com/openwatersio/water-levels/tree/main/src/sources), such as a clock the lake corrects or a span it flags.
+`errata` names the errors found in what the source publishes for the station, each an entry in the source's [`errata.json`](https://github.com/openwatersio/stillwell/tree/main/src/sources), such as a clock the store corrects or a span it flags.
 
 ### `GET /water-levels/stations/{source}/{id}/live`
 
@@ -186,7 +186,7 @@ The best estimate of the water level at a point and time, for places without a g
 
 ## Bulk data
 
-Everything the API serves, as Parquet, at `https://water-levels.openwaters.io/`, readable without an account:
+Everything the API serves, as Parquet, at `https://stillwell.openwaters.io/`, readable without an account:
 
 ```
 stations.parquet
@@ -206,13 +206,13 @@ Levels in these files are in the datum of the station's epoch they belong to; `s
 
 ```sql
 SELECT time, level_m
-FROM 'https://water-levels.openwaters.io/obs/coops/9447130/2025.parquet'
+FROM 'https://stillwell.openwaters.io/obs/coops/9447130/2025.parquet'
 WHERE flag <= 2; -- good, interpolated and preliminary
 ```
 
 ## Not in the API
 
-- Stations with `commercial_use` false, such as the UHSLC gauges whose contributors bar commercial use, until tokens and plans exist; then non-commercial users get them. They're in the public lake already.
-- Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private lake for research and for fitting tide-database constants where the operator agrees.
+- Stations with `commercial_use` false, such as the UHSLC gauges whose contributors bar commercial use, until tokens and plans exist; then non-commercial users get them. They're in the public store already.
+- Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private store for research and for fitting tide-database constants where the operator agrees.
 - CHS data in any form. Its license bars third-party transfer and commercial derivatives; Slackwater fetches it on the device.
 - Data from vessels. See [plan.md](plan.md#out-of-scope).

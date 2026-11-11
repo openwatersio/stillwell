@@ -13,7 +13,7 @@ import {
   writeObservations,
   writeRecent,
   writeStationBounds,
-} from "../src/lake/parquet.ts";
+} from "../src/store/parquet.ts";
 import {
   boundsPath,
   analysisHistoryPath,
@@ -22,7 +22,7 @@ import {
   seriesPath,
   stationListPath,
   stationsPath,
-} from "../src/lake/paths.ts";
+} from "../src/store/paths.ts";
 import {
   AfterWrite,
   describeReport,
@@ -35,7 +35,7 @@ import {
   startedListOf,
 } from "../src/refresh.ts";
 import type { Erratum } from "../src/errata.ts";
-import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/lake/analysis.ts";
+import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/store/analysis.ts";
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
@@ -111,20 +111,20 @@ const LATER = "2026-12-05T00:00:00Z";
 const HOUR = 3_600_000;
 const T = Date.UTC(2026, 10, 1);
 
-let lake: string;
+let store: string;
 beforeEach(async () => {
-  lake = await mkdtemp(join(tmpdir(), "lake-"));
+  store = await mkdtemp(join(tmpdir(), "store-"));
 });
-afterEach(() => rm(lake, { recursive: true }));
+afterEach(() => rm(store, { recursive: true }));
 
 describe("refreshSource with withheld stations", () => {
   it("drops them from the list, its snapshot, bounds and recent window, without tripping the shrink guard", async () => {
     // 20 active stations, 12 of them withheld: the 8 left would be a sharp shrink.
     const codes = Array.from({ length: 20 }, (_, i) => (i < 12 ? `x${i}` : `k${i}`));
     const all = codes.map((c) => listed("test", c));
-    await refreshSource(lake, sourceOf(all), { now: NOW });
+    await refreshSource(store, sourceOf(all), { now: NOW });
     await writeStationBounds(
-      boundsPath(lake, "test"),
+      boundsPath(store, "test"),
       ["test/x0", "test/k12"].map((id) => ({
         id,
         first: "2001-01-01T00:00:00Z",
@@ -133,7 +133,7 @@ describe("refreshSource with withheld stations", () => {
         screened: true,
       })),
     );
-    await writeRecent(recentPath(lake, "test"), [
+    await writeRecent(recentPath(store, "test"), [
       ["test/x0", "test/k12"].map((station) => ({
         station,
         epoch: 1,
@@ -142,7 +142,7 @@ describe("refreshSource with withheld stations", () => {
         flag: Flag.preliminary,
       })),
     ]);
-    await writeJsonArray(emptyYearsPath(lake, "test"), [
+    await writeJsonArray(emptyYearsPath(store, "test"), [
       { key: "test/x0 levels 1 1990", seen: NOW },
       { key: "test/k12 levels 1 1990", seen: NOW },
     ]);
@@ -157,8 +157,8 @@ describe("refreshSource with withheld stations", () => {
       drains: 0,
       requalified: null,
     });
-    await writeAnalysis(lake, "test", [verdict("test/k12"), verdict("test/x0")]);
-    const history = analysisHistoryPath(lake, "test", NOW);
+    await writeAnalysis(store, "test", [verdict("test/k12"), verdict("test/x0")]);
+    const history = analysisHistoryPath(store, "test", NOW);
     await writeJsonArray(history, [
       {
         rules: RULES,
@@ -171,12 +171,12 @@ describe("refreshSource with withheld stations", () => {
     const kept = all.filter((s) => !refused(s.source_id));
     // Twelve is more than the guard allows of 20 without --accept-withheld.
     await assert.rejects(
-      refreshSource(lake, sourceOf(kept, refused), { now: LATER }),
+      refreshSource(store, sourceOf(kept, refused), { now: LATER }),
       (error: Error) =>
         error instanceof Refused &&
         /12 of the 20 test stations .* --accept-withheld/.test(error.message),
     );
-    const { stations, report } = await refreshSource(lake, sourceOf(kept, refused), {
+    const { stations, report } = await refreshSource(store, sourceOf(kept, refused), {
       now: LATER,
       acceptWithheld: true,
     });
@@ -193,30 +193,33 @@ describe("refreshSource with withheld stations", () => {
     );
     assert.deepEqual([report.retired, report.withdrawn], [[], []]);
     // The snapshot of the list it read leaves them out too.
-    const [snapshot] = (await readdir(join(lake, "history/stations/test")))
+    const [snapshot] = (await readdir(join(store, "history/stations/test")))
       .filter((f) => f.endsWith(".parquet"))
       .sort()
       .slice(-1);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const snapshotIds = (
-      await db.runAndReadAll(`SELECT id FROM '${join(lake, "history/stations/test", snapshot!)}'`)
+      await db.runAndReadAll(`SELECT id FROM '${join(store, "history/stations/test", snapshot!)}'`)
     )
       .getRowObjectsJson()
       .map((r) => r.id);
     assert.equal(snapshotIds.length, 8);
-    assert.deepEqual([...(await readStationBounds(boundsPath(lake, "test"))).keys()], ["test/k12"]);
     assert.deepEqual(
-      (await readRecent(recentPath(lake, "test"))).map((r) => r.station),
+      [...(await readStationBounds(boundsPath(store, "test"))).keys()],
       ["test/k12"],
     );
     assert.deepEqual(
-      JSON.parse(await readFile(emptyYearsPath(lake, "test"), "utf8")).map(
+      (await readRecent(recentPath(store, "test"))).map((r) => r.station),
+      ["test/k12"],
+    );
+    assert.deepEqual(
+      JSON.parse(await readFile(emptyYearsPath(store, "test"), "utf8")).map(
         (r: { key: string }) => r.key,
       ),
       ["test/k12 levels 1 1990"],
     );
     // Its analysis, and the history of it, which carry the station's measures.
-    assert.deepEqual([...(await readAnalysis(lake, "test")).keys()], ["test/k12"]);
+    assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k12"]);
     assert.deepEqual(
       JSON.parse(await readFile(history, "utf8"))[0].changed.map((c: { id: string }) => c.id),
       ["test/k12"],
@@ -230,18 +233,18 @@ describe("refreshSource with withheld stations", () => {
     assert.equal(tooManyWithheld("test", 14, 743), null);
     assert.match(tooManyWithheld("test", 15, 743) ?? "", /more than 14/);
     const all = Array.from({ length: 20 }, (_, i) => listed("test", i < 5 ? `x${i}` : `k${i}`));
-    await refreshSource(lake, sourceOf(all), { now: NOW });
+    await refreshSource(store, sourceOf(all), { now: NOW });
     const refused = (code: string) => code.startsWith("x");
-    const { report } = await refreshSource(lake, sourceOf(all.slice(5), refused), { now: LATER });
+    const { report } = await refreshSource(store, sourceOf(all.slice(5), refused), { now: LATER });
     assert.equal(report.removed.length, 5);
   });
 
   it("still refuses a sharp shrink among the stations it keeps", async () => {
     const all = Array.from({ length: 40 }, (_, i) => listed("test", i < 2 ? `x${i}` : `k${i}`));
-    await refreshSource(lake, sourceOf(all), { now: NOW });
+    await refreshSource(store, sourceOf(all), { now: NOW });
     const refused = (code: string) => code.startsWith("x");
     await assert.rejects(
-      refreshSource(lake, sourceOf(all.slice(2, 12), refused), { now: LATER }),
+      refreshSource(store, sourceOf(all.slice(2, 12), refused), { now: LATER }),
       (error: Error) =>
         error instanceof Refused && /lists 10 stations, down from 38/.test(error.message),
     );
@@ -261,30 +264,30 @@ describe("refreshSource with withheld stations", () => {
   });
 
   it("keeps withheld stations from the readers of a list it hasn't refreshed yet", async () => {
-    await refreshSource(lake, sourceOf([listed("test", "x"), listed("test", "k")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("test", "x"), listed("test", "k")]), { now: NOW });
     const source = sourceOf([], (code) => code === "x");
     assert.deepEqual(
-      (await listOf(lake, source)).map((s) => s.id),
+      (await listOf(store, source)).map((s) => s.id),
       ["test/k"],
     );
     assert.deepEqual(
-      (await startedListOf(lake, source))!.map((s) => s.id),
+      (await startedListOf(store, source))!.map((s) => s.id),
       ["test/k"],
     );
   });
 
   it("says the new list is written when dropping withheld rows fails after it", async () => {
-    await refreshSource(lake, sourceOf([listed("test", "x"), listed("test", "k")]), { now: NOW });
-    await writeStationBounds(boundsPath(lake, "test"), [
+    await refreshSource(store, sourceOf([listed("test", "x"), listed("test", "k")]), { now: NOW });
+    await writeStationBounds(boundsPath(store, "test"), [
       { id: "test/x", first: "2000-01-01T00:00:00Z", last: "2000-01-01T00:00:00Z" },
     ]);
     // The bounds read, but can't be written back without x's row.
-    const dir = join(lake, "stations/bounds");
+    const dir = join(store, "stations/bounds");
     await chmod(dir, 0o555);
     try {
       await assert.rejects(
         refreshSource(
-          lake,
+          store,
           sourceOf([listed("test", "k")], (code) => code === "x"),
           { now: LATER },
         ),
@@ -298,7 +301,7 @@ describe("refreshSource with withheld stations", () => {
       await chmod(dir, 0o755);
     }
     assert.deepEqual(
-      (await readStationList(stationListPath(lake, "test")))!.map((s) => s.id),
+      (await readStationList(stationListPath(store, "test")))!.map((s) => s.id),
       ["test/k"],
     );
   });
@@ -306,7 +309,7 @@ describe("refreshSource with withheld stations", () => {
   it("leaves out a withheld station the source still lists", async () => {
     const refused = (code: string) => code === "x";
     const { stations } = await refreshSource(
-      lake,
+      store,
       sourceOf([listed("test", "x"), listed("test", "k")], refused),
       { now: NOW },
     );
@@ -329,10 +332,10 @@ describe("publishStations with withheld stations", () => {
     ["walvis_bay-220a-nam-uhslc_rq", walvis, "UHSLC_RQ"],
   ] as const;
 
-  /** Lists as the lake holds them before a refresh with the rule: every record present. */
+  /** Lists as the store holds them before a refresh with the rule: every record present. */
   async function seed(): Promise<void> {
     await refreshSource(
-      lake,
+      store,
       sourceOf(
         [
           listed("uhslc", "220", {
@@ -348,7 +351,7 @@ describe("publishStations with withheld stations", () => {
       { now: NOW },
     );
     await refreshSource(
-      lake,
+      store,
       sourceOf(
         geslaRecords.map(([file, at, contributor]) =>
           listed("gesla", file, {
@@ -372,17 +375,17 @@ describe("publishStations with withheld stations", () => {
   async function published(): Promise<Record<string, unknown>[]> {
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     return (
-      await db.runAndReadAll(`SELECT id, same_as FROM '${stationsPath(lake)}' ORDER BY id`)
+      await db.runAndReadAll(`SELECT id, same_as FROM '${stationsPath(store)}' ORDER BY id`)
     ).getRowObjectsJson();
   }
 
   it("leaves SANHO's records out of stations.parquet, Walvis Bay's and Lüderitz's alike", async () => {
     await seed();
-    const result = await publishStations(lake, [gesla.source, uhslc.source], [], []);
+    const result = await publishStations(store, [gesla.source, uhslc.source], [], []);
     assert.ok("count" in result);
     // Every Walvis Bay and Lüderitz series is SANHO's, UHSLC's own included.
     assert.deepEqual(await published(), [{ id: "uhslc/001", same_as: [] }]);
-    // LINKS names stations this lake doesn't hold; none of SANHO's may be dropped as missing.
+    // LINKS names stations this store doesn't hold; none of SANHO's may be dropped as missing.
     const sanho = /walvis|luderitz|-zaf-|^uhslc\/(220|702)/;
     assert.deepEqual(
       result.links.dropped.filter((d) => sanho.test(d.from) || sanho.test(d.to)),
@@ -405,7 +408,7 @@ describe("publishStations with withheld stations", () => {
       reported: null,
       report: null,
     };
-    const result = await publishStations(lake, [gesla.source, uhslc.source], [], [erratum]);
+    const result = await publishStations(store, [gesla.source, uhslc.source], [], [erratum]);
     assert.deepEqual("count" in result && result.unknownErrata, [
       "gesla-uhslc-positions gesla/nowhere-999-xxx-uhslc_fd",
     ]);
@@ -414,13 +417,13 @@ describe("publishStations with withheld stations", () => {
   it("drops them from the lists at the next refresh", async () => {
     await seed();
     const { report } = await refreshSource(
-      lake,
+      store,
       { ...uhslc.source, stations: async () => [listed("uhslc", "001", pohnpei)] },
       { now: LATER },
     );
     assert.deepEqual(report.removed, ["uhslc/220", "uhslc/702"]);
     assert.deepEqual(
-      (await readStationList(stationListPath(lake, "uhslc")))!.map((s) => s.id),
+      (await readStationList(stationListPath(store, "uhslc")))!.map((s) => s.id),
       ["uhslc/001"],
     );
   });
@@ -431,7 +434,7 @@ describe("withhold", () => {
 
   async function file(code: string, product: "levels" | "predictions", year: number, epoch = 1) {
     await writeObservations(
-      seriesPath(lake, product, "test", code, year, epoch),
+      seriesPath(store, product, "test", code, year, epoch),
       [{ time: Date.UTC(year, 0, 1), level: 1, flag: Flag.good }],
       "ZERO",
     );
@@ -439,16 +442,16 @@ describe("withhold", () => {
 
   it("deletes exactly the withheld stations' directories, found through the list's history and the files", async () => {
     const all = ["x1", "x2", "k", "x1k"].map((c) => listed("test", c));
-    await refreshSource(lake, sourceOf(all), { now: NOW });
+    await refreshSource(store, sourceOf(all), { now: NOW });
     // The list as the next refresh reads it goes to history, with x1k, which has no files.
-    await refreshSource(lake, sourceOf(all), { now: "2026-11-20T00:00:00Z" });
+    await refreshSource(store, sourceOf(all), { now: "2026-11-20T00:00:00Z" });
     await file("x1", "levels", 2000);
     await file("x1", "levels", 2001, 2);
     await file("x1", "predictions", 2000);
     await file("k", "levels", 2000);
     // An ID that only starts like a withheld one isn't another's directory.
     await file("kx1", "levels", 2000);
-    await writeStationBounds(boundsPath(lake, "test"), [
+    await writeStationBounds(boundsPath(store, "test"), [
       { id: "test/x1", first: "2000-01-01T00:00:00Z", last: "2001-01-01T00:00:00Z" },
       { id: "test/k", first: "2000-01-01T00:00:00Z", last: "2000-01-01T00:00:00Z" },
     ]);
@@ -457,7 +460,7 @@ describe("withhold", () => {
       all.filter((s) => !refused(s.source_id)),
       refused,
     );
-    const { report } = await refreshSource(lake, source, { now: LATER });
+    const { report } = await refreshSource(store, source, { now: LATER });
     // x1's files are still there, so the report says to run `withhold`.
     assert.deepEqual(report.unwithheld, ["test/x1"]);
     assert.match(describeReport(report).join("\n"), /run `ingest withhold test`/);
@@ -465,16 +468,16 @@ describe("withhold", () => {
     assert.equal(needsPerson(report), true);
     assert.equal(needsPerson({ ...report, unwithheld: [] }), false);
     const [stored] = JSON.parse(
-      await readFile(join(lake, "history/stations/test/2026-12-05T000000Z.json"), "utf8"),
+      await readFile(join(store, "history/stations/test/2026-12-05T000000Z.json"), "utf8"),
     );
     assert.deepEqual(stored.unwithheld, ["test/x1"]);
     // A later refresh, with nothing left to remove, still asks.
-    const again = await refreshSource(lake, source, { now: "2026-12-20T00:00:00Z" });
+    const again = await refreshSource(store, source, { now: "2026-12-20T00:00:00Z" });
     assert.deepEqual([again.report.removed, again.report.unwithheld], [[], ["test/x1"]]);
     await file("x2", "levels", 2000);
 
     const removed: string[][] = [];
-    const result = await withhold(lake, source, {
+    const result = await withhold(store, source, {
       remove: async (root, prefixes) => {
         removed.push(prefixes);
         await removePrefixes(root, prefixes);
@@ -485,43 +488,43 @@ describe("withhold", () => {
       removed[0],
       ["x1", "x1k", "x2"].flatMap((c) =>
         ["obs", "extremes", "predictions", "predicted-extremes"].map(
-          (d) => `${lake}/${d}/test/${c}/`,
+          (d) => `${store}/${d}/test/${c}/`,
         ),
       ),
     );
     for (const dir of ["obs/test/x1", "obs/test/x2", "predictions/test/x1"])
-      assert.equal(existsSync(join(lake, dir)), false, dir);
+      assert.equal(existsSync(join(store, dir)), false, dir);
     for (const dir of ["obs/test/k/2000.parquet", "obs/test/kx1/2000.parquet"])
-      assert.equal(existsSync(join(lake, dir)), true, dir);
-    assert.deepEqual([...(await readStationBounds(boundsPath(lake, "test"))).keys()], ["test/k"]);
+      assert.equal(existsSync(join(store, dir)), true, dir);
+    assert.deepEqual([...(await readStationBounds(boundsPath(store, "test"))).keys()], ["test/k"]);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {
     const all = Array.from({ length: 10 }, (_, i) => listed("test", `x${i}`));
-    await refreshSource(lake, sourceOf(all), { now: NOW });
+    await refreshSource(store, sourceOf(all), { now: NOW });
     const remove = async () => {
       removed++;
     };
     let removed = 0;
     await assert.rejects(
-      withhold(lake, sourceOf([], refused), { remove }),
-      /10 of the 10 test stations the lake has known are withheld, more than 5/,
+      withhold(store, sourceOf([], refused), { remove }),
+      /10 of the 10 test stations the store has known are withheld, more than 5/,
     );
     assert.equal(removed, 0);
     // A person who checked the rule lets it through.
-    await withhold(lake, sourceOf([], refused), { remove, accept: true });
+    await withhold(store, sourceOf([], refused), { remove, accept: true });
     assert.equal(removed, 1);
   });
 
-  it("refuses a lake it can't delete from, rather than report success", async () => {
+  it("refuses a store it can't delete from, rather than report success", async () => {
     const source = sourceOf([], refused);
     await assert.rejects(
-      withhold("https://water-levels.openwaters.io", source, { remove: async () => {} }),
+      withhold("https://stillwell.openwaters.io", source, { remove: async () => {} }),
       /Can't delete files from https:/,
     );
     await assert.rejects(
-      removePrefixes("https://water-levels.openwaters.io", [
-        "https://water-levels.openwaters.io/obs/test/x/",
+      removePrefixes("https://stillwell.openwaters.io", [
+        "https://stillwell.openwaters.io/obs/test/x/",
       ]),
       /Can't delete files from https:/,
     );
@@ -529,8 +532,8 @@ describe("withhold", () => {
 
   it("refuses an ID that would name more than one station's directory", () => {
     for (const id of ["", " ", ".", "..", "a*"])
-      assert.throws(() => seriesPrefixes(lake, "test", [id]), /Refusing to delete/);
-    assert.throws(() => seriesPrefixes(lake, "", ["a"]), /Not a source ID/);
+      assert.throws(() => seriesPrefixes(store, "test", [id]), /Refusing to delete/);
+    assert.throws(() => seriesPrefixes(store, "", ["a"]), /Not a source ID/);
     // A slash is encoded, so the ID stays one directory.
     assert.deepEqual(
       seriesPrefixes("s3://water-levels", "test", ["a/b"])[0],
@@ -538,7 +541,7 @@ describe("withhold", () => {
     );
   });
 
-  it("deletes an s3:// directory with the AWS CLI on the lake's endpoint", () => {
+  it("deletes an s3:// directory with the AWS CLI on the store's endpoint", () => {
     assert.deepEqual(
       awsRemoveArgs("s3://water-levels/obs/gesla/durban-181-zaf-uhslc_fd/", "https://r2.example"),
       [

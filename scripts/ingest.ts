@@ -1,5 +1,5 @@
 /**
- * Fetch from upstream sources into the lake.
+ * Fetch from upstream sources into the store.
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
@@ -12,7 +12,7 @@
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
- * `stations` refreshes each source's list in the lake, stations/<source>.parquet,
+ * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
  * sources.json and errata.json, unless `--no-publish`; `publish` writes only those. It
  * changes no file in the repo. A new source's first refresh starts its list.
@@ -39,19 +39,19 @@
  * the last `--days` whole UTC days of that window into each station's year
  * files, each row into its datum epoch's, then writes each station's first and
  * last level to stations/bounds/<source>.parquet (`updateBounds` in
- * src/lake/recent.ts); `--rebuild-bounds` reads every station's again rather
+ * src/store/recent.ts); `--rebuild-bounds` reads every station's again rather
  * than keep the ones it knows. Both print a summary, and add it to
  * the workflow run's page. `requalify` works the flags of stations' observed
- * levels out again over the years [start, end) from the lake alone (src/lake/requalify.ts),
+ * levels out again over the years [start, end) from the store alone (src/store/requalify.ts),
  * so a QC rule change reaches stored values without fetching them again.
  * `withhold` deletes the files of a source's withheld stations, whose owner
  * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
- * which backfill, compaction and requalify then keep (src/lake/years.ts).
+ * which backfill, compaction and requalify then keep (src/store/years.ts).
  * `analyze` judges the source's stations that are due from their levels in the
- * lake, such as whether they carry a tide, into stations/analysis/<source>.parquet
- * (src/lake/analysis.ts), `--all` every station, and lists the stations whose
+ * store, such as whether they carry a tide, into stations/analysis/<source>.parquet
+ * (src/store/analysis.ts), `--all` every station, and lists the stations whose
  * QC that changes; `--requalify` requalifies them, and every station after its
  * first verdict, over every year, starting batches for `--budget` minutes.
  *
@@ -63,10 +63,10 @@
  * stations; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
  *
- * The lake is WATER_LEVELS_LAKE: a directory (default `data`) or an `s3://` URL.
+ * The store is STILLWELL_STORE: a directory (default `data`) or an `s3://` URL.
  * Its bucket is public, so a source whose terms bar republishing its data keeps
- * its list and series in WATER_LEVELS_RESTRICTED_LAKE instead, which must be a
- * separate lake, and ingest refuses to write one without it. Commercial use is
+ * its list and series in STILLWELL_RESTRICTED_STORE instead, which must be a
+ * separate store, and ingest refuses to write one without it. Commercial use is
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
 import { resolve } from "node:path";
@@ -99,7 +99,7 @@ import {
   updateRecent,
   writePreliminary,
   type RunSummary,
-} from "../src/lake/recent.ts";
+} from "../src/store/recent.ts";
 import { appendFile, readFile } from "node:fs/promises";
 import { isHeld, splitStarts } from "../src/epochs.ts";
 import {
@@ -108,11 +108,11 @@ import {
   setConnections,
   publishedSources,
   type YearStats,
-} from "../src/lake/parquet.ts";
-import { commitYears, markYears, reconcileYears } from "../src/lake/years.ts";
-import { requalify } from "../src/lake/requalify.ts";
-import { analyze, markRequalified, pending, readAnalysis } from "../src/lake/analysis.ts";
-import { boundsPath, seriesDir, stationsPath, yearsPath } from "../src/lake/paths.ts";
+} from "../src/store/parquet.ts";
+import { commitYears, markYears, reconcileYears } from "../src/store/years.ts";
+import { requalify } from "../src/store/requalify.ts";
+import { analyze, markRequalified, pending, readAnalysis } from "../src/store/analysis.ts";
+import { boundsPath, seriesDir, stationsPath, yearsPath } from "../src/store/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -125,7 +125,7 @@ import {
   needsPerson,
 } from "../src/refresh.ts";
 import type {
-  LakeStation,
+  StoredStation,
   Observation,
   PublishedExtreme,
   Source,
@@ -135,29 +135,29 @@ import type {
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
 
-const LAKE = (process.env.WATER_LEVELS_LAKE ?? "data").replace(/\/$/, "");
+const STORE = (process.env.STILLWELL_STORE ?? "data").replace(/\/$/, "");
 
-/** Where a station's series go: its source's lake. */
-function lakeFor(station: Pick<Station, "source">): string {
-  return lakeOfSource(sourceOf(station.source).metadata);
+/** Where a station's series go: its source's store. */
+function storeFor(station: Pick<Station, "source">): string {
+  return storeOfSource(sourceOf(station.source).metadata);
 }
 
-/** The public lake, or the private one for a source whose terms bar republishing. */
-function lakeOfSource(metadata: SourceMetadata): string {
-  if (metadata.license.redistribution) return LAKE;
-  const restricted = process.env.WATER_LEVELS_RESTRICTED_LAKE?.replace(/\/$/, "");
+/** The public store, or the private one for a source whose terms bar republishing. */
+function storeOfSource(metadata: SourceMetadata): string {
+  if (metadata.license.redistribution) return STORE;
+  const restricted = process.env.STILLWELL_RESTRICTED_STORE?.replace(/\/$/, "");
   if (!restricted)
     throw new Error(
-      `${metadata.id} bars republishing its data; set WATER_LEVELS_RESTRICTED_LAKE to a private lake`,
+      `${metadata.id} bars republishing its data; set STILLWELL_RESTRICTED_STORE to a private store`,
     );
-  if (overlaps(restricted, LAKE))
-    throw new Error("WATER_LEVELS_RESTRICTED_LAKE must be a separate bucket or directory");
+  if (overlaps(restricted, STORE))
+    throw new Error("STILLWELL_RESTRICTED_STORE must be a separate bucket or directory");
   return restricted;
 }
 
-/** Whether two lakes share a bucket, or one directory holds the other. */
+/** Whether two stores share a bucket, or one directory holds the other. */
 function overlaps(a: string, b: string): boolean {
-  const bucket = (lake: string) => /^s3:\/\/([^/]+)/.exec(lake)?.[1];
+  const bucket = (store: string) => /^s3:\/\/([^/]+)/.exec(store)?.[1];
   if (bucket(a) || bucket(b)) return bucket(a) === bucket(b);
   const [x, y] = [resolve(a), resolve(b)];
   return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
@@ -194,7 +194,7 @@ switch (command) {
     await refreshStations(args.length ? args : Object.keys(sources));
     break;
   case "publish":
-    for (const lake of new Set(Object.values(sources).flatMap(lakesOf))) await publish(lake);
+    for (const store of new Set(Object.values(sources).flatMap(storesOf))) await publish(store);
     break;
   case "backfill": {
     const [source, ids, start, end] = args;
@@ -230,14 +230,14 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     setConnections(positive("concurrency"));
-    const lake = lakeOfSource(sourceOf(source).metadata);
-    const years = await reconcileYears(lake, source, {
+    const store = storeOfSource(sourceOf(source).metadata);
+    const years = await reconcileYears(store, source, {
       start: true,
       rebuild: values["rebuild-years"],
       keep: (id) => withheldReason(sourceOf(source), id) === null,
       concurrency: positive("concurrency"),
     });
-    console.log(`${source}: read ${years!.read} year files into ${yearsPath(lake, source)}`);
+    console.log(`${source}: read ${years!.read} year files into ${yearsPath(store, source)}`);
     for (const file of years!.failed) console.error(`  can't read ${file}`);
     if (years!.failed.length) process.exitCode = 1;
     break;
@@ -254,14 +254,14 @@ switch (command) {
 
 async function refreshStations(ids: string[]): Promise<void> {
   const now = new Date().toISOString().replace(/\.\d+Z$/, "Z");
-  const lakes = new Set<string>();
+  const stores = new Set<string>();
   const summary: string[] = [];
   for (const id of ids) {
     const source = sourceOf(id);
     try {
-      const lake = lakeOfSource(source.metadata);
-      lakes.add(lake);
-      const { stations, report } = await refreshSource(lake, source, {
+      const store = storeOfSource(source.metadata);
+      stores.add(store);
+      const { stations, report } = await refreshSource(store, source, {
         now,
         acceptEpochs: values["accept-epochs"],
         acceptWithheld: values["accept-withheld"],
@@ -283,7 +283,7 @@ async function refreshStations(ids: string[]): Promise<void> {
       const lines =
         error instanceof AfterWrite
           ? [`${id}: ${why}`, ...describeReport(error.report)]
-          : [`${id}: ${why}; keeping the list in the lake`];
+          : [`${id}: ${why}; keeping the list in the store`];
       for (const line of lines) console.error(line);
       summary.push(...lines);
       process.exitCode = 1;
@@ -292,42 +292,42 @@ async function refreshStations(ids: string[]): Promise<void> {
   // The lists are written, so their report is kept even if publishing fails.
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...summary, "```", ""].join("\n"));
-  if (!values["no-publish"]) for (const lake of lakes) await publish(lake);
+  if (!values["no-publish"]) for (const store of stores) await publish(store);
 }
 
-/** The lake a source's list is in, or none for a restricted source with no restricted lake configured. */
-function lakesOf(source: Source): string[] {
+/** The store a source's list is in, or none for a restricted source with no restricted store configured. */
+function storesOf(source: Source): string[] {
   try {
-    return [lakeOfSource(source.metadata)];
+    return [storeOfSource(source.metadata)];
   } catch {
     return [];
   }
 }
 
 /**
- * Rebuild `stations.parquet`, `sources.json` and `errata.json` for `lake`, unless a source
+ * Rebuild `stations.parquet`, `sources.json` and `errata.json` for `store`, unless a source
  * that has had a list there, by the published file or its history, has none.
  */
-async function publish(lake: string): Promise<void> {
-  // A restricted source with no restricted lake configured isn't in this one.
-  const inLake = (metadata: SourceMetadata) => {
+async function publish(store: string): Promise<void> {
+  // A restricted source with no restricted store configured isn't in this one.
+  const inStore = (metadata: SourceMetadata) => {
     try {
-      return lakeOfSource(metadata) === lake;
+      return storeOfSource(metadata) === store;
     } catch {
       return false;
     }
   };
-  const held = Object.values(sources).filter((s) => inLake(s.metadata));
+  const held = Object.values(sources).filter((s) => inStore(s.metadata));
   // A source the published file lists, or that has history, has had a list:
   // publishing without it would drop its stations.
-  const published = new Set(await publishedSources(stationsPath(lake)));
+  const published = new Set(await publishedSources(stationsPath(store)));
   const expected: string[] = [];
   for (const { metadata } of held)
-    if (published.has(metadata.id) || (await hasHistory(lake, metadata.id)))
+    if (published.has(metadata.id) || (await hasHistory(store, metadata.id)))
       expected.push(metadata.id);
-  const result = await publishStations(lake, held, expected, errata);
+  const result = await publishStations(store, held, expected, errata);
   if ("count" in result) {
-    console.log(`${stationsPath(lake)}: ${result.count} stations`);
+    console.log(`${stationsPath(store)}: ${result.count} stations`);
     const { pairs, dropped, skipped, large } = result.links;
     for (const [pair, counts] of Object.entries(pairs).sort())
       console.log(
@@ -340,7 +340,7 @@ async function publish(lake: string): Promise<void> {
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     for (const e of result.unknownErrata)
-      console.error(`  erratum lists a station not in the lake: ${e}`);
+      console.error(`  erratum lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
     // A typo in an erratum's stations tags nothing, and a bad errata file leaves
     // its errata out, so fail the run to say so, after publishing: holding back
@@ -348,7 +348,7 @@ async function publish(lake: string): Promise<void> {
     if (result.unknownErrata.length || errataProblems.length) process.exitCode = 1;
   } else {
     console.error(
-      `${stationsPath(lake)} not written: no list in the lake for ${result.missing.join(", ") || "any source"}`,
+      `${stationsPath(store)} not written: no list in the store for ${result.missing.join(", ") || "any source"}`,
     );
     process.exitCode = 1;
   }
@@ -356,16 +356,16 @@ async function publish(lake: string): Promise<void> {
 
 async function backfill(sourceId: string, ids: string, start: Date, end: Date): Promise<void> {
   const source = sourceOf(sourceId);
-  const lake = lakeOfSource(source.metadata);
+  const store = storeOfSource(source.metadata);
   // Each worker writes its stations' years; on one connection they'd wait on each other's uploads.
   setConnections(positive("concurrency"));
-  const list = await listOf(lake, source);
+  const list = await listOf(store, source);
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
   // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.
   let behind: string[] = [];
-  let named: LakeStation[];
-  const bounds = await readStationBounds(boundsPath(lake, sourceId));
+  let named: StoredStation[];
+  const bounds = await readStationBounds(boundsPath(store, sourceId));
   // Bounds an older build wrote have no `preliminary`, and backfill leaves them alone.
   const legacy = [...bounds.values()].some((b) => b.preliminary === undefined);
   if (ids === "preliminary") {
@@ -446,7 +446,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // record. One that can't be read is neither used nor written over this run.
   const empty =
     mode === "written" && source.metadata.empty_means_none
-      ? await readEmptyYears(lake, sourceId, now).catch((error: Error) => {
+      ? await readEmptyYears(store, sourceId, now).catch((error: Error) => {
           console.error(
             `${sourceId}: asking for every year, recording none; the empty-years record: ${error.message}`,
           );
@@ -479,7 +479,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     const record = new Map(empty);
     emptyFound = false;
     saving = saving.then(() =>
-      writeEmptyYears(lake, sourceId, record, now).catch((error) => fail("empty years", error)),
+      writeEmptyYears(store, sourceId, record, now).catch((error) => fail("empty years", error)),
     );
     return saving;
   };
@@ -489,7 +489,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     saving = saving.then(async () => {
       if (!found.size) return;
       try {
-        if (!(await writePreliminary(lake, sourceId, found)))
+        if (!(await writePreliminary(store, sourceId, found)))
           console.log(
             `${sourceId}: bounds predate preliminary values; run \`compact ${sourceId} --rebuild-bounds\` to record them`,
           );
@@ -500,7 +500,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     return saving;
   };
   // The epochs a station's fetch writes, each with its part of the range (`epochSpans`).
-  const spansOf = (station: LakeStation) => {
+  const spansOf = (station: StoredStation) => {
     const [begin, until] = ranges?.get(station.id) ?? [start, end];
     return epochSpans(
       station.epochs,
@@ -521,7 +521,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     const written = new Map<string, YearStats>();
     let marked: string[];
     try {
-      marked = await markYears(lake, sourceId, ids);
+      marked = await markYears(store, sourceId, ids);
     } catch (error) {
       fail(`years (skipped ${batch.length} stations)`, error);
       continue;
@@ -555,11 +555,11 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       }
     if (lowered.size)
       try {
-        await writePreliminary(lake, sourceId, lowered);
+        await writePreliminary(store, sourceId, lowered);
       } catch (error) {
         // Fetched unlowered, a killed run could leave these too late; they wait for the next run.
         fail(`bounds (skipped ${batch.length} stations)`, error);
-        await commitYears(lake, sourceId, marked, new Map()).catch((e) => fail("years", e));
+        await commitYears(store, sourceId, marked, new Map()).catch((e) => fail("years", e));
         continue;
       }
     // Lowered stations that fetched no year of levels, having none to fetch or
@@ -580,7 +580,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           const ownEpoch = product === "levels" && epoch.id === current;
           try {
             const dir = seriesDir(
-              lakeFor(station),
+              storeFor(station),
               product,
               station.source,
               station.source_id,
@@ -654,7 +654,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     });
     await saveEmpty(true);
     try {
-      await commitYears(lake, sourceId, marked, written);
+      await commitYears(store, sourceId, marked, written);
     } catch (error) {
       fail("years", error);
     }
@@ -706,7 +706,7 @@ async function reportPast(
 async function notStarted(sourceId: string): Promise<void> {
   const note = `${sourceId}: no station list yet; the Monthly workflow starts it, or dispatch Monthly with \`sources: ${sourceId}\` to start it now`;
   console.log(note);
-  // On a run's page too, so a lake that lost everything doesn't pass unseen.
+  // On a run's page too, so a store that lost everything doesn't pass unseen.
   if (process.env.GITHUB_ACTIONS) console.log(`::warning title=No station list::${note}`);
   const page = process.env.GITHUB_STEP_SUMMARY;
   if (page) await appendFile(page, `${note}\n`);
@@ -715,14 +715,14 @@ async function notStarted(sourceId: string): Promise<void> {
 async function recent(sourceId: string): Promise<void> {
   const now = Date.now();
   const source = sourceOf(sourceId);
-  const stations = await startedListOf(lakeOfSource(source.metadata), source);
+  const stations = await startedListOf(storeOfSource(source.metadata), source);
   if (!stations) return await notStarted(sourceId);
   const summary = await reporting(`recent ${sourceId}`, async () => {
     const [hours, keepDays] = [positive("hours"), positive("keep-days")];
     return updateRecent({
       source,
       stations,
-      lakeFor,
+      storeFor,
       concurrency: positive("concurrency"),
       since: new Date(now - hours * 3_600_000),
       now,
@@ -746,7 +746,7 @@ async function recent(sourceId: string): Promise<void> {
 async function compact(sourceId: string, days: number): Promise<void> {
   let live = 0;
   const source = sourceOf(sourceId);
-  const started = await startedListOf(lakeOfSource(source.metadata), source);
+  const started = await startedListOf(storeOfSource(source.metadata), source);
   if (!started) return await notStarted(sourceId);
   const summary = await reporting(`compact ${sourceId}`, async () => {
     // The window keeps 7 days back from its last hourly run, which is partway
@@ -763,7 +763,7 @@ async function compact(sourceId: string, days: number): Promise<void> {
     return compactRecent({
       source,
       stations,
-      lakeFor,
+      storeFor,
       concurrency,
       start,
       end,
@@ -807,7 +807,7 @@ function positive(name: "concurrency" | "hours" | "keep-days" | "budget"): numbe
 }
 
 /** A station by its ID or its source's own code. */
-function find(list: LakeStation[], sourceId: string, id: string): LakeStation {
+function find(list: StoredStation[], sourceId: string, id: string): StoredStation {
   const station = list.find((s) => s.id === id || s.id === `${sourceId}/${id}`);
   if (!station) throw new Error(`No station ${id} in ${sourceId}'s list`);
   return station;
@@ -823,7 +823,7 @@ async function requalifyStations(
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
   const source = sourceOf(sourceId);
-  const list = await listOf(lakeOfSource(source.metadata), source);
+  const list = await listOf(storeOfSource(source.metadata), source);
   // Every station with files, inactive ones too, since their stored values are QC'd as well.
   let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
   if (values.shard) stations = shard(stations, ...parseShard(values.shard));
@@ -839,14 +839,14 @@ async function requalifyStations(
       values: 0,
       files: 0,
     };
-    const lake = lakeOfSource(source.metadata);
+    const store = storeOfSource(source.metadata);
     for (const batch of chunks(stations, 100)) {
       const ids = batch.map((station) => station.id);
       const written = new Map<string, YearStats>();
       // A batch that can't be marked isn't written, so the years can't go stale.
       let marked: string[];
       try {
-        marked = await markYears(lake, sourceId, ids);
+        marked = await markYears(store, sourceId, ids);
       } catch (error) {
         s.failed.push(
           `years (skipped ${ids.length} stations): ${error instanceof Error ? error.message : error}`,
@@ -858,7 +858,7 @@ async function requalifyStations(
           const { files, changed, warnings } = await requalify(
             source,
             station,
-            lakeFor(station),
+            storeFor(station),
             start,
             end,
             written,
@@ -872,7 +872,7 @@ async function requalifyStations(
         }
       });
       try {
-        await commitYears(lake, sourceId, marked, written);
+        await commitYears(store, sourceId, marked, written);
       } catch (error) {
         s.failed.push(`years: ${error instanceof Error ? error.message : error}`);
       }
@@ -885,10 +885,10 @@ async function requalifyStations(
 
 async function analyzeSource(sourceId: string): Promise<void> {
   const source = sourceOf(sourceId);
-  const lake = lakeOfSource(source.metadata);
-  const list = await listOf(lake, source);
+  const store = storeOfSource(source.metadata);
+  const list = await listOf(store, source);
   setConnections(positive("concurrency"));
-  const report = await analyze(lake, source, list, {
+  const report = await analyze(store, source, list, {
     now: new Date(),
     all: values.all,
     concurrency: positive("concurrency"),
@@ -911,7 +911,7 @@ async function analyzeSource(sourceId: string): Promise<void> {
   // record; a batch at a time, each marked once done, so a run stopped partway
   // leaves the rest pending for the next.
   const listed = new Map(list.map((s) => [s.id, s]));
-  const analysis = await readAnalysis(lake, sourceId);
+  const analysis = await readAnalysis(store, sourceId);
   // Stations whose rules differ from their kind's come first; the rest are first verdicts that change nothing.
   const differs = (id: string) =>
     !isDeepStrictEqual(
@@ -935,7 +935,7 @@ async function analyzeSource(sourceId: string): Promise<void> {
     const failed = new Set(summary.failed.map((f) => f.split(": ")[0]));
     if ([...failed].some((id) => !batch.includes(id!))) continue;
     await markRequalified(
-      lake,
+      store,
       sourceId,
       batch.filter((id) => !failed.has(id)),
       new Date(),
@@ -945,8 +945,8 @@ async function analyzeSource(sourceId: string): Promise<void> {
 
 async function withholdStations(sourceId: string): Promise<void> {
   const source = sourceOf(sourceId);
-  const lake = lakeOfSource(source.metadata);
-  const { ids, prefixes, rows } = await withhold(lake, source, {
+  const store = storeOfSource(source.metadata);
+  const { ids, prefixes, rows } = await withhold(store, source, {
     accept: values["accept-withheld"],
   });
   const lines = [

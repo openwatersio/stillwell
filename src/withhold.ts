@@ -1,11 +1,11 @@
 /**
- * Stations withheld from the lake because their owner refused republication
+ * Stations withheld from the store because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
  * rows from its bounds, years, recent window, empty-years record and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
- * their series files, and their rows, from a lake that still holds them.
+ * their series files, and their rows, from a store that still holds them.
  */
-import { dropAnalysis, readAnalysis } from "./lake/analysis.ts";
+import { dropAnalysis, readAnalysis } from "./store/analysis.ts";
 import { spawn } from "node:child_process";
 import { rm } from "node:fs/promises";
 import {
@@ -19,7 +19,7 @@ import {
   writeJsonArray,
   writeRecent,
   writeStationBounds,
-} from "./lake/parquet.ts";
+} from "./store/parquet.ts";
 import {
   boundsPath,
   DATASET,
@@ -31,11 +31,11 @@ import {
   sourceFirstEpochFiles,
   stationDir,
   stationListPath,
-} from "./lake/paths.ts";
+} from "./store/paths.ts";
 import type { Source } from "./schema.ts";
-import { dropYears } from "./lake/years.ts";
+import { dropYears } from "./store/years.ts";
 
-/** Why a station, by its lake ID, is withheld, or null; null for another source's station. */
+/** Why a station, by its store ID, is withheld, or null; null for another source's station. */
 export function withheldReason(source: Source, id: string): string | null {
   const prefix = `${source.metadata.id}/`;
   if (!source.withheld || !id.startsWith(prefix)) return null;
@@ -44,23 +44,23 @@ export function withheldReason(source: Source, id: string): string | null {
 
 /**
  * Drop withheld stations' rows from the source's bounds, years, recent window,
- * empty-years record and analysis, with its history, in `lake`, rewriting only a file that holds one. Returns
+ * empty-years record and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
-export async function dropWithheldRows(lake: string, source: Source): Promise<string[]> {
+export async function dropWithheldRows(store: string, source: Source): Promise<string[]> {
   if (!source.withheld) return [];
   const id = source.metadata.id;
   const held = (station: string) => withheldReason(source, station) !== null;
   const dropped = new Set<string>();
 
-  const bounds = await readStationBounds(boundsPath(lake, id));
+  const bounds = await readStationBounds(boundsPath(store, id));
   const gone = [...bounds.keys()].filter(held);
   if (gone.length) {
     for (const station of gone) dropped.add(station);
     // A file without `preliminary` stays without it, as compaction keeps it.
     const preliminary = ![...bounds.values()].some((b) => b.preliminary === undefined);
     await writeStationBounds(
-      boundsPath(lake, id),
+      boundsPath(store, id),
       [...bounds]
         .filter(([station]) => !held(station))
         .map(([station, b]) => ({ id: station, ...b })),
@@ -68,7 +68,7 @@ export async function dropWithheldRows(lake: string, source: Source): Promise<st
     );
   }
 
-  const recent = recentPath(lake, id);
+  const recent = recentPath(store, id);
   const inRecent = (await recentStations(recent)).filter(held);
   if (inRecent.length) {
     for (const station of inRecent) dropped.add(station);
@@ -76,7 +76,7 @@ export async function dropWithheldRows(lake: string, source: Source): Promise<st
     await writeRecent(recent, [rows.filter((r) => !held(r.station))]);
   }
 
-  const emptyPath = emptyYearsPath(lake, id);
+  const emptyPath = emptyYearsPath(store, id);
   const empty = ((await readJsonArray(emptyPath)) ?? []) as { key: string; seen: string }[];
   // Each key starts with the station's ID (`emptyKey`).
   const stationOf = (key: string) => key.split(" ")[0]!;
@@ -87,45 +87,45 @@ export async function dropWithheldRows(lake: string, source: Source): Promise<st
       empty.filter((r) => !held(stationOf(r.key))),
     );
   }
-  for (const station of await dropAnalysis(lake, id, held)) dropped.add(station);
+  for (const station of await dropAnalysis(store, id, held)) dropped.add(station);
   // Last, so the values themselves are gone even if this file can't be written.
-  for (const station of await dropYears(lake, id, held)) dropped.add(station);
+  for (const station of await dropYears(store, id, held)) dropped.add(station);
   return [...dropped].sort();
 }
 
 /**
- * Every withheld station of a source that `lake` has known: in its list, any
+ * Every withheld station of a source that `store` has known: in its list, any
  * snapshot of the list in history, its bounds, its recent window or, unless
  * `files` is false, a directory of its files, so a run after the refresh
  * dropped them from the list still finds them. Listing the files reads every
  * one of the source's, so a refresh leaves it out. Also returns how many
- * stations the lake has known in all.
+ * stations the store has known in all.
  */
 export async function withheldStations(
-  lake: string,
+  store: string,
   source: Source,
   { files = true }: { files?: boolean } = {},
 ): Promise<{ ids: string[]; known: number }> {
   const id = source.metadata.id;
   const lists = [
-    ...((await exists(stationListPath(lake, id))) ? [stationListPath(lake, id)] : []),
-    ...(await listFiles(historyPath(lake, id, "*", "parquet"))),
+    ...((await exists(stationListPath(store, id))) ? [stationListPath(store, id)] : []),
+    ...(await listFiles(historyPath(store, id, "*", "parquet"))),
   ];
   const dirs: string[] = [];
   if (files)
     for (const product of PRODUCTS)
       for (const [pattern, depth] of [
-        [sourceFirstEpochFiles(lake, product, id), 2],
-        [sourceEpochDirs(lake, product, id), 3],
+        [sourceFirstEpochFiles(store, product, id), 2],
+        [sourceEpochDirs(store, product, id), 3],
       ] as const)
         for (const file of await listFiles(pattern))
           dirs.push(`${id}/${decodeURIComponent(file.split("/").at(-depth)!)}`);
   const known = new Set([
     ...dirs,
     ...(await listedIds(lists)),
-    ...(await readStationBounds(boundsPath(lake, id))).keys(),
-    ...(await recentStations(recentPath(lake, id))),
-    ...(await readAnalysis(lake, id)).keys(),
+    ...(await readStationBounds(boundsPath(store, id))).keys(),
+    ...(await recentStations(recentPath(store, id))),
+    ...(await readAnalysis(store, id)).keys(),
   ]);
   return {
     ids: [...known].filter((s) => withheldReason(source, s) !== null).sort(),
@@ -138,7 +138,7 @@ export async function withheldStations(
  * in a slash so it names that station's directory alone. Refuses an ID that
  * would name another directory, such as an empty one or `..`.
  */
-export function seriesPrefixes(lake: string, source: string, sourceIds: string[]): string[] {
+export function seriesPrefixes(store: string, source: string, sourceIds: string[]): string[] {
   if (!/^[a-z][a-z0-9-]*$/.test(source)) throw new Error(`Not a source ID: "${source}"`);
   return sourceIds.flatMap((sourceId) => {
     const dir = encodeURIComponent(sourceId);
@@ -146,21 +146,21 @@ export function seriesPrefixes(lake: string, source: string, sourceIds: string[]
     if (!sourceId.trim() || /^\.*$/.test(dir) || /[*?[\]]/.test(dir))
       throw new Error(`Refusing to delete the files of ${source} station "${sourceId}"`);
     return PRODUCTS.map((product) => {
-      const prefix = `${stationDir(lake, product, source, sourceId)}/`;
-      if (prefix !== `${lake}/${DATASET[product]}/${source}/${dir}/`)
+      const prefix = `${stationDir(store, product, source, sourceId)}/`;
+      if (prefix !== `${store}/${DATASET[product]}/${source}/${dir}/`)
         throw new Error(`${prefix} isn't one station's directory`);
       return prefix;
     });
   });
 }
 
-/** Which of `ids`, stations of `source`, still have series files in `lake`. */
-export async function withFiles(lake: string, source: string, ids: string[]): Promise<string[]> {
+/** Which of `ids`, stations of `source`, still have series files in `store`. */
+export async function withFiles(store: string, source: string, ids: string[]): Promise<string[]> {
   const out: string[] = [];
   for (const id of ids) {
     const sourceId = id.slice(source.length + 1);
     for (const product of PRODUCTS) {
-      const dir = `${stationDir(lake, product, source, sourceId)}/`;
+      const dir = `${stationDir(store, product, source, sourceId)}/`;
       // A glob reads `*`, `?` and `[` in an ID as wildcards, so only files under this exact directory count.
       const files = [
         ...(await listFiles(`${dir}*.parquet`)),
@@ -175,7 +175,7 @@ export async function withFiles(lake: string, source: string, ids: string[]): Pr
   return out;
 }
 
-/** `aws` arguments that delete everything under an `s3://` prefix on the lake's endpoint. */
+/** `aws` arguments that delete everything under an `s3://` prefix on the store's endpoint. */
 export function awsRemoveArgs(prefix: string, endpoint: string): string[] {
   if (!/^s3:\/\/[^/]+\/.+\/$/.test(prefix))
     throw new Error(`${prefix} isn't a directory in a bucket`);
@@ -184,25 +184,27 @@ export function awsRemoveArgs(prefix: string, endpoint: string): string[] {
   return ["s3", "rm", prefix, "--recursive", "--endpoint-url", url, "--only-show-errors"];
 }
 
-/** Refuses a lake `withhold` can't delete from: anything but `s3://` or a local path. */
-function deletable(lake: string): void {
-  if (/^[a-z0-9]+:\/\//i.test(lake) && !lake.startsWith("s3://"))
-    throw new Error(`Can't delete files from ${lake}; withhold needs an s3:// lake or a local one`);
+/** Refuses a store `withhold` can't delete from: anything but `s3://` or a local path. */
+function deletable(store: string): void {
+  if (/^[a-z0-9]+:\/\//i.test(store) && !store.startsWith("s3://"))
+    throw new Error(
+      `Can't delete files from ${store}; withhold needs an s3:// store or a local one`,
+    );
 }
 
 /**
- * Delete everything under each prefix: from disk for a local lake, or with
+ * Delete everything under each prefix: from disk for a local store, or with
  * the AWS CLI for an `s3://` one, since DuckDB can't delete objects. The CLI
- * takes the lake's `S3_*` credentials.
+ * takes the store's `S3_*` credentials.
  */
-export async function removePrefixes(lake: string, prefixes: string[]): Promise<void> {
-  deletable(lake);
-  if (!lake.startsWith("s3://")) {
+export async function removePrefixes(store: string, prefixes: string[]): Promise<void> {
+  deletable(store);
+  if (!store.startsWith("s3://")) {
     for (const prefix of prefixes) await rm(prefix, { recursive: true, force: true });
     return;
   }
   const endpoint = process.env.S3_ENDPOINT;
-  if (!endpoint) throw new Error("Deleting from an s3:// lake needs S3_ENDPOINT");
+  if (!endpoint) throw new Error("Deleting from an s3:// store needs S3_ENDPOINT");
   const env = {
     ...process.env,
     AWS_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID ?? "",
@@ -227,7 +229,7 @@ export async function removePrefixes(lake: string, prefixes: string[]): Promise<
 }
 
 /**
- * The most stations one run may withhold, of those the lake has known,
+ * The most stations one run may withhold, of those the store has known,
  * beyond which a rule more likely matches by mistake. `--accept-withheld`
  * lifts it, for the refresh and `withhold` alike.
  */
@@ -239,36 +241,36 @@ export function withholdLimit(known: number): number {
 export function tooManyWithheld(source: string, count: number, known: number): string | null {
   const limit = withholdLimit(known);
   return count > limit
-    ? `${count} of the ${known} ${source} stations the lake has known are withheld, more than ${limit}; check the rule, then rerun with --accept-withheld`
+    ? `${count} of the ${known} ${source} stations the store has known are withheld, more than ${limit}; check the rule, then rerun with --accept-withheld`
     : null;
 }
 
 /**
- * Remove a source's withheld stations from `lake`: delete their series files,
+ * Remove a source's withheld stations from `store`: delete their series files,
  * then drop their rows from the bounds, years, recent window and empty-years record.
  * Their list rows go at the source's next refresh. Refuses more stations than
- * `withholdLimit` allows unless `accept`, and a lake it can't delete from.
+ * `withholdLimit` allows unless `accept`, and a store it can't delete from.
  */
 export async function withhold(
-  lake: string,
+  store: string,
   source: Source,
   {
     remove = removePrefixes,
     accept = false,
-  }: { remove?: (lake: string, prefixes: string[]) => Promise<void>; accept?: boolean } = {},
+  }: { remove?: (store: string, prefixes: string[]) => Promise<void>; accept?: boolean } = {},
 ): Promise<{ ids: string[]; prefixes: string[]; rows: string[] }> {
   const id = source.metadata.id;
   if (!source.withheld) throw new Error(`${id} withholds no stations`);
-  deletable(lake);
-  const { ids, known } = await withheldStations(lake, source);
+  deletable(store);
+  const { ids, known } = await withheldStations(store, source);
   const tooMany = tooManyWithheld(id, ids.length, known);
   if (tooMany && !accept) throw new Error(tooMany);
   const prefixes = seriesPrefixes(
-    lake,
+    store,
     id,
     ids.map((s) => s.slice(id.length + 1)),
   );
-  await remove(lake, prefixes);
-  const rows = await dropWithheldRows(lake, source);
+  await remove(store, prefixes);
+  const rows = await dropWithheldRows(store, source);
   return { ids, prefixes, rows };
 }

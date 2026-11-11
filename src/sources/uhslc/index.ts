@@ -85,7 +85,7 @@ const MARGIN_MS = 31 * DAY_MS;
  * (for the FD series, its latest RQ version, null without one), and
  * `record_start` and `record_end` the first and last days UHSLC has, which a
  * backfill keeps to. `contributor` is the agency UHSLC's documentation names,
- * null where it names none. They're kept in the lake's list only.
+ * null where it names none. They're kept in the store's list only.
  */
 export type UhslcStation = ListedStation & {
   version: string | null;
@@ -96,7 +96,7 @@ export type UhslcStation = ListedStation & {
   record_end: string | null;
 };
 
-/** A station as the lake's list holds it, with the references of its epochs. */
+/** A station as the store's list holds it, with the references of its epochs. */
 type Listed = Partial<UhslcStation> & { epochs?: { reference: string | null }[] };
 
 interface Table {
@@ -187,7 +187,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
     const startOf = (v: string) => rqSpans.get(`${id}${v}`)![0];
     // The FD series carries the RQ version it starts with: the latest, except
     // while the FD set and the RQ sets reload apart after a release. With none
-    // matching, the station keeps the version the lake's list has, or on its
+    // matching, the station keeps the version the store's list has, or on its
     // first listing takes the latest.
     const version =
       versions.find(
@@ -226,7 +226,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
       `  uhslc: no contributor scanned for ${unscanned.join(", ")}; tagged non-commercial until \`npm run uhslc:contributors\` reads their files`,
     );
   // Every series from one UHSLC station number is the same gauge site, and
-  // so is the originator's own series where its number is a lake station's ID.
+  // so is the originator's own series where its number is a store station's ID.
   const byNumber = new Map<string, string[]>();
   for (const s of listed) byNumber.set(number(s), [...(byNumber.get(number(s)) ?? []), s.id]);
   for (const s of listed)
@@ -278,7 +278,7 @@ export async function stations(previous: Listed[] = []): Promise<UhslcStation[]>
 
 /**
  * ERDDAP caught mid-reload can drop rows from a list. FD series stop only a
- * few at a time, so a list where many do is refused and the lake keeps the one
+ * few at a time, so a list where many do is refused and the store keeps the one
  * it has; taken at its word, it would retire them for good. A real clean-up
  * that large needs `FD_STOPPED` raised for one refresh.
  */
@@ -350,7 +350,7 @@ function withTerms(station: UhslcStation, previous?: Listed): void {
 const unscanned: string[] = [];
 
 /**
- * Why a station is withheld from the lake, or null: a scanned version of its
+ * Why a station is withheld from the store, or null: a scanned version of its
  * station number has a documentation file whose contributor refused
  * republication (a `refused` notice), or `ALSO_WITHHELD` names the number.
  * Every series of the number counts, the FD series and each version, scanned
@@ -371,9 +371,9 @@ export function withheld(sourceId: string): string | null {
 
 /**
  * The originator's own station for a series, where its contributor numbers
- * gauges as a lake source does: NOS's are CO-OPS station IDs, and the
+ * gauges as a store source does: NOS's are CO-OPS station IDs, and the
  * two-character codes JMA and JODC give are JMA's (JODC's `HD` numbers aren't).
- * Other contributors' numbers (SHOM's, the TGI's) aren't their lake source's
+ * Other contributors' numbers (SHOM's, the TGI's) aren't their store source's
  * IDs, so those gauges are matched by nearness and name (src/same-as.ts).
  */
 export function originatorStation(
@@ -392,7 +392,7 @@ export function originatorStation(
 }
 
 /**
- * The lake's version for an FD series none of whose versions starts where it
+ * The store's version for an FD series none of whose versions starts where it
  * does. Meant for a row ERDDAP left out mid-reload; when the version is still
  * listed, the FD series has moved somewhere unexpected, which is reported.
  */

@@ -4,7 +4,7 @@ import { fromSource, qc } from "../qc.ts";
 import {
   Flag,
   Unjudged,
-  type LakeStation,
+  type StoredStation,
   type Observation,
   type Source,
   type Station,
@@ -25,7 +25,7 @@ import { analysisHistoryPath, analysisPath, boundsPath, seriesDir, seriesPath } 
 import { chunks, pool, qcFor } from "./recent.ts";
 
 /**
- * What the lake measures about each station from the values it holds, in
+ * What the store measures about each station from the values it holds, in
  * `stations/analysis/<source>.parquet`, rather than lists written into code:
  * whether its levels carry a tide (`tidal`, which picks QC's flatline and
  * outlier rules in `qcFor`), and the measures behind that. `listOf` merges a
@@ -188,8 +188,8 @@ function toSeaLevel(station: Station): number | null {
 }
 
 /** A source's analysis by station ID; empty where there's none yet. */
-export async function readAnalysis(lake: string, source: string): Promise<Map<string, Analysis>> {
-  const path = analysisPath(lake, source);
+export async function readAnalysis(store: string, source: string): Promise<Map<string, Analysis>> {
+  const path = analysisPath(store, source);
   if (!(await exists(path))) return new Map();
   const rows = await readRows(path);
   return new Map(
@@ -212,11 +212,11 @@ export async function readAnalysis(lake: string, source: string): Promise<Map<st
 
 /** Stations with their analysis's `tidal` and `tide_m`, null where there's none. */
 export async function withAnalysis<T extends Station>(
-  lake: string,
+  store: string,
   source: string,
   stations: T[],
 ): Promise<T[]> {
-  const analysis = await readAnalysis(lake, source);
+  const analysis = await readAnalysis(store, source);
   return stations.map((s) => {
     const a = analysis.get(s.id);
     return { ...s, tidal: a?.tidal ?? null, tide_m: a?.tide_m ?? null };
@@ -234,21 +234,21 @@ export interface AnalysisReport {
 
 /**
  * Judge a source's stations that are due (`judge`), from the last two years of
- * their current epoch in the lake, and write the source's analysis, keeping
+ * their current epoch in the store, and write the source's analysis, keeping
  * the rows of stations not due or not judged. A station is due with no row,
  * a row under other `RULES` or `JUDGE`, no verdict, or a verdict older than a year, or
  * with `all`. Writes the stations whose QC options change with the
  * new verdict to `history/analysis/<source>/<time>.json` and returns them.
  */
 export async function analyze(
-  lake: string,
+  store: string,
   source: Source,
-  stations: LakeStation[],
+  stations: StoredStation[],
   options: { now: Date; all?: boolean; concurrency?: number },
 ): Promise<AnalysisReport> {
   const id = source.metadata.id;
-  const previous = await readAnalysis(lake, id);
-  const bounds = await readStationBounds(boundsPath(lake, id));
+  const previous = await readAnalysis(store, id);
+  const bounds = await readStationBounds(boundsPath(store, id));
   const now = options.now.getTime();
   const due = stations.filter((s) => {
     if (!bounds.get(s.id)?.last) return false;
@@ -268,12 +268,12 @@ export async function analyze(
   // The history too, so a run stopped partway still says which stations it changed.
   const save = async () => {
     await writeAnalysis(
-      lake,
+      store,
       id,
       [...next.values()].filter((a) => listed.has(a.id)),
     );
     if (report.changed.length)
-      await writeJsonArray(analysisHistoryPath(lake, id, options.now.toISOString()), [
+      await writeJsonArray(analysisHistoryPath(store, id, options.now.toISOString()), [
         {
           rules: RULES,
           judge: JUDGE,
@@ -290,12 +290,12 @@ export async function analyze(
         let rows: Observation[] = [];
         for (const y of [year - 1, year])
           rows = rows.concat(
-            await readObservations(seriesPath(lake, "levels", id, station.source_id, y, epoch)),
+            await readObservations(seriesPath(store, "levels", id, station.source_id, y, epoch)),
           );
         // The source's errata and adapter spans, from the epoch's whole record, as requalify reads it.
-        const dir = seriesDir(lake, "levels", id, station.source_id, epoch);
+        const dir = seriesDir(store, "levels", id, station.source_id, epoch);
         // A record the source can't judge, such as one GESLA's datum-jump check
-        // refuses where the lake holds only part of it, is judged with the spans
+        // refuses where the store holds only part of it, is judged with the spans
         // it can give, its errata's, and a warning.
         const spans =
           (await source
@@ -351,9 +351,9 @@ export async function analyze(
 }
 
 /** A source's analysis, `rows` sorted by ID. */
-export function writeAnalysis(lake: string, source: string, rows: Analysis[]): Promise<void> {
+export function writeAnalysis(store: string, source: string, rows: Analysis[]): Promise<void> {
   return writeRows(
-    analysisPath(lake, source),
+    analysisPath(store, source),
     rows,
     {
       id: "VARCHAR",
@@ -380,15 +380,15 @@ export function pending(analysis: Map<string, Analysis>): string[] {
 
 /** Record that `ids`' stored years are requalified under their verdicts, as of `now`. */
 export async function markRequalified(
-  lake: string,
+  store: string,
   source: string,
   ids: string[],
   now: Date,
 ): Promise<void> {
   const done = new Set(ids);
-  const analysis = await readAnalysis(lake, source);
+  const analysis = await readAnalysis(store, source);
   await writeAnalysis(
-    lake,
+    store,
     source,
     [...analysis.values()].map((a) =>
       done.has(a.id) ? { ...a, requalified: now.toISOString() } : a,
@@ -402,22 +402,22 @@ export async function markRequalified(
  * station IDs it dropped.
  */
 export async function dropAnalysis(
-  lake: string,
+  store: string,
   source: string,
   held: (station: string) => boolean,
 ): Promise<string[]> {
   const dropped = new Set<string>();
-  const analysis = await readAnalysis(lake, source);
+  const analysis = await readAnalysis(store, source);
   const gone = [...analysis.keys()].filter(held);
   if (gone.length) {
     for (const station of gone) dropped.add(station);
     await writeAnalysis(
-      lake,
+      store,
       source,
       [...analysis.values()].filter((a) => !held(a.id)),
     );
   }
-  for (const file of await listFiles(analysisHistoryPath(lake, source, "*"))) {
+  for (const file of await listFiles(analysisHistoryPath(store, source, "*"))) {
     const runs = ((await readJsonArray(file)) ?? []) as { changed: { id: string }[] }[];
     if (!runs.some((r) => r.changed.some((c) => held(c.id)))) continue;
     for (const r of runs) for (const c of r.changed) if (held(c.id)) dropped.add(c.id);

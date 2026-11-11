@@ -29,13 +29,13 @@ import {
   writeStationBounds,
   writeStationList,
   writeStations,
-} from "../src/lake/parquet.ts";
-import { boundsPath, seriesDir, seriesPath, stationListPath } from "../src/lake/paths.ts";
-import { REFETCH_YEARS } from "../src/lake/recent.ts";
+} from "../src/store/parquet.ts";
+import { boundsPath, seriesDir, seriesPath, stationListPath } from "../src/store/paths.ts";
+import { REFETCH_YEARS } from "../src/store/recent.ts";
 import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import {
   Flag,
-  type LakeStation,
+  type StoredStation,
   type Observation,
   type Source,
   type Station,
@@ -132,7 +132,7 @@ describe("yearWritten", () => {
 
 describe("readYearFiles", () => {
   it("reads each year's preliminary count and last time from one directory", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     const t = Date.UTC(2023, 11, 31, 23);
     await writeObservations(
       seriesPath(root, "levels", "usgs", "07010000", 2023),
@@ -168,7 +168,7 @@ describe("readYearFiles", () => {
   });
 
   it("counts a provisional value QC flagged, and values ingest received", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     await writeObservations(
       seriesPath(root, "levels", "usgs", "x", 2026),
       [
@@ -185,7 +185,7 @@ describe("readYearFiles", () => {
   });
 
   it("lists only the station's own files when its ID holds a glob character", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     const write = (id: string, y: number) =>
       writeObservations(
         seriesPath(root, "levels", "usgs", id, y),
@@ -206,7 +206,7 @@ describe("readYearFiles", () => {
     // read_parquet globs too: a*'s 2023 is read alone, not with ab's.
     const own = await readYearFiles(seriesDir(root, "levels", "usgs", "a*"), [2023]);
     assert.equal(own.get(2023)!.backfilled, 1);
-    // A relative lake, which DuckDB lists without its leading `./`.
+    // A relative store, which DuckDB lists without its leading `./`.
     const relativeRoot = `./${relative(process.cwd(), root)}`;
     assert.deepEqual(
       [...(await listYears(seriesDir(relativeRoot, "levels", "usgs", "ab")))].sort(),
@@ -215,23 +215,23 @@ describe("readYearFiles", () => {
   });
 
   it("reads the current epoch's directory, not epoch 1's", () => {
-    assert.equal(seriesDir("lake", "levels", "usgs", "x"), "lake/obs/usgs/x");
-    assert.equal(seriesDir("lake", "levels", "usgs", "x", 2), "lake/obs/usgs/x/2");
+    assert.equal(seriesDir("store", "levels", "usgs", "x"), "store/obs/usgs/x");
+    assert.equal(seriesDir("store", "levels", "usgs", "x", 2), "store/obs/usgs/x/2");
     assert.equal(
-      seriesPath("lake", "levels", "usgs", "x", 2024, 2),
-      "lake/obs/usgs/x/2/2024.parquet",
+      seriesPath("store", "levels", "usgs", "x", 2024, 2),
+      "store/obs/usgs/x/2/2024.parquet",
     );
   });
 
   it("reads a station with no files as none", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     assert.equal((await readYearFiles(seriesDir(root, "levels", "usgs", "x"), [2024])).size, 0);
     assert.equal((await listYears(seriesDir(root, "levels", "usgs", "x"))).size, 0);
   });
 });
 
 describe("yearsToFetch", () => {
-  const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+  const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
   const dir = seriesDir(root, "levels", "usgs", "07010000");
   const y2023 = new Date(Date.UTC(2023, 0, 1));
   const y2027 = new Date(Date.UTC(2027, 0, 1));
@@ -347,7 +347,7 @@ describe("preliminaryRuns", () => {
 });
 
 describe("preliminaryRuns with skipUnscreened", () => {
-  const levels = (id: string, epochs: LakeStation["epochs"] = []) => ({
+  const levels = (id: string, epochs: StoredStation["epochs"] = []) => ({
     id,
     products: ["levels" as const],
     epochs,
@@ -406,7 +406,7 @@ describe("monthly refetch", () => {
 
 describe("earliestPreliminary", () => {
   it("reads the earliest value the source sent as preliminary across a station's files", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     const write = (year: number, rows: Parameters<typeof writeObservations>[1]) =>
       writeObservations(seriesPath(root, "levels", "usgs", "x", year), rows, "GAGE");
     const dir = seriesDir(root, "levels", "usgs", "x");
@@ -515,7 +515,7 @@ describe("shard", () => {
 });
 
 /** A CO-OPS station with only levels, in one open epoch. */
-function coopsStation(id: string, status: "active" | "inactive"): LakeStation {
+function coopsStation(id: string, status: "active" | "inactive"): StoredStation {
   return {
     id: `coops/${id}`,
     source: "coops",
@@ -541,11 +541,11 @@ function coopsStation(id: string, status: "active" | "inactive"): LakeStation {
         state: "open",
       },
     ],
-  } as LakeStation;
+  } as StoredStation;
 }
 
-/** `ingest.ts backfill coops …` against `lake`, through the verifying CO-OPS fixture. */
-function backfillCoops(lake: string, args: string[], env: Record<string, string> = {}) {
+/** `ingest.ts backfill coops …` against `store`, through the verifying CO-OPS fixture. */
+function backfillCoops(store: string, args: string[], env: Record<string, string> = {}) {
   return spawnSync(
     process.execPath,
     [
@@ -560,8 +560,8 @@ function backfillCoops(lake: string, args: string[], env: Record<string, string>
       encoding: "utf8",
       env: {
         ...process.env,
-        WATER_LEVELS_LAKE: lake,
-        WATER_LEVELS_CACHE: join(lake, "..", "cache"),
+        STILLWELL_STORE: store,
+        STILLWELL_CACHE: join(store, "..", "cache"),
         ...env,
       },
     },
@@ -570,23 +570,23 @@ function backfillCoops(lake: string, args: string[], env: Record<string, string>
 
 describe("backfill script", () => {
   it("walks a station named twice, by either form of its ID, once", async () => {
-    // Each in its own lake, since a run's responses are cached beside it.
+    // Each in its own store, since a run's responses are cached beside it.
     const fetches = async (ids: string) => {
-      const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-      await writeStationList(stationListPath(lake, "coops"), [coopsStation("2000", "active")]);
-      return backfillCoops(lake, [ids, "2020", "2021"]).stderr.match(/^fetch /gm)?.length;
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await writeStationList(stationListPath(store, "coops"), [coopsStation("2000", "active")]);
+      return backfillCoops(store, [ids, "2020", "2021"]).stderr.match(/^fetch /gm)?.length;
     };
     assert.equal(await fetches("2000,coops/2000"), await fetches("2000"));
   });
 
   it("lowers each batch's values before fetching, so a killed run leaves them early", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
     const ids = [...Array(102).keys()].map((i) => String(2000 + i));
     await writeStationList(
-      stationListPath(lake, "coops"),
+      stationListPath(store, "coops"),
       ids.map((id) => coopsStation(id, "active")),
     );
-    const path = boundsPath(lake, "coops");
+    const path = boundsPath(store, "coops");
     // Relative to now: lowering goes no earlier than the cutoff, three years back.
     const year = new Date().getUTCFullYear();
     const late = `${year}-02-01T00:00:00Z`;
@@ -602,7 +602,7 @@ describe("backfill script", () => {
       })),
     );
     // One request each; the process dies at the second batch's first station.
-    const run = backfillCoops(lake, ["all", fetchFrom, `${year - 1}`, "--concurrency", "1"], {
+    const run = backfillCoops(store, ["all", fetchFrom, `${year - 1}`, "--concurrency", "1"], {
       EXIT_AFTER: "101",
     });
     assert.equal(run.status, 9, run.stderr);
@@ -616,12 +616,12 @@ describe("backfill script", () => {
   });
 
   it("with --skip-unscreened, skips a station whose source never screened its values", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await writeStationList(stationListPath(lake, "coops"), [
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [
       coopsStation("8", "inactive"),
       coopsStation("9", "inactive"),
     ]);
-    const path = boundsPath(lake, "coops");
+    const path = boundsPath(store, "coops");
     await writeStationBounds(
       path,
       ["8", "9"].map((id) => ({
@@ -632,8 +632,8 @@ describe("backfill script", () => {
         screened: id === "8" ? false : null,
       })),
     );
-    assert.equal(backfillCoops(lake, ["all", "2024", "2025", "--skip-unscreened"]).status, 1);
-    const run = backfillCoops(lake, ["preliminary", "2023", "2025", "--skip-unscreened"]);
+    assert.equal(backfillCoops(store, ["all", "2024", "2025", "--skip-unscreened"]).status, 1);
+    const run = backfillCoops(store, ["preliminary", "2023", "2025", "--skip-unscreened"]);
     assert.equal(run.status, 0, run.stderr);
     const asked = new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1]));
     assert.deepEqual([...asked], ["9"]);
@@ -646,11 +646,11 @@ describe("backfill script", () => {
   });
 
   it("takes one shard of the stations with preliminary values", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
     const stations = ["11", "12", "13", "14", "15", "16"].map((id) => coopsStation(id, "inactive"));
-    await writeStationList(stationListPath(lake, "coops"), stations);
+    await writeStationList(stationListPath(store, "coops"), stations);
     await writeStationBounds(
-      boundsPath(lake, "coops"),
+      boundsPath(store, "coops"),
       stations.map((s) => ({
         id: s.id,
         first: "2024-12-01T00:00:00Z",
@@ -658,7 +658,7 @@ describe("backfill script", () => {
         preliminary: "2024-12-01T00:00:00Z",
       })),
     );
-    const run = backfillCoops(lake, ["preliminary", "2023", "2025", "--shard", "1/2"]);
+    const run = backfillCoops(store, ["preliminary", "2023", "2025", "--shard", "1/2"]);
     assert.equal(run.status, 0, run.stderr);
     const asked = [
       ...new Set([...run.stderr.matchAll(/^fetch .*station=(\w+)/gm)].map((m) => m[1])),
@@ -676,13 +676,13 @@ describe("backfill script", () => {
     const year = new Date().getUTCFullYear();
     const late = `${year}-02-01T00:00:00Z`;
     const killed = async (from: string, to: string) => {
-      const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-      await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);
-      const path = boundsPath(lake, "coops");
+      const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+      await writeStationList(stationListPath(store, "coops"), [coopsStation("7", "active")]);
+      const path = boundsPath(store, "coops");
       await writeStationBounds(path, [
         { id: "coops/7", first: late, last: late, preliminary: late },
       ]);
-      const run = backfillCoops(lake, ["all", from, to], { EXIT_AFTER: "1" });
+      const run = backfillCoops(store, ["all", from, to], { EXIT_AFTER: "1" });
       assert.equal(run.status, 9, run.stderr);
       return (await readStationBounds(path)).get("coops/7")?.preliminary;
     };
@@ -691,39 +691,39 @@ describe("backfill script", () => {
   });
 
   it("gives a lowered station its value back when it had no year to fetch", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await writeStationList(stationListPath(lake, "coops"), [coopsStation("7", "active")]);
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [coopsStation("7", "active")]);
     const good = (time: number) => ({ time, level: 2, flag: Flag.good });
     await writeObservations(
-      seriesPath(lake, "levels", "coops", "7", 2024),
+      seriesPath(store, "levels", "coops", "7", 2024),
       [...Array(12).keys()]
         .map((m) => good(Date.UTC(2024, m, 1)))
         .concat(good(Date.UTC(2024, 11, 31))),
       "STND",
     );
-    const path = boundsPath(lake, "coops");
+    const path = boundsPath(store, "coops");
     const late = "2026-02-01T00:00:00Z";
     await writeStationBounds(path, [{ id: "coops/7", first: late, last: late, preliminary: late }]);
-    const run = backfillCoops(lake, ["all", "2024", "2025"]);
+    const run = backfillCoops(store, ["all", "2024", "2025"]);
     assert.equal(run.status, 0, run.stderr);
     assert.doesNotMatch(run.stderr, /^fetch /m);
     assert.equal((await readStationBounds(path)).get("coops/7")?.preliminary, late);
   });
 
   it("with --skip-written, skips a year it found empty, for 30 days", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await writeStationList(stationListPath(lake, "coops"), [coopsStation("9", "active")]);
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [coopsStation("9", "active")]);
     const asked = (run: { stderr: string }, year: number) =>
       new RegExp(`^fetch .*begin_date=${year}`, "m").test(run.stderr);
     const args = ["9", "2020", "2023", "--concurrency", "1"];
-    const first = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    const first = backfillCoops(store, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
     assert.equal(first.status, 0, first.stderr);
     assert.ok(asked(first, 2021));
-    const record = await readEmptyYears(lake, "coops", Date.now());
+    const record = await readEmptyYears(store, "coops", Date.now());
     assert.deepEqual([...record.keys()], ["coops/9 levels 1 2021"]);
 
     // The next run skips it, and the years it wrote.
-    const second = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    const second = backfillCoops(store, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
     assert.equal(second.status, 0, second.stderr);
     assert.doesNotMatch(second.stderr, /^fetch /m);
     assert.match(second.stdout, /coops: skipped 1 years found empty in the last 30 days/);
@@ -731,10 +731,10 @@ describe("backfill script", () => {
     assert.match(first.stdout, /coops: recorded 1 years with no file that came back empty/);
 
     // A record it can't read is neither used nor written over.
-    const broken = join(lake, "stations", "empty", "coops.json");
+    const broken = join(store, "stations", "empty", "coops.json");
     const saved = readFileSync(broken, "utf8");
     writeFileSync(broken, "not json");
-    const unreadable = backfillCoops(lake, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
+    const unreadable = backfillCoops(store, [...args, "--skip-written"], { EMPTY_YEARS: "2021" });
     assert.equal(unreadable.status, 0, unreadable.stderr);
     assert.match(unreadable.stderr, /asking for every year, recording none/);
     assert.ok(asked(unreadable, 2021));
@@ -742,28 +742,28 @@ describe("backfill script", () => {
     writeFileSync(broken, saved);
 
     // A plain backfill asks again.
-    const plain = backfillCoops(lake, args, { EMPTY_YEARS: "2021" });
+    const plain = backfillCoops(store, args, { EMPTY_YEARS: "2021" });
     assert.equal(plain.status, 0, plain.stderr);
     assert.ok(asked(plain, 2021));
 
     // Past 30 days, an entry is dropped and the year is asked for again.
     const old = new Date(Date.now() - 31 * 86_400_000).toISOString();
     await writeEmptyYears(
-      lake,
+      store,
       "coops",
       new Map([["coops/9 levels 1 2021", old]]),
       Date.now() - 31 * 86_400_000,
     );
-    assert.equal((await readEmptyYears(lake, "coops", Date.now())).size, 0);
-    const later = backfillCoops(lake, [...args, "--skip-written"]);
+    assert.equal((await readEmptyYears(store, "coops", Date.now())).size, 0);
+    const later = backfillCoops(store, [...args, "--skip-written"]);
     assert.equal(later.status, 0, later.stderr);
     assert.ok(asked(later, 2021));
-    assert.equal((await readEmptyYears(lake, "coops", Date.now())).size, 0);
+    assert.equal((await readEmptyYears(store, "coops", Date.now())).size, 0);
   });
 
   it("refetches every station with preliminary values, active or not, and reads them again", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
-    const lake = join(root, "lake");
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
+    const store = join(root, "store");
     const station = (id: string, status: "active" | "inactive", since: string | null = null) =>
       ({
         id: `coops/${id}`,
@@ -790,8 +790,8 @@ describe("backfill script", () => {
             state: "open",
           },
         ],
-      }) as LakeStation;
-    await writeStationList(stationListPath(lake, "coops"), [
+      }) as StoredStation;
+    await writeStationList(stationListPath(store, "coops"), [
       station("1", "inactive"),
       station("2", "active"),
       station("3", "inactive"),
@@ -804,11 +804,11 @@ describe("backfill script", () => {
           ...station("6", "inactive").epochs,
           { ...station("6", "inactive").epochs[0]!, id: 2, state: "held" },
         ],
-      } as LakeStation,
+      } as StoredStation,
     ]);
     // Station 5's epoch starts after a preliminary row its directory holds, which compaction doesn't count.
     await writeObservations(
-      seriesPath(lake, "levels", "coops", "5", 2024),
+      seriesPath(store, "levels", "coops", "5", 2024),
       [
         { time: Date.UTC(2024, 1, 1), level: 2, flag: Flag.preliminary },
         { time: Date.UTC(2024, 7, 1), level: 2, flag: Flag.preliminary },
@@ -819,25 +819,25 @@ describe("backfill script", () => {
     // still preliminary, but before the years the refetch and compaction look in.
     const good = (time: number) => ({ time, level: 2, flag: Flag.good });
     await writeObservations(
-      seriesPath(lake, "levels", "coops", "4", 2021),
+      seriesPath(store, "levels", "coops", "4", 2021),
       [{ time: Date.UTC(2021, 4, 1), level: 2, flag: Flag.preliminary }],
       "STND",
     );
     for (const year of [2023, 2024, 2025])
       await writeObservations(
-        seriesPath(lake, "levels", "coops", "4", year),
+        seriesPath(store, "levels", "coops", "4", year),
         [...Array(12).keys()]
           .map((m) => good(Date.UTC(year, m, 1)))
           .concat(good(Date.UTC(year, 11, 31))),
         "STND",
       );
-    const file = seriesPath(lake, "levels", "coops", "1", 2024);
+    const file = seriesPath(store, "levels", "coops", "1", 2024);
     await writeObservations(
       file,
       [{ time: Date.UTC(2024, 2, 15), level: 2, flag: Flag.preliminary }],
       "STND",
     );
-    const path = boundsPath(lake, "coops");
+    const path = boundsPath(store, "coops");
     await writeStationBounds(path, [
       {
         id: "coops/1",
@@ -897,8 +897,8 @@ describe("backfill script", () => {
           encoding: "utf8",
           env: {
             ...process.env,
-            WATER_LEVELS_LAKE: lake,
-            WATER_LEVELS_CACHE: join(root, "cache"),
+            STILLWELL_STORE: store,
+            STILLWELL_CACHE: join(root, "cache"),
             GITHUB_STEP_SUMMARY: summary,
           },
         },
@@ -940,7 +940,7 @@ describe("backfill script", () => {
 
     // Bounds an older build wrote, without the column, would pick nothing; it says so instead.
     await writeStations(path, [
-      { id: "coops/1", first: null, last: null } as unknown as LakeStation,
+      { id: "coops/1", first: null, last: null } as unknown as StoredStation,
     ]);
     const old = backfill();
     assert.equal(old.status, 1);
@@ -948,11 +948,11 @@ describe("backfill script", () => {
   });
 
   it("keeps the preliminary values it read every 100 stations, though the run is killed", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
-    const lake = join(root, "lake");
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
+    const store = join(root, "store");
     const ids = [...Array(101).keys()].map((i) => String(1000 + i));
     await writeStationList(
-      stationListPath(lake, "coops"),
+      stationListPath(store, "coops"),
       ids.map(
         (id) =>
           ({
@@ -980,10 +980,10 @@ describe("backfill script", () => {
                 state: "open",
               },
             ],
-          }) as LakeStation,
+          }) as StoredStation,
       ),
     );
-    const path = boundsPath(lake, "coops");
+    const path = boundsPath(store, "coops");
     // One month each to fetch, December 2024, which the fetch verifies.
     await writeStationBounds(
       path,
@@ -1012,8 +1012,8 @@ describe("backfill script", () => {
         encoding: "utf8",
         env: {
           ...process.env,
-          WATER_LEVELS_LAKE: lake,
-          WATER_LEVELS_CACHE: join(root, "cache"),
+          STILLWELL_STORE: store,
+          STILLWELL_CACHE: join(root, "cache"),
           EXIT_AFTER: "101",
         },
       },
@@ -1024,8 +1024,8 @@ describe("backfill script", () => {
   });
 
   it("stops, and fails the run, once CO-OPS blocks it", async () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-backfill-"));
-    const lake = join(root, "lake");
+    const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
+    const store = join(root, "store");
     const stations = ["1", "2", "3", "4", "5"].map(
       (id) =>
         ({
@@ -1053,13 +1053,13 @@ describe("backfill script", () => {
               state: "open",
             },
           ],
-        }) as LakeStation,
+        }) as StoredStation,
     );
-    await writeStationList(stationListPath(lake, "coops"), stations);
+    await writeStationList(stationListPath(store, "coops"), stations);
     // Every station but 5 has a known value, later than the run's fetches.
     const late = "2026-02-01T00:00:00Z";
     await writeStationBounds(
-      boundsPath(lake, "coops"),
+      boundsPath(store, "coops"),
       ["1", "2", "3", "4"].map((id) => ({
         id: `coops/${id}`,
         first: late,
@@ -1083,7 +1083,7 @@ describe("backfill script", () => {
       ],
       {
         encoding: "utf8",
-        env: { ...process.env, WATER_LEVELS_LAKE: lake, WATER_LEVELS_CACHE: join(root, "cache") },
+        env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(root, "cache") },
       },
     );
     assert.equal(run.status, 1, run.stderr);
@@ -1095,7 +1095,7 @@ describe("backfill script", () => {
     assert.ok(asked.length > 0, run.stderr);
     assert.ok(!asked.includes("4") && !asked.includes("5"), `asked ${asked}`);
     // A station the run never reached gets its value back; one with no row gets none.
-    const after = await readStationBounds(boundsPath(lake, "coops"));
+    const after = await readStationBounds(boundsPath(store, "coops"));
     assert.equal(after.get("coops/4")?.preliminary, late);
     assert.equal(after.has("coops/5"), false);
   });
@@ -1214,7 +1214,7 @@ describe("backfillYear", () => {
   const HOUR = 3_600_000;
   const station = coopsStation("8000001", "active");
   const epoch = station.epochs[0]!;
-  const dirOf = (lake: string) => seriesDir(lake, "levels", "coops", "8000001");
+  const dirOf = (store: string) => seriesDir(store, "levels", "coops", "8000001");
   // Hourly values around a reservoir's 1897.5 m, where the file's FLOAT keeps
   // steps of 0.12 mm, and a spike. A year ends on four hours at 1897.5003,
   // which reads back as 1897.5002, and starts on four at 1897.5002, so the
@@ -1243,7 +1243,7 @@ describe("backfillYear", () => {
     }) as unknown as Source;
   const years = [2000, 2001, 2002, 2003, 2004];
   const walk = async (
-    lake: string,
+    store: string,
     shift: number,
     files: (dir: string) => Promise<ReturnType<typeof seriesFiles<Observation>>>,
   ) => {
@@ -1255,12 +1255,12 @@ describe("backfillYear", () => {
         new Date(Date.UTC(year, 0, 1)),
         new Date(Date.UTC(year + 1, 0, 1)),
         epoch,
-        await files(dirOf(lake)),
+        await files(dirOf(store)),
         new Map(),
       );
   };
   // Years either side the walk doesn't fetch, and one in it, already hold values.
-  const seed = async (lake: string) => {
+  const seed = async (store: string) => {
     for (const year of [1999, 2002, 2005]) {
       const start = Date.UTC(year, 0, 1);
       const rows = [...Array(48).keys()].map((h) => ({
@@ -1270,19 +1270,19 @@ describe("backfillYear", () => {
         source_flag: Flag.preliminary,
         received: start + h * HOUR + 123,
       }));
-      await writeObservations(seriesPath(lake, "levels", "coops", "8000001", year), rows, "STND");
+      await writeObservations(seriesPath(store, "levels", "coops", "8000001", year), rows, "STND");
     }
   };
-  const bytes = (lake: string) =>
+  const bytes = (store: string) =>
     Object.fromEntries(
-      readdirSync(dirOf(lake))
+      readdirSync(dirOf(store))
         .sort()
-        .map((f) => [f, readFileSync(join(dirOf(lake), f)).toString("base64")]),
+        .map((f) => [f, readFileSync(join(dirOf(store), f)).toString("base64")]),
     );
 
   it("writes the same files whether it reads each year once or every time", async () => {
     const [cached, uncached] = [0, 1].map(() =>
-      join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake"),
+      join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store"),
     );
     await seed(cached!);
     await seed(uncached!);
@@ -1311,20 +1311,20 @@ describe("backfillYear", () => {
   });
 
   it("reads each year file at most once, and none the listing didn't find", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await seed(lake);
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await seed(store);
     const reads: string[] = [];
     const counting = (path: string) => {
-      reads.push(relative(dirOf(lake), path));
+      reads.push(relative(dirOf(store), path));
       return readObservationFile(path);
     };
-    const files = seriesFiles(dirOf(lake), await listYears(dirOf(lake)), counting);
-    await walk(lake, 0, async () => files);
+    const files = seriesFiles(dirOf(store), await listYears(dirOf(store)), counting);
+    await walk(store, 0, async () => files);
     // Five years written, from the three seeded files read once each.
     assert.deepEqual(reads.sort(), ["1999.parquet", "2002.parquet", "2005.parquet"]);
     reads.length = 0;
-    const again = seriesFiles(dirOf(lake), await listYears(dirOf(lake)), counting);
-    await walk(lake, 0.01, async () => again);
+    const again = seriesFiles(dirOf(store), await listYears(dirOf(store)), counting);
+    await walk(store, 0.01, async () => again);
     assert.deepEqual(
       reads.sort(),
       [1999, ...years, 2005].map((y) => `${y}.parquet`),
@@ -1332,49 +1332,49 @@ describe("backfillYear", () => {
   });
 
   it("reads a year again after its read fails", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await seed(lake);
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await seed(store);
     const reads: string[] = [];
     let failing = true;
     const flaky = (path: string) => {
-      reads.push(relative(dirOf(lake), path));
+      reads.push(relative(dirOf(store), path));
       if (failing && path.endsWith("2002.parquet")) {
         failing = false;
         return Promise.reject(new Error("timed out"));
       }
       return readObservationFile(path);
     };
-    const files = seriesFiles(dirOf(lake), await listYears(dirOf(lake)), flaky);
+    const files = seriesFiles(dirOf(store), await listYears(dirOf(store)), flaky);
     // 2001's read of its neighbor 2002 fails, so 2001 fails; 2002 reads it again.
     await assert.rejects(
-      walk(lake, 0, async () => files),
+      walk(store, 0, async () => files),
       /timed out/,
     );
-    await walk(lake, 0, async () => files);
+    await walk(store, 0, async () => files);
     assert.deepEqual(reads.filter((r) => r === "2002.parquet").length, 2);
   });
 
   it("reads a year again after its write fails", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    await seed(lake);
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await seed(store);
     const reads: string[] = [];
     const counting = (path: string) => {
-      reads.push(relative(dirOf(lake), path));
+      reads.push(relative(dirOf(store), path));
       return readObservationFile(path);
     };
-    const files = seriesFiles(dirOf(lake), await listYears(dirOf(lake)), counting);
+    const files = seriesFiles(dirOf(store), await listYears(dirOf(store)), counting);
     // A directory where 2004's file goes fails its write; 2003 has read 2004 as empty.
-    mkdirSync(join(dirOf(lake), "2004.parquet"));
-    await assert.rejects(walk(lake, 0, async () => files));
+    mkdirSync(join(dirOf(store), "2004.parquet"));
+    await assert.rejects(walk(store, 0, async () => files));
     assert.ok(!reads.includes("2004.parquet"));
-    rmSync(join(dirOf(lake), "2004.parquet"), { recursive: true });
+    rmSync(join(dirOf(store), "2004.parquet"), { recursive: true });
     await files.get(2004);
     assert.ok(reads.includes("2004.parquet"));
   });
 
   it("reads extremes once, for their datum and rows", async () => {
-    const lake = join(mkdtempSync(join(tmpdir(), "water-levels-backfill-")), "lake");
-    const dir = seriesDir(lake, "extremes", "coops", "8000001");
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    const dir = seriesDir(store, "extremes", "coops", "8000001");
     let reads = 0;
     const read = readerOf("extremes");
     const files = seriesFiles(dir, new Set([2000]), (path: string) => (reads++, read(path)));

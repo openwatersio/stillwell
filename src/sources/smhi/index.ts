@@ -33,7 +33,7 @@ export const metadata: SourceMetadata = {
   attribution: "SMHI",
   contact: { email: "dataleveranser@smhi.se" },
   terms:
-    "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the lake: levels converted from centimeters to meters, and quality flags added; values from the current and previous calendar months are marked preliminary.",
+    "SMHI's open data is licensed under CC BY 4.0 (Sweden), commercial use included. Name SMHI as the source and say whether you changed the data. SMHI asks users not to download the same data repeatedly and to use its latest update. Changes in the store: levels converted from centimeters to meters, and quality flags added; values from the current and previous calendar months are marked preliminary.",
   archive: "current",
   // `latest-day` has values within about an hour of their time.
   hourly: true,
@@ -349,7 +349,7 @@ function archiveOf(sourceId: string, datum: string): Promise<Parsed> {
  * `latest-day` takes over, or for a closed station to the end the station list
  * gives; SMHI builds an active station's archive to today's midnight. One that
  * ends sooner was cut short, or is a stale copy, and backfill would take its
- * missing hours as gone and delete them from the lake. A stale copy's
+ * missing hours as gone and delete them from the store. A stale copy's
  * `t.o.m.` note ends with its own rows, so the note can't show one is current.
  *
  * A closed station's last hours can have no rows at all: Landsort (2073)

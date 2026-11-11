@@ -299,7 +299,7 @@ describe("gesla links", () => {
 describe("gesla levels", () => {
   const station = (source_id: string) => ({ source_id, kind: "coastal" as const });
 
-  it("reads a record from the zip with GESLA's flags as the lake's", async () => {
+  it("reads a record from the zip with GESLA's flags as the store's", async () => {
     const levels = await gesla.levels(
       station("cape_dor-240-can-meds"),
       new Date("1969-01-16Z"),
@@ -340,7 +340,7 @@ describe("gesla levels", () => {
       new Date("2015-06-01T02:00Z"),
     );
     // GESLA labels them 00:00 and 01:00. Neither has had GESLA's QC, which a
-    // static release never adds, so they're good, left to the lake's own QC.
+    // static release never adds, so they're good, left to the store's own QC.
     assert.deepEqual(
       levels.map((l) => [iso(l.time), l.level, l.flag]),
       [

@@ -1,6 +1,6 @@
 name: Ingest
 
-# Run any ingest command against the R2 lake by hand, e.g.
+# Run any ingest command against the R2 store by hand, e.g.
 # `backfill rws hoekvanholland 2024 2025`. Ingest hourly and Compact daily run
 # `recent` and `compact` on a schedule.
 run-name: Ingest ${{ inputs.args }}
@@ -21,7 +21,7 @@ jobs:
   # jobs, so a backfill and a compaction never rewrite one year file at once.
   # Station lists are refreshed only by the Monthly workflow, so two refreshes
   # never rewrite one list, nor two publishes stations.parquet. Anything else,
-  # `publish` included, takes the `lake` group.
+  # `publish` included, takes the `store` group.
   group:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -46,12 +46,12 @@ jobs:
             esac
           done
           case "${words[0]:-}" in
-            backfill | recent | compact | requalify | withhold | years | analyze) [ -n "${words[1]:-}" ] && group="lake-${words[1]}" || group=lake ;;
+            backfill | recent | compact | requalify | withhold | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1
               ;;
-            *) group=lake ;;
+            *) group=store ;;
           esac
           echo "name=$group" >> "$GITHUB_OUTPUT"
         env:
@@ -62,11 +62,11 @@ jobs:
     concurrency:
       group: ${{ needs.group.outputs.name }}
       cancel-in-progress: false
-    # The lake environment only deploys from main; this stops a run from another
+    # The `lake` environment only deploys from main; this stops a run from another
     # branch before it waits on that rule.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # 180 minutes stops a stuck run without holding the lake for six hours.
+    # 180 minutes stops a stuck run without holding the store for six hours.
     # Long backfills raise it.
     timeout-minutes: ${{ fromJSON(inputs.timeout) }}
     # The environment holds the R2 credentials and only runs on main.
@@ -86,7 +86,7 @@ jobs:
           node scripts/ingest.ts $ARGS
         env:
           ARGS: ${{ inputs.args }}
-          WATER_LEVELS_LAKE: s3://water-levels
+          STILLWELL_STORE: s3://water-levels
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}

@@ -1,8 +1,8 @@
-# Using the water-levels bucket
+# Using the Stillwell bucket
 
-Every public series in the lake is Parquet at `https://water-levels.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Data whose source bars republishing isn't here; it goes to a separate private lake. The exception is UHSLC stations whose contributor's own terms are stricter than UHSLC's, which are public while permission is asked ([uhslc-contributors.md](uhslc-contributors.md)). Non-commercial data a source lets anyone republish is here, with `commercial_use` false on its stations.
+Every public series in the store is Parquet at `https://stillwell.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Data whose source bars republishing isn't here; it goes to a separate private store. The exception is UHSLC stations whose contributor's own terms are stricter than UHSLC's, which are public while permission is asked ([uhslc-contributors.md](uhslc-contributors.md)). Non-commercial data a source lets anyone republish is here, with `commercial_use` false on its stations.
 
-The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license, the attribution it asks for, and where to report an error in its data (`contact`) are in [`sources.json`](https://water-levels.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
+The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license, the attribution it asks for, and where to report an error in its data (`contact`) are in [`sources.json`](https://stillwell.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
 
 The bucket holds every published source's station list and the year files backfilled so far; `stations/years/<source>.parquet` lists which years each series has. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC; older years come with backfill, which is still under way for some sources.
 
@@ -11,10 +11,10 @@ The bucket holds every published source's station list and the year files backfi
 ```
 stations.parquet                                      one row per station
 sources.json                                          license, attribution, contact and `finalizes` per source
-errata.json                                           errors in what sources publish, and what the lake does about them
+errata.json                                           errors in what sources publish, and what the store does about them
 stations/<source>.parquet                             one source's list, as ingest keeps it
 stations/years/<source>.parquet                       every year file of observed levels: id, epoch, year, hours, values by flag, version
-stations/analysis/<source>.parquet                    what the lake measures from each station's levels, such as whether they carry a tide
+stations/analysis/<source>.parquet                    what the store measures from each station's levels, such as whether they carry a tide
 history/stations/<source>/<time>.parquet, .json       each refresh's previous list, and what it changed
 recent/<source>.parquet                               last 7 days: station, time, level_m, flag, source_flag, received, epoch
 obs/<source>/<station>/<year>.parquet                 observed levels: time, level_m, flag, source_flag, received, datum
@@ -27,7 +27,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 - **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch, apart from RWS's Dutch NAP stations, whose values before 2005 are in an epoch of their own; [Datum epochs](#datum-epochs) below shows how to read across them.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
-- **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only ever marks a value suspect or bad, so `flag` is never better than `source_flag`. QC works `flag` out from `source_flag` and the lake's rules, so a value a rule no longer flags is clear again once the lake reruns QC over it, which it does for the values it fetches, and for stored years when someone runs `requalify` after a rule changes. A value from before `source_flag` was kept that QC marked suspect or bad keeps its mark. `flag <= 2` keeps everything not flagged as a problem. A `preliminary` value is one the source hasn't checked. Two signals mark the ones it never will: every `preliminary` value from a source whose `finalizes` is false in `sources.json`, such as EA, PEGELONLINE and CDEC, which never mark a value checked, and values from before a station's `source_qc_start`, which the source states or the lake infers from its flags. Those have passed only the lake's QC, and stay `preliminary`; such a source can still revise a value, which reaches the lake only when someone fetches it again. Elsewhere a `preliminary` value may be checked later, and the Monthly refetch reads the last three years again for it, but some never are, without a sign: SMHI's closed stations that are all unchecked, such as Landsort's to 2006, and USACE offices that screen nothing.
+- **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only ever marks a value suspect or bad, so `flag` is never better than `source_flag`. QC works `flag` out from `source_flag` and the store's rules, so a value a rule no longer flags is clear again once the store reruns QC over it, which it does for the values it fetches, and for stored years when someone runs `requalify` after a rule changes. A value from before `source_flag` was kept that QC marked suspect or bad keeps its mark. `flag <= 2` keeps everything not flagged as a problem. A `preliminary` value is one the source hasn't checked. Two signals mark the ones it never will: every `preliminary` value from a source whose `finalizes` is false in `sources.json`, such as EA, PEGELONLINE and CDEC, which never mark a value checked, and values from before a station's `source_qc_start`, which the source states or the store infers from its flags. Those have passed only the store's QC, and stay `preliminary`; such a source can still revise a value, which reaches the store only when someone fetches it again. Elsewhere a `preliminary` value may be checked later, and the Monthly refetch reads the last three years again for it, but some never are, without a sign: SMHI's closed stations that are all unchecked, such as Landsort's to 2006, and USACE offices that screen nothing.
 - **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. An adapter can mark a span worse than its source does without changing `source_flag`, as REFMAR does for Pointe-à-Pitre's 2020 to 2024 clock, so read `flag` to skip what shouldn't be used. Where a source doesn't mark which values it has checked, the adapter decides: Kartverket's values count as verified once they're a year old, and SMHI's from this month and the last count as preliminary at best, even where SMHI marks them checked, since it corrects them monthly. California DWR's from this month and the three before count as preliminary at best, since DWR edits its data without marking it. It's null in predictions and in values written before it was kept, and files written before then don't have the column. Where such a value's flag is better than suspect, it's the source's, and rerunning QC fills it in; a suspect or bad one may be QC's, so it stays null.
 - **`received`** is when ingest first saw a value arrive. It's empty for backfilled history.
 - **`type`** is `high` or `low`. RWS's observed extremes give both lows of a double low water, so two lows can come in a row. BSH's predicted extremes also carry its `transit` number and `event` index.
@@ -43,10 +43,10 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
 - **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. A record's length counts only its share of values not flagged suspect or bad, from its source's years file, so a long record of flagged values doesn't outrank a shorter clean one; a station whose source has no years file counts its whole record. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
-- **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. [`errata.json`](https://water-levels.openwaters.io/errata.json) has each one: which stations and span of values it's in, what's wrong, whether the lake corrected, flagged, dropped, refused, avoided or kept them, the evidence, when it was reported to the agency and what it answered, and a link (`url`) to the file in this repository that holds it.
-- **`source_qc_start`**: where the source's quality checks of the station's values start, as a UTC time, or null where none is known or the station's list hasn't been read for it yet. Null means unknown. It doesn't mean the source never checks the station's values, or that it has checked them all: its `preliminary` values may be checked later or never. At SMHI, the [adapter's notes](../src/sources/smhi/README.md) say why each station without a date has none. The source won't check the `preliminary` values before it, so they won't change. SMHI states one for 28 of its stations, 25 of them the Swedish Maritime Administration's: data before 1 July 2019 isn't quality-controlled, and automatic checks run from then on. At about 25 more SMHI stations whose notes state none, the lake infers it from SMHI's flags, as the first checked value after the last month or more of unchecked ones: 1 January 2010 at most of SMHI's own, and 11 January 2018 at Uddevalla. `flag <= 2 AND time < source_qc_start` gives that history where it passed the lake's QC.
-- **`source_qc_start_inferred`**: whether the lake inferred `source_qc_start` from the source's flags (true) or the source stated it (false). Null without a `source_qc_start`, or with one the station refresh hasn't read again since the column was added, which it settles on a later refresh. Add `AND source_qc_start_inferred = false` to keep to stated dates. An inferred date is the lake's reading of the flags, worked out once and kept, and backfill doesn't fetch the years before it again.
-- **`tidal`**: whether the station's levels carry a tide, measured from its last year in the lake: true where M2's and O1's amplitudes add to 8 cm or more (`tide_m`), on at least 30 days of values, at water within 10 m of sea level where its datums say how high it sits, and, away from the coast, where it doesn't hold still between tides like a creek drained to a sill. Null where its values can't say (under 30 days, or sampled too coarsely to fit a tide), or before its first analysis. It's measured, not taken from `kind`: a river can be tidal, and the Baltic isn't. QC follows it: still water gets two days before a flatline is suspect and no outlier check (a sea without a tide keeps six hours for values in millimeters), tidal water six hours, or two days where its tide is under 30 cm and its values move in whole centimeters. [stations.md](stations.md#analysis) has the rule.
+- **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. [`errata.json`](https://stillwell.openwaters.io/errata.json) has each one: which stations and span of values it's in, what's wrong, whether the store corrected, flagged, dropped, refused, avoided or kept them, the evidence, when it was reported to the agency and what it answered, and a link (`url`) to the file in this repository that holds it.
+- **`source_qc_start`**: where the source's quality checks of the station's values start, as a UTC time, or null where none is known or the station's list hasn't been read for it yet. Null means unknown. It doesn't mean the source never checks the station's values, or that it has checked them all: its `preliminary` values may be checked later or never. At SMHI, the [adapter's notes](../src/sources/smhi/README.md) say why each station without a date has none. The source won't check the `preliminary` values before it, so they won't change. SMHI states one for 28 of its stations, 25 of them the Swedish Maritime Administration's: data before 1 July 2019 isn't quality-controlled, and automatic checks run from then on. At about 25 more SMHI stations whose notes state none, the store infers it from SMHI's flags, as the first checked value after the last month or more of unchecked ones: 1 January 2010 at most of SMHI's own, and 11 January 2018 at Uddevalla. `flag <= 2 AND time < source_qc_start` gives that history where it passed the store's QC.
+- **`source_qc_start_inferred`**: whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false). Null without a `source_qc_start`, or with one the station refresh hasn't read again since the column was added, which it settles on a later refresh. Add `AND source_qc_start_inferred = false` to keep to stated dates. An inferred date is the store's reading of the flags, worked out once and kept, and backfill doesn't fetch the years before it again.
+- **`tidal`**: whether the station's levels carry a tide, measured from its last year in the store: true where M2's and O1's amplitudes add to 8 cm or more (`tide_m`), on at least 30 days of values, at water within 10 m of sea level where its datums say how high it sits, and, away from the coast, where it doesn't hold still between tides like a creek drained to a sill. Null where its values can't say (under 30 days, or sampled too coarsely to fit a tide), or before its first analysis. It's measured, not taken from `kind`: a river can be tidal, and the Baltic isn't. QC follows it: still water gets two days before a flatline is suspect and no outlier check (a sea without a tide keeps six hours for values in millimeters), tidal water six hours, or two days where its tide is under 30 cm and its values move in whole centimeters. [stations.md](stations.md#analysis) has the rule.
 - **`tide_m`**: the lunar tide `tidal` is judged by, M2's and O1's amplitudes added, in meters, fitted over the station's last year of usable values. Null where they span under 30 days or are sampled too coarsely to fit, and before the station's first analysis.
 - **`status`**: `active` or `inactive`.
 - **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
@@ -57,7 +57,7 @@ How many stations each source has, and in which datums:
 
 ```sql
 SELECT source, count(*) AS stations, string_agg(DISTINCT datum, ', ' ORDER BY datum) AS datums
-FROM 'https://water-levels.openwaters.io/stations.parquet'
+FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE status = 'active'
 GROUP BY source ORDER BY source;
 ```
@@ -77,7 +77,7 @@ A gauge by name, with its links to other sources:
 
 ```sql
 SELECT id, name, products, same_as, preferred
-FROM 'https://water-levels.openwaters.io/stations.parquet'
+FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE name ILIKE '%cuxhaven%';
 ```
 
@@ -95,7 +95,7 @@ One station per gauge, so a map or a count doesn't show a gauge once for each so
 
 ```sql
 SELECT count(*) AS gauges
-FROM 'https://water-levels.openwaters.io/stations.parquet'
+FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE list_contains(products, 'levels') AND preferred = id;
 ```
 
@@ -106,7 +106,7 @@ SELECT id, name,
   round(6371 * acos(least(1,
     sin(radians(lat)) * sin(radians(51.98)) +
     cos(radians(lat)) * cos(radians(51.98)) * cos(radians(lon - 4.12)))), 2) AS km
-FROM 'https://water-levels.openwaters.io/stations.parquet'
+FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE status = 'active' AND list_contains(products, 'levels')
 ORDER BY km LIMIT 5;
 ```
@@ -128,7 +128,7 @@ Datum offsets are a map. Add one to a level to convert it:
 
 ```sql
 SELECT id, datum, datums['NHN'] AS to_nhn_m
-FROM 'https://water-levels.openwaters.io/stations.parquet'
+FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE id IN ('pegelonline/5990020', 'bsh/726A');
 ```
 
@@ -151,7 +151,7 @@ The first values of a year:
 ```sql
 SET TimeZone = 'UTC';
 SELECT time, level_m, flag, datum
-FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
 ORDER BY time LIMIT 5;
 ```
 
@@ -174,7 +174,7 @@ Monthly statistics, leaving out values flagged as suspect or bad:
 SELECT date_trunc('month', time) AS month,
   round(avg(level_m), 3) AS mean_m, round(min(level_m), 2) AS min_m,
   round(max(level_m), 2) AS max_m, count(*) AS n
-FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
 WHERE flag <= 2
 GROUP BY ALL ORDER BY month LIMIT 4;
 ```
@@ -195,7 +195,7 @@ How many values each flag has:
 
 ```sql
 SELECT flag, count(*) AS n
-FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
 GROUP BY flag ORDER BY flag;
 ```
 
@@ -213,7 +213,7 @@ The year's highest high waters, as RWS selected them:
 
 ```sql
 SELECT time, level_m
-FROM 'https://water-levels.openwaters.io/extremes/rws/hoekvanholland/2024.parquet'
+FROM 'https://stillwell.openwaters.io/extremes/rws/hoekvanholland/2024.parquet'
 WHERE type = 'high' ORDER BY level_m DESC LIMIT 3;
 ```
 
@@ -233,8 +233,8 @@ The surge, as observed minus RWS's own prediction, at its largest:
 ```sql
 SELECT o.time, o.level_m AS observed_m, p.level_m AS predicted_m,
   round(o.level_m - p.level_m, 2) AS residual_m
-FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o
-JOIN 'https://water-levels.openwaters.io/predictions/rws/hoekvanholland/2024.parquet' p USING (time)
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o
+JOIN 'https://stillwell.openwaters.io/predictions/rws/hoekvanholland/2024.parquet' p USING (time)
 ORDER BY abs(o.level_m - p.level_m) DESC LIMIT 3;
 ```
 
@@ -255,7 +255,7 @@ HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` do
 
 ```sql
 SET VARIABLE files = (
-  SELECT list('https://water-levels.openwaters.io/obs/rws/hoekvanholland/' || y || '.parquet')
+  SELECT list('https://stillwell.openwaters.io/obs/rws/hoekvanholland/' || y || '.parquet')
   FROM range(2024, 2025) t(y)
 );
 SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
@@ -272,13 +272,13 @@ A year with no values has no file, so a missing file and a failed download look 
 - **`good`**, **`interpolated`**, **`preliminary`**, **`suspect`** and **`bad`**: how many values have each `flag`;
 - **`version`**: a hash of the file's rows, which changes when any row's `time`, `level_m`, `flag`, `source_flag` or `received` does, and only then.
 
-A year between a station's first and last rows with no row of its own has no values. A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights. The file covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels keeps it, and compaction checks each night that every file has a row and every row a file, so it's current but for those marks, as long as nothing else writes the files; `stations.parquet` lags it by up to a rebuild. A source has no years file until the lake builds one for it, so a missing one means not built yet, not a source with no files.
+A year between a station's first and last rows with no row of its own has no values. A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights. The file covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels keeps it, and compaction checks each night that every file has a row and every row a file, so it's current but for those marks, as long as nothing else writes the files; `stations.parquet` lags it by up to a rebuild. A source has no years file until the store builds one for it, so a missing one means not built yet, not a source with no files.
 
 The years of one station, with how much of each its source hasn't checked:
 
 ```sql
 SELECT epoch, year, hours, good + interpolated AS checked, preliminary, suspect + bad AS flagged, version
-FROM 'https://water-levels.openwaters.io/stations/years/rws.parquet'
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
 WHERE id = 'rws/hoekvanholland'
 ORDER BY epoch, year;
 ```
@@ -286,9 +286,9 @@ ORDER BY epoch, year;
 The paths of every year with a file, to pass to `read_parquet` as in [Reading many files](#reading-many-files):
 
 ```sql
-SELECT list('https://water-levels.openwaters.io/obs/' || id ||
+SELECT list('https://stillwell.openwaters.io/obs/' || id ||
   CASE WHEN epoch = 1 THEN '' ELSE '/' || epoch END || '/' || year || '.parquet' ORDER BY epoch, year)
-FROM 'https://water-levels.openwaters.io/stations/years/rws.parquet'
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
 WHERE id = 'rws/hoekvanholland' AND year IS NOT NULL;
 ```
 
@@ -302,10 +302,10 @@ That works for an `id` whose `source_id` needs no URL-encoding; one with a `/`, 
 
 ```sql
 SET TimeZone = 'UTC';
-SET VARIABLE base = 'https://water-levels.openwaters.io/obs/pegelonline/5990020';
+SET VARIABLE base = 'https://stillwell.openwaters.io/obs/pegelonline/5990020';
 WITH e AS (
   SELECT unnest(epochs, recursive := true)
-  FROM 'https://water-levels.openwaters.io/stations.parquet' WHERE id = 'pegelonline/5990020'
+  FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'pegelonline/5990020'
 ),
 o AS (
   -- epoch 1's files; add one per later epoch from its directory with UNION ALL BY NAME,
@@ -334,7 +334,7 @@ con = duckdb.connect()
 con.sql("SET TimeZone = 'UTC'")
 df = con.sql("""
     SELECT time, level_m
-    FROM 'https://water-levels.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+    FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
     WHERE flag <= 2
 """).df()
 daily = df.set_index("time").level_m.resample("D").agg(["min", "max"])

@@ -153,7 +153,7 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
   const out: Observation[] = [];
   // Backfill replaces each month it gets values for, so a month with a day the
   // archive no longer holds gives none, from the archive or the API, keeping
-  // what the lake has for it.
+  // what the store has for it.
   const missing = new Set<string>();
   const monthOf = (t: number) => new Date(t).toISOString().slice(0, 7);
   // A start within the API's days reads no archive file, not even its own day's.

@@ -24,7 +24,7 @@ Backfill asks for every product a station lists, a year per request, so a tide g
    node scripts/ingest.ts backfill rws all 2026 2027
    ```
 
-3. Refetch the years already in the lake from before the adapter kept both lows of a double low water and converted NAP before 2005. Hoek van Holland's 2024 is one; a `--skip-written` run would otherwise keep it as it is. Any other RWS year file before 2026 in a station's current epoch needs the same. At a split station, epoch 1's files from 2005 on, this year's compacted weeks among them, stay in place outside its span, and epoch 2's files hold those years again. A listing of `obs/rws/`, `extremes/rws/`, `predictions/rws/` and `predicted-extremes/rws/` in the bucket shows which files there are. For Hoek van Holland:
+3. Refetch the years already in the store from before the adapter kept both lows of a double low water and converted NAP before 2005. Hoek van Holland's 2024 is one; a `--skip-written` run would otherwise keep it as it is. Any other RWS year file before 2026 in a station's current epoch needs the same. At a split station, epoch 1's files from 2005 on, this year's compacted weeks among them, stay in place outside its span, and epoch 2's files hold those years again. A listing of `obs/rws/`, `extremes/rws/`, `predictions/rws/` and `predicted-extremes/rws/` in the bucket shows which files there are. For Hoek van Holland:
 
    ```bash
    node scripts/ingest.ts backfill rws hoekvanholland 2024 2025 --refetch
@@ -36,4 +36,4 @@ Backfill asks for every product a station lists, a year per request, so a tide g
    node scripts/ingest.ts backfill rws all 1990 2026 --skip-written --first docs/ticon-replacement.csv
    ```
 
-Each run holds the `lake-rws` group for up to 6 hours. A job that finds the group taken waits, and the next hourly run cancels it, so start each run between 01:00 and 18:30 UTC, so it ends before Compact daily at 00:40, and not on the 2nd, when Monthly refreshes the station list at 01:25.
+Each run holds the `store-rws` group for up to 6 hours. A job that finds the group taken waits, and the next hourly run cancels it, so start each run between 01:00 and 18:30 UTC, so it ends before Compact daily at 00:40, and not on the 2nd, when Monthly refreshes the station list at 01:25.

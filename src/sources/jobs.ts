@@ -9,7 +9,7 @@ import { sources } from "./index.ts";
  * - `refetch`: the monthly refetch, for sources whose values become final.
  *
  * Only sources that may be redistributed: the workflows write the public
- * lake, and have no restricted one.
+ * store, and have no restricted one.
  */
 export const JOBS = ["hourly", "compact", "lists", "refetch"] as const;
 export type Job = (typeof JOBS)[number];

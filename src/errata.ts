@@ -4,23 +4,23 @@
  * the data, two endpoints that disagree. Each source's errata are in
  * `src/sources/<source>/errata.json`, which the adapter registry imports,
  * reviewed with the code that handles them. A `flagged` erratum with stations and a span is flagged `suspect` by
- * `withErrata` wherever the lake fetches or requalifies those values; other
+ * `withErrata` wherever the store fetches or requalifies those values; other
  * handling is the adapter's, which cites the ID (`erratum \`<id>\``) where it
  * works around it. `publish` lists each station's errata in the `errata`
  * column of `stations.parquet` and writes them to `errata.json`. An entry
  * also records its report to the agency, which `npm run errata` drafts.
- * Once the agency fixes the data and the lake has refetched it, the entry
+ * Once the agency fixes the data and the store has refetched it, the entry
  * goes and its ID moves to `retired`. See CONTRIBUTING.md.
  */
 import { Flag, Unjudged, type Observation, type Source, type Station } from "./schema.ts";
 
-/** What the lake does about an erratum. */
+/** What the store does about an erratum. */
 export const HANDLING = ["corrected", "flagged", "dropped", "refused", "avoided", "kept"] as const;
 /**
  * `corrected`: values or metadata changed to what the source should have
  * published. `flagged`: values kept, flagged `suspect` or worse. `dropped`:
  * stations or values left out. `refused`: the adapter refuses the file, so its
- * values are missing until it's fixed. `avoided`: the lake doesn't use the
+ * values are missing until it's fixed. `avoided`: the store doesn't use the
  * wrong part, so nothing in it is affected. `kept`: kept as the source serves it.
  */
 export type Handling = (typeof HANDLING)[number];
@@ -30,14 +30,14 @@ export interface Erratum {
   id: string;
   source: string;
   /**
-   * Lake station IDs known to be affected; null for every station of the
+   * Store station IDs known to be affected; null for every station of the
    * source. Partial or empty where the source doesn't say which stations, or
-   * they aren't in the lake; `error` says which.
+   * they aren't in the store; `error` says which.
    */
   stations: string[] | null;
   /**
    * The UTC days of values the error is in, `since` to before `until`; null
-   * for an open end or none. What the lake lacks or changed as a result can
+   * for an open end or none. What the store lacks or changed as a result can
    * be wider, and `response` says so.
    */
   since: string | null;
@@ -45,7 +45,7 @@ export interface Erratum {
   /** What the source publishes wrong. */
   error: string;
   handling: Handling;
-  /** What the lake does about it. */
+  /** What the store does about it. */
   response: string;
   /** How it was found and how sure it is. */
   evidence: string | null;
@@ -55,7 +55,7 @@ export interface Erratum {
   report: string | null;
 }
 
-export const REPO = "openwatersio/water-levels";
+export const REPO = "openwatersio/stillwell";
 /** An entry's fields, so a misspelled one, which would widen or drop a span, is refused. */
 const FIELDS = new Set([
   "id",

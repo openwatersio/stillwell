@@ -154,7 +154,7 @@ describe("scripts/sources.ts imports", () => {
 
 describe("scheduled jobs for a source with no list yet", () => {
   it("skip it, saying the Monthly workflow starts its list", () => {
-    const root = mkdtempSync(join(tmpdir(), "water-levels-jobs-"));
+    const root = mkdtempSync(join(tmpdir(), "stillwell-jobs-"));
     for (const args of [
       ["recent", "coops"],
       ["compact", "coops"],
@@ -163,8 +163,8 @@ describe("scheduled jobs for a source with no list yet", () => {
         encoding: "utf8",
         env: {
           ...process.env,
-          WATER_LEVELS_LAKE: join(root, "lake"),
-          WATER_LEVELS_CACHE: join(root, "cache"),
+          STILLWELL_STORE: join(root, "store"),
+          STILLWELL_CACHE: join(root, "cache"),
         },
       });
       assert.match(out, /coops: no station list yet; the Monthly workflow starts it/);

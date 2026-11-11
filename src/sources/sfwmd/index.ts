@@ -42,7 +42,7 @@ export const metadata: SourceMetadata = {
     url: "https://www.sfwmd.gov/contact/dbhydro_contact_form",
   },
   terms:
-    "SFWMD publishes DBHYDRO without a license or a restriction on reuse, as Florida public records. Its disclaimer gives the data as is, without warranty, and asks users to get it from the District's own server. Provisional values are subject to revision. Changes in the lake: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added.",
+    "SFWMD publishes DBHYDRO without a license or a restriction on reuse, as Florida public records. Its disclaimer gives the data as is, without warranty, and asks users to get it from the District's own server. Provisional values are subject to revision. Changes in the store: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added.",
   // Telemetry arrives within minutes.
   hourly: true,
   // Provisional values are approved within days to months.
@@ -283,10 +283,10 @@ function titleCase(text: string): string {
 /**
  * Levels in meters NAVD88 over [start, end): the derived series between
  * `history_start` and `history_end`, and the telemetry series before and after
- * it. The lake replaces each UTC month that has values, so the series switch
+ * it. The store replaces each UTC month that has values, so the series switch
  * only at the start of a month: a month the derived series covers in part,
  * where telemetry covers it too, comes from telemetry, and a series that sends
- * nothing for a month leaves that month in the lake as it was. Where telemetry
+ * nothing for a month leaves that month in the store as it was. Where telemetry
  * ended before the derived series did, the derived series runs to the end.
  */
 export async function levels(station: Series, start: Date, end: Date): Promise<Observation[]> {

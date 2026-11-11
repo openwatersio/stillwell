@@ -13,7 +13,7 @@ import {
   writeRecent,
   writeStationList,
   writeStations,
-} from "../src/lake/parquet.ts";
+} from "../src/store/parquet.ts";
 import {
   boundsPath,
   recentPath,
@@ -23,12 +23,12 @@ import {
   stationListPath,
   stationsPath,
   yearsPath,
-} from "../src/lake/paths.ts";
+} from "../src/store/paths.ts";
 import type { Erratum } from "../src/errata.ts";
 import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
 import { LINKS } from "../src/same-as.ts";
-import { writeYears } from "../src/lake/years.ts";
+import { writeYears } from "../src/store/years.ts";
 import {
   describeReport,
   needsPerson,
@@ -106,11 +106,11 @@ const NOW = "2026-11-05T00:00:00Z";
 const LATER = "2026-12-05T00:00:00Z";
 
 describe("refreshSource", () => {
-  let lake: string;
+  let store: string;
   beforeEach(async () => {
-    lake = await mkdtemp(join(tmpdir(), "lake-"));
+    store = await mkdtemp(join(tmpdir(), "store-"));
   });
-  afterEach(() => rm(lake, { recursive: true }));
+  afterEach(() => rm(store, { recursive: true }));
 
   it("moves the stations POSITIONS names, and reports one the source has moved", async () => {
     const uhslc = (fields: Partial<ListedStation>[]): Source => ({
@@ -122,12 +122,12 @@ describe("refreshSource", () => {
             listed(id.slice(6), { id, source: "uhslc", ...served, ...fields[i] }),
           ),
     });
-    const { stations } = await refreshSource(lake, uhslc([]), { now: NOW });
+    const { stations } = await refreshSource(store, uhslc([]), { now: NOW });
     assert.deepEqual(
       stations.find((s) => s.id === "uhslc/290a")!.lat,
       POSITIONS["uhslc/290a"]!.at.lat,
     );
-    const moved = await refreshSource(lake, uhslc([{ lat: 0 }]), { now: LATER });
+    const moved = await refreshSource(store, uhslc([{ lat: 0 }]), { now: LATER });
     const id = Object.keys(POSITIONS).find((k) => k.startsWith("uhslc/"))!;
     assert.equal(moved.stations.find((s) => s.id === id)!.lat, 0);
     assert.match(moved.report.positions.join(), new RegExp(`^${id} is now at 0,`));
@@ -142,26 +142,26 @@ describe("refreshSource", () => {
           .filter((id) => id.startsWith("rws/"))
           .map((id) => listed(id.slice(4), { id, source: "rws", kind })),
     });
-    const { stations, report } = await refreshSource(lake, rws(null), { now: NOW });
+    const { stations, report } = await refreshSource(store, rws(null), { now: NOW });
     assert.equal(stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "coastal");
     assert.deepEqual(report.kinds, []);
-    const changed = await refreshSource(lake, rws("lake"), { now: LATER });
+    const changed = await refreshSource(store, rws("lake"), { now: LATER });
     assert.equal(changed.stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "lake");
     assert.match(changed.report.kinds.join(), /rws\/uithuizerwad is now lake by its source/);
     assert.ok(needsPerson(changed.report));
     assert.match(describeReport(changed.report).join("\n"), /remove its entry from KINDS/);
     // The source's kind stays, and stays reported, run after run.
-    const again = await refreshSource(lake, rws("lake"), { now: "2027-01-05T00:00:00Z" });
+    const again = await refreshSource(store, rws("lake"), { now: "2027-01-05T00:00:00Z" });
     assert.equal(again.stations.find((s) => s.id === "rws/uithuizerwad")!.kind, "lake");
     assert.match(again.report.kinds.join(), /rws\/uithuizerwad is now lake by its source/);
   });
 
   it("writes a source's first list, then snapshots it before the next", async () => {
-    const first = await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
+    const first = await refreshSource(store, sourceOf([listed("a"), listed("b")]), { now: NOW });
     assert.deepEqual(first.report.added, ["test/a", "test/b"]);
-    assert.equal((await readStationList(stationListPath(lake, "test")))!.length, 2);
+    assert.equal((await readStationList(stationListPath(store, "test")))!.length, 2);
 
-    const next = await refreshSource(lake, sourceOf([listed("a", { name: "Ay" })]), {
+    const next = await refreshSource(store, sourceOf([listed("a", { name: "Ay" })]), {
       now: LATER,
     });
     assert.deepEqual(next.report.retired, ["test/b"]);
@@ -169,7 +169,7 @@ describe("refreshSource", () => {
       { id: "test/a", fields: ["name"] },
       { id: "test/b", fields: ["status"] },
     ]);
-    const history = (await readdir(join(lake, "history/stations/test"))).sort();
+    const history = (await readdir(join(store, "history/stations/test"))).sort();
     assert.deepEqual(history, [
       "2026-11-05T000000Z.json",
       "2026-11-05T000000Z.parquet",
@@ -177,8 +177,8 @@ describe("refreshSource", () => {
       "2026-12-05T000000Z.parquet",
     ]);
     // Each snapshot is the list as its refresh started: none, then the first.
-    assert.deepEqual(await readStationList(join(lake, "history/stations/test", history[1]!)), []);
-    const snapshot = await readStationList(join(lake, "history/stations/test", history[3]!));
+    assert.deepEqual(await readStationList(join(store, "history/stations/test", history[1]!)), []);
+    const snapshot = await readStationList(join(store, "history/stations/test", history[3]!));
     assert.deepEqual(
       snapshot!.map((s) => [s.id, s.name, s.status]),
       [
@@ -194,53 +194,53 @@ describe("refreshSource", () => {
       ...sourceOf([listed("a", { reference })]),
       metadata: { ...metadata, archive: "current" as const },
     };
-    await refreshSource(lake, source, { now: NOW });
-    const [epoch] = (await readStationList(stationListPath(lake, "test")))![0]!.epochs;
+    await refreshSource(store, source, { now: NOW });
+    const [epoch] = (await readStationList(stationListPath(store, "test")))![0]!.epochs;
     assert.deepEqual([epoch!.since, epoch!.reference_since], [null, "2019-11-02T00:00:00Z"]);
   });
 
   it("refuses to start over when the list is gone but its history isn't", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    await rm(stationListPath(lake, "test"));
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
+    await rm(stationListPath(store, "test"));
     await assert.rejects(
-      refreshSource(lake, sourceOf([listed("a")]), { now: LATER }),
+      refreshSource(store, sourceOf([listed("a")]), { now: LATER }),
       (e) => e instanceof Refused && /history for test but no list/.test(e.message),
     );
   });
 
-  it("refuses to start a list over a recent window the lake already has", async () => {
-    await writeRecent(recentPath(lake, "test"), [
+  it("refuses to start a list over a recent window the store already has", async () => {
+    await writeRecent(recentPath(store, "test"), [
       [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 1 }],
     ]);
     await assert.rejects(
-      refreshSource(lake, sourceOf([listed("a")]), { now: NOW }),
+      refreshSource(store, sourceOf([listed("a")]), { now: NOW }),
       /has test series but no list or history/,
     );
   });
 
-  it("refuses to start a list over the source's series already in the lake", async () => {
+  it("refuses to start a list over the source's series already in the store", async () => {
     await writeObservations(
-      seriesPath(lake, "levels", "test", "a", 2024),
+      seriesPath(store, "levels", "test", "a", 2024),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "NAP",
     );
     await assert.rejects(
-      refreshSource(lake, sourceOf([listed("a")]), { now: NOW }),
+      refreshSource(store, sourceOf([listed("a")]), { now: NOW }),
       (e) => e instanceof Refused && /has test series but no list or history/.test(e.message),
     );
   });
 
   it("refuses a list that shrank sharply or came back empty", async () => {
     const many = Array.from({ length: 30 }, (_, i) => listed(String(i)));
-    await refreshSource(lake, sourceOf(many), { now: NOW });
+    await refreshSource(store, sourceOf(many), { now: NOW });
     await assert.rejects(
-      refreshSource(lake, sourceOf(many.slice(0, 10)), { now: LATER }),
+      refreshSource(store, sourceOf(many.slice(0, 10)), { now: LATER }),
       /lists 10 stations, down from 30/,
     );
-    await assert.rejects(refreshSource(lake, sourceOf([]), { now: LATER }), /listed no stations/);
+    await assert.rejects(refreshSource(store, sourceOf([]), { now: LATER }), /listed no stations/);
     // A new source's first fetch can't be empty either.
     const other = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
-    await assert.rejects(refreshSource(lake, other, { now: NOW }), /listed no stations/);
+    await assert.rejects(refreshSource(store, other, { now: NOW }), /listed no stations/);
     // Nor one whose stations all lack the datum a new station needs.
     const nameless = {
       ...sourceOf([
@@ -248,46 +248,46 @@ describe("refreshSource", () => {
       ]),
       metadata: { ...metadata, id: "other" },
     };
-    await assert.rejects(refreshSource(lake, nameless, { now: NOW }), /no stations with a datum/);
+    await assert.rejects(refreshSource(store, nameless, { now: NOW }), /no stations with a datum/);
   });
 
   it("refuses a station from another source", async () => {
     await assert.rejects(
-      refreshSource(lake, sourceOf([listed("a", { source: "rws", id: "rws/a" })]), { now: NOW }),
+      refreshSource(store, sourceOf([listed("a", { source: "rws", id: "rws/a" })]), { now: NOW }),
       /rws\/a isn't a test station/,
     );
   });
 
   it("lists a station whose commercial use differs from its source's default", async () => {
-    await refreshSource(lake, sourceOf([listed("a", { commercial_use: false })]), { now: NOW });
-    const [a] = (await readStationList(stationListPath(lake, "test")))!;
+    await refreshSource(store, sourceOf([listed("a", { commercial_use: false })]), { now: NOW });
+    const [a] = (await readStationList(stationListPath(store, "test")))!;
     assert.equal(a!.commercial_use, false);
   });
 
   it("refuses many datum changes at once until --accept-epochs accepts them", async () => {
     const stations = Array.from({ length: 10 }, (_, i) => listed(String(i)));
-    await refreshSource(lake, sourceOf(stations), { now: NOW });
+    await refreshSource(store, sourceOf(stations), { now: NOW });
     const moved = stations.map((s) => ({ ...s, datum: "MSL" }));
     await assert.rejects(
-      refreshSource(lake, sourceOf(moved), { now: LATER }),
+      refreshSource(store, sourceOf(moved), { now: LATER }),
       /10 stations changed datum at once \(limit 5\)/,
     );
-    const { report } = await refreshSource(lake, sourceOf(moved), {
+    const { report } = await refreshSource(store, sourceOf(moved), {
       now: LATER,
       acceptEpochs: true,
     });
     assert.equal(report.epochs.filter((e) => e.event === "opened").length, 10);
   });
 
-  it("numbers a new epoch above any epoch files already in the lake", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+  it("numbers a new epoch above any epoch files already in the store", async () => {
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     // Files from an epoch 3 that a restored list no longer knows about.
     await writeObservations(
-      seriesPath(lake, "levels", "test", "a", 2026, 3),
+      seriesPath(store, "levels", "test", "a", 2026, 3),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "MSL",
     );
-    const { stations } = await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), {
+    const { stations } = await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), {
       now: LATER,
     });
     assert.deepEqual(
@@ -300,9 +300,9 @@ describe("refreshSource", () => {
   });
 
   it("counts a field a stored station leaves out as null, not a change", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     const { report } = await refreshSource(
-      lake,
+      store,
       sourceOf([{ ...listed("a"), series_end: null } as ListedStation]),
       { now: LATER },
     );
@@ -310,8 +310,8 @@ describe("refreshSource", () => {
   });
 
   it("tells a station the source retired itself from one it stopped listing", async () => {
-    await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
-    const { report } = await refreshSource(lake, sourceOf([listed("a", { status: "inactive" })]), {
+    await refreshSource(store, sourceOf([listed("a"), listed("b")]), { now: NOW });
+    const { report } = await refreshSource(store, sourceOf([listed("a", { status: "inactive" })]), {
       now: LATER,
     });
     assert.deepEqual([report.retired, report.withdrawn], [["test/a", "test/b"], ["test/a"]]);
@@ -327,9 +327,9 @@ describe("refreshSource", () => {
       ...sourceOf([station]),
       metadata: { ...metadata, id: "gesla" },
     });
-    await refreshSource(lake, gesla(listed("a", uddevalla)), { now: NOW });
+    await refreshSource(store, gesla(listed("a", uddevalla)), { now: NOW });
     const { report } = await refreshSource(
-      lake,
+      store,
       gesla(listed("a", { ...uddevalla, status: "inactive", products: [] })),
       { now: LATER },
     );
@@ -337,13 +337,13 @@ describe("refreshSource", () => {
   });
 
   it("numbers a new epoch above files for a product the station no longer lists", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     await writeObservations(
-      seriesPath(lake, "predictions", "test", "a", 2026, 2),
+      seriesPath(store, "predictions", "test", "a", 2026, 2),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "NAP",
     );
-    const { stations } = await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), {
+    const { stations } = await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), {
       now: LATER,
     });
     assert.deepEqual(
@@ -353,12 +353,12 @@ describe("refreshSource", () => {
   });
 
   it("numbers a new epoch above an epoch only the recent window still has", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     // Rows from an epoch 2 that a restored list no longer knows about.
-    await writeRecent(recentPath(lake, "test"), [
+    await writeRecent(recentPath(store, "test"), [
       [{ station: "test/a", time: Date.parse(NOW), level: 1, flag: Flag.good, epoch: 2 }],
     ]);
-    const { stations } = await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), {
+    const { stations } = await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), {
       now: LATER,
     });
     assert.deepEqual(
@@ -367,14 +367,14 @@ describe("refreshSource", () => {
     );
   });
 
-  it("numbers a station new to the list above epoch files already in the lake", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
+  it("numbers a station new to the list above epoch files already in the store", async () => {
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
     await writeObservations(
-      seriesPath(lake, "levels", "test", "b", 2026, 2),
+      seriesPath(store, "levels", "test", "b", 2026, 2),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "NAP",
     );
-    const { stations } = await refreshSource(lake, sourceOf([listed("a"), listed("b")]), {
+    const { stations } = await refreshSource(store, sourceOf([listed("a"), listed("b")]), {
       now: LATER,
     });
     assert.deepEqual(
@@ -385,14 +385,14 @@ describe("refreshSource", () => {
 
   it("finds epoch files for many new stations with one listing per product", async () => {
     // The source has a list, so the epoch-3 files aren't another list's lost series.
-    await refreshSource(lake, sourceOf([listed("x")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("x")]), { now: NOW });
     await writeObservations(
-      seriesPath(lake, "levels", "test", "7", 2026, 3),
+      seriesPath(store, "levels", "test", "7", 2026, 3),
       [{ time: Date.parse(NOW), level: 1, flag: Flag.good }],
       "NAP",
     );
     const many = Array.from({ length: 60 }, (_, i) => listed(String(i)));
-    const { stations } = await refreshSource(lake, sourceOf([listed("x"), ...many]), {
+    const { stations } = await refreshSource(store, sourceOf([listed("x"), ...many]), {
       now: LATER,
     });
     const ids = new Map(stations.map((s) => [s.source_id, s.epochs.map((e) => e.id)]));
@@ -400,13 +400,13 @@ describe("refreshSource", () => {
   });
 
   it("applies a decision on an epoch from the source's overrides", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    await refreshSource(lake, sourceOf([listed("a", { datum: "MSL" })]), { now: LATER });
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
+    await refreshSource(store, sourceOf([listed("a", { datum: "MSL" })]), { now: LATER });
     const overrides = {
       epochs: { [epochKey("test/a", LATER)]: { reject: true, note: "the adapter misread it" } },
     };
     const { stations } = await refreshSource(
-      lake,
+      store,
       sourceOf([listed("a", { datum: "MSL" })], overrides),
       { now: "2027-01-05T00:00:00Z" },
     );
@@ -434,9 +434,9 @@ describe("refreshSource", () => {
       stations: async () => [station],
     });
     // The first refresh to list it didn't read the zero's date; the next one did.
-    await refreshSource(lake, as(wachendorf(null)), { now: "2026-11-05T14:12:26Z" });
+    await refreshSource(store, as(wachendorf(null)), { now: "2026-11-05T14:12:26Z" });
     const { stations } = await refreshSource(
-      lake,
+      store,
       as(wachendorf({ id: "2026-06-18", since: "2026-06-19" })),
       { now: "2026-11-06T22:10:13Z" },
     );
@@ -451,15 +451,15 @@ describe("refreshSource", () => {
 });
 
 describe("publishStations", () => {
-  let lake: string;
+  let store: string;
   beforeEach(async () => {
-    lake = await mkdtemp(join(tmpdir(), "lake-"));
+    store = await mkdtemp(join(tmpdir(), "store-"));
   });
-  afterEach(() => rm(lake, { recursive: true }));
+  afterEach(() => rm(store, { recursive: true }));
 
   it("publishes every list with its bounds, epochs and links", async () => {
     const { stations } = await refreshSource(
-      lake,
+      store,
       sourceOf([
         listed("a", {
           same_as: ["test/b"],
@@ -470,17 +470,17 @@ describe("publishStations", () => {
       ]),
       { now: NOW },
     );
-    await writeStations(boundsPath(lake, "test"), [
+    await writeStations(boundsPath(store, "test"), [
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
-    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"], []), {
+    assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
       links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
       unknownErrata: [],
     });
-    assert.deepEqual(await publishedSources(stationsPath(lake)), ["test"]);
+    assert.deepEqual(await publishedSources(stationsPath(store)), ["test"]);
     // sources.json carries a source's terms, not which jobs ingest runs for it.
-    const [published] = JSON.parse(await readFile(sourcesPath(lake), "utf8"));
+    const [published] = JSON.parse(await readFile(sourcesPath(store), "utf8"));
     assert.equal(published.license.id, "CC0-1.0");
     assert.deepEqual(published.contact, { url: "https://example.org/contact" });
     for (const key of ["hourly", "qc", "utc_offsets", "archive"])
@@ -491,11 +491,11 @@ describe("publishStations", () => {
     await db.run("SET TimeZone = 'UTC'");
     const rows = (
       await db.runAndReadAll(
-        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs, strftime(source_qc_start, '%Y-%m-%d %H:%M') AS source_qc_start, source_qc_start_inferred FROM '${stationsPath(lake)}' ORDER BY id`,
+        `SELECT id, strftime(first, '%Y') AS first, same_as, preferred, errata, len(epochs) AS epochs, strftime(source_qc_start, '%Y-%m-%d %H:%M') AS source_qc_start, source_qc_start_inferred FROM '${stationsPath(store)}' ORDER BY id`,
       )
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
-      // The longer record in the lake is preferred.
+      // The longer record in the store is preferred.
       {
         id: "test/a",
         first: "2001",
@@ -518,17 +518,17 @@ describe("publishStations", () => {
         source_qc_start_inferred: null,
       },
     ]);
-    // errata.json holds the errata of the sources the lake holds, here none.
-    assert.deepEqual(JSON.parse(await readFile(errataPath(lake), "utf8")), []);
+    // errata.json holds the errata of the sources the store holds, here none.
+    assert.deepEqual(JSON.parse(await readFile(errataPath(store), "utf8")), []);
   });
 
   it("prefers a shorter record over a longer one whose values are all flagged", async () => {
     const { stations } = await refreshSource(
-      lake,
+      store,
       sourceOf([listed("a", { same_as: ["test/b"] }), listed("b")]),
       { now: NOW },
     );
-    await writeStations(boundsPath(lake, "test"), [
+    await writeStations(boundsPath(store, "test"), [
       { ...stations[0]!, first: "2001-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
       { ...stations[1]!, first: "2025-01-01T00:00:00Z", last: "2026-11-04T00:00:00Z" },
     ]);
@@ -540,29 +540,29 @@ describe("publishStations", () => {
       flags,
       version: "v",
     });
-    await writeYears(lake, "test", [
+    await writeYears(store, "test", [
       year("test/a", [0, 0, 0, 5, 1]),
       year("test/b", [4, 0, 0, 0, 0]),
     ]);
-    await publishStations(lake, [sourceOf([])], ["test"], []);
+    await publishStations(store, [sourceOf([])], ["test"], []);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const rows = (
-      await db.runAndReadAll(`SELECT DISTINCT preferred FROM '${stationsPath(lake)}'`)
+      await db.runAndReadAll(`SELECT DISTINCT preferred FROM '${stationsPath(store)}'`)
     ).getRowObjectsJson();
     assert.deepEqual(rows, [{ preferred: "test/b" }]);
   });
 
   it("publishes without the flag counts when the years file can't be read", async () => {
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    await writeFile(yearsPath(lake, "test"), "not parquet");
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
+    await writeFile(yearsPath(store, "test"), "not parquet");
     assert.equal(
-      ((await publishStations(lake, [sourceOf([])], ["test"], [])) as { count: number }).count,
+      ((await publishStations(store, [sourceOf([])], ["test"], [])) as { count: number }).count,
       1,
     );
   });
 
-  it("tags each station with its errata, and names a listed station the lake lacks", async () => {
-    await refreshSource(lake, sourceOf([listed("a"), listed("b")]), { now: NOW });
+  it("tags each station with its errata, and names a listed station the store lacks", async () => {
+    await refreshSource(store, sourceOf([listed("a"), listed("b")]), { now: NOW });
     const erratum = (id: string, source: string, stations: string[] | null): Erratum => ({
       id,
       source,
@@ -579,38 +579,38 @@ describe("publishStations", () => {
     const errata = [
       erratum("test-a", "test", ["test/a", "test/gone"]),
       erratum("test-every", "test", null),
-      // Another source's isn't this lake's to report or publish.
+      // Another source's isn't this store's to report or publish.
       erratum("other-x", "other", ["other/x"]),
     ];
-    const result = await publishStations(lake, [sourceOf([])], ["test"], errata);
+    const result = await publishStations(store, [sourceOf([])], ["test"], errata);
     assert.deepEqual("count" in result && result.unknownErrata, ["test-a test/gone"]);
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const rows = (
-      await db.runAndReadAll(`SELECT id, errata FROM '${stationsPath(lake)}' ORDER BY id`)
+      await db.runAndReadAll(`SELECT id, errata FROM '${stationsPath(store)}' ORDER BY id`)
     ).getRowObjectsJson();
     assert.deepEqual(rows, [
       { id: "test/a", errata: ["test-a", "test-every"] },
       { id: "test/b", errata: ["test-every"] },
     ]);
     assert.deepEqual(
-      JSON.parse(await readFile(errataPath(lake), "utf8")).map((e: Erratum) => e.id),
+      JSON.parse(await readFile(errataPath(store), "utf8")).map((e: Erratum) => e.id),
       ["test-a", "test-every"],
     );
   });
 
   it("publishes nothing while a source it should hold has no list", async () => {
     const other: Source = { ...sourceOf([]), metadata: { ...metadata, id: "other" } };
-    assert.deepEqual(await publishStations(lake, [sourceOf([])], ["test"], []), {
+    assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       missing: ["test"],
     });
-    await writeStationList(stationListPath(lake, "test"), []);
-    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test", "other"], []), {
+    await writeStationList(stationListPath(store, "test"), []);
+    assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test", "other"], []), {
       missing: ["other"],
     });
-    assert.equal(await exists(stationsPath(lake)), false);
-    assert.deepEqual(await publishedSources(stationsPath(lake)), []);
+    assert.equal(await exists(stationsPath(store)), false);
+    assert.deepEqual(await publishedSources(stationsPath(store)), []);
     // A new source with no list yet doesn't hold up the others.
-    assert.deepEqual(await publishStations(lake, [sourceOf([]), other], ["test"], []), {
+    assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
       links: { pairs: {}, dropped: [], skipped: [], large: [] },
       unknownErrata: [],
@@ -619,22 +619,22 @@ describe("publishStations", () => {
 });
 
 describe("startedListOf", () => {
-  let lake: string;
+  let store: string;
   beforeEach(async () => {
-    lake = await mkdtemp(join(tmpdir(), "lake-"));
+    store = await mkdtemp(join(tmpdir(), "store-"));
   });
-  afterEach(() => rm(lake, { recursive: true }));
+  afterEach(() => rm(store, { recursive: true }));
 
   it("is null for a source whose list was never started, and fails for one that's lost", async () => {
-    assert.equal(await startedListOf(lake, sourceOf([])), null);
-    await refreshSource(lake, sourceOf([listed("a")]), { now: NOW });
-    assert.equal((await startedListOf(lake, sourceOf([])))!.length, 1);
-    await rm(stationListPath(lake, "test"));
-    await assert.rejects(startedListOf(lake, sourceOf([])), /history for test but no list/);
+    assert.equal(await startedListOf(store, sourceOf([])), null);
+    await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
+    assert.equal((await startedListOf(store, sourceOf([])))!.length, 1);
+    await rm(stationListPath(store, "test"));
+    await assert.rejects(startedListOf(store, sourceOf([])), /history for test but no list/);
   });
 
-  it("fails for a lake with the source's series but no list or history", async () => {
-    await writeRecent(recentPath(lake, "test"), []);
-    await assert.rejects(startedListOf(lake, sourceOf([])), /test series but no list or history/);
+  it("fails for a store with the source's series but no list or history", async () => {
+    await writeRecent(recentPath(store, "test"), []);
+    await assert.rejects(startedListOf(store, sourceOf([])), /test series but no list or history/);
   });
 });

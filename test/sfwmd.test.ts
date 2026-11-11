@@ -278,14 +278,14 @@ describe("sfwmd", () => {
     );
   });
 
-  it("leaves the months of a series that sends nothing to the lake", async () => {
+  it("leaves the months of a series that sends nothing to the store", async () => {
     serve([
       [/AP159/, () => EMPTY],
       [/IY320/, () => zipOf(csv("IY320", ["2024-02-16 12:00:00,2.0, ,P"]))],
     ]);
     const station = { series: "IY320", history: "AP159", history_end: "2024-02-10T05:00:00Z" };
     const levels = await sfwmd.levels(station, new Date("2024-01-01Z"), new Date("2024-03-01Z"));
-    // January has no values, so a merge keeps the lake's January.
+    // January has no values, so a merge keeps the store's January.
     assert.deepEqual(
       levels.map((l) => new Date(l.time).toISOString()),
       ["2024-02-16T17:00:00.000Z"],

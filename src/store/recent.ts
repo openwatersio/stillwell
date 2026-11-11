@@ -6,7 +6,7 @@ import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
   type Epoch,
-  type LakeStation,
+  type StoredStation,
   type Observation,
   type Source,
   type Station,
@@ -67,7 +67,7 @@ export interface RunSummary {
   waiting: string[];
   /** Stations the run judged with less than it should, such as without some errata spans, with why. */
   warned?: string[];
-  /** Values new to the lake. */
+  /** Values new to the store. */
   values: number;
   /** Files written. */
   files: number;
@@ -75,10 +75,10 @@ export interface RunSummary {
 
 interface RunOptions {
   source: Source;
-  /** The source's list from the lake; each job picks the stations it covers. */
-  stations: LakeStation[];
-  /** The lake a station's files go to, public or restricted. */
-  lakeFor: (station: Station) => string;
+  /** The source's list from the store; each job picks the stations it covers. */
+  stations: StoredStation[];
+  /** The store a station's files go to, public or restricted. */
+  storeFor: (station: Station) => string;
   /** How many stations to fetch, or files to merge, at once. */
   concurrency?: number;
 }
@@ -104,7 +104,7 @@ interface RunOptions {
 export async function updateRecent({
   source,
   stations: all,
-  lakeFor,
+  storeFor,
   concurrency = 4,
   since,
   now,
@@ -121,21 +121,21 @@ export async function updateRecent({
   const live = all.filter((s) => s.live && s.status === "active" && s.products.includes("levels"));
   const stations = live.filter((s) => !isHeld(s.epochs));
   const keepFrom = now - keepDays * DAY_MS;
-  // Restricted stations' recent values go to the private lake, like their series.
-  const lakeOf = (s: Station): string | undefined => {
+  // Restricted stations' recent values go to the private store, like their series.
+  const storeOf = (s: Station): string | undefined => {
     try {
-      return recentPath(lakeFor(s), id);
+      return recentPath(storeFor(s), id);
     } catch {
       return undefined;
     }
   };
   const summary = emptySummary(`recent ${id}`, stations.length);
-  // A station whose lake can't be named, such as a restricted one with no
-  // restricted lake set, fails alone rather than stop the source's run.
+  // A station whose store can't be named, such as a restricted one with no
+  // restricted store set, fails alone rather than stop the source's run.
   const pathOf = new Map<string, string>();
   for (const s of live)
     try {
-      pathOf.set(s.id, recentPath(lakeFor(s), id));
+      pathOf.set(s.id, recentPath(storeFor(s), id));
     } catch (error) {
       summary.failed.push(`${s.id}: ${message(error)}`);
     }
@@ -143,14 +143,14 @@ export async function updateRecent({
 
   // Each file is read in batches after the sweep, so one that can't be read
   // fails the run here, before the sweep spends a source's request budget.
-  const candidates = new Set([...pathOf.values(), ...all.flatMap((s) => lakeOf(s) ?? [])]);
+  const candidates = new Set([...pathOf.values(), ...all.flatMap((s) => storeOf(s) ?? [])]);
   for (const path of candidates) await checkRecent(path);
 
   // Listed stations a file holds that this run doesn't fetch, because they've
   // stopped being live or active since, keep their rows until they age out, so
   // compaction can still fold them. One whose license now sends it to the other
-  // lake doesn't, so its rows never stay in the wrong one, and it starts empty
-  // in its new lake rather than carry rows across. A station gone from the list
+  // store doesn't, so its rows never stay in the wrong one, and it starts empty
+  // in its new store rather than carry rows across. A station gone from the list
   // has nowhere to be folded, so its rows go.
   const listed = new Map(all.map((s) => [s.id, s]));
   const carried = new Map<string, string[]>();
@@ -158,7 +158,7 @@ export async function updateRecent({
     const ids = (await recentStations(path)).filter((station) => {
       if (pathOf.has(station)) return false;
       const s = listed.get(station);
-      return s !== undefined && lakeOf(s) === path;
+      return s !== undefined && storeOf(s) === path;
     });
     if (ids.length) carried.set(path, ids);
   }
@@ -299,7 +299,7 @@ export async function updateRecent({
 export async function compactRecent({
   source,
   stations: all,
-  lakeFor,
+  storeFor,
   concurrency = 8,
   start,
   end,
@@ -307,15 +307,15 @@ export async function compactRecent({
 }: RunOptions & { start: number; end: number; rebuildBounds?: boolean }): Promise<RunSummary> {
   const id = source.metadata.id;
   const summary = emptySummary(`compact ${id}`, 0);
-  // A station whose lake can't be named, such as a restricted one with no
-  // restricted lake set, fails alone rather than stop the source's fold.
+  // A station whose store can't be named, such as a restricted one with no
+  // restricted store set, fails alone rather than stop the source's fold.
   // A station without levels has rows only from before its list dropped them,
-  // and one of those whose lake can't be named has none to fold there.
+  // and one of those whose store can't be named has none to fold there.
   const levels = (s: Station) => s.products.includes("levels");
   const pathOf = new Map<string, string>();
   for (const s of all)
     try {
-      pathOf.set(s.id, recentPath(lakeFor(s), id));
+      pathOf.set(s.id, recentPath(storeFor(s), id));
     } catch (error) {
       if (levels(s)) summary.failed.push(`${s.id}: ${message(error)}`);
     }
@@ -340,14 +340,14 @@ export async function compactRecent({
         ).filter((r) => r.time >= start && r.time < end),
         (r) => r.station,
       );
-      const lake = lakeFor(batch[0]!);
+      const store = storeFor(batch[0]!);
       const folding = [...window.keys()];
       const written = new Map<string, YearStats>();
       // A batch that can't be marked still folds, since its rows age out of
       // the window; the reconcile below reads its stations' files instead.
       let marked: string[] = [];
       try {
-        marked = await markYears(lake, id, folding);
+        marked = await markYears(store, id, folding);
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
@@ -392,7 +392,7 @@ export async function compactRecent({
             const epoch = station.epochs.find((e) => e.id === epochId);
             if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
             const file = seriesPath(
-              lakeFor(station),
+              storeFor(station),
               "levels",
               id,
               station.source_id,
@@ -425,19 +425,19 @@ export async function compactRecent({
         if (changed) summary.updated++;
       });
       try {
-        await commitYears(lake, id, marked, written);
+        await commitYears(store, id, marked, written);
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
       }
     }
   }
-  // A source's stations share its lake, so this is one lake. A failure goes
+  // A source's stations share its store, so this is one store. A failure goes
   // first, so the summary's list of failures shows it.
-  for (const [lake, members] of Map.groupBy(stations, (s) => lakeFor(s)))
+  for (const [store, members] of Map.groupBy(stations, (s) => storeFor(s)))
     try {
       await updateBounds({
-        lake,
+        store,
         source: id,
         stations: members,
         spans,
@@ -449,9 +449,9 @@ export async function compactRecent({
       summary.failed.unshift(`bounds: ${message(error)}`);
     }
   // Rows a run that stopped partway left out of date, and files written without a row.
-  for (const lake of new Set(stations.map((s) => lakeFor(s))))
+  for (const store of new Set(stations.map((s) => storeFor(s))))
     try {
-      const years = await reconcileYears(lake, id, {
+      const years = await reconcileYears(store, id, {
         keep: (station) => withheldReason(source, station) === null,
         reread: unmarked,
         // Enough for a stopped run's stations, and short of compaction's time limit; an unfinished `years` build goes on a night at a time.
@@ -523,7 +523,7 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
 
 /**
  * Write each station's first and last level to the source's bounds in
- * `lake`, over the rows its epochs count: each epoch's files within its
+ * `store`, over the rows its epochs count: each epoch's files within its
  * `[since, until)`, and none of a held epoch's or one the list doesn't have.
  * Beside them goes the earliest value in the current epoch the source sent as
  * preliminary, which the monthly refetch fetches again from; backfill writes
@@ -551,7 +551,7 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
  * in; `compact --rebuild-bounds` reads every station again.
  */
 export async function updateBounds({
-  lake,
+  store,
   source,
   stations,
   spans,
@@ -559,16 +559,16 @@ export async function updateBounds({
   rebuild = false,
   concurrency = 8,
 }: {
-  lake: string;
+  store: string;
   source: string;
-  stations: LakeStation[];
+  stations: StoredStation[];
   spans: Map<string, FileBounds | null>;
   /** The year compaction ran up to. */
   year: number;
   rebuild?: boolean;
   concurrency?: number;
 }): Promise<void> {
-  const path = boundsPath(lake, source);
+  const path = boundsPath(store, source);
   const had = await readStationBounds(path);
   const known = rebuild ? new Map<string, never>() : had;
   // Bounds an older build wrote, without `preliminary`, stay without it until
@@ -577,8 +577,8 @@ export async function updateBounds({
   // Files by station directory, then year: epoch 1's beside later epochs' directories.
   const listed = new Map<string, Map<number, { epoch: number; file: string }[]>>();
   for (const [pattern, depth] of [
-    [sourceFirstEpochFiles(lake, "levels", source), 2],
-    [sourceEpochDirs(lake, "levels", source), 3],
+    [sourceFirstEpochFiles(store, "levels", source), 2],
+    [sourceEpochDirs(store, "levels", source), 3],
   ] as const)
     for (const file of await listFiles(pattern)) {
       const parts = file.split("/");
@@ -590,9 +590,9 @@ export async function updateBounds({
       byYear.set(year, [...(byYear.get(year) ?? []), { epoch, file }]);
       listed.set(dir, byYear);
     }
-  // A listing that finds nothing when the lake had bounds is a wrong path or a failed list, not a lake emptied.
+  // A listing that finds nothing when the store had bounds is a wrong path or a failed list, not a store emptied.
   if (!listed.size && had.size)
-    throw new Error(`no ${source} files listed in ${lake}, yet it has bounds; keeping them`);
+    throw new Error(`no ${source} files listed in ${store}, yet it has bounds; keeping them`);
 
   // Each end of each station: its counted years from that end inward, and
   // the bound kept there, if any.
@@ -692,7 +692,7 @@ export async function updateBounds({
         screened,
       });
   }
-  // A station not in this run, such as one whose lake can't be named, keeps
+  // A station not in this run, such as one whose store can't be named, keeps
   // what it had; so does one with no counted rows, unless this is a rebuild.
   const here = new Set(stations.map((s) => s.id));
   const bounded = new Set(bounds.map((b) => b.id));
@@ -704,18 +704,18 @@ export async function updateBounds({
 /**
  * Set the earliest preliminary value of the stations a backfill read, by ID,
  * and whether they hold a value the source screened, where given, in the
- * source's bounds in `lake`, keeping every other station's bounds and their
+ * source's bounds in `store`, keeping every other station's bounds and their
  * first and last. A station with no row and none gets no row. Returns
  * false, writing nothing, when the bounds have no `preliminary` column yet,
  * since writing one would mark every other station as having none;
  * `compact --rebuild-bounds` fills them in first.
  */
 export async function writePreliminary(
-  lake: string,
+  store: string,
   source: string,
   found: Map<string, { preliminary: number | null; screened?: boolean }>,
 ): Promise<boolean> {
-  const path = boundsPath(lake, source);
+  const path = boundsPath(store, source);
   const bounds = await readStationBounds(path);
   if ([...bounds.values()].some((b) => b.preliminary === undefined)) return false;
   let changed = false;
@@ -792,13 +792,13 @@ export async function refuseOtherDatum(
  * one centimeter for hours at the turn; at 30 cm the level leaves it within
  * about an hour, even a diurnal tide's, so a longer run is a stuck gauge.
  * A change to it, or to `qcFor`'s other limits, bumps `RULES` in
- * `src/lake/analysis.ts`, so every station's stored years are requalified.
+ * `src/store/analysis.ts`, so every station's stored years are requalified.
  */
 export const CENTIMETER_TIDE_M = 0.3;
 
 /**
  * QC's rules for a station, by whether its levels carry a tide
- * (`Station.tidal`, from `src/lake/analysis.ts`), the same for every source.
+ * (`Station.tidal`, from `src/store/analysis.ts`), the same for every source.
  * Still water, a pooled river, a lake or a creek drained to its sill, holds
  * one level to the centimeter for a day or more, so it gets two days before a
  * flatline counts as suspect, and it sits nearly flat for months and then

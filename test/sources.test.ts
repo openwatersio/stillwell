@@ -1363,7 +1363,7 @@ describe("coops", () => {
       established: "1899-01-01T00:00:00Z",
       removed: null,
     });
-    // An outage month comes back empty, so the lake keeps the 6-minute values it holds.
+    // An outage month comes back empty, so the store keeps the 6-minute values it holds.
     assert.deepEqual([levels, asked], [[], ["water_level"]]);
   });
 
@@ -2215,7 +2215,7 @@ describe("usace", () => {
   });
 
   it("enters every hand-entered zero date as a day", () => {
-    // The lake's lists keep these too, but a date dropped here would no longer
+    // The store's lists keep these too, but a date dropped here would no longer
     // bound a station read from stations.parquet, which doesn't carry them.
     assert.equal(Object.keys(ZERO_SINCE).length, 33);
     for (const [id, { since }] of Object.entries(ZERO_SINCE)) {
@@ -3005,7 +3005,7 @@ describe("uhslc", () => {
     for (const id of ["001", "329b"]) assert.equal(uhslc.withheld(id), null);
     for (const [number, { notice }] of Object.entries(ALSO_WITHHELD))
       assert.ok(NOTICES[notice]?.refused, `${number}'s notice ${notice} isn't a refusal`);
-    // A withheld series the lake still lists doesn't count toward a partial list.
+    // A withheld series the store still lists doesn't count toward a partial list.
     const five = ["101", "102", "103", "104", "105"].map((n) => ({
       ...listed[0]!,
       id: `uhslc/${n}`,
@@ -3158,10 +3158,10 @@ describe("uhslc", () => {
       [/global_daily_rqds\.json/, fixture("uhslc-rq-spans.json")],
       [/global_daily_fast\.json/, JSON.stringify(fdSpans)],
     ]);
-    const lake = { id: "uhslc/001", source_id: "001", status: "active" as const, version: "C" };
+    const store = { id: "uhslc/001", source_id: "001", status: "active" as const, version: "C" };
     // The refresh that sees the change, and the next, whose list names both versions' epochs.
     for (const epochs of [[{ reference: "C" }], [{ reference: "C" }, { reference: "B" }]]) {
-      const pohnpei = (await uhslc.stations([{ ...lake, epochs }])).find(
+      const pohnpei = (await uhslc.stations([{ ...store, epochs }])).find(
         (s) => s.id === "uhslc/001",
       )!;
       assert.deepEqual(
@@ -3175,7 +3175,7 @@ describe("uhslc", () => {
     }
   });
 
-  it("keeps the lake's version when a dropped row leaves none matching", async () => {
+  it("keeps the store's version when a dropped row leaves none matching", async () => {
     const rq = JSON.parse(fixture("uhslc-rq-stations.json"));
     const versionAt = rq.table.columnNames.indexOf("version");
     // ERDDAP mid-reload: Pohnpei's version C row is missing from the hourly list.
@@ -3195,7 +3195,7 @@ describe("uhslc", () => {
     assert.deepEqual([pohnpei.version, pohnpei.reference], ["C", { id: "C", since: null }]);
   });
 
-  it("refuses a list that looks partial against the lake's", async () => {
+  it("refuses a list that looks partial against the store's", async () => {
     serve([
       [/global_hourly_rqds\.json/, fixture("uhslc-rq-stations.json")],
       [/global_hourly_fast\.json/, fixture("uhslc-fd-stations.json")],
@@ -3363,7 +3363,7 @@ describe("uhslc", () => {
       uhslc.originatorStation({ contributor: nos, originator: "1612340" }),
       "coops/1612340",
     );
-    // Other contributors' numbers aren't their lake source's IDs.
+    // Other contributors' numbers aren't their store source's IDs.
     assert.equal(
       uhslc.originatorStation({
         contributor: "Service Hydrographique Et Oceanographique",
@@ -3520,9 +3520,9 @@ describe("refmar", () => {
     delete gauges["6118"];
     serveGauges(gauges);
     const brestBefore = previous.find((s) => s.id === "refmar/3")!;
-    // Bassins à flot was in the lake before SHOM hid it.
+    // Bassins à flot was in the store before SHOM hid it.
     const hidden = { ...brestBefore, id: "refmar/6326", source_id: "6326", kind: "coastal" };
-    // A kind `KINDS` gave a station in the lake isn't REFMAR's, so a kept record leaves it out.
+    // A kind `KINDS` gave a station in the store isn't REFMAR's, so a kept record leaves it out.
     const decided = previous.map((s) => (s.id === "refmar/6118" ? { ...s, kind: "coastal" } : s));
     const stations = await refmar.stations([...decided, hidden] as Station[]);
     const of = (id: string) => stations.find((s) => s.id === id)!;
@@ -4044,7 +4044,7 @@ describe("ea", () => {
       new Date("2025-10-20Z"),
       new Date("2025-11-12Z"),
     );
-    // October lost its first days, so it gives nothing and the lake keeps what it has;
+    // October lost its first days, so it gives nothing and the store keeps what it has;
     // November's first day gives its readings.
     assert.equal(values.length, 3);
   });
