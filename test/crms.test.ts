@@ -21,11 +21,12 @@ const fixture = (name: string) => readFileSync(new URL(`fixtures/${name}`, impor
 const CSV = fixture("crms-export.csv");
 
 /**
- * A ZIP64 zip holding `csv` deflated, laid out as CPRA's export is: the local
- * header, the data, the central directory with 64-bit sizes, then the ZIP64
- * end record, its locator and the end record. `crc` overrides the CRC.
+ * A zip holding `csv` deflated, laid out as CPRA's export is: the local
+ * header, the data, the central directory with the entry's 64-bit sizes, then
+ * the classic end record, since the zip is under 4 GB. `zip64` puts a ZIP64
+ * end record and its locator before it. `crc` overrides the CRC.
  */
-function zipOf(csv: Buffer, crc = crc32(csv)): Buffer {
+function zipOf(csv: Buffer, crc = crc32(csv), zip64 = false): Buffer {
   const name = Buffer.from("CRMS_Continuous_Hydrographic.csv");
   const data = deflateRawSync(csv);
   const local = Buffer.alloc(30);
@@ -58,7 +59,11 @@ function zipOf(csv: Buffer, crc = crc32(csv)): Buffer {
   locator.writeBigUInt64LE(BigInt(dirOffset + dir.length), 8);
   const end = Buffer.alloc(22);
   end.writeUInt32LE(0x06054b50, 0);
-  return Buffer.concat([local, name, data, dir, end64, locator, end]);
+  end.writeUInt16LE(1, 8);
+  end.writeUInt16LE(1, 10);
+  end.writeUInt32LE(dir.length, 12);
+  end.writeUInt32LE(zip64 ? 0xffffffff : dirOffset, 16);
+  return Buffer.concat([local, name, data, dir, ...(zip64 ? [end64, locator] : []), end]);
 }
 
 let requests: string[] = [];
@@ -295,6 +300,33 @@ describe("crms levels", () => {
     assert.equal((await header(crms.parser))[0], "Station ID");
     serve(zipOf(edit("Adjusted Water Elevation to Datum (ft)", "Adjusted Water Elevation (ft)")));
     await assert.rejects(header(crms.parser), /no Adjusted Water Elevation to Datum \(ft\) column/);
+  });
+
+  it("reads a zip that ends in a ZIP64 end record, and refuses one with no end record", async () => {
+    serve(zipOf(CSV, undefined, true));
+    assert.equal((await crms.levels(station("CRMS0002-H01"), ...ALL))[0]!.level, 0.384);
+    forget();
+    serve(zipOf(CSV).subarray(0, -22));
+    await assert.rejects(
+      crms.levels(station("CRMS0002-H01"), ...ALL),
+      /no end of central directory/,
+    );
+    // An end record that points to a ZIP64 one that isn't there.
+    forget();
+    const z64 = zipOf(CSV, undefined, true);
+    serve(Buffer.concat([z64.subarray(0, -98), z64.subarray(-22)]));
+    await assert.rejects(crms.levels(station("CRMS0002-H01"), ...ALL), /needs a ZIP64 end record/);
+  });
+
+  it("reads past a stray ZIP64 signature, which only a locator makes a record", async () => {
+    const zip = zipOf(CSV);
+    const at = zip.indexOf(Buffer.from("PK\x05\x06", "latin1"));
+    const tail = Buffer.from(zip);
+    // The end record's comment holds the signature, as compressed data can by chance.
+    const comment = Buffer.from("PK\x06\x06 and more", "latin1");
+    tail.writeUInt16LE(comment.length, at + 20);
+    serve(Buffer.concat([tail, comment]));
+    assert.equal((await crms.levels(station("CRMS0002-H01"), ...ALL))[0]!.level, 0.384);
   });
 
   it("leaves out a row whose fields don't match the header", async () => {
