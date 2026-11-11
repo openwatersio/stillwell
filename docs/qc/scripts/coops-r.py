@@ -8,7 +8,7 @@ STATIONS = {"8573364": "Tolchester Beach", "8574680": "Baltimore", "8575512": "A
 MONTHS = [("20100301", "20100331"), ("20150301", "20150331"), ("20200301", "20200331")]
 JOBS = [(s, a, b) for s in STATIONS for a, b in MONTHS] + [("8735180", "20201001", "20201031")]
 API = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_level&datum=STND&units=metric&time_zone=gmt&format=json&application=openwaters"
-def minutes(t): return int(datetime.datetime.strptime(t, "%Y-%m-%d %H:%M").timestamp() // 60)
+def minutes(t): return int(datetime.datetime.strptime(t, "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc).timestamp() // 60)
 def q(a, p): a = sorted(a); return a[int(p * (len(a) - 1))] if a else float("nan")
 tot = {"R": [], "N": [], "F": 0, "n": 0}
 print("| Station | Month | Verified values | R | F | R: median, p95, max distance (cm) | Unflagged: median, p95, max distance (cm) |")
