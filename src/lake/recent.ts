@@ -803,7 +803,8 @@ export const CENTIMETER_TIDE_M = 0.3;
  * one level to the centimeter for a day or more, so it gets two days before a
  * flatline counts as suspect, and it sits nearly flat for months and then
  * rises meters in a flood, so a level far outside its own range isn't suspect
- * for that alone. A sea without a tide, such as the Baltic, holds a
+ * for that alone, and a pool can be let up for a few hours and back down, so
+ * neither is a level held between two steps. A sea without a tide, such as the Baltic, holds a
  * centimeter for a day on calm days too, but a millimeter for hours only when
  * its gauge is stuck, so it keeps six hours where its values move in
  * millimeters. Tidal water never holds still that long, so it gets six hours,
@@ -818,8 +819,8 @@ export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOp
   const river = station.kind === "river" || station.kind === "lake";
   if (!(station.tidal ?? !river))
     return station.kind === "coastal"
-      ? { centimeter_flatline_s: 48 * 3600, outliers: false }
-      : { flatline_s: 48 * 3600, outliers: false };
+      ? { centimeter_flatline_s: 48 * 3600, outliers: false, held: false }
+      : { flatline_s: 48 * 3600, outliers: false, held: false };
   const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
     ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
