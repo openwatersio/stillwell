@@ -286,7 +286,8 @@ export interface Source {
    * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
-   * the recent window; one that needs the whole record throws when it isn't.
+   * the recent window; one that needs the whole record throws `Unjudged` when
+   * it isn't, or when the lake holds only part of it for good.
    * The adapter flags the same spans in what it fetches, keeping
    * `source_flag` the source's.
    */
@@ -312,4 +313,21 @@ export function stationDefaults(
     commercial_use: metadata.license.commercial_use,
     attribution: metadata.attribution,
   };
+}
+
+/**
+ * A source's `suspect` can't judge the part of a record the caller holds, as
+ * GESLA's datum-jump check can't where the lake holds only part of a record.
+ * `spans` are the ones it can still give, the source's `errata.json` spans,
+ * which the registry adds. Requalify keeps the record's stored flags and adds
+ * these, and analysis judges with them, each with a warning; the recent window
+ * keeps its stored flags.
+ */
+export class Unjudged extends Error {
+  readonly spans: [number, number][];
+  constructor(message: string, spans: [number, number][] = []) {
+    super(message);
+    this.name = "Unjudged";
+    this.spans = spans;
+  }
 }

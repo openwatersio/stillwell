@@ -1,5 +1,5 @@
 import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
-import type { LakeStation, Observation, Source } from "../schema.ts";
+import { Flag, Unjudged, type LakeStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
   listYears,
@@ -27,10 +27,11 @@ export async function requalify(
   start: number,
   end: number,
   written = new Map<string, YearStats>(),
-): Promise<{ files: number; changed: number }> {
+): Promise<{ files: number; changed: number; warnings: string[] }> {
   // Every epoch's datums and errata spans first, so a file to resolve by hand,
-  // or a record a source can't judge, stops the station before any is written.
+  // or a source's error, stops the station before any is written.
   const plans = [];
+  const warnings: string[] = [];
   for (const epoch of station.epochs) {
     const dir = seriesDir(root, "levels", station.source, station.source_id, epoch.id);
     const years = [...(await listYears(dir))].sort((a, b) => a - b);
@@ -42,16 +43,28 @@ export async function requalify(
       if (datums.length !== 1)
         throw new Error(`${path(year)} holds ${datums.join(", ") || "no datum"}; resolve by hand`);
     }
+    // A record the source can't judge keeps the flags it has, since some may be
+    // the source's spans worked out when they were fetched, as GESLA's datum
+    // jumps are from its whole file; it gets the spans the source can still
+    // give, and a warning.
+    let unjudged = false;
     const suspect =
-      (await source.suspect?.(station, async function* () {
-        for (const year of years) yield (await readObservationFile(path(year))).rows;
-      })) ?? [];
-    plans.push({ years, wanted, path, suspect });
+      (await source
+        .suspect?.(station, async function* () {
+          for (const year of years) yield (await readObservationFile(path(year))).rows;
+        })
+        .catch((error: unknown) => {
+          if (!(error instanceof Unjudged)) throw error;
+          unjudged = true;
+          warnings.push(`epoch ${epoch.id}: ${error.message}; its flags are kept`);
+          return error.spans;
+        })) ?? [];
+    plans.push({ years, wanted, path, suspect, unjudged });
   }
   const opts = qcFor(station);
   let files = 0;
   let changed = 0;
-  for (const { years, wanted, path, suspect } of plans) {
+  for (const { years, wanted, path, suspect, unjudged } of plans) {
     // Each year once, and only the three a step needs.
     const cache = new Map<number, Promise<{ rows: Observation[]; datums: string[] }>>();
     const read = (year: number) => {
@@ -74,7 +87,9 @@ export async function requalify(
       // writeObservations stamps one datum on every row; the check above is only as fresh as its read.
       if (datums.length !== 1)
         throw new Error(`${path(year)}'s datums changed while requalify ran`);
-      const next = qc(fromSource(had, suspect), opts, [...before.rows, ...after.rows]);
+      // Kept flags can only get worse, so a looser rule doesn't clear a mark there.
+      const start = unjudged ? withSpans(had, suspect) : fromSource(had, suspect);
+      const next = qc(start, opts, [...before.rows, ...after.rows]);
       if (sameRows(had, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
@@ -82,7 +97,21 @@ export async function requalify(
       files++;
     }
   }
-  return { files, changed };
+  return { files, changed, warnings };
+}
+
+/** Rows with the values in `spans` flagged at least `suspect`, keeping every other flag. */
+function withSpans(rows: Observation[], spans: [number, number][]): Observation[] {
+  return rows.map((r) =>
+    spans.some(([from, to]) => r.time >= from && r.time < to)
+      ? {
+          ...r,
+          flag: Math.max(r.flag, Flag.suspect) as Flag,
+          // A suspect or bad flag from before `source_flag` was kept may be QC's, as `fromSource` knows.
+          source_flag: r.source_flag ?? (r.flag < Flag.suspect ? r.flag : undefined),
+        }
+      : r,
+  );
 }
 
 /**

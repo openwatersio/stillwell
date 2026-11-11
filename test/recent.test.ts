@@ -1507,6 +1507,7 @@ describe("formatSummary", () => {
         stale: ["test/b"],
         failed: ["test/c: timed out"],
         waiting: ["test/d: 4 values"],
+        warned: ["test/e: epoch 1: part of the record; its flags are kept"],
         values: 12,
         files: 1,
       },
@@ -1517,5 +1518,6 @@ describe("formatSummary", () => {
     assert.match(text, /Failed:\n\n- test\/c: timed out/);
     assert.match(text, /Stale:\n\n- test\/b/);
     assert.match(text, /Waiting on a held datum change:\n\n- test\/d: 4 values/);
+    assert.match(text, /Warnings:\n\n- test\/e: epoch 1: part of the record; its flags are kept/);
   });
 });

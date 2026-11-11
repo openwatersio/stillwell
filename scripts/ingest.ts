@@ -855,7 +855,7 @@ async function requalifyStations(
       }
       await pool(batch, positive("concurrency"), async (station) => {
         try {
-          const { files, changed } = await requalify(
+          const { files, changed, warnings } = await requalify(
             source,
             station,
             lakeFor(station),
@@ -866,6 +866,7 @@ async function requalifyStations(
           if (files) s.updated++;
           s.files += files;
           s.values += changed;
+          for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
         }
