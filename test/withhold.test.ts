@@ -169,7 +169,7 @@ describe("refreshSource with withheld stations", () => {
 
     const refused = (code: string) => code.startsWith("x");
     const kept = all.filter((s) => !refused(s.source_id));
-    // Twelve is more than the guard allows of 20 without a person's say-so.
+    // Twelve is more than the guard allows of 20 without --accept-withheld.
     await assert.rejects(
       refreshSource(lake, sourceOf(kept, refused), { now: LATER }),
       (error: Error) =>

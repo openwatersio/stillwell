@@ -248,7 +248,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
   if (contributor === "cmems") {
     const national = NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
-    // A person who compared the series (`LINKS`) knows the gauge better than CMEMS's position
+    // A link in `LINKS`, made by comparing the series, knows the gauge better than CMEMS's position
     // does. Only a link to the national feed's station names the replacement.
     const copy = `gesla/${record.id}`;
     const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(

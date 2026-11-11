@@ -86,7 +86,7 @@ export function mergeStationList(
           from: old.datum,
           to: s.datum ?? old.datum,
           reason: next.reason,
-          // The epoch a person would decide on: the one the change names, the held one, or else the newest.
+          // The epoch a decision would apply to: the one the change names, the held one, or else the newest.
           key: epochKey(
             s.id,
             (next.decide ?? next.epochs.find((e) => e.state === "held") ?? next.epochs.at(-1)!)
@@ -95,7 +95,7 @@ export function mergeStationList(
         });
     } else {
       epochs = firstEpochs({ datum: s.datum!, datums, reference }, { ...options, station: s.id });
-      // A new station a person split is reported as an existing one would be.
+      // A new station with a split is reported as an existing one would be.
       const starts = splitStarts(options.splits?.[s.id], options.offsets);
       const days = epochs
         .filter((e) => starts.has(e.since ?? ""))
@@ -106,7 +106,7 @@ export function mergeStationList(
           event: "opened",
           from: s.datum!,
           to: s.datum!,
-          reason: `a person found the zero moved on ${days.join(", ")}; backfill the station from ${days[0]}`,
+          reason: `split where the zero moved on ${days.join(", ")}; backfill the station from ${days[0]}`,
           key: epochKey(s.id, epochs[0]!.since),
         });
     }

@@ -139,14 +139,14 @@ export async function refreshSource(
   if (!stations.length) throw new Refused("listed no stations with a datum");
   await renumberAboveFiles(lake, stations, previous);
   const opened = changes.filter((c) => c.event === "opened" || c.event === "held");
-  // A station already waiting on a person isn't a new change.
+  // A station already held isn't a new change.
   const limit = Math.max(5, Math.floor(previous.length * 0.02));
   if (opened.length > limit && !options.acceptEpochs)
     throw new Refused(
       `${opened.length} stations changed datum at once (limit ${limit}): ${opened.map((c) => c.id).join(", ")}; check them and rerun with --accept-epochs`,
     );
 
-  // A GESLA record dropped for holding another gauge's values was a person's decision, not the source's.
+  // A GESLA record dropped for holding another gauge's values was a decision in `DROPPED`, not the source's.
   const listedInactive = new Set(
     fetched
       .filter((s) => s.status === "inactive" && !(s.source === "gesla" && DROPPED.has(s.source_id)))

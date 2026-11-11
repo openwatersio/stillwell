@@ -58,7 +58,7 @@
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
  * and `recent` write the current epoch, never before its start, and skip a
- * station whose new epoch waits on a person. For a source with `archive:
+ * station whose new epoch is held for a decision. For a source with `archive:
  * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
  * stations; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
@@ -398,7 +398,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         ? list.filter((s) => s.status === "active")
         : // A station named twice, by either form of its ID, is walked once.
           [...new Set(ids.split(",").map((id) => find(list, sourceId, id)))];
-  // A station whose new epoch waits on a person gets nothing, in either datum.
+  // A station whose new epoch is held for a decision gets nothing, in either datum.
   let wanted = named.filter((s) => {
     if (isHeld(s.epochs)) console.error(`  ${s.id}: held for a datum change; skipped`);
     return !isHeld(s.epochs);

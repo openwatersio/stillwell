@@ -22,24 +22,24 @@ import { km, nameScore } from "./ticon.ts";
  *   of the same kind (where both say) that shares the most words with it, the
  *   nearest among equals, unless an equally named one more than 100 m away,
  *   which its source doesn't link to the first, leaves it in doubt.
- * - **`LINKS`**, a person's decision.
+ * - **`LINKS`**, an explicit decision.
  *
  * Linked stations form a group, and each lists every other in `same_as`. A
  * link by nearness or copy that would put two stations of one source in a
  * group is skipped, since one of them is likelier another gauge nearby
  * (except for an `ASSEMBLED` source), and
- * no link may join two stations a person put in `UNLINKS`. Both are reported.
+ * no link may join two stations listed in `UNLINKS`. Both are reported.
  * `preferred` names the group's series to use for observed levels, by `rank`.
  */
 
-/** A person's decision on a pair of stations, with why. */
+/** A decision on a pair of stations, with why. */
 export interface Decision {
   a: string;
   b: string;
   note: string;
 }
 
-/** Pairs a person found share a gauge that the rules below miss. */
+/** Pairs that share a gauge the rules below miss. */
 export const LINKS: Decision[] = [
   {
     a: "gesla/uddevalla-udd-swe-cmems",
@@ -118,10 +118,10 @@ export const LINKS: Decision[] = [
   },
 ];
 
-/** Pairs a person found don't share a gauge, though a rule links them. */
+/** Pairs that don't share a gauge, though a rule links them. */
 export const UNLINKS: Decision[] = [];
 
-/** Stations a person chose as their group's preferred series, with why. */
+/** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {};
 
 /**
@@ -165,7 +165,7 @@ const ASSEMBLED = new Set(["gesla"]);
 /**
  * Source pairs whose agencies each run their own gauges, so two of their
  * stations at one pier are separate instruments that check each other, never
- * one gauge. Only an ID or a person links them.
+ * one gauge. Only an ID or an entry in `LINKS` joins them.
  */
 const SEPARATE = new Set(["coops~usgs", "coops~usace"]);
 
@@ -200,7 +200,7 @@ export interface LinkReport {
 
 const LARGE = 8;
 
-/** The order links join groups in: a person's first, inferred ones last. */
+/** The order links join groups in: `LINKS` first, inferred ones last. */
 const ORDER: How[] = ["manual", "id", "near", "copy"];
 
 /**
@@ -357,7 +357,7 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Negative when `a` is the better series for the gauge's observed levels: a
- * person's choice; one with levels; one whose terms allow commercial use, so
+ * choice in `PREFER`; one with levels; one whose terms allow commercial use, so
  * the API can serve it before tokens exist; one not from an assembled
  * collection (`ASSEMBLED`), which is the fallback; one still reporting; the
  * originator's over a copy (a redistributor's, or one of `copies`, the

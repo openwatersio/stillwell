@@ -1,8 +1,8 @@
 import type { Kind } from "./schema.ts";
 
 /**
- * Stations whose source doesn't say what water they measure, with the kind a
- * person found and why. Analysis and QC read `kind` (`judge` in
+ * Stations whose source doesn't say what water they measure, with their kind
+ * and why. Analysis and QC read `kind` (`judge` in
  * `src/lake/analysis.ts`, `qcFor` in `src/lake/recent.ts`): a `coastal`
  * gauge that stands still while dry at low water stays tidal, and a tidal
  * `river` keeps the outlier check off, where one of no kind can't. A source
