@@ -19,7 +19,7 @@ export class DatumChanged extends Error {
 
 const DAY_MS = 86_400_000;
 const HOUR_MS = 3_600_000;
-/** A change this soon after the last one, or back to an earlier label, waits for a person. */
+/** A change this soon after the last one, or back to an earlier label, waits for `overrides.epochs`. */
 const HOLD_WITHIN_MS = 180 * DAY_MS;
 
 /**
@@ -42,7 +42,7 @@ export function currentEpoch(epochs: Epoch[]): Epoch {
   return open;
 }
 
-/** Whether a station waits on a person, so nothing is fetched for it. */
+/** Whether a station waits on `overrides.epochs`, so nothing is fetched for it. */
 export function isHeld(epochs: Epoch[]): boolean {
   return epochs.some((e) => e.state === "held");
 }
@@ -88,7 +88,7 @@ export interface EpochOptions {
   now: string;
   offsets: [number, number];
   decisions: Record<string, EpochDecision>;
-  /** A person's splits, by station (`Overrides.splits`). */
+  /** Hand-entered splits, by station (`Overrides.splits`). */
   splits?: Record<string, EpochSplit[]>;
   /** The lowest `id` a new epoch may take, above any epoch directory in the lake. */
   nextId?: number;
@@ -146,7 +146,7 @@ export function splitStarts(
 }
 
 /**
- * Split a station's current epoch at each day a person found its zero moved
+ * Split a station's current epoch at each hand-entered day its zero moved
  * (`Overrides.splits`), in place: it closes there, and one from that day takes
  * its label, reference and datums, so a source that names references sees no
  * change on its next refresh. Each day splits once; one ahead waits for its
@@ -209,7 +209,7 @@ function before(id: number, datum: string): Epoch {
 /**
  * For an `archive: "previous"` source: close `first` at `since`, where the
  * reference the source names starts, and open an epoch from there. Both keep
- * the label, so the earlier one converts only by a person's decision.
+ * the label, so the earlier one converts only by a decision in `overrides.epochs`.
  */
 function splitAt(
   first: Epoch,
@@ -237,7 +237,7 @@ function splitAt(
 /**
  * A station's epochs after a refresh: the current one carried forward, or a
  * new one opened, held or suppressed when the source reports another
- * reference, then a person's decisions applied and `to_current` worked out.
+ * reference, then `overrides.epochs` applied and `to_current` worked out.
  */
 export function nextEpochs(
   previous: Epoch[],
@@ -247,7 +247,7 @@ export function nextEpochs(
   epochs: Epoch[];
   event: EpochEvent | null;
   reason?: string;
-  /** The epoch a person would decide on, when it isn't the held or newest one. */
+  /** The epoch `overrides.epochs` would decide on, when it isn't the held or newest one. */
   decide?: Epoch;
 } {
   const epochs = previous.map((e) => ({ ...e, datums: { ...e.datums } }));
@@ -296,7 +296,7 @@ export function nextEpochs(
     epochs.splice(0, 1, closed!, { ...opened!, id: next + 1 });
     event = "opened";
     reason = `values before ${iso(refStart)} are in the reference before ${ref!.id}`;
-    // A person's decision converts the earlier epoch, not the new one.
+    // A decision in `overrides.epochs` converts the earlier epoch, not the new one.
     decide = closed;
   } else if (!labelChanged && !refChanged) {
     // The first refresh to see a reference records it, rather than call it a change.
@@ -313,7 +313,7 @@ export function nextEpochs(
       (e) => e.state === "rejected" && e.datum === datum && e.reference === (ref?.id ?? null),
     );
     if (rejected) {
-      // A person said this change never happened, so the station carries on in
+      // `overrides.epochs` rejected this change as one that never happened, so the station carries on in
       // its current epoch; a reference that only looked new still brings its
       // offsets under the same label. It's reported, not failed, in case the
       // change has since become real and needs a new decision.
@@ -327,7 +327,7 @@ export function nextEpochs(
         }
       }
       event = "ignored";
-      reason = "a person rejected this change";
+      reason = "rejected earlier through overrides.epochs";
     } else if (
       ref?.since &&
       refChanged &&
@@ -360,7 +360,7 @@ export function nextEpochs(
       const soon = start !== null && since - Date.parse(start) < HOLD_WITHIN_MS;
       const backwards = start !== null && since <= Date.parse(start);
       const id = Math.max(...epochs.map((e) => e.id), (options.nextId ?? 1) - 1) + 1;
-      // A held epoch keeps the end it would give the open one, until a person decides.
+      // A held epoch keeps the end it would give the open one, until `overrides.epochs` decides.
       const opened: Epoch = {
         id,
         datum,
@@ -397,12 +397,12 @@ export function nextEpochs(
   const person = applySplits(epochs, options);
   if (person.opened.length) {
     event ??= "opened";
-    reason ??= `a person found the zero moved on ${person.opened.join(", ")}; backfill the station from ${person.opened[0]}`;
-    // A person's offset converts the epoch before the first split.
+    reason ??= `overrides.splits says the zero moved on ${person.opened.join(", ")}; backfill the station from ${person.opened[0]}`;
+    // A hand-entered offset converts the epoch before the first split.
     decide ??= person.first;
   }
   event = applyDecisions(epochs, options) ?? event;
-  // A station still waiting on a person is reported on every refresh, not only the first.
+  // A station still waiting on `overrides.epochs` is reported on every refresh, not only the first.
   if (!event && isHeld(epochs)) {
     event = "waiting";
     reason = "waiting for a decision in the source's overrides";
@@ -411,7 +411,7 @@ export function nextEpochs(
 }
 
 /**
- * Apply a person's decisions to a station's epochs, in place: confirm or
+ * Apply `overrides.epochs` to a station's epochs, in place: confirm or
  * reject one, or end the one before it earlier. Returns what changed.
  */
 function applyDecisions(epochs: Epoch[], options: EpochOptions): EpochEvent | null {
@@ -445,7 +445,7 @@ function applyDecisions(epochs: Epoch[], options: EpochOptions): EpochEvent | nu
       epoch.until = null;
       event = "confirmed";
     }
-    // The person knows the reference before held through this day, and no longer.
+    // The decision says the reference before held through this day, and no longer.
     if (decision.until && before && epoch.state !== "rejected") {
       const end = iso(dayStartEarliest(decision.until, options.offsets) + DAY_MS);
       const target = epoch.state === "held" ? epoch : before;

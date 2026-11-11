@@ -5,7 +5,7 @@
       "stations": ["usace/MVN.Baton_Rouge"],
       "handling": "corrected",
       "error": "The New Orleans District places its Baton Rouge gauge at 29.43° N, about 110 km south of the gauge, which the Vicksburg District places at 30.45° N.",
-      "response": "The station refresh moves it to MVK's position, 30.4457, −91.1916, which USGS 07374000 shares, listed in `POSITIONS` in `src/positions.ts`. If MVN moves the station, the refresh reports the entry and fails the run until a person checks it.",
+      "response": "The station refresh moves it to MVK's position, 30.4457, −91.1916, which USGS 07374000 shares, listed in `POSITIONS` in `src/positions.ts`. If MVN moves the station, the refresh reports the entry and fails the run until a maintainer checks it.",
       "evidence": "CWMS catalogs: `MVN.Baton_Rouge` at 29.4292° N, −91.2069; `MVK.Baton_Rouge` at 30.4457° N, −91.1916. The gauge is at Baton Rouge, 30.45° N.",
       "reported": "2026-11-07",
       "report": "Sent to the New Orleans District (CEMVN-WATER-MANAGEMENT@usace.army.mil) on 2026-11-07, as a reply to the 2026-11-05 data request in [#10](https://github.com/openwatersio/water-levels/issues/10). No answer yet."
@@ -60,7 +60,7 @@
       ],
       "handling": "corrected",
       "error": "The CWMS location catalog places six gauges 14 to 334 km from where USGS places the same gauge. Two have a latitude off by whole degrees, and one has another gauge's position.",
-      "response": "The station refresh moves each station to the USGS gauge's position, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while CWMS still serves the position it was written against. If CWMS moves the station, the station keeps CWMS's position, and the refresh reports the entry and fails the run until a person checks it.",
+      "response": "The station refresh moves each station to the USGS gauge's position, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while CWMS still serves the position it was written against. If CWMS moves the station, the station keeps CWMS's position, and the refresh reports the entry and fails the run until a maintainer checks it.",
       "evidence": "| Station | CWMS | USGS gauge | Off by |\n| --- | --- | --- | --- |\n| `MVK.Olive_Branch`, Coldwater River at Olive Branch | 37.9075, −89.7533 | 07275900, 34.9075, −89.7533 | 334 km; latitude 3° off |\n| `MVK.Oxford`, Yocona River at Oxford | 32.2733, −89.5214 | 07274000, 34.2733, −89.5214 | 222 km; latitude 2° off |\n| `MVN.Bayou_Boeuf-Amelia` | 29.8691, −90.5950 | 073814675, 29.6683, −91.0997, railroad bridge at Amelia | 54 km |\n| `MVN.Chicot_Pass-Myette`, Chicot Pass near Myette Point | 30.0680, −91.4740, the same as `MVN.Chicot_Pass` near West Fork | 073815450, 29.8927, −91.4457 | 20 km |\n| `LRN.RoaringR_Hilham`, Roaring River near Hilham | 36.3409, −85.5902 | 03418000, 36.3409, −85.4264 | 15 km |\n| `LRN.WFBrownsCr_Glen`, West Fork Browns Creek at Glendale Lane | 36.2177, −86.8202 | 03431100, 36.0943, −86.7939 | 14 km |\n\nFound by matching every USACE station's river and place names against USGS and the other districts' catalogs on 2026-11-08. MVN's Baton Rouge, 113 km south, is [#64](https://github.com/openwatersio/water-levels/issues/64).",
       "report": "Not sent. It goes to MVK and MVN Water Management for their gauges, and to the Nashville District for LRN's."
     },

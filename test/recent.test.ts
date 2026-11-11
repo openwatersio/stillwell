@@ -140,7 +140,7 @@ describe("updateRecent", () => {
       });
     assert.equal((await run(new DatumChanged("now in NHN", "NHN"))).datumChanged, true);
     assert.equal((await run(new Error("timed out"))).datumChanged, undefined);
-    // A change a person rejected stays rejected, however often the list is
+    // A change overrides.epochs rejected stays rejected, however often the list is
     // refreshed, but a change to another datum or reference still asks for one.
     b.epochs.push(epoch(2, "NHN", { state: "rejected" }));
     assert.equal((await run(new DatumChanged("now in NHN", "NHN", null))).datumChanged, undefined);
@@ -1275,7 +1275,7 @@ describe("compactRecent", () => {
       (await readObservations(file("held", 2))).map((r) => r.level),
       [],
     );
-    // Waiting on a person isn't a failure.
+    // Waiting on overrides.epochs isn't a failure.
     assert.deepEqual(summary.failed, []);
     assert.deepEqual(summary.waiting, ["test/held: 1 values"]);
     // Nor is a held station stale once its rows age out of the window.

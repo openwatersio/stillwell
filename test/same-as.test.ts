@@ -168,7 +168,7 @@ describe("linkGauges's limits", () => {
     );
   });
 
-  it("keeps a pair a person unlinked apart, even through a third station", () => {
+  it("keeps a pair in UNLINKS apart, even through a third station", () => {
     UNLINKS.push({ a: "a/1", b: "b/1", note: "test" });
     try {
       const { stations, report } = linkGauges([
@@ -202,7 +202,7 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("links the gauges a person matched that no rule does", () => {
+  it("links the gauges LINKS matches that no rule does", () => {
     const list = [
       station("bodc/dev", { name: "Devonport", lat: 50.36839, lon: -4.18525 }),
       station("ea/E72139", { name: "Plymouth", lat: 50.368401, lon: -4.185217 }),
@@ -332,7 +332,7 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("reports a person's decision that names no station", () => {
+  it("reports a LINKS or PREFER entry that names no station", () => {
     LINKS.push({ a: "a/1", b: "gone/1", note: "test" });
     PREFER["gone/2"] = "test";
     try {
@@ -474,7 +474,7 @@ describe("copyPairs", () => {
     assert.deepEqual(stations[0]!.same_as, ["coops/9457292"]);
   });
 
-  it("guesses for a copy whose named original a person unlinked", () => {
+  it("guesses for a copy whose named original UNLINKS separates", () => {
     UNLINKS.push({ a: "uhslc/039a", b: "coops/1111111", note: "test" });
     try {
       const { stations } = linkGauges([

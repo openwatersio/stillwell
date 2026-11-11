@@ -1,7 +1,7 @@
 /**
  * The errata roundup: for each source with errata not yet reported, a draft of
  * the message to its agency, and those held back, whose `report` says why, with the channel from the adapter's
- * `metadata.contact`. A person translates it into the agency's language,
+ * `metadata.contact`. A maintainer translates it into the agency's language,
  * approves and sends it, then records `reported` and `report` on each entry.
  * Also checks that every erratum ID the code cites is an entry.
  *

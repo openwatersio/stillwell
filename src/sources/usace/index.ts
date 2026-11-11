@@ -194,7 +194,7 @@ export function toStations(
     const kept = committedSeries;
     const station = toStation(office, id, location, kept ? listed.get(kept) : best, kept, now);
     // A series CWMS no longer lists keeps the station on it, inactive,
-    // for a person to move to another series (and decide whether its files mix two).
+    // for a maintainer to move to another series (and decide whether its files mix two).
     if (kept && !listed.has(kept)) {
       console.error(
         `  usace/${id}: ${kept} is no longer listed; marked inactive (CWMS now offers ${best.name})`,

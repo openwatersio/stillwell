@@ -389,7 +389,7 @@ export const source: Source = {
     return levels(s as RefmarStation, start, end);
   },
   // Gauges whose zero moved with no change of datum marked, found from their
-  // values (docs/stations.md, "A person's split").
+  // values (docs/stations.md, "Hand-entered splits").
   overrides: {
     splits: {
       "refmar/108": [

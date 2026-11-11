@@ -158,12 +158,12 @@ describe("nextEpochs", () => {
       [early.event, early.epochs[0]!.reference, early.epochs[0]!.datums],
       [null, null, { NN: 5.2 }],
     );
-    // Once its day has come, it's a change for a person to place.
+    // Once its day has come, it's a change for overrides.epochs to place.
     const later = nextEpochs(early.epochs, fetched, options({ now: "2027-07-03T00:00:00Z" }));
     assert.equal(later.event, "held");
   });
 
-  it("holds a reference first seen with a recent date, for a person to place", () => {
+  it("holds a reference first seen with a recent date, for overrides.epochs to place", () => {
     const fetched = {
       datum: "PNP",
       datums: {},
@@ -217,12 +217,12 @@ describe("nextEpochs", () => {
     const later = options({ now: "2028-06-01T00:00:00Z" });
     const back = nextEpochs(two, { datum: "PNP", datums: {} }, later);
     assert.deepEqual([back.event, back.reason], ["held", "returns to an earlier reference"]);
-    // A held station takes no more changes until a person decides, and says so each time.
+    // A held station takes no more changes until overrides.epochs decides, and says so each time.
     const again = nextEpochs(back.epochs, { datum: "MSL", datums: {} }, later);
     assert.deepEqual([again.epochs.length, again.event], [3, "waiting"]);
   });
 
-  it("confirms or rejects a held epoch as a person decides", () => {
+  it("confirms or rejects a held epoch as overrides.epochs decides", () => {
     const now = "2027-06-01T00:00:00Z";
     const held = nextEpochs(
       [epoch({ since: "2027-03-01T00:00:00Z" })],
@@ -321,7 +321,7 @@ describe("nextEpochs", () => {
     assert.deepEqual([event, reason], ["held", "starts no later than the epoch before it"]);
   });
 
-  it("ends the old epoch earlier when a person says when it last held", () => {
+  it("ends the old epoch earlier when overrides.epochs says when it last held", () => {
     const since = "2019-04-01";
     const key = epochKey("x/1", "2019-04-01T00:00:00Z");
     const { epochs } = nextEpochs(
@@ -340,7 +340,7 @@ describe("nextEpochs", () => {
   });
 });
 
-describe("nextEpochs, as a person decides", () => {
+describe("nextEpochs, as overrides.epochs decides", () => {
   const now = "2027-06-01T00:00:00Z";
   const recent = () => [epoch({ since: "2027-03-01T00:00:00Z" })];
 
@@ -368,7 +368,7 @@ describe("nextEpochs, as a person decides", () => {
     );
   });
 
-  it("ends the epoch before earlier when a person says so after the change", () => {
+  it("ends the epoch before earlier when overrides.epochs says so after the change", () => {
     const opened = nextEpochs([epoch()], { datum: "NN", datums: {} }, options({ now })).epochs;
     const key = epochKey("x/1", now);
     const { epochs } = nextEpochs(
@@ -407,7 +407,7 @@ describe("nextEpochs, as a person decides", () => {
   });
 });
 
-describe("nextEpochs, split by a person", () => {
+describe("nextEpochs, split by overrides.splits", () => {
   const split = (...days: string[]) => ({
     "x/1": days.map((since) => ({ since, note: "the zero moved" })),
   });
@@ -591,7 +591,7 @@ describe("an archive in the reference of its time", () => {
     assert.deepEqual(
       first.epochs.map((e) => [e.id, e.since, e.until, e.state, e.reference, e.to_current]),
       [
-        // The old NAP converts to today's only by a person's decision.
+        // The old NAP converts to today's only by a decision in overrides.epochs.
         [1, null, "2005-01-01T00:00:00Z", "closed", null, null],
         [2, "2005-01-01T00:00:00Z", null, "open", "NAP 2005", 0],
       ],

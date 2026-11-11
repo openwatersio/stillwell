@@ -6,7 +6,7 @@ import type { Kind } from "../src/schema.ts";
 import { sources } from "../src/sources/index.ts";
 
 describe("decideKinds", () => {
-  it("gives a station a person's kind where its source gives none", () => {
+  it("gives a station its KINDS kind where its source gives none", () => {
     const { stations, stale } = decideKinds("rws", [
       { id: "rws/uithuizerwad", kind: null as Kind | null },
       { id: "rws/hoekvanholland", kind: null as Kind | null },
@@ -21,7 +21,7 @@ describe("decideKinds", () => {
     assert.deepEqual(stale, []);
   });
 
-  it("keeps a kind the source gives, and reports the entry for a person to remove", () => {
+  it("keeps a kind the source gives, and reports the entry for a maintainer to remove", () => {
     const { stations, stale } = decideKinds("refmar", [
       { id: "refmar/339", kind: "estuary" as Kind | null },
       { id: "refmar/108", kind: null as Kind | null },

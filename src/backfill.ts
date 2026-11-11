@@ -336,7 +336,7 @@ export async function earliestPreliminary(
  * starts before the reference it names, which a station with more than one
  * epoch records without a split; and each closed epoch under the same label,
  * as a split leaves, gets its own span. So does each closed epoch before one a
- * person's split opened (`splits`, the instants from `splitStarts`), whose
+ * hand-entered split opened (`splits`, the instants from `splitStarts`), whose
  * source serves its span on the zero of its time, as it always has; the next
  * epoch's start says so even after a decision ends this one earlier. A closed epoch under another label isn't, since the
  * source serves only the station's current one.
