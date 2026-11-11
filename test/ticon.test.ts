@@ -325,7 +325,7 @@ describe("TICON replacements", () => {
     assert.equal(exact.id, "rws/kornwerderzand.ijsselmeer.binnenhaven");
   });
 
-  it("takes a person's link for a CMEMS record over the station at its position", () => {
+  it("takes a LINKS entry for a CMEMS record over the station at its position", () => {
     // CMEMS places its copy of Wangerooge West 40 m from Wangerooge Nord.
     const lists = {
       pegelonline: [

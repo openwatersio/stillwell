@@ -150,7 +150,7 @@ export interface Epoch {
 export type LakeStation = Station & { epochs: Epoch[] };
 
 /**
- * A person's decision on one epoch, keyed in `Overrides.epochs` by
+ * A decision on one epoch, keyed in `Overrides.epochs` by
  * `epochKey`: confirm or reject a held one, reject one that never happened,
  * end the epoch before it earlier than the source said, or say how to convert
  * it when no shared reference does.
@@ -165,7 +165,7 @@ export interface EpochDecision {
 }
 
 /**
- * A day a person found a station's zero moved though the source never said,
+ * A day a station's zero moved though the source never said, found
  * from its values, against another record of the gauge or a neighbor where
  * the lake has one. Never removed once applied, as backfill reads it.
  */
@@ -175,7 +175,7 @@ export interface EpochSplit {
   note: string;
 }
 
-/** Decisions a person made about a source's stations, kept in its adapter. */
+/** Decisions made about a source's stations, kept in its adapter. */
 export interface Overrides {
   epochs?: Record<string, EpochDecision>;
   /** By station: where to split its epochs, each split opening an epoch from that day. */
@@ -251,7 +251,7 @@ export interface SourceMetadata {
  */
 export interface Source {
   metadata: SourceMetadata;
-  /** Decisions a person made about the source's stations. */
+  /** Decisions made about the source's stations. */
   overrides?: Overrides;
   /** `previous` is the lake's list, for a source that keeps choices it made before. */
   stations(previous?: Station[]): Promise<ListedStation[]>;

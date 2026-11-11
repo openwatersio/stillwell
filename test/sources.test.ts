@@ -3313,7 +3313,7 @@ describe("uhslc", () => {
     assert.equal(keep!(text), true);
   });
 
-  it("reads levels in the station's own label, so a person's decision can let them through", async () => {
+  it("reads levels in the station's own label, so a decision can let them through", async () => {
     setTransport(async () =>
       JSON.stringify({
         table: {

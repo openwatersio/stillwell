@@ -63,7 +63,7 @@ export interface RunSummary {
   blocked?: boolean;
   /** Whether a station failed because its source now reports it in another datum, which a station refresh handles. */
   datumChanged?: boolean;
-  /** Stations whose values wait in the window for a person's decision on a held datum change. */
+  /** Stations whose values wait in the window for a decision on a held datum change. */
   waiting: string[];
   /** Stations the run judged with less than it should, such as without some errata spans, with why. */
   warned?: string[];
@@ -95,7 +95,7 @@ interface RunOptions {
  * Each row carries the datum epoch it belongs to. A station's rows from
  * before its current epoch stay as they are, for compaction to fold into
  * their own epoch's files, and fetching never reaches back before the current
- * epoch's start. A station whose new epoch waits on a person isn't fetched,
+ * epoch's start. A station whose new epoch is held isn't fetched,
  * but keeps what it had.
  *
  * A station is stale when its newest value is older than three of its
@@ -249,7 +249,7 @@ export async function updateRecent({
           // Keep what we had; a failed fetch mustn't empty the window.
           summary.failed.push(`${station.id}: ${message(error)}`);
           if (error instanceof Blocked) summary.blocked = true;
-          // A refresh ignores a change a person rejected, matched on datum and
+          // A refresh ignores a rejected change, matched on datum and
           // reference as nextEpochs does, so that one doesn't ask for one; an
           // unknown reference matches none.
           if (
@@ -293,8 +293,8 @@ export async function updateRecent({
  * arrived still reach its files, as are those of a station whose list no
  * longer has `levels`. A live, active station with levels and no values in the
  * range is stale. Values at or after a held epoch's start wait in the window,
- * reported but not failed, and those older than the window when a person
- * decides need a backfill. Then it writes the source's bounds (`updateBounds`).
+ * reported but not failed, and those older than the window when the hold
+ * is decided need a backfill. Then it writes the source's bounds (`updateBounds`).
  */
 export async function compactRecent({
   source,
@@ -370,7 +370,7 @@ export async function compactRecent({
         // A row goes to the epoch its time falls in, as the next hourly run
         // would move it: a refresh can open an epoch whose start is in the
         // past after the window's rows were tagged. Rows at or after a held
-        // epoch's start wait in the window for a person's decision.
+        // epoch's start wait in the window for a decision.
         const heldFrom = Math.min(
           ...station.epochs
             .filter((e) => e.state === "held" && e.since !== null)

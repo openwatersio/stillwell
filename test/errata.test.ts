@@ -53,7 +53,7 @@ describe("errata files", () => {
     assert.equal(bad.problems.length, 1);
   });
 
-  it("back every split a person made with an erratum of the station's source", () => {
+  it("back every split with an erratum of the station's source", () => {
     for (const [name, source] of Object.entries(sources))
       for (const [station, splits] of Object.entries(source.overrides?.splits ?? {}))
         for (const split of splits) {

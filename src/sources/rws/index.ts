@@ -463,7 +463,7 @@ export const source: Source = {
       datum: s.datum,
       fresh: fresh(end),
     }),
-  // A gauge whose zero moved with no change of datum marked (docs/stations.md, "A person's split").
+  // A gauge whose zero moved with no change of datum marked (docs/stations.md, "Unreported zero moves").
   overrides: {
     splits: {
       "rws/kralendijk.plazabeachterminal": [
