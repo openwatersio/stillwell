@@ -62,14 +62,14 @@ export interface Analysis {
  * threshold in `qcFor`, so `analyze` judges every station again and
  * requalifies all its stored years.
  */
-export const RULES = "held-1";
+export const RULES = "span-1";
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a
  * verdict depends on, so `analyze` judges every station again and requalifies
  * only those whose QC changes with their verdict.
  */
-export const JUDGE = "drains-2";
+export const JUDGE = "drains-3";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;

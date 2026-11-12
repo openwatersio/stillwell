@@ -2,17 +2,24 @@ import { Flag, type Observation } from "./schema.ts";
 
 /**
  * Quality control for observed levels. Deliberately small: per-source quirks
- * (clocks, datum shifts) take most of the effort and live in the adapters. This
- * runs in Node and in the Worker.
+ * (clocks, datum shifts) take most of the effort and live in the adapters.
  */
 export interface QcOptions {
   /**
-   * Levels this many meters from the series' median are bad. Relative, because
-   * some datums (NN, NAVD88) put inland gauges hundreds of meters up.
+   * Levels this many meters from the series' median are bad, as are those
+   * outside `SPAN_M`. Relative, because some datums (NN, NAVD88) put inland
+   * gauges hundreds of meters up.
    */
   limit_m?: number;
   /** A level unchanged for this long is suspect. Rivers and lakes can sit still for days. */
   flatline_s?: number;
+  /**
+   * Levels within this many meters of a run's first count as unchanged, so a
+   * stuck gauge that dithers by a millimeter is still a flatline. Exact
+   * equality where it's 0, as at still water, where a calm pool can waver by
+   * a millimeter for days.
+   */
+  flatline_m?: number;
   /**
    * The flatline limit where a series moves in whole centimeters, where a calm
    * day can hold one value for hours. Judged from the changes in the three days
@@ -39,10 +46,24 @@ export interface QcOptions {
 export const FLATLINE_S = 6 * 3600;
 
 /**
+ * Levels no gauge can read in any datum the store holds, in meters: below the
+ * Dead Sea's shore or above Everest. QARTOD's gross range test fails a value
+ * outside the sensor's span whatever the window holds, which catches a year
+ * that is all placeholder, such as USACE's 30,479.695 m (100,000 ft), where
+ * the window's own median is the placeholder. The highest real levels in the
+ * store are USGS reservoirs at 1,817 m.
+ */
+export const SPAN_M = [-500, 9000] as const;
+
+/** Whether a level is finite and within `SPAN_M`. */
+const possible = (level: number) => level >= SPAN_M[0] && level <= SPAN_M[1];
+
+/**
  * Rows as a source sent them, with `source_flag` set to their flag before QC
  * can make it worse. Only freshly fetched rows get this: a stored row's flag
  * may already hold QC's marks. An adapter that marks a source's value worse
- * itself, such as REFMAR's suspect spans, sets `source_flag` to the source's.
+ * itself, such as USGS's `ICE` qualifier, does so before this, so it shows in
+ * `source_flag`; errata spans are marked after, by `fromSource`.
  */
 export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
   // Levels to the 0.1 mm the store reads back, so a fetched value equals its stored copy, as a flatline needs.
@@ -85,6 +106,7 @@ export function qc<T extends Observation>(
   {
     limit_m = 20,
     flatline_s = FLATLINE_S,
+    flatline_m = 0,
     centimeter_flatline_s = 0,
     spike_m = 0.25,
     outliers = true,
@@ -96,24 +118,30 @@ export function qc<T extends Observation>(
   if (!out.length) return out;
   const own = new Set<Observation>(out);
   const times = new Set(out.map((r) => r.time));
-  const all = unique([
-    ...out,
-    ...context.filter((r) => !times.has(r.time) && Number.isFinite(r.level)),
-  ]);
+  // Possible levels only, so no neighbor, residual, run or spread sees a NaN or a placeholder; the limit rule marks the rest bad.
+  const all = unique([...out, ...context.filter((r) => !times.has(r.time))]).filter((r) =>
+    possible(r.level),
+  );
   const worsen = (r: Observation, flag: Flag) => {
     if (own.has(r)) r.flag = Math.max(r.flag, flag) as Flag;
   };
 
-  const middle = median(out.filter((r) => Number.isFinite(r.level)).map((r) => r.level)) ?? 0;
+  const middle = median(out.filter((r) => possible(r.level)).map((r) => r.level)) ?? 0;
   out.forEach((r) => {
-    if (!Number.isFinite(r.level) || Math.abs(r.level - middle) > limit_m) worsen(r, Flag.bad);
+    if (!possible(r.level) || Math.abs(r.level - middle) > limit_m) worsen(r, Flag.bad);
   });
 
-  // Flatlines: runs of one value lasting at least `flatline_s`, or
-  // `centimeter_flatline_s` where the level moves in whole centimeters around them.
+  // Flatlines: runs within `flatline_m` of their first value lasting at least
+  // `flatline_s`, or `centimeter_flatline_s` where the level moves in whole
+  // centimeters around them. In 0.1 mm, the store's resolution.
+  const tolerance = Math.round(flatline_m * 10_000);
   for (let i = 0; i < all.length;) {
     let j = i;
-    while (j + 1 < all.length && all[j + 1]!.level === all[i]!.level) j++;
+    while (
+      j + 1 < all.length &&
+      Math.abs(Math.round((all[j + 1]!.level - all[i]!.level) * 10_000)) <= tolerance
+    )
+      j++;
     const span = all[j]!.time - all[i]!.time;
     if (
       j - i >= 3 &&
@@ -130,13 +158,25 @@ export function qc<T extends Observation>(
   const spacing = median(out.slice(1).map((r, i) => r.time - out[i]!.time)) ?? 0;
   const residuals = all.map((r, i) => {
     // Neighbors on both sides, so a slope at an edge or a gap doesn't look like a spike.
-    const before: number[] = [];
-    const after: number[] = [];
-    for (let k = i - 1; k >= 0 && r.time - all[k]!.time <= 3 * spacing; k--)
-      before.push(all[k]!.level);
+    const before: Observation[] = [];
+    const after: Observation[] = [];
+    for (let k = i - 1; k >= 0 && r.time - all[k]!.time <= 3 * spacing; k--) before.push(all[k]!);
     for (let k = i + 1; k < all.length && all[k]!.time - r.time <= 3 * spacing; k++)
-      after.push(all[k]!.level);
-    return before.length && after.length ? r.level - median([...before, ...after])! : undefined;
+      after.push(all[k]!);
+    if (!before.length || !after.length) return undefined;
+    // Only neighbors whose mirrored time on the other side also holds a value, within half an
+    // interval, so a gap on one side doesn't move the median along a steep tide; all of them
+    // where none pair, so every value with neighbors on both sides is judged.
+    const offset = (x: Observation) => Math.abs(x.time - r.time);
+    const paired = (x: Observation, other: Observation[]) =>
+      other.some((y) => Math.abs(offset(y) - offset(x)) <= spacing / 2);
+    const mirrored = [
+      ...before.filter((x) => paired(x, after)),
+      ...after.filter((x) => paired(x, before)),
+    ];
+    return (
+      r.level - median((mirrored.length ? mirrored : [...before, ...after]).map((x) => x.level))!
+    );
   });
   const threshold = Math.max(
     spike_m,
@@ -188,8 +228,8 @@ export function qc<T extends Observation>(
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
   // The floor keeps a short, nearly flat window from flagging ordinary changes.
   if (outliers) {
-    const levels = out.map((r) => r.level);
-    const center = median(levels)!;
+    const levels = out.map((r) => r.level).filter(possible);
+    const center = median(levels) ?? 0;
     const outlier = Math.max(10 * mad(levels), 4 * spike_m);
     out.forEach((r) => {
       if (Math.abs(r.level - center) > outlier) worsen(r, Flag.suspect);
@@ -234,6 +274,7 @@ function median(values: number[]): number | undefined {
 
 /** Median absolute deviation, scaled to a standard deviation for normal data. */
 function mad(values: number[]): number {
+  values = values.filter(Number.isFinite);
   const center = median(values);
   if (center === undefined) return 0;
   return 1.4826 * median(values.map((v) => Math.abs(v - center)))!;

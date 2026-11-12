@@ -797,6 +797,15 @@ export async function refuseOtherDatum(
 export const CENTIMETER_TIDE_M = 0.3;
 
 /**
+ * How far, in meters, a tide gauge's level can waver from a run's first value
+ * and still count as one flatline: a stuck gauge that dithers by a millimeter
+ * either way. QARTOD's flat line test takes values equal within 1 mm. A
+ * centimeter flags hours of real water where a small tide turns, as at
+ * Berwick, Louisiana.
+ */
+export const FLATLINE_M = 0.002;
+
+/**
  * QC's rules for a station, by whether its levels carry a tide
  * (`Station.tidal`, from `src/store/analysis.ts`), the same for every source.
  * Still water, a pooled river, a lake or a creek drained to its sill, holds
@@ -808,6 +817,7 @@ export const CENTIMETER_TIDE_M = 0.3;
  * centimeter for a day on calm days too, but a millimeter for hours only when
  * its gauge is stuck, so it keeps six hours where its values move in
  * millimeters. Tidal water never holds still that long, so it gets six hours,
+ * counting a level within `FLATLINE_M` of a run's first as unchanged,
  * or two days where its tide is under `CENTIMETER_TIDE_M` and its values move
  * in whole centimeters. A tidal river or lake still floods, so it keeps the
  * outlier check off; tidal water of any other kind, or none, keeps it. A
@@ -823,6 +833,7 @@ export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOp
       : { flatline_s: 48 * 3600, outliers: false, held: false };
   const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
+    flatline_m: FLATLINE_M,
     ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
     ...(river ? { outliers: false } : {}),
   };
