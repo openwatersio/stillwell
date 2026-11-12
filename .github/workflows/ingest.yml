@@ -20,8 +20,9 @@ jobs:
   # A command for one source shares that source's group with the scheduled
   # jobs, so a backfill and a compaction never rewrite one year file at once.
   # Station lists are refreshed only by the Monthly workflow, so two refreshes
-  # never rewrite one list, nor two publishes stations.parquet. Anything else,
-  # `publish` included, takes the `store` group.
+  # never rewrite one list, nor two publishes stations.parquet. `links` takes
+  # the `links` group, as Monthly's does. Anything else, `publish` included,
+  # takes the `store` group.
   group:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -46,6 +47,8 @@ jobs:
             esac
           done
           case "${words[0]:-}" in
+            # links reads levels and writes only its own file, in the group Monthly's job takes.
+            links) group=links ;;
             backfill | recent | compact | requalify | withhold | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
