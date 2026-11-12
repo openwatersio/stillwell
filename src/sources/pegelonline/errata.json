@@ -128,6 +128,26 @@
       "error": "PEGELONLINE's Bake Z levels sit 0.8 to 2.4 m high from 30 September to 21 October 2002.",
       "response": "30 September to 21 October 2002 is flagged `suspect`, keeping the source's own flag as `source_flag`. The store's QC already flags about two thirds of it.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Bake A (`pegelonline/9510063`) and Scharhörn (`pegelonline/9510060`): the differences are 0.03 to 0.08 m before and after, +0.83 m from 30 September and +2.37 m from 18 October."
+    },
+    {
+      "id": "pegelonline-este-sperrwerk-2025-06-03",
+      "stations": ["pegelonline/5950081"],
+      "since": "2025-06-03",
+      "until": "2025-06-04",
+      "handling": "kept",
+      "error": "PEGELONLINE gives Este Inneres Sperrwerk BP 3.20 m at 08:10 UTC on 3 June 2025, after 6.51 and 6.40 m at 08:08 and 08:09, followed by a gap.",
+      "response": "The value is kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark about 1,400 good one-minute values suspect.",
+      "evidence": "In PEGELONLINE's raw-data download for the gauge, as the store holds it, checked in November 2026: 6.51 m at 08:08 UTC, 6.40 m at 08:09, 3.20 m at 08:10, then a gap. The gauge also jumps for a minute or two to fixed values such as 5.19, 4.99 and 4.19 m dozens of times a year, which the store's spike test mostly catches."
+    },
+    {
+      "id": "pegelonline-eichhorst-zero",
+      "stations": ["pegelonline/693320", "pegelonline/693330"],
+      "since": "2026-11-10",
+      "until": "2026-11-11",
+      "handling": "kept",
+      "error": "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
+      "response": "The values are kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
+      "evidence": "PEGELONLINE's REST API (`/stations/693320/W/measurements.json` and the same for 693330), checked on 11 November 2026, returns 389 and 107 cm at 04:00 and 04:15 CET, 0.0 at 04:30 CET, and nothing until 06:15 CET. The store holds the same values."
     }
   ],
   "retired": []

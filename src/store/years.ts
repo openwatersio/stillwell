@@ -8,6 +8,7 @@ import {
   type YearStats,
 } from "./parquet.ts";
 import { sourceEpochDirs, sourceFirstEpochFiles, yearsPath } from "./paths.ts";
+import type { Timer } from "./recent.ts";
 
 /**
  * A source's year files of levels, `stations/years/<source>.parquet`: a row
@@ -192,6 +193,7 @@ export async function reconcileYears(
     reread = [],
     limit = Infinity,
     concurrency = 8,
+    time = (_, work) => work(),
   }: {
     start?: boolean;
     rebuild?: boolean;
@@ -199,19 +201,22 @@ export async function reconcileYears(
     reread?: string[];
     limit?: number;
     concurrency?: number;
+    time?: Timer;
   } = {},
 ): Promise<{ read: number; failed: string[] } | null> {
-  const had = await readYears(store, source).catch((error: unknown) => {
-    if (rebuild) return null;
-    throw error;
-  });
+  const had = await time("reconcile: read years", () => readYears(store, source)).catch(
+    (error: unknown) => {
+      if (rebuild) return null;
+      throw error;
+    },
+  );
   if (!had && !start && !rebuild) return null;
   const rows = new Map<string, YearRow>();
   const marked = new Set([
     ...[...(had?.values() ?? [])].filter((r) => r.year === null).map((r) => r.id),
     ...reread,
   ]);
-  const files = await listLevelFiles(store, source);
+  const files = await time("reconcile: list files", () => listLevelFiles(store, source));
   // A listing that finds nothing when there are rows is a wrong path or a failed list, not a store emptied.
   if (!files.length && [...(had?.values() ?? [])].some((r) => r.year !== null))
     throw new Error(`no ${source} files listed in ${store}, yet it has years; keeping them`);
@@ -238,38 +243,43 @@ export async function reconcileYears(
     if (row) rows.set(key(at), row);
   }
   const save = () =>
-    writeYears(store, source, [
-      ...rows.values(),
-      ...[...pending.keys()].map((id) => ({ id, epoch: null, year: null })),
-    ]);
+    time("reconcile: write years", () =>
+      writeYears(store, source, [
+        ...rows.values(),
+        ...[...pending.keys()].map((id) => ({ id, epoch: null, year: null })),
+      ]),
+    );
+  console.log(`${source} reconcile: reading ${unread.length} files`);
   const batches = Array.from({ length: Math.ceil(unread.length / 100) }, (_, i) =>
     unread.slice(i * 100, i * 100 + 100),
   );
   // Each batch's files at once, a few batches at a time, as compaction reads its bounds.
   for (let i = 0; i < batches.length; i += concurrency) {
-    await Promise.all(
-      batches.slice(i, i + concurrency).map(async (batch) => {
-        // A batch that fails is read a file at a time, so one bad file doesn't hold up the rest.
-        const stats = await readYearStats(batch).catch(async () => {
-          const each = new Map<string, YearStats>();
-          for (const file of batch)
-            try {
-              for (const [f, s] of await readYearStats([file])) each.set(f, s);
-            } catch {
-              failed.add(file);
-            }
-          return each;
-        });
-        for (const file of batch) {
-          const at = fileKey(source, file)!;
-          // A station's file that failed to read keeps it marked, so it's read again.
-          if (failed.has(file)) continue;
-          rows.set(key(at), { ...at, ...(stats.get(file) ?? EMPTY_YEAR) });
-          const left = pending.get(at.id)! - 1;
-          if (left) pending.set(at.id, left);
-          else pending.delete(at.id);
-        }
-      }),
+    await time("reconcile: read files", () =>
+      Promise.all(
+        batches.slice(i, i + concurrency).map(async (batch) => {
+          // A batch that fails is read a file at a time, so one bad file doesn't hold up the rest.
+          const stats = await readYearStats(batch).catch(async () => {
+            const each = new Map<string, YearStats>();
+            for (const file of batch)
+              try {
+                for (const [f, s] of await readYearStats([file])) each.set(f, s);
+              } catch {
+                failed.add(file);
+              }
+            return each;
+          });
+          for (const file of batch) {
+            const at = fileKey(source, file)!;
+            // A station's file that failed to read keeps it marked, so it's read again.
+            if (failed.has(file)) continue;
+            rows.set(key(at), { ...at, ...(stats.get(file) ?? EMPTY_YEAR) });
+            const left = pending.get(at.id)! - 1;
+            if (left) pending.set(at.id, left);
+            else pending.delete(at.id);
+          }
+        }),
+      ),
     );
     if (Math.floor((i + concurrency) / 50) > Math.floor(i / 50) && pending.size) await save();
   }

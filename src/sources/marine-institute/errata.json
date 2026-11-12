@@ -54,22 +54,22 @@
     {
       "id": "marine-institute-kilrush-2024-offset",
       "stations": ["marine-institute/kilrush-lough"],
-      "since": "2024-01-17",
-      "until": "2024-02-06",
+      "since": "2024-01-16",
+      "until": "2024-02-07",
       "handling": "flagged",
-      "error": "The Marine Institute's Kilrush Lough levels sit about 5 m low from 17 January to 5 February 2024.",
-      "response": "17 January to 5 February 2024 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away: the difference is about −0.2 m before and after and −5.66 m over the span."
+      "error": "The Marine Institute's Kilrush Lough levels sit about 5.6 m low from 15:00 on 16 January to about 11:00 on 6 February 2024, flat at −5.63 m for the first hours.",
+      "response": "16 January to 6 February 2024 is flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the good values before 15:00 on 16 January and after 11:00 on 6 February are flagged too.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away: the difference is about −0.2 m before and after and −5.66 m over the span. The span's first and last days, checked hour by hour in November 2026: values hold at −5.62 to −5.63 m from 15:00 on 16 January, and on 6 February sit near −5.5 m until about 11:00 before a normal tide resumes."
     },
     {
       "id": "marine-institute-kilrush-2025-offsets",
       "stations": ["marine-institute/kilrush-lough"],
-      "since": "2025-09-10",
+      "since": "2025-09-09",
       "until": "2025-12-01",
       "handling": "flagged",
-      "error": "The Marine Institute's Kilrush Lough levels step by 0.5 to 4.7 m on and off from 10 September to 30 November 2025.",
-      "response": "10 September to 30 November 2025 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Fenit (`gesla/fenit-fen-irl-cmems`) and GESLA's copies of the gauge: against Fenit the difference is −0.06 to −0.08 m outside the spans and −1.8 to −4.7 m inside them; GESLA's Marine Institute copy differs from the series by about −0.5 m on the days it has."
+      "error": "The Marine Institute's Kilrush Lough levels step by 0.5 to 4.7 m on and off from 9 September to 30 November 2025.",
+      "response": "9 September to 30 November 2025 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it. Errata spans are whole days, so 9 September's values before 22:55 are flagged too.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Fenit (`gesla/fenit-fen-irl-cmems`) and GESLA's copies of the gauge: against Fenit the difference is −0.06 to −0.08 m outside the spans and −1.8 to −4.7 m inside them; GESLA's Marine Institute copy differs from the series by about −0.5 m on the days it has. On 9 September the first 13 low values come from 22:55 to 23:55, down to −4.31 m."
     },
     {
       "id": "marine-institute-malin-head-2026-offset",
@@ -100,6 +100,46 @@
       "error": "The Marine Institute's Dublin Port levels sit about 5.8 m low from 22 April to 6 May 2020.",
       "response": "22 April to 6 May 2020 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Howth (`marine-institute/howth-water-level-1`), 11 km away: the difference is +0.19 m before, −0.03 m after and −5.67 m over the span. GESLA's CMEMS copy of the gauge differs from the series by −2.49 m on the one day it has in the span."
+    },
+    {
+      "id": "marine-institute-kilrush-2025-01-09-offset",
+      "stations": ["marine-institute/kilrush-lough"],
+      "since": "2025-01-09",
+      "until": "2025-01-10",
+      "handling": "flagged",
+      "error": "The Marine Institute's Kilrush Lough levels drop about 7 m, to between −5.2 and −6.2 m, from 01:20 to 05:40 UTC on 9 January 2025, and come back.",
+      "response": "9 January 2025 is flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too.",
+      "evidence": "In the Marine Institute's ERDDAP dataset `IrishNationalTideGaugeNetwork`, as the store holds it, checked in November 2026: 53 values below −4 m from 01:20 to 05:40 UTC on 9 January 2025, one 5-minute step down and one back up, against daily medians of 0.14 m on 8 January and 0.08 m on 10 January. GESLA's two copies of the gauge hold the same drop (erratum `gesla-kilrush-2025-01-09-offset`)."
+    },
+    {
+      "id": "marine-institute-kilrush-2025-08-offsets",
+      "stations": ["marine-institute/kilrush-lough"],
+      "since": "2025-08-04",
+      "until": "2025-08-08",
+      "handling": "flagged",
+      "error": "The Marine Institute's Kilrush Lough levels drift down from 4 August 2025 and sit 4 to 5.5 m low on 5 to 7 August.",
+      "response": "4 to 7 August 2025 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "evidence": "Daily median against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away, checked in November 2026: −0.05 to −0.09 m from 28 July to 3 August, then −1.41 m on 4 August, −3.96, −5.14 and −5.45 m on 5 to 7 August, and +0.07 m on 8 August."
+    },
+    {
+      "id": "marine-institute-kilrush-2025-08-09-offset",
+      "stations": ["marine-institute/kilrush-lough"],
+      "since": "2025-08-09",
+      "until": "2025-08-11",
+      "handling": "flagged",
+      "error": "The Marine Institute's Kilrush Lough levels sit 1.5 to 4.6 m low from 9 August 2025 to about 12:00 on 10 August.",
+      "response": "9 and 10 August 2025 are flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the normal tide after 12:00 on 10 August is flagged too.",
+      "evidence": "Daily median against Fenit (`gesla/fenit-fen-irl-cmems`), checked in November 2026: −1.63 m on 9 August and −2.79 m on 10 August, against +0.07 m on 8 August and +0.05 m on 11 August. On 10 August the values move from −3.6 to −4.6 m until 12:00, then a normal tide runs from −1.7 to +2.1 m."
+    },
+    {
+      "id": "marine-institute-skerries-2017-327m",
+      "stations": ["marine-institute/skerries-harbour"],
+      "since": "2017-01-06",
+      "until": "2017-01-07",
+      "handling": "flagged",
+      "error": "The Marine Institute's Skerries Harbour series has two values in 2017, both 327.73 m at 11:24 and 11:30 on 6 January, with QC flag 0, between missing values. The gauge's levels lie within a few meters of OD Malin.",
+      "response": "6 January 2017 is flagged `suspect` whole, keeping the source's own flag as `source_flag`. They are the only values in the store's 2017 file.",
+      "evidence": "The ERDDAP dataset `IrishNationalTideGaugeNetwork`, `Water_Level_OD_Malin` at Skerries Harbour for 6 January 2017, read November 2026: NaN on either side of the two values. The store has no 2016, 2018 or 2019 files for the station, and QC can't judge two values alone against neighbors or a window."
     }
   ],
   "retired": []
