@@ -142,6 +142,7 @@ export async function refreshSource(
     archive: source.metadata.archive,
     decisions: source.overrides?.epochs ?? {},
     splits: source.overrides?.splits ?? {},
+    restarts: source.overrides?.restarts ?? {},
     seriesChanged: source.seriesChanged?.bind(source),
   };
   const { stations, changes } = mergeStationList(previous, fetched, options_);
