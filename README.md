@@ -5,7 +5,7 @@ Observed and predicted water levels from tide, river and lake gauges around the 
 Each agency publishes in its own format, with its own limits, datums and quirks. This project fetches from each one, checks quality, and writes everything to one layout:
 
 - **One schema.** Times are UTC and levels are meters. Quality flags run from 0, good, to 4, bad, whatever scale the source used.
-- **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes.
+- **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes, and to MSL, LAT and chart datum from tide-database where it has the gauge.
 - **Licenses.** Every station carries its license, attribution and whether its terms allow commercial use. The public data holds what its sources let anyone republish, leaving out UHSLC's records, and GESLA's copies of them, whose contributor refused republication.
 - **Links between sources.** When two sources cover the same gauge, such as BSH's predictions and PEGELONLINE's observations at Cuxhaven, their stations link to each other.
 

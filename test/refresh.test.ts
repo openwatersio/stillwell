@@ -476,6 +476,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
       links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
+      datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
     assert.deepEqual(await publishedSources(stationsPath(store)), ["test"]);
@@ -613,6 +614,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
       links: { pairs: {}, dropped: [], skipped: [], large: [] },
+      datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
   });

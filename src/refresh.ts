@@ -15,6 +15,7 @@ import {
   readStationList,
   writeJsonArray,
   writeStationList,
+  writeOffsets,
   writeStations,
 } from "./store/parquet.ts";
 import {
@@ -27,6 +28,7 @@ import {
   historyPath,
   stationListPath,
   stationsPath,
+  offsetsPath,
   sourcesPath,
   errataPath,
   PRODUCTS,
@@ -34,6 +36,13 @@ import {
 import type { StoredStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
+import {
+  offsetRows,
+  ticonReplacements,
+  tideStations,
+  withDatums,
+  type DatumReport,
+} from "./datums.ts";
 import { DROPPED } from "./sources/gesla/dropped.ts";
 import { usableShares, writeYears } from "./store/years.ts";
 import { readAnalysis, withAnalysis } from "./store/analysis.ts";
@@ -249,7 +258,10 @@ export async function publishStations(
   all: Source[],
   expected: string[],
   errata: Erratum[],
-): Promise<{ count: number; links: LinkReport; unknownErrata: string[] } | { missing: string[] }> {
+): Promise<
+  | { count: number; links: LinkReport; datums: DatumReport; unknownErrata: string[] }
+  | { missing: string[] }
+> {
   const stations: StoredStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
@@ -279,8 +291,16 @@ export async function publishStations(
     for (const [id, share] of shares) usable.set(id, share);
   }
   if (missing.length || !listed.length) return { missing };
-  const { stations: linked, report } = linkGauges(stations, new Date(), usable);
+  const { stations: gauges, report } = linkGauges(stations, new Date(), usable);
+  const { stations: linked, report: datums } = withDatums(
+    gauges,
+    await tideStations(),
+    await ticonReplacements(),
+  );
   for (const station of linked) station.errata = errataOf(station, errata);
+  // Two files written one after the other: if the second write fails, they're from
+  // different publishes until the next one.
+  await writeOffsets(offsetsPath(store), linked.flatMap(offsetRows));
   await writeStations(stationsPath(store), linked);
   await writeJsonArray(
     sourcesPath(store),
@@ -302,7 +322,7 @@ export async function publishStations(
           .map((id) => `${e.id} ${id}`)
       : [],
   );
-  return { count: linked.length, links: report, unknownErrata };
+  return { count: linked.length, links: report, datums, unknownErrata };
 }
 
 /**

@@ -75,8 +75,12 @@ One station in full: the fields above plus
 ```json
 {
   "datum": "MLLW",
-  "datums": { "MSL": 1.983, "LAT": -0.912, "NAVD88": 0.692, "chart": 0 },
-  "datums_source": "coops",
+  "datums": { "MSL": 1.983, "LAT": -0.912, "NAVD88": 0.692 },
+  "datums_source": { "MSL": "tide-database", "LAT": "tide-database", "NAVD88": "source" },
+  "chart_datum": "MLLW",
+  "datums_attribution": [
+    "Slackwater database (https://github.com/openwatersio/slackwater-database)"
+  ],
   "frame": "gauge",
   "license": {
     "type": "public-domain",
@@ -92,7 +96,7 @@ One station in full: the fields above plus
 }
 ```
 
-`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when those offsets are measured against the gauge zero, and `unknown` when tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends.
+`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when the chart-datum offset comes from the tide-database station that `tide_station` names, measured against this series' zero, so observed levels and that station's predictions line up. It's `source` when the offset is the source's own or carried from another series of the gauge, which can differ from tide-database's by a few centimeters, and `unknown` when there's no chart-datum offset, as where tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends. `stations.parquet` carries `frame` and `chart_datum` ([data.md](data.md#stations)).
 
 `same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](data.md#stations)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
 
@@ -113,7 +117,7 @@ The last hours of observations, fetched from the source when the cache is older 
 {
   "station": { "id": "coops/9447130", "name": "Seattle", "tide_station": "noaa/9447130" },
   "datum": "MLLW",
-  "datums": { "MSL": 1.983, "chart": 0 },
+  "datums": { "MSL": 1.983, "MLLW": 0 },
   "frame": "gauge",
   "status": "reporting",
   "as_of": "2026-11-03T15:42:00Z",
@@ -122,7 +126,10 @@ The last hours of observations, fetched from the source when the cache is older 
     { "time": "2026-10-30T15:48:00Z", "level": 2.871, "flag": "preliminary" },
     { "time": "2026-10-30T15:54:00Z", "level": 2.905, "flag": "preliminary" }
   ],
-  "attribution": ["NOAA National Ocean Service"],
+  "attribution": [
+    "NOAA National Ocean Service",
+    "Slackwater database (https://github.com/openwatersio/slackwater-database)"
+  ],
   "notice": "Preliminary observations. Not for navigation."
 }
 ```
