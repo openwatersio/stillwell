@@ -238,11 +238,17 @@ describe("RULES and JUDGE", () => {
     ];
     if (!process.env.UPDATE_RULES)
       assert.deepEqual(cases(now), cases(was), `The cases changed: ${regenerate}`);
-    if (was.rules === RULES)
+    if (was.rules === RULES) {
       assert.deepEqual(
-        ...shared({ ...now.options, ...flat(now.flags) }, { ...was.options, ...flat(was.flags) }),
+        now.options,
+        was.options,
+        `qcFor's options changed: bump RULES in src/store/analysis.ts, ${regenerate}`,
+      );
+      assert.deepEqual(
+        ...shared(flat(now.flags), flat(was.flags)),
         `QC's flags changed: bump RULES in src/store/analysis.ts, ${regenerate}`,
       );
+    }
     if (was.judge === JUDGE)
       assert.deepEqual(
         ...shared(now.verdicts, was.verdicts),
