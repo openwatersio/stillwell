@@ -132,8 +132,8 @@ export function judge(
   // rules flag it. Elsewhere a tidal verdict also turns the outlier check on,
   // so every hold a plain six hours flags counts, values exactly equal, at an
   // estuary as at a gauge of no kind: a
-  // gauge of no kind on the coast, such as REFMAR's at Le Havre, can read
-  // its zero to a few millimeters for hours when left dry, and a tidal
+  // gauge of no kind on the coast can read its zero to a few millimeters for
+  // hours when it drops out or is left dry, and a tidal
   // verdict lets QC flag that.
   const river = station.kind === "river" || station.kind === "lake";
   const tide = qc(start, {
