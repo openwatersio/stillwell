@@ -417,7 +417,10 @@ describe("TICON replacements", () => {
       },
     ]);
     assert.equal(rows[1]!.replacement.id, "rws/a");
-    assert.match(rows[1]!.replacement.note!, /^Same slackwater-database station as a-1-nld-rws; why/);
+    assert.match(
+      rows[1]!.replacement.note!,
+      /^Same slackwater-database station as a-1-nld-rws; why/,
+    );
     assert.equal(rows[2]!.replacement.status, "unmatched");
   });
 

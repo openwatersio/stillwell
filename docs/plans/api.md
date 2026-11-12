@@ -32,18 +32,18 @@ Each source with its operator, license, attribution line, terms URL, where to re
 
 Lists stations. Filters combine:
 
-| Parameter                          | Meaning                                                                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `query`                            | Full-text search on name, ID or place, as in the tides API                                                    |
-| `latitude`, `longitude`            | Stations nearest the point, nearest first, each with `distance` in kilometers                                 |
-| `maxDistance`                      | Search radius for `latitude` and `longitude`, in kilometers                                                   |
-| `maxResults`                       | How many stations to return, 1 to 100; default 10                                                             |
-| `bbox=minLon,minLat,maxLon,maxLat` | Stations inside the box, longitude first as in GeoJSON. `minLon > maxLon` crosses the antimeridian            |
-| `kind`                             | `coastal`, `estuary`, `lake`, `river`                                                                         |
-| `source`                           | A source ID, such as `coops`                                                                                  |
+| Parameter                          | Meaning                                                                                                             |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `query`                            | Full-text search on name, ID or place, as in the tides API                                                          |
+| `latitude`, `longitude`            | Stations nearest the point, nearest first, each with `distance` in kilometers                                       |
+| `maxDistance`                      | Search radius for `latitude` and `longitude`, in kilometers                                                         |
+| `maxResults`                       | How many stations to return, 1 to 100; default 10                                                                   |
+| `bbox=minLon,minLat,maxLon,maxLat` | Stations inside the box, longitude first as in GeoJSON. `minLon > maxLon` crosses the antimeridian                  |
+| `kind`                             | `coastal`, `estuary`, `lake`, `river`                                                                               |
+| `source`                           | A source ID, such as `coops`                                                                                        |
 | `tide_station=noaa/9447130`        | The station linked to a slackwater-database station. A subordinate station resolves to its reference gauge's series |
-| `live=true`                        | Only stations the live endpoint serves                                                                        |
-| `status`                           | `active` (default) or `all`                                                                                   |
+| `live=true`                        | Only stations the live endpoint serves                                                                              |
+| `status`                           | `active` (default) or `all`                                                                                         |
 
 ```json
 {
@@ -146,14 +146,14 @@ This endpoint returns observations only. Slackwater computes the residual agains
 
 A series from the archive, joined to the live window when `end` is recent.
 
-| Parameter      | Default               | Meaning                                                                                                                                                                   |
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `start`, `end` | The 7 days before now | At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                                            |
-| `step`         | `6m`                  | As above, plus `1d`                                                                                                                                                       |
-| `datum`        | Chart datum           | As above                                                                                                                                                                  |
-| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                        |
+| Parameter      | Default               | Meaning                                                                                                                                                                         |
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `start`, `end` | The 7 days before now | At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                                                  |
+| `step`         | `6m`                  | As above, plus `1d`                                                                                                                                                             |
+| `datum`        | Chart datum           | As above                                                                                                                                                                        |
+| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                              |
 | `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
-| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                    |
+| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                          |
 
 Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`).
 

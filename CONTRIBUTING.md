@@ -39,7 +39,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                                                                                    |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                                                            |
 | `npm run ingest -- <args>`        | [`scripts/ingest.ts`](scripts/ingest.ts): `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`, described below. |
-| `npm run ticon:inventory`         | Rewrite [`docs/ticon-replacement.md`](docs/ticon-replacement.md) and its CSV from a slackwater-database checkout.                                                        |
+| `npm run ticon:inventory`         | Rewrite [`docs/ticon-replacement.md`](docs/ticon-replacement.md) and its CSV from a slackwater-database checkout.                                                  |
 | `npm run errata`                  | Draft the report to each agency of its errata not yet reported, and check the erratum IDs the code cites.                                                          |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                                                       |
 | `npm run gesla:contributors`      | Rewrite [src/sources/gesla/contributors.md](src/sources/gesla/contributors.md) from GESLA 4.1's metadata and each contributor's terms.                             |
