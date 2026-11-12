@@ -101,7 +101,7 @@ The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the publi
 From step 2, backfill, the monthly refetch, requalify, analysis, withhold and the export are jobs, and from step 3 the station refresh and `publish` too. `stillwell-jobs` runs them from a queue in SQLite (`node:sqlite`, built into Node), a file on the server in WAL mode that both services open:
 
 - **Queue:** each job with its kind, source, arguments, state, attempts, progress and result. A worker claims a job in a transaction and holds a lease it renews while the job runs, so a job runs once, and one whose worker died is claimed again when its lease runs out.
-- **Concurrency:** one job at a time per source, so a source's rate limits hold, and a few sources at once.
+- **Concurrency:** at most one job of each kind per source. Jobs that fetch from the source (backfill, refetch, the station refresh) also run one at a time per source, so its rate limits hold. Jobs that don't fetch (requalify, analysis, withhold, the export) run beside them, since the station locks keep writers apart, so a withhold or the nightly export never waits for a multi-hour backfill or requalify.
 - **Retries:** a failed job is retried with backoff, a few times, then stays failed for a maintainer to see.
 - **Schedules:** in code. A recurring job is queued under a key for its run, such as `export:2026-11-12` or `refetch:2026-11`, so a restart or a late timer never queues the same run twice.
 - **Locks:** the per-station locks every writer of a station's rows holds, with leases, so a process that dies holding one doesn't block the station.
