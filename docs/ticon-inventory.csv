@@ -1,4 +1,4 @@
-ticon_id,name,country,contributor,published,accepted,station,commercial_use,epoch_start,epoch_end,declared_originator,replacement_source,replacement_id,distance_km,status,note,gesla_id,gesla_commercial_use
+ticon_id,name,country,contributor,published,accepted,station,commercial_use,epoch_start,epoch_end,declared_originator,originator_source,originator_id,distance_km,status,note,gesla_id,gesla_commercial_use
 a121tg-a12-nld-cmems,A121TG,Netherlands,cmems,true,true,nl/a121,false,2015-06-28,2025-06-30,,rws,rws/a12,1.96,ready,CMEMS record of a gauge the national feed publishes,gesla/a121tg-a12-nld-cmems,false
 aalesundtg-aal-nor-cmems,AalesundTG,Norway,cmems,true,false,no/alesund,false,1961-01-01,2025-06-30,,kartverket,kartverket/AES,0,ready,CMEMS record of a gauge the national feed publishes,gesla/aalesundtg-aal-nor-cmems,false
 aarhus-aar-dnk-cmems,Aarhus,Denmark,cmems,true,true,dk/aarhus,false,2005-01-01,2025-07-01,,dmi,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/aarhus-aar-dnk-cmems,false

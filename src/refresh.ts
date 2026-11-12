@@ -38,7 +38,7 @@ import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import {
   offsetRows,
-  ticonReplacements,
+  ticonOriginators,
   tideStations,
   withDatums,
   type DatumReport,
@@ -295,7 +295,7 @@ export async function publishStations(
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
-    await ticonReplacements(),
+    await ticonOriginators(),
   );
   for (const station of linked) station.errata = errataOf(station, errata);
   // Two files written one after the other: if the second write fails, they're from
