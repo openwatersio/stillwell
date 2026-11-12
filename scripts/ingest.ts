@@ -339,6 +339,12 @@ async function publish(store: string): Promise<void> {
     for (const k of skipped)
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
+    const { joined, fromTide, computed, far, disagree } = result.datums;
+    console.log(
+      `  datums: ${joined} joined to slackwater-database, ${fromTide} with its datums, ${computed} computed from a linked series`,
+    );
+    for (const f of far) console.log(`  datums join dropped: ${f}`);
+    for (const d of disagree) console.log(`  datums differ: ${d}`);
     for (const e of result.unknownErrata)
       console.error(`  erratum lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);

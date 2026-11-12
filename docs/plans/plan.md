@@ -8,6 +8,7 @@ It also replaces GESLA and TICON as tide-database's source of observations. TICO
 
 - Adapters for the 19 sources the [README](../../README.md#sources) lists, writing to the store on R2, with each source's station list, datum epochs and links between sources in the store ([stations.md](../stations.md)).
 - Scheduled jobs in GitHub Actions: hourly ingest into `recent/`, a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [CONTRIBUTING.md](../../CONTRIBUTING.md) covers them.
+- Offsets to MSL, LAT and chart datum from slackwater-database or a linked series of the gauge ([data.md](../data.md#stations)).
 - QC with per-station tidal analysis and errata per source ([qc/](../qc/README.md)).
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](../hroi-evaluation.md)).
 - No API yet.
@@ -59,7 +60,6 @@ Recommended answers. The plan below assumes them; each can change without reshap
 [CONTRIBUTING.md](../../CONTRIBUTING.md) has the layout as it stands, and [`src/schema.ts`](../../src/schema.ts) the `Source` interface every adapter implements. The plan adds:
 
 ```
-src/datums.ts          offsets to MSL, LAT, NAVD88; joins to tide-database (phase 7)
 worker/                the API Worker: wrangler.jsonc, src/, test/ (phases 9 and 10)
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
 .github/workflows/     snapshot-quarterly (phase 12)
@@ -77,7 +77,7 @@ models/gtsm/<point>.parquet                      surge reanalysis at coastal poi
 bulk/<snapshot>/<source>.parquet                 quarterly, Hive-partitioned by year (phase 12)
 ```
 
-and `datums_source` on each station (phase 7). Series whose source bars republishing go in a separate private bucket, since everything in the public one is public; ingest writes such a source only to `STILLWELL_RESTRICTED_STORE` and refuses without it.
+Series whose source bars republishing go in a separate private bucket, since everything in the public one is public; ingest writes such a source only to `STILLWELL_RESTRICTED_STORE` and refuses without it.
 
 ## Phases
 
@@ -172,8 +172,8 @@ Done when tide-database's monthly update re-fits from the store, and TICON suppl
 
 Estimate: 3 days.
 
-- [ ] `src/datums.ts`: join each station to tide-database by provider ID and distance (never by name alone), and take MSL and LAT from its `datums` when the station has harmonics; otherwise use the source's own offsets.
-- [ ] Record where each offset came from (`datums_source`: source, tide-database, computed) and its epoch.
+- [x] [`src/datums.ts`](../../src/datums.ts): join each station to tide-database by provider ID and distance (never by name alone), and take MSL and LAT from its `datums` when the station has harmonics; otherwise use the source's own offsets.
+- [x] Record where each offset came from (`datums_source`: source, slackwater-database, computed) and its epoch.
 - [ ] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [ ] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
 
