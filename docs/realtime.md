@@ -10,6 +10,15 @@ How observed levels reach the API within minutes of a source publishing them. A 
 - Batch jobs (backfill, requalify, analysis) never hold up current values, and current values never hold up batch jobs.
 - The public files on R2 keep their layout, so readers of the bulk data see no change.
 
+## Why a server
+
+Realtime levels for Slackwater need values minutes old, but the bigger reasons are the limits of building the store on GitHub Actions and Parquet alone:
+
+- **Jobs queue behind each other.** Every job that writes a source's files shares its `store-<source>` concurrency group, so a long backfill or requalify holds up that source's hourly ingest, and runs waiting in the group get cancelled. ClickHouse takes concurrent inserts, so batch work and current values don't wait on each other.
+- **Schedules are unreliable.** GitHub runs `schedule` workflows late or not at all, which takes a cron Worker dispatching every workflow, plus a monthly job to keep schedules from being disabled. A service on its own box keeps its own timers.
+- **Rewriting files is the only way to change them.** The recent window and the year files are rewritten whole by several jobs, which is what forces the concurrency groups, and compaction's nightly rewrite of every current-year file grows through the year. In ClickHouse a change is an insert, and the export to Parquet is a single step that runs on a schedule.
+- **Fresh values need something always running.** Polling on each source's interval, a minute for some, doesn't fit jobs that queue for a runner and start cold.
+
 ## The server
 
 A Hetzner box of its own, `stillwell-1`, set up the way aiscast's is: `server/deploy/` in this repo with `apply.sh` and `deploy.sh`, CI deploying on every merge to `main`, Caddy only if something is served publicly, Grafana Alloy sending metrics to Grafana Cloud, and the same SSH hardening and `ops` user. It runs:
