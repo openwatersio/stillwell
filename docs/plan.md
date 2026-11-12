@@ -226,9 +226,9 @@ Most European originators arrive in phase 5. This adds the real-time sources TIC
 
 The first public endpoint, because the apps need it before anything else in the API. It needs only phases 1 and 4 to start, so it can move ahead of phases 5 to 8; the datum-frame item waits for phase 6. The design is [realtime.md](realtime.md), step 1.
 
-- [ ] A Stillwell server on Hetzner, set up as aiscast's is (`server/deploy/`, deployed by CI on merge), running ClickHouse on loopback and `cloudflared`.
-- [ ] `stillwell-ingest`: polls every hourly source's live stations at `min_interval_s`, inserts unseen values with `received`, runs `qcFor` over each changed window, records each pass in `polls`, pauses a station on `DatumChanged` and dispatches its source's refresh.
-- [ ] Export `recent/<source>.parquet` every 15 minutes, so `compact` and everything after it runs unchanged; retire the hourly workflow's `recent` jobs, and turn its alert job into Grafana alerts on `polls`.
+- [ ] A Stillwell server on Hetzner, set up as aiscast's is (`server/deploy/`, deployed by CI on merge), running ClickHouse on loopback and `cloudflared`, with ClickHouse backed up to R2 nightly.
+- [ ] `stillwell-ingest`: polls every hourly source's live stations at `min_interval_s`, inserts values it doesn't hold (by time, level and source flag) with `received`, runs `qcFor` over each changed window and marks what it judged `checked`, deletes a withheld station's rows, records each pass in `polls`, pauses a station on `DatumChanged` and dispatches its source's refresh.
+- [ ] Export `recent/<source>.parquet` every 15 minutes, leaving out withheld stations, so `compact` and everything after it runs unchanged; retire the hourly workflow's `recent` jobs, and turn its alert job into Grafana alerts on `polls`.
 - [ ] `GET /water-levels/stations/{source}/{id}/levels` ([api.md](api.md#get-water-levelsstationssourceidlevels)) in `workers/api`, bound into the gateway as `WATER_LEVELS` on `/water-levels*`, for ranges inside ClickHouse's window: levels in the requested datum (chart datum by default), `flag`, `checked`, `received`, the datum offsets, `as_of`, `updated` and `status` (reporting, stale, offline). Cached per station for `min_interval_s`, with the last good copy served as `stale` when ClickHouse doesn't answer.
 - [ ] Datum frame: return the offset tide-database used for the station's datums (phase 6 records which series and zero those came from), so the app's residual is observed minus prediction in one frame. Stations whose datums are in the constituent frame (TICON's MSL = 0 fallback) get `frame: unknown`, and the app shows the trend only.
 - [ ] Slackwater: replace the per-provider fetchers in slackwater-ios#705 (NOAA now, more later) with this one call, keeping CHS on the device. Tracked in that issue.
@@ -247,6 +247,7 @@ The rest of the API in the same Worker, reading ClickHouse once the history is l
 - [ ] `GET /water-levels/at?latitude&longitude&time`: best estimate with `method` and `uncertainty_m`. Nearest gauge with data at that time; else prediction plus residual from gauges within crowd-depth's distances (fast within about 100 km, slow within a few hundred); else prediction plus modeled surge; else model. Same rules crowd-depth uses today, so crowd-depth can switch to it.
 - [ ] Every response carries per-station attribution and the "not for navigation, preliminary data" notice; until tokens exist, responses never include `commercial_use: false` stations. The API docs and the `/water-levels` root response link to the source, as AGPL section 13 requires.
 - [ ] Historical ranges cached for a day with the Cache API.
+- [ ] Latest levels for many stations in one call, by station IDs or `tide_station`, for Slackwater's favorites and the alerts cron.
 - [ ] Alerts groundwork: a Worker cron that reads the latest levels and residual for a list of stations and reports the ones beyond a threshold. Who subscribes, and how notifications reach the phone, belongs in slackwater#394.
 - [ ] OpenAPI document and a docs page on the website next to the tides API.
 - [ ] Tests with `@cloudflare/vitest-pool-workers`, and the SQL against a ClickHouse service container.
@@ -281,7 +282,7 @@ The [evaluation](hroi-evaluation.md) found HRoI times high and low waters better
 
 ## Running costs and limits
 
-As the architecture estimates: about $7 a month in year one on R2 and Workers, plus about $20 a month for the Stillwell server, GitHub Actions free on a public repo, and a one-time backfill of $20–60 if GTSM and the USGS history need a rented box. Watch the CO-OPS throttle, RWS's 160,000-value limit, and that GitHub disables schedules on a repo with 60 days of no activity.
+As the architecture estimates: about $7 a month in year one on R2 and Workers, plus about $35 a month for the Stillwell server, GitHub Actions free on a public repo, and a one-time backfill of $20–60 if GTSM and the USGS history need a rented box. Watch the CO-OPS throttle, RWS's 160,000-value limit, and that GitHub disables schedules on a repo with 60 days of no activity.
 
 ## Open questions
 
