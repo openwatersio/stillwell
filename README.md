@@ -55,10 +55,6 @@ There's no API yet. [docs/plans/api.md](docs/plans/api.md) has the design for on
 
 Recent values are usually preliminary. Sources revise them later, and a gauge can fail without warning. Check the `flag` column, and don't rely on this data alone for navigation or safety.
 
-## Also here
-
-An implementation of the harmonic representation of inequalities (HRoI), the method BSH uses for German tide predictions, with an evaluation of it against a harmonic curve fit at German and Dutch gauges. See [docs/hroi-evaluation.md](docs/hroi-evaluation.md).
-
 ## Docs
 
 - [docs/data.md](docs/data.md): using the store's files.
