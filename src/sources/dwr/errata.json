@@ -3,9 +3,9 @@
     {
       "id": "dwr-b95580-another-header",
       "stations": [],
-      "handling": "dropped",
+      "handling": "refused",
       "error": "WDL's raw level file for San Joaquin River at Venice Island (B95580) carries the header of another station, B95500 (Middle River at Union Point).",
-      "response": "A station is left out of the list when none of its files is usable, and a file that names another station isn't, so B95580 isn't in the store until WDL fixes it.",
+      "response": "The adapter refuses a file that names another station, so the store has no values for B95580 until WDL fixes it. A refresh lists B95580 only while its file is usable. The public store listed it before the adapter checked headers, so it stays there with no data, and is inactive from the first refresh with the check. `stations` stays empty, since a store started since then has no such station.",
       "evidence": "The file's header names B95500, with variable code 821 and no notes, where B95580's own number belongs. Of all 71 WDL files the adapter reads, it's the only one. Found while backfilling California DWR; see [#55](https://github.com/openwatersio/stillwell/pull/55).",
       "reported": "2026-11-07",
       "report": "Sent to wdlweb@water.ca.gov on 2026-11-07. No answer yet."
