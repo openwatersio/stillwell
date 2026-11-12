@@ -558,7 +558,9 @@ export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: s
 /**
  * Where a station's levels are asked for from: 00:00 UTC on January 1 of the
  * year its `series_since` falls in, or -Infinity where the list has none, as
- * in `stations.parquet` or for a series CWMS no longer lists. Requests from
+ * in `stations.parquet` or for a station first listed with a series CWMS
+ * gives no extents for. A station whose series CWMS stops listing keeps the
+ * day the list had. Requests from
  * before the series begins would come back empty. The first year is asked for
  * whole, which costs no extra request, so a catalog start later than the
  * series' first value never leaves a part-year file that `--skip-written`
@@ -566,12 +568,18 @@ export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: s
  */
 export function seriesSince(station: { source_id: string; series_since?: string }): number {
   if (!station.series_since) return -Infinity;
-  const time = Date.parse(`${station.series_since.slice(0, 4)}-01-01T00:00:00Z`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(station.series_since) || Number.isNaN(time))
+  const day = station.series_since;
+  // A real day: Date rolls 2026-02-30 over to March, so it must come back the same.
+  const parsed = Date.parse(`${day}T00:00:00Z`);
+  const valid =
+    /^\d{4}-\d{2}-\d{2}$/.test(day) &&
+    !Number.isNaN(parsed) &&
+    new Date(parsed).toISOString().startsWith(day);
+  if (!valid)
     throw new Error(
       `usace/${station.source_id} has an unreadable series_since ${station.series_since}`,
     );
-  return time;
+  return Date.parse(`${day.slice(0, 4)}-01-01T00:00:00Z`);
 }
 
 /**

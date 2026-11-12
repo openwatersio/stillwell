@@ -2431,6 +2431,11 @@ describe("usace", () => {
       () => usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "Sept 2022" }),
       /unreadable/,
     );
+    assert.throws(
+      () =>
+        usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "2026-99-99" }),
+      /unreadable/,
+    );
   });
 
   it("enters every hand-entered zero date as a day", () => {
