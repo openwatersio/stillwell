@@ -235,7 +235,7 @@ The first public endpoint, because the apps need it before anything else in the 
 
 Done when a Slackwater station page for a CO-OPS, RWS or PEGELONLINE gauge shows a level under 15 minutes old.
 
-Later: rate limits. Phones on mobile networks share IP addresses, so Slackwater's User-Agent will need its own allowance in the gateway rather than the open API's 100 a minute per IP.
+Later: rate limits, as generic limits in the api.openwaters.io gateway for every API rather than anything specific to this one.
 
 ### Phase 10: API (8 days)
 
