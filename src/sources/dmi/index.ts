@@ -49,11 +49,17 @@ const OWNER_CREDITS: Record<string, string> = {
 /**
  * The datum each sea-level parameter is measured from, in centimeters.
  * `sea_reg` is the gauge's own registration: on DVR90 at the Coastal
- * Authority's gauges, as DMI's documentation says; at DMI's gauges it's an
+ * Authority's gauges from May 2002, as DMI's documentation says; at DMI's gauges it's an
  * instrument reading, so they use the others.
  * `LN` is each DMI gauge's local zero.
  */
 const DATUMS = { sealev_dvr: "DVR90", sea_reg: "DVR90", sealev_ln: "LN" } as const;
+/**
+ * The Coastal Authority's `sea_reg` is on DVR90 from this instant; before it,
+ * on an older reference 5 to 20 cm above it, so it isn't read: erratum
+ * `dmi-coastal-authority-dnn`.
+ */
+const SEA_REG_DVR90_SINCE = Date.parse("2002-05-29T00:00:00Z");
 export type Parameter = keyof typeof DATUMS;
 
 const COUNTRIES: Record<string, string> = { DNK: "DK", GRL: "GL", FRO: "FO" };
@@ -114,19 +120,25 @@ interface ObservationProps {
  * period of its metadata, so each is collapsed to its latest period, with the
  * span of all of them.
  */
-export async function stations(): Promise<DmiStation[]> {
+export async function stations(previous: Station[] = []): Promise<DmiStation[]> {
+  const ended = new Map(previous.map((s) => [s.id, (s as Partial<DmiStation>).record_end]));
   const items = await features<StationProps>(`${API}/station/items?limit=${LIMIT}`);
   const byId = new Map<string, Feature<StationProps>[]>();
   for (const f of items)
     byId.set(f.properties.stationId, [...(byId.get(f.properties.stationId) ?? []), f]);
   const listed: DmiStation[] = [];
-  for (const [id, periods] of byId) {
-    const latest = periods.reduce((a, b) =>
-      Date.parse(b.properties.validFrom) >= Date.parse(a.properties.validFrom) ? b : a,
-    );
+  let newHandovers = 0;
+  for (const [id, all] of byId) {
+    all.sort((a, b) => Date.parse(a.properties.validFrom) - Date.parse(b.properties.validFrom));
+    // Only the periods DMI or the Coastal Authority owned the gauge, so the
+    // record ends where it's handed to another owner; one that starts under
+    // another owner isn't listed.
+    const handover = all.findIndex((f) => !COVERED.has(f.properties.owner));
+    if (handover === 0) continue;
+    const periods = handover < 0 ? all : all.slice(0, handover);
+    const handedOver = handover < 0 ? null : Date.parse(all[handover]!.properties.validFrom);
+    const latest = periods.at(-1)!;
     const p = latest.properties;
-    // Every period's owner, since a backfill reads the whole record.
-    if (!periods.every((f) => COVERED.has(f.properties.owner))) continue;
     // `sea_reg` is DVR90 only where the Coastal Authority owned every period that carries it.
     const regOwners = periods.filter((f) => f.properties.parameterId.includes("sea_reg"));
     // The latest period's parameters, so a move to another one reaches `seriesChanged`;
@@ -139,7 +151,7 @@ export async function stations(): Promise<DmiStation[]> {
       parameterOf(owner, new Set(periods.flatMap((f) => f.properties.parameterId)));
     if (!parameter || !latest.geometry) continue;
     const [lon, lat] = latest.geometry.coordinates;
-    const ended = p.status !== "Active" || !!p.operationTo || !!p.validTo;
+    const isEnded = handedOver !== null || p.status !== "Active" || !!p.operationTo || !!p.validTo;
     // `validFrom` is when a period of metadata starts, not the record, so only `operationFrom` dates it.
     const starts = periods
       .map((f) => f.properties.operationFrom)
@@ -149,8 +161,23 @@ export async function stations(): Promise<DmiStation[]> {
     const credits = [...new Set(periods.map((f) => OWNER_CREDITS[f.properties.owner]))].filter(
       (c): c is string => !!c,
     );
-    // An inactive period with no end date says nothing of when values stop.
-    const recordEnd = (p.operationTo ?? p.validTo)?.slice(0, 10) ?? null;
+    // An inactive period with no end date says nothing of when values stop. A
+    // handed-over record ends the day before the handover, since `levels` reads
+    // a day past `record_end`.
+    const ends = [
+      (p.operationTo ?? p.validTo)?.slice(0, 10),
+      handedOver === null ? undefined : new Date(handedOver - DAY_MS).toISOString().slice(0, 10),
+    ].filter((d): d is string => !!d);
+    const recordEnd = ends.sort()[0] ?? null;
+    // A handover the stored list doesn't end at yet: hourly ingest may have stored
+    // the new owner's values since, which have to be deleted by hand.
+    const was = ended.get(`dmi/${id}`);
+    if (handedOver !== null && (was === undefined || was === null || was > recordEnd!)) {
+      newHandovers++;
+      console.warn(
+        `DMI ${id} was handed to ${all[handover]!.properties.owner || "no owner"} on ${all[handover]!.properties.validFrom}; delete any values stored from then on, from recent/ too`,
+      );
+    }
     listed.push({
       ...stationDefaults(metadata),
       id: `dmi/${id}`,
@@ -171,8 +198,8 @@ export async function stations(): Promise<DmiStation[]> {
       attribution: [metadata.attribution, ...credits].join("; "),
       tide_station: null,
       same_as: [],
-      status: ended ? "inactive" : "active",
-      live: !ended,
+      status: isEnded ? "inactive" : "active",
+      live: !isEnded,
       min_interval_s: 600,
       source_url: null,
       parameter,
@@ -181,9 +208,12 @@ export async function stations(): Promise<DmiStation[]> {
       record_end: recordEnd,
     });
   }
-  // An empty or partial list would retire the stations it leaves out.
-  if (listed.length < MIN_STATIONS)
-    throw new Error(`DMI listed only ${listed.length} sea-level stations; try again later`);
+  // An empty or partial list would retire the stations it leaves out, and a
+  // renamed owner would retire its gauges as handed over, so neither counts.
+  if (listed.length - newHandovers < MIN_STATIONS)
+    throw new Error(
+      `DMI listed only ${listed.length - newHandovers} sea-level stations it still owns; try again later`,
+    );
   return listed.sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -237,6 +267,7 @@ export async function levels(
   const from = Math.max(
     start.getTime(),
     record_start ? Date.parse(record_start) - DAY_MS : -Infinity,
+    parameter === "sea_reg" ? SEA_REG_DVR90_SINCE : -Infinity,
   );
   const to = Math.min(end.getTime(), record_end ? Date.parse(record_end) + DAY_MS : Infinity);
   const out: Observation[] = [];

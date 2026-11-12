@@ -21,6 +21,7 @@ Each source's README gives its coverage, datums, cadence, license and quirks.
 - [CRMS](src/sources/crms/README.md): hourly levels in Louisiana's coastal marshes and swamps.
 - [California DWR](src/sources/dwr/README.md): 15-minute stage at tidal gauges in the Sacramento–San Joaquin Delta.
 - [Environment Agency](src/sources/ea/README.md): real-time 15-minute tidal levels around England and the UK network.
+- [DMI](src/sources/dmi/README.md): 10-minute sea level at DMI's and the Danish Coastal Authority's gauges in Denmark, back to 1889.
 - [GESLA](src/sources/gesla/README.md): GESLA 4.1's static release of sea level records from more than 40 agencies.
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
 - [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
@@ -36,7 +37,7 @@ Each source's README gives its coverage, datums, cadence, license and quirks.
 - [USACE](src/sources/usace/README.md): stage at Corps gauges, pools and tailwaters on the Mississippi, Ohio, Missouri and their tributaries.
 - [USGS](src/sources/usgs/README.md): gage height and water-surface elevations at river, lake, estuary and coastal gauges across the US.
 
-[`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://stillwell.openwaters.io/sources.json) gives each source's license, the attribution it asks for, and where to report an error in its data (`contact`). The [DMI](src/sources/dmi/README.md) adapter isn't registered, so DMI isn't in the store. [docs/plans/plan.md](docs/plans/plan.md) has the sources still to come.
+[`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) lists every station, and [`sources.json`](https://stillwell.openwaters.io/sources.json) gives each source's license, the attribution it asks for, and where to report an error in its data (`contact`). [docs/plans/plan.md](docs/plans/plan.md) has the sources still to come.
 
 ## Getting the data
 

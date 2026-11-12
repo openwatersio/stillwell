@@ -25,13 +25,16 @@ afterEach(() => setTransport(fetchText));
 dmi.pacing.requestMs = 0;
 
 /**
- * DMI's list as its station endpoint answered in November 2026, which held
- * only Skagen's two periods, followed by copies of Skagen's current period
- * under other IDs, owners and parameters, enough to pass the list's floor.
+ * DMI's list as its station endpoint answered on 12 November 2026, 233
+ * periods of 178 stations, followed by copies of Skagen's current period under
+ * other IDs, owners and parameters.
  */
 function stationList(extra: Record<string, unknown>[] = []): string {
   const body = JSON.parse(fixture("dmi-stations.json"));
-  const [, current] = body.features;
+  const current = body.features.find(
+    (f: { properties: { stationId: string; validTo: string | null } }) =>
+      f.properties.stationId === "20002" && !f.properties.validTo,
+  );
   const copy = (props: Record<string, unknown>) => ({
     ...current,
     properties: {
@@ -42,16 +45,7 @@ function stationList(extra: Record<string, unknown>[] = []): string {
       ...props,
     },
   });
-  body.features.push(
-    ...Array.from({ length: 90 }, (_, i) =>
-      copy({
-        stationId: String(9_000_000 + i),
-        owner: "Kystdirektoratet / Coastal Authority",
-        parameterId: ["sea_reg"],
-      }),
-    ),
-    ...extra.map(copy),
-  );
+  body.features.push(...extra.map(copy));
   return JSON.stringify(body);
 }
 
@@ -86,7 +80,10 @@ describe("dmi stations", () => {
 
   it("reads a Coastal Authority gauge's registration as DVR90 with its owner's credit", async () => {
     serveList(stationList());
-    const station = (await dmi.stations()).find((s) => s.id === "dmi/9000000")!;
+    const station = (await dmi.stations()).find((s) => s.id === "dmi/9005201")!;
+    assert.equal(station.name, "Hvide Sande Havn");
+    assert.equal(station.owner, "Kystdirektoratet / Coastal Authority");
+    assert.equal(station.record_start, "1990-10-05");
     assert.equal(station.parameter, "sea_reg");
     assert.equal(station.datum, "DVR90");
     assert.equal(station.status, "active");
@@ -125,9 +122,59 @@ describe("dmi stations", () => {
     assert.deepEqual([gedser.status, gedser.record_end], ["inactive", null]);
   });
 
-  it("refuses a list caught short", async () => {
+  it("lists DMI's and the Coastal Authority's gauges from DMI's full list", async () => {
+    const requests = serveList(fixture("dmi-stations.json"));
+    const stations = await dmi.stations();
+    assert.match(requests[0]![0], /station\/items\?limit=300000$/);
+    const count = (owner: string, datum: string) =>
+      stations.filter((s) => s.owner === owner && s.datum === datum).length;
+    assert.equal(count("DMI", "DVR90"), 36);
+    assert.equal(count("DMI", "LN"), 15);
+    assert.equal(count("Kystdirektoratet / Coastal Authority", "DVR90"), 48);
+    assert.equal(stations.length, 99);
+    const hornbaek = stations.find((s) => s.id === "dmi/30018")!;
+    assert.deepEqual(
+      [hornbaek.status, hornbaek.record_start, hornbaek.record_end],
+      ["inactive", "1891-01-01", "1991-10-11"],
+    );
+    // DMI dates the Coastal Authority's records from 1990; `levels` reads them from May 2002.
+    const coastal = stations.filter((s) => s.owner === "Kystdirektoratet / Coastal Authority");
+    assert.ok(coastal.every((s) => s.record_start! >= "1990"));
+  });
+
+  it("names in its erratum every Coastal Authority gauge the May 2002 cutoff trims", async () => {
     serveList(fixture("dmi-stations.json"));
+    const trimmed = (await dmi.stations())
+      .filter((s) => s.parameter === "sea_reg" && (s.record_start ?? "") < "2002-05-29")
+      .map((s) => s.id);
+    const errata = JSON.parse(
+      readFileSync(new URL("../src/sources/dmi/errata.json", import.meta.url), "utf8"),
+    );
+    const entry = errata.errata.find((e: { id: string }) => e.id === "dmi-coastal-authority-dnn");
+    assert.deepEqual([...entry.stations].sort(), trimmed.sort());
+  });
+
+  it("refuses a list caught short", async () => {
+    serveList(fixture("dmi-stations-skagen.json"));
     await assert.rejects(dmi.stations(), /listed only 1 sea-level stations/);
+  });
+
+  it("refuses a list whose owner name changed, rather than retire its gauges", async () => {
+    const body = JSON.parse(fixture("dmi-stations.json"));
+    // A later period under another spelling of the Coastal Authority hands over all 48 of its gauges.
+    const renamed = body.features
+      .filter((f: { properties: { owner: string } }) => f.properties.owner.startsWith("Kyst"))
+      .map((f: { properties: Record<string, unknown> }) => ({
+        ...f,
+        properties: {
+          ...f.properties,
+          owner: "Kystdirektoratet",
+          validFrom: "2026-11-01T00:00:00Z",
+        },
+      }));
+    body.features.push(...renamed);
+    serveList(JSON.stringify(body));
+    await assert.rejects(dmi.stations(), /listed only 51 sea-level stations it still owns/);
   });
 });
 
@@ -202,6 +249,18 @@ describe("dmi levels", () => {
     );
     assert.match(requests[0]![0], /parameterId=sea_reg/);
     assert.equal(levels.length, 6);
+  });
+
+  it("reads the Coastal Authority's registration only from its move to DVR90 in May 2002", async () => {
+    const requests = serve([[/observation\/items/, fixture("dmi-levels-3.json")]]);
+    await dmi.levels("9006401", new Date("2001-01-01Z"), new Date("2003-01-01Z"), {
+      parameter: "sea_reg",
+      record_start: "1990-09-05",
+    });
+    assert.deepEqual(
+      requests.map(([url]) => /datetime=([^&]+)/.exec(url)![1]),
+      ["2002-05-29T00:00:00.000Z/2002-12-31T23:59:59.999Z"],
+    );
   });
 
   it("refuses a parameter measured from another datum than the station's", async () => {
@@ -318,6 +377,55 @@ describe("dmi owners and series", () => {
       stations.find((s) => s.id === "dmi/20061")!.attribution,
       "Danish Meteorological Institute (DMI); Danish Coastal Authority (Kystdirektoratet)",
     );
+  });
+
+  it("ends a gauge's record at its handover to an owner DMI's terms don't cover", async () => {
+    serveList(
+      stationList([
+        {
+          stationId: "20070",
+          parameterId: ["sealev_dvr"],
+          operationFrom: "1995-01-01T00:00:00Z",
+          validFrom: "1995-01-01T00:00:00Z",
+          validTo: "2018-04-16T00:00:00Z",
+        },
+        {
+          stationId: "20070",
+          name: "Havn",
+          owner: "Kommuner/Havne",
+          parameterId: ["sea_reg"],
+          operationFrom: "1995-01-01T00:00:00Z",
+          validFrom: "2018-04-16T00:00:00Z",
+        },
+      ]),
+    );
+    const station = (await dmi.stations()).find((s) => s.id === "dmi/20070")!;
+    assert.equal(station.owner, "DMI");
+    assert.equal(station.name, "Skagen Havn");
+    assert.equal(station.parameter, "sealev_dvr");
+    assert.deepEqual([station.status, station.live], ["inactive", false]);
+    assert.deepEqual([station.record_start, station.record_end], ["1995-01-01", "2018-04-15"]);
+
+    // A backfill or refetch past the handover reads nothing after it.
+    const requests = serve([[/observation\/items/, fixture("dmi-levels-3.json")]]);
+    await dmi.levels("20070", new Date("2017-01-01Z"), new Date("2027-01-01Z"), station);
+    const ends = requests.map(([url]) => /datetime=[^/]+\/([^&]+)/.exec(url)![1]!);
+    assert.deepEqual(ends, ["2017-12-31T23:59:59.999Z", "2018-04-15T23:59:59.999Z"]);
+  });
+
+  it("warns of a handover only until the stored list ends there", async (t) => {
+    const warn = t.mock.method(console, "warn", () => {});
+    const list = stationList([
+      { stationId: "20070", parameterId: ["sealev_dvr"], validFrom: "1995-01-01T00:00:00Z" },
+      { stationId: "20070", owner: "Kommuner/Havne", validFrom: "2018-04-16T00:00:00Z" },
+    ]);
+    serveList(list);
+    await dmi.stations([{ id: "dmi/20070", record_end: null } as unknown as Station]);
+    assert.equal(warn.mock.callCount(), 1);
+    assert.match(String(warn.mock.calls[0]!.arguments[0]), /20070 was handed to Kommuner\/Havne/);
+    serveList(list);
+    await dmi.stations([{ id: "dmi/20070", record_end: "2018-04-15" } as unknown as Station]);
+    assert.equal(warn.mock.callCount(), 1);
   });
 
   it("refuses levels for a station whose owner DMI's terms don't cover", async () => {
