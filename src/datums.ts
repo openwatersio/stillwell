@@ -17,7 +17,8 @@ import { km } from "./ticon.ts";
  * - **source**: what the source itself gives.
  * - **computed**: carried from another series of the same gauge (`same_as`)
  *   through a reference both give an offset to (`REFERENCES`), such as BSH's
- *   SKN to a PEGELONLINE gauge through NHN.
+ *   SKN to a PEGELONLINE gauge through NHN, or else through the offset
+ *   measured between the two series' levels (`src/links.ts`).
  *
  * Offsets describe the current epoch, as `datums` always has; older epochs
  * reach them through `to_current` (`offsetRows`).
@@ -121,13 +122,13 @@ const TIDAL_DATUMS = ["MHHW", "MHW", "DTL", "MTL", "MSL", "MLW", "MLLW", "LAT", 
 const periodOf = (s: StoredStation) => (s as { datums_period?: Period | null }).datums_period;
 
 /** Keys carried between a gauge's series, besides each series' chart datum. */
-const CARRIED = ["MSL", "LAT", "SKN"];
+export const CARRIED = ["MSL", "LAT", "SKN"];
 
 /** Chart datums fixed for a whole stretch of coast or river, which carry between series of a gauge however far apart. */
 const FIXED_CHARTS = ["SKN", "CD"];
 
 /** Tidal datums such as MSL and LAT carry only between series of a gauge this close, in km. */
-const TIDAL_KM = 1;
+export const TIDAL_KM = 1;
 
 /** Where slackwater-database's value and the source's differ by more than this, publish reports it. */
 const DISAGREE_M = 0.05;
@@ -155,11 +156,13 @@ export interface DatumReport {
  * Each station with its `tide_station`, its `datums` gaining MSL, LAT and
  * chart datum where they can be had, `datums_source`, `datums_epoch`,
  * `chart_datum` and `frame`. Stations must already be linked (`linkGauges`).
+ * `shifts` are measured offsets between linked series (`linkShifts`).
  */
 export function withDatums(
   stations: StoredStation[],
   tide: TideStation[],
   replaced: Map<string, string> = new Map(),
+  shifts: Map<string, number> = new Map(),
 ): { stations: StoredStation[]; report: DatumReport } {
   const report: DatumReport = { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] };
   const byId = new Map(stations.map((s) => [s.id, s]));
@@ -276,7 +279,10 @@ export function withDatums(
         // Nothing from a series whose terms bar commercial use reaches one that allows it.
         if (!other || (s.commercial_use && !other.commercial_use)) continue;
         const via = sharedReference(s, other);
-        if (!via) continue;
+        const shift = via
+          ? offsetsOf(s)[via]! - offsetsOf(other)[via]!
+          : shifts.get(`${s.id} ${other.id}`);
+        if (shift === undefined) continue;
         const keys = [...CARRIED, ...(other.chart_datum ? [other.chart_datum] : [])];
         const near = km(s, other) <= TIDAL_KM;
         for (const key of keys) {
@@ -285,7 +291,7 @@ export function withDatums(
           const there = offsetsOf(other)[key];
           const period = other.datums_epoch?.[key];
           if (there === undefined || key in offsetsOf(s) || !usable(s, period)) continue;
-          s.datums[key] = round(offsetsOf(s)[via]! - offsetsOf(other)[via]! + there);
+          s.datums[key] = round(shift + there);
           s.datums_source![key] = "computed";
           if (period) s.datums_epoch![key] = period;
           // The linked station's offsets are used, so its credit goes with them.
@@ -356,7 +362,7 @@ function offsetsOf(s: StoredStation): Record<string, number> {
 }
 
 /** The first reference both stations give an offset to, in `REFERENCES` order. */
-function sharedReference(a: StoredStation, b: StoredStation): string | undefined {
+export function sharedReference(a: StoredStation, b: StoredStation): string | undefined {
   const [x, y] = [offsetsOf(a), offsetsOf(b)];
   const keys = [...REFERENCES, ...Object.keys(x).filter((k) => k.startsWith("NAVD88("))];
   return keys.find((k) => isReference(k) && x[k] !== undefined && y[k] !== undefined);
