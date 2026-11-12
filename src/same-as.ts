@@ -9,7 +9,8 @@ import { km, nameScore } from "./ticon.ts";
  * - **an adapter**, from an ID the source gives: BSH names each gauge's
  *   PEGELONLINE series, UHSLC's documentation files name the originator's
  *   station number, and a source links its own series of one gauge (UHSLC's
- *   versions, RWS's twins). A link to a station another source lists more than
+ *   versions, RWS's twins, a CRMS site's series as its gauge
+ *   moved). A link to a station another source lists more than
  *   `ID_KM` away is dropped and reported, as a wrong ID.
  * - **nearness and name**: two stations of different sources within `NEAR_KM`
  *   whose names share an identifying word and name the same side of any dam or

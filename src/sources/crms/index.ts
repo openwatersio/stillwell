@@ -110,8 +110,11 @@ interface LayerStation {
   "mondata.STATUS": string | null;
 }
 
-/** CRMS's hourly surface-water gauges, from CIMS's monitoring-stations layer. */
-export async function stations(): Promise<ListedStation[]> {
+/**
+ * CRMS's hourly surface-water gauges, from CIMS's monitoring-stations layer,
+ * each linked to the site's other series, listed or still in `previous`.
+ */
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const [listed, sites] = await Promise.all([
     query<LayerStation>("monitoring_stations/MapServer/0", {
       where:
@@ -166,6 +169,16 @@ export async function stations(): Promise<ListedStation[]> {
       reference: GEOID12B,
     });
   }
+  // CPRA numbers a gauge it moves within a site anew, H02 after H01, so a
+  // site's series are one record, which GESLA's copies span. A series the
+  // layer no longer lists stays in the store, so it's linked too.
+  const ids = new Set([...out.values(), ...previous].map((s) => s.id));
+  const bySite = Map.groupBy(ids, (id) => id.slice(0, 13));
+  for (const s of out.values())
+    s.same_as = bySite
+      .get(s.id.slice(0, 13))!
+      .filter((id) => id !== s.id)
+      .sort();
   return [...out.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 

@@ -123,6 +123,28 @@ describe("crms stations", () => {
     assert.equal(s.commercial_use, true);
     // CRMS0047 is a swamp site.
     assert.equal(list[2]!.kind, "lake");
+    assert.deepEqual(s.same_as, []);
+  });
+
+  it("links the gauges of one site, which CPRA numbers anew as it moves them", async () => {
+    const layer = JSON.parse(fixture("crms-stations.json").toString());
+    const moved = structuredClone(layer.features[2]);
+    assert.equal(moved.attributes["CPRA_monitoring.STATION_ID"], "CRMS0002-H01");
+    moved.attributes["CPRA_monitoring.STATION_ID"] = "CRMS0002-H02";
+    layer.features.push(moved);
+    setTransport(async (url: string) =>
+      url.includes("monitoring_stations")
+        ? JSON.stringify(layer)
+        : fixture("crms-sites.json").toString(),
+    );
+    // The store keeps H03 after the layer stopped listing it.
+    const stored = { id: "crms/CRMS0002-H03", source_id: "CRMS0002-H03" } as Station;
+    const list = await crms.stations([stored]);
+    const same = Object.fromEntries(list.map((s) => [s.id, s.same_as]));
+    assert.deepEqual(same["crms/CRMS0002-H01"], ["crms/CRMS0002-H02", "crms/CRMS0002-H03"]);
+    assert.deepEqual(same["crms/CRMS0002-H02"], ["crms/CRMS0002-H01", "crms/CRMS0002-H03"]);
+    assert.equal(same["crms/CRMS0002-H03"], undefined);
+    assert.deepEqual(same["crms/CRMS0034-H01"], []);
   });
 });
 
