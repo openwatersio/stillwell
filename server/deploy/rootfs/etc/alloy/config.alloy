@@ -1,0 +1,51 @@
+// Grafana Alloy on the Stillwell box: scrapes the host and ClickHouse every 60 s and pushes the samples
+// to Grafana Cloud. The endpoint and token come from /etc/alloy.env through the systemd drop-in next to
+// this unit. The 60 s interval keeps every series at one sample a minute, which is how the free tier counts.
+
+// The systemd collector counts, per unit, the restarts systemd made because the process exited on its own
+// (Restart=always after a crash or OOM kill). systemctl restart, which deploys use, never moves it, so it
+// tells a crash from a deploy.
+prometheus.exporter.unix "host" {
+	enable_collectors = ["systemd"]
+
+	systemd {
+		enable_restarts = true
+		unit_include    = "(stillwell-ingest|alloy|clickhouse-server)\\.service"
+	}
+}
+
+prometheus.scrape "host" {
+	targets    = prometheus.exporter.unix.host.targets
+	forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// ClickHouse exports thousands of series; these few are its memory, CPU, inserts, refusals, failures, merges,
+// mutations, and size.
+prometheus.scrape "clickhouse" {
+	targets    = [{"__address__" = "127.0.0.1:9363"}]
+	job_name   = "clickhouse"
+	forward_to = [prometheus.relabel.clickhouse.receiver]
+}
+
+prometheus.relabel "clickhouse" {
+	forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+	rule {
+		source_labels = ["__name__"]
+		regex         = "ClickHouseMetrics_(MemoryTracking|Merge|PartMutation|Query)|ClickHouseProfileEvents_(InsertedRows|FailedQuery|FailedInsertQuery|OSCPUVirtualTimeMicroseconds|RejectedInserts)|ClickHouseAsyncMetrics_(MaxPartCountForPartition|TotalBytesOfMergeTreeTables|TotalRowsOfMergeTreeTables)"
+		action        = "keep"
+	}
+}
+
+prometheus.remote_write "grafana_cloud" {
+	external_labels = {"host" = constants.hostname}
+
+	endpoint {
+		url = sys.env("GRAFANA_CLOUD_PROM_URL")
+
+		basic_auth {
+			username = sys.env("GRAFANA_CLOUD_PROM_USER")
+			password = sys.env("GRAFANA_CLOUD_TOKEN")
+		}
+	}
+}

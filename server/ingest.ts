@@ -19,13 +19,15 @@ import { sources, sourceOf } from "../src/sources/index.ts";
 import { storeOfSource } from "../src/store/stores.ts";
 import type { Source } from "../src/schema.ts";
 import { clickhouse, databaseFor, migrate } from "../src/realtime/clickhouse.ts";
-import { schedule, type PassResult } from "../src/realtime/schedule.ts";
+import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 3_600_000;
 /** How long a pass may run before it's stopped, as the hourly workflow's 50-minute limit stopped a run. */
 const PASS_TIMEOUT_MS = 50 * MINUTE_MS;
 const PASS = fileURLToPath(new URL("pass.ts", import.meta.url));
+/** How many passes run at once: each is a process of its own, holding up to about 600 MB. */
+const PASSES_AT_ONCE = 3;
 
 const names = process.argv.slice(2);
 const chosen = (names.length ? names.map(sourceOf) : Object.values(sources)).filter(
@@ -42,6 +44,7 @@ let stopping = false;
 const wake = new Set<() => void>();
 // Running passes, stopped with the service so none outlives it beside the next one.
 const running = new Set<ReturnType<typeof spawn>>();
+const passSlots = slots(PASSES_AT_ONCE);
 for (const signal of ["SIGINT", "SIGTERM"] as const)
   process.on(signal, () => {
     stopping = true;
@@ -56,7 +59,7 @@ await Promise.all(chosen.map((source, i) => sleep(i * 20_000).then(() => run(sou
 async function run(source: Source): Promise<void> {
   const id = source.metadata.id;
   await schedule({
-    pass: (due, seeding, now) => pass(id, now, due, seeding),
+    pass: (due, seeding) => pass(id, due, seeding),
     refresh: () => refresh(id),
     sleep,
     stopped: () => stopping,
@@ -64,34 +67,59 @@ async function run(source: Source): Promise<void> {
   });
 }
 
-/** Run server/pass.ts for one source and read its result, stopping it after `PASS_TIMEOUT_MS`. */
-function pass(
-  id: string,
-  now: number,
-  intervals: number[] | null,
-  seeding: boolean,
-): Promise<PassResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(
-      process.execPath,
-      [PASS, id, String(now), intervals?.join(",") || "all", seeding ? "1" : "0"],
-      { stdio: ["ignore", "pipe", "inherit"] },
-    );
+/**
+ * Run server/pass.ts for one source and read its result, stopping it after
+ * `PASS_TIMEOUT_MS`. It waits for a slot while `PASSES_AT_ONCE` others run,
+ * and fetches up to the time it gets one.
+ */
+async function pass(id: string, intervals: number[] | null, seeding: boolean): Promise<PassResult> {
+  const asked = Date.now();
+  await passSlots.acquire();
+  // A wait this long is a source going unpolled behind others' passes.
+  if (Date.now() - asked > MINUTE_MS)
+    console.error(`${id}: waited ${Math.round((Date.now() - asked) / 1000)}s for a pass slot`);
+  if (stopping) {
+    passSlots.release();
+    throw new Error("stopping");
+  }
+  const started = Date.now();
+  return new Promise<PassResult>((resolve, reject) => {
+    let child: ReturnType<typeof spawn>;
+    try {
+      child = spawn(
+        process.execPath,
+        [PASS, id, String(started), intervals?.join(",") || "all", seeding ? "1" : "0"],
+        { stdio: ["ignore", "pipe", "inherit"] },
+      );
+    } catch (error) {
+      passSlots.release();
+      throw new PassError(error instanceof Error ? error.message : String(error), started);
+    }
     running.add(child);
     const timer = setTimeout(() => child.kill("SIGKILL"), PASS_TIMEOUT_MS);
     let out = "";
-    child.stdout.on("data", (chunk) => (out += chunk));
-    child.on("error", reject);
-    child.on("close", (code, signal) => {
+    child.stdout!.on("data", (chunk) => (out += chunk));
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
       clearTimeout(timer);
       running.delete(child);
+      passSlots.release();
+    };
+    child.on("error", (error) => {
+      finish();
+      reject(new PassError(error.message, started));
+    });
+    child.on("close", (code, signal) => {
+      finish();
       // The result is the last line; an adapter's own output can come before it.
       const last = out.trim().split("\n").at(-1);
       try {
         const result = JSON.parse(last ?? "") as Omit<PassResult, "ok">;
-        resolve({ ...result, ok: code === 0 });
+        resolve({ ...result, ok: code === 0, started });
       } catch {
-        reject(new Error(`pass ended with ${signal ?? `exit ${code}`} and no result`));
+        reject(new PassError(`pass ended with ${signal ?? `exit ${code}`} and no result`, started));
       }
     });
   });
@@ -141,6 +169,8 @@ async function refresh(source: string): Promise<boolean> {
 }
 
 function sleep(ms: number): Promise<void> {
+  // A source that comes back from a stopped pass after the signal ends at once, rather than hold the stop.
+  if (stopping) return Promise.resolve();
   return new Promise((resolve) => {
     const done = () => {
       clearTimeout(timer);

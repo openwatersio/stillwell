@@ -147,12 +147,12 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 
 ## Running the poller
 
-`server/ingest.ts` is stillwell-ingest: it polls every hourly source's live stations into ClickHouse, each at its `min_interval_s` or hourly where it gives none ([docs/plans/realtime.md](docs/plans/realtime.md)). Each pass runs in a process of its own, `server/pass.ts`, and each that ends adds a row to the `polls` table. It reads ClickHouse at `CLICKHOUSE_URL` (default `http://127.0.0.1:8123`, with `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` if set), creating the `stillwell` database, and `stillwell_restricted` for sources that bar republishing, and their tables on start. It reads station lists and `recent/<source>.parquet` from the stores, as `scripts/ingest.ts` does, and writes nothing to them: the hourly workflow keeps writing `recent/` until the history moves into ClickHouse. A source's first pass after a start adds what ClickHouse lacks from `recent/`. It doesn't use the response cache, so every pass asks the sources.
+`server/ingest.ts` is stillwell-ingest: it polls every hourly source's live stations into ClickHouse, each at its `min_interval_s` or hourly where it gives none ([docs/plans/realtime.md](docs/plans/realtime.md)). Each pass runs in a process of its own, `server/pass.ts`, three at a time, and each that ends adds a row to the `polls` table. [server/deploy/](server/deploy/README.md) sets up the box it runs on. It reads ClickHouse at `CLICKHOUSE_URL` (default `http://127.0.0.1:8123`, with `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` if set), creating the `stillwell` database, and `stillwell_restricted` for sources that bar republishing, and their tables on start. It reads station lists and `recent/<source>.parquet` from the stores, as `scripts/ingest.ts` does, and writes nothing to them: the hourly workflow keeps writing `recent/` until the history moves into ClickHouse. A source's first pass after a start adds what ClickHouse lacks from `recent/`. It doesn't use the response cache, so every pass asks the sources.
 
 Run ClickHouse in Docker, on loopback only, then poll one source, with lists from the public store:
 
 ```bash
-docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:25.8
+docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:26.8
 ```
 
 ```bash

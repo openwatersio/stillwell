@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { BLOCKED_MS, RETRY_MS, schedule, type PassResult } from "../src/realtime/schedule.ts";
+import {
+  BLOCKED_MS,
+  PassError,
+  RETRY_MS,
+  schedule,
+  slots,
+  type PassResult,
+} from "../src/realtime/schedule.ts";
 import { emptySummary } from "../src/store/recent.ts";
 
 const MINUTE = 60_000;
@@ -27,7 +34,8 @@ async function simulate(
       refreshes.push(now / MINUTE);
       return true;
     },
-    pass: async (due, seeding, at) => {
+    pass: async (due, seeding) => {
+      const at = now;
       calls.push({ at: at / MINUTE, due, seeding });
       const result = answer(calls.length, at);
       if (result instanceof Error) throw result;
@@ -156,6 +164,62 @@ describe("schedule", () => {
     assert.deepEqual(refreshes, [0, 60, 120]);
   });
 
+  it("counts intervals from when a pass began, after a wait for a slot, and rests from when it ended", async () => {
+    let now = 0;
+    const calls: number[] = [];
+    const blocked = { ...emptySummary("poll test", 1), blocked: true };
+    await schedule({
+      clock: () => now,
+      sleep: async (ms) => {
+        now += ms;
+      },
+      stopped: () => now >= 120 * MINUTE,
+      log: () => {},
+      refresh: async () => true,
+      pass: async () => {
+        // Each pass waits 20 minutes for a slot, then runs 5.
+        now += 20 * MINUTE;
+        calls.push(now / MINUTE);
+        const started = now;
+        now += 5 * MINUTE;
+        return calls.length === 1
+          ? { ...ok([360]), started }
+          : { ...ok([360]), summary: blocked, started };
+      },
+    });
+    // The second pass is asked for at minute 26, after the first's interval from when it began (20),
+    // and runs from 46 to 51; its block rests the source an hour from then, and the next waits until 131.
+    assert.deepEqual(calls, [20, 46, 131]);
+  });
+
+  it("retries a failed pass that waited for a slot after it ended", async () => {
+    let now = 0;
+    const calls: number[] = [];
+    await schedule({
+      clock: () => now,
+      sleep: async (ms) => {
+        now += ms;
+      },
+      stopped: () => now >= 60 * MINUTE,
+      log: () => {},
+      refresh: async () => true,
+      pass: async () => {
+        // The first pass waits 30 minutes for a slot, then is stopped 10 minutes in.
+        if (!calls.length) {
+          now += 30 * MINUTE;
+          calls.push(now / MINUTE);
+          const started = now;
+          now += 10 * MINUTE;
+          throw new PassError("killed", started);
+        }
+        calls.push(now / MINUTE);
+        return ok([3600]);
+      },
+    });
+    // Tried again RETRY_MS after it ended (40), not at once, as counting from when it was asked (0) would.
+    assert.deepEqual(calls, [30, 40 + RETRY_MS / MINUTE]);
+  });
+
   it("reads the list again hourly once the source has nothing left to poll", async () => {
     const calls = await simulate(70, (call) => ok(call === 1 ? [360] : []));
     assert.deepEqual(
@@ -166,5 +230,36 @@ describe("schedule", () => {
         [66, null],
       ],
     );
+  });
+});
+
+describe("slots", () => {
+  it("lets at most n hold a slot, and hands each freed one to the next in line", async () => {
+    const pool = slots(2);
+    const order: string[] = [];
+    let holding = 0;
+    let most = 0;
+    const hold = async (name: string, release: Promise<void>) => {
+      await pool.acquire();
+      holding++;
+      most = Math.max(most, holding);
+      order.push(name);
+      await release;
+      holding--;
+      pool.release();
+    };
+    let free!: () => void;
+    const first = new Promise<void>((resolve) => (free = resolve));
+    const all = Promise.all([
+      hold("a", first),
+      hold("b", Promise.resolve()),
+      hold("c", Promise.resolve()),
+      hold("d", Promise.resolve()),
+    ]);
+    await new Promise((resolve) => setImmediate(resolve));
+    free();
+    await all;
+    assert.equal(most, 2);
+    assert.deepEqual(order, ["a", "b", "c", "d"]);
   });
 });
