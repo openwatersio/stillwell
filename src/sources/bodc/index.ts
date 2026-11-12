@@ -98,9 +98,18 @@ const COUNTRY: Record<string, string> = { JER: "JE", IOM: "IM" };
 /**
  * The channel BODC's processed series is. Each dataset holds every sensor's
  * channel and marks none as the main one; this one matches GESLA's copy of
- * BODC's processed files value for value at every gauge both have.
+ * BODC's processed files value for value at every gauge both have, except
+ * those in `CHANNELS`.
  */
 const LEVEL = "ASLVBG02";
+
+/**
+ * Gauges whose processed series is another channel, by port code. Hinkley
+ * Point has no `ASLVBG02` values at all; its radar channel matches GESLA's
+ * copy of BODC's processed files at every time both hold in 2025 and 2026
+ * (erratum `bodc-hinkley-channel`).
+ */
+const CHANNELS: Record<string, string> = { HIN: "ASLVRADR" };
 
 type Cell = string | number | null;
 type Row = Record<string, Cell>;
@@ -211,23 +220,24 @@ export async function levels(
 ): Promise<Observation[]> {
   if (datum !== DATUM) throw new Error(`BODC ${code} is measured from ${DATUM}, not ${datum}`);
   const dataset = await datasetOf(code);
+  const channel = CHANNELS[code.toUpperCase()] ?? LEVEL;
   const out: Observation[] = [];
   for (const [a, b] of years(start.getTime(), end.getTime())) {
     const rows = rowsOf(
       await request(
         // Half a minute either side, so a value stamped just off a year's edge comes with the year it rounds into.
-        url(dataset, `time,${LEVEL},F${LEVEL}`, [
+        url(dataset, `time,${channel},F${channel}`, [
           `time>=${new Date(a - 30_000).toISOString()}`,
           `time<${new Date(b - 30_000).toISOString()}`,
         ]),
       ),
     );
     for (const r of rows) {
-      let flag = flagOf(r[`F${LEVEL}`]);
-      const level = r[LEVEL];
+      let flag = flagOf(r[`F${channel}`]);
+      const level = r[channel];
       if (typeof level !== "number" || flag === null) continue;
       // An improbable 0 or -1 mm stands in for no reading, at some gauges for years (see README.md).
-      if (qualifier(r[`F${LEVEL}`]) === "M" && Math.abs(level) <= 0.001) flag = Flag.bad;
+      if (qualifier(r[`F${channel}`]) === "M" && Math.abs(level) <= 0.001) flag = Flag.bad;
       // Times come a few milliseconds off the quarter hour: erratum `bodc-erddap-times`.
       const time = Math.round(Date.parse(String(r.time)) / 60_000) * 60_000;
       if (time >= a && time < b) out.push({ time, level, flag });

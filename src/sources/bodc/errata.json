@@ -50,6 +50,15 @@
       "error": "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.77 m after a one-hour gap.",
       "response": "The value is kept as served, with BODC's good flag. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
       "evidence": "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:30, then 6.77 m."
+    },
+    {
+      "id": "bodc-hinkley-channel",
+      "stations": ["bodc/hin"],
+      "handling": "corrected",
+      "error": "BODC's processed dataset for Hinkley Point (`HIN_ukcff_4602_001`) has no values in `ASLVBG02`, the channel that holds the processed series at every other gauge with values in it, and marks no channel as the processed one. Hinkley Point's processed series is in `ASLVRADR`, the radar channel, from January 2023.",
+      "response": "The adapter reads `ASLVRADR` at Hinkley Point (`CHANNELS` in `src/sources/bodc/index.ts`) and `ASLVBG02` everywhere else.",
+      "evidence": "In November 2026, Hinkley Point's `ASLVBG02` has no values in any year. Its `ASLVRADR` matches the store's copy of GESLA's BODC record of the gauge (`gesla/hinkley_point-hin-gbr-bodc`) within 1.5 mm at all 5,563 quarter hours both hold in 2025 and 2026, sits on the same zero as GESLA's CMEMS record (`gesla/hinkley-hin-gbr-cmems`) in each year from 2023 (median difference under 1 mm), and matches the EA's chart datum series (`ea/E72524`) within 5 mm at 99% of times in 2026.",
+      "reported": null
     }
   ],
   "retired": []
