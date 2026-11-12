@@ -71,6 +71,30 @@ export interface RunSummary {
   values: number;
   /** Files written. */
   files: number;
+  /** Seconds spent in each phase of the run, in the order they first ran. */
+  seconds?: Record<string, number>;
+}
+
+/** Runs a phase of work and adds the time it took to its phase's total. */
+export type Timer = <T>(phase: string, work: () => Promise<T>) => Promise<T>;
+
+/**
+ * A timer that adds each phase's seconds to `seconds` and logs each phase as
+ * it starts and ends, so a run stopped at its time limit still shows where
+ * the time went and which phase it stopped in.
+ */
+export function timer(title: string, seconds: Record<string, number>): Timer {
+  return async (phase, work) => {
+    const began = performance.now();
+    console.log(`${title}: ${phase}…`);
+    try {
+      return await work();
+    } finally {
+      const took = (performance.now() - began) / 1000;
+      seconds[phase] = (seconds[phase] ?? 0) + took;
+      console.log(`${title}: ${phase} ${took.toFixed(1)}s`);
+    }
+  };
 }
 
 interface RunOptions {
@@ -311,6 +335,9 @@ export async function compactRecent({
 }: RunOptions & { start: number; end: number; rebuildBounds?: boolean }): Promise<RunSummary> {
   const id = source.metadata.id;
   const summary = emptySummary(`compact ${id}`, 0);
+  const seconds: Record<string, number> = {};
+  summary.seconds = seconds;
+  const time = timer(summary.title, seconds);
   // A station whose store can't be named, such as a restricted one with no
   // restricted store set, fails alone rather than stop the source's fold.
   // A station without levels has rows only from before its list dropped them,
@@ -337,9 +364,11 @@ export async function compactRecent({
     )) {
       const window = Map.groupBy(
         (
-          await readRecent(
-            path,
-            batch.map((s) => s.id),
+          await time("read window", () =>
+            readRecent(
+              path,
+              batch.map((s) => s.id),
+            ),
           )
         ).filter((r) => r.time >= start && r.time < end),
         (r) => r.station,
@@ -351,85 +380,87 @@ export async function compactRecent({
       // the window; the reconcile below reads its stations' files instead.
       let marked: string[] = [];
       try {
-        marked = await markYears(store, id, folding);
+        marked = await time("mark years", () => markYears(store, id, folding));
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
       }
-      await pool(batch, concurrency, async (station) => {
-        const rows = window.get(station.id);
-        // A live station sends something every day; one that isn't live may not.
-        if (!rows?.length) {
-          // A held station isn't fetched, so it has nothing once its rows age out.
-          if (
-            station.live &&
-            station.status === "active" &&
-            levels(station) &&
-            !isHeld(station.epochs)
-          )
-            summary.stale.push(station.id);
-          return;
-        }
-        let changed = false;
-        // A row goes to the epoch its time falls in, as the next hourly run
-        // would move it: a refresh can open an epoch whose start is in the
-        // past after the window's rows were tagged. Rows at or after a held
-        // epoch's start wait in the window for a decision.
-        const heldFrom = Math.min(
-          ...station.epochs
-            .filter((e) => e.state === "held" && e.since !== null)
-            .map((e) => Date.parse(e.since!)),
-        );
-        const waiting = rows.filter((r) => r.time >= heldFrom);
-        if (waiting.length) summary.waiting.push(`${station.id}: ${waiting.length} values`);
-        const parts = Map.groupBy(
-          rows.filter((r) => r.time < heldFrom),
-          (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
-        );
-        for (const [key, values] of parts) {
-          const [epochId, year] = key.split(" ").map(Number) as [number, number];
-          const label =
-            epochId === 1 ? `${station.id} ${year}` : `${station.id} epoch ${epochId} ${year}`;
-          try {
-            // Rows of an epoch the list doesn't have, such as after a restore,
-            // have no datum to be written in.
-            const epoch = station.epochs.find((e) => e.id === epochId);
-            if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
-            const file = seriesPath(
-              storeFor(station),
-              "levels",
-              id,
-              station.source_id,
-              year,
-              epochId,
-            );
-            const existing = await readObservationFile(file);
-            await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
-            const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
-            const merged = upsert(existing.rows, incoming);
-            const span = spanOf(merged, epochWindow(station.epochs, epochId));
-            const key = spanKey(station, epochId, year);
-            if (sameRows(existing.rows, merged)) {
-              spans.set(key, span);
-              continue;
-            }
-            written.set(file, await writeObservations(file, merged, epoch.datum));
-            spans.set(key, span);
-            summary.files++;
-            const had = new Map(existing.rows.map((r) => [r.time, r]));
-            summary.values += merged.filter((r) => {
-              const before = had.get(r.time);
-              return !before || !sameRows([before], [r]);
-            }).length;
-            changed = true;
-          } catch (error) {
-            summary.failed.push(`${label}: ${message(error)}`);
+      await time("fold", () =>
+        pool(batch, concurrency, async (station) => {
+          const rows = window.get(station.id);
+          // A live station sends something every day; one that isn't live may not.
+          if (!rows?.length) {
+            // A held station isn't fetched, so it has nothing once its rows age out.
+            if (
+              station.live &&
+              station.status === "active" &&
+              levels(station) &&
+              !isHeld(station.epochs)
+            )
+              summary.stale.push(station.id);
+            return;
           }
-        }
-        if (changed) summary.updated++;
-      });
+          let changed = false;
+          // A row goes to the epoch its time falls in, as the next hourly run
+          // would move it: a refresh can open an epoch whose start is in the
+          // past after the window's rows were tagged. Rows at or after a held
+          // epoch's start wait in the window for a decision.
+          const heldFrom = Math.min(
+            ...station.epochs
+              .filter((e) => e.state === "held" && e.since !== null)
+              .map((e) => Date.parse(e.since!)),
+          );
+          const waiting = rows.filter((r) => r.time >= heldFrom);
+          if (waiting.length) summary.waiting.push(`${station.id}: ${waiting.length} values`);
+          const parts = Map.groupBy(
+            rows.filter((r) => r.time < heldFrom),
+            (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
+          );
+          for (const [key, values] of parts) {
+            const [epochId, year] = key.split(" ").map(Number) as [number, number];
+            const label =
+              epochId === 1 ? `${station.id} ${year}` : `${station.id} epoch ${epochId} ${year}`;
+            try {
+              // Rows of an epoch the list doesn't have, such as after a restore,
+              // have no datum to be written in.
+              const epoch = station.epochs.find((e) => e.id === epochId);
+              if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
+              const file = seriesPath(
+                storeFor(station),
+                "levels",
+                id,
+                station.source_id,
+                year,
+                epochId,
+              );
+              const existing = await readObservationFile(file);
+              await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
+              const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
+              const merged = upsert(existing.rows, incoming);
+              const span = spanOf(merged, epochWindow(station.epochs, epochId));
+              const key = spanKey(station, epochId, year);
+              if (sameRows(existing.rows, merged)) {
+                spans.set(key, span);
+                continue;
+              }
+              written.set(file, await writeObservations(file, merged, epoch.datum));
+              spans.set(key, span);
+              summary.files++;
+              const had = new Map(existing.rows.map((r) => [r.time, r]));
+              summary.values += merged.filter((r) => {
+                const before = had.get(r.time);
+                return !before || !sameRows([before], [r]);
+              }).length;
+              changed = true;
+            } catch (error) {
+              summary.failed.push(`${label}: ${message(error)}`);
+            }
+          }
+          if (changed) summary.updated++;
+        }),
+      );
       try {
-        await commitYears(store, id, marked, written);
+        await time("commit years", () => commitYears(store, id, marked, written));
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
@@ -448,6 +479,7 @@ export async function compactRecent({
         year: new Date(end).getUTCFullYear(),
         rebuild: rebuildBounds,
         concurrency,
+        time,
       });
     } catch (error) {
       summary.failed.unshift(`bounds: ${message(error)}`);
@@ -461,6 +493,7 @@ export async function compactRecent({
         // Enough for a stopped run's stations, and short of compaction's time limit; an unfinished `years` build goes on a night at a time.
         limit: 5000,
         concurrency,
+        time,
       });
       for (const file of years?.failed ?? []) summary.failed.push(`years: can't read ${file}`);
     } catch (error) {
@@ -562,6 +595,7 @@ export async function updateBounds({
   year: thisYear,
   rebuild = false,
   concurrency = 8,
+  time = (_, work) => work(),
 }: {
   store: string;
   source: string;
@@ -571,9 +605,10 @@ export async function updateBounds({
   year: number;
   rebuild?: boolean;
   concurrency?: number;
+  time?: Timer;
 }): Promise<void> {
   const path = boundsPath(store, source);
-  const had = await readStationBounds(path);
+  const had = await time("bounds: read bounds", () => readStationBounds(path));
   const known = rebuild ? new Map<string, never>() : had;
   // Bounds an older build wrote, without `preliminary`, stay without it until
   // a rebuild: filling it in reads nearly every file, too long for a nightly run.
@@ -584,7 +619,7 @@ export async function updateBounds({
     [sourceFirstEpochFiles(store, "levels", source), 2],
     [sourceEpochDirs(store, "levels", source), 3],
   ] as const)
-    for (const file of await listFiles(pattern)) {
+    for (const file of await time("bounds: list files", () => listFiles(pattern))) {
       const parts = file.split("/");
       const year = Number(parts.at(-1)!.replace(/\.parquet$/, ""));
       const epoch = depth === 2 ? 1 : Number(parts.at(-2));
@@ -662,14 +697,18 @@ export async function updateBounds({
 
   // Each end's year is read, files compaction didn't give in batches at once;
   // a year with no counted rows moves the end a year inward.
+  let readCount = 0;
   for (let open = ends.filter((e) => e.value === undefined && e.years.length); open.length;) {
     const unread = new Map<string, File>();
     for (const e of open)
       for (const f of e.years[e.at]!) if (!spans.has(f.key)) unread.set(f.key, f);
-    await pool([...chunks([...unread], 100)], concurrency, async (batch) => {
-      const read = await readTimeBounds(batch.map(([, f]) => f));
-      for (const [key, f] of batch) spans.set(key, read.get(f.file) ?? null);
-    });
+    await time(`bounds: read files`, () =>
+      pool([...chunks([...unread], 100)], concurrency, async (batch) => {
+        const read = await readTimeBounds(batch.map(([, f]) => f));
+        for (const [key, f] of batch) spans.set(key, read.get(f.file) ?? null);
+      }),
+    );
+    readCount += unread.size;
     for (const e of open) {
       const times = e.years[e.at]!.flatMap((f) => spans.get(f.key)?.[e.pick] ?? []);
       if (times.length) e.value = e.pick === 1 ? Math.max(...times) : Math.min(...times);
@@ -678,6 +717,7 @@ export async function updateBounds({
     open = open.filter((e) => e.value === undefined && e.at < e.years.length);
   }
 
+  console.log(`${source} bounds: read ${readCount} files`);
   const found = Map.groupBy(ends, (e) => e.id);
   const bounds: ({ id: string } & StationBounds)[] = [];
   for (const station of stations) {
@@ -702,7 +742,7 @@ export async function updateBounds({
   const bounded = new Set(bounds.map((b) => b.id));
   for (const [id, b] of had)
     if (!bounded.has(id) && (!rebuild || !here.has(id))) bounds.push({ id, ...b });
-  await writeStationBounds(path, bounds, !legacy);
+  await time("bounds: write bounds", () => writeStationBounds(path, bounds, !legacy));
 }
 
 /**
@@ -855,6 +895,11 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
+  const phases = Object.entries(s.seconds ?? {});
+  if (phases.length) {
+    lines.push("", "| Phase | Seconds |", "| - | -: |");
+    for (const [phase, took] of phases) lines.push(`| ${phase} | ${took.toFixed(1)} |`);
+  }
   for (const [what, items] of [
     ["Failed", s.failed],
     ["Stale", s.stale],
