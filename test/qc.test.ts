@@ -51,7 +51,7 @@ describe("qc spike rule", () => {
 });
 
 describe("qc with non-finite levels", () => {
-  // A 1 m tide every 6 minutes, as in docs/qc/scripts/non-finite.ts.
+  // A 1 m tide every 6 minutes.
   const window = (days: number, nan: number[], noise = () => 0) => {
     const rows = Array.from({ length: days * 240 }, (_, i) => ({
       time: T + i * 6 * MIN,

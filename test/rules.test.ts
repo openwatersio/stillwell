@@ -1,6 +1,6 @@
 // What QC's rules and `judge` do, kept beside the `RULES` and `JUDGE` they
 // were recorded under, so a change to either can't land without its version.
-// Regenerate after bumping a version:
+// Regenerating refuses a changed output under an unchanged version. After a bump:
 //
 //   UPDATE_RULES=1 node --test test/rules.test.ts
 import { describe, it } from "node:test";
@@ -30,7 +30,7 @@ const set = (rows: Observation[], from: number, to: number, level: (i: number) =
   return rows;
 };
 
-/** Series for `qc`: the cases in docs/qc/scripts/synthetic.ts and the `qc` tests' shapes. */
+/** Series for `qc`: the QC evaluation's synthetic cases and the `qc` tests' shapes. */
 const QC_SERIES: Record<string, () => Observation[]> = {
   "clean 2 m tide, 10 min": () => series(1000, 10 * MIN, tide(2)),
   "spike, flatline and far level": () => {
@@ -82,6 +82,9 @@ const QC_SERIES: Record<string, () => Observation[]> = {
     series(53, HOUR, (h) => (h >= 24 && h < 29 ? 3.5 : 3) + (Math.round(h) % 2) * 0.01),
   "pool flat six days then rising": () =>
     series(7 * 24, HOUR, (h) => (h < 144 ? 4 + (Math.round(h) % 2) * 0.01 : 4 + (h - 144) / 12)),
+  "a year of 30,479.695 m placeholders": () => series(500, 15 * MIN, () => 30479.695),
+  "placeholders among a tide": () =>
+    set(series(1000, 10 * MIN, tide(2)), 400, 500, (i) => (i % 2 ? -30479.695 : 3047.7)),
   "gauge 250 m up with a 300 m value": () => {
     const rows = series(200, 10 * MIN, (h) => 250 + tide(2)(h));
     rows[50]!.level = 300;
@@ -90,17 +93,17 @@ const QC_SERIES: Record<string, () => Observation[]> = {
 };
 
 /** Every option set `qcFor` gives, by kind, verdict and tide. */
-const OPTIONS = [
-  ...new Set(
-    ["coastal", "estuary", "river", "lake", null].flatMap((kind) =>
-      [true, false, null].flatMap((tidal) =>
-        [0.09, 1, null].map((tide_m) =>
-          JSON.stringify(qcFor({ kind, tidal, tide_m } as Parameters<typeof qcFor>[0])),
-        ),
-      ),
+const STATIONS = Object.fromEntries(
+  ["coastal", "estuary", "river", "lake", null].flatMap((kind) =>
+    [true, false, null].flatMap((tidal) =>
+      [0.09, 1, null].map((tide_m) => [
+        `${kind} tidal ${tidal} tide ${tide_m}`,
+        JSON.stringify(qcFor({ kind, tidal, tide_m } as Parameters<typeof qcFor>[0])),
+      ]),
     ),
   ),
-];
+);
+const OPTIONS = [...new Set(Object.values(STATIONS))];
 
 const station = (kind: string | null, extra: Partial<StoredStation> = {}) =>
   ({
@@ -162,6 +165,18 @@ const JUDGE_CASES: Record<string, () => [StoredStation, Observation[]]> = {
 const marks = (rows: Observation[]) =>
   rows.flatMap((r, i) => (r.flag === Flag.good ? [] : [`${i}:${r.flag}`])).join(" ");
 
+/** Days judged with the days either side as context, as requalify and backfill judge years. */
+const QC_CONTEXT: Record<string, () => [Observation[], Observation[]]> = {
+  "spike, flatline, NaN and placeholder at the edges": () => {
+    const rows = series(3 * 144, 10 * MIN, tide(2));
+    rows[144]!.level += 0.6;
+    set(rows, 260, 330, () => 1.5);
+    rows[100]!.level = -30479.695;
+    rows[300]!.level = NaN;
+    return [rows.slice(144, 288), [...rows.slice(0, 144), ...rows.slice(288)]];
+  },
+};
+
 function record() {
   const flags: Record<string, Record<string, string>> = {};
   for (const options of OPTIONS)
@@ -171,37 +186,59 @@ function record() {
         marks(qc(rows(), JSON.parse(options))),
       ]),
     );
+  for (const options of OPTIONS)
+    for (const [name, make] of Object.entries(QC_CONTEXT)) {
+      const [rows, context] = make();
+      flags[options]![name] = marks(qc(rows, JSON.parse(options), context));
+    }
   const verdicts = Object.fromEntries(
     Object.entries(JUDGE_CASES).map(([name, make]) => {
       const verdict = judge(...make());
       return [name, { ...verdict, tide_m: verdict.tide_m === null ? null : round(verdict.tide_m) }];
     }),
   );
-  return { rules: RULES, judge: JUDGE, flags, verdicts };
+  return { rules: RULES, judge: JUDGE, options: STATIONS, flags, verdicts };
 }
+
+/** Flags by option set and case, as one record. */
+const flat = (flags: Record<string, Record<string, string>>) =>
+  Object.fromEntries(
+    Object.entries(flags).flatMap(([options, cases]) =>
+      Object.entries(cases).map(([name, marks]) => [`${options} ${name}`, marks]),
+    ),
+  );
+
+/** Both records cut to the cases they share, so adding a case needs no new version. */
+const shared = <T>(a: Record<string, T>, b: Record<string, T>) =>
+  [a, b].map((x, i) => Object.fromEntries(Object.entries(x).filter(([k]) => k in (i ? a : b)))) as [
+    Record<string, T>,
+    Record<string, T>,
+  ];
 
 describe("RULES and JUDGE", () => {
   it("change whenever what the rules do changes", () => {
     const now = record();
-    if (process.env.UPDATE_RULES) {
-      writeFileSync(FIXTURE, JSON.stringify(now, null, 2) + "\n");
-      return;
-    }
     const was = JSON.parse(readFileSync(FIXTURE, "utf8")) as typeof now;
     const regenerate =
       "then regenerate test/fixtures/rules.json with UPDATE_RULES=1 node --test test/rules.test.ts";
+    const cases = (r: typeof now) => [
+      Object.keys(Object.values(r.flags)[0]!),
+      Object.keys(r.verdicts),
+    ];
+    if (!process.env.UPDATE_RULES)
+      assert.deepEqual(cases(now), cases(was), `The cases changed: ${regenerate}`);
     if (was.rules === RULES)
       assert.deepEqual(
-        now.flags,
-        was.flags,
+        ...shared({ ...now.options, ...flat(now.flags) }, { ...was.options, ...flat(was.flags) }),
         `QC's flags changed: bump RULES in src/store/analysis.ts, ${regenerate}`,
       );
     if (was.judge === JUDGE)
       assert.deepEqual(
-        now.verdicts,
-        was.verdicts,
+        ...shared(now.verdicts, was.verdicts),
         `judge's verdicts changed: bump JUDGE in src/store/analysis.ts, ${regenerate}`,
       );
-    assert.deepEqual([was.rules, was.judge], [RULES, JUDGE], `A version changed: ${regenerate}`);
+    if (process.env.UPDATE_RULES) writeFileSync(FIXTURE, JSON.stringify(now, null, 2) + "\n");
+    else
+      assert.deepEqual([was.rules, was.judge], [RULES, JUDGE], `A version changed: ${regenerate}`);
   });
 });

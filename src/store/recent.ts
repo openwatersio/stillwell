@@ -799,9 +799,10 @@ export const CENTIMETER_TIDE_M = 0.3;
 /**
  * How far, in meters, a tide gauge's level can waver from a run's first value
  * and still count as one flatline: a stuck gauge that dithers by a millimeter
- * either way. QARTOD's flat line test takes values equal within 1 mm. A
- * centimeter flags hours of real water where a small tide turns, as at
- * Berwick, Louisiana.
+ * either way, which spans 2 mm from the first: QARTOD's flat line test takes
+ * values equal within 1 mm of each other. A centimeter flags hours of real
+ * water where a small tide turns, as at Berwick, Louisiana. A change to it
+ * bumps `RULES` in `src/store/analysis.ts`.
  */
 export const FLATLINE_M = 0.002;
 

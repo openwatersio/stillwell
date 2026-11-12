@@ -377,7 +377,7 @@ export async function extremes(
 }
 
 /**
- * Checked (`Gecontroleerd`) values are good and unchecked ones preliminary.
+ * Checked (`Gecontroleerd`) and final (`Definitief`) values are good, and unchecked ones preliminary.
  * Quality code `00` is a normal value. What `25` means isn't documented where
  * we've looked, so it and any other code count as suspect until it is.
  */

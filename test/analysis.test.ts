@@ -91,6 +91,9 @@ describe("judge", () => {
     const dithering = (h: number) =>
       h % 168 < 8 ? -0.5 + ((Math.round(h * 4) % 3) - 1) * 0.001 : tide(0.5)(h);
     assert.equal(judge(river("11"), series(90, dithering)).tidal, false);
+    // Elsewhere only an exact hold counts, so a coastal gauge of no kind left dry stays tidal for QC to flag.
+    assert.equal(judge(river("12", { kind: "estuary" }), series(90, dithering)).tidal, true);
+    assert.equal(judge(river("13", { kind: null }), series(90, dithering)).tidal, true);
     // On the coast those runs are a stuck or dry gauge, for QC to flag, not still water.
     const coast = judge(river("5", { kind: "coastal" }), series(90, level));
     assert.equal(coast.tidal, true);

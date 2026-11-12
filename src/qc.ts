@@ -50,8 +50,8 @@ export const FLATLINE_S = 6 * 3600;
  * Dead Sea's shore or above Everest. QARTOD's gross range test fails a value
  * outside the sensor's span whatever the window holds, which catches a year
  * that is all placeholder, such as USACE's 30,479.695 m (100,000 ft), where
- * the window's own median is the placeholder. The highest real levels in the
- * store are USGS reservoirs at 1,817 m.
+ * the window's own median is the placeholder. A scan of every year file in
+ * November 2026 found no real level above 1,817 m, at USGS's Lyman Lake.
  */
 export const SPAN_M = [-500, 9000] as const;
 
@@ -118,7 +118,7 @@ export function qc<T extends Observation>(
   if (!out.length) return out;
   const own = new Set<Observation>(out);
   const times = new Set(out.map((r) => r.time));
-  // Possible levels only, so no neighbor, residual, run or spread sees a NaN or a placeholder; the limit rule marks the rest bad.
+  // Levels within `SPAN_M` only, so no neighbor, residual, run or spread sees a NaN or one beyond it; the limit rule marks those bad.
   const all = unique([...out, ...context.filter((r) => !times.has(r.time))]).filter((r) =>
     possible(r.level),
   );
@@ -168,12 +168,15 @@ export function qc<T extends Observation>(
     // interval, so a gap on one side doesn't move the median along a steep tide; all of them
     // where none pair, so every value with neighbors on both sides is judged.
     const offset = (x: Observation) => Math.abs(x.time - r.time);
-    const paired = (x: Observation, other: Observation[]) =>
-      other.some((y) => Math.abs(offset(y) - offset(x)) <= spacing / 2);
-    const mirrored = [
-      ...before.filter((x) => paired(x, after)),
-      ...after.filter((x) => paired(x, before)),
-    ];
+    // Both sides run outward from the value, so one pass over each finds the pairs.
+    const paired = (side: Observation[], other: Observation[]) => {
+      let j = 0;
+      return side.filter((x) => {
+        while (j < other.length && offset(other[j]!) < offset(x) - spacing / 2) j++;
+        return j < other.length && offset(other[j]!) <= offset(x) + spacing / 2;
+      });
+    };
+    const mirrored = [...paired(before, after), ...paired(after, before)];
     return (
       r.level - median((mirrored.length ? mirrored : [...before, ...after]).map((x) => x.level))!
     );
