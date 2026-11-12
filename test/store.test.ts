@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
-import { mergeFetched, mergeRange, sameRows } from "../src/store/merge.ts";
+import { mergeFetched, mergeRange, sameRows, upsert } from "../src/store/merge.ts";
 import {
   readDatums,
   readExtremes,
   readObservations,
   checkRecent,
+  foldObservationFile,
+  readObservationFile,
   readRecent,
+  readYearStats,
   writeExtremes,
   writeObservations,
   writeRecent,
@@ -640,4 +643,122 @@ describe("the store's environment", () => {
       assert.match(run.stderr, new RegExp(`${old} is set; it's now ${now}`));
     });
   }
+});
+
+describe("foldObservationFile", () => {
+  const H = 3_600_000;
+  const T = Date.UTC(2026, 0, 1);
+  // Varied levels, flags, source flags and arrivals, so a row the fold rewrites wrongly shows.
+  const existing: Observation[] = Array.from({ length: 48 }, (_, i) => {
+    const r: Observation = { time: T + i * H, level: 0.1234 + i / 7, flag: (i % 5) as Flag };
+    if (i % 3) r.source_flag = ((i + 1) % 5) as Flag;
+    if (i % 4) r.received = T + i * H + 60_000;
+    return r;
+  });
+  // A negative zero, and a level that rounds to one, which the version hashes apart from zero.
+  existing[5]!.level = -0;
+  existing[6]!.level = -0.00004;
+  const incoming: Observation[] = [
+    // A value it had, one it had with a new level, and new ones.
+    { ...existing[40]! },
+    { time: T + 41 * H, level: 9.5, flag: Flag.preliminary, source_flag: Flag.preliminary },
+    { time: T + 48 * H, level: 1.25, flag: Flag.preliminary, received: T + 49 * H },
+    { time: T + 49 * H, level: -0.5, flag: Flag.preliminary },
+  ];
+  const window: [number, number] = [T + 2 * H, T + 60 * H];
+
+  /** The file and bounds a whole read, merge and rewrite gives, beside foldObservationFile's. */
+  async function both(name: string, write: (path: string) => Promise<void>) {
+    const whole = join(root, "fold", name, "whole.parquet");
+    const fold = join(root, "fold", name, "fold.parquet");
+    await write(whole);
+    await write(fold);
+    const had = await readObservationFile(whole);
+    const merged = upsert(had.rows, incoming);
+    const wholeStats = await writeObservations(whole, merged, "NAP");
+    const from = Math.min(...incoming.map((r) => r.time));
+    let seen: { rows: Observation[]; datums: string[] } | undefined;
+    const { before, stats } = await foldObservationFile(
+      fold,
+      from,
+      "NAP",
+      window,
+      async (rows, datums) => {
+        seen = { rows, datums };
+        return upsert(rows, incoming);
+      },
+    );
+    assert.deepEqual(
+      seen!.rows,
+      had.rows.filter((r) => r.time >= from),
+    );
+    assert.deepEqual(seen!.datums, had.datums);
+    assert.deepEqual(await readObservations(fold), await readObservations(whole));
+    assert.deepEqual(stats, wholeStats);
+    assert.deepEqual(stats, (await readYearStats([fold])).get(fold));
+    return { before, merged };
+  }
+
+  it("writes the file a whole read, merge and rewrite would, reading only the rows it can change", async () => {
+    const { before, merged } = await both("current", (path) =>
+      writeObservations(path, existing, "NAP").then(() => undefined),
+    );
+    // The rows before the fold's inside the window: hours 2 to 39.
+    const inside = existing.filter((r) => r.time >= window[0] && r.time < T + 40 * H);
+    const preliminary = inside.find((r) => (r.source_flag ?? r.flag) === Flag.preliminary)!;
+    assert.deepEqual(before, [T + 2 * H, T + 39 * H, preliminary.time, true]);
+    assert.equal(merged.length, 50);
+  });
+
+  it("writes a file from before source_flag was kept as a rewrite would", async () => {
+    await both("legacy", async (path) => {
+      mkdirSync(dirname(path), { recursive: true });
+      const db = await (await DuckDBInstance.create(":memory:")).connect();
+      await db.run(
+        `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, (CASE WHEN i = 5 THEN -0.00004 WHEN i = 6 THEN 0.000049999999999999996 WHEN i = 7 THEN NULL ELSE 0.12345 + i / 7 END)::DOUBLE AS level_m, (i % 3)::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${path}' (FORMAT parquet)`,
+      );
+    });
+  });
+
+  it("writes a missing file with the fold's rows alone", async () => {
+    const { before } = await both("missing", async () => {});
+    assert.equal(before, null);
+  });
+
+  it("reads only its own file when its path has a glob character", async () => {
+    const dir = join(root, "fold", "glob");
+    // A neighbor written before `source_flag`, whose columns differ from the station's own.
+    mkdirSync(join(dir, "ab"), { recursive: true });
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, 1.5::FLOAT AS level_m, 0::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${join(dir, "ab", "2026.parquet")}' (FORMAT parquet)`,
+    );
+    const fold = async (rows: Observation[]) => {
+      seen = rows;
+      return upsert(rows, incoming);
+    };
+    let seen: Observation[] = [];
+    // Its own file is missing, so `a*` matches only its neighbor's.
+    const missing = join(dir, "a*", "2026.parquet");
+    const { before } = await foldObservationFile(missing, T, "NAP", window, fold);
+    assert.deepEqual(seen, []);
+    assert.equal(before, null);
+    assert.deepEqual(
+      (await readObservations(missing)).map((r) => r.time),
+      upsert([], incoming).map((r) => r.time),
+    );
+    // Now it has one, beside a neighbor it also matches.
+    const own = await readObservations(missing);
+    await foldObservationFile(missing, T, "NAP", window, fold);
+    assert.deepEqual(seen, own);
+  });
+
+  it("leaves the file as it is when the fold returns null", async () => {
+    const path = join(root, "fold", "kept.parquet");
+    await writeObservations(path, existing, "NAP");
+    const was = await readYearStats([path]);
+    const { stats } = await foldObservationFile(path, T, "NAP", null, async () => null);
+    assert.equal(stats, null);
+    assert.deepEqual(await readYearStats([path]), was);
+  });
 });

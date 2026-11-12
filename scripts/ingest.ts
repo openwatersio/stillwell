@@ -3,6 +3,7 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
+ *   node scripts/ingest.ts links [--concurrency 4]
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *       [--with-inactive]
@@ -120,6 +121,7 @@ import {
   listOf,
   startedListOf,
   publishStations,
+  stationsToMeasure,
   refreshSource,
   AfterWrite,
   needsPerson,
@@ -135,6 +137,7 @@ import type {
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
+import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 
 useDiskCache();
 
@@ -169,6 +172,22 @@ switch (command) {
     break;
   case "publish":
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) await publish(store);
+    break;
+  case "links":
+    // From the source lists, as publish builds stations.parquet, for the next publish to carry offsets along (src/links.ts).
+    setConnections(positive("concurrency"));
+    for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
+      const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      const { rows, failed } = await measureLinks(
+        store,
+        await stationsToMeasure(store, held),
+        positive("concurrency"),
+        await readLinks(store),
+      );
+      await writeLinks(store, rows);
+      // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
+      if (failed) process.exitCode = 1;
+    }
     break;
   case "backfill": {
     const [source, ids, start, end] = args;
@@ -956,7 +975,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

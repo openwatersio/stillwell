@@ -172,7 +172,7 @@ describe("rws", () => {
 });
 
 describe("rws stations", () => {
-  it("prefers NAP, takes MSL where that's all a location has, and lists extremes only against NAP", async () => {
+  it("prefers measured NAP, takes MSL where that's all a location measures, and lists extremes only against NAP", async () => {
     serve([[/OphalenCatalogus/, fixture("rws-catalog.json")]]);
     const stations = await rws.stations();
     // Being a meter apart doesn't make two codes one gauge; only checked twins are linked.
@@ -180,6 +180,8 @@ describe("rws stations", () => {
     assert.deepEqual(
       stations.map((s) => [s.id, s.datum, s.products, s.country_code]),
       [
+        // RWS's astronomical tide but nothing measured: listed for its predictions alone.
+        ["rws/dukegat", "NAP", ["predictions", "predicted_extremes"], "NL"],
         [
           "rws/hoekvanholland",
           "NAP",
@@ -194,13 +196,24 @@ describe("rws stations", () => {
     // RWS's description says K13a is a platform, at sea; it says nothing of the others' water.
     assert.deepEqual(
       stations.map((s) => s.kind),
-      [null, null, "coastal", null],
+      [null, null, null, "coastal", null],
     );
     // Dutch NAP stations without an offset have their history before 2005 in
     // the old NAP; MSL and Bonaire's NAP never changed.
     assert.deepEqual(
       stations.map((s) => s.reference),
-      [null, rws.REVISED_NAP, null, null],
+      [rws.REVISED_NAP, null, rws.REVISED_NAP, null, null],
+    );
+    // Only a station with measured levels is live.
+    assert.deepEqual(
+      stations.map((s) => [s.live, s.interval_s]),
+      [
+        [false, null],
+        [true, 600],
+        [true, 600],
+        [true, 600],
+        [true, 600],
+      ],
     );
   });
 
