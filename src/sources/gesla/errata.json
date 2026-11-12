@@ -429,6 +429,16 @@
       "error": "GESLA's SMHI record of Göteborg-Eriksberg holds Tingstadstunneln's levels from 1 January to 12 November 2018, as SMHI's own does.",
       "response": "1 January to 12 November 2018 is flagged `suspect`, keeping GESLA's own flag as `source_flag`.",
       "evidence": "Its daily means equal SMHI's Eriksberg (`smhi/33096`) to 0.0 cm at the median over 297 days of the span (erratum `smhi-eriksberg-2018-tingstadstunneln`). GESLA's CMEMS record of the gauge differs from SMHI's by 5 cm at the median over the span, and agrees outside it, so it may hold Eriksberg's own levels."
+    },
+    {
+      "id": "gesla-kilrush-2025-01-09-offset",
+      "stations": ["gesla/kilrushlough-kil-irl-cmems"],
+      "since": "2025-01-09",
+      "until": "2025-01-10",
+      "handling": "flagged",
+      "error": "GESLA's hourly CMEMS record of Kilrush Lough holds 4 values about 6 m low, from 02:00 to 05:00 UTC on 9 January 2025, with GESLA's good flag, from the drop the Marine Institute's own record has.",
+      "response": "9 January 2025 is flagged `suspect` in the CMEMS record, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's Marine Institute record (`gesla/kilrush_lough-kil-irl-mi_c`) holds the same drop as 53 values from 01:20 to 05:40, which GESLA already flags, so it isn't listed.",
+      "evidence": "In the store, checked in November 2026: the CMEMS record (`gesla/kilrushlough-kil-irl-cmems`) has 4 values below −3 m, down to −5.95 m, from 02:00 to 05:00 with flag good, against daily medians of 0.13 m on 8 January and 0.07 m on 10 January. The Marine Institute record has the same 53 values as the Marine Institute's own (erratum `marine-institute-kilrush-2025-01-09-offset`)."
     }
   ],
   "retired": []

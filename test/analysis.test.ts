@@ -143,8 +143,6 @@ describe("judge", () => {
 describe("qcFor", () => {
   it("gives tidal water six hours and still water two days, by verdict, then by kind", () => {
     const still = { flatline_s: 48 * 3600, outliers: false, held: false };
-    // Tidal water takes a run within 2 mm of its first value as one, so a dithering stuck gauge is a flatline.
-    const tidal = { flatline_m: FLATLINE_M };
     assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), {
       flatline_m: FLATLINE_M,
       outliers: false,
@@ -153,7 +151,9 @@ describe("qcFor", () => {
     // A tide under 30 cm can sit on one centimeter for hours; one of 30 cm or more can't.
     assert.equal(qcFor(river("5", { tidal: true, tide_m: 0.3 })).centimeter_flatline_s, undefined);
     assert.equal(qcFor(river("3", { tidal: true, tide_m: 0.09 })).centimeter_flatline_s, 48 * 3600);
-    // A tidal river floods, so only it and a lake drop the outlier check.
+    // A tidal river floods, so only it and a lake drop the outlier check, and the
+    // residual jumps, since a river's tide is too far from harmonic.
+    const tidal = { flatline_m: FLATLINE_M, jumps: true };
     assert.deepEqual(qcFor({ kind: "coastal", tidal: true, tide_m: 1 }), tidal);
     assert.deepEqual(qcFor({ kind: "estuary", tidal: true, tide_m: 1 }), tidal);
     assert.deepEqual(qcFor({ kind: null, tidal: true, tide_m: 1 }), tidal);
