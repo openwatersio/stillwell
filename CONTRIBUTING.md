@@ -41,7 +41,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run typecheck`               | `tsc --noEmit`.                                                                                                                                                                                 |
 | `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                                                                                         |
 | `npm run ingest -- <args>`        | [`scripts/ingest.ts`](scripts/ingest.ts): `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`, described below.                              |
-| `npm run ticon:inventory`         | Rewrite [`docs/ticon-replacement.md`](docs/ticon-replacement.md) and its CSV from a slackwater-database checkout.                                                                               |
+| `npm run ticon:inventory`         | Rewrite [`docs/ticon-inventory.md`](docs/ticon-inventory.md) and its CSV from a slackwater-database checkout.                                                                                   |
 | `npm run errata`                  | Draft the report to each agency of its errata not yet reported, and check the erratum IDs the code cites.                                                                                       |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                                                                                    |
 | `npm run gesla:contributors`      | Rewrite [src/sources/gesla/contributors.md](src/sources/gesla/contributors.md) from GESLA 4.1's metadata and each contributor's terms.                                                          |
@@ -86,10 +86,10 @@ Backfill skips a year whose file is already complete: a past year, asked for who
 node scripts/ingest.ts backfill coops preliminary 2023 2026-11-01
 ```
 
-`--first <file>` runs the stations a file names before the rest: one ID per line, or a CSV with a `replacement_id`, `id` or `station` column, such as [`docs/ticon-replacement.csv`](docs/ticon-replacement.csv), which lists the station matched to every TICON record, accepted or not. An unsharded run stops if the file names none of the stations; a shard can hold none of them, so it doesn't.
+`--first <file>` runs the stations a file names before the rest: one ID per line, or a CSV with an `originator_id`, `id` or `station` column, such as [`docs/ticon-inventory.csv`](docs/ticon-inventory.csv), which lists the station matched to every TICON record, accepted or not. An unsharded run stops if the file names none of the stations; a shard can hold none of them, so it doesn't.
 
 ```bash
-node scripts/ingest.ts backfill usgs all 2007 2026 --skip-written --first docs/ticon-replacement.csv
+node scripts/ingest.ts backfill usgs all 2007 2026 --skip-written --first docs/ticon-inventory.csv
 ```
 
 `--shard 2/8` takes the second of eight sets of stations, split by a hash of their IDs so a station's shard never changes, for separate jobs. The Ingest workflow runs a source's jobs one at a time, in its `store-<source>` group with that source's hourly and compaction runs, so there dispatch each shard after the last one finishes. A shard holds that group for hours, so the source's hourly runs skip meanwhile, and compaction too if one spans 00:40 UTC. The next hourly run's 12 hours and compaction's 6 days catch up a gap shorter than those, so leave a gap between shards for both to run, or run `compact <source> --days 6` between them; back-to-back shards over more than 6 days lose values from the 7-day window before they reach the year files. That's how the current year gets backfilled: both modes fetch a year still under way in full on every run, so a run over it never resumes, and it has to be split into shards that each fit in one run, such as `backfill usgs all 2026 2027 --shard 1/3`, then `2/3` and `3/3`, each dispatched with `timeout` at 360 minutes, since one stopped partway starts over on its next run. Shards running at once need a matrix workflow, which doesn't exist yet. Every backfill also rewrites the source's whole bounds file, `stations/bounds/<source>.parquet`, after each 100 stations, so two shards writing at once lose each other's preliminary values. Such a workflow has to run them one after another in the source's group, or keep shards from writing the bounds.
@@ -178,18 +178,18 @@ To withhold stations in the R2 store once the change is on `main`:
 1. Check in Actions that no Ingest, Ingest hourly, Compact daily or Monthly run for those sources, started from `main` before the merge, is still queued or running. Such a run uses the old code, which lists and fetches the withheld stations and could write their files back after `withhold` deletes them.
 2. Dispatch Ingest with `withhold <source>` for each source the rule covers, such as `withhold gesla`, then `withhold uhslc`. Each runs in the source's group, so check that it started rather than show as cancelled.
 3. Dispatch Monthly with `sources` set to those sources, `gesla uhslc`, which drops them from the lists and publishes `stations.parquet`.
-4. Run `npm run ticon:inventory` against the refreshed public store and commit [`docs/ticon-replacement.md`](docs/ticon-replacement.md) and its CSV, so GESLA's copies of withheld records are no longer named.
+4. Run `npm run ticon:inventory` against the refreshed public store and commit [`docs/ticon-inventory.md`](docs/ticon-inventory.md) and its CSV, so GESLA's copies of withheld records are no longer named.
 5. Take withheld stations out of the errata that list them, such as Mossel Bay's FD record in `gesla-uhslc-positions`. `publish` doesn't fail on them meanwhile.
 
 The other order works for steps 2 and 3, since `withhold` finds stations the list no longer has, but this one deletes the values first. Rolling back the release that withholds them would list them again at the next refresh and fetch them again at the next backfill, so a rollback needs these steps repeated once the rule is back. Snapshots in `history/stations/` written before the refresh still list the withheld stations, without any values; neither command rewrites them.
 
-## TICON replacement
+## TICON inventory
 
 ```bash
 npm run ticon:inventory
 ```
 
-Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes [docs/ticon-replacement.md](docs/ticon-replacement.md): which store source can replace each TICON record slackwater-database ships, and how far along each one is.
+Reads a slackwater-database checkout (`TIDE_DATABASE`, default `../slackwater-database`) and the store's station lists (`STILLWELL_STORE`, default the public bucket over HTTPS, so a local store needs every public source refreshed; restricted sources are left out), and writes [docs/ticon-inventory.md](docs/ticon-inventory.md): the store series for each TICON record's originator, where there is one, for every record slackwater-database ships, and how far along each one is.
 
 ## Clock check
 

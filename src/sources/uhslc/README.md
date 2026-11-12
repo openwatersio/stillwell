@@ -23,7 +23,7 @@ Hourly sea level from the University of Hawaii Sea Level Center's [ERDDAP](https
 The Monthly workflow refreshes UHSLC's list on the 2nd with every other source's. The first list has to be in the store before anything else runs: dispatch Monthly with `sources: uhslc` once, or Compact daily and the refetch fail with no list, and `npm run ticon:inventory` can't read one. Backfill runs through the Ingest workflow, or locally against a local store:
 
 ```bash
-node scripts/ingest.ts backfill uhslc all 1846 2026 --skip-written --first docs/ticon-replacement.csv
+node scripts/ingest.ts backfill uhslc all 1846 2026 --skip-written --first docs/ticon-inventory.csv
 ```
 
 That's about 21,000 station-years, at least six hours at one request a second, so it takes two or more Ingest runs, each resuming where `--skip-written` finds the last one stopped. Years outside each station's record aren't asked for. It ends before the current year, which is fetched whole on every run and so is backfilled on its own, `backfill uhslc all 2026 2027`. From then on, Monthly's refetch on the 9th (`backfill uhslc preliminary`) fetches each station from its earliest preliminary value, which brings new FD values and replaces FD with RQ as UHSLC releases it; a station with none is skipped. UHSLC isn't in Ingest hourly, since none of its series is live, but Compact daily runs it so each station's first and last values reach `stations.parquet` after a backfill.

@@ -9,7 +9,7 @@ import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import { originatorIds } from "../src/sources/gesla/index.ts";
 import { crmsOf } from "../src/sources/usgs/index.ts";
-import { replacement, type TiconRecord } from "../src/ticon.ts";
+import { originatorSeries, type TiconRecord } from "../src/ticon.ts";
 
 // The split export goes to the cache, read when the module loads.
 process.env.STILLWELL_CACHE = mkdtempSync(join(tmpdir(), "crms-"));
@@ -417,7 +417,7 @@ describe("crms links", () => {
         lon: -90.3,
       }) as Station;
     const lists = { crms: [gauge("CRMS0511-H01", "inactive"), gauge("CRMS0511-H02", "active")] };
-    assert.equal(replacement(record, lists).id, "crms/CRMS0511-H02");
-    assert.equal(replacement(record, {}).status, "planned");
+    assert.equal(originatorSeries(record, lists).id, "crms/CRMS0511-H02");
+    assert.equal(originatorSeries(record, {}).status, "planned");
   });
 });
