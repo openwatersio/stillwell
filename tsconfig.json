@@ -12,5 +12,5 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src", "scripts", "test", "workers"]
+  "include": ["src", "scripts", "test", "workers", "docs/qc/scripts"]
 }
