@@ -162,8 +162,9 @@ async function datums(
 export function periodOf(spans: unknown): Period | null {
   const dates = (Array.isArray(spans) ? spans : [])
     .filter((span): span is string => typeof span === "string")
-    .flatMap((span) => [...span.matchAll(/(\d{2})\/(\d{2})\/(\d{4})/g)])
-    .map(([, m, d, y]) => `${y}-${m}-${d}`)
+    .map((span) => /^\s*(\d{2})\/(\d{2})\/(\d{4})\s*-\s*(\d{2})\/(\d{2})\/(\d{4})\s*$/.exec(span))
+    // Only a whole span counts; any other text, even with dates in it, gives none.
+    .flatMap((m) => (m ? [`${m[3]}-${m[1]}-${m[2]}`, `${m[6]}-${m[4]}-${m[5]}`] : []))
     // A date that isn't one, such as a placeholder, would fail the published file's DATE column.
     .filter((date) => {
       const parsed = Date.parse(`${date}T00:00:00Z`);

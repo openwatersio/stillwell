@@ -248,8 +248,8 @@ export function withDatums(
         station.datums[key] = offset;
         datums_source[key] = "slackwater-database";
         gave = true;
-        // NOAA's records give the national tidal epoch, not the span CO-OPS reduced the same values over.
-        const period = record.datum_epoch ?? periodOf(s) ?? record.epoch;
+        // The span the source reduced its own values over wins: NOAA's records give the national tidal epoch for CO-OPS's.
+        const period = periodOf(s) ?? record.datum_epoch ?? record.epoch;
         if (period) station.datums_epoch![key] = period;
         else delete station.datums_epoch![key];
         if (!station.datums_attribution!.includes(record.attribution))

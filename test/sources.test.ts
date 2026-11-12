@@ -1179,6 +1179,7 @@ describe("coops", () => {
     assert.equal(coops.periodOf(["00/00/0000 - 13/45/2001"]), null);
     assert.equal(coops.periodOf([{ start: "1983-01-01" }]), null);
     assert.equal(coops.periodOf(null), null);
+    assert.equal(coops.periodOf(["error 01/01/1983 ... 12/31/2001"]), null);
   });
 
   it("marks a value suspect for its limit flag only while it's preliminary or a high or low water", () => {

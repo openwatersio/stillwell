@@ -162,6 +162,7 @@ describe("withDatums against operators' published levels", () => {
     const record = tide("noaa/9414290", {
       datums: { STND: 0, MSL: 2.7 },
       epoch: { start: "1983-01-01", end: "2001-12-31" },
+      datum_epoch: { start: "1983-01-01", end: "2001-12-31" },
     });
     const short = {
       ...s,
