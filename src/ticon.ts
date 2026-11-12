@@ -4,7 +4,8 @@ import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
 
 /**
- * Which store source can replace each TICON record in slackwater-database.
+ * The store source for the originator of each TICON record in
+ * slackwater-database, where there is one.
  * TICON ids are `<place>-<code>-<iso3>-<contributor>`, where the code is often
  * the originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC
  * id).
@@ -48,7 +49,7 @@ export interface TiconRecord {
   declared?: string;
 }
 
-export interface Replacement {
+export interface Originator {
   source: string;
   id: string | null;
   status: Status;
@@ -126,14 +127,17 @@ const PEGELONLINE_NOTE =
   "PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`";
 
 /**
- * Picks the replacement for one record. `lists` holds the store's station lists
- * by source, for the sources that have adapters.
+ * Finds the originator's series for one record. `lists` holds the store's
+ * station lists by source, for the sources that have adapters.
  *
  * The record's own `commercial_use` doesn't decide anything here: it describes
- * TICON's copy, and the replacement comes from the originator under the
- * originator's terms, which `status` reflects.
+ * TICON's copy, and the originator's series comes under the originator's
+ * terms, which `status` reflects.
  */
-export function replacement(record: TiconRecord, lists: Record<string, Station[]>): Replacement {
+export function originatorSeries(
+  record: TiconRecord,
+  lists: Record<string, Station[]>,
+): Originator {
   const { contributor, code, iso3 } = record;
   if (contributor === "noaa") return byCode(record, "coops", code, "planned", lists);
   if (contributor === "usgs") {
@@ -266,7 +270,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     const national = NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
     // A link in `LINKS`, made by comparing the series, knows the gauge better than CMEMS's position
-    // does. Only a link to the national feed's station names the replacement.
+    // does. Only a link to the national feed's station names the originator.
     const copy = `gesla/${record.id}`;
     const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(
       (id) => national && id.startsWith(`${national.source}/`),
@@ -346,7 +350,7 @@ function byCode(
   sourceId: string,
   status: Status,
   lists: Record<string, Station[]>,
-): Replacement {
+): Originator {
   const list = lists[source];
   if (!list) return { source, id: `${source}/${sourceId}`, status };
   const station = list.find((s) => s.source_id === sourceId && usable(s));
@@ -373,7 +377,7 @@ function nearest(
   source: string,
   stations: Station[] | undefined,
   { note }: { note?: string } = {},
-): Replacement {
+): Originator {
   // Ranked by whether the names share an identifying word, then by how many
   // words they share in all, then by distance.
   let best: { station: Station; km: number; score: number } | undefined;
@@ -504,7 +508,7 @@ function round(value: number): number {
  * only when they're the same gauge. Only when every matched record there agrees
  * on one series. It keeps the record's own note, such as why it was unmatched.
  */
-export function adoptSiblings<T extends { record: TiconRecord; replacement: Replacement }>(
+export function adoptSiblings<T extends { record: TiconRecord; originator: Originator }>(
   rows: T[],
   stations: Station[] = [],
 ): T[] {
@@ -513,26 +517,26 @@ export function adoptSiblings<T extends { record: TiconRecord; replacement: Repl
     (r) => r.record.station!,
   );
   return rows.map((row) => {
-    if (row.replacement.status !== "unmatched" || !row.record.station) return row;
+    if (row.originator.status !== "unmatched" || !row.record.station) return row;
     const matched = byStation
       .get(row.record.station)!
       .filter(
-        (r) => r.replacement.status === "ready" && r.replacement.source === row.replacement.source,
+        (r) => r.originator.status === "ready" && r.originator.source === row.originator.source,
       );
-    const ids = new Set(matched.map((r) => r.replacement.id));
+    const ids = new Set(matched.map((r) => r.originator.id));
     if (ids.size !== 1) return row;
     const sibling = matched[0]!;
     return {
       ...row,
-      replacement: {
-        source: sibling.replacement.source,
-        id: sibling.replacement.id,
+      originator: {
+        source: sibling.originator.source,
+        id: sibling.originator.id,
         status: "ready",
         ...distanceTo(
           row.record,
-          stations.find((s) => s.id === sibling.replacement.id),
+          stations.find((s) => s.id === sibling.originator.id),
         ),
-        note: [`Same slackwater-database station as ${sibling.record.id}`, row.replacement.note]
+        note: [`Same slackwater-database station as ${sibling.record.id}`, row.originator.note]
           .filter(Boolean)
           .join("; "),
       },
@@ -547,7 +551,7 @@ function distanceTo(record: TiconRecord, station: Station | undefined): { distan
 /**
  * USGS site numbers are mostly 8, 10 or 15 digits, often with a leading zero
  * that TICON's ids drop. Restore it to the next of those lengths. A few sites
- * have 9 digits, which `replacement` finds by checking the station list.
+ * have 9 digits, which `originatorSeries` finds by checking the station list.
  */
 export function usgsSite(code: string): string {
   const length =

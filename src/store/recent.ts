@@ -212,93 +212,19 @@ export async function updateRecent({
       const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
       const rows: StationObservation[] = [];
       await pool(batch, concurrency, async (station) => {
-        const lookback = swept
-          ? since.getTime()
-          : Math.min(since.getTime(), now - 2 * (station.interval_s ?? 0) * 1000);
-        const window = recentWindow(
-          station.epochs,
-          previous.get(station.id) ?? [],
+        const result = await refreshStation({
+          source,
+          station,
+          previous: previous.get(station.id) ?? [],
+          swept,
+          since: since.getTime(),
+          now,
           keepFrom,
-          lookback,
-        );
-        // Rows from other epochs are in another reference, and stay as they are.
-        rows.push(...window.other);
-        if (isHeld(station.epochs)) {
-          rows.push(...window.current);
-          return;
-        }
-        let merged: Observation[] = window.current;
-        let failed = false;
-        try {
-          if (swept instanceof Error) throw swept;
-          const answer = swept ? swept.get(station.id) : undefined;
-          if (answer instanceof Error) throw answer;
-          // A sweep covers the whole window, so values from before the current epoch are left out.
-          const got = swept
-            ? (answer ?? []).filter((o) => o.time >= window.from)
-            : await source.observations!(station, new Date(window.from), new Date(now));
-          // QC the whole window, so spikes and flatlines are judged against their neighbors.
-          // What we had starts again from the source's flags, so a mark can clear,
-          // except within a flatline's length of the window's start, where a run
-          // that began before it can't be seen whole, and compaction folds those days.
-          // Nothing new keeps what we had, rather than clearing the last hours.
-          if (got.length) {
-            const had = window.current;
-            const opts = qcFor(station);
-            // The longest run any flatline rule needs to see.
-            const longest = Math.max(
-              opts.flatline_s ?? FLATLINE_S,
-              opts.centimeter_flatline_s ?? 0,
-            );
-            const edge = (had[0]?.time ?? 0) + longest * 1000;
-            // A source that can't judge a part of its record keeps the flags stored.
-            const suspect = await source
-              .suspect?.(station, async function* () {
-                yield had;
-              })
-              .catch(() => null);
-            const start =
-              suspect === null
-                ? had
-                : [
-                    ...had.filter((r) => r.time < edge),
-                    ...fromSource(
-                      had.filter((r) => r.time >= edge),
-                      suspect,
-                    ),
-                  ];
-            // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
-            merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
-              ...opts,
-              jumps: false,
-            });
-          }
-        } catch (error) {
-          // Keep what we had; a failed fetch mustn't empty the window.
-          summary.failed.push(`${station.id}: ${message(error)}`);
-          if (error instanceof Blocked) summary.blocked = true;
-          // A refresh ignores a rejected change, matched on datum and
-          // reference as nextEpochs does, so that one doesn't ask for one; an
-          // unknown reference matches none.
-          if (
-            error instanceof DatumChanged &&
-            !station.epochs.some(
-              (e) =>
-                e.state === "rejected" &&
-                e.datum === error.datum &&
-                e.reference === error.reference,
-            )
-          )
-            summary.datumChanged = true;
-          failed = true;
-        }
-        for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
-        const fresh = merged.filter((r) => r.received === now).length;
-        if (fresh) reporting.add(station.id);
-        summary.values += fresh;
-        const newest = merged.at(-1)?.time ?? -Infinity;
-        const staleAfter = Math.max(staleHours * HOUR_MS, 3 * (station.interval_s ?? 0) * 1000);
-        if (!failed && newest < now - staleAfter) summary.stale.push(station.id);
+          staleHours,
+          summary,
+        });
+        rows.push(...result.rows);
+        if (result.fresh) reporting.add(station.id);
       });
       if (swept instanceof Map) for (const id of ids) swept.delete(id);
       yield rows;
@@ -310,6 +236,111 @@ export async function updateRecent({
   }
   summary.updated = reporting.size;
   return summary;
+}
+
+/**
+ * One station's part of `updateRecent`: its new window from `previous`, its
+ * rows in the recent window, and a fetch or its answer in `swept`. Returns
+ * every row the window keeps for it, other epochs' included, and how many
+ * values arrived new, adding failures, stale and datum changes to `summary`.
+ * The realtime poller (`src/realtime/poll.ts`) runs the same steps.
+ */
+export async function refreshStation({
+  source,
+  station,
+  previous,
+  swept,
+  since,
+  now,
+  keepFrom,
+  staleHours = 6,
+  summary,
+}: {
+  source: Source;
+  station: StoredStation;
+  previous: StationObservation[];
+  swept: Map<string, Observation[] | Error> | Error | undefined;
+  since: number;
+  now: number;
+  keepFrom: number;
+  staleHours?: number;
+  summary: RunSummary;
+}): Promise<{ rows: StationObservation[]; fresh: number }> {
+  const rows: StationObservation[] = [];
+  const lookback = swept ? since : Math.min(since, now - 2 * (station.interval_s ?? 0) * 1000);
+  const window = recentWindow(station.epochs, previous, keepFrom, lookback);
+  // Rows from other epochs are in another reference, and stay as they are.
+  rows.push(...window.other);
+  if (isHeld(station.epochs)) {
+    rows.push(...window.current);
+    return { rows, fresh: 0 };
+  }
+  let merged: Observation[] = window.current;
+  let failed = false;
+  try {
+    if (swept instanceof Error) throw swept;
+    const answer = swept ? swept.get(station.id) : undefined;
+    if (answer instanceof Error) throw answer;
+    // A sweep covers the whole window, so values from before the current epoch are left out.
+    const got = swept
+      ? (answer ?? []).filter((o) => o.time >= window.from)
+      : await source.observations!(station, new Date(window.from), new Date(now));
+    // QC the whole window, so spikes and flatlines are judged against their neighbors.
+    // What we had starts again from the source's flags, so a mark can clear,
+    // except within a flatline's length of the window's start, where a run
+    // that began before it can't be seen whole, and compaction folds those days.
+    // Nothing new keeps what we had, rather than clearing the last hours.
+    if (got.length) {
+      const had = window.current;
+      const opts = qcFor(station);
+      // The longest run any flatline rule needs to see.
+      const longest = Math.max(opts.flatline_s ?? FLATLINE_S, opts.centimeter_flatline_s ?? 0);
+      const edge = (had[0]?.time ?? 0) + longest * 1000;
+      // A source that can't judge a part of its record keeps the flags stored.
+      const suspect = await source
+        .suspect?.(station, async function* () {
+          yield had;
+        })
+        .catch(() => null);
+      const start =
+        suspect === null
+          ? had
+          : [
+              ...had.filter((r) => r.time < edge),
+              ...fromSource(
+                had.filter((r) => r.time >= edge),
+                suspect,
+              ),
+            ];
+      // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
+      merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
+        ...opts,
+        jumps: false,
+      });
+    }
+  } catch (error) {
+    // Keep what we had; a failed fetch mustn't empty the window.
+    summary.failed.push(`${station.id}: ${message(error)}`);
+    if (error instanceof Blocked) summary.blocked = true;
+    // A refresh ignores a rejected change, matched on datum and
+    // reference as nextEpochs does, so that one doesn't ask for one; an
+    // unknown reference matches none.
+    if (
+      error instanceof DatumChanged &&
+      !station.epochs.some(
+        (e) => e.state === "rejected" && e.datum === error.datum && e.reference === error.reference,
+      )
+    )
+      summary.datumChanged = true;
+    failed = true;
+  }
+  for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
+  const fresh = merged.filter((r) => r.received === now).length;
+  summary.values += fresh;
+  const newest = merged.at(-1)?.time ?? -Infinity;
+  const staleAfter = Math.max(staleHours * HOUR_MS, 3 * (station.interval_s ?? 0) * 1000);
+  if (!failed && newest < now - staleAfter) summary.stale.push(station.id);
+  return { rows, fresh };
 }
 
 /**
@@ -929,7 +960,7 @@ export function* chunks<T>(items: T[], size: number): Generator<T[]> {
   for (let i = 0; i < items.length; i += size) yield items.slice(i, i + size);
 }
 
-function emptySummary(title: string, stations: number): RunSummary {
+export function emptySummary(title: string, stations: number): RunSummary {
   return { title, stations, updated: 0, stale: [], failed: [], waiting: [], values: 0, files: 0 };
 }
 

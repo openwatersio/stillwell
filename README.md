@@ -62,7 +62,7 @@ Recent values are usually preliminary. Sources revise them later, and a gauge ca
 - [docs/data.md](docs/data.md): using the store's files.
 - [docs/stations.md](docs/stations.md): station lists, datum epochs, analysis and links between sources.
 - [docs/qc/](docs/qc/README.md): quality control, compared with published practice.
-- [docs/ticon-replacement.md](docs/ticon-replacement.md): the store series that can replace each TICON record.
+- [docs/ticon-inventory.md](docs/ticon-inventory.md): the store series for each TICON record's originator, where there is one.
 - [docs/plans/](docs/plans/plan.md): the roadmap and the API design.
 
 ## Contributing

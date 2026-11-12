@@ -15,6 +15,7 @@ import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import {
   ALSO_WITHHELD,
+  BOM_CONDITIONS,
   contributorOf,
   lostRefusals,
   NOTICES,
@@ -875,6 +876,22 @@ describe("bsh", () => {
     });
   });
 
+  it("asks for no year before 1 August of the year before, when BSH's terms let it be published", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      return fixture("DE__506P2026.txt");
+    });
+    const year = new Date().getUTCFullYear() + 2;
+    const range = [new Date(Date.UTC(year, 0, 1)), new Date(Date.UTC(year + 1, 0, 1))] as const;
+    assert.deepEqual(
+      await bsh.source.predictions!({ source_id: "506P", datum: "PNP" } as never, ...range),
+      [],
+    );
+    assert.deepEqual(asked, []);
+    assert.equal(new Date(bsh.publishableFrom(2027)).toISOString(), "2026-07-31T22:00:00.000Z");
+  });
+
   it("refuses a year whose file is in another datum", async () => {
     serve([[/deu2026&files=DE__506P2026/, fixture("DE__506P2026.txt")]]);
     const range = [new Date("2026-01-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
@@ -1707,6 +1724,66 @@ describe("usace", () => {
     assert.deepEqual(
       [stLouis!.series, stLouis!.datums, stLouis!.interval_s, stLouis!.live],
       ["St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev", { NAVD88: 115.696 }, 1800, true],
+    );
+    // LRC's locations give their position only as `published-latitude` and `published-longitude`.
+    const [chicago] = usace.toStations(
+      "LRC",
+      [
+        series(
+          "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+          "1Hour",
+          "2021-03-19T16:00:00Z",
+          "2026-09-14T03:00:00Z",
+        ),
+      ],
+      [
+        {
+          office: "LRC",
+          name: "Chicago Lock-Pool",
+          "long-name": "Lake Michigan at Chicago Lock",
+          kind: "SITE",
+          "published-latitude": 41.888366276028,
+          "published-longitude": -87.62116342606,
+          nation: "United States",
+        },
+      ],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      [chicago!.id, chicago!.lat, chicago!.lon],
+      ["usace/LRC.Chicago_Lock-Pool", 41.888366276028, -87.62116342606],
+    );
+    // The published pair stands in only for a missing pair, never for one
+    // coordinate, and its placeholders are still rejected.
+    const pool = (location: Partial<usace.CatalogLocation>) =>
+      usace.toStations(
+        "LRC",
+        [
+          series(
+            "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+            "1Hour",
+            "2021-03-19T16:00:00Z",
+            "2026-09-14T03:00:00Z",
+          ),
+        ],
+        [{ office: "LRC", name: "Chicago Lock-Pool", nation: "United States", ...location }],
+        new Map(),
+        now,
+      );
+    const published = {
+      "published-latitude": 41.888366276028,
+      "published-longitude": -87.62116342606,
+    };
+    assert.deepEqual(pool({ latitude: 41.89, ...published }), []);
+    assert.deepEqual(pool({ longitude: -87.62, ...published }), []);
+    assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
+    assert.deepEqual(
+      pool({
+        "published-latitude": -3.4028234663852886e38,
+        "published-longitude": -3.4028234663852886e38,
+      }),
+      [],
     );
     // A gauge whose only series stopped years ago is listed for its history, not live.
     const [old] = usace.toStations(
@@ -2981,8 +3058,8 @@ describe("uhslc", () => {
       [pohnpei.contributor, pohnpei.commercial_use, pohnpei.attribution],
       [
         "National Tidal Centre, Bureau of Meteorology",
-        false,
-        "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+        true,
+        `University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
       ],
     );
     const pohnpeiA = stations.find((s) => s.id === "uhslc/001a")!;
@@ -3182,9 +3259,12 @@ describe("uhslc", () => {
     await assert.rejects(uhslc.stations(), /research-quality stations and record spans disagree/);
   });
 
-  it("keeps the strictest terms and every credit across a version change", async () => {
-    // Pohnpei's FD series moves from version C (BOM's, non-commercial) to one
-    // starting where B does (UHSLC's own, no notice).
+  it("keeps the strictest terms and every credit across a version change", async (t) => {
+    // Pohnpei's FD series moves from version C (BOM's, made non-commercial
+    // here) to one starting where B does (UHSLC's own, no notice).
+    const was = NOTICES.bom!.commercial_use;
+    NOTICES.bom!.commercial_use = false;
+    t.after(() => (NOTICES.bom!.commercial_use = was));
     const fdSpans = JSON.parse(fixture("uhslc-fd-spans.json"));
     fdSpans.table.rows.find((r: unknown[]) => r[0] === 1)[1] = "1974-04-22T12:00:00Z";
     serve([
@@ -3204,7 +3284,7 @@ describe("uhslc", () => {
         [
           "B",
           false,
-          "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+          `University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
         ],
       );
     }

@@ -1,9 +1,9 @@
 /**
- * Inventory slackwater-database's TICON records and the store source that can
- * replace each one. Reads a slackwater-database checkout (TIDE_DATABASE, default
+ * Inventory slackwater-database's TICON records and the store source for each
+ * one's originator, where there is one. Reads a slackwater-database checkout (TIDE_DATABASE, default
  * ../slackwater-database) and the station lists in the store (STILLWELL_STORE,
  * default the public bucket over HTTPS), and writes
- * docs/ticon-replacement.csv (one row per record) and docs/ticon-replacement.md
+ * docs/ticon-inventory.csv (one row per record) and docs/ticon-inventory.md
  * (the summary).
  *
  *   node scripts/ticon-inventory.ts
@@ -22,8 +22,8 @@ import { sources } from "../src/sources/index.ts";
 import {
   adoptSiblings,
   parseId,
-  replacement,
-  type Replacement,
+  originatorSeries,
+  type Originator,
   type Status,
   type TiconRecord,
 } from "../src/ticon.ts";
@@ -89,17 +89,17 @@ if (missing.length)
 const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
 // A source in the restricted store has its list only there, so
 // it's left out. A source missing from the store would mark every record it
-// replaces unmatched, so that stops the run, except for a source none of whose
+// originates unmatched, so that stops the run, except for a source none of whose
 // records the last inventory found ready: a new adapter before its first
 // refresh, whose records keep the planned ids their codes give.
-const previous = await readFile(join(ROOT, "docs/ticon-replacement.csv"), "utf8");
+const previous = await readFile(join(ROOT, "docs/ticon-inventory.csv"), "utf8");
 const lists: Record<string, Station[]> = {};
 for (const [source, adapter] of Object.entries(sources)) {
   if (!adapter.metadata.license.redistribution) continue;
   const list = await readStationList(stationListPath(STORE, source));
   // A list not refreshed since a station was withheld still has it.
   if (list) lists[source] = withoutWithheld(adapter, list);
-  // replacement_source, replacement_id, distance_km, status
+  // originator_source, originator_id, distance_km, status
   // GESLA's list gives every record's fallback copy, so it's always needed.
   else if (
     source === "gesla" ||
@@ -110,7 +110,7 @@ for (const [source, adapter] of Object.entries(sources)) {
 }
 
 const rows = adoptSiblings(
-  records.map((record) => ({ record, replacement: replacement(record, lists) })),
+  records.map((record) => ({ record, originator: originatorSeries(record, lists) })),
   Object.values(lists).flat(),
 );
 // GESLA names its files as TICON names its records, so a record's GESLA 4.1
@@ -118,8 +118,8 @@ const rows = adoptSiblings(
 // A record in DROPPED holds another gauge's values, so it stands in for nothing.
 const gesla = new Map(lists.gesla!.filter((s) => !DROPPED.has(s.source_id)).map((s) => [s.id, s]));
 const geslaOf = (record: TiconRecord) => gesla.get(`gesla/${record.id}`);
-await writeFile(join(ROOT, "docs/ticon-replacement.csv"), csv(rows));
-await writeFile(join(ROOT, "docs/ticon-replacement.md"), summary(rows));
+await writeFile(join(ROOT, "docs/ticon-inventory.csv"), csv(rows));
+await writeFile(join(ROOT, "docs/ticon-inventory.md"), summary(rows));
 console.log(
   `${rows.length} TICON records, ${listed.size} published, ${records.filter((r) => r.accepted).length} accepted (slackwater-database ${commit})`,
 );
@@ -148,7 +148,7 @@ async function listedTicon(): Promise<Map<string, { station: string; accepted: b
   return ids;
 }
 
-type Row = { record: TiconRecord; replacement: Replacement };
+type Row = { record: TiconRecord; originator: Originator };
 
 function csv(rows: Row[]): string {
   const header = [
@@ -163,15 +163,15 @@ function csv(rows: Row[]): string {
     "epoch_start",
     "epoch_end",
     "declared_originator",
-    "replacement_source",
-    "replacement_id",
+    "originator_source",
+    "originator_id",
     "distance_km",
     "status",
     "note",
     "gesla_id",
     "gesla_commercial_use",
   ];
-  const lines = rows.map(({ record: r, replacement: x }) =>
+  const lines = rows.map(({ record: r, originator: x }) =>
     [
       r.id,
       r.name,
@@ -207,11 +207,11 @@ function summary(rows: Row[]): string {
   const published = rows.filter((r) => r.record.published);
   const accepted = published.filter((r) => r.record.accepted);
   const count = (group: Row[], status: Status) =>
-    group.filter((r) => r.replacement.status === status).length;
+    group.filter((r) => r.originator.status === status).length;
   const inGesla = (group: Row[], status: Status) =>
-    group.filter((r) => r.replacement.status === status && geslaOf(r.record)).length;
+    group.filter((r) => r.originator.status === status && geslaOf(r.record)).length;
   const acceptedInGesla = accepted.filter((r) => geslaOf(r.record)).length;
-  const bySource = [...Map.groupBy(accepted, (r) => r.replacement.source).entries()].sort(
+  const bySource = [...Map.groupBy(accepted, (r) => r.originator.source).entries()].sort(
     (a, b) => b[1].length - a[1].length,
   );
   const statusOf = (group: Row[]) =>
@@ -230,9 +230,9 @@ function summary(rows: Row[]): string {
     restricted: "The source forbids it; stays on TICON",
   };
 
-  return `# TICON replacement inventory
+  return `# TICON inventory
 
-Generated by \`npm run ticon:inventory\` from slackwater-database at \`${commit}\` and the station lists in the store; don't edit by hand. [ticon-replacement.csv](ticon-replacement.csv) has one row per TICON record. This is phase 2 of [plans/plan.md](plans/plan.md).
+Generated by \`npm run ticon:inventory\` from slackwater-database at \`${commit}\` and the station lists in the store; don't edit by hand. [ticon-inventory.csv](ticon-inventory.csv) has one row per TICON record. This is phase 2 of [plans/plan.md](plans/plan.md).
 
 slackwater-database holds ${rows.length} TICON records. ${published.length} are listed in its station files, and its quality evaluation accepts ${accepted.length} of those; it still routes the rest, marked rejected. Work is ordered by accepted records.
 
@@ -242,7 +242,7 @@ ${STATUSES.map((s) => `| ${s} | ${count(accepted, s)} | ${inGesla(accepted, s)} 
 
 The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. ${acceptedInGesla} of the ${accepted.length} accepted records have a GESLA 4.1 copy listed in the store (\`gesla_id\` in the CSV), which can stand in for the originator in a re-fit. \`gesla_commercial_use\` gives the copy's terms as the \`gesla\` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (\`license\`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
 
-## By replacement source
+## By originator source
 
 Accepted records only, in the order to build adapters: most records first.
 
@@ -259,7 +259,7 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 - **UK gauges.** BODC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the store, and BODC's own gauge once its list is. NOC's records of gauges outside the UK network stay \`restricted\`: BODC's open data is the UK network's alone.
 - **CMEMS elsewhere.** CMEMS records in countries whose feed has no list in the store yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.
 - **Irish river gauges.** Marine Institute river (\`mi_r\`) records are \`unmatched\`: their dataset names no datum, so the adapter doesn't list them.
-- **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own \`commercial_use\` is TICON's terms for its copy; the replacement comes from the originator, under the originator's terms.
+- **Contributor.** The rest map by contributor to a planned source, with its license status from Open Waters' internal sources research. A record's own \`commercial_use\` is TICON's terms for its copy; the originator's series comes under the originator's terms.
 
 "Ready" means a station matched. German records' PEGELONLINE history reaches back to 2000 at most, and not at all at gauges without a download, so the rest comes from GESLA's copies (\`gesla\`). "Planned" and "license" ids are built from codes and not yet checked against the source's station list.
 `;

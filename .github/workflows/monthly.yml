@@ -155,6 +155,23 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      # BSH publishes next year's predictions from about August. Each refresh
+      # fetches this year's for every gauge, so a gauge added in the year, or a
+      # month whose run failed, is filled by the next, and from August to December next year's
+      # too. A year not yet published writes nothing, and one unchanged
+      # rewrites no file. Nothing else fetches BSH, whose metadata is neither
+      # hourly nor finalizes.
+      - if: ${{ !cancelled() && matrix.source == 'bsh' }}
+        run: |
+          year=$(date -u +%Y)
+          end=$((year + 1))
+          if [ "$(date -u +%m)" -ge 08 ]; then end=$((year + 2)); fi
+          node scripts/ingest.ts backfill bsh all "$year" "$end"
+        env:
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # A source whose refresh or analysis failed kept its list and verdicts, so the rest still publish.
   # A list cancelled while it waits in its group cancels the run, so `always()`, not `!cancelled()`;
