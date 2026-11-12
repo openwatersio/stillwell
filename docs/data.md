@@ -95,7 +95,7 @@ GROUP BY source ORDER BY source;
 │ marine-institute │ 23       │ ODM, ZERO            │
 │ pegelonline      │ 692      │ NN, PNP              │
 │ refmar           │ 173      │ ZH, ZI               │
-│ rws              │ 691      │ MSL, NAP             │
+│ rws              │ 664      │ MSL, NAP             │
 │ sfwmd            │ 37       │ NAVD88               │
 │ smhi             │ 60       │ RH2000               │
 │ uhslc            │ 741      │ ZERO                 │

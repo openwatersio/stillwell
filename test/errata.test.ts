@@ -72,6 +72,14 @@ describe("errata files", () => {
         }
   });
 
+  it("restart only the source's own stations, with a datum and a note", () => {
+    for (const [name, source] of Object.entries(sources))
+      for (const [station, restart] of Object.entries(source.overrides?.restarts ?? {})) {
+        assert.ok(station.startsWith(`${name}/`), `${station} isn't a ${name} station`);
+        assert.ok(restart.datum && restart.note, `${station} needs a datum and a note`);
+      }
+  });
+
   it("hold every erratum ID the code cites", () => {
     const ids = new Set(errata.map((e) => e.id));
     const stray = [...citedIn(fileURLToPath(new URL("../src", import.meta.url)))].filter(
