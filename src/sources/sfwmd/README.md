@@ -14,9 +14,14 @@ Stage at 43 tidal gauges in South Florida, back to 1974 at the oldest, from [DBH
 - **Not USGS or NOAA:** every series read is the District's own (`agency` `WMD`). The catalog also lists USGS series, which the adapter doesn't read.
 - **Clock check:** against NOAA's Virginia Key (8723214), January against July of 1995 and of 2010, S-123's tailwater lags Virginia Key by 45 to 55 minutes and S-155's by 25 to 40, with r 0.97 to 0.99, the same in winter and summer within 15 minutes. S-123 in January and July 1982 against Virginia Key's predicted tide lags 55 and 65 minutes. So the derived series is in EST all year back to 1982 at least, with no daylight-saving hour, as the telemetry is. Its January and July 1982 values are all quality A. S-21A's derived series in January and July 1975 lags 135 and 110 minutes, from fewer July readings, so no hour shift there either; earlier years aren't checked.
 
+## Errata
+
+- **Manatee Bay before August 1992** (erratum `sfwmd-mbts-1992-datum`). MBTS levels before 20 August 1992 read about 1 m lower than on the current zero, against MDTS and TPTS 6 km away. They are `suspect`, with SFWMD's own flag in `source_flag`.
+- **Thursday Point, spring 2001** (erratum `sfwmd-tpts-2001-offset`). TPTS levels sit about 1.1 m low from 28 March to 21 June 2001. That span is `suspect`; the store's QC already flags about three quarters of it.
+
 ## Backfill
 
-Monthly refreshes SFWMD's list on the 2nd. Dispatch Monthly with `sources: sfwmd` once the adapter is on `main`, since Ingest hourly and Compact daily skip SFWMD until its list is in the store. Then backfill through the Ingest workflow, active stations first and the six inactive ones (HALDEMAN_T, MBTS, MDTS, S79_T, TPTS, WCOCO_T in the November 2026 catalog) in a second run; check the inactive list in the store after the refresh:
+Monthly refreshes SFWMD's list on the 2nd, and Ingest hourly and Compact daily skip SFWMD until its list is in the store, so a first run dispatches Monthly with `sources: sfwmd`. Then backfill through the Ingest workflow, active stations first and the six inactive ones (HALDEMAN_T, MBTS, MDTS, S79_T, TPTS, WCOCO_T in the November 2026 catalog) in a second run; check the inactive list in the store after the refresh:
 
 ```bash
 node scripts/ingest.ts backfill sfwmd all 1974 2026 --skip-written
