@@ -7,6 +7,7 @@ Each agency publishes in its own format, with its own limits, datums and quirks.
 - **One schema.** Times are UTC and levels are meters. Quality flags run from 0, good, to 4, bad, whatever scale the source used.
 - **Datums.** Each station's levels stay in the datum the source measures them from, and the station list gives the offsets to the other datums the source publishes, and to MSL, LAT and chart datum from slackwater-database where it has the gauge.
 - **Licenses.** Every station carries its license, attribution and whether its terms allow commercial use. The public store holds what its sources let anyone republish.
+- **Errata.** Errors found in what a source publishes, such as UHSLC's Hong Kong heights stamped an hour early, are listed in [`errata.json`](https://stillwell.openwaters.io/errata.json) with what the store does about each, and each station's `errata` names the ones that touch it.
 - **Links between sources.** When two sources cover the same gauge, such as BSH's predictions and PEGELONLINE's observations at Cuxhaven, their stations link to each other.
 
 ## Sources
@@ -69,16 +70,18 @@ Recent values are usually preliminary. Sources revise them later, and a gauge ca
 
 ## License
 
-The code is © Open Water Software, LLC and contributors, and licensed under [AGPL-3.0](LICENSE). Contributions need the [CLA](CLA.md), which you're asked to sign on your first pull request. The AGPL covers the code only, not the data.
+**Code**: [AGPL-3.0](LICENSE) © Open Waters (https://openwaters.io) and contributors with [CLA](CLA.md).
 
-The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited to "Open Waters", to each station's `attribution`, and to its `datums_attribution` wherever its offsets from slackwater-database or a linked station are used, except the stations with `commercial_use` false, which keep their contributor's terms. That includes the copies in [`test/fixtures/`](test/fixtures/) and [`docs/results/`](docs/results/). Each station's `license` names its source's license, which still applies to the source's values alongside CC BY: public domain, CC0, licenses and terms that allow reuse with credit, or public records published with no license. Their credit is part of `attribution`, and anything more a source asks for, such as a citation or a notice wherever its data is shown, is in `sources.json` and the source's README. Where a source carries other agencies' records, as UHSLC and GESLA do, each record keeps its contributor's terms, and the source's README lists them. Data whose source doesn't let anyone republish it isn't in the public store.
+**Data**: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © Open Waters (https://openwaters.io), and:
 
-A commercial user reads only the stations with `commercial_use` true. Series files carry no license column, so pick them by station ID from this list, and filter `recent/` files' rows on `station`:
+- Stations with `commercial_use` false keep their source's terms.
+- Show each station's `attribution` from [`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) wherever its data is used, and its `datums_attribution` wherever you use its datum offsets.
+
+For example, this query reads the last week of REFMAR levels that allow commercial use, with each station's attribution:
 
 ```sql
-SELECT id, name, attribution
-FROM 'https://stillwell.openwaters.io/stations.parquet'
-WHERE commercial_use;
+SELECT r.time, r.station, r.level_m, s.attribution
+FROM 'https://stillwell.openwaters.io/recent/refmar.parquet' r
+JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.id = r.station
+WHERE s.commercial_use;
 ```
-
-There are no published service terms for the public store at `stillwell.openwaters.io`. Service terms would govern access to the service, such as rate limits, identifying your client and which uses need a plan, not what you do with the data, which keeps these licenses wherever it comes from. [`docs/ticon-replacement.csv`](docs/ticon-replacement.csv) and `.md` list [TICON-4](https://doi.org/10.17882/109129) records, under TICON-4's terms.

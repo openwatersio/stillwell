@@ -31,7 +31,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Marine Environmental Data Section, Fisheries and Oceans Canada",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. The gauges are the Canadian Hydrographic Service's, whose terms need a separate license for any commercial use (tide-database#320).",
+      "GESLA's license table: research and consultancy. The gauges are the Canadian Hydrographic Service's, whose terms need a separate license for any commercial use (slackwater-database#320).",
   },
   CMEMS: {
     name: "Copernicus Marine Service",

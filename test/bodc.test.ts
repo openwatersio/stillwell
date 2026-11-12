@@ -85,6 +85,36 @@ describe("bodc", () => {
     );
   });
 
+  it("reads Hinkley Point's radar channel, which holds its processed series", async () => {
+    serve([
+      datasets,
+      [
+        /HIN_ukcff_.*\.json\?time,ASLVRADR,FASLVRADR&/,
+        JSON.stringify({
+          table: {
+            columnNames: ["time", "ASLVRADR", "FASLVRADR"],
+            rows: [
+              ["2026-06-01T00:00:00Z", 6.733, "''"],
+              ["2026-06-01T00:14:59.973Z", 6.512, "'M'"],
+            ],
+          },
+        }),
+      ],
+    ]);
+    const levels = await bodc.levels(
+      "hin",
+      new Date("2026-06-01T00:00:00Z"),
+      new Date("2026-06-01T00:30:00Z"),
+    );
+    assert.deepEqual(
+      levels.map((o) => [new Date(o.time).toISOString(), o.level, o.flag]),
+      [
+        ["2026-06-01T00:00:00.000Z", 6.733, Flag.good],
+        ["2026-06-01T00:15:00.000Z", 6.512, Flag.suspect],
+      ],
+    );
+  });
+
   it("marks bad the zeros BODC flags improbable, as at Portbury", async () => {
     serve([
       datasets,

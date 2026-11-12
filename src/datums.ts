@@ -114,6 +114,12 @@ const CHART: Record<string, string> = {
   "marine-institute": "LAT",
 };
 
+/** Datums a tidal epoch moves, which a source's `datums_period` dates. */
+const TIDAL_DATUMS = ["MHHW", "MHW", "DTL", "MTL", "MSL", "MLW", "MLLW", "LAT", "HAT"];
+
+/** The span a station's source says it reduced the station's tidal datums over, kept in its list as `datums_period`. */
+const periodOf = (s: StoredStation) => (s as { datums_period?: Period | null }).datums_period;
+
 /** Keys carried between a gauge's series, besides each series' chart datum. */
 const CARRIED = ["MSL", "LAT", "SKN"];
 
@@ -217,7 +223,12 @@ export function withDatums(
       ...s,
       datums: { ...s.datums },
       datums_source,
-      datums_epoch: {},
+      // The span a source says it reduced its tidal datums over, as CO-OPS does.
+      datums_epoch: Object.fromEntries(
+        Object.keys(s.datums)
+          .filter((k) => TIDAL_DATUMS.includes(k) && periodOf(s))
+          .map((k) => [k, periodOf(s)!]),
+      ),
       tide_station:
         s.tide_station ?? (record?.redundant === undefined ? record?.id : record.redundant) ?? null,
       datums_attribution: [],
@@ -237,8 +248,10 @@ export function withDatums(
         station.datums[key] = offset;
         datums_source[key] = "slackwater-database";
         gave = true;
-        const period = record.datum_epoch ?? record.epoch;
+        // The span the source reduced its own values over wins: NOAA's records give the national tidal epoch for CO-OPS's.
+        const period = periodOf(s) ?? record.datum_epoch ?? record.epoch;
         if (period) station.datums_epoch![key] = period;
+        else delete station.datums_epoch![key];
         if (!station.datums_attribution!.includes(record.attribution))
           station.datums_attribution!.push(record.attribution);
       }
