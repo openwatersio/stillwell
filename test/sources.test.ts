@@ -1109,6 +1109,7 @@ describe("coops", () => {
             { name: "NAVD88", value: 3.134 },
           ],
           LAT: 1.1089039,
+          DatumAnalysisPeriod: ["01/01/1983 - 12/31/2001"],
         }),
       ],
       [/9063020\/datums/, JSON.stringify({ datums: [{ name: "GL_LWD", value: 173.5 }] })],
@@ -1136,6 +1137,12 @@ describe("coops", () => {
         "coastal",
       ],
     );
+    assert.deepEqual((seattle as coops.CoopsStation).datums_period, {
+      start: "1983-01-01",
+      end: "2001-12-31",
+    });
+    // The Great Lakes have no tidal epoch.
+    assert.equal((buffalo as coops.CoopsStation).datums_period, null);
     assert.deepEqual(
       [buffalo!.datums, buffalo!.products, buffalo!.kind],
       [{ IGLD: 0, LWD: -173.5 }, ["levels"], "lake"],
@@ -1145,6 +1152,34 @@ describe("coops", () => {
       [esperanza!.live, esperanza!.status, esperanza!.datums],
       [false, "active", {}],
     );
+    // A refresh that gets no datums keeps the offsets, so it keeps their period too.
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: [station({})] })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({})] })],
+      [/9447130\/datums/, JSON.stringify({ datums: null, LAT: null })],
+    ]);
+    const [again] = await coops.stations([seattle as unknown as Station]);
+    assert.deepEqual((again as coops.CoopsStation).datums_period, {
+      start: "1983-01-01",
+      end: "2001-12-31",
+    });
+  });
+
+  it("spans every datum analysis period CO-OPS gives", () => {
+    assert.deepEqual(
+      coops.periodOf([
+        "05/01/1981 - 04/30/1983",
+        "04/01/2004 - 03/31/2012",
+        "01/01/2013 - 12/31/2017",
+      ]),
+      { start: "1981-05-01", end: "2017-12-31" },
+    );
+    assert.equal(coops.periodOf([]), null);
+    // Anything but a span of real dates gives none, and never throws.
+    assert.equal(coops.periodOf(["00/00/0000 - 13/45/2001"]), null);
+    assert.equal(coops.periodOf([{ start: "1983-01-01" }]), null);
+    assert.equal(coops.periodOf(null), null);
+    assert.equal(coops.periodOf(["error 01/01/1983 ... 12/31/2001"]), null);
   });
 
   it("marks a value suspect for its limit flag only while it's preliminary or a high or low water", () => {
