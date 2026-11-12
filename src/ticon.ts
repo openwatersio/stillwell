@@ -2,6 +2,7 @@ import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
+import { seriesOf } from "./sources/unam/index.ts";
 
 /**
  * The store source for the originator of each TICON record in
@@ -95,11 +96,10 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
   bom: { source: "bom", status: "license", note: "BOM license not stated" },
-  unam: { source: "unam", status: "license", note: "UNAM Servicio Mareográfico terms to check" },
   unam_hist: {
     source: "unam",
     status: "license",
-    note: "UNAM Servicio Mareográfico terms to check",
+    note: "SMN sends its historical records only on request, asked for in #48",
   },
   ispra: { source: "ispra", status: "license" },
   ieo: { source: "redmar", status: "license" },
@@ -119,7 +119,6 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
 const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
-  jhod: { source: "jodc", status: "license" },
   jma: { source: "jma", status: "planned" },
   linz: { source: "linz", status: "license" },
 };
@@ -174,11 +173,20 @@ export function originatorSeries(
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 
   // A UHSLC or JODC relay of a gauge another source publishes goes to that
-  // source, as slackwater-database's provenance declares.
+  // source, as slackwater-database's provenance declares. JHOD's numbers (`jhod/…`)
+  // aren't JODC's codes, so JODC's own records go by the code in their id.
   if (contributor.startsWith("uhslc") || contributor.startsWith("jodc")) {
     const [prefix, id] = record.declared?.split("/") ?? [];
     const declared = prefix ? DECLARED[prefix] : undefined;
     const relay = contributor.startsWith("uhslc") ? "UHSLC" : "JODC";
+    // A UHSLC copy of a Coast Guard gauge waits on JODC's terms, as the Coast Guard's own record does.
+    if (prefix === "jhod" && relay === "UHSLC")
+      return {
+        source: "jodc",
+        id: null,
+        status: "license",
+        note: `${relay} relay of ${record.declared}; JODC's terms ask for permission to republish`,
+      };
     if (declared && id) {
       const sourceId = declared.source === "kartverket" ? id.toUpperCase() : id;
       const match = byCode(record, declared.source, sourceId, declared.status, lists);
@@ -225,12 +233,20 @@ export function originatorSeries(
         };
       return match;
     }
-    return {
-      source: "jodc",
-      id: null,
-      status: "license",
-      note: "Japanese originals also fix GESLA's year-end truncation",
-    };
+    // JODC's own codes for JMA's gauges aren't JMA's, and the jodc source leaves them out.
+    if (code.startsWith("ma"))
+      return {
+        source: "jma",
+        id: null,
+        status: "unmatched",
+        note: "JODC relay of a JMA gauge with no JMA code declared",
+      };
+    // JODC's terms ask for permission to republish, so its records stay on
+    // TICON for commercial use until it's given (#47).
+    const match = byCode(record, "jodc", code.toUpperCase(), "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "JODC's terms ask for permission to republish" }
+      : match;
   }
 
   // The National Tide Gauge Network's records come from BODC, whose open
@@ -291,6 +307,18 @@ export function originatorSeries(
             : national.status,
         note,
       };
+  }
+
+  // SMN's records name the sensor and station number; its terms allow only
+  // non-profit reproduction, so a match stays on TICON for commercial use (#48).
+  if (contributor === "unam") {
+    const series = seriesOf(record.id);
+    if (!series)
+      return { source: "unam", id: null, status: "unmatched", note: "No SMN sensor in the id" };
+    const match = byCode(record, "unam", series, "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "SMN's terms allow only non-profit use" }
+      : match;
   }
 
   const direct = DIRECT[contributor];

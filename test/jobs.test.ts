@@ -21,6 +21,7 @@ describe("sourcesFor", () => {
       "rws",
       "sfwmd",
       "smhi",
+      "unam",
       "usace",
       "usgs",
     ]);
@@ -33,6 +34,7 @@ describe("sourcesFor", () => {
       "ea",
       "gesla",
       "jma",
+      "jodc",
       "kartverket",
       "marine-institute",
       "pegelonline",
@@ -41,6 +43,7 @@ describe("sourcesFor", () => {
       "sfwmd",
       "smhi",
       "uhslc",
+      "unam",
       "usace",
       "usgs",
     ]);

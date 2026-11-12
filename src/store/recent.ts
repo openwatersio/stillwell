@@ -16,16 +16,16 @@ import {
   checkRecent,
   readDatums,
   listFiles,
-  readObservationFile,
+  foldObservationFile,
   readRecent,
   readStationBounds,
   readTimeBounds,
   type StationBounds,
   recentStations,
-  writeObservations,
   type YearStats,
   writeRecent,
   writeStationBounds,
+  type FileBounds,
   type StationObservation,
 } from "./parquet.ts";
 import {
@@ -383,7 +383,7 @@ export async function compactRecent({
     }
   const stations = all.filter((s) => pathOf.has(s.id));
   summary.stations = stations.filter(levels).length + summary.failed.length;
-  // The span of each year file this run read whole, by `spanKey`, for the bounds.
+  // The span of each year file this run folded, by `spanKey`, for the bounds.
   const spans = new Map<string, FileBounds | null>();
   // Stations whose fold the years file may not have recorded, for the reconcile to read.
   const unmarked: string[] = [];
@@ -464,24 +464,36 @@ export async function compactRecent({
                 year,
                 epochId,
               );
-              const existing = await readObservationFile(file);
-              await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
               const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
-              const merged = upsert(existing.rows, incoming);
-              const span = spanOf(merged, epochWindow(station.epochs, epochId));
-              const key = spanKey(station, epochId, year);
-              if (sameRows(existing.rows, merged)) {
-                spans.set(key, span);
-                continue;
-              }
-              written.set(file, await writeObservations(file, merged, epoch.datum));
-              spans.set(key, span);
+              const window = epochWindow(station.epochs, epochId);
+              // The fold changes rows from its earliest on; the file's earlier rows stay as they are.
+              let from = Infinity;
+              for (const r of incoming) if (r.time < from) from = r.time;
+              let later: FileBounds | null = null;
+              let added = 0;
+              const { before, stats } = await foldObservationFile(
+                file,
+                from,
+                epoch.datum,
+                window,
+                async (existing, datums) => {
+                  await refuseOtherDatum(file, { ...station, datum: epoch.datum }, datums);
+                  const merged = upsert(existing, incoming);
+                  later = spanOf(merged, window);
+                  if (sameRows(existing, merged)) return null;
+                  const had = new Map(existing.map((r) => [r.time, r]));
+                  added = merged.filter((r) => {
+                    const before = had.get(r.time);
+                    return !before || !sameRows([before], [r]);
+                  }).length;
+                  return merged;
+                },
+              );
+              spans.set(spanKey(station, epochId, year), joinSpans(before, later));
+              if (!stats) continue;
+              written.set(file, stats);
               summary.files++;
-              const had = new Map(existing.rows.map((r) => [r.time, r]));
-              summary.values += merged.filter((r) => {
-                const before = had.get(r.time);
-                return !before || !sameRows([before], [r]);
-              }).length;
+              summary.values += added;
               changed = true;
             } catch (error) {
               summary.failed.push(`${label}: ${message(error)}`);
@@ -542,11 +554,11 @@ type Span = [number, number];
  */
 export const REFETCH_YEARS = 3;
 
-/**
- * A year file's earliest and latest counted row, its earliest preliminary one
- * or null, and whether any is one the source screened.
- */
-type FileBounds = [number, number, number | null, boolean];
+/** The bounds of a file's rows before some time, `a`, and of its rows from then on, `b`, as one. */
+function joinSpans(a: FileBounds | null, b: FileBounds | null): FileBounds | null {
+  if (!a || !b) return a ?? b;
+  return [a[0], b[1], a[2] ?? b[2], a[3] || b[3]];
+}
 
 /** A station's year file in one epoch, as `updateBounds` names it. */
 function spanKey(station: Pick<Station, "source_id">, epoch: number, year: number): string {
@@ -598,7 +610,7 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
  * only the current epoch, so earlier epochs' values can't be refetched.
  *
  * A listing of the source's files gives each station's first and last year.
- * The files of those years come from `spans`, which compaction read whole
+ * The files of those years come from `spans`, the files compaction folded
  * this run; or else from the bound already known, when it's in that year,
  * still inside an epoch, and the year is before last year; or else from a
  * read. So a backfill of earlier years is read, as is any end year from last

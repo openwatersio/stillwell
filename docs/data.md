@@ -1,6 +1,6 @@
 # Using the Stillwell store
 
-Every public series in the store is Parquet at `https://stillwell.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. It holds what each source lets anyone republish, with `commercial_use` false on the stations whose terms bar commercial use. The [README](../README.md#license) has the license, and each source's README has its own terms.
+Every public series in the store is Parquet at `https://stillwell.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. It holds what each source lets anyone republish, with `commercial_use` false on the stations whose terms bar commercial use, and on those of a source whose permission to republish has been asked for and not yet given. The [README](../README.md#license) has the license, and each source's README has its own terms.
 
 The store holds every source's station list and the year files backfilled so far; `stations/years/<source>.parquet` lists which years each series has. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC.
 

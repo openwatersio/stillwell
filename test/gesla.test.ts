@@ -117,6 +117,12 @@ describe("gesla stations", () => {
 
   it("pads USGS numbers only where USGS's parts start with a zero", () => {
     assert.deepEqual(gesla.originatorIds("USGS", "1359139", -73.7), ["usgs/01359139"]);
+    assert.deepEqual(gesla.originatorIds("JODC_GIAJ", "gs01", 139.6), ["jodc/GS01"]);
+    assert.deepEqual(gesla.originatorIds("JODC_JMA", "ma64", 140.9), []);
+    assert.deepEqual(
+      gesla.originatorIds("UNAM", "14", -110.3, new Map(), "lapaz_flotador-14-mex-unam"),
+      ["unam/14-flotador"],
+    );
     assert.deepEqual(gesla.originatorIds("USGS", "11162765", -122.4), ["usgs/11162765"]);
     // Part 09, the Colorado, is west of 100° W but has the zero too.
     assert.deepEqual(gesla.originatorIds("USGS", "9380000", -111.6), ["usgs/09380000"]);
