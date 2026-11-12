@@ -875,6 +875,22 @@ describe("bsh", () => {
     });
   });
 
+  it("asks for no year before 1 August of the year before, when BSH's terms let it be published", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      asked.push(url);
+      return fixture("DE__506P2026.txt");
+    });
+    const year = new Date().getUTCFullYear() + 2;
+    const range = [new Date(Date.UTC(year, 0, 1)), new Date(Date.UTC(year + 1, 0, 1))] as const;
+    assert.deepEqual(
+      await bsh.source.predictions!({ source_id: "506P", datum: "PNP" } as never, ...range),
+      [],
+    );
+    assert.deepEqual(asked, []);
+    assert.equal(new Date(bsh.publishableFrom(2027)).toISOString(), "2026-07-31T22:00:00.000Z");
+  });
+
   it("refuses a year whose file is in another datum", async () => {
     serve([[/deu2026&files=DE__506P2026/, fixture("DE__506P2026.txt")]]);
     const range = [new Date("2026-01-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;

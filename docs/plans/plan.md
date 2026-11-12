@@ -239,7 +239,7 @@ In parallel with the phases above.
 The [evaluation](../hroi-evaluation.md) found HRoI times high and low waters better than a harmonic curve fit at BSH gauges and at most Dutch gauges, and gives one event per semidiurnal cycle, which is the event-selection problem slackwater-database hit with RWS.
 
 - [ ] Wait for BSH's answer on the 1 August rule ([slackwater-database#335](https://github.com/openwatersio/slackwater-database/issues/335)) before publishing anything fitted to BSH predictions.
-- [ ] Ingest BSH predictions yearly from August into `predictions/bsh/` as reference data.
+- [x] Ingest BSH predictions into `predictions/bsh/` and `predicted-extremes/bsh/` as reference data: Monthly's BSH refresh fetches this year's, and from August next year's.
 - [ ] Test HRoI against observed German levels from PEGELONLINE's history in the store, which reaches 2000 at most gauges.
 - [ ] Learn BSH's per-gauge curve shapes instead of one mean curve (the Husum, Büsum and Papenburg gap).
 - [ ] Propose HRoI extremes to `@slackwater/engine` as an event method for stations with a long extremes record, in a separate issue there.

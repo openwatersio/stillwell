@@ -262,7 +262,16 @@ function hours(hhmm: string | undefined): number | undefined {
   return match ? Number(match[1]) + Number(match[2]) / 60 : undefined;
 }
 
-/** Calls `get` for each calendar year [start, end) touches, keeping rows inside it. */
+/**
+ * When BSH's terms let a year's predictions be published online: 1 August of
+ * the year before, at midnight in Germany (22:00 UTC the day before).
+ */
+export const publishableFrom = (year: number) => Date.UTC(year - 1, 6, 31, 22);
+
+/**
+ * Calls `get` for each calendar year [start, end) touches, keeping rows inside
+ * it. A year whose predictions can't be published yet is skipped unasked.
+ */
 async function byYear<T extends { time: number }>(
   start: Date,
   end: Date,
@@ -274,7 +283,7 @@ async function byYear<T extends { time: number }>(
     year <= new Date(end.getTime() - 1).getUTCFullYear();
     year++
   )
-    rows.push(...(await get(year)));
+    if (Date.now() >= publishableFrom(year)) rows.push(...(await get(year)));
   return rows.filter((r) => r.time >= start.getTime() && r.time < end.getTime());
 }
 
