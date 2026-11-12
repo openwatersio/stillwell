@@ -26,6 +26,10 @@ export interface Notice {
   refused?: string;
 }
 
+/** BOM's conditions of use for its tide information, with the disclaimers they require. */
+export const BOM_CONDITIONS =
+  "https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf";
+
 export const NOTICES: Record<string, Notice> = {
   // Terms text the scan found but no notice below matches: non-commercial until
   // a person reads it and adds a notice.
@@ -40,11 +44,13 @@ export const NOTICES: Record<string, Notice> = {
   bom: {
     name: "Bureau of Meteorology",
     pattern: /bom\.gov\.au\/other\/copyright/,
-    commercial_use: false,
-    credit: "Bureau of Meteorology, © Commonwealth of Australia",
-    url: "http://www.bom.gov.au/other/copyright.shtml",
+    commercial_use: true,
+    // BOM's conditions want their disclaimers linked from the attribution
+    // wherever they can't be shown with the data.
+    credit: `Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
+    url: BOM_CONDITIONS,
     terms:
-      "Users are deemed to accept BOM's copyright notice, whose default for content without a stated licence is personal or in-house use, not supplied to others or used commercially.",
+      "BOM allowed use of its data under the conditions of use for its tide information (reference CAS-151567-N3L2D4, openwatersio/stillwell#80): acknowledge copyright in the Commonwealth of Australia represented by the Bureau of Meteorology, and show BOM's disclaimers of warranty and liability with the data or link them from its attribution, which the credit does.",
   },
   jma: {
     name: "Japan Meteorological Agency",

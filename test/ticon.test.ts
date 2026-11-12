@@ -141,12 +141,15 @@ describe("TICON replacements", () => {
     const ended = { uhslc: [{ ...station("uhslc/281a", "Cananeia", -25, -48), version: "A" }] };
     assert.equal(replacement(record("cananeia-281-bra-uhslc_fd"), ended).id, "uhslc/281a");
     // A contributor's terms that bar commercial use keep a listed station from being cleared.
-    const bom = {
+    const nonCommercial = {
       uhslc: [
         { ...station("uhslc/001", "Pohnpei", 6.98, 158.2), version: "C", commercial_use: false },
       ],
     };
-    assert.equal(replacement(record("pohnpei-001c-fsm-uhslc_rq"), bom).status, "restricted");
+    assert.equal(
+      replacement(record("pohnpei-001c-fsm-uhslc_rq"), nonCommercial).status,
+      "restricted",
+    );
     // SANHO's gauges aren't listed, and Walvis Bay, in Namibia, is withheld.
     assert.equal(replacement(record("durban-181a-zaf-uhslc_rq"), lists).status, "restricted");
     assert.equal(replacement(record("walvis_bay-220a-nam-uhslc_rq"), lists).status, "restricted");

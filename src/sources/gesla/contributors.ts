@@ -1,3 +1,5 @@
+import { NOTICES } from "../uhslc/notices.ts";
+
 /**
  * GESLA's contributors, by the abbreviation in its metadata's `CONTRIBUTOR
  * (ABBREVIATED)` column and each file name's last part, with the terms the
@@ -64,10 +66,9 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   RWS: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   RWS_HIST: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   BOM: {
-    name: "Bureau of Meteorology, © Commonwealth of Australia",
-    commercial_use: false,
-    terms:
-      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially, as on UHSLC's BOM records; BOM has been asked for permission (openwatersio/stillwell#80).",
+    name: NOTICES.bom!.credit!,
+    commercial_use: true,
+    terms: `${RESEARCH_AND_CONSULTANCY} BOM allowed use of its data under the conditions of use for its tide information, which ask for its copyright acknowledgement and disclaimers (openwatersio/stillwell#80); the credit links them.`,
   },
   WSV: {
     name: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)",
