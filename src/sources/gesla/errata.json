@@ -161,7 +161,7 @@
       "handling": "corrected",
       "error": "GESLA 4.1 copies UHSLC's Hong Kong (Quarry Bay) records with UHSLC's times, which are an hour early: the height labeled T was measured at T + 1 h UTC.",
       "response": "The adapter moves the three records' times an hour later, as the `uhslc` adapter does for UHSLC's own series (erratum `uhslc-hong-kong-hour-early`).",
-      "evidence": "GESLA's values are UHSLC's at the same labels: on 2010-06-01 at 00:00, 01:00 and 02:00, `hong_kong-329b-hkg-uhslc_rq` gives 2.13, 2.23 and 2.28 m, and UHSLC's ERDDAP (`global_hourly_rqds`, 329 version B) 2130, 2230 and 2280 mm; on 2024-06-01 the fast-delivery record matches `global_hourly_fast` the same way. tide-database found UHSLC's hour against the Hong Kong Observatory's predictions ([openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360)). With the shift, `scripts/clock-check.ts` on 2015 fits 329 and 329b at 0 minutes against tide-database's re-fit."
+      "evidence": "GESLA's values are UHSLC's at the same labels: on 2010-06-01 at 00:00, 01:00 and 02:00, `hong_kong-329b-hkg-uhslc_rq` gives 2.13, 2.23 and 2.28 m, and UHSLC's ERDDAP (`global_hourly_rqds`, 329 version B) 2130, 2230 and 2280 mm; on 2024-06-01 the fast-delivery record matches `global_hourly_fast` the same way. slackwater-database found UHSLC's hour against the Hong Kong Observatory's predictions ([openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360)). With the shift, `scripts/clock-check.ts` on 2015 fits 329 and 329b at 0 minutes against slackwater-database's re-fit."
     },
     {
       "id": "gesla-crms-hour-early",

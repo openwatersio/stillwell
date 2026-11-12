@@ -107,7 +107,7 @@ describe("TICON replacements", () => {
     assert.equal(replacement(brest, lists).status, "ready");
   });
 
-  it("sends a UHSLC relay to the originator tide-database's provenance declares", () => {
+  it("sends a UHSLC relay to the originator slackwater-database's provenance declares", () => {
     const relay = record("honolulu-057a-usa-uhslc_rq", { declared: "noaa/1612340" });
     assert.deepEqual(replacement(relay, {}), {
       source: "coops",
@@ -401,7 +401,7 @@ describe("TICON replacements", () => {
     assert.deepEqual([ascension.source, ascension.status], ["bodc", "restricted"]);
   });
 
-  it("matches an unmatched record through its tide-database station", () => {
+  it("matches an unmatched record through its slackwater-database station", () => {
     const rows = adoptSiblings([
       {
         record: record("a-1-nld-rws", { station: "nl/a" }),
@@ -417,7 +417,10 @@ describe("TICON replacements", () => {
       },
     ]);
     assert.equal(rows[1]!.replacement.id, "rws/a");
-    assert.match(rows[1]!.replacement.note!, /^Same tide-database station as a-1-nld-rws; why/);
+    assert.match(
+      rows[1]!.replacement.note!,
+      /^Same slackwater-database station as a-1-nld-rws; why/,
+    );
     assert.equal(rows[2]!.replacement.status, "unmatched");
   });
 
