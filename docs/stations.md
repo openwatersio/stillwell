@@ -128,6 +128,7 @@ The files ingest keeps for each source, beside the ones in [data.md](data.md#lay
 ```
 stations/<source>.parquet                    one source's list: every station it has listed but withheld ones, with epochs
 stations/offsets.parquet                     each station's offsets by epoch, rebuilt with stations.parquet
+stations/links.parquet                       offsets measured between linked series' levels, once a month
 stations/bounds/<source>.parquet             first, last, earliest preliminary and screened per station, by compaction and backfill
 stations/years/<source>.parquet              each year file of levels: its hours, values by flag and version, by every run that writes them
 stations/empty/<source>.json                 years with no file a --skip-written backfill found empty, kept 30 days
@@ -229,6 +230,7 @@ A station with no links is its own preferred series. A series that allows commer
 - [`src/refresh.ts`](../src/refresh.ts): a source's refresh with its guards and report, and the rebuild of `stations.parquet`, `sources.json` and `errata.json`.
 - [`src/same-as.ts`](../src/same-as.ts): `same_as` and `preferred` across sources, with the decisions in `LINKS`, `UNLINKS` and `PREFER`.
 - [`src/datums.ts`](../src/datums.ts): `tide_station`, MSL, LAT and chart datum from slackwater-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list, which holds only what feeds them, such as CO-OPS's `datums_period` ([data.md](data.md#stations)).
+- [`src/links.ts`](../src/links.ts): offsets measured between linked series that share no reference, in `stations/links.parquet`, which `src/datums.ts` carries offsets through.
 - [`src/store/`](../src/store/): epoch paths, the `epoch` column in `recent`, readers and writers for the lists, bounds and history, and an HTTPS reader for the public bucket.
 - [`scripts/ingest.ts`](../scripts/ingest.ts): `stations`, `backfill` and `recent` read the lists from the store, write the current epoch, and skip held stations; `backfill` writes closed epochs too for an `archive: "previous"` source or a station with a split (`epochSpans` in [`src/backfill.ts`](../src/backfill.ts)).
 - `Source.overrides` ([`src/schema.ts`](../src/schema.ts)): decisions on a source's epochs, keyed by station and epoch start, the days that split a station's epochs, and the stations whose epochs restart in another datum. Each epoch event in the report prints the key.

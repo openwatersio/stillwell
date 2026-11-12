@@ -36,6 +36,7 @@ import {
 import type { StoredStation, ListedStation, Source, SourceMetadata, Station } from "./schema.ts";
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
+import { linkShifts, readLinks } from "./links.ts";
 import {
   offsetRows,
   ticonOriginators,
@@ -263,6 +264,55 @@ export async function publishStations(
   | { count: number; links: LinkReport; datums: DatumReport; unknownErrata: string[] }
   | { missing: string[] }
 > {
+  const built = await linkedStations(store, all, expected);
+  if ("missing" in built) return built;
+  const { gauges, listed, report } = built;
+  const { stations: linked, report: datums } = withDatums(
+    gauges,
+    await tideStations(),
+    await ticonOriginators(),
+    linkShifts(await readLinks(store), gauges),
+  );
+  for (const station of linked) station.errata = errataOf(station, errata);
+  // Two files written one after the other: if the second write fails, they're from
+  // different publishes until the next one.
+  await writeOffsets(offsetsPath(store), linked.flatMap(offsetRows));
+  await writeStations(stationsPath(store), linked);
+  await writeJsonArray(
+    sourcesPath(store),
+    listed.map((s) => ({
+      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
+      stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
+    })),
+  );
+  // A store's errata are its own sources', so a restricted source's stay out of the public store.
+  const held = new Set(listed.map((s) => s.metadata.id));
+  await writeJsonArray(errataPath(store), published(errata.filter((e) => held.has(e.source))));
+  const ids = new Set(linked.map((s) => s.id));
+  // A withheld station is gone on purpose, though an erratum may still name it.
+  const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
+  const unknownErrata = errata.flatMap((e) =>
+    held.has(e.source)
+      ? (e.stations ?? [])
+          .filter((id) => !ids.has(id) && !withheld(id))
+          .map((id) => `${e.id} ${id}`)
+      : [],
+  );
+  return { count: linked.length, links: report, datums, unknownErrata };
+}
+
+/**
+ * The stations in `store`'s lists, with their bounds and analysis, linked
+ * (`linkGauges`), as `stations.parquet` is built from them; or the sources
+ * in `expected` that have no list.
+ */
+async function linkedStations(
+  store: string,
+  all: Source[],
+  expected: string[],
+): Promise<
+  { gauges: StoredStation[]; listed: Source[]; report: LinkReport } | { missing: string[] }
+> {
   const stations: StoredStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
@@ -293,37 +343,18 @@ export async function publishStations(
   }
   if (missing.length || !listed.length) return { missing };
   const { stations: gauges, report } = linkGauges(stations, new Date(), usable);
-  const { stations: linked, report: datums } = withDatums(
-    gauges,
-    await tideStations(),
-    await ticonOriginators(),
-  );
-  for (const station of linked) station.errata = errataOf(station, errata);
-  // Two files written one after the other: if the second write fails, they're from
-  // different publishes until the next one.
-  await writeOffsets(offsetsPath(store), linked.flatMap(offsetRows));
-  await writeStations(stationsPath(store), linked);
-  await writeJsonArray(
-    sourcesPath(store),
-    listed.map((s) => ({
-      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
-      stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
-    })),
-  );
-  // A store's errata are its own sources', so a restricted source's stay out of the public store.
-  const held = new Set(listed.map((s) => s.metadata.id));
-  await writeJsonArray(errataPath(store), published(errata.filter((e) => held.has(e.source))));
-  const ids = new Set(linked.map((s) => s.id));
-  // A withheld station is gone on purpose, though an erratum may still name it.
-  const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
-  const unknownErrata = errata.flatMap((e) =>
-    held.has(e.source)
-      ? (e.stations ?? [])
-          .filter((id) => !ids.has(id) && !withheld(id))
-          .map((id) => `${e.id} ${id}`)
-      : [],
-  );
-  return { count: linked.length, links: report, datums, unknownErrata };
+  return { gauges, listed, report };
+}
+
+/**
+ * The stations `links` measures pairs from: as publish builds them, with the
+ * offsets carried through shared references but none through measured
+ * shifts, so a pair is chosen by the offsets its stations have without it.
+ */
+export async function stationsToMeasure(store: string, all: Source[]): Promise<StoredStation[]> {
+  const built = await linkedStations(store, all, []);
+  if ("missing" in built) return [];
+  return withDatums(built.gauges, await tideStations(), await ticonOriginators()).stations;
 }
 
 /**
