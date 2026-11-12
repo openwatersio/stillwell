@@ -21,6 +21,7 @@
     "cross-check": "node scripts/cross-check.ts",
     "uhslc:contributors": "node scripts/uhslc-contributors.ts",
     "gesla:contributors": "node scripts/gesla-contributors.ts",
+    "gesla:coverage": "node scripts/gesla-coverage.ts",
     "test": "node --test 'test/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "lint": "prettier --check .",

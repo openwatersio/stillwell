@@ -7,4 +7,5 @@ docs/ticon-replacement.md
 src/sources/uhslc/contributors.ts
 src/sources/uhslc/contributors.md
 src/sources/gesla/contributors.md
+src/sources/gesla/coverage.md
 .cla.json
