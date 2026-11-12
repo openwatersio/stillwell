@@ -32,18 +32,18 @@ Each source with its operator, license, attribution line, terms URL, where to re
 
 Lists stations. Filters combine:
 
-| Parameter                          | Meaning                                                                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `query`                            | Full-text search on name, ID or place, as in the tides API                                                    |
-| `latitude`, `longitude`            | Stations nearest the point, nearest first, each with `distance` in kilometers                                 |
-| `maxDistance`                      | Search radius for `latitude` and `longitude`, in kilometers                                                   |
-| `maxResults`                       | How many stations to return, 1 to 100; default 10                                                             |
-| `bbox=minLon,minLat,maxLon,maxLat` | Stations inside the box, longitude first as in GeoJSON. `minLon > maxLon` crosses the antimeridian            |
-| `kind`                             | `coastal`, `estuary`, `lake`, `river`                                                                         |
-| `source`                           | A source ID, such as `coops`                                                                                  |
-| `tide_station=noaa/9447130`        | The station linked to a tide-database station. A subordinate station resolves to its reference gauge's series |
-| `live=true`                        | Only stations the live endpoint serves                                                                        |
-| `status`                           | `active` (default) or `all`                                                                                   |
+| Parameter                          | Meaning                                                                                                             |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `query`                            | Full-text search on name, ID or place, as in the tides API                                                          |
+| `latitude`, `longitude`            | Stations nearest the point, nearest first, each with `distance` in kilometers                                       |
+| `maxDistance`                      | Search radius for `latitude` and `longitude`, in kilometers                                                         |
+| `maxResults`                       | How many stations to return, 1 to 100; default 10                                                                   |
+| `bbox=minLon,minLat,maxLon,maxLat` | Stations inside the box, longitude first as in GeoJSON. `minLon > maxLon` crosses the antimeridian                  |
+| `kind`                             | `coastal`, `estuary`, `lake`, `river`                                                                               |
+| `source`                           | A source ID, such as `coops`                                                                                        |
+| `tide_station=noaa/9447130`        | The station linked to a slackwater-database station. A subordinate station resolves to its reference gauge's series |
+| `live=true`                        | Only stations the live endpoint serves                                                                              |
+| `status`                           | `active` (default) or `all`                                                                                         |
 
 ```json
 {
@@ -146,16 +146,16 @@ This endpoint returns observations only. Slackwater computes the residual agains
 
 A series from the archive, joined to the live window when `end` is recent.
 
-| Parameter      | Default               | Meaning                                                                                                                                                                   |
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `start`, `end` | The 7 days before now | At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                                            |
-| `step`         | `6m`                  | As above, plus `1d`                                                                                                                                                       |
-| `datum`        | Chart datum           | As above                                                                                                                                                                  |
-| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                        |
-| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked tide-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
-| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                    |
+| Parameter      | Default               | Meaning                                                                                                                                                                         |
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `start`, `end` | The 7 days before now | At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                                                  |
+| `step`         | `6m`                  | As above, plus `1d`                                                                                                                                                             |
+| `datum`        | Chart datum           | As above                                                                                                                                                                        |
+| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                              |
+| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
+| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                          |
 
-Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the tide-database version it used (`"database": "2026.11.01"`).
+Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`).
 
 ### `GET /water-levels/stations/{source}/{id}/extremes`
 
@@ -189,7 +189,7 @@ The best estimate of the water level at a point and time, for places without a g
 `method` is one of:
 
 1. `observed`: a gauge within 1 km with data at that time.
-2. `prediction+residual`: the nearest tide-database prediction, plus the residual from gauges within about 100 km (fast) or a few hundred km (slow), as crowd-depth uses today.
+2. `prediction+residual`: the nearest slackwater-database prediction, plus the residual from gauges within about 100 km (fast) or a few hundred km (slow), as crowd-depth uses today.
 3. `prediction+surge`: the prediction plus modeled surge (STOFS-2D or GTSM).
 4. `model`: modeled total water level only.
 
@@ -206,6 +206,6 @@ bulk/<YYYY-Qn>/<source>.parquet
 ## Not in the API
 
 - Stations with `commercial_use` false, such as the UHSLC gauges whose contributors bar commercial use, until tokens and plans exist; then non-commercial users get them. They're in the public store.
-- Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private store for research and for fitting tide-database constants where the operator agrees.
+- Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private store for research and for fitting slackwater-database constants where the operator agrees.
 - CHS data in any form. Its license bars third-party transfer and commercial derivatives; Slackwater fetches it on the device.
 - Data from vessels. See [plan.md](plan.md#out-of-scope).
