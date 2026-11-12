@@ -869,6 +869,13 @@ describe("bsh", () => {
       bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
       /height unit is undefined/,
     );
+    serve([
+      [/deu2026&files=DE__808P2026/, "I_E#DE__808P2026#\nC02#Datenumfang:#Zeiten : UNKNOWN#\n"],
+    ]);
+    await assert.rejects(
+      bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
+      /height unit is undefined/,
+    );
   });
 
   it("gives datum offsets from the station's own datum, skipping heights BSH leaves null", () => {
