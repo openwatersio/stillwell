@@ -32,7 +32,7 @@ export const metadata: SourceMetadata = {
     name: "UHSLC data terms: free use and redistribution, not for legal use",
     url: "https://uhslc.soest.hawaii.edu/datainfo/",
     // UHSLC's terms let anyone use and redistribute the data free, with no
-    // limit on purpose, as tide-database already does through TICON.
+    // limit on purpose, as slackwater-database already does through TICON.
     commercial_use: true,
     redistribution: true,
   },
@@ -51,7 +51,7 @@ const DATUM = "ZERO";
 
 /**
  * UHSLC stamps its Hong Kong hourly heights an hour early: the height it
- * labels T was measured at T + 1 h UTC (tide-database#360). Every version and
+ * labels T was measured at T + 1 h UTC (slackwater-database#360). Every version and
  * the FD series. Remove once UHSLC corrects its files; the clock check shows it.
  * Erratum `uhslc-hong-kong-hour-early`.
  */
