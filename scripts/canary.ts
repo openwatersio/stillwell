@@ -36,6 +36,7 @@ import * as rws from "../src/sources/rws/index.ts";
 import * as sfwmd from "../src/sources/sfwmd/index.ts";
 import * as smhi from "../src/sources/smhi/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
+import * as unam from "../src/sources/unam/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
@@ -168,6 +169,9 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     )),
     ...(await uhslc.levels("057a", new Date("1880-01-01Z"), new Date("1880-01-04Z"))),
   ],
+  // La Paz's radar, from the end of its file, which holds 5 days.
+  unam: () =>
+    unam.levels({ source_id: "14-radar", column: "Nivel del mar (radar promedio)" }, start, end),
   usace: () => usace.levels("MVN", "Baton_Rouge.Stage.Inst.1Hour.0.rev", start, end),
   // Mississippi River at Baton Rouge, gage height.
   usgs: () => usgs.levels("9361fa9f474443a4b2391c1f1a63ca4b", start, end),

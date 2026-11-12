@@ -412,6 +412,25 @@ describe("TICON originators", () => {
     assert.deepEqual([choshi.source, choshi.id, choshi.status], ["jma", null, "unmatched"]);
   });
 
+  it("matches an SMN record to its sensor's series, restricted to non-profit use", () => {
+    const radar = record("lapaz_radar-14-mex-unam");
+    assert.deepEqual(
+      [originatorSeries(radar, {}).id, originatorSeries(radar, {}).status],
+      ["unam/14-radar", "license"],
+    );
+    const match = originatorSeries(radar, {
+      unam: [station("unam/14-radar", "La Paz (radar)", 0, 0)],
+    });
+    assert.deepEqual([match.id, match.status], ["unam/14-radar", "restricted"]);
+    // GESLA and TICON number Ciudad del Carmen's radar 4, which is Celestún.
+    assert.equal(originatorSeries(record("ciudadcarmen_radar-4-mex-unam"), {}).id, "unam/5-radar");
+    assert.equal(
+      originatorSeries(record("puertovallarta_nivelpls-19-mex-unam"), {}).id,
+      "unam/19-pls",
+    );
+    assert.equal(originatorSeries(record("veracruz-250-mex-unam_hist"), {}).status, "license");
+  });
+
   it("sends a UK gauge to BODC whether CMEMS or BODC relays it", () => {
     const cmems = originatorSeries(record("aberdeen-abe-gbr-cmems"), {});
     const bodc = originatorSeries(record("aberdeen-abe-gbr-bodc"), {});
