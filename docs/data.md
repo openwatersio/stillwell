@@ -1,10 +1,8 @@
-# Using the Stillwell bucket
+# Using the Stillwell store
 
-Every public series in the store is Parquet at `https://stillwell.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. Data whose source bars republishing isn't here; it goes to a separate private store. The exception is UHSLC stations whose contributor's own terms are stricter than UHSLC's, which are public while permission is asked ([uhslc-contributors.md](uhslc-contributors.md)). Non-commercial data a source lets anyone republish is here, with `commercial_use` false on its stations.
+Every public series in the store is Parquet at `https://stillwell.openwaters.io/`, readable without an account by DuckDB, Polars, pandas or anything else that reads Parquet over HTTPS. It holds what each source lets anyone republish, with `commercial_use` false on the stations whose terms bar commercial use. The [README](../README.md#license) has the license, and each source's README has its own terms.
 
-The data is CC BY 4.0, credited to "Open Waters" and to each station's `attribution`, except stations with `commercial_use` false, which keep their contributor's terms. Each station's `license` names its source's license, which still applies to the source's values alongside CC BY (see the [README](../README.md#license)). Each source's license, the attribution it asks for, and where to report an error in its data (`contact`) are in [`sources.json`](https://stillwell.openwaters.io/sources.json). Every station says whether its terms allow commercial use (`commercial_use`); most do. A station whose terms differ from its source's, as at some UHSLC gauges, carries the credit they ask for in its `attribution`, and [uhslc-contributors.md](uhslc-contributors.md) gives the terms.
-
-The bucket holds every published source's station list and the year files backfilled so far; `stations/years/<source>.parquet` lists which years each series has. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:40 UTC; older years come with backfill, which is still under way for some sources.
+The store holds every source's station list and the year files backfilled so far; `stations/years/<source>.parquet` lists which years each series has. Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC.
 
 ## Layout
 
@@ -12,6 +10,7 @@ The bucket holds every published source's station list and the year files backfi
 stations.parquet                                      one row per station
 sources.json                                          license, attribution, contact and `finalizes` per source
 errata.json                                           errors in what sources publish, and what the store does about them
+stations/offsets.parquet                              meters to add to a level in each station's epoch to refer it to each datum: station, epoch, datum, offset_m
 stations/<source>.parquet                             one source's list, as ingest keeps it
 stations/years/<source>.parquet                       every year file of observed levels: id, epoch, year, hours, values by flag, version
 stations/analysis/<source>.parquet                    what the store measures from each station's levels, such as whether they carry a tide
@@ -23,35 +22,52 @@ predictions/<source>/<station>/<year>.parquet         the source's predicted cur
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters: time, level_m, type, flag[, transit, event], datum
 ```
 
+[stations.md](stations.md#store-layout) describes the files ingest keeps for itself beside these.
+
 - **`<station>`** is the station's `source_id` from `stations.parquet`, URL-encoded. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
-- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch, apart from RWS's Dutch NAP stations, whose values before 2005 are in an epoch of their own; [Datum epochs](#datum-epochs) below shows how to read across them.
+- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch; [Datum epochs](#datum-epochs) below shows how to read across several.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
-- **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only ever marks a value suspect or bad, so `flag` is never better than `source_flag`. QC works `flag` out from `source_flag` and the store's rules, so a value a rule no longer flags is clear again once the store reruns QC over it, which it does for the values it fetches, and for stored years after a rule changes, when the Monthly workflow's `analyze --requalify` reaches the station. A value from before `source_flag` was kept that QC marked suspect or bad keeps its mark. `flag <= 2` keeps everything not flagged as a problem. A `preliminary` value is one the source hasn't checked. Two signals mark the ones it never will: every `preliminary` value from a source whose `finalizes` is false in `sources.json`, such as EA, PEGELONLINE and CDEC, which never mark a value checked, and values from before a station's `source_qc_start`, which the source states or the store infers from its flags. Those have passed only the store's QC, and stay `preliminary`; such a source can still revise a value, which reaches the store only when someone fetches it again. Elsewhere a `preliminary` value may be checked later, and the Monthly refetch reads the last three years again for it, but some never are, without a sign: SMHI's closed stations that are all unchecked, such as Landsort's to 2006, and USACE offices that screen nothing.
-- **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. The store can mark a span worse than its source does without changing `source_flag`, as the erratum `refmar-pointe-a-pitre-clock` does for Pointe-à-Pitre's 2020 to 2024 clock, so read `flag` to skip what shouldn't be used. Where a source doesn't mark which values it has checked, the adapter decides: Kartverket's values count as verified once they're a year old, and SMHI's from this month and the last count as preliminary at best, even where SMHI marks them checked, since it corrects them monthly. California DWR's from this month and the three before count as preliminary at best, since DWR edits its data without marking it. It's null in predictions and in values written before it was kept, and files written before then don't have the column. Where such a value's flag is better than suspect, it's the source's, and rerunning QC fills it in; a suspect or bad one may be QC's, so it stays null.
+- **`flag`** runs from best to worst: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. Source flags fold into these, and quality control only ever marks a value suspect or bad, so `flag` is never better than `source_flag`. QC works `flag` out from `source_flag` and the store's rules, so a value a rule no longer flags is clear again once the store reruns QC over it, which it does for the values it fetches, and for stored years after a rule changes, when the Monthly workflow's `analyze --requalify` reaches the station. A value without a `source_flag` that QC marked suspect or bad keeps its mark. `flag <= 2` keeps everything not flagged as a problem. A `preliminary` value is one the source hasn't checked. Two signals mark the ones it never will: every `preliminary` value from a source whose `finalizes` is false in `sources.json`, and values from before a station's `source_qc_start`, which the source states or the store infers from its flags. Those have passed only the store's QC, and stay `preliminary`; such a source can still revise a value, which reaches the store only when ingest fetches it again. Elsewhere a `preliminary` value may be checked later, and the Monthly refetch reads the last three years again for it, but some never are, without a sign. Each source's README says how it marks checked values.
+- **`source_flag`** is the source's own flag on the same scale, before quality control, so a value the source verified (0 or 1) still shows as verified where QC marked it suspect. The store can mark a span worse than its source does without changing `source_flag`, as an erratum in [`errata.json`](https://stillwell.openwaters.io/errata.json) can, so read `flag` to skip what shouldn't be used. Where a source doesn't mark which values it has checked, its adapter decides, as its README says. `source_flag` is null in predictions and in some older values, and some older files don't have the column. Where such a value's flag is better than suspect, it's the source's, and rerunning QC fills it in; a suspect or bad one may be QC's, so it stays null.
 - **`received`** is when ingest first saw a value arrive. It's empty for backfilled history.
-- **`type`** is `high` or `low`. RWS's observed extremes give both lows of a double low water, so two lows can come in a row. BSH's predicted extremes also carry its `transit` number and `event` index.
+- **`type`** is `high` or `low`. A source can give both lows of a double low water, so two lows can come in a row. BSH's predicted extremes also carry its `transit` number and `event` index.
 
 ## Stations
 
 A station is one source's series at one place; a gauge is the instrument, and `same_as` links stations that share one. Cuxhaven, for example, is `pegelonline/5990020` for observed levels and `bsh/506P` for predictions.
 
-`stations.parquet` has one row per station. Besides `id`, `name`, `lat` and `lon`, these columns matter most:
+`stations.parquet` has one row per station:
 
-- **`datum`**: what levels are measured from, such as `NAP`, `PNP` (gauge zero), `SKN` (chart datum), `STND` (CO-OPS station datum), `GZ` (gauge zero at USACE, California DWR and CDEC), `GAGE` (USGS gage datum), `ZH` (REFMAR chart datum), `ZI` (a REFMAR gauge's unknown instrument zero), `AOD` (ordnance datum: Newlyn in Great Britain, the local one in Northern Ireland, the Isle of Man and Jersey) or `CD` (chart datum, at four EA gauges and every BODC gauge).
-- **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).
+- **`id`**, **`source`** and **`source_id`**: the station's ID, `<source>/<source_id>`, and its parts.
+- **`name`**, **`lat`**, **`lon`** and **`country_code`**: as the source gives them, or as `POSITIONS` ([`src/positions.ts`](../src/positions.ts)) corrects them where a source places a station away from its gauge.
+- **`kind`**: `coastal`, `estuary`, `lake` or `river`, from the source or from `KINDS` ([`src/kinds.ts`](../src/kinds.ts)), and null where neither says.
+- **`interval_s`**: the station's usual interval between values, in seconds.
+- **`datum`**: what levels are measured from, in the source's own name for it, such as `NAP`, `PNP` (gauge zero) or `STND` (CO-OPS station datum). Each source's README lists its datums.
+- **`datums`**: meters to add to a level in `datum` to refer it to each other datum: those the source publishes, and MSL, LAT and chart datum from slackwater-database or another series of the gauge. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)), or read `stations/offsets.parquet`, which has done that.
+- **`datums_source`**: where each of `datums` came from. `source` is the source's own offset. `slackwater-database` is the station's own record in slackwater-database, joined by the source's station ID (or, for TICON's RWS and SMHI records, through [ticon-replacement.csv](ticon-replacement.csv)) within 10 km, when the record's datums are measured from the same zero as the station's levels: NOAA's STND, Kartverket's chart datum, a GESLA file's gauge zero, or NAP and RH 2000 for TICON's RWS and SMHI records, unless the store's copy of the GESLA file names another zero, as a few of RWS's offshore files do. Where several records join a station, the one whose datums can be used, then an accepted one, then the latest reduction, gives all of them, so values are never mixed from two records. It replaces the source's MSL, LAT and chart datum, and publish reports any that differ by more than 5 cm. A record whose terms bar commercial use serves only a station whose terms do too. `computed` is carried from another station of the gauge (`same_as`) through a reference both give an offset to: a national height system (NAP, NHN, NN, HN, NGVD29, RH 2000, ordnance datum, or NAVD88 with its realization) or Admiralty Chart Datum, which is fixed at each UK port. That's how a PEGELONLINE gauge gets BSH's SKN through NHN, and an EA gauge BODC's chart datum through ordnance datum. MSL, LAT and other tidal datums are carried only between stations within 1 km of each other, since they change along an estuary; SKN and chart datum CD hold for a whole stretch and carry along any link. Nothing is carried from a station whose terms bar commercial use to one whose terms allow it. A record slackwater-database keeps in the constituent frame (MSL = 0), or rejects for anything but being another record's copy, gives nothing, nor does one whose reduction period overlaps an epoch that doesn't convert to the current one, or converts by more than 5 cm, since its datums would then mix two references by more than that. RWS's 2005 revision of NAP moved most Dutch gauges by up to 3 cm, so datums reduced across it can be off by up to that much.
+- **`datums_epoch`**: the period each tidal datum in `datums` was reduced over, as `start` and `end` dates, where slackwater-database says. Empty, or without the key, for the source's own offsets and for height systems.
+- **`datums_attribution`**: the credits owed for any `slackwater-database` or `computed` offsets: slackwater-database's for each record behind them, such as TICON-4's citation, and the `attribution` of each linked station an offset was carried from, such as BSH's for SKN at a PEGELONLINE gauge. Show them with those offsets wherever they're shown, beside `attribution`, including offsets read from `stations/offsets.parquet`, which carries no credits or terms of its own, so join it to `stations.parquet` for `commercial_use` too. Empty where `datums` holds only the source's own.
+- **`chart_datum`**: the datum charts use at the station, such as `MLLW`, `LAT`, `SKN` or `CD`: slackwater-database's choice where it has a record, otherwise the source's own or one carried from a linked station, such as BSH's SKN at a PEGELONLINE gauge. Null when the station has no offset to one. A level's default datum is `chart_datum`, or `datum` when it's null.
+- **`frame`**: `gauge` when the chart-datum offset is from the slackwater-database record that `tide_station` names, so levels line up with that station's predictions; `source` when it's the source's, computed, or from another record of the gauge; `unknown` with no `chart_datum`, or where the `tide_station`'s datums are in the constituent frame (MSL = 0), so its predictions can't be compared with levels in absolute terms.
+- **`epochs`**: each span over which the station's levels share one reference (see [Datum epochs](#datum-epochs)).
 - **`products`**: which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has.
+- **`first`** and **`last`**: the station's first and last observation, over all its epochs, from the bounds compaction and backfill write. `stations.parquet` is rebuilt after compaction each night, so they usually trail the store by about a day, and are null for a station with no observations yet.
 - **`same_as`**: other stations for the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. [stations.md](stations.md#gauges-in-more-than-one-source) says how they're matched.
-- **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. A record's length counts only its share of values not flagged suspect or bad, from its source's years file, so a long record of flagged values doesn't outrank a shorter clean one; a station whose source has no years file counts its whole record. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
+- **`preferred`**: the station to use for the gauge's observed levels among this one and its `same_as`; the station's own `id` when it's the one, or when it has no links. `WHERE preferred = id` gives one station per gauge. Among a gauge's stations with observed levels, it picks one whose terms allow commercial use where there is one. A record's length counts only its share of values not flagged suspect or bad, from its source's years file, so a long record of flagged values doesn't outrank a shorter clean one. It can pick an inactive station, so filter on `status` after picking, not before, or the gauge drops out. [stations.md](stations.md#gauges-in-more-than-one-source) has the order.
+- **`tide_station`**: the slackwater-database station for the gauge: the station's own record, or the accepted record that replaces a copy slackwater-database rejected as a duplicate, or else the one linked to the station's `preferred` series or another of its `same_as`.
 - **`errata`**: the errors found in what the source publishes for this station, by ID, such as UHSLC's Hong Kong heights stamped an hour early. [`errata.json`](https://stillwell.openwaters.io/errata.json) has each one: which stations and span of values it's in, what's wrong, whether the store corrected, flagged, dropped, refused, avoided or kept them, the evidence, when it was reported to the agency and what it answered, and a link (`url`) to the file in this repository that holds it.
-- **`source_qc_start`**: where the source's quality checks of the station's values start, as a UTC time, or null where none is known or the station's list hasn't been read for it yet. Null means unknown. It doesn't mean the source never checks the station's values, or that it has checked them all: its `preliminary` values may be checked later or never. At SMHI, the [adapter's notes](../src/sources/smhi/README.md) say why each station without a date has none. The source won't check the `preliminary` values before it, so they won't change. SMHI states one for 28 of its stations, 25 of them the Swedish Maritime Administration's: data before 1 July 2019 isn't quality-controlled, and automatic checks run from then on. At about 25 more SMHI stations whose notes state none, the store infers it from SMHI's flags, as the first checked value after the last month or more of unchecked ones: 1 January 2010 at most of SMHI's own, and 11 January 2018 at Uddevalla. `flag <= 2 AND time < source_qc_start` gives that history where it passed the store's QC.
-- **`source_qc_start_inferred`**: whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false). Null without a `source_qc_start`, or with one the station refresh hasn't read again since the column was added, which it settles on a later refresh. Add `AND source_qc_start_inferred = false` to keep to stated dates. An inferred date is the store's reading of the flags, worked out once and kept, and backfill doesn't fetch the years before it again.
-- **`tidal`**: whether the station's levels carry a tide, measured from its last year in the store: true where M2's and O1's amplitudes add to 8 cm or more (`tide_m`), on at least 30 days of values, at water within 10 m of sea level where its datums say how high it sits, and, away from the coast, where it doesn't hold still between tides like a creek drained to a sill. Null where its values can't say (under 30 days, or sampled too coarsely to fit a tide), or before its first analysis. It's measured, not taken from `kind`: a river can be tidal, and the Baltic isn't. QC follows it: still water gets two days before a flatline is suspect and no outlier or held-level check (a sea without a tide keeps six hours for values in millimeters), tidal water six hours, counting values within 2 mm of a run's first as unchanged, or two days where its tide is under 30 cm and its values move in whole centimeters, and tidal water other than a river or lake also gets a check of each stored year against a harmonic fit of its own tide, which marks suspect a run that jumps away from the tide and back; values from the live window get it only when their year is requalified or refetched after they leave the window, which no job does for this rule alone. [stations.md](stations.md#analysis) has the rule.
+- **`source_qc_start`**: where the source's quality checks of the station's values start, as a UTC time, or null where none is known. Null means unknown. It doesn't mean the source never checks the station's values, or that it has checked them all: its `preliminary` values may be checked later or never. The source won't check the `preliminary` values before it, so they won't change. `flag <= 2 AND time < source_qc_start` gives that history where it passed the store's QC. A source's README says where its dates come from.
+- **`source_qc_start_inferred`**: whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false). Null without a `source_qc_start`, or with one the station refresh hasn't read yet. Add `AND source_qc_start_inferred = false` to keep to stated dates. An inferred date is the store's reading of the flags, worked out once and kept, and backfill doesn't fetch the years before it again.
+- **`tidal`**: whether the station's levels carry a tide, measured from its last year in the store: true where M2's and O1's amplitudes add to 8 cm or more (`tide_m`), with exceptions for water well above sea level and for creeks that drain to a sill. Null where its values can't say, or before its first analysis. It's measured, not taken from `kind`: a river can be tidal, and the Baltic isn't. QC's flatline, outlier, held-level and residual-jump rules follow it. [stations.md](stations.md#analysis) has the rules.
 - **`tide_m`**: the lunar tide `tidal` is judged by, M2's and O1's amplitudes added, in meters, fitted over the station's last year of usable values. Null where they span under 30 days or are sampled too coarsely to fit, and before the station's first analysis.
-- **`status`**: `active` or `inactive`.
-- **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC gauges, `commercial_use` follows them and `attribution` adds the contributor's credit.
+- **`status`**: `active` or `inactive`. A station the source stops listing stays, inactive.
+- **`live`**: whether hourly ingest polls the station into `recent/`.
+- **`min_interval_s`**: how often the source lets ingest ask for the station, in seconds, where it says.
+- **`source_url`**: the station's page at its source.
+- **`commercial_use`**, **`license`** and **`attribution`**: the station's terms. `license` is its source's; where a contributor's own terms apply, as at some UHSLC and GESLA records, `commercial_use` follows them and `attribution` adds the contributor's credit.
 
-The examples below use the DuckDB CLI (`brew install duckdb`), and each one reads straight from the bucket.
+The examples below use the DuckDB CLI (`brew install duckdb`), and each one reads straight from the store.
 
 How many stations each source has, and in which datums:
 
@@ -63,32 +79,53 @@ GROUP BY source ORDER BY source;
 ```
 
 ```
-┌─────────────┬──────────┬──────────┐
-│   source    │ stations │  datums  │
-│   varchar   │  int64   │ varchar  │
-├─────────────┼──────────┼──────────┤
-│ bsh         │      172 │ PNP, SKN │
-│ pegelonline │      691 │ NN, PNP  │
-│ rws         │      691 │ MSL, NAP │
-└─────────────┴──────────┴──────────┘
+┌──────────────────┬──────────┬──────────────────────┐
+│      source      │ stations │        datums        │
+├──────────────────┼──────────┼──────────────────────┤
+│ bodc             │ 42       │ CD                   │
+│ bsh              │ 172      │ PNP, SKN             │
+│ cdec             │ 35       │ GZ, NAVD88           │
+│ coops            │ 2930     │ STND                 │
+│ crms             │ 383      │ NAVD88               │
+│ dwr              │ 46       │ GZ, NAVD88           │
+│ ea               │ 43       │ AOD, CD              │
+│ gesla            │ 6656     │ ZERO                 │
+│ jma              │ 70       │ DL                   │
+│ kartverket       │ 33       │ CD                   │
+│ marine-institute │ 23       │ ODM, ZERO            │
+│ pegelonline      │ 692      │ NN, PNP              │
+│ refmar           │ 173      │ ZH, ZI               │
+│ rws              │ 691      │ MSL, NAP             │
+│ sfwmd            │ 37       │ NAVD88               │
+│ smhi             │ 60       │ RH2000               │
+│ uhslc            │ 741      │ ZERO                 │
+│ usace            │ 1353     │ GZ                   │
+│ usgs             │ 13972    │ GAGE, NAVD88, NGVD29 │
+└──────────────────┴──────────┴──────────────────────┘
 ```
 
 A gauge by name, with its links to other sources:
 
 ```sql
-SELECT id, name, products, same_as, preferred
+SELECT id, products, preferred
 FROM 'https://stillwell.openwaters.io/stations.parquet'
-WHERE name ILIKE '%cuxhaven%';
+WHERE name ILIKE '%cuxhaven%'
+ORDER BY id;
 ```
 
 ```
-┌─────────────────────┬─────────────────────────────┬───────────────────────────────────┬───────────────────────┬─────────────────────┐
-│         id          │            name             │             products              │        same_as        │      preferred      │
-│       varchar       │           varchar           │             varchar[]             │       varchar[]       │       varchar       │
-├─────────────────────┼─────────────────────────────┼───────────────────────────────────┼───────────────────────┼─────────────────────┤
-│ bsh/506P            │ Cuxhaven, Steubenhöft, Elbe │ [predictions, predicted_extremes] │ [pegelonline/5990020] │ pegelonline/5990020 │
-│ pegelonline/5990020 │ CUXHAVEN STEUBENHÖFT        │ [levels]                          │ [bsh/506P]            │ pegelonline/5990020 │
-└─────────────────────┴─────────────────────────────┴───────────────────────────────────┴───────────────────────┴─────────────────────┘
+┌──────────────────────────────────────────┬───────────────────────────────────┬─────────────────────┐
+│                    id                    │             products              │      preferred      │
+├──────────────────────────────────────────┼───────────────────────────────────┼─────────────────────┤
+│ bsh/506P                                 │ [predictions, predicted_extremes] │ pegelonline/5990020 │
+│ gesla/cuxhaven-825-deu-uhslc_fd          │ [levels]                          │ pegelonline/5990020 │
+│ gesla/cuxhaven-825a-deu-uhslc_rq         │ [levels]                          │ pegelonline/5990020 │
+│ gesla/cuxhaven_steubenhoft-cux-deu-bfg   │ [levels]                          │ pegelonline/5990020 │
+│ gesla/cuxhavensteubenhft-5990020-deu-wsv │ [levels]                          │ pegelonline/5990020 │
+│ gesla/cuxhaventg-cux-deu-cmems           │ [levels]                          │ pegelonline/5990020 │
+│ pegelonline/5990020                      │ [levels]                          │ pegelonline/5990020 │
+│ uhslc/825                                │ [levels]                          │ pegelonline/5990020 │
+└──────────────────────────────────────────┴───────────────────────────────────┴─────────────────────┘
 ```
 
 One station per gauge, so a map or a count doesn't show a gauge once for each source that carries it:
@@ -99,7 +136,7 @@ FROM 'https://stillwell.openwaters.io/stations.parquet'
 WHERE list_contains(products, 'levels') AND preferred = id;
 ```
 
-The nearest stations with observed levels to a point, here the mouth of the Nieuwe Waterweg:
+The nearest gauges with observed levels to a point, here the mouth of the Nieuwe Waterweg:
 
 ```sql
 SELECT id, name,
@@ -107,21 +144,20 @@ SELECT id, name,
     sin(radians(lat)) * sin(radians(51.98)) +
     cos(radians(lat)) * cos(radians(51.98)) * cos(radians(lon - 4.12)))), 2) AS km
 FROM 'https://stillwell.openwaters.io/stations.parquet'
-WHERE status = 'active' AND list_contains(products, 'levels')
+WHERE status = 'active' AND list_contains(products, 'levels') AND preferred = id
 ORDER BY km LIMIT 5;
 ```
 
 ```
-┌──────────────────────────────────┬─────────────────────────────────┬────────┐
-│                id                │              name               │   km   │
-│             varchar              │             varchar             │ double │
-├──────────────────────────────────┼─────────────────────────────────┼────────┤
-│ rws/hoekvanholland               │ Hoek van Holland                │   0.35 │
-│ rws/hoekvanholland.splitsingsdam │ Hoek van Holland, splitsingsdam │   0.89 │
-│ rws/beerkanaal                   │ Beerkanaal                      │   1.84 │
-│ rws/europoort.dintelhaven        │ Europoort Dintelhaven           │   2.29 │
-│ rws/scheurhaven                  │ Scheurhaven                     │   2.35 │
-└──────────────────────────────────┴─────────────────────────────────┴────────┘
+┌──────────────────────────────────────┬─────────────────────────────────┬──────┐
+│                  id                  │              name               │  km  │
+├──────────────────────────────────────┼─────────────────────────────────┼──────┤
+│ gesla/hoekvanhollandtg-hoe-nld-cmems │ HoekVanHollandTG                │ 0.0  │
+│ rws/hoekvanholland                   │ Hoek van Holland                │ 0.35 │
+│ rws/hoekvanholland.splitsingsdam     │ Hoek van Holland, splitsingsdam │ 0.89 │
+│ rws/beerkanaal                       │ Beerkanaal                      │ 1.84 │
+│ rws/europoort.dintelhaven            │ Europoort Dintelhaven           │ 2.29 │
+└──────────────────────────────────────┴─────────────────────────────────┴──────┘
 ```
 
 Datum offsets are a map. Add one to a level to convert it:
@@ -251,17 +287,17 @@ ORDER BY abs(o.level_m - p.level_m) DESC LIMIT 3;
 
 ## Reading many files
 
-HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` don't work. Build the list of paths, then pass it to `read_parquet`, with `union_by_name = true` when you select `*`, since older files lack `source_flag`. For several years of one station:
+HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` don't work. Build the list of paths, then pass it to `read_parquet`, with `union_by_name = true` when you select `*`, since some older files lack `source_flag`. For several years of one station:
 
 ```sql
 SET VARIABLE files = (
   SELECT list('https://stillwell.openwaters.io/obs/rws/hoekvanholland/' || y || '.parquet')
-  FROM range(2024, 2025) t(y)
+  FROM range(2020, 2025) t(y)
 );
 SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet`, below, lists them. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction and backfill write; `stations.parquet` is rebuilt after compaction each night, so they usually trail the store by about a day, and are empty for a station with no observations yet.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet`, below, lists them.
 
 ## Which years a station has
 
@@ -272,7 +308,7 @@ A year with no values has no file, so a missing file and a failed download look 
 - **`good`**, **`interpolated`**, **`preliminary`**, **`suspect`** and **`bad`**: how many values have each `flag`;
 - **`version`**: a hash of the file's rows, which changes when any row's `time`, `level_m`, `flag`, `source_flag` or `received` does, and only then.
 
-A year between a station's first and last rows with no row of its own has no values. A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights. The file covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels keeps it, and compaction checks each night that every file has a row and every row a file, so it's current but for those marks, as long as nothing else writes the files; `stations.parquet` lags it by up to a rebuild. A source has no years file until the store builds one for it, so a missing one means not built yet, not a source with no files.
+A year between a station's first and last rows with no row of its own has no values. A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights. The file covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels keeps it, and compaction checks each night that every file has a row and every row a file, so it's current but for those marks; `stations.parquet` lags it by up to a rebuild.
 
 The years of one station, with how much of each its source hasn't checked:
 
@@ -298,6 +334,8 @@ That works for an `id` whose `source_id` needs no URL-encoding; one with a `/`, 
 
 ## Datum epochs
 
+`stations/offsets.parquet` has already applied `to_current`: for each station and epoch, the meters to add to a level to refer it to each named datum. An epoch that converts to the current one has a row for every datum in the current `datums`; one that doesn't (`to_current` null) has rows only for its own frozen offsets. A station's own label, such as NAP, STND or the `MSL` RWS measures its offshore platforms from, isn't the datum of that name, so it has a row only where it's the station's `chart_datum`, as Kartverket's `CD` is, and only in an epoch that converts. To read a level in its own epoch's reference, use `to_current` from `epochs`; a join on a datum the epoch has no row for finds nothing.
+
 `stations.parquet`'s `epochs` lists each span over which a station's levels share one reference: `id`, `datum`, `since` and `until` (UTC, either null when open-ended), `seen` (the last refresh that confirmed it), `reference` (the source's own name for it, where it has one), `reference_since` (where the source says that starts), `datums` (its offsets), `to_current` and `state`. `to_current` is the meters to add to that epoch's levels to put them in the station's current `datum`, and null when they can't be converted, such as across a gauge zero reset nobody has measured. Rows in an epoch's files outside its `since` and `until` aren't part of the series: the uncertain stretch around a change, or, where an epoch opened with a start in the past, years written before it opened, which the new epoch's files hold again. A station's whole record in its current datum:
 
 ```sql
@@ -309,7 +347,7 @@ WITH e AS (
 ),
 o AS (
   -- epoch 1's files; add one per later epoch from its directory with UNION ALL BY NAME,
-  -- since files written before source_flag was kept lack that column
+  -- since some older files lack the source_flag column
   SELECT 1 AS epoch, * FROM read_parquet(getvariable('base') || '/2024.parquet')
 )
 SELECT o.time, o.level_m + e.to_current AS level_m, o.flag
@@ -321,7 +359,7 @@ QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 
 ORDER BY o.time;
 ```
 
-[stations.md](stations.md) has the rules for when an epoch opens and how epochs convert.
+[stations.md](stations.md#datum-epochs) has the rules for when an epoch opens and how epochs convert.
 
 ## Python
 

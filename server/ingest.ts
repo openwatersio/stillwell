@@ -1,7 +1,7 @@
 /**
  * stillwell-ingest: polls every hourly source's live stations into ClickHouse,
  * each station at its `min_interval_s`, hourly where it gives none
- * (docs/realtime.md). Each pass runs in a process of its own (server/pass.ts).
+ * (docs/plans/realtime.md). Each pass runs in a process of its own (server/pass.ts).
  *
  *   node server/ingest.ts [source...]
  *

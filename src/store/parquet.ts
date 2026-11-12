@@ -13,6 +13,7 @@ import {
   type Station,
 } from "../schema.ts";
 import type { EventIndex } from "../types.ts";
+import type { OffsetRow } from "../datums.ts";
 // Refuses the store and cache variables under their old names.
 import "../cache.ts";
 
@@ -480,6 +481,11 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
   interval_s: "INTEGER",
   datum: "VARCHAR",
   datums: "MAP(VARCHAR, DOUBLE)",
+  datums_source: "MAP(VARCHAR, VARCHAR)",
+  datums_epoch: 'MAP(VARCHAR, STRUCT(start DATE, "end" DATE))',
+  datums_attribution: "VARCHAR[]",
+  chart_datum: "VARCHAR",
+  frame: "VARCHAR",
   products: "VARCHAR[]",
   first: "TIMESTAMPTZ",
   last: "TIMESTAMPTZ",
@@ -514,6 +520,17 @@ export async function writeStations(path: string, stations: StoredStation[]): Pr
   );
 }
 
+/** `stations/offsets.parquet`: meters to add to a level in each station's epoch to refer it to each datum. */
+export async function writeOffsets(path: string, rows: OffsetRow[]): Promise<void> {
+  const columns = { station: "VARCHAR", epoch: "INTEGER", datum: "VARCHAR", offset_m: "DOUBLE" };
+  await viaJson(
+    path,
+    rows,
+    `SELECT * FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY station, epoch, datum`,
+    "FORMAT parquet, COMPRESSION zstd",
+  );
+}
+
 /**
  * A source's list's shared columns. The rest is kept as JSON in `extra`,
  * the QC start's columns (`IN_EXTRA`) included, so a station whose source
@@ -523,7 +540,20 @@ const IN_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
   Object.entries(STATION_COLUMNS).filter(
     ([key]) =>
-      !["first", "last", "preferred", "errata", "tidal", "tide_m", ...IN_EXTRA].includes(key),
+      ![
+        "first",
+        "last",
+        "preferred",
+        "errata",
+        "tidal",
+        "tide_m",
+        "datums_source",
+        "datums_epoch",
+        "datums_attribution",
+        "chart_datum",
+        "frame",
+        ...IN_EXTRA,
+      ].includes(key),
   ),
 );
 

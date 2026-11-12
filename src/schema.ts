@@ -52,6 +52,25 @@ export interface Station {
   datum: string;
   /** Meters to add to a level in `datum` to refer it to each other datum. */
   datums: Record<string, number>;
+  /**
+   * Where each of `datums` came from: the source, slackwater-database, or computed
+   * from another series of the gauge (`src/datums.ts`). Set as
+   * `stations.parquet` is built, as are `datums_epoch`, `chart_datum` and `frame`.
+   */
+  datums_source?: Record<string, "source" | "slackwater-database" | "computed">;
+  /** The period each tidal datum in `datums` was reduced over, where known. */
+  datums_epoch?: Record<string, { start: string; end: string }>;
+  /** The credits slackwater-database asks for, one per record whose values `datums` holds, directly or computed from them. */
+  datums_attribution?: string[];
+  /** The datum charts use at the station, such as `LAT` or `MLLW`, or null when it has no offset to one. */
+  chart_datum?: string | null;
+  /**
+   * `gauge` when slackwater-database gave the chart-datum offset for this series, so
+   * levels line up with its predictions; `source` when the source gave it or
+   * it was computed; `unknown` with no chart datum, or where `tide_station`'s
+   * datums are in the constituent frame (MSL = 0).
+   */
+  frame?: "gauge" | "source" | "unknown";
   products: Product[];
   /**
    * First and last observation in the store, as ISO times; null until a store
@@ -62,7 +81,7 @@ export interface Station {
   license: string;
   commercial_use: boolean;
   attribution: string;
-  /** tide-database station (`source/id`) for the same gauge. */
+  /** slackwater-database station (`source/id`) for the same gauge. */
   tide_station: string | null;
   /** Other store series from the same physical gauge, by `src/same-as.ts`. */
   same_as: string[];

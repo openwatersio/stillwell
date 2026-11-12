@@ -105,7 +105,7 @@ function escape(value: string): string {
  * Create the database and its tables. Observations are keyed by station and
  * time, so a later version of a value replaces it whatever its epoch, and are
  * kept a day past the 7 the poller keeps current, until the history moves in
- * (docs/realtime.md, step 2), which creates the table without the TTL.
+ * (docs/plans/realtime.md, step 2), which creates the table without the TTL.
  */
 export async function migrate(ch: ClickHouse): Promise<void> {
   await ch.exec(`CREATE DATABASE IF NOT EXISTS ${ch.database}`);
