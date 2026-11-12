@@ -57,7 +57,7 @@ export const FLATLINE_S = 6 * 3600;
  * Levels no gauge can read in any datum the store holds, in meters: below the
  * Dead Sea's shore or above Everest. QARTOD's gross range test fails a value
  * outside the sensor's span whatever the window holds, which catches a year
- * that is all placeholder, such as USACE's 30,479.695 m (100,000 ft), where
+ * that is all placeholder, such as USACE's 30,479.695 m (99,999 ft), where
  * the window's own median is the placeholder. A scan of every year file in
  * November 2026 found no real level above 1,817 m, at USGS's Lyman Lake.
  */
