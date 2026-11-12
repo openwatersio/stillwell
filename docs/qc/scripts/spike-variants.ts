@@ -13,8 +13,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const SRC = fileURLToPath(new URL("../../../src/", import.meta.url));
 const source = readFileSync(join(SRC, "qc.ts"), "utf8").replace(
-  'from "./schema.ts"',
-  `from ${JSON.stringify(pathToFileURL(join(SRC, "schema.ts")).href)}`,
+  /from "\.\/(\w+\.ts)"/g,
+  (_, file: string) => `from ${JSON.stringify(pathToFileURL(join(SRC, file)).href)}`,
 );
 const current = `    const before: number[] = [];
     const after: number[] = [];
