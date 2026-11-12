@@ -855,6 +855,29 @@ describe("bsh", () => {
     );
   });
 
+  it("reads no rows from a gauge BSH predicts only as times", async () => {
+    // 808P, Leer: times after Emden, with no heights, datum or unit.
+    serve([[/deu2026&files=DE__808P2026/, fixture("DE__808P2026.txt")]]);
+    const range = [new Date("2026-01-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
+    assert.deepEqual(
+      await bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
+      [],
+    );
+    // A file cut short, or with a header BSH never used, fails rather than reading as none.
+    serve([[/deu2026&files=DE__808P2026/, "I_E#DE__808P2026#\n"]]);
+    await assert.rejects(
+      bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
+      /height unit is undefined/,
+    );
+    serve([
+      [/deu2026&files=DE__808P2026/, "I_E#DE__808P2026#\nC02#Datenumfang:#Zeiten : UNKNOWN#\n"],
+    ]);
+    await assert.rejects(
+      bsh.source.predictedExtremes!({ source_id: "808P", datum: "PNP" } as never, ...range),
+      /height unit is undefined/,
+    );
+  });
+
   it("gives datum offsets from the station's own datum, skipping heights BSH leaves null", () => {
     // 624A: SKN 1.56 m below NHN, gauge zero unknown.
     assert.deepEqual(
