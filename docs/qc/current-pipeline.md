@@ -1,6 +1,6 @@
 # How Stillwell quality-controls water levels
 
-This maps every place a stored value's `flag` or `source_flag` is decided or changed, as of `main` at 4caa051e. Every `file:line` reference, including those to docs, is to that commit (`git show 4caa051e:<path>`). At that commit the store code was in `src/lake/` and its tests in `test/lake.test.ts`, which are now `src/store/` and `test/store.test.ts`. It covers observed levels only: extremes, predictions and predicted extremes are never QC'd or errata-flagged (see [Gaps](#gaps-and-inconsistencies-noticed-while-mapping)).
+This maps every place a stored value's `flag` or `source_flag` is decided or changed at commit 4caa051e. Every `file:line` reference, including those to docs, is to that commit (`git show 4caa051e:<path>`). At that commit the store code is in `src/lake/` and its tests in `test/lake.test.ts`, which are `src/store/` and `test/store.test.ts` on `main`. It covers observed levels only: extremes, predictions and predicted extremes are never QC'd or errata-flagged (see [Gaps](#gaps-and-inconsistencies-noticed-while-mapping)).
 
 ## Flag scheme
 

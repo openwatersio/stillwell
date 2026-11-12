@@ -1,6 +1,6 @@
 # Contributing to Stillwell
 
-This repo fetches water levels from each source's own service and writes them as Parquet to the store. The [README](README.md) covers what's in the store, and [docs/data.md](docs/data.md) covers how to read it. This file is for running and changing the code. [docs/plan.md](docs/plan.md) has the plan, and [docs/api.md](docs/api.md) the API design.
+This repo fetches water levels from each source's own service and writes them as Parquet to the store. The [README](README.md) covers what's in the store, and [docs/data.md](docs/data.md) covers how to read it. This file is for running and changing the code. [docs/plans/plan.md](docs/plans/plan.md) has the plan, and [docs/plans/api.md](docs/plans/api.md) the API design.
 
 ## Layout
 
@@ -42,7 +42,7 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 | `npm run ticon:inventory`         | Rewrite `docs/ticon-replacement.md` and its CSV from a tide-database checkout.                                                                |
 | `npm run errata`                  | Draft the report to each agency of its errata not yet reported, and check the erratum IDs the code cites.                                     |
 | `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                                  |
-| `npm run gesla:contributors`      | Rewrite docs/gesla-contributors.md from GESLA 4.1's metadata and each contributor's terms.                                                    |
+| `npm run gesla:contributors`      | Rewrite src/sources/gesla/contributors.md from GESLA 4.1's metadata and each contributor's terms.                                             |
 | `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into `docs/results/`. The RWS one downloads about 50 years of data.                                                |
 | `npm run clock-check -- <args>`   | `scripts/clock-check.ts`: check a new series' clock against TICON, described below.                                                           |
 | `npm run cross-check -- <args>`   | `scripts/cross-check.ts`: compare a region's gauges with each other and with their own tide, described below.                                 |
@@ -195,7 +195,7 @@ Reads hourly values (the value within 10 minutes of each hour, `flag` good or pr
 
 Gauges whose daily mean follows river flow, a sluice or a canal's management (in the German Bight the Eider, the Kiel Canal, the Leda and the tidal Ems) step against every neighbor, so their steps need a look at the gauge before they count.
 
-The Monthly workflow's `cross-check` job runs the checks after each full refresh of the station lists, on the 2nd or dispatched with no `sources`, over this year and the five before in three regions: the German Bight (PEGELONLINE and GESLA), the US East Coast (CO-OPS and GESLA) and Sweden (SMHI and GESLA). Each region's report is in the run's summary and an artifact; a region that fails to read its values reports nothing, and its job can be rerun. Most GESLA records end between 2020 and 2025, so the window holds only their last years, and a station whose first datum epoch ended before the window, which is all the checks read, is listed rather than checked. Read it for findings not yet in an `errata.json`, check each against another record of the gauge or a neighbor before adding an erratum (see [Source errata](#source-errata)), and add a region as a matrix entry in `.github/workflows/monthly.yml`.
+The Monthly workflow's `cross-check` job runs the checks after each full refresh of the station lists, on the 2nd or dispatched with no `sources`, over this year and the five before in three regions: the German Bight (PEGELONLINE and GESLA), the US East Coast (CO-OPS and GESLA) and Sweden (SMHI and GESLA). Each region's report is in the run's summary and an artifact; a region that fails to read its values reports nothing, and its job can be rerun. Many GESLA records end before the window or partway through it, so it holds only their last years, and a station whose first datum epoch ended before the window, which is all the checks read, is listed rather than checked. Read it for findings not yet in an `errata.json`, check each against another record of the gauge or a neighbor before adding an erratum (see [Source errata](#source-errata)), and add a region as a matrix entry in `.github/workflows/monthly.yml`.
 
 ## Evaluations
 

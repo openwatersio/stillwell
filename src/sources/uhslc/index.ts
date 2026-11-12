@@ -303,7 +303,7 @@ const FD_STOPPED = 5;
  * A station's contributor, and the terms its documentation file adds to
  * UHSLC's: its commercial-use tag and the contributor's credit. An FD series
  * takes its RQ version's file; one with no RQ version has none, and keeps
- * UHSLC's terms. See docs/uhslc-contributors.md.
+ * UHSLC's terms. See src/sources/uhslc/contributors.md.
  */
 function withTerms(station: UhslcStation, previous?: Listed): void {
   const fd = station.source_id.length === 3;
