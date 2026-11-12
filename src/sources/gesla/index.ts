@@ -11,6 +11,7 @@ import {
   Unjudged,
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
+import { seriesOf } from "../unam/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
@@ -319,6 +320,15 @@ export function originatorIds(
     case "CRMS":
       // The site's first surface-water gauge, which GESLA's records start on.
       return /^CRMS\d{4}$/.test(upper) ? [`crms/${upper}-H01`] : [];
+    // JODC's codes; its JMA records' (`MA…`) aren't JMA's own, and JODC doesn't list them.
+    case "JODC_JCG":
+    case "JODC_GIAJ":
+    case "JODC_PAHB":
+      return [`jodc/${upper}`];
+    case "UNAM": {
+      const series = seriesOf(file);
+      return series ? [`unam/${series}`] : [];
+    }
     case "UHSLC_FD":
       return [`uhslc/${code.toLowerCase()}`];
     case "UHSLC_RQ": {

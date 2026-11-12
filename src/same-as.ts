@@ -173,7 +173,7 @@ const ASSEMBLED = new Set(["gesla"]);
  * stations at one pier are separate instruments that check each other, never
  * one gauge. Only an ID or an entry in `LINKS` joins them.
  */
-const SEPARATE = new Set(["coops~usgs", "coops~usace"]);
+const SEPARATE = new Set(["coops~usgs", "coops~usace", "jma~jodc"]);
 
 function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));

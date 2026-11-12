@@ -214,7 +214,9 @@ export interface SourceMetadata {
     /**
      * Whether the terms let anyone republish the data, which the public store
      * does. A source that withholds it keeps its list and series in the
-     * restricted store. This, not `commercial_use`, decides the store.
+     * restricted store. A source whose terms ask for permission to republish,
+     * once it's asked for, is in the public store with `commercial_use` false
+     * until it's given. This, not `commercial_use`, decides the store.
      */
     redistribution: boolean;
   };

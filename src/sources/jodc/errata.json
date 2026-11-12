@@ -1,0 +1,33 @@
+{
+  "errata": [
+    {
+      "id": "jodc-day-zero",
+      "stations": ["jodc/0132", "jodc/7315", "jodc/7317", "jodc/7318", "jodc/7319"],
+      "since": "2012-01-08",
+      "until": "2021-09-02",
+      "handling": "corrected",
+      "error": "Eight lines in JODC's port files are dated day 00 of a month: 0132's 2012/01/00, 7315's 2021/05/00, 7317's 2021/01/00, 2021/03/00 and 2021/09/00, 7318's 2021/08/00, and 7319's 2021/04/00 and 2021/08/00. Each sits where the month's one missing day belongs.",
+      "response": "A line dated day 00 is read as the day after the line before it, or the month's first day at the top of a file, and refused if that falls outside the month it names.",
+      "evidence": "Every day-00 line is the only missing day of its month and sits between the lines for the days either side of it (2012/01/08 and 2012/01/10 for 0132), and its levels continue the tide from the line before. The full backfill on 2026-11-12 failed every year of these stations on \"no day\"."
+    },
+    {
+      "id": "jodc-zip-duplicates",
+      "stations": [
+        "jodc/GS01",
+        "jodc/GS02",
+        "jodc/GS03",
+        "jodc/GS04",
+        "jodc/GS05",
+        "jodc/GS06",
+        "jodc/GS07",
+        "jodc/GS08",
+        "jodc/GS09"
+      ],
+      "handling": "kept",
+      "error": "The zips of GSI's GS01 to GS09 hold their 1965 file twice.",
+      "response": "The copies are identical, so the year is read once; a zip whose copies differ is refused.",
+      "evidence": "The zips' central directories list 1965's file twice, with the same contents in GS01's and GS02's (checked 2026-11-12)."
+    }
+  ],
+  "retired": []
+}

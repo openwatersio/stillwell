@@ -372,7 +372,8 @@ export function withheld(sourceId: string): string | null {
 /**
  * The originator's own station for a series, where its contributor numbers
  * gauges as a store source does: NOS's are CO-OPS station IDs, and the
- * two-character codes JMA and JODC give are JMA's (JODC's `HD` numbers aren't).
+ * two-character codes JMA and JODC give are JMA's, and JODC's `HD` numbers are
+ * its own Coast Guard stations'.
  * Other contributors' numbers (SHOM's, the TGI's) aren't their store source's
  * IDs, so those gauges are matched by nearness and name (src/same-as.ts).
  */
@@ -388,6 +389,8 @@ export function originatorStation(
     /^[A-Z0-9]{2}$/.test(originator)
   )
     return `jma/${originator}`;
+  if (contributor === "Japan Oceanographic Data Center" && /^HD\d\d$/.test(originator))
+    return `jodc/${originator}`;
   return null;
 }
 
