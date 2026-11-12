@@ -43,7 +43,7 @@ describe("qc spike rule", () => {
 
   it("judges a value whose neighbors don't pair across it", () => {
     // 10-minute values with a neighbor 30 minutes before and 10 minutes after the spike only.
-    const rows = tide(200, 10 * MIN, 0.5).filter((_, i) => i !== 98 && i !== 99);
+    const rows = tide(200, 10 * MIN, 0.5).filter((_, i) => ![98, 99, 102, 103].includes(i));
     const k = rows.findIndex((r) => r.time === T + 100 * 10 * MIN);
     rows[k]!.level += 3;
     assert.equal(qc(rows)[k]!.flag, Flag.suspect);

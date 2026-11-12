@@ -130,7 +130,8 @@ export function judge(
   // low water, as at Werkendam in the Biesbosch, makes no difference to its QC
   // and doesn't count; a hold that wavers within `FLATLINE_M` counts, as those
   // rules flag it. Elsewhere a tidal verdict also turns the outlier check on,
-  // so every hold a plain six hours flags counts, values exactly equal: a
+  // so every hold a plain six hours flags counts, values exactly equal, at an
+  // estuary as at a gauge of no kind: a
   // gauge of no kind on the coast, such as REFMAR's at Le Havre, can read
   // its zero to a few millimeters for hours when left dry, and a tidal
   // verdict lets QC flag that.

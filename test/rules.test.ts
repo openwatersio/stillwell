@@ -63,6 +63,17 @@ const QC_SERIES: Record<string, () => Observation[]> = {
     series(7 * 240, 6 * MIN, (h) => tide(0.1)(h) + 1.2 * Math.exp(-(((h - 120) / 10) ** 2) / 2)),
   "offset run of 4 h at -7 m, 5 min": () =>
     set(series(3 * 288, 5 * MIN, tide(1.6)), 360, 408, (i) => -7 + 0.05 * Math.sin(i)),
+  // Long enough for the residual jump rule's tide fit, which needs 30 days of hourly values.
+  "40 days with an offset run and a lone 0 m before a gap, 10 min": () => {
+    const rows = set(
+      series(40 * 144, 10 * MIN, tide(1.6)),
+      2000,
+      2024,
+      (i) => -7 + 0.05 * Math.sin(i),
+    );
+    rows[4000]!.level = 0;
+    return rows.filter((_, i) => i <= 4000 || i > 4006);
+  },
   "lone 0 m before a 1 h gap, 15 min": () => {
     const rows = series(3 * 96, 15 * MIN, tide(3.4));
     rows[150]!.level = 0;
