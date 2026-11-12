@@ -22,6 +22,7 @@ import { boundsPath, recentPath, seriesPath } from "../src/store/paths.ts";
 import {
   compactRecent,
   formatSummary,
+  timer,
   lastDays,
   updateRecent,
   writePreliminary,
@@ -678,7 +679,19 @@ describe("compactRecent", () => {
     ]);
     const run = () =>
       compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
-    const summary = await run();
+    const { seconds, ...summary } = await run();
+    // Each phase, the bounds' and reconcile's included, reaches the summary.
+    assert.deepEqual(Object.keys(seconds!), [
+      "read window",
+      "mark years",
+      "fold",
+      "commit years",
+      "bounds: read bounds",
+      "bounds: list files",
+      "bounds: read files",
+      "bounds: write bounds",
+      "reconcile: read years",
+    ]);
     assert.deepEqual(
       (await readObservations(file)).map((r) => [r.time - start, r.level, r.received]),
       [
@@ -1519,5 +1532,40 @@ describe("formatSummary", () => {
     assert.match(text, /Stale:\n\n- test\/b/);
     assert.match(text, /Waiting on a held datum change:\n\n- test\/d: 4 values/);
     assert.match(text, /Warnings:\n\n- test\/e: epoch 1: part of the record; its flags are kept/);
+  });
+
+  it("tabulates each phase's seconds", () => {
+    const text = formatSummary({
+      title: "compact test",
+      stations: 1,
+      updated: 0,
+      stale: [],
+      failed: [],
+      waiting: [],
+      values: 0,
+      files: 0,
+      seconds: { fold: 12.34, "commit years": 0.5 },
+    });
+    assert.match(
+      text,
+      /\| Phase \| Seconds \|\n\| - \| -: \|\n\| fold \| 12\.3 \|\n\| commit years \| 0\.5 \|/,
+    );
+  });
+});
+
+describe("timer", () => {
+  it("adds up a phase's seconds over its runs and passes on what its work throws", async () => {
+    const seconds: Record<string, number> = {};
+    const time = timer("test", seconds);
+    assert.equal(await time("a", async () => 1), 1);
+    await time("a", async () => undefined);
+    await assert.rejects(
+      time("b", async () => {
+        throw new Error("boom");
+      }),
+      /boom/,
+    );
+    assert.deepEqual(Object.keys(seconds), ["a", "b"]);
+    assert.ok(seconds.a! >= 0 && seconds.b! >= 0);
   });
 });
