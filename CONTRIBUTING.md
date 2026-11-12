@@ -32,20 +32,21 @@ Ingest writes to `data/` by default and caches every response in `.cache/`, so y
 
 ## Commands
 
-| Command                           | Does                                                                                                                                                               |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run check`                   | Everything CI checks: lint, typecheck and tests. Run it before pushing.                                                                                            |
-| `npm test`                        | The `node:test` suites in [`test/`](test/). They use recorded fixtures and make no network calls.                                                                  |
-| `npm run typecheck`               | `tsc --noEmit`.                                                                                                                                                    |
-| `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                                                            |
-| `npm run ingest -- <args>`        | [`scripts/ingest.ts`](scripts/ingest.ts): `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`, described below. |
-| `npm run ticon:inventory`         | Rewrite [`docs/ticon-inventory.md`](docs/ticon-inventory.md) and its CSV from a slackwater-database checkout.                                                      |
-| `npm run errata`                  | Draft the report to each agency of its errata not yet reported, and check the erratum IDs the code cites.                                                          |
-| `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                                                       |
-| `npm run gesla:contributors`      | Rewrite [src/sources/gesla/contributors.md](src/sources/gesla/contributors.md) from GESLA 4.1's metadata and each contributor's terms.                             |
-| `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into [`docs/results/`](docs/results/). The RWS one downloads about 50 years of data.                                                    |
-| `npm run clock-check -- <args>`   | [`scripts/clock-check.ts`](scripts/clock-check.ts): check a new series' clock against TICON, described below.                                                      |
-| `npm run cross-check -- <args>`   | [`scripts/cross-check.ts`](scripts/cross-check.ts): compare a region's gauges with each other and with their own tide, described below.                            |
+| Command                           | Does                                                                                                                                                                                            |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`                   | Everything CI checks: lint, typecheck and tests. Run it before pushing.                                                                                                                         |
+| `npm test`                        | The `node:test` suites in [`test/`](test/). They use recorded fixtures and make no network calls.                                                                                               |
+| `npm run typecheck`               | `tsc --noEmit`.                                                                                                                                                                                 |
+| `npm run lint` / `npm run format` | Check / write formatting with Prettier.                                                                                                                                                         |
+| `npm run ingest -- <args>`        | [`scripts/ingest.ts`](scripts/ingest.ts): `stations`, `publish`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`, described below.                              |
+| `npm run ticon:inventory`         | Rewrite [`docs/ticon-inventory.md`](docs/ticon-inventory.md) and its CSV from a slackwater-database checkout.                                                                                   |
+| `npm run errata`                  | Draft the report to each agency of its errata not yet reported, and check the erratum IDs the code cites.                                                                                       |
+| `npm run uhslc:contributors`      | Rescan UHSLC's documentation files for each station's contributor and terms.                                                                                                                    |
+| `npm run gesla:contributors`      | Rewrite [src/sources/gesla/contributors.md](src/sources/gesla/contributors.md) from GESLA 4.1's metadata and each contributor's terms.                                                          |
+| `npm run gesla:coverage`          | Rewrite [src/sources/gesla/coverage.md](src/sources/gesla/coverage.md) and its CSV from the store: which GESLA records the store also has from their originator, and the years each side lacks. |
+| `npm run evaluate:bsh` / `:rws`   | Rerun the HRoI evaluations into [`docs/results/`](docs/results/). The RWS one downloads about 50 years of data.                                                                                 |
+| `npm run clock-check -- <args>`   | [`scripts/clock-check.ts`](scripts/clock-check.ts): check a new series' clock against TICON, described below.                                                                                   |
+| `npm run cross-check -- <args>`   | [`scripts/cross-check.ts`](scripts/cross-check.ts): compare a region's gauges with each other and with their own tide, described below.                                                         |
 
 CI also checks that [`package-lock.json`](package-lock.json) regenerates from [`package.json`](package.json) and that every package resolves from the npm registry.
 
