@@ -1702,6 +1702,37 @@ describe("usace", () => {
       [chicago!.id, chicago!.lat, chicago!.lon],
       ["usace/LRC.Chicago_Lock-Pool", 41.888366276028, -87.62116342606],
     );
+    // The published pair stands in only for a missing pair, never for one
+    // coordinate, and its placeholders are still rejected.
+    const pool = (location: Partial<usace.CatalogLocation>) =>
+      usace.toStations(
+        "LRC",
+        [
+          series(
+            "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+            "1Hour",
+            "2021-03-19T16:00:00Z",
+            "2026-09-14T03:00:00Z",
+          ),
+        ],
+        [{ office: "LRC", name: "Chicago Lock-Pool", nation: "United States", ...location }],
+        new Map(),
+        now,
+      );
+    const published = {
+      "published-latitude": 41.888366276028,
+      "published-longitude": -87.62116342606,
+    };
+    assert.deepEqual(pool({ latitude: 41.89, ...published }), []);
+    assert.deepEqual(pool({ longitude: -87.62, ...published }), []);
+    assert.deepEqual(pool({ "published-latitude": 0, "published-longitude": 0 }), []);
+    assert.deepEqual(
+      pool({
+        "published-latitude": -3.4028234663852886e38,
+        "published-longitude": -3.4028234663852886e38,
+      }),
+      [],
+    );
     // A gauge whose only series stopped years ago is listed for its history, not live.
     const [old] = usace.toStations(
       "MVS",
