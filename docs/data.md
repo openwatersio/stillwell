@@ -61,7 +61,7 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 - **`source_qc_start_inferred`**: whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false). Null without a `source_qc_start`, or with one the station refresh hasn't read yet. Add `AND source_qc_start_inferred = false` to keep to stated dates. An inferred date is the store's reading of the flags, worked out once and kept, and backfill doesn't fetch the years before it again.
 - **`tidal`**: whether the station's levels carry a tide, measured from its last year in the store: true where M2's and O1's amplitudes add to 8 cm or more (`tide_m`), with exceptions for water well above sea level and for creeks that drain to a sill. Null where its values can't say, or before its first analysis. It's measured, not taken from `kind`: a river can be tidal, and the Baltic isn't. QC's flatline, outlier, held-level and residual-jump rules follow it. [stations.md](stations.md#analysis) has the rules.
 - **`tide_m`**: the lunar tide `tidal` is judged by, M2's and O1's amplitudes added, in meters, fitted over the station's last year of usable values. Null where they span under 30 days or are sampled too coarsely to fit, and before the station's first analysis.
-- **`status`**: `active` or `inactive`. A station the source stops listing stays, inactive.
+- **`status`**: `active` or `inactive`. A station the source stops listing stays, inactive, and an adapter marks inactive a station its source lists as ended, such as a CO-OPS station with a `removed` date that's off the current network. An inactive station's history stays in the store.
 - **`live`**: whether hourly ingest polls the station into `recent/`.
 - **`min_interval_s`**: how often the source lets ingest ask for the station, in seconds, where it says.
 - **`source_url`**: the station's page at its source.
@@ -85,7 +85,7 @@ GROUP BY source ORDER BY source;
 │ bodc             │ 42       │ CD                   │
 │ bsh              │ 172      │ PNP, SKN             │
 │ cdec             │ 35       │ GZ, NAVD88           │
-│ coops            │ 2930     │ STND                 │
+│ coops            │ 332      │ STND                 │
 │ crms             │ 383      │ NAVD88               │
 │ dwr              │ 46       │ GZ, NAVD88           │
 │ ea               │ 43       │ AOD, CD              │

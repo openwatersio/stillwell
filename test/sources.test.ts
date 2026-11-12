@@ -1116,7 +1116,10 @@ describe("coops", () => {
         /type=historicwl/,
         JSON.stringify({
           stations: [
-            station({}),
+            // On the current network, so active whatever its removed date says.
+            station({
+              details: { established: "1899-01-01 00:00:00", removed: "1950-01-01 00:00:00" },
+            }),
             station({
               id: "9063020",
               name: "Buffalo",
@@ -1124,7 +1127,12 @@ describe("coops", () => {
               tidal: false,
               greatlakes: true,
             }),
-            station({ id: "1495000", name: "Esperanza, Antarctica", state: "" }),
+            station({
+              id: "1495000",
+              name: "Esperanza, Antarctica",
+              state: "",
+              details: { established: "1980-01-01 00:00:00", removed: "1990-01-01 00:00:00" },
+            }),
             // CO-OPS's `greatlakes` misses this one, but its `tideType` says Great Lakes.
             station({
               id: "9075199",
@@ -1133,6 +1141,8 @@ describe("coops", () => {
               tidal: false,
               greatlakes: false,
               tideType: "Great Lakes",
+              // Reinstalled: removed before it was established again.
+              details: { established: "2001-05-01 00:00:00", removed: "1994-10-01 00:00:00" },
             }),
           ],
         }),
@@ -1157,7 +1167,7 @@ describe("coops", () => {
       [/9075199\/datums/, JSON.stringify({ datums: null, LAT: null })],
     ]);
     const [esperanza, buffalo, frenes, seattle] = await coops.stations();
-    assert.equal(frenes!.kind, "lake");
+    assert.deepEqual([frenes!.kind, frenes!.status, seattle!.status], ["lake", "active", "active"]);
     assert.deepEqual(
       [
         seattle!.id,
@@ -1187,10 +1197,10 @@ describe("coops", () => {
       [buffalo!.datums, buffalo!.products, buffalo!.kind],
       [{ IGLD: 0, LWD: -173.5 }, ["levels"], "lake"],
     );
-    // Listed for its history, but not on the live network.
+    // Removed, and not on the live network: listed for its history.
     assert.deepEqual(
       [esperanza!.live, esperanza!.status, esperanza!.datums],
-      [false, "active", {}],
+      [false, "inactive", {}],
     );
     // A refresh that gets no datums keeps the offsets, so it keeps their period too.
     serve([
@@ -1203,6 +1213,15 @@ describe("coops", () => {
       start: "1983-01-01",
       end: "2001-12-31",
     });
+  });
+
+  it("refuses a historical list under half the stored one", async () => {
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: [station({})] })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({})] })],
+    ]);
+    const stored = Array.from({ length: 40 }, (_, i) => ({ id: `coops/${i}` }) as Station);
+    await assert.rejects(coops.stations(stored), /listed 1 historical stations, down from 40/);
   });
 
   it("spans every datum analysis period CO-OPS gives", () => {
