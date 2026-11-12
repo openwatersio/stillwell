@@ -62,7 +62,7 @@ export interface Analysis {
  * threshold in `qcFor`, so `analyze` judges every station again and
  * requalifies all its stored years.
  */
-export const RULES = "held-1";
+export const RULES = "jumps-1";
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a

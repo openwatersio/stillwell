@@ -23,7 +23,8 @@ const mad = (v: number[]) => {
 const [file, yearArg, ...windows] = process.argv.slice(2);
 const year = Number(yearArg);
 const { station, start, context, options } = load(file!, year);
-const cur = qc(start, options, context);
+// QC as it stood before the store's own jump rule, which this prototypes.
+const cur = qc(start, { ...options, jumps: false }, context);
 // Tide: fit on hourly values the source didn't flag.
 const mid0 = median(start.map((r: any) => r.level));
 const usable = start.filter(

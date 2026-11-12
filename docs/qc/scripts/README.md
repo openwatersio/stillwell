@@ -17,6 +17,7 @@ The synthetic counts in `non-finite.ts` depend on the Node version, since the or
 | [spike-variants.ts](spike-variants.ts)         | Compares the spike rule's neighbor reference with five alternatives, counting flags and values judged.                                                                                            |
 | [non-finite.ts](non-finite.ts)                 | What non-finite levels do to `qc`.                                                                                                                                                                |
 | [residual-prototype.ts](residual-prototype.ts) | Prototype residual jump-and-return, residual range and attenuation tests.                                                                                                                         |
+| [jumps.ts](jumps.ts)                           | What the store's residual-jump rule adds to QC, on exported station-years; [jumps-sample.txt](jumps-sample.txt) lists the 127 tidal station-years it was validated on.                            |
 | [timing.ts](timing.ts)                         | Times `qc` against a harmonic fit and prediction.                                                                                                                                                 |
 | [coops-r.py](coops-r.py)                       | Counts R and F on CO-OPS verified values, and their distance from their neighbors, from CO-OPS's API.                                                                                             |
 | [float32.py](float32.py)                       | Checks whether 0.1 mm levels survive the store's 32-bit storage, by elevation.                                                                                                                    |
@@ -33,5 +34,12 @@ node docs/qc/scripts/residual-prototype.ts jer2025.json 2025 2025-10-14T18:00/20
 ```
 
 The station-years in the evaluation are `bodc/jer` 2025, `bodc/npo` and `bodc/liv` 2024 (gap edges only), `marine-institute/kilrush-lough` 2025, `marine-institute/galway-port` 2025, `pegelonline/9420020` and `pegelonline/5950081` 2025 and 2026, `ea/E71924` and `ea/E72039` 2026, `sfwmd/MARKH` 2022, `usace/MVN.Cyremort_Point` 2019, and `coops/8729840` 2020, `coops/8761305` 2020 and 2021, `coops/8735180` 2020, `coops/8761955` 2019 and `coops/8764044` 2019.
+
+The residual-jump rule's validation, after it went into `src/qc.ts`, exports each station-year in [jumps-sample.txt](jumps-sample.txt): three of the largest tides and five others from each source's tidal stations, the Wangerooge copies, and the evaluation's storm and evidence years.
+
+```bash
+while read id year; do python -I docs/qc/scripts/export.py "$id" "$year" "jumps-${id//\//_}-$year.json"; done < docs/qc/scripts/jumps-sample.txt
+node docs/qc/scripts/jumps.ts $(while read id year; do echo "jumps-${id//\//_}-$year.json:$year"; done < docs/qc/scripts/jumps-sample.txt)
+```
 
 Some figures in the evaluation have no script: the source flag shares, summed from `stations/years/<source>.parquet` with `query.py`; the 69 JMA files checked for a 9.99 m sentinel; the check of BODC's ERDDAP for the missing 07:30 row; and the one-off run of `datumJumps` over every coastal record, whose results are the errata's own evidence.

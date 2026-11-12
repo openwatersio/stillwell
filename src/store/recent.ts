@@ -267,7 +267,11 @@ export async function updateRecent({
                       suspect,
                     ),
                   ];
-            merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), opts);
+            // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
+            merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
+              ...opts,
+              jumps: false,
+            });
           }
         } catch (error) {
           // Keep what we had; a failed fetch mustn't empty the window.
@@ -850,7 +854,8 @@ export const CENTIMETER_TIDE_M = 0.3;
  * millimeters. Tidal water never holds still that long, so it gets six hours,
  * or two days where its tide is under `CENTIMETER_TIDE_M` and its values move
  * in whole centimeters. A tidal river or lake still floods, so it keeps the
- * outlier check off; tidal water of any other kind, or none, keeps it. A
+ * outlier check off, and its tide is too far from harmonic for the residual
+ * jumps; tidal water of any other kind, or none, keeps both. A
  * station with no verdict yet is judged by its kind: a river or lake as
  * still, anything else as tidal, as a tide gauge is, since sources such as
  * RWS and REFMAR leave their tide gauges' kind unset.
@@ -864,7 +869,7 @@ export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOp
   const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
     ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
-    ...(river ? { outliers: false } : {}),
+    ...(river ? { outliers: false } : { jumps: true }),
   };
 }
 
