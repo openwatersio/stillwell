@@ -6,12 +6,12 @@ slackwater-database holds 4838 TICON records. 4838 are listed in its station fil
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1409 | 1356 | 3124 | An adapter exists and the record matched one of its stations |
-| planned | 165 | 165 | 331 | Cleared source, adapter in the plan |
+| ready | 1606 | 1553 | 3511 | An adapter exists and the record matched one of its stations |
+| planned | 1 | 1 | 3 | Cleared source, adapter in the plan |
 | to_match | 43 | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
-| license | 429 | 429 | 663 | The source's terms need confirming first |
-| unmatched | 80 | 76 | 155 | An adapter exists, but no station matched, or two matched equally; check by hand |
-| restricted | 401 | 388 | 513 | The source forbids it; stays on TICON |
+| license | 312 | 312 | 476 | The source's terms need confirming first |
+| unmatched | 117 | 113 | 206 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| restricted | 448 | 435 | 590 | The source forbids it; stays on TICON |
 
 The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. 2457 of the 2527 accepted records have a GESLA 4.1 copy listed in the store (`gesla_id` in the CSV), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
 
@@ -22,31 +22,32 @@ Accepted records only, in the order to build adapters: most records first.
 | Source | Records | Status | TICON contributors |
 | --- | --- | --- | --- |
 | usgs | 435 | ready 431, unmatched 4 | usgs |
-| uhslc | 421 | ready 360, unmatched 1, restricted 60 | uhslc_fd, uhslc_rq |
+| uhslc | 421 | ready 405, unmatched 1, restricted 15 | uhslc_fd, uhslc_rq |
 | chs | 256 | restricted 256 | meds |
-| crms | 164 | planned 164 | crms |
+| crms | 164 | ready 151, unmatched 13 | crms |
 | pegelonline | 147 | ready 146, unmatched 1 | cmems, wsv |
 | refmar | 124 | ready 123, unmatched 1 | cmems, refmar |
-| jodc | 111 | license 111 | jodc_giaj, jodc_jcg, jodc_jma, jodc_pahb |
+| jodc | 101 | unmatched 14, restricted 87 | jodc_giaj, jodc_jcg, jodc_pahb |
 | bom | 96 | license 96 | bom |
 | rws | 87 | ready 72, unmatched 15 | cmems, rws |
 | cmems | 80 | restricted 80 | cmems |
 | smhi | 70 | ready 61, unmatched 9 | cmems, smhi |
 | coops | 67 | ready 67 | noaa, uhslc_rq |
 | redmar | 55 | license 55 | cmems, ieo |
-| dwr | 51 | ready 34, unmatched 17 | cdwr |
+| dwr | 51 | ready 35, unmatched 16 | cdwr |
 | ea | 46 | ready 46 | bodc, cmems |
 | dmi | 44 | planned 1, to_match 43 | cmems, dmi |
 | sfwmd | 42 | ready 37, unmatched 5 | sfwmd |
 | ispra | 37 | license 37 | cmems, ispra |
 | marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
 | cdec | 24 | ready 13, unmatched 11 | cdwr |
-| unam | 22 | license 22 | unam, unam_hist |
+| unam | 22 | license 16, unmatched 1, restricted 5 | unam, unam_hist |
 | ncdem | 22 | license 22 | ncdem |
 | ttw | 19 | license 19 | ttw |
 | fmi | 16 | license 16 | cmems, fmi |
 | cco | 15 | license 15 | cco |
 | cm | 12 | license 12 | cm |
+| jma | 10 | unmatched 10 | jodc_jma |
 | bodc | 8 | unmatched 4, restricted 4 | bodc, cmems, noc |
 | nwfwmd | 8 | license 8 | nwfwmd |
 | da_sat | 7 | license 7 | da_sat |
@@ -60,7 +61,7 @@ Accepted records only, in the order to build adapters: most records first.
 ## How records are matched
 
 - **Codes in the id.** TICON ids end in `<code>-<country>-<contributor>`. NOAA, USGS, REFMAR, Norwegian (`nhs`) and SMHI records carry the originator's station code, so they map to `coops`, `usgs` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), `kartverket`, `refmar` and `smhi`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
-- **Declared provenance.** UHSLC and JODC records use slackwater-database's [`sources/ticon/provenance.ts`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket, JMA or JODC gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself.
+- **Declared provenance.** UHSLC and JODC records use slackwater-database's [`sources/ticon/provenance.ts`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket or JMA gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself, and other JODC records to JODC by the code in their id: the JHOD station numbers some declare aren't JODC's codes.
 - **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (`mi_c`) records, and CMEMS records in countries whose feed has a list in the store (France's once REFMAR's is there) match an active station with levels: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently. A CMEMS record linked to a station of its national feed (`LINKS` in [`src/same-as.ts`](../src/same-as.ts)) matches that station wherever CMEMS places it, or stays `to_match` if it isn't an active station with levels; the UK's match the EA first.
 - **Same station.** A record still unmatched takes the match of another record in its slackwater-database station file, since slackwater-database merges records only when they're the same gauge.
 - **UK gauges.** BODC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the store, and BODC's own gauge once its list is. NOC's records of gauges outside the UK network stay `restricted`: BODC's open data is the UK network's alone.
