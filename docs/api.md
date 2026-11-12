@@ -18,7 +18,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 - **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
-- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the store doesn't answer and nothing is cached.
+- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the server doesn't answer and nothing is cached.
 - **Versioning.** Fields are only ever added. A breaking change gets a new path.
 - Values in the examples are illustrative.
 
@@ -131,7 +131,7 @@ Observed levels, from the last minutes back through the archive, for apps, stati
 
 Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. A value that arrived in the last minutes and hasn't been through QC yet carries `"checked": false`, and its flag can still change. When `include` asks for predictions, the response names the tide-database version it used (`"database": "2026.11.01"`).
 
-`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the store didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last asked the source. A range that reaches the present carries `Cache-Control: public, max-age=<min_interval_s>`, and one that ended before today is cached for a day.
+`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last asked the source. A range that reaches the present carries `Cache-Control: public, max-age=<min_interval_s>`, and one that ended before today is cached for a day.
 
 Slackwater asks for the last 96 hours (`start` 96 hours back) and computes the residual against its own bundled prediction, so the number matches the curve the user sees.
 
