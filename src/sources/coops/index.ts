@@ -522,8 +522,9 @@ function fresh(end: Date): boolean {
  * every data request for `blockedMs`, the next for twice that, and a third
  * hold in a row throws `Blocked`: every data request
  * after it fails at once without going out, for the life of the process, so a
- * run stops instead of sending thousands of requests into the block. (A
- * long-lived Worker would need the block to expire.) Tests shrink the waits.
+ * run stops instead of sending thousands of requests into the block. The
+ * realtime server runs each pass in a process of its own (server/pass.ts), so
+ * there it lasts one pass. Tests shrink the waits.
  */
 export const pacing = {
   metadataMs: 1000,

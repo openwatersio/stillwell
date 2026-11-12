@@ -22,7 +22,7 @@ What the existing Open Waters pieces give us, and don't:
 
 ## Use cases
 
-Each consumer, what it needs from the store, and which path serves it. "Live" is the on-request path in decision 9; "archive" is the scheduled Parquet on R2.
+Each consumer, what it needs from the store, and which path serves it. "Live" is the realtime levels the Stillwell server polls, decision 9; "archive" is the scheduled Parquet on R2.
 
 | Use case                                                                                                                                                    | Freshness              | Window                            | Datum                                  | Licenses                                 | Path                                          | Phase    |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------- | -------------------------------------- | ---------------------------------------- | --------------------------------------------- | -------- |
@@ -47,25 +47,26 @@ Recommended answers. The plan below assumes them; each can change without reshap
 3. **Paths follow the gateway's convention**: `/water-levels/...`, not `/v1/water-levels/...`.
 4. **IDs are `<source>/<source_id>`** (`coops/9447130`, `usgs/07022000`, `rws/hoekvanholland`), the same form as slackwater-database's station IDs and the API's `/stations/{source}/{id}` paths. Station lists, datum epochs and links between sources live in the store, as [stations.md](../stations.md) describes. Each station carries `tide_station` with the slackwater-database `source/id` when one exists, and the link also runs the other way: slackwater-database station records carry their store series ID, and subordinate stations their reference gauge's, so an offline app knows which stations have observations without asking. Links join the same physical gauge, never the nearest one.
 5. **Bulk snapshots ship with the public API**, quarterly, with a Zenodo DOI, in two parts: the stations with `commercial_use` true, and the rest, leaving out any station with data, in any epoch, from a contributor that hasn't answered a permission request, or whose terms are unknown (`unscanned` or `unreviewed`), since a published deposit can't be withdrawn. The commercial part is CC BY 4.0, with `sources.json` in the deposit so each source's license and terms travel with it; the rest's Zenodo license is "other", pointing to the README's license section, since each of its stations keeps its contributor's terms.
-6. **The API worker lives in this repo** and is bound into the gateway as `WATER_LEVELS`, so adapters, schema and reader change together.
+6. **The API lives in this repo**: `stillwell-api` on the Stillwell server, behind a caching Worker bound into the gateway as `WATER_LEVELS`, so adapters, schema and reader change together.
 7. **Decided: slackwater-database keeps the harmonic fitting and datum reduction, and reads the store instead of GESLA.** Its fitting ([`packages/harmonic-analysis`](https://github.com/openwatersio/slackwater-database/tree/main/packages/harmonic-analysis)), constituent-name handling and datum rules ([`docs/datums.md`](https://github.com/openwatersio/slackwater-database/blob/main/docs/datums.md)) are already validated; porting them here would duplicate them. This repo's job is to be a better GESLA: originator records, fresh, in UTC, flagged, with provenance. Residuals from the store against slackwater-database's published constants then flag stations whose constants or clocks are wrong.
 8. **Constants fitted from restricted observations can still ship** where the operator agrees, as VLIZ did for IOC-derived constituents. So restricted series feed slackwater-database fits even though the API doesn't serve them.
-9. **Live levels are fetched on request, not polled into R2.** For the last 96 h of one station, the Worker calls the originator and caches the answer for the source's minimum interval (5 minutes for most, 15 for UK EA). Polling every linked gauge into per-station R2 objects every 10 minutes would be about 13 million writes a month (about $58), against $4 for the whole archive, and would mostly refresh stations nobody is looking at. The scheduled jobs build the archive; the same fetch code serves both.
+9. **Current levels are polled continuously by one server into ClickHouse, and the API reads only ClickHouse.** A Stillwell server polls every live station at its source's interval, inserts the values it hasn't seen, and runs QC; the server also serves the API, behind a caching Worker, and never calls a source on a request. The Parquet files on R2 are the record and the public product: the server exports to them, a job finishes only once its changes are on R2, and a new server rebuilds from them, so it needs no backups. Batch jobs move onto the same server in steps. See [realtime.md](realtime.md).
 10. **Apps compute residuals themselves.** The API returns observed levels in the bundled prediction's frame, and Slackwater computes the residual against the constants it ships, as slackwater-ios#705 plans, so the number always matches the curve on screen. The API's own residual is for the website, alerts and API customers, and names the database version it used.
 11. **Observations keep their arrival time** (`received`) wherever we saw them arrive, because forecast correction needs to know what was available when, not just when it was measured.
-12. **Decided: TypeScript for adapters, the store, QC and the API; Python only for NetCDF model extraction** (Brandon, 2026-11-03). Adapters must run in the Worker for live levels, and predictions come from `@slackwater/engine`, so one language serves ingest, live and the API. Model output (GTSM, STOFS) is NetCDF, which Node handles poorly, so phase 11 may use a small Python step that writes the same Parquet layout. Analysis in any language reads the store directly.
+12. **Decided: TypeScript for adapters, the store, QC and the API; Python only for NetCDF model extraction** (Brandon, 2026-11-03). Adapters, QC and the API share types and code, and predictions come from `@slackwater/engine`, so one language serves ingest and the API. Model output (GTSM, STOFS) is NetCDF, which Node handles poorly, so phase 11 may use a small Python step that writes the same Parquet layout. Analysis in any language reads the store directly.
 
 ## Repo shape
 
 [CONTRIBUTING.md](../../CONTRIBUTING.md) has the layout as it stands, and [`src/schema.ts`](../../src/schema.ts) the `Source` interface every adapter implements. The plan adds:
 
 ```
-worker/                the API Worker: wrangler.jsonc, src/, test/ (phases 9 and 10)
+workers/api/           the API's caching Worker, bound into the gateway (phases 9 and 10)
+server/                stillwell-ingest, and later stillwell-api and stillwell-jobs, with their deploy
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
 .github/workflows/     snapshot-quarterly (phase 12)
 ```
 
-Adapters run in two places: Node in Actions, and the Worker for live levels. So adapter code uses only `fetch` and plain TypeScript, with Node-only pieces (DuckDB, the disk cache) kept in [`src/store/`](../../src/store/) and [`scripts/`](../../scripts/). Live levels call `observations` for a short window; a bulk "latest" method for sources that offer one can come if per-station fetching is too slow.
+Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses only `fetch` and plain TypeScript, with the store's pieces (DuckDB, the disk cache) kept in `src/store/` and `scripts/`.
 
 ## Data layout
 
@@ -87,7 +88,7 @@ Ordered so crowd-depth and slackwater-database get what they need first, then th
 
 Estimate: 1 day.
 
-The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: the TICON replacement and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the live path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with slackwater-database.
+The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: the TICON replacement and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the realtime path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with slackwater-database.
 
 ### Phase 1: Foundations
 
@@ -163,7 +164,7 @@ Estimate: 6 days, in slackwater-database.
 - [ ] Convert contributor by contributor, in phase 2's order, with `report:merges` reviewing the result each time. A contributor whose records all convert drops out of the TICON import.
 - [ ] A monthly residual report here: observed minus slackwater-database's prediction at every converted and unconverted station. Tidal-band energy in the residual means wrong constants; a step means a datum shift; a whole-hour phase lag means a clock error. Open an issue in slackwater-database for each.
 - [ ] Link stations both ways: slackwater-database records gain the store series ID (subordinate stations take their reference gauge's), `@slackwater/database` exposes it, and the store's `tide_station` is filled from the same table.
-- [ ] Record, per station, which store series and gauge zero its datums were reduced from, so the live path can return observations in the same frame as the prediction.
+- [ ] Record, per station, which store series and gauge zero its datums were reduced from, so the API can return observations in the same frame as the prediction.
 - [ ] Re-fit on a schedule (yearly, or when a station's record has grown by a year), so constants improve as the store grows instead of waiting for a TICON release.
 
 Done when slackwater-database's monthly update re-fits from the store, and TICON supplies only the contributors that phase 2 marks as not replaceable yet.
@@ -184,37 +185,39 @@ Estimate: 3 days.
 
 Most European originators arrive in phase 5. This adds the real-time sources TICON doesn't need: UK EA river levels, **ECCC** hydrometric (OGL-Canada; confirm the datamart endpoint's license), and NWPS forecast metadata. FMI waits for a license check.
 
-### Phase 9: Live levels for Slackwater
+### Phase 9: Realtime levels for Slackwater
 
-Estimate: 5 days.
+Estimate: 8 days.
 
-The first public endpoint, because the apps need it before anything else in the API. It needs only phases 1 and 4 to start, so it can move ahead of phases 5 to 8; the datum-frame item waits for phase 6. It starts the Worker in `worker/`, bound into the gateway as `WATER_LEVELS` on `/water-levels*`.
+The first public endpoint, because the apps need it before anything else in the API. It needs only phases 1 and 4 to start, so it can move ahead of phases 5 to 8; the datum-frame item waits for phase 6. The design is [realtime.md](realtime.md), step 1.
 
-- [ ] `GET /water-levels/stations/{source}/{id}/live` ([api.md](api.md#get-water-levelsstationssourceidlive)): observations in the requested datum (chart datum by default), `flag`, `received`, the offsets to MSL and chart datum, `as_of`, and `status` (reporting, stale, offline). Small JSON, gzipped, a few KB.
-- [ ] `live()` for each source whose stations slackwater-database links to, starting with CO-OPS, RWS, PEGELONLINE, UK EA, Kartverket and the other European feeds. Each call runs the source's adapter in the Worker.
-- [ ] Cache per station for `min_interval_s` with the Cache API, so a thousand phones on one station make one upstream call. Serve a stale copy with `status: stale` when the source fails, rather than an error.
-- [ ] Quick QC on the window (spikes, flatlines, a gauge that stopped reporting) using the same [`src/qc.ts`](../../src/qc.ts) the archive uses.
+- [ ] A Stillwell server on Hetzner, set up as aiscast's is (`server/deploy/`, deployed by CI on merge), running ClickHouse on loopback and `cloudflared`. R2 stays the record, so the server needs no backups.
+- [ ] `stillwell-ingest`: polls every hourly source's live stations at `min_interval_s`, runs `qcFor` over each 7-day window in the same step and writes only the values that changed (in level, flag, source flag, `received` or epoch) with `received`, deletes a withheld station's rows, records each pass in `polls`, and on `DatumChanged` dispatches its source's refresh.
+- [ ] Grafana alerts on `polls`. The hourly workflow keeps writing `recent/` and its alert job keeps running until step 2 moves each source's history in.
+- [ ] `GET /water-levels/stations/{source}/{id}/levels` ([api.md](api.md#get-water-levelsstationssourceidlevels)) served by `stillwell-api` on the server behind `workers/api`, a caching Worker bound into the gateway as `WATER_LEVELS` on `/water-levels*`, for ranges inside the last 7 days: levels in the requested datum (chart datum by default), `flag`, `received`, the datum offsets, `as_of`, `updated` and `status` (reporting, stale, offline). Cached per station for `min_interval_s`, with the last good copy served as `stale` when the server doesn't answer.
 - [ ] Datum frame: return the offset slackwater-database used for the station's datums (phase 6 records which series and zero those came from), so the app's residual is observed minus prediction in one frame. Stations whose datums are in the constituent frame (TICON's MSL = 0 fallback) get `frame: unknown`, and the app shows the trend only.
-- [ ] Rate limits: phones on mobile networks share IP addresses, so give Slackwater's User-Agent its own allowance in the gateway rather than the open API's 100 a minute per IP.
 - [ ] Slackwater: replace the per-provider fetchers in slackwater-ios#705 (NOAA now, more later) with this one call, keeping CHS on the device. Tracked in that issue.
 
 Done when a Slackwater station page for a CO-OPS, RWS or PEGELONLINE gauge shows a level under 15 minutes old.
+
+Later: rate limits, as generic limits in the api.openwaters.io gateway for every API rather than anything specific to this one.
 
 ### Phase 10: API
 
 Estimate: 8 days.
 
-The rest of the API in the same Worker, reading R2 through a binding with `hyparquet` (pure JavaScript, range reads). Gated on a go or no-go decision on a public API, 90 days in; the live endpoint in phase 9 isn't, since Slackwater needs it either way.
+The rest of the API in `stillwell-api`, behind the same Worker, once the history is loaded into ClickHouse ([realtime.md](realtime.md), step 2). Gated on a go or no-go decision on a public API, 90 days in; the realtime levels in phase 9 aren't, since Slackwater needs it either way.
 
 - [ ] `GET /water-levels/stations` with the tides API's `query`, `latitude`, `longitude`, `maxDistance`, `maxResults` and `bbox`, plus `kind`, `source` and `tide_station`, from `stations.parquet` held in memory.
 - [ ] `GET /water-levels/stations/{source}/{id}`: metadata, datums, license, attribution and freshness.
-- [ ] `GET /water-levels/stations/{source}/{id}/levels` and `/extremes`, with `start`, `end`, `datum` (chart datum by default, as in the tides API), `units` and `include=predicted,residual,received`. Reads one file per year plus `recent/`, converts datums, adds Slackwater predictions with `@slackwater/engine` and `@slackwater/database` when `tide_station` is set, and the residual (observed minus predicted).
+- [ ] `GET /water-levels/stations/{source}/{id}/levels` and `/extremes`, with `start`, `end`, `datum` (chart datum by default, as in the tides API), `units` and `include=predicted,residual,received`. Any range, from ClickHouse; converts datums, adds Slackwater predictions with `@slackwater/engine` and `@slackwater/database` when `tide_station` is set, and the residual (observed minus predicted).
 - [ ] `GET /water-levels/at?latitude&longitude&time`: best estimate with `method` and `uncertainty_m`. Nearest gauge with data at that time; else prediction plus residual from gauges within crowd-depth's distances (fast within about 100 km, slow within a few hundred); else prediction plus modeled surge; else model. Same rules crowd-depth uses today, so crowd-depth can switch to it.
 - [ ] Every response carries per-station attribution and the "not for navigation, preliminary data" notice; until tokens exist, responses never include `commercial_use: false` stations. The API docs and the `/water-levels` root response link to the source, as AGPL section 13 requires.
-- [ ] Historical years cached with the Cache API; `recent/` cached for 5 minutes.
-- [ ] Alerts groundwork: a Worker cron that runs the live fetch and residual for a list of stations and reports the ones beyond a threshold. Who subscribes, and how notifications reach the phone, belongs in slackwater#394.
+- [ ] Ranges that ended more than 7 days ago cached for a day with the Cache API.
+- [ ] Latest levels for many stations in one call, by station IDs or `tide_station`, for Slackwater's favorites and the alerts cron.
+- [ ] Alerts groundwork: a Worker cron that reads the latest levels and residual for a list of stations and reports the ones beyond a threshold. Who subscribes, and how notifications reach the phone, belongs in slackwater#394.
 - [ ] OpenAPI document and a docs page on the website next to the tides API.
-- [ ] Tests with `@cloudflare/vitest-pool-workers` against a small fixture store.
+- [ ] Tests against a ClickHouse service container, and the Worker's with `@cloudflare/vitest-pool-workers`.
 
 ### Phase 11: Models
 
@@ -252,7 +255,7 @@ The [evaluation](../hroi-evaluation.md) found HRoI times high and low waters bet
 
 ## Running costs and limits
 
-As the architecture estimates: about $7 a month in year one on R2 and Workers, GitHub Actions free on a public repo, and a one-time backfill of $20–60 if GTSM and the USGS history need a rented box. Watch the CO-OPS throttle, RWS's 160,000-value limit, and that GitHub disables schedules on a repo with 60 days of no activity.
+As the architecture estimates: about $7 a month in year one on R2 and Workers, plus about $20 a month for the Stillwell server, GitHub Actions free on a public repo, and a one-time backfill of $20–60 if GTSM and the USGS history need a rented box. Watch the CO-OPS throttle, RWS's 160,000-value limit, and that GitHub disables schedules on a repo with 60 days of no activity.
 
 ## Open questions
 

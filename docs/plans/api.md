@@ -1,6 +1,6 @@
 # Water levels API
 
-The API this repo will serve at `https://api.openwaters.io/water-levels`, and the bulk files behind it. Parameter names, defaults and response fields follow the [tides API](https://github.com/openwatersio/slackwater/blob/main/packages/api/src/openapi.ts) wherever the two overlap, so a client of one already knows the other. This is the design to build against; [plan.md](plan.md) says when each part lands (live levels in phase 9, the rest in phase 10, bulk in phase 12). Nothing here is deployed yet.
+The API this repo will serve at `https://api.openwaters.io/water-levels`, and the bulk files behind it. Parameter names, defaults and response fields follow the [tides API](https://github.com/openwatersio/slackwater/blob/main/packages/api/src/openapi.ts) wherever the two overlap, so a client of one already knows the other. This is the design to build against; [plan.md](plan.md) says when each part lands (realtime levels in phase 9, the rest in phase 10, bulk in phase 12). Nothing here is deployed yet.
 
 ## Conventions
 
@@ -18,7 +18,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 - **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
-- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the source is unavailable and nothing is cached.
+- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the server doesn't answer and nothing is cached.
 - **Versioning.** Fields are only ever added. A breaking change gets a new path.
 - Values in the examples are illustrative.
 
@@ -42,7 +42,7 @@ Lists stations. Filters combine:
 | `kind`                             | `coastal`, `estuary`, `lake`, `river`                                                                               |
 | `source`                           | A source ID, such as `coops`                                                                                        |
 | `tide_station=noaa/9447130`        | The station linked to a slackwater-database station. A subordinate station resolves to its reference gauge's series |
-| `live=true`                        | Only stations the live endpoint serves                                                                              |
+| `live=true`                        | Only stations polled in real time                                                                                   |
 | `status`                           | `active` (default) or `all`                                                                                         |
 
 ```json
@@ -106,16 +106,18 @@ One station in full: the fields above plus
 
 `errata` names the errors found in what the source publishes for the station, each an entry in the source's [`errata.json`](https://github.com/openwatersio/stillwell/tree/main/src/sources), such as a clock the store corrects or a span it flags.
 
-### `GET /water-levels/stations/{source}/{id}/live`
+### `GET /water-levels/stations/{source}/{id}/levels`
 
-The last hours of observations, fetched from the source when the cache is older than the source allows, for apps and station pages.
+Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. Until the archive moves onto the realtime server ([realtime.md](realtime.md#order-of-work), step 2), a range must lie within the last 7 days, and one reaching further back is a 400 that says so. Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
 
-| Parameter      | Default           | Meaning                                                                                                            |
-| -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `start`, `end` | The last 96 hours | ISO 8601, as in the tides API; at most 168 hours back                                                              |
-| `step`         | `6m`              | `6m`, `15m`, `1h`, or `raw` for the source's own interval. Each step takes the sample nearest its time, not a mean |
-| `datum`        | Chart datum       | As above                                                                                                           |
-| `units`        | `meters`          | `meters` or `feet`                                                                                                 |
+| Parameter      | Default               | Meaning                                                                                                                                                                         |
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `start`, `end` | The 7 days before now | ISO 8601, as in the tides API. At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                   |
+| `step`         | `6m`                  | `6m`, `15m`, `1h`, `1d`, or `raw` for the source's own interval. Each step takes the sample nearest its time, not a mean                                                        |
+| `datum`        | Chart datum           | As above                                                                                                                                                                        |
+| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                              |
+| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
+| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                          |
 
 ```json
 {
@@ -125,10 +127,10 @@ The last hours of observations, fetched from the source when the cache is older 
   "frame": "gauge",
   "status": "reporting",
   "as_of": "2026-11-03T15:42:00Z",
-  "fetched": "2026-11-03T15:44:10Z",
+  "updated": "2026-11-03T15:44:10Z",
   "levels": [
-    { "time": "2026-10-30T15:48:00Z", "level": 2.871, "flag": "preliminary" },
-    { "time": "2026-10-30T15:54:00Z", "level": 2.905, "flag": "preliminary" }
+    { "time": "2026-10-27T15:48:00Z", "level": 2.871, "flag": "preliminary" },
+    { "time": "2026-11-03T15:42:00Z", "level": 2.905, "flag": "preliminary" }
   ],
   "attribution": [
     "NOAA National Ocean Service",
@@ -138,24 +140,11 @@ The last hours of observations, fetched from the source when the cache is older 
 }
 ```
 
-`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the source failed and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `fetched` is when the API last asked the source. Responses carry `Cache-Control: public, max-age=<min_interval_s>`.
+Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`). `predicted` and `residual` come from the linked slackwater-database station, which has a license of its own: until tokens exist they are served only where that station's terms allow commercial use, as well as the series', and otherwise left out, with the response saying why.
 
-This endpoint returns observations only. Slackwater computes the residual against its own bundled prediction, so the number matches the curve the user sees.
+`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, and one that ended before that is cached for a day.
 
-### `GET /water-levels/stations/{source}/{id}/levels`
-
-A series from the archive, joined to the live window when `end` is recent.
-
-| Parameter      | Default               | Meaning                                                                                                                                                                         |
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `start`, `end` | The 7 days before now | At most 1 year per request at 6-minute steps or coarser, 31 days at `raw` for 1-minute sources                                                                                  |
-| `step`         | `6m`                  | As above, plus `1d`                                                                                                                                                             |
-| `datum`        | Chart datum           | As above                                                                                                                                                                        |
-| `units`        | `meters`              | `meters` or `feet`                                                                                                                                                              |
-| `include`      | none                  | Comma-separated: `predicted` (Slackwater's prediction from the linked slackwater-database station), `residual` (observed minus predicted), `received` (when each value arrived) |
-| `includeBad`   | `false`               | `true` to include values flagged `bad`                                                                                                                                          |
-
-Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`).
+Slackwater asks for the last 96 hours (`start` 96 hours back) and computes the residual against its own bundled prediction, so the number matches the curve the user sees.
 
 ### `GET /water-levels/stations/{source}/{id}/extremes`
 

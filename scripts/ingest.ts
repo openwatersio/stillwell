@@ -69,7 +69,6 @@
  * separate store, and ingest refuses to write one without it. Commercial use is
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
-import { resolve } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
   backfillYear,
@@ -134,34 +133,7 @@ import type {
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
-
-const STORE = (process.env.STILLWELL_STORE ?? "data").replace(/\/$/, "");
-
-/** Where a station's series go: its source's store. */
-function storeFor(station: Pick<Station, "source">): string {
-  return storeOfSource(sourceOf(station.source).metadata);
-}
-
-/** The public store, or the private one for a source whose terms bar republishing. */
-function storeOfSource(metadata: SourceMetadata): string {
-  if (metadata.license.redistribution) return STORE;
-  const restricted = process.env.STILLWELL_RESTRICTED_STORE?.replace(/\/$/, "");
-  if (!restricted)
-    throw new Error(
-      `${metadata.id} bars republishing its data; set STILLWELL_RESTRICTED_STORE to a private store`,
-    );
-  if (overlaps(restricted, STORE))
-    throw new Error("STILLWELL_RESTRICTED_STORE must be a separate bucket or directory");
-  return restricted;
-}
-
-/** Whether two stores share a bucket, or one directory holds the other. */
-function overlaps(a: string, b: string): boolean {
-  const bucket = (store: string) => /^s3:\/\/([^/]+)/.exec(store)?.[1];
-  if (bucket(a) || bucket(b)) return bucket(a) === bucket(b);
-  const [x, y] = [resolve(a), resolve(b)];
-  return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
-}
+import { storeFor, storeOfSource } from "../src/store/stores.ts";
 
 useDiskCache();
 
