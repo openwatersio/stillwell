@@ -589,7 +589,7 @@ describe("rank", () => {
   const live = record("2001-12-17T00:00:00Z", "2026-10-01T00:00:00Z");
 
   it("prefers a series with levels, then one whose terms allow commercial use", () => {
-    // A BOM-contributed UHSLC copy is non-commercial; its live original wins on terms alone.
+    // A non-commercial UHSLC copy loses to its live original on terms alone.
     assert.equal(
       best(station("uhslc/001", { commercial_use: false, ...live }), station("refmar/9", live)),
       "refmar/9",

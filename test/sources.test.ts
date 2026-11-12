@@ -15,6 +15,7 @@ import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import {
   ALSO_WITHHELD,
+  BOM_CONDITIONS,
   contributorOf,
   lostRefusals,
   NOTICES,
@@ -3057,8 +3058,8 @@ describe("uhslc", () => {
       [pohnpei.contributor, pohnpei.commercial_use, pohnpei.attribution],
       [
         "National Tidal Centre, Bureau of Meteorology",
-        false,
-        "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+        true,
+        `University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
       ],
     );
     const pohnpeiA = stations.find((s) => s.id === "uhslc/001a")!;
@@ -3258,9 +3259,12 @@ describe("uhslc", () => {
     await assert.rejects(uhslc.stations(), /research-quality stations and record spans disagree/);
   });
 
-  it("keeps the strictest terms and every credit across a version change", async () => {
-    // Pohnpei's FD series moves from version C (BOM's, non-commercial) to one
-    // starting where B does (UHSLC's own, no notice).
+  it("keeps the strictest terms and every credit across a version change", async (t) => {
+    // Pohnpei's FD series moves from version C (BOM's, made non-commercial
+    // here) to one starting where B does (UHSLC's own, no notice).
+    const was = NOTICES.bom!.commercial_use;
+    NOTICES.bom!.commercial_use = false;
+    t.after(() => (NOTICES.bom!.commercial_use = was));
     const fdSpans = JSON.parse(fixture("uhslc-fd-spans.json"));
     fdSpans.table.rows.find((r: unknown[]) => r[0] === 1)[1] = "1974-04-22T12:00:00Z";
     serve([
@@ -3280,7 +3284,7 @@ describe("uhslc", () => {
         [
           "B",
           false,
-          "University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia",
+          `University of Hawaii Sea Level Center (UHSLC); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
         ],
       );
     }
