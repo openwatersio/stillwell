@@ -52,7 +52,7 @@ A reader asks with `FINAL`, which is cheap for one station since its rows sort t
 The other tables:
 
 - `stations` and `epochs`: each source's list and datum epochs, as `stations/<source>.parquet` holds them, loaded from R2 whenever a refresh writes it.
-- `offsets`: for each station epoch and datum, the meters to add to a level in that epoch to refer it to that datum, `to_current` included. The code that builds `stations.parquet` writes it, so the API's SQL only joins and adds, and the datum arithmetic stays in one TypeScript implementation.
+- `offsets`: for each station epoch and datum, the meters to add to a level in that epoch to refer it to that datum, `to_current` included, from `stations/offsets.parquet`, which `src/datums.ts` writes beside `stations.parquet` on every publish and ClickHouse reloads on every publish. The API's SQL only joins and adds, and the datum arithmetic stays in one TypeScript implementation. An epoch that doesn't convert (`to_current` null, held epochs included) has rows only for its own datum, so a request in any other datum leaves it out. A station's default datum is `coalesce(chart_datum, datum)`, and datum names in requests must match the table's keys exactly.
 - `polls`: one row per source pass, with which stations reported, failed or went stale, and why.
 - `jobs`: each backfill, refetch, requalify or other job, with its arguments, state, progress and result.
 - `changes`: the station-years each insert touched since their last export.
