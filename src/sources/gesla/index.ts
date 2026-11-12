@@ -466,11 +466,12 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         .trim()
         .split(/\s+/);
       const qc = Number(fields[1]);
-      if (qc >= 0 && qc <= 4 && fields[0] !== nul) {
+      const level = Number(fields[0]);
+      if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
         const flag = QC_FLAGS[qc]!;
         times[n] = timeOf(text, at) + shift;
         if (n && times[n]! < times[n - 1]!) sorted = false;
-        levels[n] = Number(fields[0]);
+        levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
         n++;
       }
