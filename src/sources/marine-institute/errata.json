@@ -130,6 +130,16 @@
       "error": "The Marine Institute's Kilrush Lough levels sit 1.5 to 4.6 m low from 9 August 2025 to about 12:00 on 10 August.",
       "response": "9 and 10 August 2025 are flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the normal tide after 12:00 on 10 August is flagged too.",
       "evidence": "Daily median against Fenit (`gesla/fenit-fen-irl-cmems`), checked in November 2026: −1.63 m on 9 August and −2.79 m on 10 August, against +0.07 m on 8 August and +0.05 m on 11 August. On 10 August the values move from −3.6 to −4.6 m until 12:00, then a normal tide runs from −1.7 to +2.1 m."
+    },
+    {
+      "id": "marine-institute-skerries-2017-327m",
+      "stations": ["marine-institute/skerries-harbour"],
+      "since": "2017-01-06",
+      "until": "2017-01-07",
+      "handling": "flagged",
+      "error": "The Marine Institute's Skerries Harbour series has two values in 2017, both 327.73 m at 11:24 and 11:30 on 6 January, with QC flag 0, between missing values. The gauge's levels lie within a few meters of OD Malin.",
+      "response": "6 January 2017 is flagged `suspect` whole, keeping the source's own flag as `source_flag`. They are the only values in the store's 2017 file.",
+      "evidence": "The ERDDAP dataset `IrishNationalTideGaugeNetwork`, `Water_Level_OD_Malin` at Skerries Harbour for 6 January 2017, read November 2026: NaN on either side of the two values. The store has no 2016, 2018 or 2019 files for the station, and QC can't judge two values alone against neighbors or a window."
     }
   ],
   "retired": []
