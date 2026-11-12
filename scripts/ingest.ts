@@ -341,7 +341,7 @@ async function publish(store: string): Promise<void> {
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
     const { joined, fromTide, computed, far, disagree } = result.datums;
     console.log(
-      `  datums: ${joined} joined to tide-database, ${fromTide} with its datums, ${computed} computed from a linked series`,
+      `  datums: ${joined} joined to slackwater-database, ${fromTide} with its datums, ${computed} computed from a linked series`,
     );
     for (const f of far) console.log(`  datums join dropped: ${f}`);
     for (const d of disagree) console.log(`  datums differ: ${d}`);

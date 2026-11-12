@@ -40,13 +40,13 @@ epochs: [{ id, datum, since, until, seen, reference, reference_since, datums, to
 - `seen` is the last refresh whose fetch named this epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.
 - `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`, or the research-quality version letter a UHSLC series carries. A source with no such field can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves, and Kartverket when chart datum moves more than a centimeter against NN2000; the reason it gives stands in for the reference, and the epoch starts at that refresh, since USGS gives no date.
 - `reference_since` is where the source says `reference` starts, or null. A first epoch with no `since` learns it on the first refresh that sees it, so a later change can still be held for coming soon after it, or before it.
-- `datums` holds the offsets to other datums. The current epoch's follow the source, refresh by refresh, as `datums` does today. An epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
+- `datums` holds the offsets to other datums. The current epoch's follow the source, refresh by refresh, as the source's list's `datums` does. An epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
 - `to_current` is the meters to add to the epoch's levels to put them in the current epoch's datum, or null when they can't be converted (below). Every refresh recomputes it from the frozen offsets and the current ones.
 - `state` is `open`, `closed`, `held` (below) or `rejected`.
 
 Overrides name an epoch by the station and the epoch's `since`, not by `id`, so they still point at the right epoch after a list is restored and `id`s are handed out again.
 
-`stations.parquet` publishes `epochs` alongside `datum` and `datums`, which describe the current epoch. The published epochs are already resolved for readers:
+`stations.parquet` publishes `epochs` alongside `datum` and `datums`, which describe the current epoch. Its `datums` adds MSL, LAT and chart datum from slackwater-database or a linked series (`src/datums.ts`), so it can differ from the current epoch's own `datums`, which keep the source's. The published epochs are already resolved for readers:
 
 - a rejected epoch carries the `to_current` of the epoch before it, plus any offset its override gives, and that epoch's span runs on to the next epoch that isn't rejected;
 - a held epoch carries a null `to_current`.
@@ -232,7 +232,7 @@ A station with no links is its own preferred series. A series that allows commer
 - `src/stations.ts`: `mergeStationList`, which opens epochs rather than marking a station inactive.
 - `src/refresh.ts`: a source's refresh with its guards and report, and the rebuild of `stations.parquet`, `sources.json` and `errata.json`.
 - `src/same-as.ts`: `same_as` and `preferred` across sources, with the decisions in `LINKS`, `UNLINKS` and `PREFER`.
-- `src/datums.ts`: `tide_station`, MSL, LAT and chart datum from tide-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list ([data.md](data.md#stations)).
+- `src/datums.ts`: `tide_station`, MSL, LAT and chart datum from slackwater-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list ([data.md](data.md#stations)).
 - `src/store/`: epoch paths, the `epoch` column in `recent`, readers and writers for the lists, bounds and history, and an HTTPS reader for the public bucket.
 - `scripts/ingest.ts`: `stations`, `backfill` and `recent` read the lists from the store, write the current epoch, and skip held stations; `backfill` writes closed epochs too for an `archive: "previous"` source or a station with a split (`epochSpans` in `src/backfill.ts`).
 - `Source.overrides` (`src/schema.ts`): decisions on a source's epochs, keyed by station and epoch start, and the days that split a station's epochs. Each epoch event in the report prints the key.

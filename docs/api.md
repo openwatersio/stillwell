@@ -76,7 +76,11 @@ One station in full: the fields above plus
 {
   "datum": "MLLW",
   "datums": { "MSL": 1.983, "LAT": -0.912, "NAVD88": 0.692 },
-  "datums_source": { "MSL": "tide-database", "LAT": "tide-database", "NAVD88": "source" },
+  "datums_source": {
+    "MSL": "slackwater-database",
+    "LAT": "slackwater-database",
+    "NAVD88": "source"
+  },
   "chart_datum": "MLLW",
   "datums_attribution": [
     "Slackwater database (https://github.com/openwatersio/slackwater-database)"
@@ -96,7 +100,7 @@ One station in full: the fields above plus
 }
 ```
 
-`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when the chart-datum offset comes from the tide-database station that `tide_station` names, measured against this series' zero, so observed levels and that station's predictions line up. It's `source` when the offset is the source's own or carried from another series of the gauge, which can differ from tide-database's by a few centimeters, and `unknown` when there's no chart-datum offset, as where tide-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends. `stations.parquet` carries `frame` and `chart_datum` ([data.md](data.md#stations)).
+`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store stores each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives meters to add to a level in `datum` to refer it to each other datum. `frame` is `gauge` when the chart-datum offset comes from the slackwater-database station that `tide_station` names, measured against this series' zero, so observed levels and that station's predictions line up. It's `source` when the offset is the source's own or carried from another series of the gauge, which can differ from slackwater-database's by a few centimeters, and `unknown` when there's no chart-datum offset, or where slackwater-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends. `stations.parquet` carries `frame` and `chart_datum` ([data.md](data.md#stations)).
 
 `same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](data.md#stations)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
 

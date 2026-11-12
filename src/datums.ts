@@ -7,10 +7,10 @@ import { km } from "./ticon.ts";
 
 /**
  * Offsets to MSL, LAT and chart datum for each station, and its link to
- * tide-database, worked out as `stations.parquet` is built. Each offset says
+ * slackwater-database, worked out as `stations.parquet` is built. Each offset says
  * where it came from (`datums_source`):
  *
- * - **tide-database**: the station's own record in tide-database, joined by
+ * - **slackwater-database**: the station's own record in slackwater-database, joined by
  *   provider ID within `ID_KM`, when the record's datums are in the same zero
  *   as the station's levels (`zeroOf`). Its MSL, LAT and chart datum replace
  *   the source's.
@@ -23,7 +23,7 @@ import { km } from "./ticon.ts";
  * reach them through `to_current` (`offsetRows`).
  */
 
-/** The part of a tide-database station this needs. */
+/** The part of a slackwater-database station this needs. */
 export interface TideStation {
   id: string;
   source: { id: string };
@@ -32,14 +32,14 @@ export interface TideStation {
   datums: Record<string, number>;
   /** Whether the record's terms allow commercial use. */
   license: { commercial_use: boolean };
-  /** The credit tide-database asks for wherever the record's values are shown. */
+  /** The credit slackwater-database asks for wherever the record's values are shown. */
   attribution: string;
   datum_frame?: "gauge" | "constituent";
   chart_datum?: string;
   epoch?: Period;
   datum_epoch?: Period;
   /**
-   * For a record tide-database keeps only as another's duplicate or
+   * For a record slackwater-database keeps only as another's duplicate or
    * superseded copy, the accepted station that replaces it, or null when it
    * doesn't name one. Absent for an accepted record.
    */
@@ -52,12 +52,12 @@ export interface Period {
   end: string;
 }
 
-export type DatumSource = "source" | "tide-database" | "computed";
+export type DatumSource = "source" | "slackwater-database" | "computed";
 
-/** Where a station's chart-datum offset came from: tide-database's record of this series, the source, or none. */
+/** Where a station's chart-datum offset came from: slackwater-database's record of this series, the source, or none. */
 export type Frame = "gauge" | "source" | "unknown";
 
-/** The store source whose station IDs each tide-database source's records carry. */
+/** The store source whose station IDs each slackwater-database source's records carry. */
 const JOINS: Record<string, string> = {
   noaa: "coops",
   ticon: "gesla",
@@ -72,7 +72,7 @@ const JOINS: Record<string, string> = {
  */
 const TICON_ZEROS: Record<string, string> = { rws: "NAP", rws_hist: "NAP", smhi: "RH2000" };
 
-/** The datums tide-database gives a station, besides its chart datum. */
+/** The datums slackwater-database gives a station, besides its chart datum. */
 const FROM_TIDE = ["MSL", "LAT"];
 
 /**
@@ -86,7 +86,7 @@ const isReference = (key: string) => REFERENCES.includes(key) || /^NAVD88\(.+\)$
 
 /**
  * What a GESLA record's `datum_information` says its zero is, where that's a
- * reference, so a record tide-database matched can carry its datums to the
+ * reference, so a record slackwater-database matched can carry its datums to the
  * originator's series.
  */
 const GESLA_ZEROS: [RegExp, string][] = [
@@ -102,7 +102,7 @@ const ALIASES: Record<string, Record<string, string>> = {
   ea: { CD: "ACD" },
 };
 
-/** The chart datum a source's own offsets give, for a station tide-database has no record of. */
+/** The chart datum a source's own offsets give, for a station slackwater-database has no record of. */
 const CHART: Record<string, string> = {
   coops: "MLLW",
   bsh: "SKN",
@@ -117,7 +117,13 @@ const CHART: Record<string, string> = {
 /** Keys carried between a gauge's series, besides each series' chart datum. */
 const CARRIED = ["MSL", "LAT", "SKN"];
 
-/** Where tide-database's value and the source's differ by more than this, publish reports it. */
+/** Chart datums fixed for a whole stretch of coast or river, which carry between series of a gauge however far apart. */
+const FIXED_CHARTS = ["SKN", "CD"];
+
+/** Tidal datums such as MSL and LAT carry only between series of a gauge this close, in km. */
+const TIDAL_KM = 1;
+
+/** Where slackwater-database's value and the source's differ by more than this, publish reports it. */
 const DISAGREE_M = 0.05;
 
 /**
@@ -129,13 +135,13 @@ const DISAGREE_M = 0.05;
 const MIXED_M = 0.05;
 
 export interface DatumReport {
-  /** Stations joined to a tide-database record, and those whose datums it gave. */
+  /** Stations joined to a slackwater-database record, and those whose datums it gave. */
   joined: number;
   fromTide: number;
   computed: number;
   /** ID joins dropped as too far apart: station, record, km. */
   far: string[];
-  /** Where tide-database and the source differ by more than `DISAGREE_M`. */
+  /** Where slackwater-database and the source differ by more than `DISAGREE_M`. */
   disagree: string[];
 }
 
@@ -166,7 +172,8 @@ export function withDatums(
           zero:
             t.datum_frame !== "constituent" &&
             allowed(t, station) &&
-            usable(station, t.datum_epoch ?? t.epoch)
+            // A record that doesn't say when it was reduced could span any epoch.
+            usable(station, t.datum_epoch ?? t.epoch ?? ALL_TIME)
               ? zero
               : undefined,
         };
@@ -187,7 +194,14 @@ export function withDatums(
     if (own) join(own, zeroOf(own, t));
     const reference = prefix === "ticon" && TICON_ZEROS[id.slice(id.lastIndexOf("-") + 1)];
     const originator = reference && byId.get(replaced.get(id) ?? "");
-    if (reference && originator && t.datum_frame === "gauge")
+    // Where the store has the record's GESLA file, its own note must name that zero: a few of RWS's are in MSL.
+    const gesla = byId.get(`gesla/${id}`);
+    if (
+      reference &&
+      originator &&
+      t.datum_frame === "gauge" &&
+      (!gesla || offsetsOf(gesla)[reference] === 0)
+    )
       join(originator, offsetsOf(originator)[reference]);
   }
   report.joined = records.size;
@@ -212,6 +226,7 @@ export function withDatums(
     };
     if (record && zero !== undefined) {
       const chart = record.chart_datum;
+      let gave = false;
       for (const key of [...FROM_TIDE, ...(chart ? [chart] : [])]) {
         const height = record.datums[key];
         if (height === undefined || key === s.datum) continue;
@@ -220,7 +235,8 @@ export function withDatums(
         if (had !== undefined && Math.abs(had - offset) > DISAGREE_M)
           report.disagree.push(`${s.id} ${key}: source ${had}, ${record.id} ${offset}`);
         station.datums[key] = offset;
-        datums_source[key] = "tide-database";
+        datums_source[key] = "slackwater-database";
+        gave = true;
         const period = record.datum_epoch ?? record.epoch;
         if (period) station.datums_epoch![key] = period;
         if (!station.datums_attribution!.includes(record.attribution))
@@ -228,7 +244,7 @@ export function withDatums(
       }
       if (chart && (chart === s.datum || station.datums[chart] !== undefined))
         station.chart_datum = chart;
-      report.fromTide++;
+      if (gave) report.fromTide++;
     }
     // Otherwise the source's own chart datum, before any is carried in.
     const fallback = CHART[s.source];
@@ -249,15 +265,20 @@ export function withDatums(
         const via = sharedReference(s, other);
         if (!via) continue;
         const keys = [...CARRIED, ...(other.chart_datum ? [other.chart_datum] : [])];
+        const near = km(s, other) <= TIDAL_KM;
         for (const key of keys) {
+          // A tidal datum is the gauge's own; only a fixed chart datum holds along an estuary.
+          if (!near && !FIXED_CHARTS.includes(key)) continue;
           const there = offsetsOf(other)[key];
           const period = other.datums_epoch?.[key];
           if (there === undefined || key in offsetsOf(s) || !usable(s, period)) continue;
           s.datums[key] = round(offsetsOf(s)[via]! - offsetsOf(other)[via]! + there);
           s.datums_source![key] = "computed";
           if (period) s.datums_epoch![key] = period;
-          for (const credit of other.datums_attribution!)
-            if (!s.datums_attribution!.includes(credit)) s.datums_attribution!.push(credit);
+          // The linked station's offsets are used, so its credit goes with them.
+          for (const credit of [other.attribution, ...other.datums_attribution!])
+            if (credit && !s.datums_attribution!.includes(credit))
+              s.datums_attribution!.push(credit);
           if (key === other.chart_datum && !s.chart_datum) s.chart_datum = key;
           changed = true;
         }
@@ -278,7 +299,7 @@ export function withDatums(
 }
 
 /**
- * The height of the station's zero in a tide-database record's datums, or
+ * The height of the station's zero in a slackwater-database record's datums, or
  * undefined when the record is in another zero: a record that names the
  * station's datum (NOAA's STND, Kartverket's CD), or a TICON record in its
  * GESLA file's gauge zero, which is the GESLA station's.
@@ -300,7 +321,7 @@ function usable(station: StoredStation, period: Period | undefined): boolean {
   const [start, end] = [Date.parse(period.start), Date.parse(period.end) + DAY_MS];
   return station.epochs.every(
     (e) =>
-      (e.to_current !== null && Math.abs(e.to_current) <= MIXED_M) ||
+      (e.to_current !== null && round(Math.abs(e.to_current)) <= MIXED_M) ||
       (e.since !== null && Date.parse(e.since) >= end) ||
       (e.until !== null && Date.parse(e.until) <= start),
   );
@@ -328,7 +349,7 @@ function sharedReference(a: StoredStation, b: StoredStation): string | undefined
   return keys.find((k) => isReference(k) && x[k] !== undefined && y[k] !== undefined);
 }
 
-/** A linked series' tide-database station: the preferred series' first, then by ID. */
+/** A linked series' slackwater-database station: the preferred series' first, then by ID. */
 function tideStationOf(s: StoredStation, all: Map<string, StoredStation>): string | null {
   const group = [s.preferred, ...[...s.same_as].sort()].filter((id) => id && id !== s.id);
   for (const id of group) {
@@ -338,12 +359,14 @@ function tideStationOf(s: StoredStation, all: Map<string, StoredStation>): strin
   return null;
 }
 
-/** `own` is whether the station's tide-database record is the one its `tide_station` predicts from. */
+/** `own` is whether the station's slackwater-database record is the one its `tide_station` predicts from. */
 function frameOf(s: StoredStation, own: boolean): Frame {
   const chart = s.chart_datum;
   if (!chart) return "unknown";
   if (!own) return "source";
-  return chart === s.datum || s.datums_source?.[chart] === "tide-database" ? "gauge" : "source";
+  return chart === s.datum || s.datums_source?.[chart] === "slackwater-database"
+    ? "gauge"
+    : "source";
 }
 
 /** One row of `stations/offsets.parquet`. */
@@ -355,35 +378,30 @@ export interface OffsetRow {
 }
 
 /**
- * Meters to add to a level in each epoch to refer it to each datum. An epoch
- * that converts to the current one reaches every current offset through its
- * `to_current`; one that doesn't has only its own datum and its frozen offsets.
+ * Meters to add to a level in each epoch to refer it to each named datum. An
+ * epoch that converts to the current one reaches every current offset through
+ * its `to_current`; one that doesn't has only its frozen offsets. A station's
+ * own label (RWS's offshore `MSL`, `NAP`, `STND`) isn't the datum of that name,
+ * so it gets a row only where it is the station's chart datum, as Kartverket's
+ * `CD` is, and only in an epoch that converts. A reader takes a level in its
+ * own epoch's reference through `to_current`. `datums` never holds a station's
+ * own label, so every other row is a real conversion.
  */
 export function offsetRows(s: StoredStation): OffsetRow[] {
-  return s.epochs.flatMap((e: Epoch) => {
-    const offsets =
+  const current = s.datum === s.chart_datum ? { ...s.datums, [s.datum]: 0 } : s.datums;
+  return s.epochs.flatMap((e: Epoch) =>
+    Object.entries(
       e.to_current === null
-        ? { ...e.datums, [e.datum]: 0 }
-        : // An epoch in another datum than the current one also keeps a row for its own.
-          {
-            [e.datum]: 0,
-            ...Object.fromEntries(
-              Object.entries({ ...s.datums, [s.datum]: 0 }).map(([k, v]) => [
-                k,
-                round(e.to_current! + v),
-              ]),
-            ),
-          };
-    return Object.entries(offsets).map(([datum, offset_m]) => ({
-      station: s.id,
-      epoch: e.id,
-      datum,
-      offset_m,
-    }));
-  });
+        ? e.datums
+        : Object.fromEntries(
+            Object.entries(current).map(([k, v]) => [k, round(e.to_current! + v)]),
+          ),
+    ).map(([datum, offset_m]) => ({ station: s.id, epoch: e.id, datum, offset_m })),
+  );
 }
 
 const DAY_MS = 86_400_000;
+const ALL_TIME: Period = { start: "0000-01-01", end: "9999-12-30" };
 
 /** Compares two lists of numbers, first difference first. */
 const compare = (a: number[], b: number[]) => a.map((x, i) => x - b[i]!).find((d) => d !== 0) ?? 0;

@@ -214,7 +214,7 @@ Done when tide-database's monthly update re-fits from the store, and TICON suppl
 ### Phase 7: Datums (3 days)
 
 - [x] `src/datums.ts`: join each station to tide-database by provider ID and distance (never by name alone), and take MSL and LAT from its `datums` when the station has harmonics; otherwise use the source's own offsets.
-- [x] Record where each offset came from (`datums_source`: source, tide-database, computed) and its epoch.
+- [x] Record where each offset came from (`datums_source`: source, slackwater-database, computed) and its epoch.
 - [ ] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [ ] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
 

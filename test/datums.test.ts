@@ -76,6 +76,8 @@ const tide = (id: string, fields: Partial<TideStation> = {}): TideStation => ({
 /** A level in a station's datum, referred to another of its datums. */
 const convert = (s: StoredStation, level: number, datum: string) => level + s.datums[datum]!;
 
+const round4 = (m: number) => Math.round(m * 1e4) / 1e4;
+
 const byId = (stations: StoredStation[], id: string) => stations.find((s) => s.id === id)!;
 
 // Operator values are the operators' own APIs and tables, read 2026-11-12.
@@ -98,9 +100,9 @@ describe("withDatums against operators' published levels", () => {
     assert.equal(s!.frame, "gauge");
     assert.equal(s!.tide_station, "noaa/9447130");
     assert.deepEqual(s!.datums_source, {
-      MSL: "tide-database",
-      MLLW: "tide-database",
-      LAT: "tide-database",
+      MSL: "slackwater-database",
+      MLLW: "slackwater-database",
+      LAT: "slackwater-database",
       NAVD88: "source",
     });
     assert.deepEqual(s!.datums_epoch!.MSL, { start: "1983-01-01", end: "2001-12-31" });
@@ -118,7 +120,7 @@ describe("withDatums against operators' published levels", () => {
     const [s] = withDatums([bergen], [record]).stations;
     // Kartverket's observation at 2026-11-01 00:00 UTC: 113.1 cm above CD, 17.9 cm above MSL.
     assert.ok(Math.abs(convert(s!, 1.131, "MSL") - 0.179) <= 0.0005);
-    // Already in chart datum, and tide-database's record is the same series.
+    // Already in chart datum, and slackwater-database's record is the same series.
     assert.equal(s!.chart_datum, "CD");
     assert.equal(s!.frame, "gauge");
   });
@@ -243,7 +245,7 @@ describe("withDatums", () => {
     const record = tide("ticon/a-1-x-uhslc_fd", { datums: { MSL: 0 }, datum_frame: "constituent" });
     const [s] = withDatums([gesla], [record]).stations;
     assert.deepEqual(s!.datums, {});
-    // Still the gauge's tide-database station.
+    // Still the gauge's slackwater-database station.
     assert.equal(s!.tide_station, "ticon/a-1-x-uhslc_fd");
   });
 
@@ -265,7 +267,7 @@ describe("withDatums", () => {
     assert.equal(byId(out, "uhslc/1").tide_station, "ticon/a-1-x-uhslc_fd");
   });
 
-  it("reports where tide-database and the source disagree", () => {
+  it("reports where slackwater-database and the source disagree", () => {
     const s = station("coops/1", { datum: "STND", datums: { MSL: -1 } });
     const record = tide("noaa/1", { datums: { STND: 0, MSL: 1.2 } });
     assert.deepEqual(withDatums([s], [record]).report.disagree, [
@@ -275,17 +277,19 @@ describe("withDatums", () => {
 });
 
 describe("withDatums with terms, epochs and frames", () => {
-  it("gives an EA gauge BODC's chart datum with no tide-database record", () => {
+  it("gives an EA gauge BODC's chart datum with no slackwater-database record", () => {
     const ea = station("ea/E70739", { datum: "AOD", same_as: ["bodc/abe"] });
     const bodc = station("bodc/abe", {
       datum: "CD",
       datums: { AOD: -2.25 },
       same_as: ["ea/E70739"],
+      attribution: "British Oceanographic Data Centre",
     });
     const s = byId(withDatums([ea, bodc], []).stations, "ea/E70739");
     assert.deepEqual(s.datums, { CD: 2.25 });
     assert.equal(s.chart_datum, "CD");
-    assert.deepEqual(s.datums_attribution, []);
+    // BODC's offsets are used, so its credit goes with them.
+    assert.deepEqual(s.datums_attribution, ["British Oceanographic Data Centre"]);
   });
 
   it("keeps a record that bars commercial use from a station that allows it", () => {
@@ -354,6 +358,8 @@ describe("withDatums with terms, epochs and frames", () => {
       withDatums([station("gesla/x-1-y-uhslc_fd", { epochs: e })], [record]).stations[0]!.datums
         .MSL;
     assert.equal(msl(epochs(0.03, "2010-01-01T00:00:00.000Z")), -2);
+    // 5 cm exactly, though the float from a difference of offsets is a hair over.
+    assert.equal(msl(epochs(0.1 - 0.05 + 1e-15, "2010-01-01T00:00:00.000Z")), -2);
     assert.equal(msl(epochs(1, "2010-01-01T00:00:00.000Z")), undefined);
     // An epoch that ends as the period starts doesn't overlap it; one that ends in its first day does.
     assert.equal(msl(epochs(1, "2000-01-01T00:00:00.000Z")), -2);
@@ -457,6 +463,55 @@ describe("withDatums with two records for a station", () => {
   });
 });
 
+describe("withDatums through the TICON inventory", () => {
+  const csv = "ticon_id,replacement_id,distance_km\nk13a-k13-nld-rws,rws/k13a.platform,0";
+  const record = tide("ticon/k13a-k13-nld-rws", { datums: { MSL: 0.1 }, datum_frame: "gauge" });
+  const rws = station("rws/k13a.platform", { datum: "NAP" });
+
+  it("joins nothing where the record's GESLA file says it's in another zero", () => {
+    const gesla = station("gesla/k13a-k13-nld-rws", {
+      datum_information: "Mean sea level",
+    } as Partial<StoredStation>);
+    const out = withDatums([rws, gesla], [record], replacements(csv)).stations;
+    assert.deepEqual(byId(out, "rws/k13a.platform").datums, {});
+  });
+
+  it("takes a record with no reduction period only where every epoch converts", () => {
+    const closed = open("NAP", {
+      until: "2005-01-01T00:00:00.000Z",
+      to_current: null,
+      state: "closed",
+    });
+    const later = open("NAP", { id: 2, since: "2005-01-01T00:00:00.000Z" });
+    assert.equal(withDatums([rws], [record], replacements(csv)).stations[0]!.datums.MSL, -0.1);
+    const split = { ...rws, epochs: [closed, later] };
+    assert.deepEqual(withDatums([split], [record], replacements(csv)).stations[0]!.datums, {});
+  });
+});
+
+describe("withDatums across a distance", () => {
+  it("carries SKN along a link of any length, but MSL only within 1 km", () => {
+    // About 2.7 km apart, as BSH's and PEGELONLINE's Geesthacht are.
+    const bsh = station("bsh/732D", {
+      datum: "PNP",
+      lat: 53.42333,
+      lon: 10.33472,
+      datums: { NHN: -5.02, SKN: -4.21, MSL: -6 },
+      same_as: ["pegelonline/5930060"],
+    });
+    const wsv = station("pegelonline/5930060", {
+      datum: "PNP",
+      lat: 53.426505,
+      lon: 10.374522,
+      datums: { NHN: -0.024 },
+      same_as: ["bsh/732D"],
+    });
+    const s = byId(withDatums([bsh, wsv], []).stations, "pegelonline/5930060");
+    assert.equal(s.datums.SKN, round4(-0.024 + 5.02 - 4.21));
+    assert.equal(s.datums.MSL, undefined);
+  });
+});
+
 describe("withDatums with records it can't trust", () => {
   it("joins nothing to a GESLA file whose values are another gauge's", () => {
     const smhi = station("smhi/2541", { datum: "RH2000" });
@@ -532,7 +587,7 @@ describe("the published files", () => {
       assert.deepEqual(row, {
         chart_datum: "MLLW",
         frame: "gauge",
-        msl_source: "tide-database",
+        msl_source: "slackwater-database",
         msl_start: "1983-01-01",
         datums_attribution: ["credit for noaa/9447130"],
       });
@@ -543,7 +598,6 @@ describe("the published files", () => {
         { datum: "MLLW", offset_m: -2.419 },
         { datum: "MSL", offset_m: -4.443 },
         { datum: "NAVD88", offset_m: -3.134 },
-        { datum: "STND", offset_m: 0 },
       ]);
     } finally {
       await rm(dir, { recursive: true, force: true });
@@ -552,7 +606,7 @@ describe("the published files", () => {
 });
 
 describe("tideStations", () => {
-  it("reads the installed tide-database, with its copies' replacements", async () => {
+  it("reads the installed slackwater-database, with its copies' replacements", async () => {
     const all = await tideStations();
     const seattle = all.find((t) => t.id === "noaa/9447130")!;
     assert.equal(seattle.source.id, "9447130");
@@ -560,11 +614,33 @@ describe("tideStations", () => {
     assert.equal(seattle.license.commercial_use, true);
     assert.ok(all.some((t) => typeof t.redundant === "string"));
     assert.ok(all.some((t) => t.redundant === null));
+    // The shapes the joins rely on, so a database update that changes them fails here.
+    const aberdeen = all.find((t) => t.id === "ticon/aberdeen-abe-gbr-bodc")!;
+    assert.equal(aberdeen.source.id, "aberdeen-abe-gbr-bodc");
+    assert.equal(aberdeen.datum_frame, "gauge");
+    assert.equal(all.find((t) => t.id === "kartverket/BGO")!.datums.CD, 0);
+    assert.ok(all.some((t) => t.id.startsWith("ticon/") && t.id.endsWith("-nld-rws")));
   });
 });
 
 describe("offsetRows", () => {
-  it("gives an epoch in another datum a row for its own", () => {
+  it("gives no row for a station's own label unless it's the station's chart datum", () => {
+    // RWS's offshore platforms are measured from RWS's own MSL, with no surveyed offsets.
+    const k13a = station("rws/k13a", { datum: "MSL" });
+    const [platform] = withDatums([k13a], []).stations;
+    assert.deepEqual(platform!.datums, {});
+    assert.equal(platform!.chart_datum, null);
+    assert.deepEqual(offsetRows(platform!), []);
+    // Kartverket's chart datum is the named datum CD, so a level in it needs no conversion.
+    const bergen = station("kartverket/BGO", { datum: "CD", datums: { MSL: -0.952 } });
+    const [cd] = withDatums([bergen], []).stations;
+    assert.deepEqual(offsetRows(cd!), [
+      { station: "kartverket/BGO", epoch: 1, datum: "MSL", offset_m: -0.952 },
+      { station: "kartverket/BGO", epoch: 1, datum: "CD", offset_m: 0 },
+    ]);
+  });
+
+  it("converts an epoch in another datum to every current one", () => {
     const s = station("coops/1", {
       datum: "MLLW",
       datums: { MSL: -1 },
@@ -575,15 +651,11 @@ describe("offsetRows", () => {
     });
     assert.deepEqual(
       offsetRows(s).filter((r) => r.epoch === 1),
-      [
-        { station: "coops/1", epoch: 1, datum: "STND", offset_m: 0 },
-        { station: "coops/1", epoch: 1, datum: "MSL", offset_m: -3 },
-        { station: "coops/1", epoch: 1, datum: "MLLW", offset_m: -2 },
-      ],
+      [{ station: "coops/1", epoch: 1, datum: "MSL", offset_m: -3 }],
     );
   });
 
-  it("puts each epoch that converts in every current datum, and the rest in their own", () => {
+  it("puts each epoch that converts in every current datum, and the rest in their frozen offsets", () => {
     const s = station("rws/x", {
       datum: "NAP",
       datums: { MSL: -0.1 },
@@ -605,10 +677,7 @@ describe("offsetRows", () => {
     });
     assert.deepEqual(offsetRows(s), [
       { station: "rws/x", epoch: 1, datum: "X", offset_m: 1 },
-      { station: "rws/x", epoch: 1, datum: "NAP", offset_m: 0 },
       { station: "rws/x", epoch: 2, datum: "MSL", offset_m: 0.15 },
-      { station: "rws/x", epoch: 2, datum: "NAP", offset_m: 0.25 },
-      { station: "rws/x", epoch: 3, datum: "NAP", offset_m: 0 },
       { station: "rws/x", epoch: 3, datum: "MSL", offset_m: -0.1 },
     ]);
   });
