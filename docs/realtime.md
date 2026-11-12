@@ -87,7 +87,7 @@ A station that leaves its source's list or stops being live drops out of the nex
 
 Deleting withheld stations' rows keeps the limit every other withholding keeps (`tooManyWithheld`): a rule that suddenly matches more stations than that fails the source's passes and deletes nothing, until the rule is fixed or `STILLWELL_ACCEPT_WITHHELD=1` accepts it, as `--accept-withheld` does for the other withholdings.
 
-When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
+When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks. It asks at most once a day, or an hour after one it couldn't start. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
 
 ## Exporting to R2
 

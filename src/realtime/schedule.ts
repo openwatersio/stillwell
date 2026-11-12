@@ -53,7 +53,7 @@ export async function schedule({
   let intervals: number[] | null = null;
   let seeded = false;
   let notBefore = 0;
-  let refreshed = -Infinity;
+  let refreshAfter = -Infinity;
   while (!stopped()) {
     const now = clock();
     const due = intervals?.filter((i) => now - (ran.get(i) ?? 0) >= seconds(i) * 1000) ?? null;
@@ -65,7 +65,7 @@ export async function schedule({
           // A first pass fetched every group; a group new to the list since is due at once.
           if (!due) for (const i of result.intervals) ran.set(i, now);
           intervals = result.intervals;
-        }
+        } else if (result.ok) intervals = null;
         if (result.seeded) seeded = true;
         if (!result.ok && !intervals) notBefore = now + RETRY_MS;
         // A list with nothing to poll, such as a new source's, is read again hourly.
@@ -74,9 +74,10 @@ export async function schedule({
           log("blocked; resting for an hour");
           notBefore = now + BLOCKED_MS;
         }
-        // At most once a day, so a station that stays changed doesn't ask GitHub every pass.
-        if (result.summary?.datumChanged && now - refreshed >= 24 * HOUR_MS && (await refresh()))
-          refreshed = now;
+        // At most once a day, so a station that stays changed doesn't ask GitHub every pass;
+        // an hour after a refresh that couldn't start.
+        if (result.summary?.datumChanged && now >= refreshAfter)
+          refreshAfter = now + ((await refresh()) ? 24 : 1) * HOUR_MS;
       } catch (error) {
         log(error instanceof Error ? error.message : String(error));
         if (!intervals) notBefore = now + RETRY_MS;

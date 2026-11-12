@@ -143,7 +143,10 @@ export async function migrate(ch: ClickHouse): Promise<void> {
     TTL toDateTime(started) + INTERVAL 90 DAY`);
 }
 
-/** Where the poller reads and writes each station's recent values. */
+/**
+ * Where the poller reads and writes each station's recent values. Deletes
+ * return once the rows are gone, so a read after one never sees them.
+ */
 export interface ObservationStore {
   /** The named stations' values from `from` on, sorted by station and time. */
   read(stations: string[], from: number): Promise<StationObservation[]>;
@@ -214,7 +217,8 @@ export function observationStore(ch: ClickHouse): ObservationStore {
       for (const batch of chunks(values, 1000))
         await ch.exec(
           `DELETE FROM observations WHERE station IN {stations:Array(String)}
-           AND concat(station, ' ', toString(toUnixTimestamp64Milli(time))) IN {keys:Array(String)}`,
+           AND concat(station, ' ', toString(toUnixTimestamp64Milli(time))) IN {keys:Array(String)}
+           SETTINGS lightweight_deletes_sync = 2`,
           {
             stations: [...new Set(batch.map((v) => v.station))],
             keys: batch.map((v) => `${v.station} ${v.time}`),
@@ -223,9 +227,13 @@ export function observationStore(ch: ClickHouse): ObservationStore {
     },
     async removeStations(stations) {
       for (const batch of chunks(stations, 1000))
-        await ch.exec(`DELETE FROM observations WHERE station IN {stations:Array(String)}`, {
-          stations: batch,
-        });
+        await ch.exec(
+          `DELETE FROM observations WHERE station IN {stations:Array(String)}
+           SETTINGS lightweight_deletes_sync = 2`,
+          {
+            stations: batch,
+          },
+        );
     },
     async stations(source) {
       const rows = await ch.query<{ station: string }>(

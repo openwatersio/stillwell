@@ -135,4 +135,36 @@ describe("schedule", () => {
     await simulate(25 * 60, () => ({ ...ok([3600]), summary: changed }), refreshes);
     assert.deepEqual(refreshes, [0, 24 * 60]);
   });
+
+  it("waits an hour to try a refresh again when it couldn't start one", async () => {
+    let now = 0;
+    const refreshes: number[] = [];
+    const changed = { ...emptySummary("poll test", 1), datumChanged: true };
+    await schedule({
+      clock: () => now,
+      sleep: async (ms) => {
+        now += ms;
+      },
+      stopped: () => now >= 150 * MINUTE,
+      log: () => {},
+      refresh: async () => {
+        refreshes.push(now / MINUTE);
+        return false;
+      },
+      pass: async () => ({ ...ok([360]), summary: changed }),
+    });
+    assert.deepEqual(refreshes, [0, 60, 120]);
+  });
+
+  it("reads the list again hourly once the source has nothing left to poll", async () => {
+    const calls = await simulate(70, (call) => ok(call === 1 ? [360] : []));
+    assert.deepEqual(
+      calls.map((c) => [c.at, c.due]),
+      [
+        [0, null],
+        [6, [360]],
+        [66, null],
+      ],
+    );
+  });
 });
