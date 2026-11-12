@@ -261,7 +261,7 @@ SET VARIABLE files = (
 SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true);
 ```
 
-The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet`, below, lists them. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction writes each night; they reach it when `stations.parquet` is next rebuilt, and are empty for a station with no observations yet.
+The same works for many stations, with paths built from `stations.parquet`. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet`, below, lists them. `stations.parquet` records each station's `first` and `last` observation, over all its epochs, from the bounds compaction and backfill write; `stations.parquet` is rebuilt after compaction each night, so they usually trail the store by about a day, and are empty for a station with no observations yet.
 
 ## Which years a station has
 

@@ -157,10 +157,12 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
   # A source whose refresh or analysis failed kept its list and verdicts, so the rest still publish.
+  # A list cancelled while it waits in its group cancels the run, so `always()`, not `!cancelled()`;
+  # a run cancelled by hand still publishes the lists it wrote, which Compact daily would that night anyway.
   publish:
     needs: [plan, lists]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
-    # The group the Ingest workflow's `publish` runs take.
+    if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
+    # The group every publish takes, Compact daily's and the Ingest workflow's.
     concurrency:
       group: store
       cancel-in-progress: false
@@ -284,7 +286,7 @@ jobs:
   # station lists are published.
   cross-check:
     needs: [plan, publish]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.publish.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
+    if: ${{ always() && needs.plan.result == 'success' && needs.publish.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
     strategy:
       fail-fast: false
       matrix:

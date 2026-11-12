@@ -3,14 +3,17 @@
 # it once the source's job succeeds again. One open issue per workflow and
 # source, found by its title, so failures after the second add nothing.
 #
-#   scripts/alert.sh <job>
+#   scripts/alert.sh <job> [--single]
 #
 # Run from a workflow's alert job after its matrix, with `job` the matrix
 # job's name (`recent` or `compact`) and GH_TOKEN allowed to read Actions and
-# write issues.
+# write issues. With `--single`, `job` is a job that isn't a matrix, such as
+# `publish`, which counts as a source of its own name. Without it, a job of
+# that bare name is the matrix skipped before it expanded, so it isn't one.
 set -euo pipefail
 
 job=$1
+single=${2:-}
 repo=$GITHUB_REPOSITORY
 run_url="$GITHUB_SERVER_URL/$repo/actions/runs/$GITHUB_RUN_ID"
 run=$(gh api "repos/$repo/actions/runs/$GITHUB_RUN_ID" --jq '"\(.workflow_id) \(.created_at)"')
@@ -21,7 +24,7 @@ read -r workflow created <<<"$run"
 # it waited on its group, or failure for any other, a timeout included.
 conclusions() {
   gh api "repos/$repo/actions/runs/$1/jobs?per_page=100" --jq \
-    ".jobs[] | select(.name | startswith(\"$job (\")) | (.name | ltrimstr(\"$job (\") | rtrimstr(\")\")) + \" \" + (if .conclusion == \"success\" then \"success\" elif (.conclusion == \"cancelled\" or .conclusion == \"skipped\") and (.steps | length) == 0 then \"none\" else \"failure\" end)"
+    ".jobs[] | select(if \"$single\" == \"\" then .name | startswith(\"$job (\") else .name == \"$job\" end) | (.name | ltrimstr(\"$job (\") | rtrimstr(\")\")) + \" \" + (if .conclusion == \"success\" then \"success\" elif (.conclusion == \"cancelled\" or .conclusion == \"skipped\") and (.steps | length) == 0 then \"none\" else \"failure\" end)"
 }
 
 current=$(conclusions "$GITHUB_RUN_ID")
