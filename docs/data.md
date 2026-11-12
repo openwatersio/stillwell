@@ -39,8 +39,8 @@ A station is one source's series at one place; a gauge is the instrument, and `s
 `stations.parquet` has one row per station:
 
 - **`id`**, **`source`** and **`source_id`**: the station's ID, `<source>/<source_id>`, and its parts.
-- **`name`**, **`lat`**, **`lon`** and **`country_code`**: as the source gives them, or as `POSITIONS` (`src/positions.ts`) corrects them where a source places a station away from its gauge.
-- **`kind`**: `coastal`, `estuary`, `lake` or `river`, from the source or from `KINDS` (`src/kinds.ts`), and null where neither says.
+- **`name`**, **`lat`**, **`lon`** and **`country_code`**: as the source gives them, or as `POSITIONS` ([`src/positions.ts`](../src/positions.ts)) corrects them where a source places a station away from its gauge.
+- **`kind`**: `coastal`, `estuary`, `lake` or `river`, from the source or from `KINDS` ([`src/kinds.ts`](../src/kinds.ts)), and null where neither says.
 - **`interval_s`**: the station's usual interval between values, in seconds.
 - **`datum`**: what levels are measured from, in the source's own name for it, such as `NAP`, `PNP` (gauge zero) or `STND` (CO-OPS station datum). Each source's README lists its datums.
 - **`datums`**: meters to add to a level in `datum` to refer it to each other datum the source publishes. Both describe the station's current epoch; an earlier epoch's levels need its own `datums`, or `to_current` first (see [Datum epochs](#datum-epochs)).

@@ -16,7 +16,7 @@ Observed sea level at about 100 of DMI's and the Danish Coastal Authority's tide
 
 ## Backfill
 
-The first list has to be in the store before anything else runs, and `npm run ticon:inventory` stops for every registered source without its list. Registering the source in `src/sources/index.ts` schedules it through its metadata (`hourly` true, `finalizes` false); it also needs an entry in `test/jobs.test.ts`, and a Monthly dispatch with `sources: dmi` starts the list. Backfill runs through the Ingest workflow, or locally against a local store. `all` takes active stations only, and most of the record before the 1990s is at gauges DMI has since replaced and lists as ended, such as Hornbæk's 30018 (1891–1991), so a second run names the inactive stations, from the store's list (`SELECT string_agg(source_id, ',') FROM 'stations/dmi.parquet' WHERE status = 'inactive'`):
+The first list has to be in the store before anything else runs, and `npm run ticon:inventory` stops for every registered source without its list. Registering the source in [`src/sources/index.ts`](../index.ts) schedules it through its metadata (`hourly` true, `finalizes` false); it also needs an entry in [`test/jobs.test.ts`](../../../test/jobs.test.ts), and a Monthly dispatch with `sources: dmi` starts the list. Backfill runs through the Ingest workflow, or locally against a local store. `all` takes active stations only, and most of the record before the 1990s is at gauges DMI has since replaced and lists as ended, such as Hornbæk's 30018 (1891–1991), so a second run names the inactive stations, from the store's list (`SELECT string_agg(source_id, ',') FROM 'stations/dmi.parquet' WHERE status = 'inactive'`):
 
 ```bash
 node scripts/ingest.ts backfill dmi all 1889 2026 --skip-written
@@ -26,6 +26,6 @@ node scripts/ingest.ts backfill dmi all 1889 2026 --skip-written
 node scripts/ingest.ts backfill dmi <inactive IDs> 1889 2026 --skip-written
 ```
 
-`docs/ticon-replacement.csv` routes DMI's and Denmark's CMEMS records to `dmi` but gives none a station ID until `npm run ticon:inventory` runs against a store with DMI's list, so `--first` has nothing to order by.
+[`docs/ticon-replacement.csv`](../../../docs/ticon-replacement.csv) routes DMI's and Denmark's CMEMS records to `dmi` but gives none a station ID until `npm run ticon:inventory` runs against a store with DMI's list, so `--first` has nothing to order by.
 
 That's about 2,770 station-years: about 1,980 at 10 minutes (about 10 seconds and 1.8 MB each) and 790 older, hourly or 15-minute years (a second or two each), so about 5,500 requests, 4 GB of compressed JSON, and 6 hours one station at a time. At the default 4 stations at once, it fits in one Ingest run with `timeout` at 360 minutes, with a second to pick up where `--skip-written` finds the first one stopped. It ends before the current year, which is fetched whole on every run and so is backfilled on its own, `backfill dmi all 2026 2027`. Ingest hourly keeps the active stations current. The source sets `finalizes` false, so Monthly doesn't refetch it: DMI stopped checking values by hand in 2013, so `auto` values stay `preliminary` and a refetch would find nothing new; a correction DMI makes reaches the store only through `backfill --refetch`.
