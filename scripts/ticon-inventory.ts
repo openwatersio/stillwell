@@ -1,6 +1,6 @@
 /**
- * Inventory slackwater-database's TICON records and the store source that can replace
- * each one. Reads a slackwater-database checkout (TIDE_DATABASE, default
+ * Inventory slackwater-database's TICON records and the store source that can
+ * replace each one. Reads a slackwater-database checkout (TIDE_DATABASE, default
  * ../slackwater-database) and the station lists in the store (STILLWELL_STORE,
  * default the public bucket over HTTPS), and writes
  * docs/ticon-replacement.csv (one row per record) and docs/ticon-replacement.md

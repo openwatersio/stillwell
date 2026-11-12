@@ -1,10 +1,10 @@
 /**
  * Clock check: cross-correlates a year of a station's observed levels, fetched
  * through its adapter, against the prediction from a TICON record's constants
- * in a slackwater-database checkout (TIDE_DATABASE, default ../slackwater-database),
- * and reports the lag that fits best. A lag near a whole hour is a clock
- * error, such as local time labeled UTC, to fix before anything fits to the
- * series. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error
+ * in a slackwater-database checkout (TIDE_DATABASE, default
+ * ../slackwater-database), and reports the lag that fits best. A lag near a
+ * whole hour is a clock error, such as local time labeled UTC, to fix before
+ * anything fits to the series. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error
  * hides in that lag; the K1 lag, from K1's phase in a fit of the year, shows it.
  *
  *   node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...

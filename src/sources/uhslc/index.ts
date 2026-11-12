@@ -51,8 +51,8 @@ const DATUM = "ZERO";
 
 /**
  * UHSLC stamps its Hong Kong hourly heights an hour early: the height it
- * labels T was measured at T + 1 h UTC (slackwater-database#360). Every version and
- * the FD series. Remove once UHSLC corrects its files; the clock check shows it.
+ * labels T was measured at T + 1 h UTC (slackwater-database#360). Every
+ * version and the FD series. Remove once UHSLC corrects its files; the clock check shows it.
  * Erratum `uhslc-hong-kong-hour-early`.
  */
 const EARLY_HOURS: Record<number, number> = { 329: 1 };

@@ -4,9 +4,10 @@ import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
 
 /**
- * Which store source can replace each TICON record in slackwater-database. TICON ids
- * are `<place>-<code>-<iso3>-<contributor>`, where the code is often the
- * originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC id).
+ * Which store source can replace each TICON record in slackwater-database.
+ * TICON ids are `<place>-<code>-<iso3>-<contributor>`, where the code is often
+ * the originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC
+ * id).
  */
 export type Status =
   /** An adapter exists and the record matched one of its stations. */
@@ -482,10 +483,10 @@ function round(value: number): number {
 }
 
 /**
- * A record left unmatched takes the match of a record in the same slackwater-database
- * station file, since slackwater-database merges records only when they're the same
- * gauge. Only when every matched record there agrees on one series. It keeps
- * the record's own note, such as why it was unmatched.
+ * A record left unmatched takes the match of a record in the same
+ * slackwater-database station file, since slackwater-database merges records
+ * only when they're the same gauge. Only when every matched record there agrees
+ * on one series. It keeps the record's own note, such as why it was unmatched.
  */
 export function adoptSiblings<T extends { record: TiconRecord; replacement: Replacement }>(
   rows: T[],
