@@ -24,7 +24,8 @@ Realtime levels for Slackwater need values minutes old, but the bigger reasons a
 A Hetzner box of its own, `stillwell-1`, in the Ashburn site, nearest most of Slackwater's users and apart from aiscast's, so one site's bad day doesn't take down both. It's set up the way aiscast's is: `server/deploy/` in this repo with `apply.sh` and `deploy.sh`, CI deploying on every merge to `main`, Grafana Alloy sending metrics to Grafana Cloud, and the same SSH hardening and `ops` user. It runs:
 
 - **ClickHouse**, on loopback only, with a database `stillwell` for public sources and `stillwell_restricted` for sources whose terms bar republishing.
-- **`stillwell-ingest`**, a Node service running this repo's adapters, QC, jobs and export.
+- **`stillwell-ingest`**, a Node service running the poller: this repo's adapters and QC.
+- **`stillwell-jobs`**, a Node service running the jobs: backfill, refetch, requalify, analysis, withhold, the station refresh and the export, each in a child process with a memory limit, so a job that fails or runs out of memory never stops the poller.
 - **`stillwell-api`**, a Node service serving the API on loopback from ClickHouse and the station tables.
 - **`cloudflared`**, publishing `stillwell-api` through a Cloudflare Tunnel behind Access, so no port is open and ClickHouse is never reachable from outside.
 
@@ -37,7 +38,7 @@ R2 holds the record: the year files, the station lists and their history, the bo
 - **A copy of the history**, loaded from R2.
 - **Values polled since the last export.** The sources still hold them, so a new server fetches them again.
 - **Changes jobs are making.** A job finishes only once the station-years it changed are exported to R2, so a finished job's work is never only on the server. A job the server loses partway is run again.
-- **Working tables**: polls, jobs and the list of unexported changes, which a new server starts empty.
+- **Working state**: `polls`, the list of unexported changes and the job queue, which a new server starts empty.
 
 The one thing a lost server can't get back is `received` for the values polled since the last export: fetched again, they arrive with `received` empty, as backfilled values do. Nothing reads `received` yet, and the forecast work that will can skip the gap.
 
@@ -68,7 +69,6 @@ The other tables:
 - `stations` and `epochs`: each source's list and datum epochs, as `stations/<source>.parquet` holds them, loaded from R2 whenever a refresh writes it.
 - `offsets`: for each station epoch and datum, the meters to add to a level in that epoch to refer it to that datum, `to_current` included, from `stations/offsets.parquet`, which `src/datums.ts` writes beside `stations.parquet` on every publish and the server reloads on every publish. An epoch that doesn't convert (`to_current` null, held epochs included) has rows only for its own datum, so a request in any other datum leaves it out. A station's default datum is `coalesce(chart_datum, datum)`, and datum names in requests must match the table's keys exactly.
 - `polls`: one row per source pass, with which stations reported, failed or went stale, and why.
-- `jobs`: each backfill, refetch, requalify or other job, with its arguments, state, progress and result.
 - `changes`: the station-years each insert touched since their last export.
 - `loaded`: the station-years whose whole history ClickHouse holds, which the year export requires.
 
@@ -81,7 +81,7 @@ For each source with `hourly` set in its metadata, `stillwell-ingest` runs passe
 3. QC then reads the last 7 days of each station that changed, runs `qcFor` with the source's errata spans, as `updateRecent` does, and inserts every row it judged with `checked` true, its flag set by QC. QC stays TypeScript, so the archive and the live values share one implementation.
 4. It records the pass in `polls` and its metrics.
 
-Every writer of a station's rows, the poller, QC and every job, holds that station's lock in `stillwell-ingest` from reading the rows to inserting them, so QC never writes back a level a pass has since revised. Jobs work station by station, so a requalify of a whole source holds up the poller by one station's work at most.
+Every writer of a station's rows, the poller, QC and every job, holds that station's lock in the job queue's database from reading the rows to inserting them, so QC never writes back a level a pass has since revised. Jobs work station by station, so a requalify of a whole source holds up the poller by one station's work at most.
 
 A station that leaves its source's list or stops being live drops out of the next pass. The adapter's `withheld` is checked every pass, so a withholding stops the station as soon as it deploys, and the poller then deletes the station's rows. The export also leaves out every withheld station, so a withheld station's values can't reach R2 again from rows not yet deleted, and the restricted database never exports to the public bucket.
 
@@ -98,7 +98,17 @@ The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the publi
 
 ## Jobs
 
-From step 2, backfill, the monthly refetch, requalify, analysis and withhold are jobs `stillwell-ingest` runs. A job is started for one source, or for one station and its years, through an admin endpoint of `stillwell-api` behind its own Access service token, from a workflow or a maintainer's machine. The same endpoint shows when a job ran, how far it got and whether it succeeded. Requalify keeps its per-station budget and resumes where it stopped.
+From step 2, backfill, the monthly refetch, requalify, analysis, withhold and the export are jobs, and from step 3 the station refresh and `publish` too. `stillwell-jobs` runs them from a queue in SQLite (`node:sqlite`, built into Node), a file on the server in WAL mode that both services open:
+
+- **Queue:** each job with its kind, source, arguments, state, attempts, progress and result. A worker claims a job in a transaction and holds a lease it renews while the job runs, so a job runs once, and one whose worker died is claimed again when its lease runs out.
+- **Concurrency:** one job at a time per source, so a source's rate limits hold, and a few sources at once.
+- **Retries:** a failed job is retried with backoff, a few times, then stays failed for a maintainer to see.
+- **Schedules:** in code. A recurring job is queued under a key for its run, such as `export:2026-11-12` or `refetch:2026-11`, so a restart or a late timer never queues the same run twice.
+- **Locks:** the per-station locks every writer of a station's rows holds, with leases, so a process that dies holding one doesn't block the station.
+
+Jobs are idempotent and resume where they stopped, as requalify does now with its per-station budget, and a job finishes only once its changes are on R2. So losing the queue loses nothing: a new server queues anything unfinished again.
+
+A job is started for one source, or for one station and its years, through an admin endpoint of `stillwell-api` behind its own Access service token, from a workflow or a maintainer's machine. The same endpoint shows when a job ran, how far it got and whether it succeeded, and Grafana gets queue depth, running jobs, failures and run times per kind.
 
 A deploy that changes a source's `errata.json` queues a requalify of the station-years the changed entries cover.
 
