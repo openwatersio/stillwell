@@ -5,6 +5,6 @@ docs/results/
 test/fixtures/
 docs/ticon-replacement.md
 src/sources/uhslc/contributors.ts
-docs/uhslc-contributors.md
-docs/gesla-contributors.md
+src/sources/uhslc/contributors.md
+src/sources/gesla/contributors.md
 .cla.json

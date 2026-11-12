@@ -12,7 +12,9 @@ Hourly tide levels at the Japan Meteorological Agency's 70 open tide gauges and 
 - **Datum:** each station's observation datum, 観測基準面 (DL), which JMA keeps fixed through gauge moves and resets: at Tokyo, the benchmark's height above DL changed with each move in 1968 and 1982 while DL's height in T.P. moved by about a centimeter. The historical set is shifted to each station's current DL (「現在の観測基準面に合わせる」), so `archive` is `current`. JMA publishes DL's height in T.P. (or, on remote islands, in a GSI datum or local mean sea level) in the current list, and revises it every year and with each GSI survey (June 2026 for 測地成果2024), but `datums` is empty: the list doesn't say which stations' heights are in T.P., and the offsets would change every year.
 - **Freshness:** provisional values appear around noon JST the next day, and the final set around the 20th of the next month, so the source isn't `hourly`. On 8 November 2026 at 00:34 JST, Chichijima's provisional file ran to the end of the 5th. The current and previous JST month are fetched fresh, final file first and the provisional one where it's missing. Nothing runs hourly, so Monthly's refetch on the 9th is what brings new values: for JMA it backfills every open station from the start of the month two months back, whose final file is out by then, to the end of this month, then runs `backfill jma preliminary` like every source that `finalizes`. The store is therefore up to about five weeks behind JMA. Older files are cached on disk, and JMA lists corrections to final files on the final set's index page; the Ingest workflow starts with an empty cache, so a backfill there with `--refetch` reads them again, and so does one locally after clearing `.cache/`.
 - **Limits:** JMA publishes no rate limit and has no robots.txt, so requests start 300 ms apart.
-- **History:** from December 1924 at the oldest gauges (Hanasaki, Ayukawa, Kushimoto, Tonoura, Sakai, Iwasaki, Fukahori). About 5,200 station-years in all.
+- **History:** from December 1924 at the oldest gauges (Hanasaki, Ayukawa, Kushimoto, Tonoura, Sakai, Iwasaki, Fukahori). About 4,900 station-years in all.
+- **Links:** UHSLC's documentation files give the originator's station number, and where the contributor is JMA or JODC and it is a two-character JMA code, UHSLC's station gets a `same_as` link to this one. JODC's relay of JMA's gauges (GESLA's `JODC_JMA` records, TICON's `jodc_jma`) isn't read: JODC's terms forbid passing its data on without permission, and JMA's own files carry the same gauges.
+- **Canary:** the weekly canary has no recorded response shape for JMA, since its paths name the month and its text has no shape; it passes when both the provisional and final sets return values.
 - **Not used:** JMA's 15-second values from the [tide observation map](https://www.jma.go.jp/bosai/tidelevel/), in T.P. rather than DL, kept for about 32 days, which cover 166 gauges including other agencies'; the original ledger values (`orgdata/`), which the historical set corrects; and the residuals (`dep`) and tide tables.
 
 ## Compared with UHSLC
@@ -21,7 +23,7 @@ UHSLC's research-quality set carries 17 of these stations, 13 contributed by JMA
 
 ## Backfill
 
-Monthly refreshes JMA's list on the 2nd; dispatch Monthly with `sources: jma` once the adapter is on `main`. Then backfill through the Ingest workflow, TICON's stations first. `all` takes active stations only, so the 20 closed ones are named in a second run:
+Monthly refreshes JMA's list on the 2nd. A full backfill goes through the Ingest workflow, TICON's stations first. `all` takes active stations only, so the 20 closed ones are named in a second run:
 
 ```bash
 node scripts/ingest.ts backfill jma all 1924 2026 --skip-written --first docs/ticon-replacement.csv
@@ -31,4 +33,4 @@ node scripts/ingest.ts backfill jma all 1924 2026 --skip-written --first docs/ti
 node scripts/ingest.ts backfill jma CS,D5,D9,DS,FU,H1,HC,HD,HF,IW,L4,ME,MS,O1,O7,R1,SS,T2,TE,TU 1924 2026 --skip-written
 ```
 
-That's about 5,200 station-years, 62,000 monthly files and about 210 MB. At 300 ms a request it needs about 6 hours, so expect a second run, which `--skip-written` resumes. Then backfill the current year on its own, `backfill jma all 2026 2027`.
+That's about 4,900 station-years, 59,000 monthly files and about 200 MB. At 300 ms a request it needs about 6 hours, so expect a second run, which `--skip-written` resumes. The current year is backfilled on its own, `backfill jma all 2026 2027`.

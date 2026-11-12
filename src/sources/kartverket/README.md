@@ -13,6 +13,8 @@ Observed water levels from the permanent tide gauges of Kartverket, the Norwegia
 - **Limits:** the API documents capacity for about 20 requests a second, shared by all users, and asks not to be polled hard. Requests start at least a second apart. A year in one request works (a year of hourly values at Vardø took 5 seconds). A month of 10-minute values at Bergen is 320 KB and took 3.4 seconds, so a station-year is about 3.8 MB and roughly 30 to 40 seconds. Responses aren't compressed. A bad request answers 200 with an `<error>` element, which fails; a range with no data answers an empty `<location>`.
 - **History:** from 1986 to 1992 at the long-running gauges, later at newer ones (Oslo from 2006, Mausund from 2010, several from 2021 to 2026). Older records, back to 1914 at Oslo and 1915 at Bergen, aren't in this API; Kartverket points to the Copernicus Marine Service for them. `stattime` gives the years with monthly means, which reach further back than the observations.
 - **Freshness:** the station list, `obstime` and `stationlevels` are never cached. A year's levels are cached only when the whole range is more than 365 days old and the response runs to its last 10 minutes. Values arrive 10 to 20 minutes after they're measured, so the gauges suit Ingest hourly.
+- **Finalizing:** the source's `finalizes` is true: Kartverket revises recent values, so Monthly's refetch takes each station again from its earliest preliminary value.
+- **Same gauge elsewhere:** `stations.parquet` links 28 of its stations to GESLA records (the NHS contributor's site codes are Kartverket's) and 7 to UHSLC series with `same_as`.
 
 ## Backfill
 
