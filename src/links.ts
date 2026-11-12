@@ -170,8 +170,8 @@ async function levels(
  * Measures every pair `pairsToMeasure` finds, `concurrency` at a time, in
  * the latest of the first `MAX_TRIES` years `yearsToMeasure` gives that
  * measures. Every `previous` row the run doesn't replace is kept, unless its
- * pair's values were read and didn't measure, or a station it names has
- * opened another epoch since: a missing list, years file or level file, a
+ * pair's values were read and didn't measure, a station it names has opened
+ * another epoch since, or its listed stations are no longer linked: a missing list, years file or level file, a
  * rewrite in progress (marked in the years file) or a failed read
  * (`failed`) takes no offsets away.
  */
@@ -234,9 +234,18 @@ export async function measureLinks(
     const s = byId.get(id);
     return s !== undefined && openEpoch(s)?.id !== epoch;
   };
+  // A pair both of whose stations are listed but no longer linked is no longer one gauge.
+  const unlinked = (r: LinkOffset) =>
+    byId.has(r.a) && byId.has(r.b) && !byId.get(r.a)!.same_as.includes(r.b);
   const kept = previous.filter((r) => {
     const key = `${r.a} ${r.b}`;
-    return !fresh.has(key) && !dropped.has(key) && !moved(r.a, r.a_epoch) && !moved(r.b, r.b_epoch);
+    return (
+      !fresh.has(key) &&
+      !dropped.has(key) &&
+      !moved(r.a, r.a_epoch) &&
+      !moved(r.b, r.b_epoch) &&
+      !unlinked(r)
+    );
   });
   console.error(
     `measured ${fresh.size} of ${pairs.length} linked pairs, kept ${kept.length} from before, dropped ${dropped.size}; ${failed} failed`,

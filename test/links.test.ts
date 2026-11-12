@@ -334,6 +334,9 @@ describe("measureLinks", () => {
         ["pegelonline/cux", 2025, 8760],
       ]);
       assert.deepEqual(await measureLinks(dir, pair(), 1, [row()]), { rows: [row()], failed: 0 });
+      // Nor once its stations are no longer linked.
+      const apart = pair().map((s) => ({ ...s, same_as: [] }));
+      assert.deepEqual((await measureLinks(dir, apart, 1, [row()])).rows, []);
       // Not once a station has opened a new epoch.
       assert.deepEqual((await measureLinks(dir, pair(), 1, [row({ b_epoch: 2 })])).rows, []);
     } finally {
