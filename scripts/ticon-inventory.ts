@@ -87,7 +87,7 @@ if (missing.length)
   throw new Error(`Station files list unknown TICON records: ${missing.join(", ")}`);
 
 const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io").replace(/\/$/, "");
-// A source that bars republishing has its list only in the restricted store, so
+// A source in the restricted store has its list only there, so
 // it's left out. A source missing from the store would mark every record it
 // originates unmatched, so that stops the run, except for a source none of whose
 // records the last inventory found ready: a new adapter before its first
@@ -253,7 +253,7 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 ## How records are matched
 
 - **Codes in the id.** TICON ids end in \`<code>-<country>-<contributor>\`. NOAA, USGS, REFMAR, Norwegian (\`nhs\`) and SMHI records carry the originator's station code, so they map to \`coops\`, \`usgs\` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), \`kartverket\`, \`refmar\` and \`smhi\`. WSV and BfG records carry a PEGELONLINE number, used when an active PEGELONLINE station has it.
-- **Declared provenance.** UHSLC and JODC records use slackwater-database's [\`sources/ticon/provenance.ts\`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket, JMA or JODC gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself.
+- **Declared provenance.** UHSLC and JODC records use slackwater-database's [\`sources/ticon/provenance.ts\`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket or JMA gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself, and other JODC records to JODC by the code in their id: the JHOD station numbers some declare aren't JODC's codes.
 - **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (\`mi_c\`) records, and CMEMS records in countries whose feed has a list in the store (France's once REFMAR's is there) match an active station with levels: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently. A CMEMS record linked to a station of its national feed (\`LINKS\` in [\`src/same-as.ts\`](../src/same-as.ts)) matches that station wherever CMEMS places it, or stays \`to_match\` if it isn't an active station with levels; the UK's match the EA first.
 - **Same station.** A record still unmatched takes the match of another record in its slackwater-database station file, since slackwater-database merges records only when they're the same gauge.
 - **UK gauges.** BODC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the store, and BODC's own gauge once its list is. NOC's records of gauges outside the UK network stay \`restricted\`: BODC's open data is the UK network's alone.

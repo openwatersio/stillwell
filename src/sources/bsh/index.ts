@@ -225,6 +225,10 @@ async function rowsOf(
     throw error;
   }
   if (!text.startsWith("I_E#")) throw new Error(`BSH ${file} is not a prediction file`);
+  // A gauge predicted by time difference from a reference port has times but no heights
+  // ("Zeiten : HW NW" or "Zeiten : HW", not "Zeiten u. Höhen") and often no datum or unit
+  // line. Any other file goes on to the checks below.
+  if (/^C02#[^#]*#\s*Zeiten\s+:\s*HW(\s+NW)?\s*#/m.test(text) && !/^VB2#/m.test(text)) return [];
   const unit = /C05#[^#]*#\s*([^#\s]+)/.exec(text)?.[1];
   if (unit !== "m") throw new Error(`BSH ${file} height unit is ${unit}, not m`);
   // BSH names each year's datum, and a gauge can move from PNP to SKN between years.
