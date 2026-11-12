@@ -125,18 +125,18 @@ export function wholeEndedYear(from: Date, to: Date, now: number): boolean {
 /**
  * Station IDs from a file, one per line, for `--first`: a plain list (blank
  * lines and `#` comments skipped), or a CSV with a header, whose
- * `replacement_id`, `id` or `station` column is used, so
- * docs/ticon-replacement.csv works as it is. IDs may be bare (`07010000`) or
+ * `originator_id`, `id` or `station` column is used, so
+ * docs/ticon-inventory.csv works as it is. IDs may be bare (`07010000`) or
  * carry their source (`usgs/07010000`); ones for another source are dropped.
  */
 export function parseStationList(text: string, sourceId: string, csv: boolean): string[] {
   let lines = text.split(/\r?\n/).map((l) => l.trim());
   if (csv) {
     const header = csvFields(lines.shift() ?? "");
-    const column = ["replacement_id", "id", "station"]
+    const column = ["originator_id", "id", "station"]
       .map((c) => header.indexOf(c))
       .find((i) => i >= 0);
-    if (column === undefined) throw new Error("CSV needs a replacement_id, id or station column");
+    if (column === undefined) throw new Error("CSV needs an originator_id, id or station column");
     lines = lines.map((l) => csvFields(l)[column] ?? "");
   } else lines = lines.map((l) => l.replace(/#.*/, "").trim());
   const ids: string[] = [];

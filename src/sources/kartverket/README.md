@@ -21,7 +21,7 @@ Observed water levels from the permanent tide gauges of Kartverket, the Norwegia
 The Monthly workflow refreshes Kartverket's list on the 2nd with every other source's; dispatch it with `sources: kartverket` once as soon as the adapter is on `main`, since Ingest hourly and Compact daily fail for Kartverket until its list is in the store, and the backfill needs each station's `record_start` from it. A gauge whose first observation or datum offsets can't be read is listed without them, with a warning. Then, through the Ingest workflow:
 
 ```bash
-node scripts/ingest.ts backfill kartverket all 1986 2026 --skip-written --first docs/ticon-replacement.csv
+node scripts/ingest.ts backfill kartverket all 1986 2026 --skip-written --first docs/ticon-inventory.csv
 node scripts/ingest.ts backfill kartverket all 2026 2027
 ```
 

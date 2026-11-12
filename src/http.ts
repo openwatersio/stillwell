@@ -1,6 +1,6 @@
 /**
- * HTTP for adapters. Plain `fetch` with retries, so it runs in Node and in a
- * Worker. Scripts swap in the disk cache from `src/cache.ts` with `setTransport`.
+ * HTTP for adapters. Plain `fetch` with retries, so it runs wherever `fetch`
+ * does. Scripts swap in the disk cache from `src/cache.ts` with `setTransport`.
  */
 const USER_AGENT = "openwaters-stillwell (+https://github.com/openwatersio/stillwell)";
 

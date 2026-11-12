@@ -26,7 +26,7 @@ UHSLC's research-quality set carries 17 of these stations, 13 contributed by JMA
 Monthly refreshes JMA's list on the 2nd. A full backfill goes through the Ingest workflow, TICON's stations first. `all` takes active stations only, so the 20 closed ones are named in a second run:
 
 ```bash
-node scripts/ingest.ts backfill jma all 1924 2026 --skip-written --first docs/ticon-replacement.csv
+node scripts/ingest.ts backfill jma all 1924 2026 --skip-written --first docs/ticon-inventory.csv
 ```
 
 ```bash

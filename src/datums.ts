@@ -68,7 +68,7 @@ const JOINS: Record<string, string> = {
 /**
  * TICON contributors whose GESLA files are measured from a reference, so a
  * record's datums in its gauge zero apply to the series the TICON inventory
- * (`docs/ticon-replacement.csv`) names for it.
+ * (`docs/ticon-inventory.csv`) names for it.
  */
 const TICON_ZEROS: Record<string, string> = { rws: "NAP", rws_hist: "NAP", smhi: "RH2000" };
 
@@ -424,28 +424,30 @@ const dropped = (id: string | undefined) => !!id?.startsWith("ticon/") && DROPPE
 const round = (m: number) => Math.round(m * 1e4) / 1e4 + 0; // + 0 turns -0 into 0
 
 /**
- * The series that replaces each TICON record, from the TICON inventory's
- * `ticon_id` and `replacement_id`, where the two are within `ID_KM`.
+ * The originator's series for each TICON record, from the TICON inventory's
+ * `ticon_id` and `originator_id`, where the two are within `ID_KM`.
  */
-export function replacements(csv: string): Map<string, string> {
+export function originators(csv: string): Map<string, string> {
   const [header, ...lines] = csv.trim().split("\n");
   const columns = csvFields(header!);
-  const [ticon, replacement, distance] = ["ticon_id", "replacement_id", "distance_km"].map((c) =>
+  const [ticon, originator, distance] = ["ticon_id", "originator_id", "distance_km"].map((c) =>
     columns.indexOf(c),
   );
+  if ([ticon, originator, distance].includes(-1))
+    throw new Error("TICON inventory needs ticon_id, originator_id and distance_km columns");
   const out = new Map<string, string>();
   for (const line of lines) {
     const f = csvFields(line);
-    if (f[replacement!] && f[distance!] && Number(f[distance!]) <= ID_KM)
-      out.set(f[ticon!]!, f[replacement!]!);
+    if (f[originator!] && f[distance!] && Number(f[distance!]) <= ID_KM)
+      out.set(f[ticon!]!, f[originator!]!);
   }
   return out;
 }
 
-/** `replacements` of the inventory in this repository. */
-export async function ticonReplacements(): Promise<Map<string, string>> {
-  const path = new URL("../docs/ticon-replacement.csv", import.meta.url);
-  return replacements(await readFile(path, "utf8"));
+/** `originators` of the inventory in this repository. */
+export async function ticonOriginators(): Promise<Map<string, string>> {
+  const path = new URL("../docs/ticon-inventory.csv", import.meta.url);
+  return originators(await readFile(path, "utf8"));
 }
 
 /**

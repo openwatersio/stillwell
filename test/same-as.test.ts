@@ -614,7 +614,7 @@ describe("rank", () => {
   const live = record("2001-12-17T00:00:00Z", "2026-10-01T00:00:00Z");
 
   it("prefers a series with levels, then one whose terms allow commercial use", () => {
-    // A BOM-contributed UHSLC copy is non-commercial; its live original wins on terms alone.
+    // A non-commercial UHSLC copy loses to its live original on terms alone.
     assert.equal(
       best(station("uhslc/001", { commercial_use: false, ...live }), station("refmar/9", live)),
       "refmar/9",
@@ -696,6 +696,30 @@ describe("rank", () => {
       }),
     ]).stations;
     assert.equal(relayed[0]!.preferred, "crms/CRMS0282-H01");
+    // GESLA's record of a site spans the gauges CPRA numbers anew as it moves
+    // them; CRMS links them, so the record joins all of them and the gauge
+    // still reporting is preferred over the site's first.
+    const moved = linkGauges(
+      [
+        station("gesla/crms6302-crms6302-usa-crms", {
+          same_as: ["crms/CRMS6302-H01"],
+          ...record("2008-01-01T00:00:00Z", "2025-12-31T00:00:00Z"),
+        }),
+        station("crms/CRMS6302-H01", {
+          same_as: ["crms/CRMS6302-H02"],
+          status: "inactive",
+          ...record("2009-01-01T00:00:00Z", "2010-12-31T00:00:00Z"),
+        }),
+        station("crms/CRMS6302-H02", {
+          same_as: ["crms/CRMS6302-H01"],
+          lat: m(200),
+          ...record("2011-01-01T00:00:00Z", "2026-10-01T00:00:00Z"),
+        }),
+      ],
+      NOW,
+    ).stations;
+    assert.deepEqual(moved[0]!.same_as, ["crms/CRMS6302-H01", "crms/CRMS6302-H02"]);
+    for (const s of moved) assert.equal(s.preferred, "crms/CRMS6302-H02");
     assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
     assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.

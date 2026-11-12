@@ -7,7 +7,8 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { writeOffsets, writeStations } from "../src/store/parquet.ts";
 import {
   offsetRows,
-  replacements,
+  originators,
+  ticonOriginators,
   tideStations,
   withDatums,
   type TideStation,
@@ -266,10 +267,10 @@ describe("withDatums", () => {
       datum_epoch: period,
     });
     const csv = [
-      "ticon_id,replacement_id,distance_km",
+      "ticon_id,originator_id,distance_km",
       "amaliahaven-amlahvn-nld-rws,rws/maasvlakte.amaliahaven,0",
     ].join("\n");
-    return withDatums([rws], [record], replacements(csv)).stations[0]!;
+    return withDatums([rws], [record], originators(csv)).stations[0]!;
   };
   const oldNap = open("NAP", {
     until: "2005-01-01T00:00:00.000Z",
@@ -496,7 +497,7 @@ describe("withDatums with two records for a station", () => {
       datum_epoch: { start: "2023-01-01", end: "2025-12-31" },
     });
     const csv = [
-      "ticon_id,replacement_id,distance_km",
+      "ticon_id,originator_id,distance_km",
       "vlissingen-vlissgn-nld-rws_hist,rws/vlissingen,0",
       "vlissingen-vlis-nld-rws,rws/vlissingen,0",
       "vlissingen-x-nld-rws,rws/vlissingen,",
@@ -505,12 +506,17 @@ describe("withDatums with two records for a station", () => {
       [hist, recent],
       [recent, hist],
     ]) {
-      const [s] = withDatums([rws], order, replacements(csv)).stations;
+      const [s] = withDatums([rws], order, originators(csv)).stations;
       assert.equal(s!.datums.MSL, -0.03);
       assert.equal(s!.tide_station, "ticon/vlissingen-vlis-nld-rws");
     }
     // A row with no distance isn't a match.
-    assert.equal(replacements(csv).has("vlissingen-x-nld-rws"), false);
+    assert.equal(originators(csv).has("vlissingen-x-nld-rws"), false);
+  });
+
+  it("reads the committed inventory, and refuses one missing a column", async () => {
+    assert.ok((await ticonOriginators()).size > 0);
+    assert.throws(() => originators("ticon_id,station,distance_km\nx,y,0"), /originator_id/);
   });
 
   it("credits every record whose values a station holds", () => {
@@ -533,7 +539,7 @@ describe("withDatums with two records for a station", () => {
 });
 
 describe("withDatums through the TICON inventory", () => {
-  const csv = "ticon_id,replacement_id,distance_km\nk13a-k13-nld-rws,rws/k13a.platform,0";
+  const csv = "ticon_id,originator_id,distance_km\nk13a-k13-nld-rws,rws/k13a.platform,0";
   const record = tide("ticon/k13a-k13-nld-rws", { datums: { MSL: 0.1 }, datum_frame: "gauge" });
   const rws = station("rws/k13a.platform", { datum: "NAP" });
 
@@ -541,7 +547,7 @@ describe("withDatums through the TICON inventory", () => {
     const gesla = station("gesla/k13a-k13-nld-rws", {
       datum_information: "Mean sea level",
     } as Partial<StoredStation>);
-    const out = withDatums([rws, gesla], [record], replacements(csv)).stations;
+    const out = withDatums([rws, gesla], [record], originators(csv)).stations;
     assert.deepEqual(byId(out, "rws/k13a.platform").datums, {});
   });
 
@@ -552,9 +558,9 @@ describe("withDatums through the TICON inventory", () => {
       state: "closed",
     });
     const later = open("NAP", { id: 2, since: "2005-01-01T00:00:00.000Z" });
-    assert.equal(withDatums([rws], [record], replacements(csv)).stations[0]!.datums.MSL, -0.1);
+    assert.equal(withDatums([rws], [record], originators(csv)).stations[0]!.datums.MSL, -0.1);
     const split = { ...rws, epochs: [closed, later] };
-    assert.deepEqual(withDatums([split], [record], replacements(csv)).stations[0]!.datums, {});
+    assert.deepEqual(withDatums([split], [record], originators(csv)).stations[0]!.datums, {});
   });
 });
 
@@ -588,8 +594,8 @@ describe("withDatums with records it can't trust", () => {
       datums: { MSL: 0.1 },
       datum_frame: "gauge",
     });
-    const csv = "ticon_id,replacement_id,distance_km\nuddevalla-2541-swe-smhi,smhi/2541,0.75";
-    const [s] = withDatums([smhi], [record], replacements(csv)).stations;
+    const csv = "ticon_id,originator_id,distance_km\nuddevalla-2541-swe-smhi,smhi/2541,0.75";
+    const [s] = withDatums([smhi], [record], originators(csv)).stations;
     assert.deepEqual(s!.datums, {});
     assert.equal(s!.tide_station, null);
   });
@@ -622,12 +628,12 @@ describe("withDatums with records it can't trust", () => {
       });
     const older = record("ticon/x-a-nld-rws", "2010-12-31", 0.1);
     const newer = record("ticon/x-b-nld-rws", "2020-12-31", 0.2);
-    const csv = "ticon_id,replacement_id,distance_km\nx-a-nld-rws,rws/x,0\nx-b-nld-rws,rws/x,0";
+    const csv = "ticon_id,originator_id,distance_km\nx-a-nld-rws,rws/x,0\nx-b-nld-rws,rws/x,0";
     for (const order of [
       [older, newer],
       [newer, older],
     ])
-      assert.equal(withDatums([rws], order, replacements(csv)).stations[0]!.datums.MSL, -0.2);
+      assert.equal(withDatums([rws], order, originators(csv)).stations[0]!.datums.MSL, -0.2);
   });
 });
 
@@ -675,7 +681,7 @@ describe("the published files", () => {
 });
 
 describe("tideStations", () => {
-  it("reads the installed slackwater-database, with its copies' replacements", async () => {
+  it("reads the installed slackwater-database, with its copies' originators", async () => {
     const all = await tideStations();
     const seattle = all.find((t) => t.id === "noaa/9447130")!;
     assert.equal(seattle.source.id, "9447130");
