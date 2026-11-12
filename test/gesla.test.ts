@@ -183,7 +183,7 @@ describe("gesla stations", () => {
     assert.equal(requests.length, 0);
   });
 
-  it("tags BOM's records for commercial use, crediting BOM with a link to its conditions", async () => {
+  it("keeps BOM's own records non-commercial, crediting BOM with a link to its conditions", async () => {
     const bom = metadata.replace(
       "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
       "seattle-9447130-usa-noaa,Seattle,9447130,USA,BOM,",
@@ -200,7 +200,7 @@ describe("gesla stations", () => {
       [record.contributor, record.commercial_use, record.attribution],
       [
         "BOM",
-        true,
+        false,
         "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf)",
       ],
     );

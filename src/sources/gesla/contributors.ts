@@ -67,8 +67,9 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   RWS_HIST: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   BOM: {
     name: NOTICES.bom!.credit!,
-    commercial_use: true,
-    terms: `${RESEARCH_AND_CONSULTANCY} BOM allowed use of its data under the conditions of use for its tide information, which ask for its copyright acknowledgement and disclaimers (openwatersio/stillwell#80); the credit links them.`,
+    commercial_use: false,
+    terms:
+      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially.",
   },
   WSV: {
     name: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)",
@@ -129,7 +130,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   BODC: {
     name: "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     commercial_use: true,
-    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
+    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
   },
   SFWMD: {
     name: "South Florida Water Management District",
@@ -225,7 +226,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Danish Meteorological Institute",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them (openwatersio/stillwell#80).",
+      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them.",
   },
   GLOSS: {
     name: "Global Sea Level Observing System",

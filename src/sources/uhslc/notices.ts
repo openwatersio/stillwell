@@ -50,7 +50,7 @@ export const NOTICES: Record<string, Notice> = {
     credit: `Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
     url: BOM_CONDITIONS,
     terms:
-      "BOM allowed use of its data under the conditions of use for its tide information (reference CAS-151567-N3L2D4, openwatersio/stillwell#80): acknowledge copyright in the Commonwealth of Australia represented by the Bureau of Meteorology, and show BOM's disclaimers of warranty and liability with the data or link them from its attribution, which the credit does.",
+      "BOM allowed use of its data under the conditions of use for its tide information (reference CAS-151567-N3L2D4): acknowledge copyright in the Commonwealth of Australia represented by the Bureau of Meteorology, and show BOM's disclaimers of warranty and liability with the data or link them from its attribution, which the credit does.",
   },
   jma: {
     name: "Japan Meteorological Agency",
@@ -78,7 +78,7 @@ export const NOTICES: Record<string, Notice> = {
       "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     url: "https://www.bodc.ac.uk/data/hosted_data_systems/sea_level/uk_tide_gauge_network/",
     terms:
-      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
+      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
   },
   ccby: {
     name: "CC BY 4.0",
