@@ -81,7 +81,7 @@ export interface Station {
   license: string;
   commercial_use: boolean;
   attribution: string;
-  /** tide-database station (`source/id`) for the same gauge. */
+  /** slackwater-database station (`source/id`) for the same gauge. */
   tide_station: string | null;
   /** Other store series from the same physical gauge, by `src/same-as.ts`. */
   same_as: string[];

@@ -4,9 +4,10 @@ import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
 
 /**
- * Which store source can replace each TICON record in tide-database. TICON ids
- * are `<place>-<code>-<iso3>-<contributor>`, where the code is often the
- * originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC id).
+ * Which store source can replace each TICON record in slackwater-database.
+ * TICON ids are `<place>-<code>-<iso3>-<contributor>`, where the code is often
+ * the originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC
+ * id).
  */
 export type Status =
   /** An adapter exists and the record matched one of its stations. */
@@ -37,13 +38,13 @@ export interface TiconRecord {
   iso3: string;
   commercial_use: boolean;
   epoch: { start: string; end: string };
-  /** Whether a tide-database station file lists this record. */
+  /** Whether a slackwater-database station file lists this record. */
   published: boolean;
-  /** Whether tide-database's quality evaluation accepts it; rejected records still get a route. */
+  /** Whether slackwater-database's quality evaluation accepts it; rejected records still get a route. */
   accepted: boolean;
-  /** The tide-database station file that lists it, as `<country>/<slug>`. */
+  /** The slackwater-database station file that lists it, as `<country>/<slug>`. */
   station?: string;
-  /** The originator tide-database's provenance declares, as `source/id`. */
+  /** The originator slackwater-database's provenance declares, as `source/id`. */
   declared?: string;
 }
 
@@ -113,7 +114,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   cv: { source: "gesla", status: "restricted", note: "GESLA lists CV as research only" },
 };
 
-/** tide-database source prefixes, as store sources, with each one's status. */
+/** slackwater-database source prefixes, as store sources, with each one's status. */
 const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
@@ -169,7 +170,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 
   // A UHSLC or JODC relay of a gauge another source publishes goes to that
-  // source, as tide-database's provenance declares.
+  // source, as slackwater-database's provenance declares.
   if (contributor.startsWith("uhslc") || contributor.startsWith("jodc")) {
     const [prefix, id] = record.declared?.split("/") ?? [];
     const declared = prefix ? DECLARED[prefix] : undefined;
@@ -482,10 +483,10 @@ function round(value: number): number {
 }
 
 /**
- * A record left unmatched takes the match of a record in the same tide-database
- * station file, since tide-database merges records only when they're the same
- * gauge. Only when every matched record there agrees on one series. It keeps
- * the record's own note, such as why it was unmatched.
+ * A record left unmatched takes the match of a record in the same
+ * slackwater-database station file, since slackwater-database merges records
+ * only when they're the same gauge. Only when every matched record there agrees
+ * on one series. It keeps the record's own note, such as why it was unmatched.
  */
 export function adoptSiblings<T extends { record: TiconRecord; replacement: Replacement }>(
   rows: T[],
@@ -515,7 +516,7 @@ export function adoptSiblings<T extends { record: TiconRecord; replacement: Repl
           row.record,
           stations.find((s) => s.id === sibling.replacement.id),
         ),
-        note: [`Same tide-database station as ${sibling.record.id}`, row.replacement.note]
+        note: [`Same slackwater-database station as ${sibling.record.id}`, row.replacement.note]
           .filter(Boolean)
           .join("; "),
       },
