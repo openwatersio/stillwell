@@ -74,6 +74,9 @@ export interface CatalogLocation {
   type?: string;
   latitude?: number;
   longitude?: number;
+  /** Where `latitude` and `longitude` are missing, as at every LRC location, the position is here. */
+  "published-latitude"?: number;
+  "published-longitude"?: number;
   elevation?: number;
   unit?: string;
   "vertical-datum"?: string;
@@ -158,7 +161,15 @@ export function toStations(
   committed: Map<string, string> = new Map(),
   now = Date.now(),
 ): UsaceStation[] {
-  const byName = new Map(locations.map((l) => [l.name, l]));
+  const byName = new Map(
+    locations.map((l) => [
+      l.name,
+      // Both coordinates from one pair, so a position is never half one and half the other.
+      l.latitude === undefined && l.longitude === undefined
+        ? { ...l, latitude: l["published-latitude"], longitude: l["published-longitude"] }
+        : l,
+    ]),
+  );
   const listed = new Map(series.map((s) => [s.name, s]));
   const byLocation = Map.groupBy(
     series.filter((s) => observed(s)),

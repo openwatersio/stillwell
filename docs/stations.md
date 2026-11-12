@@ -110,7 +110,7 @@ to_current = epoch.datums[R] − current.datums[R]
 
 Because each epoch converts straight to the current one, conversions never chain, and a station with many epochs gains no error from the number of changes. When the current epoch's offsets are re-levelled, every `to_current` follows at the next refresh, which is right: the older epochs' frozen offsets haven't changed.
 
-USACE stations carry an NGVD29 or NAVD88 offset at about 1,060 of 1,353 stations. Their resets are same-label (`GZ`), so they keep today's behavior until a decision: rows from before the reset stay out of the combined series. The difference from today is that those rows can stay in the store under epoch 1, rather than being deleted by hand.
+USACE stations carry an NGVD29 or NAVD88 offset at about 1,060 of 1,355 stations. Their resets are same-label (`GZ`), so they keep today's behavior until a decision: rows from before the reset stay out of the combined series. The difference from today is that those rows can stay in the store under epoch 1, rather than being deleted by hand.
 
 ### A gauge that changes datum more than once
 

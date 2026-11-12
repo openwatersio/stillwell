@@ -1673,6 +1673,35 @@ describe("usace", () => {
       [stLouis!.series, stLouis!.datums, stLouis!.interval_s, stLouis!.live],
       ["St Louis-Mississippi.Stage.Inst.30Minutes.0.lrgsShef-rev", { NAVD88: 115.696 }, 1800, true],
     );
+    // LRC's locations give their position only as `published-latitude` and `published-longitude`.
+    const [chicago] = usace.toStations(
+      "LRC",
+      [
+        series(
+          "Chicago Lock-Pool.Stage.Inst.1Hour.0.USGS-raw",
+          "1Hour",
+          "2021-03-19T16:00:00Z",
+          "2026-09-14T03:00:00Z",
+        ),
+      ],
+      [
+        {
+          office: "LRC",
+          name: "Chicago Lock-Pool",
+          "long-name": "Lake Michigan at Chicago Lock",
+          kind: "SITE",
+          "published-latitude": 41.888366276028,
+          "published-longitude": -87.62116342606,
+          nation: "United States",
+        },
+      ],
+      new Map(),
+      now,
+    );
+    assert.deepEqual(
+      [chicago!.id, chicago!.lat, chicago!.lon],
+      ["usace/LRC.Chicago_Lock-Pool", 41.888366276028, -87.62116342606],
+    );
     // A gauge whose only series stopped years ago is listed for its history, not live.
     const [old] = usace.toStations(
       "MVS",
