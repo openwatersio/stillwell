@@ -75,7 +75,7 @@ export interface Station {
   /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether the realtime poller polls this station. */
+  /** Whether ingest asks for this station's current values: the hourly job and the realtime poller. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a

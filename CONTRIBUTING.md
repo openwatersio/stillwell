@@ -8,6 +8,8 @@ This repo fetches water levels from each source's own service and writes them as
 src/sources/<source>/  one adapter per source, each with a README on that service's quirks
 src/store/              Parquet writing, merging and paths
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
+src/realtime/          the realtime poller's ClickHouse store, poll and schedule (docs/realtime.md)
+server/                stillwell-ingest, the service that runs the poller
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
@@ -141,6 +143,22 @@ These environment variables choose where it writes:
 Write to R2 only through the Ingest and Monthly workflows. A run from your own machine shares no concurrency group with the scheduled jobs, so it and Ingest hourly or Compact daily can each rewrite a file the other just read, and one's values are lost. That includes the bounds file, which backfill and compaction both rewrite whole.
 
 If a source starts reporting a station in another datum, `ingest stations` opens a datum epoch for it and reports it. A change it holds for a decision (soon after the last one, or back to an earlier reference) fails the run on every refresh until the source's `overrides` decide, and `backfill` and `recent` skip that station meanwhile. `backfill … all` skips inactive stations.
+
+## Running the poller
+
+`server/ingest.ts` is stillwell-ingest: it polls every hourly source's live stations into ClickHouse, each at its `min_interval_s` or hourly where it gives none ([docs/realtime.md](docs/realtime.md)). Each pass runs in a process of its own, `server/pass.ts`, and each that ends adds a row to the `polls` table. It reads ClickHouse at `CLICKHOUSE_URL` (default `http://127.0.0.1:8123`, with `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` if set), creating the `stillwell` database, and `stillwell_restricted` for sources that bar republishing, and their tables on start. It reads station lists and `recent/<source>.parquet` from the stores, as `scripts/ingest.ts` does, and writes nothing to them: the hourly workflow keeps writing `recent/` until the history moves into ClickHouse. A source's first pass after a start adds what ClickHouse lacks from `recent/`. It doesn't use the response cache, so every pass asks the sources.
+
+Run ClickHouse in Docker, on loopback only, then poll one source, with lists from the public store:
+
+```bash
+docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:25.8
+```
+
+```bash
+STILLWELL_STORE=https://stillwell.openwaters.io node server/ingest.ts kartverket
+```
+
+Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
 
 ## Withheld stations
 

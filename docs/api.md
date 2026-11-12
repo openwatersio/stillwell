@@ -122,16 +122,16 @@ Observed levels, from the last minutes back through the archive, for apps, stati
   "updated": "2026-11-03T15:44:10Z",
   "levels": [
     { "time": "2026-10-27T15:48:00Z", "level": 2.871, "flag": "preliminary" },
-    { "time": "2026-11-03T15:42:00Z", "level": 2.905, "flag": "preliminary", "checked": false }
+    { "time": "2026-11-03T15:42:00Z", "level": 2.905, "flag": "preliminary" }
   ],
   "attribution": ["NOAA National Ocean Service"],
   "notice": "Preliminary observations. Not for navigation."
 }
 ```
 
-Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. A value that arrived in the last minutes and hasn't been through QC yet carries `"checked": false`, and its flag can still change. When `include` asks for predictions, the response names the tide-database version it used (`"database": "2026.11.01"`).
+Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the tide-database version it used (`"database": "2026.11.01"`). `predicted` and `residual` come from the linked tide-database station, which has a license of its own: until tokens exist they are served only where that station's terms allow commercial use, as well as the series', and otherwise left out, with the response saying why.
 
-`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last asked the source. A range that reaches the present carries `Cache-Control: public, max-age=<min_interval_s>`, and one that ended before today is cached for a day.
+`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, and one that ended before that is cached for a day.
 
 Slackwater asks for the last 96 hours (`start` 96 hours back) and computes the residual against its own bundled prediction, so the number matches the curve the user sees.
 

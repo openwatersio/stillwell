@@ -19,7 +19,7 @@ What the existing Open Waters pieces give us, and don't:
 
 ## Use cases
 
-Each consumer, what it needs from the store, and which path serves it. "Live" is the on-request path in decision 9; "archive" is the scheduled Parquet on R2.
+Each consumer, what it needs from the store, and which path serves it. "Live" is the realtime levels the Stillwell server polls, decision 9; "archive" is the scheduled Parquet on R2.
 
 | Use case                                                                                                                                                    | Freshness              | Window                            | Datum                                  | Licenses                                 | Path                                          | Phase    |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------- | -------------------------------------- | ---------------------------------------- | --------------------------------------------- | -------- |
@@ -65,7 +65,8 @@ src/
 scripts/
   ingest.ts stations|backfill|recent|compact <source>, publish
   compact.ts, snapshot.ts, report.ts
-worker/                the API: wrangler.jsonc, src/, test/
+workers/api/           the API's caching Worker, bound into the gateway
+server/                stillwell-ingest, and later stillwell-api and stillwell-jobs, with their deploy
 .github/workflows/     ci, ingest-hourly, compact-daily, monthly, snapshot-quarterly, canary
 ```
 
@@ -116,7 +117,7 @@ Ordered so crowd-depth and tide-database get what they need first, then the publ
 
 ### Phase 0: Update the internal evaluation (1 day)
 
-The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: the TICON replacement and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the live path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with tide-database.
+The internal evaluation describes a smaller system than this plan, so bring it in line before building, and keep it in line when a decision changes: the TICON replacement and live Slackwater levels, the build estimate (about 60 days, not four to six weeks), the realtime path and why, the gateway's lack of tokens and the `/water-levels` paths, the `received` column, the private store for restricted series, and the two-way station links with tide-database.
 
 ### Phase 1: Foundations (4 days)
 
@@ -227,9 +228,9 @@ Most European originators arrive in phase 5. This adds the real-time sources TIC
 The first public endpoint, because the apps need it before anything else in the API. It needs only phases 1 and 4 to start, so it can move ahead of phases 5 to 8; the datum-frame item waits for phase 6. The design is [realtime.md](realtime.md), step 1.
 
 - [ ] A Stillwell server on Hetzner, set up as aiscast's is (`server/deploy/`, deployed by CI on merge), running ClickHouse on loopback and `cloudflared`. R2 stays the record, so the server needs no backups.
-- [ ] `stillwell-ingest`: polls every hourly source's live stations at `min_interval_s`, inserts values it doesn't hold (by time, level and source flag) with `received`, runs `qcFor` over each changed window and marks what it judged `checked`, deletes a withheld station's rows, records each pass in `polls`, pauses a station on `DatumChanged` and dispatches its source's refresh.
-- [ ] Export `recent/<source>.parquet` every 15 minutes, leaving out withheld stations, so `compact` and everything after it runs unchanged; retire the hourly workflow's `recent` jobs, and turn its alert job into Grafana alerts on `polls`.
-- [ ] `GET /water-levels/stations/{source}/{id}/levels` ([api.md](api.md#get-water-levelsstationssourceidlevels)) served by `stillwell-api` on the server behind `workers/api`, a caching Worker bound into the gateway as `WATER_LEVELS` on `/water-levels*`, for ranges inside ClickHouse's window: levels in the requested datum (chart datum by default), `flag`, `checked`, `received`, the datum offsets, `as_of`, `updated` and `status` (reporting, stale, offline). Cached per station for `min_interval_s`, with the last good copy served as `stale` when the server doesn't answer.
+- [ ] `stillwell-ingest`: polls every hourly source's live stations at `min_interval_s`, runs `qcFor` over each 7-day window in the same step and writes only the values that changed (in level, flag, source flag, `received` or epoch) with `received`, deletes a withheld station's rows, records each pass in `polls`, and on `DatumChanged` dispatches its source's refresh.
+- [ ] Grafana alerts on `polls`. The hourly workflow keeps writing `recent/` and its alert job keeps running until step 2 moves each source's history in.
+- [ ] `GET /water-levels/stations/{source}/{id}/levels` ([api.md](api.md#get-water-levelsstationssourceidlevels)) served by `stillwell-api` on the server behind `workers/api`, a caching Worker bound into the gateway as `WATER_LEVELS` on `/water-levels*`, for ranges inside the last 7 days: levels in the requested datum (chart datum by default), `flag`, `received`, the datum offsets, `as_of`, `updated` and `status` (reporting, stale, offline). Cached per station for `min_interval_s`, with the last good copy served as `stale` when the server doesn't answer.
 - [ ] Datum frame: return the offset tide-database used for the station's datums (phase 6 records which series and zero those came from), so the app's residual is observed minus prediction in one frame. Stations whose datums are in the constituent frame (TICON's MSL = 0 fallback) get `frame: unknown`, and the app shows the trend only.
 - [ ] Slackwater: replace the per-provider fetchers in slackwater-ios#705 (NOAA now, more later) with this one call, keeping CHS on the device. Tracked in that issue.
 
@@ -246,7 +247,7 @@ The rest of the API in `stillwell-api`, behind the same Worker, once the history
 - [ ] `GET /water-levels/stations/{source}/{id}/levels` and `/extremes`, with `start`, `end`, `datum` (chart datum by default, as in the tides API), `units` and `include=predicted,residual,received`. Any range, from ClickHouse; converts datums, adds Slackwater predictions with `@slackwater/engine` and `@slackwater/database` when `tide_station` is set, and the residual (observed minus predicted).
 - [ ] `GET /water-levels/at?latitude&longitude&time`: best estimate with `method` and `uncertainty_m`. Nearest gauge with data at that time; else prediction plus residual from gauges within crowd-depth's distances (fast within about 100 km, slow within a few hundred); else prediction plus modeled surge; else model. Same rules crowd-depth uses today, so crowd-depth can switch to it.
 - [ ] Every response carries per-station attribution and the "not for navigation, preliminary data" notice; until tokens exist, responses never include `commercial_use: false` stations. The API docs and the `/water-levels` root response link to the source, as AGPL section 13 requires.
-- [ ] Historical ranges cached for a day with the Cache API.
+- [ ] Ranges that ended more than 7 days ago cached for a day with the Cache API.
 - [ ] Latest levels for many stations in one call, by station IDs or `tide_station`, for Slackwater's favorites and the alerts cron.
 - [ ] Alerts groundwork: a Worker cron that reads the latest levels and residual for a list of stations and reports the ones beyond a threshold. Who subscribes, and how notifications reach the phone, belongs in slackwater#394.
 - [ ] OpenAPI document and a docs page on the website next to the tides API.
