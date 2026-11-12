@@ -124,7 +124,8 @@ export type FileBounds = [number, number, number | null, boolean];
  * rows a fold can change. Returns the earlier rows' bounds inside `window`,
  * and the written file's stats, null when `fold` left it. A missing file has
  * no rows. Earlier rows that share a time, which a whole read and rewrite
- * would collapse to one, are kept as the file has them.
+ * would collapse to one, are kept as the file has them. `fold` runs while this
+ * holds a DuckDB connection, so it mustn't wait on other store reads or writes.
  */
 export function foldObservationFile(
   path: string,
@@ -135,13 +136,16 @@ export function foldObservationFile(
 ): Promise<{ before: FileBounds | null; stats: YearStats | null }> {
   return serial(async () => {
     const db = await connection();
-    const read = await createTable();
-    const write = await createTable();
+    let read: string | undefined;
+    let write: string | undefined;
     try {
+      read = await createTable();
+      write = await createTable();
+      const glob = /[*?[]/.test(path);
       // As readObservationFile: the empty row names `source_flag` for files
       // written before it was kept, and only this file counts when its path
       // has a glob character, which read_parquet would match against others.
-      const source = `(SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::FLOAT AS level_m, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received, NULL::VARCHAR AS datum WHERE false UNION ALL BY NAME SELECT * FROM read_parquet(${quote(path)}, filename = true))`;
+      const source = `(SELECT NULL::VARCHAR AS filename, NULL::TIMESTAMPTZ AS time, NULL::FLOAT AS level_m, NULL::UTINYINT AS flag, NULL::UTINYINT AS source_flag, NULL::TIMESTAMPTZ AS received, NULL::VARCHAR AS datum WHERE false UNION ALL BY NAME SELECT * FROM read_parquet(${quote(path)}, filename = true, union_by_name = true))`;
       // `station` holds each row's datum here, and `type` its file. Levels are
       // rounded as observation() rounds them, so earlier rows are written as a
       // read and rewrite would write them, even from a file that holds doubles:
@@ -151,13 +155,13 @@ export function foldObservationFile(
       const rounded = `CASE WHEN ${x} - floor(${x}) >= 0.5 THEN ceil(${x}) ELSE floor(${x}) END`;
       try {
         await db.run(
-          `INSERT INTO ${read} (time_ms, level_m, flag, received_ms, source_flag, station, type) SELECT epoch_ms(time), CASE WHEN ${rounded} = 0 THEN coalesce(level_m, 0)::DOUBLE * 0 ELSE ${rounded} / 10000 END, flag, epoch_ms(received), source_flag, datum, filename FROM ${source}`,
+          `INSERT INTO ${read} (time_ms, level_m, flag, received_ms, source_flag, station, type) SELECT epoch_ms(time), CASE WHEN ${rounded} = 0 THEN coalesce(level_m, 0)::DOUBLE * 0 ELSE ${rounded} / 10000 END, flag, epoch_ms(received), source_flag, datum, ${glob ? "filename" : "NULL"} FROM ${source}`,
         );
       } catch (error) {
         // A missing file is an empty series, not a failure.
         if (!isMissing(error)) throw error;
       }
-      if (/[*?[]/.test(path)) {
+      if (glob) {
         const names = (await db.runAndReadAll(`SELECT DISTINCT type FROM ${read}`))
           .getRowObjects()
           .map((r) => String(r.type));
@@ -204,7 +208,7 @@ export function foldObservationFile(
       await appendObservations(write, merged);
       return { before, stats: await writeObservationTable(path, write, datum) };
     } finally {
-      await dropTable(read).finally(() => dropTable(write));
+      await (read ? dropTable(read) : Promise.resolve()).finally(() => write && dropTable(write));
     }
   });
 }
@@ -1090,7 +1094,7 @@ async function readNow(
   if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
   try {
     const reader = await db.runAndReadAll(
-      `${select} FROM read_parquet(${quote(path)}${filename ? ", filename = true" : ""}) ${alias} ${where} ORDER BY ${order}`,
+      `${select} FROM read_parquet(${quote(path)}${filename ? ", filename = true, union_by_name = true" : ""}) ${alias} ${where} ORDER BY ${order}`,
     );
     return reader.getRowObjects() as Record<string, unknown>[];
   } catch (error) {

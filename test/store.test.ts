@@ -715,7 +715,7 @@ describe("foldObservationFile", () => {
       mkdirSync(dirname(path), { recursive: true });
       const db = await (await DuckDBInstance.create(":memory:")).connect();
       await db.run(
-        `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, (CASE WHEN i = 5 THEN -0.00004 WHEN i = 6 THEN 0.000049999999999999996 ELSE 0.12345 + i / 7 END)::DOUBLE AS level_m, (i % 3)::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${path}' (FORMAT parquet)`,
+        `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, (CASE WHEN i = 5 THEN -0.00004 WHEN i = 6 THEN 0.000049999999999999996 WHEN i = 7 THEN NULL ELSE 0.12345 + i / 7 END)::DOUBLE AS level_m, (i % 3)::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${path}' (FORMAT parquet)`,
       );
     });
   });
@@ -727,7 +727,12 @@ describe("foldObservationFile", () => {
 
   it("reads only its own file when its path has a glob character", async () => {
     const dir = join(root, "fold", "glob");
-    await writeObservations(join(dir, "ab", "2026.parquet"), existing, "NAP");
+    // A neighbor written before `source_flag`, whose columns differ from the station's own.
+    mkdirSync(join(dir, "ab"), { recursive: true });
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, 1.5::FLOAT AS level_m, 0::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${join(dir, "ab", "2026.parquet")}' (FORMAT parquet)`,
+    );
     const fold = async (rows: Observation[]) => {
       seen = rows;
       return upsert(rows, incoming);
