@@ -100,7 +100,7 @@ One station in full: the fields above plus
 
 ### `GET /water-levels/stations/{source}/{id}/levels`
 
-Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
+Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. Until the archive moves onto the realtime server ([realtime.md](realtime.md#order-of-work), step 2), a range must lie within the last 7 days, and one reaching further back is a 400 that says so. Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
 
 | Parameter      | Default               | Meaning                                                                                                                                                                   |
 | -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

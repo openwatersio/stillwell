@@ -42,7 +42,7 @@ R2 holds the record: the year files, the station lists and their history, the bo
 
 The one thing a lost server can't get back is `received` for the values polled since the last export: fetched again, they arrive with `received` empty, as backfilled values do. Nothing reads `received` yet, and the forecast work that will can skip the gap.
 
-A new server deploys and fills ClickHouse from R2: each source's first pass after every start adds the values in `recent/<source>.parquet` that ClickHouse lacks, `received` included, so the API has the last 7 days at once. It adds only what ClickHouse lacks, since ClickHouse is usually the newer of the two, so a value the source revised or withdrew while the server was down, more than 12 hours before it restarts, keeps ClickHouse's copy until it ages out; from step 2, it also loads the year files with `INSERT ... SELECT FROM s3('obs/**/*.parquet')` and marks them `loaded`. The poller then fetches up to 12 hours back, as the hourly workflow does, and anything older than that and missing from R2 waits for a backfill.
+A new server deploys and fills ClickHouse from R2: each source's first pass after every start adds the values in `recent/<source>.parquet` that ClickHouse lacks, `received` included, so the API has the last 7 days at once. It adds only what ClickHouse lacks, since ClickHouse is usually the newer of the two, so a value the source revised or withdrew while the server was down, more than 12 hours before it restarts, keeps ClickHouse's copy until it ages out; from step 2, it also loads the year files with `INSERT ... SELECT ... FROM s3('obs/**/*.parquet')`, projecting each file's columns onto the table's and taking `station` and `epoch` from the file's path (`_path`), at version 0, so a value the poller has already written wins, and marks them `loaded`. The poller then fetches up to 12 hours back, as the hourly workflow does, and anything older than that and missing from R2 waits for a backfill.
 
 ## Tables
 
@@ -55,7 +55,7 @@ CREATE TABLE observations (
   flag     UInt8,                                -- Flag: the worse of the source's and QC's
   source_flag Nullable(UInt8),
   received Nullable(DateTime64(3, 'UTC')) CODEC(DoubleDelta, ZSTD),
-  version  UInt64                                -- when the row was written; the highest wins
+  version  UInt64                                -- the highest wins: the pass's start in step 1, a counter in the job queue's database from step 2
 ) ENGINE = ReplacingMergeTree(version)
 PARTITION BY toYear(time)
 ORDER BY (station, time)
@@ -83,7 +83,7 @@ For each source with `hourly` set in its metadata, `stillwell-ingest` (`server/i
 
 From step 2, every writer of a station's rows, the poller and every job, holds that station's lock in the job queue's database from reading the rows to writing them, so a job never writes back a level a pass has since revised. Jobs work station by station, so a requalify of a whole source holds up the poller by one station's work at most.
 
-A station that leaves its source's list or stops being live drops out of the next pass. The adapter's `withheld` is checked every pass, so a withholding stops the station as soon as it deploys, and the poller then deletes the station's rows. The export also leaves out every withheld station, so a withheld station's values can't reach R2 again from rows not yet deleted, and the restricted database never exports to the public bucket.
+A station that leaves its source's list or stops being live drops out of the next pass. The adapter's `withheld` is checked every pass, so a withholding stops the station as soon as it deploys, and the poller then deletes the station's rows. The export also leaves out every withheld station, so a withheld station's values can't reach R2 again from rows not yet deleted, and the restricted database never exports to the public bucket. Its files already on R2 are deleted by the withhold job, as `ingest withhold` deletes them in Actions until step 2 moves it to the server, where it takes the station's lock so no export of the station runs meanwhile.
 
 Deleting withheld stations' rows keeps the limit every other withholding keeps (`tooManyWithheld`): a rule that suddenly matches more stations than that fails the source's passes and deletes nothing, until the rule is fixed or `STILLWELL_ACCEPT_WITHHELD=1` accepts it, as `--accept-withheld` does for the other withholdings.
 
@@ -94,7 +94,7 @@ When the adapter throws `DatumChanged`, the station fails that pass and keeps it
 Exports keep the files' current schema, levels as FLOAT:
 
 - **Until step 2**, the hourly workflow keeps writing `recent/<source>.parquet` and Compact daily keeps folding it into the year files, unchanged and in their `store-<source>` groups. The server only reads `recent/`, to seed ClickHouse, and writes nothing to R2, so it never races them.
-- **From step 2 on:** ClickHouse writes Parquet to R2 itself (`INSERT INTO FUNCTION s3(...) SELECT ...`): every station-year in `changes` that is in `loaded` becomes `obs/<source>/<station>/[<epoch>/]<year>.parquet`, in the layout and sort order it has now, written whole, then the bounds, `stations.parquet` and `stations/analysis/<source>.parquet` with its `rules`, `judge` and `requalified` columns. Polled values export nightly, after each UTC day closes: about 14,000 files a night, about 1 million PUTs a month. A job's changes export when the job ends, before it reports success. A station-year that isn't in `loaded` is never exported, so a partial history can't overwrite a year file.
+- **From step 2 on:** ClickHouse writes Parquet to R2 itself (`INSERT INTO FUNCTION s3(...) SELECT ... FINAL`, so each value is written once, at its latest version): every station-year in `changes` that is in `loaded` becomes `obs/<source>/<station>/[<epoch>/]<year>.parquet`, in the layout and sort order it has now, written whole, then the bounds, `stations.parquet` and `stations/analysis/<source>.parquet` with its `rules`, `judge` and `requalified` columns. Polled values export nightly, after each UTC day closes: about 14,000 files a night, about 1 million PUTs a month. A job's changes export when the job ends, before it reports success. A station-year that isn't in `loaded` is never exported, so a partial history can't overwrite a year file.
 
 The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the public bucket.
 
@@ -102,7 +102,7 @@ The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the publi
 
 From step 2, backfill, the monthly refetch, requalify, analysis, withhold and the export are jobs, and from step 3 the station refresh and `publish` too. `stillwell-jobs` runs them from a queue in SQLite (`node:sqlite`, built into Node), a file on the server in WAL mode that both services open:
 
-- **Queue:** each job with its kind, source, arguments, state, attempts, progress and result. A worker claims a job in a transaction and holds a lease it renews while the job runs, so a job runs once, and one whose worker died is claimed again when its lease runs out.
+- **Queue:** each job with its kind, source, arguments, state, attempts, progress and result. A worker claims a job in a transaction and holds a lease it renews while the job runs, so only one worker runs a job at a time, and one whose worker died is claimed again when its lease runs out. That makes a run at least once, not exactly once: a job that died after writing runs again, which its idempotency and the export's per-station-year checkpoints make safe.
 - **Concurrency:** at most one job of each kind per source. Jobs that fetch from the source (backfill, refetch, the station refresh) also run one at a time per source, and they and the poller take the source's request slots from the queue's database, since an adapter's pacing holds only within its own process, so its rate limits hold. Jobs that don't fetch (requalify, analysis, withhold, the export) run beside them, since the station locks keep writers apart, so a withhold or the nightly export never waits for a multi-hour backfill or requalify.
 - **Retries:** a failed job is retried with backoff, a few times, then stays failed for a maintainer to see.
 - **Schedules:** in code. A recurring job is queued under a key for its run, such as `export:2026-11-12` or `refetch:2026-11`, so a restart or a late timer never queues the same run twice.
