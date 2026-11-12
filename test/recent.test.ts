@@ -680,7 +680,7 @@ describe("compactRecent", () => {
     const run = () =>
       compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
     const { seconds, ...summary } = await run();
-    // Each phase, the bounds' and reconcile's included, reaches the summary.
+    // Each phase reaches the summary; with no years file, the reconcile stops after reading it.
     assert.deepEqual(Object.keys(seconds!), [
       "read window",
       "mark years",
@@ -1558,7 +1558,9 @@ describe("timer", () => {
     const seconds: Record<string, number> = {};
     const time = timer("test", seconds);
     assert.equal(await time("a", async () => 1), 1);
-    await time("a", async () => undefined);
+    const first = seconds.a!;
+    await time("a", () => new Promise((done) => setTimeout(done, 20)));
+    assert.ok(seconds.a! >= first + 0.015);
     await assert.rejects(
       time("b", async () => {
         throw new Error("boom");

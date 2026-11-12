@@ -349,7 +349,8 @@ describe("the source's years", () => {
 
   it("follow the files compaction folds", async () => {
     const root = store();
-    await writeYears(root, "test", []);
+    // Marked by a run that stopped partway, so the reconcile reads its file again.
+    await writeYears(root, "test", [{ id: "test/a", epoch: null, year: null }]);
     const a = {
       id: "test/a",
       source: "test",
@@ -372,6 +373,15 @@ describe("the source's years", () => {
       end: start + 24 * HOUR,
     });
     assert.deepEqual(summary.failed, []);
+    assert.deepEqual(
+      Object.keys(summary.seconds!).filter((p) => p.startsWith("reconcile")),
+      [
+        "reconcile: read years",
+        "reconcile: list files",
+        "reconcile: read files",
+        "reconcile: write years",
+      ],
+    );
     const stats = (await readYearStats([seriesPath(root, "levels", "test", "a", 2026)]))
       .values()
       .next().value!;
