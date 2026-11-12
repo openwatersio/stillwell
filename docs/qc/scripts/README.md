@@ -2,9 +2,9 @@
 
 The scripts behind the measurements in [evaluation.md](../evaluation.md). They read the public store and the QC code in [src/](../../../src/); they write nothing to the store. The store changes, so a rerun can differ from the numbers in the evaluation, which were measured in November 2026 against `main` at 4caa051e.
 
-Run them from the repository root after `npm install`. The TypeScript scripts import `qc` from `src/qc.ts` and `qcFor` from `src/store/recent.ts`; `spike-variants.ts` patches a copy of `src/qc.ts` and fails if the code it patches has changed. In every script a value counts as raised by QC when its flag is suspect or bad (3 or 4) and its `source_flag` is good, interpolated or preliminary (under 3), a missing `source_flag` counting as good ([store.ts](store.ts), `raised`); a source-suspect value QC makes bad doesn't count. The scripts are type-checked with the rest of the repository (`npm run typecheck`). The Python scripts need `duckdb` (`pip install duckdb`), and `float32.py` needs `numpy`.
+Run them from the repository root after `npm install`. The TypeScript scripts import `qc` from [`src/qc.ts`](../../../src/qc.ts) and `qcFor` from [`src/store/recent.ts`](../../../src/store/recent.ts); [`spike-variants.ts`](spike-variants.ts) patches a copy of [`src/qc.ts`](../../../src/qc.ts) and fails if the code it patches has changed. In every script a value counts as raised by QC when its flag is suspect or bad (3 or 4) and its `source_flag` is good, interpolated or preliminary (under 3), a missing `source_flag` counting as good ([store.ts](store.ts), `raised`); a source-suspect value QC makes bad doesn't count. The scripts are type-checked with the rest of the repository (`npm run typecheck`). The Python scripts need `duckdb` (`pip install duckdb`), and [`float32.py`](float32.py) needs `numpy`.
 
-The synthetic counts in `non-finite.ts` depend on the Node version, since the order a sort with NaN leaves is up to the engine: under Node 24.22.1, the 24.x release `.mise.toml` resolved to when measured, it prints 12 missed spikes; under Node 26.13.0 it prints 14.
+The synthetic counts in [`non-finite.ts`](non-finite.ts) depend on the Node version, since the order a sort with NaN leaves is up to the engine: under Node 24.22.1, the 24.x release `.mise.toml` resolved to when measured, it prints 12 missed spikes; under Node 26.13.0 it prints 14.
 
 | Script                                         | What it does                                                                                                                                                                                      |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,11 +35,11 @@ node docs/qc/scripts/residual-prototype.ts jer2025.json 2025 2025-10-14T18:00/20
 
 The station-years in the evaluation are `bodc/jer` 2025, `bodc/npo` and `bodc/liv` 2024 (gap edges only), `marine-institute/kilrush-lough` 2025, `marine-institute/galway-port` 2025, `pegelonline/9420020` and `pegelonline/5950081` 2025 and 2026, `ea/E71924` and `ea/E72039` 2026, `sfwmd/MARKH` 2022, `usace/MVN.Cyremort_Point` 2019, and `coops/8729840` 2020, `coops/8761305` 2020 and 2021, `coops/8735180` 2020, `coops/8761955` 2019 and `coops/8764044` 2019.
 
-The residual-jump rule's validation, after it went into `src/qc.ts`, exports each station-year in [jumps-sample.txt](jumps-sample.txt): three of the largest tides and five others from each source's tidal stations, the Wangerooge copies, and the evaluation's storm and evidence years.
+The residual-jump rule's validation, after it went into [`src/qc.ts`](../../../src/qc.ts), exports each station-year in [jumps-sample.txt](jumps-sample.txt): three of the largest tides and five others from each source's tidal stations, the Wangerooge copies, and the evaluation's storm and evidence years.
 
 ```bash
 while read id year; do python -I docs/qc/scripts/export.py "$id" "$year" "jumps-${id//\//_}-$year.json"; done < docs/qc/scripts/jumps-sample.txt
 node docs/qc/scripts/jumps.ts $(while read id year; do echo "jumps-${id//\//_}-$year.json:$year"; done < docs/qc/scripts/jumps-sample.txt)
 ```
 
-Some figures in the evaluation have no script: the source flag shares, summed from `stations/years/<source>.parquet` with `query.py`; the 69 JMA files checked for a 9.99 m sentinel; the check of BODC's ERDDAP for the missing 07:30 row; and the one-off run of `datumJumps` over every coastal record, whose results are the errata's own evidence.
+Some figures in the evaluation have no script: the source flag shares, summed from `stations/years/<source>.parquet` with [`query.py`](query.py); the 69 JMA files checked for a 9.99 m sentinel; the check of BODC's ERDDAP for the missing 07:30 row; and the one-off run of `datumJumps` over every coastal record, whose results are the errata's own evidence.
