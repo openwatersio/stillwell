@@ -89,6 +89,11 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   // An empty list is a broken response; taken at its word, it would end every live feed.
   if (!current.stations?.length || !all.stations?.length)
     throw new Error("CO-OPS listed no water-level stations");
+  // The refresh's own guard counts only active stations, which here are the current network.
+  if (previous.length >= 20 && all.stations.length < previous.length / 2)
+    throw new Error(
+      `CO-OPS listed ${all.stations.length} historical stations, down from ${previous.length}`,
+    );
   const live = new Set(current.stations.map((s) => s.id));
   const listed = new Map(all.stations.map((s) => [s.id, s]));
   // A few current stations aren't on the historical list yet.
@@ -218,7 +223,13 @@ function toStation(
     last: null,
     tide_station: null,
     same_as: [],
-    status: "active",
+    // Removed and off the current network; a removed date before the established one is a reinstalled station.
+    status:
+      !live &&
+      s.details?.removed &&
+      (!s.details.established || isoOf(s.details.removed) >= isoOf(s.details.established))
+        ? "inactive"
+        : "active",
     live,
     min_interval_s: 360,
     source_url: `https://tidesandcurrents.noaa.gov/stationhome.html?id=${s.id}`,

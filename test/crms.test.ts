@@ -418,6 +418,15 @@ describe("crms links", () => {
       }) as Station;
     const lists = { crms: [gauge("CRMS0511-H01", "inactive"), gauge("CRMS0511-H02", "active")] };
     assert.equal(originatorSeries(record, lists).id, "crms/CRMS0511-H02");
+    // A newer gauge since retired loses to one still reporting; a site with none reporting takes the latest.
+    lists.crms.push(gauge("CRMS0511-H03", "inactive"));
+    assert.equal(originatorSeries(record, lists).id, "crms/CRMS0511-H02");
+    assert.equal(
+      originatorSeries(record, {
+        crms: [gauge("CRMS0511-H01", "inactive"), gauge("CRMS0511-H02", "inactive")],
+      }).id,
+      "crms/CRMS0511-H02",
+    );
     assert.equal(originatorSeries(record, {}).status, "planned");
   });
 });

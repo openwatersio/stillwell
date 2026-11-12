@@ -140,6 +140,20 @@ describe("TICON originators", () => {
     // An FD record whose FD series is gone is its latest version's.
     const ended = { uhslc: [{ ...station("uhslc/281a", "Cananeia", -25, -48), version: "A" }] };
     assert.equal(originatorSeries(record("cananeia-281-bra-uhslc_fd"), ended).id, "uhslc/281a");
+    // So is one whose FD series the list keeps, retired.
+    const retired = {
+      uhslc: [
+        {
+          ...station("uhslc/281", "Cananeia", -25, -48),
+          status: "inactive" as const,
+          version: "A",
+        },
+        ...ended.uhslc,
+      ],
+    };
+    assert.equal(originatorSeries(record("cananeia-281-bra-uhslc_fd"), retired).id, "uhslc/281a");
+    // And its RQ record goes to the RQ series UHSLC still serves, not the retired FD one carrying its letter.
+    assert.equal(originatorSeries(record("cananeia-281a-bra-uhslc_rq"), retired).id, "uhslc/281a");
     // A contributor's terms that bar commercial use keep a listed station from being cleared.
     const nonCommercial = {
       uhslc: [
@@ -282,7 +296,7 @@ describe("TICON originators", () => {
     assert.equal(originatorSeries(bergen, { kartverket: [] }).status, "unmatched");
   });
 
-  it("doesn't count an inactive PEGELONLINE station as ready", () => {
+  it("counts a retired PEGELONLINE station with levels as ready", () => {
     const gone = {
       ...station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3),
       status: "inactive" as const,
@@ -293,7 +307,7 @@ describe("TICON originators", () => {
         pegelonline: [gone],
       },
     );
-    assert.equal(match.status, "unmatched");
+    assert.deepEqual([match.id, match.status], ["pegelonline/5930070", "ready"]);
   });
 
   it("tells an outer harbor from an inner one, and won't guess between them", () => {

@@ -60,7 +60,7 @@ CI also checks that [`package-lock.json`](package-lock.json) regenerates from [`
 node scripts/ingest.ts stations
 ```
 
-Backfill stations' observations, extremes and predictions by year, with the end year exclusive. Pass a comma-separated list of station IDs, or `all` for every active station of the source:
+Backfill stations' observations, extremes and predictions by year, with the end year exclusive. Pass a comma-separated list of station IDs, or `all` for every active station of the source (`--with-inactive` adds the inactive ones, for a history backfill):
 
 ```bash
 node scripts/ingest.ts backfill rws hoekvanholland 2016 2025

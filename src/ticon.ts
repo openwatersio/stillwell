@@ -201,13 +201,15 @@ export function originatorSeries(
         (s) =>
           s.source_id === number &&
           usable(s) &&
+          s.status === "active" &&
           (s as Station & { version?: string }).version === version?.toUpperCase(),
       );
       // An FD record whose series UHSLC no longer serves is its latest version's.
       const latest = /^\d{3}$/.test(code)
         ? lists.uhslc
             ?.filter((s) => s.source_id.startsWith(code) && usable(s))
-            .filter((s, _, all) => !all.some((o) => o.source_id === code))
+            // A retired FD series counts as gone: UHSLC keeps it listed, inactive, once it stops serving it.
+            .filter((s, _, all) => !all.some((o) => o.source_id === code && o.status === "active"))
             .map((s) => s.source_id)
             .sort()
             .at(-1)
@@ -291,7 +293,7 @@ export function originatorSeries(
         source: national.source,
         id: null,
         status: "to_match",
-        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't an active station with levels`,
+        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't a station with levels`,
       };
     }
     if (national && lists[national.source])
@@ -324,15 +326,18 @@ export function originatorSeries(
   const direct = DIRECT[contributor];
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
-  // CRMS records carry the site; its surface-water gauge still reporting is the
-  // latest of H01, H02 and H03, since CPRA numbers a gauge it moves anew.
+  // CRMS records carry the site; its surface-water gauge is the latest of H01,
+  // H02 and H03 still reporting, or else the latest, since CPRA numbers a gauge it moves anew.
   if (contributor === "crms") {
     const site = code.toUpperCase();
     const gauge = lists.crms
       ?.filter((s) => s.source_id.startsWith(`${site}-H`) && usable(s))
-      .map((s) => s.source_id)
-      .sort()
-      .at(-1);
+      .sort(
+        (a, b) =>
+          Number(a.status === "active") - Number(b.status === "active") ||
+          a.source_id.localeCompare(b.source_id),
+      )
+      .at(-1)?.source_id;
     return byCode(record, "crms", gauge ?? `${site}-H01`, "planned", lists);
   }
   // DWR records carry its station number, which TICON writes without the trailing Q
@@ -371,9 +376,9 @@ function byCode(
   return { source, id: station.id, status: "ready", distance_km: round(km(record, station)) };
 }
 
-/** A station that still reports levels. */
+/** A station with levels, retired or not, since a record's epoch is history. */
 function usable(station: Station): boolean {
-  return station.status === "active" && station.products.includes("levels");
+  return station.products.includes("levels");
 }
 
 /**
