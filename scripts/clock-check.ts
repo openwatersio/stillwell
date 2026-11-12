@@ -6,6 +6,8 @@
  * whole hour is a clock error, such as local time labeled UTC, to fix before
  * anything fits to the series. The semidiurnal tide repeats every 12.42 hours, so a 12-hour error
  * hides in that lag; the K1 lag, from K1's phase in a fit of the year, shows it.
+ * A range shorter than a month, for a source that keeps only days (SMN keeps
+ * 5), needs values on all but one of its days rather than 30.
  *
  *   node scripts/clock-check.ts <year | start/end> <source/id>=<ticon record>...
  *   node scripts/clock-check.ts 2020 uhslc/329=hong_kong-329-hkg-uhslc_fd
@@ -63,7 +65,9 @@ for (const pair of pairs) {
     (o) => o.flag <= Flag.preliminary,
   );
   const days = new Set(observed.map((o) => Math.floor(o.time / 86_400_000))).size;
-  if (days < 30) {
+  // A month, or most of a shorter range, for a source that keeps only days (SMN's 5).
+  const rangeDays = (end.getTime() - start.getTime()) / 86_400_000;
+  if (days < (rangeDays < 30 ? Math.max(1, Math.ceil(rangeDays) - 1) : 30)) {
     // A series that couldn't be checked hasn't passed.
     flagged = true;
     console.log(`| ${station} | ${record} | ${observed.length} | | too few values | | |`);

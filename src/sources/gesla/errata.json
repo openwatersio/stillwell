@@ -440,6 +440,14 @@
       "error": "GESLA's hourly CMEMS record of Kilrush Lough holds 4 values about 6 m low, from 02:00 to 05:00 UTC on 9 January 2025, with GESLA's good flag, from the drop the Marine Institute's own record has.",
       "response": "9 January 2025 is flagged `suspect` in the CMEMS record, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's Marine Institute record (`gesla/kilrush_lough-kil-irl-mi_c`) holds the same drop as 53 values from 01:20 to 05:40, which GESLA already flags, so it isn't listed.",
       "evidence": "In the store, checked in November 2026: the CMEMS record (`gesla/kilrushlough-kil-irl-cmems`) has 4 values below −3 m, down to −5.95 m, from 02:00 to 05:00 with flag good, against daily medians of 0.13 m on 8 January and 0.07 m on 10 January. The Marine Institute record has the same 53 values as the Marine Institute's own (erratum `marine-institute-kilrush-2025-01-09-offset`)."
+    },
+    {
+      "id": "gesla-unam-carmen-number",
+      "stations": ["gesla/ciudadcarmen_radar-4-mex-unam"],
+      "handling": "corrected",
+      "error": "GESLA 4.1 and TICON-4 number SMN's Ciudad del Carmen radar record 4 (`ciudadcarmen_radar-4-mex-unam`), which is Celestún's station number. SMN numbers Ciudad del Carmen 5.",
+      "response": "The record links to `unam/5-radar`, SMN's Ciudad del Carmen radar, not to Celestún's station 4.",
+      "evidence": "SMN's station menu lists Ciudad del Carmen as station 5 and Celestún as station 4, and GESLA's Celestún records (`celestun_radar-4-mex-unam`, `celestun_flotador-4-mex-unam`) also carry 4."
     }
   ],
   "retired": []

@@ -393,6 +393,44 @@ describe("TICON originators", () => {
     );
   });
 
+  it("matches a JODC record to its station, restricted until JODC allows republishing", () => {
+    const gsi = record("aburatsubo-gs01-jpn-jodc_giaj");
+    assert.deepEqual(
+      [originatorSeries(gsi, {}).id, originatorSeries(gsi, {}).status],
+      ["jodc/GS01", "license"],
+    );
+    const match = originatorSeries(gsi, { jodc: [station("jodc/GS01", "Aburatsubo", 0, 0)] });
+    assert.deepEqual([match.id, match.status], ["jodc/GS01", "restricted"]);
+    // JHOD's own numbers aren't JODC's codes: 0136 is JODC's Tomakomai port gauge.
+    const tokuyama = record("tokuyama-hd15-jpn-jodc_jcg", { declared: "jhod/0136" });
+    assert.equal(originatorSeries(tokuyama, {}).id, "jodc/HD15");
+    // UHSLC's copy waits on JODC's terms, as the Coast Guard's own record does.
+    const naze = originatorSeries(record("naze-359a-jpn-uhslc_rq", { declared: "jhod/0180" }), {});
+    assert.deepEqual([naze.source, naze.status], ["jodc", "license"]);
+    // JODC's own code for a JMA gauge isn't JMA's.
+    const choshi = originatorSeries(record("choshigyoko-ma64-jpn-jodc_jma"), {});
+    assert.deepEqual([choshi.source, choshi.id, choshi.status], ["jma", null, "unmatched"]);
+  });
+
+  it("matches an SMN record to its sensor's series, restricted to non-profit use", () => {
+    const radar = record("lapaz_radar-14-mex-unam");
+    assert.deepEqual(
+      [originatorSeries(radar, {}).id, originatorSeries(radar, {}).status],
+      ["unam/14-radar", "license"],
+    );
+    const match = originatorSeries(radar, {
+      unam: [station("unam/14-radar", "La Paz (radar)", 0, 0)],
+    });
+    assert.deepEqual([match.id, match.status], ["unam/14-radar", "restricted"]);
+    // GESLA and TICON number Ciudad del Carmen's radar 4, which is Celestún.
+    assert.equal(originatorSeries(record("ciudadcarmen_radar-4-mex-unam"), {}).id, "unam/5-radar");
+    assert.equal(
+      originatorSeries(record("puertovallarta_nivelpls-19-mex-unam"), {}).id,
+      "unam/19-pls",
+    );
+    assert.equal(originatorSeries(record("veracruz-250-mex-unam_hist"), {}).status, "license");
+  });
+
   it("sends a UK gauge to BODC whether CMEMS or BODC relays it", () => {
     const cmems = originatorSeries(record("aberdeen-abe-gbr-cmems"), {});
     const bodc = originatorSeries(record("aberdeen-abe-gbr-bodc"), {});
