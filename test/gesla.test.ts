@@ -183,6 +183,29 @@ describe("gesla stations", () => {
     assert.equal(requests.length, 0);
   });
 
+  it("tags BOM's records for commercial use, crediting BOM with a link to its conditions", async () => {
+    const bom = metadata.replace(
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,BOM,",
+    );
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", bom.length)
+        : bom,
+    );
+    const record = (await gesla.stations()).find(
+      (s) => s.source_id === "seattle-9447130-usa-noaa",
+    )!;
+    assert.deepEqual(
+      [record.contributor, record.commercial_use, record.attribution],
+      [
+        "BOM",
+        true,
+        "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf)",
+      ],
+    );
+  });
+
   it("fails when a record it drops isn't in the release, as a renamed one wouldn't be", async () => {
     const renamed = metadata.replace("uddevalla-2541-swe-smhi,", "uddevalla2-2541-swe-smhi,");
     setTransport(async (url) =>
