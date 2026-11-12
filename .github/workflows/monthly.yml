@@ -1,7 +1,8 @@
 name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
-# rebuild stations.parquet, sources.json and errata.json, report the
+# measure offsets between linked series, rebuild stations.parquet,
+# sources.json and errata.json, report the
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
 # refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
@@ -173,11 +174,47 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
+  # Offsets between linked series of one gauge that share no reference datum,
+  # measured from a year of their levels in the store (src/links.ts),
+  # for publish to carry MSL, LAT and chart datum along. It reads levels and
+  # writes only stations/links.parquet, which publish reads, so it needs no
+  # source's group; a row the run doesn't replace is kept unless its pair was
+  # read and didn't measure, and a failed read fails the job once the file is
+  # written. Only
+  # a full refresh runs it; a cancelled run skips it, and publish uses last
+  # month's file. The links group keeps a hand-run Ingest `links` from writing
+  # the file at the same time.
+  links:
+    needs: [plan, lists]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
+    concurrency:
+      group: links
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # Each of 8 holds a year of two series at most, minute values for PEGELONLINE.
+      - run: node scripts/ingest.ts links --concurrency 8
+        env:
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+
   # A source whose refresh or analysis failed kept its list and verdicts, so the rest still publish.
   # A list cancelled while it waits in its group cancels the run, so `always()`, not `!cancelled()`;
   # a run cancelled by hand still publishes the lists it wrote, which Compact daily would that night anyway.
   publish:
-    needs: [plan, lists]
+    needs: [plan, lists, links]
     if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
     # The group every publish takes, Compact daily's and the Ingest workflow's.
     concurrency:

@@ -93,6 +93,73 @@ describe("mergeStationList", () => {
     assert.match(changes[0]!.reason!, /backfill the station from 2020-03-06/);
   });
 
+  it("restarts a station listed in the wrong datum from the start, under a new id", () => {
+    // Two NAP epochs, split at the 2005 revision, that never held a value.
+    const nap = held("europlatform", {
+      epochs: [
+        {
+          ...held("x").epochs[0]!,
+          until: "2005-01-01T00:00:00Z",
+          state: "closed",
+          to_current: null,
+        },
+        {
+          ...held("x").epochs[0]!,
+          id: 2,
+          since: "2005-01-01T00:00:00Z",
+          reference: "NAP 2005",
+          reference_since: "2005-01-01T00:00:00Z",
+        },
+      ],
+    });
+    const msl = station("europlatform", { datum: "MSL" });
+    const restarts = { "rws/europlatform": { datum: "MSL", note: "measures against MSL" } };
+    const { stations, changes } = mergeStationList([nap], [msl], {
+      ...options,
+      archive: "previous",
+      restarts,
+    });
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => [e.id, e.datum, e.since, e.until, e.state]),
+      [[3, "MSL", null, null, "open"]],
+    );
+    assert.deepEqual(
+      changes.map((c) => [c.event, c.from, c.to, c.key]),
+      [["opened", "NAP", "MSL", "rws/europlatform start"]],
+    );
+    // The next refresh finds it in MSL already and changes nothing.
+    const again = mergeStationList(stations, [msl], { ...options, archive: "previous", restarts });
+    assert.deepEqual(again.changes, []);
+    assert.deepEqual(again.stations[0]!.epochs, stations[0]!.epochs);
+    // Once only: after a refresh in NAP (a rollback, say), MSL again doesn't restart the station and orphan its MSL epoch.
+    const back = mergeStationList(stations, [station("europlatform")], {
+      ...options,
+      now: "2026-07-01T00:00:00Z",
+      archive: "previous",
+      restarts,
+    });
+    const forth = mergeStationList(back.stations, [msl], {
+      ...options,
+      now: "2026-08-01T00:00:00Z",
+      archive: "previous",
+      restarts,
+    });
+    assert.ok(forth.stations[0]!.epochs.some((e) => e.id === 3 && e.datum === "MSL"));
+    // Without the decision, or with one for another datum, the change opens an epoch at the refresh.
+    const others: Record<string, { datum: string; note: string }>[] = [
+      {},
+      { "rws/europlatform": { datum: "CD", note: "" } },
+    ];
+    for (const other of others) {
+      const plain = mergeStationList([nap], [msl], {
+        ...options,
+        archive: "previous",
+        restarts: other,
+      });
+      assert.equal(plain.stations[0]!.epochs.at(-1)!.since, options.now);
+    }
+  });
+
   it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
     const previous = [held("a", { tide_station: "ticon/a" }), held("b")];
     const { stations } = mergeStationList(previous, [station("a")], options);

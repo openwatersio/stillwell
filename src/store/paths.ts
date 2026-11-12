@@ -7,6 +7,7 @@ import type { Product } from "../schema.ts";
  *   sources.json                                        license, attribution, contact and finalizes per source
  *   errata.json                                         errors in what sources publish, and what the store does about them
  *   stations/offsets.parquet                            each station's offsets by epoch, rebuilt with stations.parquet
+ *   stations/links.parquet                              offsets measured between linked series' levels, once a month
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
  *   stations/analysis/<source>.parquet                  what analysis measures from each station's levels, such as whether they carry a tide
@@ -135,6 +136,11 @@ export function stationsPath(root: string): string {
 /** Each station's offsets by epoch, for readers that convert datums without the epochs (`src/datums.ts`). */
 export function offsetsPath(root: string): string {
   return `${root}/stations/offsets.parquet`;
+}
+
+/** Offsets measured between linked series' levels (`src/links.ts`). */
+export function linksPath(root: string): string {
+  return `${root}/stations/links.parquet`;
 }
 
 export function sourcesPath(root: string): string {

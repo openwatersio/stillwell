@@ -7,7 +7,7 @@ import {
   type EpochEvent,
   type EpochOptions,
 } from "./epochs.ts";
-import type { StoredStation, ListedStation, Station } from "./schema.ts";
+import type { EpochRestart, StoredStation, ListedStation, Station } from "./schema.ts";
 
 /** Something a refresh did to a station's epochs, for the report. */
 export interface EpochChange {
@@ -45,9 +45,11 @@ export function mergeStationList(
   fetched: ListedStation[],
   {
     seriesChanged,
+    restarts,
     ...options
   }: Omit<EpochOptions, "nextId" | "station"> & {
     seriesChanged?: (previous: Station, listed: ListedStation) => string | null;
+    restarts?: Record<string, EpochRestart>;
   },
 ): { stations: StoredStation[]; changes: EpochChange[] } {
   const byId = new Map(previous.map((s) => [s.id, s]));
@@ -66,7 +68,28 @@ export function mergeStationList(
     const omitted = s.datum === null || !Object.keys(s.datums).length;
     const datums = omitted && sameDatum ? old.datums : s.datums;
     let epochs;
-    if (old) {
+    const restart = restarts?.[s.id];
+    // Once: a station with an epoch in that datum already has history there, which a restart would orphan.
+    if (
+      old &&
+      restart &&
+      s.datum === restart.datum &&
+      !old.epochs.some((e) => e.datum === restart.datum)
+    ) {
+      // Fresh epochs from the start, under ids above the old ones, which are never reused.
+      epochs = firstEpochs(
+        { datum: s.datum, datums, reference },
+        { ...options, station: s.id, nextId: Math.max(...old.epochs.map((e) => e.id)) + 1 },
+      );
+      changes.push({
+        id: s.id,
+        event: "opened",
+        from: old.datum,
+        to: s.datum,
+        reason: `restarted in ${s.datum} from the start of its record, replacing its ${old.datum} epochs, by \`restarts\` in overrides; backfill its history`,
+        key: epochKey(s.id, epochs[0]!.since),
+      });
+    } else if (old) {
       const next = nextEpochs(
         old.epochs,
         {
