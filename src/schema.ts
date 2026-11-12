@@ -75,7 +75,7 @@ export interface Station {
   /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether the live endpoint serves this station. */
+  /** Whether the realtime poller polls this station. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a
@@ -247,7 +247,7 @@ export interface SourceMetadata {
 
 /**
  * One upstream source. Adapters use only `fetch` (through `src/http.ts`) so the
- * same code runs in Node for ingest and in the Worker for live levels.
+ * same code runs in Actions and on the Stillwell server.
  */
 export interface Source {
   metadata: SourceMetadata;
