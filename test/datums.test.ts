@@ -76,6 +76,8 @@ const tide = (id: string, fields: Partial<TideStation> = {}): TideStation => ({
 /** A level in a station's datum, referred to another of its datums. */
 const convert = (s: StoredStation, level: number, datum: string) => level + s.datums[datum]!;
 
+const FOOT = 0.3048;
+
 const round4 = (m: number) => Math.round(m * 1e4) / 1e4;
 
 const byId = (stations: StoredStation[], id: string) => stations.find((s) => s.id === id)!;
@@ -106,6 +108,72 @@ describe("withDatums against operators' published levels", () => {
       NAVD88: "source",
     });
     assert.deepEqual(s!.datums_epoch!.MSL, { start: "1983-01-01", end: "2001-12-31" });
+  });
+
+  it("carries no CO-OPS tidal datum to a linked station with an epoch in its period that doesn't convert", () => {
+    const coopsStation = station("coops/1", {
+      datum: "STND",
+      datums: { NGVD29: -1, MSL: -2 },
+      datums_period: { start: "1983-01-01", end: "2001-12-31" },
+      same_as: ["cdec/X"],
+    } as Partial<StoredStation>);
+    const linked = (epochs: Epoch[]) =>
+      station("cdec/X", { datum: "NGVD29", same_as: ["coops/1"], epochs });
+    const msl = (e: Epoch[]) =>
+      byId(withDatums([coopsStation, linked(e)], []).stations, "cdec/X").datums.MSL;
+    assert.equal(msl([open("NGVD29")]), -1);
+    const split = [
+      open("GZ", { until: "2006-01-01T00:00:00.000Z", to_current: null, state: "closed" }),
+      open("NGVD29", { id: 2, since: "2006-01-01T00:00:00.000Z" }),
+    ];
+    assert.equal(msl(split), undefined);
+  });
+
+  it("converts a USGS gage height to NAVD88 as USGS does", () => {
+    const creek = station("usgs/01396660", { datum: "GAGE", datums: { NAVD88: 85.152 } });
+    const [s] = withDatums([creek], []).stations;
+    // USGS at 2026-11-01 00:00 UTC: gage height 0.21 ft, elevation 279.58 ft above NAVD88.
+    assert.ok(Math.abs(convert(s!, 0.21 * FOOT, "NAVD88") - 279.58 * FOOT) <= 0.003);
+    assert.equal(s!.datums_source!.NAVD88, "source");
+  });
+
+  it("converts a USACE stage to NAVD88 as the New Orleans District does", () => {
+    const orleans = station("usace/MVN.New_Orleans", {
+      datum: "GZ",
+      datums: { NAVD88: -0.293, LWRP: -0.475 },
+    });
+    const [s] = withDatums([orleans], []).stations;
+    // CWMS at 2026-11-01 00:00 UTC: `rev` 2.98 ft, `rev-NAVD88` 2.02 ft.
+    assert.ok(Math.abs(convert(s!, 2.98 * FOOT, "NAVD88") - 2.02 * FOOT) <= 0.003);
+  });
+
+  it("dates a source's own tidal datums by the period it reduced them over", () => {
+    const s = station("coops/9414290", {
+      datum: "STND",
+      datums: { MSL: -2.7, MHHW: -3.5, NAVD88: -2.6 },
+      datums_period: { start: "1983-01-01", end: "2001-12-31" },
+    } as Partial<StoredStation>);
+    const [out] = withDatums([s], []).stations;
+    assert.deepEqual(out!.datums_epoch, {
+      MSL: { start: "1983-01-01", end: "2001-12-31" },
+      MHHW: { start: "1983-01-01", end: "2001-12-31" },
+    });
+    // NOAA's record gives the same values, dated by the national tidal epoch: they keep CO-OPS's span.
+    const record = tide("noaa/9414290", {
+      datums: { STND: 0, MSL: 2.7 },
+      epoch: { start: "1983-01-01", end: "2001-12-31" },
+    });
+    const short = {
+      ...s,
+      datums_period: { start: "2010-07-01", end: "2011-06-30" },
+    } as StoredStation;
+    const [joined] = withDatums([short], [record]).stations;
+    assert.equal(joined!.datums_source!.MSL, "slackwater-database");
+    assert.deepEqual(joined!.datums_epoch!.MSL, { start: "2010-07-01", end: "2011-06-30" });
+    // A record with no period of its own, at a station with none, leaves the value undated.
+    const undated = tide("noaa/9414290", { datums: { STND: 0, MSL: 2.7 } });
+    const bare = station("coops/9414290", { datum: "STND", datums: { MSL: -2.7 } });
+    assert.equal(withDatums([bare], [undated]).stations[0]!.datums_epoch!.MSL, undefined);
   });
 
   it("converts Kartverket Bergen from chart datum as Kartverket does", () => {

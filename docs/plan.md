@@ -215,8 +215,9 @@ Done when tide-database's monthly update re-fits from the store, and TICON suppl
 
 - [x] `src/datums.ts`: join each station to tide-database by provider ID and distance (never by name alone), and take MSL and LAT from its `datums` when the station has harmonics; otherwise use the source's own offsets.
 - [x] Record where each offset came from (`datums_source`: source, slackwater-database, computed) and its epoch.
-- [ ] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
-- [ ] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
+- [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
+- [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
+- [ ] Offsets measured between linked series from their overlapping hourly values, run in `analyze`, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
 
 ### Phase 8: Remaining real-time feeds (3 days)
 
