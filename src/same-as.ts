@@ -83,6 +83,11 @@ export const LINKS: Decision[] = [
     note: "CMEMS's Eems Meetpaal is RWS's Eemshaven Waddenzee gauge, 0.1 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. One source's two records, so nearness doesn't link them.",
   },
   {
+    a: "gesla/hoekvanhollandtg-hoe-nld-cmems",
+    b: "rws/hoekvanholland",
+    note: "CMEMS's copy of RWS's Hoek van Holland gauge, 0.35 km away: in the store in November 2026, the 520,978 values both hold from 2014 to 2025 agree to 0.0 cm RMS in the median month, and 99.99% within 5 mm. RWS's Hoek van Holland splitsingsdam, Maeslantkering and Noorderdam gauges share its name's words, so the copy rule leaves it in doubt.",
+  },
+  {
     a: "gesla/eidersptg-eid-deu-cmems",
     b: "pegelonline/9530010",
     note: "CMEMS's copy of WSA Tönning's Eider barrier gauge, at PEGELONLINE's position for Eider-Sperrwerk AP. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. GESLA's CMEMS name says no side of the barrier, where PEGELONLINE's says the outer one (AP), so nearness doesn't link them.",
