@@ -1,0 +1,21 @@
+I_E#DE__808P2026#
+A01#Hersteller :#M1103/BSH-Hamburg, 01.04.2025  16:52:08#
+A02#Daten-Art  :#Vorausberechnungen#
+A03#PegelNr.   :#DE__808P#
+A04#GT-Name    :#Leer, Leda, Schleuse#
+A06#GT-Jahr    :#      2026#
+A08#Position   :#53°12'57''N   7°26'55''E WGS84#
+A11#Zeitzone   :#UTC+ 1h00min (MEZ)#
+C01#VB-Berechn.:#im Zeitdifferenz-Anschluß DE__507P#
+C02#Datenumfang:#Zeiten         : HW NW#
+C04#EinheitZeit:#StdMin#
+F01#MHWI       :#11:37   #
+F02#MNWI       :#18:59   #
+LLL#
+VB1#DE__808P# #N#Do# 1. 1.2026# 5:05#      # #  1#+ 1:00#
+VB1#DE__808P# #H#Do# 1. 1.2026#10:20#      # #  1#+ 1:00#
+VB1#DE__808P# #N#Do# 1. 1.2026#17:48#      # #  1#+ 1:00#
+VB1#DE__808P# #H#Do# 1. 1.2026#22:54#      # #  1#+ 1:00#
+VB1#DE__808P# #N#Fr# 2. 1.2026# 6:22#      # #  2#+ 1:00#
+VB1#DE__808P# #H#Fr# 2. 1.2026#11:30#      # #  2#+ 1:00#
+EEE#
