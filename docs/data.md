@@ -23,7 +23,7 @@ predictions/<source>/<station>/<year>.parquet         the source's predicted cur
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters: time, level_m, type, flag[, transit, event], datum
 ```
 
-`stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station (`id`, or `station` in `offsets`) in row groups of 2,048 rows, whose statistics give each group's first and last station, so a reader that filters on one station fetches the file's footer and the one group holding it, or two where its rows cross a group boundary, rather than the whole file. `recent/<source>.parquet` is sorted by `station` the same way, in DuckDB's default row groups, which are much larger.
+`stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station (`id`, or `station` in `offsets`) in row groups of 2,048 rows, whose statistics give each group's first and last station. A reader that filters on one station and fetches only the byte ranges it needs reads the file's footer and the one group holding it, or two where its rows cross a group boundary, rather than the whole file. `stations/links.parquet` has the same groups, sorted by `a`, so only a filter on `a` skips them. `recent/<source>.parquet` is sorted by `station` the same way, in DuckDB's default row groups, which are much larger.
 
 [stations.md](stations.md#store-layout) describes the files ingest keeps for itself beside these.
 

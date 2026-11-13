@@ -859,7 +859,7 @@ export function readRows(path: string): Promise<Record<string, unknown>[]> {
   return read(path, "SELECT *", "ALL");
 }
 
-/** Rows as Parquet with the given columns and types, sorted by `order`, which starts with the station. */
+/** Rows as Parquet with the given columns and types, sorted by `order`, in row groups a filter on its first column can skip. */
 export async function writeRows(
   path: string,
   rows: object[],
