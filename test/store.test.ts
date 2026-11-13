@@ -20,7 +20,8 @@ import {
   writeStationList,
   writeStations,
 } from "../src/store/parquet.ts";
-import { seriesPath } from "../src/store/paths.ts";
+import { seriesPath, yearsPath } from "../src/store/paths.ts";
+import { writeYears } from "../src/store/years.ts";
 import { qc, withSourceFlag } from "../src/qc.ts";
 import { Flag, type StoredStation, type Observation, type Station } from "../src/schema.ts";
 
@@ -278,6 +279,54 @@ describe("store files", () => {
         ["test:2", { first: null, last: null, preliminary: undefined, screened: null }],
       ]),
     );
+  });
+});
+
+describe("files read by station", () => {
+  // Shuffled so the sort is the writer's, and enough rows for several groups.
+  const ids = Array.from(
+    { length: 5000 },
+    (_, i) => `test/${String((i * 7919) % 5000).padStart(4, "0")}`,
+  );
+
+  async function groups(path: string): Promise<{ min: string; max: string; rows: number }[]> {
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    const reader = await db.runAndReadAll(
+      `SELECT stats_min_value, stats_max_value, row_group_num_rows FROM parquet_metadata('${path}') WHERE path_in_schema = 'id' ORDER BY row_group_id`,
+    );
+    return reader
+      .getRows()
+      .map(([min, max, rows]) => ({ min: String(min), max: String(max), rows: Number(rows) }));
+  }
+
+  // A station's rows may cross into the next group, so a group may start with the last one's station.
+  function assertSorted(found: { min: string; max: string; rows: number }[], total: number) {
+    assert.equal(
+      found.reduce((sum, g) => sum + g.rows, 0),
+      total,
+    );
+    assert.ok(found.length > 1, `${found.length} row group`);
+    for (let i = 1; i < found.length; i++) assert.ok(found[i - 1]!.max <= found[i]!.min);
+    for (const { rows } of found.slice(0, -1)) assert.equal(rows, 2048);
+  }
+
+  it("writes stations.parquet sorted by ID in row groups of 2,048", async () => {
+    const path = join(root, "sorted/stations.parquet");
+    await writeStations(
+      path,
+      ids.map((id) => ({ ...listed, id, epochs: [epoch] }) as StoredStation),
+    );
+    assertSorted(await groups(path), 5000);
+  });
+
+  it("writes a source's year files sorted by station in row groups of 2,048", async () => {
+    const store = join(root, "sorted");
+    await writeYears(
+      store,
+      "test",
+      ids.flatMap((id) => [2026, 2025, 2024].map((year) => ({ id, epoch: 1, year, hours: 1 }))),
+    );
+    assertSorted(await groups(yearsPath(store, "test")), 15000);
   });
 });
 

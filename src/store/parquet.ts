@@ -503,6 +503,13 @@ const STATION_COLUMNS: Record<keyof Station, string> = {
 const EPOCHS =
   "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, reference_since TIMESTAMPTZ, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
 
+/**
+ * Parquet sorted by station in small row groups, so a reader after one station
+ * fetches the footer and one group. 2,048 rows is DuckDB's smallest group (its
+ * vector size); a smaller ROW_GROUP_SIZE still writes 2,048.
+ */
+const BY_STATION = "FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 2048";
+
 /** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
 export async function writeStations(path: string, stations: StoredStation[]): Promise<void> {
   const columns = { ...STATION_COLUMNS, epochs: EPOCHS };
@@ -510,7 +517,7 @@ export async function writeStations(path: string, stations: StoredStation[]): Pr
     path,
     stations,
     `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
-    "FORMAT parquet, COMPRESSION zstd",
+    BY_STATION,
   );
 }
 
@@ -712,7 +719,7 @@ export function readRows(path: string): Promise<Record<string, unknown>[]> {
   return read(path, "SELECT *", "ALL");
 }
 
-/** Rows as Parquet with the given columns and types, sorted by `order`. */
+/** Rows as Parquet with the given columns and types, sorted by `order`, which starts with the station. */
 export async function writeRows(
   path: string,
   rows: object[],
@@ -723,7 +730,7 @@ export async function writeRows(
     path,
     rows,
     `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY ${order}`,
-    "FORMAT parquet, COMPRESSION zstd",
+    BY_STATION,
   );
 }
 

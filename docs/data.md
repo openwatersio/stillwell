@@ -23,6 +23,8 @@ predictions/<source>/<station>/<year>.parquet         the source's predicted cur
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters: time, level_m, type, flag[, transit, event], datum
 ```
 
+`stations.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by `id` in row groups of 2,048 rows, whose statistics give each group's first and last station, so a reader that filters on one station (`WHERE id = ...`) fetches the file's footer and the one group holding it, or two where its rows cross a group boundary, rather than the whole file. `recent/<source>.parquet` is sorted by `station` the same way, in DuckDB's default row groups, which are much larger.
+
 - **`<station>`** is the station's `source_id` from `stations.parquet`, URL-encoded. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
 - **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch, apart from RWS's Dutch NAP stations, whose values before 2005 are in an epoch of their own; [Datum epochs](#datum-epochs) below shows how to read across them.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
