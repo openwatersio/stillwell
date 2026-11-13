@@ -8,7 +8,7 @@
       "response": "Backfills start from each gauge's first value, not the dataset's coverage.",
       "evidence": "The ERDDAP dataset's global `time_coverage_start` attribute; the earliest value at any gauge, found while backfilling, is October 2006 at Skerries Harbour.",
       "reported": "2026-11-08",
-      "report": "Sent to the Marine Institute on 2026-11-08; they replied they'll work through it after a period of leave. Text in [#59](https://github.com/openwatersio/stillwell/issues/59)."
+      "report": "Sent to the Marine Institute on 2026-11-08. On 2026-11-13 they sent each gauge's record start, the earliest being Howth's old middle-pier gauge on 2006-10-24 and Skerries on 2006-10-26; none is before October 2006. Text in [#59](https://github.com/openwatersio/stillwell/issues/59)."
     },
     {
       "id": "marine-institute-lat-2026",
@@ -39,7 +39,7 @@
       "response": "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
       "evidence": "LAT less OD Malin is constant at each gauge from 2008 until 24 March 2026, then moves by 1 to 5 cm. See [the adapter's README](https://github.com/openwatersio/stillwell/blob/main/src/sources/marine-institute/README.md).",
       "reported": "2026-11-08",
-      "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/stillwell/issues/59); they replied they'll work through it after a period of leave."
+      "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/stillwell/issues/59). On 2026-11-13 they replied that the harmonics and levels were re-evaluated and applied to the database at 11:15 UTC on 24 March 2026, and passed it to the team that does the work. They didn't say whether earlier values will be restated."
     },
     {
       "id": "marine-institute-castletownbere-2026-offsets",
