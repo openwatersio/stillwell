@@ -21,6 +21,7 @@ import {
   readStationBounds,
   readStationList,
   writeStationList,
+  writeOffsets,
   writeStations,
 } from "../src/store/parquet.ts";
 import { seriesPath, yearsPath } from "../src/store/paths.ts";
@@ -292,10 +293,13 @@ describe("files read by station", () => {
     (_, i) => `test/${String((i * 7919) % 5000).padStart(4, "0")}`,
   );
 
-  async function groups(path: string): Promise<{ min: string; max: string; rows: number }[]> {
+  async function groups(
+    path: string,
+    column = "id",
+  ): Promise<{ min: string; max: string; rows: number }[]> {
     const db = await (await DuckDBInstance.create(":memory:")).connect();
     const reader = await db.runAndReadAll(
-      `SELECT stats_min_value, stats_max_value, row_group_num_rows FROM parquet_metadata('${path}') WHERE path_in_schema = 'id' ORDER BY row_group_id`,
+      `SELECT stats_min_value, stats_max_value, row_group_num_rows FROM parquet_metadata('${path}') WHERE path_in_schema = '${column}' ORDER BY row_group_id`,
     );
     return reader
       .getRows()
@@ -320,6 +324,17 @@ describe("files read by station", () => {
       ids.map((id) => ({ ...listed, id, epochs: [epoch] }) as StoredStation),
     );
     assertSorted(await groups(path), 5000);
+  });
+
+  it("writes stations/offsets.parquet sorted by station in row groups of 2,048", async () => {
+    const path = join(root, "sorted/offsets.parquet");
+    await writeOffsets(
+      path,
+      ids.flatMap((station) =>
+        ["MSL", "LAT"].map((datum) => ({ station, epoch: 1, datum, offset_m: 0.1 })),
+      ),
+    );
+    assertSorted(await groups(path, "station"), 10000);
   });
 
   it("writes a source's year files sorted by station in row groups of 2,048", async () => {

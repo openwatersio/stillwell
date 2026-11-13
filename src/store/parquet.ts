@@ -644,7 +644,7 @@ export async function writeOffsets(path: string, rows: OffsetRow[]): Promise<voi
     path,
     rows,
     `SELECT * FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY station, epoch, datum`,
-    "FORMAT parquet, COMPRESSION zstd",
+    BY_STATION,
   );
 }
 
