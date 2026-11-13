@@ -99,7 +99,7 @@ The records with no originator series in the store, by contributor, most first: 
 | USGS | 650 | 4 | 17 | 0 | yes | US 4 |
 | BODC | 46 | 3 | 62 | 0 | yes | GB 3 |
 | DA_MM | 3 | 3, none linked | 271 | 1 | yes | ES 3 |
-| DMI | 3 | 3, none linked | 349 | 2 | no | DK 3 |
+| DMI | 3 | 3, none linked | 349 | 2 | yes | DK 3 |
 | MI_C | 25 | 3 | 13 | 0 | yes | IE 3 |
 | SFWMD | 43 | 3 | 118 | 0 | yes | US 3 |
 | GLOSS | 2 | 2, none linked | 6 | 0 | yes | GL 2 |
@@ -110,7 +110,7 @@ The records with no originator series in the store, by contributor, most first: 
 | REFMAR | 108 | 1 | 13 | 0 | yes | FR 1 |
 | UZ | 1 | 1, none linked | 85 | 0 | no | HR 1 |
 
-CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM, BOM and DMI have been asked ([contributors.md](contributors.md)).
+CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM and BOM have been asked ([contributors.md](contributors.md)).
 
 ## Year gaps by source
 

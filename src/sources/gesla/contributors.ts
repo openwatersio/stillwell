@@ -223,10 +223,10 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     terms: RESEARCH_AND_CONSULTANCY,
   },
   DMI: {
-    name: "Danish Meteorological Institute",
-    commercial_use: false,
+    name: NOTICES.dmi!.credit!,
+    commercial_use: true,
     terms:
-      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them.",
+      "GESLA's license table: research and consultancy. DMI licenses its tide-gauge data under CC BY 4.0, commercial use included, however the user obtained it.",
   },
   GLOSS: {
     name: "Global Sea Level Observing System",
