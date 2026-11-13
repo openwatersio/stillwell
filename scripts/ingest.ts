@@ -47,7 +47,7 @@
  * the workflow run's page. `requalify` works the flags of stations' observed
  * levels out again over the years [start, end) from the store alone (src/store/requalify.ts),
  * so a QC rule change reaches stored values without fetching them again;
- * with `--budget` it starts batches only for that many minutes.
+ * with `--budget` it starts stations only for that many minutes.
  * `withhold` deletes the files of a source's withheld stations, whose owner
  * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
@@ -57,7 +57,7 @@
  * store, such as whether they carry a tide, into stations/analysis/<source>.parquet
  * (src/store/analysis.ts), `--all` every station, and lists the stations whose
  * QC that changes; `--requalify` requalifies them, and every station after its
- * first verdict, over every year, starting batches for `--budget` minutes.
+ * first verdict, over every year, starting stations for `--budget` minutes.
  *
  * A station the source now reports against another reference opens a datum
  * epoch, whose values go to files of their own (docs/stations.md). `backfill`
@@ -98,6 +98,7 @@ import {
   formatSummary,
   lastDays,
   pool,
+  poolUntil,
   qcFor,
   REFETCH_YEARS,
   updateRecent,
@@ -117,7 +118,13 @@ import {
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { requalify } from "../src/store/requalify.ts";
-import { analyze, markRequalified, pending, readAnalysis } from "../src/store/analysis.ts";
+import {
+  analyze,
+  markRequalified,
+  pending,
+  readAnalysis,
+  requalifiedMarks,
+} from "../src/store/analysis.ts";
 import {
   boundsPath,
   requalifyLeftPath,
@@ -247,6 +254,7 @@ switch (command) {
       range.start,
       range.end,
       minutes ? Date.now() + minutes * 60_000 : 0,
+      undefined,
       first,
     );
     // A station that failed is tried again too, over this run's years only, so
@@ -875,10 +883,11 @@ function find(list: StoredStation[], sourceId: string, id: string): StoredStatio
 
 /**
  * Requalify stations 100 at a time. A station whose turn comes after `until`
- * isn't started, and is returned in `left`. Those in `first` go first, each
- * over its own years. With
- * a budget, `all` takes only the stations the years file has a file in range
- * for, or has marked as being written, or every station for a source without one.
+ * isn't started, and is returned in `left`; one requalified without a failure
+ * goes to `finished` once its files are written. Those in `first` go first,
+ * each over its own years. With a budget, `all` takes only the stations the
+ * years file has a file in range for, or has marked as being written, or every
+ * station for a source without one.
  */
 async function requalifyStations(
   sourceId: string,
@@ -886,6 +895,7 @@ async function requalifyStations(
   start: number,
   end: number,
   until = Infinity,
+  finished?: (id: string) => Promise<void>,
   first = new Map<string, { start: number; end: number }>(),
 ): Promise<RunSummary & { left: string[] }> {
   if (start >= end)
@@ -948,8 +958,7 @@ async function requalifyStations(
           );
         continue;
       }
-      await pool(batch, positive("concurrency"), async (station) => {
-        if (Date.now() > until) return void left.push(station.id);
+      const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
         try {
           const { files, changed, warnings } = await requalify(
             source,
@@ -965,8 +974,11 @@ async function requalifyStations(
           for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+          return;
         }
+        await finished?.(station.id);
       });
+      left.push(...late.map((station) => station.id));
       try {
         await commitYears(store, sourceId, marked, written);
       } catch (error) {
@@ -1008,8 +1020,8 @@ async function analyzeSource(sourceId: string): Promise<void> {
   if (report.failed.length) process.exitCode = 1;
   if (!values.requalify) return;
   // Every year of every epoch, since a station's verdict holds for its whole
-  // record; a batch at a time, each marked once done, so a run stopped partway
-  // leaves the rest pending for the next.
+  // record; each station marked once its files are written, so a run stopped
+  // partway leaves the rest pending for the next.
   const listed = new Map(list.map((s) => [s.id, s]));
   const analysis = await readAnalysis(store, sourceId);
   // Stations whose rules differ from their kind's come first; the rest are first verdicts that change nothing.
@@ -1021,25 +1033,48 @@ async function analyzeSource(sourceId: string): Promise<void> {
   const waiting = pending(analysis)
     .filter((id) => listed.has(id))
     .sort((a, b) => Number(differs(b)) - Number(differs(a)));
-  // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
+  // A station starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
   const until = Date.now() + positive("budget", "120") * 60_000;
-  for (const batch of chunks(waiting, 100)) {
-    if (Date.now() > until) {
-      console.log(
-        `analyze ${sourceId}: out of time, ${waiting.length - waiting.indexOf(batch[0]!)} stations left pending`,
+  // Finished stations are marked as others finish, at most every 5 minutes, and after each batch,
+  // since a batch of 1-minute series can run for hours.
+  const marks = requalifiedMarks(
+    (ids) => markRequalified(store, sourceId, ids, new Date()),
+    5 * 60_000,
+  );
+  let unmarked: string[] = [];
+  try {
+    let reached = 0;
+    for (const batch of chunks(waiting, 100)) {
+      if (Date.now() > until) {
+        console.log(
+          `analyze ${sourceId}: out of time, ${waiting.length - reached} stations not started`,
+        );
+        break;
+      }
+      reached += batch.length;
+      const { left } = await requalifyStations(
+        sourceId,
+        batch.join(","),
+        0,
+        10_000,
+        until,
+        marks.add,
       );
-      break;
+      await marks.flush();
+      if (left.length) {
+        console.log(
+          `analyze ${sourceId}: out of time, ${waiting.length - reached + left.length} stations not started`,
+        );
+        break;
+      }
     }
-    const summary = await requalifyStations(sourceId, batch.join(","), 0, 10_000);
-    // A failure that names no station, such as the years file's, may have skipped any of them.
-    const failed = new Set(summary.failed.map((f) => f.split(": ")[0]));
-    if ([...failed].some((id) => !batch.includes(id!))) continue;
-    await markRequalified(
-      store,
-      sourceId,
-      batch.filter((id) => !failed.has(id)),
-      new Date(),
-    );
+  } finally {
+    // A throw out of a batch still writes the stations finished before it.
+    unmarked = await marks.flush();
+  }
+  if (unmarked.length) {
+    console.error(`analyze ${sourceId}: ${unmarked.length} requalified stations left unmarked`);
+    process.exitCode = 1;
   }
 }
 
