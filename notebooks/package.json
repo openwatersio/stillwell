@@ -1,0 +1,12 @@
+{
+  "name": "stillwell-notebooks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "observable preview",
+    "build": "observable build"
+  },
+  "devDependencies": {
+    "@observablehq/framework": "1.13.4"
+  }
+}
