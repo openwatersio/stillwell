@@ -6,12 +6,12 @@ slackwater-database holds 4838 TICON records. 4838 are listed in its station fil
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1633 | 1580 | 3555 | An adapter exists and the record matched one of its stations |
-| planned | 1 | 1 | 3 | Cleared source, adapter in the plan |
-| to_match | 43 | 43 | 52 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
+| ready | 1672 | 1619 | 3603 | An adapter exists and the record matched one of its stations |
+| planned | 0 | 0 | 0 | Cleared source, adapter in the plan |
+| to_match | 0 | 0 | 0 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
 | license | 312 | 312 | 476 | The source's terms need confirming first |
-| unmatched | 76 | 72 | 146 | An adapter exists, but no station matched, or two matched equally; check by hand |
-| restricted | 462 | 449 | 606 | The source forbids it; stays on TICON |
+| unmatched | 83 | 79 | 155 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| restricted | 460 | 447 | 604 | The source forbids it; stays on TICON |
 
 The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. 2457 of the 2527 accepted records have a GESLA 4.1 copy listed in the store (`gesla_id` in the CSV), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
 
@@ -22,7 +22,7 @@ Accepted records only, in the order to build adapters: most records first.
 | Source | Records | Status | TICON contributors |
 | --- | --- | --- | --- |
 | usgs | 435 | ready 431, unmatched 4 | usgs |
-| uhslc | 421 | ready 405, unmatched 1, restricted 15 | uhslc_fd, uhslc_rq |
+| uhslc | 421 | ready 407, unmatched 1, restricted 13 | uhslc_fd, uhslc_rq |
 | chs | 256 | restricted 256 | meds |
 | crms | 164 | ready 161, unmatched 3 | crms |
 | pegelonline | 147 | ready 146, unmatched 1 | cmems, wsv |
@@ -36,7 +36,7 @@ Accepted records only, in the order to build adapters: most records first.
 | redmar | 55 | license 55 | cmems, ieo |
 | dwr | 51 | ready 39, unmatched 12 | cdwr |
 | ea | 46 | ready 46 | bodc, cmems |
-| dmi | 44 | planned 1, to_match 43 | cmems, dmi |
+| dmi | 44 | ready 37, unmatched 7 | cmems, dmi |
 | sfwmd | 42 | ready 41, unmatched 1 | sfwmd |
 | ispra | 37 | license 37 | cmems, ispra |
 | marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
