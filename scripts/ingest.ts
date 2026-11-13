@@ -10,6 +10,7 @@
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
+ *       [--budget <minutes>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
@@ -45,7 +46,8 @@
  * than keep the ones it knows. Both print a summary, and add it to
  * the workflow run's page. `requalify` works the flags of stations' observed
  * levels out again over the years [start, end) from the store alone (src/store/requalify.ts),
- * so a QC rule change reaches stored values without fetching them again.
+ * so a QC rule change reaches stored values without fetching them again;
+ * with `--budget` it starts batches only for that many minutes.
  * `withhold` deletes the files of a source's withheld stations, whose owner
  * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
@@ -162,7 +164,7 @@ const { positionals, values } = parseArgs({
     "rebuild-years": { type: "boolean", default: false },
     all: { type: "boolean", default: false },
     requalify: { type: "boolean", default: false },
-    budget: { type: "string", default: "120" },
+    budget: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -205,7 +207,9 @@ switch (command) {
   case "requalify": {
     const [source, ids, start, end] = args;
     if (!source || !ids || !start || !end) usage();
-    await requalifyStations(source, ids, parseYear(start), parseYear(end));
+    const until =
+      values.budget === undefined ? undefined : Date.now() + positive("budget") * 60_000;
+    await requalifyStations(source, ids, parseYear(start), parseYear(end), until);
     break;
   }
   case "compact": {
@@ -800,8 +804,11 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(name: "concurrency" | "hours" | "keep-days" | "budget"): number {
-  const value = Number(values[name]);
+function positive(
+  name: "concurrency" | "hours" | "keep-days" | "budget",
+  fallback?: string,
+): number {
+  const value = Number(values[name] ?? fallback);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
   return value;
@@ -819,6 +826,7 @@ async function requalifyStations(
   ids: string,
   start: number,
   end: number,
+  until?: number,
 ): Promise<RunSummary> {
   if (start >= end)
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
@@ -828,6 +836,12 @@ async function requalifyStations(
   // Every station with files, inactive ones too, since their stored values are QC'd as well.
   let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
   if (values.shard) stations = shard(stations, ...parseShard(values.shard));
+  // With a budget, each month starts a twelfth further into the list, so a
+  // source the budget can't finish doesn't leave the same stations out each time.
+  if (until) {
+    const from = Math.floor((stations.length * new Date().getUTCMonth()) / 12);
+    stations = [...stations.slice(from), ...stations.slice(0, from)];
+  }
   setConnections(positive("concurrency"));
   const summary = await reporting(`requalify ${sourceId} ${start}–${end}`, async () => {
     const s: RunSummary = {
@@ -842,6 +856,14 @@ async function requalifyStations(
     };
     const store = storeOfSource(source.metadata);
     for (const batch of chunks(stations, 100)) {
+      // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
+      if (until && Date.now() > until) {
+        // First, so the summary's first 20 warnings never leave it out.
+        (s.warned ??= []).unshift(
+          `out of time: ${stations.length - stations.indexOf(batch[0]!)} stations left from ${batch[0]!.id}`,
+        );
+        break;
+      }
       const ids = batch.map((station) => station.id);
       const written = new Map<string, YearStats>();
       // A batch that can't be marked isn't written, so the years can't go stale.
@@ -923,7 +945,7 @@ async function analyzeSource(sourceId: string): Promise<void> {
     .filter((id) => listed.has(id))
     .sort((a, b) => Number(differs(b)) - Number(differs(a)));
   // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
-  const until = Date.now() + positive("budget") * 60_000;
+  const until = Date.now() + positive("budget", "120") * 60_000;
   for (const batch of chunks(waiting, 100)) {
     if (Date.now() > until) {
       console.log(
@@ -976,7 +998,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }
