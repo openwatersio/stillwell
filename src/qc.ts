@@ -268,6 +268,65 @@ const DAY_MS = 86_400_000;
 const HOUR_MS = 3_600_000;
 
 /**
+ * The part of `context` that `qc(rows, options, context)` can see, so a year
+ * judged with its neighbors needn't scan them whole: `qc` gives the same flags
+ * with it. The spike rule and the held rule's sides look a bounded way into
+ * the context, three sampling intervals; the flatline and held rules scan it,
+ * their runs starting over from the first value, and neither run crosses a step of more than
+ * twice its tolerance (a centimeter for held levels), so where one is, a scan
+ * from either start is at the same place. Before the rows, it keeps from such
+ * a step more than `reach` before the run the rows start in; after them,
+ * through `reach` past the run they end in. `reach` covers what the rules look
+ * past a run: three days of centimeter steps, three sampling intervals of
+ * neighbors. Context within the rows' span, or without such a step, is kept.
+ */
+export function nearContext(
+  rows: Observation[],
+  { flatline_m = 0 }: QcOptions,
+  context: Observation[],
+): Observation[] {
+  const own = unique(rows);
+  if (!own.length || !context.length) return context;
+  const [first, last] = [own[0]!.time, own.at(-1)!.time];
+  const sorted = unique(context).filter((r) => possible(r.level));
+  if (sorted.some((r) => r.time >= first && r.time <= last)) return context;
+  const spacing = median(own.slice(1).map((r, i) => r.time - own[i]!.time)) ?? 0;
+  const reach = Math.max(3 * DAY_MS, 3 * spacing);
+  // In 0.1 mm, as the rules round: two values each within the tolerance of a run's first.
+  const step = 2 * Math.max(Math.round(flatline_m * 10_000), 100) + 2;
+  const apart = (a: Observation, b: Observation) =>
+    Math.abs(Math.round((b.level - a.level) * 10_000)) > step;
+  const ownFirst = own.find((r) => possible(r.level));
+  const ownLast = own.findLast((r) => possible(r.level));
+  const before = sorted.filter((r) => r.time < first);
+  const after = sorted.filter((r) => r.time > last);
+  // Before: the run the rows start in begins at or after `from`; the scan starts at a step before `from - reach`.
+  let from = ownFirst?.time ?? first;
+  let k = before.length;
+  if (ownFirst)
+    while (k > 0 && !apart(before[k - 1]!, k < before.length ? before[k]! : ownFirst)) k--;
+  if (k < before.length) from = before[k]!.time;
+  let start = 0;
+  for (let i = before.length - 1; i > 0; i--)
+    if (before[i]!.time < from - reach && apart(before[i - 1]!, before[i]!)) {
+      start = i;
+      break;
+    }
+  // After: through the first step after the rows, then `reach` more.
+  let end = after.length;
+  for (let i = 0; i < after.length; i++) {
+    const prev = i ? after[i - 1]! : ownLast;
+    if (prev && apart(prev, after[i]!)) {
+      const until = after[i]!.time + reach;
+      end = after.findIndex((r) => r.time > until);
+      if (end < 0) end = after.length;
+      break;
+    }
+  }
+  return [...before.slice(start), ...after.slice(0, end)];
+}
+
+/**
  * Runs that jump away from the tide and back, as when a sensor reads its zero
  * for a few hours or sends one wrong value as it fails: in the residual from
  * the standard set fitted to `rows`' usable values on the hour within 10 m of
@@ -398,9 +457,17 @@ function unique<T extends { time: number }>(rows: T[]): T[] {
   return sorted.filter((r, i) => i === 0 || r.time !== sorted[i - 1]!.time);
 }
 
+/** The median of finite values. */
 function median(values: number[]): number | undefined {
   if (!values.length) return undefined;
-  const sorted = [...values].sort((a, b) => a - b);
+  // The rules take thousands of medians of a few neighbors, which an insertion sort does fastest; a typed array sorts long lists without a comparator.
+  const sorted = values.length > 32 ? Float64Array.from(values).sort() : [...values];
+  if (values.length <= 32)
+    for (let i = 1; i < sorted.length; i++)
+      for (let j = i, v = sorted[i]!; j > 0 && sorted[j - 1]! > v; j--) {
+        sorted[j] = sorted[j - 1]!;
+        sorted[j - 1] = v;
+      }
   const mid = sorted.length >> 1;
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1]! + sorted[mid]!) / 2;
 }

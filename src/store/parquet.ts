@@ -33,8 +33,8 @@ const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
 /**
  * How many DuckDB connections run store work at once, 1 by default. Backfill,
- * compaction, requalify and `years` raise it to their concurrency, since each
- * year file on R2 is mostly waiting on the network. Each running call holds
+ * compaction and `years` raise it to their concurrency, and requalify's
+ * workers each to 4, since each year file on R2 is mostly waiting on the network. Each running call holds
  * one of libuv's pool threads; scripts/threadpool.ts gives the pool 64 unless
  * the environment sets its size, so more lanes than that wait for a thread.
  */
@@ -63,10 +63,28 @@ function serial<T>(work: () => Promise<T>): Promise<T> {
   return next;
 }
 
+/**
+ * Once every connection this thread has started is open, or has failed. Work
+ * that needs no connection, such as listing a directory that isn't there,
+ * starts one without waiting for it, and a worker thread ended while DuckDB
+ * is still starting aborts the whole process.
+ */
+export async function connected(): Promise<void> {
+  await Promise.all(lanes.map((lane) => lane.db.catch(() => undefined)));
+}
+
 function connection(): Promise<DuckDBConnection> {
   const db = current.getStore();
   if (!db) throw new Error("DuckDB work must run through serial()");
   return db;
+}
+
+let settings: Record<string, string> = {};
+
+/** DuckDB settings, such as `threads` and `memory_limit`, for the instance this thread starts. */
+export function limitDuckDb(options: Record<string, string>): void {
+  if (instance) throw new Error("DuckDB already started");
+  settings = options;
 }
 
 /**
@@ -77,7 +95,7 @@ function connection(): Promise<DuckDBConnection> {
  */
 async function connect(): Promise<DuckDBConnection> {
   instance ??= (async () => {
-    const created = await DuckDBInstance.create(":memory:");
+    const created = await DuckDBInstance.create(":memory:", settings);
     const endpoint = process.env.S3_ENDPOINT;
     if (endpoint) {
       const setup = await created.connect();

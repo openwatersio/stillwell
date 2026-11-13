@@ -117,7 +117,7 @@ import {
   type YearStats,
 } from "../src/store/parquet.ts";
 import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
-import { requalify } from "../src/store/requalify.ts";
+import { requalifyInWorker, WorkerDied } from "../src/store/requalify.ts";
 import {
   analyze,
   markRequalified,
@@ -963,10 +963,11 @@ async function requalifyStations(
           );
         continue;
       }
+      const died = new Set<string>();
       const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
         try {
-          const { files, changed, warnings } = await requalify(
-            source,
+          const { files, changed, warnings } = await requalifyInWorker(
+            sourceId,
             station,
             storeFor(station),
             first.get(station.id)?.start ?? start,
@@ -979,13 +980,21 @@ async function requalifyStations(
           for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
+          if (error instanceof WorkerDied) died.add(station.id);
           return;
         }
         await finished?.(station.id);
       });
       left.push(...late.map((station) => station.id));
       try {
-        await commitYears(store, sourceId, marked, written);
+        // A station whose worker died stays marked, so the next reconcile reads
+        // its files: the worker may have written one it couldn't report.
+        await commitYears(
+          store,
+          sourceId,
+          marked.filter((id) => !died.has(id)),
+          written,
+        );
       } catch (error) {
         s.failed.push(`years: ${error instanceof Error ? error.message : error}`);
       }

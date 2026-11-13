@@ -1,4 +1,6 @@
-import { fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
+import { availableParallelism, totalmem } from "node:os";
+import { Worker } from "node:worker_threads";
+import { fromSource, nearContext, qc, withSourceFlag, type QcOptions } from "../qc.ts";
 import { Flag, Unjudged, type StoredStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
@@ -89,7 +91,9 @@ export async function requalify(
         throw new Error(`${path(year)}'s datums changed while requalify ran`);
       // Kept flags can only get worse, so a looser rule doesn't clear a mark there.
       const start = unjudged ? withSpans(had, suspect) : fromSource(had, suspect);
-      const next = qc(start, opts, [...before.rows, ...after.rows]);
+      const next = qc(start, opts, nearContext(start, opts, [...before.rows, ...after.rows]));
+      // From here this year is only the next one's context, so only the part qc sees stays in memory.
+      cache.set(year, Promise.resolve({ rows: nearContext(after.rows, opts, had), datums }));
       if (sameRows(had, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
@@ -99,6 +103,113 @@ export async function requalify(
   }
   return { files, changed, warnings };
 }
+
+/** A worker thread and the stations it's requalifying, by task ID. */
+interface Pooled {
+  worker: Worker;
+  tasks: Map<
+    number,
+    {
+      written: Map<string, YearStats>;
+      resolve: (result: Awaited<ReturnType<typeof requalify>>) => void;
+      reject: (error: unknown) => void;
+    }
+  >;
+}
+
+const pool: Pooled[] = [];
+let tasks = 0;
+
+/**
+ * `requalify` in a worker thread, so stations' QC, which is CPU-bound and
+ * would otherwise take turns on the one main thread, runs side by side: a
+ * worker per core at most (`availableParallelism`), each station going to the
+ * least busy, so calls beyond that share a worker and its reads still overlap.
+ * The worker gets the source by its ID, and has its own copy of each module,
+ * such as its own DuckDB. Each file's stats reach `written` as it's written.
+ * A worker that dies fails the stations it holds with `WorkerDied`, which the
+ * caller keeps marked in the years file, since it may have written a file it
+ * couldn't report. Terminating a worker whose DuckDB has started aborts the
+ * whole process with @duckdb/node-api 2.0.0-r.1, as running out of memory did
+ * on one thread; the run's years marks then stay for the next reconcile too.
+ */
+export function requalifyInWorker(
+  source: string,
+  station: StoredStation,
+  root: string,
+  start: number,
+  end: number,
+  written = new Map<string, YearStats>(),
+): Promise<Awaited<ReturnType<typeof requalify>>> {
+  let pooled = pool.reduce<Pooled | undefined>(
+    (a, b) => (a && a.tasks.size <= b.tasks.size ? a : b),
+    undefined,
+  );
+  if (!pooled || (pooled.tasks.size && pool.length < availableParallelism())) pooled = spawn();
+  const id = tasks++;
+  const { worker } = pooled;
+  return new Promise((resolve, reject) => {
+    pooled.tasks.set(id, { written, resolve, reject });
+    // Only a busy worker keeps the process alive.
+    worker.ref();
+    worker.postMessage({ id, source, station, root, start, end });
+  });
+}
+
+function spawn(): Pooled {
+  // The machine's memory, less the workers' DuckDB, split between the workers
+  // and the main thread, so a worker collects garbage rather than grow until
+  // they don't fit together. A year of 1-minute values needs about 500 MB of
+  // heap; on a small machine with many cores the floor can overcommit. A worker
+  // past it ends the run (see `requalifyInWorker`).
+  const limit = process.constrainedMemory();
+  const memory = limit > 0 && limit < totalmem() ? limit : totalmem();
+  const cores = availableParallelism();
+  const share = (memory / 2 ** 20 - cores * DUCKDB_MB) / (cores + 1);
+  const worker = new Worker(new URL("./requalify-worker.ts", import.meta.url), {
+    resourceLimits: { maxOldGenerationSizeMb: Math.max(1024, Math.floor(share)) },
+  });
+  const pooled: Pooled = { worker, tasks: new Map() };
+  pool.push(pooled);
+  worker.on("message", (message: Reply) => {
+    const task = pooled.tasks.get(message.id);
+    if (!task) return;
+    if ("written" in message) {
+      task.written.set(...message.written);
+      return;
+    }
+    pooled.tasks.delete(message.id);
+    if (!pooled.tasks.size) worker.unref();
+    if ("error" in message) task.reject(new Error(message.error));
+    else task.resolve(message.result);
+  });
+  // An error is followed by an exit; either fails the worker's stations, and the next call starts another.
+  const die = (error: Error) => {
+    if (pool.includes(pooled)) pool.splice(pool.indexOf(pooled), 1);
+    for (const task of pooled.tasks.values()) task.reject(new WorkerDied(error.message));
+    pooled.tasks.clear();
+  };
+  worker
+    .on("error", die)
+    .on("exit", (code) => die(new Error(`requalify's worker exited with ${code}`)));
+  return pooled;
+}
+
+/**
+ * A station failed because its worker died, as on running out of memory,
+ * which may have written a file without reporting it.
+ */
+export class WorkerDied extends Error {}
+
+/** The memory each worker's DuckDB may use, in MB. */
+export const DUCKDB_MB = 1024;
+
+/** What a worker sends: a file's stats as it's written, then the station's result or error. */
+export type Reply = { id: number } & (
+  | { written: [string, YearStats] }
+  | { result: Awaited<ReturnType<typeof requalify>> }
+  | { error: string }
+);
 
 /** Rows with the values in `spans` flagged at least `suspect`, keeping every other flag. */
 function withSpans(rows: Observation[], spans: [number, number][]): Observation[] {
