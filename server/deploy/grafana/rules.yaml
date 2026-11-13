@@ -1,0 +1,41 @@
+# Alert rules for the Stillwell box, in Prometheus rule format. push.sh imports them into Grafana Cloud as
+# Grafana-managed rules in the "stillwell" folder, routed to the stillwell email contact point. The folder
+# comes from `namespace`, which mimirtool reads and promtool does not, so check with:
+#   grep -v '^namespace:' rules.yaml | promtool check rules
+namespace: stillwell
+groups:
+  - name: stillwell
+    interval: 1m
+    rules:
+      # The poller rewrites its metrics after every pass and keeps each source's last success and interval across
+      # restarts; a source with none yet counts from when the poller started. A pass succeeds when it runs to the
+      # end, unblocked, and stores new values for some station, or finds nothing to poll, as a new source does
+      # until its first list. A source fails this when none has for three of its
+      # shortest interval, and never under two hours: a source whose short-interval stations go quiet still
+      # succeeds on its hourly ones, and a pass can take 50 minutes and wait for a slot behind other sources'.
+      - alert: StillwellSourceStale
+        expr: |
+          time() - stillwell_pass_last_success_timestamp_seconds
+            > clamp_min(3 * stillwell_poll_interval_seconds, 7200)
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.source }} has stored no new values for three of its intervals"
+          description: Its passes are failing, hearing nothing new from any station, being stopped at 50 minutes or for memory, blocked by the source, or not running. Check journalctl -u stillwell-ingest for the source's lines, and the polls table on the box for the passes that ended (server/deploy/README.md).
+      # Without these series the rule above can't fire. The metrics file outlives the poller, so a stopped poller
+      # shows as stale sources, not here.
+      - alert: StillwellMetricsMissing
+        expr: absent(stillwell_pass_last_end_timestamp_seconds)
+        for: 30m
+        labels: { severity: critical }
+        annotations:
+          summary: Grafana has no pass metrics from the Stillwell box
+          description: Alloy or the box is down, or the poller has never written /var/lib/stillwell/metrics. Check systemctl status stillwell-ingest alloy and journalctl -u alloy on the box.
+      # systemd counts only the restarts it makes because a process exited on its own (Restart=always after a
+      # crash or an out-of-memory kill of the whole unit). Deploys and manual restarts never count.
+      - alert: StillwellServiceCrashed
+        expr: increase(node_systemd_service_restart_total{name=~"(stillwell-ingest|alloy|clickhouse-server)\\.service"}[10m]) > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.name }} crashed and systemd restarted it"
+          description: The process exited on its own, so this is not a deploy or a systemctl restart. Run journalctl -u {{ $labels.name }} -n 100 on the box to see why.

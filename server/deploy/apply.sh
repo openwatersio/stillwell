@@ -130,11 +130,12 @@ app_stamp=/var/lib/stillwell-app.md5
 app_changed=
 if [ "$app_sum" != "$(cat "$app_stamp" 2>/dev/null)" ] || [ ! -d /opt/stillwell ]; then
 	app_changed=1
-	# Installed beside the running one and swapped in just before the restart, so a failed install leaves it as it was.
+	# Installed beside the running one and swapped in just before the restart, so a failed install leaves it as it was;
+	# without install scripts, which would run as root, and which no dependency has.
 	rm -rf /opt/stillwell.new
 	mkdir -p /opt/stillwell.new
 	cp -R "$app/package.json" "$app/package-lock.json" "$app/.mise.toml" "$app/src" "$app/server" /opt/stillwell.new/
-	(cd /opt/stillwell.new && PATH="/opt/node/bin:$PATH" npm ci --omit=dev --no-audit --no-fund --loglevel=error)
+	(cd /opt/stillwell.new && PATH="/opt/node/bin:$PATH" npm ci --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error)
 fi
 
 systemctl daemon-reload

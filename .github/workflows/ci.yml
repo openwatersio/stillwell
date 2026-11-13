@@ -65,8 +65,10 @@ jobs:
       - name: check the box isn't ahead
         id: ahead
         run: |
-          deployed=$(ssh root@"$DEPLOY_HOST" cat /var/lib/stillwell-deployed 2>/dev/null || true)
-          if [ -n "$deployed" ] && git fetch -q origin "$deployed" 2>/dev/null &&
+          # A box that can't be reached fails the job; one with no record deploys.
+          deployed=$(ssh root@"$DEPLOY_HOST" 'cat /var/lib/stillwell-deployed 2>/dev/null || true')
+          git fetch -q origin main
+          if [ -n "$deployed" ] && git cat-file -e "$deployed^{commit}" 2>/dev/null &&
             git merge-base --is-ancestor "$GITHUB_SHA" "$deployed"; then
             echo "the box runs $deployed, which has $GITHUB_SHA"
           else

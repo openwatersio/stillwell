@@ -4,9 +4,14 @@
 
 // The systemd collector counts, per unit, the restarts systemd made because the process exited on its own
 // (Restart=always after a crash or OOM kill). systemctl restart, which deploys use, never moves it, so it
-// tells a crash from a deploy.
+// tells a crash from a deploy. The textfile collector reads the poller's pass metrics, which it rewrites
+// after every pass (STILLWELL_METRICS in stillwell-ingest.service).
 prometheus.exporter.unix "host" {
-	enable_collectors = ["systemd"]
+	enable_collectors = ["systemd", "textfile"]
+
+	textfile {
+		directory = "/var/lib/stillwell/metrics"
+	}
 
 	systemd {
 		enable_restarts = true

@@ -14,5 +14,6 @@ else
 	stamp="rm -f /var/lib/stillwell-deployed"
 fi
 # Straight from git, so a Mac's tar never adds its ._ files to what lands in /etc.
+# One deploy at a time on the box, each in a directory of its own, so a deploy by hand and CI's never mix.
 git archive --format=tar.gz HEAD package.json package-lock.json .mise.toml src server |
-	ssh -o ServerAliveInterval=30 "$host" "rm -rf stillwell-deploy && mkdir stillwell-deploy && tar xzf - -C stillwell-deploy && sh stillwell-deploy/server/deploy/apply.sh && $stamp"
+	ssh -o ServerAliveInterval=30 "$host" "flock /run/stillwell-deploy.lock sh -c 'd=\$(mktemp -d) && tar xzf - -C \$d && sh \$d/server/deploy/apply.sh && $stamp; s=\$?; rm -rf \$d; exit \$s'"

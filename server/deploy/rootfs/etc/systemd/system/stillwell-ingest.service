@@ -14,6 +14,8 @@ EnvironmentFile=/etc/stillwell.env
 # and spills to .tmp in the working directory, so both are its state directory, the one place it can write.
 StateDirectory=stillwell
 Environment=HOME=/var/lib/stillwell
+# Each source's pass metrics, which Alloy's textfile collector ships to Grafana Cloud for the alerts.
+Environment=STILLWELL_METRICS=/var/lib/stillwell/metrics/stillwell.prom
 WorkingDirectory=/var/lib/stillwell
 ExecStart=/opt/node/bin/node /opt/stillwell/server/ingest.ts
 Restart=always
