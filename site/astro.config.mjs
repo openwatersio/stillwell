@@ -2,8 +2,6 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
-const sources = await fetch("https://stillwell.openwaters.io/sources.json").then((r) => r.json());
-
 export default defineConfig({
   integrations: [
     starlight({
@@ -12,20 +10,31 @@ export default defineConfig({
         { icon: "github", label: "GitHub", href: "https://github.com/openwatersio/stillwell" },
       ],
       sidebar: [
+        { label: "Introduction", slug: "docs" },
+        { label: "Getting started", slug: "docs/getting-started" },
         {
-          label: "Start here",
+          label: "Reference",
           items: [
-            { label: "Reading the data", slug: "guide/reading-the-data" },
-            { label: "Query the store", link: "/query/" },
+            "docs/reference/stations",
+            "docs/reference/gauges",
+            "docs/reference/series",
+            "docs/reference/datums",
+            "docs/reference/offsets",
+            "docs/reference/links",
+            "docs/reference/errata",
           ],
         },
         {
-          label: "Sources",
-          collapsed: true,
-          items: sources
-            .map((s) => ({ label: s.name, link: `/sources/${s.id}/` }))
-            .sort((a, b) => a.label.localeCompare(b.label)),
+          label: "Examples",
+          items: [
+            {
+              label: "Notebooks",
+              items: [{ autogenerate: { directory: "docs/examples/notebooks" } }],
+            },
+            { label: "Tools", items: [{ autogenerate: { directory: "docs/examples/tools" } }] },
+          ],
         },
+        { label: "Query the store", link: "/query/" },
       ],
     }),
   ],

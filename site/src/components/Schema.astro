@@ -1,0 +1,82 @@
+---
+// A file's columns as the store has them, with what each means. The build fails when the store and these
+// descriptions disagree, so a reference page can't fall behind its file.
+import { rows } from "../lib/store";
+import { url } from "../lib/paths";
+import markdownit from "markdown-it";
+
+interface Props {
+  /** The file's path in the store, such as stations.parquet or errata.json. */
+  file: string;
+  /** Markdown describing each column, by name. */
+  columns: Record<string, string>;
+}
+const { file, columns } = Astro.props;
+const source = url(file);
+const read = file.endsWith(".json") ? `read_json('${source}')` : `'${source}'`;
+const schema = await rows(`DESCRIBE SELECT * FROM ${read}`);
+const names = schema.map((c) => c.column_name as string);
+const undescribed = names.filter((n) => !(n in columns));
+const absent = Object.keys(columns).filter((n) => !names.includes(n));
+if (undescribed.length || absent.length)
+  throw new Error(
+    `${file}: ${undescribed.length ? `no description for ${undescribed.join(", ")}` : ""}${undescribed.length && absent.length ? "; " : ""}${absent.length ? `described but not in the file: ${absent.join(", ")}` : ""}`,
+  );
+const md = markdownit({ html: false, linkify: true });
+// Nested types spell out every field; the columns' descriptions say what's inside.
+const short = (type: string) =>
+  type.replace(/^STRUCT\(.*\)\[\]$/, "STRUCT[]").replace(/^STRUCT\(.*\)$/, "STRUCT");
+---
+
+<div class="schema not-content">
+  <p>
+    <code>{file}</code>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      {schema.map((c) => (
+        <tr id={`column-${c.column_name}`}>
+          <td>
+            <code>{c.column_name}</code>
+          </td>
+          <td class="type">{short(String(c.column_type))}</td>
+          <td set:html={md.renderInline(columns[c.column_name])} />
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .schema {
+    margin-block: 1rem;
+    font-size: var(--sl-text-sm);
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  td:first-child {
+    white-space: nowrap;
+  }
+  .type {
+    font-family: var(--sl-font-mono);
+    color: var(--sl-color-gray-3);
+    white-space: nowrap;
+  }
+</style>

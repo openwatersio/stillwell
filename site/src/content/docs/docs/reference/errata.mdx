@@ -1,0 +1,88 @@
+---
+title: Errata
+description: errata.json, the errors found in what sources publish, and what Stillwell does about each one.
+sidebar:
+  order: 7
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+An erratum is an error in what a source publishes: values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree. `errata.json` lists every erratum in the store, with the stations and span it's in, what's wrong, what Stillwell does about it, the evidence, and what the source's agency answered when told.
+
+Each source's errata live in the repository at `src/sources/<source>/errata.json`, reviewed with the code that handles them, and each entry's `url` links to that file. When an agency fixes its data and the store has fetched it again, the entry leaves `errata.json` and its ID is never used again.
+
+`errata.json` is a JSON array, one object per erratum. DuckDB reads it with `read_json`.
+
+## Schema
+
+<Schema
+  file="errata.json"
+  columns={{
+    id: "The erratum's ID, `<source>-<what>`, such as `uhslc-hong-kong-hour-early`.",
+    source: "The source that publishes the error.",
+    stations:
+      "The station IDs known to be affected; null for every station of the source. It can be partial or empty where the source doesn't say which stations, or they aren't in the store, and `error` says which.",
+    since:
+      "The first UTC day of values the error is in; null for an open start, or for an error in metadata.",
+    until:
+      "The UTC day after the last day of values the error is in; null for an open end, or for an error in metadata.",
+    error: "What the source publishes wrong.",
+    handling:
+      "What Stillwell does about it: `corrected`, `flagged`, `dropped`, `refused`, `avoided` or `kept`. See [Handling](#handling).",
+    response:
+      "What Stillwell does about it, in a sentence or two. What the store lacks or changed as a result can be wider than `since` to `until`, and this says so.",
+    evidence: "How the error was found and how sure it is, in Markdown.",
+    reported: "The day the error was first reported to the agency; null until then.",
+    report: "Where the report went and what the agency answered.",
+    url: "The file in the Stillwell repository that holds the entry.",
+  }}
+/>
+
+## Handling
+
+| `handling`  | What Stillwell does                                                      |
+| ----------- | ------------------------------------------------------------------------ |
+| `corrected` | Changes the values or metadata to what the source should have published. |
+| `flagged`   | Keeps the values and flags them `suspect` or worse.                      |
+| `dropped`   | Leaves the stations or values out.                                       |
+| `refused`   | Refuses the file, so its values are missing until the source fixes it.   |
+| `avoided`   | Doesn't use the wrong part, so nothing in the store is affected.         |
+| `kept`      | Keeps them as the source serves them.                                    |
+
+A `flagged` erratum with stations and a span marks those observed levels `suspect` wherever the store fetches or requalifies them; extremes aren't flagged. The source's own flag stays in `source_flag`, so `flag` can be worse than `source_flag` across the span. See [Flags](/docs/reference/series/#flags).
+
+## Stations
+
+The `errata` column of [`stations.parquet`](/docs/reference/stations/) lists the IDs of the errata that touch each station. An erratum whose `stations` is null is listed on every station of its source. Join on that column, rather than on `stations`, to find every erratum of a station.
+
+## Examples
+
+How many errata each source has, by handling:
+
+<QueryResult
+  sql={`PIVOT (SELECT source, handling FROM read_json('https://stillwell.openwaters.io/errata.json'))
+ON handling IN ('corrected', 'flagged', 'dropped', 'refused', 'avoided', 'kept')
+USING count(*)
+ORDER BY source`}
+/>
+
+The errata that touch one station, here Cuxhaven:
+
+<QueryResult
+  sql={`SELECT e.id, e.handling, e.since, e.until, e.reported
+FROM 'https://stillwell.openwaters.io/stations.parquet' s, unnest(s.errata) u(erratum)
+JOIN read_json('https://stillwell.openwaters.io/errata.json') e ON e.id = u.erratum
+WHERE s.id = 'pegelonline/5990020'
+ORDER BY e.id`}
+/>
+
+Active stations with observed levels whose values are flagged by an erratum, with the erratum's span:
+
+<QueryResult
+  sql={`SELECT s.id, s.name, e.id AS erratum, e.since, e.until
+FROM 'https://stillwell.openwaters.io/stations.parquet' s, unnest(s.errata) u(erratum)
+JOIN read_json('https://stillwell.openwaters.io/errata.json') e ON e.id = u.erratum
+WHERE e.handling = 'flagged' AND s.status = 'active' AND list_contains(s.products, 'levels')
+ORDER BY s.id LIMIT 10`}
+/>

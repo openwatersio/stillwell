@@ -1,0 +1,46 @@
+---
+title: Google Colab
+description: Read the store from a Google Colab notebook, which runs Python on a Google server.
+sidebar:
+  order: 3
+---
+
+[Google Colab](https://colab.research.google.com/) runs Jupyter notebooks on a virtual machine in Google's cloud, so the Python is ordinary server-side Python. DuckDB and Polars read the store over HTTPS and fetch only the parts of each file a query needs. Everything on the [Python](/docs/examples/tools/python/) page works as it stands.
+
+## First cells
+
+Install DuckDB. If the runtime already has it, pip says so and moves on:
+
+```python
+%pip install -q duckdb
+```
+
+Then connect and set the session to UTC:
+
+```python
+import duckdb
+
+STORE = "https://stillwell.openwaters.io"
+con = duckdb.connect()
+con.sql("SET TimeZone = 'UTC'")
+```
+
+A year of Hoek van Holland's levels, leaving out values flagged as suspect or bad:
+
+```python
+levels = con.sql(f"""
+    SELECT time, level_m
+    FROM '{STORE}/obs/rws/hoekvanholland/2024.parquet'
+    WHERE flag <= 2
+    ORDER BY time
+""").df()
+levels.plot(x="time", y="level_m")
+```
+
+The [Python](/docs/examples/tools/python/) page has the rest: finding a station, reading several years from a list of files, and converting to another datum, with DuckDB, Polars or pandas.
+
+## Things to know
+
+- The runtime's disk goes away when Colab recycles the machine. Write what you want to keep to Google Drive, or download it, for example with `COPY (...) TO 'levels.csv'` and the Files panel.
+- Times are UTC. DuckDB's `.df()` converts them to the session's time zone, so keep `SET TimeZone = 'UTC'` in the first cell.
+- `level_m` is a 32-bit float. Cast it to 64 bits before adding a datum offset, or round the result.

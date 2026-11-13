@@ -1,0 +1,96 @@
+---
+title: Gauges
+description: How stations.parquet links the stations of one physical gauge across sources, which one to read, and its tide station.
+sidebar:
+  order: 2
+---
+
+import QueryResult from "../../../../components/QueryResult.astro";
+
+A gauge is the instrument in the water. A station is one source's series of it. Many gauges are in more than one source: UHSLC carries copies of CO-OPS, REFMAR, Kartverket, SMHI and other agencies' gauges, REFMAR carries some of UHSLC's, BSH lists PEGELONLINE's gauges for its predictions, USACE districts publish many USGS gauges, and GESLA holds several agencies' copies of many gauges. Cuxhaven is eight stations: `pegelonline/5990020` for observed levels, `bsh/506P` for predictions, `uhslc/825`, and five GESLA records.
+
+`stations.parquet` links the stations of a gauge with `same_as`, names the one to read for its observed levels with `preferred`, and gives the gauge's record in slackwater-database, the tide prediction database, with `tide_station`. All three are worked out each time `stations.parquet` is built, so `preferred` moves when a series stops reporting, another's record grows longer, or the share of a record's values flagged suspect or bad changes.
+
+## Schema
+
+These columns are in `stations.parquet`. [Stations](/docs/reference/stations/) describes the rest.
+
+| Column         | Type        | Meaning                                                                                                                                                                                                                                                                               |
+| -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `same_as`      | `VARCHAR[]` | The other stations of the same physical gauge, such as a BSH prediction gauge and its PEGELONLINE series, or a UHSLC copy of a CO-OPS gauge. Linked stations form a group, and each lists every other, so a link through a third station counts. Empty when the station has no links. |
+| `preferred`    | `VARCHAR`   | The station to use for the gauge's observed levels, among this one and its `same_as`. It's the station's own `id` when it's the one, or when it has no links.                                                                                                                         |
+| `tide_station` | `VARCHAR`   | The gauge's station in slackwater-database: the station's own record, or the accepted record that replaces a copy slackwater-database rejected as a duplicate, or else the one linked to the station's `preferred` series or another of its `same_as`. Null where there's none.       |
+
+## How stations are matched
+
+A link comes from one of four places:
+
+1. **An ID the source gives.** BSH names each gauge's PEGELONLINE series. UHSLC's documentation files give the originator's station number, which links a UHSLC series to a CO-OPS station where the contributor is NOS, and to a JMA or JODC station where the contributor is JMA or JODC. GESLA's site codes are the originator's own IDs for NOAA, USGS, WSV, SMHI, REFMAR, Kartverket, SFWMD, California DWR and CDEC, JODC's Coast Guard, GSI and port authorities, and UHSLC, and GESLA's SMN records name the `unam` station in their file name. A source also links its own series of one gauge, such as UHSLC's versions, RWS's twins, and a CRMS site's series, which CPRA numbers anew each time it moves the site's gauge (`H01`, then `H02`). A link to a station no list has, or to another source's station more than 10 km away, is dropped as a wrong ID.
+2. **Nearness and name.** Two stations of different sources within 100 m are linked when their names share an identifying word and name the same side of any dam, lock or barrier, such as PEGELONLINE's `OP` and `UP`. Name alone never links, and neither does nearness between two stations of one source. CO-OPS is never linked this way with USGS or USACE, nor JMA with JODC: each agency runs its own gauges, so two of them at one pier are separate instruments that check each other.
+3. **A copy's best match.** UHSLC rounds its positions, so its copy of a gauge can sit a kilometer from the original. A copy whose own source didn't name the original is linked to the station in each other source within 2 km, of the same kind where both say, that shares the most words with its name, the nearest among equals. Two equally named candidates more than 100 m apart leave it unlinked.
+4. **A decision** in Stillwell's code, with a note on why.
+
+A link by nearness or by copy never puts two stations of one source in a group, since one of them is likelier another gauge close by: CO-OPS lists several stations at some piers. GESLA is the exception, since it holds several agencies' copies of many gauges. A decision can also keep two stations apart, even through a third. A GESLA record whose values are another gauge's joins no group and is its own preferred series.
+
+## The preferred series
+
+`preferred` names the group's best station by these, in order:
+
+1. a decision in Stillwell's code;
+2. it has observed levels (a BSH prediction gauge doesn't);
+3. its terms allow commercial use;
+4. it isn't a GESLA record, which is the fallback for a gauge no other series covers;
+5. it is active and still reporting, with a value in the last year;
+6. it is the originator's own series rather than a copy: a UHSLC station whose contributor isn't UHSLC, a REFMAR station named for UHSLC, a USACE station beside a USGS one (USACE districts relay the transmissions of gauges USGS runs), and a USGS station beside a CRMS one are copies;
+7. the longer record, its span from `first` to `last` times its share of values not flagged suspect or bad;
+8. the finer interval;
+9. the lower ID, so equals always break the same way.
+
+A series that allows commercial use wins over one that doesn't, even one still reporting, so `preferred` can name a stopped series when the gauge's live one is non-commercial. Once no series in a group still reports, the originator's longer record wins rather than the series that ended last. `preferred` can name an inactive station, so filter on `status` after picking, not before, or the gauge drops out.
+
+## Reading a gauge
+
+`WHERE preferred = id` gives one station per gauge, so a map or a count shows each gauge once. A station's other series are its `same_as`.
+
+For a gauge's whole record, read every station in its group. The others aren't always copies of the preferred series' values: a CRMS site's earlier series hold the years before its gauge moved, and a GESLA record can reach back before its originator's series starts. Cuxhaven's GESLA and UHSLC records start in 1917, and PEGELONLINE's in 1999. Series in a group can overlap, and the level can step where one hands over to the next. Each is measured from its own `datum`, so refer them to one datum with `datums` before putting them together (see [Datums](/docs/reference/datums/)).
+
+`preferred` is worked out again on every build, so a reader that must be reproducible, such as a datum reduction, records the series it read rather than looking it up again.
+
+## Examples
+
+A gauge by name, with its stations in each source:
+
+<QueryResult
+  sql={`SELECT id, products, preferred, tide_station
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%cuxhaven%'
+ORDER BY id`}
+/>
+
+How many gauges have observed levels, counting each once:
+
+<QueryResult
+  sql={`SELECT count(*) AS stations, count(*) FILTER (preferred = id) AS gauges
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE list_contains(products, 'levels')`}
+/>
+
+Every series of a gauge with observed levels, and the span each covers:
+
+<QueryResult
+  sql={`SELECT s.id, s.status, s.commercial_use, s.first::DATE AS first, s.last::DATE AS last
+FROM 'https://stillwell.openwaters.io/stations.parquet' g
+JOIN 'https://stillwell.openwaters.io/stations.parquet' s
+  ON s.id = g.id OR list_contains(g.same_as, s.id)
+WHERE g.id = 'pegelonline/5990020' AND list_contains(s.products, 'levels')
+ORDER BY s.first, s.id`}
+/>
+
+The gauges carried by the most stations:
+
+<QueryResult
+  sql={`SELECT id, name, len(same_as) + 1 AS stations, status
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE preferred = id
+ORDER BY stations DESC, id LIMIT 5`}
+/>

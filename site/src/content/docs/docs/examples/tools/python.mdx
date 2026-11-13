@@ -1,0 +1,302 @@
+---
+title: Python
+description: Read the store from Python with DuckDB, Polars or pandas.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+DuckDB, Polars and pandas all read the store's Parquet files over HTTPS. DuckDB and Polars fetch only the parts of a file a query needs. pandas downloads each whole file, which is fine for one station's year (about 250 KB) and slower for `stations.parquet` (about 2 MB).
+
+Every example uses Hoek van Holland, `rws/hoekvanholland`. Pick a library once and the tabs below follow it.
+
+## Install
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```sh
+pip install duckdb pandas
+```
+
+pandas is only needed for `.df()`. DuckDB downloads its `httpfs` extension the first time it reads an `https://` path.
+
+</TabItem>
+<TabItem label="Polars">
+
+```sh
+pip install polars
+```
+
+</TabItem>
+<TabItem label="pandas">
+
+```sh
+pip install pandas pyarrow
+```
+
+</TabItem>
+</Tabs>
+
+## Read the station list
+
+[`stations.parquet`](/docs/reference/stations/) has one row per station. The active ones with observed levels:
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```python
+import duckdb
+
+STORE = "https://stillwell.openwaters.io"
+con = duckdb.connect()
+con.sql("SET TimeZone = 'UTC'")
+
+stations = con.sql(f"""
+    SELECT id, name, lat, lon, datum, datums
+    FROM '{STORE}/stations.parquet'
+    WHERE status = 'active' AND list_contains(products, 'levels')
+""").df()
+```
+
+</TabItem>
+<TabItem label="Polars">
+
+```python
+import polars as pl
+
+STORE = "https://stillwell.openwaters.io"
+
+stations = pl.read_parquet(
+    f"{STORE}/stations.parquet",
+    columns=["id", "name", "lat", "lon", "datum", "datums", "status", "products"],
+).filter((pl.col("status") == "active") & pl.col("products").list.contains("levels"))
+```
+
+</TabItem>
+<TabItem label="pandas">
+
+```python
+import pandas as pd
+
+STORE = "https://stillwell.openwaters.io"
+
+stations = pd.read_parquet(
+    f"{STORE}/stations.parquet",
+    columns=["id", "name", "lat", "lon", "datum", "datums"],
+    filters=[("status", "==", "active")],
+)
+```
+
+</TabItem>
+</Tabs>
+
+## Find a station
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```python
+con.sql(f"""
+    SELECT id, name, datum, datums
+    FROM '{STORE}/stations.parquet'
+    WHERE name ILIKE '%hoek van holland%'
+""").show()
+```
+
+</TabItem>
+<TabItem label="Polars">
+
+```python
+stations.filter(pl.col("name").str.contains("(?i)hoek van holland"))
+```
+
+</TabItem>
+<TabItem label="pandas">
+
+```python
+stations[stations.name.str.contains("hoek van holland", case=False)]
+```
+
+</TabItem>
+</Tabs>
+
+The [Stations](/docs/reference/stations/#examples) page has more ways to find one, such as the nearest stations to a point.
+
+## Read a year of levels
+
+Each station's observed levels are one file per year at `obs/<source>/<source_id>/<year>.parquet`. `flag <= 2` leaves out values flagged as suspect or bad:
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```python
+levels = con.sql(f"""
+    SELECT time, level_m
+    FROM '{STORE}/obs/rws/hoekvanholland/2024.parquet'
+    WHERE flag <= 2
+    ORDER BY time
+""").df()
+```
+
+</TabItem>
+<TabItem label="Polars">
+
+```python
+levels = (
+    pl.read_parquet(f"{STORE}/obs/rws/hoekvanholland/2024.parquet", columns=["time", "level_m", "flag"])
+    .filter(pl.col("flag") <= 2)
+    .sort("time")
+)
+```
+
+</TabItem>
+<TabItem label="pandas">
+
+```python
+levels = pd.read_parquet(
+    f"{STORE}/obs/rws/hoekvanholland/2024.parquet",
+    columns=["time", "level_m"],
+    filters=[("flag", "<=", 2)],
+)
+```
+
+</TabItem>
+</Tabs>
+
+```
+                       time  level_m
+0 2024-01-01 00:00:00+00:00     0.07
+1 2024-01-01 00:10:00+00:00     0.07
+2 2024-01-01 00:20:00+00:00     0.07
+```
+
+## Read several years
+
+HTTPS has no directory listing, so a wildcard path doesn't work, and a missing file is an error. Build the list of files from [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has), which has a row for every year file that exists:
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```python
+years = con.sql(f"""
+    SELECT year
+    FROM '{STORE}/stations/years/rws.parquet'
+    WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+    ORDER BY year
+""").fetchall()
+files = [f"{STORE}/obs/rws/hoekvanholland/{year}.parquet" for (year,) in years]
+
+levels = con.execute("""
+    SELECT time, level_m
+    FROM read_parquet($files, union_by_name = true)
+    WHERE flag <= 2
+    ORDER BY time
+""", {"files": files}).df()
+```
+
+`union_by_name = true` lets files with different columns read together, since some older files lack `source_flag`.
+
+</TabItem>
+<TabItem label="Polars">
+
+```python
+years = (
+    pl.read_parquet(f"{STORE}/stations/years/rws.parquet", columns=["id", "epoch", "year"])
+    .filter((pl.col("id") == "rws/hoekvanholland") & (pl.col("epoch") == 1) & pl.col("year").is_between(2020, 2024))
+    .sort("year")
+)
+files = [f"{STORE}/obs/rws/hoekvanholland/{year}.parquet" for year in years["year"]]
+
+levels = (
+    pl.scan_parquet(files)
+    .select("time", "level_m", "flag")
+    .filter(pl.col("flag") <= 2)
+    .sort("time")
+    .collect()
+)
+```
+
+Select the columns before collecting, since some older files lack `source_flag`.
+
+</TabItem>
+<TabItem label="pandas">
+
+```python
+years = pd.read_parquet(
+    f"{STORE}/stations/years/rws.parquet",
+    columns=["year"],
+    filters=[("id", "==", "rws/hoekvanholland"), ("epoch", "==", 1), ("year", ">=", 2020), ("year", "<=", 2024)],
+)
+files = [f"{STORE}/obs/rws/hoekvanholland/{year}.parquet" for year in sorted(years.year)]
+
+levels = pd.concat(
+    [pd.read_parquet(f, columns=["time", "level_m"], filters=[("flag", "<=", 2)]) for f in files],
+    ignore_index=True,
+)
+```
+
+</TabItem>
+</Tabs>
+
+`epoch = 1` keeps to the station's plain path. A station whose source moved it to another reference has later files under `obs/<source>/<source_id>/<epoch>/`, as [Datum epochs](/docs/reference/datums/#datum-epochs) describes.
+
+The path holds the station's `source_id` URL-encoded twice, so an `@` is `%2540`. Only one station in the store has a character that needs it. [File paths](/docs/getting-started/#file-paths) has the rule:
+
+```python
+from urllib.parse import quote
+
+source_id = "byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs"
+path = f"obs/gesla/{quote(quote(source_id, safe=''), safe='')}"
+```
+
+## Convert to another datum
+
+`datums` maps each datum the station has an offset to, in meters, to add to a level in its own `datum`. Hoek van Holland's levels are in NAP; adding `datums["LAT"]` refers them to LAT:
+
+<Tabs syncKey="python-library">
+<TabItem label="DuckDB">
+
+```python
+levels = con.sql(f"""
+    SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
+    FROM '{STORE}/obs/rws/hoekvanholland/2024.parquet' o,
+      (SELECT datums FROM '{STORE}/stations.parquet' WHERE id = 'rws/hoekvanholland') s
+    WHERE o.flag <= 2
+    ORDER BY o.time
+""").df()
+```
+
+</TabItem>
+<TabItem label="Polars">
+
+```python
+datums = stations.filter(pl.col("id") == "rws/hoekvanholland")["datums"][0]
+levels = levels.with_columns((pl.col("level_m").cast(pl.Float64) + datums["LAT"]).round(3))
+```
+
+Polars 2 reads `datums` as a map, which comes out as a `dict`.
+
+</TabItem>
+<TabItem label="pandas">
+
+```python
+datums = dict(stations.set_index("id").loc["rws/hoekvanholland", "datums"])
+levels["level_m"] = (levels.level_m.astype("float64") + datums["LAT"]).round(3)
+```
+
+pyarrow reads `datums` as a list of `(datum, offset)` pairs, so `dict()` turns it into a dictionary.
+
+</TabItem>
+</Tabs>
+
+`datums` describes the station's current epoch. [Converting a level](/docs/reference/datums/#converting-a-level) covers earlier epochs, and [Credits](/docs/reference/datums/#credits) the credits owed for offsets that don't come from the source.
+
+## Things to know
+
+- Times are UTC, as `TIMESTAMPTZ`. Polars and pandas keep them in UTC. DuckDB's `.df()` converts them to the session's time zone, so run `SET TimeZone = 'UTC'` first.
+- Levels are meters, in the `datum` column of the same file.
+- `level_m` is a 32-bit float. Cast it to 64 bits before adding an offset, or round the result, to avoid values such as `1.0730000002980231`.
+- Read only the columns you need. DuckDB and Polars then fetch only those columns' bytes.
+- [Series](/docs/reference/series/) describes every column and product, including extremes and predictions.

@@ -1,0 +1,76 @@
+---
+title: JupyterLite
+description: Read the store from a JupyterLite notebook, which runs Python in your browser.
+sidebar:
+  order: 4
+---
+
+[JupyterLite](https://jupyterlite.readthedocs.io/) is JupyterLab running entirely in the browser. Its Python kernel is [Pyodide](https://pyodide.org/), Python compiled to WebAssembly, so there's no server and no account: the [JupyterLite demo](https://jupyterlite.github.io/demo/) runs the code below as it stands.
+
+## What runs where
+
+Everything runs in your browser tab. That has two consequences for the store:
+
+- **Python can't open HTTPS connections itself.** DuckDB can't read an `https://` path in Pyodide, and pandas fails with "TLS not supported". Download each file with Pyodide's `pyfetch`, which uses the browser's `fetch`, and read the local copy.
+- **Each file is downloaded whole.** A station's year is about 250 KB and `stations.parquet` about 2 MB, so a few years of one station load in seconds. A source's years list, such as `stations/years/gesla.parquet`, is up to about 3 MB.
+
+Downloads go to `/tmp`, which is in memory and gone when the tab closes.
+
+## First cells
+
+JupyterLite loads a package when a cell imports it, so there's nothing to install. Import pandas yourself, since DuckDB's `.df()` needs it, and `tzdata`, which DuckDB needs for time zones:
+
+```python
+import duckdb
+import pandas
+import tzdata
+from pyodide.http import pyfetch
+
+async def download(path):
+    response = await pyfetch(f"https://stillwell.openwaters.io/{path}")
+    local = "/tmp/" + path.replace("/", "_")
+    with open(local, "wb") as f:
+        f.write(await response.bytes())
+    return local
+
+con = duckdb.connect()
+con.sql("SET TimeZone = 'UTC'")
+```
+
+A year of Hoek van Holland's levels, leaving out values flagged as suspect or bad:
+
+```python
+file = await download("obs/rws/hoekvanholland/2024.parquet")
+levels = con.sql(f"""
+    SELECT time, level_m
+    FROM '{file}'
+    WHERE flag <= 2
+    ORDER BY time
+""").df()
+```
+
+Several years, from the list of files that exist in [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has):
+
+```python
+years_file = await download("stations/years/rws.parquet")
+years = con.sql(f"""
+    SELECT year FROM '{years_file}'
+    WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+    ORDER BY year
+""").fetchall()
+files = [await download(f"obs/rws/hoekvanholland/{year}.parquet") for (year,) in years]
+
+levels = con.execute("""
+    SELECT time, level_m
+    FROM read_parquet($files, union_by_name = true)
+    WHERE flag <= 2
+    ORDER BY time
+""", {"files": files}).df()
+```
+
+Once a file is local, the SQL is the same as anywhere else. The [Python](/docs/examples/tools/python/) page has the rest, such as converting to another datum.
+
+## Limits
+
+- Memory is the browser tab's. Keep to the columns and years you need.
+- Notebooks you save are kept in the browser's storage for that site. Download a notebook to keep it elsewhere.

@@ -1,0 +1,229 @@
+---
+title: Series
+description: The year files of observed levels, extremes and predictions, recent/, what flags mean, and the years lists that say which files exist.
+sidebar:
+  order: 3
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+A series is one station's values over time. Each product has a directory, with one Parquet file per station per UTC year:
+
+```
+obs/<source>/<station>/<year>.parquet                 observed levels
+extremes/<source>/<station>/<year>.parquet            the source's observed high and low waters
+predictions/<source>/<station>/<year>.parquet         the source's predicted curve
+predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
+recent/<source>.parquet                               the last 7 days of observed levels, for every live station of a source
+stations/years/<source>.parquet                       every year file of observed levels the source has
+```
+
+`<station>` is the station's `source_id` from [`stations.parquet`](/docs/reference/stations/), URL-encoded, so the path is the station's `id` with the product in front: `rws/hoekvanholland` has its 2024 levels at `obs/rws/hoekvanholland/2024.parquet`. The object key holds the encoded ID, so a URL encodes it twice: `gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs` is at `obs/gesla/byu_queue_de_tortue_%2540_riceville_la-8012300-usa-usgs/2024.parquet`. Ordinary IDs are unaffected. See [Getting started](/docs/getting-started/#file-paths).
+
+When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path. Rows from different epochs are in different datums. [Datums](/docs/reference/datums/#datum-epochs) shows how to read across them.
+
+Scheduled ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC. Which of the four products a station has is in its `products` column in `stations.parquet`.
+
+## Schema
+
+<Schema
+  file="obs/rws/hoekvanholland/2024.parquet"
+  columns={{
+    time: "UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.",
+    level_m: "The level in meters, in `datum`.",
+    flag: "Quality, from 0 good to 4 bad, after Stillwell's quality checks. See [Flags](#flags).",
+    source_flag:
+      "The source's own flag on the same scale, before Stillwell's quality checks. See [Flags](#flags).",
+    received: "When ingest first saw the value arrive; null for backfilled history.",
+    datum:
+      "The reference `level_m` is measured from, the same on every row. It matches the epoch's `datum` in `stations.parquet`. See [Datums](/docs/reference/datums/).",
+  }}
+/>
+
+`predictions/` files have the same columns. `source_flag` is null in predictions, and some older files of either product don't have the column.
+
+<Schema
+  file="extremes/rws/hoekvanholland/2024.parquet"
+  columns={{
+    time: "UTC time of the high or low water.",
+    level_m: "The level in meters, in `datum`.",
+    type: "`high` or `low`. A source can give both lows of a double low water, so two lows can come in a row.",
+    flag: "Quality on the same scale as levels. See [Flags](#flags).",
+    datum: "The reference `level_m` is measured from.",
+  }}
+/>
+
+`predicted-extremes/` files have the same columns. BSH's also carry its lunar transit number and event index:
+
+<Schema
+  file="predicted-extremes/bsh/506P/2026.parquet"
+  columns={{
+    time: "UTC time of the predicted high or low water.",
+    level_m: "The predicted level in meters, in `datum`.",
+    type: "`high` or `low`.",
+    flag: "Quality on the same scale as levels. See [Flags](#flags).",
+    transit: "BSH's number for the lunar transit the high or low water follows.",
+    event:
+      "Which one it is after that transit: 1 high water after the upper transit, 2 low water after the upper, 3 high water after the lower, 4 low water after the lower.",
+    datum: "The reference `level_m` is measured from.",
+  }}
+/>
+
+`recent/<source>.parquet` holds the last 7 days of observed levels for the source's `live` stations, in one file:
+
+<Schema
+  file="recent/rws.parquet"
+  columns={{
+    station: "The station's `id`, as in `stations.parquet`.",
+    time: "UTC, as `TIMESTAMPTZ`.",
+    level_m: "The level in meters, in the epoch's datum.",
+    flag: "Quality, from 0 good to 4 bad. See [Flags](#flags).",
+    source_flag: "The source's own flag, before Stillwell's quality checks.",
+    received: "When ingest first saw the value arrive.",
+    epoch:
+      "The datum epoch the value belongs to. Rows from different epochs are in different datums.",
+  }}
+/>
+
+## Flags
+
+`flag` runs from best to worst:
+
+| `flag` | Meaning      |
+| ------ | ------------ |
+| 0      | good         |
+| 1      | interpolated |
+| 2      | preliminary  |
+| 3      | suspect      |
+| 4      | bad          |
+
+`flag <= 2` keeps everything not flagged as a problem. Source flags fold into this scale. Stillwell's quality checks only ever mark a value suspect or bad, so `flag` is never better than `source_flag`. A value that a rule no longer flags is clear again once the checks rerun over it: they run on every value ingest fetches, and on stored years when the Monthly workflow requalifies a station after a rule changes. A value without a `source_flag` that the checks marked suspect or bad keeps its mark.
+
+`source_flag` keeps the source's own judgment, so a value the source verified (0 or 1) still shows as verified where Stillwell marked it suspect. Stillwell can also mark a span worse than its source does without changing `source_flag`, as an [erratum](/docs/reference/errata/) can. Read `flag` to skip what shouldn't be used. Where a source doesn't mark which values it has checked, its adapter decides, as its README says. Where a value's `source_flag` is null and its `flag` is better than suspect, the flag is the source's.
+
+### Preliminary values
+
+A `preliminary` value is one the source hasn't checked. Two signals mark the ones it never will:
+
+- every `preliminary` value from a source whose `finalizes` is false in `sources.json`;
+- values from before a station's [`source_qc_start`](/docs/reference/stations/#where-the-source-checks-its-values).
+
+Those have passed only Stillwell's checks and stay `preliminary`. Such a source can still revise a value, which reaches the store only when ingest fetches it again. Elsewhere a `preliminary` value may be checked later, and the Monthly refetch reads the last three years again for it, but some never are, without a sign. Each source's README says how it marks checked values.
+
+## Which years a station has
+
+HTTPS has no directory listing, and a year with no values has no file, so a missing file and a failed download look alike. `stations/years/<source>.parquet` settles it, with one row per year file of observed levels the source has, in every epoch:
+
+<Schema
+  file="stations/years/rws.parquet"
+  columns={{
+    id: "The station's `id`, as in `stations.parquet`.",
+    epoch:
+      "The datum epoch whose files hold the year, 1 for the plain path. Null marks a station whose rows may be out of date.",
+    year: "The UTC year. Null marks a station whose rows may be out of date.",
+    hours: "How many UTC hours hold at least one value, of any flag.",
+    good: "How many values have `flag` 0.",
+    interpolated: "How many values have `flag` 1.",
+    preliminary: "How many values have `flag` 2.",
+    suspect: "How many values have `flag` 3.",
+    bad: "How many values have `flag` 4.",
+    version:
+      "A hash of the file's rows. It changes when any row's `time`, `level_m`, `flag`, `source_flag` or `received` does, and only then.",
+  }}
+/>
+
+A year between a station's first and last rows with no row of its own has no values. The list covers `obs/` only, not extremes or predictions. Every run that writes a year file of levels updates it, and compaction checks each night that every file has a row and every row a file.
+
+A row with no `epoch` or `year` marks a station whose rows may be out of date, and which may have a year with a file but no row: a run is writing its files, or one stopped partway or couldn't read one of them and the nightly check hasn't caught up. Read again later, or read the files and don't trust their versions. A mark from a stopped run usually clears the next night, but a station with many files can stay marked a few nights.
+
+### Caching
+
+To keep a local copy of a year, read its row in the years list first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after a run rewrote the file holds newer rows than the version stored with it, which costs one more download next time, never a stale copy. Read the other way round, it can store an old version beside new rows. Don't cache a station's years while it's marked.
+
+A file's HTTP `ETag` also works for a conditional request with `If-None-Match`. Treat it as an opaque tag to compare with the last one seen, not as a checksum: an object uploaded in several parts has an `ETag` that isn't its MD5.
+
+## Reading many files
+
+Wildcards such as `obs/rws/*/2024.parquet` don't work over HTTPS. Build the list of paths, then pass it to `read_parquet`, with `union_by_name = true` when you select `*`, since some older files lack `source_flag`. A missing file is an error, so list only files the years list has.
+
+## Examples
+
+The first values of a year:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m, flag, datum
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+ORDER BY time LIMIT 5`}
+/>
+
+Monthly statistics, leaving out values flagged suspect or bad:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT date_trunc('month', time) AS month,
+  round(avg(level_m), 3) AS mean_m, round(min(level_m), 2) AS min_m,
+  round(max(level_m), 2) AS max_m, count(*) AS n
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2
+GROUP BY ALL ORDER BY month LIMIT 4`}
+/>
+
+How many values each flag has:
+
+<QueryResult
+  sql={`SELECT flag, count(*) AS n
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+GROUP BY flag ORDER BY flag`}
+/>
+
+The year's highest high waters, as RWS selected them:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m
+FROM 'https://stillwell.openwaters.io/extremes/rws/hoekvanholland/2024.parquet'
+WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
+/>
+
+The surge, as observed minus RWS's own prediction, at its largest:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT o.time, o.level_m AS observed_m, p.level_m AS predicted_m,
+  round(o.level_m - p.level_m, 2) AS residual_m
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o
+JOIN 'https://stillwell.openwaters.io/predictions/rws/hoekvanholland/2024.parquet' p USING (time)
+ORDER BY abs(o.level_m - p.level_m) DESC LIMIT 3`}
+/>
+
+Several years of one station, read from a list of paths:
+
+<QueryResult
+  sql={`SET VARIABLE files = (
+  SELECT list('https://stillwell.openwaters.io/obs/rws/hoekvanholland/' || y || '.parquet')
+  FROM range(2020, 2025) t(y)
+);
+SELECT count(*) AS n FROM read_parquet(getvariable('files'), union_by_name = true)`}
+/>
+
+The years of one station since 2020, with how much of each its source hasn't checked:
+
+<QueryResult
+  sql={`SELECT epoch, year, hours, good + interpolated AS checked, preliminary, suspect + bad AS flagged, version
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland' AND year >= 2020
+ORDER BY epoch, year`}
+/>
+
+The paths of those years, to pass to `read_parquet` as above:
+
+<QueryResult
+  sql={`SELECT list('https://stillwell.openwaters.io/obs/' || id ||
+  CASE WHEN epoch = 1 THEN '' ELSE '/' || epoch END || '/' || year || '.parquet' ORDER BY epoch, year) AS files
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland' AND year >= 2020`}
+/>
+
+That works for an `id` whose `source_id` needs no URL-encoding. One with a `/`, `@`, space or other reserved character needs its `source_id` encoded twice in the path, as above.

@@ -1,0 +1,51 @@
+---
+title: Kaggle
+description: Read the store from a Kaggle notebook, which runs Python on a Kaggle server.
+sidebar:
+  order: 5
+---
+
+[Kaggle](https://www.kaggle.com/code) notebooks run on Kaggle's servers, so the Python is ordinary server-side Python. DuckDB and Polars read the store over HTTPS and fetch only the parts of each file a query needs. Everything on the [Python](/docs/examples/tools/python/) page works as it stands, once the notebook can reach the internet.
+
+## Internet access
+
+If the notebook's **Internet** setting is off, installing packages and reading the store both fail with connection errors. Turn it on in the notebook's settings panel.
+
+## First cells
+
+Install DuckDB. If the image already has it, pip says so and moves on:
+
+```python
+%pip install -q duckdb
+```
+
+Then connect and set the session to UTC:
+
+```python
+import duckdb
+
+STORE = "https://stillwell.openwaters.io"
+con = duckdb.connect()
+con.sql("SET TimeZone = 'UTC'")
+```
+
+A year of Hoek van Holland's levels, leaving out values flagged as suspect or bad:
+
+```python
+levels = con.sql(f"""
+    SELECT time, level_m
+    FROM '{STORE}/obs/rws/hoekvanholland/2024.parquet'
+    WHERE flag <= 2
+    ORDER BY time
+""").df()
+levels.plot(x="time", y="level_m")
+```
+
+The [Python](/docs/examples/tools/python/) page has the rest: finding a station, reading several years from a list of files, and converting to another datum, with DuckDB, Polars or pandas.
+
+## Things to know
+
+- Files you write go to `/kaggle/working`, which Kaggle keeps as the notebook's output when you save a version.
+- Times are UTC. DuckDB's `.df()` converts them to the session's time zone, so keep `SET TimeZone = 'UTC'` in the first cell.
+- `level_m` is a 32-bit float. Cast it to 64 bits before adding a datum offset, or round the result.
+- Each station's data comes under its own terms, in `license`, `commercial_use` and `attribution` in [`stations.parquet`](/docs/reference/stations/#terms). Check them before publishing a notebook or dataset built from it.

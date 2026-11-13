@@ -1,0 +1,150 @@
+---
+title: Stations
+description: stations.parquet, one row per station, with its position, datums, links to other sources, record and terms.
+sidebar:
+  order: 1
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+A station is one source's series at one place. `stations.parquet` has a row for every station in the store, active or not: where it is, what it measures from, which products it has, how far back its record goes, whether it carries a tide, and the terms its data comes under. It's the place to start any question, since every other file is named by a station's `id`.
+
+A station isn't always a gauge of its own. Cuxhaven, for example, is `pegelonline/5990020` for observed levels and `bsh/506P` for predictions, and GESLA and UHSLC hold copies of it too. [Gauges](/docs/reference/gauges/) describes how those stations link to each other.
+
+`stations.parquet` is rebuilt after compaction each night, so its record spans usually trail the store by about a day.
+
+## Schema
+
+<Schema
+  file="stations.parquet"
+  columns={{
+    id: "The station's ID, `<source>/<source_id>`, such as `rws/hoekvanholland`. Every other file names a station by it.",
+    source: "The source that publishes the station's data, as in `sources.json`.",
+    source_id:
+      "The source's own ID for the station. Series paths hold it URL-encoded (see [Getting started](/docs/getting-started/#file-paths)).",
+    name: "The station's name, as the source gives it.",
+    lat: "Latitude in degrees, as the source gives it or as Stillwell corrects it where a source places a station away from its gauge.",
+    lon: "Longitude in degrees, likewise.",
+    country_code: "ISO 3166-1 alpha-2 country code.",
+    kind: "`coastal`, `estuary`, `lake` or `river`, from the source or from Stillwell's own list; null where neither says.",
+    interval_s: "The usual interval between values, in seconds.",
+    datum:
+      "The reference the station's levels are measured from, in the source's own name for it. See [Datums](/docs/reference/datums/).",
+    datums:
+      "Meters to add to a level in `datum` to refer it to each other datum. See [Datums](/docs/reference/datums/).",
+    datums_source:
+      "Where each offset in `datums` came from. See [Datums](/docs/reference/datums/).",
+    datums_epoch:
+      "The period each tidal datum in `datums` was reduced over. See [Datums](/docs/reference/datums/).",
+    datums_attribution:
+      "The credits owed for offsets that don't come from the source itself. See [Datums](/docs/reference/datums/).",
+    chart_datum:
+      "The datum charts use at the station, such as `MLLW`, `LAT`, `SKN` or `CD`. See [Datums](/docs/reference/datums/).",
+    frame:
+      "Whether levels line up with the predictions of the station's tide record. See [Datums](/docs/reference/datums/).",
+    products:
+      "Which of `levels`, `extremes`, `predictions` and `predicted_extremes` the station has. See [Series](/docs/reference/series/).",
+    first: "The station's first observation, over all its datum epochs; null before it has any.",
+    last: "The station's last observation; null before it has any.",
+    license:
+      "The license of the station's data, as an SPDX identifier or the source's own name for its terms.",
+    commercial_use:
+      "Whether the station's terms allow commercial use. Where a contributor's own terms apply, as at some UHSLC and GESLA records, this follows them.",
+    attribution:
+      "The credit the station's data requires, including a contributor's where its terms apply.",
+    tide_station:
+      "The station's record in slackwater-database, the tide prediction database. See [Gauges](/docs/reference/gauges/).",
+    same_as: "Other stations of the same physical gauge. See [Gauges](/docs/reference/gauges/).",
+    preferred:
+      "The station to use for the gauge's observed levels. See [Gauges](/docs/reference/gauges/).",
+    errata:
+      "The IDs of errors found in what the source publishes for this station. See [Errata](/docs/reference/errata/).",
+    status:
+      "`active` or `inactive`. A station the source stops listing stays in the store, inactive, with its history.",
+    live: "Whether the hourly ingest polls the station into `recent/`.",
+    min_interval_s:
+      "How often the source lets Stillwell ask for the station, in seconds, where it says.",
+    source_qc_start:
+      "Where the source's own quality checks of the station's values start, in UTC; null where unknown.",
+    source_qc_start_inferred:
+      "Whether Stillwell inferred `source_qc_start` from the source's flags (true) or the source stated it (false).",
+    tidal:
+      "Whether the station's levels carry a tide, measured from its last year in the store; null before its first analysis.",
+    tide_m: "The amplitudes of M2 and O1 added, in meters, that `tidal` is judged by.",
+    source_url: "The station's page at its source.",
+    epochs:
+      "Each span over which the station's levels share one reference. See [Datums](/docs/reference/datums/#datum-epochs).",
+  }}
+/>
+
+## Status and polling
+
+A station stays in the store when its source stops listing it: it becomes `inactive`, and its history stays. A source can also list a station as ended, such as a CO-OPS station with a `removed` date that's off the current network, and its adapter marks it inactive. `live` stations are polled every hour into `recent/<source>.parquet`; the rest arrive with backfills and the monthly refetch. `min_interval_s` is the source's own limit on how often a station may be asked for, where it states one.
+
+## Record
+
+`first` and `last` bound the station's observations over all its datum epochs, from what compaction and backfill write. They're null for a station with no observations yet, which happens while a source's history is still being backfilled. The years a station actually has, and how many values each holds by flag, are in its source's years list: see [Series](/docs/reference/series/#which-years-a-station-has).
+
+## Where the source checks its values
+
+`source_qc_start` is where the source's quality checks of the station's values start. A source's `preliminary` values before it won't be checked, so they won't change. Null means unknown: it doesn't mean the source never checks the station's values, or that it has checked them all. `source_qc_start_inferred` says whether Stillwell worked the date out from the source's flags or the source stated it; add `source_qc_start_inferred = false` to keep to stated dates. Each source's README says where its dates come from.
+
+## Tide
+
+`tidal` says whether a station's water carries a tide, measured from its levels rather than taken from `kind`: a river can be tidal, and the Baltic isn't. It's true where M2's and O1's amplitudes, fitted over the station's last year of usable values and added as `tide_m`, come to 8 cm or more, with exceptions for water well above sea level and for creeks that drain to a sill. Both are null where the values span under 30 days or are sampled too coarsely to fit, and before the station's first analysis. Stillwell's quality checks for flatlines, outliers, held readings and jumps away from the tide follow `tidal`.
+
+## Terms
+
+Each station carries its terms: `license` is its source's, `commercial_use` says whether those terms allow commercial use, and `attribution` is the credit to show wherever its data is shown. Where a contributor's own terms apply, as at some UHSLC and GESLA records, `commercial_use` follows them and `attribution` adds the contributor's credit. Credit the offsets that don't come from the source too: they're in `datums_attribution`.
+
+## Examples
+
+How many stations each source has, and in which datums:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, string_agg(DISTINCT datum, ', ' ORDER BY datum) AS datums
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active'
+GROUP BY source ORDER BY source`}
+/>
+
+A station by name:
+
+<QueryResult
+  sql={`SELECT id, name, kind, status, first, last
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%hoek van holland%'
+ORDER BY id`}
+/>
+
+The nearest active stations with observed levels to a point, here the mouth of the Nieuwe Waterweg, one per gauge:
+
+<QueryResult
+  sql={`SELECT id, name,
+  round(6371 * acos(least(1,
+    sin(radians(lat)) * sin(radians(51.98)) +
+    cos(radians(lat)) * cos(radians(51.98)) * cos(radians(lon - 4.12)))), 2) AS km
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active' AND list_contains(products, 'levels') AND preferred = id
+ORDER BY km LIMIT 5`}
+/>
+
+Tidal stations whose terms allow commercial use, by source:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, round(median(tide_m), 2) AS median_tide_m
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE tidal AND commercial_use AND status = 'active'
+GROUP BY source ORDER BY stations DESC`}
+/>
+
+Where sources start checking their values, for the stations that have a date:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, min(source_qc_start)::DATE AS earliest,
+  max(source_qc_start)::DATE AS latest, bool_or(source_qc_start_inferred) AS any_inferred
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE source_qc_start IS NOT NULL
+GROUP BY source ORDER BY source`}
+/>

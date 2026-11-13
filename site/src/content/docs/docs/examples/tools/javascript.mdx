@@ -1,0 +1,309 @@
+---
+title: JavaScript
+description: Read the store in the browser or in Node, with DuckDB or hyparquet.
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+The store's files can be read from a web page or from Node. The bucket allows cross-origin `GET` and `HEAD` requests with a `Range` header, so a page on any site can read it, one part of a file at a time.
+
+- **DuckDB** runs SQL. In the browser it's [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview); in Node it's [`@duckdb/node-api`](https://duckdb.org/docs/api/node_neo/overview). The SQL is the same as on the [DuckDB CLI](/docs/examples/tools/duckdb/) page.
+- **[hyparquet](https://github.com/hyparam/hyparquet)** reads Parquet into plain objects, with no SQL and a small download. It runs the same in the browser and in Node. The store's files are compressed with ZSTD, so it needs `hyparquet-compressors` too.
+
+Every example uses Hoek van Holland, `rws/hoekvanholland`.
+
+## Install
+
+<Tabs syncKey="js-library">
+<TabItem label="DuckDB-WASM">
+
+In a page, import it from a CDN. DuckDB-WASM loads its WebAssembly and worker from the same CDN:
+
+```js
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32.0/+esm";
+
+const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+const worker = await duckdb.createWorker(bundle.mainWorker);
+const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
+await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+const con = await db.connect();
+await con.query("SET TimeZone = 'UTC'");
+
+async function query(sql) {
+  const table = await con.query(sql);
+  return table.toArray().map((row) => row.toJSON());
+}
+```
+
+With a bundler, `npm i @duckdb/duckdb-wasm` and serve its `.wasm` and worker files with your site.
+
+</TabItem>
+<TabItem label="Node DuckDB">
+
+```sh
+npm i @duckdb/node-api
+```
+
+```js
+import { DuckDBInstance, listValue } from "@duckdb/node-api";
+
+const instance = await DuckDBInstance.create();
+const con = await instance.connect();
+await con.run("SET TimeZone = 'UTC'");
+```
+
+</TabItem>
+<TabItem label="hyparquet">
+
+```sh
+npm i hyparquet hyparquet-compressors
+```
+
+```js
+import { asyncBufferFromUrl, parquetReadObjects } from "hyparquet";
+import { compressors } from "hyparquet-compressors";
+
+async function read(path, columns) {
+  const file = await asyncBufferFromUrl({ url: `https://stillwell.openwaters.io/${path}` });
+  return parquetReadObjects({ file, columns, compressors });
+}
+```
+
+In a page without a bundler, import both from `https://cdn.jsdelivr.net/npm/hyparquet@1.33.0/+esm` and `https://cdn.jsdelivr.net/npm/hyparquet-compressors@1.1.3/+esm`.
+
+</TabItem>
+</Tabs>
+
+## Find a station
+
+[`stations.parquet`](/docs/reference/stations/) has one row per station.
+
+<Tabs syncKey="js-library">
+<TabItem label="DuckDB-WASM">
+
+```js
+const stations = await query(`
+  SELECT id, name, datum, datums['LAT'] AS lat_offset_m
+  FROM 'https://stillwell.openwaters.io/stations.parquet'
+  WHERE name ILIKE '%hoek van holland%' AND source = 'rws'
+`);
+```
+
+</TabItem>
+<TabItem label="Node DuckDB">
+
+```js
+const stations = await con.runAndReadAll(`
+  SELECT id, name, datum, datums['LAT'] AS lat_offset_m
+  FROM 'https://stillwell.openwaters.io/stations.parquet'
+  WHERE name ILIKE '%hoek van holland%' AND source = 'rws'
+`);
+console.log(stations.getRowObjectsJS());
+```
+
+</TabItem>
+<TabItem label="hyparquet">
+
+```js
+const stations = await read("stations.parquet", ["id", "name", "lat", "lon", "datum", "datums"]);
+const station = stations.find((s) => s.id === "rws/hoekvanholland");
+```
+
+```
+{
+  id: 'rws/hoekvanholland',
+  name: 'Hoek van Holland',
+  lat: 51.976899,
+  lon: 4.119827,
+  datum: 'NAP',
+  datums: { MSL: -0.097, LAT: 1.003 }
+}
+```
+
+hyparquet reads the whole list, about 25,000 rows, but only the columns you name.
+
+</TabItem>
+</Tabs>
+
+## Read a year of levels
+
+Each station's observed levels are one file per year at `obs/<source>/<source_id>/<year>.parquet`. `flag <= 2` leaves out values flagged as suspect or bad:
+
+<Tabs syncKey="js-library">
+<TabItem label="DuckDB-WASM">
+
+```js
+const levels = await query(`
+  SELECT time, level_m
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+  WHERE flag <= 2
+  ORDER BY time
+`);
+const first = new Date(levels[0].time);
+```
+
+DuckDB-WASM returns times as milliseconds since 1970, so wrap them in `new Date()`.
+
+</TabItem>
+<TabItem label="Node DuckDB">
+
+```js
+const levels = await con.runAndReadAll(`
+  SELECT time, level_m
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+  WHERE flag <= 2
+  ORDER BY time
+`);
+const rows = levels.getRowObjectsJS();
+```
+
+```
+[
+  { time: 2024-01-01T00:00:00.000Z, level_m: 0.07000000029802322 },
+  { time: 2024-01-01T00:10:00.000Z, level_m: 0.07000000029802322 },
+  ...
+]
+```
+
+`getRowObjectsJS()` returns times as `Date`. `getRowObjectsJson()` returns them as strings in your computer's time zone, whatever the session's.
+
+</TabItem>
+<TabItem label="hyparquet">
+
+```js
+const rows = await read("obs/rws/hoekvanholland/2024.parquet", ["time", "level_m", "flag"]);
+const levels = rows.filter((r) => r.flag <= 2);
+```
+
+hyparquet returns times as `Date`.
+
+</TabItem>
+</Tabs>
+
+## Read several years
+
+HTTPS has no directory listing, so a wildcard path doesn't work, and a missing file is an error. Build the list of files from [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has), which has a row for every year file that exists:
+
+<Tabs syncKey="js-library">
+<TabItem label="DuckDB-WASM">
+
+```js
+await con.query(`
+  SET VARIABLE files = (
+    SELECT list('https://stillwell.openwaters.io/obs/rws/hoekvanholland/' || year || '.parquet' ORDER BY year)
+    FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+    WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+  )
+`);
+const levels = await query(`
+  SELECT time, level_m
+  FROM read_parquet(getvariable('files'), union_by_name = true)
+  WHERE flag <= 2
+  ORDER BY time
+`);
+```
+
+</TabItem>
+<TabItem label="Node DuckDB">
+
+```js
+const years = await con.runAndReadAll(`
+  SELECT year FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+  WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+  ORDER BY year
+`);
+const files = years
+  .getRowObjectsJS()
+  .map((r) => `https://stillwell.openwaters.io/obs/rws/hoekvanholland/${r.year}.parquet`);
+
+const levels = await con.runAndReadAll(
+  `SELECT time, level_m
+   FROM read_parquet($files, union_by_name = true)
+   WHERE flag <= 2
+   ORDER BY time`,
+  { files: listValue(files) },
+);
+```
+
+</TabItem>
+<TabItem label="hyparquet">
+
+```js
+const years = (await read("stations/years/rws.parquet", ["id", "epoch", "year"]))
+  .filter((r) => r.id === "rws/hoekvanholland" && r.epoch === 1 && r.year >= 2020 && r.year <= 2024)
+  .map((r) => r.year)
+  .sort();
+
+const levels = (
+  await Promise.all(
+    years.map((year) =>
+      read(`obs/rws/hoekvanholland/${year}.parquet`, ["time", "level_m", "flag"]),
+    ),
+  )
+)
+  .flat()
+  .filter((r) => r.flag <= 2);
+```
+
+</TabItem>
+</Tabs>
+
+`union_by_name = true` lets files with different columns read together, since some older files lack `source_flag`. `epoch = 1` keeps to the station's plain path; a station whose source moved it to another reference has later files under `obs/<source>/<source_id>/<epoch>/`, as [Datum epochs](/docs/reference/datums/#datum-epochs) describes.
+
+The path holds the station's `source_id` URL-encoded twice, so an `@` is `%2540`: `encodeURIComponent(encodeURIComponent(source_id))`. Only one station in the store has a character that needs it. [File paths](/docs/getting-started/#file-paths) has the rule.
+
+## Convert to another datum
+
+`datums` maps each datum the station has an offset to, in meters, to add to a level in its own `datum`. Hoek van Holland's levels are in NAP; adding the `LAT` offset refers them to LAT:
+
+<Tabs syncKey="js-library">
+<TabItem label="DuckDB-WASM">
+
+```js
+const levels = await query(`
+  SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o,
+    (SELECT datums FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'rws/hoekvanholland') s
+  WHERE o.flag <= 2
+  ORDER BY o.time
+`);
+```
+
+</TabItem>
+<TabItem label="Node DuckDB">
+
+```js
+const levels = await con.runAndReadAll(`
+  SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o,
+    (SELECT datums FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'rws/hoekvanholland') s
+  WHERE o.flag <= 2
+  ORDER BY o.time
+`);
+```
+
+</TabItem>
+<TabItem label="hyparquet">
+
+```js
+const offset = station.datums.LAT;
+const inLat = levels.map((r) => ({
+  time: r.time,
+  level_m: Math.round((r.level_m + offset) * 1000) / 1000,
+}));
+```
+
+</TabItem>
+</Tabs>
+
+`datums` describes the station's current epoch. [Converting a level](/docs/reference/datums/#converting-a-level) covers earlier epochs, and [Credits](/docs/reference/datums/#credits) the credits owed for offsets that don't come from the source.
+
+## Things to know
+
+- Times are UTC. Run `SET TimeZone = 'UTC'` in DuckDB, and format `Date` values with `toISOString()` or a `timeZone: "UTC"` option to keep them in UTC.
+- Levels are meters, in the `datum` column of the same file.
+- `level_m` is a 32-bit float, so it reads as `0.07000000029802322` in JavaScript. Round it for display.
+- Read only the columns you need. Both DuckDB and hyparquet then fetch only those columns' bytes.
+- [Series](/docs/reference/series/) describes every column and product, including extremes and predictions.
