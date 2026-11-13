@@ -77,7 +77,13 @@ jobs:
     permissions:
       contents: read
     steps:
+      # A `publish` takes main as it is when this job starts, not when the run
+      # started or, on a re-run, first ran, so one that waited in the store
+      # group doesn't drop a source registered since. Any other command keeps
+      # the run's commit, whose group job picked its lock.
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.args == 'publish' && 'main' || github.sha }}
       - uses: actions/setup-node@v7
         with:
           node-version-file: .mise.toml
