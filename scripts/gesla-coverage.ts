@@ -377,7 +377,7 @@ The records with no originator series in the store, by contributor, most first: 
 | --- | --: | --: | --: | --: | --- | --- |
 ${missing.map(([c, g, u]) => `| ${c} | ${g.length} | ${u.length === g.length ? `${u.length}, none linked` : u.length} | ${sum(gauges(u), (x) => x.gesla.length)} | ${u.filter((r) => r.relays.length).length} | ${terms(c)} | ${countries(u)} |`).join("\n")}
 
-CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM, BOM and DMI have been asked ([contributors.md](contributors.md)).
+CMEMS's records come from national agencies, so their countries say which feed would cover them. Some contributors need permission first: CHS's terms for MEDS's gauges bar commercial use without a license, and JODC, UNAM and BOM have been asked ([contributors.md](contributors.md)).
 
 ## Year gaps by source
 

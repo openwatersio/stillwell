@@ -3269,10 +3269,36 @@ describe("uhslc", () => {
     const flat =
       "Data supplied by the South Africa Navy Hydrographic Office; use allowed for non-commercial use";
     assert.equal(noticeOf(flat), "sanho");
+    // `ccby` comes before `sanho` in NOTICES, so this holds only if the ranking does.
+    assert.equal(
+      noticeOf("South Africa Navy Hydrographic Office. Creative Commons Attribution 4.0"),
+      "sanho",
+    );
+    assert.equal(noticeOf("nothing here"), null);
+  });
+
+  it("tags DMI's Gedser and Hornbæk files for commercial use, crediting DMI", () => {
+    // As qa837a.dmt and qa838a.dmt word it, misspelling included.
+    const flat =
+      "Copyright: Danish Meteorological Institute Application and publication of data and text is allowed for noncomercial use with proper reference and acknowledgement.";
+    assert.equal(noticeOf(flat), "dmi");
+    assert.equal(NOTICES.dmi!.commercial_use, true);
+    assert.match(
+      NOTICES.dmi!.credit!,
+      /^Danish Meteorological Institute \(DMI\), CC BY 4\.0 \(https:/,
+    );
+    // Another contributor's non-commercial note isn't DMI's license, and outranks a commercial notice.
+    assert.equal(noticeOf("Use is allowed for non-commercial use."), "unreviewed");
     assert.equal(
       noticeOf("Use is allowed for non-commercial use. Creative Commons Attribution 4.0"),
-      "dmi",
+      "unreviewed",
     );
+    assert.equal(
+      noticeOf(`${flat} Later years: use is allowed for non-commercial use.`),
+      "unreviewed",
+    );
+    assert.equal(CONTRIBUTORS["837a"]?.notice, "dmi");
+    assert.equal(CONTRIBUTORS["838a"]?.notice, "dmi");
     assert.equal(noticeOf("nothing here"), null);
   });
 

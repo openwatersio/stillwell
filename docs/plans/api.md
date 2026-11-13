@@ -194,7 +194,7 @@ bulk/<YYYY-Qn>/<source>.parquet
 
 ## Not in the API
 
-- Stations with `commercial_use` false, such as the UHSLC gauges whose contributors bar commercial use, until tokens and plans exist; then non-commercial users get them. They're in the public store.
+- Stations with `commercial_use` false, such as JODC's and UNAM's, until tokens and plans exist; then non-commercial users get them. They're in the public store.
 - Data whose source bars republishing, such as IOC's sea level monitoring facility and the restricted GESLA contributors. It goes to the private store for research and for fitting slackwater-database constants where the operator agrees.
 - CHS data in any form. Its license bars third-party transfer and commercial derivatives; Slackwater fetches it on the device.
 - Data from vessels. See [plan.md](plan.md#out-of-scope).

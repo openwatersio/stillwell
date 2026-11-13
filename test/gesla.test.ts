@@ -212,6 +212,29 @@ describe("gesla stations", () => {
     );
   });
 
+  it("tags DMI's own records for commercial use, crediting DMI with a link to its CC BY terms", async () => {
+    const dmi = metadata.replace(
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,DMI,",
+    );
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", dmi.length)
+        : dmi,
+    );
+    const record = (await gesla.stations()).find(
+      (s) => s.source_id === "seattle-9447130-usa-noaa",
+    )!;
+    assert.deepEqual(
+      [record.contributor, record.commercial_use, record.attribution],
+      [
+        "DMI",
+        true,
+        "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); Danish Meteorological Institute (DMI), CC BY 4.0 (https://www.dmi.dk/friedata/dokumentation/terms-of-use)",
+      ],
+    );
+  });
+
   it("fails when a record it drops isn't in the release, as a renamed one wouldn't be", async () => {
     const renamed = metadata.replace("uddevalla-2541-swe-smhi,", "uddevalla2-2541-swe-smhi,");
     setTransport(async (url) =>

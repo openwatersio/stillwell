@@ -30,12 +30,19 @@ export interface Notice {
 export const BOM_CONDITIONS =
   "https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf";
 
+const DMI_TERMS = "https://www.dmi.dk/friedata/dokumentation/terms-of-use";
+// DMI's notice in its Gedser and Hornbæk files, misspelling included.
+const DMI_PREFIX =
+  "Copyright: Danish Meteorological Institute Application and publication of data and text is ";
+const NON_COMMERCIAL = "allowed for non-?comm?ercial use";
+
 export const NOTICES: Record<string, Notice> = {
-  // Terms text the scan found but no notice below matches: non-commercial until
-  // a person reads it and adds a notice.
+  // Terms text the scan found but no notice below matches, or a non-commercial
+  // clause other than DMI's, which outranks any commercial notice in the same
+  // file: non-commercial until it's read and a notice added.
   unreviewed: {
     name: "Terms not yet reviewed",
-    pattern: /(?!)/,
+    pattern: new RegExp(`(?<!${DMI_PREFIX})${NON_COMMERCIAL}`, "i"),
     commercial_use: false,
     credit: null,
     url: null,
@@ -90,11 +97,13 @@ export const NOTICES: Record<string, Notice> = {
   },
   dmi: {
     name: "Danish Meteorological Institute",
-    pattern: /allowed for non-?comm?ercial use/i,
-    commercial_use: false,
-    credit: "Danish Meteorological Institute",
-    url: null,
-    terms: "Use and publication allowed for non-commercial purposes, with reference.",
+    pattern: new RegExp(DMI_PREFIX + NON_COMMERCIAL, "i"),
+    commercial_use: true,
+    // CC BY 4.0 asks for a link to the license wherever the credit is shown.
+    credit: `Danish Meteorological Institute (DMI), CC BY 4.0 (${DMI_TERMS})`,
+    url: DMI_TERMS,
+    terms:
+      "The file allows use and publication for non-commercial purposes only, with reference. DMI's current terms (changed 30 November 2023) put its oceanographic observations from tide gauges owned by DMI and the Danish Coastal Authority under CC BY 4.0, commercial use included, and apply to its data \"irrespective of whether the user himself has obtained the data via DMI's APIs or Bulk Download Services\", so they cover UHSLC's copies.",
   },
   sanho: {
     name: "South African Navy Hydrographic Office",
