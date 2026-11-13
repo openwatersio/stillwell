@@ -15,7 +15,7 @@ Data: Marine Institute, Irish National Tide Gauge Network, [CC BY 4.0](https://c
 
 `stations.parquet` has one row per station. `datums` maps each datum to the meters to add to a level to refer it to that datum.
 
-```sql id=gauges display
+```sql id=gauges display echo
 SELECT id, name, lat, lon, datum, map_extract(datums, 'LAT')[1] AS lat_offset_m, first, last
 FROM stations
 WHERE source = 'marine-institute'
@@ -41,19 +41,19 @@ const datum = view(Inputs.radio(["OD Malin", "LAT"], { label: "Datum", value: "O
 
 Each series is stored as one file per year, at `obs/<id>/<year>.parquet`. The years list says which files exist, since reading a missing one fails.
 
-```sql id=available
+```sql id=available echo
 SELECT year
 FROM years
 WHERE id = ${gauge.id} AND year BETWEEN ${start.getUTCFullYear()} AND ${stop.getUTCFullYear()}
 ```
 
-```js
+```js echo
 const shift = datum === "LAT" ? (gauge.lat_offset_m ?? 0) : 0;
 const paths = Array.from(
   available,
   ({ year }) => `'https://stillwell.openwaters.io/obs/${gauge.id}/${year}.parquet'`,
 );
-// read_parquet takes its file list as text, not as a bound parameter, so this query is built as a string.
+// read_parquet needs its file list in the query text, not as a parameter.
 const query = `
   SELECT time, level_m + ${shift} AS level, flag,
     CASE WHEN flag <= 2 THEN 'good' ELSE 'suspect or bad' END AS quality
