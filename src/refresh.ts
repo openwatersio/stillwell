@@ -269,7 +269,7 @@ export async function publishStations(
 > {
   const built = await linkedStations(store, all, expected);
   if ("missing" in built) return built;
-  const { gauges, listed, report } = built;
+  const { gauges, listed, report, steps } = built;
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
@@ -280,7 +280,14 @@ export async function publishStations(
   // Two files written one after the other: if the second write fails, they're from
   // different publishes until the next one.
   await writeOffsets(offsetsPath(store), linked.flatMap(offsetRows));
-  await writeStations(stationsPath(store), linked);
+  // The measured step stands in for an interval the source doesn't give in the published file
+  // only, after ranking and pairing, which read the source's own, as ingest does.
+  await writeStations(
+    stationsPath(store),
+    linked.map((s) =>
+      s.interval_s === null && steps.has(s.id) ? { ...s, interval_s: steps.get(s.id)! } : s,
+    ),
+  );
   await writeJsonArray(
     sourcesPath(store),
     listed.map((s) =>
@@ -312,20 +319,29 @@ export async function publishStations(
 
 /**
  * The stations in `store`'s lists, with their bounds and analysis, linked
- * (`linkGauges`), as `stations.parquet` is built from them; or the sources
- * in `expected` that have no list.
+ * (`linkGauges`), as `stations.parquet` is built from them, with the step
+ * analysis measured for each station whose source gives no interval; or the
+ * sources in `expected` that have no list.
  */
 async function linkedStations(
   store: string,
   all: Source[],
   expected: string[],
 ): Promise<
-  { gauges: StoredStation[]; listed: Source[]; report: LinkReport } | { missing: string[] }
+  | {
+      gauges: StoredStation[];
+      listed: Source[];
+      report: LinkReport;
+      /** Each station's measured step where its source gives no interval. */
+      steps: Map<string, number>;
+    }
+  | { missing: string[] }
 > {
   const stations: StoredStation[] = [];
   const listed: Source[] = [];
   const missing: string[] = [];
   const usable = new Map<string, number>();
+  const steps = new Map<string, number>();
   for (const source of all) {
     const list = await readStationList(stationListPath(store, source.metadata.id));
     if (!list) {
@@ -343,6 +359,10 @@ async function linkedStations(
         tide_m: analysis.get(s.id)?.tide_m ?? null,
       })),
     );
+    for (const s of list) {
+      const step = analysis.get(s.id)?.step_s;
+      if (s.interval_s === null && step != null) steps.set(s.id, step);
+    }
     // Only a tie-breaker in `rank`, so a years file that can't be read doesn't stop publishing.
     const shares = await usableShares(store, source.metadata.id).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: ranking without the years file: ${String(error)}`);
@@ -352,7 +372,7 @@ async function linkedStations(
   }
   if (missing.length || !listed.length) return { missing };
   const { stations: gauges, report } = linkGauges(stations, new Date(), usable);
-  return { gauges, listed, report };
+  return { gauges, listed, report, steps };
 }
 
 /**

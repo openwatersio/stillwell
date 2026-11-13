@@ -25,7 +25,8 @@ import type { Product } from "../schema.ts";
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
  *   predicted-extremes/<source>/<station>/<year>.parquet the source's predicted high and low waters
  *
- * `<station>` is the station's `source_id`, URL-encoded. Each datum epoch has
+ * `<station>` is the station's `source_id`, which `isUrlSafe` keeps to
+ * characters a key and a URL both hold as they are. Each datum epoch has
  * files of its own: epoch 1 at the paths above, a later one with its number
  * after `<station>`, as `obs/<source>/<station>/2/<year>.parquet`. Every file
  * is in its epoch's one datum.
@@ -63,6 +64,19 @@ export function seriesDir(
   return epoch === 1 ? dir : `${dir}/${epoch}`;
 }
 
+/**
+ * Whether a `source_id` can go into a key and a URL as it is: letters, digits,
+ * `.`, `_`, `~` and `-`, and not only dots.
+ */
+export function isUrlSafe(sourceId: string): boolean {
+  return /^[\w.~-]+$/.test(sourceId) && !/^\.+$/.test(sourceId);
+}
+
+/** An ID with each character a URL would have to encode as `_`, for a source whose own IDs can hold one. */
+export function urlSafe(id: string): string {
+  return id.replace(/[^\w.~-]/g, "_");
+}
+
 /** A station's directory for one product, which holds epoch 1's years and later epochs' directories. */
 export function stationDir(
   root: string,
@@ -70,6 +84,7 @@ export function stationDir(
   source: string,
   sourceId: string,
 ): string {
+  // A no-op for a URL-safe ID; it still finds the files of a withheld ID that isn't one.
   return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
 }
 

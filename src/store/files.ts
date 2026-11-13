@@ -126,7 +126,8 @@ const STATION_COLUMNS: Column[] = [
   {
     name: "source_id",
     type: "VARCHAR",
-    description: "The source's own ID for the station. Series paths hold it URL-encoded.",
+    description:
+      "The source's own ID for the station, or one made from it: letters, digits, `.`, `_`, `~` and `-`, so series paths and URLs hold it as it is.",
   },
   { name: "name", type: "VARCHAR", description: "The station's name, as the source gives it." },
   {
@@ -153,7 +154,8 @@ const STATION_COLUMNS: Column[] = [
     name: "interval_s",
     type: "INTEGER",
     nullable: true,
-    description: "The station's usual interval between values, in seconds.",
+    description:
+      "The station's usual interval between values, in seconds: the source's, or where it gives none, the most common step between its last year's values (`step_s` in its analysis); null where neither says.",
   },
   {
     name: "datum",
@@ -381,7 +383,7 @@ export const FLAG_COUNTS = ["good", "interpolated", "preliminary", "suspect", "b
 
 const SERIES_PATH = "<source>/<station>[/<epoch>]/<year>.parquet";
 const SERIES_NOTE =
-  "`<station>` is the station's `source_id`, URL-encoded in the object's key, so encoded twice in a URL, and `<epoch>` the datum epoch's `id`, left out for epoch 1.";
+  "`<station>` is the station's `source_id`, which needs no URL-encoding, and `<epoch>` the datum epoch's `id`, left out for epoch 1.";
 
 const OBSERVATION_COLUMNS = [TIME, LEVEL("level"), FLAG, SOURCE_FLAG, RECEIVED, DATUM];
 
@@ -598,6 +600,15 @@ export const FILES = {
         nullable: true,
         description:
           "Runs of the last year that a tide gauge's flatline rules flag and still water's don't.",
+      },
+      {
+        name: "step_s",
+        type: "INTEGER",
+        nullable: true,
+        // A file written before it was kept has no such column.
+        optional: true,
+        description:
+          "The most common step between the last year's values, in seconds; null with under two values, or in a row judged before it was kept.",
       },
       {
         name: "requalified",

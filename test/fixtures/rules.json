@@ -1,6 +1,6 @@
 {
   "rules": "outliers-1",
-  "judge": "drains-3",
+  "judge": "step-1",
   "options": {
     "coastal tidal true tide 0.09": "{\"flatline_m\":0.002,\"centimeter_flatline_s\":172800,\"jumps\":true}",
     "coastal tidal true tide 1": "{\"flatline_m\":0.002,\"jumps\":true}",
@@ -193,61 +193,71 @@
       "tidal": true,
       "tide_m": 0.5189,
       "days": 90,
-      "drains": 0
+      "drains": 0,
+      "step_s": 900
     },
     "pooled river with a flood": {
       "tidal": false,
       "tide_m": 0.0181,
       "days": 90,
-      "drains": 19
+      "drains": 19,
+      "step_s": 900
     },
     "river 20 days": {
       "tidal": null,
       "tide_m": null,
       "days": 20,
-      "drains": 0
+      "drains": 0,
+      "step_s": 900
     },
     "river 600 m up": {
       "tidal": false,
       "tide_m": 0.4151,
       "days": 90,
-      "drains": 0
+      "drains": 0,
+      "step_s": 900
     },
     "creek drained to a sill": {
       "tidal": false,
       "tide_m": 0.5114,
       "days": 90,
-      "drains": 13
+      "drains": 13,
+      "step_s": 900
     },
     "coast held dry weekly": {
       "tidal": true,
       "tide_m": 0.5114,
       "days": 90,
-      "drains": 13
+      "drains": 13,
+      "step_s": 900
     },
     "creek drained to a sill, dithering 1 mm": {
       "tidal": false,
       "tide_m": 0.5114,
       "days": 90,
-      "drains": 13
+      "drains": 13,
+      "step_s": 900
     },
     "whole-centimeter 12 cm tide held weekly": {
       "tidal": true,
       "tide_m": 0.1227,
       "days": 90,
-      "drains": 0
+      "drains": 0,
+      "step_s": 900
     },
     "unlabeled whole-centimeter 12 cm tide held weekly": {
       "tidal": false,
       "tide_m": 0.1227,
       "days": 90,
-      "drains": 13
+      "drains": 13,
+      "step_s": 900
     },
     "estuary surge on a 10 cm tide": {
       "tidal": true,
       "tide_m": 0.1116,
       "days": 90,
-      "drains": 0
+      "drains": 0,
+      "step_s": 900
     }
   }
 }

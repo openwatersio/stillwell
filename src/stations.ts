@@ -1,3 +1,4 @@
+import { isUrlSafe } from "./store/paths.ts";
 import {
   currentEpoch,
   epochKey,
@@ -59,6 +60,10 @@ export function mergeStationList(
   for (const { reference, ...s } of fetched) {
     if (s.id !== `${s.source}/${s.source_id}` || s.source.includes("/"))
       throw new Error(`Station ${s.id} isn't <source>/<source_id>`);
+    if (!isUrlSafe(s.source_id))
+      throw new Error(
+        `Station ${s.id}'s source_id has a character a URL would have to encode; the adapter must give it a URL-safe one`,
+      );
     const old = byId.get(s.id);
     if (s.datum === null && !old) continue;
     listed.add(s.id);

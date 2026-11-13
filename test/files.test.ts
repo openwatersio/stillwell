@@ -8,7 +8,7 @@ import { writeLinks } from "../src/links.ts";
 import { sourceEntry } from "../src/refresh.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { errata, sources } from "../src/sources/index.ts";
-import { writeAnalysis } from "../src/store/analysis.ts";
+import { JUDGE, readAnalysis, writeAnalysis } from "../src/store/analysis.ts";
 import {
   ERRATA_SCHEMA,
   FILES,
@@ -31,6 +31,7 @@ import {
   writeStations,
 } from "../src/store/parquet.ts";
 import { writeYears } from "../src/store/years.ts";
+import { analysisPath } from "../src/store/paths.ts";
 
 // Every field set, so a field added to the type must be added here, where the test below checks that the definition has it.
 const STATION: Required<StoredStation> = {
@@ -134,6 +135,7 @@ describe("published file definitions", () => {
           tide_m: null,
           days: null,
           drains: null,
+          step_s: null,
           requalified: null,
         },
       ]),
@@ -261,9 +263,9 @@ describe("published file definitions", () => {
     assert.deepEqual(ERRATA_SCHEMA.items!.properties!.handling!.enum, [...HANDLING]);
   });
 
-  it("passes an analysis file written before `judge` was kept", async () => {
+  it("passes an analysis file written before `judge` or `step_s` was kept", async () => {
     const path = join(store, "old-analysis.parquet");
-    const { judge: _, ...columns } = columnTypes(FILES.analysis);
+    const { judge: _, step_s: __, ...columns } = columnTypes(FILES.analysis);
     await writeRows(
       path,
       [{ id: "test/a", analyzed: "2026-01-01T00:00:00Z", rules: "r" }],
@@ -271,6 +273,18 @@ describe("published file definitions", () => {
       "id",
     );
     assert.deepEqual(await checkFile(path, FILES.analysis), []);
+  });
+
+  it("reads an analysis file an older build rewrote without `step_s` as judged under no `JUDGE`", async () => {
+    const { step_s: _, ...columns } = columnTypes(FILES.analysis);
+    await writeRows(
+      analysisPath(store, "older"),
+      [{ id: "older/a", analyzed: "2026-01-01T00:00:00Z", rules: "r", judge: JUDGE }],
+      columns,
+      "id",
+    );
+    const row = (await readAnalysis(store, "older")).get("older/a")!;
+    assert.deepEqual([row.judge, row.step_s], [null, null]);
   });
 
   it("refuses to check a local path that would glob other files", async () => {
