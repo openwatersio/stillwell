@@ -22,7 +22,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "Reference: files",
+          label: "Reference",
           items: [
             "docs/reference/stations",
             "docs/reference/observations",
