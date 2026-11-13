@@ -19,8 +19,16 @@ import { dirname } from "node:path";
 import { loadCatalog, type Catalog } from "../src/api/catalog.ts";
 import { apiHandler } from "../src/api/handler.ts";
 import { clickhouse } from "../src/realtime/clickhouse.ts";
+import { slots } from "../src/realtime/schedule.ts";
 
 const RELOAD_MS = 10 * 60_000;
+/**
+ * Requests answered at once: each runs three ClickHouse queries, and its user
+ * may run 8 at once, two of which a reload of the station list takes.
+ */
+const REQUESTS_AT_ONCE = 2;
+/** How long a request may wait for its turn: the Worker gives up after 10 seconds. */
+const WAIT_MS = 10_000;
 const RETRY_MS = 30_000;
 const store = process.env.STILLWELL_STORE?.replace(/\/$/, "");
 if (!store) throw new Error("set STILLWELL_STORE to the public store");
@@ -64,8 +72,25 @@ load();
 
 const handle = apiHandler({ ch, catalog: () => catalog });
 
+const turns = slots(REQUESTS_AT_ONCE);
+async function answer(method: string, url: string) {
+  const arrived = Date.now();
+  await turns.acquire();
+  try {
+    if (Date.now() - arrived > WAIT_MS)
+      return {
+        status: 503,
+        headers: { "content-type": "application/json; charset=utf-8" },
+        body: '{"message":"Busy; try again shortly"}',
+      };
+    return await handle(method, url);
+  } finally {
+    turns.release();
+  }
+}
+
 const server = createServer((request, response) => {
-  handle(request.method ?? "GET", request.url ?? "/").then(
+  answer(request.method ?? "GET", request.url ?? "/").then(
     (answer) => {
       response.writeHead(answer.status, answer.headers);
       response.end(request.method === "HEAD" ? undefined : answer.body);

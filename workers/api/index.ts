@@ -37,14 +37,13 @@ export default {
     const url = new URL(request.url);
     if (!LEVELS.test(url.pathname)) return json(404, { message: "Not found" });
 
-    const { canonical, relative } = normalize(url.searchParams, Date.now());
+    const { canonical, last: lastParams } = normalize(url.searchParams, Date.now());
     const cache = (globalThis as unknown as { caches: { default: Cache } }).caches.default;
     const key = new Request(`${url.origin}${url.pathname}?${canonical}`);
     const hit = await cache.match(key);
     if (hit) return hit;
 
-    // A range relative to now keeps one last good copy, whatever minute it was asked in.
-    const lastKey = new Request(`${url.origin}${url.pathname}?${relative}&last-good`);
+    const lastKey = new Request(`${url.origin}${url.pathname}?${lastParams}&last-good`);
     const answer = await ask(`${env.ORIGIN}${url.pathname}?${canonical}`, env, request);
     if (answer) {
       const reply = json(answer.status, answer.body, answer.cacheControl);
@@ -113,24 +112,30 @@ async function ask(
 
 /**
  * The request's parameters in one order, so every client asking for the same
- * thing shares a cache key. A start and end given together round inward to
- * the step, which keeps the same step times, and a start alone rounds up to
- * the step, or to the minute at `raw`. A range relative to now becomes the 7 days to
- * now rounded up to the step, or to the minute at `raw`. `relative` leaves
- * out the start and end that came from now.
+ * thing shares a cache key (`canonical`), and the key of its last good copy
+ * (`last`).
+ *
+ * - A range relative to now becomes the 7 days to now rounded up to the
+ *   step, or to the minute at `raw`; its last good copy leaves the range out.
+ * - A start and end given together round inward to the step, which keeps the
+ *   same step times.
+ * - A start alone, as Slackwater asks, rounds down to the step, or to the
+ *   minute at `raw`, which adds at most a value before it, unless that would
+ *   cross the 7-day window; its last good copy is keyed by how far back it
+ *   reaches, rounded the same way, so the next request finds it.
  */
 export function normalize(
   params: URLSearchParams,
   now: number,
-): { canonical: string; relative: string } {
+): { canonical: string; last: string } {
   const out = new URLSearchParams();
   // An empty value is no value, to the server too.
   for (const name of PARAMS) for (const v of params.getAll(name)) if (v) out.append(name, v);
-  const relative = out.toString();
+  const given = out.toString();
   const stepName = out.get("step") ?? "6m";
   const step = Object.hasOwn(STEPS, stepName) ? STEPS[stepName] : undefined;
   if (step === undefined || out.getAll("start").length > 1 || out.getAll("end").length > 1)
-    return { canonical: relative, relative };
+    return { canonical: given, last: given };
   const unit = step || MINUTE;
   const start = parse(out.get("start"));
   const end = parse(out.get("end"));
@@ -138,18 +143,27 @@ export function normalize(
     const to = Math.ceil(now / unit) * unit;
     out.set("start", iso(to - WINDOW_MS));
     out.set("end", iso(to));
-  } else if (step && start !== null && end !== null) {
+    out.sort();
+    return { canonical: out.toString(), last: given };
+  }
+  if (step && start !== null && end !== null) {
     const [from, to] = [Math.ceil(start / step) * step, Math.floor(end / step) * step];
     if (from <= to) {
       out.set("start", iso(from));
       out.set("end", iso(to));
     }
   } else if (start !== null && !out.has("end")) {
-    // A start alone, as Slackwater asks: the server ends the range 7 days on, which moves by less than a step.
-    out.set("start", iso(Math.ceil(start / unit) * unit));
+    const from = Math.floor(start / unit) * unit;
+    if (from >= now - WINDOW_MS) out.set("start", iso(from));
+    const back = new URLSearchParams(out);
+    back.delete("start");
+    back.set("ago", String(Math.round((now - start) / unit) * unit));
+    back.sort();
+    out.sort();
+    return { canonical: out.toString(), last: back.toString() };
   }
   out.sort();
-  return { canonical: out.toString(), relative };
+  return { canonical: out.toString(), last: out.toString() };
 }
 
 function parse(value: string | null): number | null {

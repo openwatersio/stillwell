@@ -285,7 +285,8 @@ export function levelsResponse(args: {
   return {
     station: { id: station.id, name: station.name, tide_station: station.tide_station },
     datum: conversion.named ?? station.datum,
-    datums: Object.fromEntries([...current].map(([name, offset]) => [name, length(offset - base)])),
+    // Each datum's height above the response's, as the tides API gives them: the offsets' opposite.
+    datums: Object.fromEntries([...current].map(([name, offset]) => [name, length(base - offset)])),
     frame: station.frame,
     status: statusOf(station, args.asOf, args.now),
     as_of: iso(args.asOf),

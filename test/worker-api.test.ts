@@ -12,22 +12,33 @@ const env = {
 
 describe("normalize", () => {
   it("puts a range relative to now at the 7 days to now, rounded up to the step", () => {
-    const { canonical, relative } = normalize(new URLSearchParams("units=feet&step=1h"), NOW);
+    const { canonical, last } = normalize(new URLSearchParams("units=feet&step=1h"), NOW);
     assert.equal(
       canonical,
       "end=2026-11-13T13%3A00%3A00Z&start=2026-11-06T13%3A00%3A00Z&step=1h&units=feet",
     );
-    assert.equal(relative, "step=1h&units=feet");
+    assert.equal(last, "step=1h&units=feet");
   });
 
-  it("rounds a start alone up to the step, and drops empty values", () => {
-    assert.equal(
-      normalize(new URLSearchParams("start=2026-11-09T12:03:29.5Z&end="), NOW).canonical,
-      "start=2026-11-09T12%3A06%3A00Z",
-    );
+  it("rounds a start alone down to the step, and keys its last good copy by how far back it reaches", () => {
+    const lone = normalize(new URLSearchParams("start=2026-11-09T12:03:29.5Z&end="), NOW);
+    assert.equal(lone.canonical, "start=2026-11-09T12%3A00%3A00Z");
+    assert.equal(lone.last, `ago=${96 * 3_600_000}`);
+    // A later request, 96 hours back from a later now, finds the same copy.
+    const later = normalize(new URLSearchParams("start=2026-11-09T12:05:01Z"), NOW + 90_000);
+    assert.equal(later.last, lone.last);
     assert.equal(
       normalize(new URLSearchParams("start=2026-11-09T12:03:29Z&step=raw"), NOW).canonical,
-      "start=2026-11-09T12%3A04%3A00Z&step=raw",
+      "start=2026-11-09T12%3A03%3A00Z&step=raw",
+    );
+    // At 1d, today's midnight is never in the future, and a start that rounding would push past the window stays.
+    assert.equal(
+      normalize(new URLSearchParams("start=2026-11-13T06:00:00Z&step=1d"), NOW).canonical,
+      "start=2026-11-13T00%3A00%3A00Z&step=1d",
+    );
+    assert.equal(
+      normalize(new URLSearchParams("start=2026-11-06T13:00:00Z&step=1d"), NOW).canonical,
+      "start=2026-11-06T13%3A00%3A00Z&step=1d",
     );
   });
 
@@ -142,6 +153,22 @@ describe("the Worker", () => {
       assert.equal(response.status, 200);
       assert.equal(((await response.json()) as { status: string }).status, "stale");
     }
+  });
+
+  it("serves Slackwater's start-only request its last good copy, though its start moved", async () => {
+    mock.method(globalThis, "fetch", async () =>
+      Response.json({ status: "reporting", levels: [1] }),
+    );
+    await get(`${PATH}?start=2026-11-09T12:03:29.512Z`);
+    mock.restoreAll();
+    mock.method(globalThis, "fetch", async () => {
+      throw new Error("down");
+    });
+    // Four minutes on, in the next step, so not the cached copy.
+    mock.timers.setTime(NOW + 4 * 60_000);
+    const stale = await get(`${PATH}?start=2026-11-09T12:07:31.020Z`);
+    assert.equal(stale.status, 200);
+    assert.equal(((await stale.json()) as { status: string }).status, "stale");
   });
 
   it("never serves an older copy of a station the server has since withheld", async () => {

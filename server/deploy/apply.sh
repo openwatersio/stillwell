@@ -43,8 +43,9 @@ if ! command -v clickhouse-server >/dev/null; then
 	apt-get install -yq -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold 'clickhouse-client=26.8.*' 'clickhouse-server=26.8.*' 'clickhouse-common-static=26.8.*'
 fi
 # cloudflared follows Cloudflare's releases, which each have a limited support period; a new one restarts the Tunnel.
-# When Cloudflare's repository is down, the one installed stays, rather than block the poller's deploy.
-apt-get install -yq cloudflared || command -v cloudflared >/dev/null
+# When Cloudflare's repository is down, the one installed stays, or none on a box that has none yet, rather than block
+# the poller's deploy; a box with a Tunnel token and no cloudflared then fails below, starting it.
+apt-get install -yq cloudflared || echo 'cloudflared not installed or upgraded: Cloudflare'"'"'s repository failed' >&2
 
 # Node: the newest release of the major version .mise.toml names, as CI tests with, from nodejs.org and
 # checked against its published checksums. A deploy installs a newer patch release when there is one.

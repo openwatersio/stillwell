@@ -232,7 +232,8 @@ describe("the response", () => {
       now: NOW,
     }) as Record<string, unknown>;
     assert.equal(body.datum, "MLLW");
-    assert.deepEqual(body.datums, { MLLW: 0, MSL: -6.64 }); // (-4.443 + 2.419) / 0.3048
+    // MSL's height above MLLW, as the tides API gives datums: (4.443 - 2.419) / 0.3048.
+    assert.deepEqual(body.datums, { MLLW: 0, MSL: 6.64 });
     assert.deepEqual(body.levels, [
       {
         time: "2026-11-13T11:54:00Z",
