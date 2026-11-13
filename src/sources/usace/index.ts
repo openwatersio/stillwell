@@ -478,10 +478,22 @@ export async function levels(
       const body = await getJson<ApiSeries>(`${API}/timeseries?${query}`, {
         ...V2,
         fresh: fresh(to),
+        keep: (t) => {
+          try {
+            return Array.isArray((JSON.parse(t) as ApiSeries).values);
+          } catch {
+            return false;
+          }
+        },
       });
+      // An empty range comes as `"values": []`, so a reply without the array is a failure.
+      if (!Array.isArray(body.values))
+        throw new Error(
+          `CWMS ${office} ${name} sent no values: ${JSON.stringify(body).slice(0, 100)}`,
+        );
       if (body.values?.length && body.units !== "m")
         throw new Error(`CWMS ${office} ${name} came in ${body.units}, not m`);
-      for (const [time, level, quality] of body.values ?? []) {
+      for (const [time, level, quality] of body.values) {
         const flag = flagOf(quality);
         if (level === null || !Number.isFinite(level) || flag === null) continue;
         out.push({ time, level: Math.round(level * 1000) / 1000, flag });
