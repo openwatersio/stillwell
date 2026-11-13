@@ -123,7 +123,7 @@ A station that keeps changing is held. A change within 180 days of the current e
 
 ## Store layout
 
-The files ingest keeps for each source, beside the ones in [data.md](data.md#layout). `<station>` is the URL-encoded `source_id`.
+The files ingest keeps for each source, beside the ones in [data.md](data.md#layout). `<station>` is the `source_id`, which needs no URL-encoding.
 
 ```
 stations/<source>.parquet                    one source's list: every station it has listed but withheld ones, with epochs

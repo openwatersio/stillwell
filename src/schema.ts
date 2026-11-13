@@ -296,7 +296,8 @@ export interface Source {
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
    * Why a station, by its `source_id`, is withheld from the store, or null.
-   * Withheld means its owner refused republication: the adapter never lists
+   * Withheld means its owner refused republication, or the station has a new
+   * ID: the adapter never lists
    * or fetches it, a refresh drops it from the store's list and the bounds and
    * recent window, publishing leaves it out, and `ingest withhold` deletes its
    * files (src/withhold.ts).

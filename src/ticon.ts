@@ -1,3 +1,4 @@
+import { urlSafe } from "./store/paths.ts";
 import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
@@ -273,7 +274,7 @@ export function originatorSeries(
     const note = "CMEMS record of a gauge the national feed publishes";
     // A link in `LINKS`, made by comparing the series, knows the gauge better than CMEMS's position
     // does. Only a link to the national feed's station names the originator.
-    const copy = `gesla/${record.id}`;
+    const copy = `gesla/${urlSafe(record.id)}`;
     const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(
       (id) => national && id.startsWith(`${national.source}/`),
     );
