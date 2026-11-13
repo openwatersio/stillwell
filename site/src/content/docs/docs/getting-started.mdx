@@ -19,11 +19,13 @@ WHERE flag <= 2
 ORDER BY time LIMIT 5`}
 />
 
-Three things hold for every series in the store:
+These hold for every series in the store:
 
 - **Times are UTC**, as `TIMESTAMP WITH TIME ZONE`. Set your session to UTC (`SET TimeZone = 'UTC'`), or tools such as DuckDB and pandas show them in your local zone.
-- **Levels are meters**, in the datum named on every row. A station's `datums` in `stations.parquet` converts them to other datums: see [Datums](/docs/reference/datums/).
-- **`flag` runs from 0 good to 4 bad.** `flag <= 2` keeps every value not flagged as a problem, including preliminary ones the source hasn't checked. [Series](/docs/reference/series/) has the scale.
+- **Levels are meters**, in the datum named on every row. A station's `datums` in `stations.parquet` refers them to other datums: see [Datums](/docs/guides/datums/).
+- **`level_m` is a 32-bit float**, so `0.07` reads as `0.07000000029802322` once it's widened to 64 bits, as adding an offset does. Round results to 3 places, or cast `level_m` to 64 bits first.
+- **`flag <= 2`** keeps every value not flagged as suspect or bad, including preliminary ones. [Quality flags](/docs/guides/quality-flags/) has the scale.
+- **Select only the columns you need.** Readers that make ranged requests, such as DuckDB, Polars and hyparquet, then fetch only those columns' bytes.
 
 ## What's in the store
 
@@ -41,7 +43,7 @@ predictions/<source>/<station>/<year>.parquet   the source's predicted curve
 predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
 ```
 
-Each has a page under Reference: [Stations](/docs/reference/stations/), [Gauges](/docs/reference/gauges/), [Series](/docs/reference/series/), [Datums](/docs/reference/datums/), [Offsets](/docs/reference/offsets/), [Links](/docs/reference/links/) and [Errata](/docs/reference/errata/).
+Each has a page under Reference: [Stations](/docs/reference/stations/), [Observations](/docs/reference/observations/), [Predictions](/docs/reference/predictions/), [Offsets](/docs/reference/offsets/), [Links](/docs/reference/links/), [Sources](/docs/reference/sources/) and [Errata](/docs/reference/errata/).
 
 ## Finding a station
 
@@ -54,14 +56,14 @@ WHERE name ILIKE '%cuxhaven%'
 ORDER BY id`}
 />
 
-Several sources can carry the same gauge, as GESLA, UHSLC and PEGELONLINE all carry Cuxhaven. `preferred` names the one to use for its observed levels: [Gauges](/docs/reference/gauges/) explains how.
+Several sources can carry the same gauge, as GESLA, UHSLC and PEGELONLINE all carry Cuxhaven. `preferred` names the one to use for its observed levels: [Gauges](/docs/guides/gauges/) explains how.
 
 ## File paths
 
 A series file's path is its product, the station's `id` and the year: `obs/rws/hoekvanholland/2024.parquet` holds `rws/hoekvanholland`'s observed levels for 2024.
 
-- **Encoding.** The file's key holds the `source_id` URL-encoded, so a URL encodes it again. For most stations that changes nothing. One with a reserved character in its `source_id`, such as `gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs`, is at `obs/gesla/byu_queue_de_tortue_%2540_riceville_la-8012300-usa-usgs/`: `@` is `%2540`, not `%40`. In code, encode the `source_id` twice: `encodeURIComponent(encodeURIComponent(source_id))` in JavaScript, `quote(quote(source_id, safe=""), safe="")` in Python.
-- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after the station: `obs/<source>/<station>/2/<year>.parquet`. Most stations have one epoch and only the plain path. [Datums](/docs/reference/datums/#datum-epochs) shows how to read across several.
+- **Encoding.** The file's key holds the `source_id` URL-encoded, so a URL encodes it again. For most stations that changes nothing. One with a reserved character in its `source_id`, such as `gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs`, is at `obs/gesla/byu_queue_de_tortue_%2540_riceville_la-8012300-usa-usgs/`: `@` is `%2540`, not `%40`. In code, encode the `source_id` twice: `url_encode(url_encode(source_id))` in DuckDB SQL, `encodeURIComponent(encodeURIComponent(source_id))` in JavaScript, `quote(quote(source_id, safe=""), safe="")` in Python.
+- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after the station: `obs/<source>/<station>/2/<year>.parquet`. Most stations have one epoch and only the plain path. [Datum epochs](/docs/guides/datums/#datum-epochs) shows how to read across several.
 
 ## Reading many files
 
@@ -79,16 +81,17 @@ WHERE flag <= 2
 GROUP BY ALL ORDER BY year`}
 />
 
-That builds paths from the `id` directly, which works for an `id` whose `source_id` needs no encoding; encode it as above otherwise.
+The years list has a row per epoch and year, and `epoch = 1` keeps to the station's plain path. That builds paths from the `id` directly, which works for an `id` whose `source_id` needs no encoding; encode it as above otherwise. [Observations](/docs/reference/observations/) describes the years list's columns.
 
 ## Caching
 
-To keep a local copy of a year, read its row in `stations/years/<source>.parquet` first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum. [Series](/docs/reference/series/#which-years-a-station-has) describes the years list.
+To keep a local copy of a year, read its row in `stations/years/<source>.parquet` first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum.
 
 `recent/<source>.parquet` is rewritten every hour, so read it fresh each time rather than caching it.
 
 ## Next
 
 - [Stations](/docs/reference/stations/) for everything `stations.parquet` says about a station.
-- [Series](/docs/reference/series/) for the values themselves, their flags, and which years exist.
+- [Observations](/docs/reference/observations/) for the values themselves and which years exist.
+- [Quality flags](/docs/guides/quality-flags/) and [Datums](/docs/guides/datums/) for what the values mean.
 - [Tools](/docs/examples/tools/duckdb/) and [Notebooks](/docs/examples/notebooks/marimo/) for reading the store from where you work.

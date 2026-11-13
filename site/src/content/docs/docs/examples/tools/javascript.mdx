@@ -129,7 +129,7 @@ hyparquet reads the whole list, about 25,000 rows, but only the columns you name
 
 ## Read a year of levels
 
-Each station's observed levels are one file per year at `obs/<source>/<source_id>/<year>.parquet`. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 <Tabs syncKey="js-library">
 <TabItem label="DuckDB-WASM">
@@ -184,7 +184,7 @@ hyparquet returns times as `Date`.
 
 ## Read several years
 
-HTTPS has no directory listing, so a wildcard path doesn't work, and a missing file is an error. Build the list of files from [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has), which has a row for every year file that exists:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains:
 
 <Tabs syncKey="js-library">
 <TabItem label="DuckDB-WASM">
@@ -250,13 +250,11 @@ const levels = (
 </TabItem>
 </Tabs>
 
-`union_by_name = true` lets files with different columns read together, since some older files lack `source_flag`. `epoch = 1` keeps to the station's plain path; a station whose source moved it to another reference has later files under `obs/<source>/<source_id>/<epoch>/`, as [Datum epochs](/docs/reference/datums/#datum-epochs) describes.
-
-The path holds the station's `source_id` URL-encoded twice, so an `@` is `%2540`: `encodeURIComponent(encodeURIComponent(source_id))`. Only one station in the store has a character that needs it. [File paths](/docs/getting-started/#file-paths) has the rule.
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path: `encodeURIComponent(encodeURIComponent(source_id))`.
 
 ## Convert to another datum
 
-`datums` maps each datum the station has an offset to, in meters, to add to a level in its own `datum`. Hoek van Holland's levels are in NAP; adding the `LAT` offset refers them to LAT:
+Adding the station's `LAT` offset from `datums` refers Hoek van Holland's NAP levels to LAT:
 
 <Tabs syncKey="js-library">
 <TabItem label="DuckDB-WASM">
@@ -298,12 +296,9 @@ const inLat = levels.map((r) => ({
 </TabItem>
 </Tabs>
 
-`datums` describes the station's current epoch. [Converting a level](/docs/reference/datums/#converting-a-level) covers earlier epochs, and [Credits](/docs/reference/datums/#credits) the credits owed for offsets that don't come from the source.
+[Datums](/docs/guides/datums/) covers earlier epochs and the credits owed for offsets.
 
 ## Things to know
 
-- Times are UTC. Run `SET TimeZone = 'UTC'` in DuckDB, and format `Date` values with `toISOString()` or a `timeZone: "UTC"` option to keep them in UTC.
-- Levels are meters, in the `datum` column of the same file.
-- `level_m` is a 32-bit float, so it reads as `0.07000000029802322` in JavaScript. Round it for display.
-- Read only the columns you need. Both DuckDB and hyparquet then fetch only those columns' bytes.
-- [Series](/docs/reference/series/) describes every column and product, including extremes and predictions.
+- Format `Date` values with `toISOString()` or a `timeZone: "UTC"` option to keep them in UTC.
+- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.

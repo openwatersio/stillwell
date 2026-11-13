@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Observable notebooks run JavaScript in the reader's browser. Their `DuckDBClient` is [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), which reads the store over HTTPS with ranged requests: a query fetches only the parts of each file it needs, as the DuckDB CLI does. The store allows cross-origin `GET` and `HEAD` requests with a `Range` header, so a notebook on any site can read it.
+Observable notebooks run JavaScript in the reader's browser. Their `DuckDBClient` is [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), which reads the store over HTTPS with ranged requests, as on the [JavaScript](/docs/examples/tools/javascript/) page.
 
 There are two kinds of Observable notebook, and they differ in where SQL runs:
 
@@ -50,6 +50,4 @@ The SQL is the same as on the [DuckDB CLI](/docs/examples/tools/duckdb/) page, w
 
 ## Things to know
 
-- Times are UTC. `DuckDBClient` returns them as `Date`, which shows in the reader's time zone unless you format it in UTC.
-- `level_m` is a 32-bit float, so `0.07` reads as `0.07000000029802322`. Round it in SQL with `round(level_m, 3)` when you show it.
-- Select only the columns you need. DuckDB-WASM then fetches only those columns' bytes.
+- `DuckDBClient` returns times as `Date`, which shows in the reader's time zone unless you format it in UTC.

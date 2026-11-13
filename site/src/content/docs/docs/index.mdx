@@ -76,14 +76,9 @@ Everything is [Parquet](https://parquet.apache.org/) at `https://stillwell.openw
 
 Commercial use counts stations, since a contributor's own terms can apply to some of a source's records, as at GESLA; each station carries its own terms. [Issues labeled `source`](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource) track the sources still to come.
 
-## Terms and credit
+## Terms
 
-The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © [Open Waters](https://openwaters.io), with two conditions from the sources:
-
-- Stations whose `commercial_use` is false keep their source's or contributor's terms.
-- Show each station's `attribution` wherever its data is used, and its `datums_attribution` wherever you use its datum offsets. Both are in `stations.parquet`; [Stations](/docs/reference/stations/#terms) describes them.
-
-The code that builds the store is [AGPL-3.0](https://github.com/openwatersio/stillwell/blob/main/LICENSE), at [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
+The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © [Open Waters](https://openwaters.io). Stations whose terms bar commercial use keep them, and every station's data carries a credit to show wherever it's used: [Terms](/docs/guides/terms/) has the details. The code that builds the store is [AGPL-3.0](https://github.com/openwatersio/stillwell/blob/main/LICENSE).
 
 The data is not for navigation. Observations are mostly preliminary, and a gauge can fail without warning.
 
@@ -100,7 +95,8 @@ The data is not for navigation. Observations are mostly preliminary, and a gauge
 
 ## Where to go next
 
-- [Getting started](/docs/getting-started/): reading the store, file paths, reading many files.
-- Reference: one page for each part of the data, from [Stations](/docs/reference/stations/) to [Errata](/docs/reference/errata/).
+- [Getting started](/docs/getting-started/): reading the store, file paths, reading many files, caching.
+- Guides: [Gauges](/docs/guides/gauges/), [Datums](/docs/guides/datums/), [Quality flags](/docs/guides/quality-flags/), [Terms](/docs/guides/terms/).
+- Reference: one page per file, from [`stations.parquet`](/docs/reference/stations/) to [`errata.json`](/docs/reference/errata/).
 - Examples: reading the store from a [notebook service](/docs/examples/notebooks/marimo/) or a [tool](/docs/examples/tools/duckdb/) you already use.
 - [Query the store](/query/) in your browser.

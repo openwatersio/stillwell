@@ -63,6 +63,5 @@ uvx marimo edit --sandbox stillwell.py
 
 ## Things to know
 
-- Times are UTC. `mo.sql` and Polars keep them in UTC.
-- `level_m` is a 32-bit float. Cast it to 64 bits before adding a datum offset, or round the result.
+- `mo.sql` and Polars keep times in UTC.
 - Select only the columns you need. On molab and your computer, that cuts what's downloaded; on marimo.app, it cuts what's held in memory.

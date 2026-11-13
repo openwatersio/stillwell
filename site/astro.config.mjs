@@ -13,14 +13,23 @@ export default defineConfig({
         { label: "Introduction", slug: "docs" },
         { label: "Getting started", slug: "docs/getting-started" },
         {
-          label: "Reference",
+          label: "Guides",
+          items: [
+            "docs/guides/gauges",
+            "docs/guides/datums",
+            "docs/guides/quality-flags",
+            "docs/guides/terms",
+          ],
+        },
+        {
+          label: "Reference: files",
           items: [
             "docs/reference/stations",
-            "docs/reference/gauges",
-            "docs/reference/series",
-            "docs/reference/datums",
+            "docs/reference/observations",
+            "docs/reference/predictions",
             "docs/reference/offsets",
             "docs/reference/links",
+            "docs/reference/sources",
             "docs/reference/errata",
           ],
         },

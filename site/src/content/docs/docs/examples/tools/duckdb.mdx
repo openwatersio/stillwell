@@ -57,7 +57,7 @@ The [Stations](/docs/reference/stations/#examples) page has more ways to find on
 
 ## Read a year of levels
 
-Each station's observed levels are one file per year at `obs/<source>/<source_id>/<year>.parquet`. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 ```sql
 SELECT time, level_m
@@ -89,7 +89,7 @@ COPY (
 
 ## Read several years
 
-HTTPS has no directory listing, so a wildcard such as `obs/rws/hoekvanholland/*.parquet` doesn't work, and a missing file is an error. Build the list of files from [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has), which has a row for every year file that exists, then pass it to `read_parquet`:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains, and pass it to `read_parquet`:
 
 ```sql
 SET VARIABLE files = (
@@ -117,9 +117,7 @@ GROUP BY year ORDER BY year;
 └───────┴───────┴────────┘
 ```
 
-`union_by_name = true` lets files with different columns read together, since some older files lack `source_flag`. `epoch = 1` keeps to the station's plain path; a station whose source moved it to another reference has later files under `obs/<source>/<source_id>/<epoch>/`, as [Datum epochs](/docs/reference/datums/#datum-epochs) describes.
-
-The path holds the station's `source_id` URL-encoded twice: an `@` is `%2540` in the path. Only one station in the store has a character that needs it. [File paths](/docs/getting-started/#file-paths) has the rule. DuckDB's `url_encode` builds it:
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path. DuckDB's `url_encode` builds it:
 
 ```sql
 SELECT 'https://stillwell.openwaters.io/obs/' || source || '/' || url_encode(url_encode(source_id)) AS dir
@@ -129,7 +127,7 @@ WHERE id = 'gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs';
 
 ## Convert to another datum
 
-`datums` maps each datum the station has an offset to, in meters, to add to a level in its own `datum`. Hoek van Holland's levels are in NAP; adding `datums['LAT']` refers them to LAT:
+Adding the station's `datums['LAT']` offset refers Hoek van Holland's NAP levels to LAT:
 
 ```sql
 SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
@@ -139,12 +137,9 @@ WHERE o.flag <= 2
 ORDER BY o.time;
 ```
 
-`datums` describes the station's current epoch. [Converting a level](/docs/reference/datums/#converting-a-level) covers earlier epochs, and [Credits](/docs/reference/datums/#credits) the credits owed for offsets that don't come from the source.
+[Datums](/docs/guides/datums/) covers earlier epochs and the credits owed for offsets.
 
 ## Things to know
 
-- Times are UTC, as `TIMESTAMPTZ`. Without `SET TimeZone = 'UTC'`, DuckDB shows them in your computer's time zone.
-- Levels are meters, in the `datum` column of the same file.
-- `level_m` is a 32-bit float. Arithmetic with a 64-bit offset shows the float's error, such as `1.0730000002980231`; round the result to 3 places.
-- Select only the columns you need. DuckDB then reads only those columns' bytes from each file.
-- [Series](/docs/reference/series/) describes every column and product, including extremes and predictions.
+- Without `SET TimeZone = 'UTC'`, DuckDB shows times in your computer's time zone.
+- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.

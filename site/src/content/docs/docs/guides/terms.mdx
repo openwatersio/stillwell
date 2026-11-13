@@ -1,0 +1,73 @@
+---
+title: Terms
+description: The license the data comes under, which stations keep stricter terms, and the credit to show.
+sidebar:
+  order: 4
+---
+
+import QueryResult from "../../../../components/QueryResult.astro";
+
+The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © [Open Waters](https://openwaters.io). Stations whose `commercial_use` is false keep their source's or contributor's terms. Wherever you use a station's data, show its `attribution`, and wherever you use its datum offsets, show its `datums_attribution` too.
+
+## The license
+
+CC BY 4.0 lets you share and adapt the data for any purpose, commercial or not, as long as you give credit. Credit Open Waters, and show each station's own credit as below. The code that builds the store is [AGPL-3.0](https://github.com/openwatersio/stillwell/blob/main/LICENSE).
+
+## Stations with stricter terms
+
+Some sources' terms, or a contributor's, don't allow commercial use. Those stations have [`commercial_use`](/docs/reference/stations/#column-commercial_use) false, and their data comes under the terms in their [`license`](/docs/reference/stations/#column-license) rather than CC BY 4.0 alone. [`sources.json`](/docs/reference/sources/) gives each source's terms in full. For commercial work, keep to stations where `commercial_use` is true.
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, count(*) FILTER (commercial_use) AS commercial,
+  string_agg(DISTINCT license, ', ') AS license
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+GROUP BY source ORDER BY source`}
+/>
+
+Within GESLA, commercial use depends on each record's contributor. JODC and UNAM records bar it while their permission to republish is pending.
+
+The same rule holds for offsets. Nothing is carried from a station whose terms bar commercial use to one whose terms allow it, so a commercial station's `datums` never depends on a non-commercial one.
+
+## Credit
+
+[`attribution`](/docs/reference/stations/#column-attribution) is the credit a station's data requires. Show it wherever the data is shown: on a chart, in a table, in an app, in a paper. When you show many stations, show each distinct line once.
+
+[`datums_attribution`](/docs/reference/stations/#column-datums_attribution) lists the credits owed for offsets that don't come from the station's source: slackwater-database's for each record behind them, such as TICON-4's citation, and the `attribution` of each linked station an offset was carried from. Show it beside `attribution` wherever you show or use those offsets, including offsets read from [`stations/offsets.parquet`](/docs/reference/offsets/). It is empty where `datums` holds only the source's own offsets.
+
+## Contributor credit
+
+GESLA and UHSLC collect records from many agencies. Where a contributor's own terms apply, a station's `attribution` names the contributor after the collection, and `commercial_use` follows the contributor's terms. GESLA's attribution cites its papers. GESLA asks that work using UHSLC's data also cite Caldwell et al. (2015), and UHSLC asks for that citation too.
+
+<QueryResult
+  sql={`SELECT attribution, commercial_use, count(*) AS stations
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE source IN ('gesla', 'uhslc')
+GROUP BY ALL ORDER BY stations DESC LIMIT 8`}
+/>
+
+## Not for navigation
+
+The data is not for navigation. Observations are mostly preliminary, and a gauge can fail without warning. UHSLC's terms also say its data is not for legal use.
+
+## Examples
+
+The credit lines for every series of one gauge, each shown once:
+
+<QueryResult
+  sql={`SELECT DISTINCT line
+FROM 'https://stillwell.openwaters.io/stations.parquet',
+  unnest(list_prepend(attribution, datums_attribution)) AS t(line)
+WHERE name ILIKE '%cuxhaven%'
+ORDER BY line`}
+/>
+
+The last week of REFMAR levels that allow commercial use, with each station's credit:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT r.time, r.station, r.level_m, s.attribution
+FROM 'https://stillwell.openwaters.io/recent/refmar.parquet' r
+JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.id = r.station
+WHERE s.commercial_use AND r.flag <= 2
+ORDER BY r.time DESC LIMIT 5`}
+/>

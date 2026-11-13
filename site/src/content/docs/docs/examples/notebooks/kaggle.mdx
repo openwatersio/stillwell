@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-[Kaggle](https://www.kaggle.com/code) notebooks run on Kaggle's servers, so the Python is ordinary server-side Python. DuckDB and Polars read the store over HTTPS and fetch only the parts of each file a query needs. Everything on the [Python](/docs/examples/tools/python/) page works as it stands, once the notebook can reach the internet.
+[Kaggle](https://www.kaggle.com/code) notebooks run on Kaggle's servers, so the Python is ordinary server-side Python. Everything on the [Python](/docs/examples/tools/python/) page works as it stands, once the notebook can reach the internet.
 
 ## Internet access
 
@@ -46,6 +46,4 @@ The [Python](/docs/examples/tools/python/) page has the rest: finding a station,
 ## Things to know
 
 - Files you write go to `/kaggle/working`, which Kaggle keeps as the notebook's output when you save a version.
-- Times are UTC. DuckDB's `.df()` converts them to the session's time zone, so keep `SET TimeZone = 'UTC'` in the first cell.
-- `level_m` is a 32-bit float. Cast it to 64 bits before adding a datum offset, or round the result.
-- Each station's data comes under its own terms, in `license`, `commercial_use` and `attribution` in [`stations.parquet`](/docs/reference/stations/#terms). Check them before publishing a notebook or dataset built from it.
+- Each station's data comes under its own [terms](/docs/guides/terms/). Check them before publishing a notebook or dataset built from it.

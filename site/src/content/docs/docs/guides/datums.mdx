@@ -1,0 +1,192 @@
+---
+title: Datums
+description: What a level is measured from, how to convert it to another datum, and how to read a station whose reference has changed.
+sidebar:
+  order: 2
+---
+
+import QueryResult from "../../../../components/QueryResult.astro";
+
+A level is a height above a reference, its datum, and each source measures from its own. To refer a level to another datum, add the station's offset for that datum from `datums`. A station whose reference has changed has more than one datum epoch, each in files of its own, and `to_current` puts them all in the current datum.
+
+## What a level is measured from
+
+Every series file has a `datum` column, the same on every row, in the source's own name for it: `NAP` in the Netherlands, `PNP` (gauge zero) at PEGELONLINE, `STND` (station datum) at CO-OPS. The station's [`datum`](/docs/reference/stations/#column-datum) in `stations.parquet` names the datum of its current epoch. Each source's README lists its datums.
+
+## The datums map
+
+[`datums`](/docs/reference/stations/#column-datums) is a map from a datum's name to the meters to add to a level in the station's `datum` to refer it to that datum.
+
+<QueryResult
+  sql={`SELECT id, datum, datums
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE id IN ('pegelonline/5990020', 'rws/hoekvanholland', 'coops/8518750')
+ORDER BY id`}
+/>
+
+### Where offsets come from
+
+[`datums_source`](/docs/reference/stations/#column-datums_source) says where each offset came from:
+
+- **`source`**: the source publishes it.
+- **`slackwater-database`**: the station's own record in slackwater-database, the tide prediction database, where that record is measured from the same zero as the station's levels. It replaces the source's MSL, LAT and chart datum.
+- **`computed`**: carried from another station of the same gauge (see [Gauges](/docs/guides/gauges/)). It is carried through a reference both stations give an offset to, such as a national height system or Admiralty Chart Datum, or else through the offset measured between their levels. That's how a PEGELONLINE gauge gets SKN from BSH through NHN.
+
+Tidal datums such as MSL and LAT are carried only between stations within 1 km, since they change along an estuary. Nothing is carried from a station whose terms bar commercial use to one whose terms allow it. Offsets from slackwater-database or another station owe credits of their own, in [`datums_attribution`](/docs/reference/stations/#column-datums_attribution). [Terms](/docs/guides/terms/) explains how to show them.
+
+<QueryResult
+  sql={`SELECT key AS datum, datums[key] AS offset_m, datums_source[key] AS source,
+  datums_epoch[key].start AS reduced_from, datums_epoch[key]."end" AS reduced_to
+FROM 'https://stillwell.openwaters.io/stations.parquet',
+  unnest(map_keys(datums)) AS t(key)
+WHERE id = 'pegelonline/5990020'
+ORDER BY datum`}
+/>
+
+### Reduction periods
+
+A tidal datum such as MSL is an average over a period, and it moves as sea level rises. [`datums_epoch`](/docs/reference/stations/#column-datums_epoch) gives the `start` and `end` of the period each tidal datum was reduced over, where slackwater-database or the source says. It is empty for height systems and for most sources' own offsets. Don't confuse it with a station's datum epochs, below: a reduction period belongs to one offset, while a datum epoch is a span of the station's own levels.
+
+## Chart datum
+
+[`chart_datum`](/docs/reference/stations/#column-chart_datum) names the datum charts use at the station, such as `MLLW`, `LAT`, `SKN` or `CD`. It is slackwater-database's choice where it has a record, and otherwise the source's own or one carried from a linked station. It is null when the station has no offset to one. To show levels as a chart does, add `datums[chart_datum]`. Where `chart_datum` is null, fall back to `datum`.
+
+[`frame`](/docs/reference/stations/#column-frame) says whether levels line up with the predictions of the station's `tide_station`:
+
+- `gauge`: the chart-datum offset comes from that very record, so levels and its predictions share a zero.
+- `source`: the chart-datum offset is the source's, computed, or from another record of the gauge.
+- `unknown`: there's no `chart_datum`, or the record's datums are relative to MSL = 0, so its predictions can't be compared with levels in absolute terms.
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, count(chart_datum) AS with_chart_datum,
+  count(*) FILTER (frame = 'gauge') AS gauge_frame
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active'
+GROUP BY source ORDER BY source`}
+/>
+
+## Converting a level
+
+Add the offset to the level. A level of 5.00 m at Cuxhaven, whose `datums['NHN']` is −5.033, is 5.00 − 5.033 = −0.033 m in NHN.
+
+The first levels of a year at Hoek van Holland, measured from NAP and referred to LAT:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT l.time, l.level_m AS level_nap_m, round(l.level_m + s.datums['LAT'], 3) AS level_lat_m
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' l,
+  'https://stillwell.openwaters.io/stations.parquet' s
+WHERE s.id = 'rws/hoekvanholland'
+ORDER BY l.time LIMIT 5`}
+/>
+
+`datums` describes the current epoch only. A level from an earlier epoch needs that epoch's `to_current` first, or an offset from `stations/offsets.parquet`, which has applied it already. The next section explains epochs.
+
+## Datum epochs
+
+A station's reference can change: its gauge zero is reset, or its source moves to another height system. A datum epoch is a span over which a station's levels share one reference. Most stations have one epoch.
+
+[`epochs`](/docs/reference/stations/#column-epochs) lists a station's epochs, each with an `id`, `datum`, `since`, `until`, `to_current` and `state`, among other fields.
+
+### Epoch files
+
+Each epoch has series files of its own, and no file is ever rewritten into another epoch. Epoch 1 uses the plain path, and later epochs add their number after the station: `obs/<source>/<station>/2/<year>.parquet`. [File paths](/docs/getting-started/#file-paths) has the details. `recent/<source>.parquet` gives each row's epoch in its `epoch` column.
+
+`since` and `until` bound the epoch, in UTC, with `until` exclusive. `since` is null for a first epoch with no known start, and `until` is null for the current one. An epoch's files can hold rows outside its span. Those rows are the uncertain stretch around a change, or years written before the next epoch opened, which that epoch's files hold again. They aren't part of the series, so filter on `since` and `until` when you read an epoch's files.
+
+### When an epoch opens
+
+A station gets a new epoch when:
+
+- the source reports another datum name;
+- the source reports a new reference under the same name, such as a change to PEGELONLINE's `gaugeZero.validFrom`;
+- a gauge zero reset is entered by hand, as for USACE gauges;
+- a decision finds the day a zero moved without the source saying, from the record's values against another record of the gauge or a neighbor;
+- the source serves its history in the reference of its time. RWS serves values from before the 2005 revision of NAP against NAP as it was then, so its stations whose revision offset isn't known have an epoch that ends on 2005-01-01.
+
+The new epoch starts at the instant the source gives, or a date entered by hand, or else the refresh that saw the change. A date without a time leaves that whole day out of both epochs, since nobody knows when in the day the change came.
+
+### When epochs convert
+
+`to_current` is the meters to add to an epoch's levels to put them in the station's current `datum`. It is set only when the epoch and the current one share a fixed reference: a geodetic datum such as NAP, NHN, NN, HN, NGVD29, or NAVD88 in one realization, or the epoch's own datum. Tidal datums such as MSL and LAT never count, because they move over time.
+
+A reset that keeps the datum's name never converts on its own, since the offsets alone can't tell a moved zero from a re-surveyed one. A decision sets `to_current` for such an epoch. Until then its `to_current` is null, and its rows stay out of the combined series, readable in their own datum.
+
+Each epoch converts straight to the current one, so conversions never chain, and many changes add no error. When the current epoch's offsets are re-leveled, every `to_current` follows at the next refresh.
+
+### Epoch states
+
+`state` is one of four values:
+
+- `open`: the current epoch.
+- `closed`: an earlier epoch.
+- `held`: a change within 180 days of the current epoch's start, or a return to one of the station's earlier datums. Its `to_current` is null, and the station isn't fetched until a decision confirms or rejects the change.
+- `rejected`: a change a decision found never happened, such as a datum name an adapter misread. Its files are read as the epoch before it, with that epoch's `to_current` plus any offset the decision gives, and the epoch before runs on to the next epoch that isn't rejected. In `stations/offsets.parquet` a rejected epoch's rows carry the offsets of the epoch before it.
+
+### More than one change
+
+Each change opens one more epoch, and nothing about earlier epochs changes except their `to_current`. Epoch 1 converts to epoch 3 if they share a fixed reference, whether or not epoch 2 did. A change back to an earlier datum is a new epoch, not a return to the old one, and doesn't convert on its own, since the zero may have moved in between. Several changes between two refreshes show up as one, unless the source's dates or a decision enter the ones in between.
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations,
+  count(*) FILTER (len([x FOR x IN epochs IF x.to_current IS NULL]) > 0) AS with_unconverted
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE len(epochs) > 1
+GROUP BY source ORDER BY stations DESC`}
+/>
+
+## Reading a whole record
+
+To read a station's whole record in its current datum, tag each file's rows with the epoch from its path, join them to `epochs`, keep the rows inside each epoch's span, and add `to_current`. REFMAR's Hiva Oa (`refmar/495`) changed reference in March 2020, and its first epoch converts by 1.35 m:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+WITH e AS (
+  SELECT unnest(epochs, recursive := true)
+  FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'refmar/495'
+),
+o AS (
+  SELECT 1 AS epoch, time, level_m, flag
+  FROM 'https://stillwell.openwaters.io/obs/refmar/495/2017.parquet'
+  UNION ALL
+  SELECT 2 AS epoch, time, level_m, flag
+  FROM 'https://stillwell.openwaters.io/obs/refmar/495/2/2021.parquet'
+),
+r AS (
+  SELECT o.time, o.epoch, o.level_m AS stored_m, o.level_m + e.to_current AS level_m, o.flag
+  FROM o JOIN e ON o.epoch = e.id
+    AND (e.since IS NULL OR o.time >= e.since) AND (e.until IS NULL OR o.time < e.until)
+  WHERE e.to_current IS NOT NULL
+  -- after a rejected epoch, its files and the epoch before it can share a time; the latter wins
+  QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 1
+)
+SELECT year(time) AS year, any_value(epoch) AS epoch, count(*) AS n,
+  round(avg(stored_m), 3) AS mean_stored_m, round(avg(level_m), 3) AS mean_current_m
+FROM r WHERE flag <= 2
+GROUP BY year ORDER BY year`}
+/>
+
+For more years, list each epoch's files from `stations/years/<source>.parquet`, which has an `epoch` column. [Reading many files](/docs/getting-started/#reading-many-files) shows how. Rows from an epoch whose `to_current` is null drop out of this query. Read them from their own files in their own datum.
+
+## Which offsets to use
+
+Three places in the store hold offsets. Each answers a different question.
+
+- **The `datums` map** in `stations.parquet`: offsets for the current epoch's levels. Use it for recent data and for any station with one epoch.
+- **[`stations/offsets.parquet`](/docs/reference/offsets/)**: one row per station, epoch and datum, with each epoch's `to_current` already applied. Use it to convert a level from any epoch with a single join on `station`, `epoch` and `datum`. An epoch that doesn't convert has rows only for its own frozen offsets.
+- **[`stations/links.parquet`](/docs/reference/links/)**: the offset measured between the levels of two linked stations within 1 km that share no reference datum, with how widely it varies from month to month. Its `until` is exclusive. Use it to check how two series of one gauge line up, or to see where a `computed` offset came from. You don't need it to convert levels, since `datums` already includes the offsets carried along it.
+
+REFMAR's Cancale (`refmar/6438`) has three epochs. Epochs 1 and 3 convert to its chart datum `ZH`, and epoch 2 doesn't, so `stations/offsets.parquet` has no row for it:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+WITH e AS (
+  SELECT unnest(epochs, recursive := true)
+  FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'refmar/6438'
+)
+SELECT e.id AS epoch, e.since::DATE AS since, e.until::DATE AS until, e.to_current, e.state,
+  o.datum, o.offset_m
+FROM e LEFT JOIN 'https://stillwell.openwaters.io/stations/offsets.parquet' o
+  ON o.station = 'refmar/6438' AND o.epoch = e.id
+ORDER BY e.id`}
+/>

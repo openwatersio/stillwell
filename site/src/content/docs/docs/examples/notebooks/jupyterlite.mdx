@@ -49,7 +49,7 @@ levels = con.sql(f"""
 """).df()
 ```
 
-Several years, from the list of files that exist in [`stations/years/<source>.parquet`](/docs/reference/series/#which-years-a-station-has):
+Several years, from the station's [years list](/docs/getting-started/#reading-many-files):
 
 ```python
 years_file = await download("stations/years/rws.parquet")

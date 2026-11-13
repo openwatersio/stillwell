@@ -1,6 +1,6 @@
 ---
-title: Errata
-description: errata.json, the errors found in what sources publish, and what Stillwell does about each one.
+title: errata.json
+description: The errors found in what sources publish, and what Stillwell does about each one.
 sidebar:
   order: 7
 ---
@@ -8,11 +8,9 @@ sidebar:
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-An erratum is an error in what a source publishes: values on the wrong clock or day, a gauge placed far from where it is, metadata that contradicts the data, or two endpoints that disagree. `errata.json` lists every erratum in the store, with the stations and span it's in, what's wrong, what Stillwell does about it, the evidence, and what the source's agency answered when told.
+`errata.json` lists every erratum in the store: an error in what a source publishes, such as values on the wrong clock, a gauge placed far from where it is, or metadata that contradicts the data. Each entry gives the stations and span it's in, what's wrong, what Stillwell does about it, the evidence, and what the agency answered. It's rebuilt with [`stations.parquet`](/docs/reference/stations/) from the errata files in the Stillwell repository. When an agency fixes its data and the store has fetched it again, the entry leaves the file and its ID is never used again.
 
-Each source's errata live in the repository at `src/sources/<source>/errata.json`, reviewed with the code that handles them, and each entry's `url` links to that file. When an agency fixes its data and the store has fetched it again, the entry leaves `errata.json` and its ID is never used again.
-
-`errata.json` is a JSON array, one object per erratum. DuckDB reads it with `read_json`.
+It's a JSON array, one object per erratum, which DuckDB reads with `read_json`.
 
 ## Schema
 
@@ -50,9 +48,9 @@ Each source's errata live in the repository at `src/sources/<source>/errata.json
 | `avoided`   | Doesn't use the wrong part, so nothing in the store is affected.         |
 | `kept`      | Keeps them as the source serves them.                                    |
 
-A `flagged` erratum with stations and a span marks those observed levels `suspect` wherever the store fetches or requalifies them; extremes aren't flagged. The source's own flag stays in `source_flag`, so `flag` can be worse than `source_flag` across the span. See [Flags](/docs/reference/series/#flags).
+A `flagged` erratum with stations and a span marks those observed levels `suspect`; extremes aren't flagged. See [Quality flags](/docs/guides/quality-flags/) for how that reaches `flag`.
 
-## Stations
+## Station errata
 
 The `errata` column of [`stations.parquet`](/docs/reference/stations/) lists the IDs of the errata that touch each station. An erratum whose `stations` is null is listed on every station of its source. Join on that column, rather than on `stations`, to find every erratum of a station.
 
