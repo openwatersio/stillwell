@@ -94,6 +94,13 @@ export const CRMS_EARLY = new Set(
     .map((site) => `crms${site}-crms${site}-usa-crms`),
 );
 
+/**
+ * GESLA's CRMS records that are the site's marsh well throughout, so they
+ * share no gauge with the site's surface-water series (erratum
+ * `gesla-crms0090-marsh-well`, erratum `gesla-crms0128-marsh-well`).
+ */
+export const CRMS_WELLS = new Set(["CRMS0090", "CRMS0128"]);
+
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
   /** `CONTRIBUTOR (ABBREVIATED)`, such as `NOAA` or `UHSLC_RQ`. */
@@ -318,8 +325,9 @@ export function originatorIds(
         ? [`sfwmd/${upper.replace(/_T$/, "")}_T`]
         : [`sfwmd/${upper}`];
     case "CRMS":
-      // The site's first surface-water gauge, which GESLA's records start on.
-      return /^CRMS\d{4}$/.test(upper) ? [`crms/${upper}-H01`] : [];
+      // The site's first surface-water gauge. Nine records start on the site's marsh well,
+      // which the store doesn't hold, and two are the well throughout (CRMS_WELLS).
+      return /^CRMS\d{4}$/.test(upper) && !CRMS_WELLS.has(upper) ? [`crms/${upper}-H01`] : [];
     // JODC's codes; its JMA records' (`MA…`) aren't JMA's own, and JODC doesn't list them.
     case "JODC_JCG":
     case "JODC_GIAJ":

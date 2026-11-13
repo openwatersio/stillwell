@@ -7,8 +7,15 @@ const NOW = new Date("2026-11-01T00:00:00Z");
 
 // The real decisions name stations these tests don't list, which would report them as dropped.
 const DECISIONS = [...LINKS];
-before(() => LINKS.splice(0));
-after(() => LINKS.push(...DECISIONS));
+const APART = [...UNLINKS];
+before(() => {
+  LINKS.splice(0);
+  UNLINKS.splice(0);
+});
+after(() => {
+  LINKS.push(...DECISIONS);
+  UNLINKS.push(...APART);
+});
 
 /** A station at `source/id`, by default at 0,0 with levels and no record yet. */
 const station = (
@@ -720,6 +727,35 @@ describe("rank", () => {
     ).stations;
     assert.deepEqual(moved[0]!.same_as, ["crms/CRMS6302-H01", "crms/CRMS6302-H02"]);
     for (const s of moved) assert.equal(s.preferred, "crms/CRMS6302-H02");
+    // GESLA's CRMS0128 is the site's marsh well throughout, so it names no
+    // CRMS series, and UNLINKS keeps it from the site's H01 25 m away.
+    UNLINKS.push(...APART.filter((d) => d.a === "gesla/crms0128-crms0128-usa-crms"));
+    let well: Station[];
+    try {
+      well = linkGauges(
+        [
+          station("gesla/crms0128-crms0128-usa-crms", {
+            name: "CRMS0128",
+            kind: "river",
+            lat: 29.8317,
+            lon: -89.94798,
+            ...record("2013-10-01T05:00:00Z", "2025-04-23T14:00:00Z"),
+          }),
+          station("crms/CRMS0128-H01", {
+            name: "CRMS0128-H01",
+            kind: "estuary",
+            lat: 29.83121397,
+            lon: -89.94819795,
+            status: "inactive",
+            ...record("2007-10-29T17:00:00Z", "2012-10-15T19:00:00Z"),
+          }),
+        ],
+        NOW,
+      ).stations;
+    } finally {
+      UNLINKS.splice(0);
+    }
+    for (const s of well) assert.deepEqual(s.same_as, []);
     assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
     assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.

@@ -86,7 +86,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
       new Date("1985-10-29Z"),
     )),
   ],
-  // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
+  // Hornbæk, on DVR90 since 1997.
   dmi: () => dmi.levels("30017", start, end),
   // Mitajiri-Nakanoseki's whole record, 2011 to 2013, the smallest zip (34 KB).
   jodc: () => jodc.levels("8413", new Date("2012-01-01Z"), new Date("2012-01-04Z")),
