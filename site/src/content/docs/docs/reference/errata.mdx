@@ -14,28 +14,7 @@ It's a JSON array, one object per erratum, which DuckDB reads with `read_json`.
 
 ## Schema
 
-<Schema
-  file="errata.json"
-  columns={{
-    id: "The erratum's ID, `<source>-<what>`, such as `uhslc-hong-kong-hour-early`.",
-    source: "The source that publishes the error.",
-    stations:
-      "The station IDs known to be affected; null for every station of the source. It can be partial or empty where the source doesn't say which stations, or they aren't in the store, and `error` says which.",
-    since:
-      "The first UTC day of values the error is in; null for an open start, or for an error in metadata.",
-    until:
-      "The UTC day after the last day of values the error is in; null for an open end, or for an error in metadata.",
-    error: "What the source publishes wrong.",
-    handling:
-      "What Stillwell does about it: `corrected`, `flagged`, `dropped`, `refused`, `avoided` or `kept`. See [Handling](#handling).",
-    response:
-      "What Stillwell does about it, in a sentence or two. What the store lacks or changed as a result can be wider than `since` to `until`, and this says so.",
-    evidence: "How the error was found and how sure it is, in Markdown.",
-    reported: "The day the error was first reported to the agency; null until then.",
-    report: "Where the report went and what the agency answered.",
-    url: "The file in the Stillwell repository that holds the entry.",
-  }}
-/>
+<Schema resource="errata" />
 
 ## Handling
 

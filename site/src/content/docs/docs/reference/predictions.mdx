@@ -12,20 +12,9 @@ Predictions are the source's own tide predictions, one Parquet file per station 
 
 ## Predicted curve
 
-`predictions/<source>/<station>/<year>.parquet`:
+One file per station per UTC year, for stations whose `products` include `predictions`:
 
-<Schema
-  file="predictions/rws/hoekvanholland/2026.parquet"
-  columns={{
-    time: "UTC, as `TIMESTAMPTZ`.",
-    level_m: "The predicted level in meters, in `datum`.",
-    flag: "Quality, on the same scale as observed levels. See [Quality flags](/docs/guides/quality-flags/).",
-    source_flag:
-      "The source's own flag, where it gives one; null otherwise. Older prediction files predate the column, so read several with `union_by_name = true`.",
-    received: "When ingest first saw the value arrive; null where ingest didn't record it.",
-    datum: "The reference `level_m` is measured from, the same on every row.",
-  }}
-/>
+<Schema resource="predictions" />
 
 The surge, as observed minus RWS's own prediction, at its largest:
 
@@ -42,21 +31,9 @@ The join holds only where both files share a `datum`. Otherwise refer them to on
 
 ## Predicted extremes
 
-`predicted-extremes/<source>/<station>/<year>.parquet` has `time`, `level_m`, `type`, `flag` and `datum`. BSH's files also carry its lunar transit number and event index:
+The predicted high and low waters, for stations whose `products` include `predicted_extremes`. Only BSH's files carry `transit` and `event`:
 
-<Schema
-  file="predicted-extremes/bsh/506P/2026.parquet"
-  columns={{
-    time: "UTC time of the predicted high or low water.",
-    level_m: "The predicted level in meters, in `datum`.",
-    type: "`high` or `low`.",
-    flag: "Quality, on the same scale as observed levels. See [Quality flags](/docs/guides/quality-flags/).",
-    transit: "BSH only: its number for the lunar transit the high or low water follows.",
-    event:
-      "BSH only: which one it is after that transit: 1 high water after the upper transit, 2 low water after the upper, 3 high water after the lower, 4 low water after the lower.",
-    datum: "The reference `level_m` is measured from, the same on every row.",
-  }}
-/>
+<Schema resource="predicted-extremes" />
 
 The next predicted extremes at Cuxhaven:
 

@@ -14,21 +14,9 @@ A series path is the product, the station's `id` and the year, as in `obs/rws/ho
 
 ## Observed levels
 
-`obs/<source>/<station>/<year>.parquet`, for stations whose `products` include `levels`:
+One file per station per UTC year, for stations whose `products` include `levels`:
 
-<Schema
-  file="obs/rws/hoekvanholland/2024.parquet"
-  columns={{
-    time: "UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.",
-    level_m: "The level in meters, in `datum`.",
-    flag: "Quality after Stillwell's checks: 0 good, 1 interpolated, 2 preliminary, 3 suspect, 4 bad. See [Quality flags](/docs/guides/quality-flags/).",
-    source_flag:
-      "The source's own flag on the same scale, before Stillwell's checks. Some older files don't have the column.",
-    received: "When ingest first saw the value arrive; null for backfilled history.",
-    datum:
-      "The reference `level_m` is measured from, the same on every row. It matches the `datum` of the file's epoch in [`stations.parquet`](/docs/reference/stations/). See [Datums](/docs/guides/datums/).",
-  }}
-/>
+<Schema resource="obs" />
 
 The first values of a year:
 
@@ -61,18 +49,9 @@ GROUP BY flag ORDER BY flag`}
 
 ## Observed extremes
 
-`extremes/<source>/<station>/<year>.parquet`, the high and low waters as the source selects them, for stations whose `products` include `extremes`:
+The high and low waters as the source selects them, for stations whose `products` include `extremes`:
 
-<Schema
-  file="extremes/rws/hoekvanholland/2024.parquet"
-  columns={{
-    time: "UTC time of the high or low water.",
-    level_m: "The level in meters, in `datum`.",
-    type: "`high` or `low`. A source can give both lows of a double low water, so two lows can come in a row.",
-    flag: "Quality, on the same scale as levels. See [Quality flags](/docs/guides/quality-flags/).",
-    datum: "The reference `level_m` is measured from, the same on every row.",
-  }}
-/>
+<Schema resource="extremes" />
 
 The year's highest high waters:
 
@@ -87,19 +66,7 @@ WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
 
 `recent/<source>.parquet` holds the last 7 days of observed levels for every station of the source whose `live` is true. It's rewritten every hour, so read it fresh rather than caching it.
 
-<Schema
-  file="recent/rws.parquet"
-  columns={{
-    station: "The station's `id` in `stations.parquet`.",
-    time: "UTC, as `TIMESTAMPTZ`.",
-    level_m: "The level in meters, in the datum of the row's epoch.",
-    flag: "Quality, on the same scale as `obs/`. See [Quality flags](/docs/guides/quality-flags/).",
-    source_flag: "The source's own flag, before Stillwell's checks.",
-    received: "When ingest first saw the value arrive.",
-    epoch:
-      "The datum epoch the value belongs to, its `id` in the station's `epochs`. Rows from different epochs are in different datums.",
-  }}
-/>
+<Schema resource="recent" />
 
 The latest value at each station, leaving out values flagged suspect or bad:
 
@@ -128,23 +95,7 @@ ORDER BY r.time DESC LIMIT 1`}
 
 HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Caching](/docs/getting-started/#caching).
 
-<Schema
-  file="stations/years/rws.parquet"
-  columns={{
-    id: "The station's `id` in `stations.parquet`.",
-    epoch:
-      "The datum epoch whose files hold the year, 1 for the plain path. Null marks a station whose rows may be out of date.",
-    year: "The UTC year. Null marks a station whose rows may be out of date.",
-    hours: "How many UTC hours hold at least one value, of any flag.",
-    good: "How many values have `flag` 0.",
-    interpolated: "How many values have `flag` 1.",
-    preliminary: "How many values have `flag` 2.",
-    suspect: "How many values have `flag` 3.",
-    bad: "How many values have `flag` 4.",
-    version:
-      "A hash of the file's rows. It changes when any row's `time`, `level_m`, `flag`, `source_flag` or `received` does, and only then.",
-  }}
-/>
+<Schema resource="years" />
 
 A row with a null `epoch` and `year` marks a station whose rows may be out of date: a run is writing its files, or one stopped partway. It can have a year with a file but no row. Read the list again later, and don't cache the station's files while it's marked. A mark usually clears the next night, but a station with many files can stay marked a few nights.
 

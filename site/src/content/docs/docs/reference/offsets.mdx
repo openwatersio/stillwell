@@ -12,16 +12,7 @@ import QueryResult from "../../../../components/QueryResult.astro";
 
 ## Schema
 
-<Schema
-  file="stations/offsets.parquet"
-  columns={{
-    station: "The station's `id` in `stations.parquet`.",
-    epoch:
-      "The datum epoch whose levels the offset applies to, its `id` in the station's `epochs`.",
-    datum: "The datum the offset refers levels to, such as `NHN`, `MSL`, `LAT` or `MLLW`.",
-    offset_m: "Meters to add to a level in the epoch's files to refer it to `datum`.",
-  }}
-/>
+<Schema resource="offsets" />
 
 ## Which rows an epoch has
 

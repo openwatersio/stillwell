@@ -81,8 +81,8 @@ export function years(source: string): Promise<Map<string, Row[]>> {
 
 const jsonCache = new Map<string, Promise<any>>();
 
-/** sources.json or errata.json. */
-export function json(path: "sources.json" | "errata.json"): Promise<any[]> {
+/** A JSON file in the store, such as sources.json, errata.json or datapackage.json. */
+export function json(path: string): Promise<any> {
   if (!jsonCache.has(path))
     jsonCache.set(
       path,

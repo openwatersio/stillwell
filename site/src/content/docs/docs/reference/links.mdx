@@ -12,23 +12,7 @@ import QueryResult from "../../../../components/QueryResult.astro";
 
 ## Schema
 
-<Schema
-  file="stations/links.parquet"
-  columns={{
-    a: "One station of the pair, its `id` in `stations.parquet`. It sorts before `b`.",
-    b: "The other station of the pair.",
-    a_epoch: "The datum epoch of `a` whose levels were measured, its `id` in `a`'s `epochs`.",
-    b_epoch: "The datum epoch of `b` whose levels were measured.",
-    since: "The start of the measured span, in UTC.",
-    until:
-      "The exclusive end of the measured span, in UTC: the end of the year measured, or the last value.",
-    hours: "How many hours the offset is the median of, at least 30 days' worth.",
-    offset_m:
-      "The median of `b`'s level less `a`'s, in meters, each in its own epoch's datum. Add it to a level of `a` to refer it to `b`'s datum.",
-    spread_m:
-      "How far the medians of the measured months range, in meters, over months with at least 10 days.",
-  }}
-/>
+<Schema resource="links" />
 
 ## How a pair is measured
 

@@ -12,24 +12,7 @@ import QueryResult from "../../../../components/QueryResult.astro";
 
 ## Schema
 
-<Schema
-  file="sources.json"
-  columns={{
-    id: "The source's ID, the `source` in `stations.parquet` and the first part of each station's `id`.",
-    name: "The source's name.",
-    url: "The source's home page for the data.",
-    license:
-      "The source's license, a struct with `id` (an SPDX identifier or the source's own name for its terms), `name`, `url`, `commercial_use` (whether the terms allow commercial use) and `redistribution` (whether they let anyone republish the data). These are the source's defaults; a station's own `license` and `commercial_use` can differ where a contributor's terms apply.",
-    attribution: "The credit the source's data requires.",
-    contact:
-      "Where to report an error in the source's data, a struct with `email` and `url`. At least one is set.",
-    terms:
-      "What a user of the data should know about the terms, and the changes the store makes to the source's values.",
-    finalizes:
-      "Whether values the source first publishes as preliminary become final later. Where it's false, the source's preliminary values stay preliminary. See [Quality flags](/docs/guides/quality-flags/).",
-    stations: "How many active stations the source has in `stations.parquet`.",
-  }}
-/>
+<Schema resource="sources" />
 
 ## Examples
 
