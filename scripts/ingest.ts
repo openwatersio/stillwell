@@ -96,6 +96,7 @@ import {
   formatSummary,
   lastDays,
   pool,
+  poolUntil,
   qcFor,
   REFETCH_YEARS,
   updateRecent,
@@ -873,8 +874,7 @@ async function requalifyStations(
         );
         continue;
       }
-      await pool(batch, positive("concurrency"), async (station) => {
-        if (Date.now() > until) return void left.push(station.id);
+      const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
         try {
           const { files, changed, warnings } = await requalify(
             source,
@@ -894,6 +894,7 @@ async function requalifyStations(
         }
         await finished?.(station.id);
       });
+      left.push(...late.map((station) => station.id));
       try {
         await commitYears(store, sourceId, marked, written);
       } catch (error) {
@@ -954,30 +955,35 @@ async function analyzeSource(sourceId: string): Promise<void> {
     5 * 60_000,
   );
   let unmarked: string[] = [];
-  let reached = 0;
-  for (const batch of chunks(waiting, 100)) {
-    if (Date.now() > until) {
-      console.log(
-        `analyze ${sourceId}: out of time, ${waiting.length - reached} stations not started`,
+  try {
+    let reached = 0;
+    for (const batch of chunks(waiting, 100)) {
+      if (Date.now() > until) {
+        console.log(
+          `analyze ${sourceId}: out of time, ${waiting.length - reached} stations not started`,
+        );
+        break;
+      }
+      reached += batch.length;
+      const { left } = await requalifyStations(
+        sourceId,
+        batch.join(","),
+        0,
+        10_000,
+        until,
+        marks.add,
       );
-      break;
+      await marks.flush();
+      if (left.length) {
+        console.log(
+          `analyze ${sourceId}: out of time, ${waiting.length - reached + left.length} stations not started`,
+        );
+        break;
+      }
     }
-    reached += batch.length;
-    const { left } = await requalifyStations(
-      sourceId,
-      batch.join(","),
-      0,
-      10_000,
-      until,
-      marks.add,
-    );
+  } finally {
+    // A throw out of a batch still writes the stations finished before it.
     unmarked = await marks.flush();
-    if (left.length) {
-      console.log(
-        `analyze ${sourceId}: out of time, ${waiting.length - reached + left.length} stations not started`,
-      );
-      break;
-    }
   }
   if (unmarked.length) {
     console.error(`analyze ${sourceId}: ${unmarked.length} requalified stations left unmarked`);
