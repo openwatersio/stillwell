@@ -471,11 +471,19 @@ describe("dmi owners and series", () => {
     await dmi.stations();
     assert.equal(warn.mock.callCount(), 0);
     serveList(list);
-    await dmi.stations([{ id: "dmi/20070", record_end: null } as unknown as Station]);
+    await dmi.stations([
+      { id: "dmi/20070", status: "active", record_end: null } as unknown as Station,
+    ]);
     assert.equal(warn.mock.callCount(), 1);
     assert.match(String(warn.mock.calls[0]!.arguments[0]), /20070 was handed to Kommuner\/Havne/);
     serveList(list);
     await dmi.stations([{ id: "dmi/20070", record_end: "2018-04-15" } as unknown as Station]);
+    assert.equal(warn.mock.callCount(), 1);
+    // Nor at a gauge stored inactive with no end, which hourly ingest doesn't read.
+    serveList(list);
+    await dmi.stations([
+      { id: "dmi/20070", status: "inactive", record_end: null } as unknown as Station,
+    ]);
     assert.equal(warn.mock.callCount(), 1);
   });
 

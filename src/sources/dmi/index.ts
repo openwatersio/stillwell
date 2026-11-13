@@ -129,7 +129,7 @@ interface ObservationProps {
  * span of all of them.
  */
 export async function stations(previous: Station[] = []): Promise<DmiStation[]> {
-  const ended = new Map(previous.map((s) => [s.id, (s as Partial<DmiStation>).record_end]));
+  const stored = new Map(previous.map((s) => [s.id, s as Partial<DmiStation>]));
   const items = await features<StationProps>(`${API}/station/items?limit=${LIMIT}`);
   const byId = new Map<string, Feature<StationProps>[]>();
   for (const f of items)
@@ -178,13 +178,14 @@ export async function stations(previous: Station[] = []): Promise<DmiStation[]> 
     ].filter((d): d is string => !!d);
     const recordEnd = ends.sort()[0] ?? null;
     // A handover the stored list doesn't end at yet: hourly ingest may have stored
-    // the new owner's values since, which have to be deleted by hand.
-    // One the store has never listed has no values to delete, but still counts toward the floor.
-    const stored = ended.has(`dmi/${id}`);
-    const was = ended.get(`dmi/${id}`);
-    if (handedOver !== null && (was === undefined || was === null || was > recordEnd!)) {
+    // the new owner's values since, which have to be deleted by hand. A station
+    // the store has never listed has no values to delete but still counts toward
+    // the floor; one stored inactive with no end isn't read hourly, so neither.
+    const was = stored.get(`dmi/${id}`);
+    const unseen = !was || (was.record_end ? was.record_end > recordEnd! : was.status === "active");
+    if (handedOver !== null && unseen) {
       newHandovers++;
-      if (stored)
+      if (was)
         console.warn(
           `DMI ${id} was handed to ${all[handover]!.properties.owner || "no owner"} on ${all[handover]!.properties.validFrom}; delete any values stored from then on, from recent/ too`,
         );
