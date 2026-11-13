@@ -878,8 +878,8 @@ export async function refuseOtherDatum(
  * flatline is suspect. A smaller tide, such as Göteborg's 9 cm, can sit on
  * one centimeter for hours at the turn; at 30 cm the level leaves it within
  * about an hour, even a diurnal tide's, so a longer run is a stuck gauge.
- * A change to it, or to `qcFor`'s other limits, bumps `RULES` in
- * `src/store/analysis.ts`, so every station's stored years are requalified.
+ * A change to it, or to `qcFor`'s other limits, adds a version to
+ * `RULES_HISTORY` in `src/store/analysis.ts` reaching any station.
  */
 export const CENTIMETER_TIDE_M = 0.3;
 
@@ -889,7 +889,7 @@ export const CENTIMETER_TIDE_M = 0.3;
  * either way, which spans 2 mm from the first: QARTOD's flat line test takes
  * values equal within 1 mm of each other. A centimeter flags hours of real
  * water where a small tide turns, as at Berwick, Louisiana. A change to it
- * bumps `RULES` in `src/store/analysis.ts`.
+ * adds a version to `RULES_HISTORY` in `src/store/analysis.ts`.
  */
 export const FLATLINE_M = 0.002;
 

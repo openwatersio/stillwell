@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import { currentEpoch } from "../epochs.ts";
-import { fromSource, qc } from "../qc.ts";
+import { SWITCHES, fromSource, qc, type QcOptions } from "../qc.ts";
 import {
   Flag,
   Unjudged,
@@ -38,7 +38,7 @@ export interface Analysis {
   id: string;
   /** When the station was last judged, as an ISO instant. */
   analyzed: string;
-  /** `RULES` as it was then, so a change to `qcFor`'s thresholds requalifies every station. */
+  /** `RULES` as it was then, so a change to QC's rules requalifies the stations it reaches (`reaches`). */
   rules: string;
   /** `JUDGE` as it was then, so a change to `judge` judges every station again; null in a row written before it was kept. */
   judge: string | null;
@@ -65,11 +65,42 @@ export interface Analysis {
 }
 
 /**
- * The version of QC's rules. Change it with any rule in `src/qc.ts` or
- * threshold in `qcFor`, so `analyze` judges every station again and
- * requalifies all its stored years.
+ * QC's rules by version, oldest first, each with the one rule its change is
+ * confined to, by its switch in `QcOptions` (`SWITCHES`), or null where it
+ * can change any station's flags. A rule a station's options turn off
+ * doesn't run, so a change to it can't change that station's flags, whatever
+ * rules read its marks. Add a version with any change to a rule in
+ * `src/qc.ts` or to `qcFor`, so `analyze` judges every station again and
+ * requalifies the stored years of those whose options use a rule changed
+ * since their verdict's `rules` (`reaches`); the rest keep their flags. A
+ * change to `qcFor` changes some stations' options, so it takes null.
+ * test/rules.test.ts checks each version's flags changed since the last only
+ * for the option sets its rule reaches.
  */
-export const RULES = "outliers-1";
+export const RULES_HISTORY: readonly { rules: string; rule: keyof typeof SWITCHES | null }[] = [
+  { rules: "tidal-1", rule: null },
+  // held-1 and jumps-1 also changed `qcFor`; span-1 changed several rules.
+  { rules: "held-1", rule: null },
+  { rules: "jumps-1", rule: null },
+  { rules: "span-1", rule: null },
+  { rules: "outliers-1", rule: "outliers" },
+];
+
+/** The version of QC's rules: the last in `RULES_HISTORY`. */
+export const RULES = RULES_HISTORY.at(-1)!.rules;
+
+/**
+ * Whether QC with `options` can flag differently now than under the rules
+ * version `since`: a rule changed after it in `history` is one `options`
+ * turns on, or reaches every station, or `since` isn't in `history`.
+ */
+export function reaches(since: string, options: QcOptions, history = RULES_HISTORY): boolean {
+  const at = history.findIndex((v) => v.rules === since);
+  return (
+    at < 0 ||
+    history.slice(at + 1).some((v) => v.rule === null || (options[v.rule] ?? SWITCHES[v.rule]))
+  );
+}
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a
@@ -349,14 +380,22 @@ export async function analyze(
         const was = previous.get(station.id);
         report.judged++;
         // Values that can't say, such as a new epoch's first weeks, don't undo a
-        // verdict, though new rules still requalify the station under it.
+        // verdict, though new rules that reach it requalify the station under it.
         if (verdict.tidal === null && was && was.tidal !== null) {
           // Its old `judge` stays, so it's judged again once its values can say.
           // The step stands whatever the values say about the tide.
           next.set(station.id, {
             ...was,
             step_s: verdict.step_s ?? was.step_s,
-            ...(was.rules !== RULES ? { rules: RULES, requalified: null } : {}),
+            // New rules that its options don't use leave its stored flags as they are.
+            ...(was.rules !== RULES
+              ? {
+                  rules: RULES,
+                  requalified: reaches(was.rules, qcFor({ ...station, ...was }))
+                    ? null
+                    : was.requalified,
+                }
+              : {}),
           });
           return;
         }
@@ -365,8 +404,8 @@ export async function analyze(
           qcFor({ ...station, tidal: from, tide_m: was?.tide_m ?? null }),
           qcFor({ ...station, ...verdict }),
         );
-        // A first verdict, or one under new rules, requalifies too: the stored years may be under rules no build has now.
-        const requalify = changed || !was || was.rules !== RULES;
+        // A first verdict, or one under new rules its options use, requalifies too: the stored years may be under rules no build has now.
+        const requalify = changed || !was || reaches(was.rules, qcFor({ ...station, ...verdict }));
         next.set(station.id, {
           id: station.id,
           analyzed: options.now.toISOString(),
@@ -398,7 +437,7 @@ export function writeAnalysis(store: string, source: string, rows: Analysis[]): 
 
 /**
  * Stations whose stored years aren't requalified under their verdict yet:
- * after a first verdict, one under new `RULES`, or one that changed their QC.
+ * after a first verdict, one under new `RULES` that reach their QC options, or one that changed their QC.
  */
 export function pending(analysis: Map<string, Analysis>): string[] {
   return [...analysis.values()].filter((a) => a.requalified === null).map((a) => a.id);
