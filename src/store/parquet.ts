@@ -14,6 +14,7 @@ import {
 } from "../schema.ts";
 import type { EventIndex } from "../types.ts";
 import type { OffsetRow } from "../datums.ts";
+import { FILES, IN_LIST_EXTRA, columnTypes, type Column, type ParquetFile } from "./files.ts";
 // Refuses the store and cache variables under their old names.
 import "../cache.ts";
 
@@ -236,7 +237,7 @@ async function writeObservationTable(
   table: string,
   datum: string,
 ): Promise<YearStats> {
-  await copyOut(path, table, "time, level_m, flag, source_flag, received, datum", datum, "time_ms");
+  await copyOut(path, table, FILES.obs.columns, datum, "time_ms");
   // The rows as copyOut wrote them, so the hash matches a read of the file.
   const reader = await (
     await connection()
@@ -339,11 +340,12 @@ export async function writeExtremes(
   rows: PublishedExtreme[],
   datum: string,
 ): Promise<void> {
+  // Only BSH gives `transit` and `event`; other sources' files have observed extremes' columns.
   const transit = rows.some((r) => "transit" in r);
   await copyRows(
     path,
     rows,
-    `time, level_m, type, flag${transit ? ", transit, event" : ""}, datum`,
+    FILES[transit ? "predicted-extremes" : "extremes"].columns,
     datum,
     (r) => [
       r.time,
@@ -476,15 +478,7 @@ export async function writeRecent(
   const table = await serial(createTable);
   try {
     for await (const rows of batches) await serial(() => appendRows(table, rows, recentCells));
-    await serial(() =>
-      copyOut(
-        path,
-        table,
-        "station, time, level_m, flag, source_flag, received, epoch",
-        undefined,
-        "station, time_ms",
-      ),
-    );
+    await serial(() => copyOut(path, table, FILES.recent.columns, undefined, "station, time_ms"));
   } finally {
     await serial(() => dropTable(table));
   }
@@ -579,100 +573,17 @@ export async function readRecent(path: string, stations?: string[]): Promise<Sta
   }));
 }
 
-const STATION_COLUMNS: Record<keyof Station, string> = {
-  id: "VARCHAR",
-  source: "VARCHAR",
-  source_id: "VARCHAR",
-  name: "VARCHAR",
-  lat: "DOUBLE",
-  lon: "DOUBLE",
-  country_code: "VARCHAR",
-  kind: "VARCHAR",
-  interval_s: "INTEGER",
-  datum: "VARCHAR",
-  datums: "MAP(VARCHAR, DOUBLE)",
-  datums_source: "MAP(VARCHAR, VARCHAR)",
-  datums_epoch: 'MAP(VARCHAR, STRUCT(start DATE, "end" DATE))',
-  datums_attribution: "VARCHAR[]",
-  chart_datum: "VARCHAR",
-  frame: "VARCHAR",
-  products: "VARCHAR[]",
-  first: "TIMESTAMPTZ",
-  last: "TIMESTAMPTZ",
-  license: "VARCHAR",
-  commercial_use: "BOOLEAN",
-  attribution: "VARCHAR",
-  tide_station: "VARCHAR",
-  same_as: "VARCHAR[]",
-  preferred: "VARCHAR",
-  errata: "VARCHAR[]",
-  status: "VARCHAR",
-  live: "BOOLEAN",
-  min_interval_s: "INTEGER",
-  source_qc_start: "TIMESTAMPTZ",
-  source_qc_start_inferred: "BOOLEAN",
-  tidal: "BOOLEAN",
-  tide_m: "DOUBLE",
-  source_url: "VARCHAR",
-};
-
-const EPOCHS =
-  "STRUCT(id INTEGER, datum VARCHAR, since TIMESTAMPTZ, until TIMESTAMPTZ, seen TIMESTAMPTZ, reference VARCHAR, reference_since TIMESTAMPTZ, datums MAP(VARCHAR, DOUBLE), to_current DOUBLE, state VARCHAR)[]";
-
-/**
- * Parquet sorted by station in small row groups, so a reader after one station
- * fetches the footer and one group. 2,048 rows is DuckDB's smallest group (its
- * vector size); a smaller ROW_GROUP_SIZE still writes 2,048.
- */
-const BY_STATION = "FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 2048";
-
 /** `stations.parquet`: one row per series, sorted by ID, with its datum epochs. */
-export async function writeStations(path: string, stations: StoredStation[]): Promise<void> {
-  const columns = { ...STATION_COLUMNS, epochs: EPOCHS };
-  await viaJson(
-    path,
-    stations,
-    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
-    BY_STATION,
-  );
+export function writeStations(path: string, stations: StoredStation[]): Promise<void> {
+  return writeTable(path, stations, FILES.stations);
 }
 
 /** `stations/offsets.parquet`: meters to add to a level in each station's epoch to refer it to each datum. */
-export async function writeOffsets(path: string, rows: OffsetRow[]): Promise<void> {
-  const columns = { station: "VARCHAR", epoch: "INTEGER", datum: "VARCHAR", offset_m: "DOUBLE" };
-  await viaJson(
-    path,
-    rows,
-    `SELECT * FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY station, epoch, datum`,
-    BY_STATION,
-  );
+export function writeOffsets(path: string, rows: OffsetRow[]): Promise<void> {
+  return writeTable(path, rows, FILES.offsets);
 }
 
-/**
- * A source's list's shared columns. The rest is kept as JSON in `extra`,
- * the QC start's columns (`IN_EXTRA`) included, so a station whose source
- * hasn't been asked has none rather than null, and its adapter knows to ask.
- */
-const IN_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
-const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
-  Object.entries(STATION_COLUMNS).filter(
-    ([key]) =>
-      ![
-        "first",
-        "last",
-        "preferred",
-        "errata",
-        "tidal",
-        "tide_m",
-        "datums_source",
-        "datums_epoch",
-        "datums_attribution",
-        "chart_datum",
-        "frame",
-        ...IN_EXTRA,
-      ].includes(key),
-  ),
-);
+const STATION_FIELDS = new Set(FILES.stations.columns.map((c) => c.name));
 
 /**
  * A source's list, `stations/<source>.parquet`: the shared columns except
@@ -681,19 +592,11 @@ const LIST_COLUMNS: Record<string, string> = Object.fromEntries(
 export async function writeStationList(path: string, stations: StoredStation[]): Promise<void> {
   const rows = stations.map((s) => {
     const extra = Object.fromEntries(
-      Object.entries(s).filter(
-        ([key]) => (!(key in STATION_COLUMNS) || IN_EXTRA.includes(key)) && key !== "epochs",
-      ),
+      Object.entries(s).filter(([key]) => !STATION_FIELDS.has(key) || IN_LIST_EXTRA.includes(key)),
     );
     return { ...s, extra: JSON.stringify(extra) };
   });
-  const columns = { ...LIST_COLUMNS, epochs: EPOCHS, extra: "VARCHAR" };
-  await viaJson(
-    path,
-    rows,
-    `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY id`,
-    "FORMAT parquet, COMPRESSION zstd",
-  );
+  await writeTable(path, rows, FILES.lists);
 }
 
 /** A source's list, or null when the store has none. */
@@ -859,7 +762,12 @@ export function readRows(path: string): Promise<Record<string, unknown>[]> {
   return read(path, "SELECT *", "ALL");
 }
 
-/** Rows as Parquet with the given columns and types, sorted by `order`, in row groups a filter on its first column can skip. */
+/**
+ * Rows as Parquet with the given columns and types, sorted by `order`, in row
+ * groups a filter on its first column can skip: a reader after one station
+ * fetches the footer and one group. 2,048 rows is DuckDB's smallest group (its
+ * vector size); a smaller ROW_GROUP_SIZE still writes 2,048.
+ */
 export async function writeRows(
   path: string,
   rows: object[],
@@ -870,8 +778,13 @@ export async function writeRows(
     path,
     rows,
     `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY ${order}`,
-    BY_STATION,
+    "FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 2048",
   );
+}
+
+/** Rows as one of the published files in `FILES`, with its columns, types and sort. */
+export function writeTable(path: string, rows: object[], file: ParquetFile): Promise<void> {
+  return writeRows(path, rows, columnTypes(file), file.sort.join(", "));
 }
 
 /** The files a glob matches, local or remote; none when its directory doesn't exist. */
@@ -956,6 +869,99 @@ export async function writeJsonArray(path: string, rows: object[]): Promise<void
   );
 }
 
+/**
+ * A JSON value as `JSON.stringify` writes it, through DuckDB as the rest go:
+ * one line, which a CSV with no quoting or header copies as it is. JSON
+ * escapes the control character used as the delimiter, so it can't occur.
+ */
+export function writeJson(path: string, value: unknown): Promise<void> {
+  return serial(async () => {
+    const db = await connection();
+    await prepare(path);
+    const dir = await mkdtemp(join(tmpdir(), "stillwell-"));
+    try {
+      const file = join(dir, "value.json");
+      await writeFile(file, JSON.stringify(value, null, 0));
+      await db.run(
+        `COPY (SELECT content FROM read_text(${quote(file)})) TO ${quote(path)} (FORMAT csv, HEADER false, QUOTE '', ESCAPE '', DELIMITER '\x1f')`,
+      );
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+}
+
+/**
+ * What in the Parquet file at `path` differs from `file`'s definition: a
+ * column missing, unexpected, out of order or of another type, nulls in a
+ * column (or a list's struct field) that has none, or rows out of order. None
+ * when it matches. Types are compared as DuckDB spells them back.
+ */
+export async function checkFile(path: string, file: ParquetFile): Promise<string[]> {
+  // read_parquet globs a local or S3 path, which would check other files; HTTP doesn't.
+  if (/[*?[]/.test(path) && !/^https?:/.test(path))
+    throw new Error(`can't check ${path}, which has a glob character`);
+  return serial(async () => {
+    const db = await connection();
+    if (/^https?:/.test(path)) await db.run("INSTALL httpfs; LOAD httpfs;");
+    const describe = async (select: string) =>
+      new Map(
+        (await db.runAndReadAll(`DESCRIBE ${select}`))
+          .getRowObjects()
+          .map((r) => [String(r.column_name), String(r.column_type)]),
+      );
+    const source = `read_parquet(${quote(path)}, file_row_number = true)`;
+    const actual = await describe(`SELECT * EXCLUDE (file_row_number) FROM ${source}`);
+    const declared = await describe(
+      `SELECT ${file.columns.map((c) => `NULL::${c.type} AS "${c.name}"`).join(", ")}`,
+    );
+    const columns = file.columns.filter((c) => actual.has(c.name) || !c.optional);
+    const problems: string[] = [];
+    for (const c of columns) {
+      if (!actual.has(c.name)) problems.push(`no column ${c.name}`);
+      else if (actual.get(c.name) !== declared.get(c.name))
+        problems.push(`${c.name} is ${actual.get(c.name)}, not ${declared.get(c.name)}`);
+    }
+    const unexpected = [...actual.keys()].filter((n) => !declared.has(n));
+    if (unexpected.length) problems.push(`unexpected columns ${unexpected.join(", ")}`);
+    const order = [...actual.keys()].filter((n) => declared.has(n));
+    const expected = columns.map((c) => c.name).filter((n) => actual.has(n));
+    if (order.join() !== expected.join())
+      problems.push(`columns in the order ${order.join(", ")}, not ${expected.join(", ")}`);
+    if (problems.length) return problems;
+
+    const counts = [
+      ...columns
+        .filter((c) => !c.nullable)
+        .map((c) => [c.name, `count(*) FILTER (WHERE "${c.name}" IS NULL)`]),
+      ...columns
+        .filter((c) => !c.nullable)
+        .flatMap((c) =>
+          (c.fields ?? [])
+            .filter((f) => !f.nullable)
+            .map((f) => [
+              `${c.name}.${f.name}`,
+              `(SELECT count(*) FILTER (WHERE e."${f.name}" IS NULL) FROM (SELECT unnest("${c.name}") AS e FROM ${source}))`,
+            ]),
+        ),
+      [
+        "sort",
+        `(SELECT count(*) FROM (SELECT file_row_number, row_number() OVER (ORDER BY ${file.sort.join(", ")}, file_row_number) - 1 AS sorted FROM ${source}) WHERE file_row_number != sorted)`,
+      ],
+    ];
+    const [row] = (
+      await db.runAndReadAll(
+        `SELECT ${counts.map(([name, sql]) => `${sql} AS "${name}"`).join(", ")} FROM ${source}`,
+      )
+    ).getRowObjects();
+    for (const [name] of counts) {
+      const n = Number(row![name!]);
+      if (n) problems.push(name === "sort" ? `${n} rows out of order` : `${n} nulls in ${name}`);
+    }
+    return problems;
+  });
+}
+
 type Cell = number | string | null;
 
 /**
@@ -966,7 +972,7 @@ type Cell = number | string | null;
 function copyRows<T>(
   path: string,
   rows: T[],
-  columns: string,
+  columns: Column[],
   datum: string | undefined,
   cells: (row: T) => Cell[],
   order = "time_ms",
@@ -977,7 +983,7 @@ function copyRows<T>(
 async function copyRowsNow<T>(
   path: string,
   rows: T[],
-  columns: string,
+  columns: Column[],
   datum: string | undefined,
   cells: (row: T) => Cell[],
   order: string,
@@ -1031,26 +1037,26 @@ async function appendRows<T>(table: string, rows: T[], cells: (row: T) => Cell[]
   appender.closeSync();
 }
 
+/** Copy a scratch table to `path` as `columns`, each cast to its type. */
 async function copyOut(
   path: string,
   table: string,
-  columns: string,
+  columns: Column[],
   datum: string | undefined,
   order: string,
 ): Promise<void> {
   const db = await connection();
   await prepare(path);
   const select = columns
-    .split(", ")
-    .map((c) =>
-      c === "time"
-        ? "epoch_ms(time_ms::BIGINT)::TIMESTAMPTZ AS time"
-        : c === "received"
-          ? "epoch_ms(received_ms::BIGINT)::TIMESTAMPTZ AS received"
-          : c === "datum"
-            ? `${quote(datum!)} AS datum`
-            : c,
-    )
+    .map(({ name, type }) => {
+      const value =
+        name === "time" || name === "received"
+          ? `epoch_ms(${name}_ms::BIGINT)`
+          : name === "datum"
+            ? quote(datum!)
+            : name;
+      return `CAST(${value} AS ${type}) AS ${name}`;
+    })
     .join(", ");
   await db.run(
     `COPY (SELECT ${select} FROM ${table} ORDER BY ${order}) TO ${quote(path)} (FORMAT parquet, COMPRESSION zstd)`,

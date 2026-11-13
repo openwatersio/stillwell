@@ -4,9 +4,10 @@ import {
   listFiles,
   readRows,
   readYearStats,
-  writeRows,
+  writeTable,
   type YearStats,
 } from "./parquet.ts";
+import { FILES, FLAG_COUNTS } from "./files.ts";
 import { sourceEpochDirs, sourceFirstEpochFiles, yearsPath } from "./paths.ts";
 import type { Timer } from "./recent.ts";
 
@@ -92,7 +93,7 @@ export async function readYears(
   );
 }
 
-const FLAGS = ["good", "interpolated", "preliminary", "suspect", "bad"];
+const FLAGS = FLAG_COUNTS;
 
 /**
  * Each station's share of its levels not flagged suspect or bad, over every
@@ -116,21 +117,13 @@ export async function usableShares(store: string, source: string): Promise<Map<s
 }
 
 export async function writeYears(store: string, source: string, rows: YearRow[]): Promise<void> {
-  await writeRows(
+  await writeTable(
     yearsPath(store, source),
     rows.map(({ flags, ...r }) => ({
       ...r,
       ...Object.fromEntries(FLAGS.map((f, i) => [f, flags?.[i] ?? null])),
     })),
-    {
-      id: "VARCHAR",
-      epoch: "INTEGER",
-      year: "INTEGER",
-      hours: "INTEGER",
-      ...Object.fromEntries(FLAGS.map((f) => [f, "INTEGER"])),
-      version: "VARCHAR",
-    },
-    "id, epoch NULLS FIRST, year NULLS FIRST",
+    FILES.years,
   );
 }
 
