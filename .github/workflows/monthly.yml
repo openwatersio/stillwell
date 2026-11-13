@@ -1,6 +1,7 @@
 name: Monthly
 
-# On the 2nd, refresh every source's station list, datums and terms, then
+# On the 2nd, refresh every source's station list, datums and terms and
+# requalify the years holding the last two months, then
 # measure offsets between linked series, rebuild stations.parquet,
 # sources.json, errata.json and datapackage.json, report the
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
@@ -117,14 +118,16 @@ jobs:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    # CO-OPS's datums take up to 2 hours (refreshBudgetMs), and analysis's
-    # requalify as long as it has stations pending.
+    # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
+    # requalify 2 hours. The requalify of the last two months starts stations
+    # for at most 90 minutes, and none after the job's fifth hour.
     timeout-minutes: 360
     # The environment holds the R2 credentials and only runs on main.
     environment: lake
     permissions:
       contents: read
     steps:
+      - run: echo "STARTED=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -150,6 +153,37 @@ jobs:
       # what it judged, and leaves the rest pending for the next.
       - if: ${{ !cancelled() }}
         run: node scripts/ingest.ts analyze "$SOURCE" --requalify --concurrency 8
+        env:
+          SOURCE: ${{ matrix.source }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      # Every station's years that hold the last two months, requalified with
+      # the current rules and errata and judged over the whole year, not the
+      # recent window's 7 days that compaction folds in. Compaction folds last
+      # month's final days again for a few nights after this, with the
+      # window's flags, so each month is judged whole by the next month's run,
+      # December's by February's. Only a full refresh runs it. As a step of
+      # this job, not a job of its own, it puts no job in the source's group to
+      # cancel one waiting there, such as a compaction. It takes only stations
+      # with a year file in range, and starts them for at most 90 minutes, and
+      # none once the job has run 5 hours, so the job ends within its time
+      # limit; USGS's, the most, took about 25 minutes in a local measurement.
+      # The stations it didn't finish, and every one when no time is left,
+      # are saved in the store with their years, and the next run starts
+      # with them, over those years too. A run killed partway saves nothing
+      # new, and the next starts again from the last saved list.
+      - if: ${{ !cancelled() && !inputs.sources }}
+        run: |
+          left=$(( (STARTED + 300 * 60 - $(date +%s)) / 60 ))
+          budget=$(( left < 90 ? left : 90 ))
+          # With no time left it still runs, to save every station for the next.
+          if [ "$budget" -lt 0 ]; then budget=0; fi
+          month=$(date -u +%Y-%m-01)
+          from=$(date -u -d "$month -2 months" +%Y)
+          to=$(date -u -d "$month -1 month" +%Y)
+          node scripts/ingest.ts requalify "$SOURCE" all "$from" "$((to + 1))" --budget "$budget" --concurrency 8
         env:
           SOURCE: ${{ matrix.source }}
           STILLWELL_STORE: s3://water-levels

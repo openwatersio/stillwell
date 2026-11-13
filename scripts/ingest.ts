@@ -10,6 +10,7 @@
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
+ *       [--budget <minutes>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
@@ -45,7 +46,8 @@
  * than keep the ones it knows. Both print a summary, and add it to
  * the workflow run's page. `requalify` works the flags of stations' observed
  * levels out again over the years [start, end) from the store alone (src/store/requalify.ts),
- * so a QC rule change reaches stored values without fetching them again.
+ * so a QC rule change reaches stored values without fetching them again;
+ * with `--budget` it starts stations only for that many minutes.
  * `withhold` deletes the files of a source's withheld stations, whose owner
  * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
@@ -110,9 +112,11 @@ import {
   readStationBounds,
   setConnections,
   publishedSources,
+  readJsonArray,
+  writeJsonArray,
   type YearStats,
 } from "../src/store/parquet.ts";
-import { commitYears, markYears, reconcileYears } from "../src/store/years.ts";
+import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { requalify } from "../src/store/requalify.ts";
 import {
   analyze,
@@ -121,7 +125,13 @@ import {
   readAnalysis,
   requalifiedMarks,
 } from "../src/store/analysis.ts";
-import { boundsPath, seriesDir, stationsPath, yearsPath } from "../src/store/paths.ts";
+import {
+  boundsPath,
+  requalifyLeftPath,
+  seriesDir,
+  stationsPath,
+  yearsPath,
+} from "../src/store/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -170,7 +180,7 @@ const { positionals, values } = parseArgs({
     "rebuild-years": { type: "boolean", default: false },
     all: { type: "boolean", default: false },
     requalify: { type: "boolean", default: false },
-    budget: { type: "string", default: "120" },
+    budget: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -213,7 +223,54 @@ switch (command) {
   case "requalify": {
     const [source, ids, start, end] = args;
     if (!source || !ids || !start || !end) usage();
-    await requalifyStations(source, ids, parseYear(start), parseYear(end));
+    if (values.budget === undefined) {
+      await requalifyStations(source, ids, parseYear(start), parseYear(end));
+      break;
+    }
+    // A budgeted run saves the stations it didn't finish, each with its years,
+    // and the next starts with them, each over its own years and that run's, so
+    // a source too big for the budget doesn't leave the same stations out each
+    // time. 0 saves them all, starting none.
+    if (ids !== "all" || values.shard) throw new Error("--budget resumes `all`, unsharded");
+    if (!/^\d+$/.test(values.budget))
+      throw new Error("--budget must be a whole number of minutes, 0 or more");
+    const minutes = Number(values.budget);
+    const range = { start: parseYear(start), end: parseYear(end) };
+    const path = requalifyLeftPath(storeOfSource(sourceOf(source).metadata), source);
+    const prior = ((await readJsonArray(path)) ?? []) as {
+      id: string;
+      start: number;
+      end: number;
+    }[];
+    const first = new Map(
+      prior.map((p) => [
+        p.id,
+        { start: Math.min(p.start, range.start), end: Math.max(p.end, range.end) },
+      ]),
+    );
+    const { left, failed } = await requalifyStations(
+      source,
+      ids,
+      range.start,
+      range.end,
+      minutes ? Date.now() + minutes * 60_000 : 0,
+      undefined,
+      first,
+    );
+    // A station that failed is tried again too, over this run's years only, so
+    // one that always fails, such as on a file holding two datums, stops once
+    // its year leaves the range rather than widening it each month. One whose
+    // batch couldn't be marked wasn't tried, so it keeps its saved years.
+    const failedIds = new Map(failed.map((f) => [f.split(": ")[0]!, f]));
+    await writeJsonArray(path, [
+      ...left.map((id) => ({ id, ...(first.get(id) ?? range) })),
+      ...[...failedIds]
+        .filter(([id]) => id.startsWith(`${source}/`) && !left.includes(id))
+        .map(([id, f]) => ({
+          id,
+          ...((f.startsWith(`${id}: years file not marked:`) && first.get(id)) || range),
+        })),
+    ]);
     break;
   }
   case "compact": {
@@ -811,8 +868,11 @@ async function reporting(title: string, run: () => Promise<RunSummary>): Promise
 }
 
 /** A command-line option that must be a whole number of at least 1. */
-function positive(name: "concurrency" | "hours" | "keep-days" | "budget"): number {
-  const value = Number(values[name]);
+function positive(
+  name: "concurrency" | "hours" | "keep-days" | "budget",
+  fallback?: string,
+): number {
+  const value = Number(values[name] ?? fallback);
   if (!Number.isInteger(value) || value < 1)
     throw new Error(`--${name} must be a whole number of at least 1`);
   return value;
@@ -828,7 +888,10 @@ function find(list: StoredStation[], sourceId: string, id: string): StoredStatio
 /**
  * Requalify stations 100 at a time. A station whose turn comes after `until`
  * isn't started, and is returned in `left`; one requalified without a failure
- * goes to `finished` once its files are written.
+ * goes to `finished` once its files are written. Those in `first` go first,
+ * each over its own years. With a budget, `all` takes only the stations the
+ * years file has a file in range for, or has marked as being written, or every
+ * station for a source without one.
  */
 async function requalifyStations(
   sourceId: string,
@@ -837,15 +900,36 @@ async function requalifyStations(
   end: number,
   until = Infinity,
   finished?: (id: string) => Promise<void>,
+  first = new Map<string, { start: number; end: number }>(),
 ): Promise<RunSummary & { left: string[] }> {
   if (start >= end)
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
   const source = sourceOf(sourceId);
-  const list = await listOf(storeOfSource(source.metadata), source);
+  const store = storeOfSource(source.metadata);
+  const list = await listOf(store, source);
   // Every station with files, inactive ones too, since their stored values are QC'd as well.
   let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
   if (values.shard) stations = shard(stations, ...parseShard(values.shard));
+  // Only a budgeted run, whose budget the rest would spend: a years file a
+  // short listing left a row out of would otherwise hide a station from a hand run.
+  const rows = ids === "all" && until < Infinity ? await readYears(store, sourceId) : null;
+  if (rows) {
+    const due = new Set(
+      [...rows.values()]
+        .filter((r) => {
+          const { start: from, end: to } = first.get(r.id) ?? { start, end };
+          return r.year === null || (r.year >= from && r.year < to);
+        })
+        .map((r) => r.id),
+    );
+    // A saved station always, so a row the listing left out doesn't drop its saved years.
+    stations = stations.filter((s) => due.has(s.id) || first.has(s.id));
+  }
+  stations = [
+    ...stations.filter((s) => first.has(s.id)),
+    ...stations.filter((s) => !first.has(s.id)),
+  ];
   setConnections(positive("concurrency"));
   const left: string[] = [];
   const summary = await reporting(`requalify ${sourceId} ${start}–${end}`, async () => {
@@ -859,23 +943,24 @@ async function requalifyStations(
       values: 0,
       files: 0,
     };
-    const store = storeOfSource(source.metadata);
     for (const batch of chunks(stations, 100)) {
       const ids = batch.map((station) => station.id);
-      const written = new Map<string, YearStats>();
-      // Past the budget a batch is left whole, without marking and committing the years file for nothing.
+      // Out of time: the rest aren't marked, which would rewrite the years file for nothing.
       if (Date.now() > until) {
         left.push(...ids);
         continue;
       }
+      const written = new Map<string, YearStats>();
       // A batch that can't be marked isn't written, so the years can't go stale.
       let marked: string[];
       try {
         marked = await markYears(store, sourceId, ids);
       } catch (error) {
-        s.failed.push(
-          `years (skipped ${ids.length} stations): ${error instanceof Error ? error.message : error}`,
-        );
+        // Each named, so a budgeted run saves them for the next.
+        for (const id of ids)
+          s.failed.push(
+            `${id}: years file not marked: ${error instanceof Error ? error.message : error}`,
+          );
         continue;
       }
       const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
@@ -884,8 +969,8 @@ async function requalifyStations(
             source,
             station,
             storeFor(station),
-            start,
-            end,
+            first.get(station.id)?.start ?? start,
+            first.get(station.id)?.end ?? end,
             written,
           );
           if (files) s.updated++;
@@ -905,6 +990,9 @@ async function requalifyStations(
         s.failed.push(`years: ${error instanceof Error ? error.message : error}`);
       }
     }
+    // First, so the summary's first 20 warnings never leave it out.
+    if (left.length)
+      (s.warned ??= []).unshift(`${left.length} stations not started, for the next run`);
     s.stations -= left.length;
     return s;
   });
@@ -951,7 +1039,7 @@ async function analyzeSource(sourceId: string): Promise<void> {
     .filter((id) => listed.has(id))
     .sort((a, b) => Number(differs(b)) - Number(differs(a)));
   // A station starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
-  const until = Date.now() + positive("budget") * 60_000;
+  const until = Date.now() + positive("budget", "120") * 60_000;
   // Finished stations are marked as others finish, at most every 5 minutes, and after each batch,
   // since a batch of 1-minute series can run for hours.
   const marks = requalifiedMarks(
@@ -1027,7 +1115,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

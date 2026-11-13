@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { describe, it } from "node:test";
+import { parse } from "yaml";
 import { sources } from "../src/sources/index.ts";
 import { sourcesFor } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
@@ -174,5 +175,38 @@ describe("scheduled jobs for a source with no list yet", () => {
       });
       assert.match(out, /coops: no station list yet; the Monthly workflow starts it/);
     }
+  });
+});
+
+describe("Monthly workflow", () => {
+  type Job = { concurrency?: { group: string }; steps: { run?: string; if?: string }[] };
+  const { jobs } = parse(readFileSync(".github/workflows/monthly.yml", "utf8")) as {
+    jobs: Record<string, Job>;
+  };
+
+  it("requalifies last month's year in the list job, which holds the source's group", () => {
+    const step = jobs.lists!.steps.find((s) => s.run?.includes("ingest.ts requalify"));
+    assert.ok(step, "the lists job requalifies");
+    assert.equal(jobs.lists!.concurrency?.group, "store-${{ matrix.source }}");
+    // A dispatched refresh of named sources, such as Ingest hourly's on a datum change, skips it.
+    assert.equal(step.if, "${{ !cancelled() && !inputs.sources }}");
+    // From the year two months back, since compaction refolds a month's last
+    // days with the window's flags after the run, so December's are judged in
+    // February; to last month's year, the end exclusive.
+    assert.match(step.run!, /from=\$\(date -u -d "\$month -2 months" \+%Y\)/);
+    assert.match(step.run!, /to=\$\(date -u -d "\$month -1 month" \+%Y\)/);
+    assert.match(step.run!, /all "\$from" "\$\(\(to \+ 1\)\)" --budget "\$budget" /);
+    // After analysis, whose verdicts pick the rules it judges with.
+    const index = (text: string) => jobs.lists!.steps.findIndex((s) => s.run?.includes(text));
+    assert.ok(index("ingest.ts analyze") >= 0);
+    assert.ok(index("ingest.ts analyze") < index("ingest.ts requalify"));
+  });
+
+  it("puts no job but the lists and refetch in a source's group", () => {
+    // A new job queued in a source's group would cancel the one waiting there, such as a compaction.
+    const grouped = Object.entries(jobs)
+      .filter(([, job]) => job.concurrency?.group.startsWith("store-"))
+      .map(([name]) => name);
+    assert.deepEqual(grouped.sort(), ["lists", "refetch"]);
   });
 });
