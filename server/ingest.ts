@@ -49,6 +49,9 @@ if (!chosen.length) throw new Error("no hourly source named");
 if (!process.env.STILLWELL_STORE) throw new Error("set STILLWELL_STORE to the store");
 
 for (const source of chosen) storeOfSource(source.metadata); // a restricted source with no restricted store fails now
+// A misspelled name would quietly poll a source that refuses the server, so an unknown one fails now.
+for (const name of (process.env.STILLWELL_FROM_RECENT ?? "").split(",").map((s) => s.trim()))
+  if (name) sourceOf(name);
 for (const name of new Set(chosen.map(databaseFor))) await migrate(clickhouse(name));
 
 let stopping = false;

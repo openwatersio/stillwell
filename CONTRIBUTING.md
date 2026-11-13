@@ -159,7 +159,7 @@ docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP
 STILLWELL_STORE=https://stillwell.openwaters.io node server/ingest.ts kartverket
 ```
 
-Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
+Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `STILLWELL_METRICS` names a file it writes each source's pass metrics to, and `STILLWELL_FROM_RECENT` lists sources it fills hourly from `recent/` rather than ask, for a source that refuses the server. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
 
 ## Withheld stations
 

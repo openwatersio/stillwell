@@ -159,9 +159,14 @@ if grep -q '^GRAFANA_CLOUD_PROM_URL=.' /etc/alloy.env; then
 	alloy=1
 	# With the unit's environment, so the config is checked as Alloy will run it.
 	# shellcheck source=/dev/null
-	(set -a && . /etc/alloy.env && alloy validate /etc/alloy/config.alloy)
-	systemctl enable alloy
-	systemctl restart alloy
+	# A config this Alloy release rejects leaves it as it was rather than block the app's deploy.
+	if (set -a && . /etc/alloy.env && alloy validate /etc/alloy/config.alloy); then
+		systemctl enable alloy
+		systemctl restart alloy
+	else
+		echo 'alloy config invalid: left Alloy as it was' >&2
+		alloy=
+	fi
 else
 	systemctl disable --now alloy
 	echo 'alloy off: fill in /etc/alloy.env to ship metrics' >&2
