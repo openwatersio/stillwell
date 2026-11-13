@@ -6,7 +6,7 @@ This repo fetches water levels from each source's own service and writes them as
 
 ```
 src/sources/<source>/  one adapter per source, each with a README on that service's quirks
-src/store/              Parquet writing, merging and paths
+src/store/              Parquet writing, merging and paths, and the definition of every published file (files.ts)
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/realtime/          the realtime poller's ClickHouse store, poll and schedule (docs/plans/realtime.md)
 server/                stillwell-ingest, the service that runs the poller
@@ -15,7 +15,7 @@ scripts/               ingest.ts, the weekly canary, the failure alerts, the TIC
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the store's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket) and canary.yml (a weekly live request per adapter)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -54,7 +54,7 @@ CI also checks that [`package-lock.json`](package-lock.json) regenerates from [`
 
 ## Running ingest
 
-[`scripts/ingest.ts`](scripts/ingest.ts) has ten commands: `stations`, `publish`, `links`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`. `stations` refreshes each source's list in the store, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet` and `sources.json`, unless `--no-publish`; `publish` writes only those two, from the lists in the store. Neither changes a file in the repo. `links` measures the offset between each pair of linked series that share no reference datum, from the stations as publish builds them and their levels, into `stations/links.parquet`, which the next publish carries MSL, LAT and chart datum through ([docs/data.md](docs/data.md)); the Monthly workflow runs it before publishing. Before writing a list it copies the previous one, less any withheld stations, to `history/stations/<source>/`, with a report of the stations added, retired, removed and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the store has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs`, the Monthly workflow's `accept_epochs`, after checking them). A station the source stops listing stays, marked inactive; a withheld one leaves (see [Withheld stations](#withheld-stations)). A new source's first refresh starts its list; a source with series in the store but no list or history is refused rather than started over. A station's datum epochs, and the decisions about them in the source's `overrides`, are described in [Stations](docs/stations.md#datum-epochs).
+[`scripts/ingest.ts`](scripts/ingest.ts) has ten commands: `stations`, `publish`, `links`, `backfill`, `recent`, `compact`, `requalify`, `analyze`, `withhold` and `years`. `stations` refreshes each source's list in the store, `stations/<source>.parquet`, for every source or the ones named, then writes `stations.parquet`, `stations/offsets.parquet`, `sources.json`, `errata.json` and their definitions (`datapackage.json` and the JSON Schemas, see [Published files](#published-files)), unless `--no-publish`; `publish` writes only those, from the lists in the store. Neither changes a file in the repo. `links` measures the offset between each pair of linked series that share no reference datum, from the stations as publish builds them and their levels, into `stations/links.parquet`, which the next publish carries MSL, LAT and chart datum through ([docs/data.md](docs/data.md)); the Monthly workflow runs it before publishing. Before writing a list it copies the previous one, less any withheld stations, to `history/stations/<source>/`, with a report of the stations added, retired, removed and changed, which it also prints and adds to a GitHub job summary. It keeps the previous list when the fetch fails, comes back empty or shrinks by half, when a station's terms differ from its source's, when the store has history for the source but no list, or when more stations changed datum at once than an adapter bug would explain (rerun with `--accept-epochs`, the Monthly workflow's `accept_epochs`, after checking them). A station the source stops listing stays, marked inactive; a withheld one leaves (see [Withheld stations](#withheld-stations)). A new source's first refresh starts its list; a source with series in the store but no list or history is refused rather than started over. A station's datum epochs, and the decisions about them in the source's `overrides`, are described in [Stations](docs/stations.md#datum-epochs).
 
 ```bash
 node scripts/ingest.ts stations
@@ -227,6 +227,14 @@ npm run evaluate:rws
 ```
 
 Each writes `docs/results/<source>.json` and prints a Markdown table for the [HRoI evaluation](docs/hroi-evaluation.md). The RWS one downloads about 50 years of 10-minute data in total the first time, which takes 20–30 minutes.
+
+## Published files
+
+[`src/store/files.ts`](src/store/files.ts) defines every file the store publishes: its path, each column's DuckDB type, whether it can be null, a one-line description, and the sort order, with JSON Schemas for `sources.json` and `errata.json`. The writers in [`src/store/parquet.ts`](src/store/parquet.ts) take their columns and types from it, [`test/files.test.ts`](test/files.test.ts) writes each file and compares it with its definition, and publish writes it to the store as `datapackage.json`, `sources.schema.json` and `errata.schema.json`. To add or change a column, change its definition there, and the docs that describe it. The series files (`obs/`, `predictions/`, `extremes/`, `predicted-extremes/` and `recent/`) are copied out of a scratch table in `parquet.ts` (`createTable`, `appendRows`, `copyOut`), and their readers and the `version` hash (`YEAR_STATS`) name its columns too, so a change to one of those columns needs them changed as well. A column older files lack is `optional`, so readers know to use `union_by_name`. The weekly bucket check runs [`scripts/check-files.ts`](scripts/check-files.ts) against the public store, which you can run too:
+
+```bash
+node scripts/check-files.ts https://stillwell.openwaters.io
+```
 
 ## Adding a source
 

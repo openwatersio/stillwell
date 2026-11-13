@@ -19,8 +19,9 @@ import {
   readRows,
   readStationBounds,
   writeJsonArray,
-  writeRows,
+  writeTable,
 } from "./parquet.ts";
+import { FILES } from "./files.ts";
 import { analysisHistoryPath, analysisPath, boundsPath, seriesDir, seriesPath } from "./paths.ts";
 import { chunks, pool, qcFor } from "./recent.ts";
 
@@ -357,22 +358,7 @@ export async function analyze(
 
 /** A source's analysis, `rows` sorted by ID. */
 export function writeAnalysis(store: string, source: string, rows: Analysis[]): Promise<void> {
-  return writeRows(
-    analysisPath(store, source),
-    rows,
-    {
-      id: "VARCHAR",
-      analyzed: "TIMESTAMPTZ",
-      rules: "VARCHAR",
-      judge: "VARCHAR",
-      tidal: "BOOLEAN",
-      tide_m: "DOUBLE",
-      days: "INTEGER",
-      drains: "INTEGER",
-      requalified: "TIMESTAMPTZ",
-    },
-    "id",
-  );
+  return writeTable(analysisPath(store, source), rows, FILES.analysis);
 }
 
 /**

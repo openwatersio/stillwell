@@ -6,6 +6,8 @@ import type { Product } from "../schema.ts";
  *   stations.parquet                                    one row per series
  *   sources.json                                        license, attribution, contact and finalizes per source
  *   errata.json                                         errors in what sources publish, and what the store does about them
+ *   datapackage.json                                    the definition of each file here for readers (files.ts)
+ *   sources.schema.json, errata.schema.json             the JSON Schemas of sources.json and errata.json
  *   stations/offsets.parquet                            each station's offsets by epoch, rebuilt with stations.parquet
  *   stations/links.parquet                              offsets measured between linked series' levels, once a month
  *   stations/<source>.parquet                           one source's list, with datum epochs

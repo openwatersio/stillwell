@@ -13,6 +13,7 @@ import {
   recentEpochs,
   readStationBounds,
   readStationList,
+  writeJson,
   writeJsonArray,
   writeStationList,
   writeOffsets,
@@ -37,6 +38,7 @@ import type { StoredStation, ListedStation, Source, SourceMetadata, Station } fr
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
+import { JSON_FILES, dataPackage } from "./store/files.ts";
 import {
   offsetRows,
   ticonOriginators,
@@ -243,7 +245,8 @@ async function renumberAboveFiles(
 }
 
 /**
- * Rebuild `stations.parquet`, `sources.json` and `errata.json` in `store` from the lists of
+ * Rebuild `stations.parquet`, `stations/offsets.parquet`, `sources.json` and `errata.json` in `store`, with
+ * `datapackage.json` and the JSON Schemas that define them (`src/store/files.ts`), from the lists of
  * `all`, the sources it holds, their bounds, and their years files' flag counts for `rank`. A source in `expected` that
  * has no list, because it went missing, stops the rebuild, which would
  * otherwise drop its stations from what the store publishes; it returns the
@@ -280,14 +283,20 @@ export async function publishStations(
   await writeStations(stationsPath(store), linked);
   await writeJsonArray(
     sourcesPath(store),
-    listed.map((s) => ({
-      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
-      stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
-    })),
+    listed.map((s) =>
+      sourceEntry(
+        s.metadata,
+        linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
+      ),
+    ),
   );
   // A store's errata are its own sources', so a restricted source's stay out of the public store.
   const held = new Set(listed.map((s) => s.metadata.id));
   await writeJsonArray(errataPath(store), published(errata.filter((e) => held.has(e.source))));
+  // The definition of every file above, for readers (src/store/files.ts).
+  await writeJson(`${store}/datapackage.json`, dataPackage());
+  for (const [path, schema] of Object.entries(JSON_FILES))
+    await writeJson(`${store}/${path.replace(/\.json$/, ".schema.json")}`, schema);
   const ids = new Set(linked.map((s) => s.id));
   // A withheld station is gone on purpose, though an erratum may still name it.
   const withheld = (id: string) => listed.some((s) => withheldReason(s, id) !== null);
@@ -364,6 +373,14 @@ export async function stationsToMeasure(store: string, all: Source[]): Promise<S
  * tells a reader whether the source's `preliminary` values will ever change.
  */
 const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
+
+/** A source's entry in `sources.json`: its metadata less what only ingest uses, and its active stations. */
+export function sourceEntry(metadata: SourceMetadata, stations: number): object {
+  return {
+    ...Object.fromEntries(Object.entries(metadata).filter(([key]) => !INGEST_ONLY.has(key))),
+    stations,
+  };
+}
 
 /** A source's list from the store, with each station's analysis (`withAnalysis`), or an error naming what to run. */
 export async function listOf(store: string, source: Source): Promise<StoredStation[]> {
