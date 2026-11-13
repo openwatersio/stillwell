@@ -15,6 +15,7 @@ import type { Product } from "../schema.ts";
  *   stations/analysis/<source>.parquet                  what analysis measures from each station's levels, such as whether they carry a tide
  *   stations/years/<source>.parquet                     each year file of levels: hours, values by flag and a version
  *   stations/empty/<source>.json                        years a `--skip-written` backfill found nothing in, for 30 days
+ *   stations/requalify/<source>.json                    stations a `requalify --budget` run didn't finish, for the next
  *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   history/analysis/<source>/<time>.json               stations whose QC an analysis changed
@@ -126,6 +127,11 @@ export function analysisHistoryPath(root: string, source: string, time: string):
 
 export function yearsPath(root: string, source: string): string {
   return `${root}/stations/years/${source}.parquet`;
+}
+
+/** The stations a `requalify --budget` run didn't finish, with their years, which the next starts with. */
+export function requalifyLeftPath(root: string, source: string): string {
+  return `${root}/stations/requalify/${source}.json`;
 }
 
 export function emptyYearsPath(root: string, source: string): string {
