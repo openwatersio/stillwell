@@ -90,6 +90,23 @@ describe("linkGauges", () => {
     ]);
   });
 
+  it("reports a group wider than any one link reaches, and not a large close one", () => {
+    const { stations, report } = linkGauges([
+      station("uhslc/001", { same_as: ["uhslc/001a"] }),
+      station("uhslc/001a", { lat: 1 }),
+      ...Array.from({ length: 12 }, (_, i) =>
+        station(`uhslc/1${i}`, { lat: 10, same_as: i ? ["uhslc/10"] : [] }),
+      ),
+    ]);
+    assert.equal(stations.find((s) => s.id === "uhslc/10")!.same_as.length, 11);
+    assert.deepEqual(report.wide, [["uhslc/001", "uhslc/001a"]]);
+    const { report: unplaced } = linkGauges([
+      station("uhslc/002", { same_as: ["uhslc/002a"] }),
+      station("uhslc/002a", { lat: NaN }),
+    ]);
+    assert.deepEqual(unplaced.wide, [["uhslc/002", "uhslc/002a"]]);
+  });
+
   it("links stations of different sources by nearness and name", () => {
     const { stations, report } = linkGauges([
       station("usace/LRL.Calhoun", { name: "GREEN RIVER AT LOCK 2 AT CALHOUN" }),

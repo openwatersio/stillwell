@@ -280,10 +280,18 @@ export async function publishStations(
   await writeStations(stationsPath(store), linked);
   await writeJsonArray(
     sourcesPath(store),
-    listed.map((s) => ({
-      ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
-      stations: linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
-    })),
+    listed.map((s) => {
+      const own = linked.filter((st) => st.source === s.metadata.id);
+      return {
+        ...Object.fromEntries(Object.entries(s.metadata).filter(([key]) => !INGEST_ONLY.has(key))),
+        // True only where every station allows it, inactive ones too, since their series stay.
+        license: {
+          ...s.metadata.license,
+          commercial_use: s.metadata.license.commercial_use && own.every((st) => st.commercial_use),
+        },
+        stations: own.filter((st) => st.status === "active").length,
+      };
+    }),
   );
   // A store's errata are its own sources', so a restricted source's stay out of the public store.
   const held = new Set(listed.map((s) => s.metadata.id));

@@ -206,11 +206,12 @@ export interface LinkReport {
   dropped: { from: string; to: string; reason: string }[];
   /** Links found but not made, since they'd join what the rules keep apart. */
   skipped: { a: string; b: string; how: How; reason: string }[];
-  /** Groups of more than `LARGE` stations, worth a look. */
-  large: string[][];
+  /**
+   * Groups with two stations more than `ID_KM` apart, or one without a position:
+   * likelier links chained across two gauges than one gauge, worth a look.
+   */
+  wide: string[][];
 }
-
-const LARGE = 8;
 
 /** The order links join groups in: `LINKS` first, inferred ones last. */
 const ORDER: How[] = ["manual", "id", "near", "copy"];
@@ -340,14 +341,15 @@ export function linkGauges<T extends Station>(
     count(a, b, how);
   }
   const preferredOf = new Map<string, string>();
-  const large: string[][] = [];
+  const wide: string[][] = [];
   for (const [r, group] of members) {
     const copies = copiesIn(group);
     preferredOf.set(
       r,
       group.reduce((best, s) => (rank(s, best, now, copies, usable) < 0 ? s : best)).id,
     );
-    if (group.length > LARGE) large.push(group.map((s) => s.id).sort());
+    if (group.some((a, i) => group.slice(i + 1).some((b) => !(km(a, b) <= ID_KM))))
+      wide.push(group.map((s) => s.id).sort());
   }
   return {
     stations: stations.map((s) => ({
@@ -359,7 +361,7 @@ export function linkGauges<T extends Station>(
         .sort(),
       preferred: preferredOf.get(root(s.id))!,
     })),
-    report: { pairs, dropped, skipped, large },
+    report: { pairs, dropped, skipped, wide },
   };
 }
 
