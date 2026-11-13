@@ -194,9 +194,24 @@ export interface EpochSplit {
   note: string;
 }
 
+/**
+ * A station listed in the wrong datum before it held any values. When the
+ * source first lists it in `datum`, its epochs are replaced by fresh ones
+ * from the start of its record, rather than a new epoch opening at that
+ * refresh. A decision made after checking what files the store holds for its
+ * epochs, since they'd no longer be read. It applies once: never to a
+ * station that already has an epoch in `datum`.
+ */
+export interface EpochRestart {
+  datum: string;
+  note: string;
+}
+
 /** Decisions made about a source's stations, kept in its adapter. */
 export interface Overrides {
   epochs?: Record<string, EpochDecision>;
+  /** By station (`EpochRestart`). */
+  restarts?: Record<string, EpochRestart>;
   /** By station: where to split its epochs, each split opening an epoch from that day. */
   splits?: Record<string, EpochSplit[]>;
 }

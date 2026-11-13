@@ -172,7 +172,7 @@ describe("rws", () => {
 });
 
 describe("rws stations", () => {
-  it("prefers NAP, takes MSL where that's all a location has, and lists extremes only against NAP", async () => {
+  it("prefers measured NAP, takes MSL where that's all a location measures, and lists extremes only against NAP", async () => {
     serve([[/OphalenCatalogus/, fixture("rws-catalog.json")]]);
     const stations = await rws.stations();
     // Being a meter apart doesn't make two codes one gauge; only checked twins are linked.
@@ -180,6 +180,8 @@ describe("rws stations", () => {
     assert.deepEqual(
       stations.map((s) => [s.id, s.datum, s.products, s.country_code]),
       [
+        // RWS's astronomical tide but nothing measured: listed for its predictions alone.
+        ["rws/dukegat", "NAP", ["predictions", "predicted_extremes"], "NL"],
         [
           "rws/hoekvanholland",
           "NAP",
@@ -194,13 +196,24 @@ describe("rws stations", () => {
     // RWS's description says K13a is a platform, at sea; it says nothing of the others' water.
     assert.deepEqual(
       stations.map((s) => s.kind),
-      [null, null, "coastal", null],
+      [null, null, null, "coastal", null],
     );
     // Dutch NAP stations without an offset have their history before 2005 in
     // the old NAP; MSL and Bonaire's NAP never changed.
     assert.deepEqual(
       stations.map((s) => s.reference),
-      [null, rws.REVISED_NAP, null, null],
+      [rws.REVISED_NAP, null, rws.REVISED_NAP, null, null],
+    );
+    // Only a station with measured levels is live.
+    assert.deepEqual(
+      stations.map((s) => [s.live, s.interval_s]),
+      [
+        [false, null],
+        [true, 600],
+        [true, 600],
+        [true, 600],
+        [true, 600],
+      ],
     );
   });
 
@@ -1116,7 +1129,10 @@ describe("coops", () => {
         /type=historicwl/,
         JSON.stringify({
           stations: [
-            station({}),
+            // On the current network, so active whatever its removed date says.
+            station({
+              details: { established: "1899-01-01 00:00:00", removed: "1950-01-01 00:00:00" },
+            }),
             station({
               id: "9063020",
               name: "Buffalo",
@@ -1124,7 +1140,12 @@ describe("coops", () => {
               tidal: false,
               greatlakes: true,
             }),
-            station({ id: "1495000", name: "Esperanza, Antarctica", state: "" }),
+            station({
+              id: "1495000",
+              name: "Esperanza, Antarctica",
+              state: "",
+              details: { established: "1980-01-01 00:00:00", removed: "1990-01-01 00:00:00" },
+            }),
             // CO-OPS's `greatlakes` misses this one, but its `tideType` says Great Lakes.
             station({
               id: "9075199",
@@ -1133,6 +1154,8 @@ describe("coops", () => {
               tidal: false,
               greatlakes: false,
               tideType: "Great Lakes",
+              // Reinstalled: removed before it was established again.
+              details: { established: "2001-05-01 00:00:00", removed: "1994-10-01 00:00:00" },
             }),
           ],
         }),
@@ -1157,7 +1180,7 @@ describe("coops", () => {
       [/9075199\/datums/, JSON.stringify({ datums: null, LAT: null })],
     ]);
     const [esperanza, buffalo, frenes, seattle] = await coops.stations();
-    assert.equal(frenes!.kind, "lake");
+    assert.deepEqual([frenes!.kind, frenes!.status, seattle!.status], ["lake", "active", "active"]);
     assert.deepEqual(
       [
         seattle!.id,
@@ -1187,10 +1210,10 @@ describe("coops", () => {
       [buffalo!.datums, buffalo!.products, buffalo!.kind],
       [{ IGLD: 0, LWD: -173.5 }, ["levels"], "lake"],
     );
-    // Listed for its history, but not on the live network.
+    // Removed, and not on the live network: listed for its history.
     assert.deepEqual(
       [esperanza!.live, esperanza!.status, esperanza!.datums],
-      [false, "active", {}],
+      [false, "inactive", {}],
     );
     // A refresh that gets no datums keeps the offsets, so it keeps their period too.
     serve([
@@ -1203,6 +1226,15 @@ describe("coops", () => {
       start: "1983-01-01",
       end: "2001-12-31",
     });
+  });
+
+  it("refuses a historical list under half the stored one", async () => {
+    serve([
+      [/type=historicwl/, JSON.stringify({ stations: [station({})] })],
+      [/type=waterlevels/, JSON.stringify({ stations: [station({})] })],
+    ]);
+    const stored = Array.from({ length: 40 }, (_, i) => ({ id: `coops/${i}` }) as Station);
+    await assert.rejects(coops.stations(stored), /listed 1 historical stations, down from 40/);
   });
 
   it("spans every datum analysis period CO-OPS gives", () => {
@@ -1684,6 +1716,11 @@ describe("usace", () => {
       },
     });
     assert.equal(mvn[3]!.name, "Mississippi River at Reserve (01260)");
+    // The catalog's earliest time, as a UTC day.
+    assert.deepEqual(
+      mvn.map((s) => s.series_since),
+      ["1987-03-27", "2008-01-01", "1986-07-18", "1997-01-01"],
+    );
   });
 
   it("prefers a current series, then sub-daily, then revised, then the finest interval", () => {
@@ -2079,9 +2116,10 @@ describe("usace", () => {
     const error = t.mock.method(console, "error", () => {});
     const note = { description: "…", realization: "2009.55", as_of: null };
     const from = { NAVD88: note, LWRP: note };
-    const previous = ["usace/MVN.New_Orleans", "usace/MVN.Baton_Rouge"].map(
-      (id) => ({ id, datums_from: from }) as unknown as Station,
-    );
+    const previous = [
+      { id: "usace/MVN.New_Orleans", datums_from: from, series_since: "1950-01-01" },
+      { id: "usace/MVN.Baton_Rouge", datums_from: from, series_since: "1999-01-01" },
+    ] as unknown as Station[];
     const listed = (await usace.stations(previous)) as usace.UsaceStation[];
     const station = (id: string) => listed.find((s) => s.id === id)!;
     // New Orleans' description went blank: no offsets sent, so the stored ones and their notes stay.
@@ -2089,6 +2127,9 @@ describe("usace", () => {
     assert.deepEqual(station("usace/MVN.New_Orleans").datums_from, from);
     // Baton Rouge's still gives NAVD88 but not LWRP.
     assert.deepEqual(Object.keys(station("usace/MVN.Baton_Rouge").datums_from!), ["NAVD88"]);
+    // The earlier of the list's series start and the catalog's (1986-07-18 and 1987-03-27).
+    assert.equal(station("usace/MVN.New_Orleans").series_since, "1950-01-01");
+    assert.equal(station("usace/MVN.Baton_Rouge").series_since, "1987-03-27");
     const said = error.mock.calls.map((c) => String(c.arguments[0])).join("\n");
     assert.match(said, /usace\/MVN.New_Orleans: its description no longer gives NAVD88, LWRP/);
     assert.match(said, /usace\/MVN.Baton_Rouge: its description no longer gives LWRP\n/);
@@ -2316,6 +2357,23 @@ describe("usace", () => {
       stations.map((s) => s.id),
       ["usace/MVS.Grafton"],
     );
+    assert.equal((stations[0] as usace.UsaceStation).series_since, "2011-01-01");
+  });
+
+  it("records no series start where the catalog gives none it can use", () => {
+    const at = { office: "MVS", name: "Grafton", latitude: 38.97, longitude: -90.43 };
+    const start = (from: string) =>
+      (
+        usace.toStations(
+          "MVS",
+          [series("Grafton.Stage.Inst.1Hour.0.rev", "1Hour", from, "2026-09-14T00:00:00Z")],
+          [at],
+          new Map(),
+          now,
+        )[0] as usace.UsaceStation
+      ).series_since;
+    assert.equal(start("+010000-01-01T00:00:00Z"), undefined);
+    assert.equal(start(""), undefined);
   });
 
   it("never fetches levels from before a station's gauge zero moved", async () => {
@@ -2345,6 +2403,37 @@ describe("usace", () => {
     assert.equal(usace.zeroSince({ source_id: "MVN.Reserve" }), -Infinity);
     assert.throws(
       () => usace.zeroSince({ source_id: "MVN.Reserve", zero_since: "June 2015" }),
+      /unreadable/,
+    );
+  });
+
+  it("never fetches levels from before a station's series begins", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      return JSON.stringify({ units: "m", values: [[Date.parse("2022-09-02T00:00:00Z"), 0.6, 0]] });
+    });
+    const sullivan = {
+      id: "usace/MVS.Sullivan-Jonathan_Cr",
+      source_id: "MVS.Sullivan-Jonathan_Cr",
+      datum: "GZ",
+      source_url: `https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=${encodeURIComponent("Sullivan-Jonathan Cr.Stage.Inst.15Minutes.0.lrgsShef-rev")}`,
+      series_since: "2022-09-01",
+    } as unknown as Station;
+    const observe = (start: string, end: string) =>
+      usace.source.observations!(sullivan, new Date(start), new Date(end));
+    assert.deepEqual(await observe("2000-01-01Z", "2022-01-01Z"), []);
+    assert.equal(requests.length, 0);
+    assert.equal((await observe("2022-01-01Z", "2023-01-01Z")).length, 1);
+    assert.equal(new URL(requests[0]!).searchParams.get("begin"), "2022-01-01T00:00:00.000Z");
+    assert.equal(usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr" }), -Infinity);
+    assert.throws(
+      () => usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "Sept 2022" }),
+      /unreadable/,
+    );
+    assert.throws(
+      () =>
+        usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "2026-99-99" }),
       /unreadable/,
     );
   });

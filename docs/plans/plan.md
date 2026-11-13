@@ -103,7 +103,7 @@ Estimate: 4 days.
 - [x] QC v1 ([`src/qc.ts`](../../src/qc.ts)), with rules chosen per station by its measured tide ([stations.md](../stations.md#analysis)) and `requalify` to rerun QC over stored years without fetching again. On 127 tidal station-years from every public source ([qc/scripts/jumps.ts](../qc/scripts/jumps.ts)), residual jumps add 76 flags at 4: Jersey's 0.0 m before a gap, Kilrush Lough's four hours near −5.8 m, Este's 3.20 m before a gap and Bangor's clipped levels in 2005, with 11 values of water Este's barrier held between dropouts and 5 of Kilrush's noise; none in the storms and hurricanes the sample holds, nor at Hoek van Holland's seiches. On RWS 2024 at six tide gauges the rules before held levels add 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year. Held levels, on a year at each of 295 stations from every source: at Wangerooge's CMEMS copy in 2024 and 2025 they flag 105 of the 134 values QC passed that PEGELONLINE's copy shows more than 0.2 m off, and none of the rest; elsewhere 7 values at 2 stations, both a reading held while the level moved.
 - [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 - [ ] A `restore` command for a station-list snapshot ([stations.md](../stations.md#a-refresh) has the steps by hand).
-- [ ] `tide_station` and series pins in each source's `overrides`, which holds epoch decisions and splits only.
+- [ ] `tide_station` and series pins in each source's `overrides`, which holds epoch decisions, splits and restarts only.
 
 ### Phase 2: TICON inventory
 
@@ -147,13 +147,12 @@ In the order phase 2 sets. Every adapter backfills the whole record its originat
 - [ ] **DMI** (`dmi`): refresh its list and backfill it ([its README](../../src/sources/dmi/README.md)), then rerun `npm run ticon:inventory`.
 - [ ] **CRMS** 2026: `backfill crms all 2026 2027` after CPRA's 15 November export.
 - [ ] **GESLA**: confirm its backfill covers every record, and refetch its 40 CRMS records that are an hour early (erratum `gesla-crms-hour-early`), so the store holds them on CPRA's clock: `backfill gesla <the 40 IDs> 2006 2027 --refetch`, since `--skip-written` skips their written years.
-- [ ] **Other US state networks**: FIMAN ([#51](https://github.com/openwatersio/stillwell/issues/51)) and NWFWMD ([#52](https://github.com/openwatersio/stillwell/issues/52)), whose terms or access need settling first.
+- [ ] New sources, tracked as [issues labeled `source`](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource), each with what has to be settled before it can be built.
 - [x] **JODC** (`jodc`): hourly levels above each station's zero at the 126 gauges of the Japan Coast Guard, GSI and port authorities JODC serves, back to 1910, in JST (UTC+3 at Syowa) converted to UTC, read from each station's zip, so the year-end hours TICON's copies lose are kept. JODC serves them openly, so they're in the public store, with `commercial_use` false: its terms ask for permission before its data is passed to third parties, which has been asked for ([#47](https://github.com/openwatersio/stillwell/issues/47)). See [the adapter's README](../../src/sources/jodc/README.md).
 - [ ] Backfill JODC through the Ingest workflow (two runs, in its README), and again whenever JODC adds a year.
 - [x] **UNAM** (`unam`): one-minute levels from each sensor at 26 of the Servicio Mareográfico Nacional's 27 gauges, a series per sensor above its own zero, in UTC, from the 5 days SMN serves, running hourly. SMN serves them openly but its site allows only non-profit, unaltered reproduction, so they're in the public store with `commercial_use` false while permission and the historical records are asked for ([#48](https://github.com/openwatersio/stillwell/issues/48)). The record starts when ingest starts reading; TICON's `unam_hist` records wait on SMN's answer. See [the adapter's README](../../src/sources/unam/README.md).
-- [ ] Then the case-by-case rest.
 - [ ] **WSV history before 2000**, and gauges with a later start or no download: GESLA 4.1's WSV records cover them for now. Ask WSV or BfG for the archive where GESLA has gaps.
-- [ ] Restricted series (Copernicus in situ, IOC) into the private store.
+- [ ] Restricted series into the private store, for sources whose terms bar republishing.
 - [ ] Clock check on every new series: cross-correlate against the station's TICON prediction and against neighbors, and flag whole-hour offsets before anything fits to it. This is how the WSV, RWS and Hong Kong errors showed up. [`scripts/clock-check.ts`](../../scripts/clock-check.ts) does the TICON half for a station at a time, with K1's phase to catch 12-hour errors, and has checked 13 UHSLC series; neighbors, and running it on every new series, are still to do.
 - [ ] Readers outside this repo that read series paths directly, slackwater-database and crowd-depth, read `epochs`, or they stop at epoch 1.
 
@@ -180,13 +179,13 @@ Estimate: 3 days.
 - [x] Record where each offset came from (`datums_source`: source, slackwater-database, computed) and its epoch.
 - [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
-- [ ] Offsets measured between linked series from their overlapping hourly values, run in `analyze`, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
+- [x] Offsets measured between linked series from their overlapping levels, in their own monthly job, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
 
 ### Phase 8: Remaining real-time feeds
 
 Estimate: 3 days.
 
-Most European originators arrive in phase 5. This adds the real-time sources TICON doesn't need: UK EA river levels, **ECCC** hydrometric (OGL-Canada; confirm the datamart endpoint's license), and NWPS forecast metadata. FMI waits for a license check.
+Most European originators arrive in phase 5. This adds UK EA river levels and the real-time sources TICON doesn't need, tracked as [issues labeled `source`](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource).
 
 ### Phase 9: Realtime levels for Slackwater
 
@@ -263,11 +262,10 @@ As the architecture estimates: about $7 a month in year one on R2 and Workers, p
 ## Open questions
 
 - BSH's answer on the 1 August rule.
-- ECCC datamart license; FMI sea-level license.
 - STOFS-2D station count and file sizes.
 - PSMSL's reply on commercial redistribution (request sent 2026-11-01).
 - Permission to republish DMI's Gedser and Hornbæk records from UHSLC, whose DMI terms are stricter than UHSLC's ([contributors.md](../../src/sources/uhslc/contributors.md)). They're public on UHSLC's terms until DMI answers. A refusal marks the contributor's notice `refused`, which withholds its stations, as SANHO's are ([#80](https://github.com/openwatersio/stillwell/issues/80)): never listed or fetched again, and their files and rows deleted ([CONTRIBUTING.md](../../CONTRIBUTING.md#withheld-stations)). Their `history/` snapshots still name them.
 - Whether WSV or BfG will supply PEGELONLINE's archive before 2000, and whether they're content with scripted use of the raw-data download for a full backfill.
-- Terms for FIMAN ([#51](https://github.com/openwatersio/stillwell/issues/51)) and NWFWMD ([#52](https://github.com/openwatersio/stillwell/issues/52)), BOM, and permission from JODC ([#47](https://github.com/openwatersio/stillwell/issues/47)) and UNAM ([#48](https://github.com/openwatersio/stillwell/issues/48)).
+- Terms or permission for each new source, settled in its [`source` issue](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource).
 - CHS: its reply on [slackwater-database#320](https://github.com/openwatersio/slackwater-database/issues/320) says any commercial use, derivatives included, needs a separate license, and it isn't taking new commercial requests while its licensing program (including the Value-Added Reseller Licence) is reviewed. Apply when the new options appear.
 - The 304 TICON `meds` records are Canadian gauge data that slackwater-database marks CC BY 4.0 with commercial use, on TICON's label. Check whether CHS's terms reach them, the same question GESLA's license page raises.

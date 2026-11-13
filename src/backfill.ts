@@ -64,7 +64,8 @@ const DAY_MS = 86_400_000;
  *
  * A year the source returns nothing for writes no file, so it is fetched again
  * on every run in either mode; adapters that bound requests to each series'
- * dates (USGS, CO-OPS) send no request for those years outside them. Within
+ * dates (USGS, CO-OPS) send no request for those years outside them, and
+ * USACE none for those before its series begins. Within
  * them, `--skip-written` records the years it found empty and skips them for
  * 30 days (`src/empty-years.ts`).
  */

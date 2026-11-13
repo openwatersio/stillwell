@@ -128,7 +128,7 @@ describe("qc flatline tolerance", () => {
 
 describe("qc sensor span", () => {
   it("marks a year of placeholders bad, where the window's median is the placeholder", () => {
-    // USACE MVS Sullivan, Jonathan Creek, 2026: every value 30,479.695 m (100,000 ft).
+    // USACE MVS Sullivan, Jonathan Creek, 2026: every value 30,479.695 m (99,999 ft).
     const rows = tide(500, 15 * MIN).map((r) => ({ ...r, level: 30479.695 }));
     assert.ok(qc(rows, qcFor({ kind: "river", tidal: false })).every((r) => r.flag === Flag.bad));
   });

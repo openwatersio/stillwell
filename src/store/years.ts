@@ -67,7 +67,10 @@ export async function listLevelFiles(store: string, source: string): Promise<str
 const key = (r: Pick<YearRow, "id" | "epoch" | "year">) => `${r.id} ${r.epoch} ${r.year}`;
 
 /** A source's rows by `key`, or null when it has no file yet. */
-async function readYears(store: string, source: string): Promise<Map<string, YearRow> | null> {
+export async function readYears(
+  store: string,
+  source: string,
+): Promise<Map<string, YearRow> | null> {
   const path = yearsPath(store, source);
   if (!(await exists(path))) return null;
   const rows = await readRows(path);
