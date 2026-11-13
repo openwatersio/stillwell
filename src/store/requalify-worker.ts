@@ -1,7 +1,7 @@
 import { parentPort } from "node:worker_threads";
 import { sourceOf } from "../sources/index.ts";
 import type { StoredStation } from "../schema.ts";
-import { limitDuckDb, setConnections, type YearStats } from "./parquet.ts";
+import { connected, limitDuckDb, setConnections, type YearStats } from "./parquet.ts";
 import { DUCKDB_MB, requalify, type Reply } from "./requalify.ts";
 
 // A worker can hold a few stations at once, each reading three years together;
@@ -36,10 +36,14 @@ parentPort!.on(
         return this;
       }
     })();
+    let reply: Reply;
     try {
-      post({ id, result: await requalify(sourceOf(source), station, root, start, end, written) });
+      reply = { id, result: await requalify(sourceOf(source), station, root, start, end, written) };
     } catch (error) {
-      post({ id, error: error instanceof Error ? error.message : String(error) });
+      reply = { id, error: error instanceof Error ? error.message : String(error) };
     }
+    // Not done while DuckDB is still starting, or the process could end with it.
+    await connected();
+    post(reply);
   },
 );

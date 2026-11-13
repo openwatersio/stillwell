@@ -63,6 +63,16 @@ function serial<T>(work: () => Promise<T>): Promise<T> {
   return next;
 }
 
+/**
+ * Once every connection this thread has started is open, or has failed. Work
+ * that needs no connection, such as listing a directory that isn't there,
+ * starts one without waiting for it, and a worker thread ended while DuckDB
+ * is still starting aborts the whole process.
+ */
+export async function connected(): Promise<void> {
+  await Promise.all(lanes.map((lane) => lane.db.catch(() => undefined)));
+}
+
 function connection(): Promise<DuckDBConnection> {
   const db = current.getStore();
   if (!db) throw new Error("DuckDB work must run through serial()");
