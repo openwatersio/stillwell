@@ -1,6 +1,7 @@
 import { CARRIED, sharedReference, TIDAL_KM } from "./datums.ts";
 import { Flag, type Epoch, type Observation, type StoredStation } from "./schema.ts";
-import { isMissing, readObservationFile, readRows, writeRows } from "./store/parquet.ts";
+import { FILES } from "./store/files.ts";
+import { isMissing, readObservationFile, readRows, writeTable } from "./store/parquet.ts";
 import { linksPath, seriesPath } from "./store/paths.ts";
 import { readYears } from "./store/years.ts";
 import { km } from "./ticon.ts";
@@ -279,20 +280,8 @@ export function linkShifts(rows: LinkOffset[], stations: StoredStation[]): Map<s
   return shifts;
 }
 
-const COLUMNS = {
-  a: "VARCHAR",
-  b: "VARCHAR",
-  a_epoch: "INTEGER",
-  b_epoch: "INTEGER",
-  since: "TIMESTAMPTZ",
-  until: "TIMESTAMPTZ",
-  hours: "INTEGER",
-  offset_m: "DOUBLE",
-  spread_m: "DOUBLE",
-};
-
 export function writeLinks(store: string, rows: LinkOffset[]): Promise<void> {
-  return writeRows(linksPath(store), rows, COLUMNS, "a, b");
+  return writeTable(linksPath(store), rows, FILES.links);
 }
 
 /** The measured pairs, none before the first measurement. */

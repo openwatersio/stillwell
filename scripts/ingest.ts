@@ -16,7 +16,7 @@
  *
  * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
- * sources.json and errata.json, unless `--no-publish`; `publish` writes only those. It
+ * sources.json, errata.json and their definitions (datapackage.json), unless `--no-publish`; `publish` writes only those. It
  * changes no file in the repo. A new source's first refresh starts its list.
  * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
@@ -300,7 +300,7 @@ function storesOf(source: Source): string[] {
 }
 
 /**
- * Rebuild `stations.parquet`, `sources.json` and `errata.json` for `store`, unless a source
+ * Rebuild `stations.parquet`, `sources.json`, `errata.json` and their definitions for `store`, unless a source
  * that has had a list there, by the published file or its history, has none.
  */
 async function publish(store: string): Promise<void> {

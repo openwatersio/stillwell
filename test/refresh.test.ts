@@ -6,6 +6,7 @@ import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { epochKey } from "../src/epochs.ts";
 import {
+  checkFile,
   exists,
   publishedSources,
   readStationList,
@@ -29,6 +30,7 @@ import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
 import { LINKS, UNLINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/store/years.ts";
+import { ERRATA_SCHEMA, FILES, dataPackage } from "../src/store/files.ts";
 import {
   describeReport,
   needsPerson,
@@ -556,6 +558,17 @@ describe("publishStations", () => {
     ]);
     // errata.json holds the errata of the sources the store holds, here none.
     assert.deepEqual(JSON.parse(await readFile(errataPath(store), "utf8")), []);
+    // With the definition of each file, which the files it wrote match.
+    assert.deepEqual(
+      JSON.parse(await readFile(join(store, "datapackage.json"), "utf8")),
+      dataPackage(),
+    );
+    assert.deepEqual(
+      JSON.parse(await readFile(join(store, "errata.schema.json"), "utf8")),
+      ERRATA_SCHEMA,
+    );
+    assert.deepEqual(await checkFile(stationsPath(store), FILES.stations), []);
+    assert.deepEqual(await checkFile(join(store, "stations/offsets.parquet"), FILES.offsets), []);
   });
 
   it("prefers a shorter record over a longer one whose values are all flagged", async () => {

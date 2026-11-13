@@ -2,7 +2,7 @@ name: Monthly
 
 # On the 2nd, refresh every source's station list, datums and terms, then
 # measure offsets between linked series, rebuild stations.parquet,
-# sources.json and errata.json, report the
+# sources.json, errata.json and datapackage.json, report the
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
 # refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
