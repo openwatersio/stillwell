@@ -24,6 +24,7 @@ import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
+import crmsErrata from "./crms/errata.json" with { type: "json" };
 import dmiErrata from "./dmi/errata.json" with { type: "json" };
 import dwrErrata from "./dwr/errata.json" with { type: "json" };
 import eaErrata from "./ea/errata.json" with { type: "json" };
@@ -72,6 +73,7 @@ const adapters: Record<string, Source> = {
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
   coops: coopsErrata,
+  crms: crmsErrata,
   dmi: dmiErrata,
   dwr: dwrErrata,
   ea: eaErrata,
