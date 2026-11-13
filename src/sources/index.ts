@@ -5,6 +5,7 @@ import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as coops } from "./coops/index.ts";
 import { source as crms } from "./crms/index.ts";
+import { source as dmi } from "./dmi/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
@@ -23,6 +24,7 @@ import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
+import dmiErrata from "./dmi/errata.json" with { type: "json" };
 import dwrErrata from "./dwr/errata.json" with { type: "json" };
 import eaErrata from "./ea/errata.json" with { type: "json" };
 import geslaErrata from "./gesla/errata.json" with { type: "json" };
@@ -43,6 +45,7 @@ const adapters: Record<string, Source> = {
   cdec,
   coops,
   crms,
+  dmi,
   dwr,
   ea,
   gesla,
@@ -69,6 +72,7 @@ const adapters: Record<string, Source> = {
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
   coops: coopsErrata,
+  dmi: dmiErrata,
   dwr: dwrErrata,
   ea: eaErrata,
   gesla: geslaErrata,

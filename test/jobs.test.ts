@@ -13,6 +13,7 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("hourly"), [
       "cdec",
       "coops",
+      "dmi",
       "ea",
       "kartverket",
       "marine-institute",
@@ -30,6 +31,7 @@ describe("sourcesFor", () => {
       "cdec",
       "coops",
       "crms",
+      "dmi",
       "dwr",
       "ea",
       "gesla",

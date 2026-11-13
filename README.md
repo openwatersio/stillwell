@@ -19,6 +19,7 @@ The public store aims to hold any source that publishes water level data and all
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.
 - [CRMS](src/sources/crms/README.md): hourly levels in Louisiana's coastal marshes and swamps.
+- [DMI](src/sources/dmi/README.md): 10-minute sea level at DMI's and the Danish Coastal Authority's gauges in Denmark, back to 1889.
 - [California DWR](src/sources/dwr/README.md): 15-minute stage at tidal gauges in the Sacramento–San Joaquin Delta.
 - [Environment Agency](src/sources/ea/README.md): real-time 15-minute tidal levels around England and the UK network.
 - [GESLA](src/sources/gesla/README.md): GESLA 4.1's static release of sea level records from more than 40 agencies.
