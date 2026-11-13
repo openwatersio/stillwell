@@ -34,6 +34,7 @@ def _():
     import marimo as mo
     import polars as pl
     import altair as alt
+    import pyarrow  # noqa: F401  polars needs it to read Parquet in WebAssembly, where only imported packages load
     from datetime import datetime, timedelta, timezone
 
     LAKE = "https://stillwell.openwaters.io"
