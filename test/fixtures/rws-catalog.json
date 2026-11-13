@@ -8,7 +8,8 @@
       },
       "Hoedanigheid": {
         "Code": "NAP"
-      }
+      },
+      "ProcesType": "meting"
     },
     {
       "AquoMetadata_MessageID": 2,
@@ -17,7 +18,8 @@
       },
       "Hoedanigheid": {
         "Code": "MSL"
-      }
+      },
+      "ProcesType": "meting"
     },
     {
       "AquoMetadata_MessageID": 3,
@@ -29,7 +31,8 @@
       },
       "Groepering": {
         "Code": "GETETM2"
-      }
+      },
+      "ProcesType": "meting"
     },
     {
       "AquoMetadata_MessageID": 4,
@@ -41,7 +44,8 @@
       },
       "Groepering": {
         "Code": "GETETBRKD2"
-      }
+      },
+      "ProcesType": "astronomisch"
     },
     {
       "AquoMetadata_MessageID": 5,
@@ -50,7 +54,28 @@
       },
       "Hoedanigheid": {
         "Code": "NVT"
-      }
+      },
+      "ProcesType": "meting"
+    },
+    {
+      "AquoMetadata_MessageID": 6,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "NAP"
+      },
+      "ProcesType": "verwachting"
+    },
+    {
+      "AquoMetadata_MessageID": 7,
+      "Grootheid": {
+        "Code": "WATHTE"
+      },
+      "Hoedanigheid": {
+        "Code": "NAP"
+      },
+      "ProcesType": "astronomisch"
     }
   ],
   "AquoMetadataLocatieLijst": [
@@ -89,6 +114,22 @@
     {
       "AquoMetaData_MessageID": 1,
       "Locatie_MessageID": 50
+    },
+    {
+      "AquoMetaData_MessageID": 6,
+      "Locatie_MessageID": 20
+    },
+    {
+      "AquoMetaData_MessageID": 6,
+      "Locatie_MessageID": 60
+    },
+    {
+      "AquoMetaData_MessageID": 7,
+      "Locatie_MessageID": 60
+    },
+    {
+      "Locatie_MessageID": 60,
+      "AquoMetaData_MessageID": 4
     }
   ],
   "LocatieLijst": [
@@ -128,6 +169,13 @@
       "Naam": "Hoek van Holland 2",
       "Lat": 51.98001,
       "Lon": 4.12001
+    },
+    {
+      "Locatie_MessageID": 60,
+      "Code": "dukegat",
+      "Naam": "Forecasts only",
+      "Lat": 53.43,
+      "Lon": 6.93
     }
   ]
 }

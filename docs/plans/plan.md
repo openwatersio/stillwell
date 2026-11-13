@@ -103,7 +103,7 @@ Estimate: 4 days.
 - [x] QC v1 ([`src/qc.ts`](../../src/qc.ts)), with rules chosen per station by its measured tide ([stations.md](../stations.md#analysis)) and `requalify` to rerun QC over stored years without fetching again. On 127 tidal station-years from every public source ([qc/scripts/jumps.ts](../qc/scripts/jumps.ts)), residual jumps add 76 flags at 4: Jersey's 0.0 m before a gap, Kilrush Lough's four hours near −5.8 m, Este's 3.20 m before a gap and Bangor's clipped levels in 2005, with 11 values of water Este's barrier held between dropouts and 5 of Kilrush's noise; none in the storms and hurricanes the sample holds, nor at Hoek van Holland's seiches. On RWS 2024 at six tide gauges the rules before held levels add 14 flags, all real (a stuck sensor at Vlissingen, jumps at Bath), and none on a clean year. Held levels, on a year at each of 295 stations from every source: at Wangerooge's CMEMS copy in 2024 and 2025 they flag 105 of the 134 values QC passed that PEGELONLINE's copy shows more than 0.2 m off, and none of the rest; elsewhere 7 values at 2 stations, both a reading held while the level moved.
 - [x] Tests: each adapter parses a committed fixture; the writer round-trips through DuckDB; merge and QC cases.
 - [ ] A `restore` command for a station-list snapshot ([stations.md](../stations.md#a-refresh) has the steps by hand).
-- [ ] `tide_station` and series pins in each source's `overrides`, which holds epoch decisions and splits only.
+- [ ] `tide_station` and series pins in each source's `overrides`, which holds epoch decisions, splits and restarts only.
 
 ### Phase 2: TICON inventory
 
@@ -180,7 +180,7 @@ Estimate: 3 days.
 - [x] Record where each offset came from (`datums_source`: source, slackwater-database, computed) and its epoch.
 - [x] Per source: CO-OPS datums API; RWS NAP and MSL; BSH and PEGELONLINE PNP, NHN and SKN; USGS gage datum to NAVD88; USACE series datums.
 - [x] Tests that convert a known level at a few stations to each datum and compare with the operator's published value.
-- [ ] Offsets measured between linked series from their overlapping hourly values, run in `analyze`, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
+- [x] Offsets measured between linked series from their overlapping levels, in their own monthly job, so a series that shares a gauge's zero with a slackwater-database record, such as PEGELONLINE with WSV's GESLA files, gets its MSL and LAT. PEGELONLINE publishes only mean high and low tide for its tidal gauges, not a mean water level.
 
 ### Phase 8: Remaining real-time feeds
 
