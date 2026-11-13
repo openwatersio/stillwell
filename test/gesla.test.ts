@@ -229,6 +229,12 @@ describe("gesla stations", () => {
     assert.deepEqual(gesla.originatorIds("BODC", "LER", -1.1), ["bodc/ler"]);
   });
 
+  it("links a CRMS record to its site's first surface-water gauge, unless it's the site's marsh well", () => {
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0008", -89.4), ["crms/CRMS0008-H01"]);
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0128", -90.4), []);
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0090", -90.2), []);
+  });
+
   it("links SFWMD's tailwaters to its `_T` series and other gauges to their own", () => {
     assert.deepEqual(
       gesla.originatorIds("SFWMD", "S197", -80.3, undefined, "s197_t-s197-usa-sfwmd"),
@@ -590,6 +596,19 @@ describe("gesla clocks", () => {
       [iso(hourly.times[0]!), iso(minutes.times[0]!)],
       ["2015-06-01T00:30:00.000Z", "2015-06-01T00:00:00.000Z"],
     );
+  });
+
+  it("flags each CRMS marsh well on its record's clock, and unlinks the wells throughout", () => {
+    const wells = geslaErrata.errata.filter((e) => /^gesla-crms\d{4}-marsh-well$/.test(e.id));
+    assert.equal(wells.length, 11);
+    for (const e of wells) {
+      const file = e.id.replace(/^gesla-(crms\d{4})-marsh-well$/, "$1-$1-usa-crms");
+      assert.deepEqual(e.stations, [`gesla/${file}`]);
+      // Spans read on the corrected clock where the adapter moves the record.
+      const site = file.slice(0, 8).toUpperCase();
+      assert.equal(gesla.CRMS_EARLY.has(file), !gesla.CRMS_WELLS.has(site), e.id);
+    }
+    assert.deepEqual([...gesla.CRMS_WELLS].sort(), ["CRMS0090", "CRMS0128"]);
   });
 
   it("lists the same CRMS records as the erratum", () => {

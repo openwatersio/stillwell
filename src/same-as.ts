@@ -125,7 +125,13 @@ export const LINKS: Decision[] = [
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
-export const UNLINKS: Decision[] = [];
+export const UNLINKS: Decision[] = [
+  {
+    a: "gesla/crms0128-crms0128-usa-crms",
+    b: "crms/CRMS0128-H01",
+    note: "GESLA's CRMS0128 record, October 2013 to April 2025, is the site's marsh well (CRMS0128-W01) throughout, an hour early (erratum `gesla-crms0128-marsh-well`). The site's surface-water gauge, H01, ends in October 2012, 25 m away.",
+  },
+];
 
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {};

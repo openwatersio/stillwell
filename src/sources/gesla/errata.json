@@ -209,8 +209,8 @@
       ],
       "handling": "corrected",
       "error": "GESLA 4.1's copies of 40 CRMS gauges in Louisiana, at sites CRMS0002 to CRMS0148, are an hour early: the height labeled T was measured at T + 1 h UTC. TICON-4's records fitted from these copies share the hour.",
-      "response": "The adapter moves the 40 records' times an hour later, as it does Hong Kong's, over each whole record: the 35 record-years CPRA's export doesn't cover are moved on the same record's clock. GESLA's other 300 CRMS records can't show their clock against CPRA's values, so they're kept as served. CPRA's own series (`crms`) are preferred to every GESLA CRMS record.",
-      "evidence": "Compared hour by hour with the store's `crms` series, from CPRA's export of 8 November 2026, after removing each year's median offset (GESLA's values before October 2013 sit a few centimeters to decimeters off CPRA's GEOID99 ones, 0.107 m at CRMS0002). Moved one hour later, each of the 40 records equals CPRA's series to the millimeter on 94 to 100% of hours in every one of its 714 years that CPRA's export covers (median 100%, 5.27 million hours, 2006 to 2025). At GESLA's own times, and at two hours later or one hour earlier, the same years match on a median 7% or less, the hours when a calm marsh doesn't change. The records' other 35 record-years, between 2007 and 2012, have no values in CPRA's export to compare. Of GESLA's other CRMS records, 270 match CPRA's series on fewer than 30% of hours at every shift from one hour earlier to two hours later, and 30 have no CPRA values in the years compared. Independently, GESLA's CRMS0061 equals USGS's real-time relay of the gauge (CRMS0061-H01-RT, site 301324090382400) to 0.0 mm through 2015 at one hour later, and CPRA's export is on Central Standard Time by the tide's phase against NOAA gauges (see the `crms` README)."
+      "response": "The adapter moves the 40 records' times an hour later, as it does Hong Kong's, over each whole record: the 35 record-years CPRA's export doesn't cover are moved on the same record's clock. Of GESLA's other 300 CRMS records, CRMS0090 and CRMS0128 hold the site's marsh well an hour early and are flagged whole, kept as served (erratum `gesla-crms0090-marsh-well`, erratum `gesla-crms0128-marsh-well`). The other 298 can't show their clock against CPRA's values, so they're kept as served. CPRA's own series (`crms`) are preferred to every GESLA CRMS record.",
+      "evidence": "Compared hour by hour with the store's `crms` series, from CPRA's export of 8 November 2026, after removing each year's median offset (GESLA's values before October 2013 sit a few centimeters to decimeters off CPRA's GEOID99 ones, 0.107 m at CRMS0002). Moved one hour later, each of the 40 records equals CPRA's series to the millimeter on 94 to 100% of hours in every one of its 714 years that CPRA's export covers (median 100%, 5.27 million hours, 2006 to 2025). At GESLA's own times, and at two hours later or one hour earlier, the same years match on a median 7% or less, the hours when a calm marsh doesn't change. The records' other 35 record-years, between 2007 and 2012, hold the site's marsh well, which they equal to the millimeter at the same shift (flagged by nine errata such as erratum `gesla-crms0008-marsh-well`). Of GESLA's other CRMS records, 270 match CPRA's series on fewer than 30% of hours at every shift from one hour earlier to two hours later, and 30 have no CPRA values in the years compared, CRMS0090's and CRMS0128's among them. Independently, GESLA's CRMS0061 equals USGS's real-time relay of the gauge (CRMS0061-H01-RT, site 301324090382400) to 0.0 mm through 2015 at one hour later, and CPRA's export is on Central Standard Time by the tide's phase against NOAA gauges (see the `crms` README)."
     },
     {
       "id": "gesla-datum-jumps",
@@ -448,6 +448,116 @@
       "error": "GESLA 4.1 and TICON-4 number SMN's Ciudad del Carmen radar record 4 (`ciudadcarmen_radar-4-mex-unam`), which is Celestún's station number. SMN numbers Ciudad del Carmen 5.",
       "response": "The record links to `unam/5-radar`, SMN's Ciudad del Carmen radar, not to Celestún's station 4.",
       "evidence": "SMN's station menu lists Ciudad del Carmen as station 5 and Celestún as station 4, and GESLA's Celestún records (`celestun_radar-4-mex-unam`, `celestun_flotador-4-mex-unam`) also carry 4."
+    },
+    {
+      "id": "gesla-crms0008-marsh-well",
+      "stations": ["gesla/crms0008-crms0008-usa-crms"],
+      "since": "2008-01-25",
+      "until": "2011-11-15",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0008 record holds the site's marsh well (`CRMS0008-W01`), which measures water in the marsh soil, from 25 January 2008 to 14 November 2011, and the site's surface-water gauge (`CRMS0008-H01`) after it, all as one surface-water record.",
+      "response": "25 January 2008 to 14 November 2011 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 14 November 2011 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 32,879 hours equals `CRMS0008-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.171 m below it. From its next value the record equals `CRMS0008-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0058-marsh-well",
+      "stations": ["gesla/crms0058-crms0058-usa-crms"],
+      "since": "2007-06-19",
+      "until": "2011-06-17",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0058 record holds the site's marsh well (`CRMS0058-W01`), which measures water in the marsh soil, from 19 June 2007 to 16 June 2011, and the site's surface-water gauge (`CRMS0058-H01`) after it, all as one surface-water record.",
+      "response": "19 June 2007 to 16 June 2011 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 16 June 2011 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 33,660 hours equals `CRMS0058-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.155 m below it. From its next value the record equals `CRMS0058-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0059-marsh-well",
+      "stations": ["gesla/crms0059-crms0059-usa-crms"],
+      "since": "2007-06-21",
+      "until": "2012-01-18",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0059 record holds the site's marsh well (`CRMS0059-W01`), which measures water in the marsh soil, from 21 June 2007 to 17 January 2012, and the site's surface-water gauge (`CRMS0059-H01`) after it, all as one surface-water record.",
+      "response": "21 June 2007 to 17 January 2012 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 17 January 2012 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 35,734 hours equals `CRMS0059-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.110 m below it. From its next value the record equals `CRMS0059-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0065-marsh-well",
+      "stations": ["gesla/crms0065-crms0065-usa-crms"],
+      "since": "2008-01-28",
+      "until": "2011-06-18",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0065 record holds the site's marsh well (`CRMS0065-W01`), which measures water in the marsh soil, from 28 January 2008 to 17 June 2011, and the site's surface-water gauge (`CRMS0065-H01`) after it, all as one surface-water record.",
+      "response": "28 January 2008 to 17 June 2011 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 17 June 2011 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 28,097 hours equals `CRMS0065-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.271 m below it. From its next value the record equals `CRMS0065-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0089-marsh-well",
+      "stations": ["gesla/crms0089-crms0089-usa-crms"],
+      "since": "2007-06-21",
+      "until": "2011-06-18",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0089 record holds the site's marsh well (`CRMS0089-W01`), which measures water in the marsh soil, from 21 June 2007 to 17 June 2011, and the site's surface-water gauge (`CRMS0089-H01`) after it, all as one surface-water record.",
+      "response": "21 June 2007 to 17 June 2011 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 17 June 2011 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 34,245 hours equals `CRMS0089-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.155 m below it. From its next value the record equals `CRMS0089-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0090-marsh-well",
+      "stations": ["gesla/crms0090-crms0090-usa-crms"],
+      "since": "2007-06-21",
+      "until": "2025-04-11",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0090 record holds the site's marsh well (`CRMS0090-W01`), which measures water in the marsh soil, over the whole record, 21 June 2007 to 10 April 2025, as a surface-water gauge. CPRA's export has no surface-water gauge at the site. The record is also an hour early, as the 40 in `gesla-crms-hour-early` are.",
+      "response": "The whole record is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Its times are kept as served.",
+      "evidence": "Moved an hour later, all 151,805 of its hours equal `CRMS0090-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.119 m below it before October 2013 and level with it from then on. At GESLA's own times they match on 45 to 51% of hours, those when the slow-moving well doesn't change."
+    },
+    {
+      "id": "gesla-crms0114-marsh-well",
+      "stations": ["gesla/crms0114-crms0114-usa-crms"],
+      "since": "2007-10-29",
+      "until": "2013-03-08",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0114 record holds the site's marsh well (`CRMS0114-W01`), which measures water in the marsh soil, from 29 October 2007 to 7 March 2013, and the site's surface-water gauge (`CRMS0114-H01`) after it, all as one surface-water record.",
+      "response": "29 October 2007 to 7 March 2013 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 7 March 2013 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 45,513 hours equals `CRMS0114-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.085 m below it. From its next value the record equals `CRMS0114-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0115-marsh-well",
+      "stations": ["gesla/crms0115-crms0115-usa-crms"],
+      "since": "2007-10-29",
+      "until": "2008-09-10",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0115 record holds the site's marsh well (`CRMS0115-W01`), which measures water in the marsh soil, from 29 October 2007 to 9 September 2008, and the site's surface-water gauge (`CRMS0115-H01`) after it, all as one surface-water record.",
+      "response": "29 October 2007 to 9 September 2008 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 9 September 2008 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 7,436 hours equals `CRMS0115-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.113 m below it. From its next value the record equals `CRMS0115-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0117-marsh-well",
+      "stations": ["gesla/crms0117-crms0117-usa-crms"],
+      "since": "2007-10-29",
+      "until": "2013-03-07",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0117 record holds the site's marsh well (`CRMS0117-W01`), which measures water in the marsh soil, from 29 October 2007 to 6 March 2013, and the site's surface-water gauge (`CRMS0117-H01`) after it, all as one surface-water record.",
+      "response": "29 October 2007 to 6 March 2013 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 6 March 2013 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 42,971 hours equals `CRMS0117-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.177 m below it. From its next value the record equals `CRMS0117-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0120-marsh-well",
+      "stations": ["gesla/crms0120-crms0120-usa-crms"],
+      "since": "2007-10-29",
+      "until": "2009-08-19",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0120 record holds the site's marsh well (`CRMS0120-W01`), which measures water in the marsh soil, from 29 October 2007 to 18 August 2009, and the site's surface-water gauge (`CRMS0120-H01`) after it, all as one surface-water record.",
+      "response": "29 October 2007 to 18 August 2009 is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the surface-water values of 18 August 2009 are flagged too.",
+      "evidence": "Once `gesla-crms-hour-early` moves it, every one of the span's 8,875 hours equals `CRMS0120-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, 0.119 m below it. From its next value the record equals `CRMS0120-H01` at the same offset."
+    },
+    {
+      "id": "gesla-crms0128-marsh-well",
+      "stations": ["gesla/crms0128-crms0128-usa-crms"],
+      "since": "2013-10-01",
+      "until": "2025-04-24",
+      "handling": "flagged",
+      "error": "GESLA's CRMS0128 record holds the site's marsh well (`CRMS0128-W01`), which measures water in the marsh soil, over the whole record, 1 October 2013 to 23 April 2025, as a surface-water gauge. The site's surface-water gauge, `CRMS0128-H01`, ends in October 2012, a year before the record starts. The record is also an hour early, as the 40 in `gesla-crms-hour-early` are.",
+      "response": "The whole record is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Its times are kept as served.",
+      "evidence": "Moved an hour later, all 90,749 of its hours equal `CRMS0128-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, level with it. At GESLA's own times they match on 45 to 51% of hours, those when the slow-moving well doesn't change."
     }
   ],
   "retired": []
