@@ -1,6 +1,7 @@
 import { CARRIED, sharedReference, TIDAL_KM } from "./datums.ts";
 import { Flag, type Epoch, type Observation, type StoredStation } from "./schema.ts";
-import { isMissing, readObservationFile, readRows, writeRows } from "./store/parquet.ts";
+import { FILES } from "./store/files.ts";
+import { isMissing, readObservationFile, readRows, writeTable } from "./store/parquet.ts";
 import { linksPath, seriesPath } from "./store/paths.ts";
 import { readYears } from "./store/years.ts";
 import { km } from "./ticon.ts";
@@ -74,8 +75,13 @@ export function pairsToMeasure(
       if (!ea || !eb || !a.products.includes("levels") || !b.products.includes("levels")) continue;
       const times = [a.first, b.first, ea.since, eb.since].filter((t): t is string => !!t);
       const start = Math.max(...times.map(Date.parse));
+      // One interval past each last value, so the window holds it and its end stays exclusive.
+      const past = (s: StoredStation) =>
+        s.last ? Date.parse(s.last) + 1000 * (s.interval_s || 60) : Infinity;
       const end = Math.min(
-        ...[a.last, b.last, ea.until, eb.until].map((t) => (t ? Date.parse(t) : Infinity)),
+        past(a),
+        past(b),
+        ...[ea.until, eb.until].map((t) => (t ? Date.parse(t) : Infinity)),
       );
       if (!a.first || !b.first || !a.last || !b.last || end - start < MIN_HOURS * HOUR_MS) continue;
       pairs.push({ a, b, start, end });
@@ -274,20 +280,8 @@ export function linkShifts(rows: LinkOffset[], stations: StoredStation[]): Map<s
   return shifts;
 }
 
-const COLUMNS = {
-  a: "VARCHAR",
-  b: "VARCHAR",
-  a_epoch: "INTEGER",
-  b_epoch: "INTEGER",
-  since: "TIMESTAMPTZ",
-  until: "TIMESTAMPTZ",
-  hours: "INTEGER",
-  offset_m: "DOUBLE",
-  spread_m: "DOUBLE",
-};
-
 export function writeLinks(store: string, rows: LinkOffset[]): Promise<void> {
-  return writeRows(linksPath(store), rows, COLUMNS, "a, b");
+  return writeTable(linksPath(store), rows, FILES.links);
 }
 
 /** The measured pairs, none before the first measurement. */

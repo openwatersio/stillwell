@@ -224,7 +224,10 @@ export interface SourceMetadata {
     id: string;
     name: string;
     url: string;
-    /** The default for the source's stations; a station's own terms can differ. */
+    /**
+     * The default for the source's stations; a station's own terms can differ.
+     * `sources.json` publishes it as true only where every station allows it.
+     */
     commercial_use: boolean;
     /**
      * Whether the terms let anyone republish the data, which the public store

@@ -715,6 +715,34 @@ describe("offsetRows", () => {
     ]);
   });
 
+  it("gives a rejected epoch that doesn't convert the frozen offsets of the epoch before it", () => {
+    const s = station("pegelonline/x", {
+      datum: "PNP",
+      datums: { NHN: -2 },
+      epochs: [
+        open("PNP", {
+          datums: { NHN: -1 },
+          until: "2010-01-01T00:00:00.000Z",
+          to_current: null,
+          state: "closed",
+        }),
+        open("PNP", {
+          id: 2,
+          datums: { NHN: -9 },
+          since: "2010-01-01T00:00:00.000Z",
+          until: "2020-01-01T00:00:00.000Z",
+          to_current: null,
+          state: "rejected",
+        }),
+        open("PNP", { id: 3, since: "2020-01-01T00:00:00.000Z" }),
+      ],
+    });
+    assert.deepEqual(
+      offsetRows(s).filter((r) => r.epoch === 2),
+      [{ station: "pegelonline/x", epoch: 2, datum: "NHN", offset_m: -1 }],
+    );
+  });
+
   it("converts an epoch in another datum to every current one", () => {
     const s = station("coops/1", {
       datum: "MLLW",
