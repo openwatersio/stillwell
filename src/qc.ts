@@ -1,18 +1,26 @@
+import { fit, type HarmonicModel, STANDARD, timeline } from "./harmonic.ts";
 import { Flag, type Observation } from "./schema.ts";
 
 /**
  * Quality control for observed levels. Deliberately small: per-source quirks
- * (clocks, datum shifts) take most of the effort and live in the adapters. This
- * runs in Node and in the Worker.
+ * (clocks, datum shifts) take most of the effort and live in the adapters.
  */
 export interface QcOptions {
   /**
-   * Levels this many meters from the series' median are bad. Relative, because
-   * some datums (NN, NAVD88) put inland gauges hundreds of meters up.
+   * Levels this many meters from the series' median are bad, as are those
+   * outside `SPAN_M`. Relative, because some datums (NN, NAVD88) put inland
+   * gauges hundreds of meters up.
    */
   limit_m?: number;
   /** A level unchanged for this long is suspect. Rivers and lakes can sit still for days. */
   flatline_s?: number;
+  /**
+   * Levels within this many meters of a run's first count as unchanged, so a
+   * stuck gauge that dithers by a millimeter is still a flatline. Exact
+   * equality where it's 0, as at still water, where a calm pool can waver by
+   * a millimeter for days.
+   */
+  flatline_m?: number;
   /**
    * The flatline limit where a series moves in whole centimeters, where a calm
    * day can hold one value for hours. Judged from the changes in the three days
@@ -33,16 +41,37 @@ export interface QcOptions {
    * and back down.
    */
   held?: boolean;
+  /**
+   * Whether a run of values that a jump from the tide opens and a jump back
+   * closes is suspect, judged on the residual from a harmonic fit of the
+   * values themselves. Only for a year or more of tidal water: a shorter
+   * window can't fit the tide, and a river's tide is too far from harmonic.
+   */
+  jumps?: boolean;
 }
 
 /** How long a level unchanged is suspect, where a source's settings don't say. */
 export const FLATLINE_S = 6 * 3600;
 
 /**
+ * Levels no gauge can read in any datum the store holds, in meters: below the
+ * Dead Sea's shore or above Everest. QARTOD's gross range test fails a value
+ * outside the sensor's span whatever the window holds, which catches a year
+ * that is all placeholder, such as USACE's 30,479.695 m (99,999 ft), where
+ * the window's own median is the placeholder. A scan of every year file in
+ * November 2026 found no real level above 1,817 m, at USGS's Lyman Lake.
+ */
+export const SPAN_M = [-500, 9000] as const;
+
+/** Whether a level is finite and within `SPAN_M`. */
+const possible = (level: number) => level >= SPAN_M[0] && level <= SPAN_M[1];
+
+/**
  * Rows as a source sent them, with `source_flag` set to their flag before QC
  * can make it worse. Only freshly fetched rows get this: a stored row's flag
  * may already hold QC's marks. An adapter that marks a source's value worse
- * itself, such as REFMAR's suspect spans, sets `source_flag` to the source's.
+ * itself, such as USGS's `ICE` qualifier, does so before this, so it shows in
+ * `source_flag`; errata spans are marked after, by `fromSource`.
  */
 export function withSourceFlag<T extends Observation>(rows: T[]): T[] {
   // Levels to the 0.1 mm the store reads back, so a fetched value equals its stored copy, as a flatline needs.
@@ -75,20 +104,22 @@ export function fromSource<T extends Observation>(
 
 /**
  * Sorts, drops repeated timestamps, and flags limits, flatlines, spikes, held
- * levels and outliers. `context` is values from either side, such as the neighboring
+ * levels, outliers and residual jumps. `context` is values from either side, such as the neighboring
  * years, so a flatline or spike across the edge is judged whole; they take no
- * part in the medians and spreads the rules measure against, and aren't
- * returned.
+ * part in the medians and spreads the rules measure against, nor in residual
+ * jumps, and aren't returned.
  */
 export function qc<T extends Observation>(
   rows: T[],
   {
     limit_m = 20,
     flatline_s = FLATLINE_S,
+    flatline_m = 0,
     centimeter_flatline_s = 0,
     spike_m = 0.25,
     outliers = true,
     held = true,
+    jumps = false,
   }: QcOptions = {},
   context: Observation[] = [],
 ): T[] {
@@ -96,24 +127,30 @@ export function qc<T extends Observation>(
   if (!out.length) return out;
   const own = new Set<Observation>(out);
   const times = new Set(out.map((r) => r.time));
-  const all = unique([
-    ...out,
-    ...context.filter((r) => !times.has(r.time) && Number.isFinite(r.level)),
-  ]);
+  // Levels within `SPAN_M` only, so no neighbor, residual, run or spread sees a NaN or one beyond it; the limit rule marks those bad.
+  const all = unique([...out, ...context.filter((r) => !times.has(r.time))]).filter((r) =>
+    possible(r.level),
+  );
   const worsen = (r: Observation, flag: Flag) => {
     if (own.has(r)) r.flag = Math.max(r.flag, flag) as Flag;
   };
 
-  const middle = median(out.filter((r) => Number.isFinite(r.level)).map((r) => r.level)) ?? 0;
+  const middle = median(out.filter((r) => possible(r.level)).map((r) => r.level)) ?? 0;
   out.forEach((r) => {
-    if (!Number.isFinite(r.level) || Math.abs(r.level - middle) > limit_m) worsen(r, Flag.bad);
+    if (!possible(r.level) || Math.abs(r.level - middle) > limit_m) worsen(r, Flag.bad);
   });
 
-  // Flatlines: runs of one value lasting at least `flatline_s`, or
-  // `centimeter_flatline_s` where the level moves in whole centimeters around them.
+  // Flatlines: runs within `flatline_m` of their first value lasting at least
+  // `flatline_s`, or `centimeter_flatline_s` where the level moves in whole
+  // centimeters around them. In 0.1 mm, the store's resolution.
+  const tolerance = Math.round(flatline_m * 10_000);
   for (let i = 0; i < all.length;) {
     let j = i;
-    while (j + 1 < all.length && all[j + 1]!.level === all[i]!.level) j++;
+    while (
+      j + 1 < all.length &&
+      Math.abs(Math.round((all[j + 1]!.level - all[i]!.level) * 10_000)) <= tolerance
+    )
+      j++;
     const span = all[j]!.time - all[i]!.time;
     if (
       j - i >= 3 &&
@@ -130,13 +167,28 @@ export function qc<T extends Observation>(
   const spacing = median(out.slice(1).map((r, i) => r.time - out[i]!.time)) ?? 0;
   const residuals = all.map((r, i) => {
     // Neighbors on both sides, so a slope at an edge or a gap doesn't look like a spike.
-    const before: number[] = [];
-    const after: number[] = [];
-    for (let k = i - 1; k >= 0 && r.time - all[k]!.time <= 3 * spacing; k--)
-      before.push(all[k]!.level);
+    const before: Observation[] = [];
+    const after: Observation[] = [];
+    for (let k = i - 1; k >= 0 && r.time - all[k]!.time <= 3 * spacing; k--) before.push(all[k]!);
     for (let k = i + 1; k < all.length && all[k]!.time - r.time <= 3 * spacing; k++)
-      after.push(all[k]!.level);
-    return before.length && after.length ? r.level - median([...before, ...after])! : undefined;
+      after.push(all[k]!);
+    if (!before.length || !after.length) return undefined;
+    // Only neighbors whose mirrored time on the other side also holds a value, within half an
+    // interval, so a gap on one side doesn't move the median along a steep tide; all of them
+    // where none pair, so every value with neighbors on both sides is judged.
+    const offset = (x: Observation) => Math.abs(x.time - r.time);
+    // Both sides run outward from the value, so one pass over each finds the pairs.
+    const paired = (side: Observation[], other: Observation[]) => {
+      let j = 0;
+      return side.filter((x) => {
+        while (j < other.length && offset(other[j]!) < offset(x) - spacing / 2) j++;
+        return j < other.length && offset(other[j]!) <= offset(x) + spacing / 2;
+      });
+    };
+    const mirrored = [...paired(before, after), ...paired(after, before)];
+    return (
+      r.level - median((mirrored.length ? mirrored : [...before, ...after]).map((x) => x.level))!
+    );
   });
   const threshold = Math.max(
     spike_m,
@@ -188,18 +240,128 @@ export function qc<T extends Observation>(
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
   // The floor keeps a short, nearly flat window from flagging ordinary changes.
   if (outliers) {
-    const levels = out.map((r) => r.level);
-    const center = median(levels)!;
+    const levels = out.map((r) => r.level).filter(possible);
+    const center = median(levels) ?? 0;
     const outlier = Math.max(10 * mad(levels), 4 * spike_m);
     out.forEach((r) => {
       if (Math.abs(r.level - center) > outlier) worsen(r, Flag.suspect);
     });
   }
 
+  if (jumps) for (const r of residualJumps(out)) worsen(r, Flag.suspect);
+
   return out;
 }
 
 const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
+
+/**
+ * Runs that jump away from the tide and back, as when a sensor reads its zero
+ * for a few hours or sends one wrong value as it fails: in the residual from
+ * the standard set fitted to `rows`' usable values on the hour within 10 m of
+ * their median, a step between neighbors more than 0.5 m and 10 times the
+ * spread of the steps, both the year's and those within 12 hours, opens a run.
+ * Within a day either a step back of more than half the opening, to within
+ * half of it from the residual before, closes it, or a gap after which the
+ * residual is back that near ends it at its last value, so a value just before
+ * a gap is judged too, though not one just after; a run that does neither is a
+ * level change, left alone, as is one whose year ends first. It's flagged only where every residual in it is
+ * within half the opening of the run's median, which leaves water a barrier
+ * holds while the tide moves, and that median is more than half the opening
+ * from the year's. A surge rises over hours, its residual steps a few
+ * centimeters, so it opens none, and a storm's waves or a harbor's seiche
+ * raise the bar near them. Under 30 days' worth of hourly values to fit, or a
+ * fit the sampling can't resolve, nothing is judged.
+ */
+function residualJumps(rows: Observation[]): Observation[] {
+  // shortcut: judges the window's own rows only, so a run across New Year isn't judged; upgrade if one is found.
+  // A value already bad, such as a placeholder, isn't water, so a step from it is no jump.
+  const own = rows.filter((r) => Number.isFinite(r.level) && r.flag < Flag.bad);
+  const center = median(own.map((r) => r.level))!;
+  // The first usable value of each hour, so one suspect value doesn't drop its hour from the fit.
+  const usable = own.filter((r) => r.flag < Flag.suspect && Math.abs(r.level - center) < 10);
+  const hourly = usable.filter(
+    (r, i) => i === 0 || Math.floor(r.time / HOUR_MS) !== Math.floor(usable[i - 1]!.time / HOUR_MS),
+  );
+  // 30 days' worth of hours, so a sparse year can't fit more terms than it has values.
+  if (hourly.length < 30 * 24) return [];
+  let tide: number[];
+  try {
+    tide = predict(
+      fit(hourly, STANDARD),
+      own.map((r) => r.time),
+    );
+  } catch {
+    // The engine refuses a fit its sampling can't resolve, such as 3-hourly values' S4.
+    return [];
+  }
+  const res = own.map((r, i) => r.level - tide[i]!);
+  const typical = median(res)!;
+  const t = own.map((r) => r.time);
+  const gap = Math.max(3 * (median(t.slice(1).map((x, i) => x - t[i]!)) ?? 0), 30 * 60_000);
+  const step = (i: number) => (t[i]! - t[i - 1]! <= gap ? res[i]! - res[i - 1]! : undefined);
+  const steps: number[] = [];
+  for (let i = 1; i < t.length; i++) if (step(i) !== undefined) steps.push(step(i)!);
+  const jump = Math.max(0.5, 10 * mad(steps));
+  // The steps within 12 hours, so a storm's waves or a seiche, rough for hours, set their own bar.
+  const near = (i: number) => {
+    const around: number[] = [];
+    for (let k = i - 1; k >= 1 && t[i]! - t[k]! <= DAY_MS / 2; k--) around.push(step(k)!);
+    for (let k = i + 1; k < t.length && t[k]! - t[i]! <= DAY_MS / 2; k++) around.push(step(k)!);
+    return 10 * mad(around.filter((d) => d !== undefined));
+  };
+  const flagged: Observation[] = [];
+  for (let i = 1; i < t.length; i++) {
+    const open = step(i);
+    if (open === undefined || Math.abs(open) <= jump || Math.abs(open) <= near(i)) continue;
+    const half = Math.abs(open) / 2;
+    let last: number | undefined;
+    // Only what's back within a day: a real peak before a gauge fails, as at a tsunami's first wave, is left alone.
+    for (let k = i; k + 1 < t.length && t[k + 1]! - t[i]! <= DAY_MS; k++) {
+      const back = res[k + 1]! - res[k]!;
+      const returned = Math.abs(res[k + 1]! - res[i - 1]!) < half;
+      // A gap ends the run only where the tide is back after it; a level that stays changed is left alone.
+      if (t[k + 1]! - t[k]! > gap) {
+        if (returned) last = k;
+        break;
+      }
+      if (Math.sign(back) === -Math.sign(open) && Math.abs(back) > half && returned) {
+        last = k;
+        break;
+      }
+    }
+    if (last === undefined) continue;
+    const run = res.slice(i, last + 1);
+    const mid = median(run)!;
+    // Off the tide, too, so the water after one odd value isn't taken for the jump.
+    if (run.some((x) => Math.abs(x - mid) > half) || Math.abs(mid - typical) <= half) continue;
+    flagged.push(...own.slice(i, last + 1));
+    i = last + 1; // The step that closes the run opens none.
+  }
+  return flagged;
+}
+
+/**
+ * The fit's tide at `times`, sorted. Finer than every 10 minutes it's
+ * interpolated from a 10-minute grid, a few millimeters off at most and
+ * nine-tenths faster for a year of 1-minute values.
+ */
+function predict(model: HarmonicModel, times: number[]): number[] {
+  const step = 10 * 60_000;
+  const from = Math.floor(times[0]! / step) * step;
+  const points = Math.floor((times.at(-1)! - from) / step) + 2;
+  if (points >= times.length) return timeline(model, times).map((s) => s.level);
+  const grid = timeline(
+    model,
+    Array.from({ length: points }, (_, k) => from + k * step),
+  ).map((s) => s.level);
+  return times.map((time) => {
+    const k = Math.floor((time - from) / step);
+    const f = (time - from) / step - k;
+    return grid[k]! + f * (grid[k + 1]! - grid[k]!);
+  });
+}
 
 /**
  * Whether most of the changes within three days of the run `out[i..j]` are whole
@@ -234,6 +396,7 @@ function median(values: number[]): number | undefined {
 
 /** Median absolute deviation, scaled to a standard deviation for normal data. */
 function mad(values: number[]): number {
+  values = values.filter(Number.isFinite);
   const center = median(values);
   if (center === undefined) return 0;
   return 1.4826 * median(values.map((v) => Math.abs(v - center)))!;

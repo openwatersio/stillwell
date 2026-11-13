@@ -62,14 +62,14 @@ export interface Analysis {
  * threshold in `qcFor`, so `analyze` judges every station again and
  * requalifies all its stored years.
  */
-export const RULES = "held-1";
+export const RULES = "span-1";
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a
  * verdict depends on, so `analyze` judges every station again and requalifies
  * only those whose QC changes with their verdict.
  */
-export const JUDGE = "drains-2";
+export const JUDGE = "drains-3";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;
@@ -128,8 +128,13 @@ export function judge(
   // holds those rules would flag: where a tide under `CENTIMETER_TIDE_M` moves in
   // whole centimeters, they allow the two days still water gets, so a hold at
   // low water, as at Werkendam in the Biesbosch, makes no difference to its QC
-  // and doesn't count. Elsewhere a tidal verdict also turns the outlier check
-  // on, so every hold a plain six hours flags counts.
+  // and doesn't count; a hold that wavers within `FLATLINE_M` counts, as those
+  // rules flag it. Elsewhere a tidal verdict also turns the outlier check on,
+  // so every hold a plain six hours flags counts, values exactly equal, at an
+  // estuary as at a gauge of no kind: a
+  // gauge of no kind on the coast can read its zero to a few millimeters for
+  // hours when it drops out or is left dry, and a tidal
+  // verdict lets QC flag that.
   const river = station.kind === "river" || station.kind === "lake";
   const tide = qc(start, {
     ...(river ? qcFor({ ...station, tidal: true, tide_m }) : {}),

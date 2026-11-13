@@ -1,3 +1,4 @@
+import type { Period } from "../../datums.ts";
 import { Blocked, getJson } from "../../http.ts";
 import {
   Flag,
@@ -67,13 +68,16 @@ interface ApiDatums {
   datums: { name: string; value: number }[] | null;
   LAT?: number | null;
   HAT?: number | null;
+  /** The spans the tidal datums were reduced over, `MM/DD/YYYY - MM/DD/YYYY`. */
+  DatumAnalysisPeriod?: string[] | null;
 }
 
 /**
  * Every station with water levels, current or historical. Stations on the
  * current network are live; the rest are listed for their history.
  */
-export async function stations(): Promise<ListedStation[]> {
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
+  const before = new Map(previous.map((s) => [s.id, s as CoopsStation]));
   const all = await metadataOf<{ stations: ApiStation[] }>(
     "stations.json?type=historicwl&expand=details",
     true,
@@ -85,11 +89,16 @@ export async function stations(): Promise<ListedStation[]> {
   // An empty list is a broken response; taken at its word, it would end every live feed.
   if (!current.stations?.length || !all.stations?.length)
     throw new Error("CO-OPS listed no water-level stations");
+  // The refresh's own guard counts only active stations, which here are the current network.
+  if (previous.length >= 20 && all.stations.length < previous.length / 2)
+    throw new Error(
+      `CO-OPS listed ${all.stations.length} historical stations, down from ${previous.length}`,
+    );
   const live = new Set(current.stations.map((s) => s.id));
   const listed = new Map(all.stations.map((s) => [s.id, s]));
   // A few current stations aren't on the historical list yet.
   for (const s of current.stations) if (!listed.has(s.id)) listed.set(s.id, s);
-  const stations: ListedStation[] = [];
+  const stations: CoopsStation[] = [];
   const failed: string[] = [];
   let inARow = 0;
   // A slow API that never quite fails mustn't run past the job's timeout.
@@ -98,8 +107,9 @@ export async function stations(): Promise<ListedStation[]> {
     if (Date.now() > deadline)
       throw new Error(`CO-OPS datums took longer than ${pacing.refreshBudgetMs / 60_000} minutes`);
     let heights: Record<string, number> | null = null;
+    let period: Period | null | undefined;
     try {
-      heights = await datums(s.id);
+      ({ heights, period } = await datums(s.id));
       inARow = 0;
     } catch (error) {
       // No offsets this time; the station keeps the ones it had.
@@ -109,7 +119,10 @@ export async function stations(): Promise<ListedStation[]> {
       if (++inARow >= 5 || failed.length > Math.max(10, listed.size / 10))
         throw new Error(`CO-OPS datums failed for ${failed.length} stations, e.g. ${failed[0]}`);
     }
-    stations.push(toStation(s, live.has(s.id), heights));
+    // A refresh keeps a station's offsets when none arrive, so it keeps their period too.
+    if (heights === null || !Object.keys(heights).length)
+      period = before.get(`coops/${s.id}`)?.datums_period ?? null;
+    stations.push({ ...toStation(s, live.has(s.id), heights), datums_period: period });
   }
   for (const f of failed) console.error(`  coops ${f}`);
   return stations.sort((a, b) => a.id.localeCompare(b.id));
@@ -130,8 +143,14 @@ const DATUM_NAMES: Record<string, string> = {
   GL_LWD: "LWD",
 };
 
-/** Heights above STND, in meters, for the datums CO-OPS publishes at a station. */
-async function datums(id: string): Promise<Record<string, number>> {
+/**
+ * Heights above STND, in meters, for the datums CO-OPS publishes at a station,
+ * and the span its tidal datums were reduced over: the first analysis
+ * period's start to the last one's end, or null where it gives none.
+ */
+async function datums(
+  id: string,
+): Promise<{ heights: Record<string, number>; period: Period | null }> {
   // Fresh, so a new tidal epoch's datums reach the next refresh.
   const d = await metadataOf<ApiDatums>(`stations/${id}/datums.json?units=metric`, true);
   // CO-OPS answers some failures with 200 and an error body; that's a failure, not "no datums".
@@ -141,7 +160,23 @@ async function datums(id: string): Promise<Record<string, number>> {
     if (DATUM_NAMES[name] && typeof value === "number") heights[DATUM_NAMES[name]] = value;
   if (typeof d.LAT === "number") heights.LAT = d.LAT;
   if (typeof d.HAT === "number") heights.HAT = d.HAT;
-  return heights;
+  return { heights, period: periodOf(d.DatumAnalysisPeriod ?? []) };
+}
+
+/** The span of CO-OPS's datum analysis periods, as ISO dates, or null where none parses. */
+export function periodOf(spans: unknown): Period | null {
+  const dates = (Array.isArray(spans) ? spans : [])
+    .filter((span): span is string => typeof span === "string")
+    .map((span) => /^\s*(\d{2})\/(\d{2})\/(\d{4})\s*-\s*(\d{2})\/(\d{2})\/(\d{4})\s*$/.exec(span))
+    // Only a whole span counts; any other text, even with dates in it, gives none.
+    .flatMap((m) => (m ? [`${m[3]}-${m[1]}-${m[2]}`, `${m[6]}-${m[4]}-${m[5]}`] : []))
+    // A date that isn't one, such as a placeholder, would fail the published file's DATE column.
+    .filter((date) => {
+      const parsed = Date.parse(`${date}T00:00:00Z`);
+      return !Number.isNaN(parsed) && new Date(parsed).toISOString().startsWith(date);
+    })
+    .sort();
+  return dates.length >= 2 ? { start: dates[0]!, end: dates.at(-1)! } : null;
 }
 
 /**
@@ -149,7 +184,12 @@ async function datums(id: string): Promise<Record<string, number>> {
  * a backfill can skip years it wasn't there. They're kept in the store's list
  * only; `stations.parquet` doesn't carry them.
  */
-export type CoopsStation = ListedStation & { established: string | null; removed: string | null };
+export type CoopsStation = ListedStation & {
+  established: string | null;
+  removed: string | null;
+  /** The span CO-OPS reduced the station's tidal datums over, which `datums_epoch` gives them. */
+  datums_period?: Period | null;
+};
 
 /** `heights` is null when the datums request failed, so the station keeps the offsets it had. */
 function toStation(
@@ -183,7 +223,13 @@ function toStation(
     last: null,
     tide_station: null,
     same_as: [],
-    status: "active",
+    // Removed and off the current network; a removed date before the established one is a reinstalled station.
+    status:
+      !live &&
+      s.details?.removed &&
+      (!s.details.established || isoOf(s.details.removed) >= isoOf(s.details.established))
+        ? "inactive"
+        : "active",
     live,
     min_interval_s: 360,
     source_url: `https://tidesandcurrents.noaa.gov/stationhome.html?id=${s.id}`,
@@ -487,8 +533,9 @@ function fresh(end: Date): boolean {
  * every data request for `blockedMs`, the next for twice that, and a third
  * hold in a row throws `Blocked`: every data request
  * after it fails at once without going out, for the life of the process, so a
- * run stops instead of sending thousands of requests into the block. (A
- * long-lived Worker would need the block to expire.) Tests shrink the waits.
+ * run stops instead of sending thousands of requests into the block. The
+ * realtime server runs each pass in a process of its own (server/pass.ts), so
+ * there it lasts one pass. Tests shrink the waits.
  */
 export const pacing = {
   metadataMs: 1000,

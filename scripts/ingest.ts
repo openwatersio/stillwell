@@ -3,8 +3,10 @@
  *
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
+ *   node scripts/ingest.ts links [--concurrency 4]
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
+ *       [--with-inactive]
  *   node scripts/ingest.ts recent <source> [--hours 24] [--keep-days 7]
  *   node scripts/ingest.ts compact <source> [--days 1] [--rebuild-bounds]
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
@@ -60,7 +62,7 @@
  * and `recent` write the current epoch, never before its start, and skip a
  * station whose new epoch is held for a decision. For a source with `archive:
  * "previous"`, backfill writes each closed epoch's span to its files too. `backfill all` skips inactive
- * stations; naming one still works, adapters refuse values in any datum but
+ * stations unless given `--with-inactive`; naming one still works, adapters refuse values in any datum but
  * the station's, and backfill refuses a file whose `datum` column names another.
  *
  * The store is STILLWELL_STORE: a directory (default `data`) or an `s3://` URL.
@@ -69,7 +71,7 @@
  * separate store, and ingest refuses to write one without it. Commercial use is
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
-import { resolve } from "node:path";
+import "./threadpool.ts";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
   backfillYear,
@@ -120,6 +122,7 @@ import {
   listOf,
   startedListOf,
   publishStations,
+  stationsToMeasure,
   refreshSource,
   AfterWrite,
   needsPerson,
@@ -134,34 +137,8 @@ import type {
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
 import { withhold, withheldReason } from "../src/withhold.ts";
-
-const STORE = (process.env.STILLWELL_STORE ?? "data").replace(/\/$/, "");
-
-/** Where a station's series go: its source's store. */
-function storeFor(station: Pick<Station, "source">): string {
-  return storeOfSource(sourceOf(station.source).metadata);
-}
-
-/** The public store, or the private one for a source whose terms bar republishing. */
-function storeOfSource(metadata: SourceMetadata): string {
-  if (metadata.license.redistribution) return STORE;
-  const restricted = process.env.STILLWELL_RESTRICTED_STORE?.replace(/\/$/, "");
-  if (!restricted)
-    throw new Error(
-      `${metadata.id} bars republishing its data; set STILLWELL_RESTRICTED_STORE to a private store`,
-    );
-  if (overlaps(restricted, STORE))
-    throw new Error("STILLWELL_RESTRICTED_STORE must be a separate bucket or directory");
-  return restricted;
-}
-
-/** Whether two stores share a bucket, or one directory holds the other. */
-function overlaps(a: string, b: string): boolean {
-  const bucket = (store: string) => /^s3:\/\/([^/]+)/.exec(store)?.[1];
-  if (bucket(a) || bucket(b)) return bucket(a) === bucket(b);
-  const [x, y] = [resolve(a), resolve(b)];
-  return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
-}
+import { storeFor, storeOfSource } from "../src/store/stores.ts";
+import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 
 useDiskCache();
 
@@ -179,6 +156,7 @@ const { positionals, values } = parseArgs({
     shard: { type: "string" },
     refetch: { type: "boolean", default: false },
     "skip-written": { type: "boolean", default: false },
+    "with-inactive": { type: "boolean", default: false },
     "skip-unscreened": { type: "boolean", default: false },
     "rebuild-bounds": { type: "boolean", default: false },
     "rebuild-years": { type: "boolean", default: false },
@@ -195,6 +173,22 @@ switch (command) {
     break;
   case "publish":
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) await publish(store);
+    break;
+  case "links":
+    // From the source lists, as publish builds stations.parquet, for the next publish to carry offsets along (src/links.ts).
+    setConnections(positive("concurrency"));
+    for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
+      const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      const { rows, failed } = await measureLinks(
+        store,
+        await stationsToMeasure(store, held),
+        positive("concurrency"),
+        await readLinks(store),
+      );
+      await writeLinks(store, rows);
+      // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
+      if (failed) process.exitCode = 1;
+    }
     break;
   case "backfill": {
     const [source, ids, start, end] = args;
@@ -339,6 +333,12 @@ async function publish(store: string): Promise<void> {
     for (const k of skipped)
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
+    const { joined, fromTide, computed, far, disagree } = result.datums;
+    console.log(
+      `  datums: ${joined} joined to slackwater-database, ${fromTide} with its datums, ${computed} computed from a linked series`,
+    );
+    for (const f of far) console.log(`  datums join dropped: ${f}`);
+    for (const d of disagree) console.log(`  datums differ: ${d}`);
     for (const e of result.unknownErrata)
       console.error(`  erratum lists a station not in the store: ${e}`);
     for (const p of errataProblems) console.error(`  errata: ${p}; left out`);
@@ -395,7 +395,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   } else
     named =
       ids === "all"
-        ? list.filter((s) => s.status === "active")
+        ? list.filter((s) => s.status === "active" || values["with-inactive"])
         : // A station named twice, by either form of its ID, is walked once.
           [...new Set(ids.split(",").map((id) => find(list, sourceId, id)))];
   // A station whose new epoch is held for a decision gets nothing, in either datum.
@@ -407,6 +407,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
     throw new Error("--shard splits `all` or `preliminary`, not named stations");
   // `preliminary` took its shard before picking stations, so the cutoff list is the shard's too.
   if (values.shard && ids === "all") wanted = shard(wanted, ...parseShard(values.shard));
+  if (values["with-inactive"] && ids !== "all") throw new Error("--with-inactive goes with `all`");
   if (values["skip-written"] && values.refetch)
     throw new Error("--skip-written and --refetch contradict each other");
   // Skipping every written year would skip the very years holding preliminary values.
@@ -975,7 +976,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

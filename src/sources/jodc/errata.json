@@ -1,0 +1,43 @@
+{
+  "errata": [
+    {
+      "id": "jodc-day-zero",
+      "stations": ["jodc/0132", "jodc/7315", "jodc/7317", "jodc/7318", "jodc/7319"],
+      "since": "2012-01-08",
+      "until": "2021-09-02",
+      "handling": "corrected",
+      "error": "Eight lines in JODC's port files are dated day 00 of a month: 0132's 2012/01/00, 7315's 2021/05/00, 7317's 2021/01/00, 2021/03/00 and 2021/09/00, 7318's 2021/08/00, and 7319's 2021/04/00 and 2021/08/00. Each sits where the month's one missing day belongs.",
+      "response": "A line dated day 00 is read as the day after the line before it, or the month's first day at the top of a file, and refused if that falls outside the month it names.",
+      "evidence": "Every day-00 line is the only missing day of its month and sits between the lines for the days either side of it (2012/01/08 and 2012/01/10 for 0132), and its levels continue the tide from the line before. The full backfill on 2026-11-12 failed every year of these stations on \"no day\"."
+    },
+    {
+      "id": "jodc-zip-duplicates",
+      "stations": [
+        "jodc/GS01",
+        "jodc/GS02",
+        "jodc/GS03",
+        "jodc/GS04",
+        "jodc/GS05",
+        "jodc/GS06",
+        "jodc/GS07",
+        "jodc/GS08",
+        "jodc/GS09"
+      ],
+      "handling": "kept",
+      "error": "The zips of GSI's GS01 to GS09 hold their 1965 file twice.",
+      "response": "The copies are identical, so the year is read once; a zip whose copies differ is refused.",
+      "evidence": "The zips' central directories list 1965's file twice, with the same contents in GS01's and GS02's (checked 2026-11-12)."
+    },
+    {
+      "id": "jodc-ominato-1952-offset",
+      "stations": ["jodc/HD04"],
+      "since": "1952-05-31",
+      "until": "1952-11-01",
+      "handling": "flagged",
+      "error": "JODC's Ōminato (HD04) levels sit about 2.1 m high from the start of its record, 1 June 1952 JST, to the end of October 1952.",
+      "response": "31 May 1952 UTC to the end of 31 October 1952 is flagged `suspect`, keeping the source's own flag as `source_flag`. The step isn't measured, since the record has a gap across it, so the months are flagged, as in GESLA's copy, rather than given a datum epoch of their own.",
+      "evidence": "Monthly means of JODC's values (checked 2026-11-13) are 3.62 to 3.80 m from June to October 1952 and, after a gap to 19 November, 1.52 m for the rest of November and 1.42 to 1.72 m through 1953; every year from 1953 to 2008, the record's last, averages 1.49 to 1.73 m. GESLA's copy of the gauge, `gesla/ominato-hd04-jpn-jodc_jcg`, has the same step on the same days, which GESLA's metadata marks \"Possible datum issues\" and its datum-jump check flags (erratum `gesla-datum-jumps`)."
+    }
+  ],
+  "retired": []
+}

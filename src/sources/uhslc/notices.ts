@@ -26,12 +26,23 @@ export interface Notice {
   refused?: string;
 }
 
+/** BOM's conditions of use for its tide information, with the disclaimers they require. */
+export const BOM_CONDITIONS =
+  "https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf";
+
+const DMI_TERMS = "https://www.dmi.dk/friedata/dokumentation/terms-of-use";
+// DMI's notice in its Gedser and Hornbæk files, misspelling included.
+const DMI_PREFIX =
+  "Copyright: Danish Meteorological Institute Application and publication of data and text is ";
+const NON_COMMERCIAL = "allowed for non-?comm?ercial use";
+
 export const NOTICES: Record<string, Notice> = {
-  // Terms text the scan found but no notice below matches: non-commercial until
-  // a person reads it and adds a notice.
+  // Terms text the scan found but no notice below matches, or a non-commercial
+  // clause other than DMI's, which outranks any commercial notice in the same
+  // file: non-commercial until it's read and a notice added.
   unreviewed: {
     name: "Terms not yet reviewed",
-    pattern: /(?!)/,
+    pattern: new RegExp(`(?<!${DMI_PREFIX})${NON_COMMERCIAL}`, "i"),
     commercial_use: false,
     credit: null,
     url: null,
@@ -40,11 +51,13 @@ export const NOTICES: Record<string, Notice> = {
   bom: {
     name: "Bureau of Meteorology",
     pattern: /bom\.gov\.au\/other\/copyright/,
-    commercial_use: false,
-    credit: "Bureau of Meteorology, © Commonwealth of Australia",
-    url: "http://www.bom.gov.au/other/copyright.shtml",
+    commercial_use: true,
+    // BOM's conditions want their disclaimers linked from the attribution
+    // wherever they can't be shown with the data.
+    credit: `Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: ${BOM_CONDITIONS})`,
+    url: BOM_CONDITIONS,
     terms:
-      "Users are deemed to accept BOM's copyright notice, whose default for content without a stated licence is personal or in-house use, not supplied to others or used commercially.",
+      "BOM allowed use of its data under the conditions of use for its tide information (reference CAS-151567-N3L2D4): acknowledge copyright in the Commonwealth of Australia represented by the Bureau of Meteorology, and show BOM's disclaimers of warranty and liability with the data or link them from its attribution, which the credit does.",
   },
   jma: {
     name: "Japan Meteorological Agency",
@@ -72,7 +85,7 @@ export const NOTICES: Record<string, Notice> = {
       "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     url: "https://www.bodc.ac.uk/data/hosted_data_systems/sea_level/uk_tide_gauge_network/",
     terms:
-      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
+      "The file says users must not pass the data on to third parties. BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.",
   },
   ccby: {
     name: "CC BY 4.0",
@@ -84,11 +97,13 @@ export const NOTICES: Record<string, Notice> = {
   },
   dmi: {
     name: "Danish Meteorological Institute",
-    pattern: /allowed for non-?comm?ercial use/i,
-    commercial_use: false,
-    credit: "Danish Meteorological Institute",
-    url: null,
-    terms: "Use and publication allowed for non-commercial purposes, with reference.",
+    pattern: new RegExp(DMI_PREFIX + NON_COMMERCIAL, "i"),
+    commercial_use: true,
+    // CC BY 4.0 asks for a link to the license wherever the credit is shown.
+    credit: `Danish Meteorological Institute (DMI), CC BY 4.0 (${DMI_TERMS})`,
+    url: DMI_TERMS,
+    terms:
+      "The file allows use and publication for non-commercial purposes only, with reference. DMI's current terms (changed 30 November 2023) put its oceanographic observations from tide gauges owned by DMI and the Danish Coastal Authority under CC BY 4.0, commercial use included, and apply to its data \"irrespective of whether the user himself has obtained the data via DMI's APIs or Bulk Download Services\", so they cover UHSLC's copies.",
   },
   sanho: {
     name: "South African Navy Hydrographic Office",

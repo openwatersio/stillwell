@@ -367,5 +367,8 @@ describe("cdec", () => {
       /row for MAL/,
     );
     assert.throws(() => cdec.parse("<html>", "MRZ"), /unexpected header/);
+    // A range with no readings still sends the header (MRZ, 1 January 1990); a reply without it is a failure.
+    assert.deepEqual(cdec.parse(fixture("cdec-empty.csv"), "MRZ"), []);
+    assert.throws(() => cdec.parse("", "MRZ"), /empty reply/);
   });
 });

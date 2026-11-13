@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { DuckDBInstance } from "@duckdb/node-api";
-import { mergeFetched, mergeRange, sameRows } from "../src/store/merge.ts";
+import { mergeFetched, mergeRange, sameRows, upsert } from "../src/store/merge.ts";
 import {
   readDatums,
   readExtremes,
   readObservations,
   checkRecent,
+  foldObservationFile,
+  readObservationFile,
   readRecent,
+  readYearStats,
   writeExtremes,
   writeObservations,
   writeRecent,
@@ -462,6 +465,150 @@ describe("qc", () => {
     assert.equal(qc(steps([3, 24], [3.5, 5], [3, 24]))[26]!.flag, Flag.suspect);
   });
 
+  describe("residual jumps", () => {
+    // 60 days of a 2 m semidiurnal tide with a fortnightly spring-neap, every 10 minutes.
+    const year = () =>
+      Array.from({ length: 60 * 144 }, (_, i) => {
+        const h = i / 6;
+        return {
+          time: T + i * 10 * MIN,
+          level: 2 * Math.cos((2 * Math.PI * h) / 12.4206) + 0.5 * Math.cos((2 * Math.PI * h) / 12),
+          flag: Flag.good,
+        };
+      }) as Observation[];
+
+    it("flags a run that jumps from the tide and back, as Kilrush Lough's sensor reading near its zero", () => {
+      const rows = year();
+      // Four hours at about −5.8 m, as on 9 January 2025.
+      for (let i = 3000; i < 3024; i++) rows[i]!.level = -5.8 + (i % 3) * 0.1;
+      const on = qc(rows, { jumps: true }).map((r) => r.flag);
+      const off = qc(rows).map((r) => r.flag);
+      assert.ok(on.slice(3000, 3024).every((f) => f === Flag.suspect));
+      assert.ok(off.slice(3002, 3022).every((f) => f === Flag.good));
+      // Outside the run, the flags are the other rules'.
+      assert.deepEqual(on.slice(0, 3000), off.slice(0, 3000));
+      assert.deepEqual(on.slice(3024), off.slice(3024));
+    });
+
+    it("flags a wrong value just before a gap, which has no neighbors on one side", () => {
+      // As Jersey's 0.0 m on 14 October 2025, between a rising tide and an hour's gap.
+      const rows = year();
+      const i = rows.findIndex((r, k) => k > 2000 && r.level > 1.8);
+      rows[i]!.level = 0;
+      rows.splice(i + 1, 6);
+      assert.equal(qc(rows, { jumps: true })[i]!.flag, Flag.suspect);
+      assert.equal(qc(rows)[i]!.flag, Flag.good);
+    });
+
+    it("leaves a storm surge of 3 m over a day alone", () => {
+      const rows = year().map((r) => {
+        const h = (r.time - T) / 3_600_000 - 30 * 24;
+        return { ...r, level: r.level + 3 * Math.exp(-((h / 8) ** 2)) };
+      });
+      assert.ok(qc(rows, { jumps: true }).every((r) => r.flag === Flag.good));
+    });
+
+    it("leaves a day of waves alone, which raise the bar near them", () => {
+      // Every 5 minutes, with a day of ±0.45 m waves, as at Dunmore East in Storm Herminia.
+      let seed = 1;
+      const wave = () => ((seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5) * 0.9;
+      const rows = Array.from({ length: 60 * 288 }, (_, i) => {
+        const h = i / 12;
+        return {
+          time: T + i * 5 * MIN,
+          level:
+            2 * Math.cos((2 * Math.PI * h) / 12.4206) +
+            0.5 * Math.cos((2 * Math.PI * h) / 12) +
+            (i >= 6000 && i < 6288 ? wave() : 0),
+          flag: Flag.good,
+        };
+      }) as Observation[];
+      assert.deepEqual(
+        qc(rows, { jumps: true }).map((r) => r.flag),
+        qc(rows).map((r) => r.flag),
+      );
+    });
+
+    it("leaves a run that moves with the tide, as water a barrier holds", () => {
+      // A jump of 1.5 m, then three hours whose residual swings by more than half that.
+      const rows = year();
+      for (let i = 3000; i < 3018; i++) rows[i]!.level += i < 3009 ? 1.5 : 3.5;
+      assert.deepEqual(
+        qc(rows, { jumps: true }).map((r) => r.flag),
+        qc(rows).map((r) => r.flag),
+      );
+    });
+
+    it("leaves the water between two dips, which sits on the tide", () => {
+      // As at Inishmore on 18 January 2025: a dip of 0.45 m, under the bar, then a
+      // wave 0.2 m up, so the step back to the tide is over it, and another dip of 0.6 m.
+      const rows = year();
+      rows[3000]!.level -= 0.45;
+      rows[3001]!.level += 0.2;
+      rows[3004]!.level -= 0.6;
+      assert.deepEqual(
+        qc(rows, { jumps: true })
+          .slice(3001, 3004)
+          .map((r) => r.flag),
+        qc(rows)
+          .slice(3001, 3004)
+          .map((r) => r.flag),
+      );
+    });
+
+    it("leaves a jump before an outage of more than a day", () => {
+      // A gauge that reads a tsunami's first wave and fails, or one wrong value, can't be told apart.
+      const rows = year();
+      const i = rows.findIndex((r, k) => k > 2000 && r.level > 1.8);
+      rows[i]!.level = 0;
+      rows.splice(i + 1, 2 * 144);
+      assert.equal(qc(rows, { jumps: true })[i]!.flag, qc(rows)[i]!.flag);
+    });
+
+    it("leaves a level that changes and stays changed across a gap", () => {
+      // Moved up 1 m, as a gauge serviced and set again, with a two-hour dropout soon after.
+      const rows = year().map((r, k) => (k >= 7000 ? { ...r, level: r.level + 1 } : r));
+      rows.splice(7018, 12);
+      assert.deepEqual(
+        qc(rows, { jumps: true }).map((r) => r.flag),
+        qc(rows).map((r) => r.flag),
+      );
+    });
+
+    it("fits around a suspect value at the top of each hour", () => {
+      const rows = year().map((r, k) =>
+        k % 6 ? r : { ...r, flag: Flag.suspect, source_flag: Flag.suspect },
+      );
+      for (let i = 3000; i < 3024; i++) rows[i]!.level = -5.8 + (i % 3) * 0.1;
+      const on = qc(rows, { jumps: true });
+      const off = qc(rows);
+      // The run's values that were usable: QC passes them without the rule.
+      const inRun = [...Array(24).keys()].map((k) => 3000 + k).filter((k) => k % 6);
+      assert.ok(inRun.slice(2, -2).every((k) => off[k]!.flag === Flag.good));
+      assert.ok(inRun.every((k) => on[k]!.flag === Flag.suspect));
+    });
+
+    it("judges nothing where a year is too sparse or coarse to fit", () => {
+      const tide = (h: number) =>
+        2 * Math.cos((2 * Math.PI * h) / 12.4206) + 0.5 * Math.cos((2 * Math.PI * h) / 12);
+      // Two days at each end of a year, which can't fit the standard set.
+      const sparse = [...Array(48).keys(), ...Array.from({ length: 48 }, (_, h) => 330 * 24 + h)];
+      // Every 3 hours for 120 days, where S4 can't be told from its own alias.
+      const coarse = Array.from({ length: 960 }, (_, k) => 3 * k);
+      for (const hours of [sparse, coarse]) {
+        const rows = hours.map((h) => ({
+          time: T + h * 3_600_000,
+          level: tide(h),
+          flag: Flag.good,
+        })) as Observation[];
+        assert.deepEqual(
+          qc(rows, { jumps: true }).map((r) => r.flag),
+          qc(rows).map((r) => r.flag),
+        );
+      }
+    });
+  });
+
   it("can leave out the outlier rule, for pools that sit flat and then flood", () => {
     // Six days flat at 4 m, then a 2 m rise.
     const rows = Array.from({ length: 7 * 24 }, (_, i) => ({
@@ -545,4 +692,122 @@ describe("the store's environment", () => {
       assert.match(run.stderr, new RegExp(`${old} is set; it's now ${now}`));
     });
   }
+});
+
+describe("foldObservationFile", () => {
+  const H = 3_600_000;
+  const T = Date.UTC(2026, 0, 1);
+  // Varied levels, flags, source flags and arrivals, so a row the fold rewrites wrongly shows.
+  const existing: Observation[] = Array.from({ length: 48 }, (_, i) => {
+    const r: Observation = { time: T + i * H, level: 0.1234 + i / 7, flag: (i % 5) as Flag };
+    if (i % 3) r.source_flag = ((i + 1) % 5) as Flag;
+    if (i % 4) r.received = T + i * H + 60_000;
+    return r;
+  });
+  // A negative zero, and a level that rounds to one, which the version hashes apart from zero.
+  existing[5]!.level = -0;
+  existing[6]!.level = -0.00004;
+  const incoming: Observation[] = [
+    // A value it had, one it had with a new level, and new ones.
+    { ...existing[40]! },
+    { time: T + 41 * H, level: 9.5, flag: Flag.preliminary, source_flag: Flag.preliminary },
+    { time: T + 48 * H, level: 1.25, flag: Flag.preliminary, received: T + 49 * H },
+    { time: T + 49 * H, level: -0.5, flag: Flag.preliminary },
+  ];
+  const window: [number, number] = [T + 2 * H, T + 60 * H];
+
+  /** The file and bounds a whole read, merge and rewrite gives, beside foldObservationFile's. */
+  async function both(name: string, write: (path: string) => Promise<void>) {
+    const whole = join(root, "fold", name, "whole.parquet");
+    const fold = join(root, "fold", name, "fold.parquet");
+    await write(whole);
+    await write(fold);
+    const had = await readObservationFile(whole);
+    const merged = upsert(had.rows, incoming);
+    const wholeStats = await writeObservations(whole, merged, "NAP");
+    const from = Math.min(...incoming.map((r) => r.time));
+    let seen: { rows: Observation[]; datums: string[] } | undefined;
+    const { before, stats } = await foldObservationFile(
+      fold,
+      from,
+      "NAP",
+      window,
+      async (rows, datums) => {
+        seen = { rows, datums };
+        return upsert(rows, incoming);
+      },
+    );
+    assert.deepEqual(
+      seen!.rows,
+      had.rows.filter((r) => r.time >= from),
+    );
+    assert.deepEqual(seen!.datums, had.datums);
+    assert.deepEqual(await readObservations(fold), await readObservations(whole));
+    assert.deepEqual(stats, wholeStats);
+    assert.deepEqual(stats, (await readYearStats([fold])).get(fold));
+    return { before, merged };
+  }
+
+  it("writes the file a whole read, merge and rewrite would, reading only the rows it can change", async () => {
+    const { before, merged } = await both("current", (path) =>
+      writeObservations(path, existing, "NAP").then(() => undefined),
+    );
+    // The rows before the fold's inside the window: hours 2 to 39.
+    const inside = existing.filter((r) => r.time >= window[0] && r.time < T + 40 * H);
+    const preliminary = inside.find((r) => (r.source_flag ?? r.flag) === Flag.preliminary)!;
+    assert.deepEqual(before, [T + 2 * H, T + 39 * H, preliminary.time, true]);
+    assert.equal(merged.length, 50);
+  });
+
+  it("writes a file from before source_flag was kept as a rewrite would", async () => {
+    await both("legacy", async (path) => {
+      mkdirSync(dirname(path), { recursive: true });
+      const db = await (await DuckDBInstance.create(":memory:")).connect();
+      await db.run(
+        `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, (CASE WHEN i = 5 THEN -0.00004 WHEN i = 6 THEN 0.000049999999999999996 WHEN i = 7 THEN NULL ELSE 0.12345 + i / 7 END)::DOUBLE AS level_m, (i % 3)::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${path}' (FORMAT parquet)`,
+      );
+    });
+  });
+
+  it("writes a missing file with the fold's rows alone", async () => {
+    const { before } = await both("missing", async () => {});
+    assert.equal(before, null);
+  });
+
+  it("reads only its own file when its path has a glob character", async () => {
+    const dir = join(root, "fold", "glob");
+    // A neighbor written before `source_flag`, whose columns differ from the station's own.
+    mkdirSync(join(dir, "ab"), { recursive: true });
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    await db.run(
+      `COPY (SELECT make_timestamptz(${T * 1000}::BIGINT + i * ${H * 1000}::BIGINT) AS time, 1.5::FLOAT AS level_m, 0::UTINYINT AS flag, NULL::TIMESTAMPTZ AS received, 'NAP' AS datum FROM range(48) t(i)) TO '${join(dir, "ab", "2026.parquet")}' (FORMAT parquet)`,
+    );
+    const fold = async (rows: Observation[]) => {
+      seen = rows;
+      return upsert(rows, incoming);
+    };
+    let seen: Observation[] = [];
+    // Its own file is missing, so `a*` matches only its neighbor's.
+    const missing = join(dir, "a*", "2026.parquet");
+    const { before } = await foldObservationFile(missing, T, "NAP", window, fold);
+    assert.deepEqual(seen, []);
+    assert.equal(before, null);
+    assert.deepEqual(
+      (await readObservations(missing)).map((r) => r.time),
+      upsert([], incoming).map((r) => r.time),
+    );
+    // Now it has one, beside a neighbor it also matches.
+    const own = await readObservations(missing);
+    await foldObservationFile(missing, T, "NAP", window, fold);
+    assert.deepEqual(seen, own);
+  });
+
+  it("leaves the file as it is when the fold returns null", async () => {
+    const path = join(root, "fold", "kept.parquet");
+    await writeObservations(path, existing, "NAP");
+    const was = await readYearStats([path]);
+    const { stats } = await foldObservationFile(path, T, "NAP", null, async () => null);
+    assert.equal(stats, null);
+    assert.deepEqual(await readYearStats([path]), was);
+  });
 });

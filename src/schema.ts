@@ -52,6 +52,25 @@ export interface Station {
   datum: string;
   /** Meters to add to a level in `datum` to refer it to each other datum. */
   datums: Record<string, number>;
+  /**
+   * Where each of `datums` came from: the source, slackwater-database, or computed
+   * from another series of the gauge (`src/datums.ts`). Set as
+   * `stations.parquet` is built, as are `datums_epoch`, `chart_datum` and `frame`.
+   */
+  datums_source?: Record<string, "source" | "slackwater-database" | "computed">;
+  /** The period each tidal datum in `datums` was reduced over, where known. */
+  datums_epoch?: Record<string, { start: string; end: string }>;
+  /** The credits slackwater-database asks for, one per record whose values `datums` holds, directly or computed from them. */
+  datums_attribution?: string[];
+  /** The datum charts use at the station, such as `LAT` or `MLLW`, or null when it has no offset to one. */
+  chart_datum?: string | null;
+  /**
+   * `gauge` when slackwater-database gave the chart-datum offset for this series, so
+   * levels line up with its predictions; `source` when the source gave it or
+   * it was computed; `unknown` with no chart datum, or where `tide_station`'s
+   * datums are in the constituent frame (MSL = 0).
+   */
+  frame?: "gauge" | "source" | "unknown";
   products: Product[];
   /**
    * First and last observation in the store, as ISO times; null until a store
@@ -62,7 +81,7 @@ export interface Station {
   license: string;
   commercial_use: boolean;
   attribution: string;
-  /** tide-database station (`source/id`) for the same gauge. */
+  /** slackwater-database station (`source/id`) for the same gauge. */
   tide_station: string | null;
   /** Other store series from the same physical gauge, by `src/same-as.ts`. */
   same_as: string[];
@@ -75,7 +94,7 @@ export interface Station {
   /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether the live endpoint serves this station. */
+  /** Whether ingest asks for this station's current values: the hourly job and the realtime poller. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a
@@ -175,9 +194,24 @@ export interface EpochSplit {
   note: string;
 }
 
+/**
+ * A station listed in the wrong datum before it held any values. When the
+ * source first lists it in `datum`, its epochs are replaced by fresh ones
+ * from the start of its record, rather than a new epoch opening at that
+ * refresh. A decision made after checking what files the store holds for its
+ * epochs, since they'd no longer be read. It applies once: never to a
+ * station that already has an epoch in `datum`.
+ */
+export interface EpochRestart {
+  datum: string;
+  note: string;
+}
+
 /** Decisions made about a source's stations, kept in its adapter. */
 export interface Overrides {
   epochs?: Record<string, EpochDecision>;
+  /** By station (`EpochRestart`). */
+  restarts?: Record<string, EpochRestart>;
   /** By station: where to split its epochs, each split opening an epoch from that day. */
   splits?: Record<string, EpochSplit[]>;
 }
@@ -195,7 +229,9 @@ export interface SourceMetadata {
     /**
      * Whether the terms let anyone republish the data, which the public store
      * does. A source that withholds it keeps its list and series in the
-     * restricted store. This, not `commercial_use`, decides the store.
+     * restricted store. A source whose terms ask for permission to republish,
+     * once it's asked for, is in the public store with `commercial_use` false
+     * until it's given. This, not `commercial_use`, decides the store.
      */
     redistribution: boolean;
   };
@@ -247,7 +283,7 @@ export interface SourceMetadata {
 
 /**
  * One upstream source. Adapters use only `fetch` (through `src/http.ts`) so the
- * same code runs in Node for ingest and in the Worker for live levels.
+ * same code runs in Actions and on the Stillwell server.
  */
 export interface Source {
   metadata: SourceMetadata;

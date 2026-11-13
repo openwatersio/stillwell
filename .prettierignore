@@ -3,8 +3,9 @@ data/
 package-lock.json
 docs/results/
 test/fixtures/
-docs/ticon-replacement.md
+docs/ticon-inventory.md
 src/sources/uhslc/contributors.ts
-docs/uhslc-contributors.md
-docs/gesla-contributors.md
+src/sources/uhslc/contributors.md
+src/sources/gesla/contributors.md
+src/sources/gesla/coverage.md
 .cla.json

@@ -74,6 +74,9 @@ export interface CatalogLocation {
   type?: string;
   latitude?: number;
   longitude?: number;
+  /** Where `latitude` and `longitude` are missing, as at every LRC location, the position is here. */
+  "published-latitude"?: number;
+  "published-longitude"?: number;
   elevation?: number;
   unit?: string;
   "vertical-datum"?: string;
@@ -85,11 +88,14 @@ export interface CatalogLocation {
  * A USACE station as listed, with the CWMS series its levels come from and,
  * where the gauge zero moved partway through it, the first day on the zero in
  * use now (`zero_since`, from `ZERO_SINCE`). Both are kept in the store's
- * list only; `stations.parquet` doesn't carry them. So is `datums_from`,
- * which says where each offset read from the description came from.
+ * list only; `stations.parquet` doesn't carry them. So are `series_since`,
+ * the UTC day the series begins in CWMS's catalog, before which backfill asks
+ * for nothing, and `datums_from`, which says where each offset read from the
+ * description came from.
  */
 export type UsaceStation = ListedStation & {
   series: string;
+  series_since?: string;
   zero_since?: string;
   datums_from?: Record<string, DatumNote>;
 };
@@ -103,9 +109,11 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
   const committed = new Map<string, string>();
   const committedSince = new Map<string, string>();
   const committedFrom = new Map<string, Record<string, DatumNote>>();
+  const committedStart = new Map<string, string>();
   for (const s of previous) {
-    const { series, zero_since, datums_from } = s as Partial<UsaceStation>;
+    const { series, zero_since, datums_from, series_since } = s as Partial<UsaceStation>;
     if (series) committed.set(s.id, series);
+    if (series_since) committedStart.set(s.id, series_since);
     if (zero_since) committedSince.set(s.id, zero_since);
     if (datums_from) committedFrom.set(s.id, datums_from);
   }
@@ -119,6 +127,9 @@ export async function stations(previous: Station[] = []): Promise<ListedStation[
     // dropped on its own and let a backfill reach back past the reset.
     const since = latest(ZERO_SINCE[s.source_id]?.since, committedSince.get(s.id));
     if (since) s.zero_since = since;
+    // The earlier of the catalog's start and the list's, so a catalog answer that moves it later can't hide years backfill would ask for.
+    const start = [s.series_since, committedStart.get(s.id)].filter((d) => d).sort()[0];
+    if (start) s.series_since = start;
     // A new zero date is a moved gauge zero under the same label, so a new datum epoch.
     s.reference = { id: since ?? "original", since: since ?? null };
     // A refresh that sends no offsets keeps the stored ones, so it keeps where they came from too.
@@ -158,7 +169,15 @@ export function toStations(
   committed: Map<string, string> = new Map(),
   now = Date.now(),
 ): UsaceStation[] {
-  const byName = new Map(locations.map((l) => [l.name, l]));
+  const byName = new Map(
+    locations.map((l) => [
+      l.name,
+      // Both coordinates from one pair, so a position is never half one and half the other.
+      l.latitude === undefined && l.longitude === undefined
+        ? { ...l, latitude: l["published-latitude"], longitude: l["published-longitude"] }
+        : l,
+    ]),
+  );
   const listed = new Map(series.map((s) => [s.name, s]));
   const byLocation = Map.groupBy(
     series.filter((s) => observed(s)),
@@ -287,6 +306,7 @@ function toStation(
     min_interval_s: null,
     source_url: `${API}/timeseries?office=${office}&name=${encodeURIComponent(name)}`,
     series: name,
+    ...(series && startDay(series) ? { series_since: startDay(series) } : {}),
     ...(Object.keys(described.notes).length ? { datums_from: described.notes } : {}),
   };
 }
@@ -395,6 +415,12 @@ function first(s: CatalogSeries): number {
   return Math.min(Infinity, ...times(s, "earliest-time"));
 }
 
+/** The UTC day a series begins, or undefined where its extents give none or a year past 9999. */
+function startDay(s: CatalogSeries): string | undefined {
+  const day = Number.isFinite(first(s)) ? new Date(first(s)).toISOString().slice(0, 10) : "";
+  return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : undefined;
+}
+
 function times(s: CatalogSeries, field: "earliest-time" | "latest-time"): number[] {
   return (s.extents ?? []).map((e) => Date.parse(e[field] ?? "")).filter(Number.isFinite);
 }
@@ -452,10 +478,22 @@ export async function levels(
       const body = await getJson<ApiSeries>(`${API}/timeseries?${query}`, {
         ...V2,
         fresh: fresh(to),
+        keep: (t) => {
+          try {
+            return Array.isArray((JSON.parse(t) as ApiSeries).values);
+          } catch {
+            return false;
+          }
+        },
       });
+      // An empty range comes as `"values": []`, so a reply without the array is a failure.
+      if (!Array.isArray(body.values))
+        throw new Error(
+          `CWMS ${office} ${name} sent no values: ${JSON.stringify(body).slice(0, 100)}`,
+        );
       if (body.values?.length && body.units !== "m")
         throw new Error(`CWMS ${office} ${name} came in ${body.units}, not m`);
-      for (const [time, level, quality] of body.values ?? []) {
+      for (const [time, level, quality] of body.values) {
         const flag = flagOf(quality);
         if (level === null || !Number.isFinite(level) || flag === null) continue;
         out.push({ time, level: Math.round(level * 1000) / 1000, flag });
@@ -530,6 +568,33 @@ export function zeroSince(station: Pick<Station, "source_id"> & { zero_since?: s
 }
 
 /**
+ * Where a station's levels are asked for from: 00:00 UTC on January 1 of the
+ * year its `series_since` falls in, or -Infinity where the list has none, as
+ * in `stations.parquet` or for a station first listed with a series CWMS
+ * gives no extents for. A station whose series CWMS stops listing keeps the
+ * day the list had. Requests from
+ * before the series begins would come back empty. The first year is asked for
+ * whole, which costs no extra request, so a catalog start later than the
+ * series' first value never leaves a part-year file that `--skip-written`
+ * would then keep.
+ */
+export function seriesSince(station: { source_id: string; series_since?: string }): number {
+  if (!station.series_since) return -Infinity;
+  const day = station.series_since;
+  // A real day: Date rolls 2026-02-30 over to March, so it must come back the same.
+  const parsed = Date.parse(`${day}T00:00:00Z`);
+  const valid =
+    /^\d{4}-\d{2}-\d{2}$/.test(day) &&
+    !Number.isNaN(parsed) &&
+    new Date(parsed).toISOString().startsWith(day);
+  if (!valid)
+    throw new Error(
+      `usace/${station.source_id} has an unreadable series_since ${station.series_since}`,
+    );
+  return Date.parse(`${day.slice(0, 4)}-01-01T00:00:00Z`);
+}
+
+/**
  * The office and series a station's levels come from. Every request is stage
  * above gauge zero, so a station committed in another datum is refused. A
  * station read from `stations.parquet`, which doesn't carry `series`, has it
@@ -552,7 +617,7 @@ export const source: Source = {
   observations: async (s: Station, start, end) => {
     const [office, series] = seriesOf(s);
     // Nothing from before the gauge zero moved, so the station's files keep one zero.
-    const from = Math.max(start.getTime(), zeroSince(s));
+    const from = Math.max(start.getTime(), zeroSince(s), seriesSince(s));
     return from < end.getTime() ? levels(office, series, new Date(from), end) : [];
   },
 };

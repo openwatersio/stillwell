@@ -11,6 +11,7 @@ import {
   Unjudged,
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
+import { seriesOf } from "../unam/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
@@ -92,6 +93,13 @@ export const CRMS_EARLY = new Set(
     .split(/\s+/)
     .map((site) => `crms${site}-crms${site}-usa-crms`),
 );
+
+/**
+ * GESLA's CRMS records that are the site's marsh well throughout, so they
+ * share no gauge with the site's surface-water series (erratum
+ * `gesla-crms0090-marsh-well`, erratum `gesla-crms0128-marsh-well`).
+ */
+export const CRMS_WELLS = new Set(["CRMS0090", "CRMS0128"]);
 
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
@@ -317,8 +325,18 @@ export function originatorIds(
         ? [`sfwmd/${upper.replace(/_T$/, "")}_T`]
         : [`sfwmd/${upper}`];
     case "CRMS":
-      // The site's first surface-water gauge, which GESLA's records start on.
-      return /^CRMS\d{4}$/.test(upper) ? [`crms/${upper}-H01`] : [];
+      // The site's first surface-water gauge. Nine records start on the site's marsh well,
+      // which the store doesn't hold, and two are the well throughout (CRMS_WELLS).
+      return /^CRMS\d{4}$/.test(upper) && !CRMS_WELLS.has(upper) ? [`crms/${upper}-H01`] : [];
+    // JODC's codes; its JMA records' (`MA…`) aren't JMA's own, and JODC doesn't list them.
+    case "JODC_JCG":
+    case "JODC_GIAJ":
+    case "JODC_PAHB":
+      return [`jodc/${upper}`];
+    case "UNAM": {
+      const series = seriesOf(file);
+      return series ? [`unam/${series}`] : [];
+    }
     case "UHSLC_FD":
       return [`uhslc/${code.toLowerCase()}`];
     case "UHSLC_RQ": {
@@ -466,11 +484,12 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         .trim()
         .split(/\s+/);
       const qc = Number(fields[1]);
-      if (qc >= 0 && qc <= 4 && fields[0] !== nul) {
+      const level = Number(fields[0]);
+      if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
         const flag = QC_FLAGS[qc]!;
         times[n] = timeOf(text, at) + shift;
         if (n && times[n]! < times[n - 1]!) sorted = false;
-        levels[n] = Number(fields[0]);
+        levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
         n++;
       }

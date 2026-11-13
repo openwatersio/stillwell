@@ -40,6 +40,25 @@
       "error": "BODC's Ilfracombe levels sit 0.9 to 1.6 m off GESLA's CMEMS copy of the gauge on and off from 30 September 2023 to 20 March 2025.",
       "response": "30 September 2023 to 20 March 2025 is flagged `suspect` whole, keeping BODC's own flag as `source_flag`. The store's QC already flags 82 to 93% of it.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of the gauge (`gesla/ilfracombe-ilf-gbr-cmems`): the difference is −0.01 m before and −0.02 m after and −0.88 to −1.56 m over the spans."
+    },
+    {
+      "id": "bodc-st-helier-2025-zero",
+      "stations": ["bodc/jer"],
+      "since": "2025-10-14",
+      "until": "2025-10-15",
+      "handling": "kept",
+      "error": "BODC's ERDDAP gives St. Helier 0.000 m at 19:15 UTC on 14 October 2025, between 5.559 m at 19:00 and 6.77 m after a one-hour gap.",
+      "response": "The value is kept as served, with BODC's good flag. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
+      "evidence": "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:30, then 6.77 m."
+    },
+    {
+      "id": "bodc-hinkley-channel",
+      "stations": ["bodc/hin"],
+      "handling": "corrected",
+      "error": "BODC's processed dataset for Hinkley Point (`HIN_ukcff_4602_001`) has no values in `ASLVBG02`, the channel that holds the processed series at every other gauge with values in it, and marks no channel as the processed one. Hinkley Point's processed series is in `ASLVRADR`, the radar channel, from January 2023.",
+      "response": "The adapter reads `ASLVRADR` at Hinkley Point (`CHANNELS` in `src/sources/bodc/index.ts`) and `ASLVBG02` everywhere else.",
+      "evidence": "In November 2026, Hinkley Point's `ASLVBG02` has no values in any year. Its `ASLVRADR` matches the store's copy of GESLA's BODC record of the gauge (`gesla/hinkley_point-hin-gbr-bodc`) within 1.5 mm at all 5,563 quarter hours both hold in 2025 and 2026, sits on the same zero as GESLA's CMEMS record (`gesla/hinkley-hin-gbr-cmems`) in each year from 2023 (median difference under 1 mm), and matches the EA's chart datum series (`ea/E72524`) within 5 mm at 99% of times in 2026.",
+      "reported": null
     }
   ],
   "retired": []

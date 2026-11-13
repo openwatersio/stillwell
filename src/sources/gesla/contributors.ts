@@ -1,3 +1,5 @@
+import { NOTICES } from "../uhslc/notices.ts";
+
 /**
  * GESLA's contributors, by the abbreviation in its metadata's `CONTRIBUTOR
  * (ABBREVIATED)` column and each file name's last part, with the terms the
@@ -29,7 +31,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     name: "Marine Environmental Data Section, Fisheries and Oceans Canada",
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. The gauges are the Canadian Hydrographic Service's, whose terms need a separate license for any commercial use (tide-database#320).",
+      "GESLA's license table: research and consultancy. The gauges are the Canadian Hydrographic Service's, whose terms need a separate license for any commercial use (slackwater-database#320).",
   },
   CMEMS: {
     name: "Copernicus Marine Service",
@@ -64,10 +66,10 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   RWS: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   RWS_HIST: { name: "Rijkswaterstaat", commercial_use: true, terms: RESEARCH_AND_CONSULTANCY },
   BOM: {
-    name: "Bureau of Meteorology, © Commonwealth of Australia",
+    name: NOTICES.bom!.credit!,
     commercial_use: false,
     terms:
-      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially, as on UHSLC's BOM records; BOM has been asked for permission (openwatersio/stillwell#80).",
+      "GESLA's license table: research and consultancy. BOM's copyright notice defaults to personal or in-house use, not supplied to others or used commercially.",
   },
   WSV: {
     name: "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)",
@@ -128,7 +130,7 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
   BODC: {
     name: "British Oceanographic Data Centre, as part of the function of the National Tidal and Sea Level Facility; Environment Agency",
     commercial_use: true,
-    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479, openwatersio/stillwell#80), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
+    terms: `${RESEARCH_AND_CONSULTANCY} BODC's processed UK National Tide Gauge Network data is under the Open Government Licence v3.0, as its ERDDAP datasets state and BODC confirmed in writing (ticket BODCREQ-11479), which allows republishing it under CC BY 4.0, crediting BODC and the Environment Agency.`,
   },
   SFWMD: {
     name: "South Florida Water Management District",
@@ -221,10 +223,10 @@ export const CONTRIBUTORS: Record<string, Contributor> = {
     terms: RESEARCH_AND_CONSULTANCY,
   },
   DMI: {
-    name: "Danish Meteorological Institute",
-    commercial_use: false,
+    name: NOTICES.dmi!.credit!,
+    commercial_use: true,
     terms:
-      "GESLA's license table: research and consultancy. DMI's notice on UHSLC's records of the same gauges bars commercial use; DMI has been asked whether its CC BY 4.0 terms cover them (openwatersio/stillwell#80).",
+      "GESLA's license table: research and consultancy. DMI licenses its tide-gauge data under CC BY 4.0, commercial use included, however the user obtained it.",
   },
   GLOSS: {
     name: "Global Sea Level Observing System",

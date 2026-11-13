@@ -21,7 +21,7 @@ import {
   writeStationBounds,
 } from "../src/store/parquet.ts";
 import { analysisHistoryPath, seriesPath } from "../src/store/paths.ts";
-import { qcFor } from "../src/store/recent.ts";
+import { FLATLINE_M, qcFor } from "../src/store/recent.ts";
 import {
   Flag,
   Unjudged,
@@ -87,6 +87,13 @@ describe("judge", () => {
     const verdict = judge(river("4"), series(90, level));
     assert.ok(verdict.drains! > DRAINS_RUNS);
     assert.equal(verdict.tidal, false);
+    // A hold that wavers by a millimeter counts too, as tidal QC takes it for a flatline.
+    const dithering = (h: number) =>
+      h % 168 < 8 ? -0.5 + ((Math.round(h * 4) % 3) - 1) * 0.001 : tide(0.5)(h);
+    assert.equal(judge(river("11"), series(90, dithering)).tidal, false);
+    // Elsewhere only an exact hold counts, so a coastal gauge of no kind left dry stays tidal for QC to flag.
+    assert.equal(judge(river("12", { kind: "estuary" }), series(90, dithering)).tidal, true);
+    assert.equal(judge(river("13", { kind: null }), series(90, dithering)).tidal, true);
     // On the coast those runs are a stuck or dry gauge, for QC to flag, not still water.
     const coast = judge(river("5", { kind: "coastal" }), series(90, level));
     assert.equal(coast.tidal, true);
@@ -136,15 +143,20 @@ describe("judge", () => {
 describe("qcFor", () => {
   it("gives tidal water six hours and still water two days, by verdict, then by kind", () => {
     const still = { flatline_s: 48 * 3600, outliers: false, held: false };
-    assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), { outliers: false });
+    assert.deepEqual(qcFor(river("1", { tidal: true, tide_m: 0.5 })), {
+      flatline_m: FLATLINE_M,
+      outliers: false,
+    });
     assert.deepEqual(qcFor(river("2", { tidal: false })), still);
     // A tide under 30 cm can sit on one centimeter for hours; one of 30 cm or more can't.
     assert.equal(qcFor(river("5", { tidal: true, tide_m: 0.3 })).centimeter_flatline_s, undefined);
     assert.equal(qcFor(river("3", { tidal: true, tide_m: 0.09 })).centimeter_flatline_s, 48 * 3600);
-    // A tidal river floods, so only it and a lake drop the outlier check.
-    assert.deepEqual(qcFor({ kind: "coastal", tidal: true, tide_m: 1 }), {});
-    assert.deepEqual(qcFor({ kind: "estuary", tidal: true, tide_m: 1 }), {});
-    assert.deepEqual(qcFor({ kind: null, tidal: true, tide_m: 1 }), {});
+    // A tidal river floods, so only it and a lake drop the outlier check, and the
+    // residual jumps, since a river's tide is too far from harmonic.
+    const tidal = { flatline_m: FLATLINE_M, jumps: true };
+    assert.deepEqual(qcFor({ kind: "coastal", tidal: true, tide_m: 1 }), tidal);
+    assert.deepEqual(qcFor({ kind: "estuary", tidal: true, tide_m: 1 }), tidal);
+    assert.deepEqual(qcFor({ kind: null, tidal: true, tide_m: 1 }), tidal);
     // A sea without a tide holds a centimeter for a day, but not a millimeter.
     assert.deepEqual(qcFor({ kind: "coastal", tidal: false }), {
       centimeter_flatline_s: 48 * 3600,
@@ -152,9 +164,9 @@ describe("qcFor", () => {
       held: false,
     });
     // With no verdict: a river or lake as still, anything else, water of no kind included, as tidal.
-    assert.deepEqual(qcFor({ kind: "coastal", tidal: null }), {});
-    assert.deepEqual(qcFor({ kind: "estuary", tidal: null }), {});
-    assert.deepEqual(qcFor({ kind: null, tidal: null }), {});
+    assert.deepEqual(qcFor({ kind: "coastal", tidal: null }), tidal);
+    assert.deepEqual(qcFor({ kind: "estuary", tidal: null }), tidal);
+    assert.deepEqual(qcFor({ kind: null, tidal: null }), tidal);
     assert.deepEqual(qcFor(river("4", { tidal: null })), still);
   });
 });

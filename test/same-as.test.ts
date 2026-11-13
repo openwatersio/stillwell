@@ -7,8 +7,15 @@ const NOW = new Date("2026-11-01T00:00:00Z");
 
 // The real decisions name stations these tests don't list, which would report them as dropped.
 const DECISIONS = [...LINKS];
-before(() => LINKS.splice(0));
-after(() => LINKS.push(...DECISIONS));
+const APART = [...UNLINKS];
+before(() => {
+  LINKS.splice(0);
+  UNLINKS.splice(0);
+});
+after(() => {
+  LINKS.push(...DECISIONS);
+  UNLINKS.push(...APART);
+});
 
 /** A station at `source/id`, by default at 0,0 with levels and no record yet. */
 const station = (
@@ -125,6 +132,23 @@ describe("linkGauges's limits", () => {
       report.skipped.map((k) => k.reason),
       ["would join coops and usgs, which run separate gauges"],
     );
+  });
+
+  it("links GESLA's copy of a JODC port gauge to JODC's, not to JMA's gauge nearby", () => {
+    const hirarako = { name: "Hirarako", kind: "coastal" as const, lat: 24.8133, lon: 125.2783 };
+    const { stations, report } = linkGauges([
+      station("gesla/hirarako-0151-jpn-jodc_pahb", {
+        ...hirarako,
+        contributor: "JODC_PAHB",
+        same_as: ["jodc/0151"],
+      }),
+      station("jodc/0151", hirarako),
+      station("jma/R1", { name: "Hirara", kind: "coastal", lat: 24.8, lon: 125.2833 }),
+    ]);
+    assert.deepEqual(stations[0]!.same_as, ["jodc/0151"]);
+    // A record GESLA names by ID isn't matched as a copy.
+    assert.deepEqual(stations[2]!.same_as, []);
+    assert.deepEqual(report.skipped, []);
   });
 
   it("keeps a GESLA record whose values are another gauge's out of every group", () => {
@@ -415,6 +439,14 @@ describe("nearPairs", () => {
   const pair = (a: Partial<Station>, b: Partial<Station>) =>
     nearPairs([station("usace/a", a), station("usgs/b", { lat: m(30), ...b })]).length === 1;
 
+  it("never pairs JMA's and JODC's gauges, which are separate instruments", () => {
+    const at = { name: "Maizuru", kind: "coastal" as const };
+    assert.equal(
+      nearPairs([station("jma/MZ", at), station("jodc/HD24", { ...at, lat: m(30) })]).length,
+      0,
+    );
+  });
+
   it("needs a shared identifying word, never name alone", () => {
     assert.ok(pair({ name: "Clay" }, { name: "ELK RIVER AT CLAY, WV" }));
     assert.ok(!pair({ name: "Clay" }, { name: "Clay", lat: m(150) }));
@@ -589,7 +621,7 @@ describe("rank", () => {
   const live = record("2001-12-17T00:00:00Z", "2026-10-01T00:00:00Z");
 
   it("prefers a series with levels, then one whose terms allow commercial use", () => {
-    // A BOM-contributed UHSLC copy is non-commercial; its live original wins on terms alone.
+    // A non-commercial UHSLC copy loses to its live original on terms alone.
     assert.equal(
       best(station("uhslc/001", { commercial_use: false, ...live }), station("refmar/9", live)),
       "refmar/9",
@@ -671,6 +703,59 @@ describe("rank", () => {
       }),
     ]).stations;
     assert.equal(relayed[0]!.preferred, "crms/CRMS0282-H01");
+    // GESLA's record of a site spans the gauges CPRA numbers anew as it moves
+    // them; CRMS links them, so the record joins all of them and the gauge
+    // still reporting is preferred over the site's first.
+    const moved = linkGauges(
+      [
+        station("gesla/crms6302-crms6302-usa-crms", {
+          same_as: ["crms/CRMS6302-H01"],
+          ...record("2008-01-01T00:00:00Z", "2025-12-31T00:00:00Z"),
+        }),
+        station("crms/CRMS6302-H01", {
+          same_as: ["crms/CRMS6302-H02"],
+          status: "inactive",
+          ...record("2009-01-01T00:00:00Z", "2010-12-31T00:00:00Z"),
+        }),
+        station("crms/CRMS6302-H02", {
+          same_as: ["crms/CRMS6302-H01"],
+          lat: m(200),
+          ...record("2011-01-01T00:00:00Z", "2026-10-01T00:00:00Z"),
+        }),
+      ],
+      NOW,
+    ).stations;
+    assert.deepEqual(moved[0]!.same_as, ["crms/CRMS6302-H01", "crms/CRMS6302-H02"]);
+    for (const s of moved) assert.equal(s.preferred, "crms/CRMS6302-H02");
+    // GESLA's CRMS0128 is the site's marsh well throughout, so it names no
+    // CRMS series, and UNLINKS keeps it from the site's H01 25 m away.
+    UNLINKS.push(...APART.filter((d) => d.a === "gesla/crms0128-crms0128-usa-crms"));
+    let well: Station[];
+    try {
+      well = linkGauges(
+        [
+          station("gesla/crms0128-crms0128-usa-crms", {
+            name: "CRMS0128",
+            kind: "river",
+            lat: 29.8317,
+            lon: -89.94798,
+            ...record("2013-10-01T05:00:00Z", "2025-04-23T14:00:00Z"),
+          }),
+          station("crms/CRMS0128-H01", {
+            name: "CRMS0128-H01",
+            kind: "estuary",
+            lat: 29.83121397,
+            lon: -89.94819795,
+            status: "inactive",
+            ...record("2007-10-29T17:00:00Z", "2012-10-15T19:00:00Z"),
+          }),
+        ],
+        NOW,
+      ).stations;
+    } finally {
+      UNLINKS.splice(0);
+    }
+    for (const s of well) assert.deepEqual(s.same_as, []);
     assert.equal(best(station("usgs/b"), station("rws/a", { interval_s: 900 })), "rws/a");
     assert.equal(best(station("rws/b"), station("rws/a")), "rws/a");
     // A date that doesn't parse counts as no record, whichever way round.

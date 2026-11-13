@@ -9,7 +9,8 @@ import { km, nameScore } from "./ticon.ts";
  * - **an adapter**, from an ID the source gives: BSH names each gauge's
  *   PEGELONLINE series, UHSLC's documentation files name the originator's
  *   station number, and a source links its own series of one gauge (UHSLC's
- *   versions, RWS's twins). A link to a station another source lists more than
+ *   versions, RWS's twins, a CRMS site's series as its gauge
+ *   moved). A link to a station another source lists more than
  *   `ID_KM` away is dropped and reported, as a wrong ID.
  * - **nearness and name**: two stations of different sources within `NEAR_KM`
  *   whose names share an identifying word and name the same side of any dam or
@@ -82,6 +83,11 @@ export const LINKS: Decision[] = [
     note: "CMEMS's Eems Meetpaal is RWS's Eemshaven Waddenzee gauge, 0.1 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. One source's two records, so nearness doesn't link them.",
   },
   {
+    a: "gesla/hoekvanhollandtg-hoe-nld-cmems",
+    b: "rws/hoekvanholland",
+    note: "CMEMS's copy of RWS's Hoek van Holland gauge, 0.35 km away: in the store in November 2026, the 520,978 values both hold from 2014 to 2025 agree to 0.0 cm RMS in the median month, and 99.99% within 5 mm. RWS's Hoek van Holland splitsingsdam, Maeslantkering and Noorderdam gauges share its name's words, so the copy rule leaves it in doubt.",
+  },
+  {
     a: "gesla/eidersptg-eid-deu-cmems",
     b: "pegelonline/9530010",
     note: "CMEMS's copy of WSA Tönning's Eider barrier gauge, at PEGELONLINE's position for Eider-Sperrwerk AP. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. GESLA's CMEMS name says no side of the barrier, where PEGELONLINE's says the outer one (AP), so nearness doesn't link them.",
@@ -119,7 +125,13 @@ export const LINKS: Decision[] = [
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
-export const UNLINKS: Decision[] = [];
+export const UNLINKS: Decision[] = [
+  {
+    a: "gesla/crms0128-crms0128-usa-crms",
+    b: "crms/CRMS0128-H01",
+    note: "GESLA's CRMS0128 record, October 2013 to April 2025, is the site's marsh well (CRMS0128-W01) throughout, an hour early (erratum `gesla-crms0128-marsh-well`). The site's surface-water gauge, H01, ends in October 2012, 25 m away.",
+  },
+];
 
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {};
@@ -167,7 +179,7 @@ const ASSEMBLED = new Set(["gesla"]);
  * stations at one pier are separate instruments that check each other, never
  * one gauge. Only an ID or an entry in `LINKS` joins them.
  */
-const SEPARATE = new Set(["coops~usgs", "coops~usace"]);
+const SEPARATE = new Set(["coops~usgs", "coops~usace", "jma~jodc"]);
 
 function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));

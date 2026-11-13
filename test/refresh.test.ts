@@ -27,7 +27,7 @@ import {
 import type { Erratum } from "../src/errata.ts";
 import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
-import { LINKS } from "../src/same-as.ts";
+import { LINKS, UNLINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/store/years.ts";
 import {
   describeReport,
@@ -99,8 +99,15 @@ const sourceOf = (stations: ListedStation[], overrides?: Overrides): Source => (
 
 // The real link decisions name stations these lists don't have, which would report them as dropped.
 const DECISIONS = [...LINKS];
-before(() => LINKS.splice(0));
-after(() => LINKS.push(...DECISIONS));
+const APART = [...UNLINKS];
+before(() => {
+  LINKS.splice(0);
+  UNLINKS.splice(0);
+});
+after(() => {
+  LINKS.push(...DECISIONS);
+  UNLINKS.push(...APART);
+});
 
 const NOW = "2026-11-05T00:00:00Z";
 const LATER = "2026-12-05T00:00:00Z";
@@ -476,6 +483,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
       links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
+      datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
     assert.deepEqual(await publishedSources(stationsPath(store)), ["test"]);
@@ -613,6 +621,7 @@ describe("publishStations", () => {
     assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
       links: { pairs: {}, dropped: [], skipped: [], large: [] },
+      datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
   });

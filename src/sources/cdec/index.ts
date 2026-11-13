@@ -347,7 +347,8 @@ function pacificDate(time: number): string {
  */
 export function parse(text: string, code: string): Observation[] {
   const lines = text.split(/\r?\n/).filter((l) => l.trim());
-  if (!lines.length) return [];
+  // A range with no readings still has the header, so an empty reply is a failure.
+  if (!lines.length) throw new Error(`CDEC ${code} sent an empty reply`);
   if (!/^STATION_ID,DURATION,SENSOR_NUMBER,SENSOR_TYPE,DATE TIME,OBS DATE,VALUE/.test(lines[0]!))
     throw new Error(`CDEC ${code} sent an unexpected header: ${lines[0]}`);
   const byTime = new Map<number, Observation>();

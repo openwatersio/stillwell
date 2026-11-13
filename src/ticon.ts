@@ -2,11 +2,14 @@ import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
 import { TIDAL } from "./sources/dwr/index.ts";
 import { withheld } from "./sources/uhslc/index.ts";
+import { seriesOf } from "./sources/unam/index.ts";
 
 /**
- * Which store source can replace each TICON record in tide-database. TICON ids
- * are `<place>-<code>-<iso3>-<contributor>`, where the code is often the
- * originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC id).
+ * The store source for the originator of each TICON record in
+ * slackwater-database, where there is one.
+ * TICON ids are `<place>-<code>-<iso3>-<contributor>`, where the code is often
+ * the originator's own (a NOAA station number, a PEGELONLINE number, a UHSLC
+ * id).
  */
 export type Status =
   /** An adapter exists and the record matched one of its stations. */
@@ -37,17 +40,17 @@ export interface TiconRecord {
   iso3: string;
   commercial_use: boolean;
   epoch: { start: string; end: string };
-  /** Whether a tide-database station file lists this record. */
+  /** Whether a slackwater-database station file lists this record. */
   published: boolean;
-  /** Whether tide-database's quality evaluation accepts it; rejected records still get a route. */
+  /** Whether slackwater-database's quality evaluation accepts it; rejected records still get a route. */
   accepted: boolean;
-  /** The tide-database station file that lists it, as `<country>/<slug>`. */
+  /** The slackwater-database station file that lists it, as `<country>/<slug>`. */
   station?: string;
-  /** The originator tide-database's provenance declares, as `source/id`. */
+  /** The originator slackwater-database's provenance declares, as `source/id`. */
   declared?: string;
 }
 
-export interface Replacement {
+export interface Originator {
   source: string;
   id: string | null;
   status: Status;
@@ -93,11 +96,10 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
   bom: { source: "bom", status: "license", note: "BOM license not stated" },
-  unam: { source: "unam", status: "license", note: "UNAM Servicio Mareográfico terms to check" },
   unam_hist: {
     source: "unam",
     status: "license",
-    note: "UNAM Servicio Mareográfico terms to check",
+    note: "SMN sends its historical records only on request, asked for in #48",
   },
   ispra: { source: "ispra", status: "license" },
   ieo: { source: "redmar", status: "license" },
@@ -113,11 +115,10 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   cv: { source: "gesla", status: "restricted", note: "GESLA lists CV as research only" },
 };
 
-/** tide-database source prefixes, as store sources, with each one's status. */
+/** slackwater-database source prefixes, as store sources, with each one's status. */
 const DECLARED: Record<string, { source: string; status: Status }> = {
   noaa: { source: "coops", status: "planned" },
   kartverket: { source: "kartverket", status: "planned" },
-  jhod: { source: "jodc", status: "license" },
   jma: { source: "jma", status: "planned" },
   linz: { source: "linz", status: "license" },
 };
@@ -126,14 +127,17 @@ const PEGELONLINE_NOTE =
   "PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`";
 
 /**
- * Picks the replacement for one record. `lists` holds the store's station lists
- * by source, for the sources that have adapters.
+ * Finds the originator's series for one record. `lists` holds the store's
+ * station lists by source, for the sources that have adapters.
  *
  * The record's own `commercial_use` doesn't decide anything here: it describes
- * TICON's copy, and the replacement comes from the originator under the
- * originator's terms, which `status` reflects.
+ * TICON's copy, and the originator's series comes under the originator's
+ * terms, which `status` reflects.
  */
-export function replacement(record: TiconRecord, lists: Record<string, Station[]>): Replacement {
+export function originatorSeries(
+  record: TiconRecord,
+  lists: Record<string, Station[]>,
+): Originator {
   const { contributor, code, iso3 } = record;
   if (contributor === "noaa") return byCode(record, "coops", code, "planned", lists);
   if (contributor === "usgs") {
@@ -169,11 +173,20 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 
   // A UHSLC or JODC relay of a gauge another source publishes goes to that
-  // source, as tide-database's provenance declares.
+  // source, as slackwater-database's provenance declares. JHOD's numbers (`jhod/…`)
+  // aren't JODC's codes, so JODC's own records go by the code in their id.
   if (contributor.startsWith("uhslc") || contributor.startsWith("jodc")) {
     const [prefix, id] = record.declared?.split("/") ?? [];
     const declared = prefix ? DECLARED[prefix] : undefined;
     const relay = contributor.startsWith("uhslc") ? "UHSLC" : "JODC";
+    // A UHSLC copy of a Coast Guard gauge waits on JODC's terms, as the Coast Guard's own record does.
+    if (prefix === "jhod" && relay === "UHSLC")
+      return {
+        source: "jodc",
+        id: null,
+        status: "license",
+        note: `${relay} relay of ${record.declared}; JODC's terms ask for permission to republish`,
+      };
     if (declared && id) {
       const sourceId = declared.source === "kartverket" ? id.toUpperCase() : id;
       const match = byCode(record, declared.source, sourceId, declared.status, lists);
@@ -188,13 +201,15 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
         (s) =>
           s.source_id === number &&
           usable(s) &&
+          s.status === "active" &&
           (s as Station & { version?: string }).version === version?.toUpperCase(),
       );
       // An FD record whose series UHSLC no longer serves is its latest version's.
       const latest = /^\d{3}$/.test(code)
         ? lists.uhslc
             ?.filter((s) => s.source_id.startsWith(code) && usable(s))
-            .filter((s, _, all) => !all.some((o) => o.source_id === code))
+            // A retired FD series counts as gone: UHSLC keeps it listed, inactive, once it stops serving it.
+            .filter((s, _, all) => !all.some((o) => o.source_id === code && o.status === "active"))
             .map((s) => s.source_id)
             .sort()
             .at(-1)
@@ -220,12 +235,20 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
         };
       return match;
     }
-    return {
-      source: "jodc",
-      id: null,
-      status: "license",
-      note: "Japanese originals also fix GESLA's year-end truncation",
-    };
+    // JODC's own codes for JMA's gauges aren't JMA's, and the jodc source leaves them out.
+    if (code.startsWith("ma"))
+      return {
+        source: "jma",
+        id: null,
+        status: "unmatched",
+        note: "JODC relay of a JMA gauge with no JMA code declared",
+      };
+    // JODC's terms ask for permission to republish, so its records stay on
+    // TICON for commercial use until it's given (#47).
+    const match = byCode(record, "jodc", code.toUpperCase(), "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "JODC's terms ask for permission to republish" }
+      : match;
   }
 
   // The National Tide Gauge Network's records come from BODC, whose open
@@ -249,7 +272,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
     const national = NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
     // A link in `LINKS`, made by comparing the series, knows the gauge better than CMEMS's position
-    // does. Only a link to the national feed's station names the replacement.
+    // does. Only a link to the national feed's station names the originator.
     const copy = `gesla/${record.id}`;
     const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(
       (id) => national && id.startsWith(`${national.source}/`),
@@ -270,7 +293,7 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
         source: national.source,
         id: null,
         status: "to_match",
-        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't an active station with levels`,
+        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't a station with levels`,
       };
     }
     if (national && lists[national.source])
@@ -288,18 +311,33 @@ export function replacement(record: TiconRecord, lists: Record<string, Station[]
       };
   }
 
+  // SMN's records name the sensor and station number; its terms allow only
+  // non-profit reproduction, so a match stays on TICON for commercial use (#48).
+  if (contributor === "unam") {
+    const series = seriesOf(record.id);
+    if (!series)
+      return { source: "unam", id: null, status: "unmatched", note: "No SMN sensor in the id" };
+    const match = byCode(record, "unam", series, "license", lists);
+    return match.status === "ready"
+      ? { ...match, status: "restricted", note: "SMN's terms allow only non-profit use" }
+      : match;
+  }
+
   const direct = DIRECT[contributor];
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
-  // CRMS records carry the site; its surface-water gauge still reporting is the
-  // latest of H01, H02 and H03, since CPRA numbers a gauge it moves anew.
+  // CRMS records carry the site; its surface-water gauge is the latest of H01,
+  // H02 and H03 still reporting, or else the latest, since CPRA numbers a gauge it moves anew.
   if (contributor === "crms") {
     const site = code.toUpperCase();
     const gauge = lists.crms
       ?.filter((s) => s.source_id.startsWith(`${site}-H`) && usable(s))
-      .map((s) => s.source_id)
-      .sort()
-      .at(-1);
+      .sort(
+        (a, b) =>
+          Number(a.status === "active") - Number(b.status === "active") ||
+          a.source_id.localeCompare(b.source_id),
+      )
+      .at(-1)?.source_id;
     return byCode(record, "crms", gauge ?? `${site}-H01`, "planned", lists);
   }
   // DWR records carry its station number, which TICON writes without the trailing Q
@@ -329,7 +367,7 @@ function byCode(
   sourceId: string,
   status: Status,
   lists: Record<string, Station[]>,
-): Replacement {
+): Originator {
   const list = lists[source];
   if (!list) return { source, id: `${source}/${sourceId}`, status };
   const station = list.find((s) => s.source_id === sourceId && usable(s));
@@ -338,9 +376,9 @@ function byCode(
   return { source, id: station.id, status: "ready", distance_km: round(km(record, station)) };
 }
 
-/** A station that still reports levels. */
+/** A station with levels, retired or not, since a record's epoch is history. */
 function usable(station: Station): boolean {
-  return station.status === "active" && station.products.includes("levels");
+  return station.products.includes("levels");
 }
 
 /**
@@ -356,7 +394,7 @@ function nearest(
   source: string,
   stations: Station[] | undefined,
   { note }: { note?: string } = {},
-): Replacement {
+): Originator {
   // Ranked by whether the names share an identifying word, then by how many
   // words they share in all, then by distance.
   let best: { station: Station; km: number; score: number } | undefined;
@@ -482,12 +520,12 @@ function round(value: number): number {
 }
 
 /**
- * A record left unmatched takes the match of a record in the same tide-database
- * station file, since tide-database merges records only when they're the same
- * gauge. Only when every matched record there agrees on one series. It keeps
- * the record's own note, such as why it was unmatched.
+ * A record left unmatched takes the match of a record in the same
+ * slackwater-database station file, since slackwater-database merges records
+ * only when they're the same gauge. Only when every matched record there agrees
+ * on one series. It keeps the record's own note, such as why it was unmatched.
  */
-export function adoptSiblings<T extends { record: TiconRecord; replacement: Replacement }>(
+export function adoptSiblings<T extends { record: TiconRecord; originator: Originator }>(
   rows: T[],
   stations: Station[] = [],
 ): T[] {
@@ -496,26 +534,26 @@ export function adoptSiblings<T extends { record: TiconRecord; replacement: Repl
     (r) => r.record.station!,
   );
   return rows.map((row) => {
-    if (row.replacement.status !== "unmatched" || !row.record.station) return row;
+    if (row.originator.status !== "unmatched" || !row.record.station) return row;
     const matched = byStation
       .get(row.record.station)!
       .filter(
-        (r) => r.replacement.status === "ready" && r.replacement.source === row.replacement.source,
+        (r) => r.originator.status === "ready" && r.originator.source === row.originator.source,
       );
-    const ids = new Set(matched.map((r) => r.replacement.id));
+    const ids = new Set(matched.map((r) => r.originator.id));
     if (ids.size !== 1) return row;
     const sibling = matched[0]!;
     return {
       ...row,
-      replacement: {
-        source: sibling.replacement.source,
-        id: sibling.replacement.id,
+      originator: {
+        source: sibling.originator.source,
+        id: sibling.originator.id,
         status: "ready",
         ...distanceTo(
           row.record,
-          stations.find((s) => s.id === sibling.replacement.id),
+          stations.find((s) => s.id === sibling.originator.id),
         ),
-        note: [`Same tide-database station as ${sibling.record.id}`, row.replacement.note]
+        note: [`Same slackwater-database station as ${sibling.record.id}`, row.originator.note]
           .filter(Boolean)
           .join("; "),
       },
@@ -530,7 +568,7 @@ function distanceTo(record: TiconRecord, station: Station | undefined): { distan
 /**
  * USGS site numbers are mostly 8, 10 or 15 digits, often with a leading zero
  * that TICON's ids drop. Restore it to the next of those lengths. A few sites
- * have 9 digits, which `replacement` finds by checking the station list.
+ * have 9 digits, which `originatorSeries` finds by checking the station list.
  */
 export function usgsSite(code: string): string {
   const length =

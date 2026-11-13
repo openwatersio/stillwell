@@ -147,6 +147,8 @@ interface Catalog {
     Grootheid: { Code: string };
     Hoedanigheid: { Code: string };
     Groepering?: { Code: string };
+    /** `meting` (measured), `astronomisch` (astronomical tide) or `verwachting` (forecast). */
+    ProcesType?: string;
   }[];
   AquoMetadataLocatieLijst: {
     AquoMetaData_MessageID: number;
@@ -156,15 +158,21 @@ interface Catalog {
 }
 
 /**
- * Locations with a water-level series against NAP, or against MSL where that's
- * all a location has (the offshore platforms).
+ * Locations with a measured water-level series against NAP, or against MSL
+ * where that's all a location measures (the offshore platforms), and those
+ * with only RWS's astronomical tide, listed for their predictions.
  */
 export async function stations(): Promise<ListedStation[]> {
   const catalog = await getJson<Catalog>(CATALOG, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      CatalogusFilter: { Grootheden: true, Hoedanigheden: true, Groeperingen: true },
+      CatalogusFilter: {
+        Grootheden: true,
+        Hoedanigheden: true,
+        Groeperingen: true,
+        ProcesTypes: true,
+      },
     }),
   });
   // What each metadata entry gives a location: a height series or a set of extremes.
@@ -172,7 +180,13 @@ export async function stations(): Promise<ListedStation[]> {
   const datumOf = new Map<number, string>();
   for (const m of catalog.AquoMetadataLijst) {
     const grouping = m.Groepering?.Code;
-    if (!grouping && m.Grootheid.Code === "WATHTE" && DATUMS.includes(m.Hoedanigheid.Code)) {
+    // Measured heights only: Europlatform and Goeree Lichteiland have NAP forecasts but measure against MSL.
+    if (
+      !grouping &&
+      m.Grootheid.Code === "WATHTE" &&
+      m.ProcesType === "meting" &&
+      DATUMS.includes(m.Hoedanigheid.Code)
+    ) {
       productsOf.set(m.AquoMetadata_MessageID, ["levels"]);
       datumOf.set(m.AquoMetadata_MessageID, m.Hoedanigheid.Code);
     } else if (grouping === EXTREME_GROUPING.meting)
@@ -196,34 +210,41 @@ export async function stations(): Promise<ListedStation[]> {
     products.set(link.Locatie_MessageID, set);
   }
   return linkTwins(
-    catalog.LocatieLijst.filter((l) => products.get(l.Locatie_MessageID)?.has("levels"))
-      .map((l): Station => ({
-        ...stationDefaults(metadata),
-        id: `rws/${l.Code}`,
-        source_id: l.Code,
-        name: l.Naam,
-        lat: l.Lat,
-        lon: l.Lon,
-        // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
-        country_code: l.Lon < -30 ? "BQ" : "NL",
-        // The only water RWS's catalog names is the sea of its offshore platforms.
-        kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
-        interval_s: 600,
-        datum: DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
-        datums: {},
-        products: productsFor(
-          products.get(l.Locatie_MessageID)!,
-          DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d))!,
-        ),
-        first: null,
-        last: null,
-        tide_station: null,
-        same_as: [],
-        status: "active",
-        live: true,
-        min_interval_s: 300,
-        source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
-      }))
+    // A location with only RWS's astronomical tide, such as Knock and Dukegat, is listed for its predictions.
+    catalog.LocatieLijst.filter((l) => {
+      const set = products.get(l.Locatie_MessageID);
+      return set?.has("levels") || set?.has("predictions");
+    })
+      .map((l): Station => {
+        const available = products.get(l.Locatie_MessageID)!;
+        const measured = available.has("levels");
+        // The astronomical groupings are against NAP even where a location measures against MSL.
+        const datum = DATUMS.find((d) => datums.get(l.Locatie_MessageID)?.has(d)) ?? "NAP";
+        return {
+          ...stationDefaults(metadata),
+          id: `rws/${l.Code}`,
+          source_id: l.Code,
+          name: l.Naam,
+          lat: l.Lat,
+          lon: l.Lon,
+          // The Caribbean Netherlands (Bonaire, Sint Eustatius, Saba) has its own code.
+          country_code: l.Lon < -30 ? "BQ" : "NL",
+          // The only water RWS's catalog names is the sea of its offshore platforms.
+          kind: /platform/i.test(l.Omschrijving ?? "") ? "coastal" : null,
+          interval_s: measured ? 600 : null,
+          datum,
+          datums: {},
+          products: productsFor(available, datum),
+          first: null,
+          last: null,
+          tide_station: null,
+          same_as: [],
+          status: "active",
+          live: measured,
+          min_interval_s: 300,
+          source_url: `https://waterinfo.rws.nl/publiek/waterhoogte/${encodeURIComponent(l.Code)}/details`,
+        };
+      })
       .sort((a, b) => a.id.localeCompare(b.id)),
   ).map((s) => ({ ...s, reference: revisedNap(s) ? REVISED_NAP : null }));
 }
@@ -377,7 +398,7 @@ export async function extremes(
 }
 
 /**
- * Checked (`Gecontroleerd`) values are good and unchecked ones preliminary.
+ * Checked (`Gecontroleerd`) and final (`Definitief`) values are good, and unchecked ones preliminary.
  * Quality code `00` is a normal value. What `25` means isn't documented where
  * we've looked, so it and any other code count as suspect until it is.
  */
@@ -463,8 +484,19 @@ export const source: Source = {
       datum: s.datum,
       fresh: fresh(end),
     }),
-  // A gauge whose zero moved with no change of datum marked (docs/stations.md, "Unreported zero moves").
   overrides: {
+    // Listed in NAP from RWS's NAP forecasts, though they measure against MSL.
+    restarts: {
+      "rws/europlatform": {
+        datum: "MSL",
+        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The store held no files in any product or epoch (November 2026).",
+      },
+      "rws/goeree.lichteiland": {
+        datum: "MSL",
+        note: "RWS's NAP series here is a forecast; its measured levels, from 1990 on, are against MSL. The store held only 2024's measured extremes against NAP (extremes/rws/goeree.lichteiland/2/2024.parquet, 1,415 rows), which go unread after the restart, by decision, for the MSL levels from 1990 (November 2026).",
+      },
+    },
+    // A gauge whose zero moved with no change of datum marked (docs/stations.md, "Unreported zero moves").
     splits: {
       "rws/kralendijk.plazabeachterminal": [
         {

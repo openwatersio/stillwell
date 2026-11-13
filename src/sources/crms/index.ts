@@ -30,7 +30,7 @@ export const metadata: SourceMetadata = {
     "Coastal Protection and Restoration Authority (CPRA) of Louisiana. Coastwide Reference Monitoring System. Coastal Information Management System (CIMS) database. https://cims.coastal.la.gov",
   contact: { email: "cpra-cims@usgs.gov", url: "https://cims.coastal.la.gov/" },
   terms:
-    "CPRA's CIMS disclaimer puts CPRA's data in the public domain and lets it be distributed or copied, with no warranty, and asks for a credit; its suggested citation adds the year and the date accessed. The store reads CIMS's weekly export once a month, so a value is as of the export its station's last refetch read. CPRA recommends getting its data from a CPRA server. Changes in the store: adjusted water elevations converted from feet to meters and rounded to the millimeter, times from Central Standard Time to UTC, rows without an adjusted elevation dropped, and values CPRA's comments describe as a dry sensor or a stand-in flagged suspect.",
+    "CPRA's CIMS disclaimer puts CPRA's data in the public domain and lets it be distributed or copied, with no warranty, and asks for a credit; its suggested citation adds the year and the date accessed. The store reads CIMS's weekly export once a month, so a value is as of the export its station's last refetch read. CPRA recommends getting its data from a CPRA server. Changes in the store: adjusted water elevations converted from feet to meters and rounded to the millimeter, times from Central Standard Time to UTC, rows without an adjusted elevation dropped, as are a surface-water gauge's rows CPRA labels a marsh well, and values CPRA's comments describe as a dry sensor or a stand-in flagged suspect.",
   // The export is weekly and its newest values are months old.
   hourly: false,
   // CPRA sends no preliminary values, but re-adjusts recent months from field
@@ -110,8 +110,11 @@ interface LayerStation {
   "mondata.STATUS": string | null;
 }
 
-/** CRMS's hourly surface-water gauges, from CIMS's monitoring-stations layer. */
-export async function stations(): Promise<ListedStation[]> {
+/**
+ * CRMS's hourly surface-water gauges, from CIMS's monitoring-stations layer,
+ * each linked to the site's other series, listed or still in `previous`.
+ */
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const [listed, sites] = await Promise.all([
     query<LayerStation>("monitoring_stations/MapServer/0", {
       where:
@@ -166,6 +169,16 @@ export async function stations(): Promise<ListedStation[]> {
       reference: GEOID12B,
     });
   }
+  // CPRA numbers a gauge it moves within a site anew, H02 after H01, so a
+  // site's series are one record, which GESLA's copies span. A series the
+  // layer no longer lists stays in the store, so it's linked too.
+  const ids = new Set([...out.values(), ...previous].map((s) => s.id));
+  const bySite = Map.groupBy(ids, (id) => id.slice(0, 13));
+  for (const s of out.values())
+    s.same_as = bySite
+      .get(s.id.slice(0, 13))!
+      .filter((id) => id !== s.id)
+      .sort();
   return [...out.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -181,6 +194,7 @@ export const parser: Parser = (header) => {
     date: col("Date (mm/dd/yyyy)"),
     time: col("Time (hh:mm:ss)"),
     zone: col("Time Zone"),
+    environment: col("Sensor Environment"),
     level: col("Adjusted Water Elevation to Datum (ft)"),
     geoid: col("Geoid"),
     comments: col("Comments"),
@@ -204,6 +218,13 @@ export const parser: Parser = (header) => {
       throw new Error(`CRMS's ${station} has an impossible time ${f[c.date]} ${f[c.time]}`);
     // CPRA withdraws a value by leaving its elevation empty.
     if (!level) return null;
+    // CPRA files a marsh well under a surface-water ID once, erratum `crms-0626-marsh-well`.
+    const environment = f[c.environment]!.trim();
+    if (environment === "Marsh Well") return null;
+    if (environment !== "Surface Water")
+      throw new Error(
+        `CRMS's ${station} has an elevation in a ${environment || "blank"} sensor environment`,
+      );
     const feet = Number(level);
     if (!Number.isFinite(feet))
       throw new Error(`CRMS's ${station} has an unreadable row: ${f.join(",")}`);

@@ -225,6 +225,10 @@ async function rowsOf(
     throw error;
   }
   if (!text.startsWith("I_E#")) throw new Error(`BSH ${file} is not a prediction file`);
+  // A gauge predicted by time difference from a reference port has times but no heights
+  // ("Zeiten : HW NW" or "Zeiten : HW", not "Zeiten u. Höhen") and often no datum or unit
+  // line. Any other file goes on to the checks below.
+  if (/^C02#[^#]*#\s*Zeiten\s+:\s*HW(\s+NW)?\s*#/m.test(text) && !/^VB2#/m.test(text)) return [];
   const unit = /C05#[^#]*#\s*([^#\s]+)/.exec(text)?.[1];
   if (unit !== "m") throw new Error(`BSH ${file} height unit is ${unit}, not m`);
   // BSH names each year's datum, and a gauge can move from PNP to SKN between years.
@@ -262,7 +266,16 @@ function hours(hhmm: string | undefined): number | undefined {
   return match ? Number(match[1]) + Number(match[2]) / 60 : undefined;
 }
 
-/** Calls `get` for each calendar year [start, end) touches, keeping rows inside it. */
+/**
+ * When BSH's terms let a year's predictions be published online: 1 August of
+ * the year before, at midnight in Germany (22:00 UTC the day before).
+ */
+export const publishableFrom = (year: number) => Date.UTC(year - 1, 6, 31, 22);
+
+/**
+ * Calls `get` for each calendar year [start, end) touches, keeping rows inside
+ * it. A year whose predictions can't be published yet is skipped unasked.
+ */
 async function byYear<T extends { time: number }>(
   start: Date,
   end: Date,
@@ -274,7 +287,7 @@ async function byYear<T extends { time: number }>(
     year <= new Date(end.getTime() - 1).getUTCFullYear();
     year++
   )
-    rows.push(...(await get(year)));
+    if (Date.now() >= publishableFrom(year)) rows.push(...(await get(year)));
   return rows.filter((r) => r.time >= start.getTime() && r.time < end.getTime());
 }
 

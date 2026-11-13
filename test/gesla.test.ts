@@ -117,6 +117,12 @@ describe("gesla stations", () => {
 
   it("pads USGS numbers only where USGS's parts start with a zero", () => {
     assert.deepEqual(gesla.originatorIds("USGS", "1359139", -73.7), ["usgs/01359139"]);
+    assert.deepEqual(gesla.originatorIds("JODC_GIAJ", "gs01", 139.6), ["jodc/GS01"]);
+    assert.deepEqual(gesla.originatorIds("JODC_JMA", "ma64", 140.9), []);
+    assert.deepEqual(
+      gesla.originatorIds("UNAM", "14", -110.3, new Map(), "lapaz_flotador-14-mex-unam"),
+      ["unam/14-flotador"],
+    );
     assert.deepEqual(gesla.originatorIds("USGS", "11162765", -122.4), ["usgs/11162765"]);
     // Part 09, the Colorado, is west of 100° W but has the zero too.
     assert.deepEqual(gesla.originatorIds("USGS", "9380000", -111.6), ["usgs/09380000"]);
@@ -183,6 +189,52 @@ describe("gesla stations", () => {
     assert.equal(requests.length, 0);
   });
 
+  it("keeps BOM's own records non-commercial, crediting BOM with a link to its conditions", async () => {
+    const bom = metadata.replace(
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,BOM,",
+    );
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", bom.length)
+        : bom,
+    );
+    const record = (await gesla.stations()).find(
+      (s) => s.source_id === "seattle-9447130-usa-noaa",
+    )!;
+    assert.deepEqual(
+      [record.contributor, record.commercial_use, record.attribution],
+      [
+        "BOM",
+        false,
+        "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); Bureau of Meteorology, © Commonwealth of Australia (conditions of use and disclaimers: https://www.bom.gov.au/oceanography/projects/ntc/Tidal_Information_Conditions_of_Use.pdf)",
+      ],
+    );
+  });
+
+  it("tags DMI's own records for commercial use, crediting DMI with a link to its CC BY terms", async () => {
+    const dmi = metadata.replace(
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
+      "seattle-9447130-usa-noaa,Seattle,9447130,USA,DMI,",
+    );
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", dmi.length)
+        : dmi,
+    );
+    const record = (await gesla.stations()).find(
+      (s) => s.source_id === "seattle-9447130-usa-noaa",
+    )!;
+    assert.deepEqual(
+      [record.contributor, record.commercial_use, record.attribution],
+      [
+        "DMI",
+        true,
+        "GESLA-4.1 (Haigh et al. 2023; Woodworth et al. 2017); Danish Meteorological Institute (DMI), CC BY 4.0 (https://www.dmi.dk/friedata/dokumentation/terms-of-use)",
+      ],
+    );
+  });
+
   it("fails when a record it drops isn't in the release, as a renamed one wouldn't be", async () => {
     const renamed = metadata.replace("uddevalla-2541-swe-smhi,", "uddevalla2-2541-swe-smhi,");
     setTransport(async (url) =>
@@ -198,6 +250,12 @@ describe("gesla stations", () => {
     assert.deepEqual(gesla.originatorIds("CDWR", "B91212", -121.7), ["dwr/B91212"]);
     assert.deepEqual(gesla.originatorIds("CDWR", "RVB", -121.7), ["cdec/RVB"]);
     assert.deepEqual(gesla.originatorIds("BODC", "LER", -1.1), ["bodc/ler"]);
+  });
+
+  it("links a CRMS record to its site's first surface-water gauge, unless it's the site's marsh well", () => {
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0008", -89.4), ["crms/CRMS0008-H01"]);
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0128", -90.4), []);
+    assert.deepEqual(gesla.originatorIds("CRMS", "crms0090", -90.2), []);
   });
 
   it("links SFWMD's tailwaters to its `_T` series and other gauges to their own", () => {
@@ -524,6 +582,9 @@ describe("gesla parse", () => {
       "1917/12/28 23:00:00  -1.0000 4 0",
       "1970/01/01 04:00:00   2.3900 3 0",
       "2015/01/01 01:00:00 -99.9999 5 0",
+      "2015/01/01 02:00:00 NaN 1 1",
+      "2015/01/01 03:00:00 Infinity 1 1",
+      "2015/01/01 04:00:00 1.2.3 1 1",
       "",
     ].join("\n");
     const r = gesla.parse(text, "x", null);
@@ -558,6 +619,19 @@ describe("gesla clocks", () => {
       [iso(hourly.times[0]!), iso(minutes.times[0]!)],
       ["2015-06-01T00:30:00.000Z", "2015-06-01T00:00:00.000Z"],
     );
+  });
+
+  it("flags each CRMS marsh well on its record's clock, and unlinks the wells throughout", () => {
+    const wells = geslaErrata.errata.filter((e) => /^gesla-crms\d{4}-marsh-well$/.test(e.id));
+    assert.equal(wells.length, 11);
+    for (const e of wells) {
+      const file = e.id.replace(/^gesla-(crms\d{4})-marsh-well$/, "$1-$1-usa-crms");
+      assert.deepEqual(e.stations, [`gesla/${file}`]);
+      // Spans read on the corrected clock where the adapter moves the record.
+      const site = file.slice(0, 8).toUpperCase();
+      assert.equal(gesla.CRMS_EARLY.has(file), !gesla.CRMS_WELLS.has(site), e.id);
+    }
+    assert.deepEqual([...gesla.CRMS_WELLS].sort(), ["CRMS0090", "CRMS0128"]);
   });
 
   it("lists the same CRMS records as the erratum", () => {

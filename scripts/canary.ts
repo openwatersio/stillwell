@@ -26,6 +26,7 @@ import { header as crmsHeader } from "../src/sources/crms/export.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
+import * as jodc from "../src/sources/jodc/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -35,6 +36,7 @@ import * as rws from "../src/sources/rws/index.ts";
 import * as sfwmd from "../src/sources/sfwmd/index.ts";
 import * as smhi from "../src/sources/smhi/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
+import * as unam from "../src/sources/unam/index.ts";
 import * as usace from "../src/sources/usace/index.ts";
 import * as usgs from "../src/sources/usgs/index.ts";
 
@@ -84,8 +86,10 @@ const probes: Record<string, () => Promise<unknown[]>> = {
       new Date("1985-10-29Z"),
     )),
   ],
-  // Hornbæk, on DVR90 since 1997. DMI isn't in the source list until its station endpoint works.
+  // Hornbæk, on DVR90 since 1997.
   dmi: () => dmi.levels("30017", start, end),
+  // Mitajiri-Nakanoseki's whole record, 2011 to 2013, the smallest zip (34 KB).
+  jodc: () => jodc.levels("8413", new Date("2012-01-01Z"), new Date("2012-01-04Z")),
   // Kushimoto, since 1924: a week of provisional values, which arrive a day or
   // two late, and three days of final ones a year back. Its paths name the month
   // and its text has no shape, so it's in UNRECORDED and only has to return values.
@@ -165,6 +169,9 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     )),
     ...(await uhslc.levels("057a", new Date("1880-01-01Z"), new Date("1880-01-04Z"))),
   ],
+  // La Paz's radar, from the end of its file, which holds 5 days.
+  unam: () =>
+    unam.levels({ source_id: "14-radar", column: "Nivel del mar (radar promedio)" }, start, end),
   usace: () => usace.levels("MVN", "Baton_Rouge.Stage.Inst.1Hour.0.rev", start, end),
   // Mississippi River at Baton Rouge, gage height.
   usgs: () => usgs.levels("9361fa9f474443a4b2391c1f1a63ca4b", start, end),

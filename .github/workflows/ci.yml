@@ -11,6 +11,21 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # For the realtime store's tests (test/clickhouse.test.ts), which skip without it.
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server:26.8
+        env:
+          CLICKHOUSE_SKIP_USER_SETUP: "1"
+        ports:
+          - 8123:8123
+        options: >-
+          --health-cmd "clickhouse-client --query 'SELECT 1'"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      CLICKHOUSE_URL: http://127.0.0.1:8123
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -19,6 +34,52 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  # Deploys the realtime server (server/deploy/README.md) on every push to main, once the repository
+  # variable DEPLOY_HOST names the box; until then it's skipped. The ssh key and the box's host key are
+  # secrets of the `server` environment.
+  deploy:
+    needs: [test, lockfile]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_HOST != ''
+    runs-on: ubuntu-latest
+    environment: server
+    timeout-minutes: 30
+    # One at a time, and a newer push waits rather than cancel a deploy partway.
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # to compare this commit with the one the box runs
+      - name: ssh setup
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      # A run that finishes after a later one's deploy would put older code back, so a commit the box
+      # already runs, or one behind it, isn't deployed.
+      - name: check the box isn't ahead
+        id: ahead
+        run: |
+          # A box that can't be reached fails the job; one with no record deploys.
+          deployed=$(ssh root@"$DEPLOY_HOST" 'cat /var/lib/stillwell-deployed 2>/dev/null || true')
+          git fetch -q origin main
+          if [ -n "$deployed" ] && git cat-file -e "$deployed^{commit}" 2>/dev/null &&
+            git merge-base --is-ancestor "$GITHUB_SHA" "$deployed"; then
+            echo "the box runs $deployed, which has $GITHUB_SHA"
+          else
+            echo deploy=1 >>"$GITHUB_OUTPUT"
+          fi
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      - if: steps.ahead.outputs.deploy
+        run: server/deploy/deploy.sh root@"$DEPLOY_HOST"
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
 
   lockfile:
     runs-on: ubuntu-latest

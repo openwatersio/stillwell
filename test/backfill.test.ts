@@ -443,9 +443,9 @@ describe("parseStationList", () => {
     assert.deepEqual(parseStationList(text, "usgs", false), ["usgs/07010000", "usgs/02198820"]);
   });
 
-  it("reads the replacement_id column of a CSV, quoted fields and all", () => {
+  it("reads the originator_id column of a CSV, quoted fields and all", () => {
     const text = [
-      "ticon_id,name,replacement_source,replacement_id,note",
+      "ticon_id,name,originator_source,originator_id,note",
       'a,"Name, with comma",usgs,usgs/02198820,""',
       "b,B,rws,rws/a12,",
       "c,C,usgs,,unmatched",
@@ -456,7 +456,7 @@ describe("parseStationList", () => {
 
   it("reads the committed TICON inventory", () => {
     const ids = parseStationList(
-      readFileSync(new URL("../docs/ticon-replacement.csv", import.meta.url), "utf8"),
+      readFileSync(new URL("../docs/ticon-inventory.csv", import.meta.url), "utf8"),
       "usgs",
       true,
     );
@@ -465,7 +465,7 @@ describe("parseStationList", () => {
   });
 
   it("keeps an empty first field, so the columns after it stay in place", () => {
-    const text = "ticon_id,name,replacement_id\n,Name,usgs/02198820\n,,usgs/01410600";
+    const text = "ticon_id,name,originator_id\n,Name,usgs/02198820\n,,usgs/01410600";
     assert.deepEqual(parseStationList(text, "usgs", true), ["usgs/02198820", "usgs/01410600"]);
   });
 

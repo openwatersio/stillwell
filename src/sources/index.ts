@@ -5,10 +5,12 @@ import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as coops } from "./coops/index.ts";
 import { source as crms } from "./crms/index.ts";
+import { source as dmi } from "./dmi/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
 import { source as jma } from "./jma/index.ts";
+import { source as jodc } from "./jodc/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
 import { source as marineInstitute } from "./marine-institute/index.ts";
 import { source as pegelonline } from "./pegelonline/index.ts";
@@ -17,14 +19,18 @@ import { source as rws } from "./rws/index.ts";
 import { source as sfwmd } from "./sfwmd/index.ts";
 import { source as smhi } from "./smhi/index.ts";
 import { source as uhslc } from "./uhslc/index.ts";
+import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
+import crmsErrata from "./crms/errata.json" with { type: "json" };
+import dmiErrata from "./dmi/errata.json" with { type: "json" };
 import dwrErrata from "./dwr/errata.json" with { type: "json" };
 import eaErrata from "./ea/errata.json" with { type: "json" };
 import geslaErrata from "./gesla/errata.json" with { type: "json" };
 import jmaErrata from "./jma/errata.json" with { type: "json" };
+import jodcErrata from "./jodc/errata.json" with { type: "json" };
 import marineInstituteErrata from "./marine-institute/errata.json" with { type: "json" };
 import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
 import refmarErrata from "./refmar/errata.json" with { type: "json" };
@@ -40,10 +46,12 @@ const adapters: Record<string, Source> = {
   cdec,
   coops,
   crms,
+  dmi,
   dwr,
   ea,
   gesla,
   jma,
+  jodc,
   kartverket,
   "marine-institute": marineInstitute,
   pegelonline,
@@ -52,6 +60,7 @@ const adapters: Record<string, Source> = {
   sfwmd,
   smhi,
   uhslc,
+  unam,
   usace,
   usgs,
 };
@@ -64,10 +73,13 @@ const adapters: Record<string, Source> = {
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
   coops: coopsErrata,
+  crms: crmsErrata,
+  dmi: dmiErrata,
   dwr: dwrErrata,
   ea: eaErrata,
   gesla: geslaErrata,
   jma: jmaErrata,
+  jodc: jodcErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,
   refmar: refmarErrata,

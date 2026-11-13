@@ -1,0 +1,41 @@
+# stillwell-ingest: polls every hourly source's live stations into ClickHouse (docs/plans/realtime.md).
+# The app is at /opt/stillwell, Node at /opt/node, and its environment in /etc/stillwell.env, seeded from
+# the repo's server/deploy/stillwell.env.example, which documents the variables.
+[Unit]
+Description=Stillwell realtime ingest
+After=network-online.target clickhouse-server.service
+Wants=network-online.target clickhouse-server.service
+
+[Service]
+User=stillwell
+Group=stillwell
+EnvironmentFile=/etc/stillwell.env
+# DuckDB keeps the extensions it installs, such as httpfs for reading the store over HTTPS, under HOME,
+# and spills to .tmp in the working directory, so both are its state directory, the one place it can write.
+StateDirectory=stillwell
+Environment=HOME=/var/lib/stillwell
+# Each source's pass metrics, which Alloy's textfile collector ships to Grafana Cloud for the alerts.
+Environment=STILLWELL_METRICS=/var/lib/stillwell/metrics/stillwell.prom
+# Sources that refuse the box's address, filled hourly from the recent/ the hourly workflow writes instead
+# (server/pass.ts): SFWMD drops connections from Helsinki.
+Environment=STILLWELL_FROM_RECENT=sfwmd
+WorkingDirectory=/var/lib/stillwell
+ExecStart=/opt/node/bin/node /opt/stillwell/server/ingest.ts
+Restart=always
+RestartSec=10
+# SIGTERM stops the running passes, each of which has written what it fetched or nothing; a
+# pass's inserts are short, so the timeout covers one finishing.
+KillSignal=SIGTERM
+TimeoutStopSec=60
+# Every pass runs in this unit's cgroup, so this caps the poller and its passes together; with
+# ClickHouse's 1.5 GB it leaves about 400 MB of the 4 GB box to the system.
+MemoryMax=1800M
+# A pass the kernel stops for memory fails alone and is tried again; the poller and other passes go on.
+OOMPolicy=continue
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

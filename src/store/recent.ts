@@ -16,16 +16,16 @@ import {
   checkRecent,
   readDatums,
   listFiles,
-  readObservationFile,
+  foldObservationFile,
   readRecent,
   readStationBounds,
   readTimeBounds,
   type StationBounds,
   recentStations,
-  writeObservations,
   type YearStats,
   writeRecent,
   writeStationBounds,
+  type FileBounds,
   type StationObservation,
 } from "./parquet.ts";
 import {
@@ -71,6 +71,30 @@ export interface RunSummary {
   values: number;
   /** Files written. */
   files: number;
+  /** Seconds spent in each phase of the run, in the order they first ran. */
+  seconds?: Record<string, number>;
+}
+
+/** Runs a phase of work and adds the time it took to its phase's total. */
+export type Timer = <T>(phase: string, work: () => Promise<T>) => Promise<T>;
+
+/**
+ * A timer that adds each phase's seconds to `seconds` and logs each phase as
+ * it starts and ends, so a run stopped at its time limit still shows where
+ * the time went and which phase it stopped in.
+ */
+export function timer(title: string, seconds: Record<string, number>): Timer {
+  return async (phase, work) => {
+    const began = performance.now();
+    console.log(`${title}: ${phase}…`);
+    try {
+      return await work();
+    } finally {
+      const took = (performance.now() - began) / 1000;
+      seconds[phase] = (seconds[phase] ?? 0) + took;
+      console.log(`${title}: ${phase} ${took.toFixed(1)}s`);
+    }
+  };
 }
 
 interface RunOptions {
@@ -188,89 +212,19 @@ export async function updateRecent({
       const previous = Map.groupBy(await readRecent(path, ids), (r) => r.station);
       const rows: StationObservation[] = [];
       await pool(batch, concurrency, async (station) => {
-        const lookback = swept
-          ? since.getTime()
-          : Math.min(since.getTime(), now - 2 * (station.interval_s ?? 0) * 1000);
-        const window = recentWindow(
-          station.epochs,
-          previous.get(station.id) ?? [],
+        const result = await refreshStation({
+          source,
+          station,
+          previous: previous.get(station.id) ?? [],
+          swept,
+          since: since.getTime(),
+          now,
           keepFrom,
-          lookback,
-        );
-        // Rows from other epochs are in another reference, and stay as they are.
-        rows.push(...window.other);
-        if (isHeld(station.epochs)) {
-          rows.push(...window.current);
-          return;
-        }
-        let merged: Observation[] = window.current;
-        let failed = false;
-        try {
-          if (swept instanceof Error) throw swept;
-          const answer = swept ? swept.get(station.id) : undefined;
-          if (answer instanceof Error) throw answer;
-          // A sweep covers the whole window, so values from before the current epoch are left out.
-          const got = swept
-            ? (answer ?? []).filter((o) => o.time >= window.from)
-            : await source.observations!(station, new Date(window.from), new Date(now));
-          // QC the whole window, so spikes and flatlines are judged against their neighbors.
-          // What we had starts again from the source's flags, so a mark can clear,
-          // except within a flatline's length of the window's start, where a run
-          // that began before it can't be seen whole, and compaction folds those days.
-          // Nothing new keeps what we had, rather than clearing the last hours.
-          if (got.length) {
-            const had = window.current;
-            const opts = qcFor(station);
-            // The longest run any flatline rule needs to see.
-            const longest = Math.max(
-              opts.flatline_s ?? FLATLINE_S,
-              opts.centimeter_flatline_s ?? 0,
-            );
-            const edge = (had[0]?.time ?? 0) + longest * 1000;
-            // A source that can't judge a part of its record keeps the flags stored.
-            const suspect = await source
-              .suspect?.(station, async function* () {
-                yield had;
-              })
-              .catch(() => null);
-            const start =
-              suspect === null
-                ? had
-                : [
-                    ...had.filter((r) => r.time < edge),
-                    ...fromSource(
-                      had.filter((r) => r.time >= edge),
-                      suspect,
-                    ),
-                  ];
-            merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), opts);
-          }
-        } catch (error) {
-          // Keep what we had; a failed fetch mustn't empty the window.
-          summary.failed.push(`${station.id}: ${message(error)}`);
-          if (error instanceof Blocked) summary.blocked = true;
-          // A refresh ignores a rejected change, matched on datum and
-          // reference as nextEpochs does, so that one doesn't ask for one; an
-          // unknown reference matches none.
-          if (
-            error instanceof DatumChanged &&
-            !station.epochs.some(
-              (e) =>
-                e.state === "rejected" &&
-                e.datum === error.datum &&
-                e.reference === error.reference,
-            )
-          )
-            summary.datumChanged = true;
-          failed = true;
-        }
-        for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
-        const fresh = merged.filter((r) => r.received === now).length;
-        if (fresh) reporting.add(station.id);
-        summary.values += fresh;
-        const newest = merged.at(-1)?.time ?? -Infinity;
-        const staleAfter = Math.max(staleHours * HOUR_MS, 3 * (station.interval_s ?? 0) * 1000);
-        if (!failed && newest < now - staleAfter) summary.stale.push(station.id);
+          staleHours,
+          summary,
+        });
+        rows.push(...result.rows);
+        if (result.fresh) reporting.add(station.id);
       });
       if (swept instanceof Map) for (const id of ids) swept.delete(id);
       yield rows;
@@ -282,6 +236,111 @@ export async function updateRecent({
   }
   summary.updated = reporting.size;
   return summary;
+}
+
+/**
+ * One station's part of `updateRecent`: its new window from `previous`, its
+ * rows in the recent window, and a fetch or its answer in `swept`. Returns
+ * every row the window keeps for it, other epochs' included, and how many
+ * values arrived new, adding failures, stale and datum changes to `summary`.
+ * The realtime poller (`src/realtime/poll.ts`) runs the same steps.
+ */
+export async function refreshStation({
+  source,
+  station,
+  previous,
+  swept,
+  since,
+  now,
+  keepFrom,
+  staleHours = 6,
+  summary,
+}: {
+  source: Source;
+  station: StoredStation;
+  previous: StationObservation[];
+  swept: Map<string, Observation[] | Error> | Error | undefined;
+  since: number;
+  now: number;
+  keepFrom: number;
+  staleHours?: number;
+  summary: RunSummary;
+}): Promise<{ rows: StationObservation[]; fresh: number }> {
+  const rows: StationObservation[] = [];
+  const lookback = swept ? since : Math.min(since, now - 2 * (station.interval_s ?? 0) * 1000);
+  const window = recentWindow(station.epochs, previous, keepFrom, lookback);
+  // Rows from other epochs are in another reference, and stay as they are.
+  rows.push(...window.other);
+  if (isHeld(station.epochs)) {
+    rows.push(...window.current);
+    return { rows, fresh: 0 };
+  }
+  let merged: Observation[] = window.current;
+  let failed = false;
+  try {
+    if (swept instanceof Error) throw swept;
+    const answer = swept ? swept.get(station.id) : undefined;
+    if (answer instanceof Error) throw answer;
+    // A sweep covers the whole window, so values from before the current epoch are left out.
+    const got = swept
+      ? (answer ?? []).filter((o) => o.time >= window.from)
+      : await source.observations!(station, new Date(window.from), new Date(now));
+    // QC the whole window, so spikes and flatlines are judged against their neighbors.
+    // What we had starts again from the source's flags, so a mark can clear,
+    // except within a flatline's length of the window's start, where a run
+    // that began before it can't be seen whole, and compaction folds those days.
+    // Nothing new keeps what we had, rather than clearing the last hours.
+    if (got.length) {
+      const had = window.current;
+      const opts = qcFor(station);
+      // The longest run any flatline rule needs to see.
+      const longest = Math.max(opts.flatline_s ?? FLATLINE_S, opts.centimeter_flatline_s ?? 0);
+      const edge = (had[0]?.time ?? 0) + longest * 1000;
+      // A source that can't judge a part of its record keeps the flags stored.
+      const suspect = await source
+        .suspect?.(station, async function* () {
+          yield had;
+        })
+        .catch(() => null);
+      const start =
+        suspect === null
+          ? had
+          : [
+              ...had.filter((r) => r.time < edge),
+              ...fromSource(
+                had.filter((r) => r.time >= edge),
+                suspect,
+              ),
+            ];
+      // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
+      merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
+        ...opts,
+        jumps: false,
+      });
+    }
+  } catch (error) {
+    // Keep what we had; a failed fetch mustn't empty the window.
+    summary.failed.push(`${station.id}: ${message(error)}`);
+    if (error instanceof Blocked) summary.blocked = true;
+    // A refresh ignores a rejected change, matched on datum and
+    // reference as nextEpochs does, so that one doesn't ask for one; an
+    // unknown reference matches none.
+    if (
+      error instanceof DatumChanged &&
+      !station.epochs.some(
+        (e) => e.state === "rejected" && e.datum === error.datum && e.reference === error.reference,
+      )
+    )
+      summary.datumChanged = true;
+    failed = true;
+  }
+  for (const r of merged) rows.push({ ...r, station: station.id, epoch: window.epoch });
+  const fresh = merged.filter((r) => r.received === now).length;
+  summary.values += fresh;
+  const newest = merged.at(-1)?.time ?? -Infinity;
+  const staleAfter = Math.max(staleHours * HOUR_MS, 3 * (station.interval_s ?? 0) * 1000);
+  if (!failed && newest < now - staleAfter) summary.stale.push(station.id);
+  return { rows, fresh };
 }
 
 /**
@@ -307,6 +366,9 @@ export async function compactRecent({
 }: RunOptions & { start: number; end: number; rebuildBounds?: boolean }): Promise<RunSummary> {
   const id = source.metadata.id;
   const summary = emptySummary(`compact ${id}`, 0);
+  const seconds: Record<string, number> = {};
+  summary.seconds = seconds;
+  const time = timer(summary.title, seconds);
   // A station whose store can't be named, such as a restricted one with no
   // restricted store set, fails alone rather than stop the source's fold.
   // A station without levels has rows only from before its list dropped them,
@@ -321,7 +383,7 @@ export async function compactRecent({
     }
   const stations = all.filter((s) => pathOf.has(s.id));
   summary.stations = stations.filter(levels).length + summary.failed.length;
-  // The span of each year file this run read whole, by `spanKey`, for the bounds.
+  // The span of each year file this run folded, by `spanKey`, for the bounds.
   const spans = new Map<string, FileBounds | null>();
   // Stations whose fold the years file may not have recorded, for the reconcile to read.
   const unmarked: string[] = [];
@@ -333,9 +395,11 @@ export async function compactRecent({
     )) {
       const window = Map.groupBy(
         (
-          await readRecent(
-            path,
-            batch.map((s) => s.id),
+          await time("read window", () =>
+            readRecent(
+              path,
+              batch.map((s) => s.id),
+            ),
           )
         ).filter((r) => r.time >= start && r.time < end),
         (r) => r.station,
@@ -347,85 +411,99 @@ export async function compactRecent({
       // the window; the reconcile below reads its stations' files instead.
       let marked: string[] = [];
       try {
-        marked = await markYears(store, id, folding);
+        marked = await time("mark years", () => markYears(store, id, folding));
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
       }
-      await pool(batch, concurrency, async (station) => {
-        const rows = window.get(station.id);
-        // A live station sends something every day; one that isn't live may not.
-        if (!rows?.length) {
-          // A held station isn't fetched, so it has nothing once its rows age out.
-          if (
-            station.live &&
-            station.status === "active" &&
-            levels(station) &&
-            !isHeld(station.epochs)
-          )
-            summary.stale.push(station.id);
-          return;
-        }
-        let changed = false;
-        // A row goes to the epoch its time falls in, as the next hourly run
-        // would move it: a refresh can open an epoch whose start is in the
-        // past after the window's rows were tagged. Rows at or after a held
-        // epoch's start wait in the window for a decision.
-        const heldFrom = Math.min(
-          ...station.epochs
-            .filter((e) => e.state === "held" && e.since !== null)
-            .map((e) => Date.parse(e.since!)),
-        );
-        const waiting = rows.filter((r) => r.time >= heldFrom);
-        if (waiting.length) summary.waiting.push(`${station.id}: ${waiting.length} values`);
-        const parts = Map.groupBy(
-          rows.filter((r) => r.time < heldFrom),
-          (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
-        );
-        for (const [key, values] of parts) {
-          const [epochId, year] = key.split(" ").map(Number) as [number, number];
-          const label =
-            epochId === 1 ? `${station.id} ${year}` : `${station.id} epoch ${epochId} ${year}`;
-          try {
-            // Rows of an epoch the list doesn't have, such as after a restore,
-            // have no datum to be written in.
-            const epoch = station.epochs.find((e) => e.id === epochId);
-            if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
-            const file = seriesPath(
-              storeFor(station),
-              "levels",
-              id,
-              station.source_id,
-              year,
-              epochId,
-            );
-            const existing = await readObservationFile(file);
-            await refuseOtherDatum(file, { ...station, datum: epoch.datum }, existing.datums);
-            const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
-            const merged = upsert(existing.rows, incoming);
-            const span = spanOf(merged, epochWindow(station.epochs, epochId));
-            const key = spanKey(station, epochId, year);
-            if (sameRows(existing.rows, merged)) {
-              spans.set(key, span);
-              continue;
-            }
-            written.set(file, await writeObservations(file, merged, epoch.datum));
-            spans.set(key, span);
-            summary.files++;
-            const had = new Map(existing.rows.map((r) => [r.time, r]));
-            summary.values += merged.filter((r) => {
-              const before = had.get(r.time);
-              return !before || !sameRows([before], [r]);
-            }).length;
-            changed = true;
-          } catch (error) {
-            summary.failed.push(`${label}: ${message(error)}`);
+      await time("fold", () =>
+        pool(batch, concurrency, async (station) => {
+          const rows = window.get(station.id);
+          // A live station sends something every day; one that isn't live may not.
+          if (!rows?.length) {
+            // A held station isn't fetched, so it has nothing once its rows age out.
+            if (
+              station.live &&
+              station.status === "active" &&
+              levels(station) &&
+              !isHeld(station.epochs)
+            )
+              summary.stale.push(station.id);
+            return;
           }
-        }
-        if (changed) summary.updated++;
-      });
+          let changed = false;
+          // A row goes to the epoch its time falls in, as the next hourly run
+          // would move it: a refresh can open an epoch whose start is in the
+          // past after the window's rows were tagged. Rows at or after a held
+          // epoch's start wait in the window for a decision.
+          const heldFrom = Math.min(
+            ...station.epochs
+              .filter((e) => e.state === "held" && e.since !== null)
+              .map((e) => Date.parse(e.since!)),
+          );
+          const waiting = rows.filter((r) => r.time >= heldFrom);
+          if (waiting.length) summary.waiting.push(`${station.id}: ${waiting.length} values`);
+          const parts = Map.groupBy(
+            rows.filter((r) => r.time < heldFrom),
+            (r) => `${epochAt(station.epochs, r)} ${new Date(r.time).getUTCFullYear()}`,
+          );
+          for (const [key, values] of parts) {
+            const [epochId, year] = key.split(" ").map(Number) as [number, number];
+            const label =
+              epochId === 1 ? `${station.id} ${year}` : `${station.id} epoch ${epochId} ${year}`;
+            try {
+              // Rows of an epoch the list doesn't have, such as after a restore,
+              // have no datum to be written in.
+              const epoch = station.epochs.find((e) => e.id === epochId);
+              if (!epoch) throw new Error(`the list has no epoch ${epochId}`);
+              const file = seriesPath(
+                storeFor(station),
+                "levels",
+                id,
+                station.source_id,
+                year,
+                epochId,
+              );
+              const incoming = values.map(({ station: _, epoch: __, ...r }) => r as Observation);
+              const window = epochWindow(station.epochs, epochId);
+              // The fold changes rows from its earliest on; the file's earlier rows stay as they are.
+              let from = Infinity;
+              for (const r of incoming) if (r.time < from) from = r.time;
+              let later: FileBounds | null = null;
+              let added = 0;
+              const { before, stats } = await foldObservationFile(
+                file,
+                from,
+                epoch.datum,
+                window,
+                async (existing, datums) => {
+                  await refuseOtherDatum(file, { ...station, datum: epoch.datum }, datums);
+                  const merged = upsert(existing, incoming);
+                  later = spanOf(merged, window);
+                  if (sameRows(existing, merged)) return null;
+                  const had = new Map(existing.map((r) => [r.time, r]));
+                  added = merged.filter((r) => {
+                    const before = had.get(r.time);
+                    return !before || !sameRows([before], [r]);
+                  }).length;
+                  return merged;
+                },
+              );
+              spans.set(spanKey(station, epochId, year), joinSpans(before, later));
+              if (!stats) continue;
+              written.set(file, stats);
+              summary.files++;
+              summary.values += added;
+              changed = true;
+            } catch (error) {
+              summary.failed.push(`${label}: ${message(error)}`);
+            }
+          }
+          if (changed) summary.updated++;
+        }),
+      );
       try {
-        await commitYears(store, id, marked, written);
+        await time("commit years", () => commitYears(store, id, marked, written));
       } catch (error) {
         summary.failed.push(`years: ${message(error)}`);
         unmarked.push(...folding);
@@ -444,6 +522,7 @@ export async function compactRecent({
         year: new Date(end).getUTCFullYear(),
         rebuild: rebuildBounds,
         concurrency,
+        time,
       });
     } catch (error) {
       summary.failed.unshift(`bounds: ${message(error)}`);
@@ -457,6 +536,7 @@ export async function compactRecent({
         // Enough for a stopped run's stations, and short of compaction's time limit; an unfinished `years` build goes on a night at a time.
         limit: 5000,
         concurrency,
+        time,
       });
       for (const file of years?.failed ?? []) summary.failed.push(`years: can't read ${file}`);
     } catch (error) {
@@ -474,11 +554,11 @@ type Span = [number, number];
  */
 export const REFETCH_YEARS = 3;
 
-/**
- * A year file's earliest and latest counted row, its earliest preliminary one
- * or null, and whether any is one the source screened.
- */
-type FileBounds = [number, number, number | null, boolean];
+/** The bounds of a file's rows before some time, `a`, and of its rows from then on, `b`, as one. */
+function joinSpans(a: FileBounds | null, b: FileBounds | null): FileBounds | null {
+  if (!a || !b) return a ?? b;
+  return [a[0], b[1], a[2] ?? b[2], a[3] || b[3]];
+}
 
 /** A station's year file in one epoch, as `updateBounds` names it. */
 function spanKey(station: Pick<Station, "source_id">, epoch: number, year: number): string {
@@ -530,7 +610,7 @@ function spanOf(rows: Observation[], window: Span | null): FileBounds | null {
  * only the current epoch, so earlier epochs' values can't be refetched.
  *
  * A listing of the source's files gives each station's first and last year.
- * The files of those years come from `spans`, which compaction read whole
+ * The files of those years come from `spans`, the files compaction folded
  * this run; or else from the bound already known, when it's in that year,
  * still inside an epoch, and the year is before last year; or else from a
  * read. So a backfill of earlier years is read, as is any end year from last
@@ -558,6 +638,7 @@ export async function updateBounds({
   year: thisYear,
   rebuild = false,
   concurrency = 8,
+  time = (_, work) => work(),
 }: {
   store: string;
   source: string;
@@ -567,9 +648,10 @@ export async function updateBounds({
   year: number;
   rebuild?: boolean;
   concurrency?: number;
+  time?: Timer;
 }): Promise<void> {
   const path = boundsPath(store, source);
-  const had = await readStationBounds(path);
+  const had = await time("bounds: read bounds", () => readStationBounds(path));
   const known = rebuild ? new Map<string, never>() : had;
   // Bounds an older build wrote, without `preliminary`, stay without it until
   // a rebuild: filling it in reads nearly every file, too long for a nightly run.
@@ -580,7 +662,7 @@ export async function updateBounds({
     [sourceFirstEpochFiles(store, "levels", source), 2],
     [sourceEpochDirs(store, "levels", source), 3],
   ] as const)
-    for (const file of await listFiles(pattern)) {
+    for (const file of await time("bounds: list files", () => listFiles(pattern))) {
       const parts = file.split("/");
       const year = Number(parts.at(-1)!.replace(/\.parquet$/, ""));
       const epoch = depth === 2 ? 1 : Number(parts.at(-2));
@@ -658,14 +740,18 @@ export async function updateBounds({
 
   // Each end's year is read, files compaction didn't give in batches at once;
   // a year with no counted rows moves the end a year inward.
+  let readCount = 0;
   for (let open = ends.filter((e) => e.value === undefined && e.years.length); open.length;) {
     const unread = new Map<string, File>();
     for (const e of open)
       for (const f of e.years[e.at]!) if (!spans.has(f.key)) unread.set(f.key, f);
-    await pool([...chunks([...unread], 100)], concurrency, async (batch) => {
-      const read = await readTimeBounds(batch.map(([, f]) => f));
-      for (const [key, f] of batch) spans.set(key, read.get(f.file) ?? null);
-    });
+    await time(`bounds: read files`, () =>
+      pool([...chunks([...unread], 100)], concurrency, async (batch) => {
+        const read = await readTimeBounds(batch.map(([, f]) => f));
+        for (const [key, f] of batch) spans.set(key, read.get(f.file) ?? null);
+      }),
+    );
+    readCount += unread.size;
     for (const e of open) {
       const times = e.years[e.at]!.flatMap((f) => spans.get(f.key)?.[e.pick] ?? []);
       if (times.length) e.value = e.pick === 1 ? Math.max(...times) : Math.min(...times);
@@ -674,6 +760,7 @@ export async function updateBounds({
     open = open.filter((e) => e.value === undefined && e.at < e.years.length);
   }
 
+  console.log(`${source} bounds: read ${readCount} files`);
   const found = Map.groupBy(ends, (e) => e.id);
   const bounds: ({ id: string } & StationBounds)[] = [];
   for (const station of stations) {
@@ -698,7 +785,7 @@ export async function updateBounds({
   const bounded = new Set(bounds.map((b) => b.id));
   for (const [id, b] of had)
     if (!bounded.has(id) && (!rebuild || !here.has(id))) bounds.push({ id, ...b });
-  await writeStationBounds(path, bounds, !legacy);
+  await time("bounds: write bounds", () => writeStationBounds(path, bounds, !legacy));
 }
 
 /**
@@ -797,6 +884,16 @@ export async function refuseOtherDatum(
 export const CENTIMETER_TIDE_M = 0.3;
 
 /**
+ * How far, in meters, a tide gauge's level can waver from a run's first value
+ * and still count as one flatline: a stuck gauge that dithers by a millimeter
+ * either way, which spans 2 mm from the first: QARTOD's flat line test takes
+ * values equal within 1 mm of each other. A centimeter flags hours of real
+ * water where a small tide turns, as at Berwick, Louisiana. A change to it
+ * bumps `RULES` in `src/store/analysis.ts`.
+ */
+export const FLATLINE_M = 0.002;
+
+/**
  * QC's rules for a station, by whether its levels carry a tide
  * (`Station.tidal`, from `src/store/analysis.ts`), the same for every source.
  * Still water, a pooled river, a lake or a creek drained to its sill, holds
@@ -808,9 +905,11 @@ export const CENTIMETER_TIDE_M = 0.3;
  * centimeter for a day on calm days too, but a millimeter for hours only when
  * its gauge is stuck, so it keeps six hours where its values move in
  * millimeters. Tidal water never holds still that long, so it gets six hours,
+ * counting a level within `FLATLINE_M` of a run's first as unchanged,
  * or two days where its tide is under `CENTIMETER_TIDE_M` and its values move
  * in whole centimeters. A tidal river or lake still floods, so it keeps the
- * outlier check off; tidal water of any other kind, or none, keeps it. A
+ * outlier check off, and its tide is too far from harmonic for the residual
+ * jumps; tidal water of any other kind, or none, keeps both. A
  * station with no verdict yet is judged by its kind: a river or lake as
  * still, anything else as tidal, as a tide gauge is, since sources such as
  * RWS and REFMAR leave their tide gauges' kind unset.
@@ -823,8 +922,9 @@ export function qcFor(station: Pick<Station, "kind" | "tidal" | "tide_m">): QcOp
       : { flatline_s: 48 * 3600, outliers: false, held: false };
   const small = station.tide_m != null && station.tide_m < CENTIMETER_TIDE_M;
   return {
+    flatline_m: FLATLINE_M,
     ...(small ? { centimeter_flatline_s: 48 * 3600 } : {}),
-    ...(river ? { outliers: false } : {}),
+    ...(river ? { outliers: false } : { jumps: true }),
   };
 }
 
@@ -850,6 +950,11 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
+  const phases = Object.entries(s.seconds ?? {});
+  if (phases.length) {
+    lines.push("", "| Phase | Seconds |", "| - | -: |");
+    for (const [phase, took] of phases) lines.push(`| ${phase} | ${took.toFixed(1)} |`);
+  }
   for (const [what, items] of [
     ["Failed", s.failed],
     ["Stale", s.stale],
@@ -867,7 +972,7 @@ export function* chunks<T>(items: T[], size: number): Generator<T[]> {
   for (let i = 0; i < items.length; i += size) yield items.slice(i, i + size);
 }
 
-function emptySummary(title: string, stations: number): RunSummary {
+export function emptySummary(title: string, stations: number): RunSummary {
   return { title, stations, updated: 0, stale: [], failed: [], waiting: [], values: 0, files: 0 };
 }
 

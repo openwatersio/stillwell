@@ -55,16 +55,17 @@ const DAY_MS = 86_400_000;
  * `source_flag` existed have none, so there a value QC flagged that way
  * doesn't count, and a year whose every provisional value QC flagged is done. A source qualifier such as
  * USGS's ICE is mapped to `suspect` by the adapter, before `source_flag` is
- * set, so a file whose every provisional value carries one counts as done. An
- * adapter's own verdict, such as REFMAR's suspect clock spans, sets
- * `source_flag` to the source's flag itself.
+ * set, so a file whose every provisional value carries one counts as done.
+ * Errata spans, such as REFMAR's Pointe-à-Pitre clock, leave `source_flag` as
+ * the source sent it.
  *
  * Provisional years are fetched on every run, so a long campaign of runs
  * uses `--skip-written` (`yearWritten`) instead.
  *
  * A year the source returns nothing for writes no file, so it is fetched again
  * on every run in either mode; adapters that bound requests to each series'
- * dates (USGS, CO-OPS) send no request for those years outside them. Within
+ * dates (USGS, CO-OPS) send no request for those years outside them, and
+ * USACE none for those before its series begins. Within
  * them, `--skip-written` records the years it found empty and skips them for
  * 30 days (`src/empty-years.ts`).
  */
@@ -125,18 +126,18 @@ export function wholeEndedYear(from: Date, to: Date, now: number): boolean {
 /**
  * Station IDs from a file, one per line, for `--first`: a plain list (blank
  * lines and `#` comments skipped), or a CSV with a header, whose
- * `replacement_id`, `id` or `station` column is used, so
- * docs/ticon-replacement.csv works as it is. IDs may be bare (`07010000`) or
+ * `originator_id`, `id` or `station` column is used, so
+ * docs/ticon-inventory.csv works as it is. IDs may be bare (`07010000`) or
  * carry their source (`usgs/07010000`); ones for another source are dropped.
  */
 export function parseStationList(text: string, sourceId: string, csv: boolean): string[] {
   let lines = text.split(/\r?\n/).map((l) => l.trim());
   if (csv) {
     const header = csvFields(lines.shift() ?? "");
-    const column = ["replacement_id", "id", "station"]
+    const column = ["originator_id", "id", "station"]
       .map((c) => header.indexOf(c))
       .find((i) => i >= 0);
-    if (column === undefined) throw new Error("CSV needs a replacement_id, id or station column");
+    if (column === undefined) throw new Error("CSV needs an originator_id, id or station column");
     lines = lines.map((l) => csvFields(l)[column] ?? "");
   } else lines = lines.map((l) => l.replace(/#.*/, "").trim());
   const ids: string[] = [];
