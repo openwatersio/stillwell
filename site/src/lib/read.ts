@@ -4,11 +4,23 @@ import { compressors } from "hyparquet-compressors";
 
 type Row = Record<string, any>;
 
+/** The columns a file has of those asked for: older files can lack an optional one, such as source_flag. */
+const present = (metadata: Awaited<ReturnType<typeof parquetMetadataAsync>>, columns: string[]) => {
+  const names = new Set(metadata.schema.map((e) => e.name));
+  return columns.filter((c) => names.has(c));
+};
+
 /** Some columns of a whole file, or [] when it doesn't exist. */
 export async function readFile(url: string, columns: string[]): Promise<Row[]> {
   try {
     const file = await asyncBufferFromUrl({ url });
-    return await parquetReadObjects({ file, columns, compressors });
+    const metadata = await parquetMetadataAsync(file);
+    return await parquetReadObjects({
+      file,
+      metadata,
+      columns: present(metadata, columns),
+      compressors,
+    });
   } catch (error) {
     if (String(error).includes("404")) return [];
     throw error;
@@ -20,7 +32,14 @@ export async function readFile(url: string, columns: string[]): Promise<Row[]> {
  * whose station statistics can hold it are read.
  */
 export async function readStation(url: string, station: string, columns: string[]): Promise<Row[]> {
-  const file = await asyncBufferFromUrl({ url });
+  let file;
+  try {
+    file = await asyncBufferFromUrl({ url });
+  } catch (error) {
+    // A source with no live stations yet has no recent file.
+    if (String(error).includes("404")) return [];
+    throw error;
+  }
   const metadata = await parquetMetadataAsync(file);
   const out: Row[] = [];
   let start = 0;
@@ -35,7 +54,7 @@ export async function readStation(url: string, station: string, columns: string[
         file,
         metadata,
         compressors,
-        columns: ["station", ...columns],
+        columns: present(metadata, ["station", ...columns]),
         rowStart: start,
         rowEnd: start + rows,
       });

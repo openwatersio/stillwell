@@ -82,7 +82,7 @@ levels <- dbGetQuery(con, sprintf("
 ", paste(files, collapse = ", ")))
 ```
 
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path, which DuckDB's `url_encode(url_encode(source_id))` builds.
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path, which DuckDB's `url_encode(url_encode(source_id))` builds. `url_encode` also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today.
 
 ## Convert to another datum
 

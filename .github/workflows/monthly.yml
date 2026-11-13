@@ -395,7 +395,7 @@ jobs:
       - run: |
           # Monthly first, since it enables the rest; one failure doesn't stop the others.
           failed=0
-          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml canary.yml; do
+          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml canary.yml site.yml; do
             if ! state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow" --jq .state); then
               failed=1
             elif [ "$state" = disabled_manually ]; then

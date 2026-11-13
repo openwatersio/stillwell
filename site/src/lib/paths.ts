@@ -14,9 +14,8 @@ export function seriesUrl(product: string, id: string, year: number, epoch = 1) 
   return url(`${product}/${source}/${dir}${epoch > 1 ? `/${epoch}` : ""}/${year}.parquet`);
 }
 
-// The bucket sends no Cache-Control, so a browser can keep a stale copy of a file the hourly ingest rewrites.
-export const recentUrl = (source: string) =>
-  `${url(`recent/${source}.parquet`)}?t=${Math.floor(Date.now() / 60000)}`;
+/** A source's last 7 days of observed levels, rewritten every hour. */
+export const recentUrl = (source: string) => url(`recent/${source}.parquet`);
 
 /** A station page's path, such as /stations/rws/hoekvanholland/. */
 export function stationPath(id: string) {

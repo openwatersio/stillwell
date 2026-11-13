@@ -53,15 +53,59 @@ export function stations(): Promise<Row[]> {
         s[k] = JSON.parse(s[k] ?? "null") ?? {};
       for (const k of ["datums_attribution", "epochs", "same_as", "errata", "products"])
         s[k] = JSON.parse(s[k] ?? "null") ?? [];
+      // to_json writes times as "2005-01-01 00:00:00+00", which not every browser parses; pages get ISO 8601.
+      for (const e of s.epochs)
+        for (const k of ["since", "until", "seen", "reference_since"])
+          if (e[k]) e[k] = new Date(e[k]).toISOString();
       return s;
     }),
   );
   return stationsCache;
 }
 
+/** A station's current datum epoch: its open one, else its latest that wasn't held or rejected. */
+export function currentEpoch(station: Row): number {
+  const epochs: Row[] = station.epochs ?? [];
+  return (
+    epochs.find((e) => e.state === "open")?.id ??
+    Math.max(
+      1,
+      ...epochs.filter((e) => e.state !== "held" && e.state !== "rejected").map((e) => e.id),
+    )
+  );
+}
+
+// References an offset can be carried through between two stations of a gauge, from the store's own
+// sharedReference in src/datums.ts: national height systems and Admiralty Chart Datum. Gauge zeros and tidal
+// datums don't count, even under the same name, since two stations' can differ.
+// shortcut: matches datum keys exactly, without the store's aliases, GESLA zeros or links.parquet's offsets; read
+// links.parquet if a linked station's predictions go missing.
+const REFERENCES = ["NAP", "NHN", "NN", "HN", "NGVD29", "RH2000", "AOD", "ACD"];
+const isReference = (key: string) => REFERENCES.includes(key) || /^NAVD88\(.+\)$/.test(key);
+
+/** Meters to add to a level in `from`'s datum to refer it to `to`'s, through a reference both have; undefined without one. */
+export function shiftBetween(from: Row, to: Row): number | undefined {
+  if (from.id === to.id) return 0;
+  const [a, b] = [
+    { ...from.datums, [from.datum]: 0 },
+    { ...to.datums, [to.datum]: 0 },
+  ];
+  const keys = [...REFERENCES, ...Object.keys(a).filter((k) => k.startsWith("NAVD88("))];
+  const shared = keys.find((k) => isReference(k) && a[k] !== undefined && b[k] !== undefined);
+  return shared === undefined ? undefined : a[shared] - b[shared];
+}
+
+let byIdCache: Promise<Map<string, Row>> | undefined;
+
+/** Every station by its id, built once per build rather than once per page. */
+export function stationsById(): Promise<Map<string, Row>> {
+  byIdCache ??= stations().then((all) => new Map(all.map((s) => [s.id, s])));
+  return byIdCache;
+}
+
 const yearsCache = new Map<string, Promise<Map<string, Row[]>>>();
 
-/** A source's years list, by station id. */
+/** A source's years list, by station id; empty for a source with no levels written yet, which has no file. */
 export function years(source: string): Promise<Map<string, Row[]>> {
   if (!yearsCache.has(source))
     yearsCache.set(
@@ -73,6 +117,10 @@ export function years(source: string): Promise<Map<string, Row[]>> {
           const byId = new Map<string, Row[]>();
           for (const r of all) byId.set(r.id, [...(byId.get(r.id) ?? []), r]);
           return byId;
+        },
+        (error) => {
+          if (/\b404\b/.test(String(error))) return new Map();
+          throw error;
         },
       ),
     );
@@ -86,7 +134,10 @@ export function json(path: string): Promise<any> {
   if (!jsonCache.has(path))
     jsonCache.set(
       path,
-      fetch(url(path)).then((r) => r.json()),
+      fetch(url(path)).then((r) => {
+        if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
+        return r.json();
+      }),
     );
   return jsonCache.get(path)!;
 }

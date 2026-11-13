@@ -1,11 +1,15 @@
 ---
+import { currentEpoch } from "../lib/store";
 // A station's levels over a date range in any of its datums, read in the browser when the chart scrolls into view.
 
 interface Props {
   station: Record<string, any>;
   years: { epoch: number; year: number }[];
-  /** The station that predicts this one's levels, itself or a linked one, with the datum its predictions are in. */
-  predictor?: { id: string; datum: string };
+  /**
+   * The station that predicts this one's levels, itself or a linked one: the epoch its predictions are in, the
+   * meters to add to them to refer them to this station's datum, and its credit.
+   */
+  predictor?: { id: string; shift: number; epoch: number; attribution: string };
 }
 const { station: s, years, predictor } = Astro.props;
 const datums = [s.datum, ...Object.keys(s.datums).filter((d) => d !== s.datum)];
@@ -18,6 +22,8 @@ const config = {
   datum: s.datum,
   datums: s.datums,
   epochs: s.epochs,
+  // recent/ rows from before it carried an epoch are the station's current epoch.
+  current: currentEpoch(s),
   last: s.last?.toISOString(),
   // [epoch, year] pairs; the browser builds each file's URL, which keeps a long record's page small.
   files: years.map((y) => [y.epoch, y.year]),
@@ -115,7 +121,15 @@ const config = {
             (!e.until || d.time < new Date(e.until))
           );
         };
-        const files = c.files
+        // The page lists the year files that existed when it was built; the current epoch's file for this
+        // year may have appeared since, and a missing one reads as empty.
+        const thisYear = new Date().getUTCFullYear();
+        const pairs: number[][] = c.files.some(
+          ([e, y]: number[]) => e === c.current && y === thisYear,
+        )
+          ? c.files
+          : [...c.files, [c.current, thisYear]];
+        const files = pairs
           .filter(
             ([, year]: number[]) =>
               year >= start.getUTCFullYear() && year <= until.getUTCFullYear(),
@@ -124,7 +138,7 @@ const config = {
         const [stored, recent, predicted] = await Promise.all([
           Promise.all(
             files.map(async (f: any) =>
-              (await readFile(f.url, ["time", "level_m", "flag"])).map((d) => ({
+              (await readFile(f.url, ["time", "level_m", "flag", "source_flag"])).map((d) => ({
                 ...d,
                 epoch: f.epoch,
               })),
@@ -132,23 +146,49 @@ const config = {
           ).then((r) => r.flat()),
           // recent/ holds the last 7 days, including hours compaction hasn't folded into the year files yet.
           c.live && +until > Date.now() - 7 * DAY
-            ? readStation(recentUrl(c.source), c.id, ["time", "level_m", "flag", "epoch"])
+            ? readStation(recentUrl(c.source), c.id, [
+                "time",
+                "level_m",
+                "flag",
+                "source_flag",
+                "epoch",
+              ])
             : [],
           c.predictor ? this.predictions(start, until) : [],
         ]);
+        // Each value is checked against its own epoch's span before any two are compared.
+        const inRange = (d: any) => d.time >= start && d.time < until;
+        const usable = (d: any) => inRange(d) && inEpoch(d);
+        // Values in an epoch that doesn't convert to the current datum, or one newer than this page, can't be shown.
+        const unconverted = new Set(
+          [...stored, ...recent]
+            .filter(
+              (d: any) =>
+                inRange(d) && (epochs.get(d.epoch ?? c.current) as any)?.to_current == null,
+            )
+            .map((d: any) => +d.time),
+        ).size;
+        // As compaction decides: good or interpolated by the source's flag, or by flag where there's none.
+        const finalized = (d: any) => (d.source_flag ?? d.flag) <= 1;
         const byTime = new Map<number, any>();
-        for (const d of recent) byTime.set(+d.time, d);
-        for (const d of stored) byTime.set(+d.time, d);
+        // Where two epochs' files hold one time, the earlier epoch's value stands, as it does past a rejected epoch.
+        for (const d of stored.filter(usable).sort((a, b) => a.epoch - b.epoch))
+          if (!byTime.has(+d.time)) byTime.set(+d.time, d);
+        // A recent value replaces a year file's, as the next compaction will, unless it would replace a value
+        // the source has finalized with one it hasn't.
+        for (const d of recent
+          .map((d: any) => ({ ...d, epoch: d.epoch ?? c.current }))
+          .filter(usable)) {
+          const old = byTime.get(+d.time);
+          if (!old || !finalized(old) || finalized(d)) byTime.set(+d.time, d);
+        }
         const levels = [...byTime.values()]
-          .filter((d) => d.time >= start && d.time < until && inEpoch(d))
           .map((d) => ({ time: d.time, flag: d.flag, level: d.level_m + shift(d.epoch) }))
           .sort((a, b) => a.time - b.time);
-        // Predictions are in their own station's datum; this station's offsets carry them into the one shown.
-        const toHere =
-          c.predictor && c.predictor.datum !== c.datum ? -c.datums[c.predictor.datum] : 0;
+        // Predictions are in their own station's datum; the page worked out the shift into this station's.
         const predictions = predicted.map((d: any) => ({
           time: d.time,
-          level: d.level_m + toHere + toDatum,
+          level: d.level_m + c.predictor.shift + toDatum,
         }));
         chart.replaceChildren(
           levels.length || predictions.length
@@ -191,20 +231,20 @@ const config = {
             : document.createTextNode("No values in these dates."),
         );
         const newest = levels.at(-1)?.time;
-        summary.textContent = `${levels.length.toLocaleString("en-US")} observed values${predictions.length ? ` and ${predictions.length.toLocaleString("en-US")} predicted by ${c.predictor.id}` : ""}, in ${datum}${toDatum ? `: ${c.datum} ${toDatum >= 0 ? "plus" : "minus"} ${Math.abs(toDatum)} m` : ""}.${newest ? ` The newest is from ${newest.toISOString().slice(0, 16).replace("T", " ")} UTC.` : ""}`;
+        summary.textContent = `${levels.length.toLocaleString("en-US")} observed values${predictions.length ? ` and ${predictions.length.toLocaleString("en-US")} predicted by ${c.predictor.id}${c.predictor.id === c.id ? "" : ` (${c.predictor.attribution})`}` : ""}, in ${datum}${toDatum ? `: ${c.datum} ${toDatum >= 0 ? "plus" : "minus"} ${Math.abs(toDatum)} m` : ""}.${unconverted ? ` ${unconverted.toLocaleString("en-US")} values in a datum epoch that doesn't convert to ${c.datum} aren't shown.` : ""}${newest ? ` The newest is from ${newest.toISOString().slice(0, 16).replace("T", " ")} UTC.` : ""}`;
       } catch (error) {
         chart.textContent = `Couldn't read the levels: ${error}`;
       }
     }
 
     async predictions(start: Date, until: Date) {
-      const id = this.config.predictor.id;
+      const { id, epoch } = this.config.predictor;
       const years = [];
       for (let y = start.getUTCFullYear(); y <= until.getUTCFullYear(); y++) years.push(y);
       // Prediction years have no list, so a year without a file reads as empty.
       const rows = (
         await Promise.all(
-          years.map((y) => readFile(seriesUrl("predictions", id, y), ["time", "level_m"])),
+          years.map((y) => readFile(seriesUrl("predictions", id, y, epoch), ["time", "level_m"])),
         )
       ).flat();
       return rows.filter((d) => d.time >= start && d.time < until).sort((a, b) => a.time - b.time);

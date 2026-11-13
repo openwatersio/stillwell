@@ -7,6 +7,10 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 
 // Arrow's Timestamp type; the store's times are TIMESTAMPTZ, which arrive as epoch milliseconds.
 const TIMESTAMP = 10;
+// Arrow's Date type, which arrives as epoch milliseconds too.
+const DATE = 8;
+// Arrow's Float type; precision 1 is single precision, the store's levels.
+const FLOAT = 3;
 
 let connection: Promise<duckdb.AsyncDuckDBConnection> | undefined;
 
@@ -30,9 +34,17 @@ function connect() {
 export async function query(sql: string): Promise<Record<string, any>[]> {
   const table = await (await connect()).query(sql);
   const times = table.schema.fields.filter((f) => f.type.typeId === TIMESTAMP).map((f) => f.name);
+  const dates = table.schema.fields.filter((f) => f.type.typeId === DATE).map((f) => f.name);
+  const singles = table.schema.fields
+    .filter((f) => f.type.typeId === FLOAT && (f.type as any).precision === 1)
+    .map((f) => f.name);
   return table.toArray().map((row) => {
     const o = row.toJSON();
     for (const k of times) if (o[k] != null) o[k] = new Date(Number(o[k]));
+    for (const k of dates)
+      if (o[k] != null) o[k] = new Date(Number(o[k])).toISOString().slice(0, 10);
+    // A 32-bit level such as 1.68 widens to 1.6799999475479126; seven significant digits is what it stores.
+    for (const k of singles) if (o[k] != null) o[k] = Number(o[k].toPrecision(7));
     return o;
   });
 }

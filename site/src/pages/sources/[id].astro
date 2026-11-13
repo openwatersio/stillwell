@@ -4,7 +4,6 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import Erratum from "../../components/Erratum.astro";
 import { stations, years, json } from "../../lib/store";
 import { flagChart, markdown } from "../../lib/render";
-import { recentUrl } from "../../lib/paths";
 
 export async function getStaticPaths() {
   return (await json("sources.json")).map((source) => ({
@@ -16,6 +15,7 @@ export async function getStaticPaths() {
 const { source: s } = Astro.props;
 const list = (await stations()).filter((d) => d.source === s.id);
 const live = list.filter((d) => d.live).length;
+const commercial = list.filter((d) => d.commercial_use).length;
 const byYear = new Map<number, Record<string, any>>();
 for (const rows of (await years(s.id)).values())
   for (const r of rows) {
@@ -45,7 +45,7 @@ const first = list.reduce<Date | undefined>(
     {list.length.toLocaleString("en-US")} stations,{" "}
     {list.filter((d) => d.status === "active").length.toLocaleString("en-US")} active and{" "}
     {live.toLocaleString("en-US")} polled every hour, with records from {year(first)}.
-    {live > 0 && <span data-latest={recentUrl(s.id)}>The newest value is from …</span>}
+    {live > 0 && <span data-latest={s.id}>The newest value is from …</span>}
   </p>
 
   <h2 id="terms">Terms</h2>
@@ -57,7 +57,14 @@ const first = list.reduce<Date | undefined>(
     <tr>
       <th>Commercial use</th>
       <td>
-        {s.license?.commercial_use ? "allowed" : "not allowed"}; each station's own terms apply
+        {/* Counted by station: a contributor's own terms can bar it at some of a source's stations. */}
+        {list.length && commercial === list.length
+          ? "allowed at every station"
+          : !list.length
+            ? "no stations listed"
+            : commercial === 0
+              ? "not allowed"
+              : `allowed at ${commercial.toLocaleString("en-US")} of ${list.length.toLocaleString("en-US")} stations; each station's own terms apply`}
       </td>
     </tr>
     <tr>
@@ -114,21 +121,29 @@ const first = list.reduce<Date | undefined>(
 
 <script>
   import { latest } from "../../lib/read";
+  import { recentUrl } from "../../lib/paths";
 
   // The newest value in recent/, from the file's footer alone.
   for (const el of document.querySelectorAll<HTMLElement>("[data-latest]"))
-    latest(el.dataset.latest!).then((t) => {
-      el.textContent = t
-        ? `The newest value is from ${t.toISOString().slice(0, 16).replace("T", " ")} UTC.`
-        : "";
-    });
+    latest(recentUrl(el.dataset.latest!))
+      .catch(() => undefined)
+      .then((t) => {
+        el.textContent = t
+          ? `The newest value is from ${t.toISOString().slice(0, 16).replace("T", " ")} UTC.`
+          : "";
+      });
 
   // The station list loads as JSON and shows 100 matches at a time, so a source with 14,000 stations stays a small page.
   const table = document.querySelector<HTMLTableElement>("[data-stations]");
   const filter = document.querySelector<HTMLInputElement>("[data-filter]");
   const shown = document.querySelector<HTMLElement>("[data-shown]");
   if (table && filter && shown) {
-    const list: any[][] = await fetch(table.dataset.stations!).then((r) => r.json());
+    const list: any[][] = await fetch(table.dataset.stations!)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .catch((error) => {
+        shown.textContent = `Couldn't load the station list: ${error.message}`;
+        return [];
+      });
     const body = table.tBodies[0];
     const cell = (text: string) =>
       Object.assign(document.createElement("td"), { textContent: text });

@@ -243,8 +243,10 @@ A `source_id` with a reserved character is [encoded twice](/docs/getting-started
 ```python
 from urllib.parse import quote
 
+# encodeURIComponent's safe set, which the store's keys use
+safe = "!*'()"
 source_id = "byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs"
-path = f"obs/gesla/{quote(quote(source_id, safe=''), safe='')}"
+path = f"obs/gesla/{quote(quote(source_id, safe=safe), safe=safe)}"
 ```
 
 ## Convert to another datum

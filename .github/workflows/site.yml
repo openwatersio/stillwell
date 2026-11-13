@@ -1,0 +1,47 @@
+name: Site
+
+# Build the site in site/. The build runs the docs' result tables against the public store and fails where a
+# query breaks or a reference page's columns and the live files disagree, so it runs on pull requests that change the site,
+# on pushes to main, and weekly, when the store's own changes reach it. Monthly keeps the schedule enabled.
+on:
+  pull_request:
+    paths:
+      - "site/**"
+      - ".mise.toml"
+      - ".github/workflows/site.yml"
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".mise.toml"
+      - ".github/workflows/site.yml"
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Check the lockfile regenerates from package.json
+        run: |
+          git ls-files --error-unmatch package-lock.json
+          npm install --package-lock-only --ignore-scripts
+          git diff --exit-code -- package-lock.json
+      - name: Check every package resolves from the npm registry
+        run: npx -y lockfile-lint@5.1.0 --path package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names
+      - run: npm ci
+      - run: npm run build

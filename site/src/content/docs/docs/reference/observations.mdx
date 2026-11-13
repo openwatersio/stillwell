@@ -8,7 +8,7 @@ sidebar:
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at 00:45 UTC.
+Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:40 UTC.
 
 A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#file-paths). To read several files at once, see [Reading many files](/docs/getting-started/#reading-many-files).
 

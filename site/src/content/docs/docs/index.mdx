@@ -87,7 +87,7 @@ The data is not for navigation. Observations are mostly preliminary, and a gauge
 | What                                                     | When                                                                                         |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | `recent/<source>.parquet`, the last 7 days               | Every hour, for stations polled live                                                         |
-| Year files under `obs/`, `extremes/` and the predictions | Each day folds into its year file at 00:45 UTC                                               |
+| Year files under `obs/`, `extremes/` and the predictions | Each day folds into its year file at about 00:40 UTC                                         |
 | `stations.parquet`                                       | Rebuilt after that nightly compaction, so record spans trail by about a day                  |
 | Preliminary values                                       | Fetched again each month for the last three years, for sources that check their values later |
 | Station lists, datum links and measured offsets          | Refreshed each month                                                                         |

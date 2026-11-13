@@ -4,7 +4,14 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Code } from "@astrojs/starlight/components";
 import LevelChart from "../../../components/LevelChart.astro";
 import Erratum from "../../../components/Erratum.astro";
-import { stations, years, json } from "../../../lib/store";
+import {
+  stations,
+  stationsById,
+  years,
+  json,
+  currentEpoch,
+  shiftBetween,
+} from "../../../lib/store";
 import { flagChart } from "../../../lib/render";
 import { seriesUrl, stationPath, queryPath } from "../../../lib/paths";
 
@@ -18,15 +25,15 @@ export async function getStaticPaths() {
 }
 
 const { station: s } = Astro.props;
-const byId = new Map((await stations()).map((d) => [d.id, d]));
+const byId = await stationsById();
 const yearRows = (await years(s.source)).get(s.id) ?? [];
-const errata = (await json("errata.json")).filter(
-  (e) => e.stations?.includes(s.id) || (e.source === s.source && !e.stations?.length),
-);
+// A null station list means every station of the source; an empty one means the affected stations aren't known.
+const errata = (await json("errata.json")).filter((e: any) => s.errata?.includes(e.id));
 const linked = s.same_as.map((id: string) => byId.get(id)).filter(Boolean);
-// Predictions from this station, or from a linked one whose datum this station has an offset to, such as BSH's for a PEGELONLINE gauge.
+// Predictions from this station, or from a linked one that shares a reference with it, such as BSH's for a
+// PEGELONLINE gauge through NHN. They're read from the predictor's current epoch, in its `datum`.
 const predictor = [s, ...linked].find(
-  (d) => d.products.includes("predictions") && (d.datum === s.datum || s.datums[d.datum] != null),
+  (d) => d.products.includes("predictions") && shiftBetween(d, s) !== undefined,
 );
 const day = (d?: Date) => d?.toISOString().slice(0, 10) ?? "–";
 const latest = yearRows.at(-1);
@@ -112,7 +119,14 @@ ORDER BY time DESC LIMIT 10`
     <LevelChart
       station={s}
       years={yearRows}
-      predictor={predictor && { id: predictor.id, datum: predictor.datum }}
+      predictor={
+        predictor && {
+          id: predictor.id,
+          shift: shiftBetween(predictor, s),
+          epoch: currentEpoch(predictor),
+          attribution: predictor.attribution,
+        }
+      }
     />
   ) : (
     <p>No observed levels yet.</p>

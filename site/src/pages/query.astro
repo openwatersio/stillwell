@@ -150,7 +150,7 @@ GROUP BY handling ORDER BY errata DESC`,
         const started = performance.now();
         try {
           const rows = await query(textarea.value);
-          status.textContent = `${rows.length.toLocaleString("en-US")} ${rows.length === 1 ? "row" : "rows"} in ${((performance.now() - started) / 1000).toFixed(1)} s, DuckDB ${await version()}`;
+          status.textContent = `${rows.length.toLocaleString("en-US")} ${rows.length === 1 ? "row" : "rows"} in ${((performance.now() - started) / 1000).toFixed(1)} s, DuckDB ${await version()}${rows.length > 1000 ? "; the table shows the first 1,000, the CSV has them all" : ""}`;
           result.replaceChildren(
             table(rows.slice(0, 1000)),
             ...(rows.length ? [download(rows)] : []),
@@ -168,15 +168,12 @@ GROUP BY handling ORDER BY errata DESC`,
     }
   }
 
-  // Single-precision levels print as 1.6799999475479126; seven significant digits shows them as stored, as DuckDB's CLI does.
   const show = (v: any) =>
     v instanceof Date
       ? v.toISOString().replace("T", " ").replace(".000Z", "Z")
-      : typeof v === "number" && !Number.isInteger(v)
-        ? String(Number(v.toPrecision(7)))
-        : v !== null && typeof v === "object"
-          ? JSON.stringify(v)
-          : String(v ?? "NULL");
+      : v !== null && typeof v === "object"
+        ? JSON.stringify(v)
+        : String(v ?? "NULL");
 
   function table(rows: Record<string, any>[]) {
     const t = document.createElement("table");
@@ -192,12 +189,20 @@ GROUP BY handling ORDER BY errata DESC`,
     return t;
   }
 
+  const raw = (v: any) =>
+    v instanceof Date
+      ? v.toISOString()
+      : v !== null && typeof v === "object"
+        ? JSON.stringify(v)
+        : String(v ?? "");
+
   function download(rows: Record<string, any>[]) {
     const columns = Object.keys(rows[0]);
-    const quote = (s: string) => (/[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s);
+    const quote = (s: string) => (/[",\r\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s);
     const csv = [
       columns.join(","),
-      ...rows.map((r) => columns.map((c) => quote(show(r[c]))).join(",")),
+      // Values as the query returned them, without the table's rounding.
+      ...rows.map((r) => columns.map((c) => quote(raw(r[c]))).join(",")),
     ].join("\n");
     return Object.assign(document.createElement("a"), {
       href: URL.createObjectURL(new Blob([csv], { type: "text/csv" })),

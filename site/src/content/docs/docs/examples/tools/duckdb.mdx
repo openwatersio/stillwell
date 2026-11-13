@@ -117,7 +117,7 @@ GROUP BY year ORDER BY year;
 └───────┴───────┴────────┘
 ```
 
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path. DuckDB's `url_encode` builds it:
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path. DuckDB's `url_encode` builds it, though it also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today:
 
 ```sql
 SELECT 'https://stillwell.openwaters.io/obs/' || source || '/' || url_encode(url_encode(source_id)) AS dir

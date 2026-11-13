@@ -8,9 +8,16 @@ interface Props {
 }
 const { erratum: e } = Astro.props;
 const n = e.stations?.length ?? 0;
-const where = n ? `${n} ${n === 1 ? "station" : "stations"}` : "source-wide";
+// A null list means every station of the source; an empty one means the affected stations aren't listed.
+const where = n
+  ? `${n} ${n === 1 ? "station" : "stations"}`
+  : e.stations === null
+    ? "source-wide"
+    : "stations not listed";
 const when =
-  e.since || e.until ? `, ${e.since?.slice(0, 10) ?? "…"} to ${e.until?.slice(0, 10) ?? "…"}` : "";
+  e.since || e.until
+    ? `, ${e.since?.slice(0, 10) ?? "…"} until ${e.until?.slice(0, 10) ?? "…"}`
+    : "";
 ---
 
 <details>
@@ -33,9 +40,17 @@ const when =
       {n > 20 && `, and ${n - 20} more`}
     </p>
   )}
+  {e.evidence && (
+    <>
+      <p>
+        <strong>Evidence:</strong>
+      </p>
+      <Fragment set:html={markdown(e.evidence)} />
+    </>
+  )}
   {e.url && (
     <p>
-      <a href={e.url}>Evidence</a>
+      <a href={e.url}>The entry in the repository</a>
     </p>
   )}
 </details>

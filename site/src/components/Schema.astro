@@ -14,7 +14,14 @@ const pkg = await json("datapackage.json");
 const r = pkg.resources.find((x: any) => x.name === resource);
 if (!r) throw new Error(`datapackage.json has no resource ${resource}`);
 
-type Row = { name: string; type: string; required: boolean; description: string; depth: number };
+type Row = {
+  name: string;
+  type: string;
+  required: boolean;
+  optional: boolean;
+  description: string;
+  depth: number;
+};
 const out: Row[] = [];
 
 if (r.jsonSchema) {
@@ -29,6 +36,7 @@ if (r.jsonSchema) {
           .map((t: string) => (t === "array" && p.items?.type ? `${p.items.type}[]` : t))
           .join(" or "),
         required: (item.required ?? []).includes(name),
+        optional: false,
         description: p.description ?? "",
         depth,
       });
@@ -44,6 +52,7 @@ if (r.jsonSchema) {
         name: prefix + f.name,
         type: f.duckdbType ?? f.type,
         required: !!f.constraints?.required,
+        optional: !!f.optional,
         description: f.description ?? "",
         depth,
       });
@@ -55,10 +64,9 @@ if (r.jsonSchema) {
   const defined = r.schema.fields.map((f: any) => f.name);
   const missing = defined.filter((n: string) => !live.includes(n));
   const extra = live.filter((n: string) => !defined.includes(n));
-  // Older files can lack an optional column (such as source_flag); any other difference is drift.
-  const optional = new Set(
-    r.schema.fields.filter((f: any) => !f.constraints?.required).map((f: any) => f.name),
-  );
+  // Top-level names only: types and nested fields aren't compared. Older files can lack an optional column
+  // (such as source_flag); any other difference is drift.
+  const optional = new Set(r.schema.fields.filter((f: any) => f.optional).map((f: any) => f.name));
   if (extra.length || missing.some((n: string) => !optional.has(n)))
     throw new Error(
       `${r.path}: live columns differ from datapackage.json (missing ${missing.join(", ") || "none"}; extra ${extra.join(", ") || "none"})`,
@@ -100,7 +108,11 @@ const id = (name: string) => `column-${name.replaceAll(".", "-")}`;
           </td>
           <td class="type">
             {short(c.type)}
-            {!c.required && <span class="nullable">, nullable</span>}
+            {c.optional ? (
+              <span class="nullable">, optional</span>
+            ) : (
+              !c.required && <span class="nullable">, nullable</span>
+            )}
           </td>
           <td set:html={md.renderInline(c.description)} />
         </tr>
