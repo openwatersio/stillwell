@@ -432,6 +432,10 @@ export const source: Source = {
       ],
     },
     epochs: {
+      "refmar/495 2020-03-06T00:00:00Z": {
+        until: "2020-03-04",
+        note: "The record resumes on the new zero at 23:00 UTC on 5 March 2020, after a gap since 2017, so the epoch before holds through the 4th and ends at the start of the 5th, and that hour belongs to neither epoch (erratum `refmar-hiva-oa-uhslc-2020-datum`).",
+      },
       "refmar/495 start": {
         to_current: 1.35,
         note: "REFMAR sits 0.24 m above UHSLC's record of the gauge (uhslc/017) every year from 2010 to 2015 and 1.59 m above it from 2020; UHSLC's has no step. REFMAR's yearly medians from 1977 to 2017 stay within 0.68 to 0.91 m, so the years before UHSLC's record are on the same zero.",

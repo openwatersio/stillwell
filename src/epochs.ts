@@ -110,11 +110,14 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
   const start = fetched.reference?.since;
   const since = start ? iso(dayStart(start, options.offsets)) : null;
   const id = Math.max(1, options.nextId ?? 1);
-  if (options.archive === "previous" && since && Date.parse(since) <= Date.parse(options.now))
-    return withToCurrent(
-      applySplits(splitAt(before(id, fetched.datum), since, fetched, options), options).epochs,
+  if (options.archive === "previous" && since && Date.parse(since) <= Date.parse(options.now)) {
+    const { epochs } = applySplits(
+      splitAt(before(id, fetched.datum), since, fetched, options),
       options,
     );
+    applyDecisions(epochs, options);
+    return withToCurrent(epochs, options);
+  }
   const epochs: Epoch[] = [
     {
       id,
@@ -134,7 +137,10 @@ export function firstEpochs(fetched: Fetched & { datum: string }, options: Epoch
       state: "open",
     },
   ];
-  return applySplits(epochs, options).opened.length ? withToCurrent(epochs, options) : epochs;
+  applySplits(epochs, options);
+  // Decisions apply from the first list, as on every refresh, such as an earlier end for the epoch before a split.
+  applyDecisions(epochs, options);
+  return epochs.length > 1 ? withToCurrent(epochs, options) : epochs;
 }
 
 /** The instants a station's splits (`Overrides.splits`) open epochs at. */
