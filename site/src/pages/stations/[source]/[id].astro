@@ -11,29 +11,32 @@ import {
   json,
   currentEpoch,
   shiftBetween,
+  stationLink,
+  hasPage,
 } from "../../../lib/store";
 import { flagChart } from "../../../lib/render";
-import { seriesUrl, stationPath, queryPath } from "../../../lib/paths";
+import { seriesUrl, queryPath } from "../../../lib/paths";
 
 export async function getStaticPaths() {
-  const all = await stations();
-  // STATIONS=usgs,rws builds only those sources' pages, for a quicker build while working on them.
-  const only = process.env.STATIONS?.split(",");
-  return all
-    .filter((s) => !only || only.includes(s.source))
+  return (await stations())
+    .filter((s) => hasPage(s.source))
     .map((s) => ({ params: { source: s.source, id: s.source_id }, props: { station: s } }));
 }
 
 const { station: s } = Astro.props;
 const byId = await stationsById();
 const yearRows = (await years(s.source)).get(s.id) ?? [];
-// A null station list means every station of the source; an empty one means the affected stations aren't known.
+// The store lists each station's errata, with source-wide ones expanded to every station of the source.
 const errata = (await json("errata.json")).filter((e: any) => s.errata?.includes(e.id));
 const linked = s.same_as.map((id: string) => byId.get(id)).filter(Boolean);
 // Predictions from this station, or from a linked one that shares a reference with it, such as BSH's for a
-// PEGELONLINE gauge through NHN. They're read from the predictor's current epoch, in its `datum`.
+// PEGELONLINE gauge through NHN. They're read from the predictor's current epoch, in its `datum`. A linked
+// station's are used only where its terms allow commercial use or this station's don't, as src/datums.ts does.
 const predictor = [s, ...linked].find(
-  (d) => d.products.includes("predictions") && shiftBetween(d, s) !== undefined,
+  (d) =>
+    d.products.includes("predictions") &&
+    shiftBetween(d, s) !== undefined &&
+    (d.commercial_use || !s.commercial_use),
 );
 const day = (d?: Date) => d?.toISOString().slice(0, 10) ?? "–";
 const latest = yearRows.at(-1);
@@ -115,7 +118,7 @@ ORDER BY time DESC LIMIT 10`
   </table>
 
   <h2 id="levels">Levels</h2>
-  {yearRows.length || s.live ? (
+  {yearRows.length || s.live || predictor ? (
     <LevelChart
       station={s}
       years={yearRows}
@@ -208,7 +211,7 @@ ORDER BY time DESC LIMIT 10`
         {linked.map((d: any) => (
           <tr>
             <td>
-              <a href={stationPath(d.id)}>{d.id}</a>
+              {stationLink(d.id) ? <a href={stationLink(d.id)}>{d.id}</a> : d.id}
               {d.id === s.preferred && " (preferred)"}
             </td>
             <td>{d.products.join(", ")}</td>
@@ -223,8 +226,10 @@ ORDER BY time DESC LIMIT 10`
         For the gauge's observed levels, use{" "}
         {s.preferred === s.id ? (
           "this station"
+        ) : byId.has(s.preferred) && stationLink(s.preferred) ? (
+          <a href={stationLink(s.preferred)}>{s.preferred}</a>
         ) : (
-          <a href={stationPath(s.preferred)}>{s.preferred}</a>
+          s.preferred
         )}
         {s.tide_station && `; its record in slackwater-database is ${s.tide_station}`}.
       </p>

@@ -15,7 +15,7 @@ scripts/               ingest.ts, the weekly canary, the failure alerts, the TIC
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the store's layout and the evaluations
-site/                  the site for people using the data: its docs and a page per source and station (Astro)
+site/                  the site for people using the data: its docs and a page per source (Astro)
 .github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), site.yml (the site's build) and canary.yml (a weekly live request per adapter)
 ```
 
@@ -239,13 +239,13 @@ node scripts/check-files.ts https://stillwell.openwaters.io
 
 ## Site
 
-`site/` is the site for people using the data, an [Astro](https://astro.build) project with its own `package.json`. Its docs are Markdown in `site/src/content/docs/docs/`. The queries shown with their results run against the public store when the site builds, and the schema tables come from the store's `datapackage.json`, so a build fails where one of those queries breaks or a live file's columns differ from its definition. The code on the Tools and Notebooks pages doesn't run. Each source and station gets a page, in `site/src/pages/`.
+`site/` is the site for people using the data, an [Astro](https://astro.build) project with its own `package.json`. Its docs are Markdown in `site/src/content/docs/docs/`. The queries shown with their results run against the public store when the site builds, and the schema tables come from the store's `datapackage.json`, so a build fails where one of those queries breaks or a live file's columns differ from its definition. The code on the Tools and Notebooks pages doesn't run. Each source gets a page, in `site/src/pages/`. Station pages build only for the sources `STATIONS` names, or for every source with `STATIONS=all`, since all of them come to about 1.3 GB.
 
 ```bash
 cd site && npm ci
 npm run dev                    # preview with live reload
-STATIONS=rws npm run dev       # station pages for these sources only
-npm run build                  # every page, as the Site workflow builds it
+STATIONS=rws npm run dev       # with these sources' station pages
+STATIONS=bsh,marine-institute npm run build   # as the Site workflow builds it
 ```
 
 The Site workflow builds it on pull requests that touch `site/`, on pushes to `main`, and weekly, which is when a change to the store's files reaches it, since the build reads the published store. Nothing deploys it yet.

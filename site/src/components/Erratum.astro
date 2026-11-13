@@ -1,12 +1,14 @@
 ---
 // One erratum from errata.json, folded to its id and what the store does.
 import { markdown } from "../lib/render";
-import { stationPath } from "../lib/paths";
+import { stationLink, stationsById } from "../lib/store";
 
 interface Props {
   erratum: Record<string, any>;
 }
 const { erratum: e } = Astro.props;
+// Errata can name stations the store doesn't list, such as withheld ones, which have no page.
+const byId = await stationsById();
 const n = e.stations?.length ?? 0;
 // A null list means every station of the source; an empty one means the affected stations aren't listed.
 const where = n
@@ -34,7 +36,7 @@ const when =
       {e.stations.slice(0, 20).map((id: string, i: number) => (
         <>
           {i > 0 && ", "}
-          <a href={stationPath(id)}>{id}</a>
+          {byId.has(id) && stationLink(id) ? <a href={stationLink(id)}>{id}</a> : id}
         </>
       ))}
       {n > 20 && `, and ${n - 20} more`}

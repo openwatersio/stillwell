@@ -153,10 +153,9 @@ const first = list.reduce<Date | undefined>(
       body.replaceChildren(
         ...matches.slice(0, 100).map(([name, path, id, kind, status, live, datum, first, last]) => {
           const tr = document.createElement("tr");
-          const link = Object.assign(document.createElement("a"), {
-            href: path,
-            textContent: name,
-          });
+          const link = path
+            ? Object.assign(document.createElement("a"), { href: path, textContent: name })
+            : document.createTextNode(name);
           tr.append(
             document.createElement("td"),
             cell(id),

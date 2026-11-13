@@ -64,7 +64,7 @@ WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
 
 ## The latest values
 
-`recent/<source>.parquet` holds the last 7 days of observed levels for every station of the source whose `live` is true. It's rewritten every hour, so read it fresh rather than caching it.
+`recent/<source>.parquet` holds the last 7 days of observed levels from the source's live stations, and keeps a station's rows after it stops being live until they're 7 days old. It's rewritten every hour, so read it fresh rather than caching it.
 
 <Schema resource="recent" />
 

@@ -1,6 +1,6 @@
 // Build-time reads of the store, through DuckDB in Node. Pages render from these once per build.
 import { DuckDBInstance } from "@duckdb/node-api";
-import { url } from "./paths";
+import { url, stationPath } from "./paths";
 
 const connection = await (await DuckDBInstance.create(":memory:")).connect();
 await connection.run("SET TimeZone = 'UTC'");
@@ -141,3 +141,12 @@ export function json(path: string): Promise<any> {
     );
   return jsonCache.get(path)!;
 }
+
+// shortcut: station pages build only for the sources STATIONS names ("all" for every source), since all of them
+// come to about 1.3 GB; build them all once they're hosted, or render them per request.
+const PAGES = process.env.STATIONS?.split(",").map((s) => s.trim()) ?? [];
+export const hasPage = (source: string) => PAGES.includes("all") || PAGES.includes(source);
+
+/** A station page's path, or undefined when its page isn't built, so a link to it renders as plain text. */
+export const stationLink = (id: string) =>
+  hasPage(id.split("/")[0]) ? stationPath(id) : undefined;
