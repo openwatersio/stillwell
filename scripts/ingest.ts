@@ -71,6 +71,7 @@
  * separate store, and ingest refuses to write one without it. Commercial use is
  * a tag on each station for readers to filter on; it doesn't move a station.
  */
+import "./threadpool.ts";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import {
   backfillYear,

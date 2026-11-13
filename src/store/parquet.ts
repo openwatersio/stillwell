@@ -33,7 +33,9 @@ const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 /**
  * How many DuckDB connections run store work at once, 1 by default. Backfill,
  * compaction, requalify and `years` raise it to their concurrency, since each
- * year file on R2 is mostly waiting on the network.
+ * year file on R2 is mostly waiting on the network. Each running call holds
+ * one of libuv's pool threads; scripts/threadpool.ts gives the pool 64 unless
+ * the environment sets its size, so more lanes than that wait for a thread.
  */
 export function setConnections(count: number): void {
   laneCount = Math.max(1, Math.floor(count));
