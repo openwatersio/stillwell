@@ -11,7 +11,8 @@ import {
 } from "../src/store/parquet.ts";
 import { recentPath, seriesPath } from "../src/store/paths.ts";
 import { poolUntil, updateRecent } from "../src/store/recent.ts";
-import { judgeFetched, requalify } from "../src/store/requalify.ts";
+import { judgeFetched, requalify, requalifyInWorker } from "../src/store/requalify.ts";
+import { sourceOf } from "../src/sources/index.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
 import { source as gesla } from "../src/sources/gesla/index.ts";
 import {
@@ -196,6 +197,68 @@ describe("requalify", () => {
     await requalify(source(), station, root, 2025, 2026);
     const flags = (await readObservations(path(2025))).slice(0, 5).map((r) => r.flag);
     assert.deepEqual(flags, [Flag.suspect, Flag.suspect, Flag.suspect, Flag.suspect, Flag.good]);
+  });
+
+  it("writes the same in a worker as here", async () => {
+    // A real source, since the worker finds it by its ID.
+    const real = { ...station, id: "pegelonline/1", source: "pegelonline", kind: "river" as const };
+    const [here, there] = ["here", "there"].map((name) =>
+      mkdtempSync(join(tmpdir(), `stillwell-requalify-${name}-`)),
+    );
+    const path = (root: string, year: number) =>
+      seriesPath(root, "levels", "pegelonline", "1", year);
+    const all = qc(
+      withSourceFlag(
+        hourly(Date.UTC(2024, 0, 1), Date.UTC(2026, 0, 1), [
+          NEW_YEAR - 15 * HOUR,
+          NEW_YEAR + 15 * HOUR,
+        ]),
+      ),
+      { flatline_s: 6 * 3600 },
+    );
+    for (const root of [here!, there!])
+      for (const year of [2024, 2025])
+        await writeObservations(
+          path(root, year),
+          all.filter((r) => new Date(r.time).getUTCFullYear() === year),
+          "PNP",
+        );
+    const pegelonline = sourceOf("pegelonline");
+    const written = [new Map(), new Map()];
+    const local = await requalify(pegelonline, real, here!, 2024, 2026, written[0]);
+    assert.deepEqual(
+      await requalifyInWorker("pegelonline", real, there!, 2024, 2026, written[1]),
+      local,
+    );
+    assert.equal(local.files, 2);
+    assert.deepEqual([...written[1]!.values()], [...written[0]!.values()]);
+    for (const year of [2024, 2025])
+      assert.deepEqual(
+        await readObservations(path(there!, year)),
+        await readObservations(path(here!, year)),
+      );
+  });
+
+  it("fails a station whose worker throws, and keeps the pool working", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
+    await assert.rejects(
+      requalifyInWorker("nowhere", { ...station, source: "nowhere" }, root, 2024, 2025),
+      /nowhere/,
+    );
+    assert.deepEqual(
+      await requalifyInWorker(
+        "pegelonline",
+        { ...station, id: "pegelonline/2", source: "pegelonline" },
+        root,
+        2024,
+        2025,
+      ),
+      {
+        files: 0,
+        changed: 0,
+        warnings: [],
+      },
+    );
   });
 });
 

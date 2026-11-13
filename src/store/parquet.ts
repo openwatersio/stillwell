@@ -33,8 +33,8 @@ const current = new AsyncLocalStorage<Promise<DuckDBConnection>>();
 
 /**
  * How many DuckDB connections run store work at once, 1 by default. Backfill,
- * compaction, requalify and `years` raise it to their concurrency, since each
- * year file on R2 is mostly waiting on the network. Each running call holds
+ * compaction and `years` raise it to their concurrency, and requalify's
+ * workers each to 4, since each year file on R2 is mostly waiting on the network. Each running call holds
  * one of libuv's pool threads; scripts/threadpool.ts gives the pool 64 unless
  * the environment sets its size, so more lanes than that wait for a thread.
  */
@@ -69,6 +69,14 @@ function connection(): Promise<DuckDBConnection> {
   return db;
 }
 
+let settings: Record<string, string> = {};
+
+/** DuckDB settings, such as `threads` and `memory_limit`, for the instance this thread starts. */
+export function limitDuckDb(options: Record<string, string>): void {
+  if (instance) throw new Error("DuckDB already started");
+  settings = options;
+}
+
 /**
  * A connection to the one in-memory instance. The instance loads httpfs and
  * creates the store's S3 secret once, when it starts: secrets belong to the
@@ -77,7 +85,7 @@ function connection(): Promise<DuckDBConnection> {
  */
 async function connect(): Promise<DuckDBConnection> {
   instance ??= (async () => {
-    const created = await DuckDBInstance.create(":memory:");
+    const created = await DuckDBInstance.create(":memory:", settings);
     const endpoint = process.env.S3_ENDPOINT;
     if (endpoint) {
       const setup = await created.connect();
