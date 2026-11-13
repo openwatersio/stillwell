@@ -2524,6 +2524,39 @@ describe("usace", () => {
     );
   });
 
+  it("fails on a reply with no values array, and doesn't cache it", async () => {
+    let keep: ((text: string) => boolean) | undefined;
+    const noValues = JSON.stringify({ message: "Service unavailable", details: {} });
+    setTransport(async (_, options) => {
+      keep = options.keep;
+      return noValues;
+    });
+    await assert.rejects(
+      usace.levels(
+        "MVN",
+        "Reserve.Stage.Inst.1Hour.0.rev",
+        new Date("2020-01-01Z"),
+        new Date("2020-01-02Z"),
+      ),
+      /sent no values/,
+    );
+    assert.equal(keep!(noValues), false);
+    assert.equal(keep!('{"values":null,"details":{"values":[]}}'), false);
+    // An empty range comes as an empty array, which is kept: Venice, MVN, for 1900.
+    const empty = fixture("usace-empty.json");
+    assert.equal(keep!(empty), true);
+    serve([[/timeseries/, empty]]);
+    assert.deepEqual(
+      await usace.levels(
+        "MVN",
+        "Reserve.Stage.Inst.1Hour.0.rev",
+        new Date("2020-01-01Z"),
+        new Date("2020-01-02Z"),
+      ),
+      [],
+    );
+  });
+
   it("refuses a series in feet, and a station committed in another datum", async () => {
     serve([[/timeseries/, JSON.stringify({ units: "ft", values: [[1704070800000, 20.1, 3]] })]]);
     await assert.rejects(
