@@ -10,11 +10,11 @@ export default defineConfig({
         { icon: "github", label: "GitHub", href: "https://github.com/openwatersio/stillwell" },
       ],
       sidebar: [
-        { label: "Introduction", slug: "docs" },
-        { label: "Getting started", slug: "docs/getting-started" },
         {
           label: "Guides",
           items: [
+            { label: "Introduction", slug: "docs" },
+            "docs/getting-started",
             "docs/guides/gauges",
             "docs/guides/datums",
             "docs/guides/quality-flags",
