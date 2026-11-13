@@ -129,7 +129,7 @@ def _(alt, datum, gauge, lat_offset, levels, mo, pl):
         pl.when(pl.col("flag") <= 2).then(pl.lit("good")).otherwise(pl.lit("suspect or bad")).alias("quality"),
     )
     _chart = (
-        alt.Chart(_plot.to_pandas())
+        alt.Chart(_plot)
         .mark_line(strokeWidth=1)
         .encode(
             x=alt.X("time:T", title=None),
