@@ -55,6 +55,9 @@ export function apiHandler(deps: {
         message: `${id}'s terms bar commercial use, and the open API serves only stations whose terms allow it`,
       });
 
+    if (!station.polled)
+      return json(404, { message: `${id} has no recent levels: the server doesn't poll it` });
+
     const at = now();
     const parsed = parseLevels(searchParams, at);
     if ("errors" in parsed) return invalid(parsed.errors);
@@ -119,7 +122,7 @@ async function readLevels(
      WHERE station = {station:String}
        AND time >= fromUnixTimestamp64Milli({from:Int64}) AND time <= fromUnixTimestamp64Milli({to:Int64})
      ORDER BY time
-     SETTINGS do_not_merge_across_partitions_select_final = 1`,
+     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
     { station, from: Math.floor(from), to: Math.ceil(to) },
   );
   return rows.map((r) => ({
@@ -150,7 +153,7 @@ async function newest(
      WHERE station = {station:String} AND flag != {bad:UInt8} AND epoch IN {ids:Array(UInt16)}
        AND toUnixTimestamp64Milli(time) >= {since:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
        AND toUnixTimestamp64Milli(time) < {until:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
-     SETTINGS do_not_merge_across_partitions_select_final = 1`,
+     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
     {
       station,
       bad: Flag.bad,
@@ -167,7 +170,8 @@ async function lastPass(ch: ClickHouse, source: string, group: number): Promise<
   const [row] = await ch.query<{ t: string | null }>(
     `SELECT toUnixTimestamp64Milli(maxOrNull(finished)) AS t
      FROM polls
-     WHERE source = {source:String} AND ok AND (empty(intervals) OR has(intervals, {group:UInt32}))`,
+     WHERE source = {source:String} AND ok AND (empty(intervals) OR has(intervals, {group:UInt32}))
+     SETTINGS max_execution_time = 8`,
     { source, group },
   );
   return row?.t == null ? null : Number(row.t);

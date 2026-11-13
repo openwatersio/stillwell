@@ -154,14 +154,15 @@ cat >/etc/clickhouse-server/users.d/stillwell-api.xml <<XML
     <profiles>
         <stillwell_api>
             <!-- Reads only; settings may change per query, but not these limits, so requests can't hold
-                 ClickHouse's memory or time from the poller: 300 MB a query, 400 MB and 8 queries at once. -->
+                 ClickHouse's memory or time from the poller: 300 MB a query, 400 MB and 8 queries at once, and
+                 30 seconds a query, which a levels query lowers to 8 to finish before the Worker gives up. -->
             <readonly>2</readonly>
             <max_execution_time>30</max_execution_time>
             <max_memory_usage>300000000</max_memory_usage>
             <max_memory_usage_for_user>400000000</max_memory_usage_for_user>
             <max_concurrent_queries_for_user>8</max_concurrent_queries_for_user>
             <constraints>
-                <max_execution_time><readonly/></max_execution_time>
+                <max_execution_time><max>30</max></max_execution_time>
                 <max_memory_usage><readonly/></max_memory_usage>
                 <max_memory_usage_for_user><readonly/></max_memory_usage_for_user>
                 <max_concurrent_queries_for_user><readonly/></max_concurrent_queries_for_user>

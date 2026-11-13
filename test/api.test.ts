@@ -37,6 +37,9 @@ function catalog(overrides: Record<string, unknown> = {}) {
         tide_station: "noaa/9447130",
         min_interval_s: 360,
         interval_s: 360,
+        live: true,
+        status: "active",
+        products: ["levels"],
         epoch_ids: [1, 2],
         since: [null, "2026-11-13T06:00:00Z"],
         until: ["2026-11-13T06:00:00Z", null],
@@ -56,6 +59,9 @@ function catalog(overrides: Record<string, unknown> = {}) {
         datums_attribution: [],
         tide_station: null,
         min_interval_s: null,
+        live: true,
+        status: "active",
+        products: ["levels"],
         epoch_ids: [1],
         since: [null],
         until: [null],
@@ -182,6 +188,18 @@ describe("sample", () => {
       picked.map((v) => (NOW - v.time) / MIN),
       [13, 5, 0],
     );
+  });
+
+  it("gives the same rows wherever in the step before its first step time the range starts", () => {
+    // 6-minute values from 10:00; at 15m, the 10:15 step ties between 10:12 and 10:18 and takes 10:12.
+    const at = (m: number) => Date.parse("2026-11-13T10:00:00Z") + m * MIN;
+    const values = [0, 6, 12, 18, 24, 30].map((m) => value(at(m)));
+    const rows = (start: number) =>
+      sample(seattle(), { named: null }, values, query({ start, end: at(30), step: 15 * MIN })).map(
+        (v) => (v.time - at(0)) / MIN,
+      );
+    assert.deepEqual(rows(at(1)), [12, 30]);
+    assert.deepEqual(rows(at(15)), [12, 30]);
   });
 
   it("leaves out bad values unless asked, and values outside their epoch's span or with no offset", () => {
@@ -355,6 +373,12 @@ describe("stillwell-api on ClickHouse", { skip: !process.env.CLICKHOUSE_URL }, (
       const encoded = await handle("GET", `/water-levels/stations/coops/9447130%2Fx/levels`);
       assert.equal(encoded.status, 404);
       assert.equal((await handle("GET", `/water-levels/stations/smhi/2130/levels`)).status, 451);
+      const unpolled = catalog({ live: false });
+      const notPolled = await apiHandler({ ch, catalog: () => unpolled, now: () => now })(
+        "GET",
+        `/water-levels/stations/coops/9447130/levels`,
+      );
+      assert.equal(notPolled.status, 404);
       const bad = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=NAVD88`);
       assert.equal(bad.status, 400);
       assert.equal(JSON.parse(bad.body).errors[0].path, "datum");

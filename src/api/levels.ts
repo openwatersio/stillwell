@@ -209,8 +209,10 @@ function convert(station: CatalogStation, conversion: Conversion, v: StoredLevel
 
 /**
  * The values between `start` and `end` that convert: every one at `raw`,
- * otherwise the one nearest each multiple of the step, within half a step
- * and within the range.
+ * otherwise the one nearest each multiple of the step in the range, within
+ * half a step, so a value up to half a step outside the range can be one.
+ * Where in the step before its first step time the range starts doesn't
+ * change the rows, so the Worker can round it.
  * Each keeps its own time, and one nearest two step times is listed once.
  */
 export function sample(
@@ -242,8 +244,7 @@ export function sample(
     const v = usable[i];
     if (v && Math.abs(v.time - at) <= half && picked.at(-1) !== v) picked.push(v);
   }
-  // A value nearest the first or last step time can lie just outside the range.
-  return picked.filter((v) => v.time >= query.start && v.time <= query.end);
+  return picked;
 }
 
 /**

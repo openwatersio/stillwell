@@ -29,6 +29,8 @@ const RELOAD_MS = 10 * 60_000;
 const REQUESTS_AT_ONCE = 2;
 /** How long a request may wait for its turn: the Worker gives up after 10 seconds. */
 const WAIT_MS = 10_000;
+/** How many may wait at once; past that a request is refused at once rather than queue behind ones the Worker will drop. */
+const MAX_WAITING = 8;
 const RETRY_MS = 30_000;
 const store = process.env.STILLWELL_STORE?.replace(/\/$/, "");
 if (!store) throw new Error("set STILLWELL_STORE to the public store");
@@ -73,16 +75,23 @@ load();
 const handle = apiHandler({ ch, catalog: () => catalog });
 
 const turns = slots(REQUESTS_AT_ONCE);
+const BUSY = {
+  status: 503,
+  headers: { "content-type": "application/json; charset=utf-8" },
+  body: '{"message":"Busy; try again shortly"}',
+};
+let waiting = 0;
 async function answer(method: string, url: string) {
   const arrived = Date.now();
-  await turns.acquire();
+  if (waiting >= MAX_WAITING) return BUSY;
+  waiting++;
   try {
-    if (Date.now() - arrived > WAIT_MS)
-      return {
-        status: 503,
-        headers: { "content-type": "application/json; charset=utf-8" },
-        body: '{"message":"Busy; try again shortly"}',
-      };
+    await turns.acquire();
+  } finally {
+    waiting--;
+  }
+  try {
+    if (Date.now() - arrived > WAIT_MS) return BUSY;
     return await handle(method, url);
   } finally {
     turns.release();

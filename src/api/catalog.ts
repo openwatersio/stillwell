@@ -14,6 +14,8 @@ export interface CatalogStation {
   datums_attribution: string[];
   tide_station: string | null;
   min_interval_s: number | null;
+  /** Whether the server polls the station for levels: live, active and with levels, as the poller picks them. */
+  polled: boolean;
   /** How often the station records a value, in seconds. */
   interval_s: number | null;
   /** The current epoch: the last one open. */
@@ -48,7 +50,7 @@ export async function loadCatalog(ch: ClickHouse, store: string): Promise<Catalo
     read(
       "stations.parquet",
       `id, source, name, datum, chart_datum, frame, commercial_use, attribution, datums_attribution,
-       tide_station, min_interval_s, interval_s, epochs.id AS epoch_ids, epochs.since AS since, epochs.until AS until,
+       tide_station, min_interval_s, interval_s, live, status, products, epochs.id AS epoch_ids, epochs.since AS since, epochs.until AS until,
        epochs.to_current AS to_current, epochs.state AS state`,
     ),
     read("stations/offsets.parquet", "station, epoch, datum, offset_m"),
@@ -92,6 +94,10 @@ export function buildCatalog(
       tide_station: (s.tide_station as string | null) ?? null,
       min_interval_s: (s.min_interval_s as number | null) ?? null,
       interval_s: (s.interval_s as number | null) ?? null,
+      polled:
+        s.live === true &&
+        s.status === "active" &&
+        ((s.products as string[] | null) ?? []).includes("levels"),
       epoch: open < 0 ? null : ids[open]!,
       // A held epoch waits on a decision, so its values aren't part of the series in any datum.
       epochs: new Map(
