@@ -1,0 +1,11 @@
+#!/usr/sbin/nft -f
+# The ops user reads the journal and needs no network, so it may open no connection at all, ClickHouse's on
+# loopback included, which its password also guards.
+table inet ops_egress
+delete table inet ops_egress
+table inet ops_egress {
+	chain output {
+		type filter hook output priority 0; policy accept;
+		meta skuid "ops" counter reject
+	}
+}

@@ -1,0 +1,14 @@
+[Unit]
+Description=Keep the ops user off the network
+# Before sshd, so no ops session ever runs without it.
+Before=ssh.service
+After=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/stillwell/ops-egress.nft
+ExecStop=/usr/sbin/nft delete table inet ops_egress
+
+[Install]
+WantedBy=multi-user.target

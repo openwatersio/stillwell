@@ -1,0 +1,2 @@
+# Read-only ops access: the journal and systemctl status, no forwarding (sshd_config.d/10-hardening.conf).
+restrict,pty ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJmz6GSD/GuDjcWqh42VriUv4t/fkWrfsCzFT307NdUL eddy@openclaw stillwell-ops

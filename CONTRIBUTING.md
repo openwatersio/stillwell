@@ -147,19 +147,19 @@ If a source starts reporting a station in another datum, `ingest stations` opens
 
 ## Running the poller
 
-`server/ingest.ts` is stillwell-ingest: it polls every hourly source's live stations into ClickHouse, each at its `min_interval_s` or hourly where it gives none ([docs/plans/realtime.md](docs/plans/realtime.md)). Each pass runs in a process of its own, `server/pass.ts`, and each that ends adds a row to the `polls` table. It reads ClickHouse at `CLICKHOUSE_URL` (default `http://127.0.0.1:8123`, with `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` if set), creating the `stillwell` database, and `stillwell_restricted` for sources that bar republishing, and their tables on start. It reads station lists and `recent/<source>.parquet` from the stores, as `scripts/ingest.ts` does, and writes nothing to them: the hourly workflow keeps writing `recent/` until the history moves into ClickHouse. A source's first pass after a start adds what ClickHouse lacks from `recent/`. It doesn't use the response cache, so every pass asks the sources.
+`server/ingest.ts` is stillwell-ingest: it polls every hourly source's live stations into ClickHouse, each at its `min_interval_s` or hourly where it gives none ([docs/plans/realtime.md](docs/plans/realtime.md)). Each pass runs in a process of its own, `server/pass.ts`, two at a time, and each that ends adds a row to the `polls` table. [server/deploy/](server/deploy/README.md) sets up the box it runs on. It reads ClickHouse at `CLICKHOUSE_URL` (default `http://127.0.0.1:8123`, with `CLICKHOUSE_USER` and `CLICKHOUSE_PASSWORD` if set), creating the `stillwell` database, and `stillwell_restricted` for sources that bar republishing, and their tables on start. It reads station lists and `recent/<source>.parquet` from the stores, as `scripts/ingest.ts` does, and writes nothing to them: the hourly workflow keeps writing `recent/` until the history moves into ClickHouse. A source's first pass after a start adds what ClickHouse lacks from `recent/`. It doesn't use the response cache, so every pass asks the sources.
 
 Run ClickHouse in Docker, on loopback only, then poll one source, with lists from the public store:
 
 ```bash
-docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:25.8
+docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP_USER_SETUP=1 clickhouse/clickhouse-server:26.8
 ```
 
 ```bash
 STILLWELL_STORE=https://stillwell.openwaters.io node server/ingest.ts kartverket
 ```
 
-Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
+Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `STILLWELL_METRICS` names a file it writes each source's pass metrics to, and `STILLWELL_FROM_RECENT` lists sources it fills hourly from `recent/` rather than ask, for a source that refuses the server. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
 
 ## Withheld stations
 

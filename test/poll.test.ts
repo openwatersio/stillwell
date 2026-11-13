@@ -14,7 +14,7 @@ import type { StationObservation } from "../src/store/parquet.ts";
 import { writeRecent } from "../src/store/parquet.ts";
 import { recentPath } from "../src/store/paths.ts";
 import type { ObservationStore } from "../src/realtime/clickhouse.ts";
-import { difference, pollSource, seedFromRecent } from "../src/realtime/poll.ts";
+import { difference, fillFromRecent, pollSource, seedFromRecent } from "../src/realtime/poll.ts";
 
 const HOUR = 3_600_000;
 const NOW = Date.UTC(2026, 10, 5, 12);
@@ -387,5 +387,72 @@ describe("difference", () => {
   it("sees a move to another epoch as a change", () => {
     const { changed } = difference([row(1, 1)], [{ ...row(1, 1), epoch: 2 }]);
     assert.equal(changed.length, 1);
+  });
+});
+
+describe("fillFromRecent", () => {
+  it("makes the store's window match recent/, and deletes a withheld station's values", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-fill-"));
+    const [a, b, c] = [station("a"), station("b"), station("c")];
+    const row = (s: StoredStation, time: number, level: number, flag: Flag = Flag.preliminary) => ({
+      station: s.id,
+      epoch: 1,
+      time,
+      level,
+      flag,
+    });
+    await writeRecent(recentPath(root, "test"), [
+      [row(a, NOW - 2 * HOUR, 1, Flag.bad), row(a, NOW - HOUR, 2)],
+    ]);
+    const store = memory();
+    // a holds a value QC since flagged bad and one the source dropped; b is withheld; c isn't in the file.
+    await store.write(
+      [
+        row(a, NOW - 2 * HOUR, 1),
+        row(a, NOW - 3 * HOUR, 9),
+        row(b, NOW - HOUR, 5),
+        row(c, NOW - HOUR, 7),
+      ],
+      1,
+    );
+    const summary = await fillFromRecent({
+      source: source({}, ["b"]),
+      stations: [a, c],
+      storeFor: () => root,
+      store,
+      now: NOW,
+    });
+    assert.deepEqual(
+      [...store.rows.values()]
+        .map((r) => [r.station, r.time, r.level, r.flag])
+        .sort((x, y) => String(x[0]).localeCompare(String(y[0])) || Number(x[1]) - Number(y[1])),
+      [
+        [a.id, NOW - 2 * HOUR, 1, Flag.bad],
+        [a.id, NOW - HOUR, 2, Flag.preliminary],
+        // A station the file has nothing for keeps what the store holds.
+        [c.id, NOW - HOUR, 7, Flag.preliminary],
+      ],
+    );
+    assert.deepEqual([summary.stations, summary.updated, summary.values], [2, 1, 2]);
+  });
+
+  it("deletes nothing when recent/ has no file for the source", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-fill-"));
+    const a = station("a");
+    const store = memory();
+    await store.write(
+      [{ station: a.id, epoch: 1, time: NOW - HOUR, level: 3, flag: Flag.preliminary }],
+      1,
+    );
+    const summary = await fillFromRecent({
+      source: source({}),
+      stations: [a],
+      storeFor: () => root,
+      store,
+      now: NOW,
+    });
+    assert.equal(store.rows.size, 1);
+    // Nothing new, so the pass isn't a success, and a stopped hourly workflow ages into the stale alert.
+    assert.equal(summary.updated, 0);
   });
 });

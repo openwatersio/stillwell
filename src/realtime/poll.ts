@@ -106,6 +106,67 @@ export async function pollSource({
   return summary;
 }
 
+/**
+ * One pass for a source that refuses the server, from the
+ * recent/<source>.parquet the hourly workflow writes rather than from the
+ * source: each live station's window in `store` is made to match the
+ * file's, so a value the source revised, a flag QC or errata changed, and a
+ * value the source dropped all reach `store`, written as a new version. A
+ * station the file has no values for keeps what `store` holds, so a missing
+ * or empty file deletes nothing. Every value of a station the adapter now
+ * withholds is deleted, within the limit `pollSource` keeps.
+ */
+export async function fillFromRecent({
+  source,
+  stations: all,
+  storeFor,
+  store,
+  now,
+  keepDays = 7,
+  accept = false,
+}: {
+  source: Source;
+  stations: StoredStation[];
+  storeFor: (station: StoredStation) => string;
+  store: ObservationStore;
+  now: number;
+  keepDays?: number;
+  accept?: boolean;
+}): Promise<RunSummary> {
+  const id = source.metadata.id;
+  const keepFrom = now - keepDays * DAY_MS;
+  const held = await store.stations(id);
+  const withheld = held.filter((s) => withheldReason(source, s) !== null);
+  const known = new Set([...held, ...all.map((s) => s.id)]).size;
+  const refused = tooManyWithheld(id, withheld.length, known);
+  if (refused && !accept) throw new Error(refused);
+  await store.removeStations(withheld);
+  // The stations a poll would ask, so the counts mean what a poll's do.
+  const listed = polled(source, all);
+  const summary = emptySummary(`fill ${id} from recent/`, listed.length);
+  for (const [path, members] of Map.groupBy(listed, (s) => recentPath(storeFor(s), id)))
+    for (const batch of chunks(members, BATCH)) {
+      const ids = batch.map((s) => s.id);
+      const had = Map.groupBy(await store.read(ids, keepFrom), (r) => r.station);
+      const next = Map.groupBy(
+        (await readRecent(path, ids)).filter((r) => r.time >= keepFrom && Number.isFinite(r.level)),
+        (r) => r.station,
+      );
+      const changed: StationObservation[] = [];
+      const vanished: { station: string; time: number }[] = [];
+      for (const [station, rows] of next) {
+        const diff = difference(had.get(station) ?? [], rows);
+        if (diff.changed.length) summary.updated++;
+        summary.values += diff.changed.length;
+        changed.push(...diff.changed);
+        vanished.push(...diff.vanished.map((time) => ({ station, time })));
+      }
+      await store.write(changed, now);
+      await store.remove(vanished);
+    }
+  return summary;
+}
+
 /** The stations of a source's list the poller fetches: live, active, with levels and not withheld. */
 export function polled(source: Source, stations: StoredStation[]): StoredStation[] {
   return stations.filter(
