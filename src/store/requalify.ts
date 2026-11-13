@@ -126,8 +126,12 @@ let tasks = 0;
  * worker per core at most (`availableParallelism`), each station going to the
  * least busy, so calls beyond that share a worker and its reads still overlap.
  * The worker gets the source by its ID, and has its own copy of each module,
- * such as its own DuckDB. Each file's stats reach `written` as it's written,
- * so a worker that dies, failing every station it holds, leaves them there.
+ * such as its own DuckDB. Each file's stats reach `written` as it's written.
+ * A worker that dies fails the stations it holds with `WorkerDied`, which the
+ * caller keeps marked in the years file, since it may have written a file it
+ * couldn't report. Terminating a worker whose DuckDB has started aborts the
+ * whole process with @duckdb/node-api 2.0.0-r.1, as running out of memory did
+ * on one thread; the run's years marks then stay for the next reconcile too.
  */
 export function requalifyInWorker(
   source: string,
@@ -156,7 +160,8 @@ function spawn(): Pooled {
   // The machine's memory, less the workers' DuckDB, split between the workers
   // and the main thread, so a worker collects garbage rather than grow until
   // they don't fit together. A year of 1-minute values needs about 500 MB of
-  // heap; on a small machine with many cores the floor can overcommit.
+  // heap; on a small machine with many cores the floor can overcommit. A worker
+  // past it ends the run (see `requalifyInWorker`).
   const limit = process.constrainedMemory();
   const memory = limit > 0 && limit < totalmem() ? limit : totalmem();
   const cores = availableParallelism();
