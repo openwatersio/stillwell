@@ -155,6 +155,7 @@ describe("refreshSource with withheld stations", () => {
       tide_m: 0.5,
       days: 366,
       drains: 0,
+      step_s: 600,
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/k12"), verdict("test/x0")]);

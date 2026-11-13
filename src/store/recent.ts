@@ -942,6 +942,24 @@ export async function pool<T>(
   await Promise.all(workers);
 }
 
+/**
+ * `pool`, but an item whose turn comes after `until` isn't started. Returns
+ * those, in order.
+ */
+export async function poolUntil<T>(
+  items: T[],
+  concurrency: number,
+  until: number,
+  work: (item: T) => Promise<void>,
+  now = Date.now,
+): Promise<T[]> {
+  const left: T[] = [];
+  await pool(items, concurrency, (item) =>
+    now() > until ? Promise.resolve(void left.push(item)) : work(item),
+  );
+  return left;
+}
+
 /** The summary as Markdown, for the log and `$GITHUB_STEP_SUMMARY`. */
 export function formatSummary(s: RunSummary, listed = 20): string {
   const lines = [

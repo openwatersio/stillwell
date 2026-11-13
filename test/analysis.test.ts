@@ -9,8 +9,10 @@ import {
   analyze,
   judge,
   markRequalified,
+  modalStep,
   pending,
   readAnalysis,
+  requalifiedMarks,
   withAnalysis,
   writeAnalysis,
 } from "../src/store/analysis.ts";
@@ -70,6 +72,23 @@ describe("judge", () => {
     assert.ok(Math.abs(tidal.tide_m! - 0.5) < 0.05);
     assert.equal(tidal.days, 90);
     assert.equal(judge(river("2"), series(90, pooled)).tidal, false);
+  });
+
+  it("measures the most common step between the last year's values", () => {
+    const tidal = judge(river("1"), series(90, tide(0.5)));
+    assert.equal(tidal.step_s, 900);
+    // Even where the values can't say whether the water is tidal.
+    assert.equal(judge(river("1"), series(20, tide(0.5))).step_s, 900);
+    // Whatever the flags, even those from before source_flag was kept, which judging leaves out.
+    const flagged = series(90, tide(0.5)).map((r, i) =>
+      i % 2 ? { time: r.time, level: r.level, flag: Flag.suspect } : r,
+    );
+    assert.equal(judge(river("1"), flagged).step_s, 900);
+    // The year to the last stored value, though its tail is all suspect.
+    const tail = series(60, tide(0.5))
+      .filter((_, i) => i % 4 === 0)
+      .map((r) => ({ time: r.time + 400 * 86_400_000, level: r.level, flag: Flag.suspect }));
+    assert.equal(judge(river("1"), [...series(90, tide(0.5)), ...tail]).step_s, 3600);
   });
 
   it("can't say under 30 days, and keeps out water high above the sea", () => {
@@ -349,14 +368,20 @@ describe("analyze", () => {
     const first = await analyze(store, source, stations, { now });
     assert.deepEqual(first.failed, []);
     assert.equal((await readAnalysis(store, "test")).get("test/1")!.tidal, true);
-    // A year later its values span 20 days, too few to say.
-    await writeObservations(path, series(20, tide(0.5)), "NAVD88");
+    // A year later its values span 20 days, too few to say, and come hourly.
+    await writeObservations(
+      path,
+      series(20, tide(0.5)).filter((_, i) => i % 4 === 0),
+      "NAVD88",
+    );
     const later = await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 2)) });
     assert.equal(later.judged, 1);
     assert.deepEqual(later.changed, []);
     const kept = (await readAnalysis(store, "test")).get("test/1")!;
     assert.equal(kept.tidal, true);
     assert.equal(kept.analyzed, now.toISOString());
+    // The step is measured whatever the values say about the tide.
+    assert.equal(kept.step_s, 3600);
     // New rules still requalify it under the verdict it keeps.
     await markRequalified(store, "test", ["test/1"], now);
     await writeAnalysis(store, "test", [
@@ -365,5 +390,55 @@ describe("analyze", () => {
     await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
     const bumped = (await readAnalysis(store, "test")).get("test/1")!;
     assert.deepEqual([bumped.tidal, bumped.rules, bumped.requalified], [true, RULES, null]);
+  });
+});
+
+describe("requalifiedMarks", () => {
+  it("writes one at a time and keeps a failed write's stations for the next", async () => {
+    const writes: string[][] = [];
+    let writing = false;
+    let fail = true;
+    const marks = requalifiedMarks(async (ids) => {
+      assert.ok(!writing, "writes overlap");
+      writing = true;
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      writing = false;
+      if (fail) {
+        fail = false;
+        throw new Error("transient");
+      }
+      writes.push(ids);
+    }, 0);
+    await Promise.all([marks.add("a"), marks.add("b")]);
+    assert.deepEqual(await marks.flush(), []);
+    assert.deepEqual(writes.flat().sort(), ["a", "b"]);
+  });
+
+  it("holds stations until the interval passes, and returns those a last write failed", async () => {
+    const writes: string[][] = [];
+    const held = requalifiedMarks(async (ids) => void writes.push(ids), 60_000);
+    await held.add("a");
+    assert.deepEqual(writes, []);
+    assert.deepEqual(await held.flush(), []);
+    assert.deepEqual(writes, [["a"]]);
+    const failing = requalifiedMarks(() => Promise.reject(new Error("down")), 60_000);
+    await failing.add("c");
+    assert.deepEqual(await failing.flush(), ["c"]);
+  });
+});
+
+describe("modalStep", () => {
+  const H = 3_600_000;
+  it("takes the most common step, the shorter on a tie, whatever the gaps", () => {
+    // Three-hourly with a gap: coarser than hourly, as some records are.
+    assert.equal(modalStep([0, 3, 6, 9, 30, 33].map((h) => h * H)), 10800);
+    // A year that switched from hourly to ten minutes keeps the more common.
+    const switched = [
+      ...Array.from({ length: 10 }, (_, i) => i * H),
+      ...Array.from({ length: 30 }, (_, i) => 10 * H + i * 600_000),
+    ];
+    assert.equal(modalStep(switched), 600);
+    assert.equal(modalStep([0, H, 2 * H, 2.5 * H, 3 * H]), 1800);
+    assert.equal(modalStep([0]), null);
   });
 });

@@ -341,6 +341,14 @@ describe("mergeStationList", () => {
   it("refuses an ID that isn't <source>/<source_id>", () => {
     assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })], options), /rws:a/);
   });
+
+  it("refuses a source_id a URL would have to encode", () => {
+    for (const code of ["a b", "a@b", "a+b", "a*", "..", "a%2Fb"])
+      assert.throws(
+        () => mergeStationList([], [station(code, { id: `rws/${code}` })], options),
+        /a URL would have to encode/,
+      );
+  });
 });
 
 describe("seriesPath", () => {

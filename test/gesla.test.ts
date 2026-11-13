@@ -1,3 +1,5 @@
+import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { isUrlSafe } from "../src/store/paths.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
@@ -212,6 +214,33 @@ describe("gesla stations", () => {
     );
   });
 
+  it("lists a record whose file name a URL would have to encode under a URL-safe ID, and withholds the name as an ID", async () => {
+    const at = metadata.replace("seattle-9447130-usa-noaa,", "seattle_@_9447130-usa-noaa,");
+    setTransport(async (url) =>
+      url.includes("records/resolve")
+        ? resolved("https://cvws.example/B/meta/${f}", at.length)
+        : at,
+    );
+    const record = (await gesla.stations()).find((s) => s.name === "Seattle")!;
+    assert.deepEqual(
+      [record.id, record.source_id, record.file],
+      [
+        "gesla/seattle___9447130-usa-noaa",
+        "seattle___9447130-usa-noaa",
+        "seattle_@_9447130-usa-noaa",
+      ],
+    );
+    assert.match(
+      gesla.withheld("seattle_@_9447130-usa-noaa") ?? "",
+      /^renamed gesla\/seattle___9447130-usa-noaa/,
+    );
+    assert.equal(gesla.withheld("seattle___9447130-usa-noaa"), null);
+  });
+
+  it("names only records whose file name is their ID in DROPPED, which is compared with source_id", () => {
+    for (const file of DROPPED) assert.ok(isUrlSafe(file), file);
+  });
+
   it("tags DMI's own records for commercial use, crediting DMI with a link to its CC BY terms", async () => {
     const dmi = metadata.replace(
       "seattle-9447130-usa-noaa,Seattle,9447130,USA,NOAA,",
@@ -356,6 +385,17 @@ describe("gesla links", () => {
 
 describe("gesla levels", () => {
   const station = (source_id: string) => ({ source_id, kind: "coastal" as const });
+
+  it("reads a record by its file name where the ID differs", async () => {
+    const span = [new Date("2015-06-01T00:00Z"), new Date("2015-06-01T02:00Z")] as const;
+    assert.deepEqual(
+      await gesla.levels(
+        { ...station("cuxhaven_made_up"), file: "cuxhavensteubenhft-5990020-deu-wsv" },
+        ...span,
+      ),
+      await gesla.levels(station("cuxhavensteubenhft-5990020-deu-wsv"), ...span),
+    );
+  });
 
   it("reads a record from the zip with GESLA's flags as the store's", async () => {
     const levels = await gesla.levels(
