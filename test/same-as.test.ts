@@ -105,6 +105,12 @@ describe("linkGauges", () => {
       station("uhslc/002a", { lat: NaN }),
     ]);
     assert.deepEqual(unplaced.wide, [["uhslc/002", "uhslc/002a"]]);
+    // A list read back from the store gives a missing position as null, not NaN.
+    const { report: nulled } = linkGauges([
+      station("uhslc/003", { same_as: ["uhslc/003a"] }),
+      station("uhslc/003a", { lat: null as unknown as number, lon: null as unknown as number }),
+    ]);
+    assert.deepEqual(nulled.wide, [["uhslc/003", "uhslc/003a"]]);
   });
 
   it("links stations of different sources by nearness and name", () => {

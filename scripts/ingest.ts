@@ -139,6 +139,7 @@ import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.
 import { withhold, withheldReason } from "../src/withhold.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
+import { ID_KM } from "../src/same-as.ts";
 
 useDiskCache();
 
@@ -334,7 +335,7 @@ async function publish(store: string): Promise<void> {
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
     for (const group of wide)
       console.log(
-        `  same_as group over 10 km wide, or with a station without a position: ${group.join(" ")}`,
+        `  same_as group over ${ID_KM} km wide, or with a station without a position: ${group.join(" ")}`,
       );
     const { joined, fromTide, computed, far, disagree } = result.datums;
     console.log(

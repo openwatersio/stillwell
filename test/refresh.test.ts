@@ -480,6 +480,16 @@ describe("publishStations", () => {
     // A station the source stopped listing stays in the store, with its series.
     const gone = await published([listed("a")]);
     assert.deepEqual([gone.license.commercial_use, gone.stations], [false, 1]);
+    // A source whose own terms bar it stays false, whatever its stations say.
+    await rm(store, { recursive: true });
+    const barred = {
+      ...sourceOf([listed("a")]),
+      metadata: { ...metadata, license: { ...metadata.license, commercial_use: false } },
+    };
+    await refreshSource(store, barred, { now: NOW });
+    await publishStations(store, [barred], ["test"], []);
+    const [own] = JSON.parse(await readFile(sourcesPath(store), "utf8"));
+    assert.equal(own.license.commercial_use, false);
   });
 
   it("publishes every list with its bounds, epochs and links", async () => {

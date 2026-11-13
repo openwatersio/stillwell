@@ -74,8 +74,13 @@ export function pairsToMeasure(
       if (!ea || !eb || !a.products.includes("levels") || !b.products.includes("levels")) continue;
       const times = [a.first, b.first, ea.since, eb.since].filter((t): t is string => !!t);
       const start = Math.max(...times.map(Date.parse));
+      // One interval past each last value, so the window holds it and its end stays exclusive.
+      const past = (s: StoredStation) =>
+        s.last ? Date.parse(s.last) + 1000 * (s.interval_s || 60) : Infinity;
       const end = Math.min(
-        ...[a.last, b.last, ea.until, eb.until].map((t) => (t ? Date.parse(t) : Infinity)),
+        past(a),
+        past(b),
+        ...[ea.until, eb.until].map((t) => (t ? Date.parse(t) : Infinity)),
       );
       if (!a.first || !b.first || !a.last || !b.last || end - start < MIN_HOURS * HOUR_MS) continue;
       pairs.push({ a, b, start, end });

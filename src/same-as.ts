@@ -208,7 +208,8 @@ export interface LinkReport {
   skipped: { a: string; b: string; how: How; reason: string }[];
   /**
    * Groups with two stations more than `ID_KM` apart, or one without a position:
-   * likelier links chained across two gauges than one gauge, worth a look.
+   * likelier links chained across two gauges than one gauge, worth a look. A
+   * source's own link and a `LINKS` decision have no distance limit, so one alone can do it.
    */
   wide: string[][];
 }
@@ -348,7 +349,11 @@ export function linkGauges<T extends Station>(
       r,
       group.reduce((best, s) => (rank(s, best, now, copies, usable) < 0 ? s : best)).id,
     );
-    if (group.some((a, i) => group.slice(i + 1).some((b) => !(km(a, b) <= ID_KM))))
+    const placed = (s: T) => Number.isFinite(s.lat) && Number.isFinite(s.lon);
+    if (
+      !group.every(placed) ||
+      group.some((a, i) => group.slice(i + 1).some((b) => km(a, b) > ID_KM))
+    )
       wide.push(group.map((s) => s.id).sort());
   }
   return {

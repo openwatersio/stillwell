@@ -161,6 +161,14 @@ describe("pairsToMeasure", () => {
     assert.equal(pair!.start, Date.parse("2020-01-01T00:00:00Z"));
   });
 
+  it("ends the window one interval past the earlier last value, so it holds that value", () => {
+    const [pair] = pairsToMeasure([
+      gesla({ last: "2024-12-31T23:00:00Z", interval_s: 3600 }),
+      pegel({ last: "2025-06-01T00:00:00Z", interval_s: 60 }),
+    ]);
+    assert.equal(pair!.end, Date.parse("2025-01-01T00:00:00Z"));
+  });
+
   it("leaves out a pair that shares a reference, since offsets carry through it", () => {
     assert.deepEqual(pairsToMeasure([gesla({ datums: { MSL: -0.2, NHN: 0 } }), pegel()]), []);
   });

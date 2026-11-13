@@ -408,10 +408,16 @@ export interface OffsetRow {
  */
 export function offsetRows(s: StoredStation): OffsetRow[] {
   const current = s.datum === s.chart_datum ? { ...s.datums, [s.datum]: 0 } : s.datums;
+  // A rejected epoch's levels read as the epoch before it, so frozen offsets are that one's too.
+  const frozen = (e: Epoch) =>
+    e.state === "rejected"
+      ? (s.epochs.filter((b) => b.id < e.id && b.state !== "held" && b.state !== "rejected").at(-1)
+          ?.datums ?? e.datums)
+      : e.datums;
   return s.epochs.flatMap((e: Epoch) =>
     Object.entries(
       e.to_current === null
-        ? e.datums
+        ? frozen(e)
         : Object.fromEntries(
             Object.entries(current).map(([k, v]) => [k, round(e.to_current! + v)]),
           ),
