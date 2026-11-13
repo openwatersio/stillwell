@@ -1475,6 +1475,24 @@ describe("requalify script", () => {
     ]);
   });
 
+  it("fails a station whose neighboring year can't be read, and exits", async () => {
+    const { store } = await seed();
+    const path = (year: number) => seriesPath(store, "levels", "coops", "2000", year);
+    // Big enough that the other two reads are still running when the unreadable one fails.
+    const year = (y: number) =>
+      Array.from({ length: 100_000 }, (_, i) => ({
+        time: Date.UTC(y, 0, 1) + i * 60_000,
+        level: Math.sin(i / 100),
+        flag: Flag.good,
+      }));
+    await writeObservations(path(2025), year(2025), "STND");
+    await writeObservations(path(2026), year(2026), "STND");
+    writeFileSync(path(2027), "not parquet");
+    const { status, stdout, stderr } = run(store, ["coops/2000", "2026", "2027"]);
+    assert.equal(status, 1, stderr);
+    assert.match(stdout, /coops\/2000: /);
+  });
+
   it("takes every listed station without a budget", async () => {
     const { store } = await seed();
     const { status, stdout, stderr } = run(store, ["all", "2026", "2027"]);

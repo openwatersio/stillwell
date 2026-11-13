@@ -67,10 +67,19 @@ function serial<T>(work: () => Promise<T>): Promise<T> {
  * Once every connection this thread has started is open, or has failed. Work
  * that needs no connection, such as listing a directory that isn't there,
  * starts one without waiting for it, and a worker thread ended while DuckDB
- * is still starting aborts the whole process.
+ * is starting or working aborts the whole process.
  */
 export async function connected(): Promise<void> {
   await Promise.all(lanes.map((lane) => lane.db.catch(() => undefined)));
+}
+
+/**
+ * `connected`, and once the work queued on each connection has finished,
+ * such as the reads a failed one started beside it.
+ */
+export async function settled(): Promise<void> {
+  await connected();
+  await Promise.all(lanes.map((lane) => lane.queue));
 }
 
 function connection(): Promise<DuckDBConnection> {

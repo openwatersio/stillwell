@@ -1,16 +1,19 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import {
+  readObservationFile,
   readObservations,
+  setConnections,
+  settled,
   readRecent,
   writeObservations,
   writeRecent,
 } from "../src/store/parquet.ts";
 import { recentPath, seriesPath } from "../src/store/paths.ts";
-import { poolUntil, updateRecent } from "../src/store/recent.ts";
+import { poolUntil, qcFor, updateRecent } from "../src/store/recent.ts";
 import { judgeFetched, requalify, requalifyInWorker } from "../src/store/requalify.ts";
 import { sourceOf } from "../src/sources/index.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
@@ -199,6 +202,32 @@ describe("requalify", () => {
     assert.deepEqual(flags, [Flag.suspect, Flag.suspect, Flag.suspect, Flag.suspect, Flag.good]);
   });
 
+  it("judges each of several years as QC does with the whole years either side", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
+    const path = (year: number) => seriesPath(root, "levels", "test", "1", year);
+    const years = [2023, 2024, 2025, 2026];
+    // 4 hours still either side of each New Year, a flatline only with the years either side.
+    const NEW_YEARS = years.slice(1).map((y) => Date.UTC(y, 0, 1));
+    const all = withSourceFlag(hourly(Date.UTC(2023, 0, 1), Date.UTC(2027, 0, 1))).map((r) =>
+      NEW_YEARS.some((t) => Math.abs(r.time - t) <= 4 * HOUR) ? { ...r, level: 0.5 } : r,
+    );
+    const of = (year: number) => all.filter((r) => new Date(r.time).getUTCFullYear() === year);
+    for (const year of years) await writeObservations(path(year), of(year), "NAP");
+    // A tidal river: a 6-hour flatline, and no residual-jump fit to slow the test.
+    const river = { ...station, kind: "river" as const, tidal: true, tide_m: 1 };
+    await requalify(source(), river, root, 2023, 2027);
+    const opts = qcFor(river);
+    for (const year of years) {
+      const expected = qc(fromSource(of(year)), opts, [...of(year - 1), ...of(year + 1)]);
+      assert.deepEqual(
+        (await readObservations(path(year))).map((r) => r.flag),
+        expected.map((r) => r.flag),
+        `${year}`,
+      );
+    }
+    assert.equal((await readObservations(path(2025)))[0]!.flag, Flag.suspect);
+  });
+
   it("writes the same in a worker as here", async () => {
     // A real source, since the worker finds it by its ID.
     const real = { ...station, id: "pegelonline/1", source: "pegelonline", kind: "river" as const };
@@ -259,6 +288,25 @@ describe("requalify", () => {
         warnings: [],
       },
     );
+  });
+});
+
+describe("settled", () => {
+  it("waits for a read started beside one that failed", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-settled-"));
+    const big = seriesPath(root, "levels", "test", "1", 2025);
+    const bad = seriesPath(root, "levels", "test", "1", 2026);
+    await writeObservations(big, withSourceFlag(hourly(Date.UTC(2000, 0, 1), NEW_YEAR)), "NAP");
+    writeFileSync(bad, "not parquet");
+    // Two lanes, so the bad read doesn't wait behind the big one.
+    setConnections(2);
+    let read = false;
+    const reading = readObservationFile(big).then(() => (read = true));
+    await assert.rejects(readObservationFile(bad));
+    await settled();
+    assert.ok(read);
+    await reading;
+    setConnections(1);
   });
 });
 

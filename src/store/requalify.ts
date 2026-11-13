@@ -129,9 +129,12 @@ let tasks = 0;
  * such as its own DuckDB. Each file's stats reach `written` as it's written.
  * A worker that dies fails the stations it holds with `WorkerDied`, which the
  * caller keeps marked in the years file, since it may have written a file it
- * couldn't report. Terminating a worker whose DuckDB has started aborts the
- * whole process with @duckdb/node-api 2.0.0-r.1, as running out of memory did
- * on one thread; the run's years marks then stay for the next reconcile too.
+ * couldn't report. With @duckdb/node-api 2.0.0-r.1, terminating a worker
+ * whose DuckDB has started aborts the whole process, as running out of memory
+ * did on one thread, and so does the process ending while a worker's DuckDB
+ * is starting or working, which the worker waits out for its own station
+ * (`settled`); the run's
+ * years marks then stay for the next reconcile too.
  */
 export function requalifyInWorker(
   source: string,
