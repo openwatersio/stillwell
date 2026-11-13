@@ -121,7 +121,7 @@ export function mergeStationList(
       // A new station with a split is reported as an existing one would be.
       const starts = splitStarts(options.splits?.[s.id], options.offsets);
       const days = epochs
-        .filter((e) => starts.has(e.since ?? ""))
+        .filter((e) => e.state !== "rejected" && starts.has(e.since ?? ""))
         .map((e) => e.since!.slice(0, 10));
       if (days.length)
         changes.push({

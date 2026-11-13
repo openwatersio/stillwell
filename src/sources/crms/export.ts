@@ -24,7 +24,7 @@ const WORKERS = 8;
  * name, so a build that reads or classifies rows differently splits again.
  * Raise it with any change to either, such as the adapter's `SUSPECT`.
  */
-const FORMAT = 2;
+const FORMAT = 3;
 /** The share of rows, beyond 100, that may be misshapen before the export counts as a new format. */
 const MISSHAPEN_SHARE = 0.01;
 const CACHE_DIR = process.env.STILLWELL_CACHE ?? ".cache";

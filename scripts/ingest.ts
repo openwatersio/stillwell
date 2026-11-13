@@ -17,7 +17,7 @@
  *
  * `stations` refreshes each source's list in the store, stations/<source>.parquet,
  * after snapshotting the previous one to history/, then writes stations.parquet,
- * sources.json and errata.json, unless `--no-publish`; `publish` writes only those. It
+ * sources.json, errata.json and their definitions (datapackage.json), unless `--no-publish`; `publish` writes only those. It
  * changes no file in the repo. A new source's first refresh starts its list.
  * `backfill` writes every product a station has over [start, end) (dates as YYYY or YYYY-MM-DD, end
  * exclusive) into its yearly files, replacing that range and keeping the rest,
@@ -149,6 +149,7 @@ import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.
 import { withhold, withheldReason } from "../src/withhold.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
+import { ID_KM } from "../src/same-as.ts";
 
 useDiskCache();
 
@@ -351,7 +352,7 @@ function storesOf(source: Source): string[] {
 }
 
 /**
- * Rebuild `stations.parquet`, `sources.json` and `errata.json` for `store`, unless a source
+ * Rebuild `stations.parquet`, `sources.json`, `errata.json` and their definitions for `store`, unless a source
  * that has had a list there, by the published file or its history, has none.
  */
 async function publish(store: string): Promise<void> {
@@ -374,7 +375,7 @@ async function publish(store: string): Promise<void> {
   const result = await publishStations(store, held, expected, errata);
   if ("count" in result) {
     console.log(`${stationsPath(store)}: ${result.count} stations`);
-    const { pairs, dropped, skipped, large } = result.links;
+    const { pairs, dropped, skipped, wide } = result.links;
     for (const [pair, counts] of Object.entries(pairs).sort())
       console.log(
         `  same_as ${pair}: ${Object.entries(counts)
@@ -384,7 +385,10 @@ async function publish(store: string): Promise<void> {
     for (const d of dropped) console.log(`  same_as dropped: ${d.from} to ${d.to}, ${d.reason}`);
     for (const k of skipped)
       console.log(`  same_as skipped: ${k.a} to ${k.b} by ${k.how}, ${k.reason}`);
-    for (const group of large) console.log(`  same_as large group: ${group.join(" ")}`);
+    for (const group of wide)
+      console.log(
+        `  same_as group over ${ID_KM} km wide, or with a station without a position: ${group.join(" ")}`,
+      );
     const { joined, fromTide, computed, far, disagree } = result.datums;
     console.log(
       `  datums: ${joined} joined to slackwater-database, ${fromTide} with its datums, ${computed} computed from a linked series`,

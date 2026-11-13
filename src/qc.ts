@@ -30,9 +30,9 @@ export interface QcOptions {
   /** The smallest jump from its neighbors that counts as a spike, in meters. */
   spike_m?: number;
   /**
-   * Whether a level far outside the series' own range is suspect. Off for
-   * sources with regulated pools, which sit nearly flat for months and then
-   * rise meters in a flood.
+   * Whether a level far outside the series' own range, less what the other rules
+   * marked, is suspect. Off for sources with regulated pools, which sit nearly
+   * flat for months and then rise meters in a flood.
    */
   outliers?: boolean;
   /**
@@ -131,8 +131,12 @@ export function qc<T extends Observation>(
   const all = unique([...out, ...context.filter((r) => !times.has(r.time))]).filter((r) =>
     possible(r.level),
   );
+  // What this run's rules marked, apart from flags the rows came with, such as an older run's.
+  const marked = new Set<Observation>();
   const worsen = (r: Observation, flag: Flag) => {
-    if (own.has(r)) r.flag = Math.max(r.flag, flag) as Flag;
+    if (!own.has(r)) return;
+    r.flag = Math.max(r.flag, flag) as Flag;
+    if (flag >= Flag.suspect) marked.add(r);
   };
 
   const middle = median(out.filter((r) => possible(r.level)).map((r) => r.level)) ?? 0;
@@ -239,8 +243,15 @@ export function qc<T extends Observation>(
 
   // Outliers: far outside the series' own range, such as a sensor reading its zero.
   // The floor keeps a short, nearly flat window from flagging ordinary changes.
+  // The range is that of values the rules above didn't mark in this run, so a gauge
+  // whose flatlined floor is most of its values, as in a harbor that dries, doesn't
+  // make its tide the outlier. Flags the rows came with don't count, so the result
+  // doesn't depend on an earlier run's marks.
   if (outliers) {
-    const levels = out.map((r) => r.level).filter(possible);
+    const clear = out.filter((r) => possible(r.level) && !marked.has(r));
+    const levels = (clear.length ? clear : out.filter((r) => possible(r.level))).map(
+      (r) => r.level,
+    );
     const center = median(levels) ?? 0;
     const outlier = Math.max(10 * mad(levels), 4 * spike_m);
     out.forEach((r) => {

@@ -11,6 +11,7 @@ import {
   type EpochOptions,
 } from "../src/epochs.ts";
 import type { Epoch } from "../src/schema.ts";
+import { source as refmar } from "../src/sources/refmar/index.ts";
 
 const options = (fields: Partial<EpochOptions> = {}): EpochOptions => ({
   station: "x/1",
@@ -55,6 +56,44 @@ describe("firstEpochs", () => {
     const [epoch] = firstEpochs(fetched, { ...options(), station: "x/1", archive: "current" });
     // The reference keeps its date, so a later change before it is still held.
     assert.deepEqual([epoch!.since, epoch!.reference_since], [null, "2019-11-02T00:00:00Z"]);
+  });
+
+  it("applies a decision's earlier end to the epoch before a split, from the first list", () => {
+    const epochs = firstEpochs(
+      { datum: "ZI", datums: {}, reference: null },
+      options({
+        station: "x/1",
+        splits: { "x/1": [{ since: "2020-03-06", note: "the zero moved" }] },
+        decisions: {
+          [epochKey("x/1", "2020-03-06T00:00:00Z")]: { until: "2020-03-04", note: "resumed early" },
+        },
+      }),
+    );
+    assert.deepEqual(
+      epochs.map((e) => [e.since, e.until]),
+      [
+        [null, "2020-03-05T00:00:00Z"],
+        ["2020-03-06T00:00:00Z", null],
+      ],
+    );
+  });
+
+  it("ends Hiva Oa's first epoch at the start of 5 March 2020 under REFMAR's own overrides", () => {
+    const epochs = firstEpochs(
+      { datum: "ZI", datums: {}, reference: null },
+      options({
+        station: "refmar/495",
+        splits: refmar.overrides!.splits,
+        decisions: refmar.overrides!.epochs!,
+      }),
+    );
+    assert.deepEqual(
+      epochs.map((e) => [e.since, e.until, e.to_current]),
+      [
+        [null, "2020-03-05T00:00:00Z", 1.35],
+        ["2020-03-06T00:00:00Z", null, 0],
+      ],
+    );
   });
 
   it("keeps the start of a zero dated ahead, even when the source's history is in today's reference", () => {

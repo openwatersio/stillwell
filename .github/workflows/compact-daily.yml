@@ -5,7 +5,7 @@ name: Compact daily
 # failed run leaves the file it had, and a rerun writes nothing new. Then it
 # writes each station's first and last level, and its earliest preliminary
 # value, to stations/bounds/<source>.parquet, and rebuilds stations.parquet,
-# sources.json and errata.json from every source's list and bounds.
+# sources.json, errata.json and datapackage.json from every source's list and bounds.
 on:
   schedule:
     # Between hourly runs; the fold covers six days, so a late hourly run, or

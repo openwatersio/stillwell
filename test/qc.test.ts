@@ -152,3 +152,31 @@ describe("qc sensor span", () => {
     );
   });
 });
+
+describe("qc outliers", () => {
+  const options = qcFor({ kind: null, tidal: true, tide_m: 3 });
+  // REFMAR 6438, Cancale, 2019: the gauge reads its floor of 7.3 m for half of each tide.
+  const drying = () =>
+    tide(1000, 10 * MIN, 6).map((r) => ({ ...r, level: Math.max(7.3, 7.3 + r.level) }));
+
+  it("judges the range by values the other rules didn't mark, so a harbor that dries keeps its tide", () => {
+    const out = qc(drying(), options);
+    assert.ok(out.filter((r) => r.level > 8).every((r) => r.flag === Flag.good));
+    assert.ok(out.some((r) => r.level === 7.3 && r.flag === Flag.suspect));
+  });
+
+  it("doesn't let marks the rows came with, such as an older run's, decide the range", () => {
+    // A year stored under the old rule, with its tide marked, and one crest fetched again.
+    const rows = drying().map((r) => ({ ...r, flag: r.level > 8.3 ? Flag.suspect : Flag.good }));
+    const crest = rows.findIndex((r) => r.level > 13);
+    rows[crest]!.flag = Flag.good;
+    assert.equal(qc(rows, options)[crest]!.flag, Flag.good);
+  });
+
+  it("flags a level that drifts far outside the tide, which no other rule catches", () => {
+    const rows = tide(1000, 10 * MIN);
+    for (let i = 400; i < 600; i++) rows[i]!.level += 12 * (1 - Math.abs(i - 500) / 100);
+    assert.equal(qc(rows, { ...options, outliers: false })[500]!.flag, Flag.good);
+    assert.equal(qc(rows, options)[500]!.flag, Flag.suspect);
+  });
+});
