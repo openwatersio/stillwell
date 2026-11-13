@@ -1,0 +1,107 @@
+---
+title: R
+description: Read the store from R with DuckDB.
+sidebar:
+  order: 4
+---
+
+The [duckdb](https://r.duckdb.org/) package runs the same SQL as the [DuckDB CLI](/docs/examples/tools/duckdb/) and returns data frames. It reads the store's files over HTTPS, fetching only the parts a query needs.
+
+Every example uses Hoek van Holland, `rws/hoekvanholland`.
+
+## Install
+
+```r
+install.packages(c("duckdb", "DBI"))
+```
+
+```r
+library(DBI)
+
+store <- "https://stillwell.openwaters.io"
+con <- dbConnect(duckdb::duckdb())
+dbExecute(con, "SET TimeZone = 'UTC'")
+```
+
+DuckDB downloads its `httpfs` extension the first time it reads an `https://` path.
+
+## Read the station list
+
+[`stations.parquet`](/docs/reference/stations/) has one row per station. The active ones with observed levels:
+
+```r
+stations <- dbGetQuery(con, sprintf("
+  SELECT id, name, lat, lon, datum
+  FROM '%s/stations.parquet'
+  WHERE status = 'active' AND list_contains(products, 'levels')
+", store))
+```
+
+## Find a station
+
+```r
+dbGetQuery(con, sprintf("
+  SELECT id, name, datum, datums['LAT'] AS lat_offset_m
+  FROM '%s/stations.parquet'
+  WHERE name ILIKE '%%hoek van holland%%' AND source = 'rws'
+", store))
+```
+
+`%%` is a literal `%` in `sprintf`.
+
+## Read a year of levels
+
+One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+
+```r
+levels <- dbGetQuery(con, sprintf("
+  SELECT time, level_m
+  FROM '%s/obs/rws/hoekvanholland/2024.parquet'
+  WHERE flag <= 2
+  ORDER BY time
+", store))
+```
+
+## Read several years
+
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains:
+
+```r
+years <- dbGetQuery(con, sprintf("
+  SELECT year FROM '%s/stations/years/rws.parquet'
+  WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+  ORDER BY year
+", store))$year
+files <- sprintf("'%s/obs/rws/hoekvanholland/%d.parquet'", store, years)
+
+levels <- dbGetQuery(con, sprintf("
+  SELECT time, level_m
+  FROM read_parquet([%s], union_by_name = true)
+  WHERE flag <= 2
+  ORDER BY time
+", paste(files, collapse = ", ")))
+```
+
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path, which DuckDB's `url_encode(url_encode(source_id))` builds. `url_encode` also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today.
+
+## Convert to another datum
+
+Adding the station's `datums['LAT']` offset refers Hoek van Holland's NAP levels to LAT:
+
+```r
+levels <- dbGetQuery(con, sprintf("
+  SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
+  FROM '%1$s/obs/rws/hoekvanholland/2024.parquet' o,
+    (SELECT datums FROM '%1$s/stations.parquet' WHERE id = 'rws/hoekvanholland') s
+  WHERE o.flag <= 2
+  ORDER BY o.time
+", store))
+```
+
+[Datums](/docs/guides/datums/) covers earlier epochs and the credits owed for offsets.
+
+## Things to know
+
+- DuckDB returns times as `POSIXct`. Run `SET TimeZone = 'UTC'` so SQL that works with dates and hours, such as `date_trunc`, works in UTC too.
+- Close the connection with `dbDisconnect(con, shutdown = TRUE)` when you're done.
+- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.

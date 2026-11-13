@@ -1,0 +1,58 @@
+---
+// One erratum from errata.json, folded to its id and what the store does.
+import { markdown } from "../lib/render";
+import { stationLink, stationsById } from "../lib/store";
+
+interface Props {
+  erratum: Record<string, any>;
+}
+const { erratum: e } = Astro.props;
+// Errata can name stations the store doesn't list, such as withheld ones, which have no page.
+const byId = await stationsById();
+const n = e.stations?.length ?? 0;
+// A null list means every station of the source; an empty one means the affected stations aren't listed.
+const where = n
+  ? `${n} ${n === 1 ? "station" : "stations"}`
+  : e.stations === null
+    ? "source-wide"
+    : "stations not listed";
+const when =
+  e.since || e.until
+    ? `, ${e.since?.slice(0, 10) ?? "…"} until ${e.until?.slice(0, 10) ?? "…"}`
+    : "";
+---
+
+<details>
+  <summary>
+    <strong>{e.id}</strong>: {`${e.handling}, ${where}${when}`}
+  </summary>
+  <Fragment set:html={markdown(e.error)} />
+  <p>
+    <strong>What the store does:</strong>
+  </p>
+  <Fragment set:html={markdown(e.response)} />
+  {n > 0 && (
+    <p>
+      {e.stations.slice(0, 20).map((id: string, i: number) => (
+        <>
+          {i > 0 && ", "}
+          {byId.has(id) && stationLink(id) ? <a href={stationLink(id)}>{id}</a> : id}
+        </>
+      ))}
+      {n > 20 && `, and ${n - 20} more`}
+    </p>
+  )}
+  {e.evidence && (
+    <>
+      <p>
+        <strong>Evidence:</strong>
+      </p>
+      <Fragment set:html={markdown(e.evidence)} />
+    </>
+  )}
+  {e.url && (
+    <p>
+      <a href={e.url}>The entry in the repository</a>
+    </p>
+  )}
+</details>

@@ -1,0 +1,155 @@
+---
+// A published file's columns, from the store's own datapackage.json (src/store/files.ts) and, for JSON files, the
+// JSON Schema it names. The build fails when a Parquet file's live columns and its definition disagree.
+import { json, rows } from "../lib/store";
+import { url } from "../lib/paths";
+import markdownit from "markdown-it";
+
+interface Props {
+  /** The resource's name in datapackage.json, such as stations, obs or errata. */
+  resource: string;
+}
+const { resource } = Astro.props;
+const pkg = await json("datapackage.json");
+const r = pkg.resources.find((x: any) => x.name === resource);
+if (!r) throw new Error(`datapackage.json has no resource ${resource}`);
+
+type Row = {
+  name: string;
+  type: string;
+  required: boolean;
+  optional: boolean;
+  description: string;
+  depth: number;
+};
+const out: Row[] = [];
+
+if (r.jsonSchema) {
+  // A JSON file: its items' properties, with an object property's own properties beneath it.
+  const schema = await json(r.jsonSchema);
+  const walk = (item: any, prefix: string, depth: number) => {
+    for (const [name, p] of Object.entries<any>(item.properties ?? {})) {
+      const types = [p.type].flat().filter(Boolean);
+      out.push({
+        name: prefix + name,
+        type: types
+          .map((t: string) => (t === "array" && p.items?.type ? `${p.items.type}[]` : t))
+          .join(" or "),
+        required: (item.required ?? []).includes(name),
+        optional: false,
+        description: p.description ?? "",
+        depth,
+      });
+      if (p.properties) walk(p, `${prefix}${name}.`, depth + 1);
+    }
+  };
+  walk(schema.items ?? schema, "", 0);
+} else {
+  // A Parquet file: its fields, with a struct's fields beneath it.
+  const walk = (fields: any[], prefix: string, depth: number) => {
+    for (const f of fields) {
+      out.push({
+        name: prefix + f.name,
+        type: f.duckdbType ?? f.type,
+        required: !!f.constraints?.required,
+        optional: !!f.optional,
+        description: f.description ?? "",
+        depth,
+      });
+      if (f.fields) walk(f.fields, `${prefix}${f.name}.`, depth + 1);
+    }
+  };
+  walk(r.schema.fields, "", 0);
+  const live = (await rows(`DESCRIBE SELECT * FROM '${url(r.path)}'`)).map((c) => c.column_name);
+  const defined = r.schema.fields.map((f: any) => f.name);
+  const missing = defined.filter((n: string) => !live.includes(n));
+  const extra = live.filter((n: string) => !defined.includes(n));
+  // Top-level names only: types and nested fields aren't compared. Older files can lack an optional column
+  // (such as source_flag); any other difference is drift.
+  const optional = new Set(r.schema.fields.filter((f: any) => f.optional).map((f: any) => f.name));
+  if (extra.length || missing.some((n: string) => !optional.has(n)))
+    throw new Error(
+      `${r.path}: live columns differ from datapackage.json (missing ${missing.join(", ") || "none"}; extra ${extra.join(", ") || "none"})`,
+    );
+}
+
+const md = markdownit({ html: false, linkify: true });
+// Nested types spell out every field, which the rows beneath them describe.
+const short = (type: string) =>
+  type
+    .replace(/^STRUCT\(.*\)\[\]$/, "STRUCT[]")
+    .replace(/^STRUCT\(.*\)$/, "STRUCT")
+    .replace(/^MAP\(VARCHAR, STRUCT\(.*\)\)$/, "MAP(VARCHAR, STRUCT)");
+const id = (name: string) => `column-${name.replaceAll(".", "-")}`;
+---
+
+<div class="schema not-content">
+  <p>
+    <code>{r.pattern ?? r.path}</code>
+    {r.sort && (
+      <span>
+        , sorted by {r.sort.map((s: string) => s.replace(/ NULLS FIRST$/, "")).join(", ")}
+      </span>
+    )}
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Type</th>
+        <th>Meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      {out.map((c) => (
+        <tr id={id(c.name)} class:list={{ nested: c.depth > 0 }}>
+          <td style={`padding-left: ${0.6 + c.depth * 1.2}rem`}>
+            <code>{c.depth ? c.name.split(".").at(-1) : c.name}</code>
+          </td>
+          <td class="type">
+            {short(c.type)}
+            {c.optional ? (
+              <span class="nullable">, optional</span>
+            ) : (
+              !c.required && <span class="nullable">, nullable</span>
+            )}
+          </td>
+          <td set:html={md.renderInline(c.description)} />
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .schema {
+    margin-block: 1rem;
+    font-size: var(--sl-text-sm);
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  td:first-child {
+    white-space: nowrap;
+  }
+  .nested td {
+    color: var(--sl-color-gray-2);
+  }
+  .type {
+    font-family: var(--sl-font-mono);
+    color: var(--sl-color-gray-3);
+    white-space: nowrap;
+  }
+  .nullable {
+    font-family: var(--sl-font-system);
+  }
+</style>

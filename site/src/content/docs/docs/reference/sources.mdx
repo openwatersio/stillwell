@@ -1,0 +1,46 @@
+---
+title: sources.json
+description: One entry per source, with its license, credit, contact, terms and whether its preliminary values become final.
+sidebar:
+  order: 6
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+`sources.json` has one object per source in the store: the agency or dataset that publishes its stations' values, with the terms they come under and where to report an error. It's rebuilt with [`stations.parquet`](/docs/reference/stations/) each night and after each monthly refresh. It's a JSON array, which DuckDB reads with `read_json`.
+
+## Schema
+
+<Schema resource="sources" />
+
+## Examples
+
+Each source with its license:
+
+<QueryResult
+  sql={`SELECT id, license.id AS license, license.commercial_use AS commercial_use, finalizes, stations
+FROM read_json('https://stillwell.openwaters.io/sources.json')
+ORDER BY id`}
+/>
+
+Sources whose terms bar commercial use, with what they say:
+
+<QueryResult
+  sql={`SELECT id, license.name AS license, terms
+FROM read_json('https://stillwell.openwaters.io/sources.json')
+WHERE NOT license.commercial_use
+ORDER BY id`}
+/>
+
+Each source's stations in `stations.parquet`, active and in all, and how many differ from the source's commercial terms:
+
+<QueryResult
+  sql={`SELECT j.id, j.stations AS active, count(s.id) AS all_stations,
+  count(*) FILTER (s.commercial_use <> j.license.commercial_use) AS own_terms
+FROM read_json('https://stillwell.openwaters.io/sources.json') j
+JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.source = j.id
+GROUP BY ALL ORDER BY j.id`}
+/>
+
+See the [Terms guide](/docs/guides/terms/) for what `license`, `commercial_use` and `attribution` require.

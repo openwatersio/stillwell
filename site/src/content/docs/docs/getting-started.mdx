@@ -1,0 +1,97 @@
+---
+title: Getting started
+description: Read the store over HTTPS with DuckDB, find a station, build file paths, read many files and cache them.
+---
+
+import QueryResult from "../../../components/QueryResult.astro";
+
+The store is a set of Parquet and JSON files at `https://stillwell.openwaters.io/`. There's no account, key or API to call: anything that reads Parquet over HTTPS can query it where it stands. The examples here use the [DuckDB CLI](https://duckdb.org/docs/installation/) (`brew install duckdb`); each one also runs in your browser from its link, and [Tools](/docs/examples/tools/duckdb/) has the same in Python, JavaScript and R.
+
+## A first query
+
+The first observed levels of 2024 at Hoek van Holland, leaving out values flagged as suspect or bad:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m, flag, datum
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2
+ORDER BY time LIMIT 5`}
+/>
+
+These hold for every series in the store:
+
+- **Times are UTC**, as `TIMESTAMP WITH TIME ZONE`. Set your session to UTC (`SET TimeZone = 'UTC'`), or tools such as DuckDB and pandas show them in your local zone.
+- **Levels are meters**, in the datum named on every row. A station's `datums` in `stations.parquet` refers them to other datums: see [Datums](/docs/guides/datums/).
+- **`level_m` is a 32-bit float**, so `0.07` reads as `0.07000000029802322` once it's widened to 64 bits, as adding an offset does. Round results to 3 places, or cast `level_m` to 64 bits first.
+- **`flag <= 2`** keeps every value not flagged as suspect or bad, including preliminary ones. [Quality flags](/docs/guides/quality-flags/) has the scale.
+- **Select only the columns you need.** Readers that make ranged requests, such as DuckDB, Polars and hyparquet, then fetch only those columns' bytes.
+
+## What's in the store
+
+```
+stations.parquet                                one row per station
+sources.json                                    each source's license, credit and contact
+errata.json                                     errors in what sources publish, and what the store does about them
+stations/years/<source>.parquet                 which year files each station has, with counts by flag
+stations/offsets.parquet                        each station's offsets to each datum, by datum epoch
+stations/links.parquet                          offsets measured between linked stations' levels
+recent/<source>.parquet                         the last 7 days of observed levels, updated every hour
+obs/<source>/<station>/<year>.parquet           observed levels
+extremes/<source>/<station>/<year>.parquet      the source's observed high and low waters
+predictions/<source>/<station>/<year>.parquet   the source's predicted curve
+predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted high and low waters
+```
+
+Each has a page under Reference: [Stations](/docs/reference/stations/), [Observations](/docs/reference/observations/), [Predictions](/docs/reference/predictions/), [Offsets](/docs/reference/offsets/), [Links](/docs/reference/links/), [Sources](/docs/reference/sources/) and [Errata](/docs/reference/errata/).
+
+## Finding a station
+
+Every file is named by a station's `id`, `<source>/<source_id>`. Find it in `stations.parquet`, by name:
+
+<QueryResult
+  sql={`SELECT id, name, products, first, last
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%cuxhaven%'
+ORDER BY id`}
+/>
+
+Several sources can carry the same gauge, as GESLA, UHSLC and PEGELONLINE all carry Cuxhaven. `preferred` names the one to use for its observed levels: [Gauges](/docs/guides/gauges/) explains how.
+
+## File paths
+
+A series file's path is its product, the station's `id` and the year: `obs/rws/hoekvanholland/2024.parquet` holds `rws/hoekvanholland`'s observed levels for 2024.
+
+- **Encoding.** The file's key holds the `source_id` URL-encoded, so a URL encodes it again. For most stations that changes nothing. One with a reserved character in its `source_id`, such as `gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs`, is at `obs/gesla/byu_queue_de_tortue_%2540_riceville_la-8012300-usa-usgs/`: `@` is `%2540`, not `%40`. In code, encode the `source_id` twice: `url_encode(url_encode(source_id))` in DuckDB SQL, `encodeURIComponent(encodeURIComponent(source_id))` in JavaScript, `quote(quote(source_id, safe="!*'()"), safe="!*'()")` in Python. DuckDB's `url_encode` also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today.
+- **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after the station: `obs/<source>/<station>/2/<year>.parquet`. Most stations have one epoch and only the plain path. [Datum epochs](/docs/guides/datums/#datum-epochs) shows how to read across several.
+
+## Reading many files
+
+HTTPS has no directory listing, so wildcards such as `obs/rws/*/2024.parquet` don't work. Build the list of paths and pass it to `read_parquet`, with `union_by_name = true` when you select `*`, since some older files lack a column. A missing file is an error, so list only files that exist: `stations/years/<source>.parquet` has a row for every year file a station has.
+
+<QueryResult
+  sql={`SET VARIABLE files = (
+  SELECT list('https://stillwell.openwaters.io/obs/' || id || '/' || year || '.parquet' ORDER BY year)
+  FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+  WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+);
+SELECT year(time) AS year, count(*) AS values, round(avg(level_m), 3) AS mean_m
+FROM read_parquet(getvariable('files'), union_by_name = true)
+WHERE flag <= 2
+GROUP BY ALL ORDER BY year`}
+/>
+
+The years list has a row per epoch and year, and `epoch = 1` keeps to the station's plain path. That builds paths from the `id` directly, which works for an `id` whose `source_id` needs no encoding; encode it as above otherwise. [Observations](/docs/reference/observations/) describes the years list's columns.
+
+## Caching
+
+To keep a local copy of a year, read its row in `stations/years/<source>.parquet` first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum.
+
+`recent/<source>.parquet` is rewritten every hour, so read it fresh each time rather than caching it.
+
+## Next
+
+- [Stations](/docs/reference/stations/) for everything `stations.parquet` says about a station.
+- [Observations](/docs/reference/observations/) for the values themselves and which years exist.
+- [Quality flags](/docs/guides/quality-flags/) and [Datums](/docs/guides/datums/) for what the values mean.
+- [Tools](/docs/examples/tools/duckdb/) and [Notebooks](/docs/examples/notebooks/marimo/) for reading the store from where you work.

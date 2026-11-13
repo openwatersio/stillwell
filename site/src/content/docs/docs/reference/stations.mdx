@@ -1,0 +1,132 @@
+---
+title: stations.parquet
+description: One row per station, with its location, record, datums, linked stations, terms and tide.
+sidebar:
+  order: 1
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+`stations.parquet` has one row for every station in the store, active or not. A station is one source's series at one place, and every other file names a station by its `id`. The file is rebuilt after compaction each night, so `first` and `last` usually trail the store by about a day.
+
+## Schema
+
+<Schema resource="stations" />
+
+## Identity
+
+`id` is `source` and `source_id` joined by a slash, and every other file names the station by it. `name` is the source's, and `source_url` links to the station at its source.
+
+## Location
+
+`lat` and `lon` place the station, `country_code` its country, and `kind` the water it measures.
+
+## Record
+
+`products` lists the files the station has. `first` and `last` bound its observations across all epochs, and `interval_s` is how often it reports. The years it has, with counts by flag, are in [`stations/years/<source>.parquet`](/docs/reference/observations/#which-years-exist).
+
+## Status
+
+`status` says whether the source still lists the station, and `live` whether it's polled hourly into [`recent/`](/docs/reference/observations/#the-latest-values). `min_interval_s` is the source's own limit on how often it may be asked for.
+
+## Datums
+
+`datum` names what the current epoch's levels are measured from. `datums` gives the offsets to other datums, `datums_source` where each came from, `datums_epoch` the period a tidal datum was reduced over, and `datums_attribution` the credits those offsets owe. `chart_datum` is the datum charts use, and `frame` says whether levels share a zero with the `tide_station`'s predictions. `epochs` lists every reference the station has had; each has its own series files. See [Datums](/docs/guides/datums/) for converting levels and [datum epochs](/docs/guides/datums/#datum-epochs) for reading across them.
+
+## Linked stations
+
+A gauge can appear in several sources. `same_as` lists the other stations of the same gauge, `preferred` names the one to read for its observed levels, and `tide_station` names its record in slackwater-database. All three are worked out on every build. See [Gauges](/docs/guides/gauges/) for how stations are matched and preferred.
+
+## Terms
+
+`license`, `commercial_use` and `attribution` give the terms of the station's data, which follow a contributor's own where those apply. Offsets that don't come from the source carry their own credits in `datums_attribution`. The source's terms are in [`sources.json`](/docs/reference/sources/). See [Terms](/docs/guides/terms/) for what they require.
+
+## Tide
+
+`tidal` and `tide_m` say whether the levels carry a tide, measured from the values rather than taken from `kind`: a river can be tidal, and the Baltic isn't. Some of Stillwell's quality checks depend on `tidal`; [Quality flags](/docs/guides/quality-flags/#stillwells-checks) says which.
+
+## Quality
+
+`source_qc_start` says where the source's own checks start, and `source_qc_start_inferred` whether Stillwell inferred that date. `errata` lists the known errors in what the source publishes for the station. See [Quality flags](/docs/guides/quality-flags/).
+
+## Examples
+
+How many active stations each source has, and in which datums:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, string_agg(DISTINCT datum, ', ' ORDER BY datum) AS datums
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active'
+GROUP BY source ORDER BY source`}
+/>
+
+A station by name:
+
+<QueryResult
+  sql={`SELECT id, name, kind, status, first, last
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%hoek van holland%'
+ORDER BY id`}
+/>
+
+The nearest active stations with observed levels to a point, here the mouth of the Nieuwe Waterweg, one per gauge:
+
+<QueryResult
+  sql={`SELECT id, name,
+  round(6371 * acos(least(1,
+    sin(radians(lat)) * sin(radians(51.98)) +
+    cos(radians(lat)) * cos(radians(51.98)) * cos(radians(lon - 4.12)))), 2) AS km
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active' AND list_contains(products, 'levels') AND preferred = id
+ORDER BY km LIMIT 5`}
+/>
+
+Each offset at a station, where it came from, and the period a tidal datum was reduced over:
+
+<QueryResult
+  sql={`SELECT key AS datum, datums[key] AS offset_m, datums_source[key] AS source,
+  datums_epoch[key].start AS reduced_from, datums_epoch[key]."end" AS reduced_to
+FROM 'https://stillwell.openwaters.io/stations.parquet',
+  unnest(map_keys(datums)) AS t(key)
+WHERE id = 'pegelonline/5990020'
+ORDER BY datum`}
+/>
+
+A station's epochs, one row each:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT e.id, e.datum, e.since, e.until, e.to_current, e.state
+FROM 'https://stillwell.openwaters.io/stations.parquet', unnest(epochs) t(e)
+WHERE id = 'refmar/108'
+ORDER BY e.id`}
+/>
+
+A gauge's stations in each source:
+
+<QueryResult
+  sql={`SELECT id, products, preferred, tide_station
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%cuxhaven%'
+ORDER BY id`}
+/>
+
+Tidal stations whose terms allow commercial use, by source:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, round(median(tide_m), 2) AS median_tide_m
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE tidal AND commercial_use AND status = 'active'
+GROUP BY source ORDER BY stations DESC`}
+/>
+
+Where sources start checking their values, for the stations that have a date:
+
+<QueryResult
+  sql={`SELECT source, count(*) AS stations, min(source_qc_start)::DATE AS earliest,
+  max(source_qc_start)::DATE AS latest, bool_or(source_qc_start_inferred) AS any_inferred
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE source_qc_start IS NOT NULL
+GROUP BY source ORDER BY source`}
+/>

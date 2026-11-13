@@ -1,0 +1,62 @@
+---
+title: stations/links.parquet
+description: The offsets measured each month between the levels of linked stations that share no reference datum.
+sidebar:
+  order: 5
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+`stations/links.parquet` holds offsets measured between the levels of two linked stations, not the links themselves, which are `same_as` in [`stations.parquet`](/docs/reference/stations/). It has a row for each pair of stations of one gauge within 1 km of each other that share no reference datum, where one has MSL, LAT or a chart datum of its own (not `computed`) that the other lacks. The Monthly workflow measures it, and publish carries datums across a pair by its offset. See the [Datums guide](/docs/guides/datums/) for how carried offsets reach `datums`.
+
+## Schema
+
+<Schema resource="links" />
+
+## How a pair is measured
+
+Each pair is measured in the latest calendar year of their open epochs that measures, trying up to three years in which both stations' files hold at least 30 days, latest first. At each minute both stations have a value flagged good or preliminary, it takes the first such minute in each hour, and `offset_m` is the median of the differences over those hours. A pair needs at least 30 days of hours and two months with at least 10 days each.
+
+`spread_m` shows whether the offset holds. Two series of one gauge differ by a constant, so their monthly medians agree. A datum step inside the year, or two gauges whose levels part with a river's flow, spreads wider.
+
+## Which rows publish uses
+
+Publish carries offsets along a pair whose `spread_m` is 1 cm or less and whose `a_epoch` and `b_epoch` are still the stations' open epochs. A station that opens a new epoch waits for the next month's measurement. Publish leaves out a row whose stations have since moved more than 1 km apart.
+
+A row the month's run doesn't replace is kept, so a missing file or a failed read takes nothing away. A pair whose values were read but don't measure, or that is no longer linked, loses its row.
+
+## Terms
+
+The rows are derived from both stations' levels and carry no terms of their own. Join them to `stations.parquet` for each station's `commercial_use` and `attribution`. See the [Terms guide](/docs/guides/terms/).
+
+## Examples
+
+A gauge's measured pairs:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT a, b, since::DATE AS since, until::DATE AS until, hours, offset_m, spread_m
+FROM 'https://stillwell.openwaters.io/stations/links.parquet'
+WHERE a = 'pegelonline/5990020' OR b = 'pegelonline/5990020'
+ORDER BY a, b`}
+/>
+
+How many pairs each pair of sources has, and how many publish can use by spread:
+
+<QueryResult
+  sql={`SELECT split_part(a, '/', 1) AS source_a, split_part(b, '/', 1) AS source_b,
+  count(*) AS pairs, count(*) FILTER (spread_m <= 0.01) AS within_1_cm
+FROM 'https://stillwell.openwaters.io/stations/links.parquet'
+GROUP BY ALL ORDER BY pairs DESC LIMIT 10`}
+/>
+
+The pairs that spread widest, with both stations' terms:
+
+<QueryResult
+  sql={`SELECT l.a, l.b, l.offset_m, l.spread_m, sa.commercial_use AS a_commercial, sb.commercial_use AS b_commercial
+FROM 'https://stillwell.openwaters.io/stations/links.parquet' l
+JOIN 'https://stillwell.openwaters.io/stations.parquet' sa ON sa.id = l.a
+JOIN 'https://stillwell.openwaters.io/stations.parquet' sb ON sb.id = l.b
+ORDER BY l.spread_m DESC LIMIT 5`}
+/>

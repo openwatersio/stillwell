@@ -1,0 +1,145 @@
+---
+title: DuckDB CLI
+description: Read the store from the DuckDB command line, with no download step.
+sidebar:
+  order: 1
+---
+
+The DuckDB command line reads the store's Parquet files straight over HTTPS. It fetches only the parts of each file a query needs, so a query on one station of `stations.parquet` doesn't download the whole file. The [Query the store](/query/) page runs the same SQL in your browser.
+
+## Install
+
+```sh
+brew install duckdb
+```
+
+The [DuckDB install page](https://duckdb.org/docs/installation/) has packages for Linux and Windows. DuckDB loads its `httpfs` extension the first time a query reads an `https://` path, so the first query needs internet access to download it.
+
+Start a session and set it to UTC before reading times:
+
+```sql
+SET TimeZone = 'UTC';
+```
+
+## Read the station list
+
+[`stations.parquet`](/docs/reference/stations/) has one row per station. Active stations with observed levels:
+
+```sql
+SELECT id, name, lat, lon, datum, datums
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active' AND list_contains(products, 'levels');
+```
+
+## Find a station
+
+```sql
+SELECT id, name, datum, datums
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE name ILIKE '%hoek van holland%' AND source = 'rws';
+```
+
+```
+┌─────────────────────────────────────────────────┬──────────────────────────────────────────────────┬─────────┬─────────────────────────┐
+│                       id                        │                       name                       │  datum  │         datums          │
+│                     varchar                     │                     varchar                      │ varchar │  map(varchar, double)   │
+├─────────────────────────────────────────────────┼──────────────────────────────────────────────────┼─────────┼─────────────────────────┤
+│ rws/hoekvanholland                              │ Hoek van Holland                                 │ NAP     │ {MSL=-0.097, LAT=1.003} │
+│ rws/hoekvanholland.benoordendenoorderdam        │ Hoek van Holland, benoorden de Noorderdam        │ NAP     │ {}                      │
+│ rws/hoekvanholland.maeslantkering.beneden       │ Hoek van Holland Maeslantkering beneden          │ NAP     │ {}                      │
+│ rws/hoekvanholland.maeslantkering.beneden.noord │ Hoek van Holland, Maeslantkering, Beneden, noord │ NAP     │ {MSL=-0.134, LAT=0.912} │
+│ rws/hoekvanholland.maeslantkering.boven         │ Hoek van Holland Maeslantkering boven            │ NAP     │ {}                      │
+│ rws/hoekvanholland.splitsingsdam                │ Hoek van Holland, splitsingsdam                  │ NAP     │ {}                      │
+└─────────────────────────────────────────────────┴──────────────────────────────────────────────────┴─────────┴─────────────────────────┘
+```
+
+The [Stations](/docs/reference/stations/#examples) page has more ways to find one, such as the nearest stations to a point.
+
+## Read a year of levels
+
+One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+
+```sql
+SELECT time, level_m
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2
+ORDER BY time;
+```
+
+```
+┌──────────────────────────┬─────────┐
+│           time           │ level_m │
+│ timestamp with time zone │  float  │
+├──────────────────────────┼─────────┤
+│ 2024-01-01 00:00:00+00   │    0.07 │
+│ 2024-01-01 00:10:00+00   │    0.07 │
+│ 2024-01-01 00:20:00+00   │    0.07 │
+│            ·             │      ·  │
+```
+
+To keep a copy, write it to a file:
+
+```sql
+COPY (
+  SELECT time, level_m, flag
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+  WHERE flag <= 2
+) TO 'hoekvanholland-2024.csv';
+```
+
+## Read several years
+
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains, and pass it to `read_parquet`:
+
+```sql
+SET VARIABLE files = (
+  SELECT list('https://stillwell.openwaters.io/obs/rws/hoekvanholland/' || year || '.parquet' ORDER BY year)
+  FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+  WHERE id = 'rws/hoekvanholland' AND epoch = 1 AND year BETWEEN 2020 AND 2024
+);
+
+SELECT year(time) AS year, count(*) AS n, round(avg(level_m), 3) AS mean_m
+FROM read_parquet(getvariable('files'), union_by_name = true)
+WHERE flag <= 2
+GROUP BY year ORDER BY year;
+```
+
+```
+┌───────┬───────┬────────┐
+│ year  │   n   │ mean_m │
+│ int64 │ int64 │ double │
+├───────┼───────┼────────┤
+│  2020 │ 52665 │  0.136 │
+│  2021 │ 52518 │  0.128 │
+│  2022 │ 52533 │  0.135 │
+│  2023 │ 52482 │  0.194 │
+│  2024 │ 52631 │  0.206 │
+└───────┴───────┴────────┘
+```
+
+A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path. DuckDB's `url_encode` builds it, though it also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today:
+
+```sql
+SELECT 'https://stillwell.openwaters.io/obs/' || source || '/' || url_encode(url_encode(source_id)) AS dir
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE id = 'gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs';
+```
+
+## Convert to another datum
+
+Adding the station's `datums['LAT']` offset refers Hoek van Holland's NAP levels to LAT:
+
+```sql
+SELECT o.time, round(o.level_m + s.datums['LAT'], 3) AS level_m
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o,
+  (SELECT datums FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'rws/hoekvanholland') s
+WHERE o.flag <= 2
+ORDER BY o.time;
+```
+
+[Datums](/docs/guides/datums/) covers earlier epochs and the credits owed for offsets.
+
+## Things to know
+
+- Without `SET TimeZone = 'UTC'`, DuckDB shows times in your computer's time zone.
+- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.

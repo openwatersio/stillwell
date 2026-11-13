@@ -1,0 +1,67 @@
+---
+title: marimo
+description: Read the store from a marimo notebook, in the browser on marimo.app or on a server with molab.
+sidebar:
+  order: 1
+---
+
+[marimo](https://marimo.io/) notebooks are Python files whose cells rerun when what they depend on changes. They can run in three places, and where they run decides how they read the store:
+
+| Where                             | Runs on                                                                    | Reading the store                                                                                        |
+| --------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [marimo.app](https://marimo.app/) | Your browser, with [Pyodide](https://pyodide.org/) (Python in WebAssembly) | DuckDB and Polars read over HTTPS, but download each file whole                                          |
+| [molab](https://molab.marimo.io/) | A server kernel                                                            | As in [Python](/docs/examples/tools/python/): DuckDB and Polars fetch only the parts of a file they need |
+| Your computer, with `marimo edit` | Your computer                                                              | As in [Python](/docs/examples/tools/python/)                                                             |
+
+## In the browser on marimo.app
+
+marimo.app needs no account or install. Its Python runs in the browser tab, which affects the store in two ways:
+
+- **Each file is downloaded whole.** A station's year is about 250 KB and `stations.parquet` about 2 MB, so a few years of one station load in seconds. A source's years list, such as `stations/years/gesla.parquet`, is up to about 3 MB.
+- **Only the packages a notebook imports are loaded.** Import `tzdata`, which DuckDB needs for time zones, and `pyarrow`, which Polars needs to read Parquet, even though no cell uses them by name.
+
+The first cell:
+
+```python
+import marimo as mo
+import duckdb
+import polars as pl
+import pyarrow
+import tzdata
+
+duckdb.sql("SET TimeZone = 'UTC'")
+```
+
+A year of Hoek van Holland's levels, leaving out values flagged as suspect or bad. `mo.sql` runs the query with DuckDB and returns a Polars data frame:
+
+```python
+levels = mo.sql(
+    f"""
+    SELECT time, level_m
+    FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+    WHERE flag <= 2
+    ORDER BY time
+    """
+)
+```
+
+The [Python](/docs/examples/tools/python/) page has the rest: finding a station, reading several years from a list of files, and converting to another datum. Its DuckDB code works the same here.
+
+A notebook in a public GitHub repository opens on marimo.app from its path: `https://marimo.app/github.com/<owner>/<repo>/blob/<branch>/<notebook>.py`.
+
+## On a server with molab
+
+molab runs the same notebook on a server kernel. DuckDB and Polars there read only the parts of each file a query needs, so large files and long ranges of years are faster than in the browser. The `pyarrow` and `tzdata` imports aren't needed but do no harm.
+
+## On your computer
+
+```sh
+uvx marimo edit --sandbox stillwell.py
+```
+
+`--sandbox` runs the notebook in its own environment with the packages it imports.
+
+## Things to know
+
+- `mo.sql` and Polars keep times in UTC.
+- Select only the columns you need. On molab and your computer, that cuts what's downloaded; on marimo.app, it cuts what's held in memory.

@@ -1,0 +1,221 @@
+---
+// A SQL editor over the store, run in the reader's browser by DuckDB. The query lives in the URL, so a link shares it.
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+const EXAMPLES: Record<string, string> = {
+  "Stations per source": `SELECT source, count(*) AS stations, count(*) FILTER (WHERE live) AS live
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+GROUP BY source ORDER BY stations DESC`,
+  "Nearest gauges to a point": `SELECT id, name, round(6371 * acos(least(1,
+    sin(radians(lat)) * sin(radians(51.98)) +
+    cos(radians(lat)) * cos(radians(51.98)) * cos(radians(lon - 4.12)))), 2) AS km
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE status = 'active' AND list_contains(products, 'levels') AND preferred = id
+ORDER BY km LIMIT 10`,
+  "A month's daily range": `SELECT date_trunc('day', time) AS day, min(level_m) AS low_m, max(level_m) AS high_m, count(*) AS n
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2 AND time < '2024-02-01'
+GROUP BY ALL ORDER BY day`,
+  "Errata by how they're handled": `SELECT handling, count(*) AS errata
+FROM read_json('https://stillwell.openwaters.io/errata.json')
+GROUP BY handling ORDER BY errata DESC`,
+};
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Query the store",
+    description: "Run SQL against Stillwell's Parquet files in your browser with DuckDB.",
+    tableOfContents: false,
+  }}
+>
+  <p>
+    Write SQL against the store and run it in your browser with{" "}
+    <a href="https://duckdb.org/docs/sql/introduction">DuckDB</a>. Read any file by its URL, as the
+    examples do. The query is saved in the page's address, so copy the link to share it.
+  </p>
+  <query-editor data-examples={JSON.stringify(EXAMPLES)}>
+    <label>
+      Start from{" "}
+      <select name="example">
+        <option value="">your query</option>
+        {Object.keys(EXAMPLES).map((k) => (
+          <option>{k}</option>
+        ))}
+      </select>
+    </label>
+    <textarea rows="10" spellcheck="false"></textarea>
+    <p>
+      <button type="button" data-run>
+        Run
+      </button>{" "}
+      <span data-status></span>
+    </p>
+    <div data-result></div>
+  </query-editor>
+
+  <h2>What's in the store</h2>
+  <table>
+    <tr>
+      <th>File</th>
+      <th>What it holds</th>
+    </tr>
+    <tr>
+      <td>
+        <code>stations.parquet</code>
+      </td>
+      <td>One row per station: position, datum and offsets, links to other sources, terms</td>
+    </tr>
+    <tr>
+      <td>
+        <code>sources.json</code>, <code>errata.json</code>
+      </td>
+      <td>Each source's terms, and the errors found in what sources publish</td>
+    </tr>
+    <tr>
+      <td>
+        <code>stations/years/&lt;source&gt;.parquet</code>
+      </td>
+      <td>Which year files each station has, with counts by flag</td>
+    </tr>
+    <tr>
+      <td>
+        <code>obs/&lt;source&gt;/&lt;station&gt;/&lt;year&gt;.parquet</code>
+      </td>
+      <td>Observed levels: time, level_m, flag, source_flag, received, datum</td>
+    </tr>
+    <tr>
+      <td>
+        <code>recent/&lt;source&gt;.parquet</code>
+      </td>
+      <td>The last 7 days of observed levels, updated every hour</td>
+    </tr>
+  </table>
+  <p>
+    HTTPS has no directory listing, so wildcards such as <code>obs/rws/*/2024.parquet</code> don't
+    work: build the list of files and pass it to <code>read_parquet([…])</code>.{" "}
+    <a href="/docs/getting-started/">Getting started</a> and the reference pages describe every file
+    and column.
+  </p>
+</StarlightPage>
+
+<style>
+  textarea {
+    width: 100%;
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+  }
+  [data-status] {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+  [data-result] {
+    overflow-x: auto;
+    font-size: var(--sl-text-sm);
+  }
+  [data-result] pre {
+    color: var(--sl-color-red);
+    white-space: pre-wrap;
+  }
+</style>
+
+<script>
+  import { query, version } from "../lib/duckdb";
+
+  class QueryEditor extends HTMLElement {
+    connectedCallback() {
+      const examples = JSON.parse(this.dataset.examples!);
+      const textarea = this.querySelector("textarea")!;
+      const select = this.querySelector("select")!;
+      const status = this.querySelector<HTMLElement>("[data-status]")!;
+      const result = this.querySelector<HTMLElement>("[data-result]")!;
+      const fromHash = () => new URLSearchParams(location.hash.slice(1)).get("q");
+      textarea.value = fromHash() ?? examples["Stations per source"];
+      select.addEventListener("change", () => {
+        if (select.value) textarea.value = examples[select.value];
+        run();
+      });
+      this.querySelector("[data-run]")!.addEventListener("click", run);
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) run();
+      });
+      addEventListener("hashchange", () => {
+        textarea.value = fromHash() ?? textarea.value;
+        run();
+      });
+
+      // Only the latest run writes its result, so a slow earlier query can't replace a newer one's.
+      let latest = 0;
+      async function run() {
+        const id = ++latest;
+        history.replaceState(null, "", `#q=${encodeURIComponent(textarea.value)}`);
+        status.textContent = "Running…";
+        const started = performance.now();
+        try {
+          const rows = await query(textarea.value);
+          const v = await version();
+          if (id !== latest) return;
+          status.textContent = `${rows.length.toLocaleString("en-US")} ${rows.length === 1 ? "row" : "rows"} in ${((performance.now() - started) / 1000).toFixed(1)} s, DuckDB ${v}${rows.length > 1000 ? "; the table shows the first 1,000, the CSV has them all" : ""}`;
+          result.replaceChildren(
+            table(rows.slice(0, 1000)),
+            ...(rows.length ? [download(rows)] : []),
+          );
+        } catch (error: any) {
+          if (id !== latest) return;
+          status.textContent = "";
+          result.replaceChildren(
+            Object.assign(document.createElement("pre"), {
+              textContent: error.message ?? String(error),
+            }),
+          );
+        }
+      }
+      run();
+    }
+  }
+
+  const show = (v: any) =>
+    v instanceof Date
+      ? v.toISOString().replace("T", " ").replace(".000Z", "Z")
+      : v !== null && typeof v === "object"
+        ? JSON.stringify(v)
+        : String(v ?? "NULL");
+
+  function table(rows: Record<string, any>[]) {
+    const t = document.createElement("table");
+    const columns = Object.keys(rows[0] ?? {});
+    const head = t.createTHead().insertRow();
+    for (const c of columns)
+      head.append(Object.assign(document.createElement("th"), { textContent: c }));
+    const body = t.createTBody();
+    for (const r of rows) {
+      const tr = body.insertRow();
+      for (const c of columns) tr.insertCell().textContent = show(r[c]);
+    }
+    return t;
+  }
+
+  const raw = (v: any) =>
+    v instanceof Date
+      ? v.toISOString()
+      : v !== null && typeof v === "object"
+        ? JSON.stringify(v)
+        : String(v ?? "");
+
+  function download(rows: Record<string, any>[]) {
+    const columns = Object.keys(rows[0]);
+    const quote = (s: string) => (/[",\r\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s);
+    const csv = [
+      columns.join(","),
+      // Values as the query returned them, without the table's rounding.
+      ...rows.map((r) => columns.map((c) => quote(raw(r[c]))).join(",")),
+    ].join("\n");
+    return Object.assign(document.createElement("a"), {
+      href: URL.createObjectURL(new Blob([csv], { type: "text/csv" })),
+      download: "query.csv",
+      textContent: "Download as CSV",
+    });
+  }
+
+  customElements.define("query-editor", QueryEditor);
+</script>

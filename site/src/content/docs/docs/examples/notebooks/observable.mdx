@@ -1,0 +1,53 @@
+---
+title: Observable
+description: Read the store from an Observable notebook with DuckDB in the browser.
+sidebar:
+  order: 2
+---
+
+Observable notebooks run JavaScript in the reader's browser. Their `DuckDBClient` is [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), which reads the store over HTTPS with ranged requests, as on the [JavaScript](/docs/examples/tools/javascript/) page.
+
+There are two kinds of Observable notebook, and they differ in where SQL runs:
+
+| Notebook                                                                                           | DuckDB runs                 | Results                                                                                |
+| -------------------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------- |
+| [observablehq.com](https://observablehq.com/) notebooks                                            | In the reader's browser     | Live, read each time the notebook opens                                                |
+| [Notebook Kit](https://observablehq.com/notebook-kit/) and Observable Desktop, with `DuckDBClient` | In the reader's browser     | Live, read each time the notebook opens                                                |
+| Notebook Kit and Observable Desktop, with a SQL cell's database set to `duckdb`                    | On your computer, with Node | Saved when the notebook is built, and the same for every reader until it's built again |
+
+## A live notebook
+
+Create a DuckDB client in one cell:
+
+```js
+db = DuckDBClient.of();
+```
+
+Then query it from a SQL cell whose database is `db` (`var:db` in Notebook Kit), or from JavaScript:
+
+```js
+levels = db.query(`
+  SELECT time, level_m
+  FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+  WHERE flag <= 2
+  ORDER BY time
+`);
+```
+
+That's a year of Hoek van Holland's levels, leaving out values flagged as suspect or bad. `db.query` returns an array of objects with times as `Date`, ready for [Observable Plot](https://observablehq.com/plot/):
+
+```js
+Plot.lineY(levels, { x: "time", y: "level_m" }).plot({
+  y: { label: "Level (m, NAP)", grid: true },
+});
+```
+
+In Notebook Kit, cells are statements rather than named expressions, so write `const db = DuckDBClient.of();` in one cell and `const levels = await db.query(...)` in another.
+
+## Reading more
+
+The SQL is the same as on the [DuckDB CLI](/docs/examples/tools/duckdb/) page, which shows how to find a station, read several years from a list of files, and convert to another datum. `SET VARIABLE` works in DuckDB-WASM, so the CLI's file-list query runs as it stands. A SQL cell can also take values from other cells with `${…}`, as in `WHERE id = ${station.id}`.
+
+## Things to know
+
+- `DuckDBClient` returns times as `Date`, which shows in the reader's time zone unless you format it in UTC.

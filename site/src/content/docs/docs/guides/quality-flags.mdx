@@ -1,0 +1,128 @@
+---
+title: Quality flags
+description: What each flag means, where it comes from, and which filter to use.
+sidebar:
+  order: 3
+---
+
+import QueryResult from "../../../../components/QueryResult.astro";
+
+Every observed level has a `flag` from 0 (good) to 4 (bad). It combines the source's own judgment with Stillwell's checks. `flag <= 2` keeps everything not flagged suspect or bad, including values nobody has checked yet. Use a stricter filter only when you need checked values and can give up coverage for them.
+
+## The scale
+
+| `flag` | Meaning      |
+| ------ | ------------ |
+| 0      | good         |
+| 1      | interpolated |
+| 2      | preliminary  |
+| 3      | suspect      |
+| 4      | bad          |
+
+- **Good** values are ones the source has checked and accepted.
+- **Interpolated** values are ones the source filled in between readings.
+- **Preliminary** values are ones the source hasn't checked. Most recent data is preliminary, and some sources never check their values at all. Preliminary doesn't mean good.
+- **Suspect** values are ones the source or Stillwell's checks doubt.
+- **Bad** values are ones that can't be right, such as a reading of 0 where a gauge had none.
+
+Where a source doesn't say which values it has checked, its adapter decides, as its README says. [Observations](/docs/reference/observations/) describes the columns of a series file.
+
+## The source's flag
+
+Each value also has a `source_flag`: the source's own judgment on the same 0 to 4 scale, before Stillwell's checks. `flag` is never better than `source_flag`, since Stillwell's checks only mark a value suspect or bad.
+
+When the two differ, Stillwell marked the value worse than its source did. A value the source verified still shows as verified in `source_flag`. Read `flag` to skip what shouldn't be used, and read `source_flag` to see what the source itself said.
+
+In the last week of PEGELONLINE, every value is preliminary from the source, and Stillwell's checks marked some suspect or bad:
+
+<QueryResult
+  sql={`SELECT source_flag, flag, count(*) AS "values", count(DISTINCT station) AS stations
+FROM 'https://stillwell.openwaters.io/recent/pegelonline.parquet'
+GROUP BY ALL ORDER BY ALL`}
+/>
+
+A source's own flags can account for most of its suspect values. BODC marks whole months improbable at some gauges, and Stillwell keeps them as suspect in both columns.
+
+## Stillwell's checks
+
+Stillwell checks every observed level when it's fetched, and checks stored years again when a rule changes. The checks look for:
+
+- **Limits**: a value more than 20 m from the median of its window, or not a number. These are marked bad.
+- **Flatlines**: the same value repeated for hours, as a stuck sensor reports. At a tidal station 6 hours of one value is suspect. Still water, such as a lake or a pool, may sit unchanged for 48 hours before it's marked.
+- **Spikes**: a value that jumps away from its neighbors by more than 25 cm, or by more than the gauge's usual noise allows.
+- **Outliers**: a value far outside the station's usual range, such as a sensor reading its zero.
+- **Held readings**: a short run of values that stays put while the tide moves on around it, as when a gauge holds a reading.
+
+A station's [`tidal`](/docs/reference/stations/#column-tidal) column decides which checks apply. Held readings are checked at tidal stations, and at stations not yet judged unless they're rivers or lakes. Outliers are checked at the same stations except tidal rivers and lakes. Flatlines get more time at still water. `tidal` is measured from the station's own levels, so a river can be tidal and the Baltic isn't.
+
+The checks aren't free of false positives. At harbors that dry out at low water, the outlier check has marked real high waters suspect. The held-readings check can mark a real level that rises and falls back, such as a lock basin's. If a station's suspect values look like real water, compare them with `source_flag` and with another station of the gauge. A value a rule no longer flags is clear again once the checks run over it again.
+
+Only observed levels are checked. Extremes and predictions carry the source's flags as they are.
+
+[How Stillwell quality-controls water levels](https://github.com/openwatersio/stillwell/blob/main/docs/qc/current-pipeline.md) gives every rule, threshold and exception in detail.
+
+## Preliminary values
+
+A preliminary value may be checked later. The store fetches the last three years again each month for sources that check their values later, so a value can move from preliminary to good, interpolated, suspect or bad.
+
+Two signals mark the preliminary values that will never be checked:
+
+- every preliminary value from a source whose `finalizes` is false in [`sources.json`](/docs/reference/sources/);
+- values from before a station's [`source_qc_start`](/docs/reference/stations/#column-source_qc_start), where the source's own checks begin.
+
+Those have passed only Stillwell's checks and stay preliminary. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
+
+<QueryResult
+  sql={`SELECT s.id AS source, s.finalizes,
+  count(t.id) FILTER (t.source_qc_start IS NOT NULL) AS with_qc_start, count(t.id) AS stations
+FROM read_json('https://stillwell.openwaters.io/sources.json') s
+LEFT JOIN 'https://stillwell.openwaters.io/stations.parquet' t ON t.source = s.id
+GROUP BY ALL ORDER BY source`}
+/>
+
+## Errata
+
+An erratum is an error found in what a source publishes. A `flagged` erratum with stations and a span marks those observed levels suspect, while `source_flag` keeps the source's flag. So across an erratum's span, `flag` can be worse than `source_flag` without any check having fired. A station's [`errata`](/docs/reference/stations/#column-errata) column lists the errata that touch it. [Errata](/docs/reference/errata/) describes each kind of handling.
+
+<QueryResult
+  sql={`SELECT id, since, until, len(stations) AS stations
+FROM read_json('https://stillwell.openwaters.io/errata.json')
+WHERE handling = 'flagged'
+ORDER BY id LIMIT 8`}
+/>
+
+## Choosing a filter
+
+| Filter      | Keeps                           | Use it for                                                                                                                                                                                                  |
+| ----------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flag <= 2` | good, interpolated, preliminary | Most work: maps, live levels, comparing with predictions. It keeps unchecked values, so a few errors the checks missed can get through.                                                                     |
+| `flag <= 1` | good, interpolated              | Work that needs values a source has checked, such as datum reductions or trends. It drops most recent data, and every value from sources that never check theirs: PEGELONLINE's levels are all preliminary. |
+| `flag = 0`  | good                            | Work where filled-in values would mislead, such as counting real readings. It also drops the gaps a source filled.                                                                                          |
+
+Check what a filter costs before you apply it. A station's years list gives the count of values at each flag, per year. Here are the shares by source:
+
+<QueryResult
+  sql={`SET VARIABLE files = (
+  SELECT list('https://stillwell.openwaters.io/stations/years/' || id || '.parquet')
+  FROM read_json('https://stillwell.openwaters.io/sources.json')
+);
+SELECT split_part(id, '/', 1) AS source,
+  sum(good + interpolated + preliminary + suspect + bad) AS "values",
+  round(100 * sum(good) / "values", 1) AS good_pct,
+  round(100 * sum(interpolated) / "values", 1) AS interpolated_pct,
+  round(100 * sum(preliminary) / "values", 1) AS preliminary_pct,
+  round(100 * sum(suspect) / "values", 2) AS suspect_pct,
+  round(100 * sum(bad) / "values", 2) AS bad_pct
+FROM read_parquet(getvariable('files'))
+GROUP BY source ORDER BY source`}
+/>
+
+The stations of a source with the largest share of suspect or bad values, over all their years:
+
+<QueryResult
+  sql={`SELECT id, sum(good + interpolated + preliminary + suspect + bad) AS "values",
+  round(100 * sum(suspect + bad) / "values", 1) AS flagged_pct
+FROM 'https://stillwell.openwaters.io/stations/years/coops.parquet'
+GROUP BY id HAVING "values" > 100000
+ORDER BY flagged_pct DESC LIMIT 5`}
+/>

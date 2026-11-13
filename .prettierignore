@@ -1,5 +1,5 @@
 .cache/
-data/
+/data/
 package-lock.json
 docs/results/
 test/fixtures/
@@ -9,3 +9,6 @@ src/sources/uhslc/contributors.md
 src/sources/gesla/contributors.md
 src/sources/gesla/coverage.md
 .cla.json
+site/dist/
+site/.astro/
+site/.shots/

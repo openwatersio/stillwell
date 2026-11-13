@@ -1,0 +1,266 @@
+---
+import { currentEpoch } from "../lib/store";
+// A station's levels over a date range in any of its datums, read in the browser when the chart scrolls into view.
+
+interface Props {
+  station: Record<string, any>;
+  years: { epoch: number; year: number }[];
+  /**
+   * The station that predicts this one's levels, itself or a linked one: the epoch its predictions are in, the
+   * meters to add to them to refer them to this station's datum, and its credit.
+   */
+  predictor?: { id: string; shift: number; epoch: number; attribution: string };
+}
+const { station: s, years, predictor } = Astro.props;
+const datums = [s.datum, ...Object.keys(s.datums).filter((d) => d !== s.datum)];
+const config = {
+  id: s.id,
+  source: s.source,
+  name: s.name,
+  live: s.live,
+  interval_s: s.interval_s,
+  datum: s.datum,
+  datums: s.datums,
+  epochs: s.epochs,
+  // recent/ rows from before it carried an epoch are the station's current epoch.
+  current: currentEpoch(s),
+  last: s.last?.toISOString(),
+  // [epoch, year] pairs; the browser builds each file's URL, which keeps a long record's page small.
+  files: years.map((y) => [y.epoch, y.year]),
+  predictor,
+};
+---
+
+<level-chart data-config={JSON.stringify(config)}>
+  <form>
+    <label>
+      From <input type="date" name="start" />
+    </label>
+    <label>
+      To <input type="date" name="stop" />
+    </label>
+    <label>
+      Datum{" "}
+      <select name="datum">
+        {datums.map((d) => (
+          <option value={d} selected={d === (s.chart_datum ?? s.datum)}>
+            {d}
+          </option>
+        ))}
+      </select>
+    </label>
+  </form>
+  <div class="chart" aria-live="polite">
+    Levels load when you scroll here.
+  </div>
+  <p class="summary"></p>
+</level-chart>
+
+<style>
+  form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: var(--sl-text-sm);
+  }
+  .chart {
+    min-height: 320px;
+    color: var(--sl-color-gray-3);
+  }
+  .summary {
+    font-size: var(--sl-text-sm);
+  }
+</style>
+
+<script>
+  import * as Plot from "@observablehq/plot";
+  import { readFile, readStation } from "../lib/read";
+  import { recentUrl, seriesUrl } from "../lib/paths";
+
+  const DAY = 86400e3;
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+  class LevelChart extends HTMLElement {
+    config: any;
+    form!: HTMLFormElement;
+
+    connectedCallback() {
+      this.config = JSON.parse(this.dataset.config!);
+      this.form = this.querySelector("form")!;
+      const end = this.config.live ? new Date() : new Date(this.config.last ?? Date.now());
+      this.form.start.value = iso(new Date(+end - 30 * DAY));
+      this.form.stop.value = iso(end);
+      this.form.addEventListener("change", () => this.render());
+      new IntersectionObserver((entries, observer) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          observer.disconnect();
+          this.render();
+        }
+      }).observe(this);
+    }
+
+    async render() {
+      const c = this.config;
+      const chart = this.querySelector(".chart")!;
+      const summary = this.querySelector(".summary")!;
+      const start = new Date(this.form.start.value);
+      const until = new Date(+new Date(this.form.stop.value) + DAY);
+      const datum = this.form.datum.value;
+      chart.textContent = "Loading levels…";
+      try {
+        // Each epoch's levels convert to the current datum by its to_current; outside its since and until they aren't part of the series.
+        const epochs = new Map(c.epochs.map((e: any) => [e.id, e]));
+        const toDatum = datum === c.datum ? 0 : c.datums[datum];
+        const shift = (epoch: number) => ((epochs.get(epoch) as any)?.to_current ?? 0) + toDatum;
+        const inEpoch = (d: any) => {
+          const e: any = epochs.get(d.epoch);
+          if (!e) return d.epoch === 1;
+          return (
+            e.to_current != null &&
+            (!e.since || d.time >= new Date(e.since)) &&
+            (!e.until || d.time < new Date(e.until))
+          );
+        };
+        // The page lists the year files that existed when it was built; the current epoch's file for this
+        // year may have appeared since, and a missing one reads as empty.
+        const thisYear = new Date().getUTCFullYear();
+        const pairs: number[][] = c.files.some(
+          ([e, y]: number[]) => e === c.current && y === thisYear,
+        )
+          ? c.files
+          : [...c.files, [c.current, thisYear]];
+        const files = pairs
+          .filter(
+            ([, year]: number[]) =>
+              year >= start.getUTCFullYear() && year <= until.getUTCFullYear(),
+          )
+          .map(([epoch, year]: number[]) => ({ epoch, url: seriesUrl("obs", c.id, year, epoch) }));
+        const [stored, recent, predicted] = await Promise.all([
+          Promise.all(
+            files.map(async (f: any) =>
+              (await readFile(f.url, ["time", "level_m", "flag", "source_flag"])).map((d) => ({
+                ...d,
+                epoch: f.epoch,
+              })),
+            ),
+          ).then((r) => r.flat()),
+          // recent/ holds the last 7 days, including hours compaction hasn't folded into the year files yet.
+          c.live && +until > Date.now() - 7 * DAY
+            ? readStation(recentUrl(c.source), c.id, [
+                "time",
+                "level_m",
+                "flag",
+                "source_flag",
+                "epoch",
+              ])
+            : [],
+          c.predictor ? this.predictions(start, until) : [],
+        ]);
+        // Each value is checked against its own epoch's span before any two are compared.
+        const inRange = (d: any) => d.time >= start && d.time < until;
+        const usable = (d: any) => inRange(d) && inEpoch(d);
+        // Values in an epoch that doesn't convert to the current datum, or one newer than this page, can't be shown.
+        const unconverted = new Set(
+          [...stored, ...recent]
+            .filter(
+              (d: any) =>
+                inRange(d) && (epochs.get(d.epoch ?? c.current) as any)?.to_current == null,
+            )
+            .map((d: any) => +d.time),
+        ).size;
+        // As compaction decides: good or interpolated by the source's flag, or by flag where there's none.
+        const finalized = (d: any) => (d.source_flag ?? d.flag) <= 1;
+        const byTime = new Map<number, any>();
+        // Where two epochs' files hold one time, the earlier epoch's value stands, as it does past a rejected epoch.
+        for (const d of stored.filter(usable).sort((a, b) => a.epoch - b.epoch))
+          if (!byTime.has(+d.time)) byTime.set(+d.time, d);
+        // A recent value replaces a year file's, as the next compaction will, unless it would replace a value
+        // the source has finalized with one it hasn't.
+        for (const d of recent
+          .map((d: any) => ({ ...d, epoch: d.epoch ?? c.current }))
+          .filter(usable)) {
+          const old = byTime.get(+d.time);
+          if (!old || !finalized(old) || finalized(d)) byTime.set(+d.time, d);
+        }
+        const levels = [...byTime.values()]
+          .map((d) => ({ time: d.time, flag: d.flag, level: d.level_m + shift(d.epoch) }))
+          .sort((a, b) => a.time - b.time);
+        // Predictions are in their own station's datum; the page worked out the shift into this station's.
+        const predictions = predicted.map((d: any) => ({
+          time: d.time,
+          level: d.level_m + c.predictor.shift + toDatum,
+        }));
+        chart.replaceChildren(
+          levels.length || predictions.length
+            ? Plot.plot({
+                width: chart.clientWidth || 720,
+                height: 320,
+                x: { type: "utc", label: null },
+                y: { label: `Level (m, ${datum})`, grid: true },
+                color: {
+                  legend: true,
+                  domain: ["observed", "suspect or bad", "predicted"],
+                  range: ["#4e79a7", "#e15759", "#999"],
+                },
+                marks: [
+                  Plot.lineY(predictions, {
+                    x: "time",
+                    y: "level",
+                    stroke: () => "predicted",
+                    strokeDasharray: "3,2",
+                  }),
+                  Plot.lineY(
+                    breakGaps(levels, Math.max(3 * (c.interval_s ?? 3600) * 1000, 3 * 3600e3)),
+                    { x: "time", y: "level", stroke: () => "observed" },
+                  ),
+                  Plot.dot(
+                    levels.filter((d) => d.flag > 2),
+                    { x: "time", y: "level", r: 1.5, fill: () => "suspect or bad" },
+                  ),
+                  Plot.tip(
+                    levels,
+                    Plot.pointerX({
+                      x: "time",
+                      y: "level",
+                      title: (d: any) =>
+                        `${d.time.toISOString().slice(0, 16).replace("T", " ")} UTC\n${d.level.toFixed(3)} m\nflag ${d.flag}`,
+                    }),
+                  ),
+                ],
+              })
+            : document.createTextNode("No values in these dates."),
+        );
+        const newest = levels.at(-1)?.time;
+        summary.textContent = `${levels.length.toLocaleString("en-US")} observed values${predictions.length ? ` and ${predictions.length.toLocaleString("en-US")} predicted by ${c.predictor.id}${c.predictor.id === c.id ? "" : ` (${c.predictor.attribution})`}` : ""}, in ${datum}${toDatum ? `: ${c.datum} ${toDatum >= 0 ? "plus" : "minus"} ${Math.abs(toDatum)} m` : ""}.${unconverted ? ` ${unconverted.toLocaleString("en-US")} values in a datum epoch that doesn't convert to ${c.datum} aren't shown.` : ""}${newest ? ` The newest is from ${newest.toISOString().slice(0, 16).replace("T", " ")} UTC.` : ""}`;
+      } catch (error) {
+        chart.textContent = `Couldn't read the levels: ${error}`;
+      }
+    }
+
+    async predictions(start: Date, until: Date) {
+      const { id, epoch } = this.config.predictor;
+      const years = [];
+      for (let y = start.getUTCFullYear(); y <= until.getUTCFullYear(); y++) years.push(y);
+      // Prediction years have no list, so a year without a file reads as empty.
+      const rows = (
+        await Promise.all(
+          years.map((y) => readFile(seriesUrl("predictions", id, y, epoch), ["time", "level_m"])),
+        )
+      ).flat();
+      return rows.filter((d) => d.time >= start && d.time < until).sort((a, b) => a.time - b.time);
+    }
+  }
+
+  /** Break a series where values are further apart than `gap` milliseconds, so the line doesn't bridge missing data. */
+  function breakGaps(rows: any[], gap: number) {
+    const out: any[] = [];
+    for (const [i, d] of rows.entries()) {
+      if (i && d.time - rows[i - 1].time > gap)
+        out.push({ time: new Date(+d.time - 1), level: NaN });
+      out.push(d);
+    }
+    return out;
+  }
+
+  customElements.define("level-chart", LevelChart);
+</script>

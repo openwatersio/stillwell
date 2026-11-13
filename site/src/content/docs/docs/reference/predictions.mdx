@@ -1,0 +1,55 @@
+---
+title: Predictions
+description: predictions/ and predicted-extremes/, the source's predicted tide curve and extremes.
+sidebar:
+  order: 3
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+Predictions are the source's own tide predictions, one Parquet file per station per UTC year: the predicted curve under `predictions/` and the predicted extremes under `predicted-extremes/`. Which a station has is in its `products` in [`stations.parquet`](/docs/reference/stations/). A path is the product, the station's `id` and the year, as in `predictions/rws/hoekvanholland/2026.parquet`; see [File paths](/docs/getting-started/#file-paths).
+
+## Predicted curve
+
+One file per station per UTC year, for stations whose `products` include `predictions`:
+
+<Schema resource="predictions" />
+
+The surge, as observed minus RWS's own prediction, at its largest:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT o.time, o.level_m AS observed_m, p.level_m AS predicted_m,
+  round(o.level_m - p.level_m, 2) AS surge_m
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet' o
+JOIN 'https://stillwell.openwaters.io/predictions/rws/hoekvanholland/2024.parquet' p USING (time)
+ORDER BY abs(o.level_m - p.level_m) DESC LIMIT 3`}
+/>
+
+The join holds only where both files share a `datum`. Otherwise refer them to one datum first; see [Datums](/docs/guides/datums/).
+
+## Predicted extremes
+
+The predicted high and low waters, for stations whose `products` include `predicted_extremes`. Only BSH's files carry `transit` and `event`:
+
+<Schema resource="predicted-extremes" />
+
+The next predicted extremes at Cuxhaven:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, type, level_m, transit, event, datum
+FROM 'https://stillwell.openwaters.io/predicted-extremes/bsh/506P/2026.parquet'
+WHERE time >= TIMESTAMPTZ '2026-11-01'
+ORDER BY time LIMIT 4`}
+/>
+
+The year's highest predicted high waters at Hoek van Holland:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m, datum
+FROM 'https://stillwell.openwaters.io/predicted-extremes/rws/hoekvanholland/2026.parquet'
+WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
+/>

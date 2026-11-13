@@ -1,0 +1,118 @@
+---
+title: Observations
+description: obs/, extremes/, recent/ and stations/years/, the observed levels, extremes, last 7 days, and the year files that exist.
+sidebar:
+  order: 2
+---
+
+import Schema from "../../../../components/Schema.astro";
+import QueryResult from "../../../../components/QueryResult.astro";
+
+Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:40 UTC.
+
+A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#file-paths). To read several files at once, see [Reading many files](/docs/getting-started/#reading-many-files).
+
+## Observed levels
+
+One file per station per UTC year, for stations whose `products` include `levels`:
+
+<Schema resource="obs" />
+
+The first values of a year:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m, flag, datum
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+ORDER BY time LIMIT 5`}
+/>
+
+Monthly statistics, leaving out values flagged suspect or bad:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT date_trunc('month', time) AS month,
+  round(avg(level_m), 3) AS mean_m, round(min(level_m), 2) AS min_m,
+  round(max(level_m), 2) AS max_m, count(*) AS n
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+WHERE flag <= 2
+GROUP BY ALL ORDER BY month LIMIT 4`}
+/>
+
+How many values each flag has:
+
+<QueryResult
+  sql={`SELECT flag, count(*) AS n
+FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
+GROUP BY flag ORDER BY flag`}
+/>
+
+## Observed extremes
+
+The high and low waters as the source selects them, for stations whose `products` include `extremes`:
+
+<Schema resource="extremes" />
+
+The year's highest high waters:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT time, level_m
+FROM 'https://stillwell.openwaters.io/extremes/rws/hoekvanholland/2024.parquet'
+WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
+/>
+
+## The latest values
+
+`recent/<source>.parquet` holds the last 7 days of observed levels from the source's live stations, and keeps a station's rows after it stops being live until they're 7 days old. It's rewritten every hour, so read it fresh rather than caching it.
+
+<Schema resource="recent" />
+
+The latest value at each station, leaving out values flagged suspect or bad:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT station, max(time) AS time, max_by(level_m, time) AS level_m, max_by(epoch, time) AS epoch
+FROM 'https://stillwell.openwaters.io/recent/rws.parquet'
+WHERE flag <= 2
+GROUP BY station ORDER BY station LIMIT 5`}
+/>
+
+The latest value at one station, with the datum it's measured from:
+
+<QueryResult
+  sql={`SET TimeZone = 'UTC';
+SELECT r.time, r.level_m, e.datum, r.flag
+FROM 'https://stillwell.openwaters.io/recent/rws.parquet' r
+JOIN (SELECT unnest(epochs, recursive := true)
+  FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'rws/hoekvanholland') e
+  ON e.id = r.epoch
+WHERE r.station = 'rws/hoekvanholland'
+ORDER BY r.time DESC LIMIT 1`}
+/>
+
+## Which years exist
+
+HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Caching](/docs/getting-started/#caching).
+
+<Schema resource="years" />
+
+A row with a null `epoch` and `year` marks a station whose rows may be out of date: a run is writing its files, or one stopped partway. It can have a year with a file but no row. Read the list again later, and don't cache the station's files while it's marked. A mark usually clears the next night, but a station with many files can stay marked a few nights.
+
+The years of one station since 2020, with how many of each year's values its source hasn't checked:
+
+<QueryResult
+  sql={`SELECT epoch, year, hours, good + interpolated AS checked, preliminary, suspect + bad AS flagged, version
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland' AND year >= 2020
+ORDER BY epoch, year`}
+/>
+
+The paths of those years, to pass to `read_parquet`. This builds paths from the `id` directly, which works only where the `source_id` needs no encoding:
+
+<QueryResult
+  sql={`SELECT list('https://stillwell.openwaters.io/obs/' || id ||
+  CASE WHEN epoch = 1 THEN '' ELSE '/' || epoch END || '/' || year || '.parquet' ORDER BY epoch, year) AS files
+FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
+WHERE id = 'rws/hoekvanholland' AND year >= 2020`}
+/>

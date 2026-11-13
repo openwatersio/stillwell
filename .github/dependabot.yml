@@ -16,3 +16,11 @@ updates:
       npm:
         update-types: ["minor", "patch"]
         patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: weekly
+    groups:
+      site:
+        update-types: ["minor", "patch"]
+        patterns: ["*"]

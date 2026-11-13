@@ -1,0 +1,102 @@
+---
+title: Introduction
+description: What Stillwell is, what the store holds, its sources and terms, and when each part updates.
+---
+
+import { rows, json } from "../../../lib/store";
+
+export const sources = await json("sources.json");
+export const counts = new Map(
+  (
+    await rows(`
+      SELECT source, count(*)::INT AS stations, count(*) FILTER (WHERE status = 'active')::INT AS active,
+        count(*) FILTER (WHERE live)::INT AS live, count(*) FILTER (WHERE commercial_use)::INT AS commercial, min(first) AS first
+      FROM 'https://stillwell.openwaters.io/stations.parquet' GROUP BY source`)
+  ).map((r) => [r.source, r]),
+);
+export const totals = [...counts.values()].reduce(
+  (t, r) => ({
+    stations: t.stations + r.stations,
+    active: t.active + r.active,
+    live: t.live + r.live,
+  }),
+  { stations: 0, active: 0, live: 0 },
+);
+export const n = (x) => x.toLocaleString("en-US");
+
+Stillwell is an open store of observed and predicted water levels from tide, river and lake gauges around the world. It fetches each agency's data from the agency itself, checks its quality, and publishes it in one layout: times in UTC, levels in meters with the offsets to other datums, one scale of quality flags, and each station's terms. [Open Waters](https://openwaters.io) builds it to reduce crowdsourced soundings to chart datum and to show in [Slackwater](https://slackwater.xyz) how far the water is from the prediction. It's open for anyone else who needs gauge data without writing an adapter for each agency.
+
+As of the site's last build, the store holds {n(totals.stations)} stations from {sources.length} sources, {n(totals.active)} of them active and {n(totals.live)} polled every hour.
+
+Everything is [Parquet](https://parquet.apache.org/) at `https://stillwell.openwaters.io/`, readable over HTTPS without an account by DuckDB, Polars, pandas, R or anything else that reads Parquet. [Getting started](/docs/getting-started/) reads it in a few lines.
+
+## Sources
+
+<table>
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Stations</th>
+      <th>Polled hourly</th>
+      <th>Since</th>
+      <th>License</th>
+      <th>Commercial use</th>
+    </tr>
+  </thead>
+  <tbody>
+    {[...sources]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((s) => {
+        const c = counts.get(s.id);
+        return (
+          <tr>
+            <td>
+              <a href={`/sources/${s.id}/`}>{s.name}</a>
+            </td>
+            <td>{c ? n(c.stations) : 0}</td>
+            <td>{c ? n(c.live) : 0}</td>
+            <td>{c?.first ? c.first.getUTCFullYear() : ""}</td>
+            <td>
+              {s.license?.url ? <a href={s.license.url}>{s.license.name}</a> : s.license?.name}
+            </td>
+            <td>
+              {!c
+                ? ""
+                : c.commercial === c.stations
+                  ? "all stations"
+                  : c.commercial === 0
+                    ? "none"
+                    : `${n(c.commercial)} of ${n(c.stations)}`}
+            </td>
+          </tr>
+        );
+      })}
+  </tbody>
+</table>
+
+Commercial use counts stations, since a contributor's own terms can apply to some of a source's records, as at GESLA; each station carries its own terms. [Issues labeled `source`](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource) track the sources still to come.
+
+## Terms
+
+The data is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) © [Open Waters](https://openwaters.io). Stations whose terms bar commercial use keep them, and every station's data carries a credit to show wherever it's used: [Terms](/docs/guides/terms/) has the details. The code that builds the store is [AGPL-3.0](https://github.com/openwatersio/stillwell/blob/main/LICENSE).
+
+The data is not for navigation. Observations are mostly preliminary, and a gauge can fail without warning.
+
+## When the store changes
+
+| What                                                     | When                                                                                         |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `recent/<source>.parquet`, the last 7 days               | Every hour, for stations polled live                                                         |
+| Year files under `obs/`, `extremes/` and the predictions | Each day folds into its year file at about 00:40 UTC                                         |
+| `stations.parquet`                                       | Rebuilt after that nightly compaction, so record spans trail by about a day                  |
+| Preliminary values                                       | Fetched again each month for the last three years, for sources that check their values later |
+| Station lists, datum links and measured offsets          | Refreshed each month                                                                         |
+| History                                                  | Backfills are still running for several sources, so some stations have no values yet         |
+
+## Where to go next
+
+- [Getting started](/docs/getting-started/): reading the store, file paths, reading many files, caching.
+- Guides: [Gauges](/docs/guides/gauges/), [Datums](/docs/guides/datums/), [Quality flags](/docs/guides/quality-flags/), [Terms](/docs/guides/terms/).
+- Reference: one page per file, from [`stations.parquet`](/docs/reference/stations/) to [`errata.json`](/docs/reference/errata/).
+- Examples: reading the store from a [notebook service](/docs/examples/notebooks/marimo/) or a [tool](/docs/examples/tools/duckdb/) you already use.
+- [Query the store](/query/) in your browser.

@@ -15,7 +15,8 @@ scripts/               ingest.ts, the weekly canary, the failure alerts, the TIC
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
 docs/                  the plan, the API design, the store's layout and the evaluations
-.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions) and canary.yml (a weekly live request per adapter)
+site/                  the site for people using the data: its docs and a page per source (Astro)
+.github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions), site.yml (the site's build) and canary.yml (a weekly live request per adapter)
 ```
 
 ## Getting started
@@ -232,11 +233,24 @@ Each writes `docs/results/<source>.json` and prints a Markdown table for the [HR
 
 ## Published files
 
-[`src/store/files.ts`](src/store/files.ts) defines every file the store publishes: its path, each column's DuckDB type, whether it can be null, a one-line description, and the sort order, with JSON Schemas for `sources.json` and `errata.json`. The writers in [`src/store/parquet.ts`](src/store/parquet.ts) take their columns and types from it, [`test/files.test.ts`](test/files.test.ts) writes each file and compares it with its definition, and publish writes it to the store as `datapackage.json`, `sources.schema.json` and `errata.schema.json`. To add or change a column, change its definition there, and the docs that describe it. The series files (`obs/`, `predictions/`, `extremes/`, `predicted-extremes/` and `recent/`) are copied out of a scratch table in `parquet.ts` (`createTable`, `appendRows`, `copyOut`), and their readers and the `version` hash (`YEAR_STATS`) name its columns too, so a change to one of those columns needs them changed as well. A column older files lack is `optional`, so readers know to use `union_by_name`. The weekly bucket check runs [`scripts/check-files.ts`](scripts/check-files.ts) against the public store, which you can run too:
+[`src/store/files.ts`](src/store/files.ts) defines every file the store publishes: its path, each column's DuckDB type, whether it can be null, a one-line description, and the sort order, with JSON Schemas for `sources.json` and `errata.json`. The writers in [`src/store/parquet.ts`](src/store/parquet.ts) take their columns and types from it, [`test/files.test.ts`](test/files.test.ts) writes each file and compares it with its definition, and publish writes it to the store as `datapackage.json`, `sources.schema.json` and `errata.schema.json`. To add or change a column, change its definition there, and the docs that describe it. The site's reference pages render their schema tables from the published `datapackage.json`, so they follow once publish has run. The series files (`obs/`, `predictions/`, `extremes/`, `predicted-extremes/` and `recent/`) are copied out of a scratch table in `parquet.ts` (`createTable`, `appendRows`, `copyOut`), and their readers and the `version` hash (`YEAR_STATS`) name its columns too, so a change to one of those columns needs them changed as well. A column older files lack is `optional`, so readers know to use `union_by_name`. The weekly bucket check runs [`scripts/check-files.ts`](scripts/check-files.ts) against the public store, which you can run too:
 
 ```bash
 node scripts/check-files.ts https://stillwell.openwaters.io
 ```
+
+## Site
+
+`site/` is the site for people using the data, an [Astro](https://astro.build) project with its own `package.json`. Its docs are Markdown in `site/src/content/docs/docs/`. The queries shown with their results run against the public store when the site builds, and the schema tables come from the store's `datapackage.json`, so a build fails where one of those queries breaks or a live file's columns differ from its definition. The code on the Tools and Notebooks pages doesn't run. Each source gets a page, in `site/src/pages/`. Station pages build only for the sources `STATIONS` names, or for every source with `STATIONS=all`, since all of them come to about 1.3 GB.
+
+```bash
+cd site && npm ci
+npm run dev                    # preview with live reload
+STATIONS=rws npm run dev       # with these sources' station pages
+STATIONS=bsh,marine-institute npm run build   # as the Site workflow builds it
+```
+
+The Site workflow builds it on pull requests that touch `site/`, on pushes to `main`, and weekly, which is when a change to the store's files reaches it, since the build reads the published store. Nothing deploys it yet.
 
 ## Adding a source
 
