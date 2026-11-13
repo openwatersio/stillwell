@@ -27,22 +27,60 @@ def _(mo):
 
 @app.cell
 def _():
+    import io
+    import sys
+
     import marimo as mo
     import polars as pl
     import altair as alt
-    from datetime import date, datetime, timedelta, timezone
+    from datetime import datetime, timedelta, timezone
 
     LAKE = "https://stillwell.openwaters.io"
-    return LAKE, alt, datetime, mo, pl, timedelta, timezone
+
+
+    async def read_parquet(path):
+        """One file from the lake, or None if it doesn't exist. Fetches the whole
+        file, which works both on a server and in the browser (WebAssembly)."""
+        url = f"{LAKE}/{path}"
+        if sys.platform == "emscripten":
+            from pyodide.http import pyfetch
+
+            response = await pyfetch(url)
+            if response.status == 404:
+                return None
+            if not response.ok:
+                raise RuntimeError(f"{url}: HTTP {response.status}")
+            data = await response.bytes()
+        else:
+            import urllib.error
+            import urllib.request
+
+            try:
+                with urllib.request.urlopen(url) as response:
+                    data = response.read()
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    return None
+                raise
+        return pl.read_parquet(io.BytesIO(data))
+
+
+    def lat_offset_of(datums):
+        """The LAT offset from a station's datums, read as a dict or as key/value rows."""
+        if not datums:
+            return None
+        if isinstance(datums, dict):
+            return datums.get("LAT")
+        return next((d["value"] for d in datums if d["key"] == "LAT"), None)
+    return alt, datetime, lat_offset_of, mo, pl, read_parquet, timedelta, timezone
 
 
 @app.cell
-def _(LAKE, pl):
+async def _(lat_offset_of, pl, read_parquet):
+    _all = (await read_parquet("stations.parquet")).filter(pl.col("source") == "marine-institute")
     stations = (
-        pl.read_parquet(f"{LAKE}/stations.parquet")
-        .filter(pl.col("source") == "marine-institute")
-        .with_columns(
-            pl.col("datums").map_elements(lambda d: dict(d).get("LAT") if d else None, return_dtype=pl.Float64).alias("lat_offset_m")
+        _all.with_columns(
+            pl.Series("lat_offset_m", [lat_offset_of(d) for d in _all["datums"].to_list()], dtype=pl.Float64)
         )
         .select("id", "name", "lat", "lon", "datum", "lat_offset_m", "first", "last")
         .sort("name")
@@ -63,15 +101,14 @@ def _(mo, stations, timedelta):
 
 
 @app.cell
-def _(LAKE, dates, datetime, pl, station, stations, timezone):
+async def _(dates, datetime, pl, read_parquet, station, stations, timezone):
     _row = stations.filter(pl.col("id") == station.value).row(0, named=True)
     start, stop = dates.value
     _frames = []
     for _year in range(start.year, stop.year + 1):
-        try:
-            _frames.append(pl.read_parquet(f"{LAKE}/obs/{station.value}/{_year}.parquet"))
-        except Exception:
-            pass  # no file for a year the gauge didn't report
+        _frame = await read_parquet(f"obs/{station.value}/{_year}.parquet")
+        if _frame is not None:
+            _frames.append(_frame.select("time", "level_m", "flag"))
     _start = datetime(start.year, start.month, start.day, tzinfo=timezone.utc)
     _stop = datetime(stop.year, stop.month, stop.day, 23, 59, 59, tzinfo=timezone.utc)
     levels = (
