@@ -1436,11 +1436,31 @@ describe("requalify script", () => {
 
   it("takes the stations with a year in range, the last budgeted run's left first", async () => {
     const { store, left } = await seed();
+    // Without source_flag, so a requalify of the year fills it in.
+    const saved = seriesPath(store, "levels", "coops", "2001", 2024);
+    await writeObservations(
+      saved,
+      [{ time: Date.UTC(2024, 0, 1), level: 1, flag: Flag.good }],
+      "STND",
+    );
     const { status, stdout, stderr } = run(store, ["all", "2026", "2027", "--budget", "5"]);
     assert.equal(status, 0, stderr);
     assert.match(stdout, /^\| 2 \|/m);
+    // 2001 over the year it was saved with, outside the run's.
+    assert.ok((await readObservations(saved)).every((r) => r.source_flag === Flag.good));
     // Done within the budget, so none is left for the next.
     assert.deepEqual(await readJsonArray(left), []);
+  });
+
+  it("keeps a saved station the years file has no row in range for", async () => {
+    const { store, left } = await seed();
+    await writeJsonArray(left, [{ id: "coops/2002", start: 2024, end: 2025 }]);
+    const { status, stderr } = run(store, ["all", "2026", "2027", "--budget", "0"]);
+    assert.equal(status, 0, stderr);
+    assert.deepEqual(await readJsonArray(left), [
+      { id: "coops/2002", start: 2024, end: 2027 },
+      { id: "coops/2000", start: 2026, end: 2027 },
+    ]);
   });
 
   it("saves every station it doesn't start, each from its own first year", async () => {

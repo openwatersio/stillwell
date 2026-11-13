@@ -19,6 +19,7 @@ import {
   analysisHistoryPath,
   emptyYearsPath,
   recentPath,
+  requalifyLeftPath,
   seriesPath,
   stationListPath,
   stationsPath,
@@ -146,6 +147,10 @@ describe("refreshSource with withheld stations", () => {
       { key: "test/x0 levels 1 1990", seen: NOW },
       { key: "test/k12 levels 1 1990", seen: NOW },
     ]);
+    await writeJsonArray(requalifyLeftPath(store, "test"), [
+      { id: "test/x0", start: 2026, end: 2027 },
+      { id: "test/k12", start: 2026, end: 2027 },
+    ]);
     const verdict = (id: string) => ({
       id,
       analyzed: NOW,
@@ -217,6 +222,12 @@ describe("refreshSource with withheld stations", () => {
         (r: { key: string }) => r.key,
       ),
       ["test/k12 levels 1 1990"],
+    );
+    assert.deepEqual(
+      JSON.parse(await readFile(requalifyLeftPath(store, "test"), "utf8")).map(
+        (r: { id: string }) => r.id,
+      ),
+      ["test/k12"],
     );
     // Its analysis, and the history of it, which carry the station's measures.
     assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k12"]);

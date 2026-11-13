@@ -1,7 +1,7 @@
 /**
  * Stations withheld from the store because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
- * rows from its bounds, years, recent window, empty-years record and analysis, and publishing
+ * rows from its bounds, years, recent window, empty-years record, requalify list and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a store that still holds them.
  */
@@ -27,6 +27,7 @@ import {
   historyPath,
   PRODUCTS,
   recentPath,
+  requalifyLeftPath,
   sourceEpochDirs,
   sourceFirstEpochFiles,
   stationDir,
@@ -44,7 +45,7 @@ export function withheldReason(source: Source, id: string): string | null {
 
 /**
  * Drop withheld stations' rows from the source's bounds, years, recent window,
- * empty-years record and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
+ * empty-years record, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(store: string, source: Source): Promise<string[]> {
@@ -85,6 +86,15 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
     await writeJsonArray(
       emptyPath,
       empty.filter((r) => !held(stationOf(r.key))),
+    );
+  }
+  const requalifyPath = requalifyLeftPath(store, id);
+  const requalify = ((await readJsonArray(requalifyPath)) ?? []) as { id: string }[];
+  if (requalify.some((r) => held(r.id))) {
+    for (const r of requalify) if (held(r.id)) dropped.add(r.id);
+    await writeJsonArray(
+      requalifyPath,
+      requalify.filter((r) => !held(r.id)),
     );
   }
   for (const station of await dropAnalysis(store, id, held)) dropped.add(station);
@@ -247,7 +257,7 @@ export function tooManyWithheld(source: string, count: number, known: number): s
 
 /**
  * Remove a source's withheld stations from `store`: delete their series files,
- * then drop their rows from the bounds, years, recent window and empty-years record.
+ * then drop their rows from the bounds, years, recent window, empty-years record and requalify list.
  * Their list rows go at the source's next refresh. Refuses more stations than
  * `withholdLimit` allows unless `accept`, and a store it can't delete from.
  */

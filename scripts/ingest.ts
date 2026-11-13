@@ -259,13 +259,17 @@ switch (command) {
     );
     // A station that failed is tried again too, over this run's years only, so
     // one that always fails, such as on a file holding two datums, stops once
-    // its year leaves the range rather than widening it each month.
-    const failedIds = new Set(failed.map((f) => f.split(": ")[0]!));
+    // its year leaves the range rather than widening it each month. One whose
+    // batch couldn't be marked wasn't tried, so it keeps its saved years.
+    const failedIds = new Map(failed.map((f) => [f.split(": ")[0]!, f]));
     await writeJsonArray(path, [
       ...left.map((id) => ({ id, ...(first.get(id) ?? range) })),
       ...[...failedIds]
-        .filter((id) => id.startsWith(`${source}/`) && !left.includes(id))
-        .map((id) => ({ id, ...range })),
+        .filter(([id]) => id.startsWith(`${source}/`) && !left.includes(id))
+        .map(([id, f]) => ({
+          id,
+          ...((f.startsWith(`${id}: years file not marked:`) && first.get(id)) || range),
+        })),
     ]);
     break;
   }
@@ -919,7 +923,8 @@ async function requalifyStations(
         })
         .map((r) => r.id),
     );
-    stations = stations.filter((s) => due.has(s.id));
+    // A saved station always, so a row the listing left out doesn't drop its saved years.
+    stations = stations.filter((s) => due.has(s.id) || first.has(s.id));
   }
   stations = [
     ...stations.filter((s) => first.has(s.id)),
