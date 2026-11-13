@@ -144,18 +144,24 @@ GROUP BY handling ORDER BY errata DESC`,
         run();
       });
 
+      // Only the latest run writes its result, so a slow earlier query can't replace a newer one's.
+      let latest = 0;
       async function run() {
+        const id = ++latest;
         history.replaceState(null, "", `#q=${encodeURIComponent(textarea.value)}`);
         status.textContent = "Running…";
         const started = performance.now();
         try {
           const rows = await query(textarea.value);
-          status.textContent = `${rows.length.toLocaleString("en-US")} ${rows.length === 1 ? "row" : "rows"} in ${((performance.now() - started) / 1000).toFixed(1)} s, DuckDB ${await version()}${rows.length > 1000 ? "; the table shows the first 1,000, the CSV has them all" : ""}`;
+          const v = await version();
+          if (id !== latest) return;
+          status.textContent = `${rows.length.toLocaleString("en-US")} ${rows.length === 1 ? "row" : "rows"} in ${((performance.now() - started) / 1000).toFixed(1)} s, DuckDB ${v}${rows.length > 1000 ? "; the table shows the first 1,000, the CSV has them all" : ""}`;
           result.replaceChildren(
             table(rows.slice(0, 1000)),
             ...(rows.length ? [download(rows)] : []),
           );
         } catch (error: any) {
+          if (id !== latest) return;
           status.textContent = "";
           result.replaceChildren(
             Object.assign(document.createElement("pre"), {
