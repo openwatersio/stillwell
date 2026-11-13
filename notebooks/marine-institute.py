@@ -5,6 +5,7 @@
 #     "polars",
 #     "altair",
 #     "pyarrow",
+#     "tzdata",
 # ]
 # ///
 
@@ -34,7 +35,8 @@ def _():
     import marimo as mo
     import polars as pl
     import altair as alt
-    import pyarrow  # noqa: F401  polars needs it to read Parquet in WebAssembly, where only imported packages load
+    import pyarrow  # noqa: F401  polars needs these to read Parquet and time zones in WebAssembly,
+    import tzdata  # noqa: F401  where only packages the notebook imports are loaded
     from datetime import datetime, timedelta, timezone
 
     LAKE = "https://stillwell.openwaters.io"
