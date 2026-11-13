@@ -14,7 +14,7 @@ import { checkFile, isMissing, readRows } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
 
 const base = process.argv[2] ?? "https://stillwell.openwaters.io";
-// Over HTTP a URL encodes a station ID twice, once for the key and once for the URL.
+// The JSON files are fetched, so only an HTTP(S) store can be checked.
 if (!/^https?:\/\//.test(base)) throw new Error(`${base}: only an HTTP(S) store can be checked`);
 let failed = false;
 const report = (path: string, problems: string[]) => {
@@ -63,15 +63,14 @@ for (const source of sources) {
     .sort((a, b) => Number(b.year) - Number(a.year) || String(a.id).localeCompare(String(b.id)))[0];
   if (latest) {
     const id = String(latest.id);
-    // The object key holds the URL-encoded station ID, so a URL encodes it again.
     const path = seriesPath(
-      "",
+      base,
       "levels",
       source,
-      encodeURIComponent(id.slice(source.length + 1)),
+      id.slice(source.length + 1),
       Number(latest.year),
       Number(latest.epoch),
-    ).slice(1);
+    ).slice(base.length + 1);
     await check(path, FILES.obs);
   }
 }

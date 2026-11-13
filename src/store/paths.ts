@@ -1,7 +1,8 @@
 import type { Product } from "../schema.ts";
 
 /**
- * The store's layout, under a root that is a local directory or an `s3://` URL:
+ * The store's layout, under a root that is a local directory, an `s3://` URL or,
+ * for reading, an `https://` URL:
  *
  *   stations.parquet                                    one row per series
  *   sources.json                                        license, attribution, contact and finalizes per source
@@ -24,7 +25,9 @@ import type { Product } from "../schema.ts";
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
  *   predicted-extremes/<source>/<station>/<year>.parquet the source's predicted high and low waters
  *
- * `<station>` is the station's `source_id`, URL-encoded. Each datum epoch has
+ * `<station>` is the station's `source_id`, URL-encoded. Over HTTP(S) a URL
+ * encodes that key again, so under an `https://` root `<station>` is encoded
+ * twice: `a@b` is the key `a%40b` and the URL path `a%2540b`. Each datum epoch has
  * files of its own: epoch 1 at the paths above, a later one with its number
  * after `<station>`, as `obs/<source>/<station>/2/<year>.parquet`. Every file
  * is in its epoch's one datum.
@@ -69,7 +72,9 @@ export function stationDir(
   source: string,
   sourceId: string,
 ): string {
-  return `${root}/${DATASET[product]}/${source}/${encodeURIComponent(sourceId)}`;
+  const key = encodeURIComponent(sourceId);
+  const station = /^https?:\/\//.test(root) ? encodeURIComponent(key) : key;
+  return `${root}/${DATASET[product]}/${source}/${station}`;
 }
 
 /** A glob for every station's epoch-1 files, at the plain paths, for one source. */

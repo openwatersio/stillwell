@@ -51,7 +51,7 @@ const MAX_SCATTER = 20;
 const WINDOW_DAYS = 15;
 const CONNECTIONS = 8;
 /** Bumped when what the cache holds changes, so older files aren't read. */
-const CACHE_FORMAT = 2;
+const CACHE_FORMAT = 3;
 
 const [box, fromArg, toArg, sourceArg] = process.argv.slice(2);
 const bounds = box?.split(",").map(Number);

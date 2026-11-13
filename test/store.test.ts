@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
@@ -95,6 +97,41 @@ describe("store files", () => {
   it("reads a missing file as an empty series, in no datum", async () => {
     assert.deepEqual(await readObservations(join(root, "missing.parquet")), []);
     assert.deepEqual(await readDatums(join(root, "missing.parquet")), []);
+  });
+
+  it("reads a station ID that needs encoding over HTTP", async () => {
+    // Like the public bucket: a URL's path, decoded once, is the object's key.
+    const server = createServer((req, res) => {
+      let body: Buffer;
+      try {
+        body = readFileSync(join(root, decodeURIComponent(new URL(req.url!, "http://x").pathname)));
+      } catch {
+        return res.writeHead(404).end();
+      }
+      const range = /bytes=(\d+)-(\d*)/.exec(req.headers.range ?? "");
+      const start = range ? Number(range[1]) : 0;
+      const end = range?.[2] ? Number(range[2]) + 1 : body.length;
+      res.writeHead(range ? 206 : 200, {
+        "Content-Length": end - start,
+        "Accept-Ranges": "bytes",
+        ...(range && { "Content-Range": `bytes ${start}-${end - 1}/${body.length}` }),
+      });
+      res.end(req.method === "HEAD" ? undefined : body.subarray(start, end));
+    });
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    try {
+      const id = "queue @ riceville/la+1";
+      const rows: Observation[] = [{ time: T, level: 1.5, flag: Flag.good }];
+      await writeObservations(seriesPath(root, "levels", "test", id, 2026), rows, "NAP");
+      assert.equal(
+        seriesPath(url, "levels", "test", id, 2026),
+        `${url}/obs/test/queue%2520%2540%2520riceville%252Fla%252B1/2026.parquet`,
+      );
+      assert.deepEqual(await readObservations(seriesPath(url, "levels", "test", id, 2026)), rows);
+    } finally {
+      server.close();
+    }
   });
 
   it("round-trips extremes with BSH's transit and event", async () => {
