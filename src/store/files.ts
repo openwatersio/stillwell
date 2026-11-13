@@ -153,7 +153,8 @@ const STATION_COLUMNS: Column[] = [
     name: "interval_s",
     type: "INTEGER",
     nullable: true,
-    description: "The station's usual interval between values, in seconds.",
+    description:
+      "The station's usual interval between values, in seconds: the source's, or where it gives none, the most common step between its last year's values (`step_s` in its analysis); null where neither says.",
   },
   {
     name: "datum",
@@ -598,6 +599,15 @@ export const FILES = {
         nullable: true,
         description:
           "Runs of the last year that a tide gauge's flatline rules flag and still water's don't.",
+      },
+      {
+        name: "step_s",
+        type: "INTEGER",
+        nullable: true,
+        // A file written before it was kept has no such column.
+        optional: true,
+        description:
+          "The most common step between the last year's values, in seconds; null with under two values, or in a row judged before it was kept.",
       },
       {
         name: "requalified",
