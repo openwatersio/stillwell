@@ -707,6 +707,8 @@ export type JsonSchema = {
   properties?: Record<string, JsonSchema>;
   required?: string[];
   additionalProperties?: boolean;
+  /** Valid when it fits at least one of these. */
+  anyOf?: JsonSchema[];
 };
 
 const nullable = (type: string) => [type, "null"];
@@ -754,6 +756,10 @@ export const SOURCES_SCHEMA: JsonSchema = {
           email: { type: nullable("string"), description: "The agency's published mailbox." },
           url: { type: nullable("string"), description: "The agency's contact form." },
         },
+        anyOf: [
+          { required: ["email"], properties: { email: { type: "string" } } },
+          { required: ["url"], properties: { url: { type: "string" } } },
+        ],
       },
       terms: {
         type: nullable("string"),
@@ -869,6 +875,8 @@ export function jsonProblems(schema: JsonSchema, value: unknown, at = "$"): stri
   if (types.length && !types.some((t) => t === kind || (t === "number" && kind === "integer")))
     return [`${at}: ${kind}, not ${types.join(" or ")}`];
   const problems: string[] = [];
+  if (schema.anyOf && schema.anyOf.every((s) => jsonProblems(s, value, at).length))
+    problems.push(`${at}: fits none of its ${schema.anyOf.length} forms`);
   if (schema.enum && !schema.enum.includes(value))
     problems.push(`${at}: ${JSON.stringify(value)} isn't one of ${schema.enum.join(", ")}`);
   if (

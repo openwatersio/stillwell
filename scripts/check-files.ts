@@ -14,6 +14,8 @@ import { checkFile, isMissing, readRows } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
 
 const base = process.argv[2] ?? "https://stillwell.openwaters.io";
+// Over HTTP a URL encodes a station ID twice, once for the key and once for the URL.
+if (!/^https?:\/\//.test(base)) throw new Error(`${base}: only an HTTP(S) store can be checked`);
 let failed = false;
 const report = (path: string, problems: string[]) => {
   console.log(`${problems.length ? "✗" : "✓"} ${path}`);

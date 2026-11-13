@@ -227,7 +227,7 @@ A station with no links is its own preferred series. A series that allows commer
 
 - [`src/epochs.ts`](../src/epochs.ts): opening, holding and deciding epochs, and `to_current`.
 - [`src/stations.ts`](../src/stations.ts): `mergeStationList`, which opens epochs rather than marking a station inactive.
-- [`src/refresh.ts`](../src/refresh.ts): a source's refresh with its guards and report, and the rebuild of `stations.parquet`, `sources.json` and `errata.json`.
+- [`src/refresh.ts`](../src/refresh.ts): a source's refresh with its guards and report, and the rebuild of `stations.parquet`, `sources.json`, `errata.json` and `datapackage.json`.
 - [`src/same-as.ts`](../src/same-as.ts): `same_as` and `preferred` across sources, with the decisions in `LINKS`, `UNLINKS` and `PREFER`.
 - [`src/datums.ts`](../src/datums.ts): `tide_station`, MSL, LAT and chart datum from slackwater-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list, which holds only what feeds them, such as CO-OPS's `datums_period` ([data.md](data.md#stations)).
 - [`src/links.ts`](../src/links.ts): offsets measured between linked series that share no reference, in `stations/links.parquet`, which `src/datums.ts` carries offsets through.

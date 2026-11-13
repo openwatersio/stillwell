@@ -229,7 +229,13 @@ describe("published file definitions", () => {
       path,
       Object.values(sources).map((s) => sourceEntry(s.metadata, 1)),
     );
-    assert.deepEqual(jsonProblems(SOURCES_SCHEMA, JSON.parse(await readFile(path, "utf8"))), []);
+    const published = JSON.parse(await readFile(path, "utf8"));
+    assert.deepEqual(jsonProblems(SOURCES_SCHEMA, published), []);
+    // A source needs a mailbox or a form.
+    for (const contact of [{}, { email: null, url: null }])
+      assert.deepEqual(jsonProblems(SOURCES_SCHEMA, [{ ...published[0], contact }]), [
+        "$[0].contact: fits none of its 2 forms",
+      ]);
   });
 
   it("publishes errata.json for every erratum as its schema says", async () => {
