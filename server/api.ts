@@ -82,6 +82,8 @@ const BUSY = {
 };
 let waiting = 0;
 async function answer(method: string, url: string) {
+  // Health needs no ClickHouse, so it never waits behind requests.
+  if (url === "/health") return handle(method, url);
   const arrived = Date.now();
   if (waiting >= MAX_WAITING) return BUSY;
   waiting++;
