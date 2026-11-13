@@ -286,7 +286,7 @@ export async function publishStations(
     listed.map((s) =>
       sourceEntry(
         s.metadata,
-        linked.filter((st) => st.source === s.metadata.id && st.status === "active").length,
+        linked.filter((st) => st.source === s.metadata.id),
       ),
     ),
   );
@@ -374,11 +374,22 @@ export async function stationsToMeasure(store: string, all: Source[]): Promise<S
  */
 const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
 
-/** A source's entry in `sources.json`: its metadata less what only ingest uses, and its active stations. */
-export function sourceEntry(metadata: SourceMetadata, stations: number): object {
+/**
+ * A source's entry in `sources.json`: its metadata less what only ingest uses,
+ * and the number of its `stations` that are active. `license.commercial_use` is
+ * true only where every station allows it, inactive ones too, since their series stay.
+ */
+export function sourceEntry(
+  metadata: SourceMetadata,
+  stations: Pick<Station, "status" | "commercial_use">[],
+): object {
   return {
     ...Object.fromEntries(Object.entries(metadata).filter(([key]) => !INGEST_ONLY.has(key))),
-    stations,
+    license: {
+      ...metadata.license,
+      commercial_use: metadata.license.commercial_use && stations.every((st) => st.commercial_use),
+    },
+    stations: stations.filter((st) => st.status === "active").length,
   };
 }
 

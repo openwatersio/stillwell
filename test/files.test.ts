@@ -227,7 +227,9 @@ describe("published file definitions", () => {
     const path = join(store, "sources.json");
     await writeJsonArray(
       path,
-      Object.values(sources).map((s) => sourceEntry(s.metadata, 1)),
+      Object.values(sources).map((s) =>
+        sourceEntry(s.metadata, [{ status: "active", commercial_use: true }]),
+      ),
     );
     const published = JSON.parse(await readFile(path, "utf8"));
     assert.deepEqual(jsonProblems(SOURCES_SCHEMA, published), []);

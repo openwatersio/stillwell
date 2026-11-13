@@ -466,6 +466,34 @@ describe("publishStations", () => {
   });
   afterEach(() => rm(store, { recursive: true }));
 
+  it("gives commercial_use in sources.json as true only where every station allows it", async () => {
+    const published = async (stations: ListedStation[]) => {
+      await refreshSource(store, sourceOf(stations), { now: NOW });
+      await publishStations(store, [sourceOf([])], ["test"], []);
+      const [source] = JSON.parse(await readFile(sourcesPath(store), "utf8"));
+      return source;
+    };
+    assert.equal(
+      (await published([listed("a"), listed("b", { lat: 40 })])).license.commercial_use,
+      true,
+    );
+    const mixed = await published([listed("a"), listed("b", { commercial_use: false, lat: 40 })]);
+    assert.deepEqual([mixed.license.commercial_use, mixed.license.id], [false, "CC0-1.0"]);
+    // A station the source stopped listing stays in the store, with its series.
+    const gone = await published([listed("a")]);
+    assert.deepEqual([gone.license.commercial_use, gone.stations], [false, 1]);
+    // A source whose own terms bar it stays false, whatever its stations say.
+    await rm(store, { recursive: true });
+    const barred = {
+      ...sourceOf([listed("a")]),
+      metadata: { ...metadata, license: { ...metadata.license, commercial_use: false } },
+    };
+    await refreshSource(store, barred, { now: NOW });
+    await publishStations(store, [barred], ["test"], []);
+    const [own] = JSON.parse(await readFile(sourcesPath(store), "utf8"));
+    assert.equal(own.license.commercial_use, false);
+  });
+
   it("publishes every list with its bounds, epochs and links", async () => {
     const { stations } = await refreshSource(
       store,
@@ -484,7 +512,7 @@ describe("publishStations", () => {
     ]);
     assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
-      links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], large: [] },
+      links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], wide: [] },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
@@ -633,7 +661,7 @@ describe("publishStations", () => {
     // A new source with no list yet doesn't hold up the others.
     assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
-      links: { pairs: {}, dropped: [], skipped: [], large: [] },
+      links: { pairs: {}, dropped: [], skipped: [], wide: [] },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });

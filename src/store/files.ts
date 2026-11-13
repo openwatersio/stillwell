@@ -739,7 +739,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
           commercial_use: {
             type: "boolean",
             description:
-              "The default for the source's stations; a station's own `commercial_use` can differ.",
+              "True only where the source's terms and every one of its stations, inactive ones too, allow commercial use; read each station's own `commercial_use`.",
           },
           redistribution: {
             type: "boolean",
