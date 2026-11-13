@@ -2,9 +2,10 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "marimo",
+#     "duckdb",
 #     "polars",
-#     "altair",
 #     "pyarrow",
+#     "altair",
 #     "tzdata",
 # ]
 # ///
@@ -20,7 +21,7 @@ def _(mo):
     mo.md("""
     # Irish National Tide Gauge Network in Stillwell
 
-    Observed water levels from the Marine Institute's tide gauges, as [Stillwell](https://github.com/openwatersio/stillwell) publishes them: Parquet files at `https://stillwell.openwaters.io/`, one per station and year, updated every hour. This notebook reads them directly; nothing is downloaded in bulk.
+    Observed water levels from the Marine Institute's tide gauges, as [Stillwell](https://github.com/openwatersio/stillwell) publishes them: Parquet files at `https://stillwell.openwaters.io/`, one per station and year, updated every day. This notebook reads them directly with DuckDB; the [data guide](https://github.com/openwatersio/stillwell/blob/main/docs/data.md) describes every file and column.
 
     Data: Marine Institute, Irish National Tide Gauge Network, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
     """)
@@ -29,66 +30,26 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _():
-    import io
-    import sys
-
     import marimo as mo
-    import polars as pl
+    import duckdb
     import altair as alt
-    import pyarrow  # noqa: F401  polars needs these to read Parquet and time zones in WebAssembly,
-    import tzdata  # noqa: F401  where only packages the notebook imports are loaded
-    from datetime import datetime, timedelta, timezone
+    import pyarrow  # noqa: F401  in WebAssembly only imported packages load: pyarrow for .pl(), tzdata for UTC
+    import tzdata  # noqa: F401
+    from datetime import timedelta
 
-    LAKE = "https://stillwell.openwaters.io"
-
-
-    async def read_parquet(path):
-        """One file from the lake, or None if it doesn't exist. Fetches the whole
-        file, which works both on a server and in the browser (WebAssembly)."""
-        url = f"{LAKE}/{path}"
-        if sys.platform == "emscripten":
-            from pyodide.http import pyfetch
-
-            response = await pyfetch(url)
-            if response.status == 404:
-                return None
-            if not response.ok:
-                raise RuntimeError(f"{url}: HTTP {response.status}")
-            data = await response.bytes()
-        else:
-            import urllib.error
-            import urllib.request
-
-            try:
-                with urllib.request.urlopen(url) as response:
-                    data = response.read()
-            except urllib.error.HTTPError as e:
-                if e.code == 404:
-                    return None
-                raise
-        return pl.read_parquet(io.BytesIO(data))
-
-
-    def lat_offset_of(datums):
-        """The LAT offset from a station's datums, read as a dict or as key/value rows."""
-        if not datums:
-            return None
-        if isinstance(datums, dict):
-            return datums.get("LAT")
-        return next((d["value"] for d in datums if d["key"] == "LAT"), None)
-    return alt, datetime, lat_offset_of, mo, pl, read_parquet, timedelta, timezone
+    STORE = "https://stillwell.openwaters.io"
+    duckdb.sql("SET TimeZone = 'UTC'")
+    return STORE, alt, duckdb, mo, timedelta
 
 
 @app.cell(hide_code=True)
-async def _(lat_offset_of, pl, read_parquet):
-    _all = (await read_parquet("stations.parquet")).filter(pl.col("source") == "marine-institute")
-    stations = (
-        _all.with_columns(
-            pl.Series("lat_offset_m", [lat_offset_of(d) for d in _all["datums"].to_list()], dtype=pl.Float64)
-        )
-        .select("id", "name", "lat", "lon", "datum", "lat_offset_m", "first", "last")
-        .sort("name")
-    )
+def _(STORE, duckdb):
+    stations = duckdb.sql(f"""
+        SELECT id, name, lat, lon, datum, datums['LAT'] AS lat_offset_m, first, last
+        FROM '{STORE}/stations.parquet'
+        WHERE source = 'marine-institute'
+        ORDER BY name
+    """).pl()
     stations
     return (stations,)
 
@@ -105,35 +66,37 @@ def _(mo, stations, timedelta):
 
 
 @app.cell(hide_code=True)
-async def _(dates, datetime, pl, read_parquet, station, stations, timezone):
-    _row = stations.filter(pl.col("id") == station.value).row(0, named=True)
+def _(STORE, dates, datum, duckdb, station, stations):
+    _row = stations.row(stations["id"].index_of(station.value), named=True)
+    gauge, lat_offset = _row["name"], _row["lat_offset_m"]
     start, stop = dates.value
-    _frames = []
-    for _year in range(start.year, stop.year + 1):
-        _frame = await read_parquet(f"obs/{station.value}/{_year}.parquet")
-        if _frame is not None:
-            _frames.append(_frame.select("time", "level_m", "flag"))
-    _start = datetime(start.year, start.month, start.day, tzinfo=timezone.utc)
-    _stop = datetime(stop.year, stop.month, stop.day, 23, 59, 59, tzinfo=timezone.utc)
-    levels = (
-        pl.concat(_frames).filter(pl.col("time").is_between(_start, _stop))
-        if _frames
-        else pl.DataFrame(schema={"time": pl.Datetime("us", "UTC"), "level_m": pl.Float32, "flag": pl.UInt8})
-    )
-    lat_offset = _row["lat_offset_m"]
-    gauge = _row["name"]
+    # Every series here is in datum epoch 1, so its files are at obs/<id>/<year>.parquet.
+    # The years list says which of them exist; a missing file would fail the read.
+    _files = duckdb.sql(
+        f"SELECT list('{STORE}/obs/' || id || '/' || year || '.parquet') "
+        f"FROM '{STORE}/stations/years/marine-institute.parquet' WHERE id = ? AND year BETWEEN ? AND ?",
+        params=[station.value, start.year, stop.year],
+    ).fetchall()[0][0]
+    _shift = lat_offset if datum.value == "LAT" and lat_offset is not None else 0.0
+    levels = None
+    if _files:
+        levels = duckdb.sql(
+            f"""
+            SELECT time, level_m + ? AS level, flag,
+              CASE WHEN flag <= 2 THEN 'good' ELSE 'suspect or bad' END AS quality
+            FROM read_parquet({_files})
+            WHERE time >= ? AND time < ? + INTERVAL 1 DAY
+            ORDER BY time
+            """,
+            params=[_shift, start, stop],
+        ).pl()
     return gauge, lat_offset, levels
 
 
 @app.cell(hide_code=True)
-def _(alt, datum, gauge, lat_offset, levels, mo, pl):
-    _shift = lat_offset if datum.value == "LAT" and lat_offset is not None else 0.0
-    _plot = levels.with_columns(
-        (pl.col("level_m") + _shift).alias("level"),
-        pl.when(pl.col("flag") <= 2).then(pl.lit("good")).otherwise(pl.lit("suspect or bad")).alias("quality"),
-    )
+def _(alt, datum, gauge, lat_offset, levels, mo):
     _chart = (
-        alt.Chart(_plot)
+        alt.Chart(levels)
         .mark_line(strokeWidth=1)
         .encode(
             x=alt.X("time:T", title=None),
@@ -143,12 +106,8 @@ def _(alt, datum, gauge, lat_offset, levels, mo, pl):
         )
         .properties(width="container", height=320, title=gauge)
     )
-    mo.vstack(
-        [
-            mo.ui.altair_chart(_chart),
-            mo.md(f"{len(levels):,} values. LAT is OD Malin plus {lat_offset} m, the gauge's current offset." if lat_offset is not None else f"{len(levels):,} values. No LAT offset is published for this gauge."),
-        ]
-    )
+    _offset = f"LAT is OD Malin plus {lat_offset} m, the gauge's current offset." if lat_offset is not None else "No LAT offset is published for this gauge."
+    mo.vstack([mo.ui.altair_chart(_chart), mo.md(f"{len(levels):,} values. {_offset}")]) if levels is not None else mo.md(f"{gauge} has no values in these dates.")
     return
 
 
