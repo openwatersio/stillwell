@@ -320,6 +320,19 @@ describe("stillwell-api on ClickHouse", { skip: !process.env.CLICKHOUSE_URL }, (
           version: 1,
         },
       ]);
+      // Newer still, in epoch 1 after its until: outside its span, so neither shown nor counted.
+      await ch.insert("observations", [
+        {
+          station,
+          epoch: 1,
+          time: new Date(now - MIN / 2).toISOString(),
+          level: 1,
+          flag: Flag.preliminary,
+          source_flag: null,
+          received: null,
+          version: 1,
+        },
+      ]);
       const stations = catalog({
         since: [null, new Date(now - DAY).toISOString()],
         until: [new Date(now - DAY).toISOString(), null],

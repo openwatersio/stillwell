@@ -3,6 +3,7 @@ import { Flag } from "../schema.ts";
 import type { Catalog } from "./catalog.ts";
 import {
   conversionFor,
+  convertibleEpochs,
   levelsResponse,
   maxAge,
   parseLevels,
@@ -68,7 +69,7 @@ export function apiHandler(deps: {
     try {
       [values, asOf, updated] = await Promise.all([
         readLevels(deps.ch, id, query.start - half, query.end + half),
-        newest(deps.ch, id, [...station.epochs.keys()]),
+        newest(deps.ch, id, convertibleEpochs(station, conversion)),
         lastPass(deps.ch, station.source, station.min_interval_s ?? 0),
       ]);
     } catch (error) {
@@ -131,17 +132,32 @@ async function readLevels(
 }
 
 /**
- * The time of the station's newest value that isn't bad, or null, in the
- * epochs the station list knows: a value in an epoch opened since the list
- * was published can't be converted yet, so it isn't shown or counted.
+ * The time of the station's newest value that isn't bad and that the
+ * response could show: in an epoch that converts as asked, within its span.
+ * A value in an epoch opened since the list was published, or one that
+ * doesn't convert, isn't shown, so it isn't counted either.
  */
-async function newest(ch: ClickHouse, station: string, epochs: number[]): Promise<number | null> {
+async function newest(
+  ch: ClickHouse,
+  station: string,
+  epochs: { id: number; since: number | null; until: number | null }[],
+): Promise<number | null> {
+  if (!epochs.length) return null;
+  // Each epoch's span as arrays in step with its id; an open end is the widest time there is.
   const [row] = await ch.query<{ t: string | null }>(
     `SELECT toUnixTimestamp64Milli(maxOrNull(time)) AS t
      FROM observations FINAL
-     WHERE station = {station:String} AND flag != {bad:UInt8} AND epoch IN {epochs:Array(UInt16)}
+     WHERE station = {station:String} AND flag != {bad:UInt8} AND epoch IN {ids:Array(UInt16)}
+       AND toUnixTimestamp64Milli(time) >= {since:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
+       AND toUnixTimestamp64Milli(time) < {until:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
      SETTINGS do_not_merge_across_partitions_select_final = 1`,
-    { station, bad: Flag.bad, epochs },
+    {
+      station,
+      bad: Flag.bad,
+      ids: epochs.map((e) => e.id),
+      since: epochs.map((e) => e.since ?? Number.MIN_SAFE_INTEGER),
+      until: epochs.map((e) => e.until ?? Number.MAX_SAFE_INTEGER),
+    },
   );
   return row?.t == null ? null : Number(row.t);
 }

@@ -177,6 +177,20 @@ export function conversionFor(
   return { path: "datum", message: `${station.id} has no offset to ${datum}` };
 }
 
+/** The epochs whose values convert as asked, each with its span in ms, either end null when open. */
+export function convertibleEpochs(
+  station: CatalogStation,
+  conversion: Conversion,
+): { id: number; since: number | null; until: number | null }[] {
+  return [...station.epochs]
+    .filter(([id, e]) =>
+      conversion.named === null
+        ? e.to_current !== null
+        : station.offsets.get(id)?.has(conversion.named),
+    )
+    .map(([id, e]) => ({ id, since: e.since, until: e.until }));
+}
+
 /** A stored level in the datum asked for, or null when its epoch doesn't convert or the value is outside the epoch's span. */
 function convert(station: CatalogStation, conversion: Conversion, v: StoredLevel): number | null {
   const epoch = station.epochs.get(v.epoch);
