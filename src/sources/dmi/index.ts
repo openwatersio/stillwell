@@ -55,11 +55,19 @@ const OWNER_CREDITS: Record<string, string> = {
  */
 const DATUMS = { sealev_dvr: "DVR90", sea_reg: "DVR90", sealev_ln: "LN" } as const;
 /**
- * The Coastal Authority's `sea_reg` is on DVR90 from this instant; before it,
- * on an older reference 5 to 20 cm above it, so it isn't read: erratum
- * `dmi-coastal-authority-dnn`.
+ * The Coastal Authority's gauges running before it moved `sea_reg` to DVR90 on
+ * this day, each split into an epoch of its own from it, since before it
+ * they're on an older reference 5 to 20 cm above DVR90 by an offset nobody has
+ * measured: erratum `dmi-coastal-authority-dnn`. Splits are never removed,
+ * even once the erratum is retired.
  */
-const SEA_REG_DVR90_SINCE = Date.parse("2002-05-29T00:00:00Z");
+const DVR90_SINCE = "2002-05-29";
+export const SPLIT_STATIONS = [
+  9004201, 9004203, 9004303, 9005101, 9005103, 9005110, 9005113, 9005201, 9005203, 9005210, 9005212,
+  9005213, 9006401, 9006501, 9006601, 9006701, 9006703, 9006801, 9006901, 9006902, 9007101, 9007102,
+  9010101, 9010102, 9010201, 9010202, 9020101, 9020102, 9020201, 9020202, 9020301, 9020302, 9030101,
+  9030102, 9030201, 9030202,
+].map((n) => `dmi/${n}`);
 export type Parameter = keyof typeof DATUMS;
 
 const COUNTRIES: Record<string, string> = { DNK: "DK", GRL: "GL", FRO: "FO" };
@@ -171,12 +179,15 @@ export async function stations(previous: Station[] = []): Promise<DmiStation[]> 
     const recordEnd = ends.sort()[0] ?? null;
     // A handover the stored list doesn't end at yet: hourly ingest may have stored
     // the new owner's values since, which have to be deleted by hand.
+    // One the store has never listed has no values to delete, but still counts toward the floor.
+    const stored = ended.has(`dmi/${id}`);
     const was = ended.get(`dmi/${id}`);
     if (handedOver !== null && (was === undefined || was === null || was > recordEnd!)) {
       newHandovers++;
-      console.warn(
-        `DMI ${id} was handed to ${all[handover]!.properties.owner || "no owner"} on ${all[handover]!.properties.validFrom}; delete any values stored from then on, from recent/ too`,
-      );
+      if (stored)
+        console.warn(
+          `DMI ${id} was handed to ${all[handover]!.properties.owner || "no owner"} on ${all[handover]!.properties.validFrom}; delete any values stored from then on, from recent/ too`,
+        );
     }
     listed.push({
       ...stationDefaults(metadata),
@@ -267,7 +278,6 @@ export async function levels(
   const from = Math.max(
     start.getTime(),
     record_start ? Date.parse(record_start) - DAY_MS : -Infinity,
-    parameter === "sea_reg" ? SEA_REG_DVR90_SINCE : -Infinity,
   );
   const to = Math.min(end.getTime(), record_end ? Date.parse(record_end) + DAY_MS : Infinity);
   const out: Observation[] = [];
@@ -350,4 +360,18 @@ export const source: Source = {
   stations,
   seriesChanged,
   observations: (s, start, end) => levels(s.source_id, start, end, s as DmiStation),
+  overrides: {
+    // docs/stations.md, "Unreported zero moves": the epoch before converts only once an offset is measured.
+    splits: Object.fromEntries(
+      SPLIT_STATIONS.map((id) => [
+        id,
+        [
+          {
+            since: DVR90_SINCE,
+            note: "The Coastal Authority's `sea_reg` moves from an older reference, likely DNN, 5 to 20 cm above DVR90, to DVR90 by 29 May 2002 (erratum `dmi-coastal-authority-dnn`).",
+          },
+        ],
+      ]),
+    ),
+  },
 };

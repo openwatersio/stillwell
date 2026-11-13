@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
+import { epochSpans } from "../src/backfill.ts";
+import { splitStarts } from "../src/epochs.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
+import { mergeStationList } from "../src/stations.ts";
 
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
@@ -137,12 +140,12 @@ describe("dmi stations", () => {
       [hornbaek.status, hornbaek.record_start, hornbaek.record_end],
       ["inactive", "1891-01-01", "1991-10-11"],
     );
-    // DMI dates the Coastal Authority's records from 1990; `levels` reads them from May 2002.
+    // DMI dates the Coastal Authority's records from 1990.
     const coastal = stations.filter((s) => s.owner === "Kystdirektoratet / Coastal Authority");
     assert.ok(coastal.every((s) => s.record_start! >= "1990"));
   });
 
-  it("names in its erratum every Coastal Authority gauge the May 2002 cutoff trims", async () => {
+  it("names in its erratum every Coastal Authority gauge running before May 2002", async () => {
     serveList(fixture("dmi-stations.json"));
     const trimmed = (await dmi.stations())
       .filter((s) => s.parameter === "sea_reg" && (s.record_start ?? "") < "2002-05-29")
@@ -152,6 +155,11 @@ describe("dmi stations", () => {
     );
     const entry = errata.errata.find((e: { id: string }) => e.id === "dmi-coastal-authority-dnn");
     assert.deepEqual([...entry.stations].sort(), trimmed.sort());
+    // The splits name the same gauges, on the erratum's day.
+    assert.deepEqual([...dmi.SPLIT_STATIONS].sort(), trimmed.sort());
+    const splits = dmi.source.overrides!.splits!;
+    assert.deepEqual(Object.keys(splits).sort(), trimmed.sort());
+    assert.ok(Object.values(splits).every((s) => s.length === 1 && s[0]!.since === entry.until));
   });
 
   it("refuses a list caught short", async () => {
@@ -251,7 +259,7 @@ describe("dmi levels", () => {
     assert.equal(levels.length, 6);
   });
 
-  it("reads the Coastal Authority's registration only from its move to DVR90 in May 2002", async () => {
+  it("reads the Coastal Authority's registration from before its move to DVR90 in May 2002", async () => {
     const requests = serve([[/observation\/items/, fixture("dmi-levels-3.json")]]);
     await dmi.levels("9006401", new Date("2001-01-01Z"), new Date("2003-01-01Z"), {
       parameter: "sea_reg",
@@ -259,8 +267,47 @@ describe("dmi levels", () => {
     });
     assert.deepEqual(
       requests.map(([url]) => /datetime=([^&]+)/.exec(url)![1]),
-      ["2002-05-29T00:00:00.000Z/2002-12-31T23:59:59.999Z"],
+      [
+        "2001-01-01T00:00:00.000Z/2001-12-31T23:59:59.999Z",
+        "2002-01-01T00:00:00.000Z/2002-12-31T23:59:59.999Z",
+      ],
     );
+  });
+
+  it("splits the Coastal Authority's gauges into an unconverted epoch before 29 May 2002", async () => {
+    serveList(fixture("dmi-stations.json"));
+    const fetched = await dmi.stations();
+    const { stations } = mergeStationList([], fetched, {
+      now: "2026-11-12T00:00:00Z",
+      offsets: [0, 0],
+      decisions: {},
+      splits: dmi.source.overrides!.splits!,
+    });
+    const epochs = stations.find((s) => s.id === "dmi/9006401")!.epochs;
+    assert.deepEqual(
+      epochs.map((e) => [e.id, e.datum, e.since, e.until, e.to_current, e.state]),
+      [
+        [1, "DVR90", null, "2002-05-29T00:00:00Z", null, "closed"],
+        [2, "DVR90", "2002-05-29T00:00:00Z", null, 0, "open"],
+      ],
+    );
+    // Backfill writes each epoch's own span.
+    const spans = epochSpans(
+      epochs,
+      new Date("2001-01-01Z"),
+      new Date("2003-01-01Z"),
+      undefined,
+      splitStarts(dmi.source.overrides!.splits!["dmi/9006401"], [0, 0]),
+    );
+    assert.deepEqual(
+      spans.map((s) => [s.epoch.id, s.from.toISOString(), s.to.toISOString()]),
+      [
+        [1, "2001-01-01T00:00:00.000Z", "2002-05-29T00:00:00.000Z"],
+        [2, "2002-05-29T00:00:00.000Z", "2003-01-01T00:00:00.000Z"],
+      ],
+    );
+    // A gauge that started after the move, and DMI's own, keep one epoch.
+    assert.equal(stations.find((s) => s.id === "dmi/30017")!.epochs.length, 1);
   });
 
   it("refuses a parameter measured from another datum than the station's", async () => {
@@ -419,6 +466,10 @@ describe("dmi owners and series", () => {
       { stationId: "20070", parameterId: ["sealev_dvr"], validFrom: "1995-01-01T00:00:00Z" },
       { stationId: "20070", owner: "Kommuner/Havne", validFrom: "2018-04-16T00:00:00Z" },
     ]);
+    // A store that has never listed it has nothing to delete.
+    serveList(list);
+    await dmi.stations();
+    assert.equal(warn.mock.callCount(), 0);
     serveList(list);
     await dmi.stations([{ id: "dmi/20070", record_end: null } as unknown as Station]);
     assert.equal(warn.mock.callCount(), 1);
