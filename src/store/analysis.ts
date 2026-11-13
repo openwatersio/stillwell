@@ -402,6 +402,45 @@ export async function markRequalified(
 }
 
 /**
+ * Stations to mark requalified, given to `write` as they come once `everyMs`
+ * has passed since the last write, and by `flush`, one write at a time. A
+ * failed write keeps its stations for the next; `flush` returns those still
+ * unwritten.
+ */
+export function requalifiedMarks(
+  write: (ids: string[]) => Promise<void>,
+  everyMs: number,
+): { add(id: string): Promise<void>; flush(): Promise<string[]> } {
+  let done: string[] = [];
+  let last = Date.now();
+  let writing = Promise.resolve();
+  const flush = () => {
+    const ids = done;
+    done = [];
+    last = Date.now();
+    writing = writing.then(async () => {
+      if (!ids.length) return;
+      try {
+        await write(ids);
+      } catch (error) {
+        done.push(...ids);
+        console.error(
+          `couldn't mark ${ids.length} stations requalified: ${error instanceof Error ? error.message : error}`,
+        );
+      }
+    });
+    return writing.then(() => [...done]);
+  };
+  return {
+    async add(id) {
+      done.push(id);
+      if (Date.now() - last >= everyMs) await flush();
+    },
+    flush,
+  };
+}
+
+/**
  * Drop the stations `held` names from a source's analysis and its history,
  * rewriting only a file that names one, as withholding needs. Returns the
  * station IDs it dropped.
