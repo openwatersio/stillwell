@@ -6,6 +6,8 @@ import { describe, it } from "node:test";
 import {
   JUDGE,
   RULES,
+  RULES_HISTORY,
+  reaches,
   analyze,
   judge,
   markRequalified,
@@ -191,6 +193,43 @@ describe("qcFor", () => {
 });
 
 describe("analyze", () => {
+  it("requalifies under new rules only the stations whose options use a rule changed since", async () => {
+    const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
+    // Both tidal, but a river's QC leaves the outlier check off and the coast's leaves it on.
+    const stations = [river("1"), river("2", { kind: "coastal" })];
+    const last = new Date(Date.UTC(2026, 2, 31)).toISOString();
+    for (const id of ["1", "2"])
+      await writeObservations(
+        seriesPath(store, "levels", "test", id, 2026),
+        series(90, tide(0.5)),
+        "NAVD88",
+      );
+    await writeStationBounds(`${store}/stations/bounds/test.parquet`, [
+      { id: "test/1", first: "2026-01-01T00:00:00Z", last },
+      { id: "test/2", first: "2026-01-01T00:00:00Z", last },
+    ]);
+    const now = new Date(Date.UTC(2026, 3, 1));
+    await analyze(store, source, stations, { now });
+    await markRequalified(store, "test", ["test/1", "test/2"], now);
+    await writeAnalysis(
+      store,
+      "test",
+      [...(await readAnalysis(store, "test")).values()].map((a) => ({ ...a, rules: "span-1" })),
+    );
+    await analyze(store, source, stations, { now });
+    const after = await readAnalysis(store, "test");
+    assert.deepEqual(
+      [...after.values()].map((a) => [a.id, a.tidal, a.rules]),
+      [
+        ["test/1", true, RULES],
+        ["test/2", true, RULES],
+      ],
+    );
+    // Only outliers-1 came after span-1, and the coast's options use the outlier check; a version
+    // added since that reaches rivers puts test/1 here too.
+    assert.deepEqual(pending(after), ["test/2"]);
+  });
+
   it("writes each station's verdict, lists those whose QC changes, and skips those not due", async () => {
     const store = mkdtempSync(join(tmpdir(), "stillwell-analysis-"));
     const stations = [river("1"), river("2"), river("3")];
@@ -252,6 +291,22 @@ describe("analyze", () => {
     const rejudged = await analyze(store, source, stations, { now });
     assert.deepEqual(rejudged.changed, []);
     assert.deepEqual(pending(await readAnalysis(store, "test")), ["test/1", "test/2"]);
+    // A version since theirs whose rule a river's options don't use leaves it requalified, under the new rules.
+    await markRequalified(store, "test", ["test/1", "test/2"], now);
+    const since = RULES_HISTORY.at(-2)!.rules;
+    await writeAnalysis(
+      store,
+      "test",
+      [...(await readAnalysis(store, "test")).values()].map((a) => ({ ...a, rules: since })),
+    );
+    await analyze(store, source, stations, { now });
+    const scoped = await readAnalysis(store, "test");
+    assert.deepEqual(
+      [...scoped.values()].map((a) => a.rules),
+      [RULES, RULES],
+    );
+    // Neither river's options use the outlier check, which is all outliers-1 changed.
+    assert.deepEqual(pending(scoped), []);
     // A new judge judges every station again, and requalifies only those whose QC changes.
     await markRequalified(store, "test", ["test/1", "test/2"], now);
     const judged = await readAnalysis(store, "test");
@@ -382,6 +437,18 @@ describe("analyze", () => {
     assert.equal(kept.analyzed, now.toISOString());
     // The step is measured whatever the values say about the tide.
     assert.equal(kept.step_s, 3600);
+    // New rules its options don't use leave it requalified under the verdict it keeps: a tidal river's QC leaves outliers off.
+    await writeAnalysis(store, "test", [
+      { ...kept, rules: RULES_HISTORY.at(-2)!.rules, requalified: now.toISOString() },
+    ]);
+    await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
+    const unreached = (await readAnalysis(store, "test")).get("test/1")!;
+    assert.equal(unreached.rules, RULES);
+    assert.equal(
+      unreached.requalified,
+      // Kept: a tidal river's options leave off the outlier check, which is all outliers-1 changed.
+      now.toISOString(),
+    );
     // New rules still requalify it under the verdict it keeps.
     await markRequalified(store, "test", ["test/1"], now);
     await writeAnalysis(store, "test", [
@@ -390,6 +457,37 @@ describe("analyze", () => {
     await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
     const bumped = (await readAnalysis(store, "test")).get("test/1")!;
     assert.deepEqual([bumped.tidal, bumped.rules, bumped.requalified], [true, RULES, null]);
+  });
+});
+
+describe("reaches", () => {
+  const history = [
+    { rules: "a", rule: null },
+    { rules: "b", rule: "outliers" },
+    { rules: "c", rule: "jumps" },
+  ] as const;
+  const still = qcFor({ kind: "river", tidal: false });
+  const coast = qcFor({ kind: "coastal", tidal: true, tide_m: 1 });
+  const tidalRiver = qcFor({ kind: "river", tidal: true, tide_m: 1 });
+  it("reaches the stations whose options use a rule changed since", () => {
+    // `b` changed the outlier check, which only the coast's options leave on; `c` the jump check, also the coast's.
+    assert.deepEqual(
+      [still, coast, tidalRiver].map((o) => reaches("a", o, history)),
+      [false, true, false],
+    );
+    assert.deepEqual(
+      [still, coast, tidalRiver].map((o) => reaches("b", o, history)),
+      [false, true, false],
+    );
+  });
+  it("reaches every station from before a version that reaches any, or an unknown one", () => {
+    const older = [{ rules: "z", rule: null }, ...history] as const;
+    assert.ok(reaches("z", still, older));
+    assert.ok(reaches("older", still, history));
+  });
+  it("reaches none under the current version", () => {
+    assert.ok(![still, coast, tidalRiver].some((o) => reaches("c", o, history)));
+    assert.ok(!reaches(RULES, coast));
   });
 });
 

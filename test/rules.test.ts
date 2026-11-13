@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { qc } from "../src/qc.ts";
 import { qcFor } from "../src/store/recent.ts";
-import { JUDGE, RULES, judge } from "../src/store/analysis.ts";
+import { JUDGE, RULES, RULES_HISTORY, judge, reaches } from "../src/store/analysis.ts";
 import { Flag, type Observation, type StoredStation } from "../src/schema.ts";
 
 const FIXTURE = new URL("fixtures/rules.json", import.meta.url);
@@ -210,8 +210,22 @@ function record() {
       return [name, { ...verdict, tide_m: verdict.tide_m === null ? null : round(verdict.tide_m) }];
     }),
   );
-  return { rules: RULES, judge: JUDGE, options: STATIONS, flags, verdicts };
+  return {
+    rules: RULES,
+    judge: JUDGE,
+    options: STATIONS,
+    flags,
+    verdicts,
+    previous: undefined as Snapshot | undefined,
+  };
 }
+
+/** The flags of a rules version, which the next keeps to check its own against. */
+type Snapshot = {
+  rules: string;
+  options: Record<string, string>;
+  flags: Record<string, Record<string, string>>;
+};
 
 /** Flags by option set and case, as one record. */
 const flat = (flags: Record<string, Record<string, string>>) =>
@@ -229,6 +243,19 @@ const shared = <T>(a: Record<string, T>, b: Record<string, T>) =>
   ];
 
 describe("RULES and JUDGE", () => {
+  it("keep every version, in the order they shipped", () => {
+    const names = RULES_HISTORY.map((v) => v.rules);
+    assert.equal(new Set(names).size, names.length, "A version name is used twice");
+    // Rows in the store carry these; a version is only ever added at the end, and its rule never changes.
+    assert.deepEqual(RULES_HISTORY.slice(0, 5), [
+      { rules: "tidal-1", rule: null },
+      { rules: "held-1", rule: null },
+      { rules: "jumps-1", rule: null },
+      { rules: "span-1", rule: null },
+      { rules: "outliers-1", rule: "outliers" },
+    ]);
+  });
+
   it("change whenever what the rules do changes", () => {
     const now = record();
     const was = JSON.parse(readFileSync(FIXTURE, "utf8")) as typeof now;
@@ -244,11 +271,11 @@ describe("RULES and JUDGE", () => {
       assert.deepEqual(
         now.options,
         was.options,
-        `qcFor's options changed: bump RULES in src/store/analysis.ts, ${regenerate}`,
+        `qcFor's options changed: add a version to RULES_HISTORY in src/store/analysis.ts, ${regenerate}`,
       );
       assert.deepEqual(
         ...shared(flat(now.flags), flat(was.flags)),
-        `QC's flags changed: bump RULES in src/store/analysis.ts, ${regenerate}`,
+        `QC's flags changed: add a version to RULES_HISTORY in src/store/analysis.ts, ${regenerate}`,
       );
     }
     if (was.judge === JUDGE)
@@ -256,6 +283,35 @@ describe("RULES and JUDGE", () => {
         ...shared(now.verdicts, was.verdicts),
         `judge's verdicts changed: bump JUDGE in src/store/analysis.ts, ${regenerate}`,
       );
+    // The snapshot keeps the last version's flags, so every run checks that
+    // flags changed since then only for the stations the versions since reach,
+    // compared station by station, since a change to `qcFor` changes an option set's key too.
+    const before =
+      was.rules === RULES
+        ? was.previous
+        : { rules: was.rules, options: was.options, flags: was.flags };
+    if (before) {
+      assert.ok(
+        RULES_HISTORY.some((v) => v.rules === before.rules),
+        `The snapshot's ${before.rules} isn't in RULES_HISTORY`,
+      );
+      const since = RULES_HISTORY.slice(
+        RULES_HISTORY.findIndex((v) => v.rules === before.rules) + 1,
+      );
+      if (since.every((v) => v.rule !== null))
+        assert.deepEqual(
+          now.options,
+          before.options,
+          `qcFor's options changed, which reaches any station: give the version a null rule in RULES_HISTORY`,
+        );
+      for (const [label, options] of Object.entries(now.options))
+        if (!reaches(before.rules, JSON.parse(options)) && before.options[label])
+          assert.deepEqual(
+            ...shared(now.flags[options] ?? {}, before.flags[before.options[label]!] ?? {}),
+            `QC's flags changed for ${label}, which no rule changed since ${before.rules} reaches: name the rule the change reaches in RULES_HISTORY, or null`,
+          );
+    }
+    now.previous = before;
     if (process.env.UPDATE_RULES) writeFileSync(FIXTURE, JSON.stringify(now, null, 2) + "\n");
     else
       assert.deepEqual([was.rules, was.judge], [RULES, JUDGE], `A version changed: ${regenerate}`);

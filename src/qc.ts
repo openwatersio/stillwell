@@ -50,6 +50,9 @@ export interface QcOptions {
   jumps?: boolean;
 }
 
+/** The rules `QcOptions` turns on and off, and whether each is on where a station's options don't say. */
+export const SWITCHES = { outliers: true, held: true, jumps: false };
+
 /** How long a level unchanged is suspect, where a source's settings don't say. */
 export const FLATLINE_S = 6 * 3600;
 
@@ -117,9 +120,9 @@ export function qc<T extends Observation>(
     flatline_m = 0,
     centimeter_flatline_s = 0,
     spike_m = 0.25,
-    outliers = true,
-    held = true,
-    jumps = false,
+    outliers = SWITCHES.outliers,
+    held = SWITCHES.held,
+    jumps = SWITCHES.jumps,
   }: QcOptions = {},
   context: Observation[] = [],
 ): T[] {
