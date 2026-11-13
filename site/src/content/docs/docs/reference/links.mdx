@@ -19,8 +19,9 @@ import QueryResult from "../../../../components/QueryResult.astro";
     b: "The other station of the pair.",
     a_epoch: "The datum epoch of `a` whose levels were measured.",
     b_epoch: "The datum epoch of `b` whose levels were measured.",
-    since: "The first hour measured, in UTC.",
-    until: "The last hour measured, in UTC.",
+    since: "The start of the measured span, in UTC.",
+    until:
+      "The end of the measured span, in UTC, exclusive: the end of the year measured, or the last value.",
     hours: "How many hours the offset is the median of, at least 30 days' worth.",
     offset_m:
       "The median of `b`'s level less `a`'s, in meters, each in its own epoch's datum. Add it to a level of `a` to refer it to `b`'s datum.",

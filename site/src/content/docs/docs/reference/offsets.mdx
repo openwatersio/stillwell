@@ -28,6 +28,7 @@ import QueryResult from "../../../../components/QueryResult.astro";
 - An epoch that converts to the current one has a row for every datum in the station's current `datums`, its offset there plus the epoch's `to_current`.
 - An epoch that doesn't convert (`to_current` null) has rows only for its own frozen offsets, from its `datums` in `epochs`. One with none has no rows.
 - A station's own label, such as NAP, STND or the `MSL` RWS measures its offshore platforms from, isn't the datum of that name. It has a row only where it's the station's `chart_datum`, as Kartverket's `CD` is, and only in an epoch that converts. Its offset is the epoch's `to_current`, which is 0 in the current epoch.
+- A `rejected` epoch has rows too: its values read as the epoch before it, so it carries that epoch's offsets.
 
 A join on a datum the epoch has no row for finds nothing. To read a level in its own epoch's reference, or to put it in the station's current `datum`, use `to_current` from `epochs` instead.
 
