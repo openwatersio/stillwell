@@ -5,7 +5,8 @@ name: Bucket check
 # docs/data.md. Without fsspec installed, pandas fetches a URL through urllib
 # with Python's default agent, which a zone setting once refused with a 403
 # (issue #1), so a rule change that blocks either client fails here instead of
-# in someone's notebook.
+# in someone's notebook. Then it compares a sample of the files with their
+# definitions in src/store/files.ts (scripts/check-files.ts).
 on:
   schedule:
     - cron: "30 6 * * 1"
@@ -53,3 +54,18 @@ jobs:
           ).fetchone()[0]
           print(f"obs/rws/hoekvanholland/2024.parquet with DuckDB: {rows} rows")
           assert rows > 0
+
+  files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - name: Compare a sample of the bucket's files with their definitions
+        run: node scripts/check-files.ts https://stillwell.openwaters.io
