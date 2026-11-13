@@ -12,7 +12,6 @@ Needs duckdb (pip install duckdb).
 import math
 import json
 import sys
-from urllib.parse import quote
 
 import duckdb
 
@@ -49,8 +48,8 @@ listed = {
 if year not in listed:
     sys.exit(f"{sid} has no {year} file in epoch {epoch}; it has {sorted(listed)}")
 
-# The object key holds the URL-encoded station ID (src/store/paths.ts), so a URL encodes it again; later epochs have a directory of their own.
-base = f"{STORE}/obs/{source}/{quote(quote(source_id, safe="!'()*"), safe='')}" + ("" if epoch == 1 else f"/{epoch}")
+# A source_id needs no URL-encoding (src/store/paths.ts); later epochs have a directory of their own.
+base = f"{STORE}/obs/{source}/{source_id}" + ("" if epoch == 1 else f"/{epoch}")
 years = {}
 for y in (year - 1, year, year + 1):
     if y not in listed:

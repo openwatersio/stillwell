@@ -10,7 +10,6 @@ Needs duckdb (pip install duckdb). Reads epoch 1's file.
 """
 
 import sys
-from urllib.parse import quote
 
 import duckdb
 
@@ -25,7 +24,7 @@ found = con.execute(f"select interval_s from '{STORE}/stations.parquet' where id
 if found is None or found[0] is None:
     sys.exit(f"{sid} isn't listed, or has no interval_s to judge gaps by")
 gap = 1.5 * found[0]
-url = f"{STORE}/obs/{source}/{quote(quote(source_id, safe="!'()*"), safe='')}/{year}.parquet"
+url = f"{STORE}/obs/{source}/{source_id}/{year}.parquet"
 raised = "flag >= 3 and coalesce(source_flag, 0) < 3"
 n, qc, edge, near, gaps = con.execute(
     f"""

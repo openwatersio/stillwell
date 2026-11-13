@@ -126,7 +126,8 @@ const STATION_COLUMNS: Column[] = [
   {
     name: "source_id",
     type: "VARCHAR",
-    description: "The source's own ID for the station. Series paths hold it URL-encoded.",
+    description:
+      "The source's own ID for the station, or one made from it: letters, digits, `.`, `_`, `~` and `-`, so series paths and URLs hold it as it is.",
   },
   { name: "name", type: "VARCHAR", description: "The station's name, as the source gives it." },
   {
@@ -381,7 +382,7 @@ export const FLAG_COUNTS = ["good", "interpolated", "preliminary", "suspect", "b
 
 const SERIES_PATH = "<source>/<station>[/<epoch>]/<year>.parquet";
 const SERIES_NOTE =
-  "`<station>` is the station's `source_id`, URL-encoded in the object's key, so encoded twice in a URL, and `<epoch>` the datum epoch's `id`, left out for epoch 1.";
+  "`<station>` is the station's `source_id`, which needs no URL-encoding, and `<epoch>` the datum epoch's `id`, left out for epoch 1.";
 
 const OBSERVATION_COLUMNS = [TIME, LEVEL("level"), FLAG, SOURCE_FLAG, RECEIVED, DATUM];
 

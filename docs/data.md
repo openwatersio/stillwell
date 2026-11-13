@@ -29,7 +29,7 @@ predicted-extremes/<source>/<station>/<year>.parquet  the source's predicted hig
 
 [`datapackage.json`](https://stillwell.openwaters.io/datapackage.json) describes each of these files but `history/` as a resource of a [Frictionless Data Package](https://datapackage.org/): its path pattern, each column's type, whether it can be null and what it means, and how its rows are sorted. Beside the standard Table Schema properties, each field has `duckdbType`, the type the writers write, and `optional` where some files lack the column, such as `source_flag` in older files or `transit` outside BSH's. A resource whose path has a `<placeholder>` gives one real file as its `path` and the layout as `pattern`. It's built from [`src/store/files.ts`](../src/store/files.ts), which the writers use, so it describes what they write.
 
-- **`<station>`** is the station's `source_id` from `stations.parquet`, URL-encoded in the object's key, so a URL encodes it twice: `a b` is `a%2520b`. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
+- **`<station>`** is the station's `source_id` from `stations.parquet`, which holds only letters, digits, `.`, `_`, `~` and `-`, so it goes into a URL as it is. A station's `id` is `<source>/<source_id>`, such as `rws/hoekvanholland`, so the path is the `id` with the product in front.
 - **Datum epochs.** When a source moves a station to another reference, its later values go to files of their own, with the epoch's number after `<station>`: `obs/<source>/<station>/2/<year>.parquet`. Epoch 1 is the plain path, and `recent` rows say their epoch in its `epoch` column; rows from different epochs are in different datums. Most stations have one epoch; [Datum epochs](#datum-epochs) below shows how to read across several.
 - **`time`** is UTC, as `TIMESTAMPTZ`. Set your session to UTC (`SET TimeZone = 'UTC'`) or tools such as pandas show it in your local zone.
 - **`level_m`** is meters in the file's `datum`, which is the same on every row and matches its epoch's `datum` in `stations.parquet`.
@@ -332,8 +332,6 @@ SELECT list('https://stillwell.openwaters.io/obs/' || id ||
 FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
 WHERE id = 'rws/hoekvanholland' AND year IS NOT NULL;
 ```
-
-That works for an `id` whose `source_id` needs no URL-encoding; one with a `/`, space or other reserved character needs its `source_id` encoded twice in the path.
 
 **Caching.** To keep a local copy of a year, read its row in the years file first, then download the file and store the row's `version` beside it, and download it again only when the years file shows a different one. Read in that order, a download that lands just after a run rewrote the file holds newer rows than the version stored with it, which costs one more download next time, never a stale copy; read the other way round, it can store an old version beside new rows. Don't cache a station's years while it's marked. A file's HTTP `ETag` works as well for a conditional request, with `If-None-Match`, but treat it as an opaque tag to compare with the last one seen, not as a checksum: an object uploaded in several parts has an `ETag` that isn't its MD5.
 
