@@ -1,0 +1,41 @@
+---
+// One erratum from errata.json, folded to its id and what the store does.
+import { markdown } from "../lib/render";
+import { stationPath } from "../lib/paths";
+
+interface Props {
+  erratum: Record<string, any>;
+}
+const { erratum: e } = Astro.props;
+const n = e.stations?.length ?? 0;
+const where = n ? `${n} ${n === 1 ? "station" : "stations"}` : "source-wide";
+const when =
+  e.since || e.until ? `, ${e.since?.slice(0, 10) ?? "…"} to ${e.until?.slice(0, 10) ?? "…"}` : "";
+---
+
+<details>
+  <summary>
+    <strong>{e.id}</strong>: {`${e.handling}, ${where}${when}`}
+  </summary>
+  <Fragment set:html={markdown(e.error)} />
+  <p>
+    <strong>What the store does:</strong>
+  </p>
+  <Fragment set:html={markdown(e.response)} />
+  {n > 0 && (
+    <p>
+      {e.stations.slice(0, 20).map((id: string, i: number) => (
+        <>
+          {i > 0 && ", "}
+          <a href={stationPath(id)}>{id}</a>
+        </>
+      ))}
+      {n > 20 && `, and ${n - 20} more`}
+    </p>
+  )}
+  {e.url && (
+    <p>
+      <a href={e.url}>Evidence</a>
+    </p>
+  )}
+</details>

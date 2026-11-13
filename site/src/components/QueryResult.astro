@@ -1,0 +1,76 @@
+---
+// A query shown with its result, run when the site builds, and a link to run it live in the query page.
+import { Code } from "@astrojs/starlight/components";
+import { table } from "../lib/store";
+import { queryPath } from "../lib/paths";
+
+interface Props {
+  sql: string;
+  limit?: number;
+  showSql?: boolean;
+}
+const { sql, limit = 50, showSql = true } = Astro.props;
+const result = await table(sql, limit);
+const numeric = result.types.map((t) => /INT|FLOAT|DOUBLE|DECIMAL/.test(t));
+---
+
+{showSql && <Code code={sql.trim()} lang="sql" />}
+<div class="query-result not-content">
+  <table>
+    <thead>
+      <tr>
+        {result.columns.map((c, i) => (
+          <th class:list={{ num: numeric[i] }}>
+            {c}
+            <small>{result.types[i].toLowerCase()}</small>
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {result.rows.map((r) => (
+        <tr>
+          {r.map((v, i) => (
+            <td class:list={{ num: numeric[i] }}>{v}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>
+    <a href={queryPath(sql)}>Run and edit in your browser</a>
+    <span>Result as of the site's last build.</span>
+  </p>
+</div>
+
+<style>
+  .query-result {
+    margin-top: 0.5rem;
+    overflow-x: auto;
+    font-size: var(--sl-text-sm);
+  }
+  table {
+    border-collapse: collapse;
+    font-family: var(--sl-font-mono);
+  }
+  th,
+  td {
+    padding: 0.2rem 0.75rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    text-align: left;
+    white-space: nowrap;
+  }
+  th small {
+    display: block;
+    font-weight: normal;
+    color: var(--sl-color-gray-3);
+  }
+  .num {
+    text-align: right;
+  }
+  p {
+    display: flex;
+    gap: 1rem;
+    color: var(--sl-color-gray-3);
+  }
+</style>

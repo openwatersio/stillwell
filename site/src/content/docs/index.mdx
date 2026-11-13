@@ -1,0 +1,35 @@
+---
+title: Stillwell
+description: Observed and predicted water levels from tide, river and lake gauges around the world, as open Parquet.
+template: splash
+hero:
+  tagline: Observed and predicted water levels from tide, river and lake gauges around the world, fetched from each agency, quality checked, and published as Parquet for anyone to read.
+  actions:
+    - text: Read the data
+      link: /guide/reading-the-data/
+      icon: right-arrow
+    - text: Query it in your browser
+      link: /query/
+      variant: minimal
+---
+
+import { CardGrid, Card } from "@astrojs/starlight/components";
+import { rows, json } from "../../lib/store";
+
+export const sources = await json("sources.json");
+export const [totals] = await rows(`
+  SELECT count(*)::INT AS stations, count(*) FILTER (WHERE status = 'active')::INT AS active,
+    count(*) FILTER (WHERE list_contains(products, 'levels') AND preferred = id)::INT AS gauges,
+    count(*) FILTER (WHERE live)::INT AS live, count(DISTINCT country_code)::INT AS countries
+  FROM 'https://stillwell.openwaters.io/stations.parquet'`);
+
+<CardGrid>
+  <Card title="Sources">{sources.length} agencies and archives</Card>
+  <Card title="Stations">
+    {totals.stations.toLocaleString("en-US")}, {totals.active.toLocaleString("en-US")} active
+  </Card>
+  <Card title="Gauges with observed levels">
+    {totals.gauges.toLocaleString("en-US")} in {totals.countries} countries
+  </Card>
+  <Card title="Polled every hour">{totals.live.toLocaleString("en-US")}</Card>
+</CardGrid>

@@ -1,0 +1,250 @@
+---
+// One page per station, built from stations.parquet, the years lists and errata.json.
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { Code } from "@astrojs/starlight/components";
+import LevelChart from "../../../components/LevelChart.astro";
+import Erratum from "../../../components/Erratum.astro";
+import { stations, years, json } from "../../../lib/store";
+import { flagChart } from "../../../lib/render";
+import { seriesUrl, stationPath, queryPath } from "../../../lib/paths";
+
+export async function getStaticPaths() {
+  const all = await stations();
+  // STATIONS=usgs,rws builds only those sources' pages, for a quicker build while working on them.
+  const only = process.env.STATIONS?.split(",");
+  return all
+    .filter((s) => !only || only.includes(s.source))
+    .map((s) => ({ params: { source: s.source, id: s.source_id }, props: { station: s } }));
+}
+
+const { station: s } = Astro.props;
+const byId = new Map((await stations()).map((d) => [d.id, d]));
+const yearRows = (await years(s.source)).get(s.id) ?? [];
+const errata = (await json("errata.json")).filter(
+  (e) => e.stations?.includes(s.id) || (e.source === s.source && !e.stations?.length),
+);
+const linked = s.same_as.map((id: string) => byId.get(id)).filter(Boolean);
+// Predictions from this station, or from a linked one whose datum this station has an offset to, such as BSH's for a PEGELONLINE gauge.
+const predictor = [s, ...linked].find(
+  (d) => d.products.includes("predictions") && (d.datum === s.datum || s.datums[d.datum] != null),
+);
+const day = (d?: Date) => d?.toISOString().slice(0, 10) ?? "–";
+const latest = yearRows.at(-1);
+const example = latest
+  ? `SET TimeZone = 'UTC';
+SELECT time, level_m, flag
+FROM '${seriesUrl("obs", s.id, latest.year, latest.epoch)}'
+WHERE flag <= 2
+ORDER BY time DESC LIMIT 10`
+  : `SELECT * FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = '${s.id}'`;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: s.name,
+    description: `${s.id}: water levels from ${s.source}`,
+    pagefind: false,
+  }}
+  headings={[
+    ["levels", "Levels"],
+    ["years", "Years in the store"],
+    ["datums", "Datums"],
+    ["linked", "Linked stations"],
+    ["errata", "Errata"],
+    ["terms", "Terms"],
+    ["read", "Read it yourself"],
+  ].map(([slug, text]) => ({ depth: 2, slug, text }))}
+>
+  <p>
+    <code>{s.id}</code> · <a href={`/sources/${s.source}/`}>{s.source}</a> ·{" "}
+    {s.kind ?? "kind unknown"} · {s.country_code} · {s.status}
+    {s.live && ", polled hourly"}
+    {s.source_url && (
+      <>
+        {" "}
+        · <a href={s.source_url}>at the source</a>
+      </>
+    )}
+  </p>
+
+  <table>
+    <tr>
+      <th>Record</th>
+      <td>
+        {day(s.first)} to {day(s.last)}
+      </td>
+    </tr>
+    <tr>
+      <th>Datum</th>
+      <td>
+        {s.datum}
+        {s.chart_datum && `, chart datum ${s.chart_datum}`}
+      </td>
+    </tr>
+    <tr>
+      <th>Tide</th>
+      <td>
+        {s.tidal == null
+          ? "unknown"
+          : s.tidal
+            ? `tidal, M2 + O1 = ${s.tide_m?.toFixed(3)} m`
+            : "not tidal"}
+      </td>
+    </tr>
+    <tr>
+      <th>Interval</th>
+      <td>{s.interval_s ? `${s.interval_s / 60} min` : "unknown"}</td>
+    </tr>
+    <tr>
+      <th>Products</th>
+      <td>{s.products.join(", ")}</td>
+    </tr>
+    <tr>
+      <th>Position</th>
+      <td>
+        {s.lat?.toFixed(5)}, {s.lon?.toFixed(5)}
+      </td>
+    </tr>
+  </table>
+
+  <h2 id="levels">Levels</h2>
+  {yearRows.length || s.live ? (
+    <LevelChart
+      station={s}
+      years={yearRows}
+      predictor={predictor && { id: predictor.id, datum: predictor.datum }}
+    />
+  ) : (
+    <p>No observed levels yet.</p>
+  )}
+
+  <h2 id="years">Years in the store</h2>
+  {yearRows.length ? <Fragment set:html={flagChart(yearRows)} /> : <p>No year files yet.</p>}
+  {yearRows.length > 0 && (
+    <p>
+      {yearRows.length} year {yearRows.length === 1 ? "file" : "files"}
+      {new Set(yearRows.map((y) => y.epoch)).size > 1 &&
+        `, in ${new Set(yearRows.map((y) => y.epoch)).size} datum epochs`}
+      .
+      {s.source_qc_start &&
+        ` ${s.source} checks values from ${day(s.source_qc_start)}${s.source_qc_start_inferred ? " (inferred from its flags)" : ""}.`}
+    </p>
+  )}
+
+  <h2 id="datums">Datums</h2>
+  <p>Add an offset to a level in {s.datum} to refer it to that datum.</p>
+  <table>
+    <tr>
+      <th>Datum</th>
+      <th>Add (m)</th>
+      <th>From</th>
+      <th>Reduced over</th>
+    </tr>
+    {Object.entries(s.datums).map(([name, offset]) => (
+      <tr>
+        <td>{name}</td>
+        <td>{(offset as number).toFixed(3)}</td>
+        <td>{s.datums_source[name] ?? ""}</td>
+        <td>
+          {s.datums_epoch[name]
+            ? `${s.datums_epoch[name].start ?? ""} to ${s.datums_epoch[name].end ?? ""}`
+            : ""}
+        </td>
+      </tr>
+    ))}
+  </table>
+  {s.datums_attribution.length > 0 && (
+    <p>
+      Offsets not from {s.source} itself credit: {s.datums_attribution.join("; ")}.
+    </p>
+  )}
+  {s.epochs.length > 1 && (
+    <table>
+      <tr>
+        <th>Epoch</th>
+        <th>Datum</th>
+        <th>Since</th>
+        <th>Until</th>
+        <th>To current (m)</th>
+        <th>State</th>
+      </tr>
+      {s.epochs.map((e: any) => (
+        <tr>
+          <td>{e.id}</td>
+          <td>{e.datum}</td>
+          <td>{e.since?.slice(0, 10)}</td>
+          <td>{e.until?.slice(0, 10)}</td>
+          <td>{e.to_current}</td>
+          <td>{e.state}</td>
+        </tr>
+      ))}
+    </table>
+  )}
+
+  <h2 id="linked">Linked stations</h2>
+  {linked.length ? (
+    <>
+      <table>
+        <tr>
+          <th>Station</th>
+          <th>Products</th>
+          <th>Record</th>
+          <th>Status</th>
+        </tr>
+        {linked.map((d: any) => (
+          <tr>
+            <td>
+              <a href={stationPath(d.id)}>{d.id}</a>
+              {d.id === s.preferred && " (preferred)"}
+            </td>
+            <td>{d.products.join(", ")}</td>
+            <td>
+              {day(d.first)} to {day(d.last)}
+            </td>
+            <td>{d.status}</td>
+          </tr>
+        ))}
+      </table>
+      <p>
+        For the gauge's observed levels, use{" "}
+        {s.preferred === s.id ? (
+          "this station"
+        ) : (
+          <a href={stationPath(s.preferred)}>{s.preferred}</a>
+        )}
+        {s.tide_station && `; its record in slackwater-database is ${s.tide_station}`}.
+      </p>
+    </>
+  ) : (
+    <p>No other source carries this gauge.</p>
+  )}
+
+  <h2 id="errata">Errata</h2>
+  {errata.length ? (
+    errata.map((e) => <Erratum erratum={e} />)
+  ) : (
+    <p>No errata touch this station.</p>
+  )}
+
+  <h2 id="terms">Terms</h2>
+  <table>
+    <tr>
+      <th>License</th>
+      <td>{s.license}</td>
+    </tr>
+    <tr>
+      <th>Commercial use</th>
+      <td>{s.commercial_use ? "allowed" : "not allowed"}</td>
+    </tr>
+    <tr>
+      <th>Credit</th>
+      <td>{s.attribution}</td>
+    </tr>
+  </table>
+
+  <h2 id="read">Read it yourself</h2>
+  <Code code={example} lang="sql" />
+  <p>
+    <a href={queryPath(example)}>Run and edit in your browser</a>
+  </p>
+</StarlightPage>

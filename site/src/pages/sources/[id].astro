@@ -1,0 +1,165 @@
+---
+// One page per source, from sources.json, stations.parquet, its years list and errata.json.
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import Erratum from "../../components/Erratum.astro";
+import { stations, years, json } from "../../lib/store";
+import { flagChart, markdown } from "../../lib/render";
+import { recentUrl } from "../../lib/paths";
+
+export async function getStaticPaths() {
+  return (await json("sources.json")).map((source) => ({
+    params: { id: source.id },
+    props: { source },
+  }));
+}
+
+const { source: s } = Astro.props;
+const list = (await stations()).filter((d) => d.source === s.id);
+const live = list.filter((d) => d.live).length;
+const byYear = new Map<number, Record<string, any>>();
+for (const rows of (await years(s.id)).values())
+  for (const r of rows) {
+    const y = byYear.get(r.year) ?? { year: r.year };
+    for (const flag of ["good", "interpolated", "preliminary", "suspect", "bad"])
+      y[flag] = (y[flag] ?? 0) + Number(r[flag] ?? 0);
+    byYear.set(r.year, y);
+  }
+const errata = (await json("errata.json")).filter((e) => e.source === s.id);
+const year = (d?: Date) => d?.getUTCFullYear() ?? "–";
+const first = list.reduce<Date | undefined>(
+  (m, d) => (d.first && (!m || d.first < m) ? d.first : m),
+  undefined,
+);
+---
+
+<StarlightPage
+  frontmatter={{ title: s.name, description: `Water levels from ${s.name} in Stillwell` }}
+>
+  <p>
+    <code>{s.id}</code> · <a href={s.url}>{new URL(s.url).host}</a> ·
+    <a href={`https://github.com/openwatersio/stillwell/blob/main/src/sources/${s.id}/README.md`}>
+      how Stillwell reads it
+    </a>
+  </p>
+  <p>
+    {list.length.toLocaleString("en-US")} stations,{" "}
+    {list.filter((d) => d.status === "active").length.toLocaleString("en-US")} active and{" "}
+    {live.toLocaleString("en-US")} polled every hour, with records from {year(first)}.
+    {live > 0 && <span data-latest={recentUrl(s.id)}>The newest value is from …</span>}
+  </p>
+
+  <h2 id="terms">Terms</h2>
+  <table>
+    <tr>
+      <th>License</th>
+      <td>{s.license?.url ? <a href={s.license.url}>{s.license.name}</a> : s.license?.name}</td>
+    </tr>
+    <tr>
+      <th>Commercial use</th>
+      <td>
+        {s.license?.commercial_use ? "allowed" : "not allowed"}; each station's own terms apply
+      </td>
+    </tr>
+    <tr>
+      <th>Credit</th>
+      <td>{s.attribution}</td>
+    </tr>
+    <tr>
+      <th>Checks its values</th>
+      <td>
+        {s.finalizes
+          ? "yes: preliminary values are checked later"
+          : "no: its preliminary values stay preliminary"}
+      </td>
+    </tr>
+  </table>
+  <Fragment set:html={markdown(s.terms)} />
+
+  <h2 id="values">Values by year</h2>
+  <Fragment set:html={flagChart([...byYear.values()].sort((a, b) => a.year - b.year))} />
+
+  <h2 id="stations">Stations</h2>
+  <input
+    type="search"
+    placeholder="Filter by name or ID"
+    data-filter
+    aria-label="Filter stations"
+  />
+  <table data-stations={`/data/stations/${s.id}.json`}>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Station</th>
+        <th>Kind</th>
+        <th>Status</th>
+        <th>Datum</th>
+        <th>Record</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="6">Loading stations…</td>
+      </tr>
+    </tbody>
+  </table>
+  <p data-shown></p>
+
+  <h2 id="errata">Errata</h2>
+  {errata.length ? (
+    errata.map((e) => <Erratum erratum={e} />)
+  ) : (
+    <p>No errata are recorded for this source.</p>
+  )}
+</StarlightPage>
+
+<script>
+  import { latest } from "../../lib/read";
+
+  // The newest value in recent/, from the file's footer alone.
+  for (const el of document.querySelectorAll<HTMLElement>("[data-latest]"))
+    latest(el.dataset.latest!).then((t) => {
+      el.textContent = t
+        ? `The newest value is from ${t.toISOString().slice(0, 16).replace("T", " ")} UTC.`
+        : "";
+    });
+
+  // The station list loads as JSON and shows 100 matches at a time, so a source with 14,000 stations stays a small page.
+  const table = document.querySelector<HTMLTableElement>("[data-stations]");
+  const filter = document.querySelector<HTMLInputElement>("[data-filter]");
+  const shown = document.querySelector<HTMLElement>("[data-shown]");
+  if (table && filter && shown) {
+    const list: any[][] = await fetch(table.dataset.stations!).then((r) => r.json());
+    const body = table.tBodies[0];
+    const cell = (text: string) =>
+      Object.assign(document.createElement("td"), { textContent: text });
+    const draw = () => {
+      const q = filter.value.toLowerCase();
+      const matches = q ? list.filter((d) => `${d[0]} ${d[2]}`.toLowerCase().includes(q)) : list;
+      body.replaceChildren(
+        ...matches.slice(0, 100).map(([name, path, id, kind, status, live, datum, first, last]) => {
+          const tr = document.createElement("tr");
+          const link = Object.assign(document.createElement("a"), {
+            href: path,
+            textContent: name,
+          });
+          tr.append(
+            document.createElement("td"),
+            cell(id),
+            cell(kind ?? ""),
+            cell(`${status}${live ? ", live" : ""}`),
+            cell(datum ?? ""),
+            cell(first ? `${first}–${last}` : "none yet"),
+          );
+          tr.firstChild!.appendChild(link);
+          return tr;
+        }),
+      );
+      shown.textContent =
+        matches.length > 100
+          ? `Showing 100 of ${matches.length.toLocaleString("en-US")}; filter to find others.`
+          : `${matches.length.toLocaleString("en-US")} stations.`;
+    };
+    filter.addEventListener("input", draw);
+    draw();
+  }
+</script>
