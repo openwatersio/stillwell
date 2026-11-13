@@ -27,7 +27,7 @@ def _(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import io
     import sys
@@ -79,7 +79,7 @@ def _():
     return alt, datetime, lat_offset_of, mo, pl, read_parquet, timedelta, timezone
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(lat_offset_of, pl, read_parquet):
     _all = (await read_parquet("stations.parquet")).filter(pl.col("source") == "marine-institute")
     stations = (
@@ -104,7 +104,7 @@ def _(mo, stations, timedelta):
     return dates, datum, station
 
 
-@app.cell
+@app.cell(hide_code=True)
 async def _(dates, datetime, pl, read_parquet, station, stations, timezone):
     _row = stations.filter(pl.col("id") == station.value).row(0, named=True)
     start, stop = dates.value
