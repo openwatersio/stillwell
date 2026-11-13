@@ -1,6 +1,6 @@
 # Water levels API
 
-The API this repo will serve at `https://api.openwaters.io/water-levels`, and the bulk files behind it. Parameter names, defaults and response fields follow the [tides API](https://github.com/openwatersio/slackwater/blob/main/packages/api/src/openapi.ts) wherever the two overlap, so a client of one already knows the other. This is the design to build against; [plan.md](plan.md) says when each part lands (realtime levels in phase 9, the rest in phase 10, bulk in phase 12). Nothing here is deployed yet.
+The API this repo will serve at `https://api.openwaters.io/water-levels`, and the bulk files behind it. Parameter names, defaults and response fields follow the [tides API](https://github.com/openwatersio/slackwater/blob/main/packages/api/src/openapi.ts) wherever the two overlap, so a client of one already knows the other. This is the design to build against; [plan.md](plan.md) says when each part lands (realtime levels in phase 9, the rest in phase 10, bulk in phase 12). Only `levels` is built so far, for the last 7 days, by [`server/api.ts`](../../server/api.ts) behind [workers/api](../../workers/api/README.md).
 
 ## Conventions
 
@@ -18,7 +18,7 @@ The API this repo will serve at `https://api.openwaters.io/water-levels`, and th
 - **Source.** The code is AGPL-3.0, whose section 13 has a modified version offer its source to its network users. The API docs and a `/water-levels` root response, to be added to the endpoints below, link to its source, [openwatersio/stillwell](https://github.com/openwatersio/stillwell).
 - **Requests** need a descriptive `User-Agent`. The open API allows 100 requests a minute and 10,000 a day per IP address, as the tides API does.
 - **Parameters** are camelCase, as in the tides API (`maxResults`, `includeBad`). Responses use the tides API's field names where they overlap (`latitude`, `longitude`, `distance`, `datums`), and snake_case for fields of their own.
-- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, and 503 when the server doesn't answer and nothing is cached.
+- **Errors** are JSON like the tides API's: `{"message": "…"}`, with `errors` listing each bad parameter on a 400. Status is 400 for bad parameters or a range too long, 404 for an unknown station, 451 for a station whose terms bar commercial use, as the tides API refuses a station whose source forbids redistribution, and 503 when the server doesn't answer and nothing is cached.
 - **Versioning.** Fields are only ever added. A breaking change gets a new path.
 - Values in the examples are illustrative.
 
@@ -75,7 +75,7 @@ One station in full: the fields above plus
 ```json
 {
   "datum": "MLLW",
-  "datums": { "MSL": 1.983, "LAT": -0.912, "NAVD88": 0.692 },
+  "datums": { "MSL": -1.983, "LAT": 0.912, "NAVD88": -0.692 },
   "datums_source": {
     "MSL": "slackwater-database",
     "LAT": "slackwater-database",
@@ -123,7 +123,7 @@ Observed levels, from the last minutes back through the archive, for apps, stati
 {
   "station": { "id": "coops/9447130", "name": "Seattle", "tide_station": "noaa/9447130" },
   "datum": "MLLW",
-  "datums": { "MSL": 1.983, "MLLW": 0 },
+  "datums": { "MSL": -1.983, "MLLW": 0 },
   "frame": "gauge",
   "status": "reporting",
   "as_of": "2026-11-03T15:42:00Z",
@@ -140,9 +140,9 @@ Observed levels, from the last minutes back through the archive, for apps, stati
 }
 ```
 
-Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`). `predicted` and `residual` come from the linked slackwater-database station, which has a license of its own: until tokens exist they are served only where that station's terms allow commercial use, as well as the series', and otherwise left out, with the response saying why.
+Each row is `{time, level, flag}`, plus `predicted`, `residual` and `received` when asked for. At a step, each row is the value nearest a step time, within half a step, with the value's own time, so a station reporting less often than the step lists each value once. `predicted` and `residual` aren't served yet, and asking for them is a 400. When `include` asks for predictions, the response names the slackwater-database version it used (`"database": "2026.11.01"`). `predicted` and `residual` come from the linked slackwater-database station, which has a license of its own: until tokens exist they are served only where that station's terms allow commercial use, as well as the series', and otherwise left out, with the response saying why.
 
-`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, and one that ended before that is cached for a day.
+`status` is `reporting`; `stale` when the newest value is older than three of the station's intervals and at least two hours, since many sources send values in hourly batches, or when the server didn't answer and this is the last good copy; or `offline` when the station has sent nothing for a day. `as_of` is the newest value's time and `updated` is when the poller last finished asking the source for the station. A range that ends within the last 7 days, which late values and QC can still change, carries `Cache-Control: public, max-age=<min_interval_s>`, at most 300, and one that ended before that is cached for a day.
 
 Slackwater asks for the last 96 hours (`start` 96 hours back) and computes the residual against its own bundled prediction, so the number matches the curve the user sees.
 

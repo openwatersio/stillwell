@@ -12,6 +12,7 @@ import {
   type Station,
 } from "../schema.ts";
 import { mergeFetched, sameRows, upsert } from "./merge.ts";
+import { chunks } from "../chunks.ts";
 import {
   checkRecent,
   readDatums,
@@ -968,9 +969,7 @@ export function formatSummary(s: RunSummary, listed = 20): string {
   return lines.join("\n") + "\n";
 }
 
-export function* chunks<T>(items: T[], size: number): Generator<T[]> {
-  for (let i = 0; i < items.length; i += size) yield items.slice(i, i + size);
-}
+export { chunks };
 
 export function emptySummary(title: string, stations: number): RunSummary {
   return { title, stations, updated: 0, stale: [], failed: [], waiting: [], values: 0, files: 0 };

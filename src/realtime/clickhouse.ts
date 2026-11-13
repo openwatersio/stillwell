@@ -1,6 +1,6 @@
 import type { Source } from "../schema.ts";
 import type { StationObservation } from "../store/parquet.ts";
-import { chunks } from "../store/recent.ts";
+import { chunks } from "../chunks.ts";
 
 /**
  * ClickHouse over its HTTP interface, bound to one database. Values go in as

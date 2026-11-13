@@ -9,11 +9,13 @@ src/sources/<source>/  one adapter per source, each with a README on that servic
 src/store/              Parquet writing, merging and paths, and the definition of every published file (files.ts)
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
 src/realtime/          the realtime poller's ClickHouse store, poll and schedule (docs/plans/realtime.md)
-server/                stillwell-ingest, the service that runs the poller
+src/api/               the levels API's parameters, datum conversion and responses
+server/                stillwell-ingest, the service that runs the poller, and stillwell-api, which serves levels
 src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
+workers/api/           the Cloudflare Worker that caches and serves levels at api.openwaters.io
 docs/                  the plan, the API design, the store's layout and the evaluations
 .github/workflows/     CI (ci.yml), the manual ingest against R2 (ingest.yml), and the scheduled ingest-hourly.yml, compact-daily.yml, monthly.yml (station lists, refetches, BSH's predictions, the cross-station report and keeping the schedules enabled), bucket-check.yml (a weekly read of the public bucket, and a check of a sample of its files against their definitions) and canary.yml (a weekly live request per adapter)
 ```
@@ -159,7 +161,17 @@ docker run -d --rm --name stillwell-ch -p 127.0.0.1:8123:8123 -e CLICKHOUSE_SKIP
 STILLWELL_STORE=https://stillwell.openwaters.io node server/ingest.ts kartverket
 ```
 
-Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `STILLWELL_METRICS` names a file it writes each source's pass metrics to, and `STILLWELL_FROM_RECENT` lists sources it fills hourly from `recent/` rather than ask, for a source that refuses the server. `test/clickhouse.test.ts` runs against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and is skipped otherwise.
+Set `USGS_API_KEY` for USGS, as for `scripts/ingest.ts`; on the server, a key of its own, since backfills pace themselves to a key's whole budget, and `STILLWELL_ACCEPT_WITHHELD=1` only to accept a withholding past the limit (see [Withheld stations](#withheld-stations)). With `GITHUB_TOKEN` set, it starts a source's Monthly refresh on a datum change, unless one started in the last day. `STILLWELL_METRICS` names a file it writes each source's pass metrics to, and `STILLWELL_FROM_RECENT` lists sources it fills hourly from `recent/` rather than ask, for a source that refuses the server. `test/clickhouse.test.ts` and the ClickHouse part of `test/api.test.ts` run against the ClickHouse at `CLICKHOUSE_URL` when it's set, as in CI, and are skipped otherwise.
+
+`server/api.ts` is stillwell-api: it serves `GET /water-levels/stations/{source}/{id}/levels` ([docs/plans/api.md](docs/plans/api.md)) from the database `stillwell` for the last 7 days, on 127.0.0.1 at `STILLWELL_API_PORT` (default 8787), for the Worker in [workers/api](workers/api/README.md). It reads `stations.parquet` and `stations/offsets.parquet` from `STILLWELL_STORE` through ClickHouse's `url()`, which needs a store over HTTPS, when it starts and every 10 minutes. With the poller above running:
+
+```bash
+STILLWELL_STORE=https://stillwell.openwaters.io node server/api.ts
+```
+
+```bash
+curl -s 'http://127.0.0.1:8787/water-levels/stations/kartverket/BGO/levels?step=1h'
+```
 
 ## Withheld stations
 
