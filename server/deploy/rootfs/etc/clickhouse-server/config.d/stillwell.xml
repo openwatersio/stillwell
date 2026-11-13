@@ -1,7 +1,8 @@
 <!-- ClickHouse beside stillwell-ingest on one box. It listens on loopback only, its default. -->
 <clickhouse>
-    <!-- The default is 90% of RAM; this leaves the poller its share of the 8 GB box. -->
-    <max_server_memory_usage>4000000000</max_server_memory_usage>
+    <!-- The default is 90% of RAM; this leaves the poller its share of the 4 GB box, and holds the 8 days the
+         poller keeps current with room to spare. Raise it with the box before the history moves in. -->
+    <max_server_memory_usage>1200000000</max_server_memory_usage>
     <!-- Alloy scrapes this and keeps a few series; see /etc/alloy/config.alloy. -->
     <prometheus>
         <endpoint>/metrics</endpoint>

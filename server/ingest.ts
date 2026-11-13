@@ -37,8 +37,8 @@ const HOUR_MS = 3_600_000;
 /** How long a pass may run before it's stopped, as the hourly workflow's 50-minute limit stopped a run. */
 const PASS_TIMEOUT_MS = 50 * MINUTE_MS;
 const PASS = fileURLToPath(new URL("pass.ts", import.meta.url));
-/** How many passes run at once: each is a process of its own, holding up to about 600 MB. */
-const PASSES_AT_ONCE = 3;
+/** How many passes run at once: each is a process of its own, holding up to about 800 MB. */
+const PASSES_AT_ONCE = 2;
 
 const names = process.argv.slice(2);
 const chosen = (names.length ? names.map(sourceOf) : Object.values(sources)).filter(
