@@ -226,7 +226,13 @@ jobs:
     permissions:
       contents: read
     steps:
+      # The code from main as it is when this job starts, not when the run
+      # started, so a source registered since isn't dropped from
+      # stations.parquet. The job's steps and settings stay the run's. The
+      # lists it reads may come from older code, as any night's publish does.
       - uses: actions/checkout@v7
+        with:
+          ref: main
       - uses: actions/setup-node@v7
         with:
           node-version-file: .mise.toml

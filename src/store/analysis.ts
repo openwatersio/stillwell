@@ -51,6 +51,12 @@ export interface Analysis {
   /** Runs of the last year that a tide gauge's flatline rules flag and still water's don't (`drains` in `judge`). */
   drains: number | null;
   /**
+   * The most common step between the last year's values, in seconds, whatever
+   * their flags; null with under two values. `publish` gives it as `interval_s`
+   * where the source gives none.
+   */
+  step_s: number | null;
+  /**
    * When the station's stored years were last requalified under its
    * verdict: null while a verdict that changed its QC waits for `requalify`
    * (`pending`).
@@ -70,7 +76,7 @@ export const RULES = "outliers-1";
  * verdict depends on, so `analyze` judges every station again and requalifies
  * only those whose QC changes with their verdict.
  */
-export const JUDGE = "drains-3";
+export const JUDGE = "step-1";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;
@@ -148,7 +154,12 @@ export function judge(
   const usable = still.filter((r) => r.time > since && r.flag < Flag.suspect);
   const days = new Set(usable.map((r) => Math.floor(r.time / DAY_MS))).size;
   const runs = drains(still, tide, end);
-  if (tide_m === null || days < COVERED_DAYS) return { tidal: null, tide_m, days, drains: runs };
+  // From every stored time in the year to the last, whatever its flag, sorted and without repeats.
+  const stored = [...new Set(rows.map((r) => r.time))].sort((a, b) => a - b);
+  const latest = stored.at(-1) ?? 0;
+  const step_s = modalStep(stored.filter((t) => t > latest - 366 * DAY_MS));
+  if (tide_m === null || days < COVERED_DAYS)
+    return { tidal: null, tide_m, days, drains: runs, step_s };
   const middle = usable.map((r) => r.level).sort((a, b) => a - b)[usable.length >> 1] ?? 0;
   const offset = toSeaLevel(station);
   const aboveSea = offset !== null && offset + middle > ABOVE_SEA_M;
@@ -157,7 +168,22 @@ export function judge(
     tide_m,
     days,
     drains: runs,
+    step_s,
   };
+}
+
+/** The most common step between sorted times, in whole seconds, the shorter on a tie; null with under two. */
+export function modalStep(times: number[]): number | null {
+  const counts = new Map<number, number>();
+  for (let i = 1; i < times.length; i++) {
+    const step = Math.round((times[i]! - times[i - 1]!) / 1000);
+    if (step > 0) counts.set(step, (counts.get(step) ?? 0) + 1);
+  }
+  let best: number | null = null;
+  for (const [step, n] of counts)
+    if (best === null || n > counts.get(best)! || (n === counts.get(best)! && step < best))
+      best = step;
+  return best;
 }
 
 /**
@@ -205,11 +231,14 @@ export async function readAnalysis(store: string, source: string): Promise<Map<s
         id: String(r.id),
         analyzed: new Date(r.analyzed as string).toISOString(),
         rules: String(r.rules),
-        judge: r.judge == null ? null : String(r.judge),
+        // A file an older build wrote without `step_s` reads as judged under no `JUDGE`, so the step is measured again.
+        judge: r.judge == null || !("step_s" in r) ? null : String(r.judge),
         tidal: (r.tidal as boolean | null) ?? null,
         tide_m: (r.tide_m as number | null) ?? null,
         days: r.days === null ? null : Number(r.days),
         drains: r.drains === null ? null : Number(r.drains),
+        // A file written before `step_s` was kept has no such column.
+        step_s: r.step_s == null ? null : Number(r.step_s),
         requalified: r.requalified == null ? null : new Date(r.requalified as string).toISOString(),
       },
     ]),
@@ -323,8 +352,12 @@ export async function analyze(
         // verdict, though new rules still requalify the station under it.
         if (verdict.tidal === null && was && was.tidal !== null) {
           // Its old `judge` stays, so it's judged again once its values can say.
-          if (was.rules !== RULES)
-            next.set(station.id, { ...was, rules: RULES, requalified: null });
+          // The step stands whatever the values say about the tide.
+          next.set(station.id, {
+            ...was,
+            step_s: verdict.step_s ?? was.step_s,
+            ...(was.rules !== RULES ? { rules: RULES, requalified: null } : {}),
+          });
           return;
         }
         const from = was?.tidal ?? null;
@@ -340,6 +373,8 @@ export async function analyze(
           rules: RULES,
           judge: JUDGE,
           ...verdict,
+          // A new epoch's first value or two can't give a step, so the last one measured stands.
+          step_s: verdict.step_s ?? was?.step_s ?? null,
           requalified: requalify ? null : was!.requalified,
         });
         if (changed)

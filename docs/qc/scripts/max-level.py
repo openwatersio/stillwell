@@ -10,7 +10,6 @@ Needs duckdb (pip install duckdb).
 """
 import sys, json, time, threading
 from concurrent.futures import ThreadPoolExecutor
-from urllib.parse import quote
 import duckdb
 
 STORE = "https://stillwell.openwaters.io"
@@ -21,7 +20,7 @@ files = []
 for s in SOURCES:
     for sid, epoch, year in main.execute(f"select id, epoch, year from '{STORE}/stations/years/{s}.parquet' where epoch is not null and year is not null").fetchall():
         src, source_id = sid.split("/", 1)
-        files.append((s, sid, epoch, year, f"{STORE}/obs/{src}/{quote(quote(source_id, safe="!'()*"), safe='')}" + ("" if epoch == 1 else f"/{epoch}") + f"/{year}.parquet"))
+        files.append((s, sid, epoch, year, f"{STORE}/obs/{src}/{source_id}" + ("" if epoch == 1 else f"/{epoch}") + f"/{year}.parquet"))
 if LIMIT: files = files[:LIMIT]
 local = threading.local()
 def stat(f):

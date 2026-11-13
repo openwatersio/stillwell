@@ -1,3 +1,4 @@
+import { isUrlSafe, urlSafe } from "../../store/paths.ts";
 import { csvFields } from "../../csv.ts";
 import { getJson, getText } from "../../http.ts";
 import {
@@ -110,6 +111,8 @@ export type GeslaStation = ListedStation & {
   record_quality: string | null;
   record_start: string | null;
   record_end: string | null;
+  /** GESLA's file name, where `source_id` isn't it: the name has a character a URL would have to encode, which `source_id` has as `_`. */
+  file?: string;
 };
 
 // prettier-ignore
@@ -200,6 +203,9 @@ export async function stations(): Promise<GeslaStation[]> {
     throw new Error(
       `GESLA's metadata lists ${files.size} records in ${rows.length} rows, not ${release.records}`,
     );
+  const ids = new Set([...files].map((f) => urlSafe(f ?? "")));
+  if (ids.size !== files.size)
+    throw new Error("two of GESLA's file names make the same station ID");
   const bad = rows.findIndex((r) => r.length !== header.length + 1);
   if (bad >= 0) throw new Error(`GESLA's metadata row ${bad + 2} has ${rows[bad]!.length} fields`);
   // A release that renames a dropped record would otherwise list it again.
@@ -210,7 +216,7 @@ export async function stations(): Promise<GeslaStation[]> {
   withheldFiles.length = 0;
   const kept = rows.filter((r) => {
     const file = r[c.file]!.trim();
-    const why = withheld(file);
+    const why = withheld(urlSafe(file));
     if (why) {
       console.log(`GESLA: leaving out ${file}: ${why}`);
       withheldFiles.push(file);
@@ -225,10 +231,12 @@ export async function stations(): Promise<GeslaStation[]> {
     const terms = abbrev.startsWith("UHSLC_")
       ? uhslcTerms(file)
       : { commercial_use: contributor.commercial_use, credits: [contributor.name] };
+    const sourceId = urlSafe(file);
     return {
       ...stationDefaults(metadata),
-      id: `gesla/${file}`,
-      source_id: file,
+      id: `gesla/${sourceId}`,
+      source_id: sourceId,
+      ...(sourceId !== file && { file }),
       name: r[c.site]!.trim().replace(/_+/g, " "),
       lat: Number(r[c.lat]),
       lon: Number(r[c.lon]),
@@ -265,7 +273,7 @@ export async function stations(): Promise<GeslaStation[]> {
     .map(({ code, ...s }) =>
       DROPPED.has(s.source_id)
         ? { ...s, products: [], status: "inactive" as const }
-        : { ...s, same_as: originatorIds(s.contributor, code, s.lon, fd, s.source_id) },
+        : { ...s, same_as: originatorIds(s.contributor, code, s.lon, fd, s.file ?? s.source_id) },
     )
     .sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -355,9 +363,13 @@ export function originatorIds(
  * (`refused` in src/sources/uhslc/notices.ts), or of any version of a station
  * number the `uhslc` adapter withholds, so a version the scan hasn't seen is
  * covered too. GESLA's other contributors' records aren't covered. The adapter
- * never lists or fetches one.
+ * never lists or fetches one. A record's file name that isn't URL-safe is
+ * withheld as an ID too, since the record is listed under `urlSafe(file)`.
  */
 export function withheld(file: string): string | null {
+  // A list from before IDs had to be URL-safe has the file name as its ID.
+  if (!isUrlSafe(file))
+    return `renamed gesla/${urlSafe(file)}, since a URL would have to encode this ID`;
   const match = /-(\d{3})[a-z]?-[a-z]{3}-uhslc_(fd|rq)$/.exec(file);
   if (!match) return null;
   const refused = uhslcTerms(file).refused;
@@ -761,16 +773,15 @@ export async function readRecord(file: string): Promise<string> {
 const recent = new Map<string, Promise<GeslaRecord>>();
 const KEEP = 8;
 
-function record(station: Pick<GeslaStation, "source_id" | "kind">): Promise<GeslaRecord> {
+function record(station: Pick<GeslaStation, "source_id" | "kind" | "file">): Promise<GeslaRecord> {
   let got = recent.get(station.source_id);
   // Kept as most recently used, so a record a worker is still backfilling isn't evicted.
   if (got) {
     recent.delete(station.source_id);
     recent.set(station.source_id, got);
   } else {
-    got = readRecord(station.source_id).then((text) =>
-      parse(text, station.source_id, station.kind),
-    );
+    const file = station.file ?? station.source_id;
+    got = readRecord(file).then((text) => parse(text, file, station.kind));
     got.catch(() => recent.delete(station.source_id));
     recent.set(station.source_id, got);
     if (recent.size > KEEP) recent.delete(recent.keys().next().value!);
@@ -780,7 +791,7 @@ function record(station: Pick<GeslaStation, "source_id" | "kind">): Promise<Gesl
 
 /** A record's levels over [start, end), in meters in the record's own datum. */
 export async function levels(
-  station: Pick<GeslaStation, "source_id" | "kind"> &
+  station: Pick<GeslaStation, "source_id" | "kind" | "file"> &
     Partial<Pick<GeslaStation, "record_start" | "record_end">>,
   start: Date,
   end: Date,

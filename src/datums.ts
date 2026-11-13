@@ -1,3 +1,4 @@
+import { urlSafe } from "./store/paths.ts";
 import { readFile } from "node:fs/promises";
 import { csvFields } from "./csv.ts";
 import { ID_KM } from "./same-as.ts";
@@ -199,12 +200,12 @@ export function withDatums(
           records.set(station.id, joined);
       }
     };
-    const own = JOINS[prefix] && byId.get(`${JOINS[prefix]}/${t.source.id}`);
+    const own = JOINS[prefix] && byId.get(`${JOINS[prefix]}/${urlSafe(t.source.id)}`);
     if (own) join(own, zeroOf(own, t));
     const reference = prefix === "ticon" && TICON_ZEROS[id.slice(id.lastIndexOf("-") + 1)];
     const originator = reference && byId.get(replaced.get(id) ?? "");
     // Where the store has the record's GESLA file, its own note must name that zero: a few of RWS's are in MSL.
-    const gesla = byId.get(`gesla/${id}`);
+    const gesla = byId.get(`gesla/${urlSafe(id)}`);
     if (
       reference &&
       originator &&

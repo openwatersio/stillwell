@@ -30,9 +30,11 @@ import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
 import { LINKS, UNLINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/store/years.ts";
+import { JUDGE, RULES, writeAnalysis } from "../src/store/analysis.ts";
 import { ERRATA_SCHEMA, FILES, dataPackage } from "../src/store/files.ts";
 import {
   describeReport,
+  listOf,
   needsPerson,
   publishStations,
   Refused,
@@ -492,6 +494,39 @@ describe("publishStations", () => {
     await publishStations(store, [barred], ["test"], []);
     const [own] = JSON.parse(await readFile(sourcesPath(store), "utf8"));
     assert.equal(own.license.commercial_use, false);
+  });
+
+  it("publishes the measured step as the interval where the source gives none", async () => {
+    await refreshSource(
+      store,
+      sourceOf([listed("a", { interval_s: null }), listed("b", { lat: 40 })]),
+      { now: NOW },
+    );
+    const row = (id: string, step_s: number) => ({
+      id,
+      analyzed: NOW,
+      rules: RULES,
+      judge: JUDGE,
+      tidal: true,
+      tide_m: 1,
+      days: 366,
+      drains: 0,
+      step_s,
+      requalified: NOW,
+    });
+    await writeAnalysis(store, "test", [row("test/a", 10800), row("test/b", 3600)]);
+    await publishStations(store, [sourceOf([])], ["test"], []);
+    const db = await (await DuckDBInstance.create(":memory:")).connect();
+    const rows = (
+      await db.runAndReadAll(`SELECT id, interval_s FROM '${stationsPath(store)}' ORDER BY id`)
+    ).getRowObjectsJson();
+    // The source's own interval stands.
+    assert.deepEqual(rows, [
+      { id: "test/a", interval_s: 10800 },
+      { id: "test/b", interval_s: 600 },
+    ]);
+    // The list ingest reads keeps the source's null.
+    assert.equal((await listOf(store, sourceOf([])))[0]!.interval_s, null);
   });
 
   it("publishes every list with its bounds, epochs and links", async () => {

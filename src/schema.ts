@@ -46,7 +46,7 @@ export interface Station {
   lon: number;
   country_code: string | null;
   kind: Kind | null;
-  /** Native sampling interval of the observed series, in seconds. */
+  /** Native sampling interval of the observed series, in seconds; `stations.parquet` gives the measured step where it's null. */
   interval_s: number | null;
   /** What levels are measured from, e.g. `NAP`, `PNP`, `MLLW`. */
   datum: string;
@@ -296,7 +296,8 @@ export interface Source {
   stations(previous?: Station[]): Promise<ListedStation[]>;
   /**
    * Why a station, by its `source_id`, is withheld from the store, or null.
-   * Withheld means its owner refused republication: the adapter never lists
+   * Withheld means its owner refused republication, or the station has a new
+   * ID: the adapter never lists
    * or fetches it, a refresh drops it from the store's list and the bounds and
    * recent window, publishing leaves it out, and `ingest withhold` deletes its
    * files (src/withhold.ts).
