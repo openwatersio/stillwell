@@ -26,7 +26,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "prettier --check .",
     "format": "prettier --write .",
-    "check": "npm run lint && npm run typecheck && npm test"
+    "check": "npm run lint && npm run typecheck && npm test",
+    "site": "observable preview",
+    "site:build": "observable build"
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.0-r.1",
@@ -37,6 +39,7 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@observablehq/framework": "1.13.4",
     "@types/node": "^26.6.6",
     "prettier": "^3.9.10",
     "typescript": "^7.0.2"
