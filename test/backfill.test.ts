@@ -21,16 +21,25 @@ import {
 } from "../src/backfill.ts";
 import {
   listYears,
+  readJsonArray,
   readObservationFile,
   readObservations,
   readStationBounds,
   readYearFiles,
+  writeJsonArray,
   writeObservations,
   writeStationBounds,
   writeStationList,
   writeStations,
 } from "../src/store/parquet.ts";
-import { boundsPath, seriesDir, seriesPath, stationListPath } from "../src/store/paths.ts";
+import {
+  boundsPath,
+  requalifyLeftPath,
+  seriesDir,
+  seriesPath,
+  stationListPath,
+} from "../src/store/paths.ts";
+import { writeYears } from "../src/store/years.ts";
 import { REFETCH_YEARS } from "../src/store/recent.ts";
 import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import {
@@ -1396,5 +1405,70 @@ describe("backfillYear", () => {
         new Map(),
       );
     assert.equal(reads, 1);
+  });
+});
+
+describe("requalify script", () => {
+  const run = (store: string, args: string[]) =>
+    spawnSync(process.execPath, ["scripts/ingest.ts", "requalify", "coops", ...args], {
+      encoding: "utf8",
+      env: { ...process.env, STILLWELL_STORE: store },
+    });
+
+  const seed = async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-requalify-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [
+      coopsStation("2000", "active"),
+      coopsStation("2001", "active"),
+      coopsStation("2002", "inactive"),
+    ]);
+    // 2002 has no year in range, so isn't taken; 2001's 2024 is in range only
+    // because the last run left it from 2024.
+    await writeYears(store, "coops", [
+      { id: "coops/2000", epoch: 1, year: 2026 },
+      { id: "coops/2001", epoch: 1, year: 2024 },
+      { id: "coops/2002", epoch: 1, year: 2010 },
+    ]);
+    const left = requalifyLeftPath(store, "coops");
+    await writeJsonArray(left, [{ id: "coops/2001", start: 2024, end: 2025 }]);
+    return { store, left };
+  };
+
+  it("takes the stations with a year in range, the last budgeted run's left first", async () => {
+    const { store, left } = await seed();
+    const { status, stdout, stderr } = run(store, ["all", "2026", "2027", "--budget", "5"]);
+    assert.equal(status, 0, stderr);
+    assert.match(stdout, /^\| 2 \|/m);
+    // Done within the budget, so none is left for the next.
+    assert.deepEqual(await readJsonArray(left), []);
+  });
+
+  it("saves every station it doesn't start, each from its own first year", async () => {
+    const { store, left } = await seed();
+    const { status, stdout, stderr } = run(store, ["all", "2026", "2027", "--budget", "0"]);
+    assert.equal(status, 0, stderr);
+    assert.match(stdout, /2 stations not started, for the next run/);
+    assert.deepEqual(await readJsonArray(left), [
+      // Each over its own years and the run's.
+      { id: "coops/2001", start: 2024, end: 2027 },
+      { id: "coops/2000", start: 2026, end: 2027 },
+    ]);
+  });
+
+  it("takes every listed station without a budget", async () => {
+    const { store } = await seed();
+    const { status, stdout, stderr } = run(store, ["all", "2026", "2027"]);
+    assert.equal(status, 0, stderr);
+    assert.match(stdout, /^\| 3 \|/m);
+  });
+
+  it("resumes only a whole, unsharded run, with a budget it can read", () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-requalify-")), "store");
+    assert.match(run(store, ["all", "2026", "2027", "--budget="]).stderr, /--budget must be/);
+    assert.match(run(store, ["2000", "2026", "2027", "--budget", "5"]).stderr, /--budget resumes/);
+    assert.match(
+      run(store, ["all", "2026", "2027", "--budget", "5", "--shard", "1/2"]).stderr,
+      /--budget resumes/,
+    );
   });
 });

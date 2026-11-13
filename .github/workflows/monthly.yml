@@ -119,7 +119,7 @@ jobs:
       cancel-in-progress: false
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
-    # requalify 2 hours. The requalify of the last two months starts batches
+    # requalify 2 hours. The requalify of the last two months starts stations
     # for at most 90 minutes, and none after the job's fifth hour.
     timeout-minutes: 360
     # The environment holds the R2 credentials and only runs on main.
@@ -166,19 +166,20 @@ jobs:
       # window's flags, so each month is judged whole by the next month's run,
       # December's by February's. Only a full refresh runs it. As a step of
       # this job, not a job of its own, it puts no job in the source's group to
-      # cancel one waiting there, such as a compaction. It starts batches for
-      # at most 90 minutes, and none once the job has run 5 hours, so the
-      # last batch ends within the job's time limit. Each month it starts a
-      # twelfth further into the list, and a source it can't finish says in
-      # the run's summary how many stations it left.
+      # cancel one waiting there, such as a compaction. It takes only stations
+      # with a year file in range, and starts them for at most 90 minutes, and
+      # none once the job has run 5 hours, so the job ends within its time
+      # limit; USGS's, the most, took about 25 minutes in a local measurement.
+      # The stations it didn't finish, and every one when no time is left,
+      # are saved in the store with their years, and the next run starts
+      # with them, over those years too. A run killed partway saves nothing
+      # new, and the next starts again from the last saved list.
       - if: ${{ !cancelled() && !inputs.sources }}
         run: |
           left=$(( (STARTED + 300 * 60 - $(date +%s)) / 60 ))
           budget=$(( left < 90 ? left : 90 ))
-          if [ "$budget" -lt 1 ]; then
-            echo "::warning::No time left in the job to requalify $SOURCE's last two months"
-            exit 0
-          fi
+          # With no time left it still runs, to save every station for the next.
+          if [ "$budget" -lt 0 ]; then budget=0; fi
           month=$(date -u +%Y-%m-01)
           from=$(date -u -d "$month -2 months" +%Y)
           to=$(date -u -d "$month -1 month" +%Y)

@@ -111,12 +111,20 @@ import {
   readStationBounds,
   setConnections,
   publishedSources,
+  readJsonArray,
+  writeJsonArray,
   type YearStats,
 } from "../src/store/parquet.ts";
-import { commitYears, markYears, reconcileYears } from "../src/store/years.ts";
+import { commitYears, markYears, readYears, reconcileYears } from "../src/store/years.ts";
 import { requalify } from "../src/store/requalify.ts";
 import { analyze, markRequalified, pending, readAnalysis } from "../src/store/analysis.ts";
-import { boundsPath, seriesDir, stationsPath, yearsPath } from "../src/store/paths.ts";
+import {
+  boundsPath,
+  requalifyLeftPath,
+  seriesDir,
+  stationsPath,
+  yearsPath,
+} from "../src/store/paths.ts";
 import {
   describeReport,
   hasHistory,
@@ -207,9 +215,49 @@ switch (command) {
   case "requalify": {
     const [source, ids, start, end] = args;
     if (!source || !ids || !start || !end) usage();
-    const until =
-      values.budget === undefined ? undefined : Date.now() + positive("budget") * 60_000;
-    await requalifyStations(source, ids, parseYear(start), parseYear(end), until);
+    if (values.budget === undefined) {
+      await requalifyStations(source, ids, parseYear(start), parseYear(end));
+      break;
+    }
+    // A budgeted run saves the stations it didn't finish, each with its years,
+    // and the next starts with them, each over its own years and that run's, so
+    // a source too big for the budget doesn't leave the same stations out each
+    // time. 0 saves them all, starting none.
+    if (ids !== "all" || values.shard) throw new Error("--budget resumes `all`, unsharded");
+    if (!/^\d+$/.test(values.budget))
+      throw new Error("--budget must be a whole number of minutes, 0 or more");
+    const minutes = Number(values.budget);
+    const range = { start: parseYear(start), end: parseYear(end) };
+    const path = requalifyLeftPath(storeOfSource(sourceOf(source).metadata), source);
+    const prior = ((await readJsonArray(path)) ?? []) as {
+      id: string;
+      start: number;
+      end: number;
+    }[];
+    const first = new Map(
+      prior.map((p) => [
+        p.id,
+        { start: Math.min(p.start, range.start), end: Math.max(p.end, range.end) },
+      ]),
+    );
+    const { left, failed } = await requalifyStations(
+      source,
+      ids,
+      range.start,
+      range.end,
+      minutes ? Date.now() + minutes * 60_000 : 0,
+      first,
+    );
+    // A station that failed is tried again too, over this run's years only, so
+    // one that always fails, such as on a file holding two datums, stops once
+    // its year leaves the range rather than widening it each month.
+    const failedIds = new Set(failed.map((f) => f.split(": ")[0]!));
+    await writeJsonArray(path, [
+      ...left.map((id) => ({ id, ...(first.get(id) ?? range) })),
+      ...[...failedIds]
+        .filter((id) => id.startsWith(`${source}/`) && !left.includes(id))
+        .map((id) => ({ id, ...range })),
+    ]);
     break;
   }
   case "compact": {
@@ -821,28 +869,50 @@ function find(list: StoredStation[], sourceId: string, id: string): StoredStatio
   return station;
 }
 
+/**
+ * Requalify stations 100 at a time. A station whose turn comes after `until`
+ * isn't started, and is returned in `left`. Those in `first` go first, each
+ * over its own years. With
+ * a budget, `all` takes only the stations the years file has a file in range
+ * for, or has marked as being written, or every station for a source without one.
+ */
 async function requalifyStations(
   sourceId: string,
   ids: string,
   start: number,
   end: number,
-  until?: number,
-): Promise<RunSummary> {
+  until = Infinity,
+  first = new Map<string, { start: number; end: number }>(),
+): Promise<RunSummary & { left: string[] }> {
   if (start >= end)
     throw new Error(`requalify ${start} ${end} holds no year; the end is exclusive`);
   if (values.shard && ids !== "all") throw new Error("--shard splits `all`, not named stations");
   const source = sourceOf(sourceId);
-  const list = await listOf(storeOfSource(source.metadata), source);
+  const store = storeOfSource(source.metadata);
+  const list = await listOf(store, source);
   // Every station with files, inactive ones too, since their stored values are QC'd as well.
   let stations = ids === "all" ? list : ids.split(",").map((id) => find(list, sourceId, id));
   if (values.shard) stations = shard(stations, ...parseShard(values.shard));
-  // With a budget, each month starts a twelfth further into the list, so a
-  // source the budget can't finish doesn't leave the same stations out each time.
-  if (until) {
-    const from = Math.floor((stations.length * new Date().getUTCMonth()) / 12);
-    stations = [...stations.slice(from), ...stations.slice(0, from)];
+  // Only a budgeted run, whose budget the rest would spend: a years file a
+  // short listing left a row out of would otherwise hide a station from a hand run.
+  const rows = ids === "all" && until < Infinity ? await readYears(store, sourceId) : null;
+  if (rows) {
+    const due = new Set(
+      [...rows.values()]
+        .filter((r) => {
+          const { start: from, end: to } = first.get(r.id) ?? { start, end };
+          return r.year === null || (r.year >= from && r.year < to);
+        })
+        .map((r) => r.id),
+    );
+    stations = stations.filter((s) => due.has(s.id));
   }
+  stations = [
+    ...stations.filter((s) => first.has(s.id)),
+    ...stations.filter((s) => !first.has(s.id)),
+  ];
   setConnections(positive("concurrency"));
+  const left: string[] = [];
   const summary = await reporting(`requalify ${sourceId} ${start}–${end}`, async () => {
     const s: RunSummary = {
       title: `requalify ${sourceId} ${start}–${end}`,
@@ -854,36 +924,35 @@ async function requalifyStations(
       values: 0,
       files: 0,
     };
-    const store = storeOfSource(source.metadata);
     for (const batch of chunks(stations, 100)) {
-      // A batch starts only within the budget, so the source's hourly runs and compaction aren't held off for long.
-      if (until && Date.now() > until) {
-        // First, so the summary's first 20 warnings never leave it out.
-        (s.warned ??= []).unshift(
-          `out of time: ${stations.length - stations.indexOf(batch[0]!)} stations left from ${batch[0]!.id}`,
-        );
-        break;
-      }
       const ids = batch.map((station) => station.id);
+      // Out of time: the rest aren't marked, which would rewrite the years file for nothing.
+      if (Date.now() > until) {
+        left.push(...ids);
+        continue;
+      }
       const written = new Map<string, YearStats>();
       // A batch that can't be marked isn't written, so the years can't go stale.
       let marked: string[];
       try {
         marked = await markYears(store, sourceId, ids);
       } catch (error) {
-        s.failed.push(
-          `years (skipped ${ids.length} stations): ${error instanceof Error ? error.message : error}`,
-        );
+        // Each named, so a budgeted run saves them for the next.
+        for (const id of ids)
+          s.failed.push(
+            `${id}: years file not marked: ${error instanceof Error ? error.message : error}`,
+          );
         continue;
       }
       await pool(batch, positive("concurrency"), async (station) => {
+        if (Date.now() > until) return void left.push(station.id);
         try {
           const { files, changed, warnings } = await requalify(
             source,
             station,
             storeFor(station),
-            start,
-            end,
+            first.get(station.id)?.start ?? start,
+            first.get(station.id)?.end ?? end,
             written,
           );
           if (files) s.updated++;
@@ -900,10 +969,14 @@ async function requalifyStations(
         s.failed.push(`years: ${error instanceof Error ? error.message : error}`);
       }
     }
+    // First, so the summary's first 20 warnings never leave it out.
+    if (left.length)
+      (s.warned ??= []).unshift(`${left.length} stations not started, for the next run`);
+    s.stations -= left.length;
     return s;
   });
   if (summary.failed.length) process.exitCode = 1;
-  return summary;
+  return { ...summary, left };
 }
 
 async function analyzeSource(sourceId: string): Promise<void> {
