@@ -762,7 +762,12 @@ export function readRows(path: string): Promise<Record<string, unknown>[]> {
   return read(path, "SELECT *", "ALL");
 }
 
-/** Rows as Parquet with the given columns and types, sorted by `order`. */
+/**
+ * Rows as Parquet with the given columns and types, sorted by `order`, in row
+ * groups a filter on its first column can skip: a reader after one station
+ * fetches the footer and one group. 2,048 rows is DuckDB's smallest group (its
+ * vector size); a smaller ROW_GROUP_SIZE still writes 2,048.
+ */
 export async function writeRows(
   path: string,
   rows: object[],
@@ -773,7 +778,7 @@ export async function writeRows(
     path,
     rows,
     `SELECT ${Object.keys(columns).join(", ")} FROM read_json(?, format = 'newline_delimited', columns = ${struct(columns)}) ORDER BY ${order}`,
-    "FORMAT parquet, COMPRESSION zstd",
+    "FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 2048",
   );
 }
 
