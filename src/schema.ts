@@ -46,7 +46,7 @@ export interface Station {
   lon: number;
   country_code: string | null;
   kind: Kind | null;
-  /** Native sampling interval of the observed series, in seconds. */
+  /** Native sampling interval of the observed series, in seconds; `stations.parquet` gives the measured step where it's null. */
   interval_s: number | null;
   /** What levels are measured from, e.g. `NAP`, `PNP`, `MLLW`. */
   datum: string;
