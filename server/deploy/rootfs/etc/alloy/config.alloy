@@ -43,7 +43,8 @@ prometheus.relabel "clickhouse" {
 }
 
 prometheus.remote_write "grafana_cloud" {
-	external_labels = {"host" = constants.hostname}
+	// project tells this box's series from other boxes' in a shared stack; the alert rules select on it.
+	external_labels = {"host" = constants.hostname, "project" = "stillwell"}
 
 	endpoint {
 		url = sys.env("GRAFANA_CLOUD_PROM_URL")

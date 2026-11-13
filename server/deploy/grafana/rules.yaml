@@ -15,8 +15,8 @@ groups:
       # succeeds on its hourly ones, and a pass can take 50 minutes and wait for a slot behind other sources'.
       - alert: StillwellSourceStale
         expr: |
-          time() - stillwell_pass_last_success_timestamp_seconds
-            > clamp_min(3 * stillwell_poll_interval_seconds, 7200)
+          time() - stillwell_pass_last_success_timestamp_seconds{project="stillwell"}
+            > clamp_min(3 * stillwell_poll_interval_seconds{project="stillwell"}, 7200)
         for: 5m
         labels: { severity: warning }
         annotations:
@@ -25,7 +25,7 @@ groups:
       # Without these series the rule above can't fire. The metrics file outlives the poller, so a stopped poller
       # shows as stale sources, not here.
       - alert: StillwellMetricsMissing
-        expr: absent(stillwell_pass_last_end_timestamp_seconds)
+        expr: absent(stillwell_pass_last_end_timestamp_seconds{project="stillwell"})
         for: 30m
         labels: { severity: critical }
         annotations:
@@ -34,7 +34,7 @@ groups:
       # systemd counts only the restarts it makes because a process exited on its own (Restart=always after a
       # crash or an out-of-memory kill of the whole unit). Deploys and manual restarts never count.
       - alert: StillwellServiceCrashed
-        expr: increase(node_systemd_service_restart_total{name=~"(stillwell-ingest|alloy|clickhouse-server)\\.service"}[10m]) > 0
+        expr: increase(node_systemd_service_restart_total{project="stillwell", name=~"(stillwell-ingest|alloy|clickhouse-server)\\.service"}[10m]) > 0
         labels: { severity: critical }
         annotations:
           summary: "{{ $labels.name }} crashed and systemd restarted it"
