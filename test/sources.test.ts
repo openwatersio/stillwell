@@ -1716,6 +1716,11 @@ describe("usace", () => {
       },
     });
     assert.equal(mvn[3]!.name, "Mississippi River at Reserve (01260)");
+    // The catalog's earliest time, as a UTC day.
+    assert.deepEqual(
+      mvn.map((s) => s.series_since),
+      ["1987-03-27", "2008-01-01", "1986-07-18", "1997-01-01"],
+    );
   });
 
   it("prefers a current series, then sub-daily, then revised, then the finest interval", () => {
@@ -2111,9 +2116,10 @@ describe("usace", () => {
     const error = t.mock.method(console, "error", () => {});
     const note = { description: "…", realization: "2009.55", as_of: null };
     const from = { NAVD88: note, LWRP: note };
-    const previous = ["usace/MVN.New_Orleans", "usace/MVN.Baton_Rouge"].map(
-      (id) => ({ id, datums_from: from }) as unknown as Station,
-    );
+    const previous = [
+      { id: "usace/MVN.New_Orleans", datums_from: from, series_since: "1950-01-01" },
+      { id: "usace/MVN.Baton_Rouge", datums_from: from, series_since: "1999-01-01" },
+    ] as unknown as Station[];
     const listed = (await usace.stations(previous)) as usace.UsaceStation[];
     const station = (id: string) => listed.find((s) => s.id === id)!;
     // New Orleans' description went blank: no offsets sent, so the stored ones and their notes stay.
@@ -2121,6 +2127,9 @@ describe("usace", () => {
     assert.deepEqual(station("usace/MVN.New_Orleans").datums_from, from);
     // Baton Rouge's still gives NAVD88 but not LWRP.
     assert.deepEqual(Object.keys(station("usace/MVN.Baton_Rouge").datums_from!), ["NAVD88"]);
+    // The earlier of the list's series start and the catalog's (1986-07-18 and 1987-03-27).
+    assert.equal(station("usace/MVN.New_Orleans").series_since, "1950-01-01");
+    assert.equal(station("usace/MVN.Baton_Rouge").series_since, "1987-03-27");
     const said = error.mock.calls.map((c) => String(c.arguments[0])).join("\n");
     assert.match(said, /usace\/MVN.New_Orleans: its description no longer gives NAVD88, LWRP/);
     assert.match(said, /usace\/MVN.Baton_Rouge: its description no longer gives LWRP\n/);
@@ -2348,6 +2357,23 @@ describe("usace", () => {
       stations.map((s) => s.id),
       ["usace/MVS.Grafton"],
     );
+    assert.equal((stations[0] as usace.UsaceStation).series_since, "2011-01-01");
+  });
+
+  it("records no series start where the catalog gives none it can use", () => {
+    const at = { office: "MVS", name: "Grafton", latitude: 38.97, longitude: -90.43 };
+    const start = (from: string) =>
+      (
+        usace.toStations(
+          "MVS",
+          [series("Grafton.Stage.Inst.1Hour.0.rev", "1Hour", from, "2026-09-14T00:00:00Z")],
+          [at],
+          new Map(),
+          now,
+        )[0] as usace.UsaceStation
+      ).series_since;
+    assert.equal(start("+010000-01-01T00:00:00Z"), undefined);
+    assert.equal(start(""), undefined);
   });
 
   it("never fetches levels from before a station's gauge zero moved", async () => {
@@ -2377,6 +2403,37 @@ describe("usace", () => {
     assert.equal(usace.zeroSince({ source_id: "MVN.Reserve" }), -Infinity);
     assert.throws(
       () => usace.zeroSince({ source_id: "MVN.Reserve", zero_since: "June 2015" }),
+      /unreadable/,
+    );
+  });
+
+  it("never fetches levels from before a station's series begins", async () => {
+    const requests: string[] = [];
+    setTransport(async (url) => {
+      requests.push(url);
+      return JSON.stringify({ units: "m", values: [[Date.parse("2022-09-02T00:00:00Z"), 0.6, 0]] });
+    });
+    const sullivan = {
+      id: "usace/MVS.Sullivan-Jonathan_Cr",
+      source_id: "MVS.Sullivan-Jonathan_Cr",
+      datum: "GZ",
+      source_url: `https://cwms-data.usace.army.mil/cwms-data/timeseries?office=MVS&name=${encodeURIComponent("Sullivan-Jonathan Cr.Stage.Inst.15Minutes.0.lrgsShef-rev")}`,
+      series_since: "2022-09-01",
+    } as unknown as Station;
+    const observe = (start: string, end: string) =>
+      usace.source.observations!(sullivan, new Date(start), new Date(end));
+    assert.deepEqual(await observe("2000-01-01Z", "2022-01-01Z"), []);
+    assert.equal(requests.length, 0);
+    assert.equal((await observe("2022-01-01Z", "2023-01-01Z")).length, 1);
+    assert.equal(new URL(requests[0]!).searchParams.get("begin"), "2022-01-01T00:00:00.000Z");
+    assert.equal(usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr" }), -Infinity);
+    assert.throws(
+      () => usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "Sept 2022" }),
+      /unreadable/,
+    );
+    assert.throws(
+      () =>
+        usace.seriesSince({ source_id: "MVS.Sullivan-Jonathan_Cr", series_since: "2026-99-99" }),
       /unreadable/,
     );
   });
