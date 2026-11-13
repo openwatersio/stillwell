@@ -40,6 +40,8 @@ const QC_SERIES: Record<string, () => Observation[]> = {
     rows[800]!.level = 15;
     return rows;
   },
+  "harbor drying to its floor half the time": () =>
+    series(1000, 10 * MIN, (h) => Math.max(7.3, 7.3 + 6 * Math.cos((2 * Math.PI * h) / M2_H))),
   "held reading while the tide moves": () =>
     set(series(1000, 10 * MIN, tide(2)), 300, 308, () => -7.45),
   "stuck 8 h dithering 1 mm, 6 min": () =>
