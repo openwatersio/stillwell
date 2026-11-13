@@ -27,6 +27,16 @@
       "error": "The zips of GSI's GS01 to GS09 hold their 1965 file twice.",
       "response": "The copies are identical, so the year is read once; a zip whose copies differ is refused.",
       "evidence": "The zips' central directories list 1965's file twice, with the same contents in GS01's and GS02's (checked 2026-11-12)."
+    },
+    {
+      "id": "jodc-ominato-1952-offset",
+      "stations": ["jodc/HD04"],
+      "since": "1952-05-31",
+      "until": "1952-11-01",
+      "handling": "flagged",
+      "error": "JODC's Ōminato (HD04) levels sit about 2.1 m high from the start of its record, 1 June 1952 JST, to the end of October 1952.",
+      "response": "31 May 1952 UTC to the end of 31 October 1952 is flagged `suspect`, keeping the source's own flag as `source_flag`. The step isn't measured, since the record has a gap across it, so the months are flagged, as in GESLA's copy, rather than given a datum epoch of their own.",
+      "evidence": "Monthly means of JODC's values (checked 2026-11-13) are 3.62 to 3.80 m from June to October 1952 and, after a gap to 19 November, 1.52 m for the rest of November and 1.42 to 1.72 m through 1953; every year from 1953 to 2008, the record's last, averages 1.49 to 1.73 m. GESLA's copy of the gauge, `gesla/ominato-hd04-jpn-jodc_jcg`, has the same step on the same days, which GESLA's metadata marks \"Possible datum issues\" and its datum-jump check flags (erratum `gesla-datum-jumps`)."
     }
   ],
   "retired": []

@@ -10,7 +10,7 @@ import {
   writeRecent,
 } from "../src/store/parquet.ts";
 import { recentPath, seriesPath } from "../src/store/paths.ts";
-import { updateRecent } from "../src/store/recent.ts";
+import { poolUntil, updateRecent } from "../src/store/recent.ts";
 import { judgeFetched, requalify } from "../src/store/requalify.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
 import { source as gesla } from "../src/sources/gesla/index.ts";
@@ -353,5 +353,26 @@ describe("updateRecent with a whole-centimeter flatline rule", () => {
     });
     const after = await readRecent(path);
     assert.equal(after.find((r) => r.time === window[20]!.time)!.flag, Flag.suspect);
+  });
+});
+
+describe("poolUntil", () => {
+  it("starts no item after the deadline, and returns those it left in order", async () => {
+    let clock = 0;
+    const started: number[] = [];
+    // Each item moves the clock on 5, so the deadline passes while the second pair runs.
+    const left = await poolUntil(
+      [1, 2, 3, 4, 5, 6],
+      2,
+      15,
+      async (item) => {
+        started.push(item);
+        await Promise.resolve();
+        clock += 5;
+      },
+      () => clock,
+    );
+    assert.deepEqual(started, [1, 2, 3, 4]);
+    assert.deepEqual(left, [5, 6]);
   });
 });

@@ -17,9 +17,9 @@
       "stations": ["refmar/495"],
       "handling": "corrected",
       "error": "REFMAR's Hiva Oa (UHSLC) levels before March 2020 read 1.35 m lower than on the current zero.",
-      "response": "The record splits into datum epochs on 6 March 2020, and the epoch before converts to today's zero by adding 1.35 m. The values stay as served in that epoch's files, no longer flagged.",
+      "response": "The record splits into datum epochs on 6 March 2020, and the epoch before converts to today's zero by adding 1.35 m. That epoch holds through 4 March and ends at the start of the 5th, as the record's first hour back, from 23:00 UTC that day, is already on the new zero, so that hour belongs to neither epoch. The values stay as served in the earlier epoch's files, no longer flagged.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's record of the gauge (`uhslc/017`), which has no step: REFMAR's sits 0.24 m above it every year from 2010 to 2015 and 1.59 m above it from 2020 on. UHSLC's record starts in September 2010; REFMAR's yearly medians from 1977 to 2017 stay between 0.68 and 0.91 m, and from 2020 read 2.2 m, so the years before 2010 are on the same zero as 2010 to 2015.",
-      "until": "2020-03-06"
+      "until": "2020-03-05"
     },
     {
       "id": "refmar-cancale-vigicrues-2021-2025-datum",
@@ -65,8 +65,8 @@
       "stations": ["refmar/108"],
       "since": "1997-02-28",
       "handling": "kept",
-      "error": "SHOM's Dumont d'Urville levels change zero four times with no change of datum marked: about 1.1 m in 1996 and from December 1997 to February 2000, 6.0 m from March to October 1997 and from March 2000 to 2005, 5.1 m from 2006 to 9 March 2023, and 1.3 m since.",
-      "response": "The record splits into a datum epoch at each change of zero, and the store keeps the values as served. The store holds no independent record of the gauge to measure the offsets, so the epochs before March 2023 have none and stay out of the combined series, readable on their own zeros; nothing is flagged.",
+      "error": "SHOM's Dumont d'Urville levels change zero four times with no change of datum marked: about 1.1 m in 1996 and from December 1997 to February 2000, 6.0 m from March to October 1997 and from March 2000 to 2005, 5.1 m from 2006 to 9 March 2023, and 1.3 m since, from 23:20 UTC on 9 March.",
+      "response": "The record splits into a datum epoch at each change of zero, and the store keeps the values as served. The store holds no independent record of the gauge to measure the offsets, so the epochs before March 2023 have none and stay out of the combined series, readable on their own zeros; nothing is flagged. The last epoch starts on 10 March 2023, so the two values at 23:20 and 23:40 UTC on 9 March, already on the new zero, sit at the end of the epoch before; an erratum flags whole days, and flagging the 9th would mark 24 good values to catch two.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store's only other record of the gauge, UHSLC's (`uhslc/189`), equals this one to the millimeter from 2008 to February 2023, so it is a copy rather than a check, and this rests on the record's own medians. Monthly medians are about 1.1 m in early 1996 and from December 1997 to February 2000, 5.9 to 6.1 m from March to October 1997 and from March 2000 to 2005, 5.0 to 5.3 m from 2006 to 2022, and 1.2 to 1.3 m from March 2023 on. GESLA's REFMAR copy holds the same values."
     },
     {

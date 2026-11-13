@@ -346,7 +346,11 @@ async function pace(): Promise<void> {
   if (slot > now) await new Promise((resolve) => setTimeout(resolve, slot - now));
 }
 
-/** The API answers a bad request with 200 and an `<error>` element, which fails. */
+/**
+ * The API answers a bad request with 200 and an `<error>` element, and an
+ * outage of its backend with 200 and a bare message such as
+ * `Connection refused (111)<br />`; both fail, so a station keeps its values.
+ */
 async function request(
   params: Record<string, string>,
   fresh: boolean,
@@ -355,10 +359,12 @@ async function request(
   const text = await getText(`${API}?${new URLSearchParams(params)}`, {
     fresh,
     pace,
-    keep: (t) => !!keep?.(t) && !/<error>/.test(t),
+    keep: (t) => !!keep?.(t) && /<tide\b/.test(t) && !/<error>/.test(t),
   });
   const error = /<error>([^<]*)<\/error>/.exec(text);
   if (error) throw new Error(`Kartverket: ${decode(error[1]!)}`);
+  if (!/<tide\b/.test(text))
+    throw new Error(`Kartverket: no <tide> response: ${text.slice(0, 100)}`);
   return text;
 }
 

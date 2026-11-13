@@ -287,6 +287,21 @@ describe("kartverket", () => {
     );
   });
 
+  it("fails on an outage answered with 200 and no tide element", async () => {
+    const outage = "Connection refused (111)<br />";
+    const requests = serve([[/stationdata/, outage]]);
+    await assert.rejects(
+      kartverket.levels("BGO", new Date("1990-01-01T00:00Z"), new Date("1990-01-01T03:00Z")),
+      /Connection refused/,
+    );
+    const keep = requests[0]![1].keep!;
+    assert.equal(keep(outage), false);
+    // Final values with no `<tide>` root are still not a response to cache.
+    const values = fixture("kartverket-obs-1990.xml");
+    assert.equal(keep(values), true);
+    assert.equal(keep(values.replace(/<\/?tide>/g, "")), false);
+  });
+
   it("splits requests at UTC years and keeps to the station's record", async () => {
     const requests = serve([[/stationdata/, "<tide><stationdata></stationdata></tide>"]]);
     await kartverket.levels("BGO", new Date("1980-01-01T00:00Z"), new Date("1990-06-01T00:00Z"), {

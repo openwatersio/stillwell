@@ -11,6 +11,7 @@ import {
   markRequalified,
   pending,
   readAnalysis,
+  requalifiedMarks,
   withAnalysis,
   writeAnalysis,
 } from "../src/store/analysis.ts";
@@ -365,5 +366,39 @@ describe("analyze", () => {
     await analyze(store, source, stations, { now: new Date(Date.UTC(2027, 3, 3)) });
     const bumped = (await readAnalysis(store, "test")).get("test/1")!;
     assert.deepEqual([bumped.tidal, bumped.rules, bumped.requalified], [true, RULES, null]);
+  });
+});
+
+describe("requalifiedMarks", () => {
+  it("writes one at a time and keeps a failed write's stations for the next", async () => {
+    const writes: string[][] = [];
+    let writing = false;
+    let fail = true;
+    const marks = requalifiedMarks(async (ids) => {
+      assert.ok(!writing, "writes overlap");
+      writing = true;
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      writing = false;
+      if (fail) {
+        fail = false;
+        throw new Error("transient");
+      }
+      writes.push(ids);
+    }, 0);
+    await Promise.all([marks.add("a"), marks.add("b")]);
+    assert.deepEqual(await marks.flush(), []);
+    assert.deepEqual(writes.flat().sort(), ["a", "b"]);
+  });
+
+  it("holds stations until the interval passes, and returns those a last write failed", async () => {
+    const writes: string[][] = [];
+    const held = requalifiedMarks(async (ids) => void writes.push(ids), 60_000);
+    await held.add("a");
+    assert.deepEqual(writes, []);
+    assert.deepEqual(await held.flush(), []);
+    assert.deepEqual(writes, [["a"]]);
+    const failing = requalifiedMarks(() => Promise.reject(new Error("down")), 60_000);
+    await failing.add("c");
+    assert.deepEqual(await failing.flush(), ["c"]);
   });
 });

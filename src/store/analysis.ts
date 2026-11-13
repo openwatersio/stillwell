@@ -19,8 +19,9 @@ import {
   readRows,
   readStationBounds,
   writeJsonArray,
-  writeRows,
+  writeTable,
 } from "./parquet.ts";
+import { FILES } from "./files.ts";
 import { analysisHistoryPath, analysisPath, boundsPath, seriesDir, seriesPath } from "./paths.ts";
 import { chunks, pool, qcFor } from "./recent.ts";
 
@@ -62,7 +63,7 @@ export interface Analysis {
  * threshold in `qcFor`, so `analyze` judges every station again and
  * requalifies all its stored years.
  */
-export const RULES = "span-1";
+export const RULES = "outliers-1";
 
 /**
  * The version of `judge`'s rules. Change it with any threshold or rule a
@@ -357,22 +358,7 @@ export async function analyze(
 
 /** A source's analysis, `rows` sorted by ID. */
 export function writeAnalysis(store: string, source: string, rows: Analysis[]): Promise<void> {
-  return writeRows(
-    analysisPath(store, source),
-    rows,
-    {
-      id: "VARCHAR",
-      analyzed: "TIMESTAMPTZ",
-      rules: "VARCHAR",
-      judge: "VARCHAR",
-      tidal: "BOOLEAN",
-      tide_m: "DOUBLE",
-      days: "INTEGER",
-      drains: "INTEGER",
-      requalified: "TIMESTAMPTZ",
-    },
-    "id",
-  );
+  return writeTable(analysisPath(store, source), rows, FILES.analysis);
 }
 
 /**
@@ -399,6 +385,45 @@ export async function markRequalified(
       done.has(a.id) ? { ...a, requalified: now.toISOString() } : a,
     ),
   );
+}
+
+/**
+ * Stations to mark requalified, given to `write` as they come once `everyMs`
+ * has passed since the last write, and by `flush`, one write at a time. A
+ * failed write keeps its stations for the next; `flush` returns those still
+ * unwritten.
+ */
+export function requalifiedMarks(
+  write: (ids: string[]) => Promise<void>,
+  everyMs: number,
+): { add(id: string): Promise<void>; flush(): Promise<string[]> } {
+  let done: string[] = [];
+  let last = Date.now();
+  let writing = Promise.resolve();
+  const flush = () => {
+    const ids = done;
+    done = [];
+    last = Date.now();
+    writing = writing.then(async () => {
+      if (!ids.length) return;
+      try {
+        await write(ids);
+      } catch (error) {
+        done.push(...ids);
+        console.error(
+          `couldn't mark ${ids.length} stations requalified: ${error instanceof Error ? error.message : error}`,
+        );
+      }
+    });
+    return writing.then(() => [...done]);
+  };
+  return {
+    async add(id) {
+      done.push(id);
+      if (Date.now() - last >= everyMs) await flush();
+    },
+    flush,
+  };
 }
 
 /**

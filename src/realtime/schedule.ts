@@ -18,6 +18,34 @@ export interface PassResult {
   intervals: number[];
   /** Whether the source's window from recent/ is in ClickHouse, as of this pass. */
   seeded: boolean;
+  /** When the pass began, if later than the scheduler asked for it, as after a wait for a slot. */
+  started?: number;
+}
+
+/** A pass that ended without a result, with when it began. */
+export class PassError extends Error {
+  readonly started: number;
+  constructor(message: string, started: number) {
+    super(message);
+    this.started = started;
+  }
+}
+
+/** At most `n` holders at once: `acquire` waits for a slot, and `release` hands it to the next in line. */
+export function slots(n: number): { acquire(): Promise<void>; release(): void } {
+  let busy = 0;
+  const waiting: (() => void)[] = [];
+  return {
+    async acquire() {
+      if (busy < n) busy++;
+      else await new Promise<void>((go) => waiting.push(go));
+    },
+    release() {
+      const next = waiting.shift();
+      if (next) next();
+      else busy--;
+    },
+  };
 }
 
 /**
@@ -29,7 +57,8 @@ export interface PassResult {
  * A pass that fails waits for its groups' intervals like one that succeeds,
  * so a failure never asks a source sooner; one before the groups are known is
  * tried again after `RETRY_MS`, and one the source blocked rests it for
- * `BLOCKED_MS`.
+ * `BLOCKED_MS`. Intervals count from when a pass began, and rests and
+ * retries from when it ended.
  */
 export async function schedule({
   pass,
@@ -39,7 +68,7 @@ export async function schedule({
   stopped,
   log = console.error,
 }: {
-  pass: (due: number[] | null, seeding: boolean, now: number) => Promise<PassResult>;
+  pass: (due: number[] | null, seeding: boolean) => Promise<PassResult>;
   /** Start the source's station refresh, after a datum change; whether one started or already had. */
   refresh: () => Promise<boolean>;
   clock?: () => number;
@@ -55,32 +84,40 @@ export async function schedule({
   let notBefore = 0;
   let refreshAfter = -Infinity;
   while (!stopped()) {
-    const now = clock();
+    let now = clock();
     const due = intervals?.filter((i) => now - (ran.get(i) ?? 0) >= seconds(i) * 1000) ?? null;
     if (now >= notBefore && (!due || due.length)) {
+      // A pass that waited for a slot counts from when it began.
+      const began = (started: number | undefined) => {
+        if (started === undefined || started <= now) return;
+        now = started;
+        for (const i of due ?? []) ran.set(i, now);
+      };
       for (const i of due ?? []) ran.set(i, now);
       try {
-        const result = await pass(due, !seeded, now);
+        const result = await pass(due, !seeded);
+        began(result.started);
         if (result.intervals.length) {
           // A first pass fetched every group; a group new to the list since is due at once.
           if (!due) for (const i of result.intervals) ran.set(i, now);
           intervals = result.intervals;
         } else if (result.ok) intervals = null;
         if (result.seeded) seeded = true;
-        if (!result.ok && !intervals) notBefore = now + RETRY_MS;
+        if (!result.ok && !intervals) notBefore = clock() + RETRY_MS;
         // A list with nothing to poll, such as a new source's, is read again hourly.
-        if (result.ok && !result.intervals.length) notBefore = now + seconds(0) * 1000;
+        if (result.ok && !result.intervals.length) notBefore = clock() + seconds(0) * 1000;
         if (result.summary?.blocked) {
           log("blocked; resting for an hour");
-          notBefore = now + BLOCKED_MS;
+          notBefore = clock() + BLOCKED_MS;
         }
         // At most once a day, so a station that stays changed doesn't ask GitHub every pass;
         // an hour after a refresh that couldn't start.
         if (result.summary?.datumChanged && now >= refreshAfter)
           refreshAfter = now + ((await refresh()) ? 24 : 1) * HOUR_MS;
       } catch (error) {
+        if (error instanceof PassError) began(error.started);
         log(error instanceof Error ? error.message : String(error));
-        if (!intervals) notBefore = now + RETRY_MS;
+        if (!intervals) notBefore = clock() + RETRY_MS;
       }
     }
     const next = intervals

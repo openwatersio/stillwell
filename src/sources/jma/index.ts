@@ -324,6 +324,14 @@ async function monthOf(code: string, month: number, recent: boolean): Promise<Ob
       {
         fresh: recent,
         pace,
+        // Final files are cached, so a 200 that isn't a whole month's file mustn't be.
+        keep: (t) => {
+          try {
+            return !!parse(t, code, month, Flag.good);
+          } catch {
+            return false;
+          }
+        },
       },
     );
     return parse(text, code, month, Flag.good);

@@ -133,6 +133,19 @@ describe("jma", () => {
     });
   });
 
+  it("fails on a 200 that isn't a month's file, and doesn't cache it", async () => {
+    const page = "<html><body>メンテナンス中</body></html>";
+    serve([[/hry198001CC\.txt$/, page]]);
+    await assert.rejects(
+      jma.levels("CC", new Date("1980-01-01T00:00Z"), new Date("1980-01-02T00:00Z")),
+      /has a line for/,
+    );
+    const keep = requests[0]![1].keep!;
+    assert.equal(keep(page), false);
+    assert.equal(keep(""), false);
+    assert.equal(keep(fixture("jma-historic-198001CC.txt")), true);
+  });
+
   it("falls back to provisional values, fresh and preliminary, for recent months", async () => {
     serve(chichijima);
     const levels = await jma.levels("CC", new Date("2026-10-30T00:00Z"), new Date(RECORDED));

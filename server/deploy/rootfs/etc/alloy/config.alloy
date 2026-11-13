@@ -1,0 +1,57 @@
+// Grafana Alloy on the Stillwell box: scrapes the host and ClickHouse every 60 s and pushes the samples
+// to Grafana Cloud. The endpoint and token come from /etc/alloy.env through the systemd drop-in next to
+// this unit. The 60 s interval keeps every series at one sample a minute, which is how the free tier counts.
+
+// The systemd collector counts, per unit, the restarts systemd made because the process exited on its own
+// (Restart=always after a crash or OOM kill). systemctl restart, which deploys use, never moves it, so it
+// tells a crash from a deploy. The textfile collector reads the poller's pass metrics, which it rewrites
+// after every pass (STILLWELL_METRICS in stillwell-ingest.service).
+prometheus.exporter.unix "host" {
+	enable_collectors = ["systemd", "textfile"]
+
+	textfile {
+		directory = "/var/lib/stillwell/metrics"
+	}
+
+	systemd {
+		enable_restarts = true
+		unit_include    = "(stillwell-ingest|alloy|clickhouse-server)\\.service"
+	}
+}
+
+prometheus.scrape "host" {
+	targets    = prometheus.exporter.unix.host.targets
+	forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// ClickHouse exports thousands of series; these few are its memory, CPU, inserts, refusals, failures, merges,
+// mutations, and size.
+prometheus.scrape "clickhouse" {
+	targets    = [{"__address__" = "127.0.0.1:9363"}]
+	job_name   = "clickhouse"
+	forward_to = [prometheus.relabel.clickhouse.receiver]
+}
+
+prometheus.relabel "clickhouse" {
+	forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+	rule {
+		source_labels = ["__name__"]
+		regex         = "ClickHouseMetrics_(MemoryTracking|Merge|PartMutation|Query)|ClickHouseProfileEvents_(InsertedRows|FailedQuery|FailedInsertQuery|OSCPUVirtualTimeMicroseconds|RejectedInserts)|ClickHouseAsyncMetrics_(MaxPartCountForPartition|TotalBytesOfMergeTreeTables|TotalRowsOfMergeTreeTables)"
+		action        = "keep"
+	}
+}
+
+prometheus.remote_write "grafana_cloud" {
+	// project tells this box's series from other boxes' in a shared stack; the alert rules select on it.
+	external_labels = {"host" = constants.hostname, "project" = "stillwell"}
+
+	endpoint {
+		url = sys.env("GRAFANA_CLOUD_PROM_URL")
+
+		basic_auth {
+			username = sys.env("GRAFANA_CLOUD_PROM_USER")
+			password = sys.env("GRAFANA_CLOUD_TOKEN")
+		}
+	}
+}
