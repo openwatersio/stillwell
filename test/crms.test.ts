@@ -203,6 +203,47 @@ describe("crms levels", () => {
       assert.deepEqual(await crms.levels(station(id), ...ALL), []);
   });
 
+  it("leaves out a marsh well's row filed under a surface-water gauge", async () => {
+    forget();
+    serve(zipOf(CSV));
+    const all = await crms.levels(station("CRMS0002-H01"), ...ALL);
+    forget();
+    serve(
+      zipOf(
+        edit(
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Surface Water",
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Marsh Well",
+        ),
+      ),
+    );
+    const kept = await crms.levels(station("CRMS0002-H01"), ...ALL);
+    assert.equal(kept.length, all.length - 1);
+    assert.ok(!kept.some((o) => o.time === Date.UTC(2007, 8, 29, 15)));
+    forget();
+    serve(
+      zipOf(
+        edit(
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Surface Water",
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Open Water",
+        ),
+      ),
+    );
+    await assert.rejects(
+      crms.levels(station("CRMS0002-H01"), ...ALL),
+      /Open Water sensor environment/,
+    );
+    forget();
+    serve(
+      zipOf(
+        edit(
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Surface Water",
+          "CRMS0002-H01,9/29/2007,09:00:00,CST,Surface Water ",
+        ),
+      ),
+    );
+    assert.equal((await crms.levels(station("CRMS0002-H01"), ...ALL)).length, all.length);
+  });
+
   it("flags values CPRA's comments describe as a dry sensor or a stand-in", async () => {
     serve(zipOf(CSV));
     // Water level at or below 0.03 ft over the sensor.
