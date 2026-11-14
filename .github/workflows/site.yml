@@ -1,8 +1,9 @@
 name: Site
 
-# Build the site in site/. The build runs the docs' result tables against the public store and fails where a
-# query breaks or a reference page's columns and the live files disagree, so it runs on pull requests that change the site,
-# on pushes to main, and weekly, when the store's own changes reach it. Monthly keeps the schedule enabled.
+# Build the site in site/ and deploy it to GitHub Pages. The build runs the docs' result tables against the public
+# store and fails where a query breaks or a reference page's columns and the live files disagree. Pull requests that
+# change the site only build it. Pushes to main deploy it, and so does a daily run, which picks up the store's own
+# changes. Monthly keeps the schedule enabled.
 on:
   pull_request:
     paths:
@@ -16,11 +17,18 @@ on:
       - ".mise.toml"
       - ".github/workflows/site.yml"
   schedule:
-    - cron: "0 7 * * 1"
+    - cron: "0 7 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# Runs on main, the ones that deploy, go one at a time in the order they start, so a run that starts later deploys
+# later; a newer run replaces one still waiting. Re-running an older run deploys it again. Every other ref has its own group, where a newer run cancels
+# an older one.
+concurrency:
+  group: site-${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && 'deploy' || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
@@ -44,8 +52,36 @@ jobs:
       - name: Check every package resolves from the npm registry
         run: npx -y lockfile-lint@5.1.0 --path package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names
       - run: npm ci
-      # Station pages for two small sources, to render the station page and bundle its chart: BSH's stations
-      # have predictions and no observations, and every Marine Institute station has errata.
+      # The deployed site has no station pages. A pull request builds two small sources' pages, to render the
+      # station page and bundle its chart: BSH's stations have predictions and no observations, and every Marine
+      # Institute station has errata.
       - run: npm run build
         env:
-          STATIONS: bsh,marine-institute
+          STATIONS: ${{ github.event_name == 'pull_request' && 'bsh,marine-institute' || '' }}
+      # Pages serves the site under /stillwell, so a root path in any HTML attribute needs it, once.
+      - name: Check every root path in the HTML carries the base path
+        run: |
+          if grep -rhoE "[a-z-]+=[\"']/[^\"']*" dist --include='*.html' | grep -vE "=[\"'](/stillwell([/#?]|$)|//)" | sort -u | head -20 | grep .; then
+            exit 1
+          fi
+          if grep -rlE '/stillwell/stillwell([/"#?]|$)' dist --include='*.html' | head -5 | grep .; then
+            exit 1
+          fi
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,16 +1,14 @@
 // Serves `levels` for the api.openwaters.io gateway, bound to it as WATER_LEVELS:
 // answers from Cloudflare's cache when it can, otherwise asks stillwell-api on
-// the server through its Tunnel, and when the server doesn't answer serves the
-// last good copy marked stale (docs/plans/realtime.md, The levels API).
+// the server through its Workers VPC binding, and when the server doesn't
+// answer serves the last good copy marked stale (docs/plans/realtime.md, The
+// levels API).
 
 import { parseInstant, STEPS, WINDOW_MS } from "../../src/api/levels.ts";
 
 export interface Env {
-  /** stillwell-api's Tunnel hostname, such as https://stillwell-api.openwaters.io. */
-  ORIGIN: string;
-  /** The Access service token the Tunnel's Access application lets through. */
-  ACCESS_CLIENT_ID: string;
-  ACCESS_CLIENT_SECRET: string;
+  /** stillwell-api on the server, reached through the Tunnel as a Workers VPC service. */
+  STILLWELL: { fetch(url: string, init?: RequestInit): Promise<Response> };
 }
 
 interface Context {
@@ -29,6 +27,8 @@ const LEVELS = /^\/water-levels\/stations\/[^/]+\/[^/]+\/levels$/;
 /** How long the last good copy of a range is kept for when the server doesn't answer. */
 const LAST_GOOD_S = 86_400;
 const ORIGIN_TIMEOUT_MS = 10_000;
+/** When a cached copy expires, in epoch milliseconds, stored with it. */
+const EXPIRES = "X-Levels-Expires";
 
 export default {
   async fetch(request: Request, env: Env, ctx: Context): Promise<Response> {
@@ -41,14 +41,23 @@ export default {
     const cache = (globalThis as unknown as { caches: { default: Cache } }).caches.default;
     const key = new Request(`${url.origin}${url.pathname}?${canonical}`);
     const hit = await cache.match(key);
-    if (hit) return hit;
+    // Rebuilt, not passed on: the zone's Browser Cache TTL raises a cached
+    // response's max-age to 4 hours, and may keep it that long, so a copy
+    // past its own expiry, or without one, is a miss, and a hit tells the
+    // client only the time it has left.
+    const left = hit && Math.ceil((Number(hit.headers.get(EXPIRES)) - Date.now()) / 1000);
+    if (hit && left && left > 0)
+      return new Response(hit.body, { headers: headers(`public, max-age=${left}`) });
 
     const lastKey = new Request(`${url.origin}${url.pathname}?${lastParams}&last-good`);
-    const answer = await ask(`${env.ORIGIN}${url.pathname}?${canonical}`, env, request);
+    const answer = await ask(`${url.pathname}?${canonical}`, env, request);
     if (answer) {
       const reply = json(answer.status, answer.body, answer.cacheControl);
       if (answer.status === 200) {
-        ctx.waitUntil(cache.put(key, reply.clone()));
+        const kept = reply.clone();
+        const maxAge = Number(/max-age=(\d+)/.exec(answer.cacheControl)?.[1] ?? 0);
+        kept.headers.set(EXPIRES, String(Date.now() + maxAge * 1000));
+        ctx.waitUntil(cache.put(key, kept));
         ctx.waitUntil(cache.put(lastKey, json(200, answer.body, `public, max-age=${LAST_GOOD_S}`)));
       }
       // A station withheld or no longer served is never served from an older copy.
@@ -65,24 +74,19 @@ export default {
 
 /**
  * stillwell-api's answer, when it gave one of its own: a 200 or a 4xx other
- * than Access's 401 and 403, as JSON. Anything else, such as a redirect to
- * Access's login page when the service token has expired, a 5xx or no answer
- * in time, is undefined, so the last good copy is served. Only the body and
- * its Cache-Control are kept: headers Access adds, such as its cookie, never
- * reach a client or the cache.
+ * than 401 and 403, which it never sends, as JSON. Anything else, such as a
+ * refusal from Cloudflare, a 5xx or no answer in time, is undefined, so the
+ * last good copy is served. Only the body and its Cache-Control are kept.
  */
 async function ask(
-  url: string,
+  path: string,
   env: Env,
   request: Request,
 ): Promise<{ status: number; body: object; cacheControl: string } | undefined> {
   try {
-    const answer = await fetch(url, {
-      headers: {
-        "CF-Access-Client-Id": env.ACCESS_CLIENT_ID,
-        "CF-Access-Client-Secret": env.ACCESS_CLIENT_SECRET,
-        "User-Agent": request.headers.get("User-Agent") ?? "",
-      },
+    // The binding routes to its configured host and port; the URL's host only sets the Host header.
+    const answer = await env.STILLWELL.fetch(`http://stillwell-api${path}`, {
+      headers: { "User-Agent": request.headers.get("User-Agent") ?? "" },
       redirect: "manual",
       signal: AbortSignal.timeout(ORIGIN_TIMEOUT_MS),
     });
@@ -175,12 +179,13 @@ function iso(time: number): string {
 }
 
 function json(status: number, body: object, cacheControl = "no-store"): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": cacheControl,
-    },
-  });
+  return new Response(JSON.stringify(body), { status, headers: headers(cacheControl) });
+}
+
+function headers(cacheControl: string): HeadersInit {
+  return {
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Origin": "*",
+    "Cache-Control": cacheControl,
+  };
 }

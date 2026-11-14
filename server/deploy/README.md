@@ -21,7 +21,7 @@ The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.
 - `rootfs/` holds the units and config, copied over `/`:
   - `stillwell-ingest.service` runs `node server/ingest.ts` as `stillwell`, with a 1.8 GB memory cap over the poller and its passes. SFWMD drops connections from the box, so the unit names it in `STILLWELL_FROM_RECENT`, and the poller fills it hourly from the `recent/` the hourly workflow writes rather than asking SFWMD. Two passes run at a time, since each is a process of its own holding up to about 800 MB, and a pass the kernel stops for memory fails alone.
   - `stillwell-api.service` runs `node server/api.ts` as `stillwell` on 127.0.0.1:8787, capped at 400 MB. Its ClickHouse user may not raise its limits: 30 seconds and 300 MB a query, and 400 MB and 8 queries at once. It reads the public stations and their offsets from the store through ClickHouse when it starts and every 10 minutes, keeping the last list when a reload fails, and answers `/health`, and levels, once it has one; until then it tries every 30 seconds, and a deploy warns rather than fails.
-  - `cloudflared.service` runs the Tunnel that publishes `stillwell-api` behind Cloudflare Access, so no port is open on the box.
+  - `cloudflared.service` runs the Tunnel through which the levels Worker reaches `stillwell-api`, so no port is open on the box and the API has no public hostname.
   - ClickHouse listens on loopback only, capped at 1.2 GB by [its config](rootfs/etc/clickhouse-server/config.d/stillwell.xml) and held to a hard 1.5 GB ceiling and half the CPU weight by [a systemd drop-in](rootfs/etc/systemd/system/clickhouse-server.service.d/10-stillwell.conf), so ClickHouse can't take the poller's memory or more than half the CPU under contention.
   - Alloy ships the host's CPU, memory, disk and network, its unit restarts, the poller's pass metrics and a few ClickHouse series to Grafana Cloud once `/etc/alloy.env` is filled in.
   - sshd is key-only, with fail2ban (3 tries in 10 minutes bans for an hour), and the journal is capped at 500 MB.
@@ -37,7 +37,7 @@ The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.
 3. Fill in `/etc/stillwell.env`: `USGS_API_KEY`, a key of the server's own, and `GITHUB_TOKEN`, a fine-grained token for openwatersio/stillwell with Actions read and write. Fill in `/etc/alloy.env` to ship metrics. Then run `deploy.sh` again.
 4. For deploys from CI: set the repository variable `DEPLOY_HOST` to the box's address, and in the `server` environment the secrets `DEPLOY_SSH_KEY` (the deploy key's private half) and `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <ip>`).
 5. Once metrics reach Grafana Cloud, apply the alerts with [`grafana/push.sh`](grafana/push.sh) ([Alerts](#alerts)).
-6. To publish `stillwell-api`, set up the Tunnel and Access as [workers/api/README.md](../../workers/api/README.md#setup) says, put the Tunnel's token in `/etc/cloudflared.env` as `TUNNEL_TOKEN`, and run `deploy.sh` again.
+6. To publish `stillwell-api`, set up the Tunnel and the Worker as [workers/api/README.md](../../workers/api/README.md#setup) says, put the Tunnel's token in `/etc/cloudflared.env` as `TUNNEL_TOKEN`, and run `deploy.sh` again.
 
 A replacement box is the same steps, reusing the Tunnel's token. Nothing on the old one needs copying: ClickHouse fills from `recent/` on each source's first pass.
 

@@ -1,7 +1,7 @@
 ---
 // Every source as a compact entry: what someone choosing a source needs, with the rest on the source's own page.
 import { json, rows } from "../lib/store";
-import { url } from "../lib/paths";
+import { sitePath, url } from "../lib/paths";
 
 const sources = await json("sources.json");
 const facts = new Map(
@@ -43,7 +43,7 @@ const span = (first?: Date, last?: Date) => {
       return (
         <li id={s.id}>
           <strong>
-            <a href={`/sources/${s.id}/`}>{s.name}</a>
+            <a href={sitePath(`/sources/${s.id}/`)}>{s.name}</a>
           </strong>
           <div>{details.join(" ")}</div>
         </li>

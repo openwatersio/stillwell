@@ -4,11 +4,8 @@ import worker, { normalize } from "../workers/api/index.ts";
 
 const NOW = Date.parse("2026-11-13T12:03:30Z");
 const PATH = "https://api.openwaters.io/water-levels/stations/coops/9447130/levels";
-const env = {
-  ORIGIN: "https://origin.test",
-  ACCESS_CLIENT_ID: "id",
-  ACCESS_CLIENT_SECRET: "secret",
-};
+// The binding's fetch, through the global one the tests mock.
+const env = { STILLWELL: { fetch: (url: string, init?: RequestInit) => fetch(url, init) } };
 
 describe("normalize", () => {
   it("puts a range relative to now at the 7 days to now, rounded up to the step", () => {
@@ -71,8 +68,8 @@ describe("the Worker", () => {
   let cache: Map<string, Response>;
   let waits: Promise<unknown>[];
   const ctx = { waitUntil: (p: Promise<unknown>) => void waits.push(p) };
-  const get = async (url: string) => {
-    const response = await worker.fetch(new Request(url), env, ctx);
+  const get = async (url: string, headers?: Record<string, string>) => {
+    const response = await worker.fetch(new Request(url, { headers }), env, ctx);
     await Promise.all(waits);
     return response;
   };
@@ -94,7 +91,7 @@ describe("the Worker", () => {
     mock.timers.reset();
   });
 
-  it("asks the server with the Access token once, then answers from the cache", async () => {
+  it("asks the server through its binding once, then answers from the cache", async () => {
     const calls: Request[] = [];
     mock.method(globalThis, "fetch", async (url: string, init: RequestInit) => {
       calls.push(new Request(url, init));
@@ -103,16 +100,57 @@ describe("the Worker", () => {
         { headers: { "Cache-Control": "public, max-age=300" } },
       );
     });
-    assert.equal((await get(PATH)).status, 200);
+    assert.equal((await get(PATH, { "User-Agent": "Slackwater/1.0" })).status, 200);
     assert.equal((await get(PATH)).status, 200);
     assert.equal(calls.length, 1);
     assert.ok(
       calls[0]!.url.startsWith(
-        "https://origin.test/water-levels/stations/coops/9447130/levels?end=",
+        "http://stillwell-api/water-levels/stations/coops/9447130/levels?end=",
       ),
     );
-    assert.equal(calls[0]!.headers.get("CF-Access-Client-Id"), "id");
-    assert.equal(calls[0]!.headers.get("CF-Access-Client-Secret"), "secret");
+    assert.equal(calls[0]!.headers.get("User-Agent"), "Slackwater/1.0");
+  });
+
+  it("gives a cached copy only the time it has left, whatever the cache says", async () => {
+    mock.method(globalThis, "fetch", async () =>
+      Response.json(
+        { status: "reporting", levels: [] },
+        { headers: { "Cache-Control": "public, max-age=300" } },
+      ),
+    );
+    assert.equal((await get(PATH)).headers.get("Cache-Control"), "public, max-age=300");
+    // Cloudflare's zone settings rewrite a cached response's Cache-Control.
+    for (const [url, kept] of cache) {
+      const rewritten = new Response(kept.body, kept);
+      rewritten.headers.set("Cache-Control", "public, max-age=14400");
+      cache.set(url, rewritten);
+    }
+    mock.timers.setTime(NOW + 100_000);
+    const hit = await get(PATH);
+    assert.equal(hit.headers.get("Cache-Control"), "public, max-age=200");
+    assert.equal(hit.headers.get("X-Levels-Expires"), null);
+    assert.deepEqual(await hit.json(), { status: "reporting", levels: [] });
+    // Past its expiry, the copy is a miss, though the cache still holds it.
+    mock.timers.setTime(NOW + 301_000);
+    await get(PATH);
+    assert.equal(
+      (globalThis.fetch as unknown as { mock: { callCount(): number } }).mock.callCount(),
+      2,
+    );
+  });
+
+  it("asks the server when a cached copy has no expiry", async () => {
+    const answer = mock.method(globalThis, "fetch", async () =>
+      Response.json(
+        { status: "reporting", levels: [] },
+        { headers: { "Cache-Control": "public, max-age=300" } },
+      ),
+    );
+    await get(PATH);
+    const [url] = [...cache.keys()].filter((k) => !k.includes("last-good"));
+    cache.set(url!, Response.json({ status: "reporting", levels: [] })); // cached before expiries were kept
+    await get(PATH);
+    assert.equal(answer.mock.callCount(), 2);
   });
 
   it("serves the last good copy as stale when the server doesn't answer, and 503 without one", async () => {
@@ -131,7 +169,7 @@ describe("the Worker", () => {
     assert.equal((await get(`${PATH}?step=1h`)).status, 503);
   });
 
-  it("treats Access's refusals, its login page and a server error as no answer", async () => {
+  it("treats a redirect, an HTML page, a refusal and a server error as no answer", async () => {
     mock.method(globalThis, "fetch", async () =>
       Response.json({ status: "reporting", levels: [1] }),
     );
@@ -140,7 +178,7 @@ describe("the Worker", () => {
       () =>
         new Response(null, {
           status: 302,
-          headers: { Location: "https://x.cloudflareaccess.com/login" },
+          headers: { Location: "https://example.test/login" },
         }),
       () => new Response("<html>login</html>", { headers: { "Content-Type": "text/html" } }),
       () => Response.json({ message: "forbidden" }, { status: 403 }),
@@ -190,7 +228,7 @@ describe("the Worker", () => {
     assert.equal((await get(PATH)).status, 503);
   });
 
-  it("passes on only the body and its Cache-Control, never a cookie Access set", async () => {
+  it("passes on only the body and its Cache-Control, never another header", async () => {
     mock.method(globalThis, "fetch", async () =>
       Response.json(
         { status: "reporting", levels: [] },

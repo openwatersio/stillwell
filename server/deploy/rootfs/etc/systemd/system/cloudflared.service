@@ -1,6 +1,6 @@
-# cloudflared: publishes stillwell-api through a Cloudflare Tunnel behind Access, so no port is open on the
-# box. The Tunnel, its public hostname (to http://127.0.0.1:8787) and the Access application are set up in
-# Cloudflare (server/deploy/README.md); /etc/cloudflared.env holds the Tunnel's token as TUNNEL_TOKEN.
+# cloudflared: the Cloudflare Tunnel through which the levels Worker reaches stillwell-api as a Workers VPC
+# service, so no port is open on the box and the API has no public hostname. The Tunnel and the VPC service
+# are set up in Cloudflare (workers/api/README.md); /etc/cloudflared.env holds the Tunnel's token as TUNNEL_TOKEN.
 # apply.sh enables it only once that's filled in.
 [Unit]
 Description=Cloudflare Tunnel for stillwell-api
