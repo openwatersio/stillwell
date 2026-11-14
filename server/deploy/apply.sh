@@ -27,6 +27,14 @@ if [ ! -f /usr/share/keyrings/clickhouse-keyring.gpg ]; then
 	rm -f "$key"
 fi
 echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=$(dpkg --print-architecture)] https://packages.clickhouse.com/deb lts main" >/etc/apt/sources.list.d/clickhouse.list
+# Cloudflare's apt repository, for cloudflared.
+if [ ! -f /usr/share/keyrings/cloudflare-main.gpg ]; then
+	key=$(mktemp)
+	curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg -o "$key"
+	install -m 644 "$key" /usr/share/keyrings/cloudflare-main.gpg
+	rm -f "$key"
+fi
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' >/etc/apt/sources.list.d/cloudflared.list
 # Refresh the lists and install the packages, getting past a vendor repository that refuses its index.
 . ./apt-update.sh
 # ClickHouse is installed once, at the release CI tests against, and upgraded by hand, so a deploy never
@@ -34,6 +42,10 @@ echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=$(dpkg --pr
 if ! command -v clickhouse-server >/dev/null; then
 	apt-get install -yq -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold 'clickhouse-client=26.8.*' 'clickhouse-server=26.8.*' 'clickhouse-common-static=26.8.*'
 fi
+# cloudflared follows Cloudflare's releases, which each have a limited support period; a new one restarts the Tunnel.
+# When Cloudflare's repository is down, the one installed stays, or none on a box that has none yet, rather than block
+# the poller's deploy; a box with a Tunnel token and no cloudflared then fails below, starting it.
+apt-get install -yq cloudflared || echo 'cloudflared not installed or upgraded: Cloudflare'"'"'s repository failed' >&2
 
 # Node: the newest release of the major version .mise.toml names, as CI tests with, from nodejs.org and
 # checked against its published checksums. A deploy installs a newer patch release when there is one.
@@ -112,6 +124,73 @@ XML
 umask 022
 chown root:clickhouse /etc/clickhouse-server/users.d/stillwell-password.xml
 chmod 640 /etc/clickhouse-server/users.d/stillwell-password.xml
+# stillwell-api connects as a user of its own, which reads only the database `stillwell` and, for the station
+# list, URLs under the public store: never the restricted database, and nothing it could write. Its password is
+# generated once and kept in its env file, which apply.sh writes whole, with the store from /etc/stillwell.env.
+store=$(sed -n 's/^STILLWELL_STORE=//p' /etc/stillwell.env | sed 's#/*$##')
+case "$store" in
+https://*) ;;
+*) echo "apply.sh: stillwell-api reads the store over HTTPS; STILLWELL_STORE is '$store'" >&2; exit 1 ;;
+esac
+api_password=
+if [ -f /etc/stillwell-api.env ]; then
+	api_password=$(sed -n 's/^CLICKHOUSE_PASSWORD=//p' /etc/stillwell-api.env)
+fi
+[ -n "$api_password" ] || api_password=$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')
+umask 077
+cat >/etc/stillwell-api.env <<ENV
+# Written by apply.sh on every deploy; edits are lost.
+STILLWELL_STORE=$store
+CLICKHOUSE_URL=$(sed -n 's/^CLICKHOUSE_URL=//p' /etc/stillwell.env | grep . || echo http://127.0.0.1:8123)
+CLICKHOUSE_USER=stillwell_api
+CLICKHOUSE_PASSWORD=$api_password
+ENV
+# The store as a regular expression, its backslashes doubled again for the SQL string.
+store_re=$(printf '%s' "$store" | sed -e 's/[][\\.*^$()+?{}|]/\\\\&/g')
+api_hash=$(printf '%s' "$api_password" | sha256sum | cut -d' ' -f1)
+cat >/etc/clickhouse-server/users.d/stillwell-api.xml <<XML
+<!-- Written by apply.sh from CLICKHOUSE_PASSWORD in /etc/stillwell-api.env. -->
+<clickhouse>
+    <profiles>
+        <stillwell_api>
+            <!-- Reads only; settings may change per query, but not these limits, so requests can't hold
+                 ClickHouse's memory or time from the poller: 300 MB a query, 400 MB and 8 queries at once, and
+                 30 seconds a query, which a levels query lowers to 8 to finish before the Worker gives up. -->
+            <readonly>2</readonly>
+            <max_execution_time>30</max_execution_time>
+            <max_memory_usage>300000000</max_memory_usage>
+            <max_memory_usage_for_user>400000000</max_memory_usage_for_user>
+            <max_concurrent_queries_for_user>8</max_concurrent_queries_for_user>
+            <constraints>
+                <max_execution_time><max>30</max></max_execution_time>
+                <max_memory_usage><readonly/></max_memory_usage>
+                <max_memory_usage_for_user><readonly/></max_memory_usage_for_user>
+                <max_concurrent_queries_for_user><readonly/></max_concurrent_queries_for_user>
+            </constraints>
+        </stillwell_api>
+    </profiles>
+    <users>
+        <stillwell_api>
+            <password_sha256_hex>$api_hash</password_sha256_hex>
+            <networks><ip>127.0.0.1</ip><ip>::1</ip></networks>
+            <profile>stillwell_api</profile>
+            <quota>default</quota>
+            <grants>
+                <query>GRANT SELECT ON stillwell.*</query>
+                <query>GRANT CREATE TEMPORARY TABLE ON *.*</query>
+                <query>GRANT READ ON URL('$store_re/.*')</query>
+            </grants>
+        </stillwell_api>
+    </users>
+</clickhouse>
+XML
+umask 022
+chown root:clickhouse /etc/clickhouse-server/users.d/stillwell-api.xml
+chmod 640 /etc/clickhouse-server/users.d/stillwell-api.xml
+if [ ! -f /etc/cloudflared.env ]; then
+	install -m 600 cloudflared.env.example /etc/cloudflared.env
+	echo 'created /etc/cloudflared.env from template: fill in TUNNEL_TOKEN to publish stillwell-api' >&2
+fi
 if [ ! -f /etc/alloy.env ]; then
 	install -m 600 alloy.env.example /etc/alloy.env
 	echo 'created /etc/alloy.env from template: fill in the Grafana Cloud credentials to ship metrics' >&2
@@ -120,12 +199,20 @@ fi
 # The app, its unit and its environment, against the stamp of the ones the poller last restarted with, so a
 # deploy that changes none of them, such as a change to docs or to this directory, leaves the poller and its
 # schedule running.
+app_files=$(cd "$app" && find package.json package-lock.json .mise.toml src server -path server/deploy -prune -o -type f ! -name '*.md' -print |
+	LC_ALL=C sort | xargs md5sum)
 app_sum=$({
-	(cd "$app" && find package.json package-lock.json .mise.toml src server -path server/deploy -prune -o -type f ! -name '*.md' -print |
-		LC_ALL=C sort | xargs md5sum)
+	echo "$app_files"
 	cat /etc/systemd/system/stillwell-ingest.service /etc/stillwell.env
 	readlink /opt/node
 } | md5sum)
+# stillwell-api runs the same app, with a unit and environment of its own, against a stamp of its own.
+api_sum=$({
+	echo "$app_files"
+	cat /etc/systemd/system/stillwell-api.service /etc/stillwell-api.env
+	readlink /opt/node
+} | md5sum)
+api_stamp=/var/lib/stillwell-api.md5
 app_stamp=/var/lib/stillwell-app.md5
 app_changed=
 if [ "$app_sum" != "$(cat "$app_stamp" 2>/dev/null)" ] || [ ! -d /opt/stillwell ]; then
@@ -140,7 +227,7 @@ fi
 
 systemctl daemon-reload
 systemctl restart systemd-journald
-systemctl enable clickhouse-server fail2ban stillwell-ingest
+systemctl enable clickhouse-server fail2ban stillwell-ingest stillwell-api
 # ClickHouse restarts only when its own files differ from the ones it last restarted with, recorded in a
 # stamp, so a deploy does not interrupt it for nothing and one that stopped partway is caught up by the next.
 ch_sum=$(cat /etc/clickhouse-server/config.d/stillwell.xml /etc/systemd/system/clickhouse-server.service.d/10-stillwell.conf | md5sum)
@@ -187,6 +274,26 @@ for _ in $(seq 1 30); do
 	sleep 1
 done
 [ -n "$ready" ] || { echo 'apply.sh: ClickHouse refuses the password in /etc/stillwell.env' >&2; exit 1; }
+ready=
+for _ in $(seq 1 30); do
+	if CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q 'SELECT 1' >/dev/null 2>&1; then
+		ready=1
+		break
+	fi
+	sleep 1
+done
+[ -n "$ready" ] || { echo 'apply.sh: ClickHouse refuses stillwell_api, from /etc/stillwell-api.env' >&2; exit 1; }
+# The API reads the station list through url() as that user. A refusal of the grant is this deploy's to fix; any
+# other failure, such as the store being unreachable, the API rides out on its own.
+if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q "SELECT count() FROM url('$store/stations/offsets.parquet', Parquet)" 2>&1); then
+	case "$out" in
+	*ACCESS_DENIED* | *READONLY*)
+		echo "apply.sh: stillwell_api may not read the store: $out" >&2
+		exit 1
+		;;
+	*) echo "stillwell_api couldn't read the store: $out" >&2 ;;
+	esac
+fi
 if [ -n "$app_changed" ]; then
 	rm -rf /opt/stillwell.old
 	if [ -d /opt/stillwell ]; then
@@ -200,6 +307,32 @@ else
 	systemctl start stillwell-ingest
 	echo 'stillwell-ingest unchanged: left running' >&2
 fi
+if [ "$api_sum" != "$(cat "$api_stamp" 2>/dev/null)" ]; then
+	systemctl restart stillwell-api
+	echo "$api_sum" >"$api_stamp"
+else
+	systemctl start stillwell-api
+fi
+
+# cloudflared runs only once /etc/cloudflared.env has the Tunnel's token; without one it would crash-loop.
+tunnel=
+if grep -q '^TUNNEL_TOKEN=.' /etc/cloudflared.env; then
+	tunnel=1
+	systemctl enable cloudflared
+	tunnel_sum=$({
+		cat /etc/systemd/system/cloudflared.service /etc/cloudflared.env
+		cloudflared --version
+	} | md5sum)
+	if [ "$tunnel_sum" != "$(cat /var/lib/cloudflared.md5 2>/dev/null)" ]; then
+		systemctl restart cloudflared
+		echo "$tunnel_sum" >/var/lib/cloudflared.md5
+	else
+		systemctl start cloudflared
+	fi
+else
+	systemctl disable --now cloudflared
+	echo 'cloudflared off: fill in /etc/cloudflared.env to publish stillwell-api' >&2
+fi
 # Older Node releases, once nothing runs from them.
 for old in /opt/node-v*; do
 	[ "$old" = "/opt/$version" ] || rm -rf "$old"
@@ -207,6 +340,15 @@ done
 sleep 5
 systemctl is-active clickhouse-server
 systemctl is-active stillwell-ingest
+systemctl is-active stillwell-api
+# The API answers once it has read the station list, which takes a few seconds. One that can't, such as while the
+# store is unreachable, keeps trying on its own, so it warns rather than fail the poller's deploy.
+if ! curl -fsS --retry 30 --retry-connrefused --retry-all-errors --retry-delay 2 http://127.0.0.1:8787/health >/dev/null; then
+	echo 'stillwell-api has no station list yet: see journalctl -u stillwell-api' >&2
+fi
+if [ -n "$tunnel" ]; then
+	systemctl is-active cloudflared
+fi
 if [ -n "$alloy" ]; then
 	systemctl is-active alloy
 fi

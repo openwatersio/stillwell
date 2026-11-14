@@ -1,0 +1,12 @@
+{
+  "name": "water-levels-api",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  // Reached only through the api.openwaters.io gateway's WATER_LEVELS binding.
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "ORIGIN": "https://stillwell-api.openwaters.io",
+  },
+  "observability": { "enabled": true },
+}

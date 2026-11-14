@@ -34,8 +34,26 @@ groups:
       # systemd counts only the restarts it makes because a process exited on its own (Restart=always after a
       # crash or an out-of-memory kill of the whole unit). Deploys and manual restarts never count.
       - alert: StillwellServiceCrashed
-        expr: increase(node_systemd_service_restart_total{project="stillwell", name=~"(stillwell-ingest|alloy|clickhouse-server)\\.service"}[10m]) > 0
+        expr: increase(node_systemd_service_restart_total{project="stillwell", name=~"(stillwell-ingest|stillwell-api|cloudflared|alloy|clickhouse-server)\\.service"}[10m]) > 0
         labels: { severity: critical }
         annotations:
           summary: "{{ $labels.name }} crashed and systemd restarted it"
           description: The process exited on its own, so this is not a deploy or a systemctl restart. Run journalctl -u {{ $labels.name }} -n 100 on the box to see why.
+      # A unit that stopped and stays stopped, such as one stopped by hand or whose start keeps failing, which the
+      # rule above doesn't see. cloudflared is left out, since it stays off on a box with no Tunnel token. The Worker serves the last good copy of a range while stillwell-api is down, marked stale.
+      - alert: StillwellServiceDown
+        expr: node_systemd_unit_state{project="stillwell", name=~"(stillwell-ingest|stillwell-api|clickhouse-server)\\.service", state="active"} == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.name }} is not running"
+          description: Run systemctl status {{ $labels.name }} and journalctl -u {{ $labels.name }} -n 100 on the box, then systemctl start it, or deploy again.
+      # stillwell-api reads the station list every 10 minutes and keeps serving the last one when a read fails, or
+      # answers 503 until it has one, such as when its ClickHouse user can't read the store. Either way the unit runs.
+      - alert: StillwellApiStationListOld
+        expr: time() - stillwell_api_catalog_loaded_timestamp_seconds{project="stillwell"} > 3600
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: stillwell-api hasn't read the station list for over an hour, or since it started
+          description: Withheld stations and changed terms reach the API only through the list, and with none it answers 503. Run journalctl -u stillwell-api -n 50 on the box for the error.

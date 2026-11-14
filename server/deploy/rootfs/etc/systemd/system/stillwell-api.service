@@ -1,0 +1,30 @@
+# stillwell-api: serves levels from ClickHouse on loopback, for the Worker in workers/api through the Tunnel
+# (docs/plans/realtime.md). Its environment, /etc/stillwell-api.env, is written by apply.sh: the store and a
+# ClickHouse user of its own that reads only the database `stillwell` and the store's URLs.
+[Unit]
+Description=Stillwell levels API
+After=network-online.target clickhouse-server.service
+Wants=network-online.target clickhouse-server.service
+
+[Service]
+User=stillwell
+Group=stillwell
+EnvironmentFile=/etc/stillwell-api.env
+# When it last read the station list, beside the poller's metrics, which Alloy's textfile collector ships.
+StateDirectory=stillwell
+Environment=STILLWELL_API_METRICS=/var/lib/stillwell/metrics/api.prom
+# A small young generation: each reload of the station list parses about 17 MB of rows, and a larger one
+# leaves the process holding far more than the list itself.
+ExecStart=/opt/node/bin/node --max-semi-space-size=2 /opt/stillwell/server/api.ts
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+# About 260 MB in use after repeated reloads of the station list in a Linux container, and 180 MB at its first.
+MemoryMax=400M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

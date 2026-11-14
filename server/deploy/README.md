@@ -1,24 +1,27 @@
 # The Stillwell server
 
-The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.md](../../docs/plans/realtime.md)), with ClickHouse beside it. It reads the public store over HTTPS and writes nothing to R2, so the box holds nothing that can't be rebuilt but the `polls` history: a new one fills ClickHouse from `recent/` on its first pass and polls from there.
+The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.md](../../docs/plans/realtime.md)), with ClickHouse beside it, and `stillwell-api`, which serves `levels` from ClickHouse to the Worker in [workers/api](../../workers/api/README.md) through a Cloudflare Tunnel. It reads the public store over HTTPS and writes nothing to R2, so the box holds nothing that can't be rebuilt but the `polls` history: a new one fills ClickHouse from `recent/` on its first pass and polls from there.
 
 ## What's here
 
 - [`deploy.sh`](deploy.sh) is the whole deploy: it bundles `package.json`, the lockfile, `.mise.toml`, `src/` and `server/` from `HEAD`, sends them over ssh, and runs `apply.sh` on the box. The same command sets up a fresh box and updates the live one: `server/deploy/deploy.sh root@<ip>`. CI runs it on every push to `main` once the repository variable `DEPLOY_HOST` is set (`.github/workflows/ci.yml`, the `deploy` job). It runs one deploy at a time on the box, each in a directory of its own, and records the commit it deployed in `/var/lib/stillwell-deployed` when that commit is on `main`. CI skips a commit the box already has, so a CI run that finishes late never puts older code back; a deploy by hand at the same time can still race one from CI. A deploy of a commit not on `main`, such as a branch, clears the record, so the next push to `main` deploys.
 - [`apply.sh`](apply.sh) converges the box:
-  - installs ClickHouse 26.8, the long-term-support release CI tests against, once, and Alloy, fail2ban, nftables and unattended-upgrades;
+  - installs ClickHouse 26.8, the long-term-support release CI tests against, once, and Alloy, cloudflared, fail2ban, nftables and unattended-upgrades;
   - installs the newest Node of the major version `.mise.toml` names, from nodejs.org, checked against its published checksums, into `/opt/node`;
   - creates the `stillwell` and `ops` users;
   - copies `rootfs/`, rolling back the sshd drop-in if it doesn't validate;
   - installs the app into `/opt/stillwell` with `npm ci --omit=dev`, beside the running one, and swaps it in just before restarting the poller;
-  - restarts ClickHouse only when its own config changed, and the poller only when the app, its unit, its environment or Node changed, so a deploy of docs or of this directory leaves the poller's schedule running;
+  - restarts ClickHouse only when its own config changed, the poller only when the app, its unit, its environment or Node changed, so a deploy of docs or of this directory leaves the poller's schedule running, and `stillwell-api` likewise against its own unit and environment;
+  - upgrades cloudflared from Cloudflare's repository on every deploy, and runs it only once `/etc/cloudflared.env` has the Tunnel's token, restarting it when its version, unit or token changed.
 
-  It also generates a password for ClickHouse's `default` user once, into `/etc/stillwell.env` as `CLICKHOUSE_PASSWORD`, which the poller sends, and writes its hash to `/etc/clickhouse-server/users.d/stillwell-password.xml`. It's idempotent and safe to rerun. It seeds `/etc/stillwell.env` and `/etc/alloy.env` from the templates only when they're missing, and never overwrites them. [`apt-update.sh`](apt-update.sh), which it runs for the packages, gets past a vendor repository that refuses its index with a 402 or a 5xx on a box that already has every package.
+  It also generates a password for ClickHouse's `default` user once, into `/etc/stillwell.env` as `CLICKHOUSE_PASSWORD`, which the poller sends, and writes its hash to `/etc/clickhouse-server/users.d/stillwell-password.xml`. `stillwell-api` connects as `stillwell_api`, a user of its own with a password generated the same way, which may read the database `stillwell` and URLs under the public store, for the station list, and nothing else: not `stillwell_restricted`, and no writes. apply.sh writes its environment, `/etc/stillwell-api.env`, whole on every deploy, from that password and `STILLWELL_STORE` and `CLICKHOUSE_URL` in `/etc/stillwell.env`, and its grants to `users.d/stillwell-api.xml`. It's idempotent and safe to rerun. It seeds `/etc/stillwell.env`, `/etc/alloy.env` and `/etc/cloudflared.env` from the templates only when they're missing, and never overwrites them. [`apt-update.sh`](apt-update.sh), which it runs for the packages, gets past a vendor repository that refuses its index with a 402 or a 5xx on a box that already has every package.
 
-- [`stillwell.env.example`](stillwell.env.example) lists what `/etc/stillwell.env` holds, and [`alloy.env.example`](alloy.env.example) the Grafana Cloud credentials in `/etc/alloy.env`. The real files stay on the box; secrets never enter the repo.
+- [`stillwell.env.example`](stillwell.env.example) lists what `/etc/stillwell.env` holds, [`alloy.env.example`](alloy.env.example) the Grafana Cloud credentials in `/etc/alloy.env`, and [`cloudflared.env.example`](cloudflared.env.example) the Tunnel's token in `/etc/cloudflared.env`. The real files stay on the box; secrets never enter the repo.
 - [`grafana/`](grafana/) holds the alert rules, which [`grafana/push.sh`](grafana/push.sh) applies to Grafana Cloud (see [Alerts](#alerts)).
 - `rootfs/` holds the units and config, copied over `/`:
   - `stillwell-ingest.service` runs `node server/ingest.ts` as `stillwell`, with a 1.8 GB memory cap over the poller and its passes. SFWMD drops connections from the box, so the unit names it in `STILLWELL_FROM_RECENT`, and the poller fills it hourly from the `recent/` the hourly workflow writes rather than asking SFWMD. Two passes run at a time, since each is a process of its own holding up to about 800 MB, and a pass the kernel stops for memory fails alone.
+  - `stillwell-api.service` runs `node server/api.ts` as `stillwell` on 127.0.0.1:8787, capped at 400 MB. Its ClickHouse user may not raise its limits: 30 seconds and 300 MB a query, and 400 MB and 8 queries at once. It reads the public stations and their offsets from the store through ClickHouse when it starts and every 10 minutes, keeping the last list when a reload fails, and answers `/health`, and levels, once it has one; until then it tries every 30 seconds, and a deploy warns rather than fails.
+  - `cloudflared.service` runs the Tunnel that publishes `stillwell-api` behind Cloudflare Access, so no port is open on the box.
   - ClickHouse listens on loopback only, capped at 1.2 GB by [its config](rootfs/etc/clickhouse-server/config.d/stillwell.xml) and held to a hard 1.5 GB ceiling and half the CPU weight by [a systemd drop-in](rootfs/etc/systemd/system/clickhouse-server.service.d/10-stillwell.conf), so ClickHouse can't take the poller's memory or more than half the CPU under contention.
   - Alloy ships the host's CPU, memory, disk and network, its unit restarts, the poller's pass metrics and a few ClickHouse series to Grafana Cloud once `/etc/alloy.env` is filled in.
   - sshd is key-only, with fail2ban (3 tries in 10 minutes bans for an hour), and the journal is capped at 500 MB.
@@ -34,8 +37,9 @@ The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.
 3. Fill in `/etc/stillwell.env`: `USGS_API_KEY`, a key of the server's own, and `GITHUB_TOKEN`, a fine-grained token for openwatersio/stillwell with Actions read and write. Fill in `/etc/alloy.env` to ship metrics. Then run `deploy.sh` again.
 4. For deploys from CI: set the repository variable `DEPLOY_HOST` to the box's address, and in the `server` environment the secrets `DEPLOY_SSH_KEY` (the deploy key's private half) and `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <ip>`).
 5. Once metrics reach Grafana Cloud, apply the alerts with [`grafana/push.sh`](grafana/push.sh) ([Alerts](#alerts)).
+6. To publish `stillwell-api`, set up the Tunnel and Access as [workers/api/README.md](../../workers/api/README.md#setup) says, put the Tunnel's token in `/etc/cloudflared.env` as `TUNNEL_TOKEN`, and run `deploy.sh` again.
 
-A replacement box is the same steps. Nothing on the old one needs copying: ClickHouse fills from `recent/` on each source's first pass.
+A replacement box is the same steps, reusing the Tunnel's token. Nothing on the old one needs copying: ClickHouse fills from `recent/` on each source's first pass.
 
 ## Alerts
 
@@ -43,7 +47,9 @@ The poller writes each source's pass metrics to `/var/lib/stillwell/metrics/stil
 
 - `StillwellSourceStale`: a source that has stored no new values for three of its shortest interval, or two hours at least. A pass succeeds when it runs to the end, unblocked, and stores new values for some station, or finds nothing to poll, as a new source does until its first list; a source whose short-interval stations go quiet still succeeds on its hourly ones, and a pass can take 50 minutes and wait for a slot. The poller keeps each source's last success and interval across restarts, and a source with none yet counts from when the poller started, so neither a deploy nor a crash loop resets the alert. The alert's success is stricter than `polls.ok`, which says only that the pass ran and some station answered.
 - `StillwellMetricsMissing`: no pass metrics reach Grafana for 30 minutes, because Alloy or the box is down. The metrics file outlives the poller, so a stopped poller shows as stale sources instead.
-- `StillwellServiceCrashed`: systemd restarted the poller, Alloy or ClickHouse after it exited on its own.
+- `StillwellServiceCrashed`: systemd restarted the poller, `stillwell-api`, cloudflared, Alloy or ClickHouse after it exited on its own.
+- `StillwellApiStationListOld`: `stillwell-api` hasn't read the station list for over an hour, so it serves an old one, or answers 503 with none. `stillwell-api` writes when it last read it to `/var/lib/stillwell/metrics/api.prom`.
+- `StillwellServiceDown`: the poller, `stillwell-api` or ClickHouse has not been running for 5 minutes, such as one stopped by hand or whose start keeps failing. While `stillwell-api` is down the Worker serves the last good copy of each range, marked stale.
 
 [`grafana/push.sh`](grafana/push.sh) imports the rules as Grafana-managed rules in the `stillwell` folder, routes them to a `stillwell email` contact point, and deletes rules that left the file. Run it once the box ships metrics, since `StillwellMetricsMissing` fires until then, and again after changing the rules. Grafana Cloud emails only members of its organization, so `ALERT_EMAIL` must belong to one. It needs `curl`, `jq`, `mimirtool`, and a service account token with the Admin role:
 
@@ -56,7 +62,9 @@ GRAFANA_URL=https://<stack>.grafana.net GRAFANA_TOKEN=<token> ALERT_EMAIL=<addre
 ## Operating
 
 - `journalctl -u stillwell-ingest -f` shows each pass's summary, as the hourly workflow's log does.
+- `curl -s 'http://127.0.0.1:8787/water-levels/stations/coops/9447130/levels?step=1h'` asks `stillwell-api` directly, and `curl -s http://127.0.0.1:8787/health` shows how many stations it has.
 - `(set -a && . /etc/stillwell.env && clickhouse-client -q "SELECT source, started, ok, stations, updated, values, length(failed), length(stale) FROM stillwell.polls ORDER BY started DESC LIMIT 20")` shows the last passes. `clickhouse-client` reads the password from `CLICKHOUSE_PASSWORD`, which keeps it off the command line other users can read.
 - ClickHouse is upgraded by hand, so a deploy never changes the database under live data: move CI's image and the version `apply.sh` installs to the new release together, then `apt-get install` the three `clickhouse-*` packages at that version and `systemctl restart clickhouse-server`.
 - `apply.sh` copies `rootfs/` over `/` and never deletes, so a file removed or renamed in `rootfs/` stays on the box until it's removed there by hand.
+- Rolling back past the release that added `stillwell-api` leaves its unit and cloudflared enabled with no `server/api.ts` to run, so run `systemctl disable --now stillwell-api cloudflared` and `rm /var/lib/stillwell/metrics/api.prom` on the box too.
 - To roll back, revert the commit on `main`. CI skips a rerun of an older run, since the box already has its commit; `deploy.sh` run by hand deploys the checkout's `HEAD`, leaving uncommitted changes out.

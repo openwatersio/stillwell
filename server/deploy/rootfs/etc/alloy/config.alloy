@@ -15,7 +15,7 @@ prometheus.exporter.unix "host" {
 
 	systemd {
 		enable_restarts = true
-		unit_include    = "(stillwell-ingest|alloy|clickhouse-server)\\.service"
+		unit_include    = "(stillwell-ingest|stillwell-api|cloudflared|alloy|clickhouse-server)\\.service"
 	}
 }
 

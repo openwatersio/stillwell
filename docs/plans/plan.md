@@ -61,7 +61,7 @@ Recommended answers. The plan below assumes them; each can change without reshap
 
 ```
 workers/api/           the API's caching Worker, bound into the gateway (phases 9 and 10)
-server/                stillwell-ingest, and later stillwell-api and stillwell-jobs, with their deploy
+server/                stillwell-ingest and stillwell-api, and later stillwell-jobs, with their deploy
 scripts/snapshot.ts    quarterly bulk snapshots (phase 12)
 .github/workflows/     snapshot-quarterly (phase 12)
 ```
