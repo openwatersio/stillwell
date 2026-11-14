@@ -4295,7 +4295,7 @@ describe("ea", () => {
     assert.equal(asked, 1);
   });
 
-  it("gives nothing for the split's month when the API answers empty", async () => {
+  it("gives the archive's days when the API answers empty", async () => {
     const today = Math.floor(Date.now() / 86_400_000) * 86_400_000;
     const split = today - 28 * 86_400_000;
     setTransport(async (url) => {
@@ -4311,16 +4311,16 @@ describe("ea", () => {
       new Date(split - 86_400_000),
       new Date(today),
     );
-    const sameMonth = new Date(split - 86_400_000).getUTCMonth() === new Date(split).getUTCMonth();
-    assert.equal(values.length, sameMonth ? 0 : 1);
+    // The API's days give nothing, so backfill keeps what the store has for them.
+    assert.equal(values.length, 1);
+    assert.equal(ea.source.keepsStored, true);
   });
 
-  it("gives nothing for a month with a day the archive no longer holds", async () => {
+  it("gives a month's other days when the archive doesn't hold one of them", async () => {
     setTransport(async (url) => {
       // October 28th is missing, after the 25th was read.
       if (/readings-2025-10-28\.csv$/.test(url)) throw new Error(`GET ${url} returned 404`);
       if (/readings-2025-11-10\.csv$/.test(url)) return fixture("ea-archive.csv");
-      // October 25th has a reading, which its month's missing day drops.
       if (/readings-2025-10-25\.csv$/.test(url))
         return fixture("ea-archive.csv").replaceAll("2025-11-10T", "2025-10-25T");
       if (/readings-2025-1[01]-\d\d\.csv$/.test(url)) return OTHER_GAUGE;
@@ -4331,8 +4331,11 @@ describe("ea", () => {
       new Date("2025-10-20Z"),
       new Date("2025-11-12Z"),
     );
-    // October lost its first days, so it gives nothing and the store keeps what it has;
-    // November's first day gives its readings.
-    assert.equal(values.length, 3);
+    // October 25th and November 10th each give their three readings.
+    assert.deepEqual(
+      [...new Set(values.map((v) => new Date(v.time).toISOString().slice(0, 10)))],
+      ["2025-10-25", "2025-11-10"],
+    );
+    assert.equal(values.length, 6);
   });
 });

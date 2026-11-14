@@ -686,6 +686,30 @@ describe("mergeFetched", () => {
       [1.1, 2, 3.3],
     );
   });
+
+  it("with keepAll, keeps every stored row the fetch has no time for", () => {
+    const day = 86_400_000;
+    const jul = Date.UTC(2026, 6, 24);
+    const row = (time: number, level: number) => ({ time, level, flag: Flag.preliminary });
+    // A late reading on the 24th that the fetch's copy of the day lacks.
+    const existing = [
+      row(jul, 1),
+      row(jul + 900_000, 1.5),
+      row(jul + day, 2),
+      row(jul + 2 * day, 3),
+    ];
+    // July 25th came back with nothing; the 24th and 26th were read.
+    const incoming = [row(jul, 1.1), row(jul + 2 * day, 3.3)];
+    const range = [Date.UTC(2026, 0, 1), Date.UTC(2027, 0, 1)] as const;
+    assert.deepEqual(
+      mergeFetched(existing, incoming, ...range, undefined, true).map((r) => r.level),
+      [1.1, 1.5, 2, 3.3],
+    );
+    assert.deepEqual(
+      mergeFetched(existing, incoming, ...range).map((r) => r.level),
+      [1.1, 3.3],
+    );
+  });
 });
 
 describe("the store's environment", () => {

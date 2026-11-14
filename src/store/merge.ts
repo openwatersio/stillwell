@@ -31,7 +31,9 @@ export function mergeRange<T extends { time: number; received?: number }>(
  * `mergeRange`, except that a calendar month (UTC) with no incoming rows keeps
  * the rows it had. Sources that fetch a month per request, or answer a month
  * with "no data" during an outage, shouldn't delete what the store already holds;
- * a value is only replaced by a fetch that covered its month.
+ * a value is only replaced by a fetch that covered its month. With `keepAll`,
+ * every row it had is kept unless `incoming` has its time, for a source that
+ * never withdraws a value.
  */
 export function mergeFetched<T extends { time: number; received?: number }>(
   existing: T[],
@@ -39,10 +41,11 @@ export function mergeFetched<T extends { time: number; received?: number }>(
   start: number,
   end: number,
   receivedAt?: number,
+  keepAll = false,
 ): T[] {
   const fetched = new Set(incoming.map((r) => monthOf(r.time)));
   const kept = existing.filter(
-    (r) => r.time >= start && r.time < end && !fetched.has(monthOf(r.time)),
+    (r) => r.time >= start && r.time < end && (keepAll || !fetched.has(monthOf(r.time))),
   );
   const merged = [...mergeRange(existing, incoming, start, end, receivedAt), ...kept];
   merged.sort((a, b) => a.time - b.time);

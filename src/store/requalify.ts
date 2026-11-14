@@ -119,7 +119,7 @@ function withSpans(rows: Observation[], spans: [number, number][]): Observation[
  * whole year QC'd with `context` from the years either side, as requalify
  * does, so a partial fetch is judged against the same medians and spreads.
  * What it didn't fetch keeps its flag, since only requalify knows a source's
- * errata spans over the whole record.
+ * errata spans over the whole record. `keepAll` is `mergeFetched`'s.
  */
 export function judgeFetched(
   existing: Observation[],
@@ -128,8 +128,9 @@ export function judgeFetched(
   end: number,
   opts: QcOptions,
   context: Observation[],
+  keepAll = false,
 ): Observation[] {
-  const merged = mergeFetched(existing, withSourceFlag(fetched), start, end);
+  const merged = mergeFetched(existing, withSourceFlag(fetched), start, end, undefined, keepAll);
   const times = new Set(fetched.map((r) => r.time));
   const stored = new Map(existing.map((r) => [r.time, r.flag]));
   return qc(merged, opts, context).map((r) =>

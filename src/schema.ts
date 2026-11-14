@@ -321,6 +321,13 @@ export interface Source {
    */
   observations?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /**
+   * Whether backfill keeps every level the store holds, replacing only those
+   * at times it fetched, not each month it fetched: for a source that never
+   * withdraws a value, and whose archive can lack what hourly ingest kept,
+   * such as a whole day or a late reading.
+   */
+  keepsStored?: boolean;
+  /**
    * Spans of a station's values that the store's own errata flag `suspect`,
    * beyond the spans its `errata.json` names, which the registry adds, worked
    * out from the source's levels and flags alone, so requalify flags

@@ -465,12 +465,17 @@ export async function backfillYear(
     if (!rows.length) return "empty";
     const { rows: existing, datums } = await series.get(year);
     await refuseOtherDatum(path, station, datums);
-    let merged = mergeFetched(existing, rows, ...range);
+    const keepAll = product === "levels" && source.keepsStored;
+    let merged = mergeFetched(existing, rows, ...range, undefined, keepAll);
     if (product === "levels")
-      merged = judgeFetched(existing, rows, ...range, qcFor(station), [
-        ...(await series.get(year - 1)).rows,
-        ...(await series.get(year + 1)).rows,
-      ]);
+      merged = judgeFetched(
+        existing,
+        rows,
+        ...range,
+        qcFor(station),
+        [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
+        keepAll,
+      );
     if (!merged.length || sameRows(existing, merged)) return undefined;
     let stats: YearStats;
     try {
