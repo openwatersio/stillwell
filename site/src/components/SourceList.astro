@@ -1,0 +1,120 @@
+---
+// Every source as a compact entry: what someone choosing a source needs, with the rest on the source's own page.
+import { json, rows } from "../lib/store";
+import { url } from "../lib/paths";
+
+const sources = await json("sources.json");
+const facts = new Map(
+  (
+    await rows(`
+      SELECT source, count(*)::INT AS stations,
+        count(*) FILTER (WHERE live)::INT AS live,
+        count(*) FILTER (WHERE commercial_use)::INT AS commercial,
+        min(first) AS first,
+        list(DISTINCT country_code ORDER BY country_code) FILTER (WHERE country_code IS NOT NULL) AS countries,
+        flatten(list(DISTINCT products)) AS products
+      FROM '${url("stations.parquet")}' GROUP BY source`)
+  ).map((r) => [r.source, r]),
+);
+
+const n = (x: number) => x.toLocaleString("en-US");
+const region = new Intl.DisplayNames(["en"], { type: "region" });
+// A source spanning many countries reads as a count; a few read as names.
+const countries = (codes: string[] = []) =>
+  codes.length > 3 ? `${codes.length} countries` : codes.map((c) => region.of(c) ?? c).join(", ");
+const data = (list: string[] = []) => {
+  const has = new Set(list);
+  const observed = has.has("levels") || has.has("extremes");
+  const predicted = has.has("predictions") || has.has("predicted_extremes");
+  return observed && predicted
+    ? "observations and predictions"
+    : predicted
+      ? "predictions"
+      : observed
+        ? "observations"
+        : undefined;
+};
+// Counted by station, since a contributor's own terms can bar commercial use at some of a source's stations, as at
+// GESLA; a source with no stations listed yet has only its own terms, from sources.json.
+const commercial = (s: Record<string, any>, f?: Record<string, any>) =>
+  (f ? f.commercial === 0 : !s.license?.commercial_use)
+    ? { allowed: false, text: "non-commercial" }
+    : {
+        allowed: true,
+        text:
+          !f || f.commercial === f.stations ? "commercial use" : "commercial use at some stations",
+      };
+---
+
+<ul class="sources not-content">
+  {[...sources]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((s) => {
+      const f = facts.get(s.id);
+      const use = commercial(s, f);
+      const details = f
+        ? [
+            countries(f.countries),
+            f.first && `since ${f.first.getUTCFullYear()}`,
+            data(f.products),
+            f.live > 0 && "live",
+          ].filter(Boolean)
+        : [];
+      return (
+        <li id={s.id}>
+          <a href={`/sources/${s.id}/`}>{s.name}</a>
+          <span class="count">{f ? `${n(f.stations)} stations` : "no stations yet"}</span>
+          <p>
+            {details.length > 0 && `${details.join(" · ")} · `}
+            <span class:list={["mark", use.allowed ? "yes" : "no"]} aria-hidden="true">
+              {use.allowed ? "✓" : "✗"}
+            </span>{" "}
+            {use.text}
+          </p>
+        </li>
+      );
+    })}
+</ul>
+
+<style>
+  .sources {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+  }
+  .sources li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    scroll-margin-top: calc(var(--sl-nav-height) + 1rem);
+  }
+  a {
+    font-weight: 600;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: underline;
+  }
+  .count {
+    color: var(--sl-color-gray-3);
+    text-align: right;
+    white-space: nowrap;
+  }
+  p {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--sl-color-gray-3);
+  }
+  .mark.yes {
+    color: var(--sl-color-green);
+  }
+  .mark.no {
+    color: var(--sl-color-red);
+  }
+</style>

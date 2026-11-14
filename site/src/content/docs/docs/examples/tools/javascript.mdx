@@ -129,7 +129,7 @@ hyparquet reads the whole list, about 25,000 rows, but only the columns you name
 
 ## Read a year of levels
 
-One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#building-paths-in-code) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 <Tabs syncKey="js-library">
 <TabItem label="DuckDB-WASM">
@@ -184,7 +184,7 @@ hyparquet returns times as `Date`.
 
 ## Read several years
 
-Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#read-its-levels) explains:
 
 <Tabs syncKey="js-library">
 <TabItem label="DuckDB-WASM">
@@ -250,8 +250,6 @@ const levels = (
 </TabItem>
 </Tabs>
 
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path: `encodeURIComponent(encodeURIComponent(source_id))`.
-
 ## Convert to another datum
 
 Adding the station's `LAT` offset from `datums` refers Hoek van Holland's NAP levels to LAT:
@@ -301,4 +299,4 @@ const inLat = levels.map((r) => ({
 ## Things to know
 
 - Format `Date` values with `toISOString()` or a `timeZone: "UTC"` option to keep them in UTC.
-- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.
+- [Getting started](/docs/getting-started/#read-its-levels) lists what holds for every file, such as UTC times and levels in meters, and [Observations](/docs/reference/observations/) describes every column.

@@ -3,52 +3,32 @@ title: stations.parquet
 description: One row per station, with its location, record, datums, linked stations, terms and tide.
 sidebar:
   order: 1
+  attrs:
+    class: mono
 ---
 
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-`stations.parquet` has one row for every station in the store, active or not. A station is one source's series at one place, and every other file names a station by its `id`. The file is rebuilt after compaction each night, so `first` and `last` usually trail the store by about a day.
+`https://stillwell.openwaters.io/stations.parquet`
+
+The stations table has one row for every station in the store, active or not. A station is one source's record of water levels at one place.
+
+A station's `id`, such as `rws/hoekvanholland`, is how every other file refers to it. It's part of the path to the station's [observations](/docs/reference/observations/) and [predictions](/docs/reference/predictions/), as in `obs/rws/hoekvanholland/2025.parquet`, and it names the station in the [latest values](/docs/reference/observations/#the-latest-values) and [offsets](/docs/reference/offsets/) as `station`, in the [years lists](/docs/reference/observations/#which-years-exist) as `id`, and in [links](/docs/reference/links/) as `a` and `b`. Join those to this table on it.
+
+The table is updated each night to reflect data added to the store the previous day.
 
 ## Schema
 
 <Schema resource="stations" />
 
-## Identity
+## See also
 
-`id` is `source` and `source_id` joined by a slash, and every other file names the station by it. `name` is the source's, and `source_url` links to the station at its source.
-
-## Location
-
-`lat` and `lon` place the station, `country_code` its country, and `kind` the water it measures.
-
-## Record
-
-`products` lists the files the station has. `first` and `last` bound its observations across all epochs, and `interval_s` is how often it reports. The years it has, with counts by flag, are in [`stations/years/<source>.parquet`](/docs/reference/observations/#which-years-exist).
-
-## Status
-
-`status` says whether the source still lists the station, and `live` whether it's polled hourly into [`recent/`](/docs/reference/observations/#the-latest-values). `min_interval_s` is the source's own limit on how often it may be asked for.
-
-## Datums
-
-`datum` names what the current epoch's levels are measured from. `datums` gives the offsets to other datums, `datums_source` where each came from, `datums_epoch` the period a tidal datum was reduced over, and `datums_attribution` the credits those offsets owe. `chart_datum` is the datum charts use, and `frame` says whether levels share a zero with the `tide_station`'s predictions. `epochs` lists every reference the station has had; each has its own series files. See [Datums](/docs/guides/datums/) for converting levels and [datum epochs](/docs/guides/datums/#datum-epochs) for reading across them.
-
-## Linked stations
-
-A gauge can appear in several sources. `same_as` lists the other stations of the same gauge, `preferred` names the one to read for its observed levels, and `tide_station` names its record in slackwater-database. All three are worked out on every build. See [Gauges](/docs/guides/gauges/) for how stations are matched and preferred.
-
-## Terms
-
-`license`, `commercial_use` and `attribution` give the terms of the station's data, which follow a contributor's own where those apply. Offsets that don't come from the source carry their own credits in `datums_attribution`. The source's terms are in [`sources.json`](/docs/reference/sources/). See [Terms](/docs/guides/terms/) for what they require.
-
-## Tide
-
-`tidal` and `tide_m` say whether the levels carry a tide, measured from the values rather than taken from `kind`: a river can be tidal, and the Baltic isn't. Some of Stillwell's quality checks depend on `tidal`; [Quality flags](/docs/guides/quality-flags/#stillwells-checks) says which.
-
-## Quality
-
-`source_qc_start` says where the source's own checks start, and `source_qc_start_inferred` whether Stillwell inferred that date. `errata` lists the known errors in what the source publishes for the station. See [Quality flags](/docs/guides/quality-flags/).
+- [Stations](/docs/guides/stations/) for `same_as`, `preferred` and `tide_station`: how stations from several sources are linked, and which one to read.
+- [Datums](/docs/guides/datums/) for `datum`, `datums`, `chart_datum`, `frame` and `epochs`: converting levels to another datum, and reading across a change of datum.
+- [Quality control](/docs/guides/quality-control/) for `tidal`, `tide_m`, `source_qc_start` and `errata`: which checks apply to a station, and which of its values the source will check.
+- [Terms](/docs/guides/terms/) for `license`, `commercial_use`, `attribution` and `datums_attribution`: what the terms require. Each source's terms are in [`sources.json`](/docs/reference/sources/).
+- [Which years exist](/docs/reference/observations/#which-years-exist) for the years each station has, with counts of values by flag.
 
 ## Examples
 

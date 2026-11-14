@@ -1,8 +1,10 @@
 ---
-title: stations/offsets.parquet
+title: offsets.parquet
 description: The meters to add to a level in each station's datum epoch to refer it to each named datum.
 sidebar:
   order: 4
+  attrs:
+    class: mono
 ---
 
 import Schema from "../../../../components/Schema.astro";
@@ -25,7 +27,7 @@ A join on a datum the epoch has no row for finds nothing.
 
 ## Terms
 
-The file carries no terms or credits of its own. Join it to `stations.parquet` for each station's `commercial_use`, and show `datums_attribution` with `attribution` wherever the offsets are shown. See the [Terms guide](/docs/guides/terms/).
+The file carries no terms or credits of its own. Join it to `stations.parquet` for each station's `commercial_use`, and show `datums_attribution` with `attribution` wherever the offsets are shown. See the [Terms](/docs/guides/terms/).
 
 ## Examples
 

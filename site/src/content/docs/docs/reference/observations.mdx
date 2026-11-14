@@ -10,7 +10,7 @@ import QueryResult from "../../../../components/QueryResult.astro";
 
 Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:40 UTC.
 
-A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#file-paths). To read several files at once, see [Reading many files](/docs/getting-started/#reading-many-files).
+A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#building-paths-in-code). To read several files at once, see [Reading many files](/docs/getting-started/#read-its-levels).
 
 ## Observed levels
 
@@ -93,7 +93,7 @@ ORDER BY r.time DESC LIMIT 1`}
 
 ## Which years exist
 
-HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Caching](/docs/getting-started/#caching).
+HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy).
 
 <Schema resource="years" />
 
@@ -108,7 +108,7 @@ WHERE id = 'rws/hoekvanholland' AND year >= 2020
 ORDER BY epoch, year`}
 />
 
-The paths of those years, to pass to `read_parquet`. This builds paths from the `id` directly, which works only where the `source_id` needs no encoding:
+The paths of those years, to pass to `read_parquet`. This builds paths from the `id` directly:
 
 <QueryResult
   sql={`SELECT list('https://stillwell.openwaters.io/obs/' || id ||
@@ -116,3 +116,7 @@ The paths of those years, to pass to `read_parquet`. This builds paths from the 
 FROM 'https://stillwell.openwaters.io/stations/years/rws.parquet'
 WHERE id = 'rws/hoekvanholland' AND year >= 2020`}
 />
+
+### Keeping a local copy
+
+To keep a local copy of a year, read its row in the years list first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum.

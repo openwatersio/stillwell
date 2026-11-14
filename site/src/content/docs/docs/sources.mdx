@@ -1,0 +1,12 @@
+---
+title: Sources
+description: Every agency and dataset the store reads, with what each covers and whether its data allows commercial use.
+---
+
+import SourceList from "../../../components/SourceList.astro";
+
+Stillwell reads each source from the agency or dataset that publishes it, through an adapter written for that source. Each source below links to its own page, with its terms, its values by year and quality flag, every station, and the errata recorded against it.
+
+[`sources.json`](/docs/reference/sources/) holds the same terms in machine-readable form. [Issues labeled `source`](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue%20state%3Aopen%20label%3Asource) track the sources still to come.
+
+<SourceList />

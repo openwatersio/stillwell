@@ -1,0 +1,5 @@
+/* Sidebar links for pages named after a file, such as stations.parquet, which mark themselves with sidebar.attrs. */
+.sidebar-content a.mono {
+  font-family: var(--sl-font-mono);
+  font-size: 0.875em;
+}

@@ -3,6 +3,8 @@ title: errata.json
 description: The errors found in what sources publish, and what Stillwell does about each one.
 sidebar:
   order: 7
+  attrs:
+    class: mono
 ---
 
 import Schema from "../../../../components/Schema.astro";
@@ -27,7 +29,7 @@ It's a JSON array, one object per erratum, which DuckDB reads with `read_json`.
 | `avoided`   | Doesn't use the wrong part, so nothing in the store is affected.         |
 | `kept`      | Keeps them as the source serves them.                                    |
 
-A `flagged` erratum with stations and a span marks those observed levels `suspect`; extremes aren't flagged. See [Quality flags](/docs/guides/quality-flags/) for how that reaches `flag`.
+A `flagged` erratum with stations and a span marks those observed levels `suspect`; extremes aren't flagged. See [Quality control](/docs/guides/quality-control/) for how that reaches `flag`.
 
 ## Station errata
 

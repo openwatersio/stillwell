@@ -57,7 +57,7 @@ The [Stations](/docs/reference/stations/#examples) page has more ways to find on
 
 ## Read a year of levels
 
-One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#building-paths-in-code) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 ```sql
 SELECT time, level_m
@@ -89,7 +89,7 @@ COPY (
 
 ## Read several years
 
-Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains, and pass it to `read_parquet`:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#read-its-levels) explains, and pass it to `read_parquet`:
 
 ```sql
 SET VARIABLE files = (
@@ -117,14 +117,6 @@ GROUP BY year ORDER BY year;
 └───────┴───────┴────────┘
 ```
 
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path. DuckDB's `url_encode` builds it, though it also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today:
-
-```sql
-SELECT 'https://stillwell.openwaters.io/obs/' || source || '/' || url_encode(url_encode(source_id)) AS dir
-FROM 'https://stillwell.openwaters.io/stations.parquet'
-WHERE id = 'gesla/byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs';
-```
-
 ## Convert to another datum
 
 Adding the station's `datums['LAT']` offset refers Hoek van Holland's NAP levels to LAT:
@@ -142,4 +134,4 @@ ORDER BY o.time;
 ## Things to know
 
 - Without `SET TimeZone = 'UTC'`, DuckDB shows times in your computer's time zone.
-- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.
+- [Getting started](/docs/getting-started/#read-its-levels) lists what holds for every file, such as UTC times and levels in meters, and [Observations](/docs/reference/observations/) describes every column.

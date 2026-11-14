@@ -1,4 +1,6 @@
 node_modules/
 .cache/
-data/
+/data
 !site/src/pages/data/
+.playwright-mcp
+.wrangler/

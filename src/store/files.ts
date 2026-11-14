@@ -251,7 +251,7 @@ const STATION_COLUMNS: Column[] = [
     name: "preferred",
     type: "VARCHAR",
     description:
-      "The station to use for the gauge's observed levels among this one and its `same_as`; its own `id` when it's the one.",
+      "The station to read for observed levels among this one and its `same_as`; its own `id` when it's the one. Worked out again each time this file is built, so it can change.",
   },
   {
     name: "errata",
@@ -268,13 +268,15 @@ const STATION_COLUMNS: Column[] = [
   {
     name: "live",
     type: "BOOLEAN",
-    description: "Whether hourly ingest polls the station into `recent/`.",
+    description:
+      "Whether the station's latest values are fetched as they come in. Its last 7 days are in `recent/`, which is rewritten every hour.",
   },
   {
     name: "min_interval_s",
     type: "INTEGER",
     nullable: true,
-    description: "How often the source lets ingest ask for the station, in seconds, where it says.",
+    description:
+      "The shortest time between requests for the station, in seconds: the source's own limit where it publishes one, or the store's choice where it doesn't; null where neither sets one.",
   },
   {
     name: "source_qc_start",
@@ -295,7 +297,7 @@ const STATION_COLUMNS: Column[] = [
     type: "BOOLEAN",
     nullable: true,
     description:
-      "Whether the station's levels carry a tide, measured from its last year in the store; null where they can't say, or before its first analysis.",
+      "Whether the station's levels carry a tide, measured from its last year of levels rather than taken from `kind`, so a river can be tidal and the Baltic isn't; null where the levels can't say, or before they're first measured.",
   },
   {
     name: "tide_m",

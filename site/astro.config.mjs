@@ -3,21 +3,27 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
 export default defineConfig({
+  redirects: {
+    "/docs/guides/quality-flags/": "/docs/guides/quality-control/",
+    "/docs/guides/gauges/": "/docs/guides/stations/",
+  },
   integrations: [
     starlight({
       title: "Stillwell",
+      customCss: ["./src/styles/custom.css"],
       social: [
         { icon: "github", label: "GitHub", href: "https://github.com/openwatersio/stillwell" },
       ],
       sidebar: [
         {
-          label: "Guides",
+          label: "Overview",
           items: [
             { label: "Introduction", slug: "docs" },
             "docs/getting-started",
-            "docs/guides/gauges",
+            "docs/sources",
+            "docs/guides/stations",
             "docs/guides/datums",
-            "docs/guides/quality-flags",
+            "docs/guides/quality-control",
             "docs/guides/terms",
           ],
         },
