@@ -1,0 +1,12 @@
+{
+  "name": "stillwell-observable-notebooks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "notebooks preview --root .",
+    "build": "notebooks build --root . --out dist --empty -- *.html"
+  },
+  "dependencies": {
+    "@observablehq/notebook-kit": "2.11.0"
+  }
+}

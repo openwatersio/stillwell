@@ -5,7 +5,9 @@ sidebar:
   order: 2
 ---
 
-Observable notebooks run JavaScript in the reader's browser. Their `DuckDBClient` is [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), which reads the store over HTTPS with ranged requests, as on the [JavaScript](/docs/examples/tools/javascript/) page.
+Observable notebooks run JavaScript in the reader's browser. Their `DuckDBClient` is [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), which reads the store over HTTPS, as on the [JavaScript](/docs/examples/tools/javascript/) page.
+
+[Getting started in Observable](/notebooks/observable/getting-started.html) runs the [Getting started](/docs/getting-started/) guide as a [Notebook Kit](https://observablehq.com/notebook-kit/) notebook, live in your browser. Its source is [`notebooks/observable/getting-started.html`](https://github.com/openwatersio/stillwell/blob/main/notebooks/observable/getting-started.html), which opens in Observable Desktop.
 
 There are two kinds of Observable notebook, and they differ in where SQL runs:
 
@@ -17,16 +19,19 @@ There are two kinds of Observable notebook, and they differ in where SQL runs:
 
 ## A live notebook
 
-Create a DuckDB client in one cell:
+Create a DuckDB client in one cell. Notebook Kit's `DuckDBClient` downloads every file whole unless `forceFullHTTPReads` is off; with it off, DuckDB makes ranged requests and fetches only the columns and parts of a file a query needs:
 
 ```js
-db = DuckDBClient.of();
+const db = await DuckDBClient.of({}, { filesystem: { forceFullHTTPReads: false } });
+await db.query("SET GLOBAL TimeZone = 'UTC'");
 ```
 
-Then query it from a SQL cell whose database is `db` (`var:db` in Notebook Kit), or from JavaScript:
+Each query runs on a new connection, so a setting that should last needs `SET GLOBAL`.
+
+Then query it from a SQL cell whose database is `var:db`, or from JavaScript:
 
 ```js
-levels = db.query(`
+const levels = await db.query(`
   SELECT time, level_m
   FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
   WHERE flag <= 2
@@ -34,7 +39,7 @@ levels = db.query(`
 `);
 ```
 
-That's a year of Hoek van Holland's levels, leaving out values flagged as suspect or bad. `db.query` returns an array of objects with times as `Date`, ready for [Observable Plot](https://observablehq.com/plot/):
+That's a year of Hoek van Holland's levels, leaving out values flagged as suspect or bad. In Notebook Kit, `db.query` returns an [Apache Arrow](https://arrow.apache.org/docs/js/) table, which [Observable Plot](https://observablehq.com/plot/) reads as it is:
 
 ```js
 Plot.lineY(levels, { x: "time", y: "level_m" }).plot({
@@ -42,12 +47,13 @@ Plot.lineY(levels, { x: "time", y: "level_m" }).plot({
 });
 ```
 
-In Notebook Kit, cells are statements rather than named expressions, so write `const db = DuckDBClient.of();` in one cell and `const levels = await db.query(...)` in another.
+`levels.toArray().map((row) => row.toJSON())` gives an array of plain objects. On observablehq.com, cells are named expressions instead of statements, as in `db = DuckDBClient.of()`, and its `DuckDBClient` comes from Observable's older standard library, so what it returns can differ.
 
 ## Reading more
 
-The SQL is the same as on the [DuckDB CLI](/docs/examples/tools/duckdb/) page, which shows how to find a station, read several years from a list of files, and convert to another datum. `SET VARIABLE` works in DuckDB-WASM, so the CLI's file-list query runs as it stands. A SQL cell can also take values from other cells with `${…}`, as in `WHERE id = ${station.id}`.
+The SQL is the same as on the [DuckDB CLI](/docs/examples/tools/duckdb/) page, which shows how to find a station, read several years from a list of files, and convert to another datum. `SET VARIABLE` works in DuckDB-WASM, so the CLI's file-list query runs as it stands in one SQL cell. A SQL cell can also take values from other cells with `${…}`, as in `WHERE id = ${station.id}`.
 
 ## Things to know
 
-- `DuckDBClient` returns times as `Date`, which shows in the reader's time zone unless you format it in UTC.
+- Notebook Kit's `DuckDBClient` returns times, and `DATE` values, as milliseconds since 1970, UTC. `new Date(t)` makes a `Date`, which shows in the reader's time zone unless you format it in UTC, as with `toISOString()`.
+- Notebook Kit loads its libraries from [esm.sh](https://esm.sh/) when the page opens. DuckDB-WASM is pinned with Notebook Kit's version, but Plot, Inputs and D3 load at their latest versions.
