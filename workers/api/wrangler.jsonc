@@ -7,7 +7,11 @@
   "preview_urls": false,
   // stillwell-api on the box, through the stillwell-1 Tunnel (README.md, Setup).
   "vpc_services": [
-    { "binding": "STILLWELL", "service_id": "01a1d7b2-2299-7303-a39a-5a1e5d6cbec1", "remote": true },
+    {
+      "binding": "STILLWELL",
+      "service_id": "01a1d7b2-2299-7303-a39a-5a1e5d6cbec1",
+      "remote": true,
+    },
   ],
   "observability": { "enabled": true },
 }
