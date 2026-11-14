@@ -23,21 +23,28 @@ export default defineConfig({
   site: "https://openwatersio.github.io",
   base,
   markdown: { processor: satteri({ mdastPlugins: [baseLinks] }) },
+  // Astro puts a redirect's page under the base path but doesn't add it to the target.
+  redirects: {
+    "/docs/guides/quality-flags/": `${base}/docs/guides/quality-control/`,
+    "/docs/guides/gauges/": `${base}/docs/guides/stations/`,
+  },
   integrations: [
     starlight({
       title: "Stillwell",
+      customCss: ["./src/styles/custom.css"],
       social: [
         { icon: "github", label: "GitHub", href: "https://github.com/openwatersio/stillwell" },
       ],
       sidebar: [
         {
-          label: "Guides",
+          label: "Overview",
           items: [
             { label: "Introduction", slug: "docs" },
             "docs/getting-started",
-            "docs/guides/gauges",
+            "docs/sources",
+            "docs/guides/stations",
             "docs/guides/datums",
-            "docs/guides/quality-flags",
+            "docs/guides/quality-control",
             "docs/guides/terms",
           ],
         },

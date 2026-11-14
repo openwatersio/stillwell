@@ -3,6 +3,8 @@ title: sources.json
 description: One entry per source, with its license, credit, contact, terms and whether its preliminary values become final.
 sidebar:
   order: 6
+  attrs:
+    class: mono
 ---
 
 import Schema from "../../../../components/Schema.astro";
@@ -43,4 +45,4 @@ JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.source = j.id
 GROUP BY ALL ORDER BY j.id`}
 />
 
-See the [Terms guide](/docs/guides/terms/) for what `license`, `commercial_use` and `attribution` require.
+See the [Terms](/docs/guides/terms/) for what `license`, `commercial_use` and `attribution` require.

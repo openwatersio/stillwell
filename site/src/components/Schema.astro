@@ -92,64 +92,105 @@ const id = (name: string) => `column-${name.replaceAll(".", "-")}`;
       </span>
     )}
   </p>
-  <table>
-    <thead>
-      <tr>
-        <th>Column</th>
-        <th>Type</th>
-        <th>Meaning</th>
-      </tr>
-    </thead>
-    <tbody>
-      {out.map((c) => (
-        <tr id={id(c.name)} class:list={{ nested: c.depth > 0 }}>
-          <td style={`padding-left: ${0.6 + c.depth * 1.2}rem`}>
-            <code>{c.depth ? c.name.split(".").at(-1) : c.name}</code>
-          </td>
-          <td class="type">
+  <dl class="columns">
+    {out.map((c) => (
+      <div id={id(c.name)} class:list={{ nested: c.depth > 0 }} style={`--depth: ${c.depth}`}>
+        <dt>
+          <code class="name">
+            {(c.depth ? c.name.split(".").at(-1)! : c.name)
+              .split(/(?<=_)/)
+              .map((part, i) => (i ? [<wbr />, part] : part))}
+          </code>
+        </dt>
+        <dd>
+          <span class="type">
             {short(c.type)}
             {c.optional ? (
-              <span class="nullable">, optional</span>
+              <span class="nullable">optional</span>
             ) : (
-              !c.required && <span class="nullable">, nullable</span>
+              !c.required && <span class="nullable">nullable</span>
             )}
-          </td>
-          <td set:html={md.renderInline(c.description)} />
-        </tr>
-      ))}
-    </tbody>
-  </table>
+          </span>
+          {c.description && <div class="meaning" set:html={md.renderInline(c.description)} />}
+        </dd>
+      </div>
+    ))}
+  </dl>
 </div>
 
 <style>
   .schema {
     margin-block: 1rem;
     font-size: var(--sl-text-sm);
-    overflow-x: auto;
   }
-  table {
-    border-collapse: collapse;
-    width: 100%;
+  /* Rows share the name column through subgrid, so every description starts at the same place. */
+  .columns {
+    display: grid;
+    grid-template-columns: fit-content(11rem) 1fr;
+    margin: 0;
+    border-top: 1px solid var(--sl-color-gray-5);
   }
-  th,
-  td {
-    text-align: left;
-    vertical-align: top;
-    padding: 0.4rem 0.6rem;
+  .columns > div {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    column-gap: 1.25rem;
+    padding: 0.5rem 0;
     border-bottom: 1px solid var(--sl-color-gray-5);
+    scroll-margin-top: calc(var(--sl-nav-height) + 1rem);
   }
-  td:first-child {
-    white-space: nowrap;
+  .columns > div:target {
+    background: var(--sl-color-accent-low);
   }
-  .nested td {
-    color: var(--sl-color-gray-2);
+  dt {
+    padding-left: 0.5rem;
+  }
+  /* A struct's fields indent under it, with a rule marking the nesting. */
+  .nested dt {
+    margin-left: calc((var(--depth) - 1) * 0.75rem + 0.5rem);
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--sl-color-gray-5);
+  }
+  dd {
+    margin: 0;
+    padding-right: 0.5rem;
+  }
+  /* Long names break after an underscore, never mid-word. */
+  .name {
+    font-weight: 600;
+    color: var(--sl-color-white);
   }
   .type {
     font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-xs);
     color: var(--sl-color-gray-3);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
   .nullable {
     font-family: var(--sl-font-system);
+    margin-left: 0.5rem;
+    font-style: italic;
+  }
+  .meaning {
+    margin-top: 0.15rem;
+    color: var(--sl-color-gray-3);
+  }
+  @media (max-width: 40rem) {
+    .columns,
+    .columns > div {
+      display: block;
+    }
+    dd {
+      padding-left: 0.5rem;
+      margin-top: 0.15rem;
+    }
+    .nested dd {
+      margin-left: calc((var(--depth) - 1) * 0.75rem + 0.5rem);
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--sl-color-gray-5);
+    }
+    .nested dt {
+      padding-bottom: 0;
+    }
   }
 </style>

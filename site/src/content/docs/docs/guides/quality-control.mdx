@@ -1,0 +1,252 @@
+---
+title: Quality control
+description: How Stillwell checks observed levels, what each flag means, how each source's flags map onto them, and which filter to use.
+sidebar:
+  order: 3
+---
+
+import QueryResult from "../../../../components/QueryResult.astro";
+
+Every observed level in the store carries a quality flag. The flag combines the source's own judgment with Stillwell's automatic checks and the errors recorded against the source. Quality control follows four rules:
+
+- **It doesn't correct levels.** It only flags values; the only changes are rounding levels to 0.1 mm, the store's resolution, and keeping one value where a source repeats a timestamp. A value the checks doubt is still in the store, with its flag.
+- **It keeps the source's judgment.** Each value carries the source's own flag, `source_flag`, beside the final one, `flag`.
+- **It only makes a flag worse.** Stillwell's checks mark values suspect or bad. They never upgrade a value the source doubted.
+- **It can be repeated.** When a rule changes, the stored years are checked again from the source's flags, so a value a looser rule no longer flags is clear again.
+
+For most work, filter with `flag <= 2`. That keeps every value not flagged suspect or bad, including values nobody has checked yet. [Choosing a filter](#choosing-a-filter) covers the stricter options.
+
+## How a value gets its flag
+
+1. **The source's flag.** The adapter for each source maps the source's own quality codes onto Stillwell's scale. That becomes `source_flag`. [Source flags by source](#source-flags-by-source) gives every mapping.
+2. **Errata.** Where an error is recorded against a source's values for a span of time, those values are marked suspect. See [Errata](#errata).
+3. **Automatic checks.** Stillwell's checks look at each station's series for values that can't be right or that a failing gauge would send. See [Stillwell's checks](#stillwells-checks).
+4. **Checks chosen per station.** Which checks apply depends on whether the station's levels carry a tide, measured from the levels themselves. See [Which checks apply](#which-checks-apply).
+
+`flag` is the worst of the three: the source's flag, the erratum and the checks.
+
+Only observed levels go through these steps. Observed highs and lows, predictions and predicted highs and lows carry the source's flags as they are.
+
+## The scale
+
+| `flag` | Meaning      |
+| ------ | ------------ |
+| 0      | good         |
+| 1      | interpolated |
+| 2      | preliminary  |
+| 3      | suspect      |
+| 4      | bad          |
+
+- **Good** values are ones the source has checked and accepted.
+- **Interpolated** values are ones the source filled in between readings.
+- **Preliminary** values are ones the source hasn't checked. Most recent data is preliminary, and some sources never check their values at all. Preliminary doesn't mean good.
+- **Suspect** values are ones the source, an erratum or Stillwell's checks doubt.
+- **Bad** values are ones that can't be right, such as a reading of 0 where a gauge had none.
+
+[Observations](/docs/reference/observations/) describes the columns of a series file.
+
+## The source's flag
+
+Each value also has a `source_flag`: the source's own judgment on the same 0 to 4 scale, before Stillwell's checks and errata. `flag` is never better than `source_flag`.
+
+When the two differ, Stillwell marked the value worse than its source did. A value the source verified still shows as verified in `source_flag`. Read `flag` to skip what shouldn't be used, and read `source_flag` to see what the source itself said.
+
+In the last week of PEGELONLINE, every value is preliminary from the source, and Stillwell's checks marked some suspect or bad:
+
+<QueryResult
+  sql={`SELECT source_flag, flag, count(*) AS "values", count(DISTINCT station) AS stations
+FROM 'https://stillwell.openwaters.io/recent/pegelonline.parquet'
+GROUP BY ALL ORDER BY ALL`}
+/>
+
+A source's own flags can account for most of its suspect values. BODC marks whole months improbable at some gauges, and Stillwell keeps them as suspect in both columns.
+
+### Source flags by source
+
+Each source reports quality its own way, or not at all. This is how each one's codes map onto the scale. Values a source marks missing are not stored. Where a source sends no quality information, every value gets the same flag. "Checks its values" says whether the source reviews its preliminary values later; [Preliminary values](#preliminary-values) explains why that matters.
+
+- **[BODC](/sources/bodc/)**, from the ERDDAP qualifier. Blank is good. `T` (interpolated) is interpolated. Any other letter, including `M` (improbable), is suspect, and an `M` at a level within 1 mm of zero is bad. `N` (null) is not stored. Checks its values: yes.
+- **[BSH](/sources/bsh/)** publishes predictions only, all good.
+- **[CDEC](/sources/cdec/)** sends no usable quality code. Every value is preliminary. Checks its values: no.
+- **[CO-OPS](/sources/coops/)**, from the quality (`q`) and flags (`f`) fields. Verified values are good and preliminary (`p`) values preliminary. For 6-minute levels, the flat (F) and rate-of-change (R) flags make a value suspect, and the limit flag (L) does too while the value is still preliminary. The outlier flag (O) is ignored. For hourly heights the limit flag is ignored and the inferred flag (I) makes a value at least interpolated. For highs and lows, L makes a value suspect and I at least interpolated. Checks its values: yes.
+- **[CRMS](/sources/crms/)**, from the comments on each reading. A comment saying the sensor was dry or out of the water, the water was low, the value is a daily median, the clock was reset, or the desiccant failed makes the value suspect. Everything else is good. Marsh well readings are not stored. Checks its values: yes.
+- **[DMI](/sources/dmi/)**, from `qcResult` and `qcStatus`. A result of 6 (erroneous) is bad. A result of 1 to 5 (failed a value, step or consistency check) is suspect. Otherwise a manually checked value is good and anything else preliminary. Checks its values: no.
+- **[DWR](/sources/dwr/)**, from the Hydstra quality code. 1, 2 and 40 are good. 70 and 76 are interpolated. Other codes are suspect. 151 (missing) and 255 (no data) are not stored. The current month and the three before it are at least preliminary, since DWR may still revise them. Checks its values: yes.
+- **[EA](/sources/ea/)** sends no quality code. Every value is preliminary. Checks its values: no.
+- **[GESLA](/sources/gesla/)**, from the QC and use columns. QC 0 (no QC) and 1 (correct) are good. 2 (interpolated) is interpolated. 3 (doubtful) is suspect. 4 (isolated spike or wrong) is bad. A use flag of 0 makes a value at least suspect. Checks its values: no, since each GESLA release is fixed. GESLA treats unchecked values as good, where every other source treats them as preliminary.
+- **[JMA](/sources/jma/)**, from which file served the month. The final file is good. The provisional (`sokuho`) file is preliminary, and is used only for the current and previous month in Japan time before the final file exists. Checks its values: yes.
+- **[JODC](/sources/jodc/)** publishes final values only and flags nothing. Every value is good. Checks its values: no.
+- **[Kartverket](/sources/kartverket/)**, from the XML `flag`. Anything other than `obs` is suspect. Since Kartverket marks no value as checked, an `obs` value is preliminary for its first 365 days and good after. Checks its values: yes.
+- **[Marine Institute](/sources/marine-institute/)**, from `QC_Flag`. 1 is good. 0 (not yet checked) is preliminary. 9 (missing) is not stored. Any other code is suspect. Checks its values: yes.
+- **[PEGELONLINE](/sources/pegelonline/)** sends no quality code. Every value is preliminary. Checks its values: no.
+- **[REFMAR](/sources/refmar/)**, from which series a value came from. Validated series are good. Raw series are preliminary, and a raw value between two validated ones is not stored. Checks its values: yes.
+- **[RWS](/sources/rws/)**, from the status (`Statuswaarde`) and quality code (`Kwaliteitswaardecode`). `Gecontroleerd` (checked) or `Definitief` (final) is good, and any other status preliminary. A quality code other than `00` makes a value suspect. Predictions are good. Checks its values: yes.
+- **[SFWMD](/sources/sfwmd/)**, from `QUALITY_CODE` and `CODE`. `A` (approved) is good, `P` (provisional) preliminary, anything else suspect. A `CODE` of `E` (estimated) makes a value at least interpolated, and any other code but `V` suspect. `M` (missing) is not stored. Checks its values: yes.
+- **[SMHI](/sources/smhi/)**, from the quality letter. `G` (checked) is good. `O` (unchecked) and `Y` (roughly checked) are preliminary. Anything else is suspect. The current and previous month are at least preliminary. Checks its values: yes.
+- **[UHSLC](/sources/uhslc/)**, from the `quality` field. 4 (research quality) is good. 3 (fast delivery) is preliminary. Anything else is suspect. Checks its values: yes, as research quality replaces fast delivery.
+- **[UNAM](/sources/unam/)** flags nothing. Every value is preliminary and stays so. Checks its values: no.
+- **[USACE](/sources/usace/)**, from the CWMS quality bits. Rejected is bad. Questionable is suspect. Unscreened, or screened without an "okay" verdict, is preliminary. A value replaced by interpolation is interpolated. Otherwise good. Missing is not stored. Checks its values: yes.
+- **[USGS](/sources/usgs/)**, from the approval status and qualifiers. The qualifiers `ICE`, `EQUIP`, `DRY`, `LESSTHAN` and `BLWMIN` make a value suspect. Otherwise approved values are good and anything else preliminary. `ESTIMATED` makes a value at least interpolated. Checks its values: yes.
+
+Each source's README, linked from its page, says how the adapter reads it.
+
+## Stillwell's checks
+
+Stillwell checks every observed level when it's fetched, and checks stored years again when a rule changes. Each check looks at one station's series at a time. A value can fail more than one.
+
+| Check          | Marks   | What it looks for                                                                                                                                                                                                                                                          |
+| -------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Limits         | bad     | A value that isn't a number, that lies outside −500 m to 9,000 m in any datum, or that sits more than 20 m from the median of its window. The limit is relative to the median because some datums put inland gauges hundreds of meters up.                                 |
+| Flatlines      | suspect | Four or more values that stay at one level for too long, as a stuck sensor reports. The limit depends on the station: six hours at tidal water, two days at still water. At tidal stations, a gauge that dithers by up to 2 mm still counts as flat.                       |
+| Spikes         | suspect | A value far from the median of its neighbors within three sampling intervals on both sides. The threshold is 25 cm, or eight times the station's usual scatter about that median, whichever is larger, so noisy gauges get more room.                                      |
+| Held readings  | suspect | Three or more values within 1 cm of the first of them, shorter than a flatline, that sit beyond the spike threshold from the levels on both sides, the same way. This is a gauge holding a reading while the tide moves on.                                                |
+| Outliers       | suspect | A value far outside the station's usual range, such as a sensor reading its zero: more than 10 times the median absolute deviation, and at least 1 m, from the median of the values the other checks didn't flag.                                                          |
+| Residual jumps | suspect | A run of values that jumps away from the tide and back within a day, as when a sensor reads its zero for a few hours. It's judged on the residual after fitting the station's own tide, and needs a jump of more than 0.5 m and well beyond the usual step-to-step change. |
+
+The window a check sees depends on when it runs. Stored years are checked a calendar year at a time, with the years either side as context, so a flatline across New Year is judged whole. The last seven days are checked as one window each hour. Residual jumps need 30 days' worth of hourly values to fit a tide, so they're judged on stored years only, not on the last seven days.
+
+### Which checks apply
+
+A station's [`tidal`](/docs/reference/stations/#column-tidal) column decides which checks apply. Limits and spikes apply everywhere.
+
+| Station                           | Flatline after                                                 | Held readings | Outliers | Residual jumps |
+| --------------------------------- | -------------------------------------------------------------- | ------------- | -------- | -------------- |
+| Tidal, any kind but river or lake | 6 h, or 48 h with a tide under 30 cm read in whole centimeters | yes           | yes      | yes            |
+| Tidal river or lake               | as above                                                       | yes           | no       | no             |
+| Still coast, such as the Baltic   | 6 h, or 48 h where values move in whole centimeters            | no            | no       | no             |
+| Still, any other kind or none     | 48 h                                                           | no            | no       | no             |
+
+A station not yet judged is treated as still if its source calls it a river or lake, and as tidal otherwise, as a tide gauge would be.
+
+Still water gets the looser rules for good reasons. A pooled river, a lake or a creek drained to its sill can hold one level to the centimeter for days, then rise meters in a flood, and a pool can be let up for a few hours and back down. A small tide read in whole centimeters can sit on one value for hours as it turns. A river's tide is too far from a regular tide for the residual check, and it still floods, so the outlier check stays off.
+
+### How a station is judged tidal
+
+`tidal` is measured from the station's own levels, not taken from its kind, so a river can be tidal and the Baltic isn't. Stillwell fits the main lunar tides (M2 and O1) to the last year of usable values and records their combined amplitude as [`tide_m`](/docs/reference/stations/#column-tide_m). A station is tidal when:
+
+- `tide_m` is at least 8 cm;
+- its levels are not more than 10 m above sea level, where its datum says;
+- and it is on the coast, or its levels rarely sit still the way a drained creek does.
+
+A station needs at least 30 days of values in its last year to be judged. Each verdict is redone once a year, or sooner when the rules change, and a change in verdict rechecks the station's whole record.
+
+### Known false positives
+
+The checks aren't free of false positives:
+
+- The held-readings check can mark a real level that rises and falls back the same way, such as a lock basin's.
+- At harbors that dry out at low water, the floor the gauge reads while the harbor is dry is marked as a flatline.
+- CO-OPS values that CO-OPS has verified are marked suspect when they still carry its rate-of-change flag, which can remove real storm values. The flag is rare outside storms.
+
+If a station's suspect values look like real water, compare them with `source_flag`, and with another station on the same gauge or nearby. A value a rule no longer flags is clear again once the checks run over it again.
+
+## When the checks run
+
+| When                           | What happens                                                                                                                                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Every hour                     | New values from live stations are checked with the last seven days.                                                                                                                                      |
+| Every night                    | The last few days' values fold into their year files with the flags the hourly checks gave.                                                                                                              |
+| Each month                     | Sources that check their values later are fetched again, from January three years back at most sources, and those values checked again. The years holding the last two months are checked again in full. |
+| When a rule or verdict changes | Every affected station's stored years are checked again from the source's flags.                                                                                                                         |
+| When history is added          | Each year fetched is checked with the years either side.                                                                                                                                                 |
+
+So the current year's flags can differ a little from a past year's: values from the last few weeks were judged over a seven-day window, until the monthly run checks them over the whole year.
+
+## Preliminary values
+
+A preliminary value may be checked later. Each month the store fetches values again for sources that check them later, typically from January three years back, so a value can move from preliminary to good, interpolated, suspect or bad.
+
+Two signals mark the preliminary values that will never be checked:
+
+- every preliminary value from a source whose `finalizes` is false in [`sources.json`](/docs/reference/sources/);
+- values from before a station's [`source_qc_start`](/docs/reference/stations/#column-source_qc_start), where the source's own checks begin.
+
+Those have passed only Stillwell's checks and stay preliminary. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
+
+<QueryResult
+  sql={`SELECT s.id AS source, s.finalizes,
+  count(t.id) FILTER (t.source_qc_start IS NOT NULL) AS with_qc_start, count(t.id) AS stations
+FROM read_json('https://stillwell.openwaters.io/sources.json') s
+LEFT JOIN 'https://stillwell.openwaters.io/stations.parquet' t ON t.source = s.id
+GROUP BY ALL ORDER BY source`}
+/>
+
+## Errata
+
+An erratum is an error found in what a source publishes: a clock running an hour off, a datum that moved without notice, a stretch of values from a failing gauge. Each one is recorded in [`errata.json`](/docs/reference/errata/) with its evidence and what the store does about it. Some are corrected in the adapter, some dropped, and some flagged.
+
+A `flagged` erratum with stations and a span marks those observed levels suspect, while `source_flag` keeps the source's flag. So across an erratum's span, `flag` can be worse than `source_flag` without any check having fired. A station's [`errata`](/docs/reference/stations/#column-errata) column lists the errata that touch it, and each source's page lists its errata in full.
+
+<QueryResult
+  sql={`SELECT id, since, until, len(stations) AS stations
+FROM read_json('https://stillwell.openwaters.io/errata.json')
+WHERE handling = 'flagged'
+ORDER BY id LIMIT 8`}
+/>
+
+### Comparing stations
+
+Some errors only show when one station is compared with its neighbors: a clock running late, a datum that steps, a source that copies another's values. Each month Stillwell compares nearby tide stations in three regions, the German Bight, the US East Coast and Sweden, over the current year and the five before. It looks for:
+
+- **Copied months**, where two stations agree far more closely than two gauges can.
+- **Tide timing**, where a station's tide runs early or late against its own usual timing.
+- **Level steps**, where a station's daily mean shifts against at least two of its four nearest neighbors within 150 km.
+
+These comparisons change no flag on their own. Each finding is reviewed by hand, and the real ones become errata.
+
+## Known limitations
+
+- **Highs, lows and predictions aren't checked.** An observed high water from a span the levels flag suspect stays good.
+- **Sources disagree on "unchecked".** GESLA calls unchecked values good, and JODC publishes only final values, while every other source calls unchecked values preliminary.
+- **Bad comes mostly from limits.** Only BODC, DMI, GESLA and USACE mark values bad themselves. Other sources' codes for an erroneous value map to suspect.
+- **Offsets and datum shifts mostly need errata.** The per-station checks see a value against its own series, so a level shifted by a constant for more than a day passes until an erratum or the station comparisons find it.
+- **Mixed sampling.** A year that changes from hourly to 6-minute values judges spikes by its most common spacing, so the sparser part may go unchecked for spikes and held readings.
+- **Flatlines ignore gaps.** Four equal values on either side of a long gap count as one flatline.
+
+## Choosing a filter
+
+| Filter      | Keeps                           | Use it for                                                                                                                                                                                                  |
+| ----------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flag <= 2` | good, interpolated, preliminary | Most work: maps, live levels, comparing with predictions. It keeps unchecked values, so a few errors the checks missed can get through.                                                                     |
+| `flag <= 1` | good, interpolated              | Work that needs values a source has checked, such as datum reductions or trends. It drops most recent data, and every value from sources that never check theirs: PEGELONLINE's levels are all preliminary. |
+| `flag = 0`  | good                            | Work where filled-in values would mislead, such as counting real readings. It also drops the gaps a source filled.                                                                                          |
+
+Check what a filter costs before you apply it. A station's years list gives the count of values at each flag, per year. Here are the shares by source:
+
+<QueryResult
+  sql={`SET VARIABLE files = (
+  SELECT list('https://stillwell.openwaters.io/stations/years/' || id || '.parquet')
+  FROM read_json('https://stillwell.openwaters.io/sources.json')
+);
+SELECT split_part(id, '/', 1) AS source,
+  sum(good + interpolated + preliminary + suspect + bad) AS "values",
+  round(100 * sum(good) / "values", 1) AS good_pct,
+  round(100 * sum(interpolated) / "values", 1) AS interpolated_pct,
+  round(100 * sum(preliminary) / "values", 1) AS preliminary_pct,
+  round(100 * sum(suspect) / "values", 2) AS suspect_pct,
+  round(100 * sum(bad) / "values", 2) AS bad_pct
+FROM read_parquet(getvariable('files'))
+GROUP BY source ORDER BY source`}
+/>
+
+The stations of a source with the largest share of suspect or bad values, over all their years:
+
+<QueryResult
+  sql={`SELECT id, sum(good + interpolated + preliminary + suspect + bad) AS "values",
+  round(100 * sum(suspect + bad) / "values", 1) AS flagged_pct
+FROM 'https://stillwell.openwaters.io/stations/years/coops.parquet'
+GROUP BY id HAVING "values" > 100000
+ORDER BY flagged_pct DESC LIMIT 5`}
+/>
+
+## Standards and further reading
+
+Stillwell's checks follow the tests that sea level and hydrometric agencies use for real-time data, adapted to a store that holds many sources at once:
+
+- IOC of UNESCO, 2020. [Quality Control of in situ Sea Level Observations](https://doi.org/10.25607/OBP-854). IOC Manuals and Guides 83.
+- U.S. IOOS, 2021. [Manual for Real-Time Quality Control of Water Level Data, Version 2.1](https://doi.org/10.25923/vpsx-dc82) (QARTOD).
+- IOC of UNESCO, 2013. [Recommendation for a Quality Flag Scheme](https://oceanexpert.org/document/10402). IOC Manuals and Guides 54, Vol. 3.
+- Copernicus In Situ TAC, 2025. [Quality Control Procedure](https://doi.org/10.13155/106219).
+- Haigh and others, 2023. [GESLA Version 3](https://doi.org/10.1002/gdj3.174). Geoscience Data Journal.
+
+The repository's [quality control notes](https://github.com/openwatersio/stillwell/tree/main/docs/qc) compare each check with these and some 40 other published practices, with the measurements behind that comparison. The rules themselves are in [`src/qc.ts`](https://github.com/openwatersio/stillwell/blob/main/src/qc.ts).

@@ -1,5 +1,7 @@
 // Build-time reads of the store, through DuckDB in Node. Pages render from these once per build.
 import { DuckDBInstance } from "@duckdb/node-api";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import { url, stationPath } from "./paths";
 
 const connection = await (await DuckDBInstance.create(":memory:")).connect();
@@ -16,10 +18,62 @@ export async function rows(sql: string): Promise<Row[]> {
  * A query's result as DuckDB itself prints each value, for showing it beside its SQL. Statements before
  * the last one (SET, SET VARIABLE) run first, as they would in the CLI.
  */
-export async function table(
-  sql: string,
-  limit = 50,
-): Promise<{ columns: string[]; types: string[]; rows: string[][] }> {
+export function table(sql: string, limit = 50): Promise<Table> {
+  if (!import.meta.env.DEV) return runTable(sql, limit);
+  const key = createHash("sha256").update(`${limit}\n${sql}`).digest("hex").slice(0, 16);
+  const hit = tableCache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_MS) return hit.result;
+  const result = cachedTable(key, sql, limit).catch((error) => {
+    // A failure isn't kept, so fixing the query, or the cause, and saving runs it again.
+    tableCache.delete(key);
+    throw error;
+  });
+  tableCache.set(key, { at: Date.now(), result });
+  return result;
+}
+
+type Table = { columns: string[]; types: string[]; rows: string[][] };
+
+// In dev only, so saving a page doesn't run its queries against the store again; a build always runs them,
+// so it still fails where one breaks. Results keep for a day, in memory and on disk; delete site/.cache/queries
+// and restart the dev server to rerun them sooner.
+const tableCache = new Map<string, { at: number; result: Promise<Table> }>();
+const CACHE_DIR = ".cache/queries";
+const CACHE_MS = 86_400_000;
+
+async function cachedTable(key: string, sql: string, limit: number): Promise<Table> {
+  const file = `${CACHE_DIR}/${key}.json`;
+  const fresh = await stat(file).then(
+    (s) => Date.now() - s.mtimeMs < CACHE_MS,
+    () => false,
+  );
+  // A file that can't be read or parsed, such as one deleted since, is a miss rather than an error.
+  if (fresh) {
+    const cached = await readFile(file, "utf8")
+      .then((text) => JSON.parse(text) as Table)
+      .catch(() => undefined);
+    if (cached) return cached;
+  }
+  const result = await runTable(sql, limit);
+  await mkdir(CACHE_DIR, { recursive: true });
+  // Written beside it and renamed, so a dev server stopped mid-write leaves no partial file.
+  const partial = `${file}.${process.pid}.tmp`;
+  await writeFile(partial, JSON.stringify(result));
+  await rename(partial, file);
+  return result;
+}
+
+// One query at a time on the shared connection, so one block's SET VARIABLE can't land between another's
+// SET and its read.
+let queue: Promise<unknown> = Promise.resolve();
+
+function runTable(sql: string, limit: number): Promise<Table> {
+  const run = queue.then(() => readTable(sql, limit));
+  queue = run.catch(() => undefined);
+  return run;
+}
+
+async function readTable(sql: string, limit: number): Promise<Table> {
   const statements = sql
     .split(/;\s*(?:\n|$)/)
     .map((s) => s.trim())

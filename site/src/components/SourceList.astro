@@ -1,0 +1,59 @@
+---
+// Every source as a compact entry: what someone choosing a source needs, with the rest on the source's own page.
+import { json, rows } from "../lib/store";
+import { sitePath, url } from "../lib/paths";
+
+const sources = await json("sources.json");
+const facts = new Map(
+  (
+    await rows(`
+      SELECT source, count(*)::INT AS stations,
+        min(first) AS first,
+        max(last) AS last,
+        list(DISTINCT country_code ORDER BY country_code) FILTER (WHERE country_code IS NOT NULL) AS countries
+      FROM '${url("stations.parquet")}' GROUP BY source`)
+  ).map((r) => [r.source, r]),
+);
+
+const n = (x: number) => x.toLocaleString("en-US");
+const region = new Intl.DisplayNames(["en"], { type: "region" });
+// A source spanning many countries reads as a count; a few read as names.
+const countries = (codes: string[] = []) =>
+  codes.length > 3 ? `${codes.length} countries` : codes.map((c) => region.of(c) ?? c).join(", ");
+// The years the source's record spans, or where it starts while no station has a last value.
+const span = (first?: Date, last?: Date) => {
+  if (!first) return undefined;
+  const [a, b] = [first.getUTCFullYear(), last?.getUTCFullYear()];
+  return b === undefined ? `since ${a}` : a === b ? `(${a})` : `between ${a}–${b}`;
+};
+---
+
+<ul class="not-content">
+  {[...sources]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((s) => {
+      const f = facts.get(s.id);
+      const details = f
+        ? [
+            `${n(f.stations)} stations`,
+            f.countries?.length && `in ${countries(f.countries)}`,
+            span(f.first, f.last),
+          ].filter(Boolean)
+        : ["no stations yet"];
+      return (
+        <li id={s.id}>
+          <strong>
+            <a href={sitePath(`/sources/${s.id}/`)}>{s.name}</a>
+          </strong>
+          <div>{details.join(" ")}</div>
+        </li>
+      );
+    })}
+</ul>
+
+<style>
+  li {
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+</style>

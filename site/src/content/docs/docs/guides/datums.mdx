@@ -30,7 +30,7 @@ ORDER BY id`}
 
 - **`source`**: the source publishes it.
 - **`slackwater-database`**: the station's own record in slackwater-database, the tide prediction database, where that record is measured from the same zero as the station's levels. It replaces the source's MSL, LAT and chart datum.
-- **`computed`**: carried from another station of the same gauge (see [Gauges](/docs/guides/gauges/)). It is carried through a reference both stations give an offset to, such as a national height system or Admiralty Chart Datum, or else through the offset measured between their levels. That's how a PEGELONLINE gauge gets SKN from BSH through NHN.
+- **`computed`**: carried from another station of the same gauge (see [Stations](/docs/guides/stations/)). It is carried through a reference both stations give an offset to, such as a national height system or Admiralty Chart Datum, or else through the offset measured between their levels. That's how a PEGELONLINE gauge gets SKN from BSH through NHN.
 
 Tidal datums such as MSL and LAT are carried only between stations within 1 km, since they change along an estuary. Nothing is carried from a station whose terms bar commercial use to one whose terms allow it. Offsets from slackwater-database or another station owe credits of their own, in [`datums_attribution`](/docs/reference/stations/#column-datums_attribution). [Terms](/docs/guides/terms/) explains how to show them.
 
@@ -90,7 +90,7 @@ A station's reference can change: its gauge zero is reset, or its source moves t
 
 ### Epoch files
 
-Each epoch has series files of its own, and no file is ever rewritten into another epoch. Epoch 1 uses the plain path, and later epochs add their number after the station: `obs/<source>/<station>/2/<year>.parquet`. [File paths](/docs/getting-started/#file-paths) has the details. `recent/<source>.parquet` gives each row's epoch in its `epoch` column.
+Each epoch has series files of its own, and no file is ever rewritten into another epoch. Epoch 1 uses the plain path, and later epochs add their number after the station: `obs/<source>/<station>/2/<year>.parquet`. [File paths](/docs/getting-started/#building-paths-in-code) has the details. `recent/<source>.parquet` gives each row's epoch in its `epoch` column.
 
 `since` and `until` bound the epoch, in UTC, with `until` exclusive. `since` is null for a first epoch with no known start, and `until` is null for the current one. An epoch's files can hold rows outside its span. Those rows are the uncertain stretch around a change, or years written before the next epoch opened, which that epoch's files hold again. They aren't part of the series, so filter on `since` and `until` when you read an epoch's files.
 
@@ -166,7 +166,7 @@ FROM r WHERE flag <= 2
 GROUP BY year ORDER BY year`}
 />
 
-For more years, list each epoch's files from `stations/years/<source>.parquet`, which has an `epoch` column. [Reading many files](/docs/getting-started/#reading-many-files) shows how. Rows from an epoch whose `to_current` is null drop out of this query. Read them from their own files in their own datum.
+For more years, list each epoch's files from `stations/years/<source>.parquet`, which has an `epoch` column. [Reading many files](/docs/getting-started/#read-its-levels) shows how. Rows from an epoch whose `to_current` is null drop out of this query. Read them from their own files in their own datum.
 
 ## Which offsets to use
 

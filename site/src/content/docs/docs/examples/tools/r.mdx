@@ -51,7 +51,7 @@ dbGetQuery(con, sprintf("
 
 ## Read a year of levels
 
-One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#building-paths-in-code) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 ```r
 levels <- dbGetQuery(con, sprintf("
@@ -64,7 +64,7 @@ levels <- dbGetQuery(con, sprintf("
 
 ## Read several years
 
-Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#read-its-levels) explains:
 
 ```r
 years <- dbGetQuery(con, sprintf("
@@ -81,8 +81,6 @@ levels <- dbGetQuery(con, sprintf("
   ORDER BY time
 ", paste(files, collapse = ", ")))
 ```
-
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path, which DuckDB's `url_encode(url_encode(source_id))` builds. `url_encode` also encodes `!'()*`, which the store's keys leave as they are; no station ID has those today.
 
 ## Convert to another datum
 
@@ -104,4 +102,4 @@ levels <- dbGetQuery(con, sprintf("
 
 - DuckDB returns times as `POSIXct`. Run `SET TimeZone = 'UTC'` so SQL that works with dates and hours, such as `date_trunc`, works in UTC too.
 - Close the connection with `dbDisconnect(con, shutdown = TRUE)` when you're done.
-- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.
+- [Getting started](/docs/getting-started/#read-its-levels) lists what holds for every file, such as UTC times and levels in meters, and [Observations](/docs/reference/observations/) describes every column.

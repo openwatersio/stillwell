@@ -1,8 +1,10 @@
 ---
-title: stations/links.parquet
+title: links.parquet
 description: The offsets measured each month between the levels of linked stations that share no reference datum.
 sidebar:
   order: 5
+  attrs:
+    class: mono
 ---
 
 import Schema from "../../../../components/Schema.astro";
@@ -28,7 +30,7 @@ A row the month's run doesn't replace is kept, so a missing file or a failed rea
 
 ## Terms
 
-The rows are derived from both stations' levels and carry no terms of their own. Join them to `stations.parquet` for each station's `commercial_use` and `attribution`. See the [Terms guide](/docs/guides/terms/).
+The rows are derived from both stations' levels and carry no terms of their own. Join them to `stations.parquet` for each station's `commercial_use` and `attribution`. See the [Terms](/docs/guides/terms/).
 
 ## Examples
 

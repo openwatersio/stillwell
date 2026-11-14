@@ -126,7 +126,7 @@ The [Stations](/docs/reference/stations/#examples) page has more ways to find on
 
 ## Read a year of levels
 
-One file holds a station's year, at the path [File paths](/docs/getting-started/#file-paths) describes. `flag <= 2` leaves out values flagged as suspect or bad:
+One file holds a station's year, at the path [File paths](/docs/getting-started/#building-paths-in-code) describes. `flag <= 2` leaves out values flagged as suspect or bad:
 
 <Tabs syncKey="python-library">
 <TabItem label="DuckDB">
@@ -174,7 +174,7 @@ levels = pd.read_parquet(
 
 ## Read several years
 
-Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#reading-many-files) explains:
+Build the list of files from the station's years list, as [Reading many files](/docs/getting-started/#read-its-levels) explains:
 
 <Tabs syncKey="python-library">
 <TabItem label="DuckDB">
@@ -238,17 +238,6 @@ levels = pd.concat(
 </TabItem>
 </Tabs>
 
-A `source_id` with a reserved character is [encoded twice](/docs/getting-started/#file-paths) in the path:
-
-```python
-from urllib.parse import quote
-
-# encodeURIComponent's safe set, which the store's keys use
-safe = "!*'()"
-source_id = "byu_queue_de_tortue_@_riceville_la-8012300-usa-usgs"
-path = f"obs/gesla/{quote(quote(source_id, safe=safe), safe=safe)}"
-```
-
 ## Convert to another datum
 
 Adding the station's `datums["LAT"]` offset refers Hoek van Holland's NAP levels to LAT:
@@ -294,4 +283,4 @@ pyarrow reads `datums` as a list of `(datum, offset)` pairs, so `dict()` turns i
 ## Things to know
 
 - Polars and pandas keep times in UTC. DuckDB's `.df()` converts them to the session's time zone, so run `SET TimeZone = 'UTC'` first.
-- [A first query](/docs/getting-started/#a-first-query) lists what holds for every file, such as units and the 32-bit `level_m`, and [Observations](/docs/reference/observations/) describes every column.
+- [Getting started](/docs/getting-started/#read-its-levels) lists what holds for every file, such as UTC times and levels in meters, and [Observations](/docs/reference/observations/) describes every column.
