@@ -15,7 +15,7 @@ import {
   hasPage,
 } from "../../../lib/store";
 import { flagChart } from "../../../lib/render";
-import { seriesUrl, queryPath } from "../../../lib/paths";
+import { seriesUrl, queryPath, sitePath } from "../../../lib/paths";
 
 export async function getStaticPaths() {
   return (await stations())
@@ -66,7 +66,7 @@ ORDER BY time DESC LIMIT 10`
   ].map(([slug, text]) => ({ depth: 2, slug, text }))}
 >
   <p>
-    <code>{s.id}</code> · <a href={`/sources/${s.source}/`}>{s.source}</a> ·{" "}
+    <code>{s.id}</code> · <a href={sitePath(`/sources/${s.source}/`)}>{s.source}</a> ·{" "}
     {s.kind ?? "kind unknown"} · {s.country_code} · {s.status}
     {s.live && ", polled hourly"}
     {s.source_url && (

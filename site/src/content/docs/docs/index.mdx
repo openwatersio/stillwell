@@ -4,6 +4,7 @@ description: What Stillwell is, what the store holds, its sources and terms, and
 ---
 
 import { rows, json } from "../../../lib/store";
+import { sitePath } from "../../../lib/paths";
 
 export const sources = await json("sources.json");
 export const counts = new Map(
@@ -51,7 +52,7 @@ Everything is [Parquet](https://parquet.apache.org/) at `https://stillwell.openw
         return (
           <tr>
             <td>
-              <a href={`/sources/${s.id}/`}>{s.name}</a>
+              <a href={sitePath(`/sources/${s.id}/`)}>{s.name}</a>
             </td>
             <td>{c ? n(c.stations) : 0}</td>
             <td>{c ? n(c.live) : 0}</td>

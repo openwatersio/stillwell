@@ -1,6 +1,7 @@
 ---
 // A SQL editor over the store, run in the reader's browser by DuckDB. The query lives in the URL, so a link shares it.
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { sitePath } from "../lib/paths";
 
 const EXAMPLES: Record<string, string> = {
   "Stations per source": `SELECT source, count(*) AS stations, count(*) FILTER (WHERE live) AS live
@@ -94,8 +95,8 @@ GROUP BY handling ORDER BY errata DESC`,
   <p>
     HTTPS has no directory listing, so wildcards such as <code>obs/rws/*/2024.parquet</code> don't
     work: build the list of files and pass it to <code>read_parquet([…])</code>.{" "}
-    <a href="/docs/getting-started/">Getting started</a> and the reference pages describe every file
-    and column.
+    <a href={sitePath("/docs/getting-started/")}>Getting started</a> and the reference pages
+    describe every file and column.
   </p>
 </StarlightPage>
 

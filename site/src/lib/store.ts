@@ -143,7 +143,7 @@ export function json(path: string): Promise<any> {
 }
 
 // shortcut: station pages build only for the sources STATIONS names ("all" for every source), since all of them
-// come to about 1.3 GB; build them all once they're hosted, or render them per request.
+// come to about 1.3 GB, more than GitHub Pages serves; render them per request to publish them.
 const PAGES = process.env.STATIONS?.split(",").map((s) => s.trim()) ?? [];
 export const hasPage = (source: string) => PAGES.includes("all") || PAGES.includes(source);
 
