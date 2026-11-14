@@ -120,7 +120,7 @@ A full requalify under new rules inserts a new version of most rows, which doubl
 
 `GET /water-levels/stations/{source}/{id}/levels` serves the last hours and the archive alike; there is no separate `live` endpoint. Two pieces serve it:
 
-- **`workers/api`**, bound into the api.openwaters.io gateway as `WATER_LEVELS` on `/water-levels*`. It normalizes the request into a cache key, answers from the Cache API when it can, and otherwise forwards to `stillwell-api` through its Workers VPC binding. It caches what comes back by its `Cache-Control`, keeps the last good copy longer, and serves that with `status: stale` when the server doesn't answer.
+- **`workers/api`**, bound into the api.openwaters.io gateway as `WATER_LEVELS` on `/water-levels*`. It normalizes the request into a cache key, answers from the Cache API when it can, and otherwise forwards to `stillwell-api` through its Workers VPC binding. It caches what comes back by its `Cache-Control`, answering a hit with only the time it has left, keeps the last good copy longer, and serves that with `status: stale` when the server doesn't answer.
 - **`stillwell-api`** on the server, which does the work:
 
 1. Check the parameters: a known `step`, a range within the limits, and in step 1 within the last 7 days, a datum the station has an offset to, and a station in the public database with `commercial_use` true, since only those are served until tokens exist ([api.md](api.md#conventions)). `stillwell-api` never reads `stillwell_restricted`.

@@ -27,6 +27,8 @@ const LEVELS = /^\/water-levels\/stations\/[^/]+\/[^/]+\/levels$/;
 /** How long the last good copy of a range is kept for when the server doesn't answer. */
 const LAST_GOOD_S = 86_400;
 const ORIGIN_TIMEOUT_MS = 10_000;
+/** When a cached copy expires, in epoch milliseconds, stored with it. */
+const EXPIRES = "X-Levels-Expires";
 
 export default {
   async fetch(request: Request, env: Env, ctx: Context): Promise<Response> {
@@ -39,14 +41,23 @@ export default {
     const cache = (globalThis as unknown as { caches: { default: Cache } }).caches.default;
     const key = new Request(`${url.origin}${url.pathname}?${canonical}`);
     const hit = await cache.match(key);
-    if (hit) return hit;
+    // Rebuilt, not passed on: the zone's Browser Cache TTL raises a cached
+    // response's max-age to 4 hours, and may keep it that long, so a copy
+    // past its own expiry, or without one, is a miss, and a hit tells the
+    // client only the time it has left.
+    const left = hit && Math.ceil((Number(hit.headers.get(EXPIRES)) - Date.now()) / 1000);
+    if (hit && left && left > 0)
+      return new Response(hit.body, { headers: headers(`public, max-age=${left}`) });
 
     const lastKey = new Request(`${url.origin}${url.pathname}?${lastParams}&last-good`);
     const answer = await ask(`${url.pathname}?${canonical}`, env, request);
     if (answer) {
       const reply = json(answer.status, answer.body, answer.cacheControl);
       if (answer.status === 200) {
-        ctx.waitUntil(cache.put(key, reply.clone()));
+        const kept = reply.clone();
+        const maxAge = Number(/max-age=(\d+)/.exec(answer.cacheControl)?.[1] ?? 0);
+        kept.headers.set(EXPIRES, String(Date.now() + maxAge * 1000));
+        ctx.waitUntil(cache.put(key, kept));
         ctx.waitUntil(cache.put(lastKey, json(200, answer.body, `public, max-age=${LAST_GOOD_S}`)));
       }
       // A station withheld or no longer served is never served from an older copy.
@@ -168,12 +179,13 @@ function iso(time: number): string {
 }
 
 function json(status: number, body: object, cacheControl = "no-store"): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": cacheControl,
-    },
-  });
+  return new Response(JSON.stringify(body), { status, headers: headers(cacheControl) });
+}
+
+function headers(cacheControl: string): HeadersInit {
+  return {
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Origin": "*",
+    "Cache-Control": cacheControl,
+  };
 }

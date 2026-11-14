@@ -111,6 +111,48 @@ describe("the Worker", () => {
     assert.equal(calls[0]!.headers.get("User-Agent"), "Slackwater/1.0");
   });
 
+  it("gives a cached copy only the time it has left, whatever the cache says", async () => {
+    mock.method(globalThis, "fetch", async () =>
+      Response.json(
+        { status: "reporting", levels: [] },
+        { headers: { "Cache-Control": "public, max-age=300" } },
+      ),
+    );
+    assert.equal((await get(PATH)).headers.get("Cache-Control"), "public, max-age=300");
+    // Cloudflare's zone settings rewrite a cached response's Cache-Control.
+    for (const [url, kept] of cache) {
+      const rewritten = new Response(kept.body, kept);
+      rewritten.headers.set("Cache-Control", "public, max-age=14400");
+      cache.set(url, rewritten);
+    }
+    mock.timers.setTime(NOW + 100_000);
+    const hit = await get(PATH);
+    assert.equal(hit.headers.get("Cache-Control"), "public, max-age=200");
+    assert.equal(hit.headers.get("X-Levels-Expires"), null);
+    assert.deepEqual(await hit.json(), { status: "reporting", levels: [] });
+    // Past its expiry, the copy is a miss, though the cache still holds it.
+    mock.timers.setTime(NOW + 301_000);
+    await get(PATH);
+    assert.equal(
+      (globalThis.fetch as unknown as { mock: { callCount(): number } }).mock.callCount(),
+      2,
+    );
+  });
+
+  it("asks the server when a cached copy has no expiry", async () => {
+    const answer = mock.method(globalThis, "fetch", async () =>
+      Response.json(
+        { status: "reporting", levels: [] },
+        { headers: { "Cache-Control": "public, max-age=300" } },
+      ),
+    );
+    await get(PATH);
+    const [url] = [...cache.keys()].filter((k) => !k.includes("last-good"));
+    cache.set(url!, Response.json({ status: "reporting", levels: [] })); // cached before expiries were kept
+    await get(PATH);
+    assert.equal(answer.mock.callCount(), 2);
+  });
+
   it("serves the last good copy as stale when the server doesn't answer, and 503 without one", async () => {
     mock.method(globalThis, "fetch", async () =>
       Response.json({ status: "reporting", levels: [1] }),
