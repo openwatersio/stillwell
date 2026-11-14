@@ -334,8 +334,9 @@ describe("cmems", () => {
             [t("2026-10-31T00:40:00Z"), 0.123456, 0],
           ]),
           chunk([
-            // Within the history's span: left out, though finer.
+            // A time the coarser history lacks: kept, preliminary.
             [t("2026-10-31T00:05:00Z"), 9, 1],
+            // A time the history has: the history's value stands.
             [t("2026-10-31T00:40:00Z"), 9, 1],
             // After it: kept, preliminary however good.
             [t("2026-10-31T01:00:00Z"), 0.5, 1],
@@ -350,6 +351,7 @@ describe("cmems", () => {
       );
       assert.deepEqual(values, [
         { time: Date.parse("2026-10-31T00:00:00Z"), level: 0.1, flag: Flag.good },
+        { time: Date.parse("2026-10-31T00:05:00Z"), level: 9, flag: Flag.preliminary },
         { time: Date.parse("2026-10-31T00:10:00Z"), level: 0.2, flag: Flag.bad },
         { time: Date.parse("2026-10-31T00:40:00Z"), level: 0.123456, flag: Flag.preliminary },
         { time: Date.parse("2026-10-31T01:00:00Z"), level: 0.5, flag: Flag.preliminary },

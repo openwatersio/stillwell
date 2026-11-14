@@ -189,9 +189,9 @@ async function detailsOf(code: string, path: string): Promise<Details | null> {
     console.warn(`CMEMS ${code}: can't read ${path}: ${(error as Error).message}`);
     return null;
   }
-  // Every file sampled names the Copernicus licence; one naming another needs a decision first.
+  // Every file names the Copernicus licence; one naming another, or none, needs a decision first.
   const license = attribute(file, "license");
-  if (license && license !== metadata.license.url)
+  if (license !== metadata.license.url)
     throw new Error(`CMEMS ${code}: ${path} names the licence ${license}`);
   return {
     name: nameOf(attribute(file, "platform_name"), path) ?? code,
@@ -381,9 +381,8 @@ const LATEST_MS = 60 * DAY_MS;
 /**
  * Levels over [start, end) in the gauge's own datum, in meters. The history
  * copy holds each gauge's record to about two months ago and the latest
- * window about the last month, sometimes finer. The history's values stand,
- * and the latest window's within the span the history returned are left out;
- * after it, the latest window's values are `preliminary`. The source keeps
+ * window about the last month, sometimes finer. Where both have a time, the
+ * history's value stands; the latest window's others are `preliminary`. The source keeps
  * stored values (`keepsStored`), so a month the latest window has moved past
  * keeps what it held until the history copy reaches it.
  */
@@ -403,11 +402,8 @@ export async function levels(
   if (from >= to) return [];
   const [a, b] = [Math.floor(from / 1000), Math.ceil(to / 1000)];
   const past = await rows("history", code, a, b);
-  const covered = past.length ? [past[0]!.time, past.at(-1)!.time] : null;
   const since = Math.floor((Date.now() - LATEST_MS) / 1000);
-  const recent = (b > since ? await rows("latest", code, Math.max(a, since), b) : []).filter(
-    (r) => !covered || r.time < covered[0] || r.time > covered[1],
-  );
+  const recent = b > since ? await rows("latest", code, Math.max(a, since), b) : [];
   const out = new Map<number, Observation>();
   for (const [list, floor] of [
     [past, Flag.good],
