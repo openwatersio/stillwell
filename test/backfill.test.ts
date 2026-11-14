@@ -1381,6 +1381,44 @@ describe("backfillYear", () => {
     assert.ok(reads.includes("2004.parquet"));
   });
 
+  it("keeps every stored value of a keepsStored source, such as a day it fetched nothing for", async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    const [from, to] = [Date.UTC(2000, 6, 1), Date.UTC(2000, 7, 1)];
+    const missing = Date.UTC(2000, 6, 25);
+    const hours = (level: number, skip?: number) =>
+      [...Array((to - from) / HOUR).keys()]
+        .map((h) => from + h * HOUR)
+        .filter((t) => Math.floor(t / 86_400_000) * 86_400_000 !== skip)
+        .map((time) => ({
+          time,
+          level: level + 0.3 * Math.sin(((time - from) / HOUR / 12.42) * 2 * Math.PI),
+          flag: Flag.preliminary,
+        }));
+    const path = seriesPath(store, "levels", "coops", "8000001", 2000);
+    await writeObservations(path, hours(1), "STND");
+    const partial = {
+      metadata: { id: "coops" },
+      keepsStored: true,
+      observations: async () => hours(2, missing),
+    } as unknown as Source;
+    await backfillYear(
+      partial,
+      station,
+      "levels",
+      new Date(from),
+      new Date(to),
+      epoch,
+      seriesFiles(dirOf(store), await listYears(dirOf(store)), readObservationFile),
+      new Map(),
+    );
+    const rows = await readObservations(path);
+    assert.equal(rows.length, (to - from) / HOUR);
+    const onMissing = rows.filter((r) => r.time >= missing && r.time < missing + 86_400_000);
+    assert.equal(onMissing.length, 24);
+    assert.ok(onMissing.every((r) => r.level < 1.5));
+    assert.ok(rows.filter((r) => r.time < missing).every((r) => r.level > 1.5));
+  });
+
   it("reads extremes once, for their datum and rows", async () => {
     const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
     const dir = seriesDir(store, "extremes", "coops", "8000001");

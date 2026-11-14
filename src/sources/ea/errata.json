@@ -28,6 +28,42 @@
       "error": "The EA's Dover levels sit about 4.6 m low from 29 May to 18 June 2026.",
       "response": "29 May to 18 June 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. The store's QC already flags the gauge's values from 19 June to 31 August.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against REFMAR's Calais (`refmar/55`) and Boulogne-sur-Mer (`refmar/111`): the differences are −3.84 and −4.78 m before and after the span and −8.41 and −9.37 m over it."
+    },
+    {
+      "id": "ea-archive-missing-2026-07-25",
+      "stations": "every station",
+      "since": "2026-07-25",
+      "until": "2026-07-26",
+      "handling": "kept",
+      "error": "The EA's archive has no daily file for 25 July 2026, though it holds the days around it; `GET /archive/readings-2026-07-25.csv` answers 404.",
+      "response": "The day has no values from the archive, and the store keeps what it holds for it; the rest of its month is read as usual.",
+      "evidence": "Found in November 2026, when every EA station's 2026 file in the store had no values for July or August. The archive also has no file for 25 July, 16 August or 20 August 2026, and the readings API keeps only about 30 days, so nothing else holds the day.",
+      "reported": null,
+      "report": null
+    },
+    {
+      "id": "ea-archive-missing-2026-08-16",
+      "stations": "every station",
+      "since": "2026-08-16",
+      "until": "2026-08-17",
+      "handling": "kept",
+      "error": "The EA's archive has no daily file for 16 August 2026, though it holds the days around it; `GET /archive/readings-2026-08-16.csv` answers 404.",
+      "response": "The day has no values from the archive, and the store keeps what it holds for it; the rest of its month is read as usual.",
+      "evidence": "Found in November 2026, when every EA station's 2026 file in the store had no values for July or August. The archive also has no file for 25 July, 16 August or 20 August 2026, and the readings API keeps only about 30 days, so nothing else holds the day.",
+      "reported": null,
+      "report": null
+    },
+    {
+      "id": "ea-archive-missing-2026-08-20",
+      "stations": "every station",
+      "since": "2026-08-20",
+      "until": "2026-08-21",
+      "handling": "kept",
+      "error": "The EA's archive has no daily file for 20 August 2026, though it holds the days around it; `GET /archive/readings-2026-08-20.csv` answers 404.",
+      "response": "The day has no values from the archive, and the store keeps what it holds for it; the rest of its month is read as usual.",
+      "evidence": "Found in November 2026, when every EA station's 2026 file in the store had no values for July or August. The archive also has no file for 25 July, 16 August or 20 August 2026, and the readings API keeps only about 30 days, so nothing else holds the day.",
+      "reported": null,
+      "report": null
     }
   ],
   "retired": []

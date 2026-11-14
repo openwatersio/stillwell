@@ -151,24 +151,15 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
   const split = Math.max(start.getTime(), dayOf(Date.now()) - API_DAYS * DAY_MS);
   const until = Math.min(split, end.getTime());
   const out: Observation[] = [];
-  // Backfill replaces each month it gets values for, so a month with a day the
-  // archive no longer holds gives none, from the archive or the API, keeping
-  // what the store has for it.
-  const missing = new Set<string>();
-  const monthOf = (t: number) => new Date(t).toISOString().slice(0, 7);
   // A start within the API's days reads no archive file, not even its own day's.
   for (let day = dayOf(start.getTime()); start.getTime() < until && day < until; day += DAY_MS) {
-    if (missing.has(monthOf(day))) continue;
     const today = archiveDay(day);
     // The next few days download while this one is read, rather than one at a time.
     for (let ahead = day + DAY_MS; ahead < Math.min(day + 4 * DAY_MS, until); ahead += DAY_MS)
       archiveDay(ahead).catch(() => {});
-    const file = await today;
-    if (!file) {
-      missing.add(monthOf(day));
-      continue;
-    }
-    const pairs = file.get(measure) ?? [];
+    // A day the archive doesn't hold gives nothing, and backfill keeps what the
+    // store has for it (`keepsStored`).
+    const pairs = (await today)?.get(measure) ?? [];
     for (let i = 0; i < pairs.length; i += 2)
       if (pairs[i]! >= start.getTime() && pairs[i]! < until)
         out.push(reading(pairs[i]!, pairs[i + 1]!));
@@ -178,23 +169,13 @@ export async function levels(measure: string, start: Date, end: Date): Promise<O
       `${API}/id/measures/${measure}/readings?since=${new Date(split).toISOString()}&_sorted&_limit=10000`,
       { fresh: true },
     );
-    const times = items
-      .filter((r) => typeof r.value === "number")
-      .map((r) => Date.parse(r.dateTime));
     for (const r of items.toReversed()) {
       const time = Date.parse(r.dateTime);
       if (typeof r.value === "number" && time >= split && time < end.getTime())
         out.push(reading(time, r.value));
     }
-    // An answer that's empty, or starts more than a day late, as when the API
-    // isn't serving the measure or keeps fewer days, would leave the split's
-    // month without the days between.
-    // Only where the archive gave the days before; a range within the API's
-    // days, as compaction's, has no other copy to keep.
-    if (split > start.getTime() && (!times.length || Math.min(...times) > split + DAY_MS))
-      missing.add(monthOf(split));
   }
-  return out.filter((o) => !missing.has(monthOf(o.time)));
+  return out;
 }
 
 const reading = (time: number, level: number): Observation => ({
@@ -238,18 +219,21 @@ async function fetchDay(day: number): Promise<Day> {
     csv = await getText(`${API}/archive/readings-${date}.csv`, { fresh: true });
   } catch (error) {
     // The archive keeps about a year; a day outside it answers 404. One well
-    // inside it is a gap, reported loudly, but still only drops its month, so
-    // a day the EA never publishes doesn't block the rest of the year.
+    // inside it is a gap, reported loudly, but gives only that day nothing, so
+    // a day the EA never publishes doesn't block the rest of its month:
+    // erratum `ea-archive-missing-2026-07-25`,
+    // erratum `ea-archive-missing-2026-08-16`,
+    // erratum `ea-archive-missing-2026-08-20`.
     if (!/returned 404$/.test((error as Error).message)) throw error;
     if (day > Date.now() - ARCHIVE_DAYS * DAY_MS)
       console.error(
-        `::error::EA archive has no ${date}, inside the year it keeps; its month is left out`,
+        `::error::EA archive has no ${date}, inside the year it keeps; the store keeps what it has for the day`,
       );
-    else console.warn(`EA archive has no ${date}; its month is left out`);
+    else console.warn(`EA archive has no ${date}; the store keeps what it has for the day`);
     return null;
   }
   // A file in another shape, or without a single tide gauge reading, fails
-  // rather than read as a day with nothing, which would drop its month quietly.
+  // rather than read as a day with nothing, which would hide the gap.
   if (!csv.startsWith("dateTime,measure,value"))
     throw new ArchiveShapeError(`EA archive ${date} isn't the CSV it was`);
   const parsed = parseArchive(csv);
@@ -301,4 +285,5 @@ export const source: Source = {
   metadata,
   stations,
   observations: (s: Station, start, end) => levels(measureOf(s), start, end),
+  keepsStored: true,
 };
