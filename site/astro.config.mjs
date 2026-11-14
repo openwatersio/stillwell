@@ -51,6 +51,7 @@ export default defineConfig({
         {
           label: "Reference",
           items: [
+            "docs/reference/files",
             "docs/reference/stations",
             "docs/reference/observations",
             "docs/reference/predictions",

@@ -8,7 +8,7 @@ sidebar:
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:40 UTC.
+Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:45 UTC.
 
 A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#building-paths-in-code). To read several files at once, see [Reading many files](/docs/getting-started/#read-its-levels).
 
@@ -93,7 +93,7 @@ ORDER BY r.time DESC LIMIT 1`}
 
 ## Which years exist
 
-HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy).
+HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy). A year between a station's first and last rows with no row of its own has no values. The years list is also more current than `first` and `last` in `stations.parquet`, which trail it by up to a day.
 
 <Schema resource="years" />
 
@@ -120,3 +120,5 @@ WHERE id = 'rws/hoekvanholland' AND year >= 2020`}
 ### Keeping a local copy
 
 To keep a local copy of a year, read its row in the years list first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum.
+
+Every file is served with `Cache-Control: no-cache`, since any of them can be rewritten, past years included, so a browser checks the `ETag` before it reuses a copy and gets a short `304` when nothing has changed. A file uploaded in several parts has an `ETag` that isn't its MD5.

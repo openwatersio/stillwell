@@ -55,6 +55,8 @@ A link to an ID more than 10 km away is dropped as a wrong ID. A link by nearnes
 8. it has the finer interval;
 9. it has the lower ID.
 
+A copy is a series another source relays: a UHSLC station whose contributor isn't UHSLC, or isn't on file; a REFMAR station named for UHSLC; a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs; and a USGS station beside a CRMS one, since USGS relays some CRMS gauges in real time. Where a source has no years list, the record test uses the station's whole span. Once no station in a group still reports, the later tests decide, so the originator's longer record wins over the series that ended last, and `preferred` can name a series that stopped years before another did.
+
 Because the tests read the current store, `preferred` can change from one build to the next. It moves when a series stops reporting, when another's record grows longer, or when the share of values flagged suspect or bad changes. Commercial terms rank above reporting, so `preferred` can name a stopped series when the group's live one bars commercial use.
 
 If your work must be reproducible, such as a datum reduction, record the station you read rather than looking up `preferred` again later.

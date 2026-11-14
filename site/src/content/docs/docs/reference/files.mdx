@@ -1,0 +1,50 @@
+---
+title: Files
+description: Every file the store publishes, how its rows are sorted for reading one station, and the machine-readable description of them all.
+sidebar:
+  order: 0
+---
+
+import Schema from "../../../../components/Schema.astro";
+
+Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS without an account.
+
+## Water levels
+
+- [Observations](/docs/reference/observations/#observed-levels): `obs/<source>/<station>/<year>.parquet`, one file per station per UTC year.
+- [Observed extremes](/docs/reference/observations/#observed-extremes): `extremes/<source>/<station>/<year>.parquet`, the source's high and low waters.
+- [The last 7 days](/docs/reference/observations/#the-latest-values): `recent/<source>.parquet`, every live station of a source in one file, rewritten every hour.
+- [Predictions](/docs/reference/predictions/#predicted-curve): `predictions/<source>/<station>/<year>.parquet`, the source's predicted curve.
+- [Predicted extremes](/docs/reference/predictions/#predicted-extremes): `predicted-extremes/<source>/<station>/<year>.parquet`, the source's predicted high and low waters.
+
+## Stations and sources
+
+- [`stations.parquet`](/docs/reference/stations/): one row per station.
+- [`sources.json`](/docs/reference/sources/): each source's license, credit, contact and terms.
+- [`errata.json`](/docs/reference/errata/): errors found in what sources publish, and what the store does about each.
+- [`stations/offsets.parquet`](/docs/reference/offsets/): the meters to add to a level in each station's datum epoch to refer it to each datum.
+- [`stations/links.parquet`](/docs/reference/links/): offsets measured each month between the levels of linked stations.
+- [`stations/years/<source>.parquet`](/docs/reference/observations/#which-years-exist): every year file of observed levels, with its count of values by flag.
+- [`stations/<source>.parquet`](#source-station-lists): one source's own list of stations.
+- [`stations/analysis/<source>.parquet`](#station-analysis): what the store measures from each station's levels.
+- `history/stations/<source>/<time>.parquet` and `.json`: each refresh's previous list of a source's stations, in the layout of its time, and a report of what the refresh changed.
+
+## Reading one station
+
+`stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station, in row groups of 2,048 rows whose statistics give each group's first and last station. A reader that filters on one station and fetches only the byte ranges it needs, as DuckDB, Polars and hyparquet do, reads the file's footer and the one or two groups holding that station rather than the whole file. `stations/links.parquet` has the same groups sorted by `a`, so only a filter on `a` skips them. `recent/<source>.parquet` is sorted by `station` in much larger row groups.
+
+## Machine-readable description
+
+[`datapackage.json`](https://stillwell.openwaters.io/datapackage.json) describes each file but those under `history/` as a resource of a [Frictionless Data Package](https://datapackage.org/): its path, each column's type, whether it can be null and what it means, and how its rows are sorted. The column descriptions on these pages come from it. Besides the standard Table Schema properties, each field has `duckdbType`, the type the files are written with, and `optional` where some files lack the column, such as `source_flag` in older files. A resource whose path has a `<placeholder>` gives one real file as its `path` and the layout as `pattern`. [`sources.schema.json`](https://stillwell.openwaters.io/sources.schema.json) and [`errata.schema.json`](https://stillwell.openwaters.io/errata.schema.json) are the JSON Schemas of the two JSON files.
+
+## Source station lists
+
+`stations/<source>.parquet` is one source's list as the store keeps it between refreshes: every station the source has listed, with the source's own fields beside them in `extra`. `stations.parquet` is built from these lists, with the columns worked out across sources added.
+
+<Schema resource="lists" />
+
+## Station analysis
+
+`stations/analysis/<source>.parquet` has a row for each station whose levels the store has measured: whether they carry a tide, the step between values that `stations.parquet` uses as `interval_s` where the source gives none, and the measures behind them.
+
+<Schema resource="analysis" />

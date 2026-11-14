@@ -1,6 +1,6 @@
 # Station lists in the store
 
-Each source's station list lives in the store, not in git. A new source adds only code: its adapter, README, fixtures and tests. No ingest run changes a file in the repo. A station that changes datum, once or many times, stays active: each datum epoch gets series files of its own, and `stations.parquet` says how to put the epochs together.
+Each source's station list is a file in the store, `stations/<source>.parquet`, which each refresh rewrites. A new source adds only code: its adapter, README, fixtures and tests. A station that changes datum, once or many times, stays active: each datum epoch gets series files of its own, and `stations.parquet` says how to put the epochs together.
 
 ## What a list holds
 
@@ -12,31 +12,15 @@ The lists hold three kinds of thing:
 
 ## Datum epochs
 
-An epoch is a span over which a station's levels share one reference. A zero reset, a change of datum name, and a change back each start a new epoch. The label alone can't tell them apart: a reset keeps the label (`GZ` before and after) while the reference moves.
+[Datum epochs](https://openwatersio.github.io/stillwell/docs/guides/datums/#datum-epochs) on the site describes epochs for readers: what opens one, their files, and how they convert. The [`epochs` column](https://openwatersio.github.io/stillwell/docs/reference/stations/#column-epochs) describes each field. This section is how the store keeps them.
 
-**Each epoch has its own series files, and no file is ever rewritten into another epoch.** Epoch 1 uses the plain path, and later epochs add the epoch number:
+Nothing moves when an epoch opens, so there's no rebase to resume, no file half in one epoch and half in another, and nothing to archive. Compaction and `recent` write into the station's current epoch. `recent/<source>.parquet` has an `epoch` column, so compaction folds each row into the right file, and reads a file without one as epoch 1.
 
-```
-obs/<source>/<station>/<year>.parquet           epoch 1
-obs/<source>/<station>/<epoch>/<year>.parquet   epoch 2 and later
-```
-
-The same goes for `extremes/`, `predictions/` and `predicted-extremes/`. Every file still holds one `datum` on every row, and that datum matches its own epoch. Nothing moves when an epoch opens, so there's no rebase to resume, no file half in one epoch and half in another, and nothing to archive. Compaction and `recent` write into the station's current epoch. `recent/<source>.parquet` has an `epoch` column, so compaction folds each row into the right file, and reads a file without one as epoch 1.
-
-The station's list entry carries its epochs:
-
-```
-epochs: [{ id, datum, since, until, seen, reference, reference_since, datums, to_current, state }]
-```
-
-- `id` counts up from 1 and is never reused. The next `id` is above the list's epochs, any epoch directory already in the store for any product, and any epoch the recent window still has rows for, so a list restored from a snapshot can't hand out an `id` that already has files or rows.
-- `since` and `until` are instants in UTC. The first epoch's `since` is null when the record has no known start, and the current epoch has no `until`. Rows in an epoch's files outside `[since, until)` aren't part of the series. That's how the uncertain stretch around a change stays out without being moved.
-- `seen` is the last refresh whose fetch named this epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.
-- `reference` is what the source says identifies the reference, where it says anything: PEGELONLINE's `gaugeZero.validFrom`, or the research-quality version letter a UHSLC series carries. A source with no such field can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves, and Kartverket when chart datum moves more than a centimeter against NN2000; the reason it gives stands in for the reference, and the epoch starts at that refresh, since USGS gives no date.
-- `reference_since` is where the source says `reference` starts, or null. A first epoch with no `since` learns it on the first refresh that sees it, so a later change can still be held for coming soon after it, or before it.
-- `datums` holds the offsets to other datums. The current epoch's follow the source, refresh by refresh, as the source's list's `datums` does. An epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
-- `to_current` is the meters to add to the epoch's levels to put them in the current epoch's datum, or null when they can't be converted (below). Every refresh recomputes it from the frozen offsets and the current ones.
-- `state` is `open`, `closed`, `held` (below) or `rejected`.
+- `id`: the next `id` is above the list's epochs, any epoch directory already in the store for any product, and any epoch the recent window still has rows for, so a list restored from a snapshot can't hand out an `id` that already has files or rows.
+- `reference`: a source with no field naming its reference can instead say, through `seriesChanged`, that a station kept its label but not its zero. USGS does when a station's `time_series_id` changes or its gage datum moves, and Kartverket when chart datum moves more than a centimeter against NN2000; the reason it gives stands in for the reference.
+- `reference_since`: a first epoch with no `since` learns it on the first refresh that sees it, so a later change can still be held for coming soon after it, or before it.
+- `datums`: an epoch's offsets are frozen when it closes, at the values in the list as the refresh that closed it started, before any fetch could change them.
+- `to_current`: every refresh recomputes it from the frozen offsets and the current ones.
 
 Overrides name an epoch by the station and the epoch's `since`, not by `id`, so they still point at the right epoch after a list is restored and `id`s are handed out again.
 
@@ -47,19 +31,7 @@ A station listed in the wrong datum before it held any values is corrected rathe
 - a rejected epoch carries the `to_current` of the epoch before it, plus any offset its override gives, and that epoch's span runs on to the next epoch that isn't rejected;
 - a held epoch carries a null `to_current`.
 
-A station's whole series in its current datum is then:
-
-```sql
--- obs: the station's files, with `epoch` taken from each file's path (1 for the plain path)
-SELECT o.time, o.level_m + e.to_current AS level_m, o.flag
-FROM epochs e JOIN obs o ON o.epoch = e.id
-  AND (e.since IS NULL OR o.time >= e.since) AND (e.until IS NULL OR o.time < e.until)
-WHERE e.to_current IS NOT NULL
--- after a rejected epoch, its files and the epoch before it can share a time; the latter wins
-QUALIFY row_number() OVER (PARTITION BY o.time ORDER BY e.state = 'rejected') = 1
-```
-
-[data.md](data.md#datum-epochs) gives the full query. A reader that reads one epoch's files gets one datum. Rows from an epoch that can't be converted stay in the store, readable in their own datum, but outside the combined series.
+[Reading a whole record](https://openwatersio.github.io/stillwell/docs/guides/datums/#reading-a-whole-record) on the site gives the query that puts the epochs together. A reader that reads one epoch's files gets one datum. Rows from an epoch that can't be converted stay in the store, readable in their own datum, but outside the combined series.
 
 ### When an epoch opens
 
@@ -123,7 +95,7 @@ A station that keeps changing is held. A change within 180 days of the current e
 
 ## Store layout
 
-The files ingest keeps for each source, beside the ones in [data.md](data.md#layout). `<station>` is the `source_id`, which needs no URL-encoding.
+The files ingest keeps for each source, beside the ones in [Files reference](https://openwatersio.github.io/stillwell/docs/reference/files/). `<station>` is the `source_id`, which needs no URL-encoding.
 
 ```
 stations/<source>.parquet                    one source's list: every station it has listed but withheld ones, with epochs
@@ -141,7 +113,7 @@ history/analysis/<source>/<time>.json        stations whose QC an analyze run ch
 
 - **`stations/<source>.parquet`** has the `stations.parquet` columns except `first`, `last`, `preferred`, `errata`, `tidal`, `tide_m`, `datums_source`, `datums_epoch`, `datums_attribution`, `chart_datum`, `frame`, `source_qc_start` and `source_qc_start_inferred`, plus `epochs` and an `extra` JSON column. `extra` holds `source_qc_start` and `source_qc_start_inferred`, absent for a station the adapter hasn't asked about yet, and the source's own fields (USACE `series`/`series_since`/`zero_since`/`datums_from`, CO-OPS `established`/`removed`/`datums_period`, PEGELONLINE `history_since`, UHSLC `version`/`record_start`/`record_end`, GESLA `contributor`/`originator`/`datum_information`/`record_quality`/`record_start`/`record_end`, SMHI `record_start`/`record_end`/`inferred_qc_start`, JMA and the Marine Institute `record_start`/`record_end`, Kartverket `record_start`, REFMAR `first_observation`, California DWR `parameter`/`record_start`/`record_end`, CDEC `record_start`/`record_end`, DMI `parameter`/`owner`/`record_start`/`record_end`, SFWMD `series`/`series_start`/`series_end`/`history`/`history_start`/`history_end`/`record_start`/`record_end`). Reading a list spreads `extra` back onto each station, so adapters, `backfill` and `recent` see those fields on each station. USACE's `zero_since` becomes the current epoch's `since`.
 - **`stations.parquet`** and `sources.json` are rebuilt from the per-source lists and bounds, by Compact daily each night and by Monthly after a refresh; a source joins `sources.json` with its first list. All the state is in those, so the published file can always be rebuilt. `errata.json` and each station's `errata` come from the errata files in the repository as they stand when publish runs, not from the store. Each of them is written only by jobs in its source's group: the refresh and a restore write the list, and compaction and backfill write the bounds.
-- **`stations/years/<source>.parquet`** lists every year file of levels, in every epoch, as [data.md](data.md#which-years-a-station-has) describes for readers. Backfill and requalify mark each batch of 100 stations before writing any of their files and set those files' rows after, and compaction does the same for each batch it folds; a file a run didn't write keeps its row. After its fold, compaction lists the source's files, drops the rows of files that are gone, reads the files that have no row and every file of a station still marked, which a run stopped partway leaves, and clears the marks. It reads at most 5,000 files a night, leaving the rest's stations marked for the next, and a file it can't read keeps its station marked, and fails the run so a person looks, without holding up the rest. A station's files are read together, so the limit leaves few stations part-read. `withhold`, and each refresh, drop withheld stations' rows. Compaction leaves out withheld stations' files, so their rows don't come back between a refresh and `withhold`. A batch compaction can't mark still folds, since its rows would age out of the window, and its stations' files are read again after the fold. A mark belongs to the run that set it: a later run that writes the same station leaves an earlier stopped run's mark for the reconcile. A source's first refresh starts the file empty; a source with files but no years file gets none from these runs, since compaction can't read every file in its time, until `ingest years <source>` reads them all, writing what it has every 5,000 files with the stations it hasn't finished marked, so a run stopped by its time limit picks up where it left off when run again without `--rebuild-years`; until then, compaction goes on with it 5,000 files a night. Anything that writes year files without keeping the years file, such as a rollback to a build from before the years file, a run from an older local checkout or a restore of `obs/`, leaves rows whose version no longer matches the file. Compaction doesn't compare versions, so it rereads such a station only if a stopped run left it marked; afterwards run `ingest years <source> --rebuild-years` for each source it wrote, as [CONTRIBUTING.md](../CONTRIBUTING.md#running-ingest) says. Each station's `first` and `last` in `stations.parquet` still come from the bounds, which apply each epoch's `since` and `until` to the rows and hold the earliest preliminary value; the years file counts whole files, so a reader that needs the record as it stands now, rather than as of the last publish, reads it.
+- **`stations/years/<source>.parquet`** lists every year file of levels, in every epoch, as [Observations reference](https://openwatersio.github.io/stillwell/docs/reference/observations/#which-years-exist) describes for readers. Backfill and requalify mark each batch of 100 stations before writing any of their files and set those files' rows after, and compaction does the same for each batch it folds; a file a run didn't write keeps its row. After its fold, compaction lists the source's files, drops the rows of files that are gone, reads the files that have no row and every file of a station still marked, which a run stopped partway leaves, and clears the marks. It reads at most 5,000 files a night, leaving the rest's stations marked for the next, and a file it can't read keeps its station marked, and fails the run so a person looks, without holding up the rest. A station's files are read together, so the limit leaves few stations part-read. `withhold`, and each refresh, drop withheld stations' rows. Compaction leaves out withheld stations' files, so their rows don't come back between a refresh and `withhold`. A batch compaction can't mark still folds, since its rows would age out of the window, and its stations' files are read again after the fold. A mark belongs to the run that set it: a later run that writes the same station leaves an earlier stopped run's mark for the reconcile. A source's first refresh starts the file empty; a source with files but no years file gets none from these runs, since compaction can't read every file in its time, until `ingest years <source>` reads them all, writing what it has every 5,000 files with the stations it hasn't finished marked, so a run stopped by its time limit picks up where it left off when run again without `--rebuild-years`; until then, compaction goes on with it 5,000 files a night. Anything that writes year files without keeping the years file, such as a rollback to a build from before the years file, a run from an older local checkout or a restore of `obs/`, leaves rows whose version no longer matches the file. Compaction doesn't compare versions, so it rereads such a station only if a stopped run left it marked; afterwards run `ingest years <source> --rebuild-years` for each source it wrote, as [CONTRIBUTING.md](../CONTRIBUTING.md#running-ingest) says. Each station's `first` and `last` in `stations.parquet` still come from the bounds, which apply each epoch's `since` and `until` to the rows and hold the earliest preliminary value; the years file counts whole files, so a reader that needs the record as it stands now, rather than as of the last publish, reads it.
 - **`stations/analysis/<source>.parquet`** has a row per station `analyze` has judged: `id`, `analyzed`, `rules`, `judge`, `tidal`, `tide_m`, `days`, `drains`, `step_s` and `requalified` ([Analysis](#analysis)). `listOf` merges `tidal` and `tide_m` into each station as ingest reads its list, and publish puts them in `stations.parquet`, with `step_s`, the most common step between the last year's values, as `interval_s` where the source gives none. Ingest, `same_as` ranking and `links` keep the source's own `interval_s`, null or not. A file written before `step_s` was kept has no such column, and its rows read as null until `analyze` judges them again. `analyze` writes it in its source's group, and withholding drops withheld stations' rows from it and its history.
 - **`<time>`** is the refresh's start time to the second, so a re-run never overwrites an earlier snapshot.
 - **Restricted sources.** A source's `license.redistribution` decides which store holds its list, history and series: a source whose terms bar republishing goes to the restricted store, which keeps its own `stations.parquet`. `commercial_use` is a tag on each station, which can differ from its source's default, and doesn't move a station between stores.
@@ -192,7 +164,7 @@ A new source's list starts with its first refresh. A source with no list and no 
 
 ## Gauges in more than one source
 
-Many gauges are in more than one source: UHSLC carries copies of CO-OPS, REFMAR, Kartverket, SMHI and other agencies' gauges, REFMAR some of UHSLC's, BSH lists PEGELONLINE's gauges for its predictions, and USACE districts publish many USGS gauges. `stations.parquet` links the stations that share a gauge with `same_as`, and names the one to use for its observed levels with `preferred`. Both are worked out each time the file is built, in `linkGauges` ([`src/same-as.ts`](../src/same-as.ts)). A source's list keeps only its adapter's own links in `same_as`, so a better rule or a change to `LINKS`, `UNLINKS` or `PREFER` reaches every station at the next `publish`, while an adapter's new links wait for its next station refresh. `preferred` is worked out again on every build too, so it moves when a series stops reporting, another's record grows longer, or the share of a record's values flagged suspect or bad changes.
+[Stations](https://openwatersio.github.io/stillwell/docs/guides/stations/) on the site describes how stations that share a gauge are linked with `same_as` and which one `preferred` names. Both are worked out each time the file is built, in `linkGauges` ([`src/same-as.ts`](../src/same-as.ts)). A source's list keeps only its adapter's own links in `same_as`, so a better rule or a change to `LINKS`, `UNLINKS` or `PREFER` reaches every station at the next `publish`, while an adapter's new links wait for its next station refresh. `preferred` is worked out again on every build too, so it moves when a series stops reporting, another's record grows longer, or the share of a record's values flagged suspect or bad changes.
 
 **Matching.** A link comes from one of four places:
 
@@ -230,7 +202,7 @@ A station with no links is its own preferred series. A series that allows commer
 - [`src/stations.ts`](../src/stations.ts): `mergeStationList`, which opens epochs rather than marking a station inactive.
 - [`src/refresh.ts`](../src/refresh.ts): a source's refresh with its guards and report, and the rebuild of `stations.parquet`, `sources.json`, `errata.json` and `datapackage.json`.
 - [`src/same-as.ts`](../src/same-as.ts): `same_as` and `preferred` across sources, with the decisions in `LINKS`, `UNLINKS` and `PREFER`.
-- [`src/datums.ts`](../src/datums.ts): `tide_station`, MSL, LAT and chart datum from slackwater-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list, which holds only what feeds them, such as CO-OPS's `datums_period` ([data.md](data.md#stations)).
+- [`src/datums.ts`](../src/datums.ts): `tide_station`, MSL, LAT and chart datum from slackwater-database or a linked series, with `datums_source`, `datums_epoch`, `chart_datum` and `frame`, and `stations/offsets.parquet`, all set as `stations.parquet` is built, never in a source's list, which holds only what feeds them, such as CO-OPS's `datums_period` ([stations reference](https://openwatersio.github.io/stillwell/docs/reference/stations/)).
 - [`src/links.ts`](../src/links.ts): offsets measured between linked series that share no reference, in `stations/links.parquet`, which `src/datums.ts` carries offsets through.
 - [`src/store/`](../src/store/): epoch paths, the `epoch` column in `recent`, readers and writers for the lists, bounds and history, and an HTTPS reader for the public bucket.
 - [`scripts/ingest.ts`](../scripts/ingest.ts): `stations`, `backfill` and `recent` read the lists from the store, write the current epoch, and skip held stations; `backfill` writes closed epochs too for an `archive: "previous"` source or a station with a split (`epochSpans` in [`src/backfill.ts`](../src/backfill.ts)).

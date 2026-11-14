@@ -69,14 +69,15 @@ const EPOCH_FIELDS: Column[] = [
     name: "seen",
     type: "TIMESTAMPTZ",
     nullable: true,
-    description: "The last station refresh whose fetch named the epoch's datum.",
+    description:
+      "The last station refresh whose fetch named the epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.",
   },
   {
     name: "reference",
     type: "VARCHAR",
     nullable: true,
     description:
-      "The source's own name for the reference the levels are measured against, where it gives more than the datum's label.",
+      "The source's own name for the reference the levels are measured against, where it gives more than the datum's label, such as PEGELONLINE's `gaugeZero.validFrom` or the research-quality version of a UHSLC series. For USGS and Kartverket it is the reason the source gave for a series changing.",
   },
   {
     name: "reference_since",
@@ -88,7 +89,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "datums",
     type: "MAP(VARCHAR, DOUBLE)",
     description:
-      "Meters to add to a level in the epoch's `datum` to refer it to each other datum, as the station's `datums`; frozen when the epoch closes.",
+      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. They follow the source in the current epoch and are frozen when the epoch closes.",
   },
   {
     name: "to_current",
@@ -155,7 +156,7 @@ const STATION_COLUMNS: Column[] = [
     type: "INTEGER",
     nullable: true,
     description:
-      "The station's usual interval between values, in seconds: the source's, or where it gives none, the most common step between its last year's values (`step_s` in its analysis); null where neither says.",
+      "The station's usual interval between values, in seconds: the source's, or where it gives none, the most common step between its last year's values (`step_s` in its analysis). The store measures the step at least once a year, so a change in sampling can take up to a year to show, and a station that samples irregularly, such as SFWMD, gets its most common gap. Null where neither says, as for a station not yet measured.",
   },
   {
     name: "datum",
@@ -263,7 +264,7 @@ const STATION_COLUMNS: Column[] = [
     name: "status",
     type: "VARCHAR",
     description:
-      "`active` or `inactive`. A station the source stops listing stays in the store, inactive, with its history.",
+      "`active` or `inactive`. A station the source stops listing, or lists as ended (such as a CO-OPS station with a `removed` date), stays in the store, inactive, with its history, so its ID is never reused. A station withheld at its owner's request is removed entirely.",
   },
   {
     name: "live",
@@ -290,7 +291,7 @@ const STATION_COLUMNS: Column[] = [
     type: "BOOLEAN",
     nullable: true,
     description:
-      "Whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false); null without one.",
+      "Whether the store inferred `source_qc_start` from the source's flags (true) or the source stated it (false); null without one, or where the station refresh hasn't read one yet. An inferred date is the store's reading of the flags, worked out once and kept. Filter on `source_qc_start_inferred = false` to keep only dates the source stated.",
   },
   {
     name: "tidal",
@@ -303,7 +304,8 @@ const STATION_COLUMNS: Column[] = [
     name: "tide_m",
     type: "DOUBLE",
     nullable: true,
-    description: "The amplitudes of M2 and O1 added, in meters, that `tidal` is judged by.",
+    description:
+      "The amplitudes of M2 and O1 added, in meters, that `tidal` is judged by. Null where the usable values span under 30 days or are sampled too coarsely to fit (median step over 3 hours), and before the station's first measurement.",
   },
   {
     name: "source_url",
@@ -362,7 +364,7 @@ const SOURCE_FLAG: Column = {
   nullable: true,
   optional: true,
   description:
-    "The source's own flag on the same scale, before the store's quality checks; null in predictions and some older values, and missing from some older files.",
+    "The source's own flag on the same scale, before the store's quality checks; null in predictions and some older values, and missing from some older files. Where an older value's `source_flag` is null and its `flag` is better than suspect, the `flag` is the source's; a suspect or bad one may be the store's own quality check.",
 };
 
 const RECEIVED: Column = {
@@ -371,7 +373,7 @@ const RECEIVED: Column = {
   nullable: true,
   optional: true,
   description:
-    "When ingest first saw the value arrive; null for backfilled history, and missing from some older files.",
+    "When the store first saw the value arrive; null for backfilled history, and missing from some older files.",
 };
 
 const TIME: Column = {
@@ -491,7 +493,8 @@ export const FILES = {
       {
         name: "until",
         type: "TIMESTAMPTZ",
-        description: "The end of the window measured, in UTC, exclusive.",
+        description:
+          "The end of the window measured, in UTC, exclusive: the end of the year, or one sampling interval (the source's `interval_s`, or a minute) after the last value either station holds, whichever comes first.",
       },
       {
         name: "hours",
@@ -670,7 +673,18 @@ export const FILES = {
     example: "predictions/rws/hoekvanholland/2024.parquet",
     title: "Predicted levels",
     description: `The source's predicted curve for one UTC year. ${SERIES_NOTE}`,
-    columns: [TIME, LEVEL("predicted level"), FLAG, SOURCE_FLAG, RECEIVED, DATUM],
+    columns: [
+      TIME,
+      LEVEL("predicted level"),
+      FLAG,
+      SOURCE_FLAG,
+      {
+        ...RECEIVED,
+        description:
+          "Always null: predictions are fetched in bulk, never as they come in; missing from some older files.",
+      },
+      DATUM,
+    ],
     sort: ["time"],
   },
   "predicted-extremes": {
