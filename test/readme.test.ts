@@ -73,7 +73,7 @@ describe("readmeText", () => {
     assert.equal(text, "See the plan and withheld stations, and [the code](../../stations.ts).");
   });
 
-  it("gives every adapter's README a Running ingest section last, if it has operating notes", () => {
+  it("lays out every adapter's README as its source page needs", () => {
     for (const id of readdirSync(SOURCES, { withFileTypes: true })) {
       if (!id.isDirectory()) continue;
       let markdown: string;
@@ -90,6 +90,22 @@ describe("readmeText", () => {
       const at = sections.indexOf("Running ingest");
       if (at >= 0)
         assert.equal(at, sections.length - 1, `${id.name}: ## Running ingest is the last section`);
+      // The page lists errata from errata.json, so an Errata section holds only bullets that point at one.
+      const errata = markdown.match(/^## Errata\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? "";
+      for (const bullet of errata.match(/^- .*/gm) ?? [])
+        assert.match(bullet, /\(.*erratum `/, `${id.name}: an Errata bullet names its erratum`);
+      // What the page shows: none of the runbook, and no link a reader can't follow.
+      const shown = readmeText(markdown);
+      assert.doesNotMatch(
+        shown,
+        /^#+ (Running ingest|Backfill)/m,
+        `${id.name}: shows ingest notes`,
+      );
+      assert.doesNotMatch(
+        shown,
+        /\]\((\.\.\/)+(docs\/|CONTRIBUTING)/,
+        `${id.name}: links into docs/`,
+      );
     }
   });
 });

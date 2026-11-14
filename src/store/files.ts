@@ -88,7 +88,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "datums",
     type: "MAP(VARCHAR, DOUBLE)",
     description:
-      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they keep up with the source's own offsets, keeping any the source has since left out; they're frozen when the epoch closes.",
+      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they're the source's latest offsets, kept as they were when a refresh brings none and while the station is held; they're frozen when the epoch closes.",
   },
   {
     name: "to_current",
@@ -263,7 +263,7 @@ const STATION_COLUMNS: Column[] = [
     name: "status",
     type: "VARCHAR",
     description:
-      "`active` or `inactive`. A station the source stops listing, or lists as ended (such as a CO-OPS station with a `removed` date), stays in the store, inactive, with its history, so its ID is never reused. A station withheld at its owner's request is removed entirely.",
+      "`active` or `inactive`. A station the source stops listing, lists as ended (such as a CO-OPS station with a `removed` date), or that has stopped reporting by its source's own test (as at DWR, JODC, CDEC, SFWMD, JMA and SMHI), stays in the store, inactive, with its history, so its ID is never reused; so does a record set aside as another gauge's, such as GESLA's Uddevalla. A station withheld at its owner's request is removed entirely.",
   },
   {
     name: "live",
