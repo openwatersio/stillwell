@@ -27,7 +27,7 @@ A Hetzner box, `stillwell-1`, in Helsinki. It's set up by `server/deploy/` in th
 - **`stillwell-ingest`**, a Node service running the poller: this repo's adapters and QC.
 - **`stillwell-jobs`**, a Node service running the jobs: backfill, refetch, requalify, analysis, withhold, the station refresh and the export, each in a child process with a memory limit, so a job that fails or runs out of memory never stops the poller.
 - **`stillwell-api`**, a Node service serving the API on loopback from ClickHouse and the station tables.
-- **`cloudflared`**, publishing `stillwell-api` through a Cloudflare Tunnel behind Access, so no port is open and ClickHouse is never reachable from outside.
+- **`cloudflared`**, running the Cloudflare Tunnel through which the levels Worker reaches `stillwell-api` as a Workers VPC service, so no port is open, the API has no public hostname, and only the Cloudflare account can reach the box through it.
 
 The store is about 7.3 billion rows at most across every station's span, and the live stations add about 0.9 million a day. With the codecs below, ClickHouse needs about 2 to 4 bytes a row for series like these, 15 to 30 GB in all, and 2 to 3 times that without them. The largest partition, a year of every station, is 1 to 2 GB, so the second copy a merge needs is small. The work is light: about 10 inserted rows a second, API reads of one station, and jobs that go station by station. So the box starts as a CX23 (2 vCPU, 4 GB, 40 GB disk) for step 1, with ClickHouse's `max_server_memory_usage` at 1.2 GB while it holds only the recent window, and is resized to 16 GB, such as a CX43, before step 2 moves the history in, with that limit raised to match and its merge limits set so the poller and the API keep their share, and the history loaded a source and a year at a time. Hetzner resizes a box in minutes, so it grows if the load says so.
 
@@ -110,7 +110,7 @@ From step 2, backfill, the monthly refetch, requalify, analysis, withhold and th
 
 Jobs are idempotent and resume where they stopped, as requalify does now with its per-station budget, and a job finishes only once its changes are on R2. So losing the queue loses nothing a schedule can't queue again; a job started by hand that was unfinished is started again by whoever started it.
 
-A job is started for one source, or for one station and its years, through an admin endpoint of `stillwell-api` behind its own Access service token, from a workflow or a maintainer's machine. The same endpoint shows when a job ran, how far it got and whether it succeeded, and Grafana gets queue depth, running jobs, failures and run times per kind.
+A job is started for one source, or for one station and its years, through an admin endpoint of `stillwell-api`, from a workflow or a maintainer's machine. The API has no public hostname, so how those reach the endpoint is settled when it's built. The same endpoint shows when a job ran, how far it got and whether it succeeded, and Grafana gets queue depth, running jobs, failures and run times per kind.
 
 A deploy that changes a source's `errata.json` queues a requalify of the station-years the changed entries cover.
 
@@ -120,7 +120,7 @@ A full requalify under new rules inserts a new version of most rows, which doubl
 
 `GET /water-levels/stations/{source}/{id}/levels` serves the last hours and the archive alike; there is no separate `live` endpoint. Two pieces serve it:
 
-- **`workers/api`**, bound into the api.openwaters.io gateway as `WATER_LEVELS` on `/water-levels*`. It normalizes the request into a cache key, answers from the Cache API when it can, and otherwise forwards to `stillwell-api` through the Tunnel with an Access service token held as a Worker secret. It caches what comes back by its `Cache-Control`, keeps the last good copy longer, and serves that with `status: stale` when the server doesn't answer.
+- **`workers/api`**, bound into the api.openwaters.io gateway as `WATER_LEVELS` on `/water-levels*`. It normalizes the request into a cache key, answers from the Cache API when it can, and otherwise forwards to `stillwell-api` through its Workers VPC binding. It caches what comes back by its `Cache-Control`, keeps the last good copy longer, and serves that with `status: stale` when the server doesn't answer.
 - **`stillwell-api`** on the server, which does the work:
 
 1. Check the parameters: a known `step`, a range within the limits, and in step 1 within the last 7 days, a datum the station has an offset to, and a station in the public database with `commercial_use` true, since only those are served until tokens exist ([api.md](api.md#conventions)). `stillwell-api` never reads `stillwell_restricted`.
@@ -128,7 +128,7 @@ A full requalify under new rules inserts a new version of most rows, which doubl
 3. Build the response in [api.md](api.md)'s shape: `as_of`, `updated`, `status`, `datum`, `datums`, `frame` (the station's column in `stations.parquet`), `attribution`, `notice`, and the levels with their flags.
 4. Set `Cache-Control`: a day for a range that ended more than 7 days ago, past which the poller changes nothing, otherwise the station's `min_interval_s`, at most 5 minutes.
 
-The Worker rounds a `start` and `end` given together inward to the step, which keeps the same step times, and a range relative to now, such as the default 7 days, to now rounded up to the step, or to the minute at `raw`, so every client asking for the same thing within a step shares one cache key. It passes on only stillwell-api's own JSON answers, a 200 or a 4xx other than Access's 401 and 403, with their `Cache-Control`; a redirect to Access's login page, a 5xx or no answer in 10 seconds serves the last good copy.
+The Worker rounds a `start` and `end` given together inward to the step, which keeps the same step times, and a range relative to now, such as the default 7 days, to now rounded up to the step, or to the minute at `raw`, so every client asking for the same thing within a step shares one cache key. It passes on only stillwell-api's own JSON answers, a 200 or a 4xx other than 401 and 403, which only Cloudflare sends, with their `Cache-Control`; a refusal, a 5xx or no answer in 10 seconds serves the last good copy.
 
 `stillwell-api` reuses this repo's TypeScript: the schema, the flags and the ClickHouse client. It connects as `stillwell_api`, a ClickHouse user that may read the database `stillwell` and URLs under the public store, and nothing else. The Worker is a small cache and proxy ([workers/api](../../workers/api/README.md)). `stillwell-api`'s tests run against a ClickHouse service container in CI, and the Worker's under `node:test` with the cache and the server faked.
 
