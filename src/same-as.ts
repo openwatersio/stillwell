@@ -9,7 +9,8 @@ import { km, nameScore } from "./ticon.ts";
  *
  * - **an adapter**, from an ID the source gives: BSH names each gauge's
  *   PEGELONLINE series, UHSLC's documentation files name the originator's
- *   station number, and a source links its own series of one gauge (UHSLC's
+ *   station number, GESLA's CMEMS file names start with the platform code
+ *   CMEMS's series goes by (`geslaCmems`), and a source links its own series of one gauge (UHSLC's
  *   versions, RWS's twins, a CRMS site's series as its gauge
  *   moved). A link to a station another source lists more than
  *   `ID_KM` away is dropped and reported, as a wrong ID.
@@ -149,6 +150,8 @@ const REDISTRIBUTED: Record<string, (s: Station & { contributor?: string | null 
   refmar: (s) => /\bUHSLC\b/.test(s.name),
   // GESLA assembles other agencies' records.
   gesla: () => true,
+  // Copernicus Marine's In Situ TAC relays national networks' gauges.
+  cmems: () => true,
 };
 
 export function redistributed(s: Station): boolean {
@@ -172,6 +175,7 @@ function copiesIn(group: Station[]): Set<string> {
  * Sources that assemble other agencies' records, often several of one gauge
  * (GESLA has NOAA's, UHSLC's and CMEMS's copies of many), so two of their
  * stations in a group are two copies, not two gauges, and don't keep groups apart.
+ * CMEMS relays each gauge once, so two of its stations are two gauges.
  */
 const ASSEMBLED = new Set(["gesla"]);
 
@@ -271,6 +275,10 @@ export function linkGauges<T extends Station>(
           ).add(s.id);
       }
     }
+  for (const [s, target] of geslaCmems(linkable))
+    if (!(km(s, target) <= ID_KM))
+      dropped.push({ from: s.id, to: target.id, reason: `${Math.round(km(s, target))} km apart` });
+    else add(s.id, target.id, "id");
   for (const [a, b] of nearPairs(linkable)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no
   // guess. Only the station that named it: one another source's copy names,
@@ -371,6 +379,22 @@ export function linkGauges<T extends Station>(
     })),
     report: { pairs, dropped, skipped, wide },
   };
+}
+
+/**
+ * GESLA's CMEMS records paired with CMEMS's station of the same platform:
+ * GESLA names each record's file for the platform code, CMEMS's station ID,
+ * with SHOM's `_<n>minute` where the record is one interval's file.
+ */
+export function geslaCmems<T extends Station>(stations: T[]): [T, T][] {
+  const byCode = new Map(
+    stations.filter((s) => s.source === "cmems").map((s) => [s.source_id.toLowerCase(), s]),
+  );
+  return stations.flatMap((s): [T, T][] => {
+    const code = /^gesla\/(.+)-[^-]+-[a-z]{3}-cmems$/.exec(s.id)?.[1]?.replace(/_\d+minute$/, "");
+    const target = code === undefined ? undefined : byCode.get(code);
+    return target ? [[s, target]] : [];
+  });
 }
 
 function pairKey(a: string, b: string): string {
