@@ -69,8 +69,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "seen",
     type: "TIMESTAMPTZ",
     nullable: true,
-    description:
-      "The last station refresh whose fetch named the epoch's datum. A refresh in which the source left the datum out doesn't advance it, so it says how long the old reference was really confirmed.",
+    description: "The last station refresh whose fetch named the epoch's datum.",
   },
   {
     name: "reference",
@@ -494,7 +493,7 @@ export const FILES = {
         name: "until",
         type: "TIMESTAMPTZ",
         description:
-          "The end of the window measured, in UTC, exclusive: the end of the year, or one sampling interval (the source's `interval_s`, or a minute) after the last value either station holds, whichever comes first.",
+          "The end of the window measured, in UTC, exclusive: the earliest of the end of the year measured, the end of either station's epoch, and one sampling interval (the source's `interval_s`, or a minute) after the last value either station holds.",
       },
       {
         name: "hours",

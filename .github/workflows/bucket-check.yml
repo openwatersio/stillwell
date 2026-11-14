@@ -1,9 +1,9 @@
 name: Bucket check
 
 # Read the public bucket from outside Cloudflare, the ways people do: pandas
-# and plain urllib for the root files, and DuckDB for a series file, as in
-# the site's Python example (site/src/content/docs/docs/examples/tools/python.mdx). Without fsspec installed, pandas fetches a URL through urllib
-# with Python's default agent, which a zone setting once refused with a 403
+# and plain urllib for the root files, and DuckDB for a series file. Without
+# fsspec installed, pandas fetches a URL through urllib with Python's default
+# agent, which a zone setting once refused with a 403
 # (issue #1), so a rule change that blocks either client fails here instead of
 # in someone's notebook. Then it compares a sample of the files with their
 # definitions in src/store/files.ts (scripts/check-files.ts).
