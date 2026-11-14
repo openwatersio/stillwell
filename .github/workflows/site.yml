@@ -61,7 +61,7 @@ jobs:
       # Pages serves the site under /stillwell, so a root path in any HTML attribute needs it, once.
       - name: Check every root path in the HTML carries the base path
         run: |
-          if grep -rhoE "[a-z-]+=[\"']/[^\"']*" dist --include='*.html' | grep -vE "=[\"'](/stillwell/|//)" | sort -u | head -20 | grep .; then
+          if grep -rhoE "[a-z-]+=[\"']/[^\"']*" dist --include='*.html' | grep -vE "=[\"'](/stillwell([/#?]|$)|//)" | sort -u | head -20 | grep .; then
             exit 1
           fi
           if grep -rlE '/stillwell/stillwell([/"#?]|$)' dist --include='*.html' | head -5 | grep .; then
