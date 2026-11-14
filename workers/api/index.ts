@@ -1,16 +1,14 @@
 // Serves `levels` for the api.openwaters.io gateway, bound to it as WATER_LEVELS:
 // answers from Cloudflare's cache when it can, otherwise asks stillwell-api on
-// the server through its Tunnel, and when the server doesn't answer serves the
-// last good copy marked stale (docs/plans/realtime.md, The levels API).
+// the server through its Workers VPC binding, and when the server doesn't
+// answer serves the last good copy marked stale (docs/plans/realtime.md, The
+// levels API).
 
 import { parseInstant, STEPS, WINDOW_MS } from "../../src/api/levels.ts";
 
 export interface Env {
-  /** stillwell-api's Tunnel hostname, such as https://stillwell-api.openwaters.io. */
-  ORIGIN: string;
-  /** The Access service token the Tunnel's Access application lets through. */
-  ACCESS_CLIENT_ID: string;
-  ACCESS_CLIENT_SECRET: string;
+  /** stillwell-api on the server, reached through the Tunnel as a Workers VPC service. */
+  STILLWELL: { fetch(url: string, init?: RequestInit): Promise<Response> };
 }
 
 interface Context {
@@ -44,7 +42,7 @@ export default {
     if (hit) return hit;
 
     const lastKey = new Request(`${url.origin}${url.pathname}?${lastParams}&last-good`);
-    const answer = await ask(`${env.ORIGIN}${url.pathname}?${canonical}`, env, request);
+    const answer = await ask(`${url.pathname}?${canonical}`, env, request);
     if (answer) {
       const reply = json(answer.status, answer.body, answer.cacheControl);
       if (answer.status === 200) {
@@ -65,24 +63,19 @@ export default {
 
 /**
  * stillwell-api's answer, when it gave one of its own: a 200 or a 4xx other
- * than Access's 401 and 403, as JSON. Anything else, such as a redirect to
- * Access's login page when the service token has expired, a 5xx or no answer
- * in time, is undefined, so the last good copy is served. Only the body and
- * its Cache-Control are kept: headers Access adds, such as its cookie, never
- * reach a client or the cache.
+ * than 401 and 403, which it never sends, as JSON. Anything else, such as a
+ * refusal from Cloudflare, a 5xx or no answer in time, is undefined, so the
+ * last good copy is served. Only the body and its Cache-Control are kept.
  */
 async function ask(
-  url: string,
+  path: string,
   env: Env,
   request: Request,
 ): Promise<{ status: number; body: object; cacheControl: string } | undefined> {
   try {
-    const answer = await fetch(url, {
-      headers: {
-        "CF-Access-Client-Id": env.ACCESS_CLIENT_ID,
-        "CF-Access-Client-Secret": env.ACCESS_CLIENT_SECRET,
-        "User-Agent": request.headers.get("User-Agent") ?? "",
-      },
+    // The binding routes to its configured host and port; the URL's host only sets the Host header.
+    const answer = await env.STILLWELL.fetch(`http://stillwell-api${path}`, {
+      headers: { "User-Agent": request.headers.get("User-Agent") ?? "" },
       redirect: "manual",
       signal: AbortSignal.timeout(ORIGIN_TIMEOUT_MS),
     });
