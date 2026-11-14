@@ -74,6 +74,7 @@ describe("readmeText", () => {
   });
 
   it("lays out every adapter's README as its source page needs", () => {
+    let checked = 0;
     for (const id of readdirSync(SOURCES, { withFileTypes: true })) {
       if (!id.isDirectory()) continue;
       let markdown: string;
@@ -95,6 +96,7 @@ describe("readmeText", () => {
       for (const bullet of errata.match(/^- .*/gm) ?? [])
         assert.match(bullet, /\(.*erratum `/, `${id.name}: an Errata bullet names its erratum`);
       // What the page shows: none of the runbook, and no link a reader can't follow.
+      checked++;
       const shown = readmeText(markdown);
       assert.doesNotMatch(
         shown,
@@ -107,6 +109,7 @@ describe("readmeText", () => {
         `${id.name}: links into docs/`,
       );
     }
+    assert.ok(checked >= 20, `checked only ${checked} adapter READMEs`);
   });
 });
 
