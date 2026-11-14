@@ -88,7 +88,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "datums",
     type: "MAP(VARCHAR, DOUBLE)",
     description:
-      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. They follow the source in the current epoch and are frozen when the epoch closes.",
+      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they keep up with the source's own offsets, keeping any the source has since left out; they're frozen when the epoch closes.",
   },
   {
     name: "to_current",
@@ -493,7 +493,7 @@ export const FILES = {
         name: "until",
         type: "TIMESTAMPTZ",
         description:
-          "The end of the window measured, in UTC, exclusive: the earliest of the end of the year measured, the end of either station's epoch, and one sampling interval (the source's `interval_s`, or a minute) after the last value either station holds.",
+          "The end of the window measured, in UTC, exclusive: the earliest of the end of the year measured, the end of either station's epoch, and one sampling interval (the source's `interval_s`, or a minute) after the last value either station holds. A row measured before November 2026 and not replaced since ends at the last value itself.",
       },
       {
         name: "hours",
