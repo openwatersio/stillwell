@@ -1,8 +1,28 @@
 // The public site for people using Stillwell's data; contributor docs stay in docs/.
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import { satteri } from "@astrojs/markdown-satteri";
+
+// GitHub Pages serves the site under the repository's name.
+const base = "/stillwell";
+
+// Root-relative links in the docs' Markdown, such as /docs/getting-started/, get the base path.
+const rooted = (url) =>
+  url.startsWith("/") && !url.startsWith("//") && url !== base && !url.startsWith(`${base}/`);
+const baseLinks = {
+  name: "base-links",
+  link(node, ctx) {
+    if (rooted(node.url)) ctx.setProperty(node, "url", base + node.url);
+  },
+  definition(node, ctx) {
+    if (rooted(node.url)) ctx.setProperty(node, "url", base + node.url);
+  },
+};
 
 export default defineConfig({
+  site: "https://openwatersio.github.io",
+  base,
+  markdown: { processor: satteri({ mdastPlugins: [baseLinks] }) },
   integrations: [
     starlight({
       title: "Stillwell",

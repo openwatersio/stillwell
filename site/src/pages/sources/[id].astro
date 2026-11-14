@@ -4,6 +4,7 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import Erratum from "../../components/Erratum.astro";
 import { stations, years, json } from "../../lib/store";
 import { flagChart, markdown } from "../../lib/render";
+import { sitePath } from "../../lib/paths";
 
 export async function getStaticPaths() {
   return (await json("sources.json")).map((source) => ({
@@ -92,7 +93,7 @@ const first = list.reduce<Date | undefined>(
     data-filter
     aria-label="Filter stations"
   />
-  <table data-stations={`/data/stations/${s.id}.json`}>
+  <table data-stations={sitePath(`/data/stations/${s.id}.json`)}>
     <thead>
       <tr>
         <th>Name</th>
