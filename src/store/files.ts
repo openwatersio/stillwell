@@ -76,7 +76,7 @@ const EPOCH_FIELDS: Column[] = [
     type: "VARCHAR",
     nullable: true,
     description:
-      "The source's own name for the reference the levels are measured against, where it gives more than the datum's label, such as PEGELONLINE's `gaugeZero.validFrom` or the research-quality version of a UHSLC series. For USGS and Kartverket it is the reason the source gave for a series changing.",
+      "The source's own name for the reference the levels are measured against, where it gives more than the datum's label, such as PEGELONLINE's `gaugeZero.validFrom` or the research-quality version of a UHSLC series. For USGS, Kartverket and DMI it is the reason the source gave for a series changing.",
   },
   {
     name: "reference_since",

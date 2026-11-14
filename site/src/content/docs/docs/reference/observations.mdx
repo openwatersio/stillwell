@@ -93,7 +93,7 @@ ORDER BY r.time DESC LIMIT 1`}
 
 ## Which years exist
 
-HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy). A year between a station's first and last rows with no row of its own has no values, unless the station is marked as described below. The years list is also more current than `first` and `last` in `stations.parquet`, which usually trail it by a day.
+HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy). A year between a station's first and last rows with no row of its own has no values, unless the station is marked as described below. `first` and `last` in `stations.parquet` agree with the years list after each nightly rebuild, and trail it only after a backfill between rebuilds.
 
 <Schema resource="years" />
 

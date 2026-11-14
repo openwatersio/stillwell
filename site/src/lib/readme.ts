@@ -14,10 +14,6 @@ const SKIP_SECTION = /^##\s+Backfill\b/;
 // In an Errata section, the bullets for an erratum, which the source page lists from errata.json; the
 // section's other notes, such as GESLA's clock check, stay.
 const ERRATUM_BULLET = /^- \*\*.*\(.*erratum `/;
-// Bullets about running ingest against the source rather than about its data.
-const SKIP_BULLET =
-  /^- \*\*(Backfill|Backfill size|Compaction|Rate limit|Request limits|Limits)[:*]/;
-
 /** A heading's id on the source page, prefixed so it can't collide with the page's own sections. */
 const slug = (text: string) =>
   "about-" +
@@ -41,7 +37,7 @@ function target(href: string, id: string): string {
   return REPO + path + (anchor ? `#${anchor}` : "");
 }
 
-/** The README's text for the site: no title, no ingest sections or bullets, and headings a level down. */
+/** The README's text for the site: no title, no Backfill sections or erratum bullets, and headings a level down. */
 export function readmeText(markdown: string): string {
   const out: string[] = [];
   let section = "";
@@ -58,18 +54,20 @@ export function readmeText(markdown: string): string {
     if (/^## /.test(line)) section = line;
     if (SKIP_SECTION.test(section)) continue;
     // A bullet runs until the next bullet, heading or blank line.
-    if (/^- /.test(line))
-      bullet =
-        SKIP_BULLET.test(line) || (/^##\s+Errata\b/.test(section) && ERRATUM_BULLET.test(line));
+    if (/^- /.test(line)) bullet = /^##\s+Errata\b/.test(section) && ERRATUM_BULLET.test(line);
     else if (!line.trim() || /^#/.test(line)) bullet = false;
     if (bullet) continue;
     out.push(line.replace(/^(#{2,5}) /, "#$1 "));
   }
   // A section left with nothing, such as an Errata section of erratum bullets only, loses its heading too.
-  return out
-    .join("\n")
-    .replace(/^#{3,6} [^\n]*\n\s*(?=#{3} |$(?![\s\S]))/gm, "")
-    .trim();
+  return (
+    out
+      .join("\n")
+      // Contributor docs stay in the repository, so a link to one keeps only its text.
+      .replace(/\[([^\]]+)\]\((?:\.\.\/)+(?:docs\/[^)]*|CONTRIBUTING\.md[^)]*)\)/g, "$1")
+      .replace(/^#{3,6} [^\n]*\n\s*(?=#{3} |$(?![\s\S]))/gm, "")
+      .trim()
+  );
 }
 
 /** A heading in a rendered README, for the page's table of contents. */
