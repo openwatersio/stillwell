@@ -242,9 +242,11 @@ export async function removePrefixes(store: string, prefixes: string[]): Promise
 /**
  * Delete the series files of the stations in `source`'s list whose source ID
  * `drop` names, such as GESLA's records that hold another gauge's values, and
- * their rows in the years file and the analysis. Deletes only the directories
- * that have files, and with `dryRun` deletes nothing, returning what it would
- * delete. The bounds keep them until `compact --rebuild-bounds`.
+ * their rows in the years file and the analysis, and the backfilled years of
+ * every station `drop` names, files or not, so a run after an earlier one
+ * clears what that left; `cleared` lists those, or with `dryRun` would. Deletes only the directories that have files, and with `dryRun`
+ * deletes nothing, returning what it would delete. The bounds keep them until
+ * `compact --rebuild-bounds`.
  */
 export async function dropFiles(
   store: string,
@@ -254,7 +256,7 @@ export async function dropFiles(
     remove = removePrefixes,
     dryRun = false,
   }: { remove?: (store: string, prefixes: string[]) => Promise<void>; dryRun?: boolean } = {},
-): Promise<{ ids: string[]; prefixes: string[] }> {
+): Promise<{ ids: string[]; prefixes: string[]; cleared: string[] }> {
   deletable(store);
   const list = stationListPath(store, source);
   if (!(await exists(list))) throw new Error(`The store has no list for ${source}`);
@@ -265,12 +267,22 @@ export async function dropFiles(
     source,
     ids.map((id) => id.slice(source.length + 1)),
   );
-  if (dryRun || !ids.length) return { ids, prefixes };
+  const dropped = new Set(named);
+  const path = backfilledPath(store, source);
+  const recorded = ((await readJsonArray(path)) ?? []) as { id: string }[];
+  const cleared = [...new Set(recorded.filter((r) => dropped.has(r.id)).map((r) => r.id))];
+  if (dryRun) return { ids, prefixes, cleared };
+  if (cleared.length)
+    await writeJsonArray(
+      path,
+      recorded.filter((r) => !dropped.has(r.id)),
+    );
+  if (!ids.length) return { ids, prefixes, cleared };
   await remove(store, prefixes);
   const gone = new Set(ids);
   await dropAnalysis(store, source, (id) => gone.has(id));
   await dropYears(store, source, (id) => gone.has(id));
-  return { ids, prefixes };
+  return { ids, prefixes, cleared };
 }
 
 /**
