@@ -30,6 +30,7 @@ describe("bom", () => {
       const name = {
         1996: "bom-1996.ar",
         2005: "bom-2005.ar",
+        2011: "bom-2011.ar",
         2025: "bom-2025.ar",
         2026: "bom-2026.ar",
       }[year];
@@ -66,7 +67,7 @@ describe("bom", () => {
 
   it("lists its gauges, active where the newest archive has values", async () => {
     const list = await bom.stations();
-    assert.equal(list.length, 29);
+    assert.equal(list.length, 31);
     // The newest year's archive, and the year before's for a gauge with no values yet this year.
     assert.deepEqual(requests, [
       "ftp://ftp.bom.gov.au/anon/home/ntc/pacific/uhslc/2026.ar",
@@ -95,8 +96,18 @@ describe("bom", () => {
       byId.get("bom/001")!.attribution.split("; ")[1],
       "Pacific Sea Level and Geodetic Monitoring Project",
     );
+    // Suva and Christmas Island carry BOM's credit alone, and are non-commercial until BOM confirms it owns them.
+    const suva = byId.get("bom/018")!;
+    assert.equal(suva.attribution, sources.bom!.metadata.attribution);
+    assert.equal(suva.commercial_use, false);
+    assert.equal(byId.get("bom/170")!.commercial_use, false);
+    assert.deepEqual(suva.same_as, ["gesla/suva-67050-fji-bom", "uhslc/018"]);
+    assert.deepEqual(byId.get("bom/170")!.same_as, [
+      "gesla/christmas_island-46290-aus-bom",
+      "uhslc/170",
+    ]);
     // Every station has an ID of the store's shape and a distinct number.
-    assert.equal(new Set(list.map((s) => s.source_id)).size, 29);
+    assert.equal(new Set(list.map((s) => s.source_id)).size, 31);
     for (const s of list) assert.match(s.source_id, /^\d{3}$/);
   });
 
@@ -280,6 +291,33 @@ describe("bom", () => {
     // The year under way has none until BOM makes it.
     bom.archives.clear();
     assert.deepEqual(await bom.levels("995", new Date("2026-02-01Z"), new Date("2026-02-02Z")), []);
+  });
+
+  it("reads Christmas Island's last file, which stops on 31 August, and refuses one that stops sooner", async () => {
+    const end = Date.parse("2011-09-01T00:00:00Z");
+    const got = await bom.levels(
+      "170",
+      new Date("2011-01-01T00:00:00Z"),
+      new Date("2012-01-01T00:00:00Z"),
+    );
+    assert.ok(got[0]!.time >= Date.parse("2011-01-01T00:00:00Z"));
+    assert.ok(got.at(-1)!.time < end && got.at(-1)!.time >= end - 24 * 3_600_000);
+    assert.ok(got.every((o) => o.flag === Flag.good));
+    // A file cut anywhere before the date it ends on is refused, as a short finished year is.
+    const text = (await bom.archiveOf(2011))!.get("170")!;
+    const lines = bom.uncompress(text).toString("latin1").trimEnd().split("\n");
+    assert.deepEqual(bom.parse(lines.join("\n"), "170", 2011, end).length, got.length);
+    assert.throws(() => bom.parse(lines.slice(0, -2).join("\n"), "170", 2011, end), /ends before/);
+    // So is one that runs past it.
+    const longer = bom.uncompress((await bom.archiveOf(2011))!.get("018")!).toString("latin1");
+    assert.throws(() => bom.parse(longer, "018", 2011, end), /ends after/);
+    // Suva's 2011 is a whole year.
+    const suva = await bom.levels(
+      "018",
+      new Date("2011-01-01T00:00:00Z"),
+      new Date("2012-01-01T00:00:00Z"),
+    );
+    assert.equal(suva.at(-1)!.time, Date.parse("2011-12-31T23:00:00Z"));
   });
 
   it("refuses another datum and a gauge that isn't BOM's", async () => {
