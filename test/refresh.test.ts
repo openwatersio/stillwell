@@ -547,7 +547,14 @@ describe("publishStations", () => {
     ]);
     assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
-      links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], wide: [] },
+      links: {
+        pairs: { "test~test": { id: 1 } },
+        dropped: [],
+        skipped: [],
+        wide: [],
+        disagree: [],
+        shifted: [],
+      },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
@@ -696,7 +703,7 @@ describe("publishStations", () => {
     // A new source with no list yet doesn't hold up the others.
     assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
-      links: { pairs: {}, dropped: [], skipped: [], wide: [] },
+      links: { pairs: {}, dropped: [], skipped: [], wide: [], disagree: [], shifted: [] },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });

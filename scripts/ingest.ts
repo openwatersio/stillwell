@@ -4,6 +4,7 @@
  *   node scripts/ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish]
  *   node scripts/ingest.ts publish
  *   node scripts/ingest.ts links [--concurrency 4]
+ *   node scripts/ingest.ts matches [--concurrency 4] [--accept-matches]
  *   node scripts/ingest.ts backfill <source> <station,...|all|preliminary> <start> <end>
  *       [--first <file>] [--shard <i>/<n>] [--refetch | --skip-written] [--skip-unscreened]
  *       [--with-inactive]
@@ -129,6 +130,7 @@ import {
 } from "../src/store/analysis.ts";
 import {
   boundsPath,
+  matchesPath,
   requalifyLeftPath,
   seriesDir,
   stationsPath,
@@ -158,6 +160,15 @@ import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.
 import { withhold, withheldReason } from "../src/withhold.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
+import {
+  compareStations,
+  differsByData,
+  readMatches,
+  sameByData,
+  shiftedByData,
+  writeMatches,
+  type DataMatch,
+} from "../src/matches.ts";
 import { ID_KM } from "../src/same-as.ts";
 
 useDiskCache();
@@ -171,6 +182,7 @@ const { positionals, values } = parseArgs({
     concurrency: { type: "string", default: "4" },
     "accept-epochs": { type: "boolean", default: false },
     "accept-withheld": { type: "boolean", default: false },
+    "accept-matches": { type: "boolean", default: false },
     "no-publish": { type: "boolean", default: false },
     first: { type: "string" },
     shard: { type: "string" },
@@ -206,6 +218,64 @@ switch (command) {
         await readLinks(store),
       );
       await writeLinks(store, rows);
+      // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
+      if (failed) process.exitCode = 1;
+    }
+    break;
+  case "matches":
+    // Nearby series compared by their levels, for the next publish to link those that agree (src/matches.ts).
+    setConnections(positive("concurrency"));
+    for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
+      const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      const stations = await stationsToMeasure(store, held);
+      // A missing list or years file leaves no stations; last month's file stays.
+      if (!stations.length) {
+        console.error(`${store}: no stations to compare; matches unchanged`);
+        process.exitCode = 1;
+        continue;
+      }
+      // A withheld station's row goes, as its levels do.
+      const shown = (id: string) => {
+        const source = sources[id.split("/")[0]!];
+        return !source || withheldReason(source, id) === null;
+      };
+      const previous = (await readMatches(store)).filter((m) => shown(m.a) && shown(m.b));
+      const { rows, failed, pairs } = await compareStations(
+        store,
+        stations,
+        positive("concurrency"),
+        previous,
+      );
+      // A link by levels lasts while they agree; these won't be linked by them at the next publish.
+      const agreeing = new Set(rows.filter(sameByData).map((m) => `${m.a} ${m.b}`));
+      const stopped = previous.filter((m) => sameByData(m) && !agreeing.has(`${m.a} ${m.b}`));
+      // Many at once is likelier a source's change, values flagged or stamped off the hour, than many gauges.
+      const limit = Math.max(20, Math.round(previous.filter(sameByData).length * 0.05));
+      if (stopped.length > limit && !values["accept-matches"]) {
+        console.error(
+          `${store}: ${stopped.length} pairs stopped agreeing at once (limit ${limit}); matches unchanged. Check them and rerun with --accept-matches:`,
+        );
+        for (const m of stopped) console.error(`  ${m.a} ${m.b}`);
+        process.exitCode = 1;
+        continue;
+      }
+      await writeMatches(store, rows);
+      const linked = new Set(stations.flatMap((s) => s.same_as.map((o) => `${s.id} ${o}`)));
+      const line = (m: DataMatch) =>
+        `${m.a} ${m.b}: ${m.months} months, ${(m.rms_m * 100).toFixed(1)} cm` +
+        (m.lag_h
+          ? `, ${(m.lag_rms_m * 100).toFixed(1)} cm with b ${m.lag_h > 0 ? "+" : ""}${m.lag_h} h`
+          : "");
+      const fresh = rows.filter((m) => sameByData(m) && !linked.has(`${m.a} ${m.b}`));
+      const differ = rows.filter((m) => differsByData(m) && linked.has(`${m.a} ${m.b}`));
+      const shifted = rows.filter(shiftedByData);
+      console.log(
+        `${matchesPath(store)}: ${rows.length} of ${pairs} pairs compared, ${rows.filter(sameByData).length} agree; ${failed} failed`,
+      );
+      for (const m of fresh) console.log(`  agree, not yet linked: ${line(m)}`);
+      for (const m of differ) console.log(`  linked, but differ: ${line(m)}`);
+      for (const m of shifted) console.log(`  agree only with a clock offset: ${line(m)}`);
+      for (const m of stopped) console.log(`  agreed last month, not now: ${line(m)}`);
       // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
       if (failed) process.exitCode = 1;
     }
@@ -389,7 +459,7 @@ async function publish(store: string): Promise<void> {
   const result = await publishStations(store, held, expected, errata);
   if ("count" in result) {
     console.log(`${stationsPath(store)}: ${result.count} stations`);
-    const { pairs, dropped, skipped, wide } = result.links;
+    const { pairs, dropped, skipped, wide, shifted } = result.links;
     for (const [pair, counts] of Object.entries(pairs).sort())
       console.log(
         `  same_as ${pair}: ${Object.entries(counts)
@@ -402,6 +472,14 @@ async function publish(store: string): Promise<void> {
     for (const group of wide)
       console.log(
         `  same_as group over ${ID_KM} km wide, or with a station without a position: ${group.join(" ")}`,
+      );
+    for (const m of result.links.disagree)
+      console.log(
+        `  same_as levels differ: ${m.a} to ${m.b} by ${m.how}, ${(m.rms_m * 100).toFixed(1)} cm over ${m.months} months`,
+      );
+    for (const m of shifted)
+      console.log(
+        `  same_as levels agree only with ${m.b} moved ${m.lag_h} h: ${m.a}, ${(m.lag_rms_m * 100).toFixed(1)} cm over ${m.months} months`,
       );
     const { joined, fromTide, computed, far, disagree } = result.datums;
     console.log(
@@ -1126,7 +1204,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }
