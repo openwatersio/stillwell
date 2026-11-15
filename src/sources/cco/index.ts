@@ -31,7 +31,8 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
-  attribution: "National Network of Regional Coastal Monitoring Programmes",
+  attribution:
+    "National Network of Regional Coastal Monitoring Programmes, under the Open Government Licence v3.0. Real-time data are not quality-controlled.",
   contact: { url: "https://www.coastalmonitoring.org/contact_us", email: "cco@channelcoast.org" },
   terms:
     "Open Government Licence v3.0. Real-time data are not quality-controlled; the observatory checks each month in arrears.",
@@ -112,16 +113,21 @@ async function tides(time: string, query = ""): Promise<Feature[]> {
  * Every site the tides group lists. A site's `id` is a number; an external
  * site's is a link to its provider's page, with no readings, so it's left out.
  */
-export async function stations(): Promise<ListedStation[]> {
+export async function stations(_previous?: Station[], now = Date.now()): Promise<ListedStation[]> {
   const listed = new Map<string, ListedStation>();
+  let dated = false;
   for (const { geometry, properties: p } of await tides("latest")) {
     const [lon, lat] = geometry?.coordinates ?? [];
     if (!/^\d+$/.test(String(p?.id)) || typeof p?.sensor !== "string") continue;
     if (typeof lat !== "number" || typeof lon !== "number") continue;
+    // A layer can answer in British National Grid; degrees only.
+    if (Math.abs(lat) > 90 || Math.abs(lon) > 180)
+      throw new Error(`CCO site ${p?.id} is at ${lat}, ${lon}, which isn't longitude and latitude`);
     const id = String(p!.id);
     const last = parseDate(p!.date);
     // Active while it reported within the year, as the store's other lists judge it.
-    const active = last !== null && last > Date.now() - 366 * 24 * HOUR_MS;
+    const active = last !== null && last > now - 366 * 24 * HOUR_MS;
+    dated ||= last !== null;
     listed.set(id, {
       ...stationDefaults(metadata),
       id: `cco/${id}`,
@@ -147,6 +153,8 @@ export async function stations(): Promise<ListedStation[]> {
   }
   // An empty list is a broken response; taken at its word, it would retire every station.
   if (!listed.size) throw new Error("CCO listed no tide gauges");
+  // Dates in another layout would read every site as stopped.
+  if (!dated) throw new Error("CCO listed no site with a date YYYYMMDD#hhmmss");
   return [...listed.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -168,7 +176,7 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
       const time = parseDate(p?.date);
       const level = p?.value;
       // Several sites can answer a request that names one; keep only the one asked for.
-      if (String(p?.id) !== sourceId || time === null) continue;
+      if ((p?.id !== undefined && String(p.id) !== sourceId) || time === null) continue;
       if (typeof level !== "number" || !Number.isFinite(level) || level === 9999) continue;
       const flag = flagOf(p?.QCflag);
       if (flag !== null && time >= start.getTime() && time < end.getTime())
@@ -202,8 +210,10 @@ function parseDate(text: unknown): number | null {
  * v1.0, table 1); null for a missing value (9). None means not checked yet.
  */
 function flagOf(code: unknown): Flag | null {
-  if (code === null || code === undefined || code === "") return Flag.preliminary;
-  switch (String(code).trim()) {
+  // 0 is "no QC performed" in the IOC scheme.
+  const text = String(code ?? "").trim();
+  if (text === "" || text === "0") return Flag.preliminary;
+  switch (text) {
     case "1":
     case "5": // correct but extreme
       return Flag.good;

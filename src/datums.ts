@@ -102,6 +102,8 @@ const ALIASES: Record<string, Record<string, string>> = {
   // BODC's chart datum is Admiralty Chart Datum, as EA's is.
   bodc: { CD: "ACD" },
   ea: { CD: "ACD" },
+  // CCO adds the Admiralty Tide Tables' offset to its Ordnance Datum levels (tide QC manual, 2.4).
+  cco: { CD: "ACD" },
 };
 
 /** The chart datum a source's own offsets give, for a station slackwater-database has no record of. */
@@ -111,6 +113,7 @@ const CHART: Record<string, string> = {
   pegelonline: "SKN",
   kartverket: "CD",
   bodc: "CD",
+  cco: "CD",
   ea: "CD",
   refmar: "ZH",
   "marine-institute": "LAT",

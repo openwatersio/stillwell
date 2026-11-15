@@ -36,7 +36,7 @@ afterEach(() => {
 describe("cco", () => {
   it("lists the sites with a number, in chart datum, and links GESLA's records of them", async () => {
     serve([[/tides\/latest\.geojson$/, fixture("cco-tides-latest.geojson")]]);
-    const stations = await cco.stations();
+    const stations = await cco.stations(undefined, Date.parse("2026-11-14T13:00:00Z"));
     assert.deepEqual(
       stations.map((s) => s.id),
       ["cco/38", "cco/54", "cco/71", "cco/89"],
@@ -100,6 +100,43 @@ describe("cco", () => {
     assert.deepEqual(
       requests.map((r) => r.url.match(/duration=(\d+)/)![1]),
       ["8760", "8760", "24"],
+    );
+  });
+
+  it("refuses a list in British National Grid, or one with no date it can read", async () => {
+    const list = JSON.parse(fixture("cco-tides-latest.geojson"));
+    list.features[0].geometry.coordinates = [530000, 105000];
+    serve([[/latest/, JSON.stringify(list)]]);
+    await assert.rejects(cco.stations(), /isn't longitude and latitude/);
+    for (const f of list.features) f.properties.date = "2026-11-14T12:00:00Z";
+    list.features[0].geometry.coordinates = [0, 50];
+    serve([[/latest/, JSON.stringify(list)]]);
+    await assert.rejects(cco.stations(), /no site with a date/);
+  });
+
+  it("reads a reading flagged 0 as not yet checked, and a feature with no id as the site asked for", async () => {
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            { properties: { date: "20261114#000000", value: 1, QCflag: "0" } },
+            { properties: { id: 54, date: "20261114#001000", value: 2, QCflag: " " } },
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "54",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => [o.level, o.flag]),
+      [
+        [1, Flag.preliminary],
+        [2, Flag.preliminary],
+      ],
     );
   });
 

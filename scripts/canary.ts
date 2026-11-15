@@ -204,7 +204,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
  * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten"]);
+const UNRECORDED = new Set(["cco", "cmems", "gesla", "jma", "kuestendaten"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
