@@ -96,11 +96,11 @@ describe("bom", () => {
       byId.get("bom/001")!.attribution.split("; ")[1],
       "Pacific Sea Level and Geodetic Monitoring Project",
     );
-    // Suva and Christmas Island carry BOM's credit alone, and are non-commercial until BOM confirms it owns them.
+    // Suva and Christmas Island carry BOM's credit alone and its terms.
     const suva = byId.get("bom/018")!;
     assert.equal(suva.attribution, sources.bom!.metadata.attribution);
-    assert.equal(suva.commercial_use, false);
-    assert.equal(byId.get("bom/170")!.commercial_use, false);
+    assert.equal(suva.commercial_use, true);
+    assert.equal(byId.get("bom/170")!.commercial_use, true);
     assert.deepEqual(suva.same_as, ["gesla/suva-67050-fji-bom", "uhslc/018"]);
     assert.deepEqual(byId.get("bom/170")!.same_as, [
       "gesla/christmas_island-46290-aus-bom",

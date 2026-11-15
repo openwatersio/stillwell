@@ -70,11 +70,6 @@ interface Gauge {
    * own series, not UHSLC's, so they're named here rather than found by name.
    */
   uhslc: string[];
-  /**
-   * BOM hasn't said the gauge is its own to republish, so the station is
-   * tagged non-commercial until it does (the request to BOM asks).
-   */
-  unconfirmed?: boolean;
   /** The last day of the gauge's last file, when that file stops before December 31. */
   stopped?: string;
   /** GESLA's record of BOM's own file for the gauge. */
@@ -92,8 +87,7 @@ interface Gauge {
  * Array's 16 whose files are in the archives (its Thursday Island gauge
  * isn't), the Pacific Sea Level and Geodetic Monitoring Project's 13, and
  * Suva and Christmas Island, whose records GESLA credits to BOM and which
- * BOM's National Tidal Centre supplies to PSMSL, but which BOM hasn't confirmed
- * are its own to republish. Christmas Island's file is
+ * BOM's National Tidal Centre supplies to PSMSL. Christmas Island's file is
  * in the archives for 2007 to 2011 only. The archives also carry port and
  * state-agency gauges (Fremantle, Brisbane Bar, Bundaberg, Fort Denison,
  * Townsville, Booby Island), which are those agencies' to publish and aren't
@@ -255,7 +249,6 @@ export const GAUGES: Gauge[] = [
     lon: 105.667,
     name: "Christmas Island",
     country_code: "CX",
-    unconfirmed: true,
     stopped: "2011-08-31",
     uhslc: ["170"],
     gesla: "christmas_island-46290-aus-bom",
@@ -338,7 +331,6 @@ export const GAUGES: Gauge[] = [
     lon: 178.427,
     name: "Suva",
     country_code: "FJ",
-    unconfirmed: true,
     uhslc: ["018"],
     gesla: "suva-67050-fji-bom",
   },
@@ -448,7 +440,6 @@ export async function stations(): Promise<ListedStation[]> {
     const active = hasValues(archive, g.number, year) || hasValues(before, g.number, year - 1);
     return {
       ...stationDefaults(metadata),
-      ...(g.unconfirmed && { commercial_use: false }),
       attribution: g.project
         ? `${metadata.attribution}; ${PROJECTS[g.project]}`
         : metadata.attribution,
