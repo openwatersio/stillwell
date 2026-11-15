@@ -158,6 +158,11 @@ export const LINKS: Decision[] = [
     b: "linz/RFRT",
     note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
+  {
+    a: "usace/MVK.Tendal",
+    b: "usgs/07369500",
+    note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",
+  },
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
