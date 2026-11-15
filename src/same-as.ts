@@ -133,7 +133,7 @@ export const UNLINKS: Decision[] = [
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {
   "uhslc/071":
-    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Sensor 40 at the tsunami gauge (linz/WLGT) drifts against it by 1.88 m in 2019 to 1.21 m in 2025 (erratum `linz-wellington-drift`).",
+    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Both sensors at the tsunami gauge (linz/WLGT) move against it by tenths of a metre, in turn (erratum `linz-wellington-drift`).",
 };
 
 /**
