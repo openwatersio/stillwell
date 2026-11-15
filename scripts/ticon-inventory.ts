@@ -13,7 +13,8 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parse } from "yaml";
-import { readStationList } from "../src/store/parquet.ts";
+import { readRows, readStationList } from "../src/store/parquet.ts";
+import { LINKS } from "../src/same-as.ts";
 import { stationListPath, urlSafe } from "../src/store/paths.ts";
 import type { Station } from "../src/schema.ts";
 import { isDropped } from "../src/sources/gesla/dropped.ts";
@@ -109,8 +110,15 @@ for (const [source, adapter] of Object.entries(sources)) {
   else console.warn(`No station list for ${source} in ${STORE} yet; its records stay planned`);
 }
 
+// The links publish made, by levels among them, name a CMEMS record's gauge as `LINKS` does:
+// taken from stations.parquet, not the level matches, so the rules that refuse a link apply.
+const links: { a: string; b: string }[] = [...LINKS];
+for (const row of await readRows(`${STORE}/stations.parquet`)) {
+  const same = (row.same_as as { items?: unknown[] } | null)?.items ?? [];
+  for (const other of same) links.push({ a: String(row.id), b: String(other) });
+}
 const rows = adoptSiblings(
-  records.map((record) => ({ record, originator: originatorSeries(record, lists) })),
+  records.map((record) => ({ record, originator: originatorSeries(record, lists, links) })),
   Object.values(lists).flat(),
 );
 // GESLA names its files as TICON names its records, so a record's GESLA 4.1
@@ -254,7 +262,7 @@ ${bySource.map(([source, group]) => `| ${source} | ${group.length} | ${statusOf(
 
 - **Codes in the id.** TICON ids end in \`<code>-<country>-<contributor>\`. NOAA, USGS, REFMAR, Norwegian (\`nhs\`) and SMHI records carry the originator's station code, so they map to \`coops\`, \`usgs\` (with the leading zero TICON drops restored, to USGS's 8, 10 or 15 digits, or to 9 where USGS lists that site), \`kartverket\`, \`refmar\` and \`smhi\`. WSV and BfG records carry a PEGELONLINE number, used when a PEGELONLINE station with levels has it, retired or not.
 - **Declared provenance.** UHSLC and JODC records use slackwater-database's [\`sources/ticon/provenance.ts\`](https://github.com/openwatersio/slackwater-database/blob/main/sources/ticon/provenance.ts), so a relay of a NOAA, Kartverket or JMA gauge goes to that originator, as slackwater-database already treats it. Other UHSLC records go to UHSLC itself, and other JODC records to JODC by the code in their id: the JHOD station numbers some declare aren't JODC's codes.
-- **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (\`mi_c\`) records, and CMEMS records in countries whose feed has a list in the store (France's once REFMAR's is there) match a station with levels, retired or not: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one, or a short name all of whose words the station's has, such as "Hov" in "Hov Havn I"), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently. A CMEMS record linked to a station of its national feed (\`LINKS\` in [\`src/same-as.ts\`](../src/same-as.ts)) matches that station wherever CMEMS places it, or stays \`to_match\` if it isn't a station with levels; the UK's match the EA first.
+- **Position.** RWS records, WSV and BfG records without a PEGELONLINE number, Marine Institute coastal (\`mi_c\`) records, and CMEMS records in countries whose feed has a list in the store (France's once REFMAR's is there) match a station with levels, retired or not: one within 50 m outright, else the best name match within 5 km (counting shared words, including ones like "buiten" that separate an outer harbor from an inner one, or a short name all of whose words the station's has, such as "Hov" in "Hov Havn I"), else the nearest within 1 km. Two equally good stations more than 100 m apart leave the record unmatched. Never by name alone, since RWS and CMEMS spell places differently. A CMEMS record linked to a station of its national feed (\`LINKS\` in [\`src/same-as.ts\`](../src/same-as.ts), or a link in the published \`stations.parquet\`, such as one by levels) matches that station wherever CMEMS places it, or stays \`to_match\` if it isn't a station with levels; the UK's match the EA first.
 - **Same station.** A record still unmatched takes the match of another record in its slackwater-database station file, since slackwater-database merges records only when they're the same gauge.
 - **UK gauges.** BODC's records, and UK CMEMS ones, match an EA gauge by position, as above, once the EA's list is in the store, and BODC's own gauge once its list is. NOC's records of gauges outside the UK network stay \`restricted\`: BODC's open data is the UK network's alone.
 - **CMEMS elsewhere.** CMEMS records in countries whose feed has no list in the store yet are \`to_match\`: cleared once matched to one of that feed's stations, not before.

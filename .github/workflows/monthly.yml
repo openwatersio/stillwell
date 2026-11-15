@@ -208,6 +208,43 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
+  # Pairs of stations within 10 km, and every linked pair, compared by their
+  # hourly levels (src/matches.ts), for publish to link those that agree within
+  # 1 cm and report links whose levels disagree. It reads levels and writes
+  # only stations/matches.parquet, which publish reads, so it needs no source's
+  # group; a pair whose read fails keeps last month's row, and the job fails
+  # once the file is written. It runs before links, which measures offsets
+  # along the links publish makes. Only a full refresh runs it; a cancelled run
+  # skips it, and publish uses last month's file. The matches group keeps a
+  # hand-run Ingest `matches` from writing the file at the same time.
+  matches:
+    needs: [plan, lists]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
+    concurrency:
+      group: matches
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    environment: lake
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      - run: |
+          node scripts/ingest.ts matches --concurrency 16 | tee matches.txt
+          { echo '## Level matches'; echo '```'; cat matches.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+        shell: bash -o pipefail {0}
+        env:
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+
   # Offsets between linked series of one gauge that share no reference datum,
   # measured from a year of their levels in the store (src/links.ts),
   # for publish to carry MSL, LAT and chart datum along. It reads levels and
@@ -219,7 +256,7 @@ jobs:
   # month's file. The links group keeps a hand-run Ingest `links` from writing
   # the file at the same time.
   links:
-    needs: [plan, lists]
+    needs: [plan, lists, matches]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' && !inputs.sources }}
     concurrency:
       group: links
@@ -248,7 +285,7 @@ jobs:
   # A list cancelled while it waits in its group cancels the run, so `always()`, not `!cancelled()`;
   # a run cancelled by hand still publishes the lists it wrote, which Compact daily would that night anyway.
   publish:
-    needs: [plan, lists, links]
+    needs: [plan, lists, matches, links]
     if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.sources != '[]' }}
     # The group every publish takes, Compact daily's and the Ingest workflow's.
     concurrency:
@@ -363,6 +400,13 @@ jobs:
             # reaches a gauge's last months after it leaves the latest window;
             # one that stopped earlier asks for nothing past its last day.
             cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
+            # BOM isn't hourly: its archives are rebuilt about monthly, weeks
+            # behind, and a finished year's again in the new year's first weeks,
+            # and nothing else brings its new values, so every active gauge is
+            # read again from the year before last to this one, as BODC's are,
+            # past the year each gauge's last value is in, which the default's
+            # cap would stop at.
+            bom) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
             # BODC's months arrive late and in batches, sometimes two years
             # behind, and it fills gaps and reflags months it has published;
             # nothing else fetches them, so every station's last three years
