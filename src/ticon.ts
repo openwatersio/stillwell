@@ -96,7 +96,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   sfwmd: { source: "sfwmd", status: "planned" },
   nwfwmd: { source: "nwfwmd", status: "license", note: "Northwest Florida WMD terms to check" },
   ncdem: { source: "ncdem", status: "license", note: "North Carolina DEM terms to check" },
-  bom: { source: "bom", status: "license", note: "BOM license not stated" },
+  bom: { source: "bom", status: "planned" },
   unam_hist: {
     source: "unam",
     status: "license",
