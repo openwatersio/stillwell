@@ -176,6 +176,9 @@ import { ID_KM } from "../src/same-as.ts";
 
 useDiskCache();
 
+/** The records whose files `drop` deletes, by source. */
+const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
+
 const { positionals, values } = parseArgs({
   allowPositionals: true,
   options: {
@@ -1199,9 +1202,6 @@ async function withholdStations(sourceId: string): Promise<void> {
   const file = process.env.GITHUB_STEP_SUMMARY;
   if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
 }
-
-/** The records whose files `drop` deletes, by source. */
-const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
 
 /** Delete the files of a source's dropped records, or with --dry-run list them. */
 async function dropStations(sourceId: string): Promise<void> {
