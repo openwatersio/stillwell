@@ -78,12 +78,24 @@ const UNITS: Record<string, string> = { mAOD: "AOD", m: "CD" };
  * Gauge Network gauges are listed twice, once in mAOD and once in meters above
  * chart datum, with the same readings, so a gauge's chart datum series is kept
  * only where it has no mAOD one (Avonmouth, Bournemouth, Hinkley Point and
- * Immingham). Series in millimeters copy one in meters.
+ * Immingham). Series in millimeters copy one in meters. A station is inactive
+ * and not polled when the measures list gives its series no latest reading,
+ * as for one that has never reported (Mumbles and Stornoway) or stopped months
+ * ago (Jersey and Washpile, in November 2026), and its readings hold nothing in
+ * the API's 28 days, so a day's outage retires nothing. A series the list
+ * leaves out keeps its station active.
  */
 export async function stations(): Promise<ListedStation[]> {
   const { items } = await getJson<{ items: ApiStation[] }>(
     `${API}/id/stations?type=TideGauge&_limit=1000`,
     { fresh: true },
+  );
+  const measures = await getJson<{ items: { "@id": string; latestReading?: unknown }[] }>(
+    `${API}/id/measures?qualifier=Tidal%20Level&_limit=10000`,
+    { fresh: true },
+  );
+  const silent = new Set(
+    measures.items.filter((m) => !m.latestReading).map((m) => m["@id"].split("/").at(-1)),
   );
   const tidal = items.flatMap((s) => {
     // Only the series the archive's day files are read for, so backfill and
@@ -105,12 +117,32 @@ export async function stations(): Promise<ListedStation[]> {
   const near = (a: ApiStation, b: ApiStation) =>
     labelOf(a) === labelOf(b) ||
     [a.lat, a.long].every((v, i) => Math.abs(firstOf(v) - firstOf([b.lat, b.long][i])) < 0.02);
+  const kept = tidal.filter(
+    ({ s, datum }) =>
+      [s.lat, s.long].every((v) => [v].flat()[0] !== undefined) &&
+      !(datum === "CD" && aod.some((a) => near(a, s))),
+  );
+  // A listed series the measures list gives no reading is asked for its latest within the API's days.
+  const since = new Date(dayOf(Date.now()) - API_DAYS * DAY_MS).toISOString();
+  const stopped = new Set<string>();
+  for (const { measure } of kept) {
+    const id = measure["@id"].split("/").at(-1)!;
+    if (!silent.has(id)) continue;
+    const { items: latest } = await getJson<{ items: unknown[] }>(
+      `${API}/id/measures/${id}/readings?since=${since}&_sorted&_limit=1`,
+      { fresh: true },
+    );
+    if (!latest.length) stopped.add(id);
+  }
+  // None reporting is a broken response; taken at its word, it would retire every station.
+  if (kept.length && stopped.size === kept.length) throw new Error("EA reported no tidal readings");
+  if (stopped.size)
+    console.log(`  ea: no readings in ${API_DAYS} days: ${[...stopped].join(", ")}`);
   const listed: ListedStation[] = [];
-  for (const { s, measure, datum } of tidal) {
-    const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]);
+  for (const { s, measure, datum } of kept) {
+    const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]!);
     const name = labelOf(s);
-    if (lat === undefined || lon === undefined || (datum === "CD" && aod.some((a) => near(a, s))))
-      continue;
+    const live = !stopped.has(measure["@id"].split("/").at(-1)!);
     listed.push({
       ...stationDefaults(metadata),
       id: `ea/${s.notation}`,
@@ -128,8 +160,8 @@ export async function stations(): Promise<ListedStation[]> {
       last: null,
       tide_station: null,
       same_as: [],
-      status: "active",
-      live: true,
+      status: live ? "active" : "inactive",
+      live,
       min_interval_s: 900,
       // Check for Flooding's page is keyed by the River Levels on the Internet ID.
       source_url: s.RLOIid ? `https://check-for-flooding.service.gov.uk/station/${s.RLOIid}` : null,

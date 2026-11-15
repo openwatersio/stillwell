@@ -4210,7 +4210,37 @@ describe("ea", () => {
   beforeEach(() => ea.forgetArchive());
 
   it("lists each tide gauge's mAOD series, or its chart datum series where it has no other", async () => {
-    serve([[/id\/stations\?type=TideGauge/, fixture("ea-stations.json")]]);
+    // Heysham's and Jersey's series are listed with no latest reading; only Jersey's readings hold one.
+    const reading = (notation: string, latestReading?: object) => ({
+      "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}`,
+      ...(latestReading ? { latestReading } : {}),
+    });
+    const now = { dateTime: "2026-11-15T17:45:00Z", value: 1 };
+    serve([
+      [/id\/stations\?type=TideGauge/, fixture("ea-stations.json")],
+      [
+        /id\/measures\?qualifier=Tidal/,
+        JSON.stringify({
+          items: [
+            // Newlyn's series is left out, which retires nothing.
+            ...[
+              "E70039-level-tidal_level-Mean-15_min-mAOD",
+              "E71924-level-tidal_level-Mean-15_min-m",
+            ].map((n) => reading(n, now)),
+            reading("E70239-level-tidal_level-Mean-15_min-mAOD"),
+            reading("E73439-anglian-level-tidal_level-Mean-15_min-mAOD"),
+          ],
+        }),
+      ],
+      [
+        /E70239-level-tidal_level-Mean-15_min-mAOD\/readings\?since=/,
+        JSON.stringify({ items: [now] }),
+      ],
+      [
+        /E73439-anglian-level-tidal_level-Mean-15_min-mAOD\/readings\?since=/,
+        JSON.stringify({ items: [] }),
+      ],
+    ]);
     const stations = await ea.stations();
     assert.deepEqual(
       stations.map((s) => [s.id, s.name, s.datum, s.country_code, ea.measureOf(s)]),
@@ -4230,6 +4260,25 @@ describe("ea", () => {
     );
     assert.equal(stations[0]!.interval_s, 900);
     assert.equal(stations[0]!.commercial_use, true);
+    assert.deepEqual(
+      stations.filter((s) => !s.live).map((s) => [s.id, s.status]),
+      [["ea/E73439-anglian", "inactive"]],
+    );
+  });
+
+  it("refuses an answer where no station's series reports, which would retire every station", async () => {
+    const stations = JSON.parse(fixture("ea-stations.json")) as {
+      items: { measures?: { "@id": string } | { "@id": string }[] }[];
+    };
+    const silent = stations.items.flatMap((s) =>
+      [s.measures ?? []].flat().map((m) => ({ "@id": m["@id"] })),
+    );
+    serve([
+      [/id\/stations\?type=TideGauge/, fixture("ea-stations.json")],
+      [/id\/measures\?qualifier=Tidal/, JSON.stringify({ items: silent })],
+      [/\/readings/, JSON.stringify({ items: [] })],
+    ]);
+    await assert.rejects(ea.stations(), /EA reported no tidal readings/);
   });
 
   it("reads a station from stations.parquet, without the list's extra fields", async () => {
