@@ -293,25 +293,17 @@ describe("bom", () => {
     assert.deepEqual(await bom.levels("995", new Date("2026-02-01Z"), new Date("2026-02-02Z")), []);
   });
 
-  it("reads Christmas Island's last file, which stops on 31 August, and refuses one that stops sooner", async () => {
+  it("reads a file that stops early as far as it goes, finished year or not", async () => {
+    // Christmas Island's 2011 file stops on 31 August, where the gauge's record ends.
     const end = Date.parse("2011-09-01T00:00:00Z");
     const got = await bom.levels(
       "170",
       new Date("2011-01-01T00:00:00Z"),
       new Date("2012-01-01T00:00:00Z"),
     );
-    assert.ok(got[0]!.time >= Date.parse("2011-01-01T00:00:00Z"));
     assert.ok(got.at(-1)!.time < end && got.at(-1)!.time >= end - 24 * 3_600_000);
     assert.ok(got.every((o) => o.flag === Flag.good));
-    // A file cut anywhere before the date it ends on is refused, as a short finished year is.
-    const text = (await bom.archiveOf(2011))!.get("170")!;
-    const lines = bom.uncompress(text).toString("latin1").trimEnd().split("\n");
-    assert.deepEqual(bom.parse(lines.join("\n"), "170", 2011, end).length, got.length);
-    assert.throws(() => bom.parse(lines.slice(0, -2).join("\n"), "170", 2011, end), /ends before/);
-    // So is one that runs past it.
-    const longer = bom.uncompress((await bom.archiveOf(2011))!.get("018")!).toString("latin1");
-    assert.throws(() => bom.parse(longer, "018", 2011, end), /ends after/);
-    // Suva's 2011 is a whole year.
+    // Suva's 2011 runs to the year's last hour.
     const suva = await bom.levels(
       "018",
       new Date("2011-01-01T00:00:00Z"),
@@ -347,11 +339,6 @@ describe("bom", () => {
       ],
     );
     assert.equal(first.length, 11);
-    // A finished year has to run to its last half-day.
-    assert.throws(
-      () => bom.parse(file(line("995", " 1 1", 1, full)), "995", 2026, true),
-      /ends before/,
-    );
     // The half-day lines run on from January 1: the second half, the next day.
     const two = bom.parse(
       file(

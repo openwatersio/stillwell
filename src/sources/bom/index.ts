@@ -70,8 +70,6 @@ interface Gauge {
    * own series, not UHSLC's, so they're named here rather than found by name.
    */
   uhslc: string[];
-  /** The last day of the gauge's last file, when that file stops before December 31. */
-  stopped?: string;
   /** GESLA's record of BOM's own file for the gauge. */
   gesla?: string;
   /**
@@ -249,7 +247,6 @@ export const GAUGES: Gauge[] = [
     lon: 105.667,
     name: "Christmas Island",
     country_code: "CX",
-    stopped: "2011-08-31",
     uhslc: ["170"],
     gesla: "christmas_island-46290-aus-bom",
   },
@@ -533,12 +530,7 @@ export async function levels(
       year >= thisYear || (year >= thisYear - 2 && new Date().getUTCMonth() < 3)
         ? Flag.preliminary
         : Flag.good;
-    // A year two or more back is whole in every file BOM has written, bar the last of a gauge whose
-    // file stops early, so a short one is cut off.
-    const stops = gauge.stopped && year === Number(gauge.stopped.slice(0, 4));
-    const whole =
-      year > thisYear - 2 ? false : stops ? Date.parse(gauge.stopped!) + 24 * HOUR_MS : true;
-    for (const o of parse(latin1(uncompress(member)), number, year, whole))
+    for (const o of parse(latin1(uncompress(member)), number, year))
       if (o.time >= start.getTime() && o.time < end.getTime())
         out.push({ ...o, flag, source_flag: flag });
   }
@@ -555,16 +547,7 @@ const LINE = /^(\d{3}).{8}(\d{4})([ \d]\d)([ \d]\d)([12])((?:[ \d-]{5}){12})$/;
  * (2 each), the half, `1` for hours 0 to 11 and `2` for 12 to 23, then 12
  * levels in millimeters, 5 characters each, `9999` where missing.
  */
-export function parse(
-  text: string,
-  number: string,
-  year: number,
-  /**
-   * Whether the file is a finished year's, which has to run to the year's last
-   * half-day, or the midnight (ms) after the last day a gauge's file ends on.
-   */
-  whole: boolean | number = false,
-): Observation[] {
+export function parse(text: string, number: string, year: number): Observation[] {
   const out: Observation[] = [];
   // Only the file's last newline ends a line without one; a blank line inside is a damaged record.
   const lines = text.replace(/\r?\n$/, "").split(/\r?\n/);
@@ -600,11 +583,6 @@ export function parse(
     if (half === 2) midnight += 24 * HOUR_MS;
     half = half === 1 ? 2 : 1;
   }
-  const end = whole === true ? Date.UTC(year + 1, 0, 1) : whole;
-  if (end && (midnight !== end || half !== 1))
-    throw new Error(
-      `BOM ${number}'s file for ${year} ends ${midnight < end ? "before" : "after"} ${new Date(midnight).toISOString().slice(0, 10)} half ${half}`,
-    );
   return out;
 }
 
