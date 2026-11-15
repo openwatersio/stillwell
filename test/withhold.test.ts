@@ -628,6 +628,17 @@ describe("withhold", () => {
         [{ time: Date.UTC(2015, 0, 1), level: 1, flag: Flag.good }],
         "ZERO",
       );
+    // The dropped record's backfilled years, in two epochs, and the kept one's.
+    const gesla = (code: string, epoch: number) => ({
+      id: `gesla/${code}`,
+      epoch,
+      years: [[2010, 2016]],
+    });
+    await writeJsonArray(backfilledPath(store, "gesla"), [
+      gesla(codes[0]!, 1),
+      gesla(codes[0]!, 2),
+      gesla(codes[1]!, 1),
+    ]);
     const run = spawnSync(process.execPath, ["scripts/ingest.ts", "drop", "gesla", "--dry-run"], {
       encoding: "utf8",
       env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(store, "..", "cache") },
@@ -639,7 +650,10 @@ describe("withhold", () => {
     );
     assert.match(run.stdout, /gesla\/crms0153-crms0153-usa-crms/);
     assert.doesNotMatch(run.stdout, /crms3800/);
+    // Counted by station, its two epochs' rows as one.
+    assert.match(run.stdout, /gesla: 1 dropped stations' backfilled years to clear \(dry run\)/);
     assert.equal(existsSync(seriesPath(store, "levels", "gesla", codes[0], 2015, 1)), true);
+    assert.equal(((await readJsonArray(backfilledPath(store, "gesla"))) as unknown[]).length, 3);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {
