@@ -201,39 +201,41 @@ export async function levels(slug: string, start: Date, end: Date): Promise<Obse
   return out;
 }
 
-/** `2014-01-01 00:10:00;-25.7`: UTC, then centimeters. */
-const ROW = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2});(-?\d+(?:\.\d+)?)$/;
+/** `2014-01-01 00:10:00;-25.7`: UTC, then centimeters. A file's first row can leave the time out (`2015-01-01;-1.6`), meaning 00:00. */
+const ROW = /^(\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2}:\d{2}))?;(-?\d+(?:\.\d+)?)$/;
 
 /**
- * `UTC;Level` rows in UTC and centimeters. A row that isn't one, whose date
- * doesn't exist (`Date.parse` rolls 31 February over to March), or that repeats
- * a time with another level, fails the file.
+ * `UTC;Level` rows in UTC and centimeters. A row that isn't one, or whose
+ * date doesn't exist (`Date.parse` rolls 31 February over to March), fails the
+ * file. A row with no time is midnight (erratum `ispra-midnight-without-time`),
+ * and a time with two different levels is dropped (erratum `ispra-repeated-times`).
  */
 export function parse(text: string): Observation[] {
   const [header, ...rows] = text.split(/\r?\n/);
   if (header?.trim() !== "UTC;Level") throw new Error(`ISPRA's file starts "${header}"`);
-  const seen = new Map<number, number>();
+  // Levels are compared as ISPRA writes them, not as rounded to millimeters; null marks a time with two.
+  const seen = new Map<number, number | null>();
   const out: Observation[] = [];
   for (const row of rows) {
     if (!row.trim()) continue;
     const match = ROW.exec(row);
-    const t = match ? Date.parse(`${match[1]}T${match[2]}Z`) : NaN;
+    const clock = match?.[2] ?? "00:00:00";
+    const t = match ? Date.parse(`${match[1]}T${clock}Z`) : NaN;
     if (
       !match ||
       !Number.isFinite(t) ||
-      new Date(t).toISOString().slice(0, 19) !== `${match[1]}T${match[2]}`
+      new Date(t).toISOString().slice(0, 19) !== `${match[1]}T${clock}`
     )
       throw new Error(`ISPRA's file has the row "${row}"`);
-    const level = Math.round(Number(match[3]) * 10) / 1000;
+    const cm = Number(match[3]);
     if (seen.has(t)) {
-      if (seen.get(t) !== level)
-        throw new Error(`ISPRA's file has two levels for ${row.slice(0, 19)}`);
+      if (seen.get(t) !== cm) seen.set(t, null);
       continue;
     }
-    seen.set(t, level);
-    out.push({ time: t, level, flag: Flag.preliminary });
+    seen.set(t, cm);
+    out.push({ time: t, level: Math.round(cm * 10) / 1000, flag: Flag.preliminary });
   }
-  return out;
+  return out.filter((o) => seen.get(o.time) !== null);
 }
 
 /** ISPRA publishes no limit; requests start a second apart. */

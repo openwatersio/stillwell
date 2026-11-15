@@ -114,10 +114,20 @@ describe("ispra", () => {
       ispra.parse("UTC;Level\r\n2014-01-01 00:10:00;1\r\n2014-01-01 00:10:00;1.0\r\n").length,
       1,
     );
-    assert.throws(
-      () => ispra.parse("UTC;Level\r\n2014-01-01 00:10:00;1\r\n2014-01-01 00:10:00;2\r\n"),
-      /two levels/,
+    // A time with two different levels, even within a millimeter, is dropped whole.
+    const times = (text: string) => ispra.parse(text).map((o) => new Date(o.time).toISOString());
+    assert.deepEqual(
+      times(
+        "UTC;Level\r\n2014-01-01 00:00:00;1\r\n2014-01-01 00:10:00;1\r\n2014-01-01 00:10:00;2\r\n2014-01-01 00:20:00;3\r\n2014-01-01 00:20:00;-25.71\r\n2014-01-01 00:20:00;-25.74\r\n",
+      ),
+      ["2014-01-01T00:00:00.000Z"],
     );
+    // A first row with a date and no time is midnight.
+    assert.deepEqual(ispra.parse("UTC;Level\r\n2015-01-01;-1.6\r\n2015-01-01 00:10:00;1.8\r\n"), [
+      { time: Date.parse("2015-01-01T00:00:00Z"), level: -0.016, flag: Flag.preliminary },
+      { time: Date.parse("2015-01-01T00:10:00Z"), level: 0.018, flag: Flag.preliminary },
+    ]);
+    assert.throws(() => one("2015-02-30;1"), /has the row/);
   });
 
   it("reads the dump whatever its line ends and order, naming a gauge by its latest month", () => {
@@ -131,6 +141,25 @@ describe("ispra", () => {
     assert.equal(ispra.parseDump(renamed.join("\n")).stations.get("napoli")!.name, "Napoli Porto");
     // A month the dump lists twice is asked for once.
     assert.deepEqual(ispra.parseDump([...lines, ...lines].join("\n")).months, plain.months);
+  });
+
+  it("maps every GESLA ISPRA record to a gauge of the archive, or to none where it lists none", () => {
+    const gauges = new Set(fixture("ispra-gauges.txt").trim().split("\n"));
+    const records = fixture("../../src/sources/gesla/coverage.csv")
+      .split("\n")
+      .map((row) => row.split(",")[0]!)
+      .filter((id) => id.endsWith("-ita-ispra"));
+    assert.equal(records.length, 39);
+    const unlisted = records.filter((id) => {
+      const mapped = ispra.idOfGeslaFile(id.slice("gesla/".length));
+      assert.ok(mapped === null || gauges.has(mapped.slice("ispra/".length)), id);
+      return mapped === null;
+    });
+    assert.deepEqual(unlisted, [
+      "gesla/arbatax-arb-ita-ispra",
+      "gesla/cetraro-cet-ita-ispra",
+      "gesla/pozzallo-poz-ita-ispra",
+    ]);
   });
 
   it("fails on a level file in the dump that it can't read, rather than drop its gauge", () => {
