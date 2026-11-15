@@ -515,6 +515,62 @@ export const FILES = {
     ],
     sort: ["a", "b"],
   },
+  matches: {
+    path: "stations/matches.parquet",
+    example: "stations/matches.parquet",
+    title: "Level matches",
+    description:
+      "Pairs of stations within 10 km, and every linked pair, compared once a month by their hourly levels. Publish links a pair whose levels agree within 1 cm.",
+    columns: [
+      {
+        name: "a",
+        type: "VARCHAR",
+        description:
+          "One station of the pair, its `id` in `stations.parquet`. It sorts before `b`.",
+      },
+      { name: "b", type: "VARCHAR", description: "The other station of the pair." },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        description: "The start of the window compared, in UTC: the first of the years compared.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        description: "The end of the window compared, in UTC, exclusive.",
+      },
+      {
+        name: "months",
+        type: "INTEGER",
+        description:
+          "How many months both stations hold at least 15 days of the same hours in, while `a`'s levels move by 5 cm (a standard deviation); at least 6.",
+      },
+      {
+        name: "hours",
+        type: "INTEGER",
+        description:
+          "How many hours both stations hold a good or preliminary value at, in those months.",
+      },
+      {
+        name: "rms_m",
+        type: "DOUBLE",
+        description:
+          "The median of the months' RMS difference between the two, in meters, once each month's mean difference is removed. Under 0.01 is one gauge recorded twice.",
+      },
+      {
+        name: "lag_h",
+        type: "INTEGER",
+        description:
+          "Hours, from -2 to 2, to add to `b`'s times that agree best; 0 unless one halves `rms_m`. Another value is likely a clock error in one of them.",
+      },
+      {
+        name: "lag_rms_m",
+        type: "DOUBLE",
+        description: "`rms_m` with `b`'s times moved by `lag_h`.",
+      },
+    ],
+    sort: ["a", "b"],
+  },
   years: {
     path: "stations/years/<source>.parquet",
     example: "stations/years/rws.parquet",

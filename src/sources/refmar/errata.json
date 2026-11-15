@@ -13,6 +13,16 @@
       "report": "Sent to refmar@shom.fr on 2026-11-06, in French, with the yearly results above. No answer yet."
     },
     {
+      "id": "refmar-kerguelen-raw-hour-late",
+      "stations": ["refmar/23"],
+      "since": "1993-04-05",
+      "until": "2013-06-04",
+      "handling": "corrected",
+      "error": "SHOM serves Kerguelen's raw series (2), hourly from 5 April 1993 to 3 June 2013, an hour late: each value is the one its 1-minute series (1) carries an hour earlier, and the one UHSLC's, CMEMS's and GESLA's records of the gauge carry an hour earlier.",
+      "response": "The adapter moves the raw series' values at Kerguelen labeled before 4 June 2013 an hour earlier. SHOM's validated hourly series (4), which covers a few months of the span such as November 2001 to March 2003, is on time and kept as served.",
+      "evidence": "November 2026. For every month the raw series covers, SHOM's raw series equals its 1-minute series an hour earlier on every whole hour, and the store's values from it equal GESLA's copy of CMEMS's Kerguelen record (`gesla/kerguelentg_60minute-ker-fra-cmems`) an hour earlier to the millimeter (standard deviation 0.0 cm), while the months the validated series covers equal it at the same time. M2's phase in the store's values is 50 to 57° in 1993 to 2013, against 22 to 28° in UHSLC's record (`uhslc/180`), CMEMS's, GESLA's copy of REFMAR's from an earlier download, and REFMAR's own values before 1993 and from 2017. The store's level match of November 2026 found the gauge equal to UHSLC, GESLA and CMEMS only at an hour's offset, at 0.00 cm. Of SHOM's 173 gauges, only Kerguelen and Dumont d'Urville serve both raw series as hourly values on 1 June 2000 and 1 June 2010. Dumont d'Urville's differ by an hour on 1 June 2000 too, but its stored values, mostly SHOM's validated series, hold one M2 phase from 1996 to 2026, so it isn't moved."
+    },
+    {
       "id": "refmar-hiva-oa-uhslc-2020-datum",
       "stations": ["refmar/495"],
       "handling": "corrected",

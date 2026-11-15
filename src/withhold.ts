@@ -239,6 +239,40 @@ export async function removePrefixes(store: string, prefixes: string[]): Promise
 }
 
 /**
+ * Delete the series files of the stations in `source`'s list whose source ID
+ * `drop` names, such as GESLA's records that hold another gauge's values, and
+ * their rows in the years file and the analysis. Deletes only the directories
+ * that have files, and with `dryRun` deletes nothing, returning what it would
+ * delete. The bounds keep them until `compact --rebuild-bounds`.
+ */
+export async function dropFiles(
+  store: string,
+  source: string,
+  drop: (sourceId: string) => boolean,
+  {
+    remove = removePrefixes,
+    dryRun = false,
+  }: { remove?: (store: string, prefixes: string[]) => Promise<void>; dryRun?: boolean } = {},
+): Promise<{ ids: string[]; prefixes: string[] }> {
+  deletable(store);
+  const list = stationListPath(store, source);
+  if (!(await exists(list))) throw new Error(`The store has no list for ${source}`);
+  const named = (await listedIds([list])).filter((id) => drop(id.slice(source.length + 1)));
+  const ids = await withFiles(store, source, named);
+  const prefixes = seriesPrefixes(
+    store,
+    source,
+    ids.map((id) => id.slice(source.length + 1)),
+  );
+  if (dryRun || !ids.length) return { ids, prefixes };
+  await remove(store, prefixes);
+  const gone = new Set(ids);
+  await dropAnalysis(store, source, (id) => gone.has(id));
+  await dropYears(store, source, (id) => gone.has(id));
+  return { ids, prefixes };
+}
+
+/**
  * The most stations one run may withhold, of those the store has known,
  * beyond which a rule more likely matches by mistake. `--accept-withheld`
  * lifts it, for the refresh and `withhold` alike.

@@ -130,7 +130,9 @@ const PEGELONLINE_NOTE =
 
 /**
  * Finds the originator's series for one record. `lists` holds the store's
- * station lists by source, for the sources that have adapters.
+ * station lists by source, for the sources that have adapters, and `links`
+ * the pairs known to share a gauge: `LINKS` and the links in the published
+ * `stations.parquet`.
  *
  * The record's own `commercial_use` doesn't decide anything here: it describes
  * TICON's copy, and the originator's series comes under the originator's
@@ -139,6 +141,7 @@ const PEGELONLINE_NOTE =
 export function originatorSeries(
   record: TiconRecord,
   lists: Record<string, Station[]>,
+  links: { a: string; b: string }[] = LINKS,
 ): Originator {
   const { contributor, code, iso3 } = record;
   if (contributor === "noaa") return byCode(record, "coops", code, "planned", lists);
@@ -286,12 +289,12 @@ export function originatorSeries(
   if (contributor === "cmems") {
     const national = NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
-    // A link in `LINKS`, made by comparing the series, knows the gauge better than CMEMS's position
+    // A link made by comparing the series knows the gauge better than CMEMS's position
     // does. Only a link to the national feed's station names the originator.
     const copy = `gesla/${urlSafe(record.id)}`;
-    const ids = LINKS.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : [])).filter(
-      (id) => national && id.startsWith(`${national.source}/`),
-    );
+    const ids = links
+      .flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : []))
+      .filter((id) => national && id.startsWith(`${national.source}/`));
     if (national && ids.length > 0 && lists[national.source]) {
       const linked = lists[national.source]!.find((s) => ids.includes(s.id) && usable(s));
       if (linked)
@@ -308,7 +311,7 @@ export function originatorSeries(
         source: national.source,
         id: null,
         status: "to_match",
-        note: `${note}; ${ids.join(", ")}, which LINKS names, isn't a station with levels`,
+        note: `${note}; ${ids.join(", ")}, which it's linked to, isn't a station with levels`,
       };
     }
     if (national && lists[national.source])
