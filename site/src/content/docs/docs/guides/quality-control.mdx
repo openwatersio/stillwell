@@ -79,6 +79,7 @@ Each source reports quality its own way, or not at all. This is how each one's c
 - **[JMA](/sources/jma/)**, from which file served the month. The final file is good. The provisional (`sokuho`) file is preliminary, and is used only for the current and previous month in Japan time before the final file exists. Checks its values: yes.
 - **[JODC](/sources/jodc/)** publishes final values only and flags nothing. Every value is good. Checks its values: no.
 - **[Kartverket](/sources/kartverket/)**, from the XML `flag`. Anything other than `obs` is suspect. Since Kartverket marks no value as checked, an `obs` value is preliminary for its first 365 days and good after. Checks its values: yes.
+- **[LINZ](/sources/linz/)** sends no quality code. A value from a day's file is preliminary and one from a year's file good, where LINZ has replaced a missing value or a sensor that was off with its missing mark. LINZ checks none of its values, and warns that its sensors drift. Checks its values: no.
 - **[Marine Institute](/sources/marine-institute/)**, from `QC_Flag`. 1 is good. 0 (not yet checked) is preliminary. 9 (missing) is not stored. Any other code is suspect. Checks its values: yes.
 - **[PEGELONLINE](/sources/pegelonline/)** sends no quality code. Every value is preliminary. Checks its values: no.
 - **[REFMAR](/sources/refmar/)**, from which series a value came from. Validated series are good. Raw series are preliminary, and a raw value between two validated ones is not stored. Checks its values: yes.
