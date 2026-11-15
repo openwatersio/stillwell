@@ -106,6 +106,8 @@ Stillwell checks every observed level when it's fetched, and checks stored years
 | Outliers       | suspect | A value far outside the station's usual range, such as a sensor reading its zero: more than 10 times the median absolute deviation, and at least 1 m, from the median of the values the other checks didn't flag.                                                          |
 | Residual jumps | suspect | A run of values that jumps away from the tide and back within a day, as when a sensor reads its zero for a few hours. It's judged on the residual after fitting the station's own tide, and needs a jump of more than 0.5 m and well beyond the usual step-to-step change. |
 
+GESLA's and CMEMS's adapters leave out a level outside −500 m to 9,000 m as missing, because some of their gauges use such levels as fill values. Other sources keep it, flagged bad, as do the values from GESLA and CMEMS stored before the adapters left them out.
+
 The window a check sees depends on when it runs. Stored years are checked a calendar year at a time, with the years either side as context, so a flatline across New Year is judged whole. The last seven days are checked as one window each hour. Residual jumps need 30 days' worth of hourly values to fit a tide, so they're judged on stored years only, not on the last seven days.
 
 ### Which checks apply

@@ -1,5 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 import { getJson, getText, HttpError } from "../../http.ts";
+import { possible } from "../../span.ts";
 import {
   Flag,
   stationDefaults,
@@ -411,7 +412,9 @@ export async function levels(
   ] as const)
     for (const r of list) {
       const flag = flagOf(r.value_qc);
-      if (r.value === null || flag === null || out.has(r.time)) continue;
+      // A level no gauge can read is a fill value, such as 999,999.06 m, so it's missing
+      // (erratum `cmems-fill-values`).
+      if (r.value === null || !possible(r.value) || flag === null || out.has(r.time)) continue;
       out.set(r.time, { time: r.time * 1000, level: r.value, flag: Math.max(flag, floor) as Flag });
     }
   return [...out.values()].sort((x, y) => x.time - y.time);
