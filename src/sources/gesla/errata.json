@@ -558,6 +558,18 @@
       "error": "GESLA's CRMS0128 record holds the site's marsh well (`CRMS0128-W01`), which measures water in the marsh soil, over the whole record, 1 October 2013 to 23 April 2025, as a surface-water gauge. The site's surface-water gauge, `CRMS0128-H01`, ends in October 2012, a year before the record starts. The record is also an hour early, as the 40 in `gesla-crms-hour-early` are.",
       "response": "The whole record is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Its times are kept as served.",
       "evidence": "Moved an hour later, all 90,749 of its hours equal `CRMS0128-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, level with it. At GESLA's own times they match on 45 to 51% of hours, those when the slow-moving well doesn't change."
+    },
+    {
+      "id": "gesla-ttw-longitudes",
+      "stations": [
+        "gesla/boat_cove-rbct-nzl-ttw",
+        "gesla/fishing_rock-rfrt-nzl-ttw",
+        "gesla/owenga-chit-nzl-ttw"
+      ],
+      "handling": "kept",
+      "error": "GESLA 4.1 gives Boat Cove and Fishing Rock (Raoul Island) longitudes of 177.9°E, and Owenga (Chatham Islands) 176.37°E, where LINZ's READMEs give 177.89°W, 177.90°W and 176.37°W. Each record sits about 410 to 580 km from its gauge, on the wrong side of the antimeridian.",
+      "response": "The three records keep GESLA's positions. Each is linked to LINZ's gauge by decision in `LINKS` (`src/same-as.ts`), so the copy rule's distance limit doesn't leave it unlinked.",
+      "evidence": "LINZ's READMEs for RBCT, RFRT and CHIT, November 2026; the three GESLA TTW records' positions in the store's list."
     }
   ],
   "retired": []

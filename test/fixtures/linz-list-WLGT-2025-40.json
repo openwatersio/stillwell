@@ -1,0 +1,22 @@
+{
+ "files": [
+  {
+   "name": "WLGT_40_2025.zip",
+   "uri": "/tidegauge/WLGT/2025/40/WLGT_40_2025.zip",
+   "size": 2272840,
+   "modified": "2026-01-07"
+  },
+  {
+   "name": "WLGT_40_2025100.zip",
+   "uri": "/tidegauge/WLGT/2025/40/WLGT_40_2025100.zip",
+   "size": 6931,
+   "modified": "2025-04-12"
+  },
+  {
+   "name": "WLGT_40_2025365.zip",
+   "uri": "/tidegauge/WLGT/2025/40/WLGT_40_2025365.zip",
+   "size": 7062,
+   "modified": "2026-01-02"
+  }
+ ]
+}
