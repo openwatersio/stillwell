@@ -40,3 +40,16 @@ const CRMS = /^crms(\d{4})-crms\1-usa-crms$/;
 export const isDropped = (file: string): boolean =>
   DROPPED.has(file) ||
   (CRMS.test(file) && !CRMS_EARLY.has(file) && !CRMS_WELLS.has(file.slice(0, 8).toUpperCase()));
+
+/**
+ * Dropped CRMS records whose values match no series in the store, so their
+ * files stay in it until their site is known (erratum `gesla-crms-wrong-site`).
+ */
+export const KEEP_FILES = new Set(
+  "0190 0192 0194 0217 0234 0268 2862 3800 5267 5373"
+    .split(" ")
+    .map((site) => `crms${site}-crms${site}-usa-crms`),
+);
+
+/** Whether `ingest drop gesla` deletes the files of GESLA's record `file`. */
+export const deletesFiles = (file: string): boolean => isDropped(file) && !KEEP_FILES.has(file);
