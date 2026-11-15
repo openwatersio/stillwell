@@ -365,6 +365,13 @@ jobs:
             # reaches a gauge's last months after it leaves the latest window;
             # one that stopped earlier asks for nothing past its last day.
             cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
+            # BOM isn't hourly: its archives are rebuilt about monthly, weeks
+            # behind, and a finished year's again in the new year's first weeks,
+            # and nothing else brings its new values, so every active gauge is
+            # read again from the year before last to this one, as BODC's are,
+            # past the year each gauge's last value is in, which the default's
+            # cap would stop at.
+            bom) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
             # BODC's months arrive late and in batches, sometimes two years
             # behind, and it fills gaps and reflags months it has published;
             # nothing else fetches them, so every station's last three years
