@@ -708,6 +708,23 @@ describe("gesla clocks", () => {
     );
   });
 
+  it("moves the early Spanish UHSLC copies an hour later, and Santa Cruz de la Palma's IEO record before 1990", () => {
+    const at = (file: string, time: string) =>
+      iso(gesla.parse(lines([time]), file, null).times[0]!);
+    assert.equal(at("vigo-208a-esp-uhslc_rq", "1980/06/01 00:00:00"), "1980-06-01T01:00:00.000Z");
+    assert.equal(
+      at("las_palmas-217c-esp-uhslc_rq", "1985/06/01 00:00:00"),
+      "1985-06-01T01:00:00.000Z",
+    );
+    assert.equal(
+      at("las_palmas-217d-esp-uhslc_rq", "1995/06/01 00:00:00"),
+      "1995-06-01T00:00:00.000Z",
+    );
+    assert.equal(at("cruz-cruz-esp-ieo", "1985/06/01 00:00:00"), "1985-06-01T01:00:00.000Z");
+    assert.equal(at("cruz-cruz-esp-ieo", "2000/06/01 00:00:00"), "2000-06-01T00:00:00.000Z");
+    assert.equal(at("vigo-vigo-esp-ieo", "1980/06/01 00:00:00"), "1980-06-01T00:00:00.000Z");
+  });
+
   it("refuses a record off UTC, but keeps Wewak's, which only says it is", () => {
     const text = "# TIME ZONE HOURS 1\n" + lines(["1990/01/01 00:00:00"]);
     assert.throws(() => gesla.parse(text, "x-1-png-bom", null), /on UTC1/);

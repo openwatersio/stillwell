@@ -164,6 +164,29 @@
       "evidence": "GESLA's values are UHSLC's at the same labels: on 2010-06-01 at 00:00, 01:00 and 02:00, `hong_kong-329b-hkg-uhslc_rq` gives 2.13, 2.23 and 2.28 m, and UHSLC's ERDDAP (`global_hourly_rqds`, 329 version B) 2130, 2230 and 2280 mm; on 2024-06-01 the fast-delivery record matches `global_hourly_fast` the same way. slackwater-database found UHSLC's hour against the Hong Kong Observatory's predictions ([openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360)). With the shift, `scripts/clock-check.ts` on 2015 fits 329 and 329b at 0 minutes against slackwater-database's re-fit."
     },
     {
+      "id": "gesla-spain-uhslc-hour-early",
+      "stations": [
+        "gesla/las_palmas-217a-esp-uhslc_rq",
+        "gesla/las_palmas-217b-esp-uhslc_rq",
+        "gesla/las_palmas-217c-esp-uhslc_rq",
+        "gesla/vigo-208a-esp-uhslc_rq"
+      ],
+      "handling": "corrected",
+      "error": "GESLA 4.1 copies UHSLC's research-quality versions of Vigo (208a) and of Las Palmas before 1991 (217a, 217b, 217c) with UHSLC's times, which are an hour early (erratum `uhslc-spain-hour-early`). Its copies of Las Palmas's later versions (217, 217d) are on time.",
+      "response": "The adapter moves the four records' times an hour later, as the `uhslc` adapter does for UHSLC's own series.",
+      "evidence": "M2's phase in GESLA's four copies is 240 to 245° a year at Vigo and 189 to 201° at Las Palmas, the same as UHSLC's versions and 29° (an hour) below IEO's records of the gauges, Puertos del Estado's (CMEMS) and Las Palmas's later UHSLC versions in GESLA, 217 and 217d, at 220 to 225°."
+    },
+    {
+      "id": "gesla-santa-cruz-de-la-palma-hour-early",
+      "stations": ["gesla/cruz-cruz-esp-ieo"],
+      "since": "1949-04-30",
+      "until": "1987-01-01",
+      "handling": "corrected",
+      "error": "GESLA 4.1's IEO record of Santa Cruz de la Palma (`cruz-cruz-esp-ieo`) is an hour early from its start in 1949 to the end of 1986: the height labeled T was measured at T + 1 h UTC. The record has no values from 1987 to 1995, and from 1996 it is on time.",
+      "response": "The adapter moves the record's values labeled before 1990, within its gap, an hour later.",
+      "evidence": "November 2026. UHSLC's versions of the gauge (`uhslc/206a`, `uhslc/206b`) equal the record an hour later in every year they share, 1949 to 1980, at a standard deviation of 0.6 to 6 cm a year. M2's phase in the record is 189 to 198° a year to 1986 and 223 to 230° from 1996, against 218 to 228° in UHSLC's versions (1949 to 1990) and in CMEMS's La Palma gauge (from 2007). Of GESLA's 12 IEO records, only this one changes phase by an hour. The store's level match of November 2026 found it equal to UHSLC's only at an hour's offset."
+    },
+    {
       "id": "gesla-crms-hour-early",
       "stations": [
         "gesla/crms0002-crms0002-usa-crms",

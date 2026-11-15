@@ -81,6 +81,20 @@ const WSV_SHIFT_MS = 30 * 60_000;
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
+/**
+ * Records an hour early until the time given, by file: GESLA's copies of
+ * UHSLC's Vigo and Las Palmas versions from before 1991, which UHSLC stamps an
+ * hour early (erratum `gesla-spain-uhslc-hour-early`), and IEO's Santa Cruz de
+ * la Palma before its gap from 1987 to 1995 (erratum `gesla-santa-cruz-de-la-palma-hour-early`).
+ */
+const EARLY_UNTIL: Record<string, number> = {
+  "vigo-208a-esp-uhslc_rq": Infinity,
+  "las_palmas-217a-esp-uhslc_rq": Infinity,
+  "las_palmas-217b-esp-uhslc_rq": Infinity,
+  "las_palmas-217c-esp-uhslc_rq": Infinity,
+  "cruz-cruz-esp-ieo": Date.UTC(1990, 0, 1),
+};
+
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
   /** `CONTRIBUTOR (ABBREVIATED)`, such as `NOAA` or `UHSLC_RQ`. */
@@ -457,7 +471,8 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   const zone = /^# TIME ZONE HOURS\s+(\S+)/m.exec(text)?.[1] ?? "0";
   if (zone !== "0" && file !== "wewak-56070-png-bom")
     throw new Error(`GESLA's ${file} is on UTC${zone}, which the adapter doesn't convert`);
-  const shift = HONG_KONG.test(file) || CRMS_EARLY.has(file) ? HOUR_MS : 0;
+  const earlyUntil =
+    HONG_KONG.test(file) || CRMS_EARLY.has(file) ? Infinity : (EARLY_UNTIL[file] ?? -Infinity);
   // Typed arrays sized by the line count, since the largest records hold 6 million values.
   let lines = 1;
   for (let at = text.indexOf("\n"); at >= 0; at = text.indexOf("\n", at + 1)) lines++;
@@ -478,7 +493,8 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
       const level = Number(fields[0]);
       if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
         const flag = QC_FLAGS[qc]!;
-        times[n] = timeOf(text, at) + shift;
+        const time = timeOf(text, at);
+        times[n] = time < earlyUntil ? time + HOUR_MS : time;
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;

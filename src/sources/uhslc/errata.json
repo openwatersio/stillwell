@@ -11,6 +11,14 @@
       "report": "Sent to srdata@soest.hawaii.edu on 2026-10-24, with a follow-up on 2026-11-07. No answer yet."
     },
     {
+      "id": "uhslc-spain-hour-early",
+      "stations": ["uhslc/208a", "uhslc/217a", "uhslc/217b", "uhslc/217c"],
+      "handling": "corrected",
+      "error": "UHSLC stamps its research-quality versions of Vigo (208 version A, 1943 to 1990) and of Las Palmas before 1991 (217 versions A, B and C, 1949 to 1991) an hour early: the height labeled T was measured at T + 1 h UTC. Las Palmas's FD series (217), from 1991, is on time.",
+      "response": "The four versions' values are moved an hour later.",
+      "evidence": "November 2026. IEO's records of both gauges (GESLA's `vigo-vigo-esp-ieo` and `pluz-pluz-esp-ieo`) equal UHSLC's an hour earlier in every year they share: Vigo 1943 to 1990 at a standard deviation of 0.2 to 1.6 cm in most years against 41 to 44 cm at UHSLC's own times, Las Palmas 1949 to 1956 at 0.2 to 0.4 cm in most years and 1975 to 1990 at 0.9 to 13 cm against 28 to 32 cm. From 1993 IEO's Las Palmas equals UHSLC's FD series at the same time to 0.01 cm. M2's phase, which an hour moves by 29°, is 241 to 245° a year in UHSLC's Vigo version A (1943 to 1990) against 269 to 276° in IEO's Vigo record (GESLA's `vigo-vigo-esp-ieo`) from 1943 to 2016 and in Puertos del Estado's Vigo 2 gauge (CMEMS, from 1992); at Las Palmas it is 189 to 201° in versions A, B and C against 218 to 227° in IEO's record from 1949 to 2016, UHSLC's own FD series (217) from 1991 and CMEMS's from 1992. The store's level match of November 2026 found IEO's Las Palmas and Vigo equal to UHSLC's only at an hour's offset."
+    },
+    {
       "id": "uhslc-positions",
       "stations": ["uhslc/290a", "uhslc/290", "uhslc/914", "uhslc/316", "uhslc/548", "uhslc/054a"],
       "handling": "corrected",
