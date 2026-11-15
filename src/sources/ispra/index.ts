@@ -86,7 +86,7 @@ const PLATFORM = new RegExp(`^${NODE}/platform/00105_(\\w+)_09> <([^>]*)> "([^"]
 
 /** The dump's gauges and listed months. Exported for tests. */
 export function parseDump(text: string): Listing {
-  // A gauge's code and label can change over the years; the latest month's wins, whatever the line order.
+  // A gauge's code and label can change over the years; the latest month's wins, whatever the line order. A platform's position is taken as the dump gives it.
   const codes = new Map<string, { month: string; code: string }>();
   const months = new Map<string, Set<string>>();
   const names = new Map<string, { month: string; name: string }>();
@@ -99,6 +99,9 @@ export function parseDump(text: string): Listing {
       (months.get(slug) ?? months.set(slug, new Set()).get(slug)!).add(month);
       continue;
     }
+    // A level file the pattern misses would drop its gauge or months without a trace.
+    if (line.includes("hasDownloadURL") && line.includes("_hydrometric_"))
+      throw new Error(`ISPRA's dump has a level file this adapter can't read: ${line}`);
     const label = LABEL.exec(line);
     if (label) {
       const [, code, month, name] = label as unknown as [string, string, string, string];

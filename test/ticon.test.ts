@@ -304,6 +304,20 @@ describe("TICON originators", () => {
     });
     assert.deepEqual([listed.id, listed.status], ["ispra/napoli", "ready"]);
     assert.equal(originatorSeries(napoli, { ispra: [] }).status, "unmatched");
+    // GESLA's position for Sciacca is 31 km off; the file name still names the gauge.
+    const sciacca = record("sciacca-sci-ita-ispra", {
+      name: "Sciacca",
+      lat: 37.2212,
+      lon: 13.0765,
+    });
+    const far = originatorSeries(sciacca, {
+      ispra: [station("ispra/sciacca", "Sciacca", 37.50454, 13.07646)],
+    });
+    assert.deepEqual([far.id, far.status], ["ispra/sciacca", "ready"]);
+    assert.equal(
+      originatorSeries(record("cetraro-cet-ita-ispra"), { ispra: [] }).status,
+      "unmatched",
+    );
   });
 
   it("counts a retired PEGELONLINE station with levels as ready", () => {

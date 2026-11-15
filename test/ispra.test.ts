@@ -133,6 +133,11 @@ describe("ispra", () => {
     assert.deepEqual(ispra.parseDump([...lines, ...lines].join("\n")).months, plain.months);
   });
 
+  it("fails on a level file in the dump that it can't read, rather than drop its gauge", () => {
+    const line = `<https://w3id.org/italia/env/ld/rmn/media/00105_na23_hydrometriclevel_201401> <https://w3id.org/italia/env/onto/top/hasDownloadURL> <https://rep.isprambiente.it/file/rmn/napoli_2_hydrometric_201401.csv> .`;
+    assert.throws(() => ispra.parseDump(`${fixture("ispra-dump.nt")}${line}\n`), /can't read/);
+  });
+
   it("refuses a gauge the dump doesn't list", async () => {
     serve();
     await assert.rejects(

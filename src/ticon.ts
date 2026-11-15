@@ -1,3 +1,4 @@
+import { idOfGeslaFile } from "./sources/ispra/index.ts";
 import { urlSafe } from "./store/paths.ts";
 import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
@@ -325,6 +326,13 @@ export function originatorSeries(
   }
 
   const direct = DIRECT[contributor];
+  // ISPRA's records name the gauge in their file name, as GESLA's do, so a record at the position GESLA misplaces still matches.
+  if (contributor === "ispra") {
+    const id = idOfGeslaFile(record.id);
+    return id
+      ? byCode(record, "ispra", id.slice(id.indexOf("/") + 1), "planned", lists)
+      : { source: "ispra", id: null, status: "unmatched", note: "Not in ISPRA's archive" };
+  }
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
   // CRMS records carry the site; its surface-water gauge is the latest of H01,
