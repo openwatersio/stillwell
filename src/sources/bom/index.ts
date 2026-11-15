@@ -407,9 +407,14 @@ export async function stations(): Promise<ListedStation[]> {
   let archive = await archiveOf(year);
   if (!archive) archive = await archiveOf(--year);
   if (!archive) throw new Error(`BOM has no archive for ${year} or ${year + 1}`);
+  // A gauge down for the weeks a new year's archive covers is still active: the year before counts too.
+  const before = await archiveOf(year - 1);
+  const hasValues = (from: Map<string, Buffer> | null, number: string, y: number) => {
+    const member = from?.get(number);
+    return member ? parse(latin1(uncompress(member)), number, y).length > 0 : false;
+  };
   const out = GAUGES.map((g): ListedStation => {
-    const member = archive.get(g.number);
-    const active = member ? parse(latin1(uncompress(member)), g.number, year).length > 0 : false;
+    const active = hasValues(archive, g.number, year) || hasValues(before, g.number, year - 1);
     return {
       ...stationDefaults(metadata),
       attribution: `${metadata.attribution}; ${PROJECTS[g.project]}`,
@@ -462,7 +467,7 @@ export function archiveOf(year: number): Promise<Map<string, Buffer> | null> {
       (error) => {
         // Only the years BOM has no archive for read as none: any other 550 is a file it should have.
         if (error instanceof FtpError && error.code === 550 && noArchive(year)) return null;
-        archives.delete(year);
+        // Kept, failed, for the run, so each gauge doesn't ask a stalled server again.
         throw error;
       },
     );
@@ -491,8 +496,12 @@ export async function levels(
   ) {
     const member = (await archiveOf(year))?.get(number);
     if (!member) continue;
-    // The year's archive is the last until BOM rebuilds it after the year's end.
-    const flag = year >= thisYear ? Flag.preliminary : Flag.good;
+    // BOM rebuilds a finished year's archive in the new year's first weeks (`2024.ar` on 30 January, `2025.ar` on 16 February), so until April the last year is preliminary too.
+    const now = new Date();
+    const flag =
+      year >= thisYear || (year === thisYear - 1 && now.getUTCMonth() < 3)
+        ? Flag.preliminary
+        : Flag.good;
     for (const o of parse(latin1(uncompress(member)), number, year))
       if (o.time >= start.getTime() && o.time < end.getTime())
         out.push({ ...o, flag, source_flag: flag });
@@ -568,7 +577,11 @@ export function unar(archive: Buffer, year: number): Map<string, Buffer> {
     if (!Number.isInteger(size) || body.length !== size)
       throw new Error(`BOM's ${year}.ar is cut off in ${name}`);
     const m = /^h(\d{3})\.dat\.Z$/.exec(name);
-    if (!m) throw new Error(`BOM's ${year}.ar holds ${name}`);
+    // Any other file in the archive isn't a gauge's.
+    if (!m) {
+      p += 60 + size + (size % 2);
+      continue;
+    }
     if (out.has(m[1]!)) throw new Error(`BOM's ${year}.ar holds ${name} twice`);
     out.set(m[1]!, Buffer.from(body));
     p += 60 + size + (size % 2);
@@ -584,7 +597,7 @@ export function unar(archive: Buffer, year: number): Map<string, Buffer> {
  * or a clear code cuts short.
  */
 export function uncompress(z: Buffer): Buffer {
-  // Some members of 1996's archive are gzip files under the same name (erratum `bom-gzip-named-z`).
+  // Every member of 1996's archive is a gzip file under the same name (erratum `bom-gzip-named-z`).
   if (z[0] === 0x1f && z[1] === 0x8b) return gunzipSync(z);
   if (z.length < 3 || z[0] !== 0x1f || z[1] !== 0x9d) throw new Error("Not a compressed (.Z) file");
   const maxBits = z[2]! & 0x1f;

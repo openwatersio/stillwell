@@ -22,10 +22,16 @@ export class FtpError extends Error {
  */
 export async function ftpGet(url: string, timeoutMs = 300_000): Promise<Buffer> {
   const { protocol, hostname, port, pathname } = new URL(url);
-  if (protocol !== "ftp:") throw new Error(`Not an FTP URL: ${url}`);
-  const path = decodeURIComponent(pathname);
+  // 501, a syntax error, so the retries in `fetchText` don't repeat it.
+  if (protocol !== "ftp:") throw new FtpError(`Not an FTP URL: ${url}`, 501);
+  let path: string;
+  try {
+    path = decodeURIComponent(pathname);
+  } catch {
+    throw new FtpError(`Not an FTP path: ${url}`, 501);
+  }
   // A line break in the path would end the RETR command and start another.
-  if (/[\r\n\0]/.test(path)) throw new Error(`Not an FTP path: ${url}`);
+  if (/[\r\n\0]/.test(path)) throw new FtpError(`Not an FTP path: ${url}`, 501);
   const deadline = AbortSignal.timeout(timeoutMs);
   const control = connect({ host: hostname, port: Number(port) || 21 });
   let data: Socket | undefined;
@@ -44,8 +50,12 @@ export async function ftpGet(url: string, timeoutMs = 300_000): Promise<Buffer> 
     const pasv = await command(control, reply, "PASV", 227);
     const m = /(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)/.exec(pasv);
     if (!m) throw new FtpError(`FTP ${hostname} answered PASV with ${pasv}`, 227);
-    // The control connection's host, not the address in the reply, which a NAT may misstate.
-    const socket = connect({ host: hostname, port: Number(m[5]) * 256 + Number(m[6]) });
+    // The control connection's address, not the one in the reply, which a NAT may misstate,
+    // and not the name again, which may resolve to another host.
+    const socket = connect({
+      host: control.remoteAddress ?? hostname,
+      port: Number(m[5]) * 256 + Number(m[6]),
+    });
     data = socket;
     const chunks: Buffer[] = [];
     let size = 0;
@@ -67,7 +77,7 @@ export async function ftpGet(url: string, timeoutMs = 300_000): Promise<Buffer> 
     received.catch(() => {});
     await command(control, reply, `RETR ${path}`, 150, 125);
     await received;
-    await expect(reply, 226);
+    await expect(reply, 226, 250);
     control.write("QUIT\r\n");
     return Buffer.concat(chunks);
   } catch (error) {

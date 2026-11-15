@@ -27,7 +27,12 @@ describe("bom", () => {
       requests.push(url);
       const year = Number(/\/(\d{4})\.ar$/.exec(url)?.[1]);
       // The real archives' members for these gauges, which are all the fixtures hold of each year.
-      const name = { 1996: "bom-1996.ar", 2005: "bom-2005.ar", 2026: "bom-2026.ar" }[year];
+      const name = {
+        1996: "bom-1996.ar",
+        2005: "bom-2005.ar",
+        2025: "bom-2025.ar",
+        2026: "bom-2026.ar",
+      }[year];
       if (missing.has(year) || !name)
         throw new FtpError("FTP replied 550 Failed to open file.", 550);
       return fixture(name).toString("base64");
@@ -62,7 +67,11 @@ describe("bom", () => {
   it("lists its gauges, active where the newest archive has values", async () => {
     const list = await bom.stations();
     assert.equal(list.length, 29);
-    assert.deepEqual(requests, ["ftp://ftp.bom.gov.au/anon/home/ntc/pacific/uhslc/2026.ar"]);
+    // The newest year's archive, and the year before's for a gauge with no values yet this year.
+    assert.deepEqual(requests, [
+      "ftp://ftp.bom.gov.au/anon/home/ntc/pacific/uhslc/2026.ar",
+      "ftp://ftp.bom.gov.au/anon/home/ntc/pacific/uhslc/2025.ar",
+    ]);
     const byId = new Map(list.map((s) => [s.id, s]));
     // The fixture's 2026 archive holds Cape Ferguson and Portland only.
     assert.deepEqual(
@@ -159,7 +168,7 @@ describe("bom", () => {
     missing.add(2027);
     // 2026's archive is the fixture's; 2027 has none yet.
     const list = await bom.stations();
-    assert.deepEqual(requests.length, 2);
+    assert.deepEqual(requests.length, 3);
     assert.deepEqual(
       list.filter((s) => s.status === "active").map((s) => s.id),
       ["bom/129", "bom/995"],
@@ -197,6 +206,30 @@ describe("bom", () => {
     assert.equal(requests.length, 1);
   });
 
+  it("keeps last year preliminary until April, while BOM rebuilds its archive", async () => {
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-02-10T00:00:00Z") });
+    const early = await bom.levels("995", new Date("2026-01-01Z"), new Date("2026-01-02Z"));
+    assert.equal(early[0]!.flag, Flag.preliminary);
+    assert.equal(early[0]!.source_flag, Flag.preliminary);
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-04-10T00:00:00Z") });
+    const later = await bom.levels("995", new Date("2026-01-01Z"), new Date("2026-01-02Z"));
+    assert.equal(later[0]!.flag, Flag.good);
+  });
+
+  it("keeps a gauge active that the new year's archive hasn't a value for yet", async () => {
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-01-05T00:00:00Z") });
+    // 2027's archive holds no one's values yet (a stub); 2026's is the fixture's.
+    bom.archives.set(2027, Promise.resolve(new Map()));
+    const list = await bom.stations();
+    assert.deepEqual(
+      list.filter((s) => s.status === "active").map((s) => s.id),
+      ["bom/129", "bom/995"],
+    );
+  });
+
   it("flags earlier years good, and reads a file whose first line is garbled", async () => {
     // BOM's 2005 file for Burnie has a damaged position line, which holds no value.
     const out = await bom.levels("994", new Date("2005-06-01Z"), new Date("2005-06-02Z"));
@@ -222,6 +255,9 @@ describe("bom", () => {
       /421/,
     );
     // A 550 for a year BOM should have is an error, not no values; a year with none is.
+    // A failed archive is kept for the run, so each gauge doesn't ask a stalled server again.
+    assert.equal(requests.filter((u) => u.endsWith("/2024.ar")).length, 0);
+    bom.archives.clear();
     setTransport(async () => {
       throw new FtpError("FTP replied 550 Failed to open file.", 550);
     });

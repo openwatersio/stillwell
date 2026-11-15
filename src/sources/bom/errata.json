@@ -11,8 +11,6 @@
     {
       "id": "bom-burnie-2005-position-line",
       "stations": ["bom/994"],
-      "since": "2005-01-01",
-      "until": "2006-01-01",
       "handling": "avoided",
       "error": "The first line of BOM's 2005 file for Burnie, which gives the station's name and position, is damaged: it holds a tab and misses characters (`994BURNIE<tab>L2005  T=41 03.0S  LONG=145 57.0E A  TIMEZONE=GMT`). The values below it are intact.",
       "response": "A first line that isn't a line of levels is skipped without being read, and Burnie's position comes from GESLA's record of the gauge.",
