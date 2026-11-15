@@ -27,6 +27,16 @@
       "evidence": "November 2026. GESLA's copy of UNAM's historical Progreso record (`progreso-402-mex-unam_hist`) equals UHSLC's version A 6 hours later in 1982 and 1983 (r 0.998, standard deviation 1.4 cm), against r 0.88 or less at any other whole hour. K1's and M2's phases in version A are 119° and 282°; in UNAM's record from 1952 to 1993 they are 21° and 105°, in UHSLC's versions B (1999 to 2004) and C (2012 to 2013) 28° and 110° and 10° and 105°, and at the Yucatán gauges either side, Celestún, Sisal and Telchac, 13 to 15° and 101 to 109°. Six hours moves K1 by 90° and M2 by 174°. The store's level match of November 2026 found UNAM's record 27 cm from UHSLC's at the same times."
     },
     {
+      "id": "uhslc-vardo-2007-2018-five-minutes-late",
+      "stations": ["uhslc/805"],
+      "since": "2007-01-01",
+      "until": "2019-01-01",
+      "handling": "kept",
+      "error": "UHSLC's Vardø values (805, in the research-quality version and the FD series alike) from January 2007 to December 2018 are 5 minutes late: the height labeled T stands for T − 5 min UTC. Its values from 2004 to 2006 and from 2019 are on time. The research-quality version (805a) and the FD series carry the same values.",
+      "response": "Kept as served. Moved 5 minutes earlier, the values would sit off the hour, where the store's hourly comparisons (level matches, link offsets) don't read them, and they may be 10-minute means rather than a clock error. Kartverket's own series of the gauge (`kartverket/VAW`) is the group's preferred series, and has no such lag.",
+      "evidence": "November 2026. UHSLC's hourly Vardø values were compared with Kartverket's 10-minute series of the gauge (`kartverket/VAW`), interpolated to lags from −15 to +15 minutes, year by year from 1990. In every month from January 2007 to December 2018 they fit best 300 seconds earlier, to within 10 seconds, at a standard deviation of 15 to 17 mm against 34 to 39 mm at their own times. In 2004 to 2006 and from January 2019 they equal Kartverket's at their own times to 0 to 2 mm. Kartverket's mean over the 10 minutes before each label fits as well as the lag, and no centred window does, so the values may be 10-minute means labeled at their end; either way they stand for 5 minutes before their labels. Before 2004 UHSLC's values differ from Kartverket's by about 30 mm at every lag and aren't moved. GESLA's NHS and CMEMS copies of the gauge are on time. A harmonic fit of 2006 to 2020, which mixes the late years with on-time ones, put UHSLC 170 to 240 seconds behind Kartverket from K1 to M4, while UHSLC's Honningsvåg and Andenes agree with Kartverket within about 10 seconds."
+    },
+    {
       "id": "uhslc-positions",
       "stations": ["uhslc/290a", "uhslc/290", "uhslc/914", "uhslc/316", "uhslc/548", "uhslc/054a"],
       "handling": "corrected",

@@ -275,6 +275,16 @@
       "evidence": "November 2026. Each of the 36 records with an SFWMD series of its gauge in the store and a year in common was compared with it, in its first, middle and last such year, at every whole hour from −8 to +8. 34 fit best 5 hours later, from 1974 to 2024, at r 0.98 to 1.00 and a standard deviation of 0.0 to 3.7 cm, against r 0.94 or less at any other hour, but for S-197 from January to June 1998, which fits best 4 hours later and is moved 5 like the rest. Thursday Point and West Coconut Grove, where the tide is weak, fit at r 0.8 or less at 5 to 8 hours; Thursday Point's M2 phase is 140° from SFWMD's, about 5 hours. Gordon River and Haldeman Creek equal SFWMD's `GORDON_2_T` and `HALDEMAN_T` 5 hours later (r 1.00). S-79, S-37A, S-46 and Henderson Creek have no series to compare in the same years and are moved with the rest. Lake Worth Lagoon's S155 record equals CO-OPS's Lake Worth ICW gauge (8722669) 5 hours later too (r 0.997, 2009). The store's level match of November 2026 found GESLA's SFWMD records 20 to 54 cm from SFWMD's own series at the same times."
     },
     {
+      "id": "gesla-vardo-uhslc-2007-2018-five-minutes-late",
+      "stations": ["gesla/vardo-805-nor-uhslc_fd", "gesla/vardo-805a-nor-uhslc_rq"],
+      "since": "2007-01-01",
+      "until": "2019-01-01",
+      "handling": "kept",
+      "error": "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's times, whose values from 2007 to 2018 are 5 minutes late (erratum `uhslc-vardo-2007-2018-five-minutes-late`).",
+      "response": "Kept as served, as UHSLC's own series is (erratum `uhslc-vardo-2007-2018-five-minutes-late`). Kartverket's own series of the gauge is the group's preferred series.",
+      "evidence": "Both copies fit Kartverket's series best 300 seconds earlier in 2010 and 2016, and at their own times in 2005, as UHSLC's own series does. GESLA's NHS and CMEMS copies of the gauge fit at their own times in all three years."
+    },
+    {
       "id": "gesla-crms-hour-early",
       "stations": [
         "gesla/crms0002-crms0002-usa-crms",

@@ -32,6 +32,7 @@ The store reads the zip. Ingest checks that the zip is the 4.1 release, so a new
 - **Progreso's UHSLC version A is 6 hours late** (erratum `gesla-progreso-uhslc-721a-six-hours-late`). GESLA copies UHSLC's 721a with UHSLC's times, and the store moves them 6 hours earlier.
 - **Scott Base is on NZST** (erratum `gesla-scott-base-ttw-nzst`). Toitū Te Whenua's Scott Base record is on UTC+12 all year, and the store moves it 12 hours earlier.
 - **Queensland's records are on AEST from 2020** (erratum `gesla-queensland-2020-aest`). Seven Queensland records switch from UTC to UTC+10 at the start of 2020, and the store moves their times from then on 10 hours earlier.
+- **Vardø's UHSLC copies are 5 minutes late from 2007 to 2018** (erratum `gesla-vardo-uhslc-2007-2018-five-minutes-late`). GESLA copies UHSLC's Vardø records with UHSLC's times; they're kept as served, as UHSLC's are.
 - **SFWMD's records are on EST** (erratum `gesla-sfwmd-est`). All 43 South Florida Water Management District records are on UTC−5 all year, and the store moves them 5 hours later.
 - **40 CRMS records are an hour early** (erratum `gesla-crms-hour-early`). GESLA's copies of 40 Louisiana CRMS gauges match CPRA's own series once moved an hour later, and the store moves them over each whole record.
 - **298 CRMS records hold another site's values** (erratum `gesla-crms-wrong-site`). Every GESLA CRMS record but the 42 above holds another CRMS site's series an hour early, often the next site in GESLA's own list, so the store lists them as inactive with no products or links.
