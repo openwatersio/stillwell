@@ -1,6 +1,6 @@
-import { urlSafe } from "./store/paths.ts";
+import { differsByData, MATCH_KM, sameByData, shiftedByData, type DataMatch } from "./matches.ts";
 import type { Station } from "./schema.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -25,10 +25,15 @@ import { km, nameScore } from "./ticon.ts";
  *   of the same kind (where both say) that shares the most words with it, the
  *   nearest among equals, unless an equally named one more than 100 m away,
  *   which its source doesn't link to the first, leaves it in doubt.
- * - **`LINKS`**, an explicit decision.
+ * - **levels**: two stations within `MATCH_KM` whose hourly levels agree within
+ *   `SAME_GAUGE` over `MIN_MONTHS` months, whatever their names
+ *   (`stations/matches.parquet`, from `src/matches.ts`). Never across a
+ *   `SEPARATE` pair, and within one source only for an `ASSEMBLED` one.
+ * - **`LINKS`**, an explicit decision, for pairs whose records never overlap
+ *   or that the rules above miss.
  *
  * Linked stations form a group, and each lists every other in `same_as`. A
- * link by nearness or copy that would put two stations of one source in a
+ * link by levels, nearness or copy that would put two stations of one source in a
  * group is skipped, since one of them is likelier another gauge nearby
  * (except for an `ASSEMBLED` source), and
  * no link may join two stations listed in `UNLINKS`. Both are reported.
@@ -159,6 +164,11 @@ export const LINKS: Decision[] = [
     b: "linz/RFRT",
     note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
+  {
+    a: "usace/MVK.Tendal",
+    b: "usgs/07369500",
+    note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",
+  },
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
@@ -228,6 +238,11 @@ function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));
 }
 
+/** Whether two stations' levels may link them: not `separate`, but for two of an `ASSEMBLED` source. */
+export function comparable(a: Station, b: Station): boolean {
+  return !separate(a, b) || (a.source === b.source && ASSEMBLED.has(a.source));
+}
+
 /** Farthest apart two stations matched by nearness and name can be. */
 export const NEAR_KM = 0.1;
 
@@ -240,7 +255,7 @@ export const ID_KM = 10;
 /** A series still reporting has a value within this long. */
 const REPORTING_MS = 366 * 86_400_000;
 
-export type How = "id" | "near" | "copy" | "manual";
+export type How = "id" | "data" | "near" | "copy" | "manual";
 
 export interface LinkReport {
   /** Links made, by `<source>~<source>` (sorted) and how. */
@@ -255,10 +270,14 @@ export interface LinkReport {
    * source's own link and a `LINKS` decision have no distance limit, so one alone can do it.
    */
   wide: string[][];
+  /** Pairs in one group whose levels say two gauges (`differsByData`), with how they're linked: directly, or through the group. */
+  disagree: (DataMatch & { how: How | "group" })[];
+  /** Pairs whose levels agree only with one clock moved by whole hours (`shiftedByData`): a likely erratum. */
+  shifted: DataMatch[];
 }
 
 /** The order links join groups in: `LINKS` first, inferred ones last. */
-const ORDER: How[] = ["manual", "id", "near", "copy"];
+const ORDER: How[] = ["manual", "id", "data", "near", "copy"];
 
 /**
  * Link every station to the others sharing its gauge, and name each group's
@@ -268,11 +287,12 @@ export function linkGauges<T extends Station>(
   stations: T[],
   now = new Date(),
   usable: Map<string, number> = new Map(),
+  matches: DataMatch[] = [],
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
   // GESLA's records whose values are another gauge's join no group.
   const alone = new Set(
-    [...DROPPED].map((file) => `gesla/${urlSafe(file)}`).filter((id) => byId.has(id)),
+    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
   );
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
@@ -285,7 +305,7 @@ export function linkGauges<T extends Station>(
 
   for (const { a, b } of LINKS)
     if (alone.has(a) || alone.has(b))
-      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record that isDropped finds" });
     else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
@@ -300,7 +320,7 @@ export function linkGauges<T extends Station>(
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
       else if (alone.has(other))
-        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record that isDropped finds" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });
@@ -317,6 +337,28 @@ export function linkGauges<T extends Station>(
     if (!(km(s, target) <= ID_KM))
       dropped.push({ from: s.id, to: target.id, reason: `${Math.round(km(s, target))} km apart` });
     else add(s.id, target.id, "id");
+  /** Both of a match's stations are listed and may join a group. */
+  const listed = (m: DataMatch) =>
+    byId.has(m.a) && byId.has(m.b) && !alone.has(m.a) && !alone.has(m.b);
+  /** By pair, the RMS of a link by levels, which orders them: the best agreement joins first. */
+  const agreement = new Map<string, number>();
+  for (const m of matches) {
+    const [a, b] = [byId.get(m.a), byId.get(m.b)];
+    // Within MATCH_KM now, as when compared: a station that moved away isn't linked by its old levels.
+    // On water that measures non-tidal, a pool or a lake, two gauges can agree within 1 cm.
+    if (
+      sameByData(m) &&
+      listed(m) &&
+      comparable(a!, b!) &&
+      km(a!, b!) <= MATCH_KM &&
+      a!.tidal !== false &&
+      b!.tidal !== false
+    ) {
+      add(m.a, m.b, "data");
+      // Only for a link by levels: an ID or a decision for the pair keeps its own order.
+      if (edges.get(pairKey(m.a, m.b)) === "data") agreement.set(pairKey(m.a, m.b), m.rms_m);
+    }
+  }
   for (const [a, b] of nearPairs(linkable)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no
   // guess. Only the station that named it: one another source's copy names,
@@ -341,12 +383,14 @@ export function linkGauges<T extends Station>(
   const ordered = [...edges]
     .map(([key, how]) => {
       const [a, b] = key.split("\n").map((id) => byId.get(id)!) as [T, T];
-      return { a, b, how, d: km(a, b) };
+      return { a, b, how, d: km(a, b), rms: agreement.get(key) ?? 0 };
     })
-    // Nearest first within each kind, then by ID, so which of two rival links wins doesn't depend on list order.
+    // Best agreement first among links by levels, nearest first within each kind, then by ID,
+    // so which of two rival links wins doesn't depend on list order.
     .sort(
       (x, y) =>
         ORDER.indexOf(x.how) - ORDER.indexOf(y.how) ||
+        x.rms - y.rms ||
         x.d - y.d ||
         pairKey(x.a.id, x.b.id).localeCompare(pairKey(y.a.id, y.b.id)),
     );
@@ -371,7 +415,7 @@ export function linkGauges<T extends Station>(
       continue;
     }
     // Checked across the whole of both groups, so a third station can't bridge them.
-    if (how === "near" || how === "copy") {
+    if (how === "data" || how === "near" || how === "copy") {
       const clash = ga.flatMap((x) =>
         gb.filter((y) => separate(x, y) && !ASSEMBLED.has(x.source)).map((y) => [x, y]),
       )[0];
@@ -415,7 +459,16 @@ export function linkGauges<T extends Station>(
         .sort(),
       preferred: preferredOf.get(root(s.id))!,
     })),
-    report: { pairs, dropped, skipped, wide },
+    report: {
+      pairs,
+      dropped,
+      skipped,
+      wide,
+      disagree: matches
+        .filter((m) => differsByData(m) && listed(m) && root(m.a) === root(m.b))
+        .map((m) => ({ ...m, how: edges.get(pairKey(m.a, m.b)) ?? "group" })),
+      shifted: matches.filter((m) => shiftedByData(m) && listed(m)),
+    },
   };
 }
 
