@@ -93,7 +93,7 @@ ORDER BY r.time DESC LIMIT 1`}
 
 ## Which years exist
 
-HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy).
+HTTPS has no directory listing, and a year with no values has no file. `stations/years/<source>.parquet` has one row per year file of observed levels the source has, in every epoch. It covers `obs/` only, not extremes or predictions. Every run that writes a year file updates it, and compaction checks each night that every file has a row and every row a file. Use `version` to keep a local copy current; see [Keeping a local copy](#keeping-a-local-copy). A year between a station's first and last rows with no row of its own has no values as far as the list knows, unless the station is marked as described below; to be sure, request the file, which returns 404 where it doesn't exist. `first` and `last` in `stations.parquet` can differ from it: they count only the rows inside each epoch's span, and they're rebuilt each night, while the years list counts whole files and changes with every run that writes one.
 
 <Schema resource="years" />
 
@@ -120,3 +120,5 @@ WHERE id = 'rws/hoekvanholland' AND year >= 2020`}
 ### Keeping a local copy
 
 To keep a local copy of a year, read its row in the years list first, then download the file and store the row's `version` beside it. Download it again only when the years list shows a different `version`. Read in that order, a download that lands just after the store rewrote the file holds newer rows than the version stored with it, which costs one more download next time but never leaves a stale copy. A file's HTTP `ETag` works as well for a conditional request with `If-None-Match`, but treat it as a tag to compare, not a checksum.
+
+Every file is served with `Cache-Control: no-cache`, since any of them can be rewritten, past years included, so a browser checks the `ETag` before it reuses a copy and gets a short `304` when nothing has changed. A file uploaded in several parts has an `ETag` that isn't its MD5.
