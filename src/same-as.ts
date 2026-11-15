@@ -1,6 +1,5 @@
-import { urlSafe } from "./store/paths.ts";
 import type { Station } from "./schema.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -272,7 +271,7 @@ export function linkGauges<T extends Station>(
   const byId = new Map(stations.map((s) => [s.id, s]));
   // GESLA's records whose values are another gauge's join no group.
   const alone = new Set(
-    [...DROPPED].map((file) => `gesla/${urlSafe(file)}`).filter((id) => byId.has(id)),
+    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
   );
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();

@@ -17,7 +17,9 @@ import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
-import { DROPPED } from "./dropped.ts";
+import { CRMS_EARLY, CRMS_WELLS, DROPPED, isDropped } from "./dropped.ts";
+
+export { CRMS_EARLY, CRMS_WELLS };
 
 /**
  * GESLA 4.1 (Global Extreme Sea Level Analysis), a static release of 6,682
@@ -78,29 +80,6 @@ const WSV_SHIFT_MS = 30 * 60_000;
  * are. Erratum `gesla-hong-kong-hour-early`.
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
-
-/**
- * GESLA's copies of 40 CRMS gauges, by site, are an hour early. Erratum
- * `gesla-crms-hour-early`, whose stations a test keeps equal to this list.
- */
-export const CRMS_EARLY = new Set(
-  `
-  0002 0003 0006 0008 0030 0033 0034 0035 0038 0039
-  0046 0047 0056 0058 0059 0061 0063 0065 0086 0089
-  0097 0103 0108 0114 0115 0117 0118 0119 0120 0121
-  0125 0129 0131 0132 0135 0136 0139 0146 0147 0148
-`
-    .trim()
-    .split(/\s+/)
-    .map((site) => `crms${site}-crms${site}-usa-crms`),
-);
-
-/**
- * GESLA's CRMS records that are the site's marsh well throughout, so they
- * share no gauge with the site's surface-water series (erratum
- * `gesla-crms0090-marsh-well`, erratum `gesla-crms0128-marsh-well`).
- */
-export const CRMS_WELLS = new Set(["CRMS0090", "CRMS0128"]);
 
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
@@ -271,7 +250,7 @@ export async function stations(): Promise<GeslaStation[]> {
   );
   return listed
     .map(({ code, ...s }) =>
-      DROPPED.has(s.source_id)
+      isDropped(s.source_id)
         ? { ...s, products: [], status: "inactive" as const }
         : { ...s, same_as: originatorIds(s.contributor, code, s.lon, fd, s.file ?? s.source_id) },
     )
@@ -802,8 +781,8 @@ export async function levels(
   if (station.record_start && Date.parse(station.record_start) - HOUR_MS >= end.getTime())
     return [];
   if (station.record_end && Date.parse(station.record_end) + HOUR_MS < start.getTime()) return [];
-  if (DROPPED.has(station.source_id))
-    throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see DROPPED)`);
+  if (isDropped(station.source_id))
+    throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see isDropped)`);
   const r = await record(station);
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {

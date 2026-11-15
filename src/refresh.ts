@@ -46,7 +46,7 @@ import {
   withDatums,
   type DatumReport,
 } from "./datums.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import { usableShares, writeYears } from "./store/years.ts";
 import { readAnalysis, withAnalysis } from "./store/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
@@ -159,10 +159,10 @@ export async function refreshSource(
       `${opened.length} stations changed datum at once (limit ${limit}): ${opened.map((c) => c.id).join(", ")}; check them and rerun with --accept-epochs`,
     );
 
-  // A GESLA record dropped for holding another gauge's values was a decision in `DROPPED`, not the source's.
+  // A GESLA record dropped for holding another gauge's values was a decision in `isDropped`, not the source's.
   const listedInactive = new Set(
     fetched
-      .filter((s) => s.status === "inactive" && !(s.source === "gesla" && DROPPED.has(s.source_id)))
+      .filter((s) => s.status === "inactive" && !(s.source === "gesla" && isDropped(s.source_id)))
       .map((s) => s.id),
   );
   const report = {

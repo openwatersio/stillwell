@@ -8,11 +8,11 @@
 import { writeFile } from "node:fs/promises";
 import { stations, withheldFiles } from "../src/sources/gesla/index.ts";
 import { CONTRIBUTORS } from "../src/sources/gesla/contributors.ts";
-import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { isDropped } from "../src/sources/gesla/dropped.ts";
 
-// The adapter leaves out withheld records; those in DROPPED hold another gauge's values.
+// The adapter leaves out withheld records; those that isDropped finds hold another gauge's values.
 const all = await stations();
-const list = all.filter((s) => !DROPPED.has(s.source_id));
+const list = all.filter((s) => !isDropped(s.source_id));
 const groups = Map.groupBy(list, (s) => s.contributor);
 const rows = [...groups]
   .sort(([a, x], [b, y]) => y.length - x.length || a.localeCompare(b))

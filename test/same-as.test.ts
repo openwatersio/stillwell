@@ -801,25 +801,42 @@ describe("rank", () => {
     // still reporting is preferred over the site's first.
     const moved = linkGauges(
       [
-        station("gesla/crms6302-crms6302-usa-crms", {
-          same_as: ["crms/CRMS6302-H01"],
+        station("gesla/crms0002-crms0002-usa-crms", {
+          same_as: ["crms/CRMS0002-H01"],
           ...record("2008-01-01T00:00:00Z", "2025-12-31T00:00:00Z"),
         }),
-        station("crms/CRMS6302-H01", {
-          same_as: ["crms/CRMS6302-H02"],
+        station("crms/CRMS0002-H01", {
+          same_as: ["crms/CRMS0002-H02"],
           status: "inactive",
           ...record("2009-01-01T00:00:00Z", "2010-12-31T00:00:00Z"),
         }),
-        station("crms/CRMS6302-H02", {
-          same_as: ["crms/CRMS6302-H01"],
+        station("crms/CRMS0002-H02", {
+          same_as: ["crms/CRMS0002-H01"],
           lat: m(200),
           ...record("2011-01-01T00:00:00Z", "2026-10-01T00:00:00Z"),
         }),
       ],
       NOW,
     ).stations;
-    assert.deepEqual(moved[0]!.same_as, ["crms/CRMS6302-H01", "crms/CRMS6302-H02"]);
-    for (const s of moved) assert.equal(s.preferred, "crms/CRMS6302-H02");
+    assert.deepEqual(moved[0]!.same_as, ["crms/CRMS0002-H01", "crms/CRMS0002-H02"]);
+    for (const s of moved) assert.equal(s.preferred, "crms/CRMS0002-H02");
+    // GESLA's other CRMS records hold another site's values, so they join no
+    // group, by their ID link or by nearness (erratum `gesla-crms-wrong-site`).
+    const shifted = linkGauges(
+      [
+        station("gesla/crms0153-crms0153-usa-crms", {
+          name: "CRMS0153",
+          same_as: ["crms/CRMS0153-H01"],
+          ...record("2007-06-25T00:00:00Z", "2025-04-08T00:00:00Z"),
+        }),
+        station("crms/CRMS0153-H01", {
+          name: "CRMS0153-H01",
+          ...record("2007-11-27T00:00:00Z", "2021-07-27T00:00:00Z"),
+        }),
+      ],
+      NOW,
+    );
+    for (const s of shifted.stations) assert.deepEqual(s.same_as, []);
     // GESLA's CRMS0128 is the site's marsh well throughout, so it names no
     // CRMS series, and UNLINKS keeps it from the site's H01 25 m away.
     UNLINKS.push(...APART.filter((d) => d.a === "gesla/crms0128-crms0128-usa-crms"));

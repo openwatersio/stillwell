@@ -1,4 +1,4 @@
-import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { DROPPED, isDropped } from "../src/sources/gesla/dropped.ts";
 import { isUrlSafe } from "../src/store/paths.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -672,6 +672,20 @@ describe("gesla clocks", () => {
       assert.equal(gesla.CRMS_EARLY.has(file), !gesla.CRMS_WELLS.has(site), e.id);
     }
     assert.deepEqual([...gesla.CRMS_WELLS].sort(), ["CRMS0090", "CRMS0128"]);
+  });
+
+  it("drops every CRMS record but the 40 an hour early and the two marsh wells", () => {
+    assert.equal(isDropped("crms0151-crms0151-usa-crms"), true);
+    assert.equal(isDropped("crms6304-crms6304-usa-crms"), true);
+    assert.equal(isDropped("crms0002-crms0002-usa-crms"), false);
+    assert.equal(isDropped("crms0148-crms0148-usa-crms"), false);
+    assert.equal(isDropped("crms0090-crms0090-usa-crms"), false);
+    assert.equal(isDropped("crms0128-crms0128-usa-crms"), false);
+    assert.equal(isDropped("uddevalla-2541-swe-smhi"), true);
+    assert.equal(isDropped("seattle-9447130-usa-noaa"), false);
+    const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-wrong-site")!;
+    for (const id of entry.stations!) assert.ok(isDropped(id.replace(/^gesla\//, "")), id);
+    assert.equal(entry.stations!.length, 298);
   });
 
   it("lists the same CRMS records as the erratum", () => {
