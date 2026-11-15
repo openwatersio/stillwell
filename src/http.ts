@@ -2,6 +2,8 @@
  * HTTP for adapters. Plain `fetch` with retries, so it runs wherever `fetch`
  * does. Scripts swap in the disk cache from `src/cache.ts` with `setTransport`.
  */
+import { FtpError, ftpGet } from "./ftp.ts";
+
 const USER_AGENT = "openwaters-stillwell (+https://github.com/openwatersio/stillwell)";
 
 export interface RequestOptions extends RequestInit {
@@ -66,6 +68,7 @@ export async function fetchText(
   url: string,
   { fresh: _, keep: __, pace, throttled, base64, timeout, partial, ...init }: RequestOptions = {},
 ): Promise<string> {
+  if (url.startsWith("ftp://")) return fetchFtp(url, pace, base64, timeout);
   return fetchWithRetry(
     url,
     { ...init, headers: { "user-agent": USER_AGENT, ...init.headers } },
@@ -76,6 +79,31 @@ export async function fetchText(
     4,
     partial,
   );
+}
+
+/**
+ * An FTP file, retried on dropped connections, timeouts and a server's
+ * temporary refusals (4xx), as `fetchWithRetry` is. A reply of 5xx, such as 550
+ * for a file that isn't there, is the caller's to read from the `FtpError`.
+ */
+async function fetchFtp(
+  url: string,
+  pace?: () => Promise<void>,
+  base64 = false,
+  timeout = 300,
+  attempts = 4,
+): Promise<string> {
+  for (let attempt = 1; ; attempt++) {
+    await pace?.();
+    try {
+      const body = await ftpGet(url, timeout * 1000);
+      return body.toString(base64 ? "base64" : "latin1");
+    } catch (error) {
+      if (error instanceof FtpError && error.code >= 500) throw error;
+      if (attempt >= attempts) throw error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 1000));
+  }
 }
 
 /** The socket or DNS error behind a failed fetch, such as `: ECONNRESET`. */
