@@ -26,7 +26,9 @@ Nothing below has been checked against the service:
 - the `latest` feed's `date` as a gauge's last reading, which decides `active` and `live`;
 - whether `duration` includes the reading exactly at the earlier end, and the datum's name: the adapter treats `CD` as Admiralty Chart Datum, like BODC's and the EA's.
 
-## Backfill
+## Running ingest
+
+### Backfill
 
 Once the key is in place, the Monthly workflow refreshes the list on the 2nd. Then backfill each year back to the earliest reading the API has:
 
