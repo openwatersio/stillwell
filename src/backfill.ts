@@ -199,9 +199,9 @@ export function parseShard(value: string): [number, number] {
  * how many it skips: `complete` skips what `yearDone` calls done, from one read
  * of the series directory; `written` skips what `yearWritten` does, from a
  * listing, plus a read of years from `COMPACTED_SINCE` on; `none` fetches every year. Both
- * skipping modes return the years their listing found (`listed`), and `written` the years from
- * `COMPACTED_SINCE` on it skipped with a month missing (`partial`), which aren't known to be
- * whole. A failed read throws, so the caller fails the series rather than fetch every year again.
+ * skipping modes return the years their listing found (`listed`), and the years from
+ * `COMPACTED_SINCE` on they skipped without every month and values backfill wrote (`partial`),
+ * which aren't known to be whole. A failed read throws, so the caller fails the series rather than fetch every year again.
  */
 export async function yearsToFetch(
   dir: string,
@@ -214,14 +214,14 @@ export async function yearsToFetch(
   fetch: [Date, Date][];
   skipped: number;
   listed?: Set<number>;
-  partial?: Set<number>;
+  partial: Set<number>;
 }> {
   const all = [...years(start, end)];
   // No whole ended year asked for means nothing to skip, so nothing to read.
   if (!all.some(([from, to]) => wholeEndedYear(from, to, now))) mode = "none";
   let done: (from: Date, to: Date) => boolean = () => false;
   let listed: Set<number> | undefined;
-  let partial: Set<number> | undefined;
+  let files = new Map<number, YearFile>();
   if (mode === "written") {
     const found = await listYears(dir);
     listed = found;
@@ -230,13 +230,12 @@ export async function yearsToFetch(
       .filter(([from, to]) => wholeEndedYear(from, to, now))
       .map(([from]) => from.getUTCFullYear())
       .filter((y) => y >= COMPACTED_SINCE && found.has(y));
-    const files = read.length ? await readYearFiles(dir, read, found) : new Map<number, YearFile>();
+    if (read.length) files = await readYearFiles(dir, read, found);
     done = (from, to) => yearWritten(found, from, to, now, files.get(from.getUTCFullYear()));
-    partial = new Set(read.filter((y) => files.get(y) && files.get(y)!.months < 12));
   } else if (mode === "complete") {
     const asked = all.filter(([from, to]) => wholeEndedYear(from, to, now));
     listed = await listYears(dir);
-    const files = await readYearFiles(
+    files = await readYearFiles(
       dir,
       asked.map(([from]) => from.getUTCFullYear()),
       listed,
@@ -244,6 +243,18 @@ export async function yearsToFetch(
     done = (from, to) => yearDone(files.get(from.getUTCFullYear()), from, to, now, qcStart);
   }
   const fetch = all.filter(([from, to]) => !done(from, to));
+  // A year compaction may have written, skipped without every month and values backfill wrote,
+  // isn't known to hold the whole year: compaction writes a station's first year from when it was
+  // first polled, and a refetch's months can sit beside its weeks.
+  const partial = new Set(
+    all
+      .filter((span) => !fetch.includes(span))
+      .map(([from]) => from.getUTCFullYear())
+      .filter((y) => {
+        const file = files.get(y);
+        return y >= COMPACTED_SINCE && !(file && file.months === 12 && file.backfilled > 0);
+      }),
+  );
   return { fetch, skipped: all.length - fetch.length, listed, partial };
 }
 

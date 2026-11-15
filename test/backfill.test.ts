@@ -270,22 +270,49 @@ describe("yearsToFetch", () => {
     assert.deepEqual(result.fetch.map(year), [2026]);
   });
 
-  it("with --skip-written, reports a 2026 file it skips with a month missing as partial", async () => {
-    // Compaction's November and December, and a refetch's September and October with no `received`.
-    const id = "refetched";
-    await writeObservations(
-      seriesPath(root, "levels", "usgs", id, 2026),
-      [
-        ...monthly(2026, [8, 9], Flag.good),
-        ...monthly(2026, [10, 11], Flag.good).map((r) => ({ ...r, received: r.time })),
-      ],
-      "GAGE",
-    );
+  // A 2026 year that a skip passes over goes unrecorded unless its file has every month and
+  // values backfill wrote, so these read as missing until a plain run fetches them.
+  const skip2026 = async (
+    id: string,
+    rows: { time: number; level: number; flag: Flag; received?: number }[],
+  ) => {
+    await writeObservations(seriesPath(root, "levels", "usgs", id, 2026), rows, "GAGE");
     const d = seriesDir(root, "levels", "usgs", id);
     const later = Date.UTC(2027, 5, 1);
-    const result = await yearsToFetch(d, new Date(Date.UTC(2026, 0, 1)), y2027, "written", later);
-    assert.deepEqual(result.fetch, []);
-    assert.deepEqual([...result.partial!], [2026]);
+    const from = new Date(Date.UTC(2026, 0, 1));
+    return Promise.all(
+      (["written", "complete"] as const).map((mode) => yearsToFetch(d, from, y2027, mode, later)),
+    );
+  };
+  const compacted = (months: number[]) =>
+    monthly(2026, months, Flag.good).map((r) => ({ ...r, received: r.time }));
+  const backfilled = (months: number[]) => monthly(2026, months, Flag.good);
+  const all12 = [...Array(12).keys()];
+
+  it("reports compaction's year, polled from mid-January, as partial", async () => {
+    const [written, complete] = await skip2026("january", compacted(all12));
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+    assert.deepEqual(complete.fetch, []);
+    assert.deepEqual([...complete.partial], [2026]);
+  });
+
+  it("with --skip-written, reports a station that began mid-2026, backfilled, as partial", async () => {
+    const [written] = await skip2026("august", backfilled([7, 8, 9, 10, 11]));
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+  });
+
+  it("with --skip-written, reports compaction's weeks beside a refetch's months as partial", async () => {
+    const [written] = await skip2026("refetched", [...backfilled([8, 9]), ...compacted([10, 11])]);
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+  });
+
+  it("takes a skipped 2026 with every month and backfilled values as whole", async () => {
+    const [written, complete] = await skip2026("whole", backfilled(all12));
+    assert.deepEqual([...written.partial], []);
+    assert.deepEqual([...complete.partial], []);
   });
 
   it("fetches only the years that aren't complete, or with --skip-written, not written", async () => {

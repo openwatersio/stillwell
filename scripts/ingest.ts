@@ -777,12 +777,9 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
             continue;
           }
           skipped += plan.skipped;
-          // A year skipped as written but with a month missing, such as compaction's last weeks
-          // and a refetch's months, isn't known to be whole, so it goes unrecorded.
+          // A year skipped but not known to be whole goes unrecorded (`partial`).
           if (product === "levels")
-            for (const y of plan.partial ?? [])
-              if (!plan.fetch.some(([from]) => from.getUTCFullYear() === y))
-                failedYears.add(`${epoch.id} ${y}`);
+            for (const y of plan.partial) failedYears.add(`${epoch.id} ${y}`);
           for (const [from, to] of plan.fetch) {
             if (stopped) break;
             const key = emptyKey(station.id, product, epoch.id, from.getUTCFullYear());
