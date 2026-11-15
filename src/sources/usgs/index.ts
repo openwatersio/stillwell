@@ -77,7 +77,7 @@ const VERTICAL_DATUMS: Record<string, string> = {
  * datum's (erratum `usgs-unsurveyed-altitudes`). One estimated from a map (M),
  * a digital elevation model (N), lidar (J) or an altimeter (A) is the ground
  * at the site's coordinates: at tidal sites 17 of 38 such offsets put the
- * water more than 2 m from NAVD88's zero, against 11 of 237 surveyed ones. A
+ * water more than 2 m from NAVD88's zero, against 10 of 223 surveyed ones. A
  * reported (R) or unknown (U) method, or none, isn't evidence of a survey.
  */
 const SURVEYED = new Set(["L", "D", "G", "F", "W", "X", "Y", "Z"]);
