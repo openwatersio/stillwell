@@ -148,6 +148,15 @@
       "error": "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       "response": "The values are kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
       "evidence": "PEGELONLINE's REST API (`/stations/693320/W/measurements.json` and the same for 693330), checked on 11 November 2026, returns 389 and 107 cm at 04:00 and 04:15 CET, 0.0 at 04:30 CET, and nothing until 06:15 CET. The store holds the same values."
+    },
+    {
+      "id": "pegelonline-fill-values",
+      "stations": ["pegelonline/9520050", "pegelonline/9520070"],
+      "since": "2019-01-01",
+      "handling": "dropped",
+      "error": "These 2 PEGELONLINE gauges hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 14 values from 2019 to 2022, from 10,635 to 25,689 m.",
+      "response": "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+      "evidence": "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
     }
   ],
   "retired": []
