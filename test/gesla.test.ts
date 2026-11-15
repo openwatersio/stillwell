@@ -1,4 +1,4 @@
-import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { DROPPED, isDropped } from "../src/sources/gesla/dropped.ts";
 import { isUrlSafe } from "../src/store/paths.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -674,6 +674,20 @@ describe("gesla clocks", () => {
     assert.deepEqual([...gesla.CRMS_WELLS].sort(), ["CRMS0090", "CRMS0128"]);
   });
 
+  it("drops every CRMS record but the 40 an hour early and the two marsh wells", () => {
+    assert.equal(isDropped("crms0151-crms0151-usa-crms"), true);
+    assert.equal(isDropped("crms6304-crms6304-usa-crms"), true);
+    assert.equal(isDropped("crms0002-crms0002-usa-crms"), false);
+    assert.equal(isDropped("crms0148-crms0148-usa-crms"), false);
+    assert.equal(isDropped("crms0090-crms0090-usa-crms"), false);
+    assert.equal(isDropped("crms0128-crms0128-usa-crms"), false);
+    assert.equal(isDropped("uddevalla-2541-swe-smhi"), true);
+    assert.equal(isDropped("seattle-9447130-usa-noaa"), false);
+    const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-wrong-site")!;
+    for (const id of entry.stations!) assert.ok(isDropped(id.replace(/^gesla\//, "")), id);
+    assert.equal(entry.stations!.length, 298);
+  });
+
   it("lists the same CRMS records as the erratum", () => {
     const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-hour-early")!;
     assert.deepEqual(
@@ -692,6 +706,71 @@ describe("gesla clocks", () => {
       ].map((file) => iso(gesla.parse(text, file, null).times[0]!)),
       ["2012-06-01T01:00:00.000Z", "2012-06-01T01:00:00.000Z", "2012-06-01T00:00:00.000Z"],
     );
+  });
+
+  it("applies each record's clock fix, over its span", () => {
+    const at = (file: string, time: string) =>
+      iso(gesla.parse(lines([time]), file, null).times[0]!);
+    assert.equal(at("vigo-208a-esp-uhslc_rq", "1980/06/01 00:00:00"), "1980-06-01T01:00:00.000Z");
+    assert.equal(
+      at("las_palmas-217c-esp-uhslc_rq", "1985/06/01 00:00:00"),
+      "1985-06-01T01:00:00.000Z",
+    );
+    assert.equal(
+      at("las_palmas-217d-esp-uhslc_rq", "1995/06/01 00:00:00"),
+      "1995-06-01T00:00:00.000Z",
+    );
+    assert.equal(at("cruz-cruz-esp-ieo", "1985/06/01 00:00:00"), "1985-06-01T01:00:00.000Z");
+    assert.equal(at("cruz-cruz-esp-ieo", "2000/06/01 00:00:00"), "2000-06-01T00:00:00.000Z");
+    assert.equal(at("vigo-vigo-esp-ieo", "1980/06/01 00:00:00"), "1980-06-01T00:00:00.000Z");
+    assert.equal(
+      at("progreso_yuc-721a-mex-uhslc_rq", "1982/06/01 00:00:00"),
+      "1982-05-31T18:00:00.000Z",
+    );
+    assert.equal(
+      at("scott_base_antarctica-scot-nzl-ttw", "2020/06/01 00:00:00"),
+      "2020-05-31T12:00:00.000Z",
+    );
+    assert.equal(
+      at("biscaynebay_s21_t-s21_t-usa-sfwmd", "2005/06/01 00:00:00"),
+      "2005-06-01T05:00:00.000Z",
+    );
+    // Queensland's records end 2019 at local midnight, 13:50 UTC, and resume on AEST.
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2019/12/31 13:50:00"),
+      "2019-12-31T13:50:00.000Z",
+    );
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2020/01/01 00:00:00"),
+      "2019-12-31T14:00:00.000Z",
+    );
+    assert.equal(
+      at("thursday_island-h057022b-aus-bom", "2025/06/01 10:00:00"),
+      "2025-06-01T00:00:00.000Z",
+    );
+  });
+
+  it("moves exactly the records each clock erratum lists, by its hours", () => {
+    const hours: Record<string, number> = {
+      "gesla-hong-kong-hour-early": 1,
+      "gesla-crms-hour-early": 1,
+      "gesla-spain-uhslc-hour-early": 1,
+      "gesla-santa-cruz-de-la-palma-hour-early": 1,
+      "gesla-progreso-uhslc-721a-six-hours-late": -6,
+      "gesla-scott-base-ttw-nzst": -12,
+      "gesla-queensland-2020-aest": -10,
+      "gesla-sfwmd-est": 5,
+    };
+    const listed = new Set<string>();
+    for (const [id, h] of Object.entries(hours)) {
+      const entry = geslaErrata.errata.find((e) => e.id === id)!;
+      for (const station of entry.stations!) {
+        const file = station.replace(/^gesla\//, "");
+        listed.add(file);
+        assert.equal(gesla.clockOf(file)?.hours, h, station);
+      }
+    }
+    for (const file of Object.keys(gesla.CLOCK)) assert.ok(listed.has(file), file);
   });
 
   it("refuses a record off UTC, but keeps Wewak's, which only says it is", () => {

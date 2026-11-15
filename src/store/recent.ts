@@ -574,7 +574,7 @@ function spanKey(station: Pick<Station, "source_id">, epoch: number, year: numbe
  * whose files aren't part of the series: a held one, or one the list doesn't
  * have, such as after a restore.
  */
-function epochWindow(epochs: Epoch[], id: number): Span | null {
+export function epochWindow(epochs: Epoch[], id: number): Span | null {
   const epoch = epochs.find((e) => e.id === id);
   if (!epoch || epoch.state === "held") return null;
   return [

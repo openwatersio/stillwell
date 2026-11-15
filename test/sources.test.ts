@@ -3391,6 +3391,33 @@ describe("uhslc", () => {
     ]);
   });
 
+  it("moves the early Spanish versions an hour later and Progreso's A 6 hours earlier, and leaves Las Palmas's FD series alone", async () => {
+    const urls: string[] = [];
+    setTransport(async (url) => {
+      urls.push(decodeURIComponent(url));
+      return JSON.stringify({
+        table: {
+          columnNames: ["time", "sea_level", "quality", "reference_datum"],
+          rows: [["1980-06-01T00:00:00Z", 1080, 1, "station zero"]],
+        },
+      });
+    });
+    const at = async (id: string) =>
+      new Date(
+        (
+          await uhslc.levels(id, new Date("1980-06-01T00:00:00Z"), new Date("1980-06-02T00:00:00Z"))
+        )[0]!.time,
+      ).toISOString();
+    assert.equal(await at("208a"), "1980-06-01T01:00:00.000Z");
+    assert.equal(await at("217b"), "1980-06-01T01:00:00.000Z");
+    assert.equal(await at("217"), "1980-06-01T00:00:00.000Z");
+    assert.equal(await at("206b"), "1980-06-01T00:00:00.000Z");
+    assert.equal(await at("721a"), "1980-05-31T18:00:00.000Z");
+    // Each asks for the labeled times that land in the range once moved.
+    assert.match(urls[0]!, /time>=1980-05-31T23:00:00.000Z&time<1980-06-01T23:00/);
+    assert.match(urls.at(-1)!, /time>=1980-06-01T06:00:00.000Z&time<1980-06-02T06:00/);
+  });
+
   it("asks only for the years a version has, and reads ERDDAP's 404 as no values", async () => {
     const urls: string[] = [];
     setTransport(async (url) => {
@@ -3934,6 +3961,32 @@ describe("refmar", () => {
     );
     assert.deepEqual(asked, ["2,3,4"]);
     assert.equal(values.length, 1);
+  });
+
+  it("moves Kerguelen's raw values from before June 2013 an hour earlier, asking an hour past the month", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      const params = new URL(url).searchParams;
+      if (params.get("sources") === "1") return JSON.stringify({ data: [] });
+      asked.push(params.get("dtEnd")!);
+      return JSON.stringify({
+        data: [
+          row(2, "2005/06/01 00:00:00"),
+          row(2, "2005/06/30 23:00:00"),
+          row(2, "2005/07/01 00:00:00"),
+        ],
+      });
+    });
+    const values = await refmar.levels(
+      { source_id: "23", first_observation: "1962-04-01" },
+      new Date("2005-06-01Z"),
+      new Date("2005-07-01Z"),
+    );
+    assert.deepEqual(asked, ["2005-07-01T00:59:59Z"]);
+    assert.deepEqual(
+      values.map((v) => new Date(v.time).toISOString()),
+      ["2005-06-30T22:00:00.000Z", "2005-06-30T23:00:00.000Z"],
+    );
   });
 
   it("drops raw values before a later month's validated ones", async () => {

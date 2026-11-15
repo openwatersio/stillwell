@@ -337,6 +337,32 @@ export async function readObservations(path: string): Promise<Observation[]> {
   return (await readObservationFile(path)).rows;
 }
 
+/**
+ * A series file's good or preliminary levels by hour since 1970: at each hour,
+ * the reading nearest it within a minute. Not the cross-station checks' 10
+ * minutes: where a 10-minute series lacks the hour's value, a reading 10
+ * minutes off differs from the hour's by up to 15 cm in a 3 m tide. Null when
+ * the file is missing; empty when it holds no such reading.
+ */
+export async function readHourly(path: string): Promise<Map<number, number> | null> {
+  const glob = /[*?[]/.test(path);
+  const hour = "time_bucket(INTERVAL 1 HOUR, time + INTERVAL 30 MINUTE)";
+  const off = `abs(epoch_ms(time) - epoch_ms(${hour}))`;
+  const usable = `flag IN (${Flag.good}, ${Flag.preliminary}) AND isfinite(level_m) AND ${off} <= 60000`;
+  // Every row is grouped, so a file that exists always gives some: a missing one reads as none.
+  const rows = await read(
+    path,
+    `SELECT epoch_ms(${hour}) // 3600000 AS h, arg_min(level_m, (${off}, time)) FILTER (WHERE ${usable}) AS v`,
+    "h",
+    "",
+    // read_parquet globs, so a station ID with a glob character reads only its own file.
+    `${glob ? `WHERE filename = ${quote(path)}` : ""} GROUP BY 1`,
+    glob,
+  );
+  if (!rows.length) return null;
+  return new Map(rows.filter((r) => r.v !== null).map((r) => [Number(r.h), Number(r.v)]));
+}
+
 /** A series file's observations and the datums it holds, in one read. */
 export async function readObservationFile(
   path: string,

@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { HANDLING, published } from "../src/errata.ts";
 import { writeLinks } from "../src/links.ts";
+import { writeMatches } from "../src/matches.ts";
 import { sourceEntry } from "../src/refresh.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { errata, sources } from "../src/sources/index.ts";
@@ -116,6 +117,20 @@ describe("published file definitions", () => {
           hours: 8000,
           offset_m: 0.2,
           spread_m: 0.004,
+        },
+      ]),
+    matches: () =>
+      writeMatches(store, [
+        {
+          a: "test/b",
+          b: "test/c",
+          since: "2023-01-01T00:00:00Z",
+          until: "2026-01-01T00:00:00Z",
+          months: 36,
+          hours: 26000,
+          rms_m: 0.002,
+          lag_h: 0,
+          lag_rms_m: 0.002,
         },
       ]),
     years: () =>
