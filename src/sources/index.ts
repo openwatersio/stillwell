@@ -1,6 +1,7 @@
 import { readErrata, withErrata } from "../errata.ts";
 import type { Source } from "../schema.ts";
 import { source as bodc } from "./bodc/index.ts";
+import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as cmems } from "./cmems/index.ts";
@@ -25,6 +26,7 @@ import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
+import bomErrata from "./bom/errata.json" with { type: "json" };
 import cmemsErrata from "./cmems/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
 import crmsErrata from "./crms/errata.json" with { type: "json" };
@@ -46,6 +48,7 @@ import usaceErrata from "./usace/errata.json" with { type: "json" };
 
 const adapters: Record<string, Source> = {
   bodc,
+  bom,
   bsh,
   cdec,
   cmems,
@@ -78,6 +81,7 @@ const adapters: Record<string, Source> = {
  */
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
+  bom: bomErrata,
   cmems: cmemsErrata,
   coops: coopsErrata,
   crms: crmsErrata,
