@@ -170,6 +170,9 @@ export function originatorSeries(
   // REFMAR records carry the gauge's SHOM id.
   if (contributor === "refmar") return byCode(record, "refmar", code, "planned", lists);
 
+  // TTW's records carry LINZ's gauge code, though some sit far from the gauge or under another name.
+  if (contributor === "ttw") return byCode(record, "linz", code.toUpperCase(), "planned", lists);
+
   if (contributor === "nhs")
     return byCode(record, "kartverket", code.toUpperCase(), "planned", lists);
 

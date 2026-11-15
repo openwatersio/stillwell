@@ -132,7 +132,7 @@ export const LINKS: Decision[] = [
   {
     a: "gesla/owenga-chit-nzl-ttw",
     b: "linz/CHIT",
-    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CHIT. GESLA gives Owenga's longitude as 176.37°E, but the Chatham Islands are west of the antimeridian, 14,000 km from LINZ's 176.37°W, so the rules above miss it.",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CHIT. GESLA gives Owenga's longitude as 176.37°E, but the Chatham Islands are west of the antimeridian, about 580 km from LINZ's 176.37°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
   {
     a: "gesla/castlepoint-cpit-nzl-ttw",
@@ -152,12 +152,12 @@ export const LINKS: Decision[] = [
   {
     a: "gesla/boat_cove-rbct-nzl-ttw",
     b: "linz/RBCT",
-    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RBCT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, 14,000 km from LINZ's 177.89°W, so the rules above miss it.",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RBCT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.89°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
   {
     a: "gesla/fishing_rock-rfrt-nzl-ttw",
     b: "linz/RFRT",
-    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, 14,000 km from LINZ's 177.90°W, so the rules above miss it.",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
 ];
 

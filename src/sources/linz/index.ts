@@ -35,7 +35,7 @@ export const metadata: SourceMetadata = {
     url: "https://www.linz.govt.nz/contact-us",
   },
   terms:
-    "Licensed under CC BY 3.0 NZ. Land Information New Zealand must be credited. LINZ does not quality-control the data and warns that the sensors drift, so it advises caution for long-term analysis. Changes in the store: rows LINZ marks missing or sets to a sensor-off value are left out, and quality flags added.",
+    "Licensed under CC BY 3.0 NZ. Land Information New Zealand must be credited. LINZ does not quality-control the data and warns that the sensors drift, so it advises caution for long-term analysis. Changes in the store: rows LINZ marks missing or bad, or sets to a sensor-off value, are left out, and quality flags added.",
   // Each gauge's whole record is served against its own zero, as it was measured.
   archive: "previous",
   // Daily files appear 6 to 12 days after their day, in batches, so hourly ingest would find nothing.
@@ -49,8 +49,8 @@ const DATUM = "ZERO";
 /** The sensor whose files the store reads. Sensor 41 sits on another zero, about 14 cm higher at Wellington. */
 const SENSOR = "40";
 const DAY_MS = 86_400_000;
-/** A year's files are final once the next year is this far along; before that LINZ may still reissue them. */
-const FINAL_AFTER_MS = 2 * 366 * DAY_MS;
+/** A year's file is cached once its year began this many years ago: LINZ issued 2019's in January 2022 and may reissue one. */
+const CACHE_AFTER_YEARS = 4;
 
 /** A LINZ gauge as listed, with the span of its sensor-40 files, which a backfill keeps to. */
 export type LinzStation = ListedStation & { record_start: string; record_end: string | null };
@@ -81,13 +81,19 @@ export async function stations(previous: Station[] = []): Promise<LinzStation[]>
     if (!/^[A-Z]{4}$/.test(code)) throw new Error(`Not a LINZ gauge code: ${code}`);
     const data = await getJson<GaugeData>(`${API}/api/getGaugeData/${code}`, { fresh: true, pace });
     const years = data.datasets.filter((d) => d.sensor === SENSOR).map((d) => Number(d.year));
+    if (years.some((y) => !Number.isInteger(y)))
+      throw new Error(`LINZ ${code}: a dataset's year isn't a number`);
+    const was = known.get(`linz/${code}`);
     if (!years.length) {
-      console.warn(`  linz ${code}: no sensor ${SENSOR} files, so not listed`);
+      // A gauge that had sensor 40 files and has none now is likelier a glitch than a closed gauge.
+      console.warn(
+        `  linz ${code}: no sensor ${SENSOR} files${was ? "; kept as listed" : ", so not listed"}`,
+      );
+      if (was) out.push(was);
       continue;
     }
     const first = Math.min(...years);
     const last = Math.max(...years);
-    const was = known.get(`linz/${code}`);
     const readme = parseReadme(data.description);
     if (!readme) {
       console.warn(
@@ -143,11 +149,18 @@ export function parseReadme(
   if (!name || at < 0) return null;
   let lat: number | undefined;
   let lon: number | undefined;
-  for (const m of text.slice(at + 16, at + 120).matchAll(COORDINATE)) {
+  for (const m of text
+    .slice(at + 16, at + 120)
+    .split(/NZTM|UTM/)[0]!
+    .matchAll(COORDINATE)) {
+    const isLat = m[4] === "N" || m[4] === "S";
+    // The first of each is the position; a later number, such as a mistyped "CITM COORDINATES" line's, is not.
+    if (isLat ? lat !== undefined : lon !== undefined) continue;
     const [deg, min, sec] = [Number(m[1]), Number(m[2]), Number(m[3] ?? 0)];
+    if (min >= 60 || sec >= 60) return null;
     const value = (deg + min / 60 + sec / 3600) * (m[4] === "S" || m[4] === "W" ? -1 : 1);
-    if (m[4] === "N" || m[4] === "S") lat ??= value;
-    else lon ??= value;
+    if (isLat) lat = value;
+    else lon = value;
   }
   if (lat === undefined || lon === undefined || Math.abs(lat) > 90 || Math.abs(lon) > 180)
     return null;
@@ -177,6 +190,10 @@ export async function levels(
   const out: Observation[] = [];
   for (let year = new Date(from).getUTCFullYear(); Date.UTC(year, 0, 1) < to; year++) {
     const names = await listing(sourceId, year);
+    // A gauge's sensor 40 years run without a gap, so a past year in its record with no files is
+    // an answer gone wrong, which backfill would take for a year with no data.
+    if (!names.length && record_start && year < new Date().getUTCFullYear())
+      throw new Error(`LINZ lists no files for ${sourceId} in ${year}`);
     const yearly = `${sourceId}_${SENSOR}_${year}.zip`;
     const files = names.includes(yearly)
       ? [yearly]
@@ -189,13 +206,13 @@ export async function levels(
       const zip = await getText(`${API}/tidegauge/${sourceId}/${year}/${SENSOR}/${name}`, {
         base64: true,
         pace,
-        // Only a year's file, once it is old enough that LINZ won't reissue it, is kept.
-        fresh: !final || Date.UTC(year, 0, 1) + FINAL_AFTER_MS > Date.now(),
+        // Only a year's file, once it is old enough that LINZ is unlikely to reissue it, is cached.
+        fresh: !final || Date.UTC(year + CACHE_AFTER_YEARS, 0, 1) > Date.now(),
         timeout: 120,
       });
       for (const [file, csv] of await unzip(zip)) {
         if (!file.toLowerCase().endsWith(".csv")) continue;
-        for (const o of parse(csv, sourceId, final ? Flag.good : Flag.preliminary))
+        for (const o of parse(csv, sourceId, !final))
           if (o.time >= from && o.time < to) out.push(o);
       }
     }
@@ -225,9 +242,11 @@ function dayOf(name: string, code: string, year: number): number | null {
  * a year's `WLGT,20190101,00:00:00,03.487`. LINZ writes a missing value as
  * `//.///` and marks a bad one with a trailing `/` (`47.80/`), and its daily
  * files hold 0.001 where a sensor was off, which the year's file replaces with
- * the missing mark; none of those are levels, nor is a zero.
+ * the missing mark (erratum `linz-sensor-off-values`); none of those are
+ * levels, nor is a 0.000.
  */
-export function parse(csv: string, code: string, flag: Flag): Observation[] {
+export function parse(csv: string, code: string, daily: boolean): Observation[] {
+  const flag = daily ? Flag.preliminary : Flag.good;
   const out: Observation[] = [];
   for (const line of csv.split("\n")) {
     const f = line.trim().split(",");
@@ -250,7 +269,7 @@ export function parse(csv: string, code: string, flag: Flag): Observation[] {
     if (at.getUTCDate() !== d || at.getUTCMonth() !== mo - 1 || h > 23 || mi > 59 || s > 59)
       continue;
     const level = Number(value);
-    if (Math.abs(level) <= 0.001) continue;
+    if (level === 0 || (daily && level === 0.001)) continue;
     out.push({ time, level: Math.round(level * 1000) / 1000, flag });
   }
   return out;
@@ -277,6 +296,12 @@ async function pace(): Promise<void> {
  * README gives is from a 2017 calibration, after the lift.
  */
 const overrides: Overrides = {
+  epochs: {
+    "linz/KAIT start": {
+      to_current: -0.88,
+      note: "The README says the station was uplifted 0.88 m, so a level before the lift is that much higher than the same water after it, and the daily means step by about 0.9 m (erratum `linz-kaikoura-uplift`).",
+    },
+  },
   splits: {
     "linz/KAIT": [
       {

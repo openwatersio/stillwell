@@ -127,6 +127,15 @@ describe("linz", () => {
     );
   });
 
+  it("keeps a listed gauge whose sensor 40 files have gone from its datasets", async () => {
+    serve(listRoutes);
+    const was = (await linz.stations()) as Station[];
+    const empty = { gauge: "WLGT", description: "", datasets: [] };
+    serve([[/getGaugeData\/WLGT$/, JSON.stringify(empty)], ...listRoutes]);
+    const now = await linz.stations(was);
+    assert.equal(now.find((s) => s.id === "linz/WLGT")!.name, "Wellington");
+  });
+
   it("refuses an empty list", async () => {
     serve([[/listGauges$/, JSON.stringify({ gauges: [] })]]);
     await assert.rejects(linz.stations(), /listed no gauges/);
@@ -208,6 +217,33 @@ describe("linz", () => {
     assert.deepEqual(before, []);
   });
 
+  it("drops 0.001 from a day's file, where a sensor was off, but not from a year's", () => {
+    const csv = "WLGT,2019-04-20 00:00,0.001\nWLGT,2019-04-20 00:01,0.002\n";
+    assert.deepEqual(
+      linz.parse(csv, "WLGT", true).map((r) => r.level),
+      [0.002],
+    );
+    const year = "WLGT,20190420,00:00:00,00.001\nWLGT,20190420,00:01:00,00.000\n";
+    assert.deepEqual(
+      linz.parse(year, "WLGT", false).map((r) => r.level),
+      [0.001],
+    );
+  });
+
+  it("fails a past year in a gauge's record that lists no files, rather than read it as no data", async () => {
+    serve([[/listDatasetFiles\/WLGT\/2025\/40$/, JSON.stringify({ files: [] })]]);
+    const span = [new Date("2025-04-09T00:00:00Z"), new Date("2025-04-10T00:00:00Z")] as const;
+    await assert.rejects(
+      linz.levels("WLGT", ...span, { record_start: "2007-01-01T00:00:00.000Z" }),
+      /lists no files for WLGT in 2025/,
+    );
+    assert.deepEqual(await linz.levels("WLGT", ...span), []);
+  });
+
+  it("decides Kaikoura's zero", () => {
+    assert.equal(linz.source.overrides!.epochs!["linz/KAIT start"]!.to_current, -0.88);
+  });
+
   it("refuses a station that isn't a LINZ code", async () => {
     await assert.rejects(linz.levels("../x", new Date(0), new Date(1)), /Not a LINZ station/);
   });
@@ -218,7 +254,7 @@ describe("linz parse", () => {
     const rows = linz.parse(
       "WLGT,20190101,00:00:00,03.487\nWLGT,2019-04-20 00:01,5.251\nWLGT,2019-04-20 0:02,-0.25\n",
       "WLGT",
-      Flag.good,
+      false,
     );
     assert.deepEqual(
       rows.map((r) => [new Date(r.time).toISOString(), r.level]),
@@ -238,13 +274,13 @@ describe("linz parse", () => {
         "WLGT,2019-04-20 24:00,5.251",
         "WLGT,2019-04-20 00:03,//.///",
         "WLGT,2019-04-20 00:04,47.80/",
-        "WLGT,2019-04-20 00:05,0.001",
+        "WLGT,2019-04-20 00:05,0.000",
         "WLGT,2019-04-20 00:06,",
         "WLGT,2019-04-20 00:07,5.251,extra",
         "WLGT,2019-04-20 00:08,5.251",
       ].join("\n"),
       "WLGT",
-      Flag.good,
+      false,
     );
     assert.deepEqual(
       rows.map((r) => r.time),
