@@ -28,6 +28,7 @@ import * as gesla from "../src/sources/gesla/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
 import * as jodc from "../src/sources/jodc/index.ts";
+import * as ispra from "../src/sources/ispra/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
@@ -90,6 +91,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     ),
   // Newlyn, from the readings API.
   ea: () => ea.levels("E72239-level-tidal_level-Mean-15_min-mAOD", start, end),
+  // Napoli, January 2014: the dump, then the first month of a gauge with files.
+  ispra: () => ispra.levels("napoli", new Date("2014-01-01Z"), new Date("2014-01-04Z")),
   // A static release, so its metadata, from one iCloud share, then a record's
   // first days from the other: Honolulu Pier 45, one of the smallest.
   gesla: async () => [

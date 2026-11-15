@@ -558,6 +558,14 @@
       "error": "GESLA's CRMS0128 record holds the site's marsh well (`CRMS0128-W01`), which measures water in the marsh soil, over the whole record, 1 October 2013 to 23 April 2025, as a surface-water gauge. The site's surface-water gauge, `CRMS0128-H01`, ends in October 2012, a year before the record starts. The record is also an hour early, as the 40 in `gesla-crms-hour-early` are.",
       "response": "The whole record is flagged `suspect`, keeping GESLA's own flag as `source_flag`. Its times are kept as served.",
       "evidence": "Moved an hour later, all 90,749 of its hours equal `CRMS0128-W01`'s adjusted elevation in CPRA's export of 8 November 2026 to the millimeter, level with it. At GESLA's own times they match on 45 to 51% of hours, those when the slow-moving well doesn't change."
+    },
+    {
+      "id": "gesla-sciacca-position",
+      "stations": ["gesla/sciacca-sci-ita-ispra"],
+      "handling": "corrected",
+      "error": "GESLA 4.1 places its ISPRA record of Sciacca at 37.2212, 13.0765, 31 km south of the gauge and at sea. The longitude is right.",
+      "response": "The station refresh moves the record to ISPRA's position for the gauge, in `POSITIONS` in `src/positions.ts`, as it does for GESLA's UHSLC records (erratum `gesla-uhslc-positions`). The entry applies only while GESLA still serves the position it was written against. With the position corrected, the record links to ISPRA's series and Copernicus's copy of the gauge.",
+      "evidence": "ISPRA's RDF dump gives its Sciacca tide gauge at 37.50454, 13.07646, and Copernicus's In Situ TAC lists RMN-Sciacca at 37.5045, 13.0765; GESLA's own record of the Copernicus copy (`gesla/rmn_sciacca-rmn-ita-cmems`) is at 37.5045, 13.0765. Only GESLA's ISPRA record differs, checked in November 2026."
     }
   ],
   "retired": []

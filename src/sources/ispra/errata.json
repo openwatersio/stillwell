@@ -1,0 +1,13 @@
+{
+  "errata": [
+    {
+      "id": "ispra-listed-months-missing",
+      "stations": "every station",
+      "handling": "avoided",
+      "error": "ISPRA's RDF dump lists 5,138 monthly level files, from 2010 to October 2023, and many of them return 404. For Venezia, 100 of the 166 listed months resolve, January 2014 to April 2022; the months before and after, listed too, don't.",
+      "response": "The loader asks only for the months the dump lists and skips one that returns 404, so a station's years are partial and the store's coverage is what the repository serves.",
+      "evidence": "Every listed Venezia month requested with HEAD in November 2026: 100 return 200, from 201401 to 202204, and 66 return 404. Spot checks find Napoli's October 2023 and Trieste's January and February 2010, all listed, return 404 too."
+    }
+  ],
+  "retired": []
+}

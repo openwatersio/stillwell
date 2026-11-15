@@ -219,6 +219,13 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: -999, lon: -999 },
     at: { lat: 50.781775, lon: 0.057004 },
   },
+  // GESLA's ISPRA record of Sciacca has ISPRA's longitude and a latitude 31 km
+  // south, at sea. ISPRA's own list, Copernicus's relay and GESLA's CMEMS copy
+  // agree on the gauge: erratum `gesla-sciacca-position`.
+  "gesla/sciacca-sci-ita-ispra": {
+    served: { lat: 37.22120833, lon: 13.07645556 },
+    at: { lat: 37.50454, lon: 13.07646 },
+  },
 };
 
 /** Farthest a source's position can move before its correction is out of date. */
