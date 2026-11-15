@@ -1377,7 +1377,7 @@ erie_lake_erie_pa-9063038-usa-noaa,Erie_Lake_Erie_Pa,United States,noaa,true,tru
 erieau_ontario-12250-can-meds,Erieau_Ontario,Canada,meds,true,true,ca/erieau,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/erieau_ontario-12250-can-meds,false
 esashiko-0140-jpn-jodc_pahb,Esashiko,Japan,jodc_pahb,true,true,jp/esashiko,true,1983-03-31,2023-12-31,,jodc,jodc/0140,0.01,restricted,JODC's terms ask for permission to republish,gesla/esashiko-0140-jpn-jodc_pahb,false
 esashiko-1615-jpn-jodc_pahb,Esashiko,Japan,jodc_pahb,true,true,jp/esashiko-ticon-esashiko-1615-jpn-jodc-pahb,true,2010-12-31,2023-12-31,,jodc,jodc/1615,0,restricted,JODC's terms ask for permission to republish,gesla/esashiko-1615-jpn-jodc_pahb,false
-esbjerg-esb-dnk-dmi,Esbjerg,Denmark,dmi,true,true,dk/esbjerg,true,1950-01-01,2025-07-01,,dmi,,,unmatched,Ambiguous between dmi/9006401 and dmi/25148,gesla/esbjerg-esb-dnk-dmi,false
+esbjerg-esb-dnk-dmi,Esbjerg,Denmark,dmi,true,true,dk/esbjerg,true,1950-01-01,2025-07-01,,dmi,,,unmatched,Ambiguous between dmi/9006401 and dmi/25148,gesla/esbjerg-esb-dnk-dmi,true
 esbjergtg-esb-dnk-cmems,EsbjergTG,Denmark,cmems,true,false,dk/esbjerg,false,2014-07-30,2025-06-30,,dmi,,,unmatched,Ambiguous between dmi/9006401 and dmi/25148,gesla/esbjergtg-esb-dnk-cmems,false
 escambia_river_nr_molino_fla-2376033-usa-usgs,Escambia_River_Nr_Molino_Fla,United States,usgs,true,false,us/escambia-river-nr-molino-fla,true,2007-10-01,2025-05-01,,usgs,usgs/02376033,0,ready,,gesla/escambia_river_nr_molino_fla-2376033-usa-usgs,true
 escatawpa_river_at_i_10_nr_orange_grove_ms-248018020-usa-usgs,Escatawpa_River_At_I_10_Nr_Orange_Grove_Ms,United States,usgs,true,true,us/escatawpa-river-at-i-10-nr-orange-grove-ms,true,2007-10-01,2025-05-01,,usgs,usgs/0248018020,0,ready,,gesla/escatawpa_river_at_i_10_nr_orange_grove_ms-248018020-usa-usgs,true
@@ -1568,9 +1568,9 @@ garibaldi-9437540-usa-noaa,Garibaldi,United States,noaa,true,false,us/garibaldi,
 gatineau-16105-can-meds,Gatineau,Canada,meds,true,true,ca/gatineau,true,1964-08-01,1982-06-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/gatineau-16105-can-meds,false
 gavle_hamn-35236-swe-smhi,Gavle_Hamn,Sweden,smhi,true,true,se/gavle-hamn,true,2023-12-20,2025-07-02,,smhi,smhi/35236,0,ready,,gesla/gavle_hamn-35236-swe-smhi,true
 gdansk-gda-pol-cmems,Gdansk,Poland,cmems,true,true,pl/gdansk,false,2005-03-02,2025-07-01,,cmems,,,restricted,GESLA lists CMEMS as research only,gesla/gdansk-gda-pol-cmems,false
-gedser-837a-dnk-uhslc_rq,Gedser,Denmark,uhslc_rq,true,true,dk/gedser,true,1891-09-01,2012-12-31,,uhslc,uhslc/837a,0.04,ready,,gesla/gedser-837a-dnk-uhslc_rq,false
+gedser-837a-dnk-uhslc_rq,Gedser,Denmark,uhslc_rq,true,true,dk/gedser,true,1891-09-01,2012-12-31,,uhslc,uhslc/837a,0.04,ready,,gesla/gedser-837a-dnk-uhslc_rq,true
 gedser-ged-dnk-cmems,Gedser,Denmark,cmems,true,false,dk/gedser,false,1992-03-26,2025-07-01,,dmi,dmi/31616,0.83,ready,CMEMS record of a gauge the national feed publishes,gesla/gedser-ged-dnk-cmems,false
-gedser-ged-dnk-dmi,Gedser,Denmark,dmi,true,false,dk/gedser,true,1891-09-01,2025-07-01,,dmi,dmi/31616,0.83,ready,,gesla/gedser-ged-dnk-dmi,false
+gedser-ged-dnk-dmi,Gedser,Denmark,dmi,true,false,dk/gedser,true,1891-09-01,2025-07-01,,dmi,dmi/31616,0.83,ready,,gesla/gedser-ged-dnk-dmi,true
 geelong-60770-aus-bom,Geelong,Australia,bom,true,true,au/geelong,true,1965-09-01,2022-12-31,,bom,,,license,BOM license not stated,gesla/geelong-60770-aus-bom,false
 geertruidenberg_amercentrale-geertdbg-nld-rws_hist,Geertruidenberg_Amercentrale,Netherlands,rws_hist,true,false,nl/geertruidenberg-amercentrale,true,1970-11-01,1981-01-02,,rws,rws/geertruidenbergamercentrale,0,ready,,gesla/geertruidenberg_amercentrale-geertdbg-nld-rws_hist,true
 gen_dynamics_pier-8664022-usa-noaa,Gen_Dynamics_Pier,United States,noaa,true,false,us/general-dynamics-pier,true,1997-03-28,1998-12-15,noaa/8664022,coops,coops/8664022,0,ready,,gesla/gen_dynamics_pier-8664022-usa-noaa,true
@@ -1883,9 +1883,9 @@ hooksielplate-9430020-deu-wsv,Hooksielplate,Germany,wsv,true,true,de/hooksielpla
 hope_bay_bc-7360-can-meds,Hope_Bay_BC,Canada,meds,true,true,ca/hope-bay,true,1961-04-19,2016-09-22,,chs,,,restricted,CHS license bars commercial derivatives,gesla/hope_bay_bc-7360-can-meds,false
 hopedale-1405-can-meds,Hopedale,Canada,meds,true,true,ca/hopedale,true,1950-06-29,1984-07-27,,chs,,,restricted,CHS license bars commercial derivatives,gesla/hopedale-1405-can-meds,false
 hopewell-8638481-usa-noaa,Hopewell,United States,noaa,true,false,us/city-point,true,2010-07-01,2012-06-20,noaa/8638481,coops,coops/8638481,0,ready,,gesla/hopewell-8638481-usa-noaa,true
-hornbaek-838a-dnk-uhslc_rq,Hornbaek,Denmark,uhslc_rq,true,true,dk/hornbaek,true,1891-01-01,2012-12-31,,uhslc,uhslc/838a,0.02,ready,,gesla/hornbaek-838a-dnk-uhslc_rq,false
+hornbaek-838a-dnk-uhslc_rq,Hornbaek,Denmark,uhslc_rq,true,true,dk/hornbaek,true,1891-01-01,2012-12-31,,uhslc,uhslc/838a,0.02,ready,,gesla/hornbaek-838a-dnk-uhslc_rq,true
 hornbaek-hor-dnk-cmems,Hornbaek,Denmark,cmems,true,false,dk/hornbaek,false,1991-10-10,2025-07-01,,dmi,dmi/30017,0.94,ready,CMEMS record of a gauge the national feed publishes,gesla/hornbaek-hor-dnk-cmems,false
-hornbaek-hor-dnk-dmi,Hornbaek,Denmark,dmi,true,false,dk/hornbaek,true,1891-01-01,2025-07-01,,dmi,dmi/30017,0.94,ready,,gesla/hornbaek-hor-dnk-dmi,false
+hornbaek-hor-dnk-dmi,Hornbaek,Denmark,dmi,true,false,dk/hornbaek,true,1891-01-01,2025-07-01,,dmi,dmi/30017,0.94,ready,,gesla/hornbaek-hor-dnk-dmi,true
 hornby_island-7953-can-meds,Hornby_Island,Canada,meds,true,true,ca/hornby-island,true,1967-09-21,1971-10-08,,chs,,,restricted,CHS license bars commercial derivatives,gesla/hornby_island-7953-can-meds,false
 horneburg-5960020-deu-wsv,Horneburg,Germany,wsv,true,true,de/horneburg,true,2008-12-18,2025-07-13,,pegelonline,pegelonline/5960020,0,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/horneburg-5960020-deu-wsv,true
 horns_hook-8518668-usa-noaa,Horns_Hook,United States,noaa,true,false,us/horns-hook,true,1979-09-28,2005-10-14,noaa/8518668,coops,coops/8518668,0,ready,,gesla/horns_hook-8518668-usa-noaa,true
