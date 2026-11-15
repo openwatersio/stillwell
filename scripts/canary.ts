@@ -18,6 +18,7 @@ import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bodc from "../src/sources/bodc/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
+import * as cmems from "../src/sources/cmems/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
 import * as dwr from "../src/sources/dwr/index.ts";
 import * as ea from "../src/sources/ea/index.ts";
@@ -60,6 +61,19 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   },
   // Martinez, on the Carquinez Strait.
   cdec: () => cdec.levels({ source_id: "MRZ" }, start, end),
+  // Aarhus, relayed from DMI: a week of the latest window, which runs a day or
+  // two behind, and three days of the history copy a year back. Its paths name
+  // the time chunk and its SQLite files have no shape, so it's in UNRECORDED.
+  cmems: async () => {
+    const latest = await cmems.levels("Aarhus", new Date(end.getTime() - 7 * DAY_MS), end);
+    const history = await cmems.levels(
+      "Aarhus",
+      new Date(start.getTime() - 365 * DAY_MS),
+      new Date(end.getTime() - 365 * DAY_MS),
+    );
+    // Either alone would pass a moved bucket, whose 403s read as no chunk.
+    return latest.length && history.length ? [...latest, ...history] : [];
+  },
   // San Francisco; live, so no metadata request for its dates.
   coops: () => coops.levels("9414290", start, end, { live: true }),
   // Fisherman's Cut in the Delta, from the tail of its file, which runs a day or two behind.
@@ -183,7 +197,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
  * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["gesla", "jma", "kuestendaten"]);
+const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");

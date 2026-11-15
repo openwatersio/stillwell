@@ -1,0 +1,10 @@
+# Title : in-situ files catalog
+# Description : catalog of available in-situ files compliant with Marine Data Store
+# Project : Copernicus Marine In Situ TAC
+# Format version : 3.0
+# Date of update : 2026-11-14T20:33:26Z
+# product_id,file_name,geospatial_lat_min,geospatial_lat_max,geospatial_lon_min,geospatial_lon_max,time_coverage_start,time_coverage_end,institution,date_update,data_mode,parameters
+COP-BO-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/latest/20261015/BO_TS_MO_Flinten16_20261015.nc,55.561,55.561,12.8095,12.8095,2026-10-15T00:00:00Z,2026-10-15T23:00:00Z,SMHI,2026-10-16T02:44:48Z,R,DEPH HCDT HCSP SLEV TEMP
+COP-BO-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/latest/20261015/BO_TS_TG_Aarhus_20261015.nc,56.15,56.15,10.2167,10.2167,2026-10-15T00:00:00Z,2026-10-15T23:50:00Z,DMI,2026-10-16T02:45:09Z,R,DEPH SLEV TEMP
+COP-NO-1,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/latest/20261015/NO_TS_TG_A121TG_20261015.nc,55.4,55.4,3.81,3.81,2026-10-15T00:00:00Z,2026-10-15T23:50:00Z,Rijkswaterstaat Water- Traffic and Environment,2026-10-16T23:35:06Z,R,DEPH SLEV
+COP-GLOBAL-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/latest/20261015/GL_TS_TG_AmbesTG_20261015.nc,45.04048,45.04048,-0.60352,-0.60352,2026-10-15T00:00:00Z,2026-10-15T23:59:00Z,Hydrographic and oceanographic service of the French navy,2026-10-16T01:51:46Z,R,DEPH SLEV

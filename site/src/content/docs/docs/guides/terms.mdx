@@ -36,12 +36,12 @@ The same rule holds for offsets. Nothing is carried from a station whose terms b
 
 ## Contributor credit
 
-GESLA and UHSLC collect records from many agencies. Where a contributor's own terms apply, a station's `attribution` names the contributor after the collection, and `commercial_use` follows the contributor's terms. GESLA's attribution cites its papers. GESLA asks that work using UHSLC's data also cite Caldwell et al. (2015), and UHSLC asks for that citation too.
+GESLA, UHSLC and CMEMS collect records from many agencies. Where a contributor's own terms apply, a station's `attribution` names the contributor after the collection, and `commercial_use` follows the contributor's terms. CMEMS's attribution adds the providing institution and any credit line the provider asks for, such as SHOM's DOI for its gauges. GESLA's attribution cites its papers. GESLA asks that work using UHSLC's data also cite Caldwell et al. (2015), and UHSLC asks for that citation too.
 
 <QueryResult
   sql={`SELECT attribution, commercial_use, count(*) AS stations
 FROM 'https://stillwell.openwaters.io/stations.parquet'
-WHERE source IN ('gesla', 'uhslc')
+WHERE source IN ('gesla', 'uhslc', 'cmems')
 GROUP BY ALL ORDER BY stations DESC LIMIT 8`}
 />
 

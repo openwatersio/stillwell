@@ -3,6 +3,7 @@ import type { Source } from "../schema.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
+import { source as cmems } from "./cmems/index.ts";
 import { source as coops } from "./coops/index.ts";
 import { source as crms } from "./crms/index.ts";
 import { source as dmi } from "./dmi/index.ts";
@@ -23,6 +24,7 @@ import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
+import cmemsErrata from "./cmems/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
 import crmsErrata from "./crms/errata.json" with { type: "json" };
 import dmiErrata from "./dmi/errata.json" with { type: "json" };
@@ -44,6 +46,7 @@ const adapters: Record<string, Source> = {
   bodc,
   bsh,
   cdec,
+  cmems,
   coops,
   crms,
   dmi,
@@ -72,6 +75,7 @@ const adapters: Record<string, Source> = {
  */
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
+  cmems: cmemsErrata,
   coops: coopsErrata,
   crms: crmsErrata,
   dmi: dmiErrata,

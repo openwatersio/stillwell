@@ -18,6 +18,7 @@ The public store aims to hold any source that publishes water level data and all
 - [BSH](src/sources/bsh/README.md): predicted high and low waters and tide curves at German gauges.
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.
+- [Copernicus Marine](src/sources/cmems/README.md): sea level at about 790 tide gauges relayed from European national networks and SHOM's worldwide network, from the In Situ TAC's near-real-time product.
 - [CRMS](src/sources/crms/README.md): hourly levels in Louisiana's coastal marshes and swamps.
 - [DMI](src/sources/dmi/README.md): 10-minute sea level at DMI's and the Danish Coastal Authority's gauges in Denmark, back to 1889.
 - [California DWR](src/sources/dwr/README.md): 15-minute stage at tidal gauges in the Sacramento–San Joaquin Delta.
