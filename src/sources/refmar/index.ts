@@ -45,6 +45,15 @@ const VALIDATED = 3;
 const HOURLY = 4;
 
 /**
+ * Gauges whose raw series (2) SHOM serves an hour late, by gauge, with the
+ * time before which its labels are late. Kerguelen's, hourly from April 1993
+ * to June 2013, is its 1-minute series (1) labeled an hour later (erratum
+ * `refmar-kerguelen-raw-hour-late`).
+ */
+const RAW_LATE: Record<string, number> = { "23": Date.UTC(2014, 0, 1) };
+const HOUR_MS = 3_600_000;
+
+/**
  * A REFMAR gauge with the first day SHOM gives for its record, kept in the
  * store's list so a backfill doesn't ask for decades before it.
  */
@@ -335,10 +344,13 @@ async function rowsOf(
   from: number,
   to: number,
 ): Promise<{ idsource: number; time: number; level: number }[]> {
+  const lateUntil = sources.includes(RAW) ? (RAW_LATE[id] ?? -Infinity) : -Infinity;
+  // A late raw value labeled up to an hour past `to` belongs before it.
+  const late = from < lateUntil ? HOUR_MS : 0;
   const params = new URLSearchParams({
     sources: sources.join(","),
     dtStart: iso(from),
-    dtEnd: iso(to - 1000),
+    dtEnd: iso(to + late - 1000),
   });
   const body = await getJson<{ data: Row[] }>(`${API}/observation/json/${id}?${params}`, {
     pace,
@@ -347,7 +359,11 @@ async function rowsOf(
   });
   return body.data
     .filter((r) => typeof r.value === "number")
-    .map((r) => ({ idsource: r.idsource, time: parseTime(r.timestamp), level: r.value! }))
+    .map((r) => {
+      const time = parseTime(r.timestamp);
+      const shift = r.idsource === RAW && time < lateUntil ? HOUR_MS : 0;
+      return { idsource: r.idsource, time: time - shift, level: r.value! };
+    })
     .filter((r) => r.time >= from && r.time < to);
 }
 

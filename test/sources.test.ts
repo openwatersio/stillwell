@@ -3936,6 +3936,32 @@ describe("refmar", () => {
     assert.equal(values.length, 1);
   });
 
+  it("moves Kerguelen's raw values from before 2014 an hour earlier, asking an hour past the month", async () => {
+    const asked: string[] = [];
+    setTransport(async (url) => {
+      const params = new URL(url).searchParams;
+      if (params.get("sources") === "1") return JSON.stringify({ data: [] });
+      asked.push(params.get("dtEnd")!);
+      return JSON.stringify({
+        data: [
+          row(2, "2005/06/01 00:00:00"),
+          row(2, "2005/06/30 23:00:00"),
+          row(2, "2005/07/01 00:00:00"),
+        ],
+      });
+    });
+    const values = await refmar.levels(
+      { source_id: "23", first_observation: "1962-04-01" },
+      new Date("2005-06-01Z"),
+      new Date("2005-07-01Z"),
+    );
+    assert.deepEqual(asked, ["2005-07-01T00:59:59Z"]);
+    assert.deepEqual(
+      values.map((v) => new Date(v.time).toISOString()),
+      ["2005-06-30T22:00:00.000Z", "2005-06-30T23:00:00.000Z"],
+    );
+  });
+
   it("drops raw values before a later month's validated ones", async () => {
     let call = 0;
     setTransport(async (url) => {
