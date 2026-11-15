@@ -18,6 +18,7 @@ The public store aims to hold any source that publishes water level data and all
 - [BSH](src/sources/bsh/README.md): predicted high and low waters and tide curves at German gauges.
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.
+- [Copernicus Marine](src/sources/cmems/README.md): sea level at about 790 tide gauges relayed from European national networks and SHOM's worldwide network, from the In Situ TAC's near-real-time product.
 - [CRMS](src/sources/crms/README.md): hourly levels in Louisiana's coastal marshes and swamps.
 - [DMI](src/sources/dmi/README.md): 10-minute sea level at DMI's and the Danish Coastal Authority's gauges in Denmark, back to 1889.
 - [California DWR](src/sources/dwr/README.md): 15-minute stage at tidal gauges in the Sacramento–San Joaquin Delta.
@@ -49,15 +50,15 @@ WHERE flag <= 2
 ORDER BY time LIMIT 5;
 ```
 
-The [data guide](docs/data.md) has the file layout, every column, and more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
+The [docs site](https://openwatersio.github.io/stillwell/docs/) has the file layout, every column, and more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 
 [An API is planned](docs/plans/api.md).
 
 ## Docs
 
-- [Using the data](docs/data.md): the store's files, columns and example queries.
-- [Stations](docs/stations.md): station lists, datum epochs, analysis and links between sources.
-- [Quality control](docs/qc/README.md): how levels are flagged, compared with published practice.
+- [Using the data](https://openwatersio.github.io/stillwell/docs/): the store's files, columns and example queries.
+- [Station lists](docs/stations.md), for contributors: how the store keeps and refreshes each source's stations, opens datum epochs and links stations across sources. The [Stations](https://openwatersio.github.io/stillwell/docs/guides/stations/) and [Datums](https://openwatersio.github.io/stillwell/docs/guides/datums/) guides cover the same for readers.
+- [Quality control notes](docs/qc/README.md): an evaluation of the checks against published practice. The [Quality control](https://openwatersio.github.io/stillwell/docs/guides/quality-control/) guide describes the checks for readers.
 - [TICON inventory](docs/ticon-inventory.md): the store series for each TICON record's originator, where there is one.
 - [Plans](docs/plans/plan.md): the roadmap and the API design.
 

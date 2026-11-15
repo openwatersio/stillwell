@@ -1,0 +1,10 @@
+# Title : in-situ files catalog
+# Description : catalog of available in-situ files compliant with Marine Data Store
+# Project : Copernicus Marine In Situ TAC
+# Format version : 3.0
+# Date of update : 2026-11-13T16:53:02Z
+# product_id,file_name,geospatial_lat_min,geospatial_lat_max,geospatial_lon_min,geospatial_lon_max,time_coverage_start,time_coverage_end,institution,date_update,data_mode,parameters
+COP-AR-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/history/AD/AR_PR_AD_58GS.nc,57.08916,80.65442,-14.0052,43.10439,2017-03-01T18:17:20Z,2020-11-28T22:36:06Z,Institute of Marine Research,2025-11-24T16:36:42Z,R,DEPH EWCT NSCT
+COP-BO-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/history/TG/BO_TS_TG_Aarhus.nc,56.15,56.15,10.2167,10.2167,2005-01-01T00:00:00Z,2026-11-01T03:40:00Z,DMI,2026-11-01T05:45:13Z,R,DEPH SLEV TEMP
+COP-BO-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/history/TG/BO_TS_TG_Ahus.nc,55.9284,55.9284,14.3286,14.3286,2010-12-16T14:00:00Z,2012-05-30T06:00:00Z,SMHI,2024-06-17T13:38:22Z,R,DEPH SLEV
+COP-GLOBAL-01,INSITU_GLO_PHYBGCWAV_DISCRETE_MYNRT_013_030/cmems_obs-ins_glo_phybgcwav_mynrt_na_irr_202311/history/TG/GL_TS_TG_AmbesTG_10minute.nc,45.04048,45.04048,-0.60352,-0.60352,2008-09-06T05:30:00Z,2015-12-31T22:50:00Z,Hydrographic and oceanographic service of the French navy,2026-11-07T08:47:08Z,R,DEPH SLEV

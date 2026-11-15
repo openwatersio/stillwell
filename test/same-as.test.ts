@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
 import type { Station } from "../src/schema.ts";
-import { copyPairs, linkGauges, LINKS, nearPairs, PREFER, rank, UNLINKS } from "../src/same-as.ts";
+import {
+  copyPairs,
+  geslaCmems,
+  linkGauges,
+  LINKS,
+  nearPairs,
+  PREFER,
+  rank,
+  UNLINKS,
+} from "../src/same-as.ts";
 
 const NOW = new Date("2026-11-01T00:00:00Z");
 
@@ -527,6 +536,44 @@ describe("nearPairs", () => {
   });
 });
 
+describe("geslaCmems", () => {
+  it("pairs GESLA's CMEMS records with CMEMS's station by the platform code their files start with", () => {
+    const cmems = station("cmems/BremenTG", { name: "Oslebshausen" });
+    const shom = station("cmems/FosSurMerTG", { name: "Fos-sur-Mer" });
+    const pairs = geslaCmems([
+      cmems,
+      shom,
+      station("gesla/brementg-bre-deu-cmems", { name: "BremenTG" }),
+      // One of SHOM's interval files.
+      station("gesla/fossurmertg_60minute-fos-fra-cmems", { name: "FosSurMerTG 60minute" }),
+      // Another contributor's record, and a CMEMS record with no station.
+      station("gesla/oslebshausen-4910060-deu-wsv", { name: "Oslebshausen" }),
+      station("gesla/a2tg-a2t-bel-cmems", { name: "A2TG" }),
+    ]).map(([a, b]) => `${a.id} ${b.id}`);
+    assert.deepEqual(pairs, [
+      "gesla/brementg-bre-deu-cmems cmems/BremenTG",
+      "gesla/fossurmertg_60minute-fos-fra-cmems cmems/FosSurMerTG",
+    ]);
+  });
+
+  it("links them in linkGauges, unless they're farther apart than an ID vouches for", () => {
+    const { stations, report } = linkGauges(
+      [
+        station("cmems/BremenTG", { name: "Oslebshausen" }),
+        station("gesla/brementg-bre-deu-cmems", { name: "BremenTG" }),
+        station("cmems/GomeraTG", { name: "Gomera tide gauge", lat: 1 }),
+        station("gesla/gomeratg-gom-esp-cmems", { name: "GomeraTG", lat: 1 + m(14_430) }),
+      ],
+      NOW,
+    );
+    assert.deepEqual(stations[0]!.same_as, ["gesla/brementg-bre-deu-cmems"]);
+    assert.deepEqual(stations[2]!.same_as, []);
+    assert.deepEqual(report.dropped, [
+      { from: "gesla/gomeratg-gom-esp-cmems", to: "cmems/GomeraTG", reason: "14 km apart" },
+    ]);
+  });
+});
+
 describe("copyPairs", () => {
   const nhs = { contributor: "Norwegian Hydrographic Services", kind: "coastal" as const };
   const ids = (stations: Station[]) => copyPairs(stations).map(([a, b]) => `${a.id} ${b.id}`);
@@ -549,6 +596,26 @@ describe("copyPairs", () => {
         station("refmar/383", { name: "PAPEETE", lat: m(600) }),
       ]),
       [],
+    );
+  });
+
+  it("links a copy whose whole short name the original's has", () => {
+    assert.deepEqual(
+      ids([
+        station("cmems/Hov", { name: "Hov" }),
+        station("dmi/22598", { name: "Hov Havn I", lat: m(700) }),
+        station("dmi/1", { name: "Snaptun Havn", lat: m(900) }),
+      ]),
+      ["cmems/Hov dmi/22598"],
+    );
+    // A name with more of the copy's words wins over a short one.
+    assert.deepEqual(
+      ids([
+        station("cmems/AmelandNes", { name: "Ameland Nes" }),
+        station("rws/ameland.nes", { name: "Ameland, Nes", lat: m(200) }),
+        station("rws/nes", { name: "Nes", lat: m(-500) }),
+      ]),
+      ["cmems/AmelandNes rws/ameland.nes"],
     );
   });
 

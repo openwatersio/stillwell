@@ -12,6 +12,8 @@ on:
       - "notebooks/observable/**"
       - ".mise.toml"
       - ".github/workflows/site.yml"
+      # Source pages render each adapter's README.
+      - "src/sources/*/README.md"
   push:
     branches: [main]
     paths:
@@ -19,6 +21,8 @@ on:
       - "notebooks/observable/**"
       - ".mise.toml"
       - ".github/workflows/site.yml"
+      # Source pages render each adapter's README.
+      - "src/sources/*/README.md"
   schedule:
     - cron: "0 7 * * *"
   workflow_dispatch:

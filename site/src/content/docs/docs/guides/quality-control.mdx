@@ -68,6 +68,7 @@ Each source reports quality its own way, or not at all. This is how each one's c
 - **[BODC](/sources/bodc/)**, from the ERDDAP qualifier. Blank is good. `T` (interpolated) is interpolated. Any other letter, including `M` (improbable), is suspect, and an `M` at a level within 1 mm of zero is bad. `N` (null) is not stored. Checks its values: yes.
 - **[BSH](/sources/bsh/)** publishes predictions only, all good.
 - **[CDEC](/sources/cdec/)** sends no usable quality code. Every value is preliminary. Checks its values: no.
+- **[CMEMS](/sources/cmems/)**, from `value_qc`. 1 (good), 2 (probably good) and 5 (changed) are good. 0 (no QC) is preliminary. 3 (probably bad) is suspect, 4 (bad) bad and 8 interpolated. 9 (missing) is not stored. Any other code is suspect. Values from the latest window, the last month or so, are at least preliminary until the history copy replaces them. Checks its values: yes, as the history copy replaces the latest window.
 - **[CO-OPS](/sources/coops/)**, from the quality (`q`) and flags (`f`) fields. Verified values are good and preliminary (`p`) values preliminary. For 6-minute levels, the flat (F) and rate-of-change (R) flags make a value suspect, and the limit flag (L) does too while the value is still preliminary. The outlier flag (O) is ignored. For hourly heights the limit flag is ignored and the inferred flag (I) makes a value at least interpolated. For highs and lows, L makes a value suspect and I at least interpolated. Checks its values: yes.
 - **[CRMS](/sources/crms/)**, from the comments on each reading. A comment saying the sensor was dry or out of the water, the water was low, the value is a daily median, the clock was reset, or the desiccant failed makes the value suspect. Everything else is good. Marsh well readings are not stored. Checks its values: yes.
 - **[DMI](/sources/dmi/)**, from `qcResult` and `qcStatus`. A result of 6 (erroneous) is bad. A result of 1 to 5 (failed a value, step or consistency check) is suspect. Otherwise a manually checked value is good and anything else preliminary. Checks its values: no.
@@ -88,7 +89,7 @@ Each source reports quality its own way, or not at all. This is how each one's c
 - **[USACE](/sources/usace/)**, from the CWMS quality bits. Rejected is bad. Questionable is suspect. Unscreened, or screened without an "okay" verdict, is preliminary. A value replaced by interpolation is interpolated. Otherwise good. Missing is not stored. Checks its values: yes.
 - **[USGS](/sources/usgs/)**, from the approval status and qualifiers. The qualifiers `ICE`, `EQUIP`, `DRY`, `LESSTHAN` and `BLWMIN` make a value suspect. Otherwise approved values are good and anything else preliminary. `ESTIMATED` makes a value at least interpolated. Checks its values: yes.
 
-Each source's README, linked from its page, says how the adapter reads it.
+Each source's page says how Stillwell reads that source, under "How Stillwell reads it".
 
 ## Stillwell's checks
 
@@ -161,7 +162,7 @@ Two signals mark the preliminary values that will never be checked:
 - every preliminary value from a source whose `finalizes` is false in [`sources.json`](/docs/reference/sources/);
 - values from before a station's [`source_qc_start`](/docs/reference/stations/#column-source_qc_start), where the source's own checks begin.
 
-Those have passed only Stillwell's checks and stay preliminary. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
+Those have passed only Stillwell's checks and stay preliminary. GESLA is the exception to the scale: it stores its QC flag 0, no quality control, as good, so GESLA values nobody checked are `good` rather than `preliminary` and these filters don't find them. To select the values a station's source will never check, join each station's source in `sources.json` and filter on `coalesce(source_flag, flag) = 2 AND (NOT finalizes OR time < source_qc_start)`, which also keeps the ones Stillwell's checks flagged, apart from older values stored without a `source_flag`. A station with a null `source_qc_start` has no known start, so only the `finalizes` test applies to it. A source that doesn't finalize can still revise a value; the revision reaches the store only when the value is fetched again. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
 
 <QueryResult
   sql={`SELECT s.id AS source, s.finalizes,
@@ -249,4 +250,4 @@ Stillwell's checks follow the tests that sea level and hydrometric agencies use 
 - Copernicus In Situ TAC, 2025. [Quality Control Procedure](https://doi.org/10.13155/106219).
 - Haigh and others, 2023. [GESLA Version 3](https://doi.org/10.1002/gdj3.174). Geoscience Data Journal.
 
-The repository's [quality control notes](https://github.com/openwatersio/stillwell/tree/main/docs/qc) compare each check with these and some 40 other published practices, with the measurements behind that comparison. The rules themselves are in [`src/qc.ts`](https://github.com/openwatersio/stillwell/blob/main/src/qc.ts).
+The rules themselves are in [`src/qc.ts`](https://github.com/openwatersio/stillwell/blob/main/src/qc.ts).

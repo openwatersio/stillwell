@@ -34,7 +34,7 @@ All three are worked out again each time `stations.parquet` is built.
 
 A link comes from one of four places:
 
-1. **An ID the source gives.** BSH names each gauge's PEGELONLINE series. UHSLC names the originator's station number, which links its copy to a CO-OPS, JMA or JODC station. GESLA's site codes are the originator's own IDs for many agencies. A source also links its own series of one gauge, such as a CRMS site whose gauge moved and got a new number.
+1. **An ID the source gives.** BSH names each gauge's PEGELONLINE series. UHSLC names the originator's station number, which links its copy to a CO-OPS, JMA or JODC station. GESLA's site codes are the originator's own IDs for many agencies, and its CMEMS records are named for the CMEMS platform code. A source also links its own series of one gauge, such as a CRMS site whose gauge moved and got a new number.
 2. **Nearness with a shared name.** Two stations of different sources within 100 m are linked when their names share an identifying word and name the same side of any dam, lock or barrier. Name alone never links. CO-OPS is never linked this way with USGS or USACE, nor JMA with JODC, since each agency runs its own gauges.
 3. **A copy's best match.** UHSLC rounds its positions, so its copy can sit a kilometer from the original. A copy whose source didn't name the original is linked to the best-named station within 2 km in each other source.
 4. **A decision** in Stillwell's code, with a note on why.
@@ -54,6 +54,8 @@ A link to an ID more than 10 km away is dropped as a wrong ID. A link by nearnes
 7. it has the longer record, its span times its share of values not flagged suspect or bad;
 8. it has the finer interval;
 9. it has the lower ID.
+
+A copy is a series another source relays: every GESLA record; a UHSLC station whose contributor isn't UHSLC, or isn't on file; a REFMAR station named for UHSLC; a USACE station beside a USGS one, since USACE districts relay the transmissions of gauges USGS runs; and a USGS station beside a CRMS one, since USGS relays some CRMS gauges in real time. Where a source has no years list, the record test uses the station's whole span. Once no station in a group still reports, the later tests decide, so the originator's longer record wins over the series that ended last, and `preferred` can name a series that stopped years before another did.
 
 Because the tests read the current store, `preferred` can change from one build to the next. It moves when a series stops reporting, when another's record grows longer, or when the share of values flagged suspect or bad changes. Commercial terms rank above reporting, so `preferred` can name a stopped series when the group's live one bars commercial use.
 
