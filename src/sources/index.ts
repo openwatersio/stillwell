@@ -25,6 +25,7 @@ import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
+import bomErrata from "./bom/errata.json" with { type: "json" };
 import cmemsErrata from "./cmems/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
 import crmsErrata from "./crms/errata.json" with { type: "json" };
@@ -77,6 +78,7 @@ const adapters: Record<string, Source> = {
  */
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
+  bom: bomErrata,
   cmems: cmemsErrata,
   coops: coopsErrata,
   crms: crmsErrata,

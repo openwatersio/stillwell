@@ -5,9 +5,10 @@ import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { FtpError, ftpGet } from "../src/ftp.ts";
 import { fetchText, setTransport } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
-import { linkGauges } from "../src/same-as.ts";
+import { linkGauges, rank } from "../src/same-as.ts";
 import type { Station } from "../src/schema.ts";
 import * as bom from "../src/sources/bom/index.ts";
+import { BOM_CONDITIONS, NOTICES } from "../src/sources/uhslc/notices.ts";
 import { sources } from "../src/sources/index.ts";
 
 const fixture = (name: string) => readFileSync(new URL(`fixtures/${name}`, import.meta.url));
@@ -40,10 +41,15 @@ describe("bom", () => {
     mock.timers.reset();
   });
 
-  it("is a public source tagged as not for commercial use", () => {
+  it("is a public source tagged as UHSLC tags its copies of these gauges", () => {
     const { license, attribution, terms } = bom.metadata;
     assert.equal(license.redistribution, true);
-    assert.equal(license.commercial_use, false);
+    // The same terms UHSLC's copies of BOM's gauges carry, from one notice.
+    assert.equal(license.commercial_use, NOTICES.bom!.commercial_use);
+    assert.equal(license.commercial_use, true);
+    assert.equal(license.url, BOM_CONDITIONS);
+    assert.equal(attribution, NOTICES.bom!.credit);
+    assert.ok(terms!.startsWith(NOTICES.bom!.terms));
     assert.match(attribution, /Bureau of Meteorology, © Commonwealth of Australia/);
     assert.match(attribution, /Tidal_Information_Conditions_of_Use\.pdf/);
     // Both disclaimers of BOM's conditions of use, and its reply.
@@ -67,7 +73,7 @@ describe("bom", () => {
     assert.equal(ferguson.name, "Cape Ferguson");
     assert.equal(ferguson.datum, "TGZ");
     assert.equal(ferguson.interval_s, 3600);
-    assert.equal(ferguson.commercial_use, false);
+    assert.equal(ferguson.commercial_use, true);
     assert.equal(
       ferguson.attribution.split("; ")[1],
       "Australian Baseline Sea Level Monitoring Array",
@@ -118,6 +124,33 @@ describe("bom", () => {
       "uhslc/343a",
     ]);
     assert.deepEqual(byId.get("uhslc/001")!.same_as, ["bom/001", "gesla/pohnpei-67950-fsm-bom"]);
+  });
+
+  it("prefers BOM's own series to UHSLC's copy of the same gauge", async () => {
+    const list = (await bom.stations()) as Station[];
+    const ferguson = list.find((s) => s.id === "bom/995")!;
+    const copy: Station & { contributor: string } = {
+      ...ferguson,
+      id: "uhslc/343a",
+      source: "uhslc",
+      source_id: "343a",
+      lat: -19.28,
+      lon: 147.06,
+      same_as: [],
+      // UHSLC's copy of BOM's gauge carries BOM's notice, so its terms equal BOM's.
+      commercial_use: NOTICES.bom!.commercial_use,
+      contributor: "Bureau of Meteorology",
+      first: "1991-09-12T00:00:00Z",
+      last: "2021-12-31T23:00:00Z",
+      status: "inactive",
+    };
+    const own = { ...ferguson, first: "2005-01-01T00:00:00Z", last: "2026-09-30T23:00:00Z" };
+    assert.equal(own.commercial_use, copy.commercial_use);
+    // BOM's own series comes first whichever way they're compared, though the copy has the longer record.
+    assert.ok(rank(own, copy, new Date("2026-11-14T00:00:00Z")) < 0);
+    assert.ok(rank(copy, own, new Date("2026-11-14T00:00:00Z")) > 0);
+    const { stations } = linkGauges([own, copy], new Date("2026-11-14T00:00:00Z"));
+    assert.deepEqual(new Set(stations.map((s) => s.preferred)), new Set(["bom/995"]));
   });
 
   it("falls back to last year's archive early in a year", async () => {
@@ -188,11 +221,18 @@ describe("bom", () => {
       bom.levels("995", new Date("2024-01-01Z"), new Date("2024-01-02Z")),
       /421/,
     );
-    // A failed year is asked for again, not remembered.
+    // A 550 for a year BOM should have is an error, not no values; a year with none is.
     setTransport(async () => {
       throw new FtpError("FTP replied 550 Failed to open file.", 550);
     });
-    assert.deepEqual(await bom.levels("995", new Date("2024-01-01Z"), new Date("2024-01-02Z")), []);
+    await assert.rejects(
+      bom.levels("995", new Date("2024-01-01Z"), new Date("2024-01-02Z")),
+      /550/,
+    );
+    assert.deepEqual(await bom.levels("995", new Date("2001-01-01Z"), new Date("2001-01-02Z")), []);
+    // The year under way has none until BOM makes it.
+    bom.archives.clear();
+    assert.deepEqual(await bom.levels("995", new Date("2026-02-01Z"), new Date("2026-02-02Z")), []);
   });
 
   it("refuses another datum and a gauge that isn't BOM's", async () => {
@@ -208,45 +248,54 @@ describe("bom", () => {
 
   it("skips missing values and refuses a file it can't read", () => {
     const header = "995FERGUSON2026  LAT=19 17.0S  LONG=147 03.0E  TIMEZONE=GMT";
-    const line = (stn: string, md: string, half: string, cells: string[]) =>
-      `${stn}FERGUSO${"N"}2026${md}${half}${cells.map((c) => c.padStart(5)).join("")}`;
+    const line = (stn: string, md: string, half: number, cells: string[]) =>
+      `${stn}FERGUSON2026${md}${half}${cells.map((c) => c.padStart(5)).join("")}`;
     const cells = ["9999", "10431", "-9", ...Array<string>(9).fill("500")];
-    const out = bom.parse([header, line("995", " 1 1", "2", cells)].join("\n"), "995", 2026);
+    const full = Array<string>(12).fill("500");
+    const file = (...lines: string[]) => [header, ...lines].join("\n");
+    const first = bom.parse(file(line("995", " 1 1", 1, cells)), "995", 2026);
     assert.deepEqual(
-      out.slice(0, 2).map((o) => [o.time, o.level]),
+      first.slice(0, 2).map((o) => [o.time, o.level]),
       [
-        [Date.UTC(2026, 0, 1, 13), 10.431],
-        [Date.UTC(2026, 0, 1, 14), -0.009],
+        [Date.UTC(2026, 0, 1, 1), 10.431],
+        [Date.UTC(2026, 0, 1, 2), -0.009],
       ],
     );
-    assert.equal(out.length, 11);
+    assert.equal(first.length, 11);
+    // The half-day lines run on from January 1: the second half, the next day.
+    const two = bom.parse(
+      file(
+        line("995", " 1 1", 1, full),
+        line("995", " 1 1", 2, full),
+        line("995", " 1 2", 1, full),
+      ),
+      "995",
+      2026,
+    );
+    assert.equal(two.length, 36);
+    assert.equal(two[35]!.time, Date.UTC(2026, 0, 2, 11));
+    const bad = (text: string, pattern: RegExp) =>
+      assert.throws(() => bom.parse(text, "995", 2026), pattern);
     // Another gauge's line, another year's, and a day that isn't one.
-    assert.throws(
-      () => bom.parse([header, line("996", " 1 1", "1", cells)].join("\n"), "995", 2026),
-      /has a line/,
-    );
-    assert.throws(
-      () =>
-        bom.parse(
-          [header, line("995", " 1 1", "1", cells).replace("2026", "2025")].join("\n"),
-          "995",
-          2026,
-        ),
-      /has a line/,
-    );
-    assert.throws(
-      () => bom.parse([header, line("995", " 631", "1", cells)].join("\n"), "995", 2026),
-      /no day/,
-    );
-    assert.throws(
-      () =>
-        bom.parse(
-          [header, line("995", " 1 1", "1", cells), line("995", " 1 1", "1", cells)].join("\n"),
-          "995",
-          2026,
-        ),
-      /twice/,
-    );
+    bad(file(line("996", " 1 1", 1, cells)), /has a line/);
+    bad(file(line("995", " 1 1", 1, cells).replace("2026", "2025")), /has a line/);
+    bad(file(line("995", " 631", 1, cells)), /belongs/);
+    // A missing, repeated or out-of-order half-day, and a file that doesn't start on January 1.
+    bad(file(line("995", " 1 1", 1, full), line("995", " 1 2", 1, full)), /1\/? ?2?.*belongs/);
+    bad(file(line("995", " 1 1", 1, full), line("995", " 1 1", 1, full)), /belongs/);
+    bad(file(line("995", " 1 1", 2, full)), /belongs/);
+    bad(file(line("995", " 1 2", 1, full)), /belongs/);
+    // A blank or malformed cell isn't a level, whatever its place in the line.
+    for (const at of [0, 5, 11]) {
+      const blank = [...full];
+      blank[at] = "";
+      bad(file(line("995", " 1 1", 1, blank)), /not a level/);
+    }
+    bad(file(line("995", " 1 1", 1, [...full.slice(0, 11), "- 5"])), /not a level/);
+    bad(file(line("995", " 1 1", 1, ["1 23", ...full.slice(1)])), /not a level/);
+    // A first line that is a line of levels is one, not a damaged position line.
+    assert.equal(bom.parse(line("995", " 1 1", 1, full), "995", 2026).length, 12);
+    assert.equal(bom.parse("garbled\n" + line("995", " 1 1", 1, full), "995", 2026).length, 12);
   });
 
   it("decompresses compress and gzip files", () => {
@@ -263,12 +312,15 @@ describe("bom", () => {
 
 describe("ftp", () => {
   let server: Server;
+  /** Every socket and passive listener the server opened, closed after each test. */
+  const open: { destroy?: () => void; close?: () => void }[] = [];
   let port: number;
   /** An anonymous FTP server that serves a file, or refuses one it hasn't. */
   const files = new Map<string, Buffer>([["/anon/a.bin", Buffer.from([0, 1, 2, 250, 251])]]);
 
   beforeEach(async () => {
     server = createServer((control: Socket) => {
+      open.push(control);
       let data: Server | undefined;
       control.write("220 ready\r\n");
       let buffer = "";
@@ -281,16 +333,23 @@ describe("ftp", () => {
           const [verb, arg] = [line.split(" ")[0], line.slice(5)];
           if (verb === "USER") control.write("331 password\r\n");
           else if (verb === "PASS")
-            control.write("230-welcome\r\n 230 still welcome\r\n230 in\r\n");
+            control.write("230-welcome\r\n231 not the end\r\n 230 nor this\r\n230 in\r\n");
           else if (verb === "TYPE") control.write("200 binary\r\n");
           else if (verb === "PASV") {
-            data = createServer();
+            data = createServer((socket) => open.push(socket));
+            open.push(data);
             data.listen(0, "127.0.0.1", () => {
               const p = (data!.address() as { port: number }).port;
               control.write(`227 Entering Passive Mode (10,9,9,9,${p >> 8},${p & 255})\r\n`);
             });
           } else if (verb === "RETR") {
             const body = files.get(arg!);
+            if (arg === "/anon/stall.bin") {
+              // Starts the transfer and never ends it, as a dropped route does.
+              data!.once("connection", (socket) => socket.write("partial"));
+              control.write("150 sending\r\n");
+              continue;
+            }
             if (!body) {
               control.write("550 Failed to open file.\r\n");
               data?.close();
@@ -311,6 +370,10 @@ describe("ftp", () => {
   });
 
   afterEach(() => {
+    for (const handle of open.splice(0)) {
+      handle.destroy?.();
+      handle.close?.();
+    }
     server.close();
   });
 
@@ -326,6 +389,21 @@ describe("ftp", () => {
       Buffer.from([0, 1, 2, 250, 251]).toString("base64"),
     );
     assert.equal(await fetchText(url), Buffer.from([0, 1, 2, 250, 251]).toString("latin1"));
+  });
+
+  it("gives up on a transfer that stalls, instead of waiting for it", async () => {
+    await assert.rejects(
+      ftpGet(`ftp://127.0.0.1:${port}/anon/stall.bin`, 300),
+      (error: unknown) => error instanceof DOMException && error.name === "TimeoutError",
+    );
+  });
+
+  it("refuses a path that holds a line break, which would start another command", async () => {
+    await assert.rejects(
+      ftpGet(`ftp://127.0.0.1:${port}/anon/a.bin%0D%0ADELE%20x`),
+      /Not an FTP path/,
+    );
+    await assert.rejects(ftpGet(`ftp://127.0.0.1:${port}/anon/a%00.bin`), /Not an FTP path/);
   });
 
   it("reports a refusal with its code, and doesn't retry a 550", async () => {

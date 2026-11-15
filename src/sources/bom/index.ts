@@ -35,15 +35,17 @@ export const metadata: SourceMetadata = {
     id: "LicenseRef-BOM",
     name: "Bureau of Meteorology conditions of use for tide information",
     url: BOM_CONDITIONS,
-    // BOM's reply (CAS-151567-N3L2D4) doesn't mention commercial use; tagged
-    // false until it says whether the permission reaches it.
-    commercial_use: false,
+    // As UHSLC's copies of these gauges are (`NOTICES.bom`): BOM's reply
+    // (CAS-151567-N3L2D4) allows use under its conditions, and the store reads
+    // that as covering commercial use. A copy can't carry looser terms than
+    // the original, so a change to one is a change to both.
+    commercial_use: NOTICES.bom!.commercial_use,
     redistribution: true,
   },
   attribution: NOTICES.bom!.credit!,
   // The page that publishes the Centre's contact details; BOM's site is closed to scripted requests, so no mailbox is recorded.
   contact: { url: "https://www.bom.gov.au/oceanography/projects/ntc/ntc.shtml" },
-  terms: `BOM allowed use of its data in its reply of 12 November 2026 (reference CAS-151567-N3L2D4), as long as the products follow the conditions of use for its tide information: acknowledge copyright in the Commonwealth of Australia represented by the Bureau of Meteorology, and show these disclaimers with the data or link them from its attribution, which the credit does. "${DISCLAIMER}" Where a product modifies the data: "${MODIFIED_DISCLAIMER}" The reply doesn't mention commercial use, so it's tagged as not allowed until BOM says. Changes in the store: levels from millimeters to meters, the tide gauge zero named ${DATUM}, and quality flags added.`,
+  terms: `${NOTICES.bom!.terms} "${DISCLAIMER}" Where a product modifies the data: "${MODIFIED_DISCLAIMER}" Changes in the store: levels from millimeters to meters, the tide gauge zero named ${DATUM}, and quality flags added.`,
   // The files are rebuilt about monthly, and weeks behind.
   hourly: false,
   // The current year's values are preliminary until BOM's yearly archive replaces them.
@@ -62,14 +64,18 @@ interface Gauge {
   country_code: string;
   /** Which monitoring project runs the gauge. */
   project: "ABSLMP" | "SPSLCMP";
-  /** UHSLC's series of the gauge, which carry the same hourly values. */
+  /**
+   * UHSLC's series of the gauge, which carry the same hourly values, by ID. BOM
+   * numbers its Australian Baseline Array gauges (956 to 959, 992 to 997) in its
+   * own series, not UHSLC's, so they're named here rather than found by name.
+   */
   uhslc: string[];
   /** GESLA's record of BOM's own file for the gauge. */
   gesla?: string;
   /**
    * Meters from the tide gauge zero up to the Australian Height Datum, from
    * the list beside the files (`readme.txt`); where it gives one value that fits
-   * the gauge's mean level.
+   * the gauge's mean level. Broome's doesn't (erratum `bom-broome-ahd`).
    */
   ahd?: number;
 }
@@ -438,6 +444,10 @@ export async function stations(): Promise<ListedStation[]> {
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
+/** BOM keeps archives for 1996 and for 2005 on, and none for the years between or one the year under way hasn't made yet. */
+const noArchive = (year: number) =>
+  (year > 1996 && year < 2005) || year >= new Date().getUTCFullYear();
+
 /** The archives fetched this run, by year, as each station's compressed file; null where BOM has none. */
 export const archives = new Map<number, Promise<Map<string, Buffer> | null>>();
 
@@ -450,8 +460,8 @@ export function archiveOf(year: number): Promise<Map<string, Buffer> | null> {
     got = getText(`${DIRECTORY}/${year}.ar`, { base64: true, fresh: true, pace }).then(
       (body) => unar(Buffer.from(body, "base64"), year),
       (error) => {
-        // BOM keeps 1996 and 2005 on; the years between have no archive.
-        if (error instanceof FtpError && error.code === 550) return null;
+        // Only the years BOM has no archive for read as none: any other 550 is a file it should have.
+        if (error instanceof FtpError && error.code === 550 && noArchive(year)) return null;
         archives.delete(year);
         throw error;
       },
@@ -492,6 +502,8 @@ export async function levels(
 
 const latin1 = (b: Buffer) => b.toString("latin1");
 
+const LINE = /^(\d{3}).{8}(\d{4})([ \d]\d)([ \d]\d)([12])((?:[ \d-]{5}){12})$/;
+
 /**
  * A year's file: after a first line holding the station's position, a line for
  * each half of each day: the station number, its name (8), the year, month, day
@@ -500,33 +512,37 @@ const latin1 = (b: Buffer) => b.toString("latin1");
  */
 export function parse(text: string, number: string, year: number): Observation[] {
   const out: Observation[] = [];
-  const seen = new Set<string>();
-  // A first line is the position; one that's garbled (BOM's 2005 file for Burnie) holds no value.
-  for (const line of text.split(/\r?\n/).slice(1)) {
-    if (!line.trim()) continue;
-    const m = /^(\d{3}).{8}(\d{4})([ \d]\d)([ \d]\d)([12])((?:[ \d-]{5}){12})$/.exec(
-      line.trimEnd(),
-    );
+  const lines = text.split(/\r?\n/).filter((l) => l.trim());
+  // A file starts with the station's position, which holds no value; one that's
+  // damaged (erratum `bom-burnie-2005-position-line`) is skipped like it.
+  if (lines.length && !LINE.test(lines[0]!)) lines.shift();
+  // The lines run from January 1 on, a half-day each, without a gap or a repeat.
+  let midnight = Date.UTC(year, 0, 1);
+  let half = 1;
+  for (const line of lines) {
+    const m = LINE.exec(line);
     if (!m || m[1] !== number || Number(m[2]) !== year)
       throw new Error(`BOM ${number}'s file for ${year} has a line ${line.slice(0, 40)}`);
-    const [month, day, half] = [Number(m[3]), Number(m[4]), Number(m[5])];
-    const midnight = Date.UTC(year, month - 1, day);
+    const [month, day] = [Number(m[3]), Number(m[4])];
     // Date.UTC rolls 31 June over to 1 July.
-    if (new Date(midnight).getUTCMonth() !== month - 1 || new Date(midnight).getUTCDate() !== day)
-      throw new Error(`BOM ${number} has no day ${year}-${month}-${day}`);
-    if (seen.has(`${midnight}/${half}`))
-      throw new Error(`BOM ${number} has ${line.slice(11, 21)} twice`);
-    seen.add(`${midnight}/${half}`);
+    if (Date.UTC(year, month - 1, day) !== midnight || Number(m[5]) !== half)
+      throw new Error(
+        `BOM ${number}'s file for ${year} has ${line.slice(11, 21).trim()} where ${new Date(midnight).toISOString().slice(0, 10)} half ${half} belongs`,
+      );
     const cells = m[6]!;
     for (let i = 0; i < 12; i++) {
       const cell = cells.slice(5 * i, 5 * i + 5).trim();
+      // 9999 is the format's missing value, so a level of 9.999 m can't be told from it.
       if (cell === "9999") continue;
+      if (!/^-?\d+$/.test(cell)) throw new Error(`BOM ${number}: not a level: "${cell}"`);
       out.push({
         time: midnight + ((half - 1) * 12 + i) * HOUR_MS,
         level: Number(cell) / 1000,
         flag: Flag.good,
       });
     }
+    if (half === 2) midnight += 24 * HOUR_MS;
+    half = half === 1 ? 2 : 1;
   }
   return out;
 }
@@ -553,6 +569,7 @@ export function unar(archive: Buffer, year: number): Map<string, Buffer> {
       throw new Error(`BOM's ${year}.ar is cut off in ${name}`);
     const m = /^h(\d{3})\.dat\.Z$/.exec(name);
     if (!m) throw new Error(`BOM's ${year}.ar holds ${name}`);
+    if (out.has(m[1]!)) throw new Error(`BOM's ${year}.ar holds ${name} twice`);
     out.set(m[1]!, Buffer.from(body));
     p += 60 + size + (size % 2);
   }
@@ -567,7 +584,7 @@ export function unar(archive: Buffer, year: number): Map<string, Buffer> {
  * or a clear code cuts short.
  */
 export function uncompress(z: Buffer): Buffer {
-  // Some members of 1996's archive are gzip files under the same name.
+  // Some members of 1996's archive are gzip files under the same name (erratum `bom-gzip-named-z`).
   if (z[0] === 0x1f && z[1] === 0x8b) return gunzipSync(z);
   if (z.length < 3 || z[0] !== 0x1f || z[1] !== 0x9d) throw new Error("Not a compressed (.Z) file");
   const maxBits = z[2]! & 0x1f;
