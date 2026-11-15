@@ -13,7 +13,7 @@ Use a normal `ign` source adapter. Follow JMA's provisional/final distinction, C
 ## Behavior
 
 - List the 12 station directories, including retired FUER1 and MURC1, with metadata supported by IGN's station sheets.
-- Read reviewed `procesados/integros` files and preferred-sensor daily `observados` files. Reviewed values win at shared timestamps; retain finer observations absent from the reviewed series.
+- Read reviewed `procesados/integros` and `horarios` files, preferring minute values at shared timestamps on the same reference. Read raw sensor archives separately and poll the newer radar for live values. Raw and reviewed series link through `same_as`.
 - Store meters increasing upward. Retain Join Mark as the reference for reviewed series. Raw readings may join them only with an evidenced sensor-to-JM conversion; never infer a surveyed offset from a mean difference. Preserve separately referenced series where the source does not establish a conversion.
 - Publish NMMA offsets only where the station sheet establishes that reference. Island orthometric heights alone do not establish NMMA.
 - Keep commercial use false pending IGN's confirmation. Record the README's attribution condition and distinguish it from the broader IGN license.

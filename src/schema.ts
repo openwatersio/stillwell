@@ -327,6 +327,8 @@ export interface Source {
    * such as a whole day or a late reading.
    */
   keepsStored?: boolean;
+  /** Whether recent polling keeps readings absent from later responses, for feeds whose inventories can be incomplete. */
+  keepsRecent?: boolean;
   /**
    * Spans of a station's values that the store's own errata flag `suspect`,
    * beyond the spans its `errata.json` names, which the registry adds, worked

@@ -84,6 +84,8 @@ export async function stations(): Promise<ListedStation[]> {
       ];
       return ids.map((id): ListedStation => {
         const part = id.slice(code.length + 1);
+        const endYear = periods[id]?.[1];
+        const ended = endYear != null && endYear < new Date().getUTCFullYear();
         const historicalBm = part === oldBm[code] || (!part && code === "TN031");
         const raw = g.sensors.includes(part) || g.charts.includes(part);
         const datum = historicalBm || g.sensors.includes(part) ? "BM" : part ? "ZERO" : "JM";
@@ -106,8 +108,8 @@ export async function stations(): Promise<ListedStation[]> {
           last: null,
           tide_station: null,
           same_as: ids.filter((other) => other !== id).map((other) => `ign/${other}`),
-          status: g.last || g.charts.includes(part) ? "inactive" : "active",
-          live: !g.last && part === g.sensors[0],
+          status: g.last || ended || g.charts.includes(part) ? "inactive" : "active",
+          live: !g.last && !ended && part === g.sensors[0],
           min_interval_s: 3600,
           source_url: `${BASE}fichas/${code}.pdf`,
         };
@@ -193,7 +195,10 @@ async function reviewed(
   const out = new Map<number, Observation>();
   for (const folder of ["integros", "horarios"]) {
     const path = `${code}/procesados/${folder}/`;
-    for (const file of await inventory(path)) {
+    const files = (await inventory(path)).sort(
+      (a, b) => Number(a.endsWith("_BM.txt")) - Number(b.endsWith("_BM.txt")) || a.localeCompare(b),
+    );
+    for (const file of files) {
       const m = /^(\d{6})_(?:horarios_)?(\d{4})_(JM|BM)\.txt$/.exec(file);
       if (!m) continue;
       if (m[1] !== g.number) throw new Error(`IGN ${code}: another station in catalog: ${file}`);
@@ -207,16 +212,12 @@ async function reviewed(
       const currentMark = m[3] === "JM" ? g.jm : code === "ALBO1" ? "C_Mfo" : g.bm;
       if (!historical && normalizedMark(named[2]!) !== normalizedMark(currentMark))
         throw new Error(`IGN ${code}: unexpected benchmark mark ${named[2]}`);
+      if (code === "TN031" && !historical)
+        throw new Error(`IGN TN031: new reviewed reference in ${file}; update the catalog`);
       if (historical !== ((part !== undefined && part === oldBm[code]) || code === "TN031"))
         continue;
       if (part && !historical) continue;
-      const mark = historical
-        ? oldBm[code]!
-        : m[3] === "JM"
-          ? g.jm
-          : code === "ALBO1"
-            ? "C_Mfo"
-            : g.bm;
+      const mark = historical ? oldBm[code]! : currentMark;
       const offset = !historical && m[3] === "BM" ? bmToJm(g) : 0;
       for (const o of parse(body, {
         year,
@@ -242,12 +243,21 @@ async function rawLevels(
 ): Promise<Observation[]> {
   const path = `${code}/observados/`;
   const yearLinks = await inventory(path);
+  const dailyYears = new Set(
+    yearLinks.filter((f) => /^\d{4}\/$/.test(f)).map((f) => Number(f.slice(0, 4))),
+  );
+  const yearStart = Date.UTC(new Date().getUTCFullYear(), 0, 1);
+  const annualNames = from < yearStart ? await inventory(`${path}ficheros_anuales/`, true) : [];
+  const annualYears = annualNames.flatMap((file) => {
+    const m = /^(\d{6})_(\d{4})_(\d{4})\.txt$/.exec(file);
+    return m && m[1] === g.number && m[2] === sensor ? [Number(m[3])] : [];
+  });
   const out: Observation[] = [];
-  for (const link of yearLinks) {
-    if (!/^\d{4}\/$/.test(link)) continue;
-    const year = Number(link.slice(0, 4));
+  for (const year of [...new Set([...dailyYears, ...annualYears])].sort((a, b) => a - b)) {
     if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) <= from) continue;
-    let annual = to - from > 7 * DAY && year < new Date().getUTCFullYear();
+    const annual =
+      annualYears.includes(year) &&
+      ((to - from > 7 * DAY && Date.UTC(year, 0, 1) < yearStart) || !dailyYears.has(year));
     let dir = annual ? `${path}ficheros_anuales/` : `${path}${year}/`;
     const matching = (files: string[], size: number) =>
       files
@@ -260,12 +270,7 @@ async function rawLevels(
             Number(m[3]!.slice(0, 4)) === year &&
             m[3]!.length === size,
         );
-    let files = matching(await inventory(dir, annual), annual ? 4 : 8);
-    if (annual && !files.length) {
-      annual = false;
-      dir = `${path}${year}/`;
-      files = matching(await inventory(dir), 8);
-    }
+    let files = matching(annual ? annualNames : await inventory(dir), annual ? 4 : 8);
     for (const { file, match: m } of files) {
       const day = annual ? undefined : m![3]!;
       if (day) {
@@ -276,7 +281,8 @@ async function rawLevels(
         year,
         gauge: code,
         raw: true,
-        sign: g.charts.includes(sensor) ? 1 : -1,
+        // MURC1's 0503 archive increases downward despite its sheet: erratum `ign-murc1-chart-archive`.
+        sign: g.charts.includes(sensor) && !(code === "MURC1" && sensor === "0503") ? 1 : -1,
         offset: 0,
         day,
       }))
@@ -310,10 +316,8 @@ export async function levels(
         : "JM";
   if (datum && datum !== expected)
     throw new Error(`IGN ${id}: expected datum ${expected}, got ${datum}`);
-  const span = sensor ? periods[id] : undefined;
-  const from = Math.max(start.getTime(), Date.UTC(Math.max(g.first, span?.[0] ?? g.first), 0, 1));
-  const last = span?.[1] ?? g.last;
-  const to = Math.min(end.getTime(), last ? Date.UTC(last + 1, 0, 1) : Infinity);
+  const from = start.getTime();
+  const to = end.getTime();
   if (!Number.isFinite(from) || !Number.isFinite(to)) throw new Error("IGN needs finite dates");
   if (from >= to) return [];
   const out = sensor
@@ -327,4 +331,5 @@ export const source: Source = {
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
   keepsStored: true,
+  keepsRecent: true,
 };

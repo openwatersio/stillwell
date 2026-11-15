@@ -2,11 +2,9 @@
   "errata": [
     {
       "id": "ign-duplicate-raw-rows",
-      "stations": ["ign/ALAC1-1633"],
-      "since": "2026-11-12",
-      "until": "2026-11-13",
+      "stations": "every station",
       "handling": "dropped",
-      "error": "ALAC1's 1633 raw daily file repeats 12 November 2026 at 04:05:00 three times with the identical 798 mm value.",
+      "error": "Some raw logger exports repeat identical rows. ALAC1’s 1633 daily file repeats 12 November 2026 at 04:05:00 three times with the same 798 mm value.",
       "response": "Keep one copy of identical adjacent raw rows. Conflicting values at a repeated timestamp and decreasing timestamps still fail the fetch.",
       "evidence": "Observed in https://datos-geodesia.ign.es/Red_de_Mareografos/ALAC1/observados/2026/220051_1633_20261112.txt on 15 November 2026 UTC: 1,442 rows, with three identical 04:05:00 rows. A recorded excerpt is test/fixtures/ign-duplicates.txt."
     },
@@ -25,6 +23,16 @@
       "error": "Some reviewed files name marks that differ from the station sheet: MURC1's 2001 hourly file uses JM NAP-943 rather than NP-1744; TN021's 2008–2019 BM files use NGZ-581 rather than BM Inox; TN031's 2009–2021 BM files use NGAB-161 rather than Inox. CRI 1.",
       "response": "Validate each header's named mark. MURC1 uses NAP-943's surveyed 2.313 m NMMA height from MURC2's sheet. Keep the old Tenerife BMs as separate references without invented offsets: TN021-NGZ581 and TN031. Raw sensors have series of their own and inherit no surveyed offset from today's sheet.",
       "evidence": "Headers in MURC1/procesados/horarios/220046_horarios_2001_JM.txt, TN021/procesados/integros/370032_2008_BM.txt and TN031/procesados/integros/370033_2009_BM.txt, compared with fichas/MURC1.pdf, MURC2.pdf, TN021.pdf and TN031.pdf, under https://datos-geodesia.ign.es/Red_de_Mareografos/. MURC1's first -2260 mm reading is +0.053 m NMMA using the named NAP-943, versus +4.290 m using NP-1744."
+    },
+    {
+      "id": "ign-murc1-chart-archive",
+      "stations": ["ign/MURC1-0503"],
+      "since": "2001-01-01",
+      "until": "2004-01-01",
+      "handling": "corrected",
+      "error": "The MURC1 sheet labels sensor 0503 as a mechanical recorder operating in 1991–1998, but its archive publishes 2001–2003 observations. Those values increase downward, opposite to reviewed water heights.",
+      "response": "Read the actual archive years, retain a separate instrument reference, and reverse the observed distance to increase upward. Sheet periods inform status but do not remove archived observations.",
+      "evidence": "MURC1/observados/ficheros_anuales/ lists 220046_0503_2001.txt through 2003. In the first 64 KB of the 2001 export, 364 shared hours correlate -1.0 with procesados/horarios/220046_horarios_2001_JM.txt. At 2001-01-01 00:00 the raw distance is 583 mm and the reviewed height is -2260 mm. Files and fichas/MURC1.pdf under https://datos-geodesia.ign.es/Red_de_Mareografos/ checked 15 November 2026."
     }
   ],
   "retired": []

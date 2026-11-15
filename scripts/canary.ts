@@ -199,7 +199,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 };
 
 /**
- * Sources never recorded. JMA's and GESLA's request paths change, so a
+ * Sources never recorded. IGN daily paths change with the date. JMA's and GESLA's request paths change, so a
  * recording would fail the next one: JMA's name the month, and GESLA's iCloud
  * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.

@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { afterEach, describe, it } from "node:test";
+import { afterEach, describe, it, mock } from "node:test";
 import { fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
 import * as ign from "../src/sources/ign/index.ts";
 import { sourceOf } from "../src/sources/index.ts";
 import { linkGauges } from "../src/same-as.ts";
 import type { Station } from "../src/schema.ts";
+import type { StoredStation } from "../src/schema.ts";
+import { refreshStation } from "../src/store/recent.ts";
 
 ign.pacing.requestMs = 0;
 
@@ -67,10 +69,101 @@ describe("IGN", () => {
     assert.equal(list.find((s) => s.source_id === "FUER1")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "MURC1")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "ALAC1-0301")!.status, "inactive");
+    assert.equal(list.find((s) => s.source_id === "ALAC1-0702")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "TN013")!.datums.NMMA, undefined);
     assert.ok(list.every((s) => !s.commercial_use));
     assert.equal(ign.metadata.license.redistribution, true);
     assert.ok(alac.same_as.includes("ign/ALAC1-1633"));
+  });
+
+  it("keeps archived observations outside the sheet's stated sensor period", async () => {
+    serve({
+      "MURC1/observados/": listing("MURC1/observados", ["2001/"]),
+      "MURC1/observados/ficheros_anuales/": listing("MURC1/observados/ficheros_anuales", [
+        "220046_0503_2001.txt",
+      ]),
+      "MURC1/observados/ficheros_anuales/220046_0503_2001.txt": '01/01/2001 00:00:00 583 "mm"',
+    });
+    const out = await ign.levels("MURC1-0503", new Date("2001-01-01Z"), new Date("2002-01-01Z"));
+    assert.equal(out[0]!.level, -0.583);
+  });
+
+  it("reads annual-only years absent from daily directory listings", async () => {
+    serve({
+      "ALME2/observados/": listing("ALME2/observados", ["2000/"]),
+      "ALME2/observados/ficheros_anuales/": listing("ALME2/observados/ficheros_anuales", [
+        "220042_0901_1985.txt",
+      ]),
+      "ALME2/observados/ficheros_anuales/220042_0901_1985.txt": '01/01/1985 00:00:00 1500 "mm"',
+    });
+    const out = await ign.levels("ALME2-0901", new Date("1985-01-01Z"), new Date("1985-01-02Z"));
+    assert.equal(out[0]!.level, 1.5);
+  });
+
+  it("signals a new TN031 reviewed reference rather than silently dropping it", async () => {
+    serve({
+      "TN031/procesados/integros/": listing("TN031/procesados/integros", ["370033_2025_JM.txt"]),
+      "TN031/procesados/horarios/": listing("TN031/procesados/horarios", []),
+      "TN031/procesados/integros/370033_2025_JM.txt":
+        "370 CANARIAS 033 TN031 mm respecto JM SS.3\n01/01/2025 00:00:00 -18000",
+    });
+    await assert.rejects(
+      ign.levels("TN031", new Date("2025-01-01Z"), new Date("2025-01-02Z")),
+      /reference/,
+    );
+  });
+
+  it("preserves recent IGN observations when a later directory listing omits their day", async () => {
+    serve({
+      "": fixture("root.html"),
+      "ALAC1/observados/": listing("ALAC1/observados", ["2026/"]),
+      "ALAC1/observados/2026/": listing("ALAC1/observados/2026", ["220051_1633_20261115.txt"]),
+      "ALAC1/observados/2026/220051_1633_20261115.txt": '15/11/2026 05:00:00 1100 "mm"',
+    });
+    const listed = (await ign.stations()).find((s) => s.source_id === "ALAC1-1633")!;
+    const station = {
+      ...listed,
+      epochs: [
+        {
+          id: 1,
+          datum: "BM",
+          since: null,
+          until: null,
+          seen: null,
+          reference: "ALAC1/1633",
+          reference_since: null,
+          datums: {},
+          to_current: 0,
+          state: "open",
+        },
+      ],
+    } as StoredStation;
+    const prior = Date.UTC(2026, 10, 14, 23);
+    const summary = {
+      title: "IGN regression",
+      stations: 1,
+      updated: 0,
+      stale: [],
+      failed: [],
+      waiting: [],
+      values: 0,
+      files: 0,
+    };
+    const { rows } = await refreshStation({
+      source: ign.source,
+      station,
+      previous: [{ station: station.id, epoch: 1, time: prior, level: -1, flag: Flag.preliminary }],
+      swept: undefined,
+      since: Date.UTC(2026, 10, 14, 18),
+      now: Date.UTC(2026, 10, 15, 6),
+      keepFrom: Date.UTC(2026, 10, 8),
+      summary,
+    });
+    assert.deepEqual(summary.failed, []);
+    assert.deepEqual(
+      rows.map((r) => r.time),
+      [prior, Date.UTC(2026, 10, 15, 5)],
+    );
   });
 
   it("refuses an empty, shortened or unknown station catalog", async () => {
@@ -121,6 +214,29 @@ describe("IGN", () => {
       },
     );
     assert.equal(out[0]!.level, -15.905);
+  });
+
+  it("prefers direct JM over converted BM, then minute over hourly values", async () => {
+    serve({
+      "ALBO1/procesados/integros/": listing("ALBO1/procesados/integros", [
+        "220048_2021_BM.txt",
+        "220048_2021_JM.txt",
+      ]),
+      "ALBO1/procesados/horarios/": listing("ALBO1/procesados/horarios", [
+        "220048_horarios_2021_JM.txt",
+      ]),
+      "ALBO1/procesados/integros/220048_2021_BM.txt":
+        "220 MEDITERRANEO 048 ALBO1 mm respecto BM C_Mfo\n01/01/2021 00:00:00 -1101",
+      "ALBO1/procesados/integros/220048_2021_JM.txt":
+        "220 MEDITERRANEO 048 ALBO1 mm respecto JM NG K 272\n01/01/2021 00:00:00 -15900",
+      "ALBO1/procesados/horarios/220048_horarios_2021_JM.txt":
+        "220 MEDITERRANEO 048 ALBO1 mm respecto JM NG K 272\n01/01/2021 00:00 -16000\n01/01/2021 01:00 -16010",
+    });
+    const out = await ign.levels("ALBO1", new Date("2021-01-01Z"), new Date("2021-01-01T02:00Z"));
+    assert.deepEqual(
+      out.map((r) => r.level),
+      [-15.9, -16.01],
+    );
   });
 
   it("reads the reviewed hourly format without seconds", () => {
@@ -361,5 +477,29 @@ describe("IGN", () => {
       (await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date("2026-01-01Z"))).length,
       150_000,
     );
+  });
+
+  it("uses current-year daily files across New Year even when an annual snapshot exists", async () => {
+    mock.timers.enable({ apis: ["Date"], now: Date.UTC(2026, 10, 15) });
+    try {
+      serve({
+        "ALAC1/observados/": listing("ALAC1/observados", ["2025/", "2026/"]),
+        "ALAC1/observados/ficheros_anuales/": listing("ALAC1/observados/ficheros_anuales", [
+          "220051_1633_2025.txt",
+          "220051_1633_2026.txt",
+        ]),
+        "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt": '31/12/2025 00:00:00 1050 "mm"',
+        "ALAC1/observados/ficheros_anuales/220051_1633_2026.txt": '01/01/2026 00:00:00 900 "mm"',
+        "ALAC1/observados/2026/": listing("ALAC1/observados/2026", ["220051_1633_20260101.txt"]),
+        "ALAC1/observados/2026/220051_1633_20260101.txt": '01/01/2026 00:00:00 1000 "mm"',
+      });
+      const out = await ign.levels("ALAC1-1633", new Date("2025-12-31Z"), new Date("2026-01-10Z"));
+      assert.deepEqual(
+        out.map((r) => r.level),
+        [-1.05, -1],
+      );
+    } finally {
+      mock.timers.reset();
+    }
   });
 });

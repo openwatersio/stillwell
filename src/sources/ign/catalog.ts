@@ -4,7 +4,6 @@ export interface Gauge {
   name: string;
   lat: number;
   lon: number;
-  first: number;
   last?: number;
   bm: string;
   bmHeight: number | null;
@@ -23,7 +22,6 @@ export const gauges: Record<string, Gauge> = {
     name: "A Coruña",
     lat: dms(43, 21, 52),
     lon: -dms(8, 23, 56),
-    first: 1950,
     bm: "NG K 793",
     bmHeight: 3.478,
     jm: "NP 615",
@@ -37,7 +35,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Alicante Muelle de Levante",
     lat: dms(38, 20, 18),
     lon: -dms(0, 28, 40),
-    first: 1927,
     bm: "NG AB 881",
     bmHeight: null,
     jm: "NP 1",
@@ -51,7 +48,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Alicante Harbour Mouth",
     lat: dms(38, 20, 20),
     lon: -dms(0, 28, 52),
-    first: 1957,
     bm: "M3",
     bmHeight: null,
     jm: "NP 1",
@@ -65,7 +61,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Isla de Alborán",
     lat: dms(35, 56, 20),
     lon: -dms(3, 2, 1),
-    first: 2016,
     bm: "Clv. Mfo",
     bmHeight: 0.923,
     jm: "NG K 272",
@@ -79,7 +74,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Almería",
     lat: dms(36, 49, 56),
     lon: -dms(2, 29, 6),
-    first: 2000,
     bm: "NG K 587 st",
     bmHeight: 2.628,
     jm: "NG U 74",
@@ -93,7 +87,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Puerto del Rosario Former Gauge",
     lat: dms(28, 29, 48),
     lon: -dms(13, 51, 33),
-    first: 1999,
     last: 2018,
     bm: "SS Pozo",
     bmHeight: 2.793,
@@ -108,7 +101,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Puerto del Rosario",
     lat: dms(28, 29, 53),
     lon: -dms(13, 51, 24),
-    first: 2018,
     bm: "NG K 249",
     bmHeight: null,
     jm: "NG U 712",
@@ -122,7 +114,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Cartagena Former Gauge",
     lat: dms(37, 35, 50),
     lon: -dms(0, 58, 28),
-    first: 2001,
     last: 2005,
     bm: "NGV-654",
     bmHeight: null,
@@ -138,7 +129,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Cartagena",
     lat: dms(37, 35, 48),
     lon: -dms(0, 58, 26),
-    first: 2005,
     bm: "NG X 944",
     bmHeight: 2.345,
     jm: "NAP 943",
@@ -152,7 +142,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Santa Cruz de Tenerife",
     lat: dms(28, 28, 38),
     lon: -dms(16, 14, 28),
-    first: 1992,
     bm: "NG U 320",
     bmHeight: 4.671,
     jm: "NG R 333",
@@ -166,7 +155,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Puerto de la Cruz",
     lat: dms(28, 25, 6),
     lon: -dms(16, 33, 4),
-    first: 2008,
     bm: "BM Inox",
     bmHeight: 2.632,
     jm: "NG Z 577",
@@ -180,7 +168,6 @@ export const gauges: Record<string, Gauge> = {
     name: "Los Cristianos",
     lat: dms(28, 2, 49),
     lon: -dms(16, 43, 5),
-    first: 2009,
     bm: "Inox. CRI 1",
     bmHeight: 2.388,
     jm: "SS.3",
