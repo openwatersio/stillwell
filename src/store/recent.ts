@@ -1,4 +1,5 @@
 import { commitYears, markYears, reconcileYears } from "./years.ts";
+import { readBackfilled, recordYear, writeBackfilled } from "../backfilled.ts";
 import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
@@ -388,6 +389,8 @@ export async function compactRecent({
   const spans = new Map<string, FileBounds | null>();
   // Stations whose fold the years file may not have recorded, for the reconcile to read.
   const unmarked: string[] = [];
+  // Each station's years folded from January 1, which compaction carries whole, by store.
+  const carried = new Map<string, [string, number, number][]>();
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -491,6 +494,11 @@ export async function compactRecent({
                 },
               );
               spans.set(spanKey(station, epochId, year), joinSpans(before, later));
+              // From within its first step, or hour, so it was polled as the year began.
+              if (from < Date.UTC(year, 0, 1) + Math.max(3600, station.interval_s ?? 0) * 1000) {
+                const store = storeFor(station);
+                carried.set(store, [...(carried.get(store) ?? []), [station.id, epochId, year]]);
+              }
               if (!stats) continue;
               written.set(file, stats);
               summary.files++;
@@ -511,6 +519,14 @@ export async function compactRecent({
       }
     }
   }
+  for (const [store, years] of carried)
+    try {
+      const record = await readBackfilled(store, id);
+      for (const [station, epoch, year] of years) recordYear(record, station, epoch, year);
+      await writeBackfilled(store, id, record);
+    } catch (error) {
+      summary.failed.push(`backfilled years: ${message(error)}`);
+    }
   // A source's stations share its store, so this is one store. A failure goes
   // first, so the summary's list of failures shows it.
   for (const [store, members] of Map.groupBy(stations, (s) => storeFor(s)))

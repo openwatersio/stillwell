@@ -38,6 +38,14 @@ const headings = [
 ];
 const errata = (await json("errata.json")).filter((e) => e.source === s.id);
 const year = (d?: Date) => d?.getUTCFullYear() ?? "–";
+const count = (n: number) => n.toLocaleString("en-US");
+// sources.json's `backfill`, absent before the first publish that writes it.
+const history = (b?: { since: number | null; complete: number; incomplete: number } | null) =>
+  !b || b.since === null || !(b.complete + b.incomplete)
+    ? "not known yet"
+    : !b.incomplete
+      ? `complete from ${b.since} at the ${count(b.complete)} stations with levels judged`
+      : `complete from ${b.since} at ${count(b.complete)} of ${count(b.complete + b.incomplete)} stations with levels; the station list shows how many years each of the rest is missing`;
 const first = list.reduce<Date | undefined>(
   (m, d) => (d.first && (!m || d.first < m) ? d.first : m),
   undefined,
@@ -57,6 +65,7 @@ const first = list.reduce<Date | undefined>(
     {live.toLocaleString("en-US")} polled every hour, with records from {year(first)}.
     {live > 0 && <span data-latest={s.id}>The newest value is from …</span>}
   </p>
+  <p>Its history in the store: {history(s.backfill)}.</p>
 
   <h2 id="terms">Terms</h2>
   <table>
@@ -168,22 +177,27 @@ const first = list.reduce<Date | undefined>(
       const q = filter.value.toLowerCase();
       const matches = q ? list.filter((d) => `${d[0]} ${d[2]}`.toLowerCase().includes(q)) : list;
       body.replaceChildren(
-        ...matches.slice(0, 100).map(([name, path, id, kind, status, live, datum, first, last]) => {
-          const tr = document.createElement("tr");
-          const link = path
-            ? Object.assign(document.createElement("a"), { href: path, textContent: name })
-            : document.createTextNode(name);
-          tr.append(
-            document.createElement("td"),
-            cell(id),
-            cell(kind ?? ""),
-            cell(`${status}${live ? ", live" : ""}`),
-            cell(datum ?? ""),
-            cell(first ? `${first}–${last}` : "none yet"),
-          );
-          tr.firstChild!.appendChild(link);
-          return tr;
-        }),
+        ...matches
+          .slice(0, 100)
+          .map(([name, path, id, kind, status, live, datum, first, last, missing]) => {
+            const tr = document.createElement("tr");
+            const link = path
+              ? Object.assign(document.createElement("a"), { href: path, textContent: name })
+              : document.createTextNode(name);
+            tr.append(
+              document.createElement("td"),
+              cell(id),
+              cell(kind ?? ""),
+              cell(`${status}${live ? ", live" : ""}`),
+              cell(datum ?? ""),
+              cell(
+                (first ? `${first}–${last}` : "none yet") +
+                  (missing ? `, ${missing} ${missing === 1 ? "year" : "years"} missing` : ""),
+              ),
+            );
+            tr.firstChild!.appendChild(link);
+            return tr;
+          }),
       );
       shown.textContent =
         matches.length > 100
