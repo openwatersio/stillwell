@@ -6,11 +6,11 @@ slackwater-database holds 4838 TICON records. 4838 are listed in its station fil
 
 | Status | Accepted | Accepted, in GESLA | All listed | Meaning |
 | --- | --- | --- | --- | --- |
-| ready | 1690 | 1497 | 3622 | An adapter exists and the record matched one of its stations |
+| ready | 1716 | 1523 | 3679 | An adapter exists and the record matched one of its stations |
 | planned | 0 | 0 | 0 | Cleared source, adapter in the plan |
 | to_match | 0 | 0 | 0 | Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first |
-| license | 293 | 293 | 443 | The source's terms need confirming first |
-| unmatched | 84 | 77 | 169 | An adapter exists, but no station matched, or two matched equally; check by hand |
+| license | 197 | 197 | 318 | The source's terms need confirming first |
+| unmatched | 154 | 147 | 237 | An adapter exists, but no station matched, or two matched equally; check by hand |
 | restricted | 460 | 447 | 604 | The source forbids it; stays on TICON |
 
 The status is the originator's: the aim is an adapter for every source in GESLA, which brings live values and years after GESLA's release. 2314 of the 2527 accepted records have a GESLA 4.1 copy listed in the store (`gesla_id` in the CSV), which can stand in for the originator in a re-fit. `gesla_commercial_use` gives the copy's terms as the `gesla` source tags them, from GESLA's table and its contributor's terms where this repo knows them; where the originator's own terms are still unconfirmed (`license`), take the stricter until they are. GESLA 4.1 renamed or dropped RWS's records, so this name match finds no RWS copy; [the GESLA adapter's README](../src/sources/gesla/README.md) maps some of the renamed ones by hand.
@@ -26,17 +26,17 @@ Accepted records only, in the order to build adapters: most records first.
 | chs | 256 | restricted 256 | meds |
 | crms | 164 | ready 161, unmatched 3 | crms |
 | pegelonline | 147 | ready 146, unmatched 1 | cmems, wsv |
-| refmar | 124 | ready 123, unmatched 1 | cmems, refmar |
+| refmar | 124 | ready 124 | cmems, refmar |
 | jodc | 101 | restricted 101 | jodc_giaj, jodc_jcg, jodc_pahb |
-| bom | 96 | license 96 | bom |
-| rws | 87 | ready 72, unmatched 15 | cmems, rws |
+| bom | 96 | ready 9, unmatched 87 | bom |
+| rws | 87 | ready 83, unmatched 4 | cmems, rws |
 | cmems | 80 | restricted 80 | cmems |
-| smhi | 70 | ready 66, unmatched 4 | cmems, smhi |
+| smhi | 70 | ready 67, unmatched 3 | cmems, smhi |
 | coops | 67 | ready 67 | noaa, uhslc_rq |
 | redmar | 55 | license 55 | cmems, ieo |
 | dwr | 51 | ready 39, unmatched 12 | cdwr |
 | ea | 46 | ready 46 | bodc, cmems |
-| dmi | 44 | ready 37, unmatched 7 | cmems, dmi |
+| dmi | 44 | ready 41, unmatched 3 | cmems, dmi |
 | sfwmd | 42 | ready 41, unmatched 1 | sfwmd |
 | ispra | 37 | license 37 | cmems, ispra |
 | marine-institute | 31 | ready 19, unmatched 12 | cmems, mi_c, mi_r |
