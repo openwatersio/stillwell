@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { chmod, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -589,6 +590,39 @@ describe("withhold", () => {
     assert.equal(deletesFiles("crms0002-crms0002-usa-crms"), false);
     for (const file of KEEP_FILES) assert.equal(isDropped(file), true, file);
     assert.equal(KEEP_FILES.size, 10);
+  });
+
+  it("runs `ingest.ts drop gesla --dry-run` through to its report", async () => {
+    const codes = ["crms0153-crms0153-usa-crms", "crms3800-crms3800-usa-crms"];
+    await refreshSource(
+      store,
+      sourceOf(
+        codes.map((c) => listed("gesla", c)),
+        undefined,
+        "gesla",
+      ),
+      {
+        now: NOW,
+      },
+    );
+    for (const code of codes)
+      await writeObservations(
+        seriesPath(store, "levels", "gesla", code, 2015, 1),
+        [{ time: Date.UTC(2015, 0, 1), level: 1, flag: Flag.good }],
+        "ZERO",
+      );
+    const run = spawnSync(process.execPath, ["scripts/ingest.ts", "drop", "gesla", "--dry-run"], {
+      encoding: "utf8",
+      env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(store, "..", "cache") },
+    });
+    assert.equal(run.status, 0, run.stderr);
+    assert.match(
+      run.stdout,
+      /gesla: 1 dropped stations with files, \d+ directories to delete \(dry run\)/,
+    );
+    assert.match(run.stdout, /gesla\/crms0153-crms0153-usa-crms/);
+    assert.doesNotMatch(run.stdout, /crms3800/);
+    assert.equal(existsSync(seriesPath(store, "levels", "gesla", codes[0], 2015, 1)), true);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {
