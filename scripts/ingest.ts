@@ -91,6 +91,7 @@ import {
   seriesFiles,
   shard,
   wholeEndedYear,
+  COMPACTED_SINCE,
   years,
   yearsToFetch,
 } from "../src/backfill.ts";
@@ -743,7 +744,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       const current = epochOf(station);
       let levels: string | undefined;
       // The years of the station's levels whose fetch failed, or skipped part-written, which go unrecorded.
-      const failedYears = new Set<number>();
+      const failedYears = new Set<string>();
       for (const product of station.products)
         for (const { epoch, from: since, to: until } of spans) {
           if (stopped) break;
@@ -761,15 +762,18 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               epoch.id,
             );
             plan = await yearsToFetch(dir, since, until, mode, now, station.source_qc_start);
-            if (plan.fetch.length)
-              files = seriesFiles(dir, plan.listed ?? (await listYears(dir)), readerOf(product));
+            if (plan.fetch.length) {
+              plan.listed ??= await listYears(dir);
+              files = seriesFiles(dir, plan.listed, readerOf(product));
+            }
             // A station picked for its preliminary value is read again even with no year
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
           } catch (error) {
             fail(`${station.id} ${product}`, error);
             if (product === "levels")
-              for (const [from] of years(since, until)) failedYears.add(from.getUTCFullYear());
+              for (const [from] of years(since, until))
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             continue;
           }
           skipped += plan.skipped;
@@ -777,7 +781,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           // and a refetch's months, isn't known to be whole, so it goes unrecorded.
           if (product === "levels")
             for (const y of plan.partial ?? [])
-              if (!plan.fetch.some(([from]) => from.getUTCFullYear() === y)) failedYears.add(y);
+              if (!plan.fetch.some(([from]) => from.getUTCFullYear() === y))
+                failedYears.add(`${epoch.id} ${y}`);
           for (const [from, to] of plan.fetch) {
             if (stopped) break;
             const key = emptyKey(station.id, product, epoch.id, from.getUTCFullYear());
@@ -798,6 +803,15 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                 files!,
                 written,
               );
+              // An empty answer for a year from 2026 on that has a file, perhaps compaction's
+              // last weeks, may be an outage, so it doesn't vouch for the rest of the year.
+              if (
+                rows === "empty" &&
+                product === "levels" &&
+                from.getUTCFullYear() >= COMPACTED_SINCE &&
+                plan.listed?.has(from.getUTCFullYear())
+              )
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
               if (rows === "empty") {
                 // A year with a file keeps being asked for, so an outage never blocks its refill.
                 if (
@@ -814,7 +828,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
               else fail(label, error);
-              if (product === "levels") failedYears.add(from.getUTCFullYear());
+              if (product === "levels") failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             }
           }
         }

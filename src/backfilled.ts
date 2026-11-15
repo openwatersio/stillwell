@@ -105,7 +105,7 @@ const into = (from: number, to: number, year: number) =>
 /**
  * Record a station's walk over [start, end): each of its whole years
  * (`wholeYears`) that an epoch's span (`epochSpans`) reaches into goes to that
- * epoch, unless it's in `failed`. A year an epoch starts partway through
+ * epoch, unless it's in `failed`, as `<epoch> <year>`. A year an epoch starts partway through
  * counts, since the walk asked for all of it the epoch holds. The current
  * year counts only for a live station, which compaction carries on from
  * here; another's later months would go unasked.
@@ -117,14 +117,14 @@ export function recordWalk(
   start: Date,
   end: Date,
   now: number,
-  failed: Set<number> = new Set(),
+  failed: Set<string> = new Set(),
 ): void {
   const years = wholeYears(start, end, now);
   if (!years) return;
   const last = live ? years[1] : Math.min(years[1], new Date(now).getUTCFullYear());
   for (const { epoch, from, to } of spans)
     for (let y = years[0]; y < last; y++)
-      if (!failed.has(y) && into(from.getTime(), to.getTime(), y))
+      if (!failed.has(`${epoch.id} ${y}`) && into(from.getTime(), to.getTime(), y))
         recordYear(record, id, epoch.id, y);
 }
 

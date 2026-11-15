@@ -683,6 +683,24 @@ describe("compactRecent", () => {
     assert.deepEqual([...(await readBackfilled(root, "test")).get(a.id)!], [[1, [[2027, 2028]]]]);
   });
 
+  it("takes a station with no interval to step by its values' shortest gap", async () => {
+    const root = store();
+    const b = station("b", { interval_s: null });
+    const day = Date.UTC(2027, 0, 1);
+    // Two-hourly, from 02:00.
+    await writeRecent(recentPath(root, "test"), [
+      [2, 4, 6].map((h) => ({ ...at(day + h * HOUR, 1, day + h * HOUR), station: b.id, epoch: 1 })),
+    ]);
+    await compactRecent({
+      source: source({}),
+      stations: [b],
+      storeFor: () => root,
+      start: day,
+      end: day + DAY,
+    });
+    assert.deepEqual([...(await readBackfilled(root, "test")).get(b.id)!], [[1, [[2027, 2028]]]]);
+  });
+
   it("folds yesterday into the year file, carrying received and keeping what it had", async () => {
     setConnections(4);
     const root = store();

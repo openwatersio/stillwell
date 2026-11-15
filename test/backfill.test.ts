@@ -826,6 +826,23 @@ describe("backfill script", () => {
     ]);
   });
 
+  it("doesn't record a year from 2026 on whose file an empty answer can't vouch for", async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [
+      { ...coopsStation("9", "active"), live: true },
+    ]);
+    // Compaction's November values, then a fetch of the whole year that comes back empty.
+    const nov = Date.UTC(2026, 10, 1);
+    await writeObservations(
+      seriesPath(store, "levels", "coops", "9", 2026),
+      [{ time: nov, level: 1, flag: Flag.good, received: nov }],
+      "STND",
+    );
+    const run = backfillCoops(store, ["9", "2026", "2027"], { EMPTY_YEARS: "2026" });
+    assert.equal(run.status, 0, run.stderr);
+    assert.equal((await readBackfilled(store, "coops")).get("coops/9"), undefined);
+  });
+
   it("refetches every station with preliminary values, active or not, and reads them again", async () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-backfill-"));
     const store = join(root, "store");

@@ -71,7 +71,8 @@ describe("recordWalk", () => {
       at("1990-01-01"),
       at("2027-01-01"),
       NOW,
-      new Set([2000]),
+      // 2010 failed in epoch 1 alone, so epoch 2 still has it.
+      new Set(["1 2000", "1 2010"]),
     );
     assert.deepEqual(
       [...record.get("test/a")!],
@@ -80,7 +81,7 @@ describe("recordWalk", () => {
           1,
           [
             [1990, 2000],
-            [2001, 2011],
+            [2001, 2010],
           ],
         ],
         [2, [[2010, 2027]]],

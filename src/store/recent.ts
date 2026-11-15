@@ -494,8 +494,18 @@ export async function compactRecent({
                 },
               );
               spans.set(spanKey(station, epochId, year), joinSpans(before, later));
-              // From within its first step, or hour, so it was polled as the year began.
-              if (from < Date.UTC(year, 0, 1) + Math.max(3600, station.interval_s ?? 0) * 1000) {
+              // From within its first step, or hour, so it was polled as the year began. A
+              // station with no interval steps by its values' shortest gap here.
+              const times = incoming.map((r) => r.time).sort((a, b) => a - b);
+              let gap = Infinity;
+              for (let i = 1; i < times.length; i++)
+                if (times[i]! > times[i - 1]!) gap = Math.min(gap, times[i]! - times[i - 1]!);
+              const step = station.interval_s
+                ? station.interval_s * 1000
+                : Number.isFinite(gap)
+                  ? gap
+                  : 0;
+              if (from <= Date.UTC(year, 0, 1) + Math.max(3_600_000, step)) {
                 const store = storeFor(station);
                 carried.set(store, [...(carried.get(store) ?? []), [station.id, epochId, year]]);
               }
