@@ -100,9 +100,9 @@ One station in full: the fields above plus
 }
 ```
 
-`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store keeps each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives each other datum's height above `datum`, in meters, as the tides API's `datums` does: the opposite of the store's offsets, which are the meters to add to a level to refer it to each datum. `frame` is `gauge` when the chart-datum offset comes from the slackwater-database station that `tide_station` names, measured against this series' zero, so observed levels and that station's predictions line up. It's `source` when the offset is the source's own or carried from another series of the gauge, which can differ from slackwater-database's by a few centimeters, and `unknown` when there's no chart-datum offset, or where slackwater-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends. `stations.parquet` carries `frame` and `chart_datum` ([data.md](../data.md#stations)).
+`datum` is the datum the response is in, the station's chart datum unless `datum` asks for another. The store keeps each series in its source's own datum instead (station datum, STND, for CO-OPS; gage datum, GAGE, for USGS gage height), and the API will convert where the station has offsets; a USGS gage with no surveyed altitude has none, so its levels stay in gage datum. `datums` gives each other datum's height above `datum`, in meters, as the tides API's `datums` does: the opposite of the store's offsets, which are the meters to add to a level to refer it to each datum. `frame` is `gauge` when the chart-datum offset comes from the slackwater-database station that `tide_station` names, measured against this series' zero, so observed levels and that station's predictions line up. It's `source` when the offset is the source's own or carried from another series of the gauge, which can differ from slackwater-database's by a few centimeters, and `unknown` when there's no chart-datum offset, or where slackwater-database's datums for the linked station are in the constituent frame (MSL = 0). Then observed levels and predictions can't be compared in absolute terms, only as trends. `stations.parquet` carries `frame` and `chart_datum` ([stations reference](https://openwatersio.github.io/stillwell/docs/reference/stations/)).
 
-`same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([data.md](../data.md#stations)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
+`same_as` lists the other stations for the same gauge, and `preferred` names the one to use for its observed levels, as in `stations.parquet` ([Stations guide](https://openwatersio.github.io/stillwell/docs/guides/stations/#the-preferred-station)). Among the gauge's stations with observed levels, `preferred` names one whose terms allow commercial use where there is one.
 
 `errata` names the errors found in what the source publishes for the station, each an entry in the source's [`errata.json`](https://github.com/openwatersio/stillwell/tree/main/src/sources), such as a clock the store corrects or a span it flags.
 
@@ -186,7 +186,7 @@ The best estimate of the water level at a point and time, for places without a g
 
 ## Bulk data
 
-The API serves what the store holds, and the store's files stay readable without an account, as [data.md](../data.md) describes. Phase 12 adds quarterly snapshots, with a DOI:
+The API serves what the store holds, and the store's files stay readable without an account, as [Getting started](https://openwatersio.github.io/stillwell/docs/getting-started/) describes. Phase 12 adds quarterly snapshots, with a DOI:
 
 ```
 bulk/<YYYY-Qn>/<source>.parquet
