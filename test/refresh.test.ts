@@ -181,7 +181,7 @@ describe("refreshSource", () => {
     assert.deepEqual(next.report.retired, ["test/b"]);
     assert.deepEqual(next.report.changed, [
       { id: "test/a", fields: ["name"] },
-      { id: "test/b", fields: ["status"] },
+      { id: "test/b", fields: ["live", "status"] },
     ]);
     const history = (await readdir(join(store, "history/stations/test"))).sort();
     assert.deepEqual(history, [

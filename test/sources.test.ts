@@ -4294,7 +4294,22 @@ describe("ea", () => {
         JSON.stringify({ items: [] }),
       ],
     ]);
-    const stations = await ea.stations();
+    // The store listed Newlyn's chart datum series, but not Jersey's.
+    const cd = (id: string, name: string, lat: number, lon: number) =>
+      ({ id, datum: "CD", name, lat, lon, same_as: [] }) as unknown as Station;
+    const stations = await ea.stations([cd("ea/E72224", "Newlyn", 50.1, -5.5)]);
+    assert.deepEqual(
+      stations.filter((s) => s.same_as.length).map((s) => [s.id, s.same_as]),
+      [["ea/E72239", ["ea/E72224"]]],
+    );
+    // A twin the EA no longer lists is found in the store by label, and a link the store holds stays.
+    const kept = await ea.stations([
+      cd("ea/E70299", "Jersey", 0, 0),
+      cd("ea/E79924", "Elsewhere", 0, 0),
+      { id: "ea/E72239", same_as: ["ea/E79924"] } as unknown as Station,
+    ]);
+    assert.deepEqual(kept.find((s) => s.id === "ea/E70239")!.same_as, ["ea/E70299"]);
+    assert.deepEqual(kept.find((s) => s.id === "ea/E72239")!.same_as, ["ea/E79924"]);
     assert.deepEqual(
       stations.map((s) => [s.id, s.name, s.datum, s.country_code, ea.measureOf(s)]),
       [
@@ -4316,6 +4331,54 @@ describe("ea", () => {
     assert.deepEqual(
       stations.filter((s) => !s.live).map((s) => [s.id, s.status]),
       [["ea/E73439-anglian", "inactive"]],
+    );
+  });
+
+  it("links Avonmouth Portbury's mAOD series to its chart datum one by label, 2 km apart", async () => {
+    // The EA's November 2026 answer for the gauge, and the store's listing of its old series.
+    const series = (notation: string, unit: string, lat: number, long: number) => ({
+      notation,
+      label: "Avonmouth Portbury",
+      lat,
+      long,
+      measures: {
+        "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}-level-tidal_level-Mean-15_min-${unit}`,
+        qualifier: "Tidal Level",
+        unitName: unit,
+        period: 900,
+      },
+    });
+    const reporting = (notation: string, unit: string) => ({
+      "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}-level-tidal_level-Mean-15_min-${unit}`,
+      latestReading: { dateTime: "2026-11-15T17:45:00Z", value: 1 },
+    });
+    serve([
+      [
+        /id\/stations\?type=TideGauge/,
+        JSON.stringify({
+          items: [
+            series("E72639", "mAOD", 51.49999, -2.728468),
+            series("E72624", "m", 51.50291, -2.6988),
+          ],
+        }),
+      ],
+      [
+        /id\/measures\?qualifier=Tidal/,
+        JSON.stringify({ items: [reporting("E72639", "mAOD"), reporting("E72624", "m")] }),
+      ],
+    ]);
+    const old = {
+      id: "ea/E72624",
+      datum: "CD",
+      name: "Avonmouth Portbury",
+      lat: 51.50291,
+      lon: -2.6988,
+      same_as: [],
+    } as unknown as Station;
+    const listed = await ea.stations([old]);
+    assert.deepEqual(
+      listed.map((s) => [s.id, s.same_as]),
+      [["ea/E72639", ["ea/E72624"]]],
     );
   });
 
