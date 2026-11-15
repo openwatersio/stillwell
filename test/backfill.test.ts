@@ -42,6 +42,7 @@ import {
 import { writeYears } from "../src/store/years.ts";
 import { REFETCH_YEARS } from "../src/store/recent.ts";
 import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import { readBackfilled } from "../src/backfilled.ts";
 import {
   Flag,
   type StoredStation,
@@ -267,6 +268,51 @@ describe("yearsToFetch", () => {
     const d = seriesDir(root, "levels", "usgs", id);
     const result = await yearsToFetch(d, new Date(Date.UTC(2026, 0, 1)), y2027, "written", later);
     assert.deepEqual(result.fetch.map(year), [2026]);
+  });
+
+  // A 2026 year that a skip passes over goes unrecorded unless its file has every month and
+  // values backfill wrote, so these read as missing until a plain run fetches them.
+  const skip2026 = async (
+    id: string,
+    rows: { time: number; level: number; flag: Flag; received?: number }[],
+  ) => {
+    await writeObservations(seriesPath(root, "levels", "usgs", id, 2026), rows, "GAGE");
+    const d = seriesDir(root, "levels", "usgs", id);
+    const later = Date.UTC(2027, 5, 1);
+    const from = new Date(Date.UTC(2026, 0, 1));
+    return Promise.all(
+      (["written", "complete"] as const).map((mode) => yearsToFetch(d, from, y2027, mode, later)),
+    );
+  };
+  const compacted = (months: number[]) =>
+    monthly(2026, months, Flag.good).map((r) => ({ ...r, received: r.time }));
+  const backfilled = (months: number[]) => monthly(2026, months, Flag.good);
+  const all12 = [...Array(12).keys()];
+
+  it("reports compaction's year, polled from mid-January, as partial", async () => {
+    const [written, complete] = await skip2026("january", compacted(all12));
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+    assert.deepEqual(complete.fetch, []);
+    assert.deepEqual([...complete.partial], [2026]);
+  });
+
+  it("with --skip-written, reports a station that began mid-2026, backfilled, as partial", async () => {
+    const [written] = await skip2026("august", backfilled([7, 8, 9, 10, 11]));
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+  });
+
+  it("with --skip-written, reports compaction's weeks beside a refetch's months as partial", async () => {
+    const [written] = await skip2026("refetched", [...backfilled([8, 9]), ...compacted([10, 11])]);
+    assert.deepEqual(written.fetch, []);
+    assert.deepEqual([...written.partial], [2026]);
+  });
+
+  it("takes a skipped 2026 with every month and backfilled values as whole", async () => {
+    const [written, complete] = await skip2026("whole", backfilled(all12));
+    assert.deepEqual([...written.partial], []);
+    assert.deepEqual([...complete.partial], []);
   });
 
   it("fetches only the years that aren't complete, or with --skip-written, not written", async () => {
@@ -768,6 +814,60 @@ describe("backfill script", () => {
     assert.equal(later.status, 0, later.stderr);
     assert.ok(asked(later, 2021));
     assert.equal((await readEmptyYears(store, "coops", Date.now())).size, 0);
+  });
+
+  it("records the years each station's levels came back for, less a failed year", async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [
+      coopsStation("9", "active"),
+      coopsStation("10", "active"),
+    ]);
+    // Epoch 1's ranges, by station.
+    const record = async () =>
+      [...(await readBackfilled(store, "coops"))].map(([id, epochs]) => [id, epochs.get(1)]);
+    // An empty year is recorded; publish judges whether it's sure.
+    const first = backfillCoops(store, ["9", "2020", "2023"], { EMPTY_YEARS: "2021" });
+    assert.equal(first.status, 0, first.stderr);
+    assert.deepEqual(await record(), [["coops/9", [[2020, 2023]]]]);
+    // A failed year is left out, and a station with no year left gets no entry.
+    const second = backfillCoops(store, ["9,10", "2023", "2025"], { FAIL_YEARS: "2023" });
+    assert.equal(second.status, 1);
+    assert.deepEqual(await record(), [
+      ["coops/10", [[2024, 2025]]],
+      [
+        "coops/9",
+        [
+          [2020, 2023],
+          [2024, 2025],
+        ],
+      ],
+    ]);
+    const third = backfillCoops(store, ["10", "2023", "2024"], { FAIL_YEARS: "2023" });
+    assert.equal(third.status, 1);
+    assert.deepEqual((await record())[0], ["coops/10", [[2024, 2025]]]);
+    const fourth = backfillCoops(store, ["all", "2023", "2025"]);
+    assert.equal(fourth.status, 0, fourth.stderr);
+    assert.deepEqual(await record(), [
+      ["coops/10", [[2023, 2025]]],
+      ["coops/9", [[2020, 2025]]],
+    ]);
+  });
+
+  it("doesn't record a year from 2026 on whose file an empty answer can't vouch for", async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    await writeStationList(stationListPath(store, "coops"), [
+      { ...coopsStation("9", "active"), live: true },
+    ]);
+    // Compaction's November values, then a fetch of the whole year that comes back empty.
+    const nov = Date.UTC(2026, 10, 1);
+    await writeObservations(
+      seriesPath(store, "levels", "coops", "9", 2026),
+      [{ time: nov, level: 1, flag: Flag.good, received: nov }],
+      "STND",
+    );
+    const run = backfillCoops(store, ["9", "2026", "2027"], { EMPTY_YEARS: "2026" });
+    assert.equal(run.status, 0, run.stderr);
+    assert.equal((await readBackfilled(store, "coops")).get("coops/9"), undefined);
   });
 
   it("refetches every station with preliminary values, active or not, and reads them again", async () => {

@@ -91,9 +91,18 @@ import {
   seriesFiles,
   shard,
   wholeEndedYear,
+  COMPACTED_SINCE,
+  years,
   yearsToFetch,
 } from "../src/backfill.ts";
 import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import {
+  mergeBackfilled,
+  readBackfilled,
+  recordWalk,
+  writeBackfilled,
+  type Backfilled,
+} from "../src/backfilled.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { Blocked } from "../src/http.ts";
 import {
@@ -614,6 +623,12 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           return undefined;
         })
       : undefined;
+  // The whole years each station's levels came back for, for the source's completeness, merged
+  // into the record at each write. One that can't be read now fails the run and isn't written over.
+  const backfilled: Backfilled | undefined = await readBackfilled(store, sourceId).then(
+    () => new Map(),
+    (error: Error) => void fail("backfilled years, recording none", error),
+  );
   let emptyFound = false;
   let emptySkipped = 0;
   let emptyRecorded = 0;
@@ -731,6 +746,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       const spans = spansOf(station);
       const current = epochOf(station);
       let levels: string | undefined;
+      // The years of the station's levels whose fetch failed, or skipped part-written, which go unrecorded.
+      const failedYears = new Set<string>();
       for (const product of station.products)
         for (const { epoch, from: since, to: until } of spans) {
           if (stopped) break;
@@ -748,16 +765,24 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               epoch.id,
             );
             plan = await yearsToFetch(dir, since, until, mode, now, station.source_qc_start);
-            if (plan.fetch.length)
-              files = seriesFiles(dir, plan.listed ?? (await listYears(dir)), readerOf(product));
+            if (plan.fetch.length) {
+              plan.listed ??= await listYears(dir);
+              files = seriesFiles(dir, plan.listed, readerOf(product));
+            }
             // A station picked for its preliminary value is read again even with no year
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
           } catch (error) {
             fail(`${station.id} ${product}`, error);
+            if (product === "levels")
+              for (const [from] of years(since, until))
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             continue;
           }
           skipped += plan.skipped;
+          // A year skipped but not known to be whole goes unrecorded (`partial`).
+          if (product === "levels")
+            for (const y of plan.partial) failedYears.add(`${epoch.id} ${y}`);
           for (const [from, to] of plan.fetch) {
             if (stopped) break;
             const key = emptyKey(station.id, product, epoch.id, from.getUTCFullYear());
@@ -778,6 +803,15 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                 files!,
                 written,
               );
+              // An empty answer for a year from 2026 on that has a file, perhaps compaction's
+              // last weeks, may be an outage, so it doesn't vouch for the rest of the year.
+              if (
+                rows === "empty" &&
+                product === "levels" &&
+                from.getUTCFullYear() >= COMPACTED_SINCE &&
+                plan.listed?.has(from.getUTCFullYear())
+              )
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
               if (rows === "empty") {
                 // A year with a file keeps being asked for, so an outage never blocks its refill.
                 if (
@@ -794,6 +828,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
               else fail(label, error);
+              if (product === "levels") failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             }
           }
         }
@@ -811,9 +846,23 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         } catch (error) {
           fail(`${station.id} preliminary`, error);
         }
+      // A stop may have cut the station's walk short. Publish judges the empty years.
+      if (backfilled && !stopped && station.products.includes("levels")) {
+        const [begin, until] = ranges?.get(station.id) ?? [start, end];
+        recordWalk(backfilled, station, spans, begin, until, now, failedYears);
+      }
       await saveEmpty();
     });
     await saveEmpty(true);
+    // Merged into the record as it is now, so a compaction's years since this run started stay.
+    if (backfilled?.size)
+      try {
+        const record = mergeBackfilled(await readBackfilled(store, sourceId), backfilled);
+        await writeBackfilled(store, sourceId, record);
+        backfilled.clear();
+      } catch (error) {
+        fail("backfilled years", error);
+      }
     try {
       await commitYears(store, sourceId, marked, written);
     } catch (error) {

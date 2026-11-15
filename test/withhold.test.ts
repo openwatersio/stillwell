@@ -21,6 +21,7 @@ import {
   emptyYearsPath,
   recentPath,
   requalifyLeftPath,
+  backfilledPath,
   seriesPath,
   stationListPath,
   stationsPath,
@@ -155,6 +156,10 @@ describe("refreshSource with withheld stations", () => {
       { id: "test/x0", start: 2026, end: 2027 },
       { id: "test/k12", start: 2026, end: 2027 },
     ]);
+    await writeJsonArray(backfilledPath(store, "test"), [
+      { id: "test/x0", years: [[1990, 2027]] },
+      { id: "test/k12", years: [[1990, 2027]] },
+    ]);
     const verdict = (id: string) => ({
       id,
       analyzed: NOW,
@@ -230,6 +235,12 @@ describe("refreshSource with withheld stations", () => {
     );
     assert.deepEqual(
       JSON.parse(await readFile(requalifyLeftPath(store, "test"), "utf8")).map(
+        (r: { id: string }) => r.id,
+      ),
+      ["test/k12"],
+    );
+    assert.deepEqual(
+      JSON.parse(await readFile(backfilledPath(store, "test"), "utf8")).map(
         (r: { id: string }) => r.id,
       ),
       ["test/k12"],
