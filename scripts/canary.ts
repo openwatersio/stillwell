@@ -105,7 +105,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   dmi: () => dmi.levels("30017", start, end),
   // Separate references: both the live BM feed and a reviewed JM year must work.
   ign: async () => {
-    const latest = await ign.levels("ALAC1-BM", start, end);
+    const latest = await ign.levels("ALAC1-1633", start, end);
     const final = await ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2024-01-04Z"));
     return latest.length && final.length ? [...latest, ...final] : [];
   },

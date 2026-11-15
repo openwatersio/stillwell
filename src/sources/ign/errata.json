@@ -2,13 +2,29 @@
   "errata": [
     {
       "id": "ign-duplicate-raw-rows",
-      "stations": ["ign/ALAC1-BM"],
+      "stations": ["ign/ALAC1-1633"],
       "since": "2026-11-12",
       "until": "2026-11-13",
       "handling": "dropped",
       "error": "ALAC1's 1633 raw daily file repeats 12 November 2026 at 04:05:00 three times with the identical 798 mm value.",
       "response": "Keep one copy of identical adjacent raw rows. Conflicting values at a repeated timestamp and decreasing timestamps still fail the fetch.",
       "evidence": "Observed in https://datos-geodesia.ign.es/Red_de_Mareografos/ALAC1/observados/2026/220051_1633_20261112.txt on 15 November 2026 UTC: 1,442 rows, with three identical 04:05:00 rows. A recorded excerpt is test/fixtures/ign-duplicates.txt."
+    },
+    {
+      "id": "ign-negative-sentinel",
+      "stations": "every station",
+      "handling": "kept",
+      "error": "Reviewed exports use numeric -9999 both for missing data and for genuine -9.999 m heights, although Leeme.txt documents only positive 9999 as missing.",
+      "response": "Drop positive 9999 and explicit --- gaps. Retain numeric -9999 with a suspect source flag so real heights are not deleted and ambiguous placeholders do not pass normal quality filters.",
+      "evidence": "TN013's 2024 minute JM file has 506 numeric -9999 readings, all neighboring levels within 150 mm, including 1 January at 19:21 between -9987 and -10001. Its 2020 hourly JM file has 71 consecutive -9999 hours from 18 December 11:00 through 21 December 09:00. FUER1's 2005 minute JM file starts with -9999 and has 39,865 such rows. Source URLs are under https://datos-geodesia.ign.es/Red_de_Mareografos/<station>/procesados/; checked 15 November 2026."
+    },
+    {
+      "id": "ign-reviewed-marks",
+      "stations": ["ign/MURC1", "ign/TN021-NGZ581", "ign/TN031"],
+      "handling": "kept",
+      "error": "Some reviewed files name marks that differ from the station sheet: MURC1's 2001 hourly file uses JM NAP-943 rather than NP-1744; TN021's 2008–2019 BM files use NGZ-581 rather than BM Inox; TN031's 2009–2021 BM files use NGAB-161 rather than Inox. CRI 1.",
+      "response": "Validate each header's named mark. MURC1 uses NAP-943's surveyed 2.313 m NMMA height from MURC2's sheet. Keep the old Tenerife BMs as separate references without invented offsets: TN021-NGZ581 and TN031. Raw sensors have series of their own and inherit no surveyed offset from today's sheet.",
+      "evidence": "Headers in MURC1/procesados/horarios/220046_horarios_2001_JM.txt, TN021/procesados/integros/370032_2008_BM.txt and TN031/procesados/integros/370033_2009_BM.txt, compared with fichas/MURC1.pdf, MURC2.pdf, TN021.pdf and TN031.pdf, under https://datos-geodesia.ign.es/Red_de_Mareografos/. MURC1's first -2260 mm reading is +0.053 m NMMA using the named NAP-943, versus +4.290 m using NP-1744."
     }
   ],
   "retired": []

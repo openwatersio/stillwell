@@ -8,6 +8,9 @@ import {
   type SourceMetadata,
 } from "../../schema.ts";
 import { gauges, type Gauge } from "./catalog.ts";
+import recordedPeriods from "./periods.json" with { type: "json" };
+
+const periods: Record<string, (number | null)[]> = recordedPeriods;
 
 const BASE = "https://datos-geodesia.ign.es/Red_de_Mareografos/";
 const DAY = 86_400_000;
@@ -26,7 +29,7 @@ export const metadata: SourceMetadata = {
   attribution: "Área de Geodesia, Instituto Geográfico Nacional (IGN)",
   contact: { email: "ign@transportes.gob.es", url: "https://www.ign.es/web/gds-red-mareografos" },
   terms:
-    "IGN's data-server README requires citing Área de Geodesia, IGN. Redistribution is permitted with attribution; commercial use is tagged false pending confirmation that IGN's CC BY 4.0 policy covers these series. See openwatersio/stillwell#181. Times are read as UTC, millimeters converted to meters and raw digital distances reversed; surveyed BM–JM offsets are applied where documented.",
+    "IGN's data-server README requires citing Área de Geodesia, IGN. Redistribution is permitted with attribution; commercial use is tagged false pending confirmation that IGN's CC BY 4.0 policy covers these series. See openwatersio/stillwell#181. Times are read as UTC, millimeters converted to meters and raw digital distances reversed. Raw sensors and differently named historical references remain separate; surveyed offsets are applied only to reviewed files with matching named marks.",
   archive: "current",
   hourly: true,
   finalizes: true,
@@ -58,24 +61,33 @@ async function inventory(path: string, optional = false): Promise<string[]> {
     .filter((f) => /^[A-Za-z0-9_.-]+\/?$/.test(f));
 }
 
+const oldBm: Record<string, string> = { TN021: "NGZ581", TN031: "NGAB161" };
+const normalizedMark = (mark: string) => mark.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
 export async function stations(): Promise<ListedStation[]> {
   const codes = (await inventory(""))
     .filter((f) => f.endsWith("/") && f !== "fichas/")
     .map((f) => f.slice(0, -1));
-  if (codes.length !== Object.keys(gauges).length || codes.some((c) => !gauges[c]))
+  if (
+    new Set(codes).size !== Object.keys(gauges).length ||
+    codes.length !== Object.keys(gauges).length ||
+    codes.some((c) => !gauges[c])
+  )
     throw new Error("IGN station catalog changed; check the station sheets");
   return codes
     .flatMap((code) => {
       const g = gauges[code]!;
       const ids = [
         code,
-        ...(g.bmHeight === null ? [`${code}-BM`] : []),
-        ...g.charts.map((s) => `${code}-${s}`),
+        ...(code === "TN021" ? [`${code}-${oldBm[code]}`] : []),
+        ...[...g.sensors, ...g.charts].map((sensor) => `${code}-${sensor}`),
       ];
       return ids.map((id): ListedStation => {
         const part = id.slice(code.length + 1);
-        const datum = part === "BM" ? "BM" : part ? "ZERO" : "JM";
-        const live = !g.last && (part === "BM" || (!part && g.bmHeight !== null));
+        const historicalBm = part === oldBm[code] || (!part && code === "TN031");
+        const raw = g.sensors.includes(part) || g.charts.includes(part);
+        const datum = historicalBm || g.sensors.includes(part) ? "BM" : part ? "ZERO" : "JM";
+        const reference = historicalBm ? oldBm[code]! : raw ? `${code}/${part}` : g.jm;
         return {
           ...stationDefaults(metadata),
           id: `ign/${id}`,
@@ -85,20 +97,17 @@ export async function stations(): Promise<ListedStation[]> {
           lon: g.lon,
           country_code: "ES",
           kind: "coastal",
-          interval_s: part && part !== "BM" ? 3600 : null,
+          interval_s: g.charts.includes(part) ? 3600 : null,
           datum,
           datums: datum === "JM" ? { [g.origin]: g.jmHeight } : {},
-          reference: {
-            id: datum === "JM" ? g.jm : datum === "BM" ? g.bm : `${code}/${part}`,
-            since: null,
-          },
+          reference: { id: reference, since: null },
           products: ["levels"],
           first: null,
           last: null,
           tide_station: null,
           same_as: ids.filter((other) => other !== id).map((other) => `ign/${other}`),
-          status: g.last || (part && part !== "BM") ? "inactive" : "active",
-          live,
+          status: g.last || g.charts.includes(part) ? "inactive" : "active",
+          live: !g.last && part === g.sensors[0],
           min_interval_s: 3600,
           source_url: `${BASE}fichas/${code}.pdf`,
         };
@@ -108,6 +117,7 @@ export async function stations(): Promise<ListedStation[]> {
 }
 
 interface ParseOptions {
+  mark?: string;
   year: number;
   gauge: string;
   raw: boolean;
@@ -117,10 +127,13 @@ interface ParseOptions {
   day?: string;
 }
 export function parse(body: string, options: ParseOptions): Observation[] {
-  const { year, gauge, raw, reference, sign, offset, day } = options;
+  const { year, gauge, raw, reference, sign, offset, day, mark } = options;
   const lines = body.trim().split(/\r?\n/);
   if (!raw) {
     const header = lines.shift()!;
+    const actualMark = /respecto\s+(?:JM|BM)\s+(.+?)\s*$/i.exec(header)?.[1];
+    if (mark && (!actualMark || normalizedMark(actualMark) !== normalizedMark(mark)))
+      throw new Error(`IGN ${gauge}: unexpected benchmark mark ${actualMark}`);
     if (
       !new RegExp(`\\b${gauge}\\b`).test(header) ||
       !new RegExp(`respecto\\s+${reference}\\b`, "i").test(header) ||
@@ -153,11 +166,12 @@ export function parse(body: string, options: ParseOptions): Observation[] {
       throw new Error(`IGN ${gauge}: invalid or out-of-order timestamp: ${stamp}`);
     previous = time;
     previousLine = line;
-    if (m[7] === "---" || Math.abs(Number(m[7])) === 9999) continue;
+    if (m[7] === "---" || Number(m[7]) === 9999) continue;
     out.push({
       time,
       level: Math.round(((sign * Number(m[7])) / 1000 + offset) * 1e6) / 1e6,
-      flag: raw ? Flag.preliminary : Flag.good,
+      // Numeric -9999 is both a real height and an undocumented sentinel: erratum `ign-negative-sentinel`.
+      flag: Number(m[7]) === -9999 ? Flag.suspect : raw ? Flag.preliminary : Flag.good,
     });
   }
   if (!lines.some((l) => l.trim())) throw new Error(`IGN ${gauge}: empty data file`);
@@ -169,9 +183,14 @@ function bmToJm(g: Gauge): number {
   return g.bmHeight - g.jmHeight;
 }
 
-async function reviewed(code: string, g: Gauge, from: number, to: number): Promise<Observation[]> {
+async function reviewed(
+  code: string,
+  g: Gauge,
+  part: string | undefined,
+  from: number,
+  to: number,
+): Promise<Observation[]> {
   const out = new Map<number, Observation>();
-  // Minute values win over hourly means where both series provide a timestamp.
   for (const folder of ["integros", "horarios"]) {
     const path = `${code}/procesados/${folder}/`;
     for (const file of await inventory(path)) {
@@ -180,11 +199,30 @@ async function reviewed(code: string, g: Gauge, from: number, to: number): Promi
       if (m[1] !== g.number) throw new Error(`IGN ${code}: another station in catalog: ${file}`);
       const year = Number(m[2]);
       if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) <= from) continue;
-      const offset = m[3] === "BM" ? bmToJm(g) : 0;
-      for (const o of parse(await text(path + file), {
+      const body = await text(path + file);
+      const named = /respecto\s+(JM|BM)\s+(.+?)\s*$/i.exec(body.split(/\r?\n/)[0]!);
+      if (!named || named[1]!.toUpperCase() !== m[3])
+        throw new Error(`IGN ${code}: invalid reference in ${file}`);
+      const historical = m[3] === "BM" && normalizedMark(named[2]!) === oldBm[code];
+      const currentMark = m[3] === "JM" ? g.jm : code === "ALBO1" ? "C_Mfo" : g.bm;
+      if (!historical && normalizedMark(named[2]!) !== normalizedMark(currentMark))
+        throw new Error(`IGN ${code}: unexpected benchmark mark ${named[2]}`);
+      if (historical !== ((part !== undefined && part === oldBm[code]) || code === "TN031"))
+        continue;
+      if (part && !historical) continue;
+      const mark = historical
+        ? oldBm[code]!
+        : m[3] === "JM"
+          ? g.jm
+          : code === "ALBO1"
+            ? "C_Mfo"
+            : g.bm;
+      const offset = !historical && m[3] === "BM" ? bmToJm(g) : 0;
+      for (const o of parse(body, {
         year,
         gauge: code,
         reference: m[3]!,
+        mark,
         raw: false,
         sign: 1,
         offset,
@@ -198,66 +236,54 @@ async function reviewed(code: string, g: Gauge, from: number, to: number): Promi
 async function rawLevels(
   code: string,
   g: Gauge,
-  sensor: string | null,
-  offset: number,
+  sensor: string,
   from: number,
   to: number,
 ): Promise<Observation[]> {
   const path = `${code}/observados/`;
   const yearLinks = await inventory(path);
-  const supported = sensor ? [sensor] : g.sensors;
-  const out = new Map<number, Observation>();
-  const selectedDay = new Map<string, string>();
+  const out: Observation[] = [];
   for (const link of yearLinks) {
     if (!/^\d{4}\/$/.test(link)) continue;
     const year = Number(link.slice(0, 4));
     if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) <= from) continue;
     let annual = to - from > 7 * DAY && year < new Date().getUTCFullYear();
     let dir = annual ? `${path}ficheros_anuales/` : `${path}${year}/`;
-    let files = await inventory(dir, annual);
-    const matches = (names: string[], size: number) =>
-      names
+    const matching = (files: string[], size: number) =>
+      files
         .map((file) => ({ file, match: /^(\d{6})_(\d{4})_(\d{4}|\d{8})\.txt$/.exec(file) }))
         .filter(
           ({ match: m }) =>
             m &&
             m[1] === g.number &&
-            supported.includes(m[2]!) &&
+            m[2] === sensor &&
             Number(m[3]!.slice(0, 4)) === year &&
             m[3]!.length === size,
-        )
-        .sort((a, b) => supported.indexOf(a.match![2]!) - supported.indexOf(b.match![2]!));
-    let matching = matches(files, annual ? 4 : 8);
-    if (annual && !matching.length) {
+        );
+    let files = matching(await inventory(dir, annual), annual ? 4 : 8);
+    if (annual && !files.length) {
       annual = false;
       dir = `${path}${year}/`;
-      files = await inventory(dir);
-      matching = matches(files, 8);
+      files = matching(await inventory(dir), 8);
     }
-    for (const { file, match: m } of matching) {
+    for (const { file, match: m } of files) {
       const day = annual ? undefined : m![3]!;
       if (day) {
         const start = Date.UTC(year, Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8)));
-        if (start >= to || start + DAY <= from || selectedDay.has(day)) continue;
+        if (start >= to || start + DAY <= from) continue;
       }
-      const rows = parse(await text(dir + file), {
+      for (const o of parse(await text(dir + file), {
         year,
         gauge: code,
         raw: true,
-        sign: sensor ? 1 : -1,
-        offset,
+        sign: g.charts.includes(sensor) ? 1 : -1,
+        offset: 0,
         day,
-      });
-      for (const o of rows) {
-        const date = new Date(o.time).toISOString().slice(0, 10).replaceAll("-", "");
-        if (selectedDay.has(date) && selectedDay.get(date) !== m![2]) continue;
-        selectedDay.set(date, m![2]!);
-        if (o.time < from || o.time >= to) continue;
-        if (!out.has(o.time)) out.set(o.time, o);
-      }
+      }))
+        out.push(o);
     }
   }
-  return [...out.values()];
+  return out;
 }
 
 export async function levels(
@@ -268,38 +294,32 @@ export async function levels(
 ): Promise<Observation[]> {
   const [code, part] = id.split("-");
   const g = gauges[code!];
+  const special = code === "TN021" && part === oldBm[code];
   if (
     !g ||
-    (part && part !== "BM" && !g.charts.includes(part)) ||
-    id !== `${code}${part ? `-${part}` : ""}` ||
-    (part === "BM" && g.bmHeight !== null)
+    (part && !special && ![...g.sensors, ...g.charts].includes(part)) ||
+    id !== `${code}${part ? `-${part}` : ""}`
   )
     throw new Error(`Not an IGN station: ${id}`);
-  const expected = part === "BM" ? "BM" : part ? "ZERO" : "JM";
+  const sensor = !!part && !special;
+  const expected =
+    special || (!part && code === "TN031") || g.sensors.includes(part ?? "")
+      ? "BM"
+      : part
+        ? "ZERO"
+        : "JM";
   if (datum && datum !== expected)
     throw new Error(`IGN ${id}: expected datum ${expected}, got ${datum}`);
-  const from = Math.max(start.getTime(), Date.UTC(g.first, 0, 1));
-  const to = Math.min(end.getTime(), g.last ? Date.UTC(g.last + 1, 0, 1) : Infinity);
+  const span = sensor ? periods[id] : undefined;
+  const from = Math.max(start.getTime(), Date.UTC(Math.max(g.first, span?.[0] ?? g.first), 0, 1));
+  const last = span?.[1] ?? g.last;
+  const to = Math.min(end.getTime(), last ? Date.UTC(last + 1, 0, 1) : Infinity);
   if (!Number.isFinite(from) || !Number.isFinite(to)) throw new Error("IGN needs finite dates");
   if (from >= to) return [];
-  const out = new Map<number, Observation>();
-  if (!part) for (const o of await reviewed(code!, g, from, to)) out.set(o.time, o);
-  const rawFrom = part && part !== "BM" ? from : Math.max(from, Date.UTC(g.digitalSince, 0, 1));
-  if ((part || g.bmHeight !== null) && rawFrom < to) {
-    const offset = !part ? bmToJm(g) : 0;
-    for (const o of await rawLevels(
-      code!,
-      g,
-      part && part !== "BM" ? part : null,
-      offset,
-      rawFrom,
-      to,
-    ))
-      if (!out.has(o.time)) out.set(o.time, o);
-  }
-  return [...out.values()]
-    .filter((o) => o.time >= from && o.time < to)
-    .sort((a, b) => a.time - b.time);
+  const out = sensor
+    ? await rawLevels(code!, g, part!, from, to)
+    : await reviewed(code!, g, part, from, to);
+  return out.filter((o) => o.time >= from && o.time < to).sort((a, b) => a.time - b.time);
 }
 
 export const source: Source = {

@@ -31,3 +31,7 @@ Fixture tests cover station metadata, unit and sign conversion, datum isolation,
 ## Open evidence to collect
 
 Record each station's sensor codes, reference relationships and time convention from IGN documentation. Alicante's sheet gives JM NP1 at 3.41 m but no BM height; that sheet alone cannot convert radar distances to JM. Confirm the preferred sensor and references before implementation chooses the raw-series representation. Island national-datum offsets remain absent unless explicitly supported.
+
+## Reference decisions
+
+Raw series are isolated per sensor. Current sheets do not establish every historical sensor-to-mark relationship; they provide no safe basis for merging those raw records into reviewed series. Reviewed headers validate mark identity as well as BM/JM role. Historical Tenerife BMs with different names remain separate and carry no surveyed offsets. MURC1’s reviewed NAP-943 reference uses its published 2.313 m NMMA height from MURC2’s sheet. Ambiguous numeric -9999 readings are retained as suspect; documented positive 9999 and explicit --- gaps are dropped.

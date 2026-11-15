@@ -63,14 +63,14 @@ describe("IGN", () => {
     assert.equal(alac.datum, "JM");
     assert.equal(alac.datums.NMMA, 3.41);
     assert.equal(alac.live, false);
-    assert.equal(list.find((s) => s.source_id === "ALAC1-BM")!.live, true);
+    assert.equal(list.find((s) => s.source_id === "ALAC1-1633")!.live, true);
     assert.equal(list.find((s) => s.source_id === "FUER1")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "MURC1")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "ALAC1-0301")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "TN013")!.datums.NMMA, undefined);
     assert.ok(list.every((s) => !s.commercial_use));
     assert.equal(ign.metadata.license.redistribution, true);
-    assert.ok(alac.same_as.includes("ign/ALAC1-BM"));
+    assert.ok(alac.same_as.includes("ign/ALAC1-1633"));
   });
 
   it("refuses an empty, shortened or unknown station catalog", async () => {
@@ -107,18 +107,20 @@ describe("IGN", () => {
     });
   });
 
-  it("converts a distance below BM to JM using only the surveyed difference", () => {
-    const result = ign.parse('01/01/2024 00:00:00 4834 "mm"\n01/01/2024 00:10:00 4787 "mm"', {
-      year: 2024,
-      gauge: "TN013",
-      raw: true,
-      sign: -1,
-      offset: -5.478,
-    });
-    assert.deepEqual(
-      result.map((o) => o.level),
-      [-10.312, -10.265],
+  it("converts a reviewed BM file only using its documented mark", () => {
+    const out = ign.parse(
+      "220 MEDITERRANEO 048 ALBO1 mm respecto BM C_Mfo\n01/01/2021 00:00:00 -1101",
+      {
+        year: 2021,
+        gauge: "ALBO1",
+        reference: "BM",
+        mark: "C_Mfo",
+        raw: false,
+        sign: 1,
+        offset: -14.804,
+      },
     );
+    assert.equal(out[0]!.level, -15.905);
   });
 
   it("reads the reviewed hourly format without seconds", () => {
@@ -145,14 +147,14 @@ describe("IGN", () => {
     );
   });
 
-  it("drops both signed missing sentinels and refuses voltage, invalid dates and the wrong file identity", () => {
+  it("drops documented missing markers, retains ambiguous -9999 as suspect and rejects invalid rows", () => {
     const options = { year: 2024, gauge: "ALAC1", raw: true, sign: -1 as const, offset: 0 };
     assert.deepEqual(
       ign.parse(
         '01/01/2024 00:00:00 9999 "mm"\n01/01/2024 00:01:00 -9999 "mm"\n01/01/2024 00:02:00 --- "mm"',
         options,
       ),
-      [],
+      [{ time: Date.UTC(2024, 0, 1, 0, 1), level: 9.999, flag: Flag.suspect }],
     );
     for (const line of [
       '01/01/2024 00:00:00 14.2 "V"',
@@ -174,7 +176,7 @@ describe("IGN", () => {
     );
   });
 
-  it("merges reviewed values by timestamp, retaining finer preliminary observations and [start,end)", async () => {
+  it("keeps raw sensor readings out of reviewed series, including when the reviewed inventory is short", async () => {
     serve({
       "TN013/procesados/integros/": listing("TN013/procesados/integros", ["370031_2024_JM.txt"]),
       "TN013/procesados/horarios/": listing("TN013/procesados/horarios", []),
@@ -188,10 +190,96 @@ describe("IGN", () => {
     const out = await ign.levels("TN013", new Date("2024-01-01Z"), new Date("2024-01-01T00:02Z"));
     assert.deepEqual(
       out.map((o) => [o.level, o.flag]),
+      [[-10.271, Flag.good]],
+    );
+  });
+
+  it("validates the named benchmark, not just the BM or JM role", () => {
+    assert.throws(
+      () =>
+        ign.parse(fixture("reviewed.txt"), {
+          year: 2024,
+          gauge: "ALAC1",
+          reference: "JM",
+          mark: "NAP-943",
+          raw: false,
+          sign: 1,
+          offset: 0,
+        }),
+      /mark/,
+    );
+  });
+
+  it("preserves a numeric -9999 reviewed height as suspect instead of deleting it", () => {
+    const out = ign.parse(
+      "370 CANARIAS 013 TN013 Serie integra en mm respecto JM NGR-333\n01/01/2024 19:20:00 -9987\n01/01/2024 19:21:00 -9999\n01/01/2024 19:22:00 -10001",
+      {
+        year: 2024,
+        gauge: "TN013",
+        reference: "JM",
+        mark: "NG R 333",
+        raw: false,
+        sign: 1,
+        offset: 0,
+      },
+    );
+    assert.deepEqual(
+      out.map((o) => [o.level, o.flag]),
       [
-        [-10.271, Flag.good],
-        [-10.308, Flag.preliminary],
+        [-9.987, Flag.good],
+        [-9.999, Flag.suspect],
+        [-10.001, Flag.good],
       ],
+    );
+  });
+
+  it("uses MURC1's published NAP-943 reference and isolates the older Tenerife benchmark", async () => {
+    serve({
+      "": fixture("root.html"),
+      "TN021/procesados/integros/": listing("TN021/procesados/integros", ["370032_2008_BM.txt"]),
+      "TN021/procesados/horarios/": listing("TN021/procesados/horarios", []),
+      "TN021/procesados/integros/370032_2008_BM.txt":
+        "370 CANARIAS 032 TN021 mm respecto BM NGZ-581\n01/01/2008 00:00:00 -2341",
+    });
+    const stations = await ign.stations();
+    assert.equal(stations.find((s) => s.source_id === "MURC1")!.datums.NMMA, 2.313);
+    assert.deepEqual(stations.find((s) => s.source_id === "TN021-NGZ581")!.datums, {});
+    assert.deepEqual(
+      await ign.levels("TN021", new Date("2008-01-01Z"), new Date("2008-01-02Z")),
+      [],
+    );
+    const old = await ign.levels("TN021-NGZ581", new Date("2008-01-01Z"), new Date("2008-01-02Z"));
+    assert.equal(old[0]!.level, -2.341);
+  });
+
+  it("does not let another sensor's annual export override the requested sensor's daily file", async () => {
+    serve({
+      "ALAC1/observados/": listing("ALAC1/observados", ["2025/"]),
+      "ALAC1/observados/ficheros_anuales/": listing("ALAC1/observados/ficheros_anuales", [
+        "220051_1603_2025.txt",
+      ]),
+      "ALAC1/observados/ficheros_anuales/220051_1603_2025.txt": '01/01/2025 00:00:00 1100 "mm"',
+      "ALAC1/observados/2025/": listing("ALAC1/observados/2025", ["220051_1633_20250101.txt"]),
+      "ALAC1/observados/2025/220051_1633_20250101.txt": '01/01/2025 00:00:00 1000 "mm"',
+    });
+    for (const end of ["2025-01-02Z", "2025-01-10Z"])
+      assert.equal(
+        (await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date(end)))[0]!.level,
+        -1,
+      );
+  });
+
+  it("does not turn an omitted reviewed file into preliminary replacements", async () => {
+    serve({
+      "TN013/procesados/integros/": listing("TN013/procesados/integros", []),
+      "TN013/procesados/horarios/": listing("TN013/procesados/horarios", []),
+      "TN013/observados/": listing("TN013/observados", ["2024/"]),
+      "TN013/observados/2024/": listing("TN013/observados/2024", ["370031_1631_20240101.txt"]),
+      "TN013/observados/2024/370031_1631_20240101.txt": '01/01/2024 00:00:00 4834 "mm"',
+    });
+    assert.deepEqual(
+      await ign.levels("TN013", new Date("2024-01-01Z"), new Date("2024-01-02Z")),
+      [],
     );
   });
 
@@ -225,7 +313,7 @@ describe("IGN", () => {
     );
   });
 
-  it("does not fill a preferred sensor's intraday gaps from a spare sensor", async () => {
+  it("keeps each sensor's intraday gaps separate from spare readings", async () => {
     serve({
       "ALAC1/observados/": listing("ALAC1/observados", ["2026/"]),
       "ALAC1/observados/2026/": listing("ALAC1/observados/2026", [
@@ -237,7 +325,7 @@ describe("IGN", () => {
       "ALAC1/observados/2026/220051_1603_20260101.txt": '01/01/2026 00:01:00 1100 "mm"',
     });
     const out = await ign.levels(
-      "ALAC1-BM",
+      "ALAC1-1633",
       new Date("2026-01-01T00:01Z"),
       new Date("2026-01-01T00:02Z"),
     );
@@ -255,5 +343,23 @@ describe("IGN", () => {
     });
     const out = await ign.levels("ALAC1-0301", new Date("1927-01-01Z"), new Date("1928-01-01Z"));
     assert.equal(out[0]!.level, 1.499);
+  });
+
+  it("reads a minute-resolution annual export without exceeding the argument limit", async () => {
+    const rows = Array.from({ length: 150_000 }, (_, i) => {
+      const t = new Date(Date.UTC(2025, 0, 1) + i * 60_000).toISOString();
+      return `${t.slice(8, 10)}/${t.slice(5, 7)}/${t.slice(0, 4)} ${t.slice(11, 19)} 1000 "mm"`;
+    }).join("\n");
+    serve({
+      "ALAC1/observados/": listing("ALAC1/observados", ["2025/"]),
+      "ALAC1/observados/ficheros_anuales/": listing("ALAC1/observados/ficheros_anuales", [
+        "220051_1633_2025.txt",
+      ]),
+      "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt": rows,
+    });
+    assert.equal(
+      (await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date("2026-01-01Z"))).length,
+      150_000,
+    );
   });
 });
