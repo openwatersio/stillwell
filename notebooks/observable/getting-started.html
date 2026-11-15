@@ -4,7 +4,9 @@
   <script type="text/markdown">
     # Getting started with Stillwell
 
-    [Stillwell](https://openwatersio.github.io/stillwell/) is a set of Parquet and JSON files at `https://stillwell.openwaters.io/`, with measured water levels from national and regional agencies in one format. This notebook queries them from your browser with [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), without an account and without downloading the whole store. It follows the site's [Getting started](https://openwatersio.github.io/stillwell/docs/getting-started/) guide.
+    [Stillwell](https://openwatersio.github.io/stillwell/docs/) is an open store of observed and predicted water levels from tide, river and lake gauges around the world. It holds [stations](https://openwatersio.github.io/stillwell/docs/guides/stations/) from many [sources](https://openwatersio.github.io/stillwell/docs/sources/) in one layout, with [quality control](https://openwatersio.github.io/stillwell/docs/guides/quality-control/) and offsets to other [datums](https://openwatersio.github.io/stillwell/docs/guides/datums/). It is built by [Open Waters](https://openwaters.io) to power tide predictions and water level observations for [Slackwater](https://slackwater.xyz), and to reduce crowd-sourced depth soundings to chart datum.
+
+    The store is a set of Parquet and JSON files at `https://stillwell.openwaters.io/`. This notebook queries them from your browser with [DuckDB-WASM](https://duckdb.org/docs/api/wasm/overview), without an account and without downloading the whole store. It follows the site's [Getting started](https://openwatersio.github.io/stillwell/docs/getting-started/) guide.
 
     It follows one station, Hoek van Holland at the mouth of the Port of Rotterdam, from finding it to comparing this year's water with the last ten.
   </script>
