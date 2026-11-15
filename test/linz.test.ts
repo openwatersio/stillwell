@@ -89,12 +89,12 @@ describe("linz", () => {
     assert.equal(otat.lon, 170.629444);
   });
 
-  it("gives the chart datum offset a calibration states, and Sumner's below gauge zero", async () => {
+  it("drops a calibration's chart datum offset after sensors were replaced, and keeps Sumner's below gauge zero", async () => {
     serve(listRoutes);
     const stations = await linz.stations();
-    // CD is 2.016 m above gauge zero, so a level above it is that much less above CD.
-    assert.deepEqual(stations.find((s) => s.id === "linz/CHIT")!.datums, { CD: -2.016 });
-    assert.deepEqual(stations.find((s) => s.id === "linz/KAIT")!.datums, { CD: -1.38 });
+    // Owenga's 2011 calibration and Kaikoura's 2017 one are followed by replaced sensors (2014 and 2019, 2018).
+    assert.deepEqual(stations.find((s) => s.id === "linz/CHIT")!.datums, {});
+    assert.deepEqual(stations.find((s) => s.id === "linz/KAIT")!.datums, {});
     assert.deepEqual(stations.find((s) => s.id === "linz/SUMT")!.datums, { CD: 0.5 });
   });
 
@@ -303,6 +303,16 @@ describe("linz parseReadme", () => {
       linz.parseReadme(head + "Chart Datum is 0.50m below TG0 (Datum transfer)\r\n")!.datums,
       { CD: 0.5 },
     );
+  });
+
+  it("keeps a calibration's offset only while no sensors were replaced since", () => {
+    const head = "NAME: X\r\nWGS-84 POSITION: 41\u00b0 17' 04\"S\r\n 174\u00b0 46' 47\"E\r\n";
+    const table = "Results of 2022 calibration:\r\n  CD - 1.53\r\n  TG0 - 0.000\r\n";
+    const history = (y: number) => `GAUGE HISTORY\r\n${y}: sensors replaced November 24\r\n`;
+    // CD is 1.53 m above gauge zero, so a level above it is that much less above CD.
+    assert.deepEqual(linz.parseReadme(head + history(2021) + table)!.datums, { CD: -1.53 });
+    assert.deepEqual(linz.parseReadme(head + history(2022) + table)!.datums, {});
+    assert.deepEqual(linz.parseReadme(head + history(2024) + table)!.datums, {});
   });
 
   it("refuses a README without a name or a position", () => {

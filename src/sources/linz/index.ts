@@ -80,7 +80,9 @@ export async function stations(previous: Station[] = []): Promise<LinzStation[]>
   for (const code of gauges) {
     if (!/^[A-Z]{4}$/.test(code)) throw new Error(`Not a LINZ gauge code: ${code}`);
     const data = await getJson<GaugeData>(`${API}/api/getGaugeData/${code}`, { fresh: true, pace });
-    const years = data.datasets.filter((d) => d.sensor === SENSOR).map((d) => Number(d.year));
+    const years = (data.datasets ?? [])
+      .filter((d) => d.sensor === SENSOR)
+      .map((d) => Number(d.year));
     if (years.some((y) => !Number.isInteger(y)))
       throw new Error(`LINZ ${code}: a dataset's year isn't a number`);
     const was = known.get(`linz/${code}`);
@@ -137,8 +139,8 @@ const COORDINATE = /(\d+)\D+?(\d+)(?:\D+?(\d+(?:\.\d+)?))?\D*?([NSEW])\b/g;
 
 /**
  * A gauge's name, position and the chart datum offset its README states: the
- * `CD` line of a calibration's table of heights above gauge zero, or "Chart
- * Datum is X m below TG0". "Chart Datum is X m below BM" at a reference port
+ * `CD` line of a calibration's table of heights above gauge zero, where no
+ * sensors were replaced since, or "Chart Datum is X m below TG0". "Chart Datum is X m below BM" at a reference port
  * says nothing of where gauge zero is, so gives no offset.
  */
 export function parseReadme(
@@ -168,7 +170,12 @@ export function parseReadme(
   const above = /^\s*CD\s*-\s*(\d+(?:\.\d+)?)\b/m.exec(text)?.[1];
   const below = /Chart Datum is (\d+(?:\.\d+)?)\s*m below TG0/i.exec(text)?.[1];
   // Millimeters, as LINZ gives them, so floating point doesn't leave 0.0000001.
-  if (above) datums.CD = -Math.round(Number(above) * 1000) / 1000;
+  // A calibration's offset is for the zero of the sensors then, so it isn't kept once the
+  // README lists sensors replaced in that year or later.
+  const calibrated = Number(/Results of (\d{4}) calibration/.exec(text)?.[1]);
+  const replaced = [...text.matchAll(/^\s*(\d{4}):.*\breplaced\b/gim)].map((m) => Number(m[1]));
+  if (above && !replaced.some((y) => y >= calibrated))
+    datums.CD = -Math.round(Number(above) * 1000) / 1000;
   else if (below) datums.CD = Math.round(Number(below) * 1000) / 1000;
   return { name, lat: Math.round(lat * 1e6) / 1e6, lon: Math.round(lon * 1e6) / 1e6, datums };
 }

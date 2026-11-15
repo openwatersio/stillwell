@@ -14,6 +14,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
+import { Flag } from "../src/schema.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bodc from "../src/sources/bodc/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
@@ -121,8 +122,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
   // Wellington, since 2007: three days of daily files from about two weeks back, since
-  // they appear 6 to 12 days late, and three days of the year's file from the year
-  // before last. Its paths name the
+  // they appear 6 to 12 days late, and three days of a year's file from four years back. Its paths name the
   // year and the day, so it's in UNRECORDED and only has to return values.
   linz: async () => {
     const latest = await linz.levels(
@@ -132,11 +132,13 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     );
     const final = await linz.levels(
       "WLGT",
-      new Date(start.getTime() - 730 * DAY_MS),
-      new Date(end.getTime() - 730 * DAY_MS),
+      new Date(start.getTime() - 1500 * DAY_MS),
+      new Date(end.getTime() - 1500 * DAY_MS),
     );
-    // Either alone would pass a listing that lost its daily or its yearly files.
-    return latest.length && final.length ? [...latest, ...final] : [];
+    // A listing that lost its yearly zip falls back to the day files, which are preliminary. In early
+    // January the latest days can come from last year's zip, so only the old year is held to its flag.
+    const read = final.every((o) => o.flag === Flag.good);
+    return latest.length && final.length && read ? [...latest, ...final] : [];
   },
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),

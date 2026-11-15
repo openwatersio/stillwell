@@ -171,7 +171,10 @@ export const UNLINKS: Decision[] = [
 ];
 
 /** Stations chosen as their group's preferred series, with why. */
-export const PREFER: Record<string, string> = {};
+export const PREFER: Record<string, string> = {
+  "uhslc/071":
+    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Sensor 40 at the tsunami gauge (linz/WLGT) drifts against it by 1.88 m in 2019 to 1.21 m in 2025 (erratum `linz-wellington-drift`).",
+};
 
 /**
  * Whether a station's series is a copy of another agency's gauge, by source,

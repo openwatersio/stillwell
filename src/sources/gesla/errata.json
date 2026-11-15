@@ -566,7 +566,7 @@
         "gesla/fishing_rock-rfrt-nzl-ttw",
         "gesla/owenga-chit-nzl-ttw"
       ],
-      "handling": "avoided",
+      "handling": "kept",
       "error": "GESLA 4.1 gives Boat Cove and Fishing Rock (Raoul Island) longitudes of 177.9°E, and Owenga (Chatham Islands) 176.37°E, where LINZ's READMEs give 177.89°W, 177.90°W and 176.37°W. Each record sits about 410 to 580 km from its gauge, on the wrong side of the antimeridian.",
       "response": "The three records keep GESLA's positions. Each is linked to LINZ's gauge by decision in `LINKS` (`src/same-as.ts`), so the copy rule's distance limit doesn't leave it unlinked.",
       "evidence": "LINZ's READMEs for RBCT, RFRT and CHIT, November 2026; the three GESLA TTW records' positions in the store's list."
