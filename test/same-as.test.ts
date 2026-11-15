@@ -599,6 +599,26 @@ describe("copyPairs", () => {
     );
   });
 
+  it("links a copy whose whole short name the original's has", () => {
+    assert.deepEqual(
+      ids([
+        station("cmems/Hov", { name: "Hov" }),
+        station("dmi/22598", { name: "Hov Havn I", lat: m(700) }),
+        station("dmi/1", { name: "Snaptun Havn", lat: m(900) }),
+      ]),
+      ["cmems/Hov dmi/22598"],
+    );
+    // A name with more of the copy's words wins over a short one.
+    assert.deepEqual(
+      ids([
+        station("cmems/AmelandNes", { name: "Ameland Nes" }),
+        station("rws/ameland.nes", { name: "Ameland, Nes", lat: m(200) }),
+        station("rws/nes", { name: "Nes", lat: m(-500) }),
+      ]),
+      ["cmems/AmelandNes rws/ameland.nes"],
+    );
+  });
+
   it("takes the best-named match in each source, and none when two are as good", () => {
     const copy = station("uhslc/819", { name: "Goteborg-Torshamnen", ...nhs });
     assert.deepEqual(

@@ -518,12 +518,13 @@ export function copyPairs<T extends Station>(
   for (const copy of stations.filter((s) => redistributed(s) && !named.has(s.id))) {
     const candidates = stations
       .filter((s) => !separate(copy, s) && Math.abs(s.lat - copy.lat) <= window)
-      .map((s) => ({ s, d: km(copy, s), words: nameScore(copy.name, s.name).total }))
+      .map((s) => ({ s, d: km(copy, s) }))
       .filter(
         // A town's name is shared by its streams, so a coastal copy matches no river.
         (c) =>
           c.d <= COPY_KM && alike(copy, c.s) && !(copy.kind && c.s.kind && copy.kind !== c.s.kind),
-      );
+      )
+      .map((c) => ({ ...c, words: nameScore(copy.name, c.s.name).total }));
     for (const [, matches] of Map.groupBy(candidates, (c) => c.s.source)) {
       matches.sort((x, y) => y.words - x.words || x.d - y.d || x.s.id.localeCompare(y.s.id));
       const [best, ...rest] = matches as [(typeof matches)[0], ...typeof matches];
