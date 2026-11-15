@@ -344,6 +344,17 @@ jobs:
               # A station that fails doesn't keep the rest from their refetch.
               node scripts/ingest.ts backfill jma all "$(date -u -d "$year-$month-01 -2 months" +%F)" "$(date -u -d "$year-$month-01 +1 month" +%F)" || status=1
               set -- "$year-$month-01" ;;
+            # LINZ isn't hourly either: its daily files appear 6 to 12 days late,
+            # so this is what brings its new values. Every open station is read
+            # again from two months back to the end of this month, since the
+            # preliminary run below stops at the year of a station's last value
+            # and skips one with no preliminary value, which leaves out the first
+            # days of a new year and a new gauge. That run then reads each
+            # station from its earliest preliminary value, which brings in the
+            # year's file that replaces a year's daily files.
+            linz)
+              node scripts/ingest.ts backfill linz all "$(date -u -d "$year-$month-01 -2 months" +%F)" "$(date -u -d "$year-$month-01 +1 month" +%F)" || status=1
+              set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" ;;
             # CMEMS isn't hourly either: its latest window holds about the last
             # month, and its history copy reaches about two months back, a month
             # at a time, so every gauge is read again from six months back,

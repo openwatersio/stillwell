@@ -1,0 +1,61 @@
+{
+ "gauge": "SCOT",
+ "description": "SITE INFORMATION\r\n-----------------\r\nNAME:             Scott Base\r\nCODE:             SCOT\r\nWGS-84 POSITION:   77\u00b0 51'S\r\n                  166\u00b0 46'E\r\nUTM COORDINATES:    541 500 mE\r\nZONE 57 (SOUTH)   1 357 740 mN\t\r\n           \r\n===========================================================\r\n\r\nREFERENCE BENCH MARKS\t\t\r\n----------------------\t\t  \r\nBM A, LINZ geodetic code DJRB  \r\n\r\n===========================================================\r\n\r\nSUMMARY OF TIDE GAUGE ZERO (TG0) BELOW DJRB (metres)\r\n-----------------------------------------------\r\n\r\nCalibration Date\r\n\r\nDecember 2016\t11.364\r\nNovember 2017\t11.369\r\nNovember 2018\t11.573\r\nNovember 2019\t11.232\r\nNovember 2020\t11.409\r\nNovember 2021\t11.533\r\nNovember 2022\t11.678\r\nNovember 2023\t11.698\r\nNovember 2024\t11.934\r\nNovember 2025 \t11.067\r\n\r\n===========================================================\r\n\r\nGAUGE HISTORY\t\t\r\n----------------------\t\t  \r\n2018: Drift of TG0 over 15-16 January; sharp offset of ~0.08m between 15:15 and 15:25 on 21 January.\r\n2019: TG0 raised 0.122m at 10:30 and a further 0.072m at 16:00 on 18 January.  On 20 January at 09:00 the gauge dropped 0.128m.  \r\n2020: Gantry lifted morning 25 January, then lowered and lifted again late afternoon.  Gauge returned to water 12 May; seabed mounting \r\nhad moved horizontally ~1m.\r\n2021: TG0 appears to have been shifted down 0.130m on 17 February at 07:35, down a further 0.148m 19 February at 07:40, then raised 0.305m \r\nthe same day at 14:45 and down 0.190m  25 February at 08:15.  On 16 March TG0 lifted 0.200m at 08:25 then later lowered by 0.072m at 18:25. \r\nDrift of TG0 commencing 8 February, suggesting that data from then until 17 March should be considered to be unreliable. Gauge re-established 17 Nov.\r\n2023: Data logger changed mid-February; logging rate increased from 5 to 1 minutes\r\n2023: Gauge failed 2 August; reinstalled 25 November\r\n2024: Vertical shift of gauge 10 May \r\n2025: The RO gantry has been moved landward due to erosion concerns at the old site.\r\n2026: Gauge removed 5 March due to iceberg activity.\r\n\r\n===========================================================\r\n\r\n\r\nFILE NAME FORMAT NOTES\r\n-----------------------\r\n\r\nThe sea level data .zip file is named using the format\r\nSCOT_yyyyddd.zip, where:\r\n\r\nyyyy is the year (eg 2009)\r\nddd is the day of the year (eg 110, for 20 April).\r\n\r\nThe .zip file contains a single file of sea level data, \r\nnamed in the same format but using a .csv file extension.\r\n\r\n===========================================================\r\n\r\nSEA LEVEL DATA FORMAT - comma delimited\r\n----------------------------------------\r\n\r\n1st field: site code (SCOT)\r\n2nd field: date and time (yyyy-mm-dd hh:mm) NZST, 24 hour\r\n3rd field: sea level height (metres)\r\n\r\neg:\r\n\r\nSCOT,2016-01-05 15:50,1.881\r\nSCOT,2016-01-05 15:55,1.884\r\nSCOT,2016-01-05 16:00,1.888\r\n\r\n\r\n2024-2025: \r\n\r\n1st field: date (yyyy-mm-dd)\r\n2nd field: time (hh:mm:ss), 24 hour\r\n3rd field: sea level height (millimetres)\r\n\r\n\r\neg:\r\n\r\n2024-01-01, 00:00:00, 2400\r\n2024-01-01, 00:01:00, 2405\r\n2024-01-01, 00:02:00, 2404\r\n\r\n===========================================================",
+ "datasets": [
+  {
+   "year": "2016",
+   "sensor": "00",
+   "datasetid": "SCOT/2016/00"
+  },
+  {
+   "year": "2017",
+   "sensor": "00",
+   "datasetid": "SCOT/2017/00"
+  },
+  {
+   "year": "2018",
+   "sensor": "00",
+   "datasetid": "SCOT/2018/00"
+  },
+  {
+   "year": "2019",
+   "sensor": "00",
+   "datasetid": "SCOT/2019/00"
+  },
+  {
+   "year": "2020",
+   "sensor": "00",
+   "datasetid": "SCOT/2020/00"
+  },
+  {
+   "year": "2021",
+   "sensor": "00",
+   "datasetid": "SCOT/2021/00"
+  },
+  {
+   "year": "2022",
+   "sensor": "00",
+   "datasetid": "SCOT/2022/00"
+  },
+  {
+   "year": "2023",
+   "sensor": "00",
+   "datasetid": "SCOT/2023/00"
+  },
+  {
+   "year": "2024",
+   "sensor": "00",
+   "datasetid": "SCOT/2024/00"
+  },
+  {
+   "year": "2025",
+   "sensor": "00",
+   "datasetid": "SCOT/2025/00"
+  },
+  {
+   "year": "2026",
+   "sensor": "00",
+   "datasetid": "SCOT/2026/00"
+  }
+ ]
+}
