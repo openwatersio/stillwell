@@ -67,7 +67,8 @@ function credentials(): Record<string, string> {
 
 /**
  * GESLA's records of CCO's gauges by the name CCO lists them under, which the
- * store links as one gauge. A name no list has leaves the link dropped.
+ * store links as one gauge. Whitby Harbour's is left out: CMEMS and TICON keep
+ * it apart from the EA's and BODC's Whitby, so its link waits for a position check.
  */
 const GESLA: Record<string, string> = {
   "arun platform": "gesla/arun_platform-arn-gbr-cco",
@@ -85,7 +86,6 @@ const GESLA: Record<string, string> = {
   "swanage pier": "gesla/swanage_pier-swp-gbr-cco",
   "teignmouth pier": "gesla/teignmouth_pier-tnp-gbr-cco",
   "west bay harbour": "gesla/west_bay_harbour-wbh-gbr-cco",
-  "whitby harbour": "gesla/whitby_harbour-wtb-gbr-cco",
 };
 
 interface Feature {
@@ -172,17 +172,24 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
       new Date(cursor).toISOString().replace(/[-:T]|\.\d+Z/g, ""),
       `?sensor=${sourceId}&duration=${hours}`,
     );
-    for (const { properties: p } of features) {
+    // Several sites can answer a request that names one; keep only the one asked for.
+    const mine = features.filter(({ properties: p }) => String(p?.id) === sourceId);
+    // An answer with features but none of this site's is a response this adapter misreads, not a gap.
+    if (features.length && !mine.length)
+      throw new Error(`CCO answered for site ${sourceId} with no feature carrying its id`);
+    for (const { properties: p } of mine) {
       const time = parseDate(p?.date);
+      if (time === null) throw new Error(`CCO reading of site ${sourceId} has date ${p?.date}`);
       const level = p?.value;
-      // Several sites can answer a request that names one; keep only the one asked for.
-      if ((p?.id !== undefined && String(p.id) !== sourceId) || time === null) continue;
-      if (typeof level !== "number" || !Number.isFinite(level) || level === 9999) continue;
-      const flag = flagOf(p?.QCflag);
-      if (flag !== null && time >= start.getTime() && time < end.getTime())
-        out.set(time, { time, level, flag });
+      // A missing value is null, or 9999 in the manual's files.
+      if (level === null || level === undefined || level === 9999) continue;
+      if (typeof level !== "number" || !Number.isFinite(level))
+        throw new Error(`CCO reading of site ${sourceId} has value ${level}`);
+      if (time >= start.getTime() && time < end.getTime())
+        out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }
-    cursor -= hours * HOUR_MS;
+    // Each request starts one reading inside the last, so a reading at the edge the API leaves out of a window isn't lost; the Map drops the repeat.
+    cursor -= hours * HOUR_MS - 600_000;
   }
   return [...out.values()].sort((a, b) => a.time - b.time);
 }
@@ -207,9 +214,10 @@ function parseDate(text: unknown): number | null {
 
 /**
  * The monthly check's flag, which follows the IOC's scheme (TideQCManual
- * v1.0, table 1); null for a missing value (9). None means not checked yet.
+ * v1.0, table 1). None means not checked yet. A value the check marks missing
+ * (9) that the API still sends is bad, so a refetch replaces the stored one.
  */
-function flagOf(code: unknown): Flag | null {
+function flagOf(code: unknown): Flag {
   // 0 is "no QC performed" in the IOC scheme.
   const text = String(code ?? "").trim();
   if (text === "" || text === "0") return Flag.preliminary;
@@ -221,9 +229,8 @@ function flagOf(code: unknown): Flag | null {
       return Flag.interpolated;
     case "4":
     case "8":
-      return Flag.bad;
     case "9":
-      return null;
+      return Flag.bad;
     // Doubtful (3), a reference change (6), flat-lining (7) and any code the manual doesn't list.
     default:
       return Flag.suspect;

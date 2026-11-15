@@ -78,7 +78,7 @@ describe("cco", () => {
     const at = (t: string) => out.find((o) => o.time === Date.parse(`2026-11-14T${t}Z`));
     assert.deepEqual(
       out.map((o) => o.time),
-      [0, 10, 20, 60, 70, 80, 90].map((m) => Date.parse("2026-11-14T00:00:00Z") + m * 60_000),
+      [0, 10, 20, 50, 60, 70, 80, 90].map((m) => Date.parse("2026-11-14T00:00:00Z") + m * 60_000),
     );
     assert.deepEqual([at("00:00")!.level, at("00:00")!.flag], [1.31, Flag.preliminary]);
     assert.equal(at("00:10")!.flag, Flag.good);
@@ -89,9 +89,10 @@ describe("cco", () => {
     // An unlisted code is suspect, not good; 9999, null and flag 9 are not stored.
     assert.equal(at("01:30")!.flag, Flag.suspect);
     assert.equal(at("00:30"), undefined);
-    assert.equal(at("00:50"), undefined);
+    // A value the check marks missing, but that the API still sends, is bad.
+    assert.equal(at("00:50")!.flag, Flag.bad);
     // The other site in the answer, and a reading before the start, are left out.
-    assert.equal(out.length, 7);
+    assert.equal(out.length, 8);
   });
 
   it("asks a year at a time", async () => {
@@ -99,7 +100,7 @@ describe("cco", () => {
     await cco.levels("54", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));
     assert.deepEqual(
       requests.map((r) => r.url.match(/duration=(\d+)/)![1]),
-      ["8760", "8760", "24"],
+      ["8760", "8760", "25"],
     );
   });
 
@@ -114,13 +115,13 @@ describe("cco", () => {
     await assert.rejects(cco.stations(), /no site with a date/);
   });
 
-  it("reads a reading flagged 0 as not yet checked, and a feature with no id as the site asked for", async () => {
+  it("reads a reading flagged 0 or blank as not yet checked", async () => {
     serve([
       [
         /tides\//,
         JSON.stringify({
           features: [
-            { properties: { date: "20261114#000000", value: 1, QCflag: "0" } },
+            { properties: { id: 54, date: "20261114#000000", value: 1, QCflag: "0" } },
             { properties: { id: 54, date: "20261114#001000", value: 2, QCflag: " " } },
           ],
         }),
@@ -140,7 +141,17 @@ describe("cco", () => {
     );
   });
 
-  it("refuses a stamp that isn't a real time", async () => {
+  it("fails on an answer it can't read rather than read it as no values", async () => {
+    const ask = (feature: object) => {
+      serve([[/tides\//, JSON.stringify({ features: [{ properties: feature }] })]]);
+      return cco.levels("54", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T01:00:00Z"));
+    };
+    await assert.rejects(ask({ date: "20261114#000000", value: 1 }), /no feature carrying its id/);
+    await assert.rejects(ask({ id: 54, date: "2026-11-14T00:00:00Z", value: 1 }), /has date/);
+    await assert.rejects(ask({ id: 54, date: "20261114#000000", value: "1.3" }), /has value/);
+  });
+
+  it("fails on a stamp that isn't a real time", async () => {
     serve([
       [
         /tides\//,
@@ -149,11 +160,9 @@ describe("cco", () => {
         }),
       ],
     ]);
-    const out = await cco.levels(
-      "54",
-      new Date("2026-02-01T00:00:00Z"),
-      new Date("2026-03-05T00:00:00Z"),
+    await assert.rejects(
+      cco.levels("54", new Date("2026-02-01T00:00:00Z"), new Date("2026-03-05T00:00:00Z")),
+      /has date/,
     );
-    assert.deepEqual(out, []);
   });
 });

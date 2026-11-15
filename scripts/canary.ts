@@ -216,7 +216,7 @@ for (const id of named.length ? named : Object.keys(probes)) {
   const needs = { usgs: ["USGS_API_KEY"], cco: ["CCO_API_KEY", "CCO_REFERER"] }[id];
   const missing = needs?.filter((name) => !process.env[name]);
   if (missing?.length) {
-    console.log(`${id}: skipped, no ${missing.join(" or ")}`);
+    console.log(`${id}: skipped, no ${missing.join(" and no ")}`);
     continue;
   }
   const shapes: Record<string, Shape[]> = {};
