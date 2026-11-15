@@ -120,9 +120,11 @@ export async function stations(_previous?: Station[], now = Date.now()): Promise
     const [lon, lat] = geometry?.coordinates ?? [];
     if (!/^\d+$/.test(String(p?.id)) || typeof p?.sensor !== "string") continue;
     if (typeof lat !== "number" || typeof lon !== "number") continue;
-    // A layer can answer in British National Grid; degrees only.
-    if (Math.abs(lat) > 90 || Math.abs(lon) > 180)
-      throw new Error(`CCO site ${p?.id} is at ${lat}, ${lon}, which isn't longitude and latitude`);
+    // A layer can answer in British National Grid, or with the axes swapped; the network's gauges are around Great Britain.
+    if (lat < 49 || lat > 61 || lon < -9 || lon > 3)
+      throw new Error(
+        `CCO site ${p?.id} is at ${lat}, ${lon}, which isn't a position around Great Britain`,
+      );
     const id = String(p!.id);
     const last = parseDate(p!.date);
     // Active while it reported within the year, as the store's other lists judge it.
@@ -189,6 +191,7 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
         out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }
     // Each request starts one reading inside the last, so a reading at the edge the API leaves out of a window isn't lost; the Map drops the repeat.
+    if (cursor - hours * HOUR_MS <= start.getTime()) break;
     cursor -= hours * HOUR_MS - 600_000;
   }
   return [...out.values()].sort((a, b) => a.time - b.time);

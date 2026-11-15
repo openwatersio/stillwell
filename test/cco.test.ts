@@ -86,7 +86,7 @@ describe("cco", () => {
     assert.equal(at("01:10")!.flag, Flag.interpolated);
     assert.equal(at("01:00")!.flag, Flag.suspect);
     assert.equal(at("01:20")!.flag, Flag.suspect);
-    // An unlisted code is suspect, not good; 9999, null and flag 9 are not stored.
+    // An unlisted code is suspect, not good; 9999 and null are not stored.
     assert.equal(at("01:30")!.flag, Flag.suspect);
     assert.equal(at("00:30"), undefined);
     // A value the check marks missing, but that the API still sends, is bad.
@@ -104,11 +104,17 @@ describe("cco", () => {
     );
   });
 
+  it("asks once for a window of whole hours", async () => {
+    serve([[/tides\//, JSON.stringify({ features: [] })]]);
+    await cco.levels("54", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z"));
+    assert.equal(requests.length, 1);
+  });
+
   it("refuses a list in British National Grid, or one with no date it can read", async () => {
     const list = JSON.parse(fixture("cco-tides-latest.geojson"));
     list.features[0].geometry.coordinates = [530000, 105000];
     serve([[/latest/, JSON.stringify(list)]]);
-    await assert.rejects(cco.stations(), /isn't longitude and latitude/);
+    await assert.rejects(cco.stations(), /isn't a position around Great Britain/);
     for (const f of list.features) f.properties.date = "2026-11-14T12:00:00Z";
     list.features[0].geometry.coordinates = [0, 50];
     serve([[/latest/, JSON.stringify(list)]]);
