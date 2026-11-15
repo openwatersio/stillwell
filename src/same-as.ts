@@ -44,6 +44,21 @@ export interface Decision {
 
 /** Pairs that share a gauge the rules below miss. */
 export const LINKS: Decision[] = [
+  ...[
+    ["alicantetg-ali-esp-cmems", "ALAC1"],
+    ["alicante2tg-ali-esp-cmems", "ALAC2"],
+    ["alborantg-alb-esp-cmems", "ALBO1"],
+    ["coruna2tg-cor-esp-cmems", "ACOR1"],
+    ["almeria3tg-alm-esp-cmems", "ALME2"],
+    ["cartagenatg-car-esp-cmems", "MURC2"],
+    ["fuerteventura3tg-fue-esp-cmems", "FUER2"],
+    ["tenerife3tg-ten-esp-cmems", "TN021"],
+    ["tenerife4tg-ten-esp-cmems", "TN031"],
+  ].map(([copy, gauge]) => ({
+    a: `gesla/${copy}`,
+    b: `ign/${gauge}`,
+    note: "IGN gauge identified in openwatersio/stillwell#181; GESLA's CMEMS position matches IGN's station sheet (checked against the store's station list on 15 November 2026). Explicit IDs keep neighboring gauges, particularly Alicante's two, distinct.",
+  })),
   {
     a: "gesla/uddevalla-udd-swe-cmems",
     b: "smhi/2541",

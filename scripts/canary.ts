@@ -25,6 +25,7 @@ import * as ea from "../src/sources/ea/index.ts";
 import * as crms from "../src/sources/crms/index.ts";
 import { header as crmsHeader } from "../src/sources/crms/export.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
+import * as ign from "../src/sources/ign/index.ts";
 import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
 import * as jodc from "../src/sources/jodc/index.ts";
@@ -102,6 +103,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   ],
   // Hornbæk, on DVR90 since 1997.
   dmi: () => dmi.levels("30017", start, end),
+  // Separate references: both the live BM feed and a reviewed JM year must work.
+  ign: async () => {
+    const latest = await ign.levels("ALAC1-BM", start, end);
+    const final = await ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2024-01-04Z"));
+    return latest.length && final.length ? [...latest, ...final] : [];
+  },
   // Mitajiri-Nakanoseki's whole record, 2011 to 2013, the smallest zip (34 KB).
   jodc: () => jodc.levels("8413", new Date("2012-01-01Z"), new Date("2012-01-04Z")),
   // Kushimoto, since 1924: a week of provisional values, which arrive a day or
@@ -197,7 +204,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
  * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten"]);
+const UNRECORDED = new Set(["cmems", "gesla", "ign", "jma", "kuestendaten"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");

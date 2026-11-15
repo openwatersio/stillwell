@@ -1,0 +1,15 @@
+{
+  "errata": [
+    {
+      "id": "ign-duplicate-raw-rows",
+      "stations": ["ign/ALAC1-BM"],
+      "since": "2026-11-12",
+      "until": "2026-11-13",
+      "handling": "dropped",
+      "error": "ALAC1's 1633 raw daily file repeats 12 November 2026 at 04:05:00 three times with the identical 798 mm value.",
+      "response": "Keep one copy of identical adjacent raw rows. Conflicting values at a repeated timestamp and decreasing timestamps still fail the fetch.",
+      "evidence": "Observed in https://datos-geodesia.ign.es/Red_de_Mareografos/ALAC1/observados/2026/220051_1633_20261112.txt on 15 November 2026 UTC: 1,442 rows, with three identical 04:05:00 rows. A recorded excerpt is test/fixtures/ign-duplicates.txt."
+    }
+  ],
+  "retired": []
+}
