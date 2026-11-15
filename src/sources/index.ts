@@ -1,6 +1,7 @@
 import { readErrata, withErrata } from "../errata.ts";
 import type { Source } from "../schema.ts";
 import { source as bodc } from "./bodc/index.ts";
+import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as cmems } from "./cmems/index.ts";
@@ -14,6 +15,7 @@ import { source as ign } from "./ign/index.ts";
 import { source as jma } from "./jma/index.ts";
 import { source as jodc } from "./jodc/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
+import { source as linz } from "./linz/index.ts";
 import { source as marineInstitute } from "./marine-institute/index.ts";
 import { source as pegelonline } from "./pegelonline/index.ts";
 import { source as refmar } from "./refmar/index.ts";
@@ -25,6 +27,7 @@ import { source as unam } from "./unam/index.ts";
 import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
+import bomErrata from "./bom/errata.json" with { type: "json" };
 import cmemsErrata from "./cmems/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
 import crmsErrata from "./crms/errata.json" with { type: "json" };
@@ -35,6 +38,7 @@ import geslaErrata from "./gesla/errata.json" with { type: "json" };
 import ignErrata from "./ign/errata.json" with { type: "json" };
 import jmaErrata from "./jma/errata.json" with { type: "json" };
 import jodcErrata from "./jodc/errata.json" with { type: "json" };
+import linzErrata from "./linz/errata.json" with { type: "json" };
 import marineInstituteErrata from "./marine-institute/errata.json" with { type: "json" };
 import pegelonlineErrata from "./pegelonline/errata.json" with { type: "json" };
 import refmarErrata from "./refmar/errata.json" with { type: "json" };
@@ -46,6 +50,7 @@ import usaceErrata from "./usace/errata.json" with { type: "json" };
 
 const adapters: Record<string, Source> = {
   bodc,
+  bom,
   bsh,
   cdec,
   cmems,
@@ -59,6 +64,7 @@ const adapters: Record<string, Source> = {
   jma,
   jodc,
   kartverket,
+  linz,
   "marine-institute": marineInstitute,
   pegelonline,
   refmar,
@@ -78,6 +84,7 @@ const adapters: Record<string, Source> = {
  */
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
+  bom: bomErrata,
   cmems: cmemsErrata,
   coops: coopsErrata,
   crms: crmsErrata,
@@ -88,6 +95,7 @@ export const errataFiles: Record<string, unknown> = {
   ign: ignErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
+  linz: linzErrata,
   "marine-institute": marineInstituteErrata,
   pegelonline: pegelonlineErrata,
   refmar: refmarErrata,

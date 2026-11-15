@@ -2,7 +2,7 @@ import { urlSafe } from "./store/paths.ts";
 import { readFile } from "node:fs/promises";
 import { csvFields } from "./csv.ts";
 import { ID_KM } from "./same-as.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import type { Epoch, StoredStation } from "./schema.ts";
 import { km } from "./ticon.ts";
 
@@ -433,7 +433,7 @@ const ALL_TIME: Period = { start: "0000-01-01", end: "9999-12-30" };
 const compare = (a: number[], b: number[]) => a.map((x, i) => x - b[i]!).find((d) => d !== 0) ?? 0;
 
 /** A TICON record of a GESLA file whose values are another gauge's. */
-const dropped = (id: string | undefined) => !!id?.startsWith("ticon/") && DROPPED.has(id.slice(6));
+const dropped = (id: string | undefined) => !!id?.startsWith("ticon/") && isDropped(id.slice(6));
 const round = (m: number) => Math.round(m * 1e4) / 1e4 + 0; // + 0 turns -0 into 0
 
 /**

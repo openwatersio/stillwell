@@ -1,0 +1,206 @@
+{
+ "gauge": "CHIT",
+ "description": "SITE INFORMATION\r\n-----------------\r\nNAME:\t\t\tOwenga\r\nCODE:             \tCHIT\r\nWGS-84 POSITION:   \t44\u00b0 01\" 26\"S\r\n                  \t176\u00b0 22' 03\"W\r\nCITM COORDINATES: \t3 510 750 mE\r\n                  \t5 122 500 mN\t\r\nDATA COMMENCED:   \t17 December 2007 (UTC), Julian Day 351\r\n\r\n======================================================================\r\n\r\nPRESSURE SENSOR DETAILS\r\n------------------------\r\nRECORD INTERVAL:  1 minute\r\nTIME SYSTEM:      UTC\r\nMANUFACTURER:     Druck \r\nSENSOR MODEL:     PTX 1830\r\nRANGE:            0 - 20 metres (4-20mA output)\r\n\r\n======================================================================\r\n\r\n**********************************************************************\r\n***                             NOTE                               ***\r\n***                                                                ***\r\n***               THESE SENSORS ARE LIABLE TO DRIFT.               ***\r\n***                                                                ***\r\n***          *********   CAUTION IS ADVISED   *********            ***\r\n***                                                                ***\r\n**********************************************************************\r\n\r\n======================================================================\r\n\r\nGAUGE HISTORY\r\n----------------------\t\r\n2008: sensor 40 malfunctioning from November 26 \r\n2010: sensors replaced February 18; calibration December\r\n2012: routine maintenance May 23 \r\n2013: drift of sensor 41 from 20 June; sensor 41 faulty November\r\n2014: sensors replaced April 9; routine maintenance November 18\r\n2017: routine maintenance December\r\n2019: sensors replaced October 23\r\n2021: routine maintenance November\r\n\r\n======================================================================\r\n\r\nREFERENCE BENCH MARKS\t\t\r\n----------------------\t\t  \r\n\r\nResults of 2011 calibration:\r\n\r\n  EBRK - 5.606\r\n       | \r\n       |\r\n       |\r\n  EBRL - 3.645\r\n       | \r\n       |\r\n       |\r\n  EBRM - 3.446\r\n       |\r\n       |      \r\n       | \r\n       |\r\n    CD - 2.016 (LAT analysis)\r\n       | \r\n       |\r\n       |\r\n   TG0 - 0.000\t  \r\n\r\n======================================================================\r\n\r\nANNUAL FILE DETAILS\r\n--------------------\r\n\r\n*** DATA HAS NOT BEEN QUALITY CONTROLLED ***\r\n\r\nThe annual sea level data .zip file is named using the format\r\nGGGG_ss_yyyy.zip (e.g. CHIT_40_2019.zip), where:\r\n\r\nGGGG is the code for the monitoring site (eg CHIT, for Owenga)\r\nss is sensor code (either 40 or 41)\r\nyyyy is the year (eg 2019).\r\n\r\nThe .zip file contains a single file of sea level data for the year, \r\nnamed in the same format but using a .csv file extension.\r\n\r\nThe format of the sea level data in the annual .csv file is:\r\n1st field: site code (eg CHIT)\r\n2nd field: date (yyyymmdd) UTC\r\n3rd field: time (hh:mm:ss) UTC, 24 hour\r\n4th field: sea level height (metres)\r\n\r\ne.g.:\r\nCHIT,20190101,00:00:00,02.764\r\nCHIT,20190101,00:01:00,02.753\r\nCHIT,20190101,00:02:00,02.755\r\n\r\n======================================================================\r\n\r\nDAILY FILE DETAILS\r\n-------------------\r\n\r\n*** DATA HAS NOT BEEN QUALITY CONTROLLED ***\r\n\r\nThe daily sea level data .zip files are named using the format\r\nGGGG_ss_yyyyddd.zip (e.g. CHIT_40_2019110.zip), where:\r\n\r\nGGGG is the code for the monitoring site (eg CHIT, for Owenga)\r\nss is sensor code (either 40 or 41)\r\nyyyy is the year (eg 2019)\r\nddd is the day of the year (eg 110, for 20 April).\r\n\r\nThe .zip file contains a single file of sea level data for the day,\r\nnamed in the same format but using a .csv file extension.\r\n\r\nThe format of the sea level data in the daily .csv file is:\r\n1st field: site code (eg CHIT)\r\n2nd field: date and time (yyyy-mm-dd hh:mm) UTC, 24 hour\r\n3rd field: sea level height (metres)\r\n\r\ne.g.:\r\nCHIT,2019-04-20 00:00,5.251\r\nCHIT,2019-04-20 00:01,5.257\r\nCHIT,2019-04-20 00:02,5.263\r\n\r\n======================================================================\r\n\t\t\t\t  \r\n\t\t\t\t  ",
+ "datasets": [
+  {
+   "year": "2007",
+   "sensor": "40",
+   "datasetid": "CHIT/2007/40"
+  },
+  {
+   "year": "2007",
+   "sensor": "41",
+   "datasetid": "CHIT/2007/41"
+  },
+  {
+   "year": "2008",
+   "sensor": "40",
+   "datasetid": "CHIT/2008/40"
+  },
+  {
+   "year": "2008",
+   "sensor": "41",
+   "datasetid": "CHIT/2008/41"
+  },
+  {
+   "year": "2009",
+   "sensor": "40",
+   "datasetid": "CHIT/2009/40"
+  },
+  {
+   "year": "2009",
+   "sensor": "41",
+   "datasetid": "CHIT/2009/41"
+  },
+  {
+   "year": "2010",
+   "sensor": "40",
+   "datasetid": "CHIT/2010/40"
+  },
+  {
+   "year": "2010",
+   "sensor": "41",
+   "datasetid": "CHIT/2010/41"
+  },
+  {
+   "year": "2011",
+   "sensor": "40",
+   "datasetid": "CHIT/2011/40"
+  },
+  {
+   "year": "2011",
+   "sensor": "41",
+   "datasetid": "CHIT/2011/41"
+  },
+  {
+   "year": "2012",
+   "sensor": "40",
+   "datasetid": "CHIT/2012/40"
+  },
+  {
+   "year": "2012",
+   "sensor": "41",
+   "datasetid": "CHIT/2012/41"
+  },
+  {
+   "year": "2013",
+   "sensor": "40",
+   "datasetid": "CHIT/2013/40"
+  },
+  {
+   "year": "2013",
+   "sensor": "41",
+   "datasetid": "CHIT/2013/41"
+  },
+  {
+   "year": "2014",
+   "sensor": "40",
+   "datasetid": "CHIT/2014/40"
+  },
+  {
+   "year": "2014",
+   "sensor": "41",
+   "datasetid": "CHIT/2014/41"
+  },
+  {
+   "year": "2015",
+   "sensor": "40",
+   "datasetid": "CHIT/2015/40"
+  },
+  {
+   "year": "2015",
+   "sensor": "41",
+   "datasetid": "CHIT/2015/41"
+  },
+  {
+   "year": "2016",
+   "sensor": "40",
+   "datasetid": "CHIT/2016/40"
+  },
+  {
+   "year": "2016",
+   "sensor": "41",
+   "datasetid": "CHIT/2016/41"
+  },
+  {
+   "year": "2017",
+   "sensor": "40",
+   "datasetid": "CHIT/2017/40"
+  },
+  {
+   "year": "2017",
+   "sensor": "41",
+   "datasetid": "CHIT/2017/41"
+  },
+  {
+   "year": "2018",
+   "sensor": "40",
+   "datasetid": "CHIT/2018/40"
+  },
+  {
+   "year": "2018",
+   "sensor": "41",
+   "datasetid": "CHIT/2018/41"
+  },
+  {
+   "year": "2019",
+   "sensor": "40",
+   "datasetid": "CHIT/2019/40"
+  },
+  {
+   "year": "2019",
+   "sensor": "41",
+   "datasetid": "CHIT/2019/41"
+  },
+  {
+   "year": "2020",
+   "sensor": "40",
+   "datasetid": "CHIT/2020/40"
+  },
+  {
+   "year": "2020",
+   "sensor": "41",
+   "datasetid": "CHIT/2020/41"
+  },
+  {
+   "year": "2021",
+   "sensor": "40",
+   "datasetid": "CHIT/2021/40"
+  },
+  {
+   "year": "2021",
+   "sensor": "41",
+   "datasetid": "CHIT/2021/41"
+  },
+  {
+   "year": "2022",
+   "sensor": "40",
+   "datasetid": "CHIT/2022/40"
+  },
+  {
+   "year": "2022",
+   "sensor": "41",
+   "datasetid": "CHIT/2022/41"
+  },
+  {
+   "year": "2023",
+   "sensor": "40",
+   "datasetid": "CHIT/2023/40"
+  },
+  {
+   "year": "2023",
+   "sensor": "41",
+   "datasetid": "CHIT/2023/41"
+  },
+  {
+   "year": "2024",
+   "sensor": "40",
+   "datasetid": "CHIT/2024/40"
+  },
+  {
+   "year": "2024",
+   "sensor": "41",
+   "datasetid": "CHIT/2024/41"
+  },
+  {
+   "year": "2025",
+   "sensor": "40",
+   "datasetid": "CHIT/2025/40"
+  },
+  {
+   "year": "2025",
+   "sensor": "41",
+   "datasetid": "CHIT/2025/41"
+  },
+  {
+   "year": "2026",
+   "sensor": "40",
+   "datasetid": "CHIT/2026/40"
+  },
+  {
+   "year": "2026",
+   "sensor": "41",
+   "datasetid": "CHIT/2026/41"
+  }
+ ]
+}

@@ -40,8 +40,11 @@ import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/store/analysis
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
+import { deletesFiles, isDropped, KEEP_FILES } from "../src/sources/gesla/dropped.ts";
+import { readYears, writeYears } from "../src/store/years.ts";
 import {
   awsRemoveArgs,
+  dropFiles,
   removePrefixes,
   seriesPrefixes,
   tooManyWithheld,
@@ -509,6 +512,72 @@ describe("withhold", () => {
     for (const dir of ["obs/test/k/2000.parquet", "obs/test/kx1/2000.parquet"])
       assert.equal(existsSync(join(store, dir)), true, dir);
     assert.deepEqual([...(await readStationBounds(boundsPath(store, "test"))).keys()], ["test/k"]);
+  });
+
+  it("drops the files of the stations a rule names, and only lists them on a dry run", async () => {
+    const all = ["d1", "d2", "keep", "k"].map((c) => listed("test", c));
+    await refreshSource(store, sourceOf(all), { now: NOW });
+    await file("d1", "levels", 2000);
+    await file("d1", "levels", 2001, 2);
+    await file("keep", "levels", 2000);
+    await file("k", "levels", 2000);
+    // d2 has no files, so there's nothing to delete for it.
+    const drop = (code: string) => code.startsWith("d");
+    await writeYears(store, "test", [
+      { id: "test/d1", epoch: 1, year: 2000 },
+      { id: "test/k", epoch: 1, year: 2000 },
+    ]);
+    const verdict = (id: string) => ({
+      id,
+      analyzed: NOW,
+      rules: RULES,
+      judge: JUDGE,
+      tidal: true,
+      tide_m: 0.5,
+      days: 366,
+      drains: 0,
+      step_s: 600,
+      requalified: null,
+    });
+    await writeAnalysis(store, "test", [verdict("test/d1"), verdict("test/k")]);
+    const removed: string[][] = [];
+    const remove = async (root: string, prefixes: string[]) => {
+      removed.push(prefixes);
+      await removePrefixes(root, prefixes);
+    };
+    const dry = await dropFiles(store, "test", drop, { remove, dryRun: true });
+    assert.deepEqual(dry.ids, ["test/d1"]);
+    assert.equal(removed.length, 0);
+    assert.equal(existsSync(join(store, "obs/test/d1/2000.parquet")), true);
+    const done = await dropFiles(store, "test", drop, { remove });
+    assert.deepEqual(done.prefixes, dry.prefixes);
+    assert.deepEqual(
+      removed[0],
+      ["obs", "extremes", "predictions", "predicted-extremes"].map((d) => `${store}/${d}/test/d1/`),
+    );
+    assert.equal(existsSync(join(store, "obs/test/d1")), false);
+    assert.deepEqual(
+      [...(await readYears(store, "test"))!.keys()].map((k) => k.split(" ")[0]),
+      ["test/k"],
+    );
+    assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k"]);
+    for (const dir of ["obs/test/keep/2000.parquet", "obs/test/k/2000.parquet"])
+      assert.equal(existsSync(join(store, dir)), true, dir);
+    // Nothing is left to delete the second time.
+    assert.deepEqual((await dropFiles(store, "test", drop, { remove })).ids, []);
+    await assert.rejects(
+      dropFiles("https://stillwell.openwaters.io", "test", drop),
+      /Can't delete files from https:/,
+    );
+  });
+
+  it("deletes the files of GESLA's dropped CRMS records, but not the ten unidentified ones", () => {
+    assert.equal(deletesFiles("crms0153-crms0153-usa-crms"), true);
+    assert.equal(deletesFiles("uddevalla-2541-swe-smhi"), true);
+    assert.equal(deletesFiles("crms3800-crms3800-usa-crms"), false);
+    assert.equal(deletesFiles("crms0002-crms0002-usa-crms"), false);
+    for (const file of KEEP_FILES) assert.equal(isDropped(file), true, file);
+    assert.equal(KEEP_FILES.size, 10);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {

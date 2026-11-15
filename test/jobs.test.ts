@@ -30,6 +30,7 @@ describe("sourcesFor", () => {
     ]);
     assert.deepEqual(sourcesFor("compact"), [
       "bodc",
+      "bom",
       "cdec",
       "cmems",
       "coops",
@@ -42,6 +43,7 @@ describe("sourcesFor", () => {
       "jma",
       "jodc",
       "kartverket",
+      "linz",
       "marine-institute",
       "pegelonline",
       "refmar",
@@ -56,6 +58,7 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
+      "bom",
       "cmems",
       "coops",
       "crms",
@@ -63,6 +66,7 @@ describe("sourcesFor", () => {
       "ign",
       "jma",
       "kartverket",
+      "linz",
       "marine-institute",
       "refmar",
       "rws",

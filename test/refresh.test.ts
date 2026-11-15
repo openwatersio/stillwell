@@ -28,7 +28,7 @@ import {
 import type { Erratum } from "../src/errata.ts";
 import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
-import { LINKS, UNLINKS } from "../src/same-as.ts";
+import { LINKS, PREFER, UNLINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/store/years.ts";
 import { JUDGE, RULES, writeAnalysis } from "../src/store/analysis.ts";
 import { ERRATA_SCHEMA, FILES, dataPackage } from "../src/store/files.ts";
@@ -104,13 +104,16 @@ const sourceOf = (stations: ListedStation[], overrides?: Overrides): Source => (
 // The real link decisions name stations these lists don't have, which would report them as dropped.
 const DECISIONS = [...LINKS];
 const APART = [...UNLINKS];
+const PREFERRED = { ...PREFER };
 before(() => {
   LINKS.splice(0);
   UNLINKS.splice(0);
+  for (const id of Object.keys(PREFER)) delete PREFER[id];
 });
 after(() => {
   LINKS.push(...DECISIONS);
   UNLINKS.push(...APART);
+  Object.assign(PREFER, PREFERRED);
 });
 
 const NOW = "2026-11-05T00:00:00Z";
@@ -547,7 +550,14 @@ describe("publishStations", () => {
     ]);
     assert.deepEqual(await publishStations(store, [sourceOf([])], ["test"], []), {
       count: 2,
-      links: { pairs: { "test~test": { id: 1 } }, dropped: [], skipped: [], wide: [] },
+      links: {
+        pairs: { "test~test": { id: 1 } },
+        dropped: [],
+        skipped: [],
+        wide: [],
+        disagree: [],
+        shifted: [],
+      },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });
@@ -696,7 +706,7 @@ describe("publishStations", () => {
     // A new source with no list yet doesn't hold up the others.
     assert.deepEqual(await publishStations(store, [sourceOf([]), other], ["test"], []), {
       count: 0,
-      links: { pairs: {}, dropped: [], skipped: [], wide: [] },
+      links: { pairs: {}, dropped: [], skipped: [], wide: [], disagree: [], shifted: [] },
       datums: { joined: 0, fromTide: 0, computed: 0, far: [], disagree: [] },
       unknownErrata: [],
     });

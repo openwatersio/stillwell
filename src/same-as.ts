@@ -1,6 +1,6 @@
-import { urlSafe } from "./store/paths.ts";
+import { differsByData, MATCH_KM, sameByData, shiftedByData, type DataMatch } from "./matches.ts";
 import type { Station } from "./schema.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -25,10 +25,15 @@ import { km, nameScore } from "./ticon.ts";
  *   of the same kind (where both say) that shares the most words with it, the
  *   nearest among equals, unless an equally named one more than 100 m away,
  *   which its source doesn't link to the first, leaves it in doubt.
- * - **`LINKS`**, an explicit decision.
+ * - **levels**: two stations within `MATCH_KM` whose hourly levels agree within
+ *   `SAME_GAUGE` over `MIN_MONTHS` months, whatever their names
+ *   (`stations/matches.parquet`, from `src/matches.ts`). Never across a
+ *   `SEPARATE` pair, and within one source only for an `ASSEMBLED` one.
+ * - **`LINKS`**, an explicit decision, for pairs whose records never overlap
+ *   or that the rules above miss.
  *
  * Linked stations form a group, and each lists every other in `same_as`. A
- * link by nearness or copy that would put two stations of one source in a
+ * link by levels, nearness or copy that would put two stations of one source in a
  * group is skipped, since one of them is likelier another gauge nearby
  * (except for an `ASSEMBLED` source), and
  * no link may join two stations listed in `UNLINKS`. Both are reported.
@@ -60,56 +65,6 @@ export const LINKS: Decision[] = [
     note: "IGN gauge identified in openwatersio/stillwell#181; GESLA's CMEMS position matches IGN's station sheet (checked against the store's station list on 15 November 2026). Explicit IDs keep neighboring gauges, particularly Alicante's two, distinct.",
   })),
   {
-    a: "gesla/uddevalla-udd-swe-cmems",
-    b: "smhi/2541",
-    note: "CMEMS's copy of SMHI's Uddevalla gauge: 98% of 128,161 shared hours agree within 0.5 mm. GESLA calls it a river gauge and SMHI a coastal one, so the copy rule skips it.",
-  },
-  {
-    a: "bodc/dev",
-    b: "ea/E72139",
-    note: "One National Tide Gauge Network gauge, 3 m apart, which BODC names Devonport and the EA Plymouth. The EA's readings less BODC's equal NTSLF's chart datum offset to the centimeter (see the BODC README). The names share no word, so nearness doesn't link them.",
-  },
-  {
-    a: "uhslc/805",
-    b: "kartverket/VAW",
-    note: "UHSLC's copy of the Norwegian Hydrographic Service's Vardø gauge, which UHSLC rounds to 70°20′N 31°06′E, 4.6 km from Kartverket's position and beyond the copy rule's 2 km.",
-  },
-  {
-    a: "uhslc/850a",
-    b: "refmar/749",
-    note: "UHSLC's copy of SHOM's Ile Royale gauge, SHOM number 540 in UHSLC's documentation file. UHSLC keeps Ile Royale Anse Legoff (545) apart as 851, as REFMAR keeps 127 apart from 749, but both REFMAR names share Ile Royale's words, so the copy rule leaves it in doubt.",
-  },
-  {
-    a: "gesla/delfzijl-delfzl-nld-rws_hist",
-    b: "gesla/delfzijl-del-nld-rws",
-    note: "GESLA's historic and current RWS records of Delfzijl, 0.2 km apart. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month, where they overlap in 2005 and 2006. One source's two records, so nearness doesn't link them.",
-  },
-  {
-    a: "gesla/delfzijltg-del-nld-cmems",
-    b: "gesla/delfzijl-del-nld-rws",
-    note: "CMEMS's copy of RWS's Delfzijl gauge, which CMEMS names as originator, 0.3 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month from 2014. One source's two records, so nearness doesn't link them.",
-  },
-  {
-    a: "gesla/eemshaventg-eem-nld-cmems",
-    b: "gesla/eemshaven_haven-eem-nld-rws",
-    note: "CMEMS's copy of RWS's Eemshaven haven gauge, 1.8 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them 0.4 cm RMS apart in a usual month. One source's two records, so nearness doesn't link them.",
-  },
-  {
-    a: "gesla/eemsmeetpaaltg-eem-nld-cmems",
-    b: "gesla/eemshaven_waddenzee-eem-nld-rws",
-    note: "CMEMS's Eems Meetpaal is RWS's Eemshaven Waddenzee gauge, 0.1 km from GESLA's RWS record. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. One source's two records, so nearness doesn't link them.",
-  },
-  {
-    a: "gesla/hoekvanhollandtg-hoe-nld-cmems",
-    b: "rws/hoekvanholland",
-    note: "CMEMS's copy of RWS's Hoek van Holland gauge, 0.35 km away: in the store in November 2026, the 520,978 values both hold from 2014 to 2025 agree to 0.0 cm RMS in the median month, and 99.99% within 5 mm. RWS's Hoek van Holland splitsingsdam, Maeslantkering and Noorderdam gauges share its name's words, so the copy rule leaves it in doubt.",
-  },
-  {
-    a: "gesla/eidersptg-eid-deu-cmems",
-    b: "pegelonline/9530010",
-    note: "CMEMS's copy of WSA Tönning's Eider barrier gauge, at PEGELONLINE's position for Eider-Sperrwerk AP. The cross-station checks (scripts/cross-check.ts, November 2026) find them identical, 0.0 cm RMS a month. GESLA's CMEMS name says no side of the barrier, where PEGELONLINE's says the outer one (AP), so nearness doesn't link them.",
-  },
-  {
     a: "gesla/degerby-deg-fin-cmems",
     b: "gesla/foglo_degerby-134252-fin-fmi",
     note: "CMEMS's copy of FMI's Föglö Degerby gauge, which CMEMS names as originator, 0.3 km apart. The cross-station checks (scripts/cross-check.ts, November 2026) find them 0.9 cm RMS apart in a usual month; on the hour, 48% of 29,924 shared hours agree within 5 mm once their 11 cm datum difference is removed, so the two are processed differently, though FMI runs no other gauge there. One source's two records, so nearness doesn't link them.",
@@ -139,6 +94,46 @@ export const LINKS: Decision[] = [
     b: "pegelonline/9620090",
     note: "CMEMS's copy of WSV's Lübeck-Bauhof gauge: 307 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.021 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 4.8 km away, beyond the copy rule's 2 km.",
   },
+  {
+    a: "gesla/auckland-auct-nzl-ttw",
+    b: "linz/AUCT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, AUCT. LINZ calls the gauge Devonport Naval Base, so the rules above miss it.",
+  },
+  {
+    a: "gesla/owenga-chit-nzl-ttw",
+    b: "linz/CHIT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CHIT. GESLA gives Owenga's longitude as 176.37°E, but the Chatham Islands are west of the antimeridian, about 580 km from LINZ's 176.37°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
+  {
+    a: "gesla/castlepoint-cpit-nzl-ttw",
+    b: "linz/CPIT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CPIT. GESLA places it 2.3 km from LINZ's position, beyond the copy rule's 2 km, so the rules above miss it.",
+  },
+  {
+    a: "gesla/manukau-mnkt-nzl-ttw",
+    b: "linz/MNKT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, MNKT. LINZ calls the gauge Paratutae and GESLA Manukau, so the rules above miss it.",
+  },
+  {
+    a: "gesla/puysegur_point-puyt-nzl-ttw",
+    b: "linz/PUYT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, PUYT. LINZ calls the gauge Welcombe Bay and GESLA Puysegur Point, so the rules above miss it.",
+  },
+  {
+    a: "gesla/boat_cove-rbct-nzl-ttw",
+    b: "linz/RBCT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RBCT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.89°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
+  {
+    a: "gesla/fishing_rock-rfrt-nzl-ttw",
+    b: "linz/RFRT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
+  {
+    a: "usace/MVK.Tendal",
+    b: "usgs/07369500",
+    note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",
+  },
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
@@ -151,7 +146,10 @@ export const UNLINKS: Decision[] = [
 ];
 
 /** Stations chosen as their group's preferred series, with why. */
-export const PREFER: Record<string, string> = {};
+export const PREFER: Record<string, string> = {
+  "uhslc/071":
+    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Sensor 40 at the tsunami gauge (linz/WLGT) drifts against it by 1.88 m in 2019 to 1.21 m in 2025 (erratum `linz-wellington-drift`).",
+};
 
 /**
  * Whether a station's series is a copy of another agency's gauge, by source,
@@ -205,6 +203,11 @@ function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));
 }
 
+/** Whether two stations' levels may link them: not `separate`, but for two of an `ASSEMBLED` source. */
+export function comparable(a: Station, b: Station): boolean {
+  return !separate(a, b) || (a.source === b.source && ASSEMBLED.has(a.source));
+}
+
 /** Farthest apart two stations matched by nearness and name can be. */
 export const NEAR_KM = 0.1;
 
@@ -217,7 +220,7 @@ export const ID_KM = 10;
 /** A series still reporting has a value within this long. */
 const REPORTING_MS = 366 * 86_400_000;
 
-export type How = "id" | "near" | "copy" | "manual";
+export type How = "id" | "data" | "near" | "copy" | "manual";
 
 export interface LinkReport {
   /** Links made, by `<source>~<source>` (sorted) and how. */
@@ -232,10 +235,14 @@ export interface LinkReport {
    * source's own link and a `LINKS` decision have no distance limit, so one alone can do it.
    */
   wide: string[][];
+  /** Pairs in one group whose levels say two gauges (`differsByData`), with how they're linked: directly, or through the group. */
+  disagree: (DataMatch & { how: How | "group" })[];
+  /** Pairs whose levels agree only with one clock moved by whole hours (`shiftedByData`): a likely erratum. */
+  shifted: DataMatch[];
 }
 
 /** The order links join groups in: `LINKS` first, inferred ones last. */
-const ORDER: How[] = ["manual", "id", "near", "copy"];
+const ORDER: How[] = ["manual", "id", "data", "near", "copy"];
 
 /**
  * Link every station to the others sharing its gauge, and name each group's
@@ -245,11 +252,12 @@ export function linkGauges<T extends Station>(
   stations: T[],
   now = new Date(),
   usable: Map<string, number> = new Map(),
+  matches: DataMatch[] = [],
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
   // GESLA's records whose values are another gauge's join no group.
   const alone = new Set(
-    [...DROPPED].map((file) => `gesla/${urlSafe(file)}`).filter((id) => byId.has(id)),
+    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
   );
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
@@ -262,7 +270,7 @@ export function linkGauges<T extends Station>(
 
   for (const { a, b } of LINKS)
     if (alone.has(a) || alone.has(b))
-      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record that isDropped finds" });
     else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
@@ -277,7 +285,7 @@ export function linkGauges<T extends Station>(
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
       else if (alone.has(other))
-        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record that isDropped finds" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });
@@ -294,6 +302,28 @@ export function linkGauges<T extends Station>(
     if (!(km(s, target) <= ID_KM))
       dropped.push({ from: s.id, to: target.id, reason: `${Math.round(km(s, target))} km apart` });
     else add(s.id, target.id, "id");
+  /** Both of a match's stations are listed and may join a group. */
+  const listed = (m: DataMatch) =>
+    byId.has(m.a) && byId.has(m.b) && !alone.has(m.a) && !alone.has(m.b);
+  /** By pair, the RMS of a link by levels, which orders them: the best agreement joins first. */
+  const agreement = new Map<string, number>();
+  for (const m of matches) {
+    const [a, b] = [byId.get(m.a), byId.get(m.b)];
+    // Within MATCH_KM now, as when compared: a station that moved away isn't linked by its old levels.
+    // On water that measures non-tidal, a pool or a lake, two gauges can agree within 1 cm.
+    if (
+      sameByData(m) &&
+      listed(m) &&
+      comparable(a!, b!) &&
+      km(a!, b!) <= MATCH_KM &&
+      a!.tidal !== false &&
+      b!.tidal !== false
+    ) {
+      add(m.a, m.b, "data");
+      // Only for a link by levels: an ID or a decision for the pair keeps its own order.
+      if (edges.get(pairKey(m.a, m.b)) === "data") agreement.set(pairKey(m.a, m.b), m.rms_m);
+    }
+  }
   for (const [a, b] of nearPairs(linkable)) add(a.id, b.id, "near");
   // A copy whose adapter named its original, by a link that held, needs no
   // guess. Only the station that named it: one another source's copy names,
@@ -318,12 +348,14 @@ export function linkGauges<T extends Station>(
   const ordered = [...edges]
     .map(([key, how]) => {
       const [a, b] = key.split("\n").map((id) => byId.get(id)!) as [T, T];
-      return { a, b, how, d: km(a, b) };
+      return { a, b, how, d: km(a, b), rms: agreement.get(key) ?? 0 };
     })
-    // Nearest first within each kind, then by ID, so which of two rival links wins doesn't depend on list order.
+    // Best agreement first among links by levels, nearest first within each kind, then by ID,
+    // so which of two rival links wins doesn't depend on list order.
     .sort(
       (x, y) =>
         ORDER.indexOf(x.how) - ORDER.indexOf(y.how) ||
+        x.rms - y.rms ||
         x.d - y.d ||
         pairKey(x.a.id, x.b.id).localeCompare(pairKey(y.a.id, y.b.id)),
     );
@@ -348,7 +380,7 @@ export function linkGauges<T extends Station>(
       continue;
     }
     // Checked across the whole of both groups, so a third station can't bridge them.
-    if (how === "near" || how === "copy") {
+    if (how === "data" || how === "near" || how === "copy") {
       const clash = ga.flatMap((x) =>
         gb.filter((y) => separate(x, y) && !ASSEMBLED.has(x.source)).map((y) => [x, y]),
       )[0];
@@ -392,7 +424,16 @@ export function linkGauges<T extends Station>(
         .sort(),
       preferred: preferredOf.get(root(s.id))!,
     })),
-    report: { pairs, dropped, skipped, wide },
+    report: {
+      pairs,
+      dropped,
+      skipped,
+      wide,
+      disagree: matches
+        .filter((m) => differsByData(m) && listed(m) && root(m.a) === root(m.b))
+        .map((m) => ({ ...m, how: edges.get(pairKey(m.a, m.b)) ?? "group" })),
+      shifted: matches.filter((m) => shiftedByData(m) && listed(m)),
+    },
   };
 }
 
