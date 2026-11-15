@@ -34,7 +34,8 @@ export interface EpochChange {
  * had, and a new station without a datum isn't listed until the source names
  * it. A source that sends no offsets at all keeps the old ones while the datum
  * stays the same, so a refresh that loses them doesn't erase them; one that
- * sends some replaces them all.
+ * sends some replaces them all. One that marks a station `no_datums` clears
+ * them, since the source says the ones it gave were wrong.
  *
  * `seriesChanged` lets a source say a station kept its datum's name but not
  * the series or zero it measures from, such as a USGS gage whose datum moved.

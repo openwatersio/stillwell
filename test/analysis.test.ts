@@ -100,6 +100,13 @@ describe("judge", () => {
     const verdict = judge(high, series(90, tide(TIDE_M * 2)));
     assert.equal(verdict.tidal, false);
     assert.ok(verdict.tide_m! >= TIDE_M);
+    // With no offset, ground well above the sea keeps it out too, and ground near it doesn't.
+    const gage = { datum: "GAGE", datums: {} };
+    assert.equal(
+      judge({ ...river("14", gage), ground_m: 248 }, series(90, tide(0.5))).tidal,
+      false,
+    );
+    assert.equal(judge({ ...river("15", gage), ground_m: 8 }, series(90, tide(0.5))).tidal, true);
   });
 
   it("leaves water that drains between tides still", () => {

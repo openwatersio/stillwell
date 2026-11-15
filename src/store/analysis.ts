@@ -107,7 +107,7 @@ export function reaches(since: string, options: QcOptions, history = RULES_HISTO
  * verdict depends on, so `analyze` judges every station again and requalifies
  * only those whose QC changes with their verdict.
  */
-export const JUDGE = "step-1";
+export const JUDGE = "ground-1";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;
@@ -119,6 +119,16 @@ export const COVERED_DAYS = 30;
  * Colorado at Lees Ferry), and the tidal streams measured sit within 10 m.
  */
 export const ABOVE_SEA_M = 10;
+
+/**
+ * How far a site's ground (`ground_m`, the altitude a source such as USGS gives
+ * where it gives no offset for the gauge's zero) may sit above its water, in meters, so
+ * a site whose ground is more than `ABOVE_SEA_M` plus this above the sea is
+ * above it, whatever its gauge reads. An estimated ground is a few meters out
+ * and a bank stands above the water; Middle Haddam on the tidal Connecticut
+ * sits on ground 8 m up.
+ */
+const GROUND_MARGIN_M = 10;
 
 /** Stations `analyze` judges between writes. */
 const BATCH = 500;
@@ -134,8 +144,9 @@ type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "requalifi
  * Whether a station's levels carry a tide, from its last year: the lunar
  * tide (`tideOf`) is `TIDE_M` or more, on `COVERED_DAYS` days or more,
  * its water sits within `ABOVE_SEA_M` of sea level where its datums can say
- * (`toSeaLevel`), and, away from the coast, no more than `DRAINS_RUNS` runs
- * of a still level are ones a tide gauge's flatline rules flag and still
+ * (`toSeaLevel`), or its ground (`ground_m`) within that and
+ * `GROUND_MARGIN_M` where they can't, and, away from the coast, no more
+ * than `DRAINS_RUNS` runs of a still level are ones a tide gauge's flatline rules flag and still
  * water's don't, as at a creek that drains to a sill at low water: the rules
  * QC gives a tidal river or lake of its tide, and six hours elsewhere. On the coast such runs are a
  * stuck gauge or one left dry, which QC should flag: Coruña, with a 1.25 m
@@ -146,7 +157,8 @@ type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "requalifi
  * and adapter spans, are flagged as `requalify` flags them.
  */
 export function judge(
-  station: Station,
+  // `ground_m` is a source's own list field, such as USGS's, kept in the list's `extra`.
+  station: Station & { ground_m?: number | null },
   rows: Observation[],
   suspect: [number, number][] = [],
 ): Verdict {
@@ -193,7 +205,10 @@ export function judge(
     return { tidal: null, tide_m, days, drains: runs, step_s };
   const middle = usable.map((r) => r.level).sort((a, b) => a - b)[usable.length >> 1] ?? 0;
   const offset = toSeaLevel(station);
-  const aboveSea = offset !== null && offset + middle > ABOVE_SEA_M;
+  const aboveSea =
+    offset !== null
+      ? offset + middle > ABOVE_SEA_M
+      : (station.ground_m ?? -Infinity) > ABOVE_SEA_M + GROUND_MARGIN_M;
   return {
     tidal: tide_m >= TIDE_M && !aboveSea && (station.kind === "coastal" || runs <= DRAINS_RUNS),
     tide_m,

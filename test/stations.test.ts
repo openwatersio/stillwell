@@ -350,6 +350,26 @@ describe("mergeStationList", () => {
     assert.equal("no_datums" in stations[0]!, false);
   });
 
+  it("leaves a held epoch's offsets for its decision to settle", () => {
+    const stored = held("a", { datums: { MLLW: -2.4 } });
+    // A change held for a decision: the open epoch carries on beside it.
+    stored.epochs.push({
+      ...stored.epochs[0]!,
+      id: 2,
+      since: "2026-11-01T00:00:00Z",
+      state: "held",
+    });
+    const { stations } = mergeStationList(
+      [stored],
+      [{ ...station("a", { datums: {} }), no_datums: true }],
+      options,
+    );
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => e.datums),
+      [{ MLLW: -2.4 }, { MLLW: -2.4 }],
+    );
+  });
+
   it("refuses an ID that isn't <source>/<source_id>", () => {
     assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })], options), /rws:a/);
   });

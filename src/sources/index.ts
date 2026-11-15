@@ -45,6 +45,7 @@ import sfwmdErrata from "./sfwmd/errata.json" with { type: "json" };
 import smhiErrata from "./smhi/errata.json" with { type: "json" };
 import uhslcErrata from "./uhslc/errata.json" with { type: "json" };
 import usaceErrata from "./usace/errata.json" with { type: "json" };
+import usgsErrata from "./usgs/errata.json" with { type: "json" };
 
 const adapters: Record<string, Source> = {
   bodc,
@@ -100,6 +101,7 @@ export const errataFiles: Record<string, unknown> = {
   smhi: smhiErrata,
   uhslc: uhslcErrata,
   usace: usaceErrata,
+  usgs: usgsErrata,
 };
 
 /** Every source's errata, and what's wrong with any, which `publish` and the tests fail on. */
