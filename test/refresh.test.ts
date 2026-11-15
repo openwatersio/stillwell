@@ -28,7 +28,7 @@ import {
 import type { Erratum } from "../src/errata.ts";
 import { KINDS } from "../src/kinds.ts";
 import { POSITIONS } from "../src/positions.ts";
-import { LINKS, UNLINKS } from "../src/same-as.ts";
+import { LINKS, PREFER, UNLINKS } from "../src/same-as.ts";
 import { writeYears } from "../src/store/years.ts";
 import { JUDGE, RULES, writeAnalysis } from "../src/store/analysis.ts";
 import { ERRATA_SCHEMA, FILES, dataPackage } from "../src/store/files.ts";
@@ -104,13 +104,16 @@ const sourceOf = (stations: ListedStation[], overrides?: Overrides): Source => (
 // The real link decisions name stations these lists don't have, which would report them as dropped.
 const DECISIONS = [...LINKS];
 const APART = [...UNLINKS];
+const PREFERRED = { ...PREFER };
 before(() => {
   LINKS.splice(0);
   UNLINKS.splice(0);
+  for (const id of Object.keys(PREFER)) delete PREFER[id];
 });
 after(() => {
   LINKS.push(...DECISIONS);
   UNLINKS.push(...APART);
+  Object.assign(PREFER, PREFERRED);
 });
 
 const NOW = "2026-11-05T00:00:00Z";
