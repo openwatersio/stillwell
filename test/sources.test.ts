@@ -3392,14 +3392,16 @@ describe("uhslc", () => {
   });
 
   it("moves the early Spanish versions an hour later and Progreso's A 6 hours earlier, and leaves Las Palmas's FD series alone", async () => {
-    setTransport(async () =>
-      JSON.stringify({
+    const urls: string[] = [];
+    setTransport(async (url) => {
+      urls.push(decodeURIComponent(url));
+      return JSON.stringify({
         table: {
           columnNames: ["time", "sea_level", "quality", "reference_datum"],
           rows: [["1980-06-01T00:00:00Z", 1080, 1, "station zero"]],
         },
-      }),
-    );
+      });
+    });
     const at = async (id: string) =>
       new Date(
         (
@@ -3411,6 +3413,9 @@ describe("uhslc", () => {
     assert.equal(await at("217"), "1980-06-01T00:00:00.000Z");
     assert.equal(await at("206b"), "1980-06-01T00:00:00.000Z");
     assert.equal(await at("721a"), "1980-05-31T18:00:00.000Z");
+    // Each asks for the labeled times that land in the range once moved.
+    assert.match(urls[0]!, /time>=1980-05-31T23:00:00.000Z&time<1980-06-01T23:00/);
+    assert.match(urls.at(-1)!, /time>=1980-06-01T06:00:00.000Z&time<1980-06-02T06:00/);
   });
 
   it("asks only for the years a version has, and reads ERDDAP's 404 as no values", async () => {
@@ -3958,7 +3963,7 @@ describe("refmar", () => {
     assert.equal(values.length, 1);
   });
 
-  it("moves Kerguelen's raw values from before 2014 an hour earlier, asking an hour past the month", async () => {
+  it("moves Kerguelen's raw values from before June 2013 an hour earlier, asking an hour past the month", async () => {
     const asked: string[] = [];
     setTransport(async (url) => {
       const params = new URL(url).searchParams;

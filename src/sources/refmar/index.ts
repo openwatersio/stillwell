@@ -50,7 +50,7 @@ const HOURLY = 4;
  * to June 2013, is its 1-minute series (1) labeled an hour later (erratum
  * `refmar-kerguelen-raw-hour-late`).
  */
-const RAW_LATE: Record<string, number> = { "23": Date.UTC(2014, 0, 1) };
+const RAW_LATE: Record<string, number> = { "23": Date.UTC(2013, 5, 4) };
 const HOUR_MS = 3_600_000;
 
 /**
