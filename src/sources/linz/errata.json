@@ -1,0 +1,15 @@
+{
+  "errata": [
+    {
+      "id": "linz-kaikoura-uplift",
+      "stations": ["linz/KAIT"],
+      "since": "2016-11-13",
+      "until": "2016-11-14",
+      "handling": "flagged",
+      "error": "The Kaikoura earthquake of 14 November 2016 NZDT (13 November, 11:02 UTC) lifted the gauge and its benchmark 0.88 m, as the README says, and LINZ's levels carry on from the same zero without a note. Daily means fall from about 3.4 m on 12 November to 2.4 m on 14 November, and the minimum on 13 November is 0.38 m against 1.5 m on 14 November.",
+      "response": "13 November 2016 is flagged `suspect`, keeping the source's own flag as `source_flag`. A datum epoch starts on 14 November, so the levels before it, on the old zero, stay out of the series in the current epoch. Its chart datum offset is the README's 2017 calibration, which is after the lift.",
+      "evidence": "Daily means and minimums of the 2016 sensor 40 file, November 2016; the README's note that the station was uplifted 0.88 m."
+    }
+  ],
+  "retired": []
+}

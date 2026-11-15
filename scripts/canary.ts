@@ -29,6 +29,7 @@ import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
 import * as jodc from "../src/sources/jodc/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
+import * as linz from "../src/sources/linz/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
@@ -119,6 +120,24 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   },
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
+  // Wellington, since 2007: three days of daily files from about two weeks back, since
+  // they appear 6 to 12 days late, and three days of the year's file from the year
+  // before last. Its paths name the
+  // year and the day, so it's in UNRECORDED and only has to return values.
+  linz: async () => {
+    const latest = await linz.levels(
+      "WLGT",
+      new Date(start.getTime() - 14 * DAY_MS),
+      new Date(end.getTime() - 14 * DAY_MS),
+    );
+    const final = await linz.levels(
+      "WLGT",
+      new Date(start.getTime() - 730 * DAY_MS),
+      new Date(end.getTime() - 730 * DAY_MS),
+    );
+    // Either alone would pass a listing that lost its daily or its yearly files.
+    return latest.length && final.length ? [...latest, ...final] : [];
+  },
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
   // Hamburg Port Authority's files on kuestendaten.de, which a backfill reads
@@ -192,12 +211,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 };
 
 /**
- * Sources never recorded. JMA's and GESLA's request paths change, so a
- * recording would fail the next one: JMA's name the month, and GESLA's iCloud
- * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
+ * Sources never recorded. JMA's, LINZ's and GESLA's request paths change, so a
+ * recording would fail the next one: JMA's name the month, LINZ's the year and
+ * day, and GESLA's iCloud links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten"]);
+const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten", "linz"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
