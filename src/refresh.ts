@@ -38,6 +38,7 @@ import type { StoredStation, ListedStation, Source, SourceMetadata, Station } fr
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
+import { readMatches } from "./matches.ts";
 import { JSON_FILES, dataPackage } from "./store/files.ts";
 import {
   offsetRows,
@@ -371,7 +372,12 @@ async function linkedStations(
     for (const [id, share] of shares) usable.set(id, share);
   }
   if (missing.length || !listed.length) return { missing };
-  const { stations: gauges, report } = linkGauges(stations, new Date(), usable);
+  const { stations: gauges, report } = linkGauges(
+    stations,
+    new Date(),
+    usable,
+    await readMatches(store),
+  );
   return { gauges, listed, report, steps };
 }
 
