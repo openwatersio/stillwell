@@ -50,15 +50,15 @@ WHERE flag <= 2
 ORDER BY time LIMIT 5;
 ```
 
-The [data guide](docs/data.md) has the file layout, every column, and more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
+The [docs site](https://openwatersio.github.io/stillwell/docs/) has the file layout, every column, and more example queries: finding stations by name or by distance from a point, converting between datums, comparing observed levels with the prediction, reading many files at once, and reading from Python.
 
 [An API is planned](docs/plans/api.md).
 
 ## Docs
 
-- [Using the data](docs/data.md): the store's files, columns and example queries.
-- [Stations](docs/stations.md): station lists, datum epochs, analysis and links between sources.
-- [Quality control](docs/qc/README.md): how levels are flagged, compared with published practice.
+- [Using the data](https://openwatersio.github.io/stillwell/docs/): the store's files, columns and example queries.
+- [Station lists](docs/stations.md), for contributors: how the store keeps and refreshes each source's stations, opens datum epochs and links stations across sources. The [Stations](https://openwatersio.github.io/stillwell/docs/guides/stations/) and [Datums](https://openwatersio.github.io/stillwell/docs/guides/datums/) guides cover the same for readers.
+- [Quality control notes](docs/qc/README.md): an evaluation of the checks against published practice. The [Quality control](https://openwatersio.github.io/stillwell/docs/guides/quality-control/) guide describes the checks for readers.
 - [TICON inventory](docs/ticon-inventory.md): the store series for each TICON record's originator, where there is one.
 - [Plans](docs/plans/plan.md): the roadmap and the API design.
 

@@ -8,7 +8,7 @@ It also becomes slackwater-database's source of observations, from each originat
 
 - Adapters for the 19 sources the [README](../../README.md#sources) lists, writing to the store on R2, with each source's station list, datum epochs and links between sources in the store ([stations.md](../stations.md)).
 - Scheduled jobs in GitHub Actions: hourly ingest into `recent/`, a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [CONTRIBUTING.md](../../CONTRIBUTING.md) covers them.
-- Offsets to MSL, LAT and chart datum from slackwater-database or a linked series of the gauge ([data.md](../data.md#stations)).
+- Offsets to MSL, LAT and chart datum from slackwater-database or a linked series of the gauge ([where offsets come from](https://openwatersio.github.io/stillwell/docs/guides/datums/#where-offsets-come-from)).
 - QC with per-station tidal analysis and errata per source ([qc/](../qc/README.md)).
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](../hroi-evaluation.md)).
 - No API yet.
@@ -70,7 +70,7 @@ Adapters run in Node, in Actions and on the Stillwell server. Adapter code uses 
 
 ## Data layout
 
-[data.md](../data.md#layout) has the store's layout and columns. The plan adds:
+[Files reference](https://openwatersio.github.io/stillwell/docs/reference/files/) has the store's layout and columns. The plan adds:
 
 ```
 models/stofs2d/<cycle>.parquet                   station-point nowcast and forecast (phase 11)

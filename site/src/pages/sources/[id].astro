@@ -4,6 +4,7 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import Erratum from "../../components/Erratum.astro";
 import { stations, years, json } from "../../lib/store";
 import { flagChart, markdown } from "../../lib/render";
+import { readme } from "../../lib/readme";
 import { sitePath } from "../../lib/paths";
 
 export async function getStaticPaths() {
@@ -25,6 +26,16 @@ for (const rows of (await years(s.id)).values())
       y[flag] = (y[flag] ?? 0) + Number(r[flag] ?? 0);
     byYear.set(r.year, y);
   }
+const about = readme(s.id);
+const headings = [
+  { depth: 2, slug: "terms", text: "Terms" },
+  ...(about
+    ? [{ depth: 2, slug: "about", text: "How Stillwell reads it" }, ...about.headings]
+    : []),
+  { depth: 2, slug: "values", text: "Values by year" },
+  { depth: 2, slug: "stations", text: "Stations" },
+  { depth: 2, slug: "errata", text: "Errata" },
+];
 const errata = (await json("errata.json")).filter((e) => e.source === s.id);
 const year = (d?: Date) => d?.getUTCFullYear() ?? "–";
 const first = list.reduce<Date | undefined>(
@@ -35,12 +46,10 @@ const first = list.reduce<Date | undefined>(
 
 <StarlightPage
   frontmatter={{ title: s.name, description: `Water levels from ${s.name} in Stillwell` }}
+  headings={headings}
 >
   <p>
-    <code>{s.id}</code> · <a href={s.url}>{new URL(s.url).host}</a> ·
-    <a href={`https://github.com/openwatersio/stillwell/blob/main/src/sources/${s.id}/README.md`}>
-      how Stillwell reads it
-    </a>
+    <code>{s.id}</code> · <a href={s.url}>{new URL(s.url).host}</a>
   </p>
   <p>
     {list.length.toLocaleString("en-US")} stations,{" "}
@@ -82,6 +91,13 @@ const first = list.reduce<Date | undefined>(
     </tr>
   </table>
   <Fragment set:html={markdown(s.terms)} />
+
+  {about && (
+    <>
+      <h2 id="about">How Stillwell reads it</h2>
+      <Fragment set:html={about.html} />
+    </>
+  )}
 
   <h2 id="values">Values by year</h2>
   <Fragment set:html={flagChart([...byYear.values()].sort((a, b) => a.year - b.year))} />
