@@ -16,7 +16,9 @@ Sea level at tide gauges that Copernicus Marine's In Situ Thematic Assembly Cent
 - **Withdrawn values:** a value the latest window had and the history copy later drops (QC 9, or no value) stays in the store as the latest window gave it, `preliminary`, since the source keeps stored levels.
 - **Linking:** CMEMS is a relay, so `src/same-as.ts` marks it redistributed: where it shares a gauge with the originator's series, the originator's is preferred while it reports. GESLA's CMEMS records are linked to it by ID, since GESLA names each record's file for the platform code (`geslaCmems`), as long as the two positions are within 10 km; on 14 November 2026 that linked 700 of GESLA's 717 CMEMS records, and the rest are gauges CMEMS no longer serves or two whose positions differ by 11 and 14 km (Kihnu, Gomera). The copy rule links it to the originator's series (the best-named station of each other source within 2 km), which on 14 November 2026 found one for 480 of the 787 gauges. Its series is preferred over GESLA's, whose CMEMS records aren't tagged for commercial use. Unlike GESLA, it isn't an assembled source: it relays each gauge once, so two CMEMS stations are two gauges and never join one group.
 
-## Backfill
+## Running ingest
+
+### Backfill
 
 The Monthly workflow refreshes the list on the 2nd. A full backfill goes through the Ingest workflow, inactive gauges included:
 
