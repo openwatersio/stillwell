@@ -11,7 +11,7 @@ src/hroi/              the harmonic representation of inequalities (HRoI), BSH's
 src/realtime/          the realtime poller's ClickHouse store, poll and schedule (docs/plans/realtime.md)
 src/api/               the levels API's parameters, datum conversion and responses
 server/                stillwell-ingest, the service that runs the poller, and stillwell-api, which serves levels
-src/                   shared pieces: HTTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
+src/                   shared pieces: HTTP, anonymous FTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
 workers/cron/          the Cloudflare Worker that starts the scheduled workflows
