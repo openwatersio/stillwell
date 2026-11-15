@@ -1,0 +1,82 @@
+{
+  "errata": [
+    {
+      "id": "linz-kaikoura-uplift",
+      "stations": ["linz/KAIT"],
+      "since": "2016-11-13",
+      "until": "2016-11-14",
+      "handling": "flagged",
+      "error": "The Kaikoura earthquake of 14 November 2016 NZDT (13 November, 11:02 UTC) lifted the gauge and its benchmark 0.88 m, as the README says, and LINZ's levels carry on from the same zero without a note. Daily means fall from about 3.4 m on 12 November to 2.4 m on 14 November, and the minimum on 13 November is 0.38 m against 1.5 m on 14 November.",
+      "response": "13 November 2016 is flagged `suspect`, keeping the source's own flag as `source_flag`: from 11:02 UTC its values are on the new zero but stored in the earlier epoch. A datum epoch starts on 14 November, and the levels before it convert to it by the README's 0.88 m, so the series carries on across the lift. The README's chart datum offset is from 2017 and is dropped, since sensors were replaced in 2018.",
+      "evidence": "Daily means and minimums of the 2016 sensor 40 file, November 2016; the README's note that the station was uplifted 0.88 m."
+    },
+    {
+      "id": "linz-sensor-off-values",
+      "stations": "every station",
+      "handling": "dropped",
+      "error": "LINZ's daily files write 0.001 m where a sensor was off, and 0.000 m appears in the year's files too, among rows marked missing. Wellington's file for 10 April 2025 reads 0.001 at 02:26 to 02:28 and 22:48 to 22:50, and the year's file for 2025 has the missing mark `//.///` for the same minutes.",
+      "response": "A 0.001 in a day's file and a 0.000 in any file are left out. A level of exactly zero is lost at a gauge whose tide crosses its zero, such as Sumner's, at most a minute a crossing.",
+      "evidence": "Wellington's daily and year's files for 10 April 2025, November 2026; 15 rows of 0.000 beside marked values at Fishing Rock and one at Wellington in 2025."
+    },
+    {
+      "id": "linz-wellington-drift",
+      "stations": ["linz/WLGT"],
+      "since": "2019-01-01",
+      "handling": "kept",
+      "error": "Sensor 40's levels at Wellington drift against UHSLC's hourly Wellington: the mean difference is 1.88 m in 2019, 1.44 m in 2023 and 1.21 m in 2025, and the correlation falls from 0.9991 to 0.9826 to 0.80. The README lists sensor replacements in 2012 and 2018 and none since.",
+      "response": "Kept as LINZ serves it. The store can't tell LINZ's sensor from UHSLC's copy, so nothing is flagged.",
+      "evidence": "Hourly values at the same instants for 2019, 2023 and 2025, compared with `uhslc/071`, November 2026."
+    },
+    {
+      "id": "linz-new-brighton-pier-high-values",
+      "stations": ["linz/NBRT"],
+      "since": "2025-02-08",
+      "until": "2025-12-07",
+      "handling": "kept",
+      "error": "5,760 minutes of New Brighton Pier's 2025 file read 13.4 to 13.9 m, against a median of 4.17 m, between 8 February and 6 December.",
+      "response": "Kept as LINZ serves it, for QC's rules to judge.",
+      "evidence": "The 2025 sensor 40 file, November 2026."
+    },
+    {
+      "id": "linz-owenga-sensor-fault",
+      "stations": ["linz/CHIT"],
+      "since": "2008-11-26",
+      "until": "2010-02-18",
+      "handling": "flagged",
+      "error": "Sensor 40 at Owenga reads a constant -4.85 m from 26 November 2008 until its replacement on 17 or 18 February 2010 (daily files for 26 November 2008 to 9 February 2010; 17 February 2010 has 41 rows). The README says \"sensor 40 malfunctioning from November 26\" and the sensors were replaced on 18 February 2010.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
+      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-castlepoint-sensor-fault",
+      "stations": ["linz/CPIT"],
+      "since": "2012-01-29",
+      "until": "2012-03-27",
+      "handling": "flagged",
+      "error": "Sensor 40 at Castlepoint failed on 29 January 2012 and was replaced on 26 March, as the README says. Between them its daily means sit near 1.9 m and its daily ranges are 0.02 to 0.3 m on most days, against a tide of about 1.5 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
+      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-north-cape-sensor-fault",
+      "stations": ["linz/NCPT"],
+      "since": "2011-07-10",
+      "until": "2011-10-07",
+      "handling": "flagged",
+      "error": "Sensor 40 at North Cape malfunctioned from 10 July 2011 and was replaced on 6 October, as the README says. Its daily means swing from -1.7 to 4.8 m in that time, and from 23 September it holds near 4.84 m with a daily range of 0.0 to 0.02 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
+      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-sumner-sensor-fault",
+      "stations": ["linz/SUMT"],
+      "since": "2016-06-28",
+      "until": "2022-04-02",
+      "handling": "flagged",
+      "error": "Sensor 40 at Sumner was damaged on 28 or 29 June 2016, as the README says (\"sensor 40 damaged from June 29\"), and was never replaced before the site closed on 1 April 2022. Its daily ranges reach 10.9 m on 29 June 2016, and from 11 July 2016 it reads a constant near -4.79 m: a year of 2018 holds 520,343 minutes with a median of -4.795 m, while sensor 41 reads a tide there with a median of 1.96 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
+      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+    }
+  ],
+  "retired": []
+}

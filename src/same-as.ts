@@ -124,6 +124,41 @@ export const LINKS: Decision[] = [
     b: "pegelonline/9620090",
     note: "CMEMS's copy of WSV's Lübeck-Bauhof gauge: 307 of the 318 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.021 m below PEGELONLINE's gauge zero, its NHN offset. CMEMS places it 4.8 km away, beyond the copy rule's 2 km.",
   },
+  {
+    a: "gesla/auckland-auct-nzl-ttw",
+    b: "linz/AUCT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, AUCT. LINZ calls the gauge Devonport Naval Base, so the rules above miss it.",
+  },
+  {
+    a: "gesla/owenga-chit-nzl-ttw",
+    b: "linz/CHIT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CHIT. GESLA gives Owenga's longitude as 176.37°E, but the Chatham Islands are west of the antimeridian, about 580 km from LINZ's 176.37°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
+  {
+    a: "gesla/castlepoint-cpit-nzl-ttw",
+    b: "linz/CPIT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, CPIT. GESLA places it 2.3 km from LINZ's position, beyond the copy rule's 2 km, so the rules above miss it.",
+  },
+  {
+    a: "gesla/manukau-mnkt-nzl-ttw",
+    b: "linz/MNKT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, MNKT. LINZ calls the gauge Paratutae and GESLA Manukau, so the rules above miss it.",
+  },
+  {
+    a: "gesla/puysegur_point-puyt-nzl-ttw",
+    b: "linz/PUYT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, PUYT. LINZ calls the gauge Welcombe Bay and GESLA Puysegur Point, so the rules above miss it.",
+  },
+  {
+    a: "gesla/boat_cove-rbct-nzl-ttw",
+    b: "linz/RBCT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RBCT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.89°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
+  {
+    a: "gesla/fishing_rock-rfrt-nzl-ttw",
+    b: "linz/RFRT",
+    note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
+  },
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
@@ -136,7 +171,10 @@ export const UNLINKS: Decision[] = [
 ];
 
 /** Stations chosen as their group's preferred series, with why. */
-export const PREFER: Record<string, string> = {};
+export const PREFER: Record<string, string> = {
+  "uhslc/071":
+    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Sensor 40 at the tsunami gauge (linz/WLGT) drifts against it by 1.88 m in 2019 to 1.21 m in 2025 (erratum `linz-wellington-drift`).",
+};
 
 /**
  * Whether a station's series is a copy of another agency's gauge, by source,
