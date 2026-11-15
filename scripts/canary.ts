@@ -14,8 +14,10 @@
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
+import { Flag } from "../src/schema.ts";
 import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bodc from "../src/sources/bodc/index.ts";
+import * as bom from "../src/sources/bom/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
 import * as cmems from "../src/sources/cmems/index.ts";
@@ -29,6 +31,7 @@ import * as dmi from "../src/sources/dmi/index.ts";
 import * as jma from "../src/sources/jma/index.ts";
 import * as jodc from "../src/sources/jodc/index.ts";
 import * as kartverket from "../src/sources/kartverket/index.ts";
+import * as linz from "../src/sources/linz/index.ts";
 import * as marineInstitute from "../src/sources/marine-institute/index.ts";
 import * as pegelonline from "../src/sources/pegelonline/index.ts";
 import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
@@ -50,6 +53,15 @@ const start = new Date(end.getTime() - 3 * DAY_MS);
 const probes: Record<string, () => Promise<unknown[]>> = {
   // Aberdeen, from a month BODC has processed: its values arrive months late.
   bodc: () => bodc.levels("abe", new Date("2025-12-01T00:00Z"), new Date("2025-12-04T00:00Z")),
+  // Cape Ferguson's June of last year, from last year's archive, which is whole
+  // all year; the current year's runs weeks behind. The FTP's files are text, so
+  // it's in UNRECORDED and only has to return values.
+  bom: () =>
+    bom.levels(
+      "995",
+      new Date(Date.UTC(end.getUTCFullYear() - 1, 5, 1)),
+      new Date(Date.UTC(end.getUTCFullYear() - 1, 5, 4)),
+    ),
   // Cuxhaven's predicted highs and lows: the year's smaller file.
   bsh: () => bsh.extremes("506P", end.getUTCFullYear()),
   // The CSV's header, from the export's directory and first 64 KB, checked by
@@ -119,6 +131,25 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   },
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
+  // Wellington, since 2007: three days of daily files from about two weeks back, since
+  // they appear 6 to 12 days late, and three days of a year's file from four years back. Its paths name the
+  // year and the day, so it's in UNRECORDED and only has to return values.
+  linz: async () => {
+    const latest = await linz.levels(
+      "WLGT",
+      new Date(start.getTime() - 14 * DAY_MS),
+      new Date(end.getTime() - 14 * DAY_MS),
+    );
+    const final = await linz.levels(
+      "WLGT",
+      new Date(start.getTime() - 1500 * DAY_MS),
+      new Date(end.getTime() - 1500 * DAY_MS),
+    );
+    // A listing that lost its yearly zip falls back to the day files, which are preliminary. In early
+    // January the latest days can come from last year's zip, so only the old year is held to its flag.
+    const read = final.every((o) => o.flag === Flag.good);
+    return latest.length && final.length && read ? [...latest, ...final] : [];
+  },
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
   // Hamburg Port Authority's files on kuestendaten.de, which a backfill reads
@@ -192,12 +223,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 };
 
 /**
- * Sources never recorded. JMA's and GESLA's request paths change, so a
- * recording would fail the next one: JMA's name the month, and GESLA's iCloud
- * links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
+ * Sources never recorded. JMA's, LINZ's and GESLA's request paths change, so a
+ * recording would fail the next one: JMA's name the month, LINZ's the year and
+ * day, and GESLA's iCloud links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["cmems", "gesla", "jma", "kuestendaten"]);
+const UNRECORDED = new Set(["bom", "cmems", "gesla", "jma", "kuestendaten", "linz"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
