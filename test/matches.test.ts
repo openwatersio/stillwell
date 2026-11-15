@@ -1,13 +1,19 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { compare, compareStations, pairsToCompare, type DataMatch } from "../src/matches.ts";
+import {
+  compare,
+  compareStations,
+  pairsToCompare,
+  tooManyStopped,
+  type DataMatch,
+} from "../src/matches.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Epoch, type Observation, type StoredStation } from "../src/schema.ts";
 import { writeObservations } from "../src/store/parquet.ts";
-import { seriesPath } from "../src/store/paths.ts";
+import { seriesPath, yearsPath } from "../src/store/paths.ts";
 import { writeYears } from "../src/store/years.ts";
 
 const HOUR_MS = 3_600_000;
@@ -305,6 +311,24 @@ describe("compareStations", () => {
     }
   });
 
+  it("keeps last month's row, as a failed read, when a years file can't be read", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "matches-"));
+    try {
+      const [a, b] = pair();
+      await store(dir, [
+        [a, 0],
+        [b, 0],
+      ]);
+      await writeFile(yearsPath(dir, "b"), "not parquet");
+      const previous = [match("a/1", "b/1")];
+      const { rows, failed } = await compareStations(dir, [a, b], 2, previous);
+      assert.deepEqual(rows, previous);
+      assert.equal(failed, 1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("keeps last month's row when the years file shares no year with the record", async () => {
     const dir = await mkdtemp(join(tmpdir(), "matches-"));
     try {
@@ -379,5 +403,14 @@ describe("compareStations", () => {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("tooManyStopped", () => {
+  it("stops a run where at least 20, and more than 5%, stop agreeing", () => {
+    assert.equal(tooManyStopped(20, 100), true);
+    assert.equal(tooManyStopped(21, 410), true);
+    assert.equal(tooManyStopped(19, 100), false);
+    assert.equal(tooManyStopped(20, 400), false);
   });
 });

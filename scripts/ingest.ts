@@ -166,6 +166,7 @@ import {
   readMatches,
   sameByData,
   shiftedByData,
+  tooManyStopped,
   writeMatches,
   type DataMatch,
 } from "../src/matches.ts";
@@ -249,11 +250,10 @@ switch (command) {
       // A link by levels lasts while they agree; these won't be linked by them at the next publish.
       const agreeing = new Set(rows.filter(sameByData).map((m) => `${m.a} ${m.b}`));
       const stopped = previous.filter((m) => sameByData(m) && !agreeing.has(`${m.a} ${m.b}`));
-      // Many at once is likelier a source's change, values flagged or stamped off the hour, than many gauges.
-      const limit = Math.max(20, Math.round(previous.filter(sameByData).length * 0.05));
-      if (stopped.length > limit && !values["accept-matches"]) {
+      const agreed = previous.filter(sameByData).length;
+      if (tooManyStopped(stopped.length, agreed) && !values["accept-matches"]) {
         console.error(
-          `${store}: ${stopped.length} pairs stopped agreeing at once (limit ${limit}); matches unchanged. Check them and rerun with --accept-matches:`,
+          `${store}: ${stopped.length} of ${agreed} pairs stopped agreeing at once; matches unchanged. Check them and rerun with --accept-matches:`,
         );
         for (const m of stopped) console.error(`  ${m.a} ${m.b}`);
         process.exitCode = 1;

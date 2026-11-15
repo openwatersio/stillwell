@@ -157,6 +157,15 @@ export function yearsToCompare(
 }
 
 /**
+ * Whether too many pairs stopped agreeing in one run to be gauges: at least 20,
+ * and more than 5% of those that agreed. Many at once is likelier a source's
+ * change, such as values flagged or stamped off the hour.
+ */
+export function tooManyStopped(stopped: number, agreed: number): boolean {
+  return stopped >= 20 && stopped > agreed * 0.05;
+}
+
+/**
  * Compares every pair `pairsToCompare` finds, `concurrency` at a time, over
  * the years `yearsToCompare` gives. A `previous` row the run doesn't replace
  * is kept unless its pair's levels were read and no longer compare (under
@@ -178,8 +187,17 @@ export async function compareStations(
   const epochsOf = new Map(stations.map((s) => [s.id, s.epochs]));
   /** Sources with a years file. */
   const listed = new Set<string>();
+  /** Sources whose years file couldn't be read: their pairs keep last month's rows, as failed reads. */
+  const unread = new Set<string>();
   for (const source of new Set(pairs.flatMap(([a, b]) => [a.source, b.source]))) {
-    const rows = await readYears(store, source);
+    let rows: Awaited<ReturnType<typeof readYears>>;
+    try {
+      rows = await readYears(store, source);
+    } catch (e) {
+      console.error(`${store}: ${source}'s years file: ${(e as Error).message}`);
+      unread.add(source);
+      continue;
+    }
     if (rows) listed.add(source);
     for (const r of rows?.values() ?? [])
       if (r.year === null) marked.add(r.id);
@@ -258,6 +276,11 @@ export async function compareStations(
       const [a, b] = pairs[next++]!;
       const key = `${a.id} ${b.id}`;
       if (++done % 1000 === 0) console.error(`compared ${done} of ${pairs.length} pairs`);
+      if (unread.has(a.source) || unread.has(b.source)) {
+        keep.add(key);
+        failed++;
+        continue;
+      }
       if (marked.has(a.id) || marked.has(b.id)) {
         keep.add(key);
         continue;
