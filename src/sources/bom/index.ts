@@ -48,7 +48,7 @@ export const metadata: SourceMetadata = {
   terms: `${NOTICES.bom!.terms} "${DISCLAIMER}" Where a product modifies the data: "${MODIFIED_DISCLAIMER}" Changes in the store: levels from millimeters to meters, the tide gauge zero named ${DATUM}, and quality flags added.`,
   // The files are rebuilt about monthly, and weeks behind.
   hourly: false,
-  // The current year's values are preliminary until BOM's yearly archive replaces them.
+  // The last years' values are preliminary until BOM has rebuilt their archives.
   finalizes: true,
   empty_means_none: true,
 };
@@ -451,7 +451,7 @@ export async function stations(): Promise<ListedStation[]> {
 
 /** BOM keeps archives for 1996 and for 2005 on, and none for the years between or one the year under way hasn't made yet. */
 const noArchive = (year: number) =>
-  (year > 1996 && year < 2005) || year >= new Date().getUTCFullYear();
+  year < 1996 || (year > 1996 && year < 2005) || year >= new Date().getUTCFullYear();
 
 /** The archives fetched this run, by year, as each station's compressed file; null where BOM has none. */
 export const archives = new Map<number, Promise<Map<string, Buffer> | null>>();
@@ -496,13 +496,15 @@ export async function levels(
   ) {
     const member = (await archiveOf(year))?.get(number);
     if (!member) continue;
-    // BOM rebuilds a finished year's archive in the new year's first weeks (`2024.ar` on 30 January, `2025.ar` on 16 February), so until April the last year is preliminary too.
-    const now = new Date();
+    // BOM rebuilds a year's archive in the first weeks of the next year and
+    // again in the one after (`2025.ar` on 16 February 2026, `2024.ar` on 30
+    // January 2026), so until April the last two years are preliminary too.
     const flag =
-      year >= thisYear || (year === thisYear - 1 && now.getUTCMonth() < 3)
+      year >= thisYear || (year >= thisYear - 2 && new Date().getUTCMonth() < 3)
         ? Flag.preliminary
         : Flag.good;
-    for (const o of parse(latin1(uncompress(member)), number, year))
+    // A year two or more back is whole in every file BOM has written, so a short one is cut off.
+    for (const o of parse(latin1(uncompress(member)), number, year, year <= thisYear - 2))
       if (o.time >= start.getTime() && o.time < end.getTime())
         out.push({ ...o, flag, source_flag: flag });
   }
@@ -519,7 +521,13 @@ const LINE = /^(\d{3}).{8}(\d{4})([ \d]\d)([ \d]\d)([12])((?:[ \d-]{5}){12})$/;
  * (2 each), the half, `1` for hours 0 to 11 and `2` for 12 to 23, then 12
  * levels in millimeters, 5 characters each, `9999` where missing.
  */
-export function parse(text: string, number: string, year: number): Observation[] {
+export function parse(
+  text: string,
+  number: string,
+  year: number,
+  /** Whether the file is a finished year's, which has to run to the year's last half-day. */
+  whole = false,
+): Observation[] {
   const out: Observation[] = [];
   const lines = text.split(/\r?\n/).filter((l) => l.trim());
   // A file starts with the station's position, which holds no value; one that's
@@ -533,8 +541,9 @@ export function parse(text: string, number: string, year: number): Observation[]
     if (!m || m[1] !== number || Number(m[2]) !== year)
       throw new Error(`BOM ${number}'s file for ${year} has a line ${line.slice(0, 40)}`);
     const [month, day] = [Number(m[3]), Number(m[4])];
-    // Date.UTC rolls 31 June over to 1 July.
-    if (Date.UTC(year, month - 1, day) !== midnight || Number(m[5]) !== half)
+    // Date.UTC rolls 31 June over to 1 July, and day 0 or month 13 into the neighboring one.
+    const dated = new Date(midnight);
+    if (month !== dated.getUTCMonth() + 1 || day !== dated.getUTCDate() || Number(m[5]) !== half)
       throw new Error(
         `BOM ${number}'s file for ${year} has ${line.slice(11, 21).trim()} where ${new Date(midnight).toISOString().slice(0, 10)} half ${half} belongs`,
       );
@@ -553,6 +562,10 @@ export function parse(text: string, number: string, year: number): Observation[]
     if (half === 2) midnight += 24 * HOUR_MS;
     half = half === 1 ? 2 : 1;
   }
+  if (whole && (midnight !== Date.UTC(year + 1, 0, 1) || half !== 1))
+    throw new Error(
+      `BOM ${number}'s file for ${year} ends before ${new Date(midnight).toISOString().slice(0, 10)} half ${half}`,
+    );
   return out;
 }
 

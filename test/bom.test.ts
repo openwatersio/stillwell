@@ -256,7 +256,18 @@ describe("bom", () => {
     );
     // A 550 for a year BOM should have is an error, not no values; a year with none is.
     // A failed archive is kept for the run, so each gauge doesn't ask a stalled server again.
-    assert.equal(requests.filter((u) => u.endsWith("/2024.ar")).length, 0);
+    let asked = 0;
+    setTransport(async () => {
+      asked++;
+      throw new FtpError("FTP replied 421 Service not available", 421);
+    });
+    bom.archives.clear();
+    for (let i = 0; i < 3; i++)
+      await assert.rejects(
+        bom.levels("995", new Date("2024-01-01Z"), new Date("2024-01-02Z")),
+        /421/,
+      );
+    assert.equal(asked, 1);
     bom.archives.clear();
     setTransport(async () => {
       throw new FtpError("FTP replied 550 Failed to open file.", 550);
@@ -298,6 +309,11 @@ describe("bom", () => {
       ],
     );
     assert.equal(first.length, 11);
+    // A finished year has to run to its last half-day.
+    assert.throws(
+      () => bom.parse(file(line("995", " 1 1", 1, full)), "995", 2026, true),
+      /ends before/,
+    );
     // The half-day lines run on from January 1: the second half, the next day.
     const two = bom.parse(
       file(
@@ -321,6 +337,9 @@ describe("bom", () => {
     bad(file(line("995", " 1 1", 1, full), line("995", " 1 1", 1, full)), /belongs/);
     bad(file(line("995", " 1 1", 2, full)), /belongs/);
     bad(file(line("995", " 1 2", 1, full)), /belongs/);
+    // Day 0 and month 13 aren't dates a neighboring day can stand for.
+    bad(file(line("995", " 1 0", 1, full)), /belongs/);
+    bad(file(line("995", "13 1", 1, full)), /belongs/);
     // A blank or malformed cell isn't a level, whatever its place in the line.
     for (const at of [0, 5, 11]) {
       const blank = [...full];
