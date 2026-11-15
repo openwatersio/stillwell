@@ -2,6 +2,7 @@ import { readErrata, withErrata } from "../errata.ts";
 import type { Source } from "../schema.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bsh } from "./bsh/index.ts";
+import { source as cco } from "./cco/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as cmems } from "./cmems/index.ts";
 import { source as coops } from "./coops/index.ts";
@@ -45,6 +46,7 @@ import usaceErrata from "./usace/errata.json" with { type: "json" };
 const adapters: Record<string, Source> = {
   bodc,
   bsh,
+  cco,
   cdec,
   cmems,
   coops,

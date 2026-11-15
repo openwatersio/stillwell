@@ -1,0 +1,160 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "id": "tides.38",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -0.1013,
+     50.8118
+    ]
+   },
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": 38,
+    "sensor": "Brighton",
+    "institution": "Channel Coastal Observatory",
+    "date": "20261114#120000",
+    "type": "tides",
+    "value": 3.21,
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "tides.54",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     1.4092,
+     51.2238
+    ]
+   },
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": 54,
+    "sensor": "Deal Pier",
+    "institution": "Channel Coastal Observatory",
+    "date": "20261114#120000",
+    "type": "tides",
+    "value": 2.84,
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "tides.89",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -3.4625,
+     50.5806
+    ]
+   },
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": 89,
+    "sensor": "Dawlish",
+    "institution": "Channel Coastal Observatory",
+    "date": "20261114#120000",
+    "type": "tides",
+    "value": null,
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "tides.71",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -0.6146,
+     54.4886
+    ]
+   },
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": 71,
+    "sensor": "Whitby Harbour",
+    "institution": "Channel Coastal Observatory",
+    "date": "20201114#120000",
+    "type": "tides",
+    "value": 1.9,
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "tides.https://example.org/provider-gauge",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -1.0,
+     50.0
+    ]
+   },
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": "https://example.org/provider-gauge",
+    "sensor": "Provider Gauge",
+    "institution": "Another provider",
+    "date": "20261114#120000",
+    "type": "tides",
+    "value": null,
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   }
+  }
+ ]
+}
