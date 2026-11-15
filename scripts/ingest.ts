@@ -1258,10 +1258,11 @@ async function dropStations(sourceId: string): Promise<void> {
   if (!drop) throw new Error(`${sourceId} drops no records`);
   const store = storeOfSource(sourceOf(sourceId).metadata);
   const dryRun = values["dry-run"];
-  const { ids, prefixes } = await dropFiles(store, sourceId, drop, { dryRun });
+  const { ids, prefixes, cleared } = await dropFiles(store, sourceId, drop, { dryRun });
   const lines = [
     `${sourceId}: ${ids.length} dropped stations with files, ${prefixes.length} directories ${dryRun ? "to delete (dry run)" : "deleted"}`,
     ...ids.map((id) => `  ${id}`),
+    `${sourceId}: ${cleared.length} dropped stations' backfilled years ${dryRun ? "to clear (dry run)" : "cleared"}`,
   ];
   if (ids.length && !dryRun)
     lines.push(

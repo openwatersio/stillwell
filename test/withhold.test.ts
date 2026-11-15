@@ -10,6 +10,7 @@ import {
   readRecent,
   readStationBounds,
   readStationList,
+  readJsonArray,
   writeJsonArray,
   writeObservations,
   writeRecent,
@@ -552,6 +553,15 @@ describe("withhold", () => {
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/d1"), verdict("test/k")]);
+    // d2's ranges stay from a drop before it cleared them.
+    const ranges = (id: string) => ({ id, epoch: 1, years: [[1990, 2027]] });
+    await writeJsonArray(backfilledPath(store, "test"), [
+      ranges("test/d1"),
+      ranges("test/d2"),
+      ranges("test/k"),
+    ]);
+    const recorded = async () =>
+      ((await readJsonArray(backfilledPath(store, "test"))) as { id: string }[]).map((r) => r.id);
     const removed: string[][] = [];
     const remove = async (root: string, prefixes: string[]) => {
       removed.push(prefixes);
@@ -559,8 +569,10 @@ describe("withhold", () => {
     };
     const dry = await dropFiles(store, "test", drop, { remove, dryRun: true });
     assert.deepEqual(dry.ids, ["test/d1"]);
+    assert.deepEqual(dry.cleared, ["test/d1", "test/d2"]);
     assert.equal(removed.length, 0);
     assert.equal(existsSync(join(store, "obs/test/d1/2000.parquet")), true);
+    assert.deepEqual(await recorded(), ["test/d1", "test/d2", "test/k"]);
     const done = await dropFiles(store, "test", drop, { remove });
     assert.deepEqual(done.prefixes, dry.prefixes);
     assert.deepEqual(
@@ -573,10 +585,15 @@ describe("withhold", () => {
       ["test/k"],
     );
     assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k"]);
+    assert.deepEqual(await recorded(), ["test/k"]);
     for (const dir of ["obs/test/keep/2000.parquet", "obs/test/k/2000.parquet"])
       assert.equal(existsSync(join(store, dir)), true, dir);
-    // Nothing is left to delete the second time.
-    assert.deepEqual((await dropFiles(store, "test", drop, { remove })).ids, []);
+    // Nothing is left to delete the second time, but rows an earlier drop left are cleared.
+    await writeJsonArray(backfilledPath(store, "test"), [ranges("test/d1"), ranges("test/k")]);
+    const again = await dropFiles(store, "test", drop, { remove });
+    assert.deepEqual(again.ids, []);
+    assert.deepEqual(again.cleared, ["test/d1"]);
+    assert.deepEqual(await recorded(), ["test/k"]);
     await assert.rejects(
       dropFiles("https://stillwell.openwaters.io", "test", drop),
       /Can't delete files from https:/,
