@@ -39,7 +39,7 @@
       "response": "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
       "evidence": "LAT less OD Malin is constant at each gauge from 2008 until 24 March 2026, then moves by 1 to 5 cm. See [the adapter's README](https://github.com/openwatersio/stillwell/blob/main/src/sources/marine-institute/README.md).",
       "reported": "2026-11-08",
-      "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/stillwell/issues/59). On 2026-11-13 they replied that the harmonics and levels were re-evaluated and applied to the database at 11:15 UTC on 24 March 2026, and passed it to the team that does the work. They didn't say whether earlier values will be restated."
+      "report": "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/stillwell/issues/59). On 2026-11-13 they replied that the harmonics and levels were re-evaluated and applied to the database at 11:15 UTC on 24 March 2026, and passed it to the team that does the work. They didn't say whether earlier values will be restated. On 2026-11-15 we asked whether LAT before 24 March 2026 will be restated, and for a write-up of the re-evaluation ([#247](https://github.com/openwatersio/stillwell/issues/247#issuecomment-6894846291))."
     },
     {
       "id": "marine-institute-castletownbere-2026-offsets",
