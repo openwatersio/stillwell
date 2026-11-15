@@ -77,7 +77,7 @@ const NATIONAL: Record<string, { source: string; status: Status }> = {
   gbr: { source: "bodc", status: "planned" },
   fin: { source: "fmi", status: "license" },
   esp: { source: "redmar", status: "license" },
-  ita: { source: "ispra", status: "license" },
+  ita: { source: "ispra", status: "planned" },
 };
 
 /** Contributors whose records all go to one planned source. */
@@ -102,7 +102,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
     status: "license",
     note: "SMN sends its historical records only on request, asked for in #48",
   },
-  ispra: { source: "ispra", status: "license" },
+  ispra: { source: "ispra", status: "planned" },
   ieo: { source: "redmar", status: "license" },
   meds: { source: "chs", status: "restricted", note: "CHS license bars commercial derivatives" },
   bodc: { source: "bodc", status: "planned" },

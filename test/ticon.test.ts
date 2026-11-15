@@ -296,6 +296,16 @@ describe("TICON originators", () => {
     assert.equal(originatorSeries(bergen, { kartverket: [] }).status, "unmatched");
   });
 
+  it("checks ISPRA records against its list once there is one", () => {
+    const napoli = record("napoli-nap-ita-ispra", { name: "Napoli", lat: 40.84, lon: 14.27 });
+    assert.equal(originatorSeries(napoli, {}).status, "planned");
+    const listed = originatorSeries(napoli, {
+      ispra: [station("ispra/napoli", "Napoli", 40.84141, 14.26919)],
+    });
+    assert.deepEqual([listed.id, listed.status], ["ispra/napoli", "ready"]);
+    assert.equal(originatorSeries(napoli, { ispra: [] }).status, "unmatched");
+  });
+
   it("counts a retired PEGELONLINE station with levels as ready", () => {
     const gone = {
       ...station("pegelonline/5930070", "ALTENGAMME", 53.43, 10.3),

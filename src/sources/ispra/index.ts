@@ -30,7 +30,8 @@ export const metadata: SourceMetadata = {
   },
   attribution:
     "ISPRA, Istituto Superiore per la Protezione e la Ricerca Ambientale, Rete Mareografica Nazionale (doi:10.83182/ispra-rmn, doi:10.83182/ispra-ron)",
-  contact: { email: "reteondametrica@isprambiente.it", url: "https://www.mareografico.it/" },
+  // mareografico.it publishes no address for errors in the data.
+  contact: { url: "https://www.mareografico.it/" },
   terms:
     "CC BY 4.0: credit ISPRA, link to the license and say if the data was changed. ISPRA releases the values as they are, from unvalidated dynamic data, accepts no responsibility for errors or omissions, and says its own database prevails where the two differ. Changes in the store: levels converted from centimeters to meters and flagged preliminary.",
   // ISPRA's open files are monthly archives that stop in 2023, and its live view has no API.
@@ -43,8 +44,8 @@ export const metadata: SourceMetadata = {
 const DATUM = "ZERO";
 const INTERVAL_S = 600;
 
-/** Gauges in GESLA's ISPRA records that the archive doesn't list. */
-const NOT_IN_ARCHIVE = new Set(["arbatax", "cetraro", "pozzallo"]);
+/** Gauges mareografico.it shows that the archive doesn't list, so GESLA's records of them have no series here. */
+const NOT_IN_ARCHIVE = new Set(["arbatax", "cetraro", "marzamemi", "milazzo", "pozzallo"]);
 
 /**
  * The store ID of the archive's gauge that a GESLA ISPRA record's file, such
@@ -79,26 +80,29 @@ const MEDIA = new RegExp(
 );
 /** The series' English label, whose name is the gauge's own: the platform's names the municipality. */
 const LABEL = new RegExp(
-  `^${NODE}/observationseries/00105_(\\w+)_hydrometriclevel_\\d{6}> <[^>]*rdf-schema#label> "(.+) - Water Level, \\w+ \\d{4}"@en \\.$`,
+  `^${NODE}/observationseries/00105_(\\w+)_hydrometriclevel_(\\d{6})> <[^>]*rdf-schema#label> "(.+) - Water Level, \\w+ \\d{4}"@en \\.$`,
 );
 const PLATFORM = new RegExp(`^${NODE}/platform/00105_(\\w+)_09> <([^>]*)> "([^"]*)"`);
 
 /** The dump's gauges and listed months. Exported for tests. */
 export function parseDump(text: string): Listing {
-  const codes = new Map<string, string>();
-  const months = new Map<string, string[]>();
-  const names = new Map<string, string>();
+  // A gauge's code and label can change over the years; the latest month's wins, whatever the line order.
+  const codes = new Map<string, { month: string; code: string }>();
+  const months = new Map<string, Set<string>>();
+  const names = new Map<string, { month: string; name: string }>();
   const coords = new Map<string, { lat?: number; lon?: number }>();
-  for (const line of text.split("\n")) {
+  for (const line of text.split(/\r?\n/)) {
     const media = MEDIA.exec(line);
     if (media) {
-      codes.set(media[2]!, media[1]!);
-      (months.get(media[2]!) ?? months.set(media[2]!, []).get(media[2]!)!).push(media[3]!);
+      const [, code, slug, month] = media as unknown as [string, string, string, string];
+      if (month >= (codes.get(slug)?.month ?? "")) codes.set(slug, { month, code });
+      (months.get(slug) ?? months.set(slug, new Set()).get(slug)!).add(month);
       continue;
     }
     const label = LABEL.exec(line);
     if (label) {
-      names.set(label[1]!, label[2]!);
+      const [, code, month, name] = label as unknown as [string, string, string, string];
+      if (month >= (names.get(code)?.month ?? "")) names.set(code, { month, name });
       continue;
     }
     const platform = PLATFORM.exec(line);
@@ -110,15 +114,14 @@ export function parseDump(text: string): Listing {
       coords.set(code, { ...coords.get(code), lon: Number(value) });
   }
   const stations = new Map<string, Gauge>();
-  for (const [slug, code] of codes) {
+  for (const [slug, { code }] of codes) {
     const c = coords.get(code);
-    const name = names.get(code);
+    const name = names.get(code)?.name;
     if (!name || c?.lat === undefined || c.lon === undefined || !c.lat || !c.lon)
       throw new Error(`ISPRA's dump gives no name or position for ${slug} (${code})`);
     stations.set(slug, { code, name, lat: c.lat, lon: c.lon });
   }
-  for (const list of months.values()) list.sort();
-  return { stations, months };
+  return { stations, months: new Map([...months].map(([slug, set]) => [slug, [...set].sort()])) };
 }
 
 let listing: Promise<Listing> | undefined;
@@ -195,19 +198,37 @@ export async function levels(slug: string, start: Date, end: Date): Promise<Obse
   return out;
 }
 
-/** `UTC;Level` rows such as `2014-01-01 00:10:00;-25.7`, in UTC and centimeters. */
+/** `2014-01-01 00:10:00;-25.7`: UTC, then centimeters. */
+const ROW = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2});(-?\d+(?:\.\d+)?)$/;
+
+/**
+ * `UTC;Level` rows in UTC and centimeters. A row that isn't one, whose date
+ * doesn't exist (`Date.parse` rolls 31 February over to March), or that repeats
+ * a time with another level, fails the file.
+ */
 export function parse(text: string): Observation[] {
   const [header, ...rows] = text.split(/\r?\n/);
   if (header?.trim() !== "UTC;Level") throw new Error(`ISPRA's file starts "${header}"`);
+  const seen = new Map<number, number>();
   const out: Observation[] = [];
   for (const row of rows) {
     if (!row.trim()) continue;
-    const [time, level] = row.split(";") as [string, string | undefined];
-    const t = Date.parse(`${time.replace(" ", "T")}Z`);
-    const cm = level === undefined || level.trim() === "" ? NaN : Number(level);
-    if (!Number.isFinite(t) || !Number.isFinite(cm))
+    const match = ROW.exec(row);
+    const t = match ? Date.parse(`${match[1]}T${match[2]}Z`) : NaN;
+    if (
+      !match ||
+      !Number.isFinite(t) ||
+      new Date(t).toISOString().slice(0, 19) !== `${match[1]}T${match[2]}`
+    )
       throw new Error(`ISPRA's file has the row "${row}"`);
-    out.push({ time: t, level: Math.round(cm * 10) / 1000, flag: Flag.preliminary });
+    const level = Math.round(Number(match[3]) * 10) / 1000;
+    if (seen.has(t)) {
+      if (seen.get(t) !== level)
+        throw new Error(`ISPRA's file has two levels for ${row.slice(0, 19)}`);
+      continue;
+    }
+    seen.set(t, level);
+    out.push({ time: t, level, flag: Flag.preliminary });
   }
   return out;
 }

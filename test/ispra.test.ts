@@ -97,6 +97,42 @@ describe("ispra", () => {
     );
   });
 
+  it("refuses dates that don't exist, repeated times with another level, and rows of another shape", () => {
+    const one = (row: string) => ispra.parse(`UTC;Level\r\n${row}\r\n`);
+    assert.equal(one("2020-02-29 00:10:00;1.5")[0]!.level, 0.015);
+    for (const row of [
+      "2019-02-29 00:10:00;1",
+      "2014-02-31 00:10:00;1",
+      "2014-13-01 00:10:00;1",
+      "2014-01-31 24:00:00;1",
+      "2014-01-01 00:10:00;1;2",
+      "2014-01-01 00:10:00;0x1F",
+      "2014-01-01 00:10:00;",
+    ])
+      assert.throws(() => one(row), /has the row/, row);
+    assert.equal(
+      ispra.parse("UTC;Level\r\n2014-01-01 00:10:00;1\r\n2014-01-01 00:10:00;1.0\r\n").length,
+      1,
+    );
+    assert.throws(
+      () => ispra.parse("UTC;Level\r\n2014-01-01 00:10:00;1\r\n2014-01-01 00:10:00;2\r\n"),
+      /two levels/,
+    );
+  });
+
+  it("reads the dump whatever its line ends and order, naming a gauge by its latest month", () => {
+    const lines = fixture("ispra-dump.nt").trimEnd().split("\n");
+    const plain = ispra.parseDump(lines.join("\n"));
+    assert.deepEqual(ispra.parseDump(lines.join("\r\n")), plain);
+    assert.deepEqual(ispra.parseDump([...lines].reverse().join("\n")), plain);
+    const label = (month: string, name: string) =>
+      `<https://w3id.org/italia/env/ld/rmn/observationseries/00105_na23_hydrometriclevel_${month}> <http://www.w3.org/2000/01/rdf-schema#label> "${name} - Water Level, March 2014"@en .`;
+    const renamed = [...lines, label("201405", "Napoli Porto"), label("201301", "Napoli Vecchio")];
+    assert.equal(ispra.parseDump(renamed.join("\n")).stations.get("napoli")!.name, "Napoli Porto");
+    // A month the dump lists twice is asked for once.
+    assert.deepEqual(ispra.parseDump([...lines, ...lines].join("\n")).months, plain.months);
+  });
+
   it("refuses a gauge the dump doesn't list", async () => {
     serve();
     await assert.rejects(
@@ -116,7 +152,8 @@ describe("ispra", () => {
       "ispra/san-benedetto-del-tronto",
     ]);
     assert.deepEqual(ids("palinuro-pal-ita-ispra"), ["ispra/palinuro"]);
-    // The archive lists no Arbatax, Cetraro or Pozzallo.
-    assert.deepEqual(ids("arbatax-arb-ita-ispra"), []);
+    // The archive lists no Arbatax, Cetraro, Marzamemi, Milazzo or Pozzallo.
+    for (const file of ["arbatax-arb", "pozzallo-poz", "milazzo-mil"])
+      assert.deepEqual(ids(`${file}-ita-ispra`), []);
   });
 });
