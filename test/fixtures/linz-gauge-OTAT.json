@@ -1,0 +1,176 @@
+{
+ "gauge": "OTAT",
+ "description": "SITE INFORMATION\r\n-----------------\r\nNAME:\t\t\tPort Chalmers\r\nCODE:             \tOTAT\r\nWGS-84 POSITION:   \t45\u00b0 48' 52\"S\r\n                  \t170\u00b0 37' 46E\r\nNZTM COORDINATES: \t1 415 820 mE\r\n                  \t4 923 840 mN\t\r\nDATA COMMENCED:   \t1 March 2010 (UTC), Julian Day 060\r\n\r\n======================================================================\r\n\r\nPRESSURE SENSOR DETAILS\r\n------------------------\r\nRECORD INTERVAL:  1 minute\r\nTIME SYSTEM:      UTC\r\nMANUFACTURER:     Druck \r\nSENSOR MODEL:     PTX 1830\r\nRANGE:            0 - 20 metres (4-20mA output)\r\n\r\n======================================================================\r\n\r\n**********************************************************************\r\n***                             NOTE                               ***\r\n***                                                                ***\r\n***               THESE SENSORS ARE LIABLE TO DRIFT.               ***\r\n***                                                                ***\r\n***          *********   CAUTION IS ADVISED   *********            ***\r\n***                                                                ***\r\n**********************************************************************\r\n\r\n======================================================================\r\n\r\nGAUGE HISTORY\r\n----------------------\r\n2013: routine maintenance January 29\r\n2014: routine maintenance July 29\r\n2016: routine maintenance June 28\r\n2017: routine maintenance August \r\n2019: sensors replaced September 30\r\n2021: sensors replaced May 26, maintenance November\r\n\r\n======================================================================\r\n\r\nREFERENCE BENCH MARKS\t\t\r\n----------------------\t\t  \r\n\r\nREFERENCE PORT: Port Chalmers (BM DR0F). Chart Datum is 3.816m below BM DR0F.\r\nData from the above nearby reference gauge should be used for any long-term analysis.\r\n\r\n======================================================================\r\n\r\nANNUAL FILE DETAILS\r\n--------------------\r\n\r\n*** DATA HAS NOT BEEN QUALITY CONTROLLED ***\r\n\r\nThe annual sea level data .zip file is named using the format\r\nGGGG_ss_yyyy.zip (e.g. OTAT_40_2019.zip), where:\r\n\r\nGGGG is the code for the monitoring site (eg OTAT, for Port Chalmers)\r\nss is sensor code (either 40 or 41)\r\nyyyy is the year (eg 2019).\r\n\r\nThe .zip file contains a single file of sea level data for the year, \r\nnamed in the same format but using a .csv file extension.\r\n\r\nThe format of the sea level data in the annual .csv file is:\r\n1st field: site code (eg OTAT)\r\n2nd field: date (yyyymmdd) UTC\r\n3rd field: time (hh:mm:ss) UTC, 24 hour\r\n4th field: sea level height (metres)\r\n\r\ne.g.:\r\nOTAT,20190101,00:00:00,02.764\r\nOTAT,20190101,00:01:00,02.753\r\nOTAT,20190101,00:02:00,02.755\r\n\r\n======================================================================\r\n\r\nDAILY FILE DETAILS\r\n-------------------\r\n\r\n*** DATA HAS NOT BEEN QUALITY CONTROLLED ***\r\n\r\nThe daily sea level data .zip files are named using the format\r\nGGGG_ss_yyyyddd.zip (e.g. OTAT_40_2019110.zip), where:\r\n\r\nGGGG is the code for the monitoring site (eg OTAT, for Port Chalmers)\r\nss is sensor code (either 40 or 41)\r\nyyyy is the year (eg 2019)\r\nddd is the day of the year (eg 110, for 20 April).\r\n\r\nThe .zip file contains a single file of sea level data for the day,\r\nnamed in the same format but using a .csv file extension.\r\n\r\nThe format of the sea level data in the daily .csv file is:\r\n1st field: site code (eg OTAT)\r\n2nd field: date and time (yyyy-mm-dd hh:mm) UTC, 24 hour\r\n3rd field: sea level height (metres)\r\n\r\ne.g.:\r\nOTAT,2019-04-20 00:00,5.251\r\nOTAT,2019-04-20 00:01,5.257\r\nOTAT,2019-04-20 00:02,5.263\r\n\r\n======================================================================",
+ "datasets": [
+  {
+   "year": "2010",
+   "sensor": "40",
+   "datasetid": "OTAT/2010/40"
+  },
+  {
+   "year": "2010",
+   "sensor": "41",
+   "datasetid": "OTAT/2010/41"
+  },
+  {
+   "year": "2011",
+   "sensor": "40",
+   "datasetid": "OTAT/2011/40"
+  },
+  {
+   "year": "2011",
+   "sensor": "41",
+   "datasetid": "OTAT/2011/41"
+  },
+  {
+   "year": "2012",
+   "sensor": "40",
+   "datasetid": "OTAT/2012/40"
+  },
+  {
+   "year": "2012",
+   "sensor": "41",
+   "datasetid": "OTAT/2012/41"
+  },
+  {
+   "year": "2013",
+   "sensor": "40",
+   "datasetid": "OTAT/2013/40"
+  },
+  {
+   "year": "2013",
+   "sensor": "41",
+   "datasetid": "OTAT/2013/41"
+  },
+  {
+   "year": "2014",
+   "sensor": "40",
+   "datasetid": "OTAT/2014/40"
+  },
+  {
+   "year": "2014",
+   "sensor": "41",
+   "datasetid": "OTAT/2014/41"
+  },
+  {
+   "year": "2015",
+   "sensor": "40",
+   "datasetid": "OTAT/2015/40"
+  },
+  {
+   "year": "2015",
+   "sensor": "41",
+   "datasetid": "OTAT/2015/41"
+  },
+  {
+   "year": "2016",
+   "sensor": "40",
+   "datasetid": "OTAT/2016/40"
+  },
+  {
+   "year": "2016",
+   "sensor": "41",
+   "datasetid": "OTAT/2016/41"
+  },
+  {
+   "year": "2017",
+   "sensor": "40",
+   "datasetid": "OTAT/2017/40"
+  },
+  {
+   "year": "2017",
+   "sensor": "41",
+   "datasetid": "OTAT/2017/41"
+  },
+  {
+   "year": "2018",
+   "sensor": "40",
+   "datasetid": "OTAT/2018/40"
+  },
+  {
+   "year": "2018",
+   "sensor": "41",
+   "datasetid": "OTAT/2018/41"
+  },
+  {
+   "year": "2019",
+   "sensor": "40",
+   "datasetid": "OTAT/2019/40"
+  },
+  {
+   "year": "2019",
+   "sensor": "41",
+   "datasetid": "OTAT/2019/41"
+  },
+  {
+   "year": "2020",
+   "sensor": "40",
+   "datasetid": "OTAT/2020/40"
+  },
+  {
+   "year": "2020",
+   "sensor": "41",
+   "datasetid": "OTAT/2020/41"
+  },
+  {
+   "year": "2021",
+   "sensor": "40",
+   "datasetid": "OTAT/2021/40"
+  },
+  {
+   "year": "2021",
+   "sensor": "41",
+   "datasetid": "OTAT/2021/41"
+  },
+  {
+   "year": "2022",
+   "sensor": "40",
+   "datasetid": "OTAT/2022/40"
+  },
+  {
+   "year": "2022",
+   "sensor": "41",
+   "datasetid": "OTAT/2022/41"
+  },
+  {
+   "year": "2023",
+   "sensor": "40",
+   "datasetid": "OTAT/2023/40"
+  },
+  {
+   "year": "2023",
+   "sensor": "41",
+   "datasetid": "OTAT/2023/41"
+  },
+  {
+   "year": "2024",
+   "sensor": "40",
+   "datasetid": "OTAT/2024/40"
+  },
+  {
+   "year": "2024",
+   "sensor": "41",
+   "datasetid": "OTAT/2024/41"
+  },
+  {
+   "year": "2025",
+   "sensor": "40",
+   "datasetid": "OTAT/2025/40"
+  },
+  {
+   "year": "2025",
+   "sensor": "41",
+   "datasetid": "OTAT/2025/41"
+  },
+  {
+   "year": "2026",
+   "sensor": "40",
+   "datasetid": "OTAT/2026/40"
+  },
+  {
+   "year": "2026",
+   "sensor": "41",
+   "datasetid": "OTAT/2026/41"
+  }
+ ]
+}

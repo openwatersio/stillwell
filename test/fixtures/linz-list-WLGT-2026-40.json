@@ -1,0 +1,28 @@
+{
+ "files": [
+  {
+   "name": "WLGT_40_2026001.zip",
+   "uri": "/tidegauge/WLGT/2026/40/WLGT_40_2026001.zip",
+   "size": 7094,
+   "modified": "2026-01-03"
+  },
+  {
+   "name": "WLGT_40_2026002.zip",
+   "uri": "/tidegauge/WLGT/2026/40/WLGT_40_2026002.zip",
+   "size": 7157,
+   "modified": "2026-01-04"
+  },
+  {
+   "name": "WLGT_40_2026309.zip",
+   "uri": "/tidegauge/WLGT/2026/40/WLGT_40_2026309.zip",
+   "size": 7059,
+   "modified": "2026-11-14"
+  },
+  {
+   "name": "WLGT_40_2026310.zip",
+   "uri": "/tidegauge/WLGT/2026/40/WLGT_40_2026310.zip",
+   "size": 7014,
+   "modified": "2026-11-12"
+  }
+ ]
+}

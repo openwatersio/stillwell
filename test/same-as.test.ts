@@ -17,13 +17,16 @@ const NOW = new Date("2026-11-01T00:00:00Z");
 // The real decisions name stations these tests don't list, which would report them as dropped.
 const DECISIONS = [...LINKS];
 const APART = [...UNLINKS];
+const PREFERRED = { ...PREFER };
 before(() => {
   LINKS.splice(0);
   UNLINKS.splice(0);
+  for (const id of Object.keys(PREFER)) delete PREFER[id];
 });
 after(() => {
   LINKS.push(...DECISIONS);
   UNLINKS.push(...APART);
+  Object.assign(PREFER, PREFERRED);
 });
 
 /** A station at `source/id`, by default at 0,0 with levels and no record yet. */
