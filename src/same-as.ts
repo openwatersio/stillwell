@@ -1,7 +1,6 @@
 import { differsByData, MATCH_KM, sameByData, shiftedByData, type DataMatch } from "./matches.ts";
-import { urlSafe } from "./store/paths.ts";
 import type { Station } from "./schema.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
 import { km, nameScore } from "./ticon.ts";
 
 /**
@@ -165,6 +164,11 @@ export const LINKS: Decision[] = [
     b: "linz/RFRT",
     note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
+  {
+    a: "usace/MVK.Tendal",
+    b: "usgs/07369500",
+    note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",
+  },
 ];
 
 /** Pairs that don't share a gauge, though a rule links them. */
@@ -288,7 +292,7 @@ export function linkGauges<T extends Station>(
   const byId = new Map(stations.map((s) => [s.id, s]));
   // GESLA's records whose values are another gauge's join no group.
   const alone = new Set(
-    [...DROPPED].map((file) => `gesla/${urlSafe(file)}`).filter((id) => byId.has(id)),
+    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
   );
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
@@ -301,7 +305,7 @@ export function linkGauges<T extends Station>(
 
   for (const { a, b } of LINKS)
     if (alone.has(a) || alone.has(b))
-      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record that isDropped finds" });
     else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
@@ -316,7 +320,7 @@ export function linkGauges<T extends Station>(
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
       else if (alone.has(other))
-        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record that isDropped finds" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });

@@ -17,7 +17,7 @@ import { readRows, readStationList } from "../src/store/parquet.ts";
 import { LINKS } from "../src/same-as.ts";
 import { stationListPath, urlSafe } from "../src/store/paths.ts";
 import type { Station } from "../src/schema.ts";
-import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { isDropped } from "../src/sources/gesla/dropped.ts";
 import { withoutWithheld } from "../src/refresh.ts";
 import { sources } from "../src/sources/index.ts";
 import {
@@ -123,8 +123,8 @@ const rows = adoptSiblings(
 );
 // GESLA names its files as TICON names its records, so a record's GESLA 4.1
 // copy is `gesla/<id>` where 4.1 kept the name (it renamed or dropped RWS's).
-// A record in DROPPED holds another gauge's values, so it stands in for nothing.
-const gesla = new Map(lists.gesla!.filter((s) => !DROPPED.has(s.source_id)).map((s) => [s.id, s]));
+// A record that isDropped finds holds another gauge's values, so it stands in for nothing.
+const gesla = new Map(lists.gesla!.filter((s) => !isDropped(s.source_id)).map((s) => [s.id, s]));
 const geslaOf = (record: TiconRecord) => gesla.get(`gesla/${urlSafe(record.id)}`);
 await writeFile(join(ROOT, "docs/ticon-inventory.csv"), csv(rows));
 await writeFile(join(ROOT, "docs/ticon-inventory.md"), summary(rows));

@@ -13,6 +13,7 @@
  *   node scripts/ingest.ts requalify <source> <station,...|all> <start> <end> [--shard <i>/<n>]
  *       [--budget <minutes>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
+ *   node scripts/ingest.ts drop <source> [--dry-run]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
@@ -157,7 +158,8 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
-import { withhold, withheldReason } from "../src/withhold.ts";
+import { dropFiles, withhold, withheldReason } from "../src/withhold.ts";
+import { deletesFiles } from "../src/sources/gesla/dropped.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 import {
@@ -196,6 +198,7 @@ const { positionals, values } = parseArgs({
     all: { type: "boolean", default: false },
     requalify: { type: "boolean", default: false },
     budget: { type: "string" },
+    "dry-run": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -355,6 +358,12 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     await withholdStations(source);
+    break;
+  }
+  case "drop": {
+    const [source] = args;
+    if (!source) usage();
+    await dropStations(source);
     break;
   }
   case "years": {
@@ -1191,6 +1200,29 @@ async function withholdStations(sourceId: string): Promise<void> {
   if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
 }
 
+/** The records whose files `drop` deletes, by source. */
+const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
+
+/** Delete the files of a source's dropped records, or with --dry-run list them. */
+async function dropStations(sourceId: string): Promise<void> {
+  const drop = DROPS[sourceId];
+  if (!drop) throw new Error(`${sourceId} drops no records`);
+  const store = storeOfSource(sourceOf(sourceId).metadata);
+  const dryRun = values["dry-run"];
+  const { ids, prefixes } = await dropFiles(store, sourceId, drop, { dryRun });
+  const lines = [
+    `${sourceId}: ${ids.length} dropped stations with files, ${prefixes.length} directories ${dryRun ? "to delete (dry run)" : "deleted"}`,
+    ...ids.map((id) => `  ${id}`),
+  ];
+  if (ids.length && !dryRun)
+    lines.push(
+      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them.`,
+    );
+  for (const line of lines) console.log(line);
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+}
+
 function parseYear(value: string): number {
   if (!/^\d{4}$/.test(value)) throw new Error(`Not a year: ${value}`);
   return Number(value);
@@ -1204,7 +1236,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

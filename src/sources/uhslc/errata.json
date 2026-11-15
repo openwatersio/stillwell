@@ -11,6 +11,22 @@
       "report": "Sent to srdata@soest.hawaii.edu on 2026-10-24, with a follow-up on 2026-11-07. No answer yet."
     },
     {
+      "id": "uhslc-spain-hour-early",
+      "stations": ["uhslc/208a", "uhslc/217a", "uhslc/217b", "uhslc/217c"],
+      "handling": "corrected",
+      "error": "UHSLC stamps its research-quality versions of Vigo (208 version A, 1943 to 1990) and its older ones of Las Palmas (217 versions A, B and C, 1949 to 1991) an hour early: the height labeled T was measured at T + 1 h UTC. Las Palmas's FD series (217), from May 1991, is on time.",
+      "response": "The four versions' values are moved an hour later.",
+      "evidence": "November 2026. IEO's records of both gauges (GESLA's `vigo-vigo-esp-ieo` and `pluz-pluz-esp-ieo`) equal UHSLC's an hour earlier in every year they share: Vigo 1943 to 1990 at a standard deviation of 0.2 to 1.6 cm in most years against 41 to 44 cm at UHSLC's own times, Las Palmas 1949 to 1956 at 0.2 to 0.4 cm in most years and 1975 to 1990 at 0.9 to 13 cm against 28 to 32 cm. From 1993 IEO's Las Palmas equals UHSLC's FD series at the same time to 0.01 cm. M2's phase, which an hour moves by 29°, is 241 to 245° a year in UHSLC's Vigo version A (1943 to 1990) against 269 to 276° in IEO's Vigo record (GESLA's `vigo-vigo-esp-ieo`) from 1943 to 2016 and in Puertos del Estado's Vigo 2 gauge (CMEMS, from 1992); at Las Palmas it is 189 to 201° in versions A, B and C against 218 to 227° in IEO's record from 1949 to 2016, UHSLC's own FD series (217) from 1991 and CMEMS's from 1992. The store's level match of November 2026 found IEO's Las Palmas and Vigo equal to UHSLC's only at an hour's offset."
+    },
+    {
+      "id": "uhslc-progreso-721a-six-hours-late",
+      "stations": ["uhslc/721a"],
+      "handling": "corrected",
+      "error": "UHSLC's Progreso version A (721a, 1980 to 1984) is 6 hours late: the height labeled T was measured at T − 6 h UTC. Versions B and C are on time.",
+      "response": "Every value of version A is moved 6 hours earlier.",
+      "evidence": "November 2026. GESLA's copy of UNAM's historical Progreso record (`progreso-402-mex-unam_hist`) equals UHSLC's version A 6 hours later in 1982 and 1983 (r 0.998, standard deviation 1.4 cm), against r 0.88 or less at any other whole hour. K1's and M2's phases in version A are 119° and 282°; in UNAM's record from 1952 to 1993 they are 21° and 105°, in UHSLC's versions B (1999 to 2004) and C (2012 to 2013) 28° and 110° and 10° and 105°, and at the Yucatán gauges either side, Celestún, Sisal and Telchac, 13 to 15° and 101 to 109°. Six hours moves K1 by 90° and M2 by 174°. The store's level match of November 2026 found UNAM's record 27 cm from UHSLC's at the same times."
+    },
+    {
       "id": "uhslc-positions",
       "stations": ["uhslc/290a", "uhslc/290", "uhslc/914", "uhslc/316", "uhslc/548", "uhslc/054a"],
       "handling": "corrected",
