@@ -148,6 +148,26 @@
       "error": "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       "response": "The values are kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
       "evidence": "PEGELONLINE's REST API (`/stations/693320/W/measurements.json` and the same for 693330), checked on 11 November 2026, returns 389 and 107 cm at 04:00 and 04:15 CET, 0.0 at 04:30 CET, and nothing until 06:15 CET. The store holds the same values."
+    },
+    {
+      "id": "pegelonline-wangerooge-west-2026-dropout",
+      "stations": ["pegelonline/9420040"],
+      "since": "2026-10-26",
+      "until": "2026-10-30",
+      "handling": "flagged",
+      "error": "From the storm surge of 25 October 2026 to 29 October, PEGELONLINE's Wangerooge West gauge reads −2.40 m, 7.5 m below its median and 6 m below any low water, whenever the water is below about 7.1 m, and all day on 27 and 28 October.",
+      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The −2.40 m values from 20:28 UTC on 25 October are flagged by QC once the station is judged tidal: with this span, its last year has one hold that drains count, and tidal QC flags every −2.40 m value of 2026.",
+      "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged the gauge not tidal. 5,086 values read −2.40 m from 25 October 20:28 to 29 October 13:43 UTC, each run starting with a drop of up to 10 m in a minute. Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`) reads normal tides throughout, with a high water of 8.83 m on 25 October. CMEMS's copy carries the same values (erratum `cmems-wangerooge-west-2026-dropout`). Every value from 30 October to 14 November is a normal tide."
+    },
+    {
+      "id": "pegelonline-schillig-2026-dropout",
+      "stations": ["pegelonline/9430030"],
+      "since": "2026-10-26",
+      "until": "2026-11-14",
+      "handling": "flagged",
+      "error": "From 26 October to 13 November 2026, after the storm surge of 25 October, PEGELONLINE's Schillig gauge reads −2.50 m, 7.6 m below its median, for most of each day and all of some. Single values and runs of up to a few hours read −2.50 m from 13 July.",
+      "response": "26 October to 13 November 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The earlier −2.50 m values are flagged by QC once the station is judged tidal: with this span, its last year has no hold that drains count, and tidal QC flags every −2.50 m value of 2026.",
+      "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged the gauge not tidal. 22,411 values read −2.50 m in 2026, 22,014 of them from 26 October 02:47 to 13 November 06:20 UTC. Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`), 12 km away, reads normal tides throughout. Every value from 14 November is a normal tide."
     }
   ],
   "retired": []
