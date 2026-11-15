@@ -168,6 +168,26 @@
       "error": "From 26 October to 13 November 2026, after the storm surge of 25 October, PEGELONLINE's Schillig gauge reads −2.50 m, 7.6 m below its median, for most of each day and all of some. Single values and runs of up to a few hours read −2.50 m from 13 July.",
       "response": "26 October to 13 November 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The earlier −2.50 m values are flagged by QC once the station is judged tidal: with this span, its last year has no hold that drains count, and tidal QC flags every −2.50 m value of 2026.",
       "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged the gauge not tidal. 22,411 values read −2.50 m in 2026, 22,014 of them from 26 October 02:47 to 13 November 06:20 UTC. Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`), 12 km away, reads normal tides throughout. Every value from 14 November is a normal tide."
+    },
+    {
+      "id": "pegelonline-mellumplate-2026-dropout",
+      "stations": ["pegelonline/9420010"],
+      "since": "2026-09-16",
+      "until": "2026-09-18",
+      "handling": "flagged",
+      "error": "On 16 and 17 September 2026 PEGELONLINE's Mellumplate gauge reads −2.50 m, 7.6 m below its median, for half of the 16th and a few minutes of the 17th, and values from 0.31 to 10.0 m in between. −2.50 m is the value Schillig's sensor reads from October (erratum `pegelonline-schillig-2026-dropout`).",
+      "response": "16 and 17 September 2026 are flagged `suspect`, keeping the source flag as `source_flag`. QC flags the −2.50 m values of its other days in 2026.",
+      "evidence": "Found from the dropouts at Wangerooge West and Schillig, November 2026: Mellumplate has 1,202 values of −2.50 m from 14 July to 5 October 2026, all flagged by QC except 46 on 16 and 17 September. On the 16th, 732 of the day's values are −2.50 m in runs under 6 hours, so the flatline rule doesn't reach them and they widen the spread the outlier check judges by."
+    },
+    {
+      "id": "pegelonline-rechtenfleth-2026-11-11",
+      "stations": ["pegelonline/4970030"],
+      "since": "2026-11-11",
+      "until": "2026-11-12",
+      "handling": "flagged",
+      "error": "From 08:33 to about 11:30 UTC on 11 November 2026 PEGELONLINE's Rechtenfleth gauge falls from 3.17 to 0.15 m in ten minutes, holds 0.56 m for 40 minutes, then holds 10.56 m for about two hours, above any other value of its year.",
+      "response": "11 November 2026 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found from the dropouts at Wangerooge West and Schillig, November 2026: 0.1% of Rechtenfleth's values before November 2026 are below 2.14 m and 0.1% above 8.24 m. QC flags 7 values of the episode: the holds are shorter than the 6-hour flatline, and the outlier check judges them against a spread they widen. The tide before 08:33 and from 12:00 is normal."
     }
   ],
   "retired": []
