@@ -449,7 +449,11 @@ export async function stations(): Promise<ListedStation[]> {
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-/** BOM keeps archives for 1996 and for 2005 on, and none for the years between or one the year under way hasn't made yet. */
+/**
+ * Whether a 550 for the year's archive just means BOM has none: it keeps
+ * archives for 1996 and from 2005 on, so 1997 to 2004 have none, and nor has
+ * the year under way (or a later one) before BOM writes its first archive.
+ */
 const noArchive = (year: number) =>
   year < 1996 || (year > 1996 && year < 2005) || year >= new Date().getUTCFullYear();
 
@@ -529,7 +533,8 @@ export function parse(
   whole = false,
 ): Observation[] {
   const out: Observation[] = [];
-  const lines = text.split(/\r?\n/).filter((l) => l.trim());
+  // Only the file's last newline ends a line without one; a blank line inside is a damaged record.
+  const lines = text.replace(/\r?\n$/, "").split(/\r?\n/);
   // A file starts with the station's position, which holds no value; one that's
   // damaged (erratum `bom-burnie-2005-position-line`) is skipped like it.
   if (lines.length && !LINE.test(lines[0]!)) lines.shift();

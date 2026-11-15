@@ -348,6 +348,10 @@ describe("bom", () => {
     }
     bad(file(line("995", " 1 1", 1, [...full.slice(0, 11), "- 5"])), /not a level/);
     bad(file(line("995", " 1 1", 1, ["1 23", ...full.slice(1)])), /not a level/);
+    // A blank line inside the file is a damaged record, not nothing; only the last newline is.
+    bad(`${file(line("995", " 1 1", 1, full), "", line("995", " 1 1", 2, full))}`, /has a line/);
+    assert.equal(bom.parse(`${file(line("995", " 1 1", 1, full))}\n`, "995", 2026).length, 12);
+    assert.equal(bom.parse(`${file(line("995", " 1 1", 1, full))}\r\n`, "995", 2026).length, 12);
     // A first line that is a line of levels is one, not a damaged position line.
     assert.equal(bom.parse(line("995", " 1 1", 1, full), "995", 2026).length, 12);
     assert.equal(bom.parse("garbled\n" + line("995", " 1 1", 1, full), "995", 2026).length, 12);
