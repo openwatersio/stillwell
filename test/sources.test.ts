@@ -1353,6 +1353,59 @@ describe("coops", () => {
     assert.deepEqual([levels, asked.length], [[], 1]);
   });
 
+  it("asks for a year's hourly heights at once, in halves in a leap year", async () => {
+    const asked: string[] = [];
+    const day = (d: Date) => d.toISOString().slice(0, 10);
+    setTransport(async (url) => {
+      const params = new URL(url).searchParams;
+      const [from, to] = ["begin_date", "end_date"].map((k) => {
+        const s = params.get(k)!;
+        return Date.UTC(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8));
+      });
+      // October alone has 6-minute values, from its first minute.
+      if (params.get("product") === "water_level")
+        return from === Date.UTC(1952, 9, 1)
+          ? JSON.stringify({ data: [{ t: "1952-10-01 00:00", v: "6", f: "0,0,0,0", q: "v" }] })
+          : JSON.stringify({ error: { message: "No data was found." } });
+      asked.push(`${params.get("begin_date")}-${params.get("end_date")}`);
+      // An hourly height on the 15th of each month asked for, at the month's number.
+      const data = [];
+      for (let m = 0; m < 12; m++) {
+        const t = new Date(Date.UTC(new Date(from).getUTCFullYear(), m, 15));
+        if (t.getTime() >= from && t.getTime() <= to)
+          data.push({ t: `${day(t)} 00:00`, v: String(m + 1), f: "0,0" });
+      }
+      return JSON.stringify({ data });
+    });
+    const span = { established: "1899-01-01T00:00:00Z", removed: null };
+    const leap = await coops.levels(
+      "1495000",
+      new Date("1952-01-01Z"),
+      new Date("1953-01-01Z"),
+      span,
+    );
+    // October's hourly height gives way to its 6-minute value; every other month keeps its own.
+    assert.deepEqual(
+      [asked, leap.map((l) => l.level)],
+      [
+        ["19520101 00:00-19520630 23:59", "19520701 00:00-19521231 23:59"],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 11, 12],
+      ],
+    );
+    asked.length = 0;
+    // From May, a year that isn't a leap year takes one request, ending with the range.
+    const plain = await coops.levels(
+      "1495000",
+      new Date("1951-05-01Z"),
+      new Date("1951-08-01Z"),
+      span,
+    );
+    assert.deepEqual(
+      [asked, plain.map((l) => l.level)],
+      [["19510501 00:00-19510731 23:59"], [5, 6, 7]],
+    );
+  });
+
   it("reads high and low waters, keeping higher and lower ones as high and low", async () => {
     serve([
       [/details\.json/, JSON.stringify({ established: "1899-01-01 00:00:00" })],
