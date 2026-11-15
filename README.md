@@ -15,7 +15,7 @@ Data from each agency is fetched, quality checked, and written with:
 The public store aims to hold any source that publishes water level data and allows republishing. See [open issues for new sources](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue+state%3Aopen+label%3Asource).
 
 - [BODC](src/sources/bodc/README.md): quality-controlled 15-minute levels from the UK National Tide Gauge Network.
-- [BOM](src/sources/bom/README.md): hourly sea levels at 29 gauges of the Bureau of Meteorology's National Tidal Centre in Australia and the Pacific, back to 1996, from its FTP archives.
+- [BOM](src/sources/bom/README.md): hourly sea levels at 31 gauges of the Bureau of Meteorology's National Tidal Centre in Australia and the Pacific, back to 1996, from its FTP archives.
 - [BSH](src/sources/bsh/README.md): predicted high and low waters and tide curves at German gauges.
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.

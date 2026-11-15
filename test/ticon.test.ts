@@ -378,8 +378,12 @@ describe("TICON originators", () => {
     assert.equal(exact.id, "rws/kornwerderzand.ijsselmeer.binnenhaven");
   });
 
-  it("takes a LINKS entry for a CMEMS record over the station at its position", () => {
+  it("takes a link for a CMEMS record over the station at its position", () => {
     // CMEMS places its copy of Wangerooge West 40 m from Wangerooge Nord.
+    const links = [
+      { a: "gesla/wangeroogetg-wan-deu-cmems", b: "pegelonline/9420040" },
+      { a: "gesla/eemsmeetpaaltg-eem-nld-cmems", b: "gesla/eemshaven_waddenzee-eem-nld-rws" },
+    ];
     const lists = {
       pegelonline: [
         station("pegelonline/9420030", "WANGEROOGE NORD", 53.806299, 7.9292),
@@ -389,18 +393,21 @@ describe("TICON originators", () => {
     const match = originatorSeries(
       record("wangeroogetg-wan-deu-cmems", { name: "WangeroogeTG", lat: 53.806, lon: 7.929 }),
       lists,
+      links,
     );
     assert.deepEqual([match.id, match.distance_km], ["pegelonline/9420040", 5.2]);
     // With West gone, Nord at the record's position is still the wrong gauge.
     const stale = originatorSeries(
       record("wangeroogetg-wan-deu-cmems", { name: "WangeroogeTG", lat: 53.806, lon: 7.929 }),
       { pegelonline: lists.pegelonline.slice(0, 1) },
+      links,
     );
     assert.deepEqual([stale.id, stale.status], [null, "to_match"]);
     // A link to another GESLA record names no national station, so position still decides.
     const meetpaal = originatorSeries(
       record("eemsmeetpaaltg-eem-nld-cmems", { name: "EemsMeetpaalTG", lat: 53.45, lon: 6.83 }),
       { rws: [station("rws/eemshaven.waddenzee", "Eemshaven Waddenzee", 53.451, 6.83)] },
+      links,
     );
     assert.equal(meetpaal.id, "rws/eemshaven.waddenzee");
   });

@@ -62,8 +62,8 @@ interface Gauge {
   lat: number;
   lon: number;
   country_code: string;
-  /** Which monitoring project runs the gauge. */
-  project: "ABSLMP" | "SPSLCMP";
+  /** Which monitoring project runs the gauge; none for a gauge BOM runs outside both. */
+  project?: "ABSLMP" | "SPSLCMP";
   /**
    * UHSLC's series of the gauge, which carry the same hourly values, by ID. BOM
    * numbers its Australian Baseline Array gauges (956 to 959, 992 to 997) in its
@@ -83,11 +83,13 @@ interface Gauge {
 /**
  * The gauges BOM runs itself: the Australian Baseline Sea Level Monitoring
  * Array's 16 whose files are in the archives (its Thursday Island gauge
- * isn't) and the Pacific Sea Level and Geodetic Monitoring Project's 13. The
- * archives also carry port, state-agency and other countries' gauges
- * (Fremantle, Brisbane Bar, Bundaberg, Fort Denison, Townsville, Booby Island,
- * Flying Fish Cove, Suva, Jackson Bay), which are those agencies' to publish
- * and aren't listed.
+ * isn't), the Pacific Sea Level and Geodetic Monitoring Project's 13, and
+ * Suva and Christmas Island, whose records GESLA credits to BOM and which
+ * BOM's National Tidal Centre supplies to PSMSL. Christmas Island's file is
+ * in the archives for 2007 to 2011 only. The archives also carry port and
+ * state-agency gauges (Fremantle, Brisbane Bar, Bundaberg, Fort Denison,
+ * Townsville, Booby Island), which are those agencies' to publish and aren't
+ * listed.
  */
 export const GAUGES: Gauge[] = [
   {
@@ -240,6 +242,15 @@ export const GAUGES: Gauge[] = [
     gesla: "home_island-46280-aus-bom",
   },
   {
+    number: "170",
+    lat: -10.417,
+    lon: 105.667,
+    name: "Christmas Island",
+    country_code: "CX",
+    uhslc: ["170"],
+    gesla: "christmas_island-46290-aus-bom",
+  },
+  {
     number: "993",
     lat: -38.374,
     lon: 145.223,
@@ -310,6 +321,15 @@ export const GAUGES: Gauge[] = [
     project: "SPSLCMP",
     uhslc: ["009"],
     gesla: "honiara-56670-slb-bom",
+  },
+  {
+    number: "018",
+    lat: -18.132,
+    lon: 178.427,
+    name: "Suva",
+    country_code: "FJ",
+    uhslc: ["018"],
+    gesla: "suva-67050-fji-bom",
   },
   {
     number: "023",
@@ -417,7 +437,9 @@ export async function stations(): Promise<ListedStation[]> {
     const active = hasValues(archive, g.number, year) || hasValues(before, g.number, year - 1);
     return {
       ...stationDefaults(metadata),
-      attribution: `${metadata.attribution}; ${PROJECTS[g.project]}`,
+      attribution: g.project
+        ? `${metadata.attribution}; ${PROJECTS[g.project]}`
+        : metadata.attribution,
       id: `bom/${g.number}`,
       source_id: g.number,
       name: g.name,
@@ -490,7 +512,8 @@ export async function levels(
 ): Promise<Observation[]> {
   if ((datum ?? DATUM) !== DATUM)
     throw new Error(`BOM ${number} is read in ${DATUM}, not ${datum}`);
-  if (!GAUGES.some((g) => g.number === number)) throw new Error(`Not a BOM gauge: ${number}`);
+  const gauge = GAUGES.find((g) => g.number === number);
+  if (!gauge) throw new Error(`Not a BOM gauge: ${number}`);
   const out: Observation[] = [];
   const thisYear = new Date().getUTCFullYear();
   for (
@@ -507,8 +530,7 @@ export async function levels(
       year >= thisYear || (year >= thisYear - 2 && new Date().getUTCMonth() < 3)
         ? Flag.preliminary
         : Flag.good;
-    // A year two or more back is whole in every file BOM has written, so a short one is cut off.
-    for (const o of parse(latin1(uncompress(member)), number, year, year <= thisYear - 2))
+    for (const o of parse(latin1(uncompress(member)), number, year))
       if (o.time >= start.getTime() && o.time < end.getTime())
         out.push({ ...o, flag, source_flag: flag });
   }
@@ -525,13 +547,7 @@ const LINE = /^(\d{3}).{8}(\d{4})([ \d]\d)([ \d]\d)([12])((?:[ \d-]{5}){12})$/;
  * (2 each), the half, `1` for hours 0 to 11 and `2` for 12 to 23, then 12
  * levels in millimeters, 5 characters each, `9999` where missing.
  */
-export function parse(
-  text: string,
-  number: string,
-  year: number,
-  /** Whether the file is a finished year's, which has to run to the year's last half-day. */
-  whole = false,
-): Observation[] {
+export function parse(text: string, number: string, year: number): Observation[] {
   const out: Observation[] = [];
   // Only the file's last newline ends a line without one; a blank line inside is a damaged record.
   const lines = text.replace(/\r?\n$/, "").split(/\r?\n/);
@@ -567,10 +583,6 @@ export function parse(
     if (half === 2) midnight += 24 * HOUR_MS;
     half = half === 1 ? 2 : 1;
   }
-  if (whole && (midnight !== Date.UTC(year + 1, 0, 1) || half !== 1))
-    throw new Error(
-      `BOM ${number}'s file for ${year} ends before ${new Date(midnight).toISOString().slice(0, 10)} half ${half}`,
-    );
   return out;
 }
 
