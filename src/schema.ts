@@ -142,6 +142,12 @@ export interface Station {
 export type ListedStation = Omit<Station, "datum"> & {
   datum: string | null;
   reference?: { id: string; since: string | null } | null;
+  /**
+   * True when `datums` is empty because the source's offsets for the station
+   * are known to be wrong, so the refresh clears the stored ones rather than
+   * keep them as it does for offsets the source left out.
+   */
+  no_datums?: boolean;
 };
 
 /**

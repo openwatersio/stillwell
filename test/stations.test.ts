@@ -338,6 +338,18 @@ describe("mergeStationList", () => {
     assert.deepEqual(stations[0]!.datums, { MLLW: -2.4 });
   });
 
+  it("clears committed offsets the source marks as wrong", () => {
+    const { stations, changes } = mergeStationList(
+      [held("a", { datums: { MLLW: -2.4 } })],
+      [{ ...station("a", { datums: {} }), no_datums: true }],
+      options,
+    );
+    assert.deepEqual(changes, []);
+    assert.deepEqual(stations[0]!.datums, {});
+    assert.deepEqual(stations[0]!.epochs.at(-1)!.datums, {});
+    assert.equal("no_datums" in stations[0]!, false);
+  });
+
   it("refuses an ID that isn't <source>/<source_id>", () => {
     assert.throws(() => mergeStationList([], [station("a", { id: "rws:a" })], options), /rws:a/);
   });

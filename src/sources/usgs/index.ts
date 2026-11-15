@@ -16,7 +16,8 @@ import {
  *
  * Each station is one instantaneous series: gage height (00065) in the gage's
  * own datum where the site has it, else a water-surface elevation in NAVD88 or
- * NGVD29. `datums` gives the gage datum's altitude from `monitoring-locations`.
+ * NGVD29. `datums` gives the gage datum's altitude from `monitoring-locations`
+ * where USGS surveyed it, or from `GAGE_DATUMS`.
  */
 const API = "https://api.waterdata.usgs.gov/ogcapi/v1";
 
@@ -70,6 +71,152 @@ const VERTICAL_DATUMS: Record<string, string> = {
   LMSL: "LMSL",
 };
 
+/**
+ * `altitude_method_code`s that mean USGS estimated the site's altitude from a
+ * topographic map (M), a digital elevation model (N), airborne lidar (J) or an
+ * altimeter (A) rather than surveying the gage datum. That's the ground at the
+ * site's coordinates, not the gage's zero: at tidal sites 17 of 38 such
+ * offsets put the water more than 2 m from NAVD88's zero, against 11 of 237
+ * surveyed ones. No offset is given for them.
+ */
+const ESTIMATED = new Set(["M", "N", "J", "A"]);
+
+/**
+ * Gage datums decided per site, by site number, where `altitude` isn't the
+ * gage's zero: the offsets to give instead, or none. Each note says where the
+ * value comes from.
+ */
+export const GAGE_DATUMS: Record<string, { datums: Record<string, number>; note: string }> = {
+  "01389802": {
+    datums: {},
+    note: "Passaic R at Great Falls: gage height averages 115 ft against ground at 104 ft (USGS 3DEP), so the gage reads elevation and adding the 100 ft altitude counts it twice.",
+  },
+  "02266291": {
+    datums: {},
+    note: "Lateral 405 at S-405A: gage height averages 96.0 ft against ground at 95.9 ft (USGS 3DEP) and an altitude of 96 ft, so the gage reads elevation and adding the altitude counts it twice.",
+  },
+  "02266292": {
+    datums: {},
+    note: "Lateral 405 below S-405A: gage height averages 90.2 ft against ground at 99.7 ft (USGS 3DEP), so the gage reads elevation and adding the 101 ft altitude counts it twice.",
+  },
+  "02266295": {
+    datums: {},
+    note: "Lateral 410 at S-410: gage height averages 95.5 ft against ground at 93.2 ft (USGS 3DEP), so the gage reads elevation and adding the 93 ft altitude counts it twice.",
+  },
+  "02266296": {
+    datums: {},
+    note: "Lateral 410 below S-410: gage height averages 90.1 ft against ground at 88.1 ft (USGS 3DEP), so the gage reads elevation and adding the 89 ft altitude counts it twice.",
+  },
+  "02272701": {
+    datums: {},
+    note: "Kissimmee River above S-69: gage height averages 31.5 ft against ground at 23.8 ft (USGS 3DEP); adding the 24 ft altitude puts the water 32 ft above the ground.",
+  },
+  "02321975": {
+    datums: {},
+    note: "Santa Fe River at US 441: gage height averages 31.5 ft against ground at 37 ft (USGS 3DEP), so the gage reads elevation and adding the 35 ft altitude counts it twice.",
+  },
+  "02400175": {
+    datums: {},
+    note: "Coosa River at Adams Ferry: gage height averages 505 ft against ground at 509 ft (USGS 3DEP), so the gage reads elevation and adding the 556 ft altitude counts it twice.",
+  },
+  "02492100": {
+    datums: {},
+    note: "Pearl River Navigation Canal lock: gage height averages 25.5 ft against ground at 29.5 ft (USGS 3DEP); adding the 19 ft altitude puts the water 15 ft above the ground.",
+  },
+  "05548185": {
+    datums: {},
+    note: "Elizabeth Lake drain: gage height averages 793.9 ft against ground at 793.7 ft (USGS 3DEP), so the gage reads elevation and adding the 790 ft altitude counts it twice.",
+  },
+  "07250550": {
+    datums: {},
+    note: "Arkansas River at Trimble Lock and Dam: gage height averages 372 ft against ground at 392 ft at the dam (USGS 3DEP), so the gage reads elevation and adding the 402 ft altitude counts it twice.",
+  },
+  "07263450": {
+    datums: {},
+    note: "Arkansas River at Murray Dam: gage height averages 249 ft against ground at 238 ft (USGS 3DEP), so the gage reads elevation and adding the 224 ft altitude counts it twice.",
+  },
+  "07263708": {
+    datums: {},
+    note: "Mound Lake at Plum Bayou Mounds: gage height averages 230.8 ft against ground at 231.5 ft (USGS 3DEP), so the gage reads elevation and adding the 243 ft altitude counts it twice.",
+  },
+  "07288800": {
+    datums: {},
+    note: "Yazoo River at Redwood: gage height averages 57 ft against ground at 66 ft (USGS 3DEP); adding the 40 ft altitude puts the water 31 ft above the ground.",
+  },
+  "07359000": {
+    datums: {},
+    note: "Lake Catherine at Jones Mill: gage height averages 302.5 ft against ground at 322 ft by the lake (USGS 3DEP), so the gage reads elevation and adding the 313 ft altitude counts it twice.",
+  },
+  "08015910": {
+    datums: {},
+    note: "Calcasieu River at Moss Bluff: gage height averages 25.5 ft where the ground model reads the water at -1 ft (USGS 3DEP); adding the 24.7 ft altitude puts this tidal reach 51 ft above it.",
+  },
+  "08065500": {
+    datums: {},
+    note: "Trinity River near Midway: gage height averages 129 ft against ground at 165 ft at the bridge (USGS 3DEP), so the gage reads elevation and adding the 118 ft altitude puts the water 82 ft above the bridge.",
+  },
+  "08180990": {
+    datums: {},
+    note: "Leon Creek at IH 10: gage height averages 982 ft against ground at 1,004 ft at the bridge (USGS 3DEP), so the gage reads elevation and adding the 979 ft altitude counts it twice.",
+  },
+  "08470500": {
+    datums: {},
+    note: "Arroyo Colorado at FM 106: gage height averaged 10.6 ft in its last year where the ground model reads the water at -0.5 ft (USGS 3DEP); adding the 17.5 ft altitude puts it 28 ft above it.",
+  },
+  "08474395": {
+    datums: {},
+    note: "Brazos Santiago Pass at South Padre Island: with the 2.35 ft altitude the water reads 0.68 m below NOAA's co-located SPI Brazos Santiago gauge (8779749) and 0.79 m below South Padre Island CG Station (8779748), 1.4 km away, in each's NAVD88 over the same 169 hours in November 2026, with 1 to 2 cm spread.",
+  },
+  "09328990": {
+    datums: {},
+    note: "Colorado River above Dirty Devil River: gage height averages 3,568 ft, Lake Powell's surface, so the gage reads elevation and adding the 3,785 ft altitude counts it twice.",
+  },
+  "09429495": {
+    datums: {},
+    note: "Imperial Reservoir at Imperial Dam: gage height averages 180.4 ft against ground at 186 ft (USGS 3DEP), so the gage reads elevation and adding the 184 ft altitude counts it twice.",
+  },
+  "09469000": {
+    datums: {},
+    note: "San Carlos Reservoir at Coolidge Dam: gage height averages 2,448.5 ft against ground at 2,450 ft (USGS 3DEP), so the gage reads elevation and adding the 2,502 ft altitude counts it twice.",
+  },
+  "11312676": {
+    datums: {},
+    note: "Middle River at Middle River: with the 0.0 ft altitude the water reads 2.95 ft above Old River near Byron (11313315) over the same 168 hours in November 2026, with 0.26 ft spread, in one tidal channel system.",
+  },
+  "11313405": {
+    datums: {},
+    note: "Old River at Bacon Island: with the 0.0 ft altitude the water reads 5.2 ft above Old River near Byron (11313315), downstream on the same channel, over the same 168 hours in November 2026, with 0.31 ft spread.",
+  },
+  "11313433": {
+    datums: {},
+    note: "Dutch Slough below Jersey Island Road: with the 0.0 ft altitude the water reads 3.5 ft above Old River near Byron (11313315) and the San Joaquin at Jersey Point (11337190) over the same 168 hours in November 2026.",
+  },
+  "11507200": {
+    datums: {},
+    note: "A Canal at Klamath Falls: gage height averaged 4,142.6 ft in its last year against ground at 4,141 ft (USGS 3DEP), so the gage reads elevation and adding the 4,126 ft altitude counts it twice.",
+  },
+  "15278000": {
+    datums: {},
+    note: "Eklutna Lake near Palmer: gage height averages 846.8 ft, the lake's surface, so the gage reads elevation and adding the 860 ft altitude counts it twice.",
+  },
+  "182827067040500": {
+    datums: {},
+    note: "Lago Guerrero near Isabela: gage height averages 407 ft against ground at 415 ft (USGS 3DEP), so the gage reads elevation and adding the 398 ft altitude counts it twice.",
+  },
+  "422206071033901": {
+    datums: { NAVD88: -32.516 },
+    note: "Charles River below the New Charles River Dam: USGS's -5 ft is a DEM estimate. The gage reads the Metropolitan District Commission datum, 106.68 ft below NAVD88, the surveyed altitude of the Charles River Dam gage (01104715) whose readings it shares; with it the water reads 4 cm below NOAA's Boston gauge (8443970) in its NAVD88, with 1 cm spread, over 1,678 shared readings in November 2026.",
+  },
+  "422340071043201": {
+    datums: { NAVD88: -32.516 },
+    note: "Mystic River below the Amelia Earhart Dam: USGS's -5 ft is a DEM estimate. The gage reads the Metropolitan District Commission datum, 106.68 ft below NAVD88, the surveyed altitude of the Charles River Dam gage (01104715) whose readings it shares; with it the water reads 5 cm below NOAA's Boston gauge (8443970) in its NAVD88, with 1 cm spread, over 1,678 shared readings in November 2026.",
+  },
+  "423000088164401": {
+    datums: {},
+    note: "Elizabeth Lake at Twin Lakes: gage height averages 794.0 ft against ground at 794.2 ft (USGS 3DEP), so the gage reads elevation and adding the 790 ft altitude counts it twice.",
+  },
+};
+
 const FEET = 0.3048;
 const DAY_MS = 86_400_000;
 
@@ -94,6 +241,7 @@ interface ApiLocation {
   country_code: string | null;
   hydrologic_unit_code: string | null;
   altitude: number | null;
+  altitude_method_code: string | null;
   vertical_datum: string | null;
 }
 
@@ -153,7 +301,7 @@ export async function stations(): Promise<UsgsStation[]> {
       const batch = ids.slice(i, i + LOCATION_BATCH);
       const params = new URLSearchParams({
         properties:
-          "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,vertical_datum",
+          "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,altitude_method_code,vertical_datum",
         filter: `id IN (${batch.map((id) => `'${id}'`).join(",")})`,
         "filter-lang": "cql-text",
       });
@@ -275,11 +423,18 @@ function toStation(
 ): UsgsStation {
   const site = location.id.replace(/^USGS-/, "");
   const datum = DATUM_OF.get(series.parameter_code)!;
-  const datums: Record<string, number> = {};
+  let datums: Record<string, number> = {};
+  let noDatums = false;
   // Gage height plus the gage datum's altitude is the level in that vertical datum.
   const vertical = location.vertical_datum ? VERTICAL_DATUMS[location.vertical_datum] : undefined;
-  if (datum === GAGE && vertical && typeof location.altitude === "number")
-    datums[vertical] = Math.round(location.altitude * FEET * 1000) / 1000 + 0; // + 0 turns -0 into 0
+  const decided = GAGE_DATUMS[site];
+  if (datum === GAGE && decided) {
+    datums = { ...decided.datums };
+    noDatums = !Object.keys(datums).length;
+  } else if (datum === GAGE && vertical && typeof location.altitude === "number") {
+    if (ESTIMATED.has(location.altitude_method_code ?? "")) noDatums = true;
+    else datums[vertical] = Math.round(location.altitude * FEET * 1000) / 1000 + 0; // + 0 turns -0 into 0
+  }
   const live = reporting(series);
   return {
     ...stationDefaults(metadata),
@@ -293,6 +448,7 @@ function toStation(
     interval_s: null,
     datum,
     datums,
+    ...(noDatums && { no_datums: true }),
     products: ["levels"],
     first: null,
     last: null,
@@ -446,7 +602,8 @@ export function seriesChanged(committed: Station, listed: ListedStation): string
   const [was, now] = [committed, listed] as unknown as Partial<UsgsStation>[];
   if (was!.time_series_id && now!.time_series_id && was!.time_series_id !== now!.time_series_id)
     return `series ${was!.time_series_id} is now ${now!.time_series_id}`;
-  if (committed.datum !== GAGE) return null;
+  // A decided gage datum corrects the offset; the zero itself didn't move.
+  if (committed.datum !== GAGE || listed.source_id in GAGE_DATUMS) return null;
   const [before, after] = [Object.keys(committed.datums), Object.keys(listed.datums)];
   for (const name of before) {
     const [height, next] = [committed.datums[name]!, listed.datums[name]];

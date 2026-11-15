@@ -2669,6 +2669,8 @@ describe("usgs", () => {
             end: new Date(Date.now() - 30 * 86_400_000).toISOString(),
           }),
           series("07020500", "00065", { id: "replacement", begin: "2026-10-01T00:00:00+00:00" }),
+          series("381142122015801", "00065"),
+          series("422206071033901", "00065"),
         ]),
       ],
       [/parameter_code=62620/, collection([series("0158540095", "62620")])],
@@ -2713,6 +2715,20 @@ describe("usgs", () => {
           location("02171645", -80.0, 33.2, { state_name: "Puerto Rico" }),
           location("07022000", -89.5, 37.0, { hydrologic_unit_code: "07140105" }),
           location("07020500", -89.8, 37.6, { hydrologic_unit_code: "07140105" }),
+          // First Mallard Branch, Suisun Marsh: an altitude from a DEM is the ground, not the gage's zero.
+          location("381142122015801", -122.03, 38.19, {
+            site_type_code: "ES",
+            altitude: 6,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
+          // Charles River below the dam, Boston: a decision gives its gage datum in place of a DEM's -5 ft.
+          location("422206071033901", -71.06, 42.37, {
+            site_type_code: "ES",
+            altitude: -5,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
         ]),
       ],
     ]);
@@ -2731,7 +2747,22 @@ describe("usgs", () => {
         ["usgs/07010000", "river", "GAGE", { NAVD88: 115.696 }, "07010000-00065", true, "US"],
         ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
         ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
+        ["usgs/381142122015801", "estuary", "GAGE", {}, "381142122015801-00065", true, "US"],
+        [
+          "usgs/422206071033901",
+          "estuary",
+          "GAGE",
+          { NAVD88: -32.516 },
+          "422206071033901-00065",
+          true,
+          "US",
+        ],
       ],
+    );
+    // Only the estimated altitude clears what the store holds; a site with none keeps it.
+    assert.deepEqual(
+      list.filter((s) => s.no_datums).map((s) => s.id),
+      ["usgs/381142122015801"],
     );
     assert.equal(
       list[0]!.source_url,
@@ -2856,6 +2887,15 @@ describe("usgs", () => {
     );
     // A site that lists no altitude keeps its offsets.
     assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
+    // A decided gage datum corrects the offset rather than moving the zero.
+    const boston = { id: "usgs/422206071033901", datum: "GAGE", datums: { NAVD88: -1.524 } };
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: { NAVD88: -32.516 } }),
+      ),
+      null,
+    );
   });
 
   it("asks only for the years a station's series covers", async () => {
