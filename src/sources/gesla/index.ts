@@ -81,19 +81,55 @@ const WSV_SHIFT_MS = 30 * 60_000;
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
+/** A clock fix: hours to add to GESLA's times from `since` to before `until`, as labeled. */
+interface Clock {
+  hours: number;
+  since?: number;
+  until?: number;
+}
+
+/** From GESLA's first time in 2020, Queensland's records are on AEST (UTC+10). */
+const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1) };
+
 /**
- * Records an hour early until the time given, by file: GESLA's copies of
- * UHSLC's Vigo and Las Palmas versions from before 1991, which UHSLC stamps an
- * hour early (erratum `gesla-spain-uhslc-hour-early`), and IEO's Santa Cruz de
- * la Palma before its gap from 1987 to 1995 (erratum `gesla-santa-cruz-de-la-palma-hour-early`).
+ * Clock fixes by file. GESLA's copies of UHSLC's Vigo and Las Palmas versions
+ * from before 1991, which UHSLC stamps an hour early (erratum
+ * `gesla-spain-uhslc-hour-early`); IEO's Santa Cruz de la Palma, an hour early
+ * before its gap from 1987 to 1995 (erratum
+ * `gesla-santa-cruz-de-la-palma-hour-early`); UHSLC's Progreso version A, 6
+ * hours late (erratum `gesla-progreso-uhslc-721a-six-hours-late`); TTW's Scott
+ * Base, on NZST (erratum `gesla-scott-base-ttw-nzst`); and Queensland's
+ * records from 2020 (erratum `gesla-queensland-2020-aest`).
  */
-const EARLY_UNTIL: Record<string, number> = {
-  "vigo-208a-esp-uhslc_rq": Infinity,
-  "las_palmas-217a-esp-uhslc_rq": Infinity,
-  "las_palmas-217b-esp-uhslc_rq": Infinity,
-  "las_palmas-217c-esp-uhslc_rq": Infinity,
-  "cruz-cruz-esp-ieo": Date.UTC(1990, 0, 1),
+const CLOCK: Record<string, Clock> = {
+  "vigo-208a-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217a-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217b-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217c-esp-uhslc_rq": { hours: 1 },
+  "cruz-cruz-esp-ieo": { hours: 1, until: Date.UTC(1990, 0, 1) },
+  "progreso_yuc-721a-mex-uhslc_rq": { hours: -6 },
+  "scott_base_antarctica-scot-nzl-ttw": { hours: -12 },
+  "cape_ferguson-h033007a-aus-bom": QUEENSLAND_AEST,
+  "cardwell-h035012a-aus-bom": QUEENSLAND_AEST,
+  "cooktown-h066003a-aus-bom": QUEENSLAND_AEST,
+  "fishermans_landing-h052003b-aus-bom": QUEENSLAND_AEST,
+  "half_tide_tug_harbour-h060010a-aus-bom": QUEENSLAND_AEST,
+  "south_trees-h052026a-aus-bom": QUEENSLAND_AEST,
+  "thursday_island-h057022b-aus-bom": QUEENSLAND_AEST,
 };
+
+/** SFWMD's records are on EST (UTC−5) throughout. Erratum `gesla-sfwmd-est`. */
+const SFWMD = /-usa-sfwmd$/;
+
+/** The largest clock fix, which a range asked for is widened by. */
+const CLOCK_MARGIN_MS = 12 * HOUR_MS;
+
+/** The clock fix for `file`, if it has one. */
+function clockOf(file: string): Clock | undefined {
+  if (HONG_KONG.test(file) || CRMS_EARLY.has(file)) return { hours: 1 };
+  if (SFWMD.test(file)) return { hours: 5 };
+  return CLOCK[file];
+}
 
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
@@ -471,8 +507,10 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   const zone = /^# TIME ZONE HOURS\s+(\S+)/m.exec(text)?.[1] ?? "0";
   if (zone !== "0" && file !== "wewak-56070-png-bom")
     throw new Error(`GESLA's ${file} is on UTC${zone}, which the adapter doesn't convert`);
-  const earlyUntil =
-    HONG_KONG.test(file) || CRMS_EARLY.has(file) ? Infinity : (EARLY_UNTIL[file] ?? -Infinity);
+  const clock = clockOf(file);
+  const [shift, since, until] = clock
+    ? [clock.hours * HOUR_MS, clock.since ?? -Infinity, clock.until ?? Infinity]
+    : [0, Infinity, -Infinity];
   // Typed arrays sized by the line count, since the largest records hold 6 million values.
   let lines = 1;
   for (let at = text.indexOf("\n"); at >= 0; at = text.indexOf("\n", at + 1)) lines++;
@@ -494,7 +532,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
       if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
         const flag = QC_FLAGS[qc]!;
         const time = timeOf(text, at);
-        times[n] = time < earlyUntil ? time + HOUR_MS : time;
+        times[n] = time >= since && time < until ? time + shift : time;
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
@@ -794,9 +832,10 @@ export async function levels(
   const refused = withheld(station.source_id);
   if (refused) throw new Error(`GESLA's ${station.source_id} is withheld: ${refused}`);
   // The record's own span, with a margin for the clock fixes.
-  if (station.record_start && Date.parse(station.record_start) - HOUR_MS >= end.getTime())
+  if (station.record_start && Date.parse(station.record_start) - CLOCK_MARGIN_MS >= end.getTime())
     return [];
-  if (station.record_end && Date.parse(station.record_end) + HOUR_MS < start.getTime()) return [];
+  if (station.record_end && Date.parse(station.record_end) + CLOCK_MARGIN_MS < start.getTime())
+    return [];
   if (isDropped(station.source_id))
     throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see isDropped)`);
   const r = await record(station);

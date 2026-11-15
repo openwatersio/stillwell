@@ -708,7 +708,7 @@ describe("gesla clocks", () => {
     );
   });
 
-  it("moves the early Spanish UHSLC copies an hour later, and Santa Cruz de la Palma's IEO record before 1990", () => {
+  it("applies each record's clock fix, over its span", () => {
     const at = (file: string, time: string) =>
       iso(gesla.parse(lines([time]), file, null).times[0]!);
     assert.equal(at("vigo-208a-esp-uhslc_rq", "1980/06/01 00:00:00"), "1980-06-01T01:00:00.000Z");
@@ -723,6 +723,31 @@ describe("gesla clocks", () => {
     assert.equal(at("cruz-cruz-esp-ieo", "1985/06/01 00:00:00"), "1985-06-01T01:00:00.000Z");
     assert.equal(at("cruz-cruz-esp-ieo", "2000/06/01 00:00:00"), "2000-06-01T00:00:00.000Z");
     assert.equal(at("vigo-vigo-esp-ieo", "1980/06/01 00:00:00"), "1980-06-01T00:00:00.000Z");
+    assert.equal(
+      at("progreso_yuc-721a-mex-uhslc_rq", "1982/06/01 00:00:00"),
+      "1982-05-31T18:00:00.000Z",
+    );
+    assert.equal(
+      at("scott_base_antarctica-scot-nzl-ttw", "2020/06/01 00:00:00"),
+      "2020-05-31T12:00:00.000Z",
+    );
+    assert.equal(
+      at("biscaynebay_s21_t-s21_t-usa-sfwmd", "2005/06/01 00:00:00"),
+      "2005-06-01T05:00:00.000Z",
+    );
+    // Queensland's records end 2019 at local midnight, 13:50 UTC, and resume on AEST.
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2019/12/31 13:50:00"),
+      "2019-12-31T13:50:00.000Z",
+    );
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2020/01/01 00:00:00"),
+      "2019-12-31T14:00:00.000Z",
+    );
+    assert.equal(
+      at("thursday_island-h057022b-aus-bom", "2025/06/01 10:00:00"),
+      "2025-06-01T00:00:00.000Z",
+    );
   });
 
   it("refuses a record off UTC, but keeps Wewak's, which only says it is", () => {

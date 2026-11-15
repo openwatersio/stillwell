@@ -3391,7 +3391,7 @@ describe("uhslc", () => {
     ]);
   });
 
-  it("moves the early Spanish versions an hour later, and leaves Las Palmas's FD series alone", async () => {
+  it("moves the early Spanish versions an hour later and Progreso's A 6 hours earlier, and leaves Las Palmas's FD series alone", async () => {
     setTransport(async () =>
       JSON.stringify({
         table: {
@@ -3410,6 +3410,7 @@ describe("uhslc", () => {
     assert.equal(await at("217b"), "1980-06-01T01:00:00.000Z");
     assert.equal(await at("217"), "1980-06-01T00:00:00.000Z");
     assert.equal(await at("206b"), "1980-06-01T00:00:00.000Z");
+    assert.equal(await at("721a"), "1980-05-31T18:00:00.000Z");
   });
 
   it("asks only for the years a version has, and reads ERDDAP's 404 as no values", async () => {
