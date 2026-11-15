@@ -82,7 +82,7 @@ const WSV_SHIFT_MS = 30 * 60_000;
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
 /** A clock fix: hours to add to GESLA's times from `since` to before `until`, as labeled. */
-interface Clock {
+export interface Clock {
   hours: number;
   since?: number;
   until?: number;
@@ -101,7 +101,7 @@ const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1) };
  * Base, on NZST (erratum `gesla-scott-base-ttw-nzst`); and Queensland's
  * records from 2020 (erratum `gesla-queensland-2020-aest`).
  */
-const CLOCK: Record<string, Clock> = {
+export const CLOCK: Record<string, Clock> = {
   "vigo-208a-esp-uhslc_rq": { hours: 1 },
   "las_palmas-217a-esp-uhslc_rq": { hours: 1 },
   "las_palmas-217b-esp-uhslc_rq": { hours: 1 },
@@ -125,7 +125,7 @@ const SFWMD = /-usa-sfwmd$/;
 const CLOCK_MARGIN_MS = 12 * HOUR_MS;
 
 /** The clock fix for `file`, if it has one. */
-function clockOf(file: string): Clock | undefined {
+export function clockOf(file: string): Clock | undefined {
   if (HONG_KONG.test(file) || CRMS_EARLY.has(file)) return { hours: 1 };
   if (SFWMD.test(file)) return { hours: 5 };
   return CLOCK[file];

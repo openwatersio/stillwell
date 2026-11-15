@@ -217,7 +217,7 @@ describe("linkGauges's limits", () => {
     assert.deepEqual(byId.get("refmar/3")!.same_as, ["gesla/brest-3-fra-refmar"]);
     assert.deepEqual(
       report.dropped.map((d) => [d.from, d.to, d.reason]),
-      [["uhslc/9", "gesla/uddevalla-2541-swe-smhi", "a GESLA record in DROPPED"]],
+      [["uhslc/9", "gesla/uddevalla-2541-swe-smhi", "a GESLA record that isDropped finds"]],
     );
     assert.deepEqual(byId.get("gesla/uddevalla-2541-swe-smhi")!.same_as, []);
     assert.deepEqual(byId.get("smhi/2541")!.same_as, ["gesla/uddevalla-udd-swe-cmems"]);

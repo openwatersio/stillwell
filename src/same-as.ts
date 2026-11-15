@@ -289,7 +289,7 @@ export function linkGauges<T extends Station>(
 
   for (const { a, b } of LINKS)
     if (alone.has(a) || alone.has(b))
-      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record in DROPPED" });
+      dropped.push({ from: a, to: b, reason: "LINKS names a GESLA record that isDropped finds" });
     else if (byId.has(a) && byId.has(b)) add(a, b, "manual");
     else dropped.push({ from: a, to: b, reason: "LINKS names no such station" });
   for (const { a, b } of UNLINKS)
@@ -304,7 +304,7 @@ export function linkGauges<T extends Station>(
       const target = byId.get(other);
       if (!target) dropped.push({ from: s.id, to: other, reason: "no such station" });
       else if (alone.has(other))
-        dropped.push({ from: s.id, to: other, reason: "a GESLA record in DROPPED" });
+        dropped.push({ from: s.id, to: other, reason: "a GESLA record that isDropped finds" });
       // A position that isn't a number can't vouch for an ID either.
       else if (target.source !== s.source && !(km(s, target) <= ID_KM))
         dropped.push({ from: s.id, to: other, reason: `${Math.round(km(s, target))} km apart` });

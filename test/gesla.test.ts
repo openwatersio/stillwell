@@ -750,6 +750,29 @@ describe("gesla clocks", () => {
     );
   });
 
+  it("moves exactly the records each clock erratum lists, by its hours", () => {
+    const hours: Record<string, number> = {
+      "gesla-hong-kong-hour-early": 1,
+      "gesla-crms-hour-early": 1,
+      "gesla-spain-uhslc-hour-early": 1,
+      "gesla-santa-cruz-de-la-palma-hour-early": 1,
+      "gesla-progreso-uhslc-721a-six-hours-late": -6,
+      "gesla-scott-base-ttw-nzst": -12,
+      "gesla-queensland-2020-aest": -10,
+      "gesla-sfwmd-est": 5,
+    };
+    const listed = new Set<string>();
+    for (const [id, h] of Object.entries(hours)) {
+      const entry = geslaErrata.errata.find((e) => e.id === id)!;
+      for (const station of entry.stations!) {
+        const file = station.replace(/^gesla\//, "");
+        listed.add(file);
+        assert.equal(gesla.clockOf(file)?.hours, h, station);
+      }
+    }
+    for (const file of Object.keys(gesla.CLOCK)) assert.ok(listed.has(file), file);
+  });
+
   it("refuses a record off UTC, but keeps Wewak's, which only says it is", () => {
     const text = "# TIME ZONE HOURS 1\n" + lines(["1990/01/01 00:00:00"]);
     assert.throws(() => gesla.parse(text, "x-1-png-bom", null), /on UTC1/);
