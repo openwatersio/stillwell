@@ -128,6 +128,16 @@ describe("ispra", () => {
       { time: Date.parse("2015-01-01T00:10:00Z"), level: 0.018, flag: Flag.preliminary },
     ]);
     assert.throws(() => one("2015-02-30;1"), /has the row/);
+    // Midnight without a time is the first row's alone, and a blank row is a corrupt file.
+    assert.throws(
+      () => ispra.parse("UTC;Level\r\n2015-01-01 00:10:00;1\r\n2015-01-01;-1.6\r\n"),
+      /has the row/,
+    );
+    assert.throws(
+      () => ispra.parse("UTC;Level\r\n2015-01-01 00:10:00;1\r\n\r\n2015-01-01 00:20:00;2\r\n"),
+      /has the row ""/,
+    );
+    assert.equal(ispra.parse("UTC;Level\r\n2015-01-01 00:10:00;1\r\n").length, 1);
   });
 
   it("reads the dump whatever its line ends and order, naming a gauge by its latest month", () => {

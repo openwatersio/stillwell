@@ -216,10 +216,13 @@ export function parse(text: string): Observation[] {
   // Levels are compared as ISPRA writes them, not as rounded to millimeters; null marks a time with two.
   const seen = new Map<number, number | null>();
   const out: Observation[] = [];
-  for (const row of rows) {
-    if (!row.trim()) continue;
+  // Only the file's last line terminator leaves an empty element; a blank row elsewhere is a corrupt file.
+  if (rows.at(-1) === "") rows.pop();
+  for (const [i, row] of rows.entries()) {
     const match = ROW.exec(row);
-    const clock = match?.[2] ?? "00:00:00";
+    // A date with no time is the first row's midnight, and nowhere else.
+    const clock = match?.[2] ?? (i === 0 ? "00:00:00" : "");
+    if (match && !clock) throw new Error(`ISPRA's file has the row "${row}"`);
     const t = match ? Date.parse(`${match[1]}T${clock}Z`) : NaN;
     if (
       !match ||
