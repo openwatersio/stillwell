@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
+import { crc32, deflateRawSync } from "node:zlib";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { Flag, type Station } from "../src/schema.ts";
+import { firstEpochs, nextEpochs } from "../src/epochs.ts";
 import * as linz from "../src/sources/linz/index.ts";
 
 const fixture = (name: string) =>
@@ -31,6 +33,53 @@ afterEach(() => {
   mock.timers.reset();
   mock.restoreAll();
 });
+
+/** A zip holding one CSV, as the base64 text the adapter's transport returns. */
+function zipOf(name: string, csv: string): string {
+  const file = Buffer.from(name.replace(/\.zip$/, ".csv"));
+  const data = Buffer.from(csv);
+  const packed = deflateRawSync(data);
+  const crc = crc32(data);
+  const local = Buffer.alloc(30);
+  local.writeUInt32LE(0x04034b50, 0);
+  local.writeUInt16LE(20, 4);
+  local.writeUInt16LE(8, 8);
+  local.writeUInt32LE(crc, 14);
+  local.writeUInt32LE(packed.length, 18);
+  local.writeUInt32LE(data.length, 22);
+  local.writeUInt16LE(file.length, 26);
+  const central = Buffer.alloc(46);
+  central.writeUInt32LE(0x02014b50, 0);
+  central.writeUInt16LE(20, 4);
+  central.writeUInt16LE(20, 6);
+  central.writeUInt16LE(8, 10);
+  central.writeUInt32LE(crc, 16);
+  central.writeUInt32LE(packed.length, 20);
+  central.writeUInt32LE(data.length, 24);
+  central.writeUInt16LE(file.length, 28);
+  const offset = local.length + file.length + packed.length;
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(1, 8);
+  end.writeUInt16LE(1, 10);
+  end.writeUInt32LE(central.length + file.length, 12);
+  end.writeUInt32LE(offset, 16);
+  return Buffer.concat([local, file, packed, central, file, end]).toString("base64");
+}
+
+/** A year's file of one row a minute for `code`, from `level` at each minute. */
+function yearCsv(code: string, year: number, level: (minute: number) => number): string {
+  const rows: string[] = [];
+  const start = Date.UTC(year, 0, 1);
+  const minutes = (Date.UTC(year + 1, 0, 1) - start) / 60_000;
+  for (let m = 0; m < minutes; m++) {
+    const at = new Date(start + m * 60_000).toISOString();
+    rows.push(
+      `${code},${at.slice(0, 10).replaceAll("-", "")},${at.slice(11, 19)},${level(m).toFixed(3).padStart(6, "0")}`,
+    );
+  }
+  return rows.join("\n");
+}
 
 const CODES = ["CHIT", "KAIT", "OTAT", "SCOT", "SUMT", "WLGT"];
 const listRoutes: [RegExp, string][] = [
@@ -196,6 +245,262 @@ describe("linz", () => {
     assert.equal(at("2025-04-15T21:18:00Z"), undefined);
     assert.equal(at("2025-04-14T02:47:00Z"), undefined);
     assert.ok(at("2025-04-10T00:00:00Z"));
+  });
+
+  it("reads sensor 41 over a span where sensor 40 is stuck, and sensor 40 either side", async () => {
+    const requests = serve([
+      [/listDatasetFiles\/SUMT\/2016\/40$/, fixture("linz-list-SUMT-2016-40.json")],
+      [/listDatasetFiles\/SUMT\/2016\/41$/, fixture("linz-list-SUMT-2016-41.json")],
+      [/tidegauge\/SUMT\/2016\/40\/SUMT_40_2016\.zip$/, fixture("linz-SUMT_40_2016.zip.b64")],
+      [/tidegauge\/SUMT\/2016\/41\/SUMT_41_2016\.zip$/, fixture("linz-SUMT_41_2016.zip.b64")],
+    ]);
+    const obs = await linz.levels(
+      "SUMT",
+      new Date("2016-06-27T23:58:00Z"),
+      new Date("2016-06-28T00:03:00Z"),
+    );
+    // Sensor 40 until the span starts at midnight, then sensor 41; no stuck -4.79 m survives.
+    assert.deepEqual(
+      obs.map((o) => [new Date(o.time).toISOString().slice(11, 16), o.level, o.flag]),
+      [
+        ["23:58", 1.953, Flag.good],
+        ["23:59", 1.949, Flag.good],
+        ["00:00", 1.921, Flag.good],
+        ["00:01", 1.915, Flag.good],
+        ["00:02", 1.912, Flag.good],
+      ],
+    );
+    assert.ok(requests.some(([url]) => /SUMT_41_2016\.zip$/.test(url)));
+    // A range before the span reads no sensor 41 file.
+    requests.length = 0;
+    await linz.levels("SUMT", new Date("2016-06-27T23:58:00Z"), new Date("2016-06-28T00:00:00Z"));
+    assert.ok(requests.every(([url]) => !/\/41\//.test(url)));
+  });
+
+  it("reads nothing for days where both sensors are stuck", async () => {
+    const requests = serve([]);
+    const obs = await linz.levels(
+      "NCPT",
+      new Date("2011-09-22T00:00:00Z"),
+      new Date("2011-09-22T00:05:00Z"),
+    );
+    assert.deepEqual(obs, []);
+    assert.equal(requests.length, 0);
+  });
+
+  it("reads a whole year of sensor 41 inside a span, and no sensor 40 file", async () => {
+    const name = "SUMT_41_2017.zip";
+    const requests = serve([
+      [
+        /listDatasetFiles\/SUMT\/2017\/40$/,
+        JSON.stringify({ files: [{ name: "SUMT_40_2017.zip" }] }),
+      ],
+      [/listDatasetFiles\/SUMT\/2017\/41$/, JSON.stringify({ files: [{ name }] })],
+      [
+        /tidegauge\/SUMT\/2017\/41\/SUMT_41_2017\.zip$/,
+        zipOf(
+          name,
+          yearCsv("SUMT", 2017, () => 1.5),
+        ),
+      ],
+    ]);
+    // A year's minutes are too many arguments for one push.
+    const obs = await linz.levels(
+      "SUMT",
+      new Date("2017-01-01T00:00:00Z"),
+      new Date("2018-01-01T00:00:00Z"),
+    );
+    assert.equal(obs.length, 525_600);
+    assert.ok(requests.every(([url]) => !/SUMT_40_2017\.zip/.test(url)));
+  });
+
+  it("reads a span across a year's end from both years' sensor 41 files", async () => {
+    const files = (y: number) => JSON.stringify({ files: [{ name: `WLGT_41_${y}.zip` }] });
+    const requests = serve([
+      [/listDatasetFiles\/WLGT\/2014\/40$/, files(2014).replace("_41_", "_40_")],
+      [/listDatasetFiles\/WLGT\/2015\/40$/, files(2015).replace("_41_", "_40_")],
+      [/listDatasetFiles\/WLGT\/2014\/41$/, files(2014)],
+      [/listDatasetFiles\/WLGT\/2015\/41$/, files(2015)],
+      [
+        /WLGT\/2014\/41\/WLGT_41_2014\.zip$/,
+        zipOf("WLGT_41_2014.zip", "WLGT,20141231,23:59:00,03.100"),
+      ],
+      [
+        /WLGT\/2015\/41\/WLGT_41_2015\.zip$/,
+        zipOf("WLGT_41_2015.zip", "WLGT,20150101,00:00:00,03.110"),
+      ],
+    ]);
+    const obs = await linz.levels(
+      "WLGT",
+      new Date("2014-12-31T23:59:00Z"),
+      new Date("2015-01-01T00:01:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => o.level),
+      [3.1, 3.11],
+    );
+    assert.ok(requests.every(([url]) => !/WLGT_40_/.test(url)));
+  });
+
+  it("fails a span year where LINZ lists no sensor 41 files", async () => {
+    serve([
+      [
+        /listDatasetFiles\/SUMT\/2017\/40$/,
+        JSON.stringify({ files: [{ name: "SUMT_40_2017.zip" }] }),
+      ],
+      [/listDatasetFiles\/SUMT\/2017\/41$/, JSON.stringify({ files: [] })],
+    ]);
+    await assert.rejects(
+      linz.levels("SUMT", new Date("2017-03-01T00:00:00Z"), new Date("2017-03-02T00:00:00Z")),
+      /lists no sensor 41 files for SUMT in 2017/,
+    );
+  });
+
+  it("leaves out Napier's minutes after its step on 24 February 2008, and keeps those either side", async () => {
+    const name = "NAPT_40_2008.zip";
+    const csv = [
+      "NAPT,20080224,18:50:00,03.300",
+      "NAPT,20080224,18:51:00,03.294",
+      "NAPT,20080224,23:59:00,02.900",
+      "NAPT,20080225,00:00:00,02.910",
+    ].join("\n");
+    const requests = serve([
+      [/listDatasetFiles\/NAPT\/2008\/40$/, JSON.stringify({ files: [{ name }] })],
+      [/tidegauge\/NAPT\/2008\/40\/NAPT_40_2008\.zip$/, zipOf(name, csv)],
+    ]);
+    const obs = await linz.levels(
+      "NAPT",
+      new Date("2008-02-24T00:00:00Z"),
+      new Date("2008-02-26T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => new Date(o.time).toISOString().slice(8, 16)),
+      ["24T18:50", "25T00:00"],
+    );
+    assert.ok(requests.every(([url]) => !/\/41\//.test(url)));
+  });
+
+  it("resumes sensor 40 on the day a span ends, and reads sensor 41 on the day before", async () => {
+    serve([
+      [
+        /listDatasetFiles\/CPIT\/2012\/40$/,
+        JSON.stringify({ files: [{ name: "CPIT_40_2012.zip" }] }),
+      ],
+      [
+        /listDatasetFiles\/CPIT\/2012\/41$/,
+        JSON.stringify({ files: [{ name: "CPIT_41_2012.zip" }] }),
+      ],
+      [
+        /CPIT\/2012\/40\/CPIT_40_2012\.zip$/,
+        zipOf("CPIT_40_2012.zip", "CPIT,20120330,23:59:00,01.900\nCPIT,20120331,00:00:00,03.700"),
+      ],
+      [
+        /CPIT\/2012\/41\/CPIT_41_2012\.zip$/,
+        zipOf("CPIT_41_2012.zip", "CPIT,20120330,23:59:00,04.000\nCPIT,20120331,00:00:00,04.100"),
+      ],
+    ]);
+    const obs = await linz.levels(
+      "CPIT",
+      new Date("2012-03-30T23:59:00Z"),
+      new Date("2012-03-31T00:01:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => o.level),
+      [4, 3.7],
+    );
+  });
+
+  it("keeps every span's dates real, in order, and clear of the next", () => {
+    for (const [code, spans] of Object.entries(linz.SENSOR_41))
+      spans.forEach((s, i) => {
+        for (const date of [s.from, s.to])
+          assert.ok(
+            new Date(Date.parse(date))
+              .toISOString()
+              .startsWith(date.replace(/Z$/, "").slice(0, 16)),
+            `${code} ${date} isn't a date`,
+          );
+        assert.ok(Date.parse(s.from) < Date.parse(s.to), `${code} ${s.from} isn't before ${s.to}`);
+        if (i)
+          assert.ok(Date.parse(spans[i - 1]!.to) <= Date.parse(s.from), `${code} spans overlap`);
+      });
+  });
+
+  it("backs every sensor 41 span with an erratum for its station and days", () => {
+    const errata = JSON.parse(
+      readFileSync(new URL("../src/sources/linz/errata.json", import.meta.url), "utf8"),
+    ).errata as {
+      stations: string[] | null;
+      since: string | null;
+      until: string | null;
+      handling: string;
+    }[];
+    for (const [code, spans] of Object.entries(linz.SENSOR_41))
+      for (const span of spans) {
+        const covered = errata.some(
+          (e) =>
+            (e.handling === "corrected" || e.handling === "dropped") &&
+            e.stations?.includes(`linz/${code}`) &&
+            (e.since ?? "") <= span.from.slice(0, 10) &&
+            (e.until ?? "9999") >= span.to.slice(0, 10),
+        );
+        assert.ok(covered, `${code} ${span.from} to ${span.to} has no erratum`);
+      }
+  });
+
+  it("opens the epochs the overrides split, each converting by what was measured", () => {
+    const options = (station: string, withOverrides: boolean) => ({
+      station,
+      now: "2026-11-15T00:00:00Z",
+      offsets: [0, 0] as [number, number],
+      decisions: withOverrides ? linz.source.overrides!.epochs! : {},
+      splits: withOverrides ? linz.source.overrides!.splits : undefined,
+      archive: "previous" as const,
+    });
+    const fetched = { datum: "ZERO", datums: {}, reference: null };
+    // A new station gets its epochs at once; one already in the store has them split by a refresh.
+    const epochsOf = (station: string) => {
+      const fresh = firstEpochs(fetched, options(station, true));
+      const stored = firstEpochs(fetched, options(station, false));
+      const split = nextEpochs(stored, fetched, options(station, true)).epochs;
+      assert.deepEqual(
+        split.map((e) => [e.since, e.to_current]),
+        fresh.map((e) => [e.since, e.to_current]),
+      );
+      return fresh.map((e) => [e.since, e.to_current]);
+    };
+    assert.deepEqual(epochsOf("linz/NAPT"), [
+      [null, -0.344],
+      ["2008-02-25T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(epochsOf("linz/WLGT"), [
+      [null, -0.64],
+      ["2012-05-30T00:00:00Z", -0.38],
+      ["2021-04-16T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(epochsOf("linz/GIST"), [
+      [null, -1.53],
+      ["2013-09-26T00:00:00Z", -0.95],
+      ["2021-05-12T00:00:00Z", -0.54],
+      ["2024-12-13T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(epochsOf("linz/OTAT"), [
+      [null, -0.56],
+      ["2021-05-26T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(epochsOf("linz/TAUT"), [
+      [null, -0.47],
+      ["2024-03-21T00:00:00Z", 0],
+    ]);
+    // Korotiti Bay's step has no record to measure against.
+    assert.deepEqual(epochsOf("linz/GBIT"), [
+      [null, null],
+      ["2024-09-10T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(epochsOf("linz/KAIT"), [
+      [null, -0.88],
+      ["2016-11-14T00:00:00Z", 0],
+    ]);
   });
 
   it("stops at the end of the range and before a gauge's record", async () => {
