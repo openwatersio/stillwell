@@ -180,6 +180,11 @@ export const LINKS: Decision[] = [
     note: "CMEMS's copy of RWS's Zwartsluis Zwarte Water gauge: all 128 months both hold from August 2014 agree within 1 cm RMS, and 98.9% of their 90,196 shared hours within 5 mm. The Meppelerdiep gauge 1.8 km away is named as alike, so the copy rule leaves it in doubt; it agrees within 1 cm in 86 of 136 months, but only 38% of hours within 5 mm. RWS's Zwartsluis binnen, 40 m away, ends in 1985.",
   },
   {
+    a: "linz/SCOT",
+    b: "uhslc/663a",
+    note: "LINZ's Scott Base gauge and UHSLC's, at the same position (under 5 m apart, by LINZ's README and UHSLC's list). UHSLC's record runs to June 2017 and LINZ's from February 2016, and from 29 March 2016, with LINZ's labels read as NZST, the two agree at the same hours to 2.5 mm (r 0.9999, UHSLC's hourly values against one-hour means of LINZ's) with no offset between their zeros. Before the gauge failed on 28 February 2016, LINZ's levels are 0.120 m higher (erratum `linz-scott-base-step-2016`). The name and position rules link them too; this keeps the link if either moves.",
+  },
+  {
     a: "usace/MVK.Tendal",
     b: "usgs/07369500",
     note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",

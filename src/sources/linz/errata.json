@@ -306,6 +306,236 @@
       "error": "Gisborne's zero steps down on 12 or 13 December 2024, with no file for the 12th, when the README lists sensors replaced in 2024: sensor 40's median offset from UHSLC's Gisborne is 2.323 m over the 30 days before and 1.781 m after (0.542 m), and sensor 41's 2.368 and 1.826 m (0.542 m).",
       "response": "Levels before 13 December 2024 are converted to the later zero by -0.54 m, as an earlier epoch. The step falls in the gap before the file for the 13th, so no minute is left out.",
       "evidence": "UHSLC's hourly Gisborne (`uhslc/078b`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-antarctic-formats",
+      "stations": ["linz/ROBT", "linz/SCOT"],
+      "since": null,
+      "until": null,
+      "handling": "corrected",
+      "error": "The READMEs of Cape Roberts and Scott Base describe the files' layouts wrongly or leave some out. Cape Roberts' README lists three layouts and none for 2010, whose rows carry ten fields, or for 2022, which uses the Julian-day layout; 2007's daily files hold `ROBT,2007-11-08 00:05,6.117`. Scott Base's README gives `SCOT,2016-01-05 15:50,1.881` and a layout with separate date and time for 2024 and 2025, but its 2016 to 2022 files hold `SCOT,20160105,15:50:00,1.881`, its 2023 file `2023-01-01,00:00:00,2.504` in meters, its 2024 and 2026 files the same layout in millimeters, and its 2025 file `1/01/2025,00:00:00,3162` in millimeters with the day first (31/12/2025 is its last row). Scott Base's 2026 file is `SCOT_00_2026_01-03.zip`, January to March, since the gauge was removed on 5 March.",
+      "response": "Each row is read by the layout it holds and accepted only where every field is where that layout puts it. Scott Base's levels are millimeters from labels of 1 January 2024 on and meters before, where its levels stay near 2.4 m across the change (2.398 at 23:59 on 31 December 2023 and 2.400 at 00:00 on 1 January 2024) and their tide matches Cape Roberts' in amplitude and phase.",
+      "evidence": "Every row of every file: 72 of 72 Cape Roberts files (18 yearly files for 2008 to 2025 and 54 daily files for 8 November to 31 December 2007) and 11 of 11 Scott Base files (yearly files for 2016 to 2025 and the 2026 file), November 2026; tide fits of each year against Cape Roberts' and UHSLC's Scott Base (erratum `linz-scott-base-clock`)."
+    },
+    {
+      "id": "linz-antarctic-file-rows",
+      "stations": ["linz/ROBT", "linz/SCOT"],
+      "since": null,
+      "until": null,
+      "handling": "dropped",
+      "error": "The Antarctic files hold rows that aren't levels or are cut. Missing levels are `-6999.000` in Cape Roberts' 2008 to 2010 files and `6999` or `-6999` with empty fields in 2011's (95,310 rows). Cape Roberts' 2024 file has 383 rows with a field missing or two joined (`2024,0,30,6.252,-2.681,976.63` has no day, and the 287 like it would read as a level of -2.7 m; `2024,11,1715,26,6.-3.368,979.01` has no level), and its 2023 file has three empty rows. Scott Base's 2023 file has 12,960 rows for 1 to 9 December whose dates and times a spreadsheet has mangled (`1/12/2023  1,02:00:00,2.573`, with the hour in the date and `:59:00 am` for a time). Rows repeat in both gauges: Cape Roberts' 31 December 2021 (285 rows), 10 to 15 September 2023 (1,728 rows) and 1 January 2022 (3 rows), and Scott Base's 24 and 25 January 2017 (499 rows) and 10 and 11 August 2020 (244 rows), with the same level each time, and five minutes where two levels disagree (Cape Roberts on 12 April 2008, 22 June 2009, 21 October 2011 and 3 August 2023, 0.001 to 0.01 m apart, and Scott Base on 5 July 2023 at 16:13 NZST, 0.004 m apart). Scott Base reads 0.000 for 11,382 rows.",
+      "response": "A row that isn't a level is left out, as are a level of 0.000 and any level of 100 m or more. A minute that repeats with the same level is kept once, and where its levels disagree neither is kept. The mangled December 2023 rows are left out: their minutes can't be told from the rows around them, though 9 days of 1,440 rows run on from one valid level to the next.",
+      "evidence": "Every row of the 72 and 11 files, counted by layout, November 2026."
+    },
+    {
+      "id": "linz-scott-base-clock",
+      "stations": ["linz/SCOT"],
+      "since": null,
+      "until": null,
+      "handling": "corrected",
+      "error": "Scott Base's README gives the time system NZST for its first layout and none for the rest. Its labels are NZST, UTC+12 and without daylight saving, in every file but one stretch: from the reinstalled logger on 25 November 2023 to the end of October 2024 they are UTC+13, and from November 2024 UTC+12 again. The README says nothing of it. The labels run on without a break across the change, so the day it happened can't be read from the file, and the fit of the tide moves from UTC+13 on 28 October to UTC+12 on 1 November.",
+      "response": "Labels are read as UTC+12, except as UTC+13 from 25 November 2023 to 29 October 2024, and the labels from 29 to 31 October 2024 are left out.",
+      "evidence": "Against UHSLC's hourly Scott Base (`uhslc/663a`) in 2016 and 2017, a one-hour centered mean of the five-minute levels fits at a lag of exactly 12.00 hours every month (r 0.9999, residual 2.5 mm). From 2016 to 2026 the phases of K1, O1, M2 and S2 in each period, Cape Roberts' (UTC) less Scott Base's, are 8, 8, 12 and 17 degrees at UTC+12, and 9, 9, 12 and 19 degrees at UTC+13 from December 2023 to October 2024, where UTC+12 gives -7, -5, -19 and -11; a whole hour is 15, 14, 29 and 30 degrees. Daily fits of the tide against the prediction from UHSLC's record change over between 28 October and 1 November 2024. November 2026."
+    },
+    {
+      "id": "linz-cape-roberts-unreliable-2009",
+      "stations": ["linz/ROBT"],
+      "since": "2009-08-29",
+      "until": "2009-12-09",
+      "handling": "flagged",
+      "error": "LINZ's README marks Cape Roberts' levels from 29 August to 7 December 2009 \"DATA UNRELIABLE\": its sensor malfunctioned in late August, and a new one installed on 4 December failed 4 days later. The levels climb from 6.2 m in the first days of the span to 8.6 m by late November, 2.4 m up, with no change in the tide; those from 3:05 UTC on 4 December are 0.4 to 1.5 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The levels from 3:05 UTC on 4 December aren't kept (erratum `linz-cape-roberts-new-sensor-2009`).",
+      "evidence": "Daily medians of the 2009 file, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-cape-roberts-new-sensor-2009",
+      "stations": ["linz/ROBT"],
+      "since": "2009-12-04",
+      "until": "2010-01-01",
+      "handling": "dropped",
+      "error": "From 3:05 UTC on 4 December 2009, when the README says a new sensor was installed and failed 4 days later, Cape Roberts' levels are 0.4 to 1.5 m, against 8.6 m in the days before and 6.2 m before the sensor malfunctioned.",
+      "response": "Levels from 03:00 UTC on 4 December 2009 to the end of the year aren't kept.",
+      "evidence": "The 2009 file, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-cape-roberts-step-2010",
+      "stations": ["linz/ROBT"],
+      "since": null,
+      "until": "2010-11-05",
+      "handling": "kept",
+      "error": "Cape Roberts' gauge was re-established on 5 November 2010 (the README says early November) and reads about 0.25 m lower than before 2009: the median of its levels is 6.2 m from January to August 2009 and 5.9 to 6.0 m from November 2010 on. UHSLC's Scott Base has no values for 2007 to 2009, so no record measures the step.",
+      "response": "Values from 5 November 2010 are in a later epoch, and the earlier epoch has no `to_current`, so the API doesn't convert across the step.",
+      "evidence": "Medians of the 2008 to 2010 files, and of Cape Roberts' hourly levels less UHSLC's Scott Base, which stay between 3.96 and 4.06 m from November 2010 to June 2017, November 2026; the README's gauge history and its table of the zero below benchmark B93M (8.234 m in November 2008, 7.993 m in November 2011)."
+    },
+    {
+      "id": "linz-cape-roberts-step-2019",
+      "stations": ["linz/ROBT"],
+      "since": "2019-02-03",
+      "until": "2019-02-04",
+      "handling": "dropped",
+      "error": "Cape Roberts' levels step up 1.2 m at 03:07 UTC on 3 February 2019, from about 5.9 to 7.1 m, and the README lists nothing for 2019 but a calibration. Against Scott Base's, which was working, the difference steps from 3.891 m over the ten days before to 5.121 m over the ten days after (1.230 m); the step across the minutes of the jump is 1.17 to 1.29 m depending on the window. The README's table puts the zero 1.319 m lower in October 2019 than in November 2018 (erratum `linz-cape-roberts-calibration-2019`).",
+      "response": "Levels from 03:00 UTC on 3 February 2019 to the end of that day aren't kept, since an epoch starts on a whole day, and values from 4 February are in a later epoch. The earlier epoch has no `to_current`: a `to_current` is to the current zero, and Cape Roberts' failure and re-establishment in 2021 left no record to measure that step against (erratum `linz-cape-roberts-step-2021`).",
+      "evidence": "Cape Roberts' 2019 file and Scott Base's (UTC+12 labels) at the same hours, the medians of the differences over the 10 days either side, November 2026; the README's table of the zero below B93M."
+    },
+    {
+      "id": "linz-cape-roberts-calibration-2019",
+      "stations": ["linz/ROBT"],
+      "since": null,
+      "until": null,
+      "handling": "kept",
+      "error": "Cape Roberts' README lists the zero of the gauge 9.534 m below benchmark B93M at the calibration of October 2019, marked \"unreliable\", against 8.215 m in November 2018 and 7.766 m in November 2021. The levels step up 1.2 m on 3 February 2019 and stay on that zero until the gauge failed in March 2021, which fits the table's change of 1.319 m and doesn't show a calibration of a different zero.",
+      "response": "No levels are flagged for the calibration, since the data hold no span that marks it; the README's value isn't used for any conversion.",
+      "evidence": "Cape Roberts' daily medians from February 2019 to March 2021, November 2026; the README's table."
+    },
+    {
+      "id": "linz-cape-roberts-step-2021",
+      "stations": ["linz/ROBT"],
+      "since": null,
+      "until": "2021-11-06",
+      "handling": "kept",
+      "error": "Cape Roberts' levels step down about 1.7 m between its failure on 16 March 2021 and its re-establishment on 6 November: from about 7.5 m to 5.7 m. Scott Base's gauge failed and was re-established in the same months (erratum `linz-scott-base-step-2021`), so the two gauges' difference, which steps from 5.403 m to 3.546 m (1.857 m), shows only the two steps together. The README's tables put Cape Roberts' zero 1.768 m higher in November 2021 than in October 2019 and Scott Base's 0.124 m lower than in November 2020, which adds to 1.892 m.",
+      "response": "Values from 6 November 2021 are in a later epoch, and the earlier epoch has no `to_current`.",
+      "evidence": "The medians of both gauges' hourly differences over the 4 weeks before 5 February and the 5 weeks from 25 November, November 2026; the README tables of both gauges."
+    },
+    {
+      "id": "linz-cape-roberts-failed-2021",
+      "stations": ["linz/ROBT"],
+      "since": "2021-03-16",
+      "until": "2021-11-07",
+      "handling": "dropped",
+      "error": "Cape Roberts' gauge failed on 16 March 2021 (the README says so) and was re-established on 6 November. Its file still has a row for every five minutes: from 21:55 UTC on 16 March the levels are 20 to 23 m and then, from April to November, run from -9 to 35 m with daily medians that jump by up to 5 m, until 03:00 UTC on 6 November, when they read 4.6 m and settle over three hours to a tide around 5.9 m.",
+      "response": "Levels from 21:00 UTC on 16 March to 06:00 UTC on 6 November 2021 aren't kept.",
+      "evidence": "The 2021 file, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-start-2016",
+      "stations": ["linz/SCOT"],
+      "since": "2016-01-01",
+      "until": "2016-02-03",
+      "handling": "dropped",
+      "error": "Scott Base's file for 2016 starts at 15:50 NZST on 5 January, and its levels aren't a tide until 03:40 UTC on 2 February: they drift from 2.0 to 1.7 m until the 13th, then sit near 0.4 m, flat to a few centimeters, until 03:40 UTC on 2 February, when they jump to 2.3 m. UHSLC's record starts on 2 February.",
+      "response": "Levels before 04:00 UTC on 2 February 2016 aren't kept.",
+      "evidence": "The 2016 file and UHSLC's hourly Scott Base (`uhslc/663a`), November 2026."
+    },
+    {
+      "id": "linz-scott-base-step-2016",
+      "stations": ["linz/SCOT"],
+      "since": "2016-02-28",
+      "until": "2016-03-29",
+      "handling": "dropped",
+      "error": "Scott Base's levels run 0.120 m above UHSLC's hourly Scott Base (`uhslc/663a`) from 2 to 21 February 2016 (daily medians of the difference 0.119 to 0.121 m) and level with it from 29 March (0.000 m). The gauge failed at about 12:00 UTC on 28 February, reading 0.01 to 0.4 m, and has no values from 3 to 29 March, so the zero moved in the failure.",
+      "response": "Levels from 23:00 UTC on 28 February to 29 March aren't kept, and values from 29 March are in a later epoch. The earlier epoch has no `to_current`, since a `to_current` is to the current zero and no record measures Scott Base's later steps (erratum `linz-scott-base-step-2021`).",
+      "evidence": "The 2016 file and UHSLC's hourly Scott Base, a one-hour centered mean at lag 12.00 hours, November 2026."
+    },
+    {
+      "id": "linz-scott-base-step-2018",
+      "stations": ["linz/SCOT"],
+      "since": "2018-01-14",
+      "until": "2018-01-22",
+      "handling": "flagged",
+      "error": "Scott Base's README lists a drift of TG0 over 15 and 16 January 2018 and a sharp offset of about 0.08 m between 15:15 and 15:25 on 21 January. Against Cape Roberts', the difference falls from 3.954 m over the 12 days before to 3.866 m over the 2 weeks from the 23rd (0.088 m), so its levels rise 0.09 m.",
+      "response": "The span from 14 to 21 January is flagged `suspect`, keeping the source's own flag as `source_flag`, and values from 22 January are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-stuck-2018-12",
+      "stations": ["linz/SCOT"],
+      "since": "2018-12-13",
+      "until": "2018-12-19",
+      "handling": "dropped",
+      "error": "From 09:35 UTC on 13 December 2018 to 19:55 UTC on 18 December Scott Base's levels are spikes to 0.02 m and then a constant 2.10 m, one level an hour from the 14th. The README lists nothing for 2018 but January.",
+      "response": "Levels from 09:00 UTC on 13 December to 20:00 UTC on 18 December 2018 aren't kept.",
+      "evidence": "The 2018 file, November 2026."
+    },
+    {
+      "id": "linz-scott-base-steps-2019-01",
+      "stations": ["linz/SCOT"],
+      "since": "2019-01-17",
+      "until": "2019-01-20",
+      "handling": "flagged",
+      "error": "Scott Base's README lists TG0 raised 0.122 m at 10:30 and 0.072 m at 16:00 on 18 January 2019, then lowered 0.128 m at 09:00 on the 20th. The three together move the levels by 0.066 m, and against Cape Roberts' the difference is 3.907 m over the 11 days before and 3.891 m over the 11 days after (0.016 m), so no step is left to convert; the zero between the steps is up to 0.19 m off.",
+      "response": "The days of the three shifts, 17 to 19 January, are flagged `suspect`, keeping the source's own flag as `source_flag`. No epoch opens, since no step shows.",
+      "evidence": "Scott Base's and Cape Roberts' hourly levels, the medians of the differences either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-step-2019",
+      "stations": ["linz/SCOT"],
+      "since": "2019-02-24",
+      "until": "2019-11-04",
+      "handling": "dropped",
+      "error": "Scott Base's gauge fails at about 12:00 UTC on 24 February 2019, which its README doesn't list, and reads 0.01 m, with spells of 7.999 m and a fall from 7.4 m to 0.3 m on 28 to 31 October, until 01:00 UTC on 3 November. It then reads a tide again 0.50 m below its levels before: against Cape Roberts', the difference steps from 3.891 m to 5.622 m (1.731 m), of which Cape Roberts' own step of 3 February is 1.230 m (erratum `linz-cape-roberts-step-2019`). The README's table puts the zero 0.341 m higher in November 2019 than in November 2018.",
+      "response": "Levels from 12:00 UTC on 24 February to 02:00 UTC on 3 November 2019 aren't kept, and values from 3 November are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "The 2019 file and Cape Roberts', November 2026; the README's table of the zero below DJRB."
+    },
+    {
+      "id": "linz-scott-base-step-2020",
+      "stations": ["linz/SCOT"],
+      "since": "2020-01-25",
+      "until": "2020-05-13",
+      "handling": "dropped",
+      "error": "Scott Base's gantry was lifted on the morning of 25 January 2020 (NZ time), after which its levels read 0.27 and then 0.03 m, 0.000 for most of February to April and 0.01 m until 12 May, when the README says the gauge was returned to the water with its mount moved about 1 m. The levels read after it are 0.18 m higher against Cape Roberts', the difference falling from 5.606 to 5.428 m.",
+      "response": "Levels from 06:00 UTC on 25 January to 04:10 UTC on 12 May 2020 aren't kept, and values from 12 May are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "The 2020 file and Cape Roberts', the medians of the differences, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-unreliable-2021",
+      "stations": ["linz/SCOT"],
+      "since": "2021-02-07",
+      "until": "2021-03-17",
+      "handling": "flagged",
+      "error": "Scott Base's README marks its levels from 8 February to 17 March 2021 unreliable, after a drift of TG0, and lists six shifts of TG0 from 17 February to 16 March. The levels still follow a tide, and against Cape Roberts' the difference moves from 5.403 m over the 4 weeks before to 5.583 m over the span, with a standard deviation of 0.103 m against 0.065 m, and by 0.2 to 0.3 m over days.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      "evidence": "Scott Base's and Cape Roberts' hourly levels, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-step-2021",
+      "stations": ["linz/SCOT"],
+      "since": "2021-03-16",
+      "until": "2021-11-18",
+      "handling": "dropped",
+      "error": "Scott Base's gauge fails at 19:45 UTC on 16 March 2021 and reads 0.0 to 1.4 m, drifting down from 1.5 m to 0.1 m by October with a tide much smaller than before, until the README's re-establishment on 17 November (NZ time). Its levels then sit on a zero about 1.9 m lower against Cape Roberts', the difference falling from 5.403 to 3.546 m (1.857 m), which Cape Roberts' own step of November 2021 shares (erratum `linz-cape-roberts-step-2021`).",
+      "response": "Levels from 19:00 UTC on 16 March to 02:00 UTC on 17 November 2021 aren't kept, and values from 17 November are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "The 2021 file and Cape Roberts', November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-step-2022",
+      "stations": ["linz/SCOT"],
+      "since": "2022-03-06",
+      "until": "2022-03-09",
+      "handling": "dropped",
+      "error": "Scott Base's 2022 file ends on 9 March, after a failure from 08:15 UTC on 6 March (levels 0.01 to 0.04 m, then a spell of 8.0 m) to 01:45 UTC on the 8th, and has no more levels until 30 October. Its levels are then 0.17 m higher against Cape Roberts', the difference falling from 3.553 m over the 7 weeks before to 3.383 m over the 2 months from 2 November. The README's table puts the zero 0.145 m lower in November 2022 than in 2021.",
+      "response": "Levels from 08:00 UTC on 6 March to 02:00 UTC on 8 March 2022 aren't kept, and values from 30 October are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "The 2022 file and Cape Roberts', November 2026; the README's table."
+    },
+    {
+      "id": "linz-scott-base-shift-2024",
+      "stations": ["linz/SCOT"],
+      "since": "2024-05-09",
+      "until": "2024-05-11",
+      "handling": "dropped",
+      "error": "Scott Base's README lists a vertical shift of the gauge on 10 May 2024. From 21:17 UTC on 9 May to 02:48 UTC on 10 May its levels hold spikes to 0.05 m, and against Cape Roberts' they show no step across it: the difference is 3.446 m before and 3.424 m after (0.022 m).",
+      "response": "Levels from 21:00 UTC on 9 May to 03:00 UTC on 10 May 2024 aren't kept. No epoch opens.",
+      "evidence": "The 2024 file and Cape Roberts', November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-scott-base-drift-2024",
+      "stations": ["linz/SCOT"],
+      "since": "2024-06-01",
+      "until": "2024-07-11",
+      "handling": "kept",
+      "error": "From June to early July 2024 the difference between Cape Roberts' and Scott Base's levels falls 0.21 m, from 3.424 to 3.215 m, in steps of 0.1 to 0.16 m over days, while Scott Base's own monthly median rises 0.12 m and Cape Roberts' falls 0.14 m. Neither gauge's README lists anything for these weeks, and the zero of neither can be told to have moved.",
+      "response": "Kept as LINZ serves it, with no epoch, since the weeks the zero moved can't be placed or tied to a gauge.",
+      "evidence": "Hourly differences and each gauge's monthly medians for 2024, November 2026; both READMEs' gauge histories."
+    },
+    {
+      "id": "linz-scott-base-step-2025",
+      "stations": ["linz/SCOT"],
+      "since": "2025-03-09",
+      "until": "2025-11-21",
+      "handling": "dropped",
+      "error": "Scott Base's gauge fails at about 01:00 UTC on 9 March 2025 and reads -0.02 m, flat, until 00:42 UTC on 20 November, when a tide returns. The README says only that its gantry was moved landward in 2025. The levels are then 0.64 m lower against Cape Roberts', the difference rising from 3.417 m over the 7 weeks before to 4.052 m over the 2 weeks from 25 November.",
+      "response": "Levels from 01:00 UTC on 9 March to 01:00 UTC on 20 November 2025 aren't kept, and values from 20 November are in a later epoch. The earlier epoch has no `to_current`.",
+      "evidence": "The 2025 file and Cape Roberts', November 2026; the README's gauge history."
     }
   ],
   "retired": []

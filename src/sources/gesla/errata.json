@@ -1062,6 +1062,16 @@
       "error": "GESLA's CMEMS records of Kornwerderzand fall slowly from 1.60 m at 04:40 UTC to 1.49 m at 08:30 UTC on 5 October 2025, with GESLA's good flag, through a storm high water of about 2.75 m, as CMEMS's own records do.",
       "response": "5 October 2025 is flagged `suspect` in both CMEMS records, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's RWS record (`gesla/kornwerderzand_waddenzee_buitenhaven-kor-nld-rws`) reads the storm as RWS does, so it isn't listed.",
       "evidence": "In the store, checked in November 2026: both records hold the same 10-minute values as CMEMS's on that morning (erratum `cmems-kornwerderzand-2025-10-05-ramp`), 1.59 m at 05:00 UTC and 1.49 m at 08:30 UTC, while GESLA's RWS record reads 2.75 m and 1.83 m and RWS Harlingen peaks at 2.86 m at 05:30 UTC. GESLA's CMEMS records rise again from 08:40 UTC and match the RWS record at 09:00 UTC. They end on 2026-05-31, before CMEMS's July 2026 offsets."
+    },
+    {
+      "id": "gesla-scott-base-ttw-nzdt-2023",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-11-25",
+      "until": "2024-10-29",
+      "handling": "flagged",
+      "error": "From the logger's reinstallation on 25 November 2023 to late October 2024, the Toitū Te Whenua record of Scott Base is on UTC+13, not the New Zealand Standard Time (UTC+12) of the rest of the record (erratum `gesla-scott-base-ttw-nzst`), so after the adapter moves its times 12 hours earlier they are an hour late: the height labeled T was measured at T − 13 h UTC.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The `linz` source's Scott Base series has the span on the right clock (erratum `linz-scott-base-clock`).",
+      "evidence": "November 2026. The record's hourly values equal the `linz` source's Scott Base levels at the same minute with a lag of one hour from December 2023 to October 2024 (83% of 8,693 hours in 2024 within 1.5 mm at a lag of one hour, 18% at none), and equal them at none in 2016 to 2022. Against Cape Roberts' record (UTC) the phases of K1, O1, M2 and S2 are 9, 9, 12 and 19 degrees at UTC+13 and -7, -5, -19 and -11 at UTC+12 over the span."
     }
   ],
   "retired": []
