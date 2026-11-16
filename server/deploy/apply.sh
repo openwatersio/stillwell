@@ -377,6 +377,7 @@ sleep 5
 systemctl is-active clickhouse-server
 systemctl is-active stillwell-ingest
 systemctl is-active stillwell-api
+systemctl is-active stillwell-jobs
 # The API answers once it has read the station list, which takes a few seconds. One that can't, such as while the
 # store is unreachable, keeps trying on its own, so it warns rather than fail the poller's deploy.
 if ! curl -fsS --retry 30 --retry-connrefused --retry-all-errors --retry-delay 2 http://127.0.0.1:8787/health >/dev/null; then

@@ -22,7 +22,7 @@ RestartSec=10
 # Jobs are units of their own, so stopping or restarting this service leaves them running; a restart reads
 # their results.
 TimeoutStopSec=30
-MemoryMax=300M
+MemoryMax=600M
 
 [Install]
 WantedBy=multi-user.target

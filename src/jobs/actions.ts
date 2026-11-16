@@ -77,7 +77,16 @@ export async function actionsWriting(token: string, repo: string): Promise<Set<s
   const get = client(token, repo);
   const out = new Set<string>();
   for (const workflow of ["ingest.yml", ...Object.keys(WORKFLOWS)])
-    for (const status of ["queued", "in_progress", "waiting", "requested", "pending"])
+    // In the order a run moves through them, so one that moves on between reads lands in a list still to be read,
+    // and in_progress first too, since a run can go back to waiting on an environment or a concurrency group.
+    for (const status of [
+      "in_progress",
+      "requested",
+      "pending",
+      "queued",
+      "waiting",
+      "in_progress",
+    ])
       for (const run of await all<Run>(
         get,
         `actions/workflows/${workflow}/runs?status=${status}`,

@@ -59,6 +59,8 @@ let lastPollsError = "";
 let lastStopped: string | null = null;
 let lastMetricsError = "";
 let stopping = false;
+// Above the loop, which never returns, so it's set before a pass reads it.
+let ids: [number, number] | undefined;
 for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, () => (stopping = true));
 
 while (!stopping) {
@@ -86,10 +88,8 @@ async function tick(): Promise<void> {
   for (const job of allJobs(db, ["cancelling"])) {
     // One that ended before the cancel reached it ends as it did.
     const ended = units.ended(job.id);
-    if (!units.clear(job.id)) {
-      console.error(`job ${job.id}: not stopped yet; its lane stays taken until it is`);
-      continue;
-    }
+    // clear says why when it can't; the lane stays taken until the job has stopped.
+    if (!units.clear(job.id)) continue;
     if (ended?.ok) markEnded(db, job.id, "succeeded", `${ended.result}, before its cancel`);
     else markEnded(db, job.id, "cancelled", "stopped by hand");
     console.log(`job ${job.id} ended on its cancel: ${job.command.join(" ")}`);
@@ -199,7 +199,6 @@ function writeMetrics(stopped: string | null): void {
   }
 }
 
-let ids: [number, number] | undefined;
 function stillwellIds(): [number, number] {
   ids ??= [
     Number(execFileSync("id", ["-u", "stillwell"], { encoding: "utf8" })),
