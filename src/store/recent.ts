@@ -592,7 +592,7 @@ type Span = [number, number];
 
 /**
  * How many years before the current one the monthly refetch reaches back
- * (`backfill … preliminary` from January of that year, in monthly.yml), and
+ * (`backfill … preliminary` from January of that year, in scripts/monthly.sh), and
  * so how far back compaction looks for a station's first preliminary value.
  */
 export const REFETCH_YEARS = 3;

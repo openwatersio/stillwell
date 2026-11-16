@@ -1,0 +1,3 @@
+#!/bin/sh
+# The job queue's command (server/jobs-cli.ts), run as root on the box: `stillwell-jobs` with no arguments lists its usage.
+exec /opt/node/bin/node /opt/stillwell/server/jobs-cli.ts "$@"

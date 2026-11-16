@@ -87,7 +87,7 @@ A station that leaves its source's list or stops being live drops out of the nex
 
 Deleting withheld stations' rows keeps the limit every other withholding keeps (`tooManyWithheld`): a rule that suddenly matches more stations than that fails the source's passes and deletes nothing, until the rule is fixed or `STILLWELL_ACCEPT_WITHHELD=1` accepts it, as `--accept-withheld` does for the other withholdings.
 
-When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks. It asks at most once a day, or an hour after one it couldn't start. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
+When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks, or, for a source on the server's job queue, leaves it to the job service, which reads the change from `polls` and queues its list refresh ([jobs.md](jobs.md)). It asks at most once a day, or an hour after one it couldn't start. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
 
 ## Exporting to R2
 
@@ -99,6 +99,8 @@ Exports keep the files' current schema, levels as FLOAT:
 The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the public bucket.
 
 ## Jobs
+
+[jobs.md](jobs.md) is the job queue as it's built: on the server, with `scripts/ingest.ts` writing R2 directly, before ClickHouse holds the history. What follows is how jobs work once it does.
 
 From step 2, backfill, the monthly refetch, requalify, analysis, withhold and the export are jobs, and from step 3 the station refresh and `publish` too. `stillwell-jobs` runs them from a queue in SQLite (`node:sqlite`, built into Node), a file on the server in WAL mode that both services open:
 
@@ -134,7 +136,7 @@ The Worker rounds a `start` and `end` given together inward to the step, which k
 
 ## Order of work
 
-1. **Phase 9: realtime.** The server, ClickHouse, the poller and QC for every hourly source, `stillwell-api` and the Worker serving `levels` for ranges inside the poller's window, ClickHouse keeping the 7 days the poller keeps current, which covers Slackwater's 96 hours. The server writes nothing to R2: the hourly workflow keeps writing `recent/`, and backfill, refetch, requalify, analysis, withhold and `compact` stay in Actions, unchanged, so fixes to them, such as USGS compaction's growing run time, still land there. Grafana alerts on the poller's pass metrics watch the server, including a source that has stored no new values for three of its intervals. Until step 2 the hourly workflow also fetches each source once an hour, so the server has its own USGS API key rather than share the budget a backfill paces itself to, and a source's Monthly refresh can be started by either; both check for a refresh started in the last day, and a rare second one only repeats the refresh.
+1. **Phase 9: realtime.** The server, ClickHouse, the poller and QC for every hourly source, `stillwell-api` and the Worker serving `levels` for ranges inside the poller's window, ClickHouse keeping the 7 days the poller keeps current, which covers Slackwater's 96 hours. The server writes nothing to R2: the hourly workflow keeps writing `recent/`, and backfill, refetch, requalify, analysis, withhold and `compact` stay in Actions, unchanged, so fixes to them, such as USGS compaction's growing run time, still land there. Grafana alerts on the poller's pass metrics watch the server, including a source that has stored no new values for three of its intervals. Until step 2 the hourly workflow also fetches each source once an hour, so the poller and every backfill share the one USGS API key, whose pace leaves the poller room (`pacing` in `src/sources/usgs/index.ts`), and a source's Monthly refresh can be started by either; both check for a refresh started in the last day, and a rare second one only repeats the refresh.
 2. **History moves in, one source at a time.** For each source: stop its Actions jobs that write `recent/` or year files, the hourly `recent` job included, load its year files into ClickHouse and mark them `loaded`, move its backfill, refetch, requalify, analysis and withhold to jobs on the server, then let the export own its files. A source's Actions writers and the export never run side by side, since each would overwrite the other's year files. A source waits for its running backfills, its current-year backfill included, to finish before it moves. Once every source has moved, `compact`, `recent/` and the `store-<source>` concurrency groups go, and `levels` serves any range, which phase 10 needs.
 3. **Lists and publishing move in.** The station refresh and `publish` run on the server. Actions keeps CI, deploys and the canary, and the cron Worker retires.
 
