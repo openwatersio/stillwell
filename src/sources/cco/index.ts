@@ -105,6 +105,8 @@ async function tides(time: string, query = ""): Promise<Feature[]> {
     fresh: true,
     pace,
     headers: credentials(),
+    // A year of one site can take minutes to answer.
+    timeout: 900,
   });
   // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON.
   if (/"features"\s*:\s*\]/.test(text)) return [];
@@ -153,7 +155,8 @@ export async function stations(_previous?: Station[], now = Date.now()): Promise
       same_as: GESLA[p.sensor.toLowerCase()] ? [GESLA[p.sensor.toLowerCase()]!] : [],
       status: active ? "active" : "inactive",
       live: active,
-      min_interval_s: 600,
+      // Stillwell told the observatory it reads each site once an hour.
+      min_interval_s: 3600,
       source_url: "https://coastalmonitoring.org/observations/",
     });
   }
@@ -186,11 +189,12 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
     for (const { properties: p } of mine) {
       const time = parseDate(p?.date);
       if (time === null) throw new Error(`CCO reading of site ${sourceId} has date ${p?.date}`);
-      // The API sends the value as text, such as "3.88300"; a missing one is null or empty, or 9999 in the manual's files.
-      if (p?.value === null || p?.value === undefined || p.value === "") continue;
-      const level = Number(p.value);
-      if (!Number.isFinite(level))
-        throw new Error(`CCO reading of site ${sourceId} has value ${p.value}`);
+      // The API sends the value as text, such as "3.88300"; a missing one is null or blank, or 9999 in the manual's files.
+      const text = typeof p?.value === "string" ? p.value.trim() : p?.value;
+      if (text === null || text === undefined || text === "") continue;
+      const level = typeof text === "string" && /^-?\d+(\.\d+)?$/.test(text) ? Number(text) : text;
+      if (typeof level !== "number" || !Number.isFinite(level))
+        throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
       if (level === 9999) continue;
       if (time >= start.getTime() && time < end.getTime())
         out.set(time, { time, level, flag: flagOf(p?.QCflag) });

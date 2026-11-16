@@ -1,0 +1,23 @@
+{
+  "errata": [
+    {
+      "id": "cco-west-bay-position",
+      "stations": ["cco/95"],
+      "handling": "corrected",
+      "error": "CCO's list puts West Bay Harbour at 50.7102° N, 2.8200° W, 3.9 km west of the harbour. GESLA's record of the gauge, which CCO supplied, and CMEMS's copy of it both put it at 50.7089° N, 2.7641° W.",
+      "response": "The station refresh moves it to 50.70888, −2.76411, listed in `POSITIONS` in `src/positions.ts`. If CCO moves the station, the refresh reports the entry and fails the run until a person checks it.",
+      "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`.",
+      "report": "Not reported yet."
+    },
+    {
+      "id": "cco-empty-window-answers",
+      "stations": "every station",
+      "handling": "avoided",
+      "error": "A request for a window with no readings answers `{\"type\":\"FeatureCollection\",\"features\":]}`, which isn't JSON. Lymington and Brighton instead answer HTTP 500 for a window before their first reading.",
+      "response": "The adapter reads the first as no values. The second is an error, so a backfill of those two sites starts at their first year (README, Running ingest).",
+      "evidence": "Requests of 2026-11-16: Herne Bay for 1 June 2001 answers the first body; Lymington for 1 June 2008 and Brighton for 1 June 2005 answer 500 with `Internal Server Error`.",
+      "report": "Not reported yet."
+    }
+  ],
+  "retired": []
+}

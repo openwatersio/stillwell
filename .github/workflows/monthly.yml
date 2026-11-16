@@ -403,11 +403,12 @@ jobs:
             # one that stopped earlier asks for nothing past its last day.
             cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
             # CCO's monthly check flags the readings of a finished month, and
-            # only the last year's carry flags, so older readings stay
-            # preliminary for good. Reading from the earliest preliminary
-            # reading would fetch every year of the archive each month, so the
-            # last 12 months are read again.
-            cco) from=$(date -u -d "$year-$month-01 -12 months" +%F) && set -- "$year-$month-01" ;;
+            # only the last year's carry flags; older readings stay preliminary
+            # for good, so reading from the earliest preliminary reading would
+            # fetch the whole archive each month, and a station with none
+            # preliminary would be left out. Every active station is read
+            # again from 12 months back to this month, finished years included.
+            cco) which=all from=$(date -u -d "$year-$month-01 -12 months" +%F) && set -- "$year-$month-01" --refetch ;;
             # BOM isn't hourly: its archives are rebuilt about monthly, weeks
             # behind, and a finished year's again in the new year's first weeks,
             # and nothing else brings its new values, so every active gauge is

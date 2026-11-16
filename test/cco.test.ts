@@ -146,6 +146,7 @@ describe("cco", () => {
             reading(12, "1", null),
             reading(13, "1", ""),
             reading(14, "1", "9999"),
+            reading(15, "1", " "),
           ],
         }),
       ],
@@ -212,6 +213,7 @@ describe("cco", () => {
     );
     await assert.rejects(ask({ id: "90", date: "2026-11-14T00:00:00Z", value: "1" }), /has date/);
     await assert.rejects(ask({ id: "90", date: "20261114#000000", value: "high" }), /has value/);
+    await assert.rejects(ask({ id: "90", date: "20261114#000000", value: true }), /has value/);
     // A stamp that isn't a real time.
     await assert.rejects(ask({ id: "90", date: "20261131#000000", value: "1" }), /has date/);
   });
