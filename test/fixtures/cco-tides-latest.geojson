@@ -3,86 +3,202 @@
  "features": [
   {
    "type": "Feature",
-   "id": "tides.38",
-   "geometry": {
-    "type": "Point",
-    "coordinates": [
-     -0.1013,
-     50.8118
-    ]
-   },
    "properties": {
     "boundedBy": null,
     "msGeometry": null,
     "msGeometryOSGB": null,
-    "id": 38,
+    "id": "86",
+    "sensor": "Arun Platform",
+    "institution": "Southeast Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20240209#094000",
+    "value": "-0.28700",
+    "type": "tides",
+    "hw": "5.613",
+    "hw_timestamp": "20240209#104000",
+    "lw": "0.835",
+    "lw_timestamp": "20240209#164900",
+    "prev_hw": "5.452",
+    "prev_hw_timestamp": "20240208#222400",
+    "prev_lw": "1.134",
+    "prev_lw_timestamp": "20240209#042200",
+    "QCflag": null
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -0.49213,
+     50.76984
+    ]
+   },
+   "id": "tides.86"
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": "http://www.ntslf.org/data/realtime?port=Barmouth",
+    "sensor": "Barmouth",
+    "institution": "This record is external to NNRCMP and included as a reference to a site hosted elsewhere",
+    "date": null,
+    "value": null,
+    "type": "tides",
+    "hw": null,
+    "hw_timestamp": null,
+    "lw": null,
+    "lw_timestamp": null,
+    "prev_hw": null,
+    "prev_hw_timestamp": null,
+    "prev_lw": null,
+    "prev_lw_timestamp": null,
+    "QCflag": null
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -4.0447,
+     52.719
+    ]
+   },
+   "id": "tides.http://www.ntslf.org/data/realtime?port=Barmouth"
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": "88",
     "sensor": "Brighton",
-    "institution": "Channel Coastal Observatory",
-    "date": "20261114#120000",
+    "institution": "Southeast Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20261116#120000",
+    "value": "3.88300",
     "type": "tides",
-    "value": 3.21,
-    "hw": null,
-    "hw_timestamp": null,
-    "lw": null,
-    "lw_timestamp": null,
-    "prev_hw": null,
-    "prev_hw_timestamp": null,
-    "prev_lw": null,
-    "prev_lw_timestamp": null,
+    "hw": "5.255",
+    "hw_timestamp": "20261116#145900",
+    "lw": "2.308",
+    "lw_timestamp": "20261116#212800",
+    "prev_hw": "5.476",
+    "prev_hw_timestamp": "20261116#024700",
+    "prev_lw": "2.345",
+    "prev_lw_timestamp": "20261116#090300",
     "QCflag": null
-   }
-  },
-  {
-   "type": "Feature",
-   "id": "tides.54",
+   },
    "geometry": {
     "type": "Point",
     "coordinates": [
-     1.4092,
-     51.2238
+     -0.10116,
+     50.81175
     ]
    },
+   "id": "tides.88"
+  },
+  {
+   "type": "Feature",
    "properties": {
     "boundedBy": null,
     "msGeometry": null,
     "msGeometryOSGB": null,
-    "id": 54,
+    "id": "90",
     "sensor": "Deal Pier",
-    "institution": "Channel Coastal Observatory",
-    "date": "20261114#120000",
+    "institution": "Southeast Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20261116#115000",
+    "value": "3.08100",
     "type": "tides",
-    "value": 2.84,
-    "hw": null,
-    "hw_timestamp": null,
-    "lw": null,
-    "lw_timestamp": null,
-    "prev_hw": null,
-    "prev_hw_timestamp": null,
-    "prev_lw": null,
-    "prev_lw_timestamp": null,
+    "hw": "4.981",
+    "hw_timestamp": "20261116#152400",
+    "lw": "2.187",
+    "lw_timestamp": "20261116#221400",
+    "prev_hw": "5.240",
+    "prev_hw_timestamp": "20261116#025500",
+    "prev_lw": "1.952",
+    "prev_lw_timestamp": "20261116#095200",
     "QCflag": null
-   }
-  },
-  {
-   "type": "Feature",
-   "id": "tides.89",
+   },
    "geometry": {
     "type": "Point",
     "coordinates": [
-     -3.4625,
-     50.5806
+     1.40926,
+     51.22379
     ]
    },
+   "id": "tides.90"
+  },
+  {
+   "type": "Feature",
    "properties": {
     "boundedBy": null,
     "msGeometry": null,
     "msGeometryOSGB": null,
-    "id": 89,
-    "sensor": "Dawlish",
-    "institution": "Channel Coastal Observatory",
-    "date": "20261114#120000",
-    "type": "tides",
+    "id": "102",
+    "sensor": "Port Isaac",
+    "institution": "Southwest Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20261031#235000",
     "value": null,
+    "type": "tides",
+    "hw": "6.566",
+    "hw_timestamp": "20261101#093200",
+    "lw": "2.227",
+    "lw_timestamp": "20261101#032300",
+    "prev_hw": "6.573",
+    "prev_hw_timestamp": "20261031#210600",
+    "prev_lw": "1.908",
+    "prev_lw_timestamp": "20261031#150100",
+    "QCflag": "9"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -4.83438,
+     50.59418
+    ]
+   },
+   "id": "tides.102"
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": "106",
+    "sensor": "Second Severn Crossing",
+    "institution": "Southwest Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20261116#120000",
+    "value": "9.62700",
+    "type": "tides",
+    "hw": "9.971",
+    "hw_timestamp": "20261116#231600",
+    "lw": "3.654",
+    "lw_timestamp": "20261116#170900",
+    "prev_hw": "10.368",
+    "prev_hw_timestamp": "20261116#104900",
+    "prev_lw": "3.422",
+    "prev_lw_timestamp": "20261116#044300",
+    "QCflag": null
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -2.70002,
+     51.57012
+    ]
+   },
+   "id": "tides.106"
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "boundedBy": null,
+    "msGeometry": null,
+    "msGeometryOSGB": null,
+    "id": "http://www.ntslf.org/data/realtime?port=Whitby",
+    "sensor": "Whitby",
+    "institution": "This record is external to NNRCMP and included as a reference to a site hosted elsewhere",
+    "date": null,
+    "value": null,
+    "type": "tides",
     "hw": null,
     "hw_timestamp": null,
     "lw": null,
@@ -92,69 +208,46 @@
     "prev_lw": null,
     "prev_lw_timestamp": null,
     "QCflag": null
-   }
-  },
-  {
-   "type": "Feature",
-   "id": "tides.71",
+   },
    "geometry": {
     "type": "Point",
     "coordinates": [
-     -0.6146,
-     54.4886
+     -0.6143666667,
+     54.49
     ]
    },
+   "id": "tides.http://www.ntslf.org/data/realtime?port=Whitby"
+  },
+  {
+   "type": "Feature",
    "properties": {
     "boundedBy": null,
     "msGeometry": null,
     "msGeometryOSGB": null,
-    "id": 71,
+    "id": "112",
     "sensor": "Whitby Harbour",
-    "institution": "Channel Coastal Observatory",
-    "date": "20201114#120000",
+    "institution": "Northeast Regional Coastal Monitoring Programme; National Network of Regional Coastal Monitoring Programmes",
+    "date": "20261116#120000",
+    "value": "3.10300",
     "type": "tides",
-    "value": 1.9,
-    "hw": null,
-    "hw_timestamp": null,
-    "lw": null,
-    "lw_timestamp": null,
-    "prev_hw": null,
-    "prev_hw_timestamp": null,
-    "prev_lw": null,
-    "prev_lw_timestamp": null,
+    "hw": "4.744",
+    "hw_timestamp": "20261116#200900",
+    "lw": "2.640",
+    "lw_timestamp": "20261116#135600",
+    "prev_hw": "4.579",
+    "prev_hw_timestamp": "20261116#081000",
+    "prev_lw": "2.186",
+    "prev_lw_timestamp": "20261116#014500",
     "QCflag": null
-   }
-  },
-  {
-   "type": "Feature",
-   "id": "tides.https://example.org/provider-gauge",
+   },
    "geometry": {
     "type": "Point",
     "coordinates": [
-     -1.0,
-     50.0
+     -0.61462,
+     54.48862
     ]
    },
-   "properties": {
-    "boundedBy": null,
-    "msGeometry": null,
-    "msGeometryOSGB": null,
-    "id": "https://example.org/provider-gauge",
-    "sensor": "Provider Gauge",
-    "institution": "Another provider",
-    "date": "20261114#120000",
-    "type": "tides",
-    "value": null,
-    "hw": null,
-    "hw_timestamp": null,
-    "lw": null,
-    "lw_timestamp": null,
-    "prev_hw": null,
-    "prev_hw_timestamp": null,
-    "prev_lw": null,
-    "prev_lw_timestamp": null,
-    "QCflag": null
-   }
+   "id": "tides.112"
   }
  ]
 }

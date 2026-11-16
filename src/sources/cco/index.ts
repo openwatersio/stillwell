@@ -1,4 +1,4 @@
-import { getJson } from "../../http.ts";
+import { getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -32,7 +32,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution:
-    "National Network of Regional Coastal Monitoring Programmes, under the Open Government Licence v3.0. Real-time data are not quality-controlled.",
+    "Real time data are from the National Network of Regional Coastal Monitoring Programmes, made freely available under the terms of the Open Government Licence v3.0. Data are not quality-controlled in real time.",
   contact: { url: "https://www.coastalmonitoring.org/contact_us", email: "cco@channelcoast.org" },
   terms:
     "Open Government Licence v3.0. Real-time data are not quality-controlled; the observatory checks each month in arrears.",
@@ -67,8 +67,9 @@ function credentials(): Record<string, string> {
 
 /**
  * GESLA's records of CCO's gauges by the name CCO lists them under, which the
- * store links as one gauge. Whitby Harbour's is left out: CMEMS and TICON keep
- * it apart from the EA's and BODC's Whitby, so its link waits for a position check.
+ * store links as one gauge. Whitby Harbour is a gauge of its own, 150 m from
+ * the EA's and BODC's Whitby: CMEMS, GESLA and TICON keep the two apart, so
+ * only its CCO record is linked.
  */
 const GESLA: Record<string, string> = {
   "arun platform": "gesla/arun_platform-arn-gbr-cco",
@@ -82,10 +83,10 @@ const GESLA: Record<string, string> = {
   "port isaac": "gesla/port_isaac-pti-gbr-cco",
   "sandown pier": "gesla/sandown_pier-sdp-gbr-cco",
   scarborough: "gesla/scarborough-sca-gbr-cco",
-  "severn bridge": "gesla/severn_bridge-ssc-gbr-cco",
+  "second severn crossing": "gesla/severn_bridge-ssc-gbr-cco",
   "swanage pier": "gesla/swanage_pier-swp-gbr-cco",
-  "teignmouth pier": "gesla/teignmouth_pier-tnp-gbr-cco",
   "west bay harbour": "gesla/west_bay_harbour-wbh-gbr-cco",
+  "whitby harbour": "gesla/whitby_harbour-wtb-gbr-cco",
 };
 
 interface Feature {
@@ -100,11 +101,14 @@ interface Feature {
 }
 
 async function tides(time: string, query = ""): Promise<Feature[]> {
-  const body = await getJson<{ features?: Feature[] }>(`${API}/tides/${time}.geojson${query}`, {
+  const text = await getText(`${API}/tides/${time}.geojson${query}`, {
     fresh: true,
     pace,
     headers: credentials(),
   });
+  // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON.
+  if (/"features"\s*:\s*\]/.test(text)) return [];
+  const body = JSON.parse(text) as { features?: Feature[] };
   if (!Array.isArray(body.features)) throw new Error("CCO answered without a feature list");
   return body.features;
 }
@@ -182,11 +186,12 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
     for (const { properties: p } of mine) {
       const time = parseDate(p?.date);
       if (time === null) throw new Error(`CCO reading of site ${sourceId} has date ${p?.date}`);
-      const level = p?.value;
-      // A missing value is null, or 9999 in the manual's files.
-      if (level === null || level === undefined || level === 9999) continue;
-      if (typeof level !== "number" || !Number.isFinite(level))
-        throw new Error(`CCO reading of site ${sourceId} has value ${level}`);
+      // The API sends the value as text, such as "3.88300"; a missing one is null or empty, or 9999 in the manual's files.
+      if (p?.value === null || p?.value === undefined || p.value === "") continue;
+      const level = Number(p.value);
+      if (!Number.isFinite(level))
+        throw new Error(`CCO reading of site ${sourceId} has value ${p.value}`);
+      if (level === 9999) continue;
       if (time >= start.getTime() && time < end.getTime())
         out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }

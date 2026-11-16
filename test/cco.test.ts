@@ -5,8 +5,8 @@ import { fetchText, setTransport } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
 import * as cco from "../src/sources/cco/index.ts";
 
-// These fixtures follow the API page's field list, with site numbers made up:
-// no key was available to record a real response.
+// The fixtures are responses recorded from the API on 2026-11-16, trimmed to a
+// few sites and readings. The API sends ids, values and flags as text.
 const fixture = (name: string) =>
   readFileSync(new URL(`fixtures/${name}`, import.meta.url), "utf8");
 
@@ -36,20 +36,28 @@ afterEach(() => {
 describe("cco", () => {
   it("lists the sites with a number, in chart datum, and links GESLA's records of them", async () => {
     serve([[/tides\/latest\.geojson$/, fixture("cco-tides-latest.geojson")]]);
-    const stations = await cco.stations(undefined, Date.parse("2026-11-14T13:00:00Z"));
+    const stations = await cco.stations(undefined, Date.parse("2026-11-16T13:00:00Z"));
+    // Barmouth and Whitby are other providers' gauges with a link for an id, and no readings.
     assert.deepEqual(
       stations.map((s) => s.id),
-      ["cco/38", "cco/54", "cco/71", "cco/89"],
+      ["cco/102", "cco/106", "cco/112", "cco/86", "cco/88", "cco/90"],
     );
-    const deal = stations.find((s) => s.id === "cco/54")!;
+    const deal = stations.find((s) => s.id === "cco/90")!;
     assert.deepEqual(
       [deal.name, deal.lat, deal.lon, deal.datum, deal.interval_s, deal.status],
-      ["Deal Pier", 51.2238, 1.4092, "CD", 600, "active"],
+      ["Deal Pier", 51.22379, 1.40926, "CD", 600, "active"],
     );
     assert.deepEqual(deal.same_as, ["gesla/deal_pier-dlp-gbr-cco"]);
-    // Dawlish has no GESLA record; Whitby Harbour's last reading is years old.
-    assert.deepEqual(stations.find((s) => s.id === "cco/89")!.same_as, []);
-    assert.equal(stations.find((s) => s.id === "cco/71")!.status, "inactive");
+    // CCO calls Severn Bridge by the crossing's name; Whitby Harbour is its own gauge, linked to its CCO record only.
+    assert.deepEqual(stations.find((s) => s.id === "cco/106")!.same_as, [
+      "gesla/severn_bridge-ssc-gbr-cco",
+    ]);
+    assert.deepEqual(stations.find((s) => s.id === "cco/112")!.same_as, [
+      "gesla/whitby_harbour-wtb-gbr-cco",
+    ]);
+    // Arun Platform's last reading is from February 2024; Port Isaac's is from two weeks ago.
+    assert.equal(stations.find((s) => s.id === "cco/86")!.status, "inactive");
+    assert.equal(stations.find((s) => s.id === "cco/102")!.status, "active");
     // The key and referer go in headers, never the URL.
     assert.equal(requests[0]!.headers["x-api-key"], "test-key");
     assert.equal(requests[0]!.headers.referer, "https://example.test/");
@@ -63,41 +71,113 @@ describe("cco", () => {
     assert.equal(requests.length, 0);
   });
 
-  it("reads one site's readings with the monthly check's flags, and drops missing values", async () => {
+  it("reads one site's readings, flagged by the monthly check", async () => {
     serve([
       [
-        /tides\/20261114013500\.geojson\?sensor=54&duration=2$/,
+        /tides\/20260915011000\.geojson\?sensor=90&duration=1$/,
         fixture("cco-tides-deal-pier.geojson"),
       ],
     ]);
     const out = await cco.levels(
-      "54",
-      new Date("2026-11-14T00:00:00Z"),
-      new Date("2026-11-14T01:35:00Z"),
+      "90",
+      new Date("2026-09-15T00:10:00Z"),
+      new Date("2026-09-15T01:10:00Z"),
     );
-    const at = (t: string) => out.find((o) => o.time === Date.parse(`2026-11-14T${t}Z`));
+    // The window includes the reading at each end; the one before the start is left out.
     assert.deepEqual(
-      out.map((o) => o.time),
-      [0, 10, 20, 50, 60, 70, 80, 90].map((m) => Date.parse("2026-11-14T00:00:00Z") + m * 60_000),
+      out.map((o) => [new Date(o.time).toISOString().slice(11, 16), o.level, o.flag]),
+      [
+        ["00:10", 5.458, Flag.good],
+        ["00:20", 5.576, Flag.good],
+        ["00:30", 5.68, Flag.good],
+        ["00:40", 5.751, Flag.good],
+        ["00:50", 5.809, Flag.good],
+        ["01:00", 5.846, Flag.good],
+      ],
     );
-    assert.deepEqual([at("00:00")!.level, at("00:00")!.flag], [1.31, Flag.preliminary]);
-    assert.equal(at("00:10")!.flag, Flag.good);
-    assert.equal(at("00:20")!.flag, Flag.bad);
-    assert.equal(at("01:10")!.flag, Flag.interpolated);
-    assert.equal(at("01:00")!.flag, Flag.suspect);
-    assert.equal(at("01:20")!.flag, Flag.suspect);
-    // An unlisted code is suspect, not good; 9999 and null are not stored.
-    assert.equal(at("01:30")!.flag, Flag.suspect);
-    assert.equal(at("00:30"), undefined);
-    // A value the check marks missing, but that the API still sends, is bad.
-    assert.equal(at("00:50")!.flag, Flag.bad);
-    // The other site in the answer, and a reading before the start, are left out.
-    assert.equal(out.length, 8);
+  });
+
+  it("drops the readings of a gauge that sent no value, whatever the flag", async () => {
+    serve([[/tides\//, fixture("cco-tides-port-isaac.geojson")]]);
+    const out = await cco.levels(
+      "102",
+      new Date("2026-10-31T23:00:00Z"),
+      new Date("2026-11-01T00:00:00Z"),
+    );
+    assert.deepEqual(out, []);
+  });
+
+  it("reads an answer with no readings as none", async () => {
+    serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
+    assert.deepEqual(
+      await cco.levels("89", new Date("2001-05-31T23:00:00Z"), new Date("2001-06-01T00:00:00Z")),
+      [],
+    );
+  });
+
+  it("maps the check's flags, and reads no flag, 0 or blank as not yet checked", async () => {
+    const reading = (n: number, QCflag: unknown, value: unknown = "1.5") => ({
+      properties: {
+        id: "90",
+        date: `20261114#00${String(n * 3).padStart(2, "0")}00`,
+        value,
+        QCflag,
+      },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            reading(0, null),
+            reading(1, "0"),
+            reading(2, " "),
+            reading(3, "1"),
+            reading(4, "5"),
+            reading(5, "2"),
+            reading(6, "3"),
+            reading(7, "4"),
+            reading(8, "8"),
+            // The check marked it missing but the API still sent the value.
+            reading(9, "9"),
+            reading(10, "6"),
+            reading(11, "17"),
+            // Missing: null, empty or 9999.
+            reading(12, "1", null),
+            reading(13, "1", ""),
+            reading(14, "1", "9999"),
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T02:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => o.flag),
+      [
+        Flag.preliminary,
+        Flag.preliminary,
+        Flag.preliminary,
+        Flag.good,
+        Flag.good,
+        Flag.interpolated,
+        Flag.suspect,
+        Flag.bad,
+        Flag.bad,
+        Flag.bad,
+        Flag.suspect,
+        Flag.suspect,
+      ],
+    );
+    assert.ok(out.every((o) => o.level === 1.5));
   });
 
   it("asks a year at a time", async () => {
-    serve([[/tides\//, JSON.stringify({ features: [] })]]);
-    await cco.levels("54", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));
+    serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
+    await cco.levels("90", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));
     assert.deepEqual(
       requests.map((r) => r.url.match(/duration=(\d+)/)![1]),
       ["8760", "8760", "25"],
@@ -105,8 +185,8 @@ describe("cco", () => {
   });
 
   it("asks once for a window of whole hours", async () => {
-    serve([[/tides\//, JSON.stringify({ features: [] })]]);
-    await cco.levels("54", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z"));
+    serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
+    await cco.levels("90", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z"));
     assert.equal(requests.length, 1);
   });
 
@@ -121,54 +201,18 @@ describe("cco", () => {
     await assert.rejects(cco.stations(), /no site with a date/);
   });
 
-  it("reads a reading flagged 0 or blank as not yet checked", async () => {
-    serve([
-      [
-        /tides\//,
-        JSON.stringify({
-          features: [
-            { properties: { id: 54, date: "20261114#000000", value: 1, QCflag: "0" } },
-            { properties: { id: 54, date: "20261114#001000", value: 2, QCflag: " " } },
-          ],
-        }),
-      ],
-    ]);
-    const out = await cco.levels(
-      "54",
-      new Date("2026-11-14T00:00:00Z"),
-      new Date("2026-11-14T01:00:00Z"),
-    );
-    assert.deepEqual(
-      out.map((o) => [o.level, o.flag]),
-      [
-        [1, Flag.preliminary],
-        [2, Flag.preliminary],
-      ],
-    );
-  });
-
   it("fails on an answer it can't read rather than read it as no values", async () => {
     const ask = (feature: object) => {
       serve([[/tides\//, JSON.stringify({ features: [{ properties: feature }] })]]);
-      return cco.levels("54", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T01:00:00Z"));
+      return cco.levels("90", new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T01:00:00Z"));
     };
-    await assert.rejects(ask({ date: "20261114#000000", value: 1 }), /no feature carrying its id/);
-    await assert.rejects(ask({ id: 54, date: "2026-11-14T00:00:00Z", value: 1 }), /has date/);
-    await assert.rejects(ask({ id: 54, date: "20261114#000000", value: "1.3" }), /has value/);
-  });
-
-  it("fails on a stamp that isn't a real time", async () => {
-    serve([
-      [
-        /tides\//,
-        JSON.stringify({
-          features: [{ properties: { id: 54, date: "20260231#000000", value: 1, QCflag: null } }],
-        }),
-      ],
-    ]);
     await assert.rejects(
-      cco.levels("54", new Date("2026-02-01T00:00:00Z"), new Date("2026-03-05T00:00:00Z")),
-      /has date/,
+      ask({ date: "20261114#000000", value: "1" }),
+      /no feature carrying its id/,
     );
+    await assert.rejects(ask({ id: "90", date: "2026-11-14T00:00:00Z", value: "1" }), /has date/);
+    await assert.rejects(ask({ id: "90", date: "20261114#000000", value: "high" }), /has value/);
+    // A stamp that isn't a real time.
+    await assert.rejects(ask({ id: "90", date: "20261131#000000", value: "1" }), /has date/);
   });
 });
