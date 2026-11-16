@@ -18,7 +18,6 @@ describe("sourcesFor", () => {
       "dmi",
       "ea",
       "kartverket",
-      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -44,7 +43,6 @@ describe("sourcesFor", () => {
       "jodc",
       "kartverket",
       "linz",
-      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -55,7 +53,13 @@ describe("sourcesFor", () => {
       "usace",
       "usgs",
     ]);
-    assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
+    // The Marine Institute is on the server's job queue (src/sources/server.json), so Actions leaves it out.
+    assert.deepEqual(
+      sourcesFor("lists"),
+      Object.keys(sources)
+        .filter((id) => id !== "marine-institute")
+        .sort(),
+    );
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "bom",
@@ -67,7 +71,6 @@ describe("sourcesFor", () => {
       "jma",
       "kartverket",
       "linz",
-      "marine-institute",
       "refmar",
       "rws",
       "sfwmd",
