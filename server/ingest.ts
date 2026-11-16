@@ -198,7 +198,7 @@ async function refresh(source: string): Promise<boolean> {
   if (SERVER_SOURCES.has(source)) {
     if (PHASES.get(source) === "server") return true;
     console.error(
-      `${source}: a datum changed while it moves back to Actions; its list is refreshed once it has`,
+      `${source}: a datum changed while it moves back to Actions; its list waits for Actions' next refresh of it`,
     );
     return false;
   }

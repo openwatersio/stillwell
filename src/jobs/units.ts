@@ -101,10 +101,12 @@ export function systemd(store: string, memory = 0): Units {
       }
     },
     clear(id) {
+      let stopError = "";
       try {
         systemctl("stop", unitOf(id));
-      } catch {
-        // A unit that's gone can't be stopped; one that is still there is caught below.
+      } catch (error) {
+        // A unit that's gone can't be stopped; one that is still there is reported below with why.
+        stopError = (error as Error).message;
       }
       let state: string;
       try {
@@ -115,7 +117,10 @@ export function systemd(store: string, memory = 0): Units {
         );
         return false;
       }
-      if (!/LoadState=not-found|ActiveState=(inactive|failed)/.test(state)) return false;
+      if (!/LoadState=not-found|ActiveState=(inactive|failed)/.test(state)) {
+        console.error(`job ${id}: still running after a stop${stopError ? `: ${stopError}` : ""}`);
+        return false;
+      }
       try {
         systemctl("reset-failed", unitOf(id));
       } catch {

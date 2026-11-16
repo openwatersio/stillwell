@@ -16,7 +16,9 @@ else
   git fetch -q origin main
 fi
 # A main without the file has no source on the server; any other failure to read it stops the write.
-if [ -n "$(git ls-tree FETCH_HEAD src/sources/server.json)" ]; then
+# Assigned on its own, so a failing ls-tree stops the script rather than read as an absent file.
+entry=$(git ls-tree --full-tree FETCH_HEAD -- src/sources/server.json)
+if [ -n "$entry" ]; then
   list=$(git show FETCH_HEAD:src/sources/server.json)
 else
   list='{}'

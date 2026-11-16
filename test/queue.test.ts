@@ -260,7 +260,7 @@ describe("job service", () => {
     const loop = lines.findIndex((l) => l.startsWith("while (!stopping)"));
     assert.ok(loop > 0);
     assert.deepEqual(
-      lines.slice(loop).filter((l) => /^(let|const|var) /.test(l)),
+      lines.slice(loop).filter((l) => /^(let|const|var|class) /.test(l)),
       [],
     );
   });
