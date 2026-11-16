@@ -59,6 +59,8 @@ let lastPollsError = "";
 let lastStopped: string | null = null;
 let lastMetricsError = "";
 let stopping = false;
+// Above the loop, which never returns, so it's set before a pass reads it.
+let ids: [number, number] | undefined;
 for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, () => (stopping = true));
 
 while (!stopping) {
@@ -199,7 +201,6 @@ function writeMetrics(stopped: string | null): void {
   }
 }
 
-let ids: [number, number] | undefined;
 function stillwellIds(): [number, number] {
   ids ??= [
     Number(execFileSync("id", ["-u", "stillwell"], { encoding: "utf8" })),

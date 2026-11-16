@@ -254,6 +254,18 @@ describe("actions", () => {
   });
 });
 
+describe("job service", () => {
+  it("declares nothing below its loop, which never returns", () => {
+    const lines = readFileSync("server/jobs.ts", "utf8").split("\n");
+    const loop = lines.findIndex((l) => l.startsWith("while (!stopping)"));
+    assert.ok(loop > 0);
+    assert.deepEqual(
+      lines.slice(loop).filter((l) => /^(let|const|var) /.test(l)),
+      [],
+    );
+  });
+});
+
 describe("workflows", () => {
   it("runs the ownership guard before every job that writes one source does anything", () => {
     for (const [file, job] of [

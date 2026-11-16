@@ -25,7 +25,8 @@ export const unitOf = (id: number) => `stillwell-job-${id}`;
 export const jobDir = (id: number) => `/var/lib/stillwell-jobs/runs/${id}`;
 
 function systemctl(...args: string[]): string {
-  return execFileSync("systemctl", args, { encoding: "utf8" });
+  // Its errors come back in the throw; on the service's stderr they'd only repeat in the journal.
+  return execFileSync("systemctl", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 }
 
 /** Node as the units start it, through the link deploys move, so a later deploy's cleanup never removes it. */
