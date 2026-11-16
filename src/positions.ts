@@ -219,6 +219,12 @@ export const POSITIONS: Record<string, { served: Position; at: Position }> = {
     served: { lat: -999, lon: -999 },
     at: { lat: 50.781775, lon: 0.057004 },
   },
+  // CCO's list puts West Bay Harbour 3.9 km west of the harbour, where GESLA's
+  // and CMEMS's records of the same gauge have it: erratum `cco-west-bay-position`.
+  "cco/95": {
+    served: { lat: 50.71017, lon: -2.82 },
+    at: { lat: 50.70888, lon: -2.76411 },
+  },
 };
 
 /** Farthest a source's position can move before its correction is out of date. */

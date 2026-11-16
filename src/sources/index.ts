@@ -4,6 +4,7 @@ import { possible } from "../span.ts";
 import { source as bodc } from "./bodc/index.ts";
 import { source as bom } from "./bom/index.ts";
 import { source as bsh } from "./bsh/index.ts";
+import { source as cco } from "./cco/index.ts";
 import { source as cdec } from "./cdec/index.ts";
 import { source as cmems } from "./cmems/index.ts";
 import { source as coops } from "./coops/index.ts";
@@ -28,6 +29,7 @@ import { source as usace } from "./usace/index.ts";
 import { source as usgs } from "./usgs/index.ts";
 import bodcErrata from "./bodc/errata.json" with { type: "json" };
 import bomErrata from "./bom/errata.json" with { type: "json" };
+import ccoErrata from "./cco/errata.json" with { type: "json" };
 import cdecErrata from "./cdec/errata.json" with { type: "json" };
 import cmemsErrata from "./cmems/errata.json" with { type: "json" };
 import coopsErrata from "./coops/errata.json" with { type: "json" };
@@ -53,6 +55,7 @@ const adapters: Record<string, Source> = {
   bodc,
   bom,
   bsh,
+  cco,
   cdec,
   cmems,
   coops,
@@ -85,6 +88,7 @@ const adapters: Record<string, Source> = {
 export const errataFiles: Record<string, unknown> = {
   bodc: bodcErrata,
   bom: bomErrata,
+  cco: ccoErrata,
   cdec: cdecErrata,
   cmems: cmemsErrata,
   coops: coopsErrata,
