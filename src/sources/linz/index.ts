@@ -35,7 +35,7 @@ export const metadata: SourceMetadata = {
     url: "https://www.linz.govt.nz/contact-us",
   },
   terms:
-    "Licensed under CC BY 3.0 NZ. Land Information New Zealand must be credited. LINZ does not quality-control the data and warns that the sensors drift, so it advises caution for long-term analysis. Changes in the store: rows LINZ marks missing or bad, or sets to a sensor-off value, are left out, and quality flags added.",
+    "Licensed under CC BY 3.0 NZ. Land Information New Zealand must be credited. LINZ does not quality-control the data and warns that the sensors drift, so it advises caution for long-term analysis. Changes in the store: rows LINZ marks missing or bad, or sets to a sensor-off value, are left out; over spans where sensor 40 is stuck, erratic or missing, sensor 41's levels stand in, or nothing is read where both are stuck; Napier's levels before a step in 2008 are converted to the later zero by the API; datum steps are converted by what UHSLC's records measure at Wellington, Port Chalmers, Tauranga and Gisborne, and those gauges' minutes between a step and the next day are left out; and quality flags are added. The source's errata list each span and step.",
   // Each gauge's whole record is served against its own zero, as it was measured.
   archive: "previous",
   // Daily files appear 6 to 12 days after their day, in batches, so hourly ingest would find nothing.
@@ -46,7 +46,7 @@ export const metadata: SourceMetadata = {
 
 /** The datum LINZ's levels are measured from: each sensor's own tide gauge zero (TG0). */
 const DATUM = "ZERO";
-/** The sensor whose files the store reads. Sensor 41 sits on another zero, about 14 cm higher at Wellington. */
+/** The sensor whose files the store reads. Sensor 41 sits on a zero of its own, and the two drift apart by 0.3 to 1.5 m at some gauges (README). */
 const SENSOR = "40";
 const DAY_MS = 86_400_000;
 /** A year's file is cached once its year began this many years ago: LINZ issued 2019's in January 2022 and may reissue one. */
@@ -182,8 +182,9 @@ export function parseReadme(
 
 /**
  * Observed 1-minute levels in meters above the gauge's zero over [start, end),
- * from sensor 40's files, a UTC calendar year per listing: the year's zip when
- * LINZ has issued it, else each day's.
+ * from sensor 40's files, except over the spans of `SENSOR_41`, where sensor 41's
+ * stand in or nothing is read. A UTC calendar year per listing: the year's zip
+ * when LINZ has issued it, else each day's.
  */
 export async function levels(
   sourceId: string,
@@ -194,55 +195,148 @@ export async function levels(
   if (!/^[A-Z]{4}$/.test(sourceId)) throw new Error(`Not a LINZ station: ${sourceId}`);
   const from = Math.max(start.getTime(), record_start ? Date.parse(record_start) : -Infinity);
   const to = Math.min(end.getTime(), record_end ? Date.parse(record_end) : Infinity);
+  const spans = SENSOR_41[sourceId] ?? [];
   const out: Observation[] = [];
   for (let year = new Date(from).getUTCFullYear(); Date.UTC(year, 0, 1) < to; year++) {
-    const names = await listing(sourceId, year);
-    // A gauge's sensor 40 years run without a gap, so a past year in its record with no files is
-    // an answer gone wrong, which backfill would take for a year with no data.
-    if (!names.length && record_start && year < new Date().getUTCFullYear())
-      throw new Error(`LINZ lists no files for ${sourceId} in ${year}`);
-    const yearly = `${sourceId}_${SENSOR}_${year}.zip`;
-    const files = names.includes(yearly)
-      ? [yearly]
-      : names.filter((n) => {
-          const day = dayOf(n, sourceId, year);
-          return day !== null && day + DAY_MS > from && day < to;
-        });
-    for (const name of files) {
-      const final = name === yearly;
-      const zip = await getText(`${API}/tidegauge/${sourceId}/${year}/${SENSOR}/${name}`, {
-        base64: true,
-        pace,
-        // Only a year's file, once it is old enough that LINZ is unlikely to reissue it, is cached.
-        fresh: !final || Date.UTC(year + CACHE_AFTER_YEARS, 0, 1) > Date.now(),
-        timeout: 120,
-      });
-      for (const [file, csv] of await unzip(zip)) {
-        if (!file.toLowerCase().endsWith(".csv")) continue;
-        for (const o of parse(csv, sourceId, !final))
-          if (o.time >= from && o.time < to) out.push(o);
-      }
+    const yearStart = Date.UTC(year, 0, 1);
+    const yearEnd = Date.UTC(year + 1, 0, 1);
+    // Sensor 40's files are read only outside the spans, so a year inside one lists and downloads none.
+    const stretches = outside(spans, Math.max(from, yearStart), Math.min(to, yearEnd));
+    if (stretches.length) {
+      const names = await listing(sourceId, SENSOR, year);
+      // A gauge's sensor 40 years run without a gap, so a past year in its record with no files is
+      // an answer gone wrong, which backfill would take for a year with no data.
+      if (!names.length && record_start && year < new Date().getUTCFullYear())
+        throw new Error(`LINZ lists no files for ${sourceId} in ${year}`);
+      for (const o of await sensorLevels(sourceId, SENSOR, year, names, stretches)) out.push(o);
+    }
+    let names41: string[] | undefined;
+    for (const s of spans) {
+      const a = Math.max(from, Date.parse(s.from), yearStart);
+      const b = Math.min(to, Date.parse(s.to), yearEnd);
+      if (s.sensor !== "41" || a >= b) continue;
+      names41 ??= await listing(sourceId, "41", year);
+      if (!names41.length)
+        throw new Error(`LINZ lists no sensor 41 files for ${sourceId} in ${year}`);
+      // Pushed one by one: a year's minutes are more than a spread's arguments can hold.
+      for (const o of await sensorLevels(sourceId, "41", year, names41, [[a, b]])) out.push(o);
     }
   }
   return out.sort((a, b) => a.time - b.time);
 }
 
-/** The names of a gauge's sensor-40 files for a year. */
-async function listing(code: string, year: number): Promise<string[]> {
+/** `[from, to)` less the spans, as the stretches left. */
+function outside(
+  spans: { from: string; to: string }[],
+  from: number,
+  to: number,
+): [number, number][] {
+  let parts: [number, number][] = from < to ? [[from, to]] : [];
+  for (const s of spans) {
+    const a = Date.parse(s.from);
+    const b = Date.parse(s.to);
+    parts = parts.flatMap(([x, y]): [number, number][] =>
+      a >= y || b <= x
+        ? [[x, y]]
+        : (
+            [
+              [x, Math.min(y, a)],
+              [Math.max(x, b), y],
+            ] as [number, number][]
+          ).filter(([p, q]) => q > p),
+    );
+  }
+  return parts;
+}
+
+/**
+ * A sensor's levels within any of `ranges` (`[from, to)`) from one year's files:
+ * the year's file if LINZ has issued it, else each day's, each read once.
+ */
+async function sensorLevels(
+  code: string,
+  sensor: string,
+  year: number,
+  names: string[],
+  ranges: [number, number][],
+): Promise<Observation[]> {
+  const out: Observation[] = [];
+  const yearly = `${code}_${sensor}_${year}.zip`;
+  const files = names.includes(yearly)
+    ? [yearly]
+    : names.filter((n) => {
+        const day = dayOf(n, code, sensor, year);
+        return day !== null && ranges.some(([from, to]) => day + DAY_MS > from && day < to);
+      });
+  for (const name of files) {
+    const final = name === yearly;
+    const zip = await getText(`${API}/tidegauge/${code}/${year}/${sensor}/${name}`, {
+      base64: true,
+      pace,
+      // Only a year's file, once it is old enough that LINZ is unlikely to reissue it, is cached.
+      fresh: !final || Date.UTC(year + CACHE_AFTER_YEARS, 0, 1) > Date.now(),
+      timeout: 120,
+    });
+    for (const [file, csv] of await unzip(zip)) {
+      if (!file.toLowerCase().endsWith(".csv")) continue;
+      for (const o of parse(csv, code, !final))
+        if (ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
+    }
+  }
+  return out;
+}
+
+/** The names of a gauge's files for a sensor and year. */
+async function listing(code: string, sensor: string, year: number): Promise<string[]> {
   const { files } = await getJson<{ files: { name: string }[] }>(
-    `${API}/api/listDatasetFiles/${code}/${year}/${SENSOR}`,
+    `${API}/api/listDatasetFiles/${code}/${year}/${sensor}`,
     { fresh: true, pace },
   );
   if (!Array.isArray(files)) throw new Error(`LINZ ${code} ${year}: no file list`);
   return files.map((f) => f.name).filter(Boolean);
 }
 
-/** The UTC midnight a daily file's name `<code>_40_<year><day of year>.zip` gives, or null for any other file. */
-function dayOf(name: string, code: string, year: number): number | null {
-  const m = new RegExp(`^${code}_${SENSOR}_${year}(\\d{3})\\.zip$`).exec(name);
+/** The UTC midnight a daily file's name `<code>_<sensor>_<year><day of year>.zip` gives, or null for any other file. */
+function dayOf(name: string, code: string, sensor: string, year: number): number | null {
+  const m = new RegExp(`^${code}_${sensor}_${year}(\\d{3})\\.zip$`).exec(name);
   const day = Number(m?.[1]);
   return m && day >= 1 && day <= 366 ? Date.UTC(year, 0, day) : null;
 }
+
+/**
+ * UTC spans, `from` to before `to`, over which sensor 40 is stuck, erratic or
+ * missing while sensor 41 reads a tide whose level is within 0.25 m of sensor
+ * 40's healthy levels on each side; the store reads sensor 41 over them (the
+ * `linz-*-sensor-fault` errata). A null sensor reads neither: both are stuck,
+ * or the first minutes after a step in the zero, which the epoch split can't
+ * place (erratum `linz-napier-step-2008`).
+ */
+export const SENSOR_41: Record<string, { from: string; to: string; sensor: "41" | null }[]> = {
+  AUCT: [{ from: "2012-11-19", to: "2012-11-27", sensor: "41" }],
+  CHIT: [{ from: "2008-11-25", to: "2010-02-17", sensor: "41" }],
+  CPIT: [
+    { from: "2012-01-29", to: "2012-03-31", sensor: "41" },
+    { from: "2019-07-26", to: "2021-07-26", sensor: "41" },
+  ],
+  GIST: [{ from: "2021-05-11T23:56:00Z", to: "2021-05-12", sensor: null }],
+  NAPT: [
+    { from: "2008-02-24T18:51:00Z", to: "2008-02-25", sensor: null },
+    { from: "2010-02-07", to: "2010-03-05", sensor: "41" },
+  ],
+  NCPT: [
+    { from: "2011-07-07", to: "2011-09-22", sensor: "41" },
+    { from: "2011-09-22", to: "2011-10-06", sensor: null },
+    { from: "2011-10-06", to: "2012-02-20", sensor: "41" },
+    { from: "2012-12-13", to: "2013-03-04", sensor: "41" },
+    { from: "2013-11-17", to: "2014-01-23", sensor: "41" },
+  ],
+  SUMT: [{ from: "2016-06-28", to: "2022-04-02", sensor: "41" }],
+  TAUT: [{ from: "2024-03-20T23:17:00Z", to: "2024-03-21", sensor: null }],
+  WLGT: [
+    { from: "2014-12-23", to: "2015-01-10", sensor: "41" },
+    { from: "2021-04-15T21:56:00Z", to: "2021-04-16", sensor: null },
+  ],
+};
 
 /**
  * The levels in one file. A daily file's rows are `WLGT,2019-04-20 00:00,5.251`,
@@ -304,12 +398,92 @@ async function pace(): Promise<void> {
  */
 const overrides: Overrides = {
   epochs: {
+    "linz/WLGT start": {
+      to_current: -0.64,
+      note: "Wellington's zero stepped down 0.26 m on 30 May 2012 and 0.38 m on 16 April 2021, so a level before the first is 0.64 m higher than the same water now (errata `linz-wellington-step-2012` and `linz-wellington-step-2021`).",
+    },
+    "linz/WLGT 2012-05-30T00:00:00Z": {
+      to_current: -0.38,
+      note: "A level between the two steps is 0.38 m higher than the same water since 16 April 2021 (erratum `linz-wellington-step-2021`).",
+    },
+    "linz/GIST start": {
+      to_current: -1.53,
+      note: "Gisborne's zero stepped down 0.57 m on 26 September 2013, 0.41 m on 12 May 2021 and 0.54 m on 13 December 2024, so a level before the first is 1.53 m higher than the same water now (errata `linz-gisborne-step-2013`, `linz-gisborne-step-2021` and `linz-gisborne-step-2024`).",
+    },
+    "linz/GIST 2013-09-26T00:00:00Z": {
+      to_current: -0.95,
+      note: "A level between the first two steps and the last is 0.95 m higher than the same water now (errata `linz-gisborne-step-2021` and `linz-gisborne-step-2024`).",
+    },
+    "linz/GIST 2021-05-12T00:00:00Z": {
+      to_current: -0.54,
+      note: "A level between the last two steps is 0.54 m higher than the same water since 13 December 2024 (erratum `linz-gisborne-step-2024`).",
+    },
+    "linz/OTAT start": {
+      to_current: -0.56,
+      note: "Port Chalmers' zero stepped down 0.56 m on 26 May 2021, when its sensors were replaced (erratum `linz-port-chalmers-step-2021`).",
+    },
+    "linz/TAUT start": {
+      to_current: -0.47,
+      note: "Tauranga's zero stepped down 0.47 m on 20 March 2024 (erratum `linz-tauranga-step-2024`).",
+    },
+    "linz/NAPT start": {
+      to_current: -0.344,
+      note: "The README lists a \"step in data on February 25\" 2008, at 18:51 UTC on 24 February after a gap in the record. Both sensors' levels fall 0.34 to 0.37 m against UHSLC's hourly Napier, so a level before the step is 0.344 m higher than the same water after it (erratum `linz-napier-step-2008`).",
+    },
     "linz/KAIT start": {
       to_current: -0.88,
       note: "The README says the station was uplifted 0.88 m, so a level before the lift is that much higher than the same water after it, and the daily means step by about 0.9 m (erratum `linz-kaikoura-uplift`).",
     },
   },
   splits: {
+    "linz/GIST": [
+      {
+        since: "2013-09-26",
+        note: "Gisborne's levels fall 0.57 m against UHSLC's hourly Gisborne (`078b`) between 20:48 UTC on 25 September 2013 and 03:23 on the 26th, a gap in the record (erratum `linz-gisborne-step-2013`).",
+      },
+      {
+        since: "2021-05-12",
+        note: "Gisborne's levels fall 0.41 m against UHSLC's hourly Gisborne from 23:56 UTC on 11 May 2021, after a gap, and a split starts on a whole day, so the four minutes before midnight are left out (erratum `linz-gisborne-step-2021`).",
+      },
+      {
+        since: "2024-12-13",
+        note: "Gisborne's levels fall 0.54 m against UHSLC's hourly Gisborne, and the file for 13 December 2024 is the first after a gap that began before 12 December (erratum `linz-gisborne-step-2024`).",
+      },
+    ],
+    "linz/GBIT": [
+      {
+        since: "2024-09-10",
+        note: "Korotiti Bay's sensors were replaced on 11 September 2024 (NZ time), and both read about 0.8 m lower from 21:39 UTC on the 10th, when the day's file begins, after a gap. No other record of the gauge gives the step's size, so the earlier epoch has no `to_current` (erratum `linz-korotiti-bay-step-2024`).",
+      },
+    ],
+    "linz/OTAT": [
+      {
+        since: "2021-05-26",
+        note: "Port Chalmers' sensors were replaced on 26 May 2021, and levels from 03:00 UTC on the 26th, after a gap, are 0.56 m lower against UHSLC's hourly Port Chalmers (erratum `linz-port-chalmers-step-2021`).",
+      },
+    ],
+    "linz/TAUT": [
+      {
+        since: "2024-03-21",
+        note: "Tauranga's levels fall 0.47 m against UHSLC's hourly Tauranga from 23:17 UTC on 20 March 2024, after a gap, and a split starts on a whole day, so that evening's minutes are left out (erratum `linz-tauranga-step-2024`).",
+      },
+    ],
+    "linz/WLGT": [
+      {
+        since: "2012-05-30",
+        note: "Wellington's sensors were replaced on 30 May 2012, and levels fall 0.26 m against UHSLC's hourly Wellington between 22:54 UTC on the 29th and 00:02 on the 30th (erratum `linz-wellington-step-2012`).",
+      },
+      {
+        since: "2021-04-16",
+        note: "Wellington's levels fall 0.38 m against UHSLC's hourly Wellington from 21:56 UTC on 15 April 2021, after a gap, and a split starts on a whole day, so the two hours after it are left out (erratum `linz-wellington-step-2021`).",
+      },
+    ],
+    "linz/NAPT": [
+      {
+        since: "2008-02-25",
+        note: "TG0 stepped down 0.344 m at 18:51 UTC on 24 February 2008, and a split starts on a whole day, so the five hours after the step are left out (erratum `linz-napier-step-2008`).",
+      },
+    ],
     "linz/KAIT": [
       {
         since: "2016-11-14",

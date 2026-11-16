@@ -17,6 +17,7 @@ The public store aims to hold any source that publishes water level data and all
 - [BODC](src/sources/bodc/README.md): quality-controlled 15-minute levels from the UK National Tide Gauge Network.
 - [BOM](src/sources/bom/README.md): hourly sea levels at 31 gauges of the Bureau of Meteorology's National Tidal Centre in Australia and the Pacific, back to 1996, from its FTP archives.
 - [BSH](src/sources/bsh/README.md): predicted high and low waters and tide curves at German gauges.
+- [CCO](src/sources/cco/README.md): 10-minute levels at the Channel Coastal Observatory's tide gauges around England and Wales.
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.
 - [Copernicus Marine](src/sources/cmems/README.md): sea level at about 790 tide gauges relayed from European national networks and SHOM's worldwide network, from the In Situ TAC's near-real-time product.
