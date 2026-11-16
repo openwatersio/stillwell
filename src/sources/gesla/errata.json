@@ -1082,6 +1082,46 @@
       "error": "The Toitū Te Whenua record of Scott Base changes from UTC+13 to UTC+12 on a day from 29 to 31 October 2024, and its labels run on without a break, so the clock of those three days can't be settled: the fit of the tide moves from UTC+13 on 28 October to UTC+12 on 1 November.",
       "response": "The labels of 29 to 31 October 2024 are moved 12 hours earlier and flagged `suspect`, keeping the source's own flag as `source_flag`. The `linz` source leaves those days out (erratum `linz-scott-base-clock`).",
       "evidence": "November 2026. Daily fits of the tide against the prediction from UHSLC's Scott Base (`uhslc/663a`) favor UTC+13 until 28 October, are even on the 29th to 31st (by 0.013 m, 0.017 m the other way and 0.004 m), and favor UTC+12 from 1 November."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2016",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2016-03-02",
+      "until": "2016-03-30",
+      "handling": "flagged",
+      "error": "From 06:00 UTC on 2 March to 00:00 on 29 March 2016 the Toitū Te Whenua record of Scott Base holds one value for all 643 hours, the last before the gauge failed, where LINZ's files have no levels. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2016 file, November 2026: all 643 hourly steps are 0.000 m; the `linz` source's Scott Base has no level from 3 March to 29 March."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2022",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2022-03-09",
+      "until": "2022-10-31",
+      "handling": "flagged",
+      "error": "From 02:00 UTC on 9 March to 23:00 UTC on 30 October 2022 the Toitū Te Whenua record of Scott Base holds one value, changing by at most 0.0001 m an hour, for all 5,662 hours, where LINZ's file has no levels. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2022 file, November 2026: every hourly step is 0.0000 to 0.0001 m; the `linz` source's Scott Base has no level from 9 March to 30 October 2022."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2023-08",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-08-02",
+      "until": "2023-11-25",
+      "handling": "flagged",
+      "error": "From 03:00 UTC on 2 August to 11:00 on 24 November 2023, the gauge's failure and its reinstallation, the Toitū Te Whenua record of Scott Base changes by 0.0001 to 0.0002 m an hour for all 2,745 hours. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2023 file, November 2026: every hourly step in the span is between -0.0002 and -0.0001 m; LINZ's file has no levels from 2 August to 25 November (erratum `linz-scott-base-clock` for its labels). The span's first and last day also hold the hours either side, which are measured."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2023-12",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-11-30",
+      "until": "2024-01-01",
+      "handling": "flagged",
+      "error": "From 12:00 UTC on 30 November to 10:00 on 31 December 2023 the Toitū Te Whenua record of Scott Base falls by 0.0004 to 0.0005 m an hour for all 743 hours, from 2.48 m to 2.27 m, where LINZ's files have measured levels from 10 December. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2023 file, November 2026: every hourly step in the span is between -0.0005 and -0.0004 m. For the 528 hours from 10 to 31 December that the `linz` source also holds, the correlation with its levels is 0.06 at lags of -3 to +3 hours, the mean absolute difference 0.30 m, and LINZ's range 1.39 m against 0.47 m. The span's first day also holds measured hours."
     }
   ],
   "retired": []
