@@ -48,7 +48,7 @@ LINZ warns that the sensors drift and advises caution for long-term analysis.
 - **Cape Roberts' failure of 2021:** the gauge failed on 16 March and its file has rows to 6 November that run from -9 to 35 m, which are left out (erratum `linz-cape-roberts-failed-2021`).
 - **Scott Base's failures:** its gauge reads 0.0 to 0.4 m or a constant for weeks to months at a time. Its README lists 2020's gantry and 2021's drift, and not the failures of 2016, 2019, 2022 and 2025 or the stuck days of December 2018 (errata `linz-scott-base-start-2016`, `linz-scott-base-step-2016`, `linz-scott-base-stuck-2018-12`, `linz-scott-base-step-2019`, `linz-scott-base-step-2020`, `linz-scott-base-step-2021`, `linz-scott-base-step-2022` and `linz-scott-base-step-2025`). The spells are left out whole.
 - **Scott Base's 2023 logger:** it logged every five minutes until mid-February 2023 and every minute after, failed on 2 August and was reinstalled on 25 November, with no step in its zero against Cape Roberts' (0.03 m) and a clock an hour ahead of its earlier one (erratum `linz-scott-base-clock`).
-- **GESLA's Scott Base:** the record `gesla/scott_base_antarctica-scot-nzl-ttw` moves GESLA's times 12 hours, as it must from 2016 to 2023, and is an hour late over the UTC+13 stretch, which is flagged `suspect` (erratum `gesla-scott-base-ttw-nzdt-2023`).
+- **GESLA's Scott Base:** the record `gesla/scott_base_antarctica-scot-nzl-ttw` is moved 12 hours earlier, as it must be from 2016 to 2023, and 13 hours over the UTC+13 stretch (erratum `gesla-scott-base-ttw-nzdt-2023`); the three days of the change back are flagged `suspect` (erratum `gesla-scott-base-ttw-clock-2024-10`).
 
 ## Running ingest
 
@@ -96,10 +96,10 @@ node scripts/ingest.ts backfill linz ROBT,SCOT 2007 2026
 node scripts/ingest.ts backfill linz ROBT,SCOT 2026 2027
 ```
 
-GESLA's record of Scott Base takes the flag of its UTC+13 stretch from `gesla-scott-base-ttw-nzdt-2023` once requalified:
+GESLA's record of Scott Base is moved an hour more over its UTC+13 stretch, and flagged for the three days of the change, once fetched again:
 
 ```bash
-node scripts/ingest.ts requalify gesla scott_base_antarctica-scot-nzl-ttw 2023 2025
+node scripts/ingest.ts backfill gesla scott_base_antarctica-scot-nzl-ttw 2023 2026 --refetch
 ```
 
 Cape Roberts' 2026 file isn't out, so its current year is one listing that returns no files. LINZ issues a year's file in the following January or February, and has none of the year's days before, so Monthly reads the whole of last year at Cape Roberts every month (`backfill linz ROBT`), with `--refetch`, and an empty listing for last year before May isn't an error. Later than that it fails the run until LINZ issues the file. Scott Base has no later file, since the gauge was removed on 5 March 2026.

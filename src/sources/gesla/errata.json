@@ -1067,11 +1067,21 @@
       "id": "gesla-scott-base-ttw-nzdt-2023",
       "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
       "since": "2023-11-24",
+      "until": "2024-10-29",
+      "handling": "corrected",
+      "error": "From the logger's reinstallation on 25 November 2023 to late October 2024, the Toitū Te Whenua record of Scott Base is on UTC+13, not the New Zealand Standard Time (UTC+12) of the rest of the record (erratum `gesla-scott-base-ttw-nzst`), so after the 12-hour move its times are an hour late: the height labeled T was measured at T − 13 h UTC. The labels of 29 to 31 October 2024, in which the clock changed back, can't be placed (erratum `gesla-scott-base-ttw-clock-2024-10`).",
+      "response": "The adapter moves the record's times 13 hours earlier from labels of 25 November 2023 to before 29 October 2024.",
+      "evidence": "November 2026. The record's hourly values equal the `linz` source's Scott Base levels at the same minute at a lag of one hour from December 2023 to October 2024 (83% of 8,693 hours of 2024 within 1.5 mm, against 18% at none), and at none in 2016 to 2022. Against Cape Roberts' record (UTC) the phases of K1, O1, M2 and S2 are 9, 9, 12 and 19 degrees at UTC+13 and -7, -5, -19 and -11 at UTC+12 over the span."
+    },
+    {
+      "id": "gesla-scott-base-ttw-clock-2024-10",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2024-10-28",
       "until": "2024-11-01",
       "handling": "flagged",
-      "error": "From the logger's reinstallation on 25 November 2023 to late October 2024 (stored from 12:00 UTC on 24 November 2023 to the same hour on 31 October 2024), the Toitū Te Whenua record of Scott Base is on UTC+13, not the New Zealand Standard Time (UTC+12) of the rest of the record (erratum `gesla-scott-base-ttw-nzst`), so after the adapter moves its times 12 hours earlier they are an hour late: the height labeled T was measured at T − 13 h UTC.",
-      "response": "The span, with the days whose clock the `linz` source can't settle (29 to 31 October 2024), is flagged `suspect`, keeping the source's own flag as `source_flag`. The `linz` source's Scott Base series has the span on the right clock (erratum `linz-scott-base-clock`).",
-      "evidence": "November 2026. The record's hourly values equal the `linz` source's Scott Base levels at the same minute with a lag of one hour from December 2023 to October 2024 (83% of 8,693 hours in 2024 within 1.5 mm at a lag of one hour, 18% at none), and equal them at none in 2016 to 2022. Against Cape Roberts' record (UTC) the phases of K1, O1, M2 and S2 are 9, 9, 12 and 19 degrees at UTC+13 and -7, -5, -19 and -11 at UTC+12 over the span."
+      "error": "The Toitū Te Whenua record of Scott Base changes from UTC+13 to UTC+12 on a day from 29 to 31 October 2024, and its labels run on without a break, so the clock of those three days can't be settled: the fit of the tide moves from UTC+13 on 28 October to UTC+12 on 1 November.",
+      "response": "The labels of 29 to 31 October 2024 are moved 12 hours earlier and flagged `suspect`, keeping the source's own flag as `source_flag`. The `linz` source leaves those days out (erratum `linz-scott-base-clock`).",
+      "evidence": "November 2026. Daily fits of the tide against the prediction from UHSLC's Scott Base (`uhslc/663a`) favor UTC+13 until 28 October, are even on the 29th to 31st (by 0.013 m, 0.017 m the other way and 0.004 m), and favor UTC+12 from 1 November."
     }
   ],
   "retired": []

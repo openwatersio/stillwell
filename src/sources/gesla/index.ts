@@ -89,6 +89,8 @@ export interface Clock {
   until?: number;
   /** Whether a date in the span whose day is 12 or less has its day and month swapped. */
   dayMonth?: boolean;
+  /** A further fix over a span of labeled times, on top of `hours`. */
+  extra?: { hours: number; since: number; until: number };
 }
 
 /**
@@ -104,7 +106,8 @@ const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1), dayMon
  * before its gap from 1987 to 1995 (erratum
  * `gesla-santa-cruz-de-la-palma-hour-early`); UHSLC's Progreso version A, 6
  * hours late (erratum `gesla-progreso-uhslc-721a-six-hours-late`); TTW's Scott
- * Base, on NZST (erratum `gesla-scott-base-ttw-nzst`); and Queensland's
+ * Base, on NZST (erratum `gesla-scott-base-ttw-nzst`) and an hour more from
+ * November 2023 to October 2024 (erratum `gesla-scott-base-ttw-nzdt-2023`); and Queensland's
  * records from 2020 (erratum `gesla-queensland-2020-aest`).
  */
 export const CLOCK: Record<string, Clock> = {
@@ -114,7 +117,11 @@ export const CLOCK: Record<string, Clock> = {
   "las_palmas-217c-esp-uhslc_rq": { hours: 1 },
   "cruz-cruz-esp-ieo": { hours: 1, until: Date.UTC(1990, 0, 1) },
   "progreso_yuc-721a-mex-uhslc_rq": { hours: -6 },
-  "scott_base_antarctica-scot-nzl-ttw": { hours: -12 },
+  "scott_base_antarctica-scot-nzl-ttw": {
+    hours: -12,
+    // The logger was on UTC+13 from 25 November 2023 to 29 October 2024 (erratum `gesla-scott-base-ttw-nzdt-2023`).
+    extra: { hours: -1, since: Date.UTC(2023, 10, 25), until: Date.UTC(2024, 9, 29) },
+  },
   "cape_ferguson-h033007a-aus-bom": QUEENSLAND_AEST,
   "cardwell-h035012a-aus-bom": QUEENSLAND_AEST,
   "cooktown-h066003a-aus-bom": QUEENSLAND_AEST,
@@ -128,7 +135,7 @@ export const CLOCK: Record<string, Clock> = {
 const SFWMD = /-usa-sfwmd$/;
 
 /** The largest clock fix, which a range asked for is widened by. */
-const CLOCK_MARGIN_MS = 12 * HOUR_MS;
+const CLOCK_MARGIN_MS = 13 * HOUR_MS;
 
 /** The clock fix for `file`, if it has one. */
 export function clockOf(file: string): Clock | undefined {
@@ -556,8 +563,13 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
       if (qc >= 0 && qc <= 4 && fields[0] !== nul && possible(level)) {
         const flag = QC_FLAGS[qc]!;
         const time = timeOf(text, at);
+        const more = clock?.extra && time >= clock.extra.since && time < clock.extra.until;
         times[n] =
-          time < since || time >= until ? time : (dayMonth ? swapDayMonth(time) : time) + shift;
+          time < since || time >= until
+            ? time
+            : (dayMonth ? swapDayMonth(time) : time) +
+              shift +
+              (more ? clock!.extra!.hours * HOUR_MS : 0);
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
