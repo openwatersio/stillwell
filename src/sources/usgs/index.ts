@@ -902,9 +902,10 @@ const PAGE = 50_000;
  * Keyless clients get 1,000 requests in any rolling hour per IP, through
  * api.data.gov, and every client behind that IP shares them. Past that the API
  * answers 429 with a Retry-After of up to an hour, until the oldest request in
- * the window ages out. So requests that go out start `requestMs` apart (cache
- * hits don't wait), a little over 3.6 seconds to leave a margin, which keeps
- * one keyless run under the limit. A 429 holds every request for as long as
+ * the window ages out. Every client shares one key, a run's backfill beside the
+ * poller's sweeps, each about 30 requests every 15 minutes. So requests that go
+ * out start `requestMs` apart (cache hits don't wait), 4.8 seconds, about 750
+ * an hour, which leaves a quarter of the limit for the sweeps. A 429 holds every request for as long as
  * it waits: `fetchText` retries one with a Retry-After of a minute or less, or
  * none, after a backoff, up to three times; past those, or for a longer
  * Retry-After, `request` waits as long as it asks (`blockedMs` without one)
@@ -912,7 +913,7 @@ const PAGE = 50_000;
  * run a budget of its own; it goes in a header, never the URL, so it stays out
  * of logs and cache keys. Tests shrink the waits.
  */
-export const pacing = { requestMs: 3700, blockedMs: 15 * 60_000 };
+export const pacing = { requestMs: 4800, blockedMs: 15 * 60_000 };
 let nextSlot = 0;
 let blockedUntil = 0;
 
