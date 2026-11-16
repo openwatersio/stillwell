@@ -29,7 +29,7 @@ The public store aims to hold any source that publishes water level data and all
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
 - [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
 - [Kartverket](src/sources/kartverket/README.md): 10-minute levels at Norway's and Svalbard's permanent tide gauges.
-- [LINZ](src/sources/linz/README.md): 1-minute levels at 19 of Land Information New Zealand's tsunami gauges, from 2007.
+- [LINZ](src/sources/linz/README.md): 1-minute levels at 19 of Land Information New Zealand's tsunami gauges, and 5-minute and 1-minute levels at its two Antarctic gauges, from 2007.
 - [Marine Institute](src/sources/marine-institute/README.md): 5-minute levels from the Irish National Tide Gauge Network.
 - [PEGELONLINE](src/sources/pegelonline/README.md): observed levels at German federal gauges on the coast and the rivers.
 - [REFMAR](src/sources/refmar/README.md): SHOM's and its partners' tide gauges in France and its overseas territories.
