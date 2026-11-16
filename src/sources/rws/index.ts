@@ -390,9 +390,9 @@ export async function extremes(
       );
     if (!types.length || !heights.length) continue;
     for (const h of heights) assertCentimeters(h, datum);
-    // The fullest selection's type wins at a time two share, as its height does.
+    // The fullest selection's type wins at a time two share, as its heights do in `consecutive`.
     const typeAt = new Map<number, string | undefined>();
-    for (const t of types)
+    for (const t of types.toSorted((a, b) => b.MetingenLijst.length - a.MetingenLijst.length))
       for (const m of t.MetingenLijst) {
         const time = Date.parse(m.Tijdstip);
         if (!typeAt.has(time)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
@@ -481,24 +481,37 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 const MEANS = new Set(["GEM24H"]);
 
 /**
- * Every series of readings as measured, the one with the most values first. RWS
- * answers a request with a series per instrument and per way of deriving values,
- * all of one height: at Katsbinnen in 1999 a float gauge's year and 7 values from
- * the next year's pressure sensor, at Maastricht Borgharen in 1988 a daily mean
- * (`GEM24H`) beside the 10-minute readings, and at Goeree Lichteiland in 2023 two
- * parts with the same metadata. A mean is left out, and any other way of deriving
- * values fails, rather than vanish. Pushed in this order, `dedupe` keeps the
- * fullest series' value where two share a time, and each other's values fill the
- * times it lacks. A missing-value sentinel doesn't count as a value.
+ * Every series of readings as measured, the finest first. RWS answers a request
+ * with a series per instrument and per way of deriving values, all of one height:
+ * at Katsbinnen in 1999 a float gauge's year and 7 values from the next year's
+ * pressure sensor, at Maastricht Borgharen in 1988 a daily mean (`GEM24H`) beside
+ * the 10-minute readings, and at Goeree Lichteiland in 2023 two parts with the
+ * same metadata. A mean is left out, and any other way of deriving values fails,
+ * rather than vanish. Series rank by their median step between values, then by
+ * how many values they have, then by instrument code. Pushed in this order,
+ * `dedupe` keeps the finest series' value where two share a time, so a coarser or
+ * partial series only fills the times it lacks. A missing-value sentinel isn't a
+ * value.
  */
 function readings(location: string, series: Series[]): Series[] {
-  const values = (s: Series) =>
+  const times = (s: Series) =>
     s.MetingenLijst.filter((m) => {
       const v = m.Meetwaarde.Waarde_Numeriek;
       return v === undefined
         ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined
         : Math.abs(v) <= 10_000;
-    }).length;
+    })
+      .map((m) => Date.parse(m.Tijdstip))
+      .sort((a, b) => a - b);
+  // A series with one value has no step, and ranks after every series that has one.
+  const step = (t: number[]) => {
+    const steps = t
+      .slice(1)
+      .map((x, i) => x - t[i]!)
+      .filter((d) => d > 0)
+      .sort((a, b) => a - b);
+    return steps.length ? steps[Math.floor(steps.length / 2)]! : Infinity;
+  };
   const instrument = (s: Series) => s.AquoMetadata.MeetApparaat?.Code ?? "";
   return series
     .filter((s) => {
@@ -507,22 +520,28 @@ function readings(location: string, series: Series[]): Series[] {
         throw new Error(`RWS ${location}: unknown WaardeBewerkingsMethode ${how}`);
       return how === "NVT";
     })
-    .map((s) => ({ s, n: values(s) }))
-    .sort((a, b) => b.n - a.n || instrument(a.s).localeCompare(instrument(b.s)))
+    .map((s) => {
+      const t = times(s);
+      return { s, step: step(t), n: t.length };
+    })
+    .sort((a, b) => a.step - b.step || b.n - a.n || instrument(a.s).localeCompare(instrument(b.s)))
     .map(({ s }) => s);
 }
 
 /**
- * Of series ranked by `readings`, the first and each other whose whole span lies
- * outside every one already taken. RWS can answer a period's extremes with two
- * selections of the same tides, as at Hoek van Holland in early 2024 (314
- * extremes with the agger's lows and 224 without, with the same metadata), so
- * a series that overlaps would give a tide a second extreme. Parts that follow
- * each other, as at Goeree Lichteiland in 2023, or one instrument handing over
- * to another, are taken.
+ * Of series of readings, the one with the most values and each other whose whole
+ * span lies outside every one already taken. RWS can answer a period's extremes
+ * with two selections of the same tides, as at Hoek van Holland in early 2024 (314
+ * extremes with the agger's lows and 224 without, with the same metadata), so a
+ * series that overlaps would give a tide a second extreme. Parts that follow each
+ * other, as at Goeree Lichteiland in 2023, or one instrument handing over to
+ * another, are taken. Ranked by count, not step: a stray pair of extremes 10
+ * minutes apart mustn't push out the year's selection.
  */
-function consecutive(ranked: Series[]): Series[] {
+function consecutive(series: Series[]): Series[] {
   const taken: { series: Series; from: number; to: number }[] = [];
+  // Stable, so equal counts keep the order `readings` gave them.
+  const ranked = series.toSorted((a, b) => b.MetingenLijst.length - a.MetingenLijst.length);
   for (const series of ranked) {
     // A loop, not Math.min(...): a series can have too many values to spread.
     let [from, to] = [Infinity, -Infinity];

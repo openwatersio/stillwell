@@ -145,8 +145,16 @@ describe("rws", () => {
               [times[2]!, 999_999_999],
             ],
           ],
-          // The fullest series: it wins where both have a time.
-          [msl, [times[0]!, times[2]!, "2023-03-01T00:00:00.000+01:00"].map((t) => [t, 10])],
+          // The finest series: it wins where both have a time.
+          [
+            msl,
+            [
+              times[0]!,
+              "2023-01-01T01:10:00.000+01:00",
+              "2023-01-01T01:20:00.000+01:00",
+              times[2]!,
+            ].map((t) => [t, 10]),
+          ],
           // A second part with the same metadata, as at Goeree Lichteiland in 2023.
           [msl, [[times[3]!, 20]]],
           // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
@@ -161,7 +169,8 @@ describe("rws", () => {
       ]),
       [
         ["2023-01-01T00:00:00.000Z", 0.1],
-        ["2023-02-28T23:00:00.000Z", 0.1],
+        ["2023-01-01T00:10:00.000Z", 0.1],
+        ["2023-01-01T00:20:00.000Z", 0.1],
         ["2023-06-01T09:30:00.000Z", 0.99],
         ["2023-12-30T22:50:00.000Z", 0.1],
         ["2023-12-30T23:00:00.000Z", 0.2],
@@ -173,7 +182,11 @@ describe("rws", () => {
       [
         /OphalenWaarnemingen/,
         answer(
-          [typeChannel, [times[0]!, times[2]!].map((t) => [t, "hoogwater"])],
+          // The fuller selection, as Hoek van Holland's 314 extremes are against 224.
+          [
+            typeChannel,
+            [times[0]!, "2023-03-01T00:00:00.000+01:00", times[2]!].map((t) => [t, "hoogwater"]),
+          ],
           // The overlapping selection labels a shared time otherwise; the fuller one's label wins.
           [
             typeChannel,
@@ -237,6 +250,44 @@ describe("rws", () => {
       rws.levels("goeree.lichteiland", ...range, { datum: "MSL" }),
       /unknown WaardeBewerkingsMethode GEM10M/,
     );
+  });
+
+  it("keeps a finer series' value where a coarser one with more values shares its time", async () => {
+    // A staff gauge read once a day for 10 days, and a 10-minute gauge that runs 2 of them.
+    const day = (d: number, hhmm = "08:00") =>
+      `2023-03-${String(d).padStart(2, "0")}T${hhmm}:00.000+01:00`;
+    const daily = Array.from({ length: 10 }, (_, i) => [day(i + 1), 50] as [string, number]);
+    const tenMinute: [string, number][] = [];
+    for (const d of [4, 5])
+      for (let m = 7 * 60; m < 9 * 60; m += 10)
+        tenMinute.push([
+          day(
+            d,
+            `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`,
+          ),
+          20,
+        ]);
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [{ ...nap, MeetApparaat: { Code: "peilschaal" } }, daily],
+          [{ ...nap, MeetApparaat: { Code: "vlotter" } }, tenMinute.slice(1, 7)],
+        ),
+      ],
+    ]);
+    const levels = await rws.levels(
+      "x",
+      new Date("2023-03-01T00:00:00Z"),
+      new Date("2023-03-11T00:00:00Z"),
+    );
+    const at = (iso: string) => levels.find((l) => l.time === Date.parse(iso))?.level;
+    // 6 ten-minute values, 07:10 to 08:00 on 4 March, against 10 daily ones: the 10-minute value wins at 08:00.
+    assert.equal(at("2023-03-04T07:00:00.000Z"), 0.2);
+    // The daily series fills the days the 10-minute one lacks.
+    assert.equal(at("2023-03-01T07:00:00.000Z"), 0.5);
+    assert.equal(at("2023-03-10T07:00:00.000Z"), 0.5);
+    assert.equal(levels.length, 9 + 6);
   });
 
   it("reads both lows of a double low water, and not the rise between them", async () => {
