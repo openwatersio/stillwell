@@ -77,15 +77,16 @@ const UNITS: Record<string, string> = { mAOD: "AOD", m: "CD" };
  * Every `TideGauge` station with a tidal level in meters. Most National Tide
  * Gauge Network gauges are listed twice, once in mAOD and once in meters above
  * chart datum, with the same readings, so a gauge's chart datum series is kept
- * only where it has no mAOD one (Avonmouth, Bournemouth, Hinkley Point and
- * Immingham). Series in millimeters copy one in meters. A station is inactive
+ * only where it has no mAOD one, which none has had since November 2026. An
+ * mAOD station names in `same_as` its gauge's chart datum series the store
+ * lists, and keeps a link it had. Series in millimeters copy one in meters. A station is inactive
  * and not polled when the measures list gives its series no latest reading,
  * as for one that has never reported (Mumbles and Stornoway) or stopped months
  * ago (Jersey and Washpile, in November 2026), and its readings hold nothing in
  * the API's 28 days, so a day's outage retires nothing. A series the list
  * leaves out keeps its station active.
  */
-export async function stations(): Promise<ListedStation[]> {
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const { items } = await getJson<{ items: ApiStation[] }>(
     `${API}/id/stations?type=TideGauge&_limit=1000`,
     { fresh: true },
@@ -138,6 +139,34 @@ export async function stations(): Promise<ListedStation[]> {
   if (kept.length && stopped.size === kept.length) throw new Error("EA reported no tidal readings");
   if (stopped.size)
     console.log(`  ea: no readings in ${API_DAYS} days: ${[...stopped].join(", ")}`);
+  // A chart datum series the store lists, such as Bournemouth's until November 2026, is the
+  // same gauge as the listed mAOD station with its label, or else the nearest within about
+  // 2 km, and keeps its history in that station's group. A link the store holds stays.
+  const aodListed = kept.filter((k) => k.datum === "AOD").map((k) => k.s);
+  const at = (v: number | number[] | undefined) => firstOf(v);
+  const twin = new Map<string, string[]>();
+  for (const p of previous) {
+    if (p.datum !== "CD") continue;
+    const close = aodListed.filter(
+      (a) =>
+        labelOf(a) === p.name ||
+        (Math.abs(at(a.lat) - p.lat) < 0.02 && Math.abs(at(a.long) - p.lon) < 0.02),
+    );
+    const best =
+      close.find((a) => labelOf(a) === p.name) ??
+      close.sort(
+        (a, b) =>
+          Math.hypot(at(a.lat) - p.lat, at(a.long) - p.lon) -
+          Math.hypot(at(b.lat) - p.lat, at(b.long) - p.lon),
+      )[0];
+    if (best) twin.set(`ea/${best.notation}`, [...(twin.get(`ea/${best.notation}`) ?? []), p.id]);
+  }
+  const known = new Set(previous.map((p) => p.id));
+  const held = new Map(previous.map((p) => [p.id, p.same_as ?? []]));
+  const twinsOf = (s: ApiStation) =>
+    [...new Set([...(twin.get(`ea/${s.notation}`) ?? []), ...(held.get(`ea/${s.notation}`) ?? [])])]
+      .filter((id) => known.has(id))
+      .sort();
   const listed: ListedStation[] = [];
   for (const { s, measure, datum } of kept) {
     const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]!);
@@ -159,7 +188,7 @@ export async function stations(): Promise<ListedStation[]> {
       first: null,
       last: null,
       tide_station: null,
-      same_as: [],
+      same_as: twinsOf(s),
       status: live ? "active" : "inactive",
       live,
       min_interval_s: 900,

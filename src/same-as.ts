@@ -57,7 +57,7 @@ export const LINKS: Decision[] = [
   {
     a: "bodc/ptb",
     b: "ea/E72624",
-    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred.",
+    note: "The National Tide Gauge Network's Portbury gauge, which the EA names Avonmouth Portbury and places 2 km east; its other listing of the gauge, E72623, is 70 m from BODC's position. Both are in chart datum with a mean level about 7.4 m. BODC flags its whole record improbable, so its record counts as empty in `rank` and the EA's series is preferred: since November 2026 the mAOD series E72639, which names E72624 as its twin and joins the group.",
   },
   {
     a: "gesla/rostocktg-ros-deu-cmems",
