@@ -14,14 +14,6 @@ IGN's [tide-gauge network](https://www.ign.es/web/gds-red-mareografos) publishes
 - **Datums:** reviewed JM series carry their named mark's height relative to `NMMA` on the peninsula, or `Tenerife`, `Fuerteventura` or `Alboran` on those islands. IGN's [height-origin table](https://datos-geodesia.ign.es/Red_de_Mareografos/fichas/Origenes_Altitudes_Nacionales.pdf) distinguishes these origins. Island heights are never labeled NMMA. Both Alicante Join Marks are NP1, given to the centimeter as 3.41 m. Raw series and unmatched historical BMs carry no surveyed offsets.
 - **Copies:** explicit links to the nine GESLA CMEMS records in issue #181 use positions checked against the store. Shared ranking prefers IGN over GESLA under matching commercial-use tags. A commercially usable CMEMS series can remain preferred while IGN's confirmation is pending.
 
-## Errata
-
-- **Repeated logger rows** (erratum `ign-duplicate-raw-rows`). Identical adjacent raw rows are kept once.
-- **Ambiguous missing marker** (erratum `ign-negative-sentinel`). Numeric −9999 is retained as suspect because it can be a real height or a missing placeholder.
-- **Historical mark names** (erratum `ign-reviewed-marks`). Headers identify references that differ from today's sheets; offsets follow the named mark or remain unset.
-
-- **Chart archive metadata** (erratum `ign-murc1-chart-archive`). Cartagena 0503 exports cover 2001–2003 despite the earlier period in the sheet; comparison with reviewed heights establishes their downward direction.
-
 ## Running ingest
 
 Requests start at least 350 ms apart. Inventories and files are read fresh because IGN does not establish that exports are immutable. Historical requests longer than a week use the requested sensor's annual export in `observados/ficheros_anuales` where available, otherwise its daily files. A spare sensor's annual export cannot override the requested sensor. Current-year backfills can need hundreds of daily files per live sensor.
