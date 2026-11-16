@@ -145,7 +145,8 @@ describe("rws", () => {
               [times[2]!, 999_999_999],
             ],
           ],
-          [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          // The fullest series: it wins where both have a time.
+          [msl, [times[0]!, times[2]!, "2023-03-01T00:00:00.000+01:00"].map((t) => [t, 10])],
           // A second part with the same metadata, as at Goeree Lichteiland in 2023.
           [msl, [[times[3]!, 20]]],
           // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
@@ -160,6 +161,7 @@ describe("rws", () => {
       ]),
       [
         ["2023-01-01T00:00:00.000Z", 0.1],
+        ["2023-02-28T23:00:00.000Z", 0.1],
         ["2023-06-01T09:30:00.000Z", 0.99],
         ["2023-12-30T22:50:00.000Z", 0.1],
         ["2023-12-30T23:00:00.000Z", 0.2],
@@ -172,7 +174,14 @@ describe("rws", () => {
         /OphalenWaarnemingen/,
         answer(
           [typeChannel, [times[0]!, times[2]!].map((t) => [t, "hoogwater"])],
-          [typeChannel, [[times[1]!, "laagwater"]]],
+          // The overlapping selection labels a shared time otherwise; the fuller one's label wins.
+          [
+            typeChannel,
+            [
+              [times[1]!, "laagwater"],
+              [times[2]!, "laagwater"],
+            ],
+          ],
           [typeChannel, [[times[3]!, "laagwater"]]],
           [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
           [msl, [[times[1]!, 99]]],
@@ -202,6 +211,21 @@ describe("rws", () => {
       ],
     ]);
     assert.deepEqual(await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }), []);
+    // But a mean in the datum doesn't hide readings that are now in another.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+          [nap, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    await assert.rejects(
+      rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /extremes are in NAP, not MSL/,
+    );
     // A way of deriving values the adapter doesn't know fails rather than vanish.
     serve([
       [

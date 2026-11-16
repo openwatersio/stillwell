@@ -375,11 +375,14 @@ export async function extremes(
       location,
       series.filter((s) => s.AquoMetadata.Typering?.Code === "GETETTPE"),
     );
-    const all = series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE");
-    const inDatum = all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
-    const heights = consecutive(readings(location, inDatum));
+    // Readings only: a daily mean in the datum doesn't hide readings that moved to another.
+    const all = readings(
+      location,
+      series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE"),
+    );
+    const heights = consecutive(all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum));
     // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
-    if (types.length && all.length && !inDatum.length)
+    if (types.length && all.length && !heights.length)
       throw new DatumChanged(
         `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
         all[0]!.AquoMetadata.Hoedanigheid.Code,
@@ -387,11 +390,13 @@ export async function extremes(
       );
     if (!types.length || !heights.length) continue;
     for (const h of heights) assertCentimeters(h, datum);
-    const typeAt = new Map(
-      types.flatMap((t) =>
-        t.MetingenLijst.map((m) => [Date.parse(m.Tijdstip), m.Meetwaarde.Waarde_Alfanumeriek]),
-      ),
-    );
+    // The fullest selection's type wins at a time two share, as its height does.
+    const typeAt = new Map<number, string | undefined>();
+    for (const t of types)
+      for (const m of t.MetingenLijst) {
+        const time = Date.parse(m.Tijdstip);
+        if (!typeAt.has(time)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
+      }
     for (const m of heights.flatMap((h) => h.MetingenLijst)) {
       const time = Date.parse(m.Tijdstip);
       const kind = typeAt.get(time);
