@@ -392,7 +392,7 @@ export async function extremes(
     for (const h of heights) assertCentimeters(h, datum);
     // The fullest selection's type wins at a time two share, as its heights do in `consecutive`.
     const typeAt = new Map<number, string | undefined>();
-    for (const t of types.toSorted((a, b) => b.MetingenLijst.length - a.MetingenLijst.length))
+    for (const t of byValues(types))
       for (const m of t.MetingenLijst) {
         const time = Date.parse(m.Tijdstip);
         if (!typeAt.has(time)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
@@ -480,30 +480,39 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 /** Ways RWS derives values that aren't readings as measured, which are left out. */
 const MEANS = new Set(["GEM24H"]);
 
+/** The times of a series' values, in order; a missing-value sentinel isn't a value. */
+function valueTimes(s: Series): number[] {
+  return s.MetingenLijst.filter((m) => {
+    const v = m.Meetwaarde.Waarde_Numeriek;
+    return v === undefined ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined : Math.abs(v) <= 10_000;
+  })
+    .map((m) => Date.parse(m.Tijdstip))
+    .sort((a, b) => a - b);
+}
+
+/** Series with more values first; stable, so equal ones keep their order. */
+const byValues = (series: Series[]) =>
+  series
+    .map((s) => ({ s, n: valueTimes(s).length }))
+    .sort((a, b) => b.n - a.n)
+    .map(({ s }) => s);
+
 /**
- * Every series of readings as measured, the finest first. RWS answers a request
- * with a series per instrument and per way of deriving values, all of one height:
- * at Katsbinnen in 1999 a float gauge's year and 7 values from the next year's
- * pressure sensor, at Maastricht Borgharen in 1988 a daily mean (`GEM24H`) beside
- * the 10-minute readings, and at Goeree Lichteiland in 2023 two parts with the
- * same metadata. A mean is left out, and any other way of deriving values fails,
- * rather than vanish. Series rank by their median step between values, then by
- * how many values they have, then by instrument code. Pushed in this order,
- * `dedupe` keeps the finest series' value where two share a time, so a coarser or
- * partial series only fills the times it lacks. A missing-value sentinel isn't a
- * value.
+ * Every series of readings as measured, the one to keep first where two share a
+ * time. RWS answers a request with a series per instrument and per way of deriving
+ * values, all of one height: at Katsbinnen in 1999 a float gauge's year and 7
+ * values from the next year's pressure sensor, at Maastricht Borgharen in 1988 a
+ * daily mean (`GEM24H`) beside the 10-minute readings, and at Goeree Lichteiland in
+ * 2023 two parts with the same metadata. A mean is left out, and any other way of
+ * deriving values fails, rather than vanish. A series whose values span a day or
+ * more ranks by its median step between values, the finest first, so a 10-minute
+ * gauge's reading wins over a once-a-day staff gauge's; a shorter one ranks after
+ * those, so a burst of a few values only fills times the others lack. Then more
+ * values, then the instrument's code. Pushed in this order, `dedupe` keeps the
+ * first series' value at a time two share.
  */
 function readings(location: string, series: Series[]): Series[] {
-  const times = (s: Series) =>
-    s.MetingenLijst.filter((m) => {
-      const v = m.Meetwaarde.Waarde_Numeriek;
-      return v === undefined
-        ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined
-        : Math.abs(v) <= 10_000;
-    })
-      .map((m) => Date.parse(m.Tijdstip))
-      .sort((a, b) => a - b);
-  // A series with one value has no step, and ranks after every series that has one.
+  // A series with one value has no step.
   const step = (t: number[]) => {
     const steps = t
       .slice(1)
@@ -521,10 +530,17 @@ function readings(location: string, series: Series[]): Series[] {
       return how === "NVT";
     })
     .map((s) => {
-      const t = times(s);
-      return { s, step: step(t), n: t.length };
+      const t = valueTimes(s);
+      const long = t.length > 1 && t.at(-1)! - t[0]! >= 86_400_000;
+      return { s, long, step: long ? step(t) : Infinity, n: t.length, code: instrument(s) };
     })
-    .sort((a, b) => a.step - b.step || b.n - a.n || instrument(a.s).localeCompare(instrument(b.s)))
+    .sort(
+      (a, b) =>
+        Number(b.long) - Number(a.long) ||
+        a.step - b.step ||
+        b.n - a.n ||
+        (a.code < b.code ? -1 : a.code > b.code ? 1 : 0),
+    )
     .map(({ s }) => s);
 }
 
@@ -535,23 +551,19 @@ function readings(location: string, series: Series[]): Series[] {
  * extremes with the agger's lows and 224 without, with the same metadata), so a
  * series that overlaps would give a tide a second extreme. Parts that follow each
  * other, as at Goeree Lichteiland in 2023, or one instrument handing over to
- * another, are taken. Ranked by count, not step: a stray pair of extremes 10
- * minutes apart mustn't push out the year's selection.
+ * another, are taken. Ranked by values, not step: a stray pair of extremes 10
+ * minutes apart mustn't push out the year's selection. A series with no values
+ * takes no span.
  */
 function consecutive(series: Series[]): Series[] {
   const taken: { series: Series; from: number; to: number }[] = [];
-  // Stable, so equal counts keep the order `readings` gave them.
-  const ranked = series.toSorted((a, b) => b.MetingenLijst.length - a.MetingenLijst.length);
-  for (const series of ranked) {
-    // A loop, not Math.min(...): a series can have too many values to spread.
-    let [from, to] = [Infinity, -Infinity];
-    for (const m of series.MetingenLijst) {
-      const t = Date.parse(m.Tijdstip);
-      [from, to] = [Math.min(from, t), Math.max(to, t)];
-    }
-    if (taken.every((t) => to < t.from || from > t.to)) taken.push({ series, from, to });
+  for (const s of byValues(series)) {
+    const t = valueTimes(s);
+    if (!t.length) continue;
+    const [from, to] = [t[0]!, t.at(-1)!];
+    if (taken.every((x) => to < x.from || from > x.to)) taken.push({ series: s, from, to });
   }
-  return taken.map((t) => t.series);
+  return taken.map((x) => x.series);
 }
 
 // Chunk boundaries are inclusive on both ends, so the shared sample repeats.

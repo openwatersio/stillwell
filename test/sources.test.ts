@@ -253,41 +253,82 @@ describe("rws", () => {
   });
 
   it("keeps a finer series' value where a coarser one with more values shares its time", async () => {
-    // A staff gauge read once a day for 10 days, and a 10-minute gauge that runs 2 of them.
-    const day = (d: number, hhmm = "08:00") =>
-      `2023-03-${String(d).padStart(2, "0")}T${hhmm}:00.000+01:00`;
-    const daily = Array.from({ length: 10 }, (_, i) => [day(i + 1), 50] as [string, number]);
+    // A staff gauge read once a day for 30 days, and a 10-minute gauge that runs 07:00 to 08:50 on 2 of them.
+    const at = (d: number, h: number, m: number) =>
+      `2023-03-${String(d).padStart(2, "0")}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00.000+01:00`;
+    const daily = Array.from({ length: 30 }, (_, i) => [at(i + 1, 8, 0), 50] as [string, number]);
     const tenMinute: [string, number][] = [];
     for (const d of [4, 5])
       for (let m = 7 * 60; m < 9 * 60; m += 10)
-        tenMinute.push([
-          day(
-            d,
-            `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`,
-          ),
-          20,
-        ]);
+        tenMinute.push([at(d, Math.floor(m / 60), m % 60), 20]);
+    // A burst from a third instrument: two values 5 minutes apart, finer than the gauge, one at a shared time.
+    const burst: [string, number][] = [
+      [at(4, 8, 0), 77],
+      [at(4, 8, 5), 77],
+    ];
     serve([
       [
         /OphalenWaarnemingen/,
         answer(
+          [{ ...nap, MeetApparaat: { Code: "burst" } }, burst],
           [{ ...nap, MeetApparaat: { Code: "peilschaal" } }, daily],
-          [{ ...nap, MeetApparaat: { Code: "vlotter" } }, tenMinute.slice(1, 7)],
+          [{ ...nap, MeetApparaat: { Code: "vlotter" } }, tenMinute],
         ),
       ],
     ]);
     const levels = await rws.levels(
       "x",
       new Date("2023-03-01T00:00:00Z"),
-      new Date("2023-03-11T00:00:00Z"),
+      new Date("2023-04-01T00:00:00Z"),
     );
-    const at = (iso: string) => levels.find((l) => l.time === Date.parse(iso))?.level;
-    // 6 ten-minute values, 07:10 to 08:00 on 4 March, against 10 daily ones: the 10-minute value wins at 08:00.
-    assert.equal(at("2023-03-04T07:00:00.000Z"), 0.2);
+    const level = (iso: string) => levels.find((l) => l.time === Date.parse(iso))?.level;
+    // 24 ten-minute values against 30 daily ones: the 10-minute value wins at 08:00, over the burst too.
+    assert.equal(level("2023-03-04T07:00:00.000Z"), 0.2);
+    assert.equal(level("2023-03-05T07:00:00.000Z"), 0.2);
     // The daily series fills the days the 10-minute one lacks.
-    assert.equal(at("2023-03-01T07:00:00.000Z"), 0.5);
-    assert.equal(at("2023-03-10T07:00:00.000Z"), 0.5);
-    assert.equal(levels.length, 9 + 6);
+    assert.equal(level("2023-03-01T07:00:00.000Z"), 0.5);
+    assert.equal(level("2023-03-30T07:00:00.000Z"), 0.5);
+    // The burst spans less than a day, so it ranks last and only fills a time the others lack.
+    assert.equal(level("2023-03-04T07:05:00.000Z"), 0.77);
+    assert.equal(levels.length, 30 - 2 + 24 + 1);
+  });
+
+  it("ranks extremes selections by real values, not by entries", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Padded with missing-value sentinels: 4 entries, 1 value, inside the other's span.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "hoogwater"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          // Overlapping it, with 3 values.
+          [typeChannel, [2, 8, 11].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [2, 8, 11].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    const extremes = await rws.extremes(
+      "hoekvanholland",
+      new Date("2023-12-31T00:00:00Z"),
+      new Date("2024-01-02T00:00:00Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [new Date(e.time).toISOString(), e.type]),
+      [
+        ["2024-01-01T01:00:00.000Z", "high"],
+        ["2024-01-01T07:00:00.000Z", "low"],
+        ["2024-01-01T10:00:00.000Z", "high"],
+      ],
+    );
   });
 
   it("reads both lows of a double low water, and not the rise between them", async () => {
