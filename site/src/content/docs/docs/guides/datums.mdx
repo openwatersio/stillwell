@@ -92,7 +92,7 @@ A station's reference can change: its gauge zero is reset, or its source moves t
 
 Each epoch has series files of its own, and no file is ever rewritten into another epoch, so every file holds one `datum` on every row, the datum of its own epoch. Epoch 1 uses the plain path, and later epochs add their number after the station: `obs/<source>/<station>/2/<year>.parquet`. The same goes for `extremes/`, `predictions/` and `predicted-extremes/`. [File paths](/docs/getting-started/#building-paths-in-code) has the details. `recent/<source>.parquet` gives each row's epoch in its `epoch` column.
 
-`since` and `until` bound the epoch, in UTC, with `until` exclusive. `since` is null for a first epoch with no known start, and `until` is null for the current one. An epoch's files can hold rows outside its span. Those rows are the uncertain stretch around a change, or years written before the next epoch opened, which that epoch's files hold again. They aren't part of the series, so filter on `since` and `until` when you read an epoch's files.
+`since` and `until` bound the epoch, in UTC, with `until` exclusive. `since` is null for a first epoch with no known start, and `until` is null for the current one. An epoch's files can hold rows outside its span. Those rows are the uncertain stretch around a change, or values written before the next epoch opened, which that epoch's files may hold too. They aren't part of the series, so filter on `since` and `until` when you read an epoch's files.
 
 ### When an epoch opens
 
