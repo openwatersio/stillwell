@@ -1122,6 +1122,66 @@
       "error": "From 12:00 UTC on 30 November to 10:00 on 31 December 2023 the Toitū Te Whenua record of Scott Base falls by 0.0004 to 0.0005 m an hour for all 743 hours, from 2.48 m to 2.27 m, where LINZ's files have measured levels from 10 December. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
       "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
       "evidence": "The store's 2023 file, November 2026: every hourly step in the span is between -0.0005 and -0.0004 m. For the 528 hours from 10 to 31 December that the `linz` source also holds, the correlation with its levels is 0.06 at lags of -3 to +3 hours, the mean absolute difference 0.30 m, and LINZ's range 1.39 m against 0.47 m. The span's first day also holds measured hours."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2016",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2016-02-28",
+      "until": "2016-03-02",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 to 0.4 m from 23:00 UTC on 28 February), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2016`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2018-12",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2018-12-13",
+      "until": "2018-12-19",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (spikes to 0.02 m and a constant 2.10 m from 09:35 UTC on 13 December to 19:55 on 18 December), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-stuck-2018-12`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2019",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2019-02-24",
+      "until": "2019-11-04",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 m, with spells of 7.999 m, from about 12:00 UTC on 24 February to 01:00 UTC on 3 November), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2019`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2020",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2020-01-25",
+      "until": "2020-05-13",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.27, 0.03, 0.000 and 0.01 m from 06:40 UTC on 25 January to 04:05 UTC on 12 May), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2020`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2021",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2021-03-16",
+      "until": "2021-11-18",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (a drift from 1.5 to 0.1 m with a shrunken tide, from 19:45 UTC on 16 March to 01:45 UTC on 17 November), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2021`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2022",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2022-03-06",
+      "until": "2022-03-09",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 to 0.04 m and a spell of 8.0 m from 08:15 UTC on 6 March to 01:45 on the 8th), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2022`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
     }
   ],
   "retired": []
