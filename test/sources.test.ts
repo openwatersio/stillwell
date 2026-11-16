@@ -2914,6 +2914,26 @@ describe("usgs", () => {
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
   });
 
+  it("counts an altitude as surveyed only by a survey method, and GPS only when it's accurate", () => {
+    const surveyed = (altitude_method_code: string | null, altitude_accuracy: number | null) =>
+      usgs.isSurveyed({ altitude_method_code, altitude_accuracy });
+    // Levels and GNSS, whatever the accuracy.
+    assert.equal(surveyed("L", 20), true);
+    assert.equal(surveyed("X", null), true);
+    // GPS under a foot counts; a foot or more doesn't.
+    for (const code of ["D", "F", "G"]) {
+      assert.equal(surveyed(code, 0.1), true);
+      assert.equal(surveyed(code, 1), false);
+    }
+    // With no accuracy, corrected and survey-grade GPS count, and plain GPS doesn't.
+    assert.equal(surveyed("D", null), true);
+    assert.equal(surveyed("F", null), true);
+    assert.equal(surveyed("G", null), false);
+    // Estimates, reported and unknown methods, and none.
+    for (const code of ["M", "N", "J", "A", "R", "U", null])
+      assert.equal(surveyed(code, 0.1), false);
+  });
+
   it("notices a station's series or gage zero changing under the same datum name", () => {
     const committed = {
       id: "usgs/03612600",

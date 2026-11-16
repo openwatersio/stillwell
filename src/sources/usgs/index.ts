@@ -82,6 +82,26 @@ const VERTICAL_DATUMS: Record<string, string> = {
  */
 const SURVEYED = new Set(["L", "D", "G", "F", "W", "X", "Y", "Z"]);
 
+/**
+ * GPS methods, whose altitude is a survey only where USGS gives it an
+ * `altitude_accuracy` under a foot: plain GPS (G) reaches 141 ft at some
+ * sites (erratum `usgs-imprecise-gps-altitudes`). With no accuracy given,
+ * differentially corrected (D) and survey-grade (F) GPS count, and plain GPS
+ * doesn't.
+ */
+const GPS = new Set(["D", "F", "G"]);
+
+/** Whether a site's altitude was surveyed, so it's the gage datum's (`SURVEYED`, `GPS`). */
+export function isSurveyed(
+  location: Pick<ApiLocation, "altitude_method_code" | "altitude_accuracy">,
+): boolean {
+  const code = location.altitude_method_code ?? "";
+  if (!SURVEYED.has(code)) return false;
+  if (!GPS.has(code)) return true;
+  const accuracy = location.altitude_accuracy;
+  return typeof accuracy === "number" ? accuracy < 1 : code !== "G";
+}
+
 /** Every `altitude_method_code` USGS gave in November 2026. */
 const METHODS = new Set([...SURVEYED, "M", "N", "J", "A", "R", "U"]);
 
@@ -316,6 +336,8 @@ interface ApiLocation {
   hydrologic_unit_code: string | null;
   altitude: number | null;
   altitude_method_code: string | null;
+  /** In feet. */
+  altitude_accuracy: number | null;
   vertical_datum: string | null;
 }
 
@@ -378,7 +400,7 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
       const batch = ids.slice(i, i + LOCATION_BATCH);
       const params = new URLSearchParams({
         properties:
-          "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,altitude_method_code,vertical_datum",
+          "id,monitoring_location_name,agency_code,site_type_code,state_name,country_code,hydrologic_unit_code,altitude,altitude_accuracy,altitude_method_code,vertical_datum",
         filter: `id IN (${batch.map((id) => `'${id}'`).join(",")})`,
         "filter-lang": "cql-text",
       });
@@ -519,7 +541,7 @@ function toStation(
   // Gage height plus the gage datum's altitude is the level in that vertical datum.
   const vertical = location.vertical_datum ? VERTICAL_DATUMS[location.vertical_datum] : undefined;
   const decided = GAGE_DATUMS[site];
-  const surveyed = SURVEYED.has(location.altitude_method_code ?? "");
+  const surveyed = isSurveyed(location);
   if (decided && datum !== GAGE)
     console.warn(`usgs/${site}: GAGE_DATUMS has a decision, but its series is in ${datum}`);
   // An answer with no altitude and no method is more likely a gap, and keeps the stored offsets.
