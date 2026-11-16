@@ -25,7 +25,8 @@ export const unitOf = (id: number) => `stillwell-job-${id}`;
 export const jobDir = (id: number) => `/var/lib/stillwell-jobs/runs/${id}`;
 
 function systemctl(...args: string[]): string {
-  return execFileSync("systemctl", args, { encoding: "utf8" });
+  // Its errors come back in the throw; on the service's stderr they'd only repeat in the journal.
+  return execFileSync("systemctl", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 }
 
 /** Node as the units start it, through the link deploys move, so a later deploy's cleanup never removes it. */
@@ -100,10 +101,12 @@ export function systemd(store: string, memory = 0): Units {
       }
     },
     clear(id) {
+      let stopError = "";
       try {
         systemctl("stop", unitOf(id));
-      } catch {
-        // A unit that's gone can't be stopped; one that is still there is caught below.
+      } catch (error) {
+        // A unit that's gone can't be stopped; one that is still there is reported below with why.
+        stopError = (error as Error).message;
       }
       let state: string;
       try {
@@ -114,11 +117,16 @@ export function systemd(store: string, memory = 0): Units {
         );
         return false;
       }
-      if (!/LoadState=not-found|ActiveState=(inactive|failed)/.test(state)) return false;
+      if (!/LoadState=not-found|ActiveState=(inactive|failed)/.test(state)) {
+        console.error(`job ${id}: still running after a stop${stopError ? `: ${stopError}` : ""}`);
+        return false;
+      }
       try {
         systemctl("reset-failed", unitOf(id));
-      } catch {
-        // Only a failed unit has anything to reset.
+      } catch (error) {
+        // Only a failed unit has anything to reset; one left loaded would answer for a job of the same id later.
+        if (!/not loaded|not found/i.test((error as Error).message))
+          console.error(`job ${id}: its unit wasn't reset: ${(error as Error).message}`);
       }
       execFileSync("rm", ["-rf", jobDir(id)]);
       return true;
