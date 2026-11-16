@@ -464,6 +464,8 @@ describe("linz", () => {
         const covered = errata.some(
           (e) =>
             (e.handling === "corrected" || e.handling === "dropped") &&
+            // One for the whole record, such as the clock's, says nothing of a span.
+            (e.since || e.until) &&
             e.stations?.includes(`linz/${code}`) &&
             (e.since ?? "") <= span.from.slice(0, 10) &&
             (e.until ?? "9999") >= span.to.slice(0, 10),
@@ -674,7 +676,11 @@ describe("linz Antarctic gauges", () => {
       "ROBT,20091204,03:00:00,5.5",
       "ROBT,20091204,02:55:00,5.6",
     ].join("\n");
-    serve([list("ROBT", 2009, "ROBT_00_2009.zip"), zip("ROBT", 2009, "ROBT_00_2009.zip", csv)]);
+    serve([
+      list("ROBT", 2008, "ROBT_00_2008.zip"),
+      list("ROBT", 2009, "ROBT_00_2009.zip"),
+      zip("ROBT", 2009, "ROBT_00_2009.zip", csv),
+    ]);
     const obs = await linz.levels(
       "ROBT",
       new Date("2009-01-01T00:00:00Z"),
@@ -717,6 +723,80 @@ describe("linz Antarctic gauges", () => {
       ],
     );
     assert.ok(requests.every(([url]) => !/2007364/.test(url)));
+  });
+
+  it("reads 2007's last day for the first minute of 2008 when 2008 is asked for alone", async () => {
+    serve([
+      list("ROBT", 2007, "ROBT_00_2007365.zip"),
+      zip(
+        "ROBT",
+        2007,
+        "ROBT_00_2007365.zip",
+        "ROBT,2007-12-31 23:55,6.100\nROBT,2008-01-01 00:00,6.123",
+      ),
+      list("ROBT", 2008, "ROBT_00_2008.zip"),
+      zip("ROBT", 2008, "ROBT_00_2008.zip", "ROBT,20080101,00:05:00,6.130"),
+    ]);
+    const obs = await linz.levels(
+      "ROBT",
+      new Date("2008-01-01T00:00:00Z"),
+      new Date("2009-01-01T00:00:00Z"),
+    );
+    assert.deepEqual(obs.map(iso), ["2008-01-01T00:00", "2008-01-01T00:05"]);
+  });
+
+  it("fails rather than read a year's last hours from an empty next-year listing", async () => {
+    serve([
+      list("SCOT", 2018, "SCOT_00_2018.zip"),
+      zip("SCOT", 2018, "SCOT_00_2018.zip", "SCOT,20181231,23:59:00,2.100"),
+      list("SCOT", 2019),
+    ]);
+    await assert.rejects(
+      linz.levels("SCOT", new Date("2018-12-01T00:00:00Z"), new Date("2019-01-01T00:00:00Z"), {
+        record_start: "2016-01-01T00:00:00.000Z",
+        record_end: "2026-03-05T00:00:00.000Z",
+      }),
+      /lists no files for SCOT in 2019/,
+    );
+  });
+
+  it("reads Cape Roberts' last year, before its file is issued in March, as no data", async () => {
+    const span = [new Date("2026-12-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
+    const was = { record_start: "2007-01-01T00:00:00.000Z" };
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-01-09T00:00:00Z") });
+    serve([list("ROBT", 2026), list("ROBT", 2025, "ROBT_00_2025.zip")]);
+    assert.deepEqual(await linz.levels("ROBT", ...span, was), []);
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-03-09T00:00:00Z") });
+    await assert.rejects(linz.levels("ROBT", ...span, was), /lists no files for ROBT in 2026/);
+  });
+
+  it("takes Scott Base's unit from the file's year, not the row's label", async () => {
+    serve([
+      list("SCOT", 2023, "SCOT_00_2023.zip"),
+      zip("SCOT", 2023, "SCOT_00_2023.zip", "2024-01-01,00:00:00,2.401"),
+      list("SCOT", 2024, "SCOT_00_2024.zip"),
+      zip("SCOT", 2024, "SCOT_00_2024.zip", "2024-01-01,00:01:00,2400"),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2023-12-31T00:00:00Z"),
+      new Date("2024-01-01T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2023-12-31T11:00", 2.401],
+        ["2023-12-31T11:01", 2.4],
+      ],
+    );
+  });
+
+  it("reads the Antarctic layouts only at the Antarctic gauges", () => {
+    assert.deepEqual(linz.parse("2024,1,1000,30,5.676,-3.458,973.02", "WLGT", false), []);
+    assert.deepEqual(linz.parse("2023-01-01,00:00:00,2.504", "WLGT", false), []);
+    assert.deepEqual(linz.parse("WLGT,20110101,0:05:00,5.38,30,-2.338,992.99", "WLGT", false), []);
   });
 
   it("reads Scott Base's NZST labels as UTC, in meters until 2024 and millimeters from it", async () => {

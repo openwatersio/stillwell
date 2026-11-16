@@ -156,18 +156,11 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     // A listing that lost its yearly zip falls back to the day files, which are preliminary. In early
     // January the latest days can come from last year's zip, so only the old year is held to its flag.
     const read = final.every((o) => o.flag === Flag.good);
-    // The Antarctic gauges' files change layout from year to year, so one year of each is read too:
-    // Cape Roberts' Julian-day layout of 2025 and Scott Base's millimeters of 2024.
-    const robt = await linz.levels(
-      "ROBT",
-      new Date(start.getTime() - 600 * DAY_MS),
-      new Date(end.getTime() - 600 * DAY_MS),
-    );
-    const scot = await linz.levels(
-      "SCOT",
-      new Date(start.getTime() - 900 * DAY_MS),
-      new Date(end.getTime() - 900 * DAY_MS),
-    );
+    // The Antarctic gauges' files change layout from year to year, so one year of each is read too,
+    // on fixed days since one gauge is closed and the other issues a year at a time: Cape Roberts'
+    // Julian-day layout of 2025 and Scott Base's day-first millimeters of 2025.
+    const robt = await linz.levels("ROBT", new Date("2025-03-01"), new Date("2025-03-04"));
+    const scot = await linz.levels("SCOT", new Date("2025-01-10"), new Date("2025-01-13"));
     return latest.length && final.length && read && robt.length && scot.length
       ? [...latest, ...final, ...robt, ...scot]
       : [];

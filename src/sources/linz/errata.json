@@ -324,7 +324,7 @@
       "until": null,
       "handling": "dropped",
       "error": "The Antarctic files hold rows that aren't levels or are cut. Missing levels are `-6999.000` in Cape Roberts' 2008 to 2010 files and `6999` or `-6999` with empty fields in 2011's (95,310 rows). Cape Roberts' 2024 file has 383 rows with a field missing or two joined (`2024,0,30,6.252,-2.681,976.63` has no day, and the 287 like it would read as a level of -2.7 m; `2024,11,1715,26,6.-3.368,979.01` has no level), and its 2023 file has three empty rows. Scott Base's 2023 file has 12,960 rows for 1 to 9 December whose dates and times a spreadsheet has mangled (`1/12/2023  1,02:00:00,2.573`, with the hour in the date and `:59:00 am` for a time). Rows repeat in both gauges: Cape Roberts' 31 December 2021 (285 rows), 10 to 15 September 2023 (1,728 rows) and 1 January 2022 (3 rows), and Scott Base's 24 and 25 January 2017 (499 rows) and 10 and 11 August 2020 (244 rows), with the same level each time, and five minutes where two levels disagree (Cape Roberts on 12 April 2008, 22 June 2009, 21 October 2011 and 3 August 2023, 0.001 to 0.01 m apart, and Scott Base on 5 July 2023 at 16:13 NZST, 0.004 m apart). Scott Base reads 0.000 for 11,382 rows.",
-      "response": "A row that isn't a level is left out, as are a level of 0.000 and any level of 100 m or more. A minute that repeats with the same level is kept once, and where its levels disagree neither is kept. The mangled December 2023 rows are left out: their minutes can't be told from the rows around them, though 9 days of 1,440 rows run on from one valid level to the next.",
+      "response": "A row that isn't a level is left out, as are a level of 0.000 and any level of 20 m or more. A minute that repeats with the same level is kept once, and where its levels disagree neither is kept. The mangled December 2023 rows are left out: their minutes can't be told from the rows around them, though 9 days of 1,440 rows run on from one valid level to the next.",
       "evidence": "Every row of the 72 and 11 files, counted by layout, November 2026."
     },
     {
@@ -423,7 +423,7 @@
       "since": "2016-02-28",
       "until": "2016-03-29",
       "handling": "dropped",
-      "error": "Scott Base's levels run 0.120 m above UHSLC's hourly Scott Base (`uhslc/663a`) from 2 to 21 February 2016 (daily medians of the difference 0.119 to 0.121 m) and level with it from 29 March (0.000 m). The gauge failed at about 12:00 UTC on 28 February, reading 0.01 to 0.4 m, and has no values from 3 to 29 March, so the zero moved in the failure.",
+      "error": "Scott Base's levels run 0.120 m above UHSLC's hourly Scott Base (`uhslc/663a`) from 2 to 21 February 2016 (daily medians of the difference 0.119 to 0.121 m) and level with it from 29 March (0.000 m). The gauge failed at about 23:00 UTC on 28 February, after spikes to 0.03 m from noon, reading 0.01 to 0.4 m, and has no values from 3 to 29 March, so the zero moved in the failure.",
       "response": "Levels from 23:00 UTC on 28 February to 29 March aren't kept, and values from 29 March are in a later epoch. The earlier epoch has no `to_current`, since a `to_current` is to the current zero and no record measures Scott Base's later steps (erratum `linz-scott-base-step-2021`).",
       "evidence": "The 2016 file and UHSLC's hourly Scott Base, a one-hour centered mean at lag 12.00 hours, November 2026."
     },
@@ -473,7 +473,7 @@
       "since": "2020-01-25",
       "until": "2020-05-13",
       "handling": "dropped",
-      "error": "Scott Base's gantry was lifted on the morning of 25 January 2020 (NZ time), after which its levels read 0.27 and then 0.03 m, 0.000 for most of February to April and 0.01 m until 12 May, when the README says the gauge was returned to the water with its mount moved about 1 m. The levels read after it are 0.18 m higher against Cape Roberts', the difference falling from 5.606 to 5.428 m.",
+      "error": "Scott Base's gantry was lifted on the morning of 25 January 2020 (NZ time) and lowered and lifted again in the late afternoon, and from 06:40 UTC (19:40 NZ time) its levels read 0.27 and then 0.03 m, 0.000 for most of February to April and 0.01 m until 12 May, when the README says the gauge was returned to the water with its mount moved about 1 m. The levels read after it are 0.18 m higher against Cape Roberts', the difference falling from 5.606 to 5.428 m.",
       "response": "Levels from 06:00 UTC on 25 January to 04:10 UTC on 12 May 2020 aren't kept, and values from 12 May are in a later epoch. The earlier epoch has no `to_current`.",
       "evidence": "The 2020 file and Cape Roberts', the medians of the differences, November 2026; the README's gauge history."
     },

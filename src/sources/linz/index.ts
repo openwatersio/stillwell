@@ -120,7 +120,8 @@ export async function stations(previous: Station[] = []): Promise<LinzStation[]>
     }
     // Sensor 40 stopped before last year: Sumner closed in 2022.
     const closed = CLOSED[code];
-    const active = !closed && last >= thisYear - 1;
+    // Cape Roberts' year's file comes out in the next January or February.
+    const active = !closed && last >= thisYear - (code === "ROBT" ? 2 : 1);
     out.push({
       ...stationDefaults(metadata),
       id: `linz/${code}`,
@@ -130,7 +131,7 @@ export async function stations(previous: Station[] = []): Promise<LinzStation[]>
       lon: readme.lon,
       country_code: ANTARCTIC.has(code) ? "AQ" : "NZ",
       kind: "coastal",
-      interval_s: 60,
+      interval_s: code === "ROBT" ? 300 : 60,
       datum: DATUM,
       datums: readme.datums,
       products: ["levels"],
@@ -225,9 +226,24 @@ export async function levels(
       const names = await listing(sourceId, sensor, year);
       // A gauge's sensor 40 years run without a gap, so a past year in its record with no files is
       // an answer gone wrong, which backfill would take for a year with no data.
-      if (!names.length && record_start && year < new Date().getUTCFullYear())
+      // Cape Roberts' file for a year isn't issued until January or February after it.
+      const now = new Date();
+      const unissued =
+        sourceId === "ROBT" &&
+        year === now.getUTCFullYear() - 1 &&
+        now.getTime() < Date.UTC(year + 1, 2, 1);
+      if (!names.length && record_start && year < now.getUTCFullYear() && !unissued)
         throw new Error(`LINZ lists no files for ${sourceId} in ${year}`);
       for (const o of await sensorLevels(sourceId, sensor, year, names, stretches)) out.push(o);
+      // The year's first row can be the last of the year before's last day file, as Cape Roberts' 2008's is.
+      if (sourceId === "ROBT" && stretches[0]![0] === yearStart && year > 2007) {
+        const before = await listing(sourceId, sensor, year - 1);
+        if (!before.includes(`${sourceId}_${sensor}_${year - 1}.zip`))
+          for (const o of await sensorLevels(sourceId, sensor, year - 1, before, [
+            [yearStart, yearStart + slack],
+          ]))
+            out.push(o);
+      }
       // Scott Base's labels run up to 13 hours ahead of UTC, so the next year's file begins in this one.
       if (
         AHEAD.has(sourceId) &&
@@ -235,6 +251,8 @@ export async function levels(
         yearEnd < Date.parse(record_end ?? "9999")
       ) {
         const next = await listing(sourceId, sensor, year + 1);
+        // An empty listing would replace the month's stored levels without the year's last hours.
+        if (!next.length) throw new Error(`LINZ lists no files for ${sourceId} in ${year + 1}`);
         for (const o of await sensorLevels(sourceId, sensor, year + 1, next, stretches))
           out.push(o);
       }
@@ -332,7 +350,7 @@ async function sensorLevels(
     for (const [file, csv] of await unzip(zip)) {
       if (!file.toLowerCase().endsWith(".csv")) continue;
       for (const row of parse(csv, code, !final)) {
-        const o = atGauge(code, row);
+        const o = atGauge(code, row, year);
         if (o && ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
       }
     }
@@ -455,7 +473,10 @@ export function parse(csv: string, code: string, daily: boolean): Observation[] 
     let value: string | undefined;
     if (f[0] === code) {
       if (f.length === 3) [stamp, value] = [f[1], f[2]];
-      else if ([4, 7, 10].includes(f.length)) [stamp, value] = [`${f[1]} ${f[2]}`, f[3]];
+      else if (f.length === 4 || (ANTARCTIC.has(code) && (f.length === 7 || f.length === 10)))
+        [stamp, value] = [`${f[1]} ${f[2]}`, f[3]];
+    } else if (!ANTARCTIC.has(code)) {
+      // The other layouts are the Antarctic files'.
     } else if (/^\d{4}$/.test(f[0]!) && f.length === 7) {
       const [year, day, hhmm] = [Number(f[0]), Number(f[1]), Number(f[2])];
       const date = new Date(Date.UTC(year, 0, day));
@@ -504,14 +525,14 @@ export function parse(csv: string, code: string, daily: boolean): Observation[] 
  *   whose labels run on without a break, are left out. Its levels are millimeters
  *   from 2024, meters before.
  */
-function atGauge(code: string, row: Observation): Observation | null {
+function atGauge(code: string, row: Observation, fileYear: number): Observation | null {
   let { time, level } = row;
   if (code === "SCOT") {
     if (time >= Date.UTC(2024, 9, 29) && time < Date.UTC(2024, 10, 1)) return null;
     time -= (time >= Date.UTC(2023, 10, 25) && time < Date.UTC(2024, 9, 29) ? 13 : 12) * 3_600_000;
-    if (row.time >= Date.UTC(2024, 0, 1)) level /= 1000;
+    if (fileYear >= 2024) level /= 1000;
   }
-  return Math.abs(level) >= 100 ? null : { ...row, time, level: Math.round(level * 1000) / 1000 };
+  return Math.abs(level) >= 20 ? null : { ...row, time, level: Math.round(level * 1000) / 1000 };
 }
 
 /**
