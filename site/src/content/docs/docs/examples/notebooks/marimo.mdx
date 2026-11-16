@@ -51,7 +51,13 @@ A notebook in a public GitHub repository opens on marimo.app from its path: `htt
 
 ## On a server with molab
 
-molab runs the same notebook on a server kernel. DuckDB and Polars there read only the parts of each file a query needs, so large files and long ranges of years are faster than in the browser. The `pyarrow` and `tzdata` imports aren't needed but do no harm.
+molab runs the same notebook on a server kernel. There, add a line to the first cell that names your project, its version, and a URL or email address in the `User-Agent` DuckDB sends. Polars sends its own, `polars/<version>`, and has no setting to change it.
+
+```python
+duckdb.sql("CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'})")
+```
+
+DuckDB and Polars there read only the parts of each file a query needs, so large files and long ranges of years are faster than in the browser. The `pyarrow` and `tzdata` imports aren't needed but do no harm.
 
 ## On your computer
 
@@ -59,7 +65,7 @@ molab runs the same notebook on a server kernel. DuckDB and Polars there read on
 uvx marimo edit --sandbox stillwell.py
 ```
 
-`--sandbox` runs the notebook in its own environment with the packages it imports.
+`--sandbox` runs the notebook in its own environment with the packages it imports. Add the `User-Agent` line from molab to the first cell here too.
 
 ## Things to know
 

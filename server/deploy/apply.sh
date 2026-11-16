@@ -285,7 +285,7 @@ done
 [ -n "$ready" ] || { echo 'apply.sh: ClickHouse refuses stillwell_api, from /etc/stillwell-api.env' >&2; exit 1; }
 # The API reads the station list through url() as that user. A refusal of the grant is this deploy's to fix; any
 # other failure, such as the store being unreachable, the API rides out on its own.
-if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q "SELECT count() FROM url('$store/stations/offsets.parquet', Parquet)" 2>&1); then
+if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q "SELECT count() FROM url('$store/stations/offsets.parquet', Parquet, headers('User-Agent' = 'openwaters-stillwell/1 (+https://github.com/openwatersio/stillwell)'))" 2>&1); then
 	case "$out" in
 	*ACCESS_DENIED* | *READONLY*)
 		echo "apply.sh: stillwell_api may not read the store: $out" >&2

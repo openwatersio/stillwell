@@ -28,6 +28,7 @@ import {
   type Hourly,
 } from "../src/cross-check.ts";
 import { STANDARD, fit, resolvable } from "../src/harmonic.ts";
+import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { seriesPath, stationsPath } from "../src/store/paths.ts";
 import { Flag } from "../src/schema.ts";
@@ -88,7 +89,7 @@ interface Listed {
   later: boolean;
 }
 
-const instance = await DuckDBInstance.create(":memory:");
+const instance = await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT });
 // Loaded once: connections loading it at the same moment conflict in the catalog.
 if (/^https?:\/\//.test(STORE))
   await (await instance.connect()).run("INSTALL httpfs; LOAD httpfs;");

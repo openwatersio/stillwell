@@ -2,9 +2,11 @@
 import { DuckDBInstance } from "@duckdb/node-api";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
-import { url, stationPath } from "./paths";
+import { url, stationPath, USER_AGENT } from "./paths";
 
-const connection = await (await DuckDBInstance.create(":memory:")).connect();
+const connection = await (
+  await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT })
+).connect();
 await connection.run("SET TimeZone = 'UTC'");
 
 type Row = Record<string, any>;
@@ -188,7 +190,7 @@ export function json(path: string): Promise<any> {
   if (!jsonCache.has(path))
     jsonCache.set(
       path,
-      fetch(url(path)).then((r) => {
+      fetch(url(path), { headers: { "User-Agent": USER_AGENT } }).then((r) => {
         if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
         return r.json();
       }),

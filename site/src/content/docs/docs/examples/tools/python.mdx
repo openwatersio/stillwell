@@ -29,6 +29,8 @@ pandas is only needed for `.df()`. DuckDB downloads its `httpfs` extension the f
 pip install polars
 ```
 
+Polars sends its own `User-Agent`, `polars/<version>`, and has no setting to name your project in it.
+
 </TabItem>
 <TabItem label="pandas">
 
@@ -52,6 +54,7 @@ import duckdb
 STORE = "https://stillwell.openwaters.io"
 con = duckdb.connect()
 con.sql("SET TimeZone = 'UTC'")
+con.sql("CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'})")
 
 stations = con.sql(f"""
     SELECT id, name, lat, lon, datum, datums
@@ -81,11 +84,14 @@ stations = pl.read_parquet(
 import pandas as pd
 
 STORE = "https://stillwell.openwaters.io"
+# Your project, its version, and a URL or email address.
+HEADERS = {"User-Agent": "my-project/1.0 (you@example.org)"}
 
 stations = pd.read_parquet(
     f"{STORE}/stations.parquet",
     columns=["id", "name", "lat", "lon", "datum", "datums"],
     filters=[("status", "==", "active")],
+    storage_options=HEADERS,
 )
 ```
 
@@ -159,6 +165,7 @@ levels = pd.read_parquet(
     f"{STORE}/obs/rws/hoekvanholland/2024.parquet",
     columns=["time", "level_m"],
     filters=[("flag", "<=", 2)],
+    storage_options=HEADERS,
 )
 ```
 
@@ -226,11 +233,12 @@ years = pd.read_parquet(
     f"{STORE}/stations/years/rws.parquet",
     columns=["year"],
     filters=[("id", "==", "rws/hoekvanholland"), ("epoch", "==", 1), ("year", ">=", 2020), ("year", "<=", 2024)],
+    storage_options=HEADERS,
 )
 files = [f"{STORE}/obs/rws/hoekvanholland/{year}.parquet" for year in sorted(years.year)]
 
 levels = pd.concat(
-    [pd.read_parquet(f, columns=["time", "level_m"], filters=[("flag", "<=", 2)]) for f in files],
+    [pd.read_parquet(f, columns=["time", "level_m"], filters=[("flag", "<=", 2)], storage_options=HEADERS) for f in files],
     ignore_index=True,
 )
 ```
