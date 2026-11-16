@@ -107,6 +107,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
   ieo: { source: "redmar", status: "license" },
   meds: { source: "chs", status: "restricted", note: "CHS license bars commercial derivatives" },
   bodc: { source: "bodc", status: "planned" },
+  cco: { source: "cco", status: "planned" },
   noc: {
     source: "bodc",
     status: "restricted",

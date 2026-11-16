@@ -1,0 +1,29 @@
+{
+  "errata": [
+    {
+      "id": "cco-west-bay-position",
+      "stations": ["cco/95"],
+      "handling": "corrected",
+      "error": "CCO's list puts West Bay Harbour at 50.7102° N, 2.8200° W, 3.9 km west of the harbour. GESLA's record of the gauge, which CCO supplied, and CMEMS's copy of it both put it at 50.7089° N, 2.7641° W.",
+      "response": "The station refresh moves it to 50.70888, −2.76411, listed in `POSITIONS` in `src/positions.ts`. If CCO moves the station, the refresh reports the entry and fails the run until a person checks it.",
+      "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`."
+    },
+    {
+      "id": "cco-fill-values",
+      "stations": ["cco/93", "cco/117", "cco/126"],
+      "handling": "dropped",
+      "error": "CCO's levels hold fill values where a gauge sent nothing: 999.9999 or −999.9999, with no flag. A year of Exmouth's has 16 readings of 999.9999 from 18:30 on 18 December 2019, Hastings Pier's 2019 has 2 on 19 June, and Swanage Pier's 2018 has 2 of −999.9999 on 23 April. GESLA's records of CCO's gauges hold such values too, as erratum `gesla-fill-values` says. A value of 999.9999 lies inside the store's span of −500 to 9,000 m.",
+      "response": "A level of 999 m or more in either direction is left out as missing, as is 9999.",
+      "evidence": "One year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of these sites, and the other nine sites, weren't scanned."
+    },
+    {
+      "id": "cco-empty-window-answers",
+      "stations": "every station",
+      "handling": "avoided",
+      "error": "A request for a window with no readings answers `{\"type\":\"FeatureCollection\",\"features\":]}`, which isn't JSON. Lymington and Brighton instead answer HTTP 500 for a window before their first reading.",
+      "response": "The adapter reads the first as no values. The second is an error, so a backfill of those two sites starts at their first year (README, Running ingest).",
+      "evidence": "Requests of 2026-11-16: Herne Bay for 1 June 2001 answers the first body; Lymington for 1 June 2008 and Brighton for 1 June 2005 answer 500 with `Internal Server Error`."
+    }
+  ],
+  "retired": []
+}

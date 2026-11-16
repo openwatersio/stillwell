@@ -10,7 +10,7 @@
  * response is shaped by its URL path; `--record` writes those shapes as the
  * new reference, after a change has been checked and the adapter handles it.
  * A source with no recording yet prints its shape and has only to return
- * values. USGS is skipped without USGS_API_KEY.
+ * values. USGS is skipped without USGS_API_KEY, and CCO without CCO_API_KEY and CCO_REFERER.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
@@ -19,6 +19,7 @@ import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bodc from "../src/sources/bodc/index.ts";
 import * as bom from "../src/sources/bom/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
+import * as cco from "../src/sources/cco/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
 import * as cmems from "../src/sources/cmems/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -71,6 +72,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   crms: async () => {
     await crmsHeader(crms.parser);
     return crms.stations();
+  },
+  // Deal Pier, found by name in the site list; needs a key, so it is skipped without one.
+  cco: async () => {
+    const deal = (await cco.stations()).find((s) => s.name === "Deal Pier");
+    if (!deal) throw new Error("CCO no longer lists Deal Pier");
+    return cco.levels(deal.source_id, start, end);
   },
   // Martinez, on the Carquinez Strait.
   cdec: () => cdec.levels({ source_id: "MRZ" }, start, end),
@@ -231,7 +238,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
  * day, and GESLA's iCloud links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["bom", "cmems", "gesla", "jma", "kuestendaten", "linz"]);
+const UNRECORDED = new Set(["bom", "cco", "cmems", "gesla", "jma", "kuestendaten", "linz"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
@@ -240,8 +247,10 @@ for (const id of named) if (!probes[id]) throw new Error(`No canary for ${id}`);
 
 let failed = false;
 for (const id of named.length ? named : Object.keys(probes)) {
-  if (id === "usgs" && !process.env.USGS_API_KEY) {
-    console.log(`${id}: skipped, no USGS_API_KEY`);
+  const needs = { usgs: ["USGS_API_KEY"], cco: ["CCO_API_KEY", "CCO_REFERER"] }[id];
+  const missing = needs?.filter((name) => !process.env[name]);
+  if (missing?.length) {
+    console.log(`${id}: skipped, no ${missing.join(" and no ")}`);
     continue;
   }
   const shapes: Record<string, Shape[]> = {};

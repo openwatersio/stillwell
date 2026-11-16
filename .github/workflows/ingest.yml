@@ -102,3 +102,5 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           # USGS shares 1,000 requests an hour among keyless clients on one IP.
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}

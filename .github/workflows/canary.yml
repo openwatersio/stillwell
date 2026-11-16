@@ -59,3 +59,5 @@ jobs:
       - run: node scripts/canary.ts
         env:
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}
