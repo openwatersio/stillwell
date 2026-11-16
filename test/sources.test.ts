@@ -2993,6 +2993,33 @@ describe("usgs", () => {
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
   });
 
+  it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {
+    const sites = (n: number, bad: number, field: "method" | "accuracy") =>
+      Array.from({ length: n }, (_, i) => ({
+        altitude: 10,
+        altitude_method_code: field === "method" && i < bad ? null : "L",
+        altitude_accuracy: field === "accuracy" && i < bad ? null : 0.1,
+      }));
+    for (const field of ["method", "accuracy"] as const) {
+      // 1 in 30 of 600 is 20.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(600, 20, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(600, 21, field)), /of 600/);
+      // Under 300, up to 10 pass.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(100, 10, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(100, 11, field)));
+    }
+    // A site with no altitude isn't counted.
+    assert.doesNotThrow(() =>
+      usgs.checkAltitudes(
+        Array.from({ length: 50 }, () => ({
+          altitude: null,
+          altitude_method_code: null,
+          altitude_accuracy: null,
+        })),
+      ),
+    );
+  });
+
   it("counts an altitude as surveyed only by a survey method accurate to under a foot", () => {
     const surveyed = (altitude_method_code: string | null, altitude_accuracy: number | null) =>
       usgs.isSurveyed({ altitude_method_code, altitude_accuracy });

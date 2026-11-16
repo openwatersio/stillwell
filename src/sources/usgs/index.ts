@@ -414,26 +414,7 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
       `USGS has no monitoring location for ${missing.length} sites, e.g. ${missing[0]}`,
     );
 
-  // About 1 in 130 sites with an altitude lists no method. A reply that drops
-  // the field, or changes its codes, would read as every altitude unsurveyed
-  // and clear every offset.
-  const altitudes = [...locations.values()].filter(
-    (f) => typeof f.properties.altitude === "number",
-  );
-  const unknown = altitudes.filter(
-    (f) => !METHODS.has(f.properties.altitude_method_code ?? ""),
-  ).length;
-  if (unknown > Math.max(10, altitudes.length / 30))
-    throw new Error(
-      `USGS gave no known altitude method for ${unknown} of ${altitudes.length} sites with an altitude`,
-    );
-  // Every surveyed site gave an accuracy in November 2026; a reply without one would clear nearly every offset.
-  const surveys = altitudes.filter((f) => SURVEYED.has(f.properties.altitude_method_code ?? ""));
-  const unrated = surveys.filter((f) => typeof f.properties.altitude_accuracy !== "number").length;
-  if (unrated > Math.max(10, surveys.length / 30))
-    throw new Error(
-      `USGS gave no altitude accuracy for ${unrated} of ${surveys.length} surveyed sites with an altitude`,
-    );
+  checkAltitudes([...locations.values()].map((f) => f.properties));
   const out: UsgsStation[] = [];
   for (const [id, s] of chosen) {
     const location = locations.get(id);
@@ -442,6 +423,33 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
     out.push(toStation(location.properties, location.geometry.coordinates, s, kind, grounds));
   }
   return out.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+/**
+ * Refuses a `monitoring-locations` reply that dropped or changed the fields
+ * the offsets rest on, which would clear nearly every offset: more than 1 in
+ * 30 sites with an altitude giving no method USGS used in November 2026
+ * (about 1 in 130 then gave none), or more than 1 in 30 surveyed sites giving
+ * no accuracy (none did). Up to 10 are allowed whatever the share, so a short
+ * list with a gap or two isn't refused; a whole USGS reply holds about 13,500
+ * altitudes, where the share decides.
+ */
+export function checkAltitudes(
+  locations: Pick<ApiLocation, "altitude" | "altitude_method_code" | "altitude_accuracy">[],
+): void {
+  const limit = (n: number) => Math.max(10, n / 30);
+  const altitudes = locations.filter((l) => typeof l.altitude === "number");
+  const unknown = altitudes.filter((l) => !METHODS.has(l.altitude_method_code ?? "")).length;
+  if (unknown > limit(altitudes.length))
+    throw new Error(
+      `USGS gave no known altitude method for ${unknown} of ${altitudes.length} sites with an altitude`,
+    );
+  const surveys = altitudes.filter((l) => SURVEYED.has(l.altitude_method_code ?? ""));
+  const unrated = surveys.filter((l) => typeof l.altitude_accuracy !== "number").length;
+  if (unrated > limit(surveys.length))
+    throw new Error(
+      `USGS gave no altitude accuracy for ${unrated} of ${surveys.length} surveyed sites with an altitude`,
+    );
 }
 
 /** How many sites one `monitoring-locations` request asks for, keeping the URL short. */
