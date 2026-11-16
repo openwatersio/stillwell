@@ -146,6 +146,8 @@ describe("cco", () => {
             reading(12, "1", null),
             reading(13, "1", ""),
             reading(14, "1", "9999"),
+            reading(16, "1", "999.9999"),
+            reading(17, "1", "-999.9999"),
             reading(15, "1", " "),
           ],
         }),

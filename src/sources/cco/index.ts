@@ -195,10 +195,14 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
       // The API sends the value as text, such as "3.88300"; a missing one is null or blank, or 9999 in the manual's files.
       const text = typeof p?.value === "string" ? p.value.trim() : p?.value;
       if (text === null || text === undefined || text === "") continue;
-      const level = typeof text === "string" && /^-?\d+(\.\d+)?$/.test(text) ? Number(text) : text;
+      const level =
+        typeof text === "string" && /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(text)
+          ? Number(text)
+          : text;
       if (typeof level !== "number" || !Number.isFinite(level))
         throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
-      if (level === 9999) continue;
+      // Fill values, 9999 and ±999.9999 (erratum `cco-fill-values`); no tide reaches 999 m.
+      if (Math.abs(level) >= 999) continue;
       if (time >= start.getTime() && time < end.getTime())
         out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }

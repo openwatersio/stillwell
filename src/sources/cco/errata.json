@@ -9,6 +9,14 @@
       "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`."
     },
     {
+      "id": "cco-fill-values",
+      "stations": ["cco/93", "cco/117", "cco/126"],
+      "handling": "dropped",
+      "error": "CCO's levels hold fill values where a gauge sent nothing: 999.9999 or −999.9999, with no flag. A year of Exmouth's has 16 readings of 999.9999 from 18:30 on 18 December 2019, Hastings Pier's 2019 has 2 on 19 June, and Swanage Pier's 2018 has 2 of −999.9999 on 23 April. GESLA's records of CCO's gauges hold such values too, as erratum `gesla-fill-values` says. A value of 999.9999 lies inside the store's span of −500 to 9,000 m.",
+      "response": "A level of 999 m or more in either direction is left out as missing, as is 9999.",
+      "evidence": "One year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of these sites, and the other nine sites, weren't scanned."
+    },
+    {
       "id": "cco-empty-window-answers",
       "stations": "every station",
       "handling": "avoided",
