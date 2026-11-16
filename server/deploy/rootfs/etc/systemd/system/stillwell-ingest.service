@@ -35,8 +35,6 @@ MemoryMax=1800M
 OOMPolicy=continue
 NoNewPrivileges=true
 ProtectSystem=strict
-# The job service's drop box, where a datum change asks for a source's list refresh (src/jobs/schedule.ts).
-ReadWritePaths=-/var/lib/stillwell-jobs/requests
 ProtectHome=true
 PrivateTmp=true
 

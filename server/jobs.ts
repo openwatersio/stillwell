@@ -6,20 +6,13 @@
  *
  *   node server/jobs.ts
  *
- * STILLWELL_JOBS_DB is the database, STILLWELL_JOBS_ENV the environment file
- * each job reads (the store and its credentials), STILLWELL_JOBS_METRICS the
+ * STILLWELL_JOBS_DB is the database, STILLWELL_WRITE_STORE the store jobs write,
+ * with the S3_* credentials to write it, STILLWELL_JOBS_METRICS the
  * file it writes its metrics to, in Prometheus's text format, and GITHUB_TOKEN
  * reads Actions' runs and main's server.json.
  */
 import { execFileSync } from "node:child_process";
-import {
-  readdirSync,
-  readFileSync,
-  realpathSync,
-  renameSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { readdirSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { totalmem } from "node:os";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,27 +31,21 @@ import {
   startable,
   type Job,
 } from "../src/jobs/queue.ts";
-import { REFRESH_REQUESTS, due, refreshFor, type Planned } from "../src/jobs/schedule.ts";
-import { envOf, jobDir, systemd } from "../src/jobs/units.ts";
-import { sources } from "../src/sources/index.ts";
-import { PHASES, runsJob } from "../src/sources/jobs.ts";
+import { due, refreshFor, type Planned } from "../src/jobs/schedule.ts";
+import { clickhouse } from "../src/realtime/clickhouse.ts";
+import { jobDir, systemd } from "../src/jobs/units.ts";
+import { PHASES } from "../src/sources/jobs.ts";
 
 /** Jobs running at once, across lanes, of which at most LONG_SLOTS run over an hour, so a source's hourly run always has one. */
 const SLOTS = 3;
 const LONG_SLOTS = 2;
 const TICK_MS = 10_000;
-/**
- * The memory a box needs before store jobs run on it: three jobs at a fifth
- * each beside the poller's, ClickHouse's and the API's caps, about 4 GB.
- * A smaller box runs checks only.
- */
-const STORE_JOBS_MEMORY = 15e9;
 /** How long an answer from GitHub stands before it's asked again. */
 const GITHUB_MS = 5 * 60_000;
 
 const db = openQueue(process.env.STILLWELL_JOBS_DB ?? "/var/lib/stillwell-jobs/jobs.db");
-const envFile = process.env.STILLWELL_JOBS_ENV ?? "/etc/stillwell-jobs.env";
-const units = systemd(process.execPath, envFile, Math.floor(totalmem() / 5));
+const writeStore = process.env.STILLWELL_WRITE_STORE ?? "";
+const units = systemd(process.execPath, writeStore, Math.floor(totalmem() / 5));
 const metricsPath = process.env.STILLWELL_JOBS_METRICS;
 // The release this service runs, which deploys point /opt/stillwell at; each job keeps the one it started with.
 const release = realpathSync(fileURLToPath(new URL("..", import.meta.url)));
@@ -68,7 +55,7 @@ let github: { at: number; writing: Set<string>; onServer: Set<string> } = {
   writing: new Set([ALL]),
   onServer: new Set(),
 };
-const loggedRequests = new Set<string>();
+let lastPollsError = "";
 let lastStopped: string | null = null;
 let lastMetricsError = "";
 let stopping = false;
@@ -127,12 +114,9 @@ async function tick(): Promise<void> {
     // A run waiting behind a long job in its lane isn't joined by the next one of the same kind.
     if (!queuedKind(db, planned.kind) && enqueue(db, planned, now))
       console.log(`queued ${planned.key}`);
-  for (const planned of refreshRequests(now))
-    console.log(
-      !queuedKind(db, planned.kind) && enqueue(db, planned, now)
-        ? `queued ${planned.key}, as the poller asked`
-        : `refresh of ${planned.kind.slice("refresh:".length)} asked for again; one today already`,
-    );
+  for (const planned of await datumChanges(now))
+    if (!queuedKind(db, planned.kind) && enqueue(db, planned, now))
+      console.log(`queued ${planned.key}, as a datum changed`);
   // A source that left the server phase takes its waiting jobs with it, so none starts if it comes back.
   for (const job of cancelQueuedUnless(
     db,
@@ -144,7 +128,7 @@ async function tick(): Promise<void> {
 
   const { writing, onServer } = await askGithub();
   const noStore = storeMissing();
-  const notReady = smallBox() ?? noStore;
+  const notReady = noStore;
   if (notReady !== lastReadiness) console.log(notReady ?? "store jobs can run");
   lastReadiness = notReady;
   const runs = (j: Job) => {
@@ -224,30 +208,18 @@ function stillwellIds(): [number, number] {
   return ids;
 }
 
-/** Why the box is too small for store jobs, which leaves it checks, or null. */
-function smallBox(): string | null {
-  return totalmem() < STORE_JOBS_MEMORY
-    ? `store jobs wait for a box with ${STORE_JOBS_MEMORY / 1e9} GB; this one runs checks only`
-    : null;
-}
-
 /**
- * Why the jobs can't reach the store now, or null when they can: an environment file without the store's
- * credentials, in which a job would write a local directory that's deleted when it ends.
+ * Why jobs can't write the store now, or null when they can: without STILLWELL_WRITE_STORE naming an s3://
+ * store and the credentials for it in /etc/stillwell.env, a job would write a local directory that's deleted
+ * when it ends.
  */
 function storeMissing(): string | null {
-  let env: Record<string, string>;
-  try {
-    env = envOf(readFileSync(envFile, "utf8"));
-  } catch (error) {
-    return `store jobs wait for ${envFile}: ${(error as Error).message}`;
-  }
-  if (!env.STILLWELL_STORE?.startsWith("s3://"))
-    return `store jobs wait for STILLWELL_STORE in ${envFile} to name an s3:// store`;
+  if (!writeStore.startsWith("s3://"))
+    return "store jobs wait for STILLWELL_WRITE_STORE in /etc/stillwell.env to name an s3:// store";
   const missing = ["S3_ENDPOINT", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"].filter(
-    (k) => !env[k],
+    (k) => !process.env[k],
   );
-  if (missing.length) return `store jobs wait for ${missing.join(", ")} in ${envFile}`;
+  if (missing.length) return `store jobs wait for ${missing.join(", ")} in /etc/stillwell.env`;
   return null;
 }
 
@@ -278,37 +250,24 @@ async function askGithub(): Promise<{ writing: Set<string>; onServer: Set<string
 }
 
 /**
- * The list refreshes the poller asked for on a datum change, one a day per source. The directory is root's,
- * with only the stillwell group allowed to add to it, so a request is removed once read, and one for a source
- * not on the server is left and reported once.
+ * The list refreshes datum changes ask for: the sources on the server whose passes in the last hour reported a
+ * station in another datum, from the poller's polls table, each refreshed once a day (refreshFor's key).
  */
-function refreshRequests(now: Date): Planned[] {
-  let names: string[];
+async function datumChanges(now: Date): Promise<Planned[]> {
+  const sources = [...PHASES].filter(([, phase]) => phase === "server").map(([id]) => id);
+  if (!sources.length) return [];
   try {
-    names = readdirSync(REFRESH_REQUESTS);
-  } catch {
+    const rows = await clickhouse("stillwell").query<{ source: string }>(
+      "SELECT DISTINCT source FROM polls WHERE datum_changed AND finished > now() - INTERVAL 1 HOUR AND has({sources:Array(String)}, source)",
+      { sources },
+    );
+    return rows.map((r) => refreshFor(r.source, now));
+  } catch (error) {
+    const message = `can't read datum changes from polls: ${(error as Error).message}`;
+    if (message !== lastPollsError) console.error(message);
+    lastPollsError = message;
     return [];
   }
-  const out: Planned[] = [];
-  for (const name of names) {
-    const source = sources[name];
-    if (PHASES.get(name) !== "server" || !source || !runsJob("lists", source)) {
-      if (!loggedRequests.has(name))
-        console.error(`refresh request ${name}: not a source on the server; left`);
-      loggedRequests.add(name);
-      continue;
-    }
-    try {
-      rmSync(`${REFRESH_REQUESTS}/${name}`, { force: true });
-    } catch (error) {
-      if (!loggedRequests.has(name))
-        console.error(`refresh request ${name}: ${(error as Error).message}`);
-      loggedRequests.add(name);
-      continue;
-    }
-    out.push(refreshFor(name, now));
-  }
-  return out;
 }
 
 /** Removes the units and directories of ended jobs that a failed clear left behind. */

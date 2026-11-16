@@ -36,7 +36,7 @@ import { PHASES, SERVER_SOURCES, sourcesFor, type Phase } from "../src/sources/j
 import { sources } from "../src/sources/index.ts";
 import { due, refreshFor } from "../src/jobs/schedule.ts";
 import { ALL, writing } from "../src/jobs/actions.ts";
-import { endedFrom, envOf } from "../src/jobs/units.ts";
+import { endedFrom } from "../src/jobs/units.ts";
 
 const NOW = new Date("2026-11-16T00:00:00Z");
 const words = (s: string) => s.split(" ");
@@ -275,18 +275,6 @@ describe("workflows", () => {
 });
 
 describe("units", () => {
-  it("reads an environment file as systemd does, which ignores an export line", () => {
-    assert.deepEqual(
-      envOf(
-        'STILLWELL_STORE="s3://water-levels"\nexport S3_ENDPOINT=x\n# A=b\nS3_ACCESS_KEY_ID=\n',
-      ),
-      {
-        STILLWELL_STORE: "s3://water-levels",
-        S3_ACCESS_KEY_ID: "",
-      },
-    );
-  });
-
   const show = (props: Record<string, string>) =>
     Object.entries({ LoadState: "loaded", ...props })
       .map(([k, v]) => `${k}=${v}`)

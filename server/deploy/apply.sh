@@ -195,14 +195,6 @@ if [ ! -f /etc/alloy.env ]; then
 	install -m 600 alloy.env.example /etc/alloy.env
 	echo 'created /etc/alloy.env from template: fill in the Grafana Cloud credentials to ship metrics' >&2
 fi
-# The job service's state, root's, and in it the drop box where the poller asks for a list refresh: the
-# stillwell group may add a file but not list or replace the directory (src/jobs/schedule.ts).
-install -d -m 755 /var/lib/stillwell-jobs
-install -d -o root -g stillwell -m 1730 /var/lib/stillwell-jobs/requests
-if [ ! -f /etc/stillwell-jobs.env ]; then
-	install -m 600 stillwell-jobs.env.example /etc/stillwell-jobs.env
-	echo 'created /etc/stillwell-jobs.env from template: fill in the store credentials before a source moves to the box' >&2
-fi
 
 # The app, its unit and its environment, against the stamp of the ones the poller last restarted with, so a
 # deploy that changes none of them, such as a change to docs other than the TICON inventory, or to this

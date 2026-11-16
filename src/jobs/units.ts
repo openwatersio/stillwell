@@ -28,8 +28,11 @@ function systemctl(...args: string[]): string {
   return execFileSync("systemctl", args, { encoding: "utf8" });
 }
 
-/** Jobs as transient systemd units, each allowed `memory` bytes. */
-export function systemd(node: string, envFile: string, memory = 0): Units {
+/**
+ * Jobs as transient systemd units, each allowed `memory` bytes, reading /etc/stillwell.env as the poller does,
+ * with `store`, the writable store, as their STILLWELL_STORE.
+ */
+export function systemd(node: string, store: string, memory = 0): Units {
   return {
     start(job, release) {
       execFileSync("install", ["-d", "-m", "755", dirname(jobDir(job.id))]);
@@ -49,7 +52,8 @@ export function systemd(node: string, envFile: string, memory = 0): Units {
         `--property=Environment=NODE_OPTIONS=--max-old-space-size=${Math.floor((memory * 0.6) / 2 ** 20)}`,
         // Below the poller's default weight, so a busy job never holds up its passes.
         "--property=CPUWeight=50",
-        `--property=EnvironmentFile=${envFile}`,
+        "--property=EnvironmentFile=/etc/stillwell.env",
+        `--property=Environment=STILLWELL_STORE=${store}`,
         `--property=WorkingDirectory=${jobDir(job.id)}`,
         "--property=Environment=HOME=/var/lib/stillwell",
         `--property=Environment=STILLWELL_CACHE=${jobDir(job.id)}/cache`,
@@ -133,15 +137,4 @@ export function endedFrom(show: string): Ended {
     };
   if (props.ActiveState === "inactive") return { ok: false, result: "stopped" };
   return null;
-}
-
-/** An environment file's variables as systemd reads them: quotes around a value are dropped, and a line systemd ignores, such as one starting `export`, is left out. */
-export function envOf(text: string): Record<string, string> {
-  return Object.fromEntries(
-    text
-      .split("\n")
-      .map((line) => /^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line))
-      .filter((m) => m !== null)
-      .map((m) => [m[1], m[2].replace(/^(["'])(.*)\1$/, "$2")]),
-  );
 }

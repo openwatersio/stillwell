@@ -75,9 +75,9 @@ bsh_predictions() {
 
 # CO-OPS verifies a month a month or two after it ends, so most stations start at last month or this one, a
 # request a month at one a second; one never verified is fetched from the cutoff on, 36 requests or more. USGS
-# approves months to years later, a year a request at one every 3.7 seconds, too many for one run across 11,000
+# approves months to years later, a year a request at one every 4.8 seconds, too many for one run across 11,000
 # stations, so each month takes a twelfth of them, at most about 1,200 stations and up to three years each, about
-# 3.7 hours at most, and each station comes round once a year; the current year is left to compaction. RWS and
+# 4.8 hours at most, and each station comes round once a year; the current year is left to compaction. RWS and
 # USACE ask a year a request. Some USACE offices screen nothing, so their values stay preliminary for good;
 # --skip-unscreened leaves out a station with a year of record and no value its source screened, but for
 # January's run. REFMAR's partner gauges often have only raw values, so it skips them the same way. California

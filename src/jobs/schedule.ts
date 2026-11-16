@@ -11,14 +11,6 @@ export interface Planned {
   timeout: number;
 }
 
-/**
- * The poller files a request for a source's list refresh here, as an empty file named for the source, when the
- * source reports a station in another datum; the job service queues the refresh. The poller can't write the
- * queue, which only root writes, so this is root's directory, which the stillwell group may only add to
- * (server/deploy/apply.sh).
- */
-export const REFRESH_REQUESTS = "/var/lib/stillwell-jobs/requests";
-
 /** Each schedule's command, timeout, and when in its period it's due, as the workflows run them in Actions. */
 const SCHEDULES: Record<
   Job,

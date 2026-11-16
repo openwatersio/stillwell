@@ -88,4 +88,4 @@ groups:
         labels: { severity: warning }
         annotations:
           summary: A store job has waited over 12 hours to start
-          description: Run stillwell-jobs list on the box for what waits and what runs, and journalctl -u stillwell-jobs -n 50 for why store jobs can't run, such as missing credentials in /etc/stillwell-jobs.env.
+          description: Run stillwell-jobs list on the box for what waits and what runs, and journalctl -u stillwell-jobs -n 50 for why store jobs can't run, such as STILLWELL_WRITE_STORE or its credentials missing from /etc/stillwell.env.
