@@ -2,6 +2,10 @@
 
 export const STORE = "https://stillwell.openwaters.io";
 
+/** Sent on the build's reads of the store, as the Open Waters User-Agent policy asks; the browser sends its own. */
+export const USER_AGENT =
+  "openwaters-stillwell-site/1 (+https://github.com/openwatersio/stillwell)";
+
 export const url = (path: string) => `${STORE}/${path}`;
 
 /**
