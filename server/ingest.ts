@@ -22,7 +22,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sources, sourceOf } from "../src/sources/index.ts";
 import { storeOfSource } from "../src/store/stores.ts";
-import { SERVER_SOURCES } from "../src/sources/jobs.ts";
+import { PHASES, SERVER_SOURCES } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
 import { clickhouse, databaseFor, migrate } from "../src/realtime/clickhouse.ts";
 import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
@@ -193,8 +193,15 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
  * the pass's row in polls. Returns whether a refresh started or one already had.
  */
 async function refresh(source: string): Promise<boolean> {
-  // A source on the server's job queue is refreshed there: the job service reads the change from polls.
-  if (SERVER_SOURCES.has(source)) return true;
+  // A source on the server's job queue is refreshed there: the job service reads the change from polls. One
+  // moving back is refreshed by neither until it leaves server.json, which the log says.
+  if (SERVER_SOURCES.has(source)) {
+    if (PHASES.get(source) === "server") return true;
+    console.error(
+      `${source}: a datum changed while it moves back to Actions; its list is refreshed once it has`,
+    );
+    return false;
+  }
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     console.error(`${source}: a datum changed; set GITHUB_TOKEN to start its refresh`);

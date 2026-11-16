@@ -16,7 +16,7 @@ else
   git fetch -q origin main
 fi
 # A main without the file has no source on the server; any other failure to read it stops the write.
-if git cat-file -e FETCH_HEAD:src/sources/server.json 2>/dev/null; then
+if [ -n "$(git ls-tree FETCH_HEAD src/sources/server.json)" ]; then
   list=$(git show FETCH_HEAD:src/sources/server.json)
 else
   list='{}'

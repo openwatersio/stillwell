@@ -909,9 +909,9 @@ const PAGE = 50_000;
  * it waits: `fetchText` retries one with a Retry-After of a minute or less, or
  * none, after a backoff, up to three times; past those, or for a longer
  * Retry-After, `request` waits as long as it asks (`blockedMs` without one)
- * and starts over, up to three rounds in all. A key in USGS_API_KEY gives the
- * run a budget of its own; it goes in a header, never the URL, so it stays out
- * of logs and cache keys. Tests shrink the waits.
+ * and starts over, up to three rounds in all. The key in USGS_API_KEY goes in a
+ * header, never the URL, so it stays out of logs and cache keys. Tests shrink
+ * the waits.
  */
 export const pacing = { requestMs: 4800, blockedMs: 15 * 60_000 };
 let nextSlot = 0;
