@@ -2751,12 +2751,14 @@ describe("usgs", () => {
             site_type_code: "ST-TS",
             altitude: 0,
             altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
           }),
           location("07010000", -90.18, 38.63, {
             hydrologic_unit_code: "07140101",
             altitude: 379.58,
             altitude_method_code: "X",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
             state_name: "Missouri",
           }),
@@ -2764,6 +2766,7 @@ describe("usgs", () => {
             hydrologic_unit_code: "05140206",
             altitude: 270,
             altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NGVD29",
           }),
           // The Missouri at Hermann, outside the Mississippi and Ohio basins, is listed too.
@@ -2799,6 +2802,7 @@ describe("usgs", () => {
           location("08000001", -97, 30, {
             altitude: 50,
             altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "COE1912",
           }),
           // An altitude with no method is no evidence of a survey.
@@ -2967,21 +2971,18 @@ describe("usgs", () => {
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
   });
 
-  it("counts an altitude as surveyed only by a survey method, and GPS only when it's accurate", () => {
+  it("counts an altitude as surveyed only by a survey method accurate to under a foot", () => {
     const surveyed = (altitude_method_code: string | null, altitude_accuracy: number | null) =>
       usgs.isSurveyed({ altitude_method_code, altitude_accuracy });
-    // Levels and GNSS, whatever the accuracy.
-    assert.equal(surveyed("L", 20), true);
-    assert.equal(surveyed("X", null), true);
-    // GPS under a foot counts; a foot or more doesn't.
-    for (const code of ["D", "F", "G"]) {
+    // Every survey method counts under a foot, and none at a foot or more.
+    for (const code of ["L", "D", "G", "F", "W", "X", "Y", "Z"]) {
       assert.equal(surveyed(code, 0.1), true);
       assert.equal(surveyed(code, 1), false);
     }
-    // With no accuracy, corrected and survey-grade GPS count, and plain GPS doesn't.
+    // With no accuracy, only corrected and survey-grade GPS count.
     assert.equal(surveyed("D", null), true);
     assert.equal(surveyed("F", null), true);
-    assert.equal(surveyed("G", null), false);
+    for (const code of ["G", "L", "W", "X", "Y", "Z"]) assert.equal(surveyed(code, null), false);
     // Estimates, reported and unknown methods, and none.
     for (const code of ["M", "N", "J", "A", "R", "U", null])
       assert.equal(surveyed(code, 0.1), false);

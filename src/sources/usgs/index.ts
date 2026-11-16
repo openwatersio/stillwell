@@ -83,23 +83,19 @@ const VERTICAL_DATUMS: Record<string, string> = {
 const SURVEYED = new Set(["L", "D", "G", "F", "W", "X", "Y", "Z"]);
 
 /**
- * GPS methods, whose altitude is a survey only where USGS gives it an
- * `altitude_accuracy` under a foot: plain GPS (G) reaches 141 ft at some
- * sites (erratum `usgs-imprecise-gps-altitudes`). With no accuracy given,
- * differentially corrected (D) and survey-grade (F) GPS count, and plain GPS
- * doesn't.
+ * Whether a site's altitude was surveyed, so it's the gage datum's: a survey
+ * method (`SURVEYED`) with an `altitude_accuracy` under a foot, since USGS
+ * gives some surveyed altitudes as far out as 141 ft (erratum
+ * `usgs-imprecise-altitudes`). With no accuracy given, only differentially
+ * corrected (D) and survey-grade (F) GPS count.
  */
-const GPS = new Set(["D", "F", "G"]);
-
-/** Whether a site's altitude was surveyed, so it's the gage datum's (`SURVEYED`, `GPS`). */
 export function isSurveyed(
   location: Pick<ApiLocation, "altitude_method_code" | "altitude_accuracy">,
 ): boolean {
   const code = location.altitude_method_code ?? "";
   if (!SURVEYED.has(code)) return false;
-  if (!GPS.has(code)) return true;
   const accuracy = location.altitude_accuracy;
-  return typeof accuracy === "number" ? accuracy < 1 : code !== "G";
+  return typeof accuracy === "number" ? accuracy < 1 : code === "D" || code === "F";
 }
 
 /** Every `altitude_method_code` USGS gave in November 2026. */
