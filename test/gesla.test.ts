@@ -1,4 +1,4 @@
-import { DROPPED } from "../src/sources/gesla/dropped.ts";
+import { DROPPED, isDropped } from "../src/sources/gesla/dropped.ts";
 import { isUrlSafe } from "../src/store/paths.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -397,6 +397,35 @@ describe("gesla levels", () => {
     );
   });
 
+  it("reads past a swapped record's labeled ends, since a swapped day moves within its year", async () => {
+    const span = [new Date("2025-12-01T00:00Z"), new Date("2025-12-02T00:00Z")] as const;
+    const ended = { record_start: "2010-01-01T00:00:00Z", record_end: "2025-06-30T23:50:00Z" };
+    // An ordinary record's labeled end stops the read before the record is fetched.
+    assert.deepEqual(
+      await gesla.levels({ ...station("scott_base_antarctica-scot-nzl-ttw"), ...ended }, ...span),
+      [],
+    );
+    // A Queensland record's label 2025/01/12 is 1 December, so its record is read.
+    await assert.rejects(
+      gesla.levels({ ...station("cape_ferguson-h033007a-aus-bom"), ...ended }, ...span),
+      /has no record cape_ferguson/,
+    );
+    // And its label 2025/12/01 is 12 January, before a labeled start in June.
+    const early = [new Date("2025-01-12T00:00Z"), new Date("2025-01-13T00:00Z")] as const;
+    const started = { record_start: "2025-06-01T00:00:00Z", record_end: "2025-12-31T23:50:00Z" };
+    assert.deepEqual(
+      await gesla.levels(
+        { ...station("scott_base_antarctica-scot-nzl-ttw"), ...started },
+        ...early,
+      ),
+      [],
+    );
+    await assert.rejects(
+      gesla.levels({ ...station("cape_ferguson-h033007a-aus-bom"), ...started }, ...early),
+      /has no record cape_ferguson/,
+    );
+  });
+
   it("reads a record from the zip with GESLA's flags as the store's", async () => {
     const levels = await gesla.levels(
       station("cape_dor-240-can-meds"),
@@ -638,6 +667,23 @@ describe("gesla parse", () => {
       ],
     );
   });
+
+  it("drops a level no gauge can read as missing, whatever its flag", () => {
+    // Fill values from AWG, Cape Roberts and Arun Platform, around a real AWG value.
+    const text = [
+      "# NULL VALUE -99.9999",
+      "2022/03/01 00:00:00 999999.0600 4 0",
+      "2022/03/01 00:10:00  -0.8700 1 1",
+      "2010/05/01 00:00:00 -6999.0000 1 1",
+      "2014/01/01 00:00:00 -105000000000.0000 4 0",
+      "",
+    ].join("\n");
+    const r = gesla.parse(text, "awgtg-awg-nld-cmems", null);
+    assert.deepEqual(
+      [...r.times].map((t, i) => [iso(t), r.levels[i]]),
+      [["2022-03-01T00:10:00.000Z", -0.87]],
+    );
+  });
 });
 
 describe("gesla clocks", () => {
@@ -674,6 +720,20 @@ describe("gesla clocks", () => {
     assert.deepEqual([...gesla.CRMS_WELLS].sort(), ["CRMS0090", "CRMS0128"]);
   });
 
+  it("drops every CRMS record but the 40 an hour early and the two marsh wells", () => {
+    assert.equal(isDropped("crms0151-crms0151-usa-crms"), true);
+    assert.equal(isDropped("crms6304-crms6304-usa-crms"), true);
+    assert.equal(isDropped("crms0002-crms0002-usa-crms"), false);
+    assert.equal(isDropped("crms0148-crms0148-usa-crms"), false);
+    assert.equal(isDropped("crms0090-crms0090-usa-crms"), false);
+    assert.equal(isDropped("crms0128-crms0128-usa-crms"), false);
+    assert.equal(isDropped("uddevalla-2541-swe-smhi"), true);
+    assert.equal(isDropped("seattle-9447130-usa-noaa"), false);
+    const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-wrong-site")!;
+    for (const id of entry.stations!) assert.ok(isDropped(id.replace(/^gesla\//, "")), id);
+    assert.equal(entry.stations!.length, 298);
+  });
+
   it("lists the same CRMS records as the erratum", () => {
     const entry = geslaErrata.errata.find((e) => e.id === "gesla-crms-hour-early")!;
     assert.deepEqual(
@@ -691,6 +751,118 @@ describe("gesla clocks", () => {
         "crms0400-crms0400-usa-crms",
       ].map((file) => iso(gesla.parse(text, file, null).times[0]!)),
       ["2012-06-01T01:00:00.000Z", "2012-06-01T01:00:00.000Z", "2012-06-01T00:00:00.000Z"],
+    );
+  });
+
+  it("applies each record's clock fix, over its span", () => {
+    const at = (file: string, time: string) =>
+      iso(gesla.parse(lines([time]), file, null).times[0]!);
+    assert.equal(at("vigo-208a-esp-uhslc_rq", "1980/06/01 00:00:00"), "1980-06-01T01:00:00.000Z");
+    assert.equal(
+      at("las_palmas-217c-esp-uhslc_rq", "1985/06/01 00:00:00"),
+      "1985-06-01T01:00:00.000Z",
+    );
+    assert.equal(
+      at("las_palmas-217d-esp-uhslc_rq", "1995/06/01 00:00:00"),
+      "1995-06-01T00:00:00.000Z",
+    );
+    assert.equal(at("cruz-cruz-esp-ieo", "1985/06/01 00:00:00"), "1985-06-01T01:00:00.000Z");
+    assert.equal(at("cruz-cruz-esp-ieo", "2000/06/01 00:00:00"), "2000-06-01T00:00:00.000Z");
+    assert.equal(at("vigo-vigo-esp-ieo", "1980/06/01 00:00:00"), "1980-06-01T00:00:00.000Z");
+    assert.equal(
+      at("progreso_yuc-721a-mex-uhslc_rq", "1982/06/01 00:00:00"),
+      "1982-05-31T18:00:00.000Z",
+    );
+    assert.equal(
+      at("scott_base_antarctica-scot-nzl-ttw", "2020/06/01 00:00:00"),
+      "2020-05-31T12:00:00.000Z",
+    );
+    assert.equal(
+      at("biscaynebay_s21_t-s21_t-usa-sfwmd", "2005/06/01 00:00:00"),
+      "2005-06-01T05:00:00.000Z",
+    );
+    // Queensland's records end 2019 at local midnight, 13:50 UTC, and resume on AEST.
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2019/12/31 13:50:00"),
+      "2019-12-31T13:50:00.000Z",
+    );
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2020/01/01 00:00:00"),
+      "2019-12-31T14:00:00.000Z",
+    );
+    // From 2020 a label on day 1 to 12 has its day and month swapped: 2025/06/01 is 6 January.
+    assert.equal(
+      at("thursday_island-h057022b-aus-bom", "2025/06/01 10:00:00"),
+      "2025-01-06T00:00:00.000Z",
+    );
+    assert.equal(
+      at("thursday_island-h057022b-aus-bom", "2025/06/13 10:00:00"),
+      "2025-06-13T00:00:00.000Z",
+    );
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2020/03/01 00:00:00"),
+      "2020-01-02T14:00:00.000Z",
+    );
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2020/12/12 23:50:00"),
+      "2020-12-12T13:50:00.000Z",
+    );
+    // Before 2020, and in other records, dates are kept.
+    assert.equal(
+      at("cape_ferguson-h033007a-aus-bom", "2019/03/01 00:00:00"),
+      "2019-03-01T00:00:00.000Z",
+    );
+    assert.equal(
+      at("scott_base_antarctica-scot-nzl-ttw", "2020/03/01 00:00:00"),
+      "2020-02-29T12:00:00.000Z",
+    );
+  });
+
+  it("joins Queensland's swapped days into one series with no repeated time", () => {
+    const times: string[] = [];
+    for (let t = Date.UTC(2020, 0, 1); t < Date.UTC(2021, 0, 1); t += 600_000) {
+      const d = new Date(t);
+      const [y, m, day] = [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()];
+      // GESLA's label for the AEST time t: day and month swapped when the day is 12 or less.
+      const [lm, ld] = day <= 12 ? [day, m] : [m, day];
+      const p = (n: number) => String(n).padStart(2, "0");
+      times.push(`${y}/${p(lm)}/${p(ld)} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:00`);
+    }
+    times.sort();
+    const parsed = gesla.parse(lines(times), "cape_ferguson-h033007a-aus-bom", null).times;
+    assert.equal(parsed.length, times.length);
+    for (let i = 1; i < parsed.length; i++) assert.equal(parsed[i]! - parsed[i - 1]!, 600_000);
+    assert.equal(iso(parsed[0]!), "2019-12-31T14:00:00.000Z");
+  });
+
+  it("moves exactly the records each clock erratum lists, by its hours", () => {
+    const hours: Record<string, number> = {
+      "gesla-hong-kong-hour-early": 1,
+      "gesla-crms-hour-early": 1,
+      "gesla-spain-uhslc-hour-early": 1,
+      "gesla-santa-cruz-de-la-palma-hour-early": 1,
+      "gesla-progreso-uhslc-721a-six-hours-late": -6,
+      "gesla-scott-base-ttw-nzst": -12,
+      "gesla-queensland-2020-aest": -10,
+      "gesla-sfwmd-est": 5,
+    };
+    const listed = new Set<string>();
+    for (const [id, h] of Object.entries(hours)) {
+      const entry = geslaErrata.errata.find((e) => e.id === id)!;
+      for (const station of entry.stations!) {
+        const file = station.replace(/^gesla\//, "");
+        listed.add(file);
+        assert.equal(gesla.clockOf(file)?.hours, h, station);
+      }
+    }
+    for (const file of Object.keys(gesla.CLOCK)) assert.ok(listed.has(file), file);
+    // Only the Queensland records have their day and month swapped.
+    const queensland = geslaErrata.errata
+      .find((e) => e.id === "gesla-queensland-2020-aest")!
+      .stations!.map((s) => s.replace(/^gesla\//, ""));
+    assert.deepEqual(
+      Object.keys(gesla.CLOCK).filter((file) => gesla.CLOCK[file]!.dayMonth),
+      queensland,
     );
   });
 
@@ -720,6 +892,29 @@ describe("datumJumps", () => {
       source: new Uint8Array(times.length),
     };
   };
+
+  it("leaves stored fill values out of requalify's jump search", async () => {
+    const { times, levels } = series(200, 2, 0, 0);
+    // 30 days of Cape Roberts' −6,999 m, flagged good, as the store may still hold them.
+    const rows = [...times].map((time, i) => ({
+      time,
+      level: i >= 150 * 24 && i < 180 * 24 ? -6999 : levels[i]!,
+      flag: Flag.good,
+      source_flag: Flag.good,
+    }));
+    const station = {
+      source_id: "cape_roberts-robt-nzl-ttw",
+      kind: "coastal",
+      record_start: "1970-01-01T00:00:00Z",
+      record_end: "1970-07-19T00:00:00Z",
+    } as unknown as Station;
+    assert.deepEqual(
+      await gesla.source.suspect!(station, async function* () {
+        yield rows;
+      }),
+      [],
+    );
+  });
 
   it("returns the shorter side of a jump", () => {
     assert.deepEqual(gesla.datumJumps(series(200, 2, 1.5, 150)), [[150 * DAY, Infinity]]);

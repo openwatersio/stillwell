@@ -50,12 +50,23 @@ const REFERENCE = "station zero";
 const DATUM = "ZERO";
 
 /**
- * UHSLC stamps its Hong Kong hourly heights an hour early: the height it
- * labels T was measured at T + 1 h UTC (slackwater-database#360). Every
- * version and the FD series. Remove once UHSLC corrects its files; the clock check shows it.
- * Erratum `uhslc-hong-kong-hour-early`.
+ * Series UHSLC stamps early, in hours, by station number (every version and
+ * the FD series) or by version: the height it labels T was measured at T + the
+ * hours UTC, so a negative number is a series stamped late. Hong Kong's
+ * (slackwater-database#360, erratum `uhslc-hong-kong-hour-early`), the
+ * versions of Vigo and Las Palmas before 1991 (erratum
+ * `uhslc-spain-hour-early`), and Progreso's version A, 6 hours late (erratum
+ * `uhslc-progreso-721a-six-hours-late`). Remove one once UHSLC corrects its
+ * files; the clock check shows it.
  */
-const EARLY_HOURS: Record<number, number> = { 329: 1 };
+const EARLY_HOURS: Record<string, number> = {
+  329: 1,
+  "208a": 1,
+  "217a": 1,
+  "217b": 1,
+  "217c": 1,
+  "721a": -6,
+};
 
 /**
  * The South African Navy Hydrographic Office refused permission to republish
@@ -458,7 +469,7 @@ export async function levels(
   if (refused) throw new Error(`UHSLC ${sourceId} is withheld: ${refused}`);
   const id = Number(match[1]);
   const version = match[2]?.toUpperCase();
-  const shift = (EARLY_HOURS[id] ?? 0) * HOUR_MS;
+  const shift = (EARLY_HOURS[sourceId] ?? EARLY_HOURS[id] ?? 0) * HOUR_MS;
   // The days UHSLC has, with a month's margin, since they come from its daily
   // means, which can start or end a day inside the hourly record. An FD series
   // keeps growing past its last listed day.

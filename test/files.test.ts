@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { HANDLING, published } from "../src/errata.ts";
 import { writeLinks } from "../src/links.ts";
+import { writeMatches } from "../src/matches.ts";
 import { sourceEntry } from "../src/refresh.ts";
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { errata, sources } from "../src/sources/index.ts";
@@ -54,6 +55,7 @@ const STATION: Required<StoredStation> = {
   products: ["levels"],
   first: "2001-01-01T00:00:00Z",
   last: "2026-11-01T00:00:00Z",
+  missing_years: [2003],
   license: "CC0-1.0",
   commercial_use: true,
   attribution: "Test",
@@ -116,6 +118,20 @@ describe("published file definitions", () => {
           hours: 8000,
           offset_m: 0.2,
           spread_m: 0.004,
+        },
+      ]),
+    matches: () =>
+      writeMatches(store, [
+        {
+          a: "test/b",
+          b: "test/c",
+          since: "2023-01-01T00:00:00Z",
+          until: "2026-01-01T00:00:00Z",
+          months: 36,
+          hours: 26000,
+          rms_m: 0.002,
+          lag_h: 0,
+          lag_rms_m: 0.002,
         },
       ]),
     years: () =>
@@ -229,8 +245,13 @@ describe("published file definitions", () => {
     const path = join(store, "sources.json");
     await writeJsonArray(
       path,
-      Object.values(sources).map((s) =>
-        sourceEntry(s.metadata, [{ status: "active", commercial_use: true }]),
+      // Every other source with its backfill known, so both forms are checked.
+      Object.values(sources).map((s, i) =>
+        sourceEntry(
+          s.metadata,
+          [{ status: "active", commercial_use: true, missing_years: [2003] }],
+          i % 2 ? 1990 : undefined,
+        ),
       ),
     );
     const published = JSON.parse(await readFile(path, "utf8"));

@@ -38,6 +38,7 @@ import type { StoredStation, ListedStation, Source, SourceMetadata, Station } fr
 import { errataOf, published, type Erratum } from "./errata.ts";
 import { linkGauges, type LinkReport } from "./same-as.ts";
 import { linkShifts, readLinks } from "./links.ts";
+import { readMatches } from "./matches.ts";
 import { JSON_FILES, dataPackage } from "./store/files.ts";
 import {
   offsetRows,
@@ -46,7 +47,8 @@ import {
   withDatums,
   type DatumReport,
 } from "./datums.ts";
-import { DROPPED } from "./sources/gesla/dropped.ts";
+import { isDropped } from "./sources/gesla/dropped.ts";
+import { backfillStatus } from "./backfilled.ts";
 import { usableShares, writeYears } from "./store/years.ts";
 import { readAnalysis, withAnalysis } from "./store/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
@@ -159,10 +161,10 @@ export async function refreshSource(
       `${opened.length} stations changed datum at once (limit ${limit}): ${opened.map((c) => c.id).join(", ")}; check them and rerun with --accept-epochs`,
     );
 
-  // A GESLA record dropped for holding another gauge's values was a decision in `DROPPED`, not the source's.
+  // A GESLA record dropped for holding another gauge's values was a decision in `isDropped`, not the source's.
   const listedInactive = new Set(
     fetched
-      .filter((s) => s.status === "inactive" && !(s.source === "gesla" && DROPPED.has(s.source_id)))
+      .filter((s) => s.status === "inactive" && !(s.source === "gesla" && isDropped(s.source_id)))
       .map((s) => s.id),
   );
   const report = {
@@ -269,7 +271,7 @@ export async function publishStations(
 > {
   const built = await linkedStations(store, all, expected);
   if ("missing" in built) return built;
-  const { gauges, listed, report, steps } = built;
+  const { gauges, listed, report, steps, since } = built;
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
@@ -294,6 +296,7 @@ export async function publishStations(
       sourceEntry(
         s.metadata,
         linked.filter((st) => st.source === s.metadata.id),
+        since.get(s.metadata.id),
       ),
     ),
   );
@@ -334,6 +337,8 @@ async function linkedStations(
       report: LinkReport;
       /** Each station's measured step where its source gives no interval. */
       steps: Map<string, number>;
+      /** Each source's `backfillStatus` `since`, absent where it isn't known. */
+      since: Map<string, number | null>;
     }
   | { missing: string[] }
 > {
@@ -342,6 +347,8 @@ async function linkedStations(
   const missing: string[] = [];
   const usable = new Map<string, number>();
   const steps = new Map<string, number>();
+  const since = new Map<string, number | null>();
+  const now = Date.now();
   for (const source of all) {
     const list = await readStationList(stationListPath(store, source.metadata.id));
     if (!list) {
@@ -351,14 +358,19 @@ async function linkedStations(
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(store, source.metadata.id));
     const analysis = await readAnalysis(store, source.metadata.id);
-    stations.push(
-      ...withoutWithheld(source, list).map((s) => ({
-        ...s,
-        ...bounds.get(s.id),
-        tidal: analysis.get(s.id)?.tidal ?? null,
-        tide_m: analysis.get(s.id)?.tide_m ?? null,
-      })),
-    );
+    const kept = withoutWithheld(source, list).map((s) => ({
+      ...s,
+      ...bounds.get(s.id),
+      tidal: analysis.get(s.id)?.tidal ?? null,
+      tide_m: analysis.get(s.id)?.tide_m ?? null,
+    }));
+    // Readers' business, not publishing's, so a file that can't be read leaves it unknown.
+    const status = await backfillStatus(store, source, kept, now).catch((error: unknown) => {
+      console.warn(`${source.metadata.id}: no backfill status: ${String(error)}`);
+      return null;
+    });
+    if (status) since.set(source.metadata.id, status.since);
+    stations.push(...kept.map((s) => ({ ...s, missing_years: status?.missing.get(s.id) ?? null })));
     for (const s of list) {
       const step = analysis.get(s.id)?.step_s;
       if (s.interval_s === null && step != null) steps.set(s.id, step);
@@ -371,8 +383,13 @@ async function linkedStations(
     for (const [id, share] of shares) usable.set(id, share);
   }
   if (missing.length || !listed.length) return { missing };
-  const { stations: gauges, report } = linkGauges(stations, new Date(), usable);
-  return { gauges, listed, report, steps };
+  const { stations: gauges, report } = linkGauges(
+    stations,
+    new Date(),
+    usable,
+    await readMatches(store),
+  );
+  return { gauges, listed, report, steps, since };
 }
 
 /**
@@ -396,13 +413,18 @@ const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_no
 
 /**
  * A source's entry in `sources.json`: its metadata less what only ingest uses,
- * and the number of its `stations` that are active. `license.commercial_use` is
- * true only where every station allows it, inactive ones too, since their series stay.
+ * the number of its `stations` that are active, and its `backfill`, from
+ * `since` and the stations' `missing_years`, null where `since` isn't known.
+ * `license.commercial_use` is true only where every station allows it,
+ * inactive ones too, since their series stay.
  */
 export function sourceEntry(
   metadata: SourceMetadata,
-  stations: Pick<Station, "status" | "commercial_use">[],
+  stations: Pick<Station, "status" | "commercial_use" | "missing_years">[],
+  since?: number | null,
 ): object {
+  const judged = stations.filter((st) => st.missing_years);
+  const complete = judged.filter((st) => !st.missing_years!.length).length;
   return {
     ...Object.fromEntries(Object.entries(metadata).filter(([key]) => !INGEST_ONLY.has(key))),
     license: {
@@ -410,6 +432,8 @@ export function sourceEntry(
       commercial_use: metadata.license.commercial_use && stations.every((st) => st.commercial_use),
     },
     stations: stations.filter((st) => st.status === "active").length,
+    backfill:
+      since === undefined ? null : { since, complete, incomplete: judged.length - complete },
   };
 }
 

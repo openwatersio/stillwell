@@ -78,6 +78,13 @@ export interface Station {
    */
   first: string | null;
   last: string | null;
+  /**
+   * The years of levels the store lacks, from its source's earliest year to
+   * this one (`missingYears` in `src/backfilled.ts`). Empty when the history
+   * is complete, null where it isn't known. Set as `stations.parquet` is
+   * built, never by an adapter.
+   */
+  missing_years?: number[] | null;
   license: string;
   commercial_use: boolean;
   attribution: string;

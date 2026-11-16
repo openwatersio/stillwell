@@ -220,6 +220,13 @@ const STATION_COLUMNS: Column[] = [
     description: "The station's last observation; null before it has any.",
   },
   {
+    name: "missing_years",
+    type: "INTEGER[]",
+    nullable: true,
+    description:
+      "The UTC years of observed levels the store doesn't have yet, from the source's `backfill.since` in `sources.json` to this year for a live station, or for another to the year after its last stored one or the last year a backfill asked for, whichever is later, but not this year. A year counts as had when no backfill can ask the source for it in the station's datum; when its file is in the station's series, and at a source polled hourly from 2026 on a backfill also covered it or compaction carried it from the year's start, since compaction began in November 2026 and writes a station's first year from when it was first polled; or when a backfill asked for it, got nothing, and that answer is sure: the source answers an outage with an error, or the year is before the station's first stored year or, for an inactive station, after its last. An empty year inside the record, or after an active station's, stays listed, since it may have been an outage. Empty when the station's history is complete; null where it isn't known, while a run is writing the station's files, or where the station has no levels.",
+  },
+  {
     name: "license",
     type: "VARCHAR",
     description: "The license of the station's data, as its source's `license.id`.",
@@ -325,6 +332,7 @@ export const IN_LIST_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const NOT_IN_LISTS = new Set([
   "first",
   "last",
+  "missing_years",
   "preferred",
   "errata",
   "tidal",
@@ -511,6 +519,62 @@ export const FILES = {
         type: "DOUBLE",
         description:
           "How far the medians of the measured months range, in meters, over months with at least 10 days.",
+      },
+    ],
+    sort: ["a", "b"],
+  },
+  matches: {
+    path: "stations/matches.parquet",
+    example: "stations/matches.parquet",
+    title: "Level matches",
+    description:
+      "Pairs of stations within 10 km, and every linked pair, compared once a month by their hourly levels. Publish links a pair whose levels agree within 1 cm.",
+    columns: [
+      {
+        name: "a",
+        type: "VARCHAR",
+        description:
+          "One station of the pair, its `id` in `stations.parquet`. It sorts before `b`.",
+      },
+      { name: "b", type: "VARCHAR", description: "The other station of the pair." },
+      {
+        name: "since",
+        type: "TIMESTAMPTZ",
+        description: "The start of the window compared, in UTC: the first of the years compared.",
+      },
+      {
+        name: "until",
+        type: "TIMESTAMPTZ",
+        description: "The end of the window compared, in UTC, exclusive.",
+      },
+      {
+        name: "months",
+        type: "INTEGER",
+        description:
+          "How many months both stations hold at least 15 days of the same hours in, while `a`'s levels move by 5 cm (a standard deviation); at least 6.",
+      },
+      {
+        name: "hours",
+        type: "INTEGER",
+        description:
+          "How many hours both stations hold a good or preliminary value at, in those months.",
+      },
+      {
+        name: "rms_m",
+        type: "DOUBLE",
+        description:
+          "The median of the months' RMS difference between the two, in meters, once each month's mean difference is removed. Under 0.01 is one gauge recorded twice.",
+      },
+      {
+        name: "lag_h",
+        type: "INTEGER",
+        description:
+          "Hours, from -2 to 2, to add to `b`'s times that agree best; 0 unless one halves `rms_m`. Another value is likely a clock error in one of them.",
+      },
+      {
+        name: "lag_rms_m",
+        type: "DOUBLE",
+        description: "`rms_m` with `b`'s times moved by `lag_h`.",
       },
     ],
     sort: ["a", "b"],
@@ -748,7 +812,17 @@ export const SOURCES_SCHEMA: JsonSchema = {
   items: {
     type: "object",
     additionalProperties: false,
-    required: ["id", "name", "url", "license", "attribution", "contact", "finalizes", "stations"],
+    required: [
+      "id",
+      "name",
+      "url",
+      "license",
+      "attribution",
+      "contact",
+      "finalizes",
+      "stations",
+      "backfill",
+    ],
     properties: {
       id: { type: "string", description: "The source's ID, as in each station's `source`." },
       name: { type: "string", description: "The agency or service's name." },
@@ -797,6 +871,30 @@ export const SOURCES_SCHEMA: JsonSchema = {
           "Whether values the source publishes as preliminary become final later. Where false, `preliminary` values stay so.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
+      backfill: {
+        type: nullable("object"),
+        description:
+          "How much of the source's history the store has, from `stations.parquet`'s `missing_years`; null where that isn't known.",
+        additionalProperties: false,
+        required: ["since", "complete", "incomplete"],
+        properties: {
+          since: {
+            type: nullable("integer"),
+            description:
+              "The first UTC year any of the source's stations has a file of levels for; null before it has one.",
+          },
+          complete: {
+            type: "integer",
+            description:
+              "How many stations with levels, active or not, have every year from `since` on, or a source's answer that it has none.",
+          },
+          incomplete: {
+            type: "integer",
+            description:
+              "How many stations with levels have a year in `missing_years`. A station a run is writing, whose `missing_years` is null, is in neither count.",
+          },
+        },
+      },
     },
   },
 };

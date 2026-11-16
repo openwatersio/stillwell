@@ -24,6 +24,8 @@ export interface MonthAgreement {
   r: number;
   /** RMS of the difference once the month's mean difference is removed, in meters. */
   rms: number;
+  /** The first series' standard deviation in the month, in meters. */
+  spread: number;
 }
 
 /**
@@ -54,6 +56,7 @@ export function monthlyAgreement(a: Hourly, b: Hourly, minHours = 360): MonthAgr
         hours: x.length,
         r: correlation(x, y),
         rms: Math.sqrt(variance(x.map((v, i) => v - y[i]!))),
+        spread: Math.sqrt(variance(x)),
       });
     hour = next;
   }

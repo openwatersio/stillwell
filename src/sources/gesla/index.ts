@@ -1,5 +1,6 @@
 import { isUrlSafe, urlSafe } from "../../store/paths.ts";
 import { csvFields } from "../../csv.ts";
+import { possible } from "../../span.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -17,7 +18,9 @@ import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
 import { NOTICES, type Notice } from "../uhslc/notices.ts";
 import { CONTRIBUTORS } from "./contributors.ts";
-import { DROPPED } from "./dropped.ts";
+import { CRMS_EARLY, CRMS_WELLS, DROPPED, isDropped } from "./dropped.ts";
+
+export { CRMS_EARLY, CRMS_WELLS };
 
 /**
  * GESLA 4.1 (Global Extreme Sea Level Analysis), a static release of 6,682
@@ -79,28 +82,60 @@ const WSV_SHIFT_MS = 30 * 60_000;
  */
 const HONG_KONG = /^hong_kong-329[a-z]?-hkg-uhslc_(fd|rq)$/;
 
-/**
- * GESLA's copies of 40 CRMS gauges, by site, are an hour early. Erratum
- * `gesla-crms-hour-early`, whose stations a test keeps equal to this list.
- */
-export const CRMS_EARLY = new Set(
-  `
-  0002 0003 0006 0008 0030 0033 0034 0035 0038 0039
-  0046 0047 0056 0058 0059 0061 0063 0065 0086 0089
-  0097 0103 0108 0114 0115 0117 0118 0119 0120 0121
-  0125 0129 0131 0132 0135 0136 0139 0146 0147 0148
-`
-    .trim()
-    .split(/\s+/)
-    .map((site) => `crms${site}-crms${site}-usa-crms`),
-);
+/** A clock fix: hours to add to GESLA's times from `since` to before `until`, as labeled. */
+export interface Clock {
+  hours: number;
+  since?: number;
+  until?: number;
+  /** Whether a date in the span whose day is 12 or less has its day and month swapped. */
+  dayMonth?: boolean;
+}
 
 /**
- * GESLA's CRMS records that are the site's marsh well throughout, so they
- * share no gauge with the site's surface-water series (erratum
- * `gesla-crms0090-marsh-well`, erratum `gesla-crms0128-marsh-well`).
+ * From GESLA's first time in 2020, Queensland's records are on AEST (UTC+10),
+ * and a label on day 1 to 12 of a month has its day and month swapped.
  */
-export const CRMS_WELLS = new Set(["CRMS0090", "CRMS0128"]);
+const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1), dayMonth: true };
+
+/**
+ * Clock fixes by file. GESLA's copies of UHSLC's Vigo and Las Palmas versions
+ * from before 1991, which UHSLC stamps an hour early (erratum
+ * `gesla-spain-uhslc-hour-early`); IEO's Santa Cruz de la Palma, an hour early
+ * before its gap from 1987 to 1995 (erratum
+ * `gesla-santa-cruz-de-la-palma-hour-early`); UHSLC's Progreso version A, 6
+ * hours late (erratum `gesla-progreso-uhslc-721a-six-hours-late`); TTW's Scott
+ * Base, on NZST (erratum `gesla-scott-base-ttw-nzst`); and Queensland's
+ * records from 2020 (erratum `gesla-queensland-2020-aest`).
+ */
+export const CLOCK: Record<string, Clock> = {
+  "vigo-208a-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217a-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217b-esp-uhslc_rq": { hours: 1 },
+  "las_palmas-217c-esp-uhslc_rq": { hours: 1 },
+  "cruz-cruz-esp-ieo": { hours: 1, until: Date.UTC(1990, 0, 1) },
+  "progreso_yuc-721a-mex-uhslc_rq": { hours: -6 },
+  "scott_base_antarctica-scot-nzl-ttw": { hours: -12 },
+  "cape_ferguson-h033007a-aus-bom": QUEENSLAND_AEST,
+  "cardwell-h035012a-aus-bom": QUEENSLAND_AEST,
+  "cooktown-h066003a-aus-bom": QUEENSLAND_AEST,
+  "fishermans_landing-h052003b-aus-bom": QUEENSLAND_AEST,
+  "half_tide_tug_harbour-h060010a-aus-bom": QUEENSLAND_AEST,
+  "south_trees-h052026a-aus-bom": QUEENSLAND_AEST,
+  "thursday_island-h057022b-aus-bom": QUEENSLAND_AEST,
+};
+
+/** SFWMD's records are on EST (UTC−5) throughout. Erratum `gesla-sfwmd-est`. */
+const SFWMD = /-usa-sfwmd$/;
+
+/** The largest clock fix, which a range asked for is widened by. */
+const CLOCK_MARGIN_MS = 12 * HOUR_MS;
+
+/** The clock fix for `file`, if it has one. */
+export function clockOf(file: string): Clock | undefined {
+  if (HONG_KONG.test(file) || CRMS_EARLY.has(file)) return { hours: 1 };
+  if (SFWMD.test(file)) return { hours: 5 };
+  return CLOCK[file];
+}
 
 /** A GESLA record as listed, with the fields of its metadata row kept in the store's list. */
 export type GeslaStation = ListedStation & {
@@ -271,7 +306,7 @@ export async function stations(): Promise<GeslaStation[]> {
   );
   return listed
     .map(({ code, ...s }) =>
-      DROPPED.has(s.source_id)
+      isDropped(s.source_id)
         ? { ...s, products: [], status: "inactive" as const }
         : { ...s, same_as: originatorIds(s.contributor, code, s.lon, fd, s.file ?? s.source_id) },
     )
@@ -450,6 +485,21 @@ function timeOf(s: string, at = 0): number {
   );
 }
 
+/** `time` with its day and month swapped, when its day is 12 or less. */
+function swapDayMonth(time: number): number {
+  const d = new Date(time);
+  const day = d.getUTCDate();
+  if (day > 12) return time;
+  return Date.UTC(
+    d.getUTCFullYear(),
+    day - 1,
+    d.getUTCMonth() + 1,
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+  );
+}
+
 /** A record's values, sorted by time, with flags already the store's. */
 export interface GeslaRecord {
   times: Float64Array;
@@ -478,7 +528,11 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   const zone = /^# TIME ZONE HOURS\s+(\S+)/m.exec(text)?.[1] ?? "0";
   if (zone !== "0" && file !== "wewak-56070-png-bom")
     throw new Error(`GESLA's ${file} is on UTC${zone}, which the adapter doesn't convert`);
-  const shift = HONG_KONG.test(file) || CRMS_EARLY.has(file) ? HOUR_MS : 0;
+  const clock = clockOf(file);
+  const [shift, since, until] = clock
+    ? [clock.hours * HOUR_MS, clock.since ?? -Infinity, clock.until ?? Infinity]
+    : [0, Infinity, -Infinity];
+  const dayMonth = clock?.dayMonth ?? false;
   // Typed arrays sized by the line count, since the largest records hold 6 million values.
   let lines = 1;
   for (let at = text.indexOf("\n"); at >= 0; at = text.indexOf("\n", at + 1)) lines++;
@@ -497,9 +551,13 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         .split(/\s+/);
       const qc = Number(fields[1]);
       const level = Number(fields[0]);
-      if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
+      // A level no gauge can read is a fill value, such as CMEMS's 999,999.06 m, so it's
+      // missing (erratum `gesla-fill-values`).
+      if (qc >= 0 && qc <= 4 && fields[0] !== nul && possible(level)) {
         const flag = QC_FLAGS[qc]!;
-        times[n] = timeOf(text, at) + shift;
+        const time = timeOf(text, at);
+        times[n] =
+          time < since || time >= until ? time : (dayMonth ? swapDayMonth(time) : time) + shift;
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
@@ -798,12 +856,15 @@ export async function levels(
 ): Promise<Observation[]> {
   const refused = withheld(station.source_id);
   if (refused) throw new Error(`GESLA's ${station.source_id} is withheld: ${refused}`);
-  // The record's own span, with a margin for the clock fixes.
-  if (station.record_start && Date.parse(station.record_start) - HOUR_MS >= end.getTime())
-    return [];
-  if (station.record_end && Date.parse(station.record_end) + HOUR_MS < start.getTime()) return [];
-  if (DROPPED.has(station.source_id))
-    throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see DROPPED)`);
+  // The record's own span, with a margin for the clock fixes. A swapped day and
+  // month can move a value to any month of its year.
+  const margin = clockOf(station.file ?? station.source_id)?.dayMonth
+    ? 366 * 24 * HOUR_MS
+    : CLOCK_MARGIN_MS;
+  if (station.record_start && Date.parse(station.record_start) - margin >= end.getTime()) return [];
+  if (station.record_end && Date.parse(station.record_end) + margin < start.getTime()) return [];
+  if (isDropped(station.source_id))
+    throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see isDropped)`);
   const r = await record(station);
   const out: Observation[] = [];
   for (let i = lowerBound(r.times, start.getTime()); i < r.times.length; i++) {
@@ -843,6 +904,8 @@ export const source: Source = {
     const [times, levels, source]: number[][] = [[], [], []];
     for await (const rows of record())
       for (const r of rows) {
+        // As `parse` leaves them out (erratum `gesla-fill-values`), until the store no longer holds any.
+        if (!possible(r.level)) continue;
         times.push(r.time);
         levels.push(r.level);
         source.push(r.source_flag ?? r.flag);

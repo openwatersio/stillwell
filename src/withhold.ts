@@ -1,7 +1,7 @@
 /**
  * Stations withheld from the store because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
- * rows from its bounds, years, recent window, empty-years record, requalify list and analysis, and publishing
+ * rows from its bounds, years, recent window, empty-years record, backfilled years, requalify list and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes
  * their series files, and their rows, from a store that still holds them.
  */
@@ -21,6 +21,7 @@ import {
   writeStationBounds,
 } from "./store/parquet.ts";
 import {
+  backfilledPath,
   boundsPath,
   DATASET,
   emptyYearsPath,
@@ -45,7 +46,7 @@ export function withheldReason(source: Source, id: string): string | null {
 
 /**
  * Drop withheld stations' rows from the source's bounds, years, recent window,
- * empty-years record, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
+ * empty-years record, backfilled years, requalify list and analysis, with its history, in `store`, rewriting only a file that holds one. Returns
  * the station IDs it dropped rows for.
  */
 export async function dropWithheldRows(store: string, source: Source): Promise<string[]> {
@@ -88,13 +89,13 @@ export async function dropWithheldRows(store: string, source: Source): Promise<s
       empty.filter((r) => !held(stationOf(r.key))),
     );
   }
-  const requalifyPath = requalifyLeftPath(store, id);
-  const requalify = ((await readJsonArray(requalifyPath)) ?? []) as { id: string }[];
-  if (requalify.some((r) => held(r.id))) {
-    for (const r of requalify) if (held(r.id)) dropped.add(r.id);
+  for (const path of [requalifyLeftPath(store, id), backfilledPath(store, id)]) {
+    const rows = ((await readJsonArray(path)) ?? []) as { id: string }[];
+    if (!rows.some((r) => held(r.id))) continue;
+    for (const r of rows) if (held(r.id)) dropped.add(r.id);
     await writeJsonArray(
-      requalifyPath,
-      requalify.filter((r) => !held(r.id)),
+      path,
+      rows.filter((r) => !held(r.id)),
     );
   }
   for (const station of await dropAnalysis(store, id, held)) dropped.add(station);
@@ -239,6 +240,52 @@ export async function removePrefixes(store: string, prefixes: string[]): Promise
 }
 
 /**
+ * Delete the series files of the stations in `source`'s list whose source ID
+ * `drop` names, such as GESLA's records that hold another gauge's values, and
+ * their rows in the years file and the analysis, and the backfilled years of
+ * every station `drop` names, files or not, so a run after an earlier one
+ * clears what that left; `cleared` lists those, or with `dryRun` would. Deletes only the directories that have files, and with `dryRun`
+ * deletes nothing, returning what it would delete. The bounds keep them until
+ * `compact --rebuild-bounds`.
+ */
+export async function dropFiles(
+  store: string,
+  source: string,
+  drop: (sourceId: string) => boolean,
+  {
+    remove = removePrefixes,
+    dryRun = false,
+  }: { remove?: (store: string, prefixes: string[]) => Promise<void>; dryRun?: boolean } = {},
+): Promise<{ ids: string[]; prefixes: string[]; cleared: string[] }> {
+  deletable(store);
+  const list = stationListPath(store, source);
+  if (!(await exists(list))) throw new Error(`The store has no list for ${source}`);
+  const named = (await listedIds([list])).filter((id) => drop(id.slice(source.length + 1)));
+  const ids = await withFiles(store, source, named);
+  const prefixes = seriesPrefixes(
+    store,
+    source,
+    ids.map((id) => id.slice(source.length + 1)),
+  );
+  const dropped = new Set(named);
+  const path = backfilledPath(store, source);
+  const recorded = ((await readJsonArray(path)) ?? []) as { id: string }[];
+  const cleared = [...new Set(recorded.filter((r) => dropped.has(r.id)).map((r) => r.id))];
+  if (dryRun) return { ids, prefixes, cleared };
+  if (cleared.length)
+    await writeJsonArray(
+      path,
+      recorded.filter((r) => !dropped.has(r.id)),
+    );
+  if (!ids.length) return { ids, prefixes, cleared };
+  await remove(store, prefixes);
+  const gone = new Set(ids);
+  await dropAnalysis(store, source, (id) => gone.has(id));
+  await dropYears(store, source, (id) => gone.has(id));
+  return { ids, prefixes, cleared };
+}
+
+/**
  * The most stations one run may withhold, of those the store has known,
  * beyond which a rule more likely matches by mistake. `--accept-withheld`
  * lifts it, for the refresh and `withhold` alike.
@@ -257,7 +304,7 @@ export function tooManyWithheld(source: string, count: number, known: number): s
 
 /**
  * Remove a source's withheld stations from `store`: delete their series files,
- * then drop their rows from the bounds, years, recent window, empty-years record and requalify list.
+ * then drop their rows from the bounds, years, recent window, empty-years record, backfilled years and requalify list.
  * Their list rows go at the source's next refresh. Refuses more stations than
  * `withholdLimit` allows unless `accept`, and a store it can't delete from.
  */

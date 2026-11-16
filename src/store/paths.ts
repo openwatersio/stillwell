@@ -10,11 +10,13 @@ import type { Product } from "../schema.ts";
  *   sources.schema.json, errata.schema.json             the JSON Schemas of sources.json and errata.json
  *   stations/offsets.parquet                            each station's offsets by epoch, rebuilt with stations.parquet
  *   stations/links.parquet                              offsets measured between linked series' levels, once a month
+ *   stations/matches.parquet                            nearby series compared by their levels, once a month, for linking
  *   stations/<source>.parquet                           one source's list, with datum epochs
  *   stations/bounds/<source>.parquet                    first, last, earliest preliminary and screened, by compaction and backfill
  *   stations/analysis/<source>.parquet                  what analysis measures from each station's levels, such as whether they carry a tide
  *   stations/years/<source>.parquet                     each year file of levels: hours, values by flag and a version
  *   stations/empty/<source>.json                        years a `--skip-written` backfill found nothing in, for 30 days
+ *   stations/backfilled/<source>.json                   each station's years, by epoch, that backfill got an answer for or compaction carried whole
  *   stations/requalify/<source>.json                    stations a `requalify --budget` run didn't finish, for the next
  *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
@@ -138,6 +140,10 @@ export function emptyYearsPath(root: string, source: string): string {
   return `${root}/stations/empty/${source}.json`;
 }
 
+export function backfilledPath(root: string, source: string): string {
+  return `${root}/stations/backfilled/${source}.json`;
+}
+
 /** A refresh's snapshot of the list, and with `.json`, its report. */
 export function historyPath(
   root: string,
@@ -164,6 +170,11 @@ export function offsetsPath(root: string): string {
 /** Offsets measured between linked series' levels (`src/links.ts`). */
 export function linksPath(root: string): string {
   return `${root}/stations/links.parquet`;
+}
+
+/** Pairs of series compared by their levels, which publish links by (`src/matches.ts`). */
+export function matchesPath(root: string): string {
+  return `${root}/stations/matches.parquet`;
 }
 
 export function sourcesPath(root: string): string {

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { chmod, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,6 +10,7 @@ import {
   readRecent,
   readStationBounds,
   readStationList,
+  readJsonArray,
   writeJsonArray,
   writeObservations,
   writeRecent,
@@ -20,6 +22,7 @@ import {
   emptyYearsPath,
   recentPath,
   requalifyLeftPath,
+  backfilledPath,
   seriesPath,
   stationListPath,
   stationsPath,
@@ -40,8 +43,11 @@ import { JUDGE, RULES, readAnalysis, writeAnalysis } from "../src/store/analysis
 import { Flag, type ListedStation, type Source, type SourceMetadata } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
+import { deletesFiles, isDropped, KEEP_FILES } from "../src/sources/gesla/dropped.ts";
+import { readYears, writeYears } from "../src/store/years.ts";
 import {
   awsRemoveArgs,
+  dropFiles,
   removePrefixes,
   seriesPrefixes,
   tooManyWithheld,
@@ -151,6 +157,10 @@ describe("refreshSource with withheld stations", () => {
       { id: "test/x0", start: 2026, end: 2027 },
       { id: "test/k12", start: 2026, end: 2027 },
     ]);
+    await writeJsonArray(backfilledPath(store, "test"), [
+      { id: "test/x0", years: [[1990, 2027]] },
+      { id: "test/k12", years: [[1990, 2027]] },
+    ]);
     const verdict = (id: string) => ({
       id,
       analyzed: NOW,
@@ -226,6 +236,12 @@ describe("refreshSource with withheld stations", () => {
     );
     assert.deepEqual(
       JSON.parse(await readFile(requalifyLeftPath(store, "test"), "utf8")).map(
+        (r: { id: string }) => r.id,
+      ),
+      ["test/k12"],
+    );
+    assert.deepEqual(
+      JSON.parse(await readFile(backfilledPath(store, "test"), "utf8")).map(
         (r: { id: string }) => r.id,
       ),
       ["test/k12"],
@@ -509,6 +525,135 @@ describe("withhold", () => {
     for (const dir of ["obs/test/k/2000.parquet", "obs/test/kx1/2000.parquet"])
       assert.equal(existsSync(join(store, dir)), true, dir);
     assert.deepEqual([...(await readStationBounds(boundsPath(store, "test"))).keys()], ["test/k"]);
+  });
+
+  it("drops the files of the stations a rule names, and only lists them on a dry run", async () => {
+    const all = ["d1", "d2", "keep", "k"].map((c) => listed("test", c));
+    await refreshSource(store, sourceOf(all), { now: NOW });
+    await file("d1", "levels", 2000);
+    await file("d1", "levels", 2001, 2);
+    await file("keep", "levels", 2000);
+    await file("k", "levels", 2000);
+    // d2 has no files, so there's nothing to delete for it.
+    const drop = (code: string) => code.startsWith("d");
+    await writeYears(store, "test", [
+      { id: "test/d1", epoch: 1, year: 2000 },
+      { id: "test/k", epoch: 1, year: 2000 },
+    ]);
+    const verdict = (id: string) => ({
+      id,
+      analyzed: NOW,
+      rules: RULES,
+      judge: JUDGE,
+      tidal: true,
+      tide_m: 0.5,
+      days: 366,
+      drains: 0,
+      step_s: 600,
+      requalified: null,
+    });
+    await writeAnalysis(store, "test", [verdict("test/d1"), verdict("test/k")]);
+    // d2's ranges stay from a drop before it cleared them.
+    const ranges = (id: string) => ({ id, epoch: 1, years: [[1990, 2027]] });
+    await writeJsonArray(backfilledPath(store, "test"), [
+      ranges("test/d1"),
+      ranges("test/d2"),
+      ranges("test/k"),
+    ]);
+    const recorded = async () =>
+      ((await readJsonArray(backfilledPath(store, "test"))) as { id: string }[]).map((r) => r.id);
+    const removed: string[][] = [];
+    const remove = async (root: string, prefixes: string[]) => {
+      removed.push(prefixes);
+      await removePrefixes(root, prefixes);
+    };
+    const dry = await dropFiles(store, "test", drop, { remove, dryRun: true });
+    assert.deepEqual(dry.ids, ["test/d1"]);
+    assert.deepEqual(dry.cleared, ["test/d1", "test/d2"]);
+    assert.equal(removed.length, 0);
+    assert.equal(existsSync(join(store, "obs/test/d1/2000.parquet")), true);
+    assert.deepEqual(await recorded(), ["test/d1", "test/d2", "test/k"]);
+    const done = await dropFiles(store, "test", drop, { remove });
+    assert.deepEqual(done.prefixes, dry.prefixes);
+    assert.deepEqual(
+      removed[0],
+      ["obs", "extremes", "predictions", "predicted-extremes"].map((d) => `${store}/${d}/test/d1/`),
+    );
+    assert.equal(existsSync(join(store, "obs/test/d1")), false);
+    assert.deepEqual(
+      [...(await readYears(store, "test"))!.keys()].map((k) => k.split(" ")[0]),
+      ["test/k"],
+    );
+    assert.deepEqual([...(await readAnalysis(store, "test")).keys()], ["test/k"]);
+    assert.deepEqual(await recorded(), ["test/k"]);
+    for (const dir of ["obs/test/keep/2000.parquet", "obs/test/k/2000.parquet"])
+      assert.equal(existsSync(join(store, dir)), true, dir);
+    // Nothing is left to delete the second time, but rows an earlier drop left are cleared.
+    await writeJsonArray(backfilledPath(store, "test"), [ranges("test/d1"), ranges("test/k")]);
+    const again = await dropFiles(store, "test", drop, { remove });
+    assert.deepEqual(again.ids, []);
+    assert.deepEqual(again.cleared, ["test/d1"]);
+    assert.deepEqual(await recorded(), ["test/k"]);
+    await assert.rejects(
+      dropFiles("https://stillwell.openwaters.io", "test", drop),
+      /Can't delete files from https:/,
+    );
+  });
+
+  it("deletes the files of GESLA's dropped CRMS records, but not the ten unidentified ones", () => {
+    assert.equal(deletesFiles("crms0153-crms0153-usa-crms"), true);
+    assert.equal(deletesFiles("uddevalla-2541-swe-smhi"), true);
+    assert.equal(deletesFiles("crms3800-crms3800-usa-crms"), false);
+    assert.equal(deletesFiles("crms0002-crms0002-usa-crms"), false);
+    for (const file of KEEP_FILES) assert.equal(isDropped(file), true, file);
+    assert.equal(KEEP_FILES.size, 10);
+  });
+
+  it("runs `ingest.ts drop gesla --dry-run` through to its report", async () => {
+    const codes = ["crms0153-crms0153-usa-crms", "crms3800-crms3800-usa-crms"];
+    await refreshSource(
+      store,
+      sourceOf(
+        codes.map((c) => listed("gesla", c)),
+        undefined,
+        "gesla",
+      ),
+      {
+        now: NOW,
+      },
+    );
+    for (const code of codes)
+      await writeObservations(
+        seriesPath(store, "levels", "gesla", code, 2015, 1),
+        [{ time: Date.UTC(2015, 0, 1), level: 1, flag: Flag.good }],
+        "ZERO",
+      );
+    // The dropped record's backfilled years, in two epochs, and the kept one's.
+    const gesla = (code: string, epoch: number) => ({
+      id: `gesla/${code}`,
+      epoch,
+      years: [[2010, 2016]],
+    });
+    await writeJsonArray(backfilledPath(store, "gesla"), [
+      gesla(codes[0]!, 1),
+      gesla(codes[0]!, 2),
+      gesla(codes[1]!, 1),
+    ]);
+    const run = spawnSync(process.execPath, ["scripts/ingest.ts", "drop", "gesla", "--dry-run"], {
+      encoding: "utf8",
+      env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(store, "..", "cache") },
+    });
+    assert.equal(run.status, 0, run.stderr);
+    assert.match(
+      run.stdout,
+      /gesla: 1 dropped stations with files, \d+ directories to delete \(dry run\)/,
+    );
+    assert.match(run.stdout, /gesla\/crms0153-crms0153-usa-crms/);
+    assert.doesNotMatch(run.stdout, /crms3800/);
+    // Counted by station, its two epochs' rows as one.
+    assert.match(run.stdout, /gesla: 1 dropped stations' backfilled years to clear \(dry run\)/);
+    assert.equal(existsSync(seriesPath(store, "levels", "gesla", codes[0], 2015, 1)), true);
+    assert.equal(((await readJsonArray(backfilledPath(store, "gesla"))) as unknown[]).length, 3);
   });
 
   it("refuses a rule that withholds more stations than a mistake would explain", async () => {
