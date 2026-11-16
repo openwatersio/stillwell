@@ -515,6 +515,7 @@ describe("publishStations", () => {
       days: 366,
       drains: 0,
       step_s,
+      sea_level: null,
       requalified: NOW,
     });
     await writeAnalysis(store, "test", [row("test/a", 10800), row("test/b", 3600)]);

@@ -12,12 +12,6 @@
 - **History before 2010:** mareografico.it's data archive lists "pre-NTN data" for 23 gauges, from stations that the local hydrographic services ran before the network, with sea level only, collection starting in different years and "the level reference is not unique". It also lists hourly levels, daily means with a Bloomfield filter, and tidal constants. These come through the site's session-driven forms, with no files or terms of their own, so the store doesn't read them.
 - **Times:** `UTC` is UTC. No clock check has been run.
 
-## Errata
-
-- **Listed months missing** (erratum `ispra-listed-months-missing`). Many months the dump lists return 404: of Venezia's 166, 100 resolve, January 2014 to April 2022.
-- **A date with no time** (erratum `ispra-midnight-without-time`). The first row of some files, such as Bari's January 2015, gives a date and no time, which is read as 00:00 UTC.
-- **Two levels for one time** (erratum `ispra-repeated-times`). Carloforte's March 2019 file interleaves two series, so a time with two different levels is dropped whole. A time repeated with the same level is read once.
-
 ## Running ingest
 
 - **Limits:** ISPRA publishes none. Requests start at least a second apart. A month is about 100 KB, a year of one gauge about 1.2 MB, and the dump 7 MB, read fresh on every run.

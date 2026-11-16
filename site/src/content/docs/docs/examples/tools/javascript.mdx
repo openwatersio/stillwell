@@ -52,6 +52,10 @@ import { DuckDBInstance, listValue } from "@duckdb/node-api";
 const instance = await DuckDBInstance.create();
 const con = await instance.connect();
 await con.run("SET TimeZone = 'UTC'");
+// Your project, its version, and a URL or email address.
+await con.run(
+  "CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'})",
+);
 ```
 
 </TabItem>
@@ -66,7 +70,14 @@ import { asyncBufferFromUrl, parquetReadObjects } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
 
 async function read(path, columns) {
-  const file = await asyncBufferFromUrl({ url: `https://stillwell.openwaters.io/${path}` });
+  const file = await asyncBufferFromUrl({
+    url: `https://stillwell.openwaters.io/${path}`,
+    // In Node, your project, its version, and a URL or email address. A browser sends its own, and the
+    // store's CORS rules refuse a page that sets one.
+    requestInit: globalThis.process?.versions?.node
+      ? { headers: { "User-Agent": "my-project/1.0 (you@example.org)" } }
+      : undefined,
+  });
   return parquetReadObjects({ file, columns, compressors });
 }
 ```

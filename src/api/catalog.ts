@@ -1,3 +1,4 @@
+import { USER_AGENT } from "../http.ts";
 import type { ClickHouse } from "../realtime/clickhouse.ts";
 
 /** What the levels API needs of a station from `stations.parquet`. */
@@ -43,8 +44,8 @@ export type Catalog = Map<string, CatalogStation>;
 export async function loadCatalog(ch: ClickHouse, store: string): Promise<Catalog> {
   const read = (file: string, columns: string) =>
     ch.query<Record<string, unknown>>(
-      `SELECT ${columns} FROM url({url:String}, Parquet) SETTINGS date_time_output_format = 'iso'`,
-      { url: `${store}/${file}` },
+      `SELECT ${columns} FROM url({url:String}, Parquet, headers('User-Agent' = {ua:String})) SETTINGS date_time_output_format = 'iso'`,
+      { url: `${store}/${file}`, ua: USER_AGENT },
     );
   const [stations, offsets] = await Promise.all([
     read(

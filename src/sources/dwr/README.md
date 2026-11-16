@@ -13,10 +13,6 @@ Stage every 15 minutes at about 50 tidal gauges in the Sacramento–San Joaquin 
 - **Freshness:** WDL rewrites the files daily, and they end a day or two before the request: on 7 November 2026, Fisherman's Cut ended at 10:45 PST on 5 November, and the stage files months back. So `hourly` is false, and new values arrive through Monthly's refetch on the 9th, which for DWR reads every active station again from January of last year to that day, finished years included. Values a stage file gains more than a year after their time aren't fetched again without a manual backfill. Files are in time order; one that isn't is sorted, and a repeated time keeps its last row.
 - **Not USGS or NOAA:** WDL's data is DWR's own: every station in `TIDAL` is `source` "DWR Hydstra" in the station list, and a station from any other source is left out.
 
-## Errata
-
-- **B95580's file is another station's** (erratum `dwr-b95580-another-header`). WDL's raw level file for San Joaquin River at Venice Island carries another station's header, so B95580 has no values.
-
 ## Running ingest
 
 - **Station refresh:** a refresh probes each file's first KB to decide whether to list it and which parameter a new station takes.

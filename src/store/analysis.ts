@@ -57,6 +57,12 @@ export interface Analysis {
    */
   step_s: number | null;
   /**
+   * What the sea-level guard read from the station's list when it was judged
+   * (`seaLevelOf`), so a station whose offsets or ground change is judged
+   * again; null where it read neither, or in a row written before it was kept.
+   */
+  sea_level: string | null;
+  /**
    * When the station's stored years were last requalified under its
    * verdict: null while a verdict that changed its QC waits for `requalify`
    * (`pending`).
@@ -107,7 +113,7 @@ export function reaches(since: string, options: QcOptions, history = RULES_HISTO
  * verdict depends on, so `analyze` judges every station again and requalifies
  * only those whose QC changes with their verdict.
  */
-export const JUDGE = "step-1";
+export const JUDGE = "ground-1";
 
 /** Days of the last year with values that a verdict needs. */
 export const COVERED_DAYS = 30;
@@ -120,6 +126,16 @@ export const COVERED_DAYS = 30;
  */
 export const ABOVE_SEA_M = 10;
 
+/**
+ * How far a site's ground (`ground_m`, the altitude a source such as USGS gives
+ * where it gives no offset for the gauge's zero) may sit above its water, in meters, so
+ * a site whose ground is more than `ABOVE_SEA_M` plus this above the sea is
+ * above it, whatever its gauge reads. An estimated ground is a few meters out
+ * and a bank stands above the water; Middle Haddam on the tidal Connecticut
+ * sits on ground 8 m up.
+ */
+const GROUND_MARGIN_M = 10;
+
 /** Stations `analyze` judges between writes. */
 const BATCH = 500;
 
@@ -128,14 +144,15 @@ const REJUDGE_MS = 365 * 86_400_000;
 
 const DAY_MS = 86_400_000;
 
-type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "requalified">;
+type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "sea_level" | "requalified">;
 
 /**
  * Whether a station's levels carry a tide, from its last year: the lunar
  * tide (`tideOf`) is `TIDE_M` or more, on `COVERED_DAYS` days or more,
  * its water sits within `ABOVE_SEA_M` of sea level where its datums can say
- * (`toSeaLevel`), and, away from the coast, no more than `DRAINS_RUNS` runs
- * of a still level are ones a tide gauge's flatline rules flag and still
+ * (`toSeaLevel`), or its ground (`ground_m`) within that and
+ * `GROUND_MARGIN_M` where they can't, and, away from the coast, no more
+ * than `DRAINS_RUNS` runs of a still level are ones a tide gauge's flatline rules flag and still
  * water's don't, as at a creek that drains to a sill at low water: the rules
  * QC gives a tidal river or lake of its tide, and six hours elsewhere. On the coast such runs are a
  * stuck gauge or one left dry, which QC should flag: Coruña, with a 1.25 m
@@ -146,7 +163,8 @@ type Verdict = Omit<Analysis, "id" | "analyzed" | "rules" | "judge" | "requalifi
  * and adapter spans, are flagged as `requalify` flags them.
  */
 export function judge(
-  station: Station,
+  // `ground_m` is a source's own list field, such as USGS's, kept in the list's `extra`.
+  station: Station & { ground_m?: number | null },
   rows: Observation[],
   suspect: [number, number][] = [],
 ): Verdict {
@@ -193,7 +211,10 @@ export function judge(
     return { tidal: null, tide_m, days, drains: runs, step_s };
   const middle = usable.map((r) => r.level).sort((a, b) => a - b)[usable.length >> 1] ?? 0;
   const offset = toSeaLevel(station);
-  const aboveSea = offset !== null && offset + middle > ABOVE_SEA_M;
+  const aboveSea =
+    offset !== null
+      ? offset + middle > ABOVE_SEA_M
+      : (station.ground_m ?? -Infinity) > ABOVE_SEA_M + GROUND_MARGIN_M;
   return {
     tidal: tide_m >= TIDE_M && !aboveSea && (station.kind === "coastal" || runs <= DRAINS_RUNS),
     tide_m,
@@ -250,6 +271,17 @@ function toSeaLevel(station: Station): number | null {
   return datum === undefined ? null : station.datums[datum]!;
 }
 
+/**
+ * What `judge`'s sea-level guard reads from a station's list: its gauge
+ * zero's height above sea level (`toSeaLevel`), or else its ground's
+ * (`ground_m`), or null where it has neither.
+ */
+export function seaLevelOf(station: Station & { ground_m?: number | null }): string | null {
+  const offset = toSeaLevel(station);
+  if (offset !== null) return `datum ${offset}`;
+  return typeof station.ground_m === "number" ? `ground ${station.ground_m}` : null;
+}
+
 /** A source's analysis by station ID; empty where there's none yet. */
 export async function readAnalysis(store: string, source: string): Promise<Map<string, Analysis>> {
   const path = analysisPath(store, source);
@@ -270,6 +302,8 @@ export async function readAnalysis(store: string, source: string): Promise<Map<s
         drains: r.drains === null ? null : Number(r.drains),
         // A file written before `step_s` was kept has no such column.
         step_s: r.step_s == null ? null : Number(r.step_s),
+        // A file written before `sea_level` was kept has no such column, so each station is judged again.
+        sea_level: r.sea_level == null ? null : String(r.sea_level),
         requalified: r.requalified == null ? null : new Date(r.requalified as string).toISOString(),
       },
     ]),
@@ -302,8 +336,9 @@ export interface AnalysisReport {
  * Judge a source's stations that are due (`judge`), from the last two years of
  * their current epoch in the store, and write the source's analysis, keeping
  * the rows of stations not due or not judged. A station is due with no row,
- * a row under other `RULES` or `JUDGE`, no verdict, or a verdict older than a year, or
- * with `all`. Writes the stations whose QC options change with the
+ * a row under other `RULES` or `JUDGE`, no verdict, a verdict whose sea-level
+ * input its list no longer gives (`seaLevelOf`), or a verdict older than a
+ * year, or with `all`. Writes the stations whose QC options change with the
  * new verdict to `history/analysis/<source>/<time>.json` and returns them.
  */
 export async function analyze(
@@ -325,6 +360,7 @@ export async function analyze(
       p.rules !== RULES ||
       p.judge !== JUDGE ||
       p.tidal === null ||
+      p.sea_level !== seaLevelOf(s) ||
       now - Date.parse(p.analyzed) > REJUDGE_MS
     );
   });
@@ -414,6 +450,7 @@ export async function analyze(
           ...verdict,
           // A new epoch's first value or two can't give a step, so the last one measured stands.
           step_s: verdict.step_s ?? was?.step_s ?? null,
+          sea_level: seaLevelOf(station),
           requalified: requalify ? null : was!.requalified,
         });
         if (changed)

@@ -45,27 +45,6 @@ describe("readmeText", () => {
     assert.equal(text, "Intro.");
   });
 
-  it("drops erratum bullets, keeps other notes in Errata, and drops an Errata heading left empty", () => {
-    const kept = readmeText(
-      [
-        "Intro.",
-        "",
-        "## Errata",
-        "",
-        "- **Clock early** (erratum `x-clock`). An hour early.",
-        "- **Clock check:** matches its neighbors.",
-      ].join("\n"),
-    );
-    assert.doesNotMatch(kept, /x-clock/);
-    assert.match(kept, /### Errata\n\n- \*\*Clock check:\*\*/);
-    const empty = readmeText(
-      ["Intro.", "", "## Errata", "", "- **Clock early** (erratum `x-clock`). An hour early."].join(
-        "\n",
-      ),
-    );
-    assert.equal(empty, "Intro.");
-  });
-
   it("keeps only the text of a link to contributor docs", () => {
     const text = readmeText(
       "See [the plan](../../../docs/plans/plan.md) and [withheld stations](../../../CONTRIBUTING.md#withheld-stations), and [the code](../../stations.ts).",
@@ -91,10 +70,11 @@ describe("readmeText", () => {
       const at = sections.indexOf("Running ingest");
       if (at >= 0)
         assert.equal(at, sections.length - 1, `${id.name}: ## Running ingest is the last section`);
-      // The page lists errata from errata.json, so an Errata section holds only bullets that point at one.
-      const errata = markdown.match(/^## Errata\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? "";
-      for (const bullet of errata.match(/^- .*/gm) ?? [])
-        assert.match(bullet, /\(.*erratum `/, `${id.name}: an Errata bullet names its erratum`);
+      // Errata are documented in errata.json alone, which the page lists.
+      assert.ok(
+        !sections.includes("Errata"),
+        `${id.name}: errata belong in errata.json, not the README`,
+      );
       // What the page shows: none of the runbook, and no link a reader can't follow.
       checked++;
       const shown = readmeText(markdown);
