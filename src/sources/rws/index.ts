@@ -123,6 +123,8 @@ interface Series {
     Typering?: { Code: string };
     /** How values were derived: `NVT` for each reading as measured, `GEM24H` for a daily mean. */
     WaardeBewerkingsMethode?: { Code: string };
+    /** The instrument, such as a float gauge or a pressure sensor. */
+    MeetApparaat?: { Code: string };
   };
   MetingenLijst: Measurement[];
 }
@@ -368,13 +370,14 @@ export async function extremes(
       fresh,
     );
     // Every series of each kind, since RWS can split one channel's year into several.
+    // Every type series counts: a type is only looked up at a height's time.
     const types = readings(
       location,
       series.filter((s) => s.AquoMetadata.Typering?.Code === "GETETTPE"),
     );
     const all = series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE");
     const inDatum = all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
-    const heights = readings(location, inDatum);
+    const heights = consecutive(readings(location, inDatum));
     // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
     if (types.length && all.length && !inDatum.length)
       throw new DatumChanged(
@@ -473,46 +476,58 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 const MEANS = new Set(["GEM24H"]);
 
 /**
- * The readings as measured from every series of one height. RWS answers a year
- * with a series per instrument and per way of deriving values: at Katsbinnen in
- * 1999 a float gauge's year and 7 values from the next year's pressure sensor,
- * at Maastricht Borgharen in 1988 a daily mean (`GEM24H`) beside the 10-minute
- * readings, and at Europlatform in 2024 two parts split on 24 January with the
- * same metadata. The longest series counts whole (the earliest-starting of
- * equal ones), and each other only outside its first and last time, so two
- * instruments never mix within it and a tide never gets a second extreme. A
- * mean is left out; any other way of deriving values fails, rather than vanish.
+ * Every series of readings as measured, the one with the most values first. RWS
+ * answers a request with a series per instrument and per way of deriving values,
+ * all of one height: at Katsbinnen in 1999 a float gauge's year and 7 values from
+ * the next year's pressure sensor, at Maastricht Borgharen in 1988 a daily mean
+ * (`GEM24H`) beside the 10-minute readings, and at Goeree Lichteiland in 2023 two
+ * parts with the same metadata. A mean is left out, and any other way of deriving
+ * values fails, rather than vanish. Pushed in this order, `dedupe` keeps the
+ * fullest series' value where two share a time, and each other's values fill the
+ * times it lacks. A missing-value sentinel doesn't count as a value.
  */
 function readings(location: string, series: Series[]): Series[] {
-  const kept = series.filter((s) => {
-    const how = s.AquoMetadata.WaardeBewerkingsMethode?.Code ?? "NVT";
-    if (how !== "NVT" && !MEANS.has(how))
-      throw new Error(`RWS ${location}: unknown WaardeBewerkingsMethode ${how}`);
-    return how === "NVT" && s.MetingenLijst.length;
-  });
-  // A loop, not Math.min(...): a year of minutes has too many values to spread.
-  const span = (s: Series) => {
+  const values = (s: Series) =>
+    s.MetingenLijst.filter((m) => {
+      const v = m.Meetwaarde.Waarde_Numeriek;
+      return v === undefined
+        ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined
+        : Math.abs(v) <= 10_000;
+    }).length;
+  const instrument = (s: Series) => s.AquoMetadata.MeetApparaat?.Code ?? "";
+  return series
+    .filter((s) => {
+      const how = s.AquoMetadata.WaardeBewerkingsMethode?.Code ?? "NVT";
+      if (how !== "NVT" && !MEANS.has(how))
+        throw new Error(`RWS ${location}: unknown WaardeBewerkingsMethode ${how}`);
+      return how === "NVT";
+    })
+    .map((s) => ({ s, n: values(s) }))
+    .sort((a, b) => b.n - a.n || instrument(a.s).localeCompare(instrument(b.s)))
+    .map(({ s }) => s);
+}
+
+/**
+ * Of series ranked by `readings`, the first and each other whose whole span lies
+ * outside every one already taken. RWS can answer a period's extremes with two
+ * selections of the same tides, as at Hoek van Holland in early 2024 (314
+ * extremes with the agger's lows and 224 without, with the same metadata), so
+ * a series that overlaps would give a tide a second extreme. Parts that follow
+ * each other, as at Goeree Lichteiland in 2023, or one instrument handing over
+ * to another, are taken.
+ */
+function consecutive(ranked: Series[]): Series[] {
+  const taken: { series: Series; from: number; to: number }[] = [];
+  for (const series of ranked) {
+    // A loop, not Math.min(...): a series can have too many values to spread.
     let [from, to] = [Infinity, -Infinity];
-    for (const m of s.MetingenLijst) {
+    for (const m of series.MetingenLijst) {
       const t = Date.parse(m.Tijdstip);
       [from, to] = [Math.min(from, t), Math.max(to, t)];
     }
-    return [from, to] as const;
-  };
-  kept.sort((a, b) => b.MetingenLijst.length - a.MetingenLijst.length || span(a)[0] - span(b)[0]);
-  const [longest, ...others] = kept;
-  if (!longest) return [];
-  const [from, to] = span(longest);
-  return [
-    longest,
-    ...others.map((s) => ({
-      ...s,
-      MetingenLijst: s.MetingenLijst.filter((m) => {
-        const t = Date.parse(m.Tijdstip);
-        return t < from || t > to;
-      }),
-    })),
-  ];
+    if (taken.every((t) => to < t.from || from > t.to)) taken.push({ series, from, to });
+  }
+  return taken.map((t) => t.series);
 }
 
 // Chunk boundaries are inclusive on both ends, so the shared sample repeats.

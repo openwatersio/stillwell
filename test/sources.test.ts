@@ -135,10 +135,18 @@ describe("rws", () => {
       [
         /OphalenWaarnemingen/,
         answer(
-          // Listed first, as at Katsbinnen in 1999: another instrument, counted only outside the longest series' span.
-          [other, [[times[1]!, 99]]],
+          // Listed first, as at Katsbinnen in 1999: another instrument fills a time the fuller
+          // series lacks, and loses where both have one. Its sentinel isn't a value.
+          [
+            other,
+            [
+              [times[0]!, 99],
+              [times[1]!, 99],
+              [times[2]!, 999_999_999],
+            ],
+          ],
           [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
-          // A second part with the same metadata, as at Europlatform in 2024.
+          // A second part with the same metadata, as at Goeree Lichteiland in 2023.
           [msl, [[times[3]!, 20]]],
           // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
           [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[4]!, 30]]],
@@ -152,20 +160,22 @@ describe("rws", () => {
       ]),
       [
         ["2023-01-01T00:00:00.000Z", 0.1],
+        ["2023-06-01T09:30:00.000Z", 0.99],
         ["2023-12-30T22:50:00.000Z", 0.1],
         ["2023-12-30T23:00:00.000Z", 0.2],
       ],
     );
-    // Another instrument's turning point within the longest series' span would be a second extreme of the tide.
+    // Extremes take series that follow each other, and leave out one that overlaps, as Hoek van
+    // Holland's second selection of the same tides does in early 2024.
     serve([
       [
         /OphalenWaarnemingen/,
         answer(
-          [{ ...typeChannel, MeetApparaat: { Code: "155" } }, [[times[1]!, "hoogwater"]]],
           [typeChannel, [times[0]!, times[2]!].map((t) => [t, "hoogwater"])],
+          [typeChannel, [[times[1]!, "laagwater"]]],
           [typeChannel, [[times[3]!, "laagwater"]]],
-          [other, [[times[1]!, 99]]],
           [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          [msl, [[times[1]!, 99]]],
           [msl, [[times[3]!, 20]]],
         ),
       ],
