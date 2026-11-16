@@ -4466,6 +4466,59 @@ describe("ea", () => {
     );
   });
 
+  it("waits out the archive's 429s, then stops the run once it keeps refusing", async () => {
+    const pacing = { ...ea.archivePacing };
+    ea.archivePacing.blockedMs = 5;
+    try {
+      const measure = "E72239-level-tidal_level-Mean-15_min-mAOD";
+      let refusals = 2;
+      setTransport(async (url) => {
+        if (/readings-2025-11-10\.csv$/.test(url)) {
+          if (refusals-- > 0) throw new Error(`GET ${url} returned 429`);
+          return fixture("ea-archive.csv");
+        }
+        throw new Error(`GET ${url} returned 404`);
+      });
+      // Refused twice, then served on the third of three tries.
+      const day = await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z"));
+      assert.equal(day.length, 3);
+
+      ea.forgetArchive();
+      let asked = 0;
+      setTransport(async (url) => {
+        asked++;
+        throw new Error(`GET ${url} returned 429`);
+      });
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z")),
+        (error) => error instanceof Blocked && /still refusing/.test(error.message),
+      );
+      assert.equal(asked, 3);
+      // Every download after asks for nothing.
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-12Z"), new Date("2025-11-13Z")),
+        Blocked,
+      );
+      assert.equal(asked, 3);
+
+      // A Retry-After past the longest hold stops the run at once.
+      ea.forgetArchive();
+      asked = 0;
+      setTransport(async (url) => {
+        asked++;
+        throw new Error(`GET ${url} returned 429 (retry after 3600 s)`);
+      });
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z")),
+        Blocked,
+      );
+      assert.equal(asked, 1);
+    } finally {
+      Object.assign(ea.archivePacing, pacing);
+      ea.forgetArchive();
+    }
+  });
+
   it("reads no archive file for a start within the API's days", async () => {
     const asked: string[] = [];
     setTransport(async (url) => {
