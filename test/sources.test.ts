@@ -2729,6 +2729,7 @@ describe("usgs", () => {
           series("02037500", "00065"),
           series("09469000", "00065"),
           series("08000001", "00065"),
+          series("08000002", "00065"),
         ]),
       ],
       [/parameter_code=62620/, collection([series("0158540095", "62620")])],
@@ -2805,6 +2806,8 @@ describe("usgs", () => {
             altitude_accuracy: 0.1,
             vertical_datum: "COE1912",
           }),
+          // A survey method with the altitude missing is a gap, and clears nothing.
+          location("08000002", -97.1, 30.1, { altitude_method_code: "L" }),
           // An altitude with no method is no evidence of a survey.
           location("02035000", -77.5, 37.6, { altitude: 120, vertical_datum: "NAVD88" }),
           // Charles River below the dam, Boston: a decision gives its gage datum in place of a DEM's -5 ft.
@@ -2839,6 +2842,7 @@ describe("usgs", () => {
         ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
         ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
         ["usgs/08000001", "river", "GAGE", {}, "08000001-00065", true, "US"],
+        ["usgs/08000002", "river", "GAGE", {}, "08000002-00065", true, "US"],
         ["usgs/09469000", "river", "GAGE", {}, "09469000-00065", true, "US"],
         ["usgs/381142122015801", "estuary", "GAGE", {}, "381142122015801-00065", true, "US"],
         [
@@ -2942,6 +2946,24 @@ describe("usgs", () => {
       ],
     ]);
     await assert.rejects(usgs.stations(), /no known altitude method for 12 of 12 sites/);
+    // A reply that drops the accuracy would clear every surveyed offset.
+    serve([
+      [/parameter_code=/, collection(sites.map((site) => series(site, "00065")))],
+      [/statistic_id=00021/, collection([tidal])],
+      [
+        /monitoring-locations/,
+        collection(
+          sites.map((site) =>
+            location(site, -81, 32, {
+              altitude: 10,
+              altitude_method_code: "L",
+              vertical_datum: "NAVD88",
+            }),
+          ),
+        ),
+      ],
+    ]);
+    await assert.rejects(usgs.stations(), /no altitude accuracy for 12 of 12 surveyed sites/);
     // A site a short answer left out is asked for again.
     let asked = 0;
     setTransport(async (url) => {
@@ -3034,6 +3056,14 @@ describe("usgs", () => {
         listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
       )!,
       /another altitude than GAGE_DATUMS decided/,
+    );
+    // Offsets the store held from before the decision aren't the decision's, so nothing moved from it.
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
+      ),
+      null,
     );
   });
 

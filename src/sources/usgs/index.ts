@@ -427,6 +427,13 @@ export async function stations(previous: Station[] = []): Promise<UsgsStation[]>
     throw new Error(
       `USGS gave no known altitude method for ${unknown} of ${altitudes.length} sites with an altitude`,
     );
+  // Every surveyed site gave an accuracy in November 2026; a reply without one would clear nearly every offset.
+  const surveys = altitudes.filter((f) => SURVEYED.has(f.properties.altitude_method_code ?? ""));
+  const unrated = surveys.filter((f) => typeof f.properties.altitude_accuracy !== "number").length;
+  if (unrated > Math.max(10, surveys.length / 30))
+    throw new Error(
+      `USGS gave no altitude accuracy for ${unrated} of ${surveys.length} surveyed sites with an altitude`,
+    );
   const out: UsgsStation[] = [];
   for (const [id, s] of chosen) {
     const location = locations.get(id);
@@ -555,8 +562,13 @@ function toStation(
     noDatums = !Object.keys(datums).length;
   } else if (datum === GAGE && surveyed && vertical && typeof location.altitude === "number")
     datums[vertical] = Math.round(location.altitude * FEET * 1000) / 1000 + 0; // + 0 turns -0 into 0
-  // An unsurveyed altitude, or a method with no altitude, says the stored offsets aren't the gage's zero.
-  else if (datum === GAGE && !decided && !gap) noDatums = !surveyed;
+  // An unsurveyed altitude, or an unsurveyed method with no altitude, says the stored offsets aren't the gage's zero.
+  // A survey method with the altitude missing is a gap too, and keeps them.
+  else if (datum === GAGE && !decided && !gap)
+    noDatums =
+      typeof location.altitude === "number"
+        ? !surveyed
+        : !SURVEYED.has(location.altitude_method_code ?? "");
   // The ground's altitude still says how far above the sea the site is, for the tidal judgment.
   // An answer with no altitude keeps the ground the store held.
   const ground =
@@ -741,7 +753,8 @@ export function seriesChanged(committed: Station, listed: ListedStation): string
   if (decided) {
     // A decision set aside while the store holds its offsets: the zero may have moved.
     const setAside =
-      listed.no_datums && Object.keys(decided.datums).some((name) => name in committed.datums);
+      listed.no_datums &&
+      Object.entries(decided.datums).some(([name, offset]) => committed.datums[name] === offset);
     return setAside ? "USGS lists another altitude than GAGE_DATUMS decided against" : null;
   }
   const [before, after] = [Object.keys(committed.datums), Object.keys(listed.datums)];

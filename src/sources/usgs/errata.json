@@ -2952,9 +2952,9 @@
         "usgs/11313433"
       ],
       "handling": "avoided",
-      "error": "These sites' surveyed altitudes put their water where other gauges show it isn't. Brazos Santiago Pass (08474395) reads 0.68 m below NOAA's co-located gauge (8779749) in its NAVD88. Middle River (11312676), Old River at Bacon Island (11313405) and Dutch Slough (11313433), listed at 0.0 ft NAVD88, read 2.9 to 5.2 ft above Old River near Byron (11313315) on the same tidal channels. The Calcasieu at Moss Bluff (08015910) and Arroyo Colorado at FM 106 (08470500) read 51 and 28 ft above water the 3DEP model shows near 0 ft.",
+      "error": "These sites' surveyed altitudes put their water where other gauges show it isn't. Brazos Santiago Pass (08474395) reads 0.68 m below NOAA's co-located gauge (8779749) in its NAVD88. Middle River (11312676), Old River at Bacon Island (11313405) and Dutch Slough (11313433), listed at 0.0 ft NAVD88, read 2.9 to 5.2 ft above Old River near Byron (11313315) on the same tidal channels. The Calcasieu at Moss Bluff, Louisiana (08015910), and Arroyo Colorado at FM 106, Texas (08470500), read 51 and 28 ft above water the 3DEP model shows near 0 ft.",
       "response": "No offsets, by `GAGE_DATUMS`.",
-      "evidence": "Hourly means shared with the neighbors named over the 7 days to 15 November 2026, and 3DEP ground at the Texas sites, November 2026."
+      "evidence": "Hourly means shared with the neighbors named over the 7 days to 15 November 2026, and 3DEP ground at the Calcasieu and Arroyo Colorado sites, November 2026."
     }
   ],
   "retired": []
