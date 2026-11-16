@@ -109,12 +109,12 @@ export function allJobs(db: DatabaseSync, states: Job["state"][]): Job[] {
 export const isLong = (job: Pick<Job, "timeout">) => job.timeout > 60;
 
 /**
- * The queued jobs to start now, oldest first: one per lane, none in a lane
- * with a job running or being cancelled, none `runs` refuses, at most `slots`
- * running in all, of them at most `longSlots` long. A job `runs` refuses holds
- * the later jobs in its lane, so a lane's jobs start in the order queued, but
- * a short one, such as a source's hourly run, may start ahead of a long one
- * waiting only for a long slot, which could otherwise hold it for hours.
+ * The queued jobs to start now: one per lane, none in a lane with a job
+ * running or being cancelled, none `runs` refuses, at most `slots` running in
+ * all, of them at most `longSlots` long. A lane's short jobs, such as a
+ * source's hourly run, start before its long ones, oldest first within each,
+ * so an hourly run waits behind at most the one long job running, never a
+ * row of them queued; a job `runs` refuses holds the later jobs of its kind.
  */
 export function startable(
   db: DatabaseSync,
@@ -127,7 +127,8 @@ export function startable(
   let total = running.length;
   let long = running.filter(isLong).length;
   const out: Job[] = [];
-  for (const job of allJobs(db, ["queued"])) {
+  const queued = allJobs(db, ["queued"]);
+  for (const job of [...queued.filter((j) => !isLong(j)), ...queued.filter(isLong)]) {
     if (total >= slots) break;
     if (busy.has(job.lane)) continue;
     if (isLong(job) && long >= longSlots) continue;

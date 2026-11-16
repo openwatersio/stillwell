@@ -112,6 +112,11 @@ switch (command) {
     break;
   case "baseline": {
     if (!rest[0]) fail("usage: stillwell-jobs baseline <migration|none>");
+    // A baseline begins a record, so one on a database that has a record would mark migrations done that never ran.
+    if (baseline(db) !== null)
+      fail(
+        `this database's record began at ${baseline(db) || "none"}; baseline is for one with none`,
+      );
     const id = rest[0] === "none" ? "" : rest[0];
     if (id && !(await loadMigrations()).some(([m]) => m === id)) fail(`no migration ${rest[0]}`);
     setBaseline(

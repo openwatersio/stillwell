@@ -341,9 +341,12 @@ else
 	systemctl start stillwell-jobs
 fi
 # Releases no process runs from any more, such as a job started before this deploy, and installs that failed.
+# The services start through the /opt/stillwell link, where pgrep can't see the release, so the one before the
+# current is kept too, for a service whose restart this deploy failed or skipped.
 current=$(readlink -f /opt/stillwell)
+previous=$(find "$releases" -mindepth 1 -maxdepth 1 -type d ! -name '*.new' ! -path "$current" -printf '%T@ %p\n' | sort -n | tail -n 1 | cut -d' ' -f2-)
 for old in "$releases"/*; do
-	[ "$old" != "$current" ] || continue
+	[ "$old" != "$current" ] && [ "$old" != "$previous" ] || continue
 	pgrep -f -- "$old/" >/dev/null || rm -rf "$old"
 done
 

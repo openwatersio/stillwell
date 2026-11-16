@@ -16,12 +16,14 @@ if (!JOBS.includes(job as Job)) {
 }
 try {
   const picked = sourcesFor(job as Job, ids);
-  if (!picked.length)
+  // One named but on the server would otherwise be left out of a run that goes green.
+  const onServer = ids.filter((id) => SERVER_SOURCES.has(id));
+  if (onServer.length)
     throw new Error(
-      ids.length
-        ? `None of ${ids.join(", ")} runs ${job} in Actions${ids.some((id) => SERVER_SOURCES.has(id)) ? ": the server's job queue writes those in src/sources/server.json" : ""}`
-        : `No source runs ${job}`,
+      `${onServer.join(", ")} ${onServer.length > 1 ? "are" : "is"} in src/sources/server.json, so the server's job queue writes ${onServer.length > 1 ? "them" : "it"}, not Actions`,
     );
+  if (!picked.length)
+    throw new Error(ids.length ? `None of ${ids.join(", ")} runs ${job}` : `No source runs ${job}`);
   console.log(JSON.stringify(picked));
 } catch (error) {
   console.error((error as Error).message);

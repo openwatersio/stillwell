@@ -45,7 +45,7 @@ const GITHUB_MS = 5 * 60_000;
 
 const db = openQueue(process.env.STILLWELL_JOBS_DB ?? "/var/lib/stillwell-jobs/jobs.db");
 const writeStore = process.env.STILLWELL_WRITE_STORE ?? "";
-const units = systemd(process.execPath, writeStore, Math.floor(totalmem() / 5));
+const units = systemd(writeStore, Math.floor(totalmem() / 5));
 const metricsPath = process.env.STILLWELL_JOBS_METRICS;
 // The release this service runs, which deploys point /opt/stillwell at; each job keeps the one it started with.
 const release = realpathSync(fileURLToPath(new URL("..", import.meta.url)));
@@ -184,9 +184,9 @@ function writeMetrics(stopped: string | null): void {
   // The directory is the stillwell user's, so the file is written with that user's rights: a link a stillwell
   // process put in the path can lead the write only where that user could write anyway.
   const [uid, gid] = stillwellIds();
-  process.setegid!(gid);
-  process.seteuid!(uid);
   try {
+    process.setegid!(gid);
+    process.seteuid!(uid);
     writeFileSync(`${metricsPath}.tmp`, `${lines.join("\n")}\n`);
     renameSync(`${metricsPath}.tmp`, metricsPath);
   } catch (error) {
@@ -237,9 +237,18 @@ async function askGithub(): Promise<{ writing: Set<string>; onServer: Set<string
     console.error("store jobs wait for GITHUB_TOKEN, to read Actions' runs and main's server.json");
   else
     try {
-      const phases = await mainPhases(token, "openwatersio/stillwell");
+      // A slow GitHub holds the loop for at most two minutes, after which it counts as unknown.
+      const [phases, writing] = await Promise.race([
+        Promise.all([
+          mainPhases(token, "openwatersio/stillwell"),
+          actionsWriting(token, "openwatersio/stillwell"),
+        ]),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("no answer in two minutes")), 120_000).unref(),
+        ),
+      ]);
       answer = {
-        writing: await actionsWriting(token, "openwatersio/stillwell"),
+        writing,
         onServer: new Set([...phases].filter(([, p]) => p === "server").map(([s]) => s)),
       };
     } catch (error) {

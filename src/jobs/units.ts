@@ -28,47 +28,60 @@ function systemctl(...args: string[]): string {
   return execFileSync("systemctl", args, { encoding: "utf8" });
 }
 
+/** Node as the units start it, through the link deploys move, so a later deploy's cleanup never removes it. */
+export const NODE = "/opt/node/bin/node";
+
 /**
- * Jobs as transient systemd units, each allowed `memory` bytes, reading /etc/stillwell.env as the poller does,
- * with `store`, the writable store, as their STILLWELL_STORE.
+ * The `systemd-run` arguments that start a job from `release`, as the stillwell user, allowed `memory` bytes,
+ * reading /etc/stillwell.env as the poller does. Its own variables, `store` as STILLWELL_STORE among them, go
+ * through `env` on its command, since systemd lets a unit's EnvironmentFile override its Environment.
  */
-export function systemd(node: string, store: string, memory = 0): Units {
+export function runArgs(job: Job, release: string, store: string, memory: number): string[] {
+  const env = {
+    STILLWELL_STORE: store,
+    // V8's heap under the cap, leaving the rest to DuckDB, as Actions sets it for compaction.
+    NODE_OPTIONS: `--max-old-space-size=${Math.floor((memory * 0.6) / 2 ** 20)}`,
+    // scripts/monthly.sh's requalify and analysis, whose workers each take at least 1 GB, within the cap.
+    STILLWELL_CONCURRENCY: String(Math.max(1, Math.floor(memory / 2 ** 30 / 1.5))),
+    // DuckDB keeps its extensions under HOME, the poller's state directory.
+    HOME: "/var/lib/stillwell",
+    STILLWELL_CACHE: `${jobDir(job.id)}/cache`,
+    // A shell script, such as scripts/monthly.sh, runs node itself.
+    PATH: `${dirname(NODE)}:/usr/bin:/bin`,
+  };
+  return [
+    `--unit=${unitOf(job.id)}`,
+    `--description=Stillwell job ${job.id}: ${job.command.join(" ")}`,
+    "--uid=stillwell",
+    "--gid=stillwell",
+    // The unit stays, with its result, once the job exits, so a restart of the service still reads it.
+    "--property=RemainAfterExit=yes",
+    `--property=RuntimeMaxSec=${job.timeout * 60}`,
+    `--property=MemoryMax=${memory}`,
+    // Below the poller's default weight, so a busy job never holds up its passes.
+    "--property=CPUWeight=50",
+    "--property=EnvironmentFile=/etc/stillwell.env",
+    `--property=WorkingDirectory=${jobDir(job.id)}`,
+    "--property=NoNewPrivileges=yes",
+    "--property=ProtectSystem=strict",
+    "--property=ProtectHome=yes",
+    "--property=PrivateTmp=yes",
+    `--property=ReadWritePaths=/var/lib/stillwell ${jobDir(job.id)}`,
+    "/usr/bin/env",
+    ...Object.entries(env).map(([k, v]) => `${k}=${v}`),
+    job.command[0].endsWith(".sh") ? "/bin/bash" : NODE,
+    `${release}/${job.command[0]}`,
+    ...job.command.slice(1),
+  ];
+}
+
+/** Jobs as transient systemd units, each allowed `memory` bytes, writing `store`. */
+export function systemd(store: string, memory = 0): Units {
   return {
     start(job, release) {
       execFileSync("install", ["-d", "-m", "755", dirname(jobDir(job.id))]);
       execFileSync("install", ["-d", "-o", "stillwell", "-g", "stillwell", jobDir(job.id)]);
-      execFileSync("systemd-run", [
-        `--unit=${unitOf(job.id)}`,
-        `--description=Stillwell job ${job.id}: ${job.command.join(" ")}`,
-        "--uid=stillwell",
-        "--gid=stillwell",
-        // The unit stays, with its result, once the job exits, so a restart of the service still reads it.
-        "--property=RemainAfterExit=yes",
-        `--property=RuntimeMaxSec=${job.timeout * 60}`,
-        `--property=MemoryMax=${memory}`,
-        // scripts/monthly.sh's requalify and analysis, whose workers each take at least 1 GB, within the cap.
-        `--property=Environment=STILLWELL_CONCURRENCY=${Math.max(1, Math.floor(memory / 2 ** 30 / 1.5))}`,
-        // V8's heap under the cap, leaving the rest to DuckDB, as Actions sets it for compaction.
-        `--property=Environment=NODE_OPTIONS=--max-old-space-size=${Math.floor((memory * 0.6) / 2 ** 20)}`,
-        // Below the poller's default weight, so a busy job never holds up its passes.
-        "--property=CPUWeight=50",
-        "--property=EnvironmentFile=/etc/stillwell.env",
-        `--property=Environment=STILLWELL_STORE=${store}`,
-        `--property=WorkingDirectory=${jobDir(job.id)}`,
-        "--property=Environment=HOME=/var/lib/stillwell",
-        `--property=Environment=STILLWELL_CACHE=${jobDir(job.id)}/cache`,
-        "--property=NoNewPrivileges=yes",
-        "--property=ProtectSystem=strict",
-        "--property=ProtectHome=yes",
-        "--property=PrivateTmp=yes",
-        // A shell script, such as scripts/monthly.sh, runs node itself.
-        `--property=Environment=PATH=${dirname(node)}:/usr/bin:/bin`,
-        // DuckDB keeps its extensions under HOME, the poller's state directory.
-        `--property=ReadWritePaths=/var/lib/stillwell ${jobDir(job.id)}`,
-        ...(job.command[0].endsWith(".sh") ? ["/bin/bash"] : [node]),
-        `${release}/${job.command[0]}`,
-        ...job.command.slice(1),
-      ]);
+      execFileSync("systemd-run", runArgs(job, release, store, memory));
     },
     ended(id) {
       try {

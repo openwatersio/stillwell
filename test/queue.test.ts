@@ -36,7 +36,7 @@ import { PHASES, SERVER_SOURCES, sourcesFor, type Phase } from "../src/sources/j
 import { sources } from "../src/sources/index.ts";
 import { due, refreshFor } from "../src/jobs/schedule.ts";
 import { ALL, writing } from "../src/jobs/actions.ts";
-import { endedFrom } from "../src/jobs/units.ts";
+import { NODE, endedFrom, runArgs } from "../src/jobs/units.ts";
 
 const NOW = new Date("2026-11-16T00:00:00Z");
 const words = (s: string) => s.split(" ");
@@ -275,6 +275,28 @@ describe("workflows", () => {
 });
 
 describe("units", () => {
+  it("gives a job the write store on its command, where the env file can't override it", () => {
+    const db = openQueue(":memory:");
+    const job = enqueue(db, {
+      command: ["scripts/monthly.sh", "lists", "ea"],
+      lane: "store-ea",
+      timeout: 360,
+    })!;
+    const args = runArgs(job, "/opt/stillwell-releases/r1", "s3://water-levels", 4 * 2 ** 30);
+    const envAt = args.indexOf("/usr/bin/env");
+    assert.ok(args.indexOf("--property=EnvironmentFile=/etc/stillwell.env") < envAt);
+    assert.ok(args.slice(envAt).includes("STILLWELL_STORE=s3://water-levels"));
+    assert.ok(!args.some((a) => a.startsWith("--property=Environment=")));
+    assert.ok(args.slice(envAt).includes(`PATH=/opt/node/bin:/usr/bin:/bin`));
+    assert.deepEqual(args.slice(-4), [
+      "/bin/bash",
+      "/opt/stillwell-releases/r1/scripts/monthly.sh",
+      "lists",
+      "ea",
+    ]);
+    assert.equal(NODE, "/opt/node/bin/node");
+  });
+
   const show = (props: Record<string, string>) =>
     Object.entries({ LoadState: "loaded", ...props })
       .map(([k, v]) => `${k}=${v}`)
@@ -363,7 +385,7 @@ describe("queue", () => {
     const d = enqueue(db, job("recent smhi --hours 12"))!;
     assert.deepEqual(
       startable(db, 3, () => true, 2).map((j) => j.id),
-      [a.id, b.id, d.id],
+      [d.id, a.id, b.id],
     );
   });
 
@@ -376,6 +398,18 @@ describe("queue", () => {
     markStarted(db, 2, "/opt/r1");
     enqueue(db, long("requalify rws all 2020 2027"));
     const hourly = enqueue(db, job("recent rws --hours 12"))!;
+    assert.deepEqual(
+      startable(db, 3, () => true, 2).map((j) => j.id),
+      [hourly.id],
+    );
+  });
+
+  it("starts a lane's hourly run before a row of long jobs queued ahead of it", () => {
+    const db = openQueue(":memory:");
+    const long = (args: string) => ({ ...job(args), timeout: 360 });
+    enqueue(db, long("backfill usgs all 2026 2027 --shard 2/3"));
+    enqueue(db, long("backfill usgs all 2026 2027 --shard 3/3"));
+    const hourly = enqueue(db, job("recent usgs --hours 12"))!;
     assert.deepEqual(
       startable(db, 3, () => true, 2).map((j) => j.id),
       [hourly.id],
