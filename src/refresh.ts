@@ -10,6 +10,8 @@ import {
   exists,
   anyFile,
   highestEpochs,
+  listable,
+  publishedSources,
   recentEpochs,
   readStationBounds,
   readStationList,
@@ -457,7 +459,8 @@ export function withoutWithheld(source: Source, list: StoredStation[]): StoredSt
 /**
  * A source's list from the store, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
- * existed and is gone, or series with no list, are still errors.
+ * existed and is gone, or series with no list, are still errors. Over HTTP, which can't list files, a list
+ * counts as having existed when the published `stations.parquet` names the source, and series as a recent window.
  */
 export async function startedListOf(
   store: string,
@@ -466,6 +469,17 @@ export async function startedListOf(
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(store, sourceId));
   if (list) return withAnalysis(store, sourceId, withoutWithheld(source, list));
+  // HTTP can't list the history or series files, so a reader there checks the published list and the recent
+  // window; a list lost before its source was first published reads as never started.
+  if (!listable(store)) {
+    // Every store has a stations.parquet once it publishes, so none means a wrong store URL.
+    if (!(await exists(stationsPath(store)))) throw new Error(`no ${stationsPath(store)}`);
+    if ((await publishedSources(stationsPath(store))).includes(sourceId))
+      throw new Error(lostList(store, sourceId));
+    if (await exists(recentPath(store, sourceId)))
+      throw new Error(`the store has ${sourceId} series but no list for it`);
+    return null;
+  }
   if (await hasHistory(store, sourceId)) throw new Error(lostList(store, sourceId));
   // The refresh refuses such a store too, so waiting for it would wait for good.
   if (await hasSeries(store, sourceId))

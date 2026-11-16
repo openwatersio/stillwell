@@ -146,7 +146,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
   // Wellington, since 2007: three days of daily files from about two weeks back, since
-  // they appear 6 to 12 days late, and three days of a year's file from four years back. Its paths name the
+  // they appear 6 to 12 days late, and three days of a year's file from four years back; Cape Roberts and
+  // Scott Base, three days of a year's file each. Its paths name the
   // year and the day, so it's in UNRECORDED and only has to return values.
   linz: async () => {
     const latest = await linz.levels(
@@ -162,7 +163,14 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     // A listing that lost its yearly zip falls back to the day files, which are preliminary. In early
     // January the latest days can come from last year's zip, so only the old year is held to its flag.
     const read = final.every((o) => o.flag === Flag.good);
-    return latest.length && final.length && read ? [...latest, ...final] : [];
+    // The Antarctic gauges' files change layout from year to year, so one year of each is read too,
+    // on fixed days since one gauge is closed and the other issues a year at a time: Cape Roberts'
+    // Julian-day layout of 2025 and Scott Base's day-first millimeters of 2025.
+    const robt = await linz.levels("ROBT", new Date("2025-03-01"), new Date("2025-03-04"));
+    const scot = await linz.levels("SCOT", new Date("2025-01-10"), new Date("2025-01-13"));
+    return latest.length && final.length && read && robt.length && scot.length
+      ? [...latest, ...final, ...robt, ...scot]
+      : [];
   },
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),

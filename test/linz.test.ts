@@ -81,7 +81,7 @@ function yearCsv(code: string, year: number, level: (minute: number) => number):
   return rows.join("\n");
 }
 
-const CODES = ["CHIT", "KAIT", "OTAT", "SCOT", "SUMT", "WLGT"];
+const CODES = ["CHIT", "KAIT", "OTAT", "ROBT", "SCOT", "SUMT", "WLGT"];
 const listRoutes: [RegExp, string][] = [
   [/\/api\/listGauges$/, fixture("linz-gauges.json")],
   ...CODES.map((c): [RegExp, string] => [
@@ -99,13 +99,12 @@ const fileRoutes: [RegExp, string][] = [
 describe("linz", () => {
   linz.pacing.requestMs = 0;
 
-  it("lists the gauges with sensor 40 files, with positions and stated chart datum offsets", async () => {
+  it("lists the gauges with sensor 40 files, and the Antarctic gauges with sensor 00 files", async () => {
     const requests = serve(listRoutes);
     const stations = await linz.stations();
-    // Scott Base has only sensor 00, which the adapter doesn't read.
     assert.deepEqual(
       stations.map((s) => s.id),
-      ["linz/CHIT", "linz/KAIT", "linz/OTAT", "linz/SUMT", "linz/WLGT"],
+      ["linz/CHIT", "linz/KAIT", "linz/OTAT", "linz/ROBT", "linz/SCOT", "linz/SUMT", "linz/WLGT"],
     );
     assert.ok(requests.every(([, o]) => o.fresh));
     const wlgt = stations.find((s) => s.id === "linz/WLGT")!;
@@ -124,6 +123,31 @@ describe("linz", () => {
     assert.equal(wlgt.record_end, null);
     // "Chart Datum is 3.565m below BM ABPC" doesn't say where gauge zero is.
     assert.deepEqual(wlgt.datums, {});
+  });
+
+  it("lists Cape Roberts and Scott Base in Antarctica, from their sensor 00 years", async () => {
+    serve(listRoutes);
+    const stations = await linz.stations();
+    const robt = stations.find((s) => s.id === "linz/ROBT")!;
+    assert.equal(robt.name, "Cape Roberts");
+    assert.equal(robt.lat, -77.033333);
+    assert.equal(robt.lon, 163.183333);
+    assert.equal(robt.country_code, "AQ");
+    assert.equal(robt.kind, "coastal");
+    assert.equal(robt.record_start, "2007-01-01T00:00:00.000Z");
+    // Its last year is last year's, so it is open and its record has no end.
+    assert.equal(robt.status, "active");
+    assert.equal(robt.record_end, null);
+    assert.deepEqual(robt.datums, {});
+    const scot = stations.find((s) => s.id === "linz/SCOT")!;
+    assert.equal(scot.name, "Scott Base");
+    assert.equal(scot.lat, -77.85);
+    assert.equal(scot.lon, 166.766667);
+    assert.equal(scot.country_code, "AQ");
+    assert.equal(scot.record_start, "2016-01-01T00:00:00.000Z");
+    // Its README says the gauge was removed on 5 March 2026, though 2026 is the current year.
+    assert.equal(scot.status, "inactive");
+    assert.equal(scot.record_end, "2026-03-05T00:00:00.000Z");
   });
 
   it("reads the README's own spellings of a position", async () => {
@@ -172,7 +196,7 @@ describe("linz", () => {
     const fresh = await linz.stations();
     assert.deepEqual(
       fresh.map((s) => s.id),
-      ["linz/CHIT", "linz/KAIT", "linz/SUMT"],
+      ["linz/CHIT", "linz/KAIT", "linz/ROBT", "linz/SCOT", "linz/SUMT"],
     );
   });
 
@@ -440,6 +464,8 @@ describe("linz", () => {
         const covered = errata.some(
           (e) =>
             (e.handling === "corrected" || e.handling === "dropped") &&
+            // One for the whole record, such as the clock's, says nothing of a span.
+            (e.since || e.until) &&
             e.stations?.includes(`linz/${code}`) &&
             (e.since ?? "") <= span.from.slice(0, 10) &&
             (e.until ?? "9999") >= span.to.slice(0, 10),
@@ -554,6 +580,472 @@ describe("linz", () => {
   });
 });
 
+describe("linz Antarctic gauges", () => {
+  linz.pacing.requestMs = 0;
+
+  const list = (code: string, year: number, ...names: string[]) =>
+    [
+      new RegExp(`listDatasetFiles/${code}/${year}/00$`),
+      JSON.stringify({ files: [{ name: "" }, ...names.map((name) => ({ name }))] }),
+    ] as [RegExp, string];
+  const zip = (code: string, year: number, name: string, csv: string) =>
+    [new RegExp(`tidegauge/${code}/${year}/00/${name}$`), zipOf(name, csv)] as [RegExp, string];
+  const iso = (o: { time: number }) => new Date(o.time).toISOString().slice(0, 16);
+
+  it("reads every layout of Cape Roberts' files and Scott Base's", () => {
+    const rows = (csv: string, code: string) =>
+      linz
+        .parse(csv, code, false)
+        .map((r) => [new Date(r.time).toISOString().slice(0, 16), r.level]);
+    // 2007's day, 2008's year, 2011's with samples, temperature and pressure, 2010's with them twice.
+    assert.deepEqual(rows("ROBT,2007-11-08 00:05,6.117", "ROBT"), [["2007-11-08T00:05", 6.117]]);
+    assert.deepEqual(rows("ROBT,20080117,00:05:00,6.047", "ROBT"), [["2008-01-17T00:05", 6.047]]);
+    assert.deepEqual(rows("ROBT,20110101,0:05:00,5.38,30,-2.338,992.99", "ROBT"), [
+      ["2011-01-01T00:05", 5.38],
+    ]);
+    assert.deepEqual(
+      rows("ROBT,20101231,23:55:00,5.372,30,-2.338,993.15,30,-2.338,993.15", "ROBT"),
+      [["2010-12-31T23:55", 5.372]],
+    );
+    // A level of exactly 6 is written `6`.
+    assert.deepEqual(rows("ROBT,20110219,15:05:00,6,21,-2,988.64", "ROBT"), [
+      ["2011-02-19T15:05", 6],
+    ]);
+    // Year, day of the year, hour and minute as one number (so 5 is 00:05), samples, level.
+    assert.deepEqual(
+      rows(
+        "2018,1,0,30,5.37,-2.889,986.98\n2018,1,5,30,5.392,-2.889,986.98\n2024,1,1000,30,5.676,-3.458,973.02",
+        "ROBT",
+      ),
+      [
+        ["2018-01-01T00:00", 5.37],
+        ["2018-01-01T00:05", 5.392],
+        ["2024-01-01T10:00", 5.676],
+      ],
+    );
+    assert.deepEqual(rows("2024,366,2355,30,5.39,-3.238,987.4", "ROBT"), [
+      ["2024-12-31T23:55", 5.39],
+    ]);
+    // Scott Base's 2016 to 2022 rows, 2023's with the date first, and 2025's with the day first.
+    assert.deepEqual(rows("SCOT,20160105,15:50:00,1.881", "SCOT"), [["2016-01-05T15:50", 1.881]]);
+    assert.deepEqual(rows("2023-01-01,00:05:00,2.504", "SCOT"), [["2023-01-01T00:05", 2.504]]);
+    assert.deepEqual(rows("2024-01-03,13:37:00,792.7", "SCOT"), [["2024-01-03T13:37", 792.7]]);
+    assert.deepEqual(rows("1/01/2025,00:00:00,3162\n31/12/2025,23:59:00,2475", "SCOT"), [
+      ["2025-01-01T00:00", 3162],
+      ["2025-12-31T23:59", 2475],
+    ]);
+  });
+
+  it("leaves out the rows whose fields aren't where their layout puts them", () => {
+    const read = (csv: string, code: string) => linz.parse(csv, code, false);
+    assert.deepEqual(
+      read(
+        [
+          // No day of the year: it would read as January 5 and a level of -2.681.
+          "2024,5,30,6.251,-2.681,976.79",
+          "2024,0,30,6.252,-2.681,976.63",
+          // A level cut short, and a temperature and pressure run together.
+          "2024,11,1715,26,6.-3.368,979.01",
+          "2024,27,1910,30,5.797,-3.992.17",
+          // Cape Roberts' missing marks are not 0 but impossible levels, which atGauge refuses.
+          ",,,,,,",
+          "2024,367,0,30,5.5,-3.2,970.1",
+          "2023,60,2400,30,5.5,-3.2,970.1",
+        ].join("\n"),
+        "ROBT",
+      ),
+      [],
+    );
+    // Scott Base's mangled rows of 1 to 9 December 2023 have the hour in the date and `am` in the time.
+    assert.deepEqual(
+      read("1/12/2023  1,02:00:00,2.573\n9/12/2023  1,:59:00 am,2.803\n", "SCOT"),
+      [],
+    );
+  });
+
+  it("reads Cape Roberts' year as UTC, dropping missing levels, repeats and spans, and keeping the rest good", async () => {
+    const csv = [
+      "ROBT,20090101,00:00:00,5.993",
+      "ROBT,20090101,00:05:00,-6999.000",
+      "ROBT,20090101,00:10:00,6999.000",
+      // The same minute twice with the same level is one minute; with two levels, none.
+      "ROBT,20090101,00:15:00,5.99",
+      "ROBT,20090101,00:15:00,5.99",
+      "ROBT,20090101,00:20:00,6.152",
+      "ROBT,20090101,00:20:00,6.162",
+      "ROBT,20091204,03:00:00,5.5",
+      "ROBT,20091204,02:55:00,5.6",
+    ].join("\n");
+    serve([
+      list("ROBT", 2008, "ROBT_00_2008.zip"),
+      list("ROBT", 2009, "ROBT_00_2009.zip"),
+      zip("ROBT", 2009, "ROBT_00_2009.zip", csv),
+    ]);
+    const obs = await linz.levels(
+      "ROBT",
+      new Date("2009-01-01T00:00:00Z"),
+      new Date("2010-01-01T00:00:00Z"),
+    );
+    // The new sensor's levels from 03:00 UTC on 4 December 2009 aren't a sea level (erratum `linz-cape-roberts-new-sensor-2009`).
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level, o.flag]),
+      [
+        ["2009-01-01T00:00", 5.993, Flag.good],
+        ["2009-01-01T00:15", 5.99, Flag.good],
+        ["2009-12-04T02:55", 5.6, Flag.good],
+      ],
+    );
+  });
+
+  it("reads 2007's days, and the first minute of 2008 from the last day's file", async () => {
+    const requests = serve([
+      list("ROBT", 2007, "ROBT_00_2007364.zip", "ROBT_00_2007365.zip"),
+      zip(
+        "ROBT",
+        2007,
+        "ROBT_00_2007365.zip",
+        "ROBT,2007-12-31 23:55,6.100\nROBT,2008-01-01 00:00,6.123",
+      ),
+      list("ROBT", 2008, "ROBT_00_2008.zip"),
+      zip("ROBT", 2008, "ROBT_00_2008.zip", "ROBT,20080101,00:05:00,6.130"),
+    ]);
+    const obs = await linz.levels(
+      "ROBT",
+      new Date("2007-12-31T23:00:00Z"),
+      new Date("2008-01-01T00:06:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level, o.flag]),
+      [
+        ["2007-12-31T23:55", 6.1, Flag.preliminary],
+        ["2008-01-01T00:00", 6.123, Flag.preliminary],
+        ["2008-01-01T00:05", 6.13, Flag.good],
+      ],
+    );
+    assert.ok(requests.every(([url]) => !/2007364/.test(url)));
+  });
+
+  it("reads 2007's last day for the first minute of 2008 when 2008 is asked for alone", async () => {
+    serve([
+      list("ROBT", 2007, "ROBT_00_2007365.zip"),
+      zip(
+        "ROBT",
+        2007,
+        "ROBT_00_2007365.zip",
+        "ROBT,2007-12-31 23:55,6.100\nROBT,2008-01-01 00:00,6.123",
+      ),
+      list("ROBT", 2008, "ROBT_00_2008.zip"),
+      zip("ROBT", 2008, "ROBT_00_2008.zip", "ROBT,20080101,00:05:00,6.130"),
+    ]);
+    const obs = await linz.levels(
+      "ROBT",
+      new Date("2008-01-01T00:00:00Z"),
+      new Date("2009-01-01T00:00:00Z"),
+    );
+    assert.deepEqual(obs.map(iso), ["2008-01-01T00:00", "2008-01-01T00:05"]);
+  });
+
+  it("fails rather than read a year's last hours from an empty next-year listing", async () => {
+    serve([
+      list("SCOT", 2018, "SCOT_00_2018.zip"),
+      zip("SCOT", 2018, "SCOT_00_2018.zip", "SCOT,20181231,23:59:00,2.100"),
+      list("SCOT", 2019),
+    ]);
+    await assert.rejects(
+      linz.levels("SCOT", new Date("2018-12-01T00:00:00Z"), new Date("2019-01-01T00:00:00Z"), {
+        record_start: "2016-01-01T00:00:00.000Z",
+        record_end: "2026-03-05T00:00:00.000Z",
+      }),
+      /lists no files for SCOT in 2019/,
+    );
+  });
+
+  it("reads Cape Roberts' last year, before its file is issued by May, as no data", async () => {
+    const span = [new Date("2026-12-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
+    const was = { record_start: "2007-01-01T00:00:00.000Z" };
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-01-09T00:00:00Z") });
+    serve([list("ROBT", 2026), list("ROBT", 2025, "ROBT_00_2025.zip")]);
+    assert.deepEqual(await linz.levels("ROBT", ...span, was), []);
+    mock.timers.reset();
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-05-09T00:00:00Z") });
+    await assert.rejects(linz.levels("ROBT", ...span, was), /lists no files for ROBT in 2026/);
+  });
+
+  it("takes Scott Base's unit from the file's year, not the row's label", async () => {
+    serve([
+      list("SCOT", 2023, "SCOT_00_2023.zip"),
+      zip("SCOT", 2023, "SCOT_00_2023.zip", "2024-01-01,00:00:00,2.401"),
+      list("SCOT", 2024, "SCOT_00_2024.zip"),
+      zip("SCOT", 2024, "SCOT_00_2024.zip", "2024-01-01,00:01:00,2400"),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2023-12-31T00:00:00Z"),
+      new Date("2024-01-01T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2023-12-31T11:00", 2.401],
+        ["2023-12-31T11:01", 2.4],
+      ],
+    );
+  });
+
+  it("keeps a level of 20 m or more at a New Zealand gauge for QC to judge", async () => {
+    serve([
+      [
+        /listDatasetFiles\/WLGT\/2025\/40$/,
+        JSON.stringify({ files: [{ name: "WLGT_40_2025.zip" }] }),
+      ],
+      [
+        /WLGT\/2025\/40\/WLGT_40_2025\.zip$/,
+        zipOf("WLGT_40_2025.zip", "WLGT,20250410,00:00:00,47.800"),
+      ],
+    ]);
+    const obs = await linz.levels(
+      "WLGT",
+      new Date("2025-04-10T00:00:00Z"),
+      new Date("2025-04-11T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => o.level),
+      [47.8],
+    );
+  });
+
+  it("reads the Antarctic layouts only at the Antarctic gauges", () => {
+    assert.deepEqual(linz.parse("2024,1,1000,30,5.676,-3.458,973.02", "WLGT", false), []);
+    assert.deepEqual(linz.parse("2023-01-01,00:00:00,2.504", "WLGT", false), []);
+    assert.deepEqual(linz.parse("WLGT,20110101,0:05:00,5.38,30,-2.338,992.99", "WLGT", false), []);
+  });
+
+  it("reads Scott Base's NZST labels as UTC, in meters until 2024 and millimeters from it", async () => {
+    serve([
+      list("SCOT", 2023, "SCOT_00_2023.zip"),
+      zip("SCOT", 2023, "SCOT_00_2023.zip", "2023-06-01,12:00:00,2.504\n2023-12-31,23:59:00,2.398"),
+      list("SCOT", 2024, "SCOT_00_2024.zip"),
+      zip("SCOT", 2024, "SCOT_00_2024.zip", "2024-01-01,00:00:00,2400\n2024-01-03,13:37:00,792.7"),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2023-06-01T00:00:00Z"),
+      new Date("2024-01-04T00:00:00Z"),
+    );
+    // 2023 is NZST until 25 November, and then UTC+13 (erratum `linz-scott-base-clock`).
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2023-06-01T00:00", 2.504],
+        ["2023-12-31T10:59", 2.398],
+        ["2023-12-31T11:00", 2.4],
+        ["2024-01-03T00:37", 0.793],
+      ],
+    );
+  });
+
+  it("reads Scott Base's clock as UTC+13 from the logger's reinstallation to October 2024, and leaves out the days between", async () => {
+    serve([
+      list("SCOT", 2024, "SCOT_00_2024.zip"),
+      zip(
+        "SCOT",
+        2024,
+        "SCOT_00_2024.zip",
+        [
+          "2024-10-28,23:59:00,2500",
+          "2024-10-29,00:00:00,2501",
+          "2024-10-31,23:59:00,2502",
+          "2024-11-01,00:00:00,2503",
+        ].join("\n"),
+      ),
+      list("SCOT", 2023, "SCOT_00_2023.zip"),
+      zip(
+        "SCOT",
+        2023,
+        "SCOT_00_2023.zip",
+        ["2023-11-24,23:59:00,2.1", "2023-11-25,00:00:00,2.2"].join("\n"),
+      ),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2023-11-24T00:00:00Z"),
+      new Date("2024-11-02T00:00:00Z"),
+      { record_start: "2016-01-01T00:00:00.000Z" },
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        // UTC+12 before the reinstallation, UTC+13 after.
+        ["2023-11-24T11:59", 2.1],
+        ["2023-11-24T11:00", 2.2],
+        ["2024-10-28T10:59", 2.5],
+        ["2024-10-31T12:00", 2.503],
+      ].sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+    );
+  });
+
+  it("reads the next year's file for the last hours of a UTC year, and only then", async () => {
+    const requests = serve([
+      list("SCOT", 2018, "SCOT_00_2018.zip"),
+      list("SCOT", 2019, "SCOT_00_2019.zip"),
+      zip("SCOT", 2018, "SCOT_00_2018.zip", "SCOT,20181231,23:59:00,2.100"),
+      zip(
+        "SCOT",
+        2019,
+        "SCOT_00_2019.zip",
+        "SCOT,20190101,00:00:00,2.110\nSCOT,20190101,11:59:00,2.120\nSCOT,20190101,12:00:00,2.130",
+      ),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2018-12-31T00:00:00Z"),
+      new Date("2019-01-01T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2018-12-31T11:59", 2.1],
+        ["2018-12-31T12:00", 2.11],
+        ["2018-12-31T23:59", 2.12],
+      ],
+    );
+    // A range early in a year asks for no other year.
+    requests.length = 0;
+    await linz.levels("SCOT", new Date("2018-06-01T00:00:00Z"), new Date("2018-06-02T00:00:00Z"));
+    assert.ok(requests.every(([url]) => !/2019/.test(url)));
+  });
+
+  it("reads Scott Base's 2026 file, which LINZ names for its months", async () => {
+    const requests = serve([
+      list("SCOT", 2026, "SCOT_00_2026_01-03.zip"),
+      zip(
+        "SCOT",
+        2026,
+        "SCOT_00_2026_01-03.zip",
+        "2026-01-02,00:00:00,2476\n2026-03-05,11:49:00,1065\n2026-03-05,12:00:00,1000",
+      ),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2026-01-01T00:00:00Z"),
+      new Date("2027-01-01T00:00:00Z"),
+      { record_start: "2016-01-01T00:00:00.000Z", record_end: "2026-03-05T00:00:00.000Z" },
+    );
+    // The gauge was removed on 5 March (NZST), and the record ends on UTC's 5th.
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level, o.flag]),
+      [
+        ["2026-01-01T12:00", 2.476, Flag.good],
+        ["2026-03-04T23:49", 1.065, Flag.good],
+      ],
+    );
+    assert.equal(requests.filter(([url]) => /SCOT_00_2026_01-03/.test(url)).length, 1);
+    // A month the file doesn't cover isn't downloaded.
+    requests.length = 0;
+    await linz.levels("SCOT", new Date("2026-06-01T00:00:00Z"), new Date("2026-07-01T00:00:00Z"));
+    assert.ok(requests.every(([url]) => !/SCOT_00_2026_01-03/.test(url)));
+  });
+
+  it("leaves out the spans where the gauge reads no sea level", async () => {
+    serve([
+      list("SCOT", 2025, "SCOT_00_2025.zip"),
+      zip(
+        "SCOT",
+        2025,
+        "SCOT_00_2025.zip",
+        [
+          "8/03/2025,12:00:00,2500",
+          "10/03/2025,12:00:00,-20",
+          "20/11/2025,12:00:00,-20",
+          "21/11/2025,15:00:00,1500",
+        ].join("\n"),
+      ),
+      list("SCOT", 2026),
+    ]);
+    const obs = await linz.levels(
+      "SCOT",
+      new Date("2025-03-01T00:00:00Z"),
+      new Date("2025-12-31T00:00:00Z"),
+    );
+    // Scott Base's gauge read -0.02 m, flat, from 9 March to 20 November (erratum `linz-scott-base-step-2025`).
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2025-03-08T00:00", 2.5],
+        ["2025-11-21T03:00", 1.5],
+      ],
+    );
+  });
+
+  it("cuts Cape Roberts' 3 February 2019 step to the end of its day", async () => {
+    serve([
+      list("ROBT", 2019, "ROBT_00_2019.zip"),
+      zip(
+        "ROBT",
+        2019,
+        "ROBT_00_2019.zip",
+        [
+          "2019,34,255,30,5.8,-2,986",
+          "2019,34,300,30,5.9,-2,986",
+          "2019,34,2355,30,7.2,-2,986",
+          "2019,35,0,30,7.1,-2,986",
+        ].join("\n"),
+      ),
+    ]);
+    const obs = await linz.levels(
+      "ROBT",
+      new Date("2019-02-03T00:00:00Z"),
+      new Date("2019-02-05T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => [iso(o), o.level]),
+      [
+        ["2019-02-03T02:55", 5.8],
+        ["2019-02-04T00:00", 7.1],
+      ],
+    );
+  });
+
+  it("opens an epoch at each step in the Antarctic gauges' zeros, with no conversion where nothing measured it", () => {
+    const options = (station: string, withOverrides: boolean) => ({
+      station,
+      now: "2026-11-15T00:00:00Z",
+      offsets: [0, 0] as [number, number],
+      decisions: withOverrides ? linz.source.overrides!.epochs! : {},
+      splits: withOverrides ? linz.source.overrides!.splits : undefined,
+      archive: "previous" as const,
+    });
+    const fetched = { datum: "ZERO", datums: {}, reference: null };
+    const epochsOf = (station: string) =>
+      firstEpochs(fetched, options(station, true)).map((e) => [e.since, e.to_current]);
+    assert.deepEqual(epochsOf("linz/ROBT"), [
+      [null, null],
+      ["2010-11-05T00:00:00Z", null],
+      ["2019-02-04T00:00:00Z", null],
+      ["2021-11-06T00:00:00Z", 0],
+    ]);
+    assert.deepEqual(
+      epochsOf("linz/SCOT").map(([since]) => since),
+      [
+        null,
+        "2016-03-29T00:00:00Z",
+        "2018-01-22T00:00:00Z",
+        "2019-11-03T00:00:00Z",
+        "2020-05-12T00:00:00Z",
+        "2021-11-17T00:00:00Z",
+        "2022-10-30T00:00:00Z",
+        "2025-11-20T00:00:00Z",
+      ],
+    );
+    assert.ok(
+      epochsOf("linz/SCOT")
+        .slice(0, -1)
+        .every(([, to]) => to === null),
+    );
+  });
+});
+
 describe("linz parse", () => {
   it("reads a year's rows and a day's rows", () => {
     const rows = linz.parse(
@@ -623,5 +1115,43 @@ describe("linz parseReadme", () => {
   it("refuses a README without a name or a position", () => {
     assert.equal(linz.parseReadme("WGS-84 POSITION: 41° 17' 04\"S 174° 46' 47\"E"), null);
     assert.equal(linz.parseReadme("NAME: X\nWGS-84 POSITION: 41° 17' 04\"S"), null);
+  });
+});
+
+describe("linz Antarctic files in a layout it doesn't know", () => {
+  linz.pacing.requestMs = 0;
+
+  it("fails a file whose rows none of its layouts or units read, rather than read it as no data", async () => {
+    const rows = Array.from({ length: 3 }, (_, i) => `ROBT,2026010${1 + i},00:05:00,5912`);
+    serve([
+      [
+        /listDatasetFiles\/ROBT\/2026\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2026.zip" }] }),
+      ],
+      [/tidegauge\/ROBT\/2026\/00\/ROBT_00_2026\.zip$/, zipOf("ROBT_00_2026.zip", rows.join("\n"))],
+    ]);
+    await assert.rejects(
+      linz.levels("ROBT", new Date("2026-01-01T00:00:00Z"), new Date("2026-02-01T00:00:00Z")),
+      /none of a layout or unit this reads/,
+    );
+  });
+
+  it("reads a file of nothing but missing marks, and fails one of a layout it doesn't know", async () => {
+    const route = (csv: string): [RegExp, string][] => [
+      [
+        /listDatasetFiles\/ROBT\/2025\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2025.zip" }] }),
+      ],
+      [
+        /listDatasetFiles\/ROBT\/2026\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2026.zip" }] }),
+      ],
+      [/tidegauge\/ROBT\/2026\/00\/ROBT_00_2026\.zip$/, zipOf("ROBT_00_2026.zip", csv)],
+    ];
+    const span = [new Date("2026-01-01T00:00:00Z"), new Date("2026-02-01T00:00:00Z")] as const;
+    serve(route("ROBT,20260101,00:05:00,-6999.000\nROBT,20260101,00:10:00,-6999.000"));
+    assert.deepEqual(await linz.levels("ROBT", ...span), []);
+    serve(route("not,a,layout"));
+    await assert.rejects(linz.levels("ROBT", ...span), /none of a layout this reads/);
   });
 });

@@ -111,6 +111,9 @@ refetch() {
     # preliminary value, which brings in the year's file that replaces a year's daily files.
     linz)
       ingest backfill linz all "$(date -u -d "$year-$month-01 -2 months" +%F)" "$(date -u -d "$year-$month-01 +1 month" +%F)" || status=1
+      # Cape Roberts has only year's files, issued in January or February for the year before, which no
+      # daily file or preliminary value leads the run above or below to.
+      ingest backfill linz ROBT "$((year - 1))" "$year" --refetch || status=1
       set -- "$(date -u -d "$year-$month-01 +1 month" +%F)"
       ;;
     # CMEMS isn't hourly either: its latest window holds about the last month, and its history copy reaches about
