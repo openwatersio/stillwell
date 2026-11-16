@@ -295,9 +295,9 @@ interface Row {
 }
 
 /**
- * Observed levels in meters above STND over [start, end), a calendar month per
- * request: 6-minute values, plus hourly heights for any part of the month before
- * the 6-minute record starts (everything before about 1996).
+ * Observed levels in meters above STND over [start, end): 6-minute values, a
+ * calendar month per request, plus hourly heights for any part of the month
+ * before the 6-minute record starts (everything before about 1996).
  */
 export async function levels(
   id: string,
@@ -307,6 +307,10 @@ export async function levels(
 ): Promise<Observation[]> {
   const window = await operated(id, end, station);
   const out: Observation[] = [];
+  // Hourly heights go up to 365 days a request, so the first month that needs
+  // them asks for the rest of its year, and later months take their share.
+  let hourlyYear: number | undefined;
+  let hourlyRows: Row[] = [];
   for (const [from, to] of chunks(start, end, "month")) {
     if (!overlaps(window, from, to)) continue;
     const sixMinute = await rowsOf("water_level", id, from, to);
@@ -316,10 +320,20 @@ export async function levels(
     // Only before the 6-minute era: later, a month with no 6-minute values is
     // an outage or a gap, and hourly heights would replace the store's 6-minute
     // values for that month.
-    const hourly =
-      from.getTime() < SIX_MINUTE_ERA && firstSixMinute > from.getTime()
-        ? (await rowsOf("hourly_height", id, from, to)).filter((r) => timeOf(r.t) < firstSixMinute)
-        : [];
+    let hourly: Row[] = [];
+    if (from.getTime() < SIX_MINUTE_ERA && firstSixMinute > from.getTime()) {
+      if (hourlyYear !== from.getUTCFullYear()) {
+        hourlyYear = from.getUTCFullYear();
+        const until = new Date(
+          Math.min(end.getTime(), Date.UTC(hourlyYear + 1, 0, 1), SIX_MINUTE_ERA),
+        );
+        hourlyRows = [];
+        for (const [a, b] of within365([from, until]))
+          hourlyRows.push(...(await rowsOf("hourly_height", id, a, b)));
+      }
+      const until = Math.min(to.getTime(), firstSixMinute);
+      hourly = hourlyRows.filter((r) => timeOf(r.t) >= from.getTime() && timeOf(r.t) < until);
+    }
     for (const [rows, isHourly] of [
       [hourly, true],
       [sixMinute, false],
@@ -500,7 +514,7 @@ function* chunks(start: Date, end: Date, unit: "month" | "year"): Generator<[Dat
   }
 }
 
-/** CO-OPS refuses a high/low request over 365 days, so a leap year goes in two halves. */
+/** CO-OPS refuses an hourly-height or high/low request over 365 days, so a leap year goes in two halves. */
 function within365([from, to]: [Date, Date]): [Date, Date][] {
   if (to.getTime() - from.getTime() <= 365 * DAY_MS) return [[from, to]];
   const mid = new Date(Date.UTC(from.getUTCFullYear(), 6, 1));

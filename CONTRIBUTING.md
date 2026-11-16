@@ -356,6 +356,7 @@ The traps this project has fallen into, for the openwaters-review skill and anyo
 - A source whose terms are stated per file or per station treats a missing statement as unknown, which needs a decision, never as the source's default. And where an adapter merges two feeds of one series, such as a history and a latest window, it decides per timestamp, not by the span one feed covers, so a coarser feed doesn't drop the finer one's values.
 - Runs outside the workflows share no concurrency group with the scheduled jobs. A local store directory also has no AWS CLI deletes, and it always lists completely. Code that deletes refuses a store it can't delete from, as `withhold` refuses any store that isn't on S3 or a local directory.
 - The monthly files measured from levels, `stations/links.parquet` and `stations/matches.parquet`, keep a pair's last row when a read fails, so one bad read never empties them. That holds for every read the run makes, the years files and lists read before the pairs as well as each pair's levels: a read that throws outside the per-pair `try` stops every store instead.
+- A change to a decision table, such as `KINDS`, `POSITIONS`, `LINKS` or a source's `overrides`, updates the source README wherever it names that table's stations, so the README's list stays whole.
 
 ## Shared conventions
 

@@ -23,7 +23,7 @@ export interface EpochChange {
 
 /**
  * Merge a source's fresh station list into the store's. A station the source
- * stopped listing stays, marked inactive, so its ID is never reused. The
+ * stopped listing stays, marked inactive and not live, so its ID is never reused. The
  * refresh takes withheld stations out of both lists first, so they leave. What the
  * store can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
  * it from the bounds compaction writes.
@@ -153,7 +153,8 @@ export function mergeStationList(
     ...merged,
     ...previous
       .filter((s) => !listed.has(s.id))
-      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const })),
+      // Nothing asks for a station the source no longer lists.
+      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const, live: false })),
   ].sort((a, b) => a.id.localeCompare(b.id));
   return { stations, changes };
 }
