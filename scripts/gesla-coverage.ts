@@ -11,6 +11,7 @@
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 import { DuckDBInstance } from "@duckdb/node-api";
+import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { stationListPath, stationsPath, yearsPath } from "../src/store/paths.ts";
 import { CONTRIBUTORS } from "../src/sources/gesla/contributors.ts";
@@ -55,7 +56,9 @@ const REACH: Record<string, { served?: boolean; note: string }> = {
 
 const OUT = new URL("../src/sources/gesla/", import.meta.url);
 
-const db = await (await DuckDBInstance.create(":memory:")).connect();
+const db = await (
+  await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT })
+).connect();
 if (/^https?:\/\//.test(STORE)) await db.run("INSTALL httpfs; LOAD httpfs;");
 await db.run("SET TimeZone = 'UTC'");
 const quote = (s: string) => `'${s.replaceAll("'", "''")}'`;

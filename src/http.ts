@@ -4,7 +4,8 @@
  */
 import { FtpError, ftpGet } from "./ftp.ts";
 
-const USER_AGENT = "openwaters-stillwell (+https://github.com/openwatersio/stillwell)";
+/** Sent on every HTTP request to a source and to the public store, as the Open Waters User-Agent policy asks: a name, a version and a contact. */
+export const USER_AGENT = "openwaters-stillwell/1 (+https://github.com/openwatersio/stillwell)";
 
 export interface RequestOptions extends RequestInit {
   /** Skip any cache, e.g. for real-time series that change every fetch. */

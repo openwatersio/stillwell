@@ -15,6 +15,7 @@ import {
 import type { EventIndex } from "../types.ts";
 import type { OffsetRow } from "../datums.ts";
 import { FILES, IN_LIST_EXTRA, columnTypes, type Column, type ParquetFile } from "./files.ts";
+import { USER_AGENT } from "../http.ts";
 // Refuses the store and cache variables under their old names.
 import "../cache.ts";
 
@@ -104,7 +105,10 @@ export function limitDuckDb(options: Record<string, string>): void {
  */
 async function connect(): Promise<DuckDBConnection> {
   instance ??= (async () => {
-    const created = await DuckDBInstance.create(":memory:", settings);
+    const created = await DuckDBInstance.create(":memory:", {
+      custom_user_agent: USER_AGENT,
+      ...settings,
+    });
     const endpoint = process.env.S3_ENDPOINT;
     if (endpoint) {
       const setup = await created.connect();
