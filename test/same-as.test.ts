@@ -504,6 +504,33 @@ describe("linkGauges's limits", () => {
     }
   });
 
+  it("keeps both of CMEMS's records of one RWS gauge in its group by a decision", () => {
+    const list = [
+      station("cmems/IJgeulstroompaal1TG", { lat: 52.46605, lon: 4.51893 }),
+      station("cmems/IJmondstroompaalTG", { lat: 52.46497, lon: 4.5179 }),
+      station("rws/ijgeul.1", { lat: 52.4639, lon: 4.5162 }),
+    ];
+    const matches = agree(
+      ["cmems/IJgeulstroompaal1TG", "rws/ijgeul.1"],
+      ["cmems/IJmondstroompaalTG", "rws/ijgeul.1"],
+    );
+    const group = () =>
+      linkGauges(list, NOW, new Map(), matches).stations.find((s) => s.id === "rws/ijgeul.1")!
+        .same_as;
+    // Levels link one record, and refuse the other as a second CMEMS station.
+    assert.equal(group().length, 1);
+    LINKS.push(
+      ...DECISIONS.filter(
+        (d) => d.a === "cmems/IJgeulstroompaal1TG" && d.b === "cmems/IJmondstroompaalTG",
+      ),
+    );
+    try {
+      assert.deepEqual(group(), ["cmems/IJgeulstroompaal1TG", "cmems/IJmondstroompaalTG"]);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
   it("reports a LINKS or PREFER entry that names no station", () => {
     LINKS.push({ a: "a/1", b: "gone/1", note: "test" });
     PREFER["gone/2"] = "test";

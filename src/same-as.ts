@@ -130,6 +130,71 @@ export const LINKS: Decision[] = [
     note: "GESLA's TTW record takes its file name from LINZ's gauge code, RFRT. GESLA gives Raoul Island's longitude as 177.90°E, but it is west of the antimeridian, about 410 km from LINZ's 177.90°W (erratum `gesla-ttw-longitudes`), so the rules above miss it.",
   },
   {
+    a: "cmems/DenOeverTG",
+    b: "cmems/DenOeverBuitenTG",
+    note: "CMEMS's two records of RWS's Den Oever Waddenzee voorhaven gauge: all 74 months both hold from August 2014 agree within 1 cm RMS, and all but 2 of their 53,464 shared hours within 5 mm. Linked here so both stay in RWS's group, which no inferred link does for two CMEMS stations.",
+  },
+  {
+    a: "cmems/HoutribsluizenNoordTG",
+    b: "rws/lelystad.houtribsluis.noord",
+    note: "CMEMS's copy of RWS's Houtribsluis noord gauge: all 136 months both hold from August 2014 agree within 1 cm RMS, and 99.7% of their 97,328 shared hours within 5 mm. The zuid gauge 0.4 km away differs by 6.5 cm RMS. CMEMS runs its name into one word, which shares no identifying word with RWS's, so the rules above miss it.",
+  },
+  {
+    a: "cmems/HoutribsluizenZuidTG",
+    b: "rws/lelystad.houtribsluis.zuid",
+    note: "CMEMS's copy of RWS's Houtribsluis zuid gauge: all 136 months both hold from August 2014 agree within 1 cm RMS, and 99.6% of their 95,659 shared hours within 5 mm. The noord gauge 0.4 km away differs by 6.6 cm RMS. CMEMS runs its name into one word, which shares no identifying word with RWS's, so the rules above miss it.",
+  },
+  {
+    a: "cmems/IJgeulstroompaal1TG",
+    b: "cmems/IJmondstroompaalTG",
+    note: "CMEMS's two records of RWS's IJgeul 1 gauge: all 50 months both hold, August 2014 to November 2018, agree within 1 cm RMS, and all but 7 of their 35,325 shared hours within 5 mm. Linked here so both stay in RWS's group, which no inferred link does for two CMEMS stations.",
+  },
+  {
+    a: "cmems/KampenTG",
+    b: "rws/kampen.ijssel",
+    note: "CMEMS's copy of RWS's Kampen IJssel gauge: all 125 months both hold from July 2015 agree within 1 cm RMS, and 99.8% of their 89,457 shared hours within 5 mm. On the same water, RWS's Keteldiep gauge 6 km away differs by 1.8 cm RMS in the median month and Scheeresluis beneden 2.9 km away by 3.3 cm. RWS's Kampen, equally named, ends in 1980, so the copy rule leaves it in doubt.",
+  },
+  {
+    a: "cmems/KaterveerTG",
+    b: "rws/zwolle.ijssel",
+    note: "CMEMS's copy of RWS's Zwolle IJssel gauge, at the Katerveer bridge: 121 of the 123 months both hold from July 2015 agree within 1 cm RMS, the rest within 1.5 cm, and 99.5% of their 85,254 shared hours within 5 mm. The Zwarte Water kanaal gauge 1.2 km away differs by 11 cm RMS. The names share no word, so the rules above miss it.",
+  },
+  {
+    a: "cmems/KornwerderzandBuitenTG",
+    b: "cmems/KornwerderzandTG",
+    note: "CMEMS's two records of RWS's Kornwerderzand Waddenzee buitenhaven gauge: all 63 months both hold from July 2015 agree within 1 cm RMS, and all but 6 of their 44,795 shared hours within 5 mm. Linked here so both stay in RWS's group, which no inferred link does for two CMEMS stations.",
+  },
+  {
+    a: "cmems/KrabbersgatsluizenZuidTG",
+    b: "rws/krabbersgat.markermeer",
+    note: "CMEMS's copy of RWS's Krabbersgat Markermeer gauge, on the lock's south side: all 136 months both hold from August 2014 agree within 1 cm RMS, and 99.6% of their 97,043 shared hours within 5 mm. The IJsselmeer gauge 0.3 km away differs by 7.7 cm RMS, but is named as alike, so the copy rule leaves it in doubt.",
+  },
+  {
+    a: "cmems/MondDerVechtTG",
+    b: "rws/hasselt.zwartewater",
+    note: "CMEMS's copy of RWS's Hasselt Zwarte Water gauge, at the Vecht's mouth: all 120 months both hold from July 2015 agree within 1 cm RMS, and 99.6% of their 85,200 shared hours within 5 mm. On the same water, RWS's Zwartsluis gauge 8 km downstream differs by 1.7 cm RMS in the median month, and its Zwolle kanaal gauge 7 km upstream agrees within 1 cm in 36 of 56 months but only 28.6% of hours within 5 mm. The names share no word, so the rules above miss it.",
+  },
+  {
+    a: "cmems/Rodby",
+    b: "dmi/31573",
+    note: "CMEMS's copy of DMI's Rødbyhavns Havn I gauge: 199 of the 201 months both hold from January 2010 agree within 1 cm RMS, the rest within 3.4 cm, and 74.1% of their 144,460 shared hours within 5 mm, with no offset between them. DMI's Rødbyhavns Havn, equally named, ends in 1990, so the copy rule leaves it in doubt.",
+  },
+  {
+    a: "cmems/RoggebotsluisZuidTG",
+    b: "rws/dronten.roggebotsluis.drontermeer",
+    note: "CMEMS's copy of RWS's Roggebotsluis Drontermeer gauge, on the lock's south side: all 103 months both hold from August 2014 to March 2023 agree within 1 cm RMS, and 99.4% of their 68,596 shared hours within 5 mm. The Vossemeer gauge 0.4 km away differs by 8.4 cm RMS, but is named as alike, so the copy rule leaves it in doubt.",
+  },
+  {
+    a: "cmems/SpooldersluisTG",
+    b: "rws/zwolle.zwartewater.kanaal",
+    note: "CMEMS's copy of RWS's Zwolle Zwarte Water kanaal gauge, at the Spoolde lock: all 60 months both hold from August 2014 agree within 1 cm RMS, and 99.6% of their 42,916 shared hours within 5 mm. The IJssel gauge 0.3 km away differs by 14 cm RMS. The names share no word, so the rules above miss it.",
+  },
+  {
+    a: "cmems/ZwartsluisTG",
+    b: "rws/zwartsluis.zwartewater",
+    note: "CMEMS's copy of RWS's Zwartsluis Zwarte Water gauge: all 128 months both hold from August 2014 agree within 1 cm RMS, and 98.9% of their 90,196 shared hours within 5 mm. The Meppelerdiep gauge 1.8 km away is named as alike, so the copy rule leaves it in doubt; it agrees within 1 cm in 86 of 136 months, but only 38% of hours within 5 mm. RWS's Zwartsluis binnen, 40 m away, ends in 1985.",
+  },
+  {
     a: "usace/MVK.Tendal",
     b: "usgs/07369500",
     note: "The Vicksburg District's relay of USGS's Tensas River at Tendal gauge: 95% of its 2026 readings equal USGS's an hour later (erratum `usace-relay-clock-offsets`). CWMS places it 4.4 km from USGS's position, too far for the copy rule.",
@@ -148,7 +213,7 @@ export const UNLINKS: Decision[] = [
 /** Stations chosen as their group's preferred series, with why. */
 export const PREFER: Record<string, string> = {
   "uhslc/071":
-    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Sensor 40 at the tsunami gauge (linz/WLGT) drifts against it by 1.88 m in 2019 to 1.21 m in 2025 (erratum `linz-wellington-drift`).",
+    "LINZ's Wellington reference gauge, which LINZ's README for its tsunami gauge says to use for long-term analysis. Both sensors at the tsunami gauge (linz/WLGT) move against it by tenths of a metre, in turn (erratum `linz-wellington-drift`).",
 };
 
 /**
@@ -188,7 +253,7 @@ function copiesIn(group: Station[]): Set<string> {
  * Sources that assemble other agencies' records, often several of one gauge
  * (GESLA has NOAA's, UHSLC's and CMEMS's copies of many), so two of their
  * stations in a group are two copies, not two gauges, and don't keep groups apart.
- * CMEMS relays each gauge once, so two of its stations are two gauges.
+ * Two CMEMS stations are two gauges, but for a few gauges it lists twice, which `LINKS` joins.
  */
 const ASSEMBLED = new Set(["gesla"]);
 

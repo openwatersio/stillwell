@@ -21,11 +21,11 @@
     {
       "id": "linz-wellington-drift",
       "stations": ["linz/WLGT"],
-      "since": "2019-01-01",
+      "since": "2015-06-01",
       "handling": "kept",
-      "error": "Sensor 40's levels at Wellington drift against UHSLC's hourly Wellington: the mean difference is 1.88 m in 2019, 1.44 m in 2023 and 1.21 m in 2025, and the correlation falls from 0.9991 to 0.9826 to 0.80. The README lists sensor replacements in 2012 and 2018 and none since.",
-      "response": "Kept as LINZ serves it. The store can't tell LINZ's sensor from UHSLC's copy, so nothing is flagged.",
-      "evidence": "Hourly values at the same instants for 2019, 2023 and 2025, compared with `uhslc/071`, November 2026."
+      "error": "At Wellington both sensors' levels move against UHSLC's hourly Wellington by tenths of a metre. Sensor 40's monthly median offset swings seasonally between 1.94 and 2.37 m from June 2015 to February 2018 while sensor 41 holds 2.03 to 2.07 m, and in 2023 and 2024 it is sensor 41 that swings, from 1.16 to 1.82 m, while sensor 40 stays within 1.33 and 1.56 m. The zero steps down as well, by 0.26 m on 30 May 2012 and 0.38 m on 15 April 2021 (errata `linz-wellington-step-2012` and `linz-wellington-step-2021`).",
+      "response": "Kept as LINZ serves it, from sensor 40. Neither sensor holds against UHSLC throughout, so the store can't pick the better one and flags nothing. UHSLC's Wellington is the preferred series.",
+      "evidence": "Hourly values at the same instants for 2010 to 2024, compared with `uhslc/071`, monthly medians, November 2026."
     },
     {
       "id": "linz-new-brighton-pier-high-values",
@@ -33,49 +33,279 @@
       "since": "2025-02-08",
       "until": "2025-12-07",
       "handling": "kept",
-      "error": "5,760 minutes of New Brighton Pier's 2025 file read 13.4 to 13.9 m, against a median of 4.17 m, between 8 February and 6 December.",
-      "response": "Kept as LINZ serves it, for QC's rules to judge.",
-      "evidence": "The 2025 sensor 40 file, November 2026."
+      "error": "Four stretches of New Brighton Pier's 2025 sensor 40 file, each 1,440 minutes from 23:54 UTC on 8 February, 19 May, 27 August and 5 December to 23:53 UTC on the next day, read 13.4 to 13.9 m (5,760 minutes in all), at a gauge whose other 2025 minutes run from 2.9 to 5.6 m. Sensor 41 has no value for those minutes, and from August 2024 it reads a constant 11.7 to 12.2 m on its own.",
+      "response": "Kept as LINZ serves it. QC flags all 5,760 minutes `suspect`.",
+      "evidence": "The 2025 sensor 40 and 41 files, and the stored 2025 file's flags, November 2026."
     },
     {
       "id": "linz-owenga-sensor-fault",
       "stations": ["linz/CHIT"],
-      "since": "2008-11-26",
-      "until": "2010-02-18",
-      "handling": "flagged",
-      "error": "Sensor 40 at Owenga reads a constant -4.85 m from 26 November 2008 until its replacement on 17 or 18 February 2010 (daily files for 26 November 2008 to 9 February 2010; 17 February 2010 has 41 rows). The README says \"sensor 40 malfunctioning from November 26\" and the sensors were replaced on 18 February 2010.",
-      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
-      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+      "since": "2008-11-25",
+      "until": "2010-02-17",
+      "handling": "corrected",
+      "error": "Sensor 40 at Owenga failed on 25 November 2008 (its file for that day has a range of 40 m; the README says \"sensor 40 malfunctioning from November 26\") and reads a constant -4.85 m until its replacement on 17 February 2010, whose file has only the last 41 minutes of that day. Sensor 41 reads a tide throughout.",
+      "response": "Sensor 41 is read from 25 November 2008 to before 17 February 2010. Over the 60 days before the failure sensor 41 agrees with sensor 40 within 0.02 m (median difference -0.013 m). Sensor 41 has 147 minutes above 5 m, up to 16 m, on 11 February 2010, which QC flags. In the six days after the replacement, 18 to 23 February 2010, sensor 41's daily median is 0.05 to 0.06 m above sensor 40's.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
     },
     {
       "id": "linz-castlepoint-sensor-fault",
       "stations": ["linz/CPIT"],
       "since": "2012-01-29",
-      "until": "2012-03-27",
-      "handling": "flagged",
-      "error": "Sensor 40 at Castlepoint failed on 29 January 2012 and was replaced on 26 March, as the README says. Between them its daily means sit near 1.9 m and its daily ranges are 0.02 to 0.3 m on most days, against a tide of about 1.5 m.",
-      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
-      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+      "until": "2012-03-31",
+      "handling": "corrected",
+      "error": "Sensor 40 at Castlepoint failed on 29 January 2012 and was replaced on 26 March, as the README says. From 30 January to 30 March its daily medians run from 1.8 to 3.7 m with daily ranges from 0.01 to 3.6 m, while sensor 41's run from 3.7 to 4.2 m.",
+      "response": "Sensor 41 is read from 29 January to before 31 March 2012. Its median level in the span is 3.82 m, against sensor 40's 3.73 m in the 60 days before and 3.79 m in the 60 days after.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
     },
     {
       "id": "linz-north-cape-sensor-fault",
       "stations": ["linz/NCPT"],
-      "since": "2011-07-10",
-      "until": "2011-10-07",
-      "handling": "flagged",
-      "error": "Sensor 40 at North Cape malfunctioned from 10 July 2011 and was replaced on 6 October, as the README says. Its daily means swing from -1.7 to 4.8 m in that time, and from 23 September it holds near 4.84 m with a daily range of 0.0 to 0.02 m.",
-      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
-      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+      "since": "2011-07-07",
+      "until": "2012-02-20",
+      "handling": "corrected",
+      "error": "Sensor 40 at North Cape malfunctioned from 10 July 2011 and was replaced on 6 October, as the README says, but it stays erratic until 19 February 2012: from 7 July to 21 September 2011 its daily medians run from -1.9 to 4.5 m and its daily ranges from 0.03 to 7.1 m, and from 6 October to 19 February from 0.4 to 4.3 m and 1.2 to 5.3 m. Over the same days sensor 41's medians stay between 3.9 and 4.4 m, with ranges of 1.2 to 2.5 m before 22 September.",
+      "response": "Sensor 41 is read from 7 July 2011 to before 22 September and from 6 October 2011 to before 20 February 2012, and neither sensor is read between (erratum `linz-north-cape-both-sensors-stuck`). Sensor 41's median level is 4.12 and 4.06 m in the two spans, against sensor 40's 4.34 m in the 60 days before and 4.04 m after the first, and 4.16 and 4.14 m around the second.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
     },
     {
       "id": "linz-sumner-sensor-fault",
       "stations": ["linz/SUMT"],
       "since": "2016-06-28",
       "until": "2022-04-02",
+      "handling": "corrected",
+      "error": "Sensor 40 at Sumner was damaged on 28 or 29 June 2016, as the README says (\"sensor 40 damaged from June 29\"), and was never replaced before the site closed on 1 April 2022. Its daily range is 7.7 m on 28 June and 10.9 m on 29 June 2016. From 11 July to 31 December 2016 its daily medians run from -4.8 to -3.6 m with ranges up to 12.8 m, and it holds -4.79 m through 2017 and 2018 and +4.79 m from 1 January 2019 to 24 August 2020, after which it has no values; sensor 41 reads a tide throughout, with daily medians of 1.7 to 2.4 m, until the closure.",
+      "response": "Sensor 41 is read from 28 June 2016 to the closure. Before the failure it agrees with sensor 40 within 0.03 m (median difference 0.025 m over the 60 days before, with a daily standard deviation of 0.005 m). Against UHSLC's Lyttelton, 5.5 km away, sensor 40's monthly median offset was 0.4 to 0.5 m from March 2011 to May 2016, and sensor 41's is 0.42 to 0.53 m from June 2016 to December 2020, so sensor 41 holds the level. In the years LINZ serves only as daily files, 2021 and 2022, 63 of the 455 days (every seventh) give an offset of 0.45 to 0.53 m.",
+      "evidence": "The sensor 40 and 41 files for the years and UHSLC's Lyttelton (`uhslc/667a`) at the same hours, with the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-castlepoint-sensor-fault-2019",
+      "stations": ["linz/CPIT"],
+      "since": "2019-07-26",
+      "until": "2021-07-26",
+      "handling": "corrected",
+      "error": "Sensor 40 at Castlepoint reads a constant 4.85 m from 28 July 2019 (the README lists a \"sensor 40 failure\" in July 2019) until the sensors were replaced on 24 November 2021. Sensor 41 reads a tide until it failed on 26 July 2021, as the README says.",
+      "response": "Sensor 41 is read from 26 July 2019 to before 26 July 2021. Its median level in the span is 4.03 m, against sensor 40's 4.03 m in the 60 days before. LINZ lists no file for any day from 27 July to 22 November 2021, and both sensors fail on 26 July itself, which QC flags.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-north-cape-both-sensors-stuck",
+      "stations": ["linz/NCPT"],
+      "since": "2011-09-22",
+      "until": "2011-10-06",
+      "handling": "dropped",
+      "error": "Sensor 40 holds 4.84 m and sensor 41 4.81 m, each with a daily range of 0.00 to 0.04 m, from 22 September to 5 October 2011.",
+      "response": "Both sensors' values are left out for those days.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-north-cape-sensor-fault-2013",
+      "stations": ["linz/NCPT"],
+      "since": "2012-12-13",
+      "until": "2013-03-04",
+      "handling": "corrected",
+      "error": "Sensor 40 at North Cape is erratic again from 13 December 2012 to 3 March 2013: its daily medians run from 0.6 to 4.4 m and its daily ranges up to 5.2 m, against sensor 41's medians of 4.0 to 4.4 m and ranges of 1.2 to 2.5 m. The README lists nothing for these months.",
+      "response": "Sensor 41 is read from 13 December 2012 to before 4 March 2013. Its median level is 4.19 m, against sensor 40's 4.08 m in the 60 days before and 4.15 m after.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-north-cape-sensor-fault-2014",
+      "stations": ["linz/NCPT"],
+      "since": "2013-11-17",
+      "until": "2014-01-23",
+      "handling": "corrected",
+      "error": "Sensor 40 at North Cape is erratic a third time, from 17 November 2013 to 22 January 2014: its daily medians run from 0.6 to 4.4 m and its daily ranges up to 5.2 m, against sensor 41's medians of 4.0 to 4.3 m and ranges of 1.4 to 2.5 m. The README lists routine maintenance on 23 January.",
+      "response": "Sensor 41 is read from 17 November 2013 to before 23 January 2014. Its median level is 4.13 m, against sensor 40's 3.99 m in the 60 days before and 4.17 m after.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-auckland-sensor-fault",
+      "stations": ["linz/AUCT"],
+      "since": "2012-11-19",
+      "until": "2012-11-27",
+      "handling": "corrected",
+      "error": "Sensor 40 at Devonport is erratic from 19 to 26 November 2012, with daily ranges up to 6.1 m against sensor 41's 2.8 m. The README lists nothing for these days.",
+      "response": "Sensor 41 is read from 19 to before 27 November 2012. Its median level is 5.14 m, against sensor 40's 5.03 m in the 60 days before and 5.06 m after. From 11 July to 27 August 2012 sensor 40 is erratic too, and sensor 41's level is 5.61 m against 5.36 m before and 5.03 m after, which is 0.25 m or more from either side, so those values stay as LINZ serves them, for QC.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-wellington-sensor-fault",
+      "stations": ["linz/WLGT"],
+      "since": "2014-12-23",
+      "until": "2015-01-10",
+      "handling": "corrected",
+      "error": "Sensor 40 at Wellington is erratic from 23 December 2014 to 9 January 2015: its daily medians run from 4.6 to 4.8 m with ranges up to 4.8 m, while sensor 41's are 3.1 to 3.2 m with ranges of 0.9 to 1.4 m. Its monthly offset from UHSLC's Wellington has a standard deviation of 0.77 m in December and 0.74 m in January, against 0.01 m in most months.",
+      "response": "Sensor 41 is read from 23 December 2014 to before 10 January 2015. Its median level is 3.12 m, against sensor 40's 3.19 m in the 60 days before and 3.20 m after.",
+      "evidence": "The sensor 40 and 41 files for the two years and UHSLC's Wellington (`uhslc/071`) at the same hours, November 2026."
+    },
+    {
+      "id": "linz-napier-sensor-fault",
+      "stations": ["linz/NAPT"],
+      "since": "2010-02-07",
+      "until": "2010-03-05",
+      "handling": "corrected",
+      "error": "Sensor 40 at Napier is erratic from 7 February to 4 March 2010: its daily medians run from 3.0 to 13.1 m and its daily ranges from 3.2 to 14.6 m, while sensor 41's are 2.8 to 3.0 m and 1.1 to 2.3 m. The README lists nothing for these days.",
+      "response": "Sensor 41 is read from 7 February to before 5 March 2010. Its median level is 2.91 m, against sensor 40's 2.72 m in the 60 days before and 2.74 m after.",
+      "evidence": "The sensor 40 and 41 files for the years and the README's gauge history, November 2026."
+    },
+    {
+      "id": "linz-napier-step-2008",
+      "stations": ["linz/NAPT"],
+      "since": "2007-09-20",
+      "until": "2008-02-25",
+      "handling": "corrected",
+      "error": "Napier's levels step down 0.344 m at 18:51 UTC on 24 February 2008, which is the 25 February of the README's \"step in data on February 25\", after a gap in the record. Against UHSLC's hourly Napier, sensor 40's median offset is 2.097 m from 1 to 24 February and 1.753 m from 26 February to 19 March; sensor 41 steps 0.36 m too.",
+      "response": "The levels before the step are converted to the later zero by -0.344 m, as an earlier epoch. Epochs start on a whole day, so the five hours after the step on 24 February are left out.",
+      "evidence": "The 2008 sensor 40 and 41 files and UHSLC's Napier (`uhslc/668a`) for the same hours, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-zero-steps",
+      "stations": "every station",
+      "since": null,
+      "until": null,
+      "handling": "kept",
+      "error": "A gauge's levels are measured from its sensors' own zero, which moves when sensors are replaced or calibrated, by amounts no README gives. Only Wellington, Napier, Port Chalmers, Tauranga and Gisborne have a UHSLC record to measure the steps against, and the steps both sensors share there are corrected (errata `linz-wellington-step-2012`, `linz-wellington-step-2021`, `linz-napier-step-2008`, `linz-port-chalmers-step-2021`, `linz-tauranga-step-2024`, `linz-gisborne-step-2013`, `linz-gisborne-step-2021`, `linz-gisborne-step-2024`). At Wellington in March 2018, Napier in April 2018 and Tauranga in June 2020, when the README lists sensors replaced, sensor 40 steps by -0.51, -0.56 and -0.28 m while sensor 41 steps by about -0.2 m or not at all, so the step is the replacement resetting sensor 40's drift, not the zero, and it stays. Korotiti Bay's step has no record to measure against (erratum `linz-korotiti-bay-step-2024`). At the other gauges a step is not measurable, so their levels are as LINZ serves them.",
+      "response": "Kept as LINZ serves it. A step changes the level of the whole record after it, so a series that spans one isn't continuous in height.",
+      "evidence": "Comparison of both sensors' monthly offsets against UHSLC's hourly records at the five gauges that have one, November 2026."
+    },
+    {
+      "id": "linz-korotiti-bay-sensors",
+      "stations": ["linz/GBIT"],
+      "since": "2021-08-01",
+      "until": "2024-09-11",
       "handling": "flagged",
-      "error": "Sensor 40 at Sumner was damaged on 28 or 29 June 2016, as the README says (\"sensor 40 damaged from June 29\"), and was never replaced before the site closed on 1 April 2022. Its daily ranges reach 10.9 m on 29 June 2016, and from 11 July 2016 it reads a constant near -4.79 m: a year of 2018 holds 520,343 minutes with a median of -4.795 m, while sensor 41 reads a tide there with a median of 1.96 m.",
-      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read, so nothing replaces it.",
-      "evidence": "The sensor 40 file for the year, November 2026; the README's gauge history."
+      "error": "Korotiti Bay's two sensors disagree from August 2021 until they were replaced on 11 September 2024. Sensor 40's monthly medians run from 6.1 to 6.8 m from August 2021 to April 2023, then 4.1 m in June 2023 and 8.3 to 14.7 m from July 2023 to August 2024 (with daily ranges beyond 6 m), while sensor 41's run from 5.3 to 6.3 m. Before the span both read 5.8 to 6.0 m, and from September 2024 both read 4.5 to 4.8 m. The README's chart datum, 4.43 m above TG0, is from the 2021 calibration, before sensors were replaced in 2023 and 2024, so the store does not publish it.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Neither sensor is known to be right, so neither is read as a replacement.",
+      "evidence": "The 2021 to 2024 sensor 40 and 41 files, monthly medians, November 2026; the README's gauge history and calibration."
+    },
+    {
+      "id": "linz-wellington-step-2012",
+      "stations": ["linz/WLGT"],
+      "since": null,
+      "until": "2012-05-30",
+      "handling": "corrected",
+      "error": "Wellington's zero steps down on 30 May 2012, when the README lists sensors replaced: sensor 40's median offset from UHSLC's Wellington is 2.271 m over the 30 days before and 2.007 m after (0.264 m), and sensor 41's 2.256 and 2.040 m (0.216 m).",
+      "response": "Levels before 30 May 2012 are converted to the later zero by -0.26 m, as an earlier epoch. The step falls in an hour's gap between 22:54 UTC on the 29th and 00:02 on the 30th, so no minute is left out.",
+      "evidence": "UHSLC's hourly Wellington (`uhslc/071`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-wellington-step-2021",
+      "stations": ["linz/WLGT"],
+      "since": null,
+      "until": "2021-04-16",
+      "handling": "corrected",
+      "error": "Wellington's zero steps down on 15 April 2021, after a gap from 20:25 to 21:56 UTC, and the README lists no work then: sensor 40's median offset from UHSLC's Wellington is 1.860 m over the 30 days before and 1.483 m after (0.377 m), and sensor 41's 1.927 and 1.541 m (0.386 m).",
+      "response": "Levels before 16 April 2021 are converted to the later zero by -0.38 m, as an earlier epoch. Epochs start on a whole day, so the 2 hours from 21:56 UTC on 15 April are left out.",
+      "evidence": "UHSLC's hourly Wellington (`uhslc/071`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-port-chalmers-step-2021",
+      "stations": ["linz/OTAT"],
+      "since": null,
+      "until": "2021-05-26",
+      "handling": "corrected",
+      "error": "Port Chalmers' zero steps down on 26 May 2021, when the README lists sensors replaced: sensor 40's median offset from UHSLC's Port Chalmers is 3.483 m over the 30 days before (daily standard deviation 0.084 m) and 2.923 m after (0.560 m), and sensor 41's 3.439 and 2.891 m (0.548 m).",
+      "response": "Levels before 26 May 2021 are converted to the later zero by -0.56 m, as an earlier epoch. The step falls in the gap between 23:40 UTC on the 25th and about 03:00 on the 26th, so no minute is left out.",
+      "evidence": "UHSLC's hourly Port Chalmers (`uhslc/669a`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-tauranga-step-2024",
+      "stations": ["linz/TAUT"],
+      "since": null,
+      "until": "2024-03-21",
+      "handling": "corrected",
+      "error": "Tauranga's zero steps down on 20 March 2024, after a gap from 22:17 to 23:17 UTC, and the README lists nothing for 2024: sensor 40's median offset from UHSLC's Tauranga is 3.807 m over the 30 days before and 3.336 m after (0.471 m), and sensor 41's 3.783 and 3.298 m (0.485 m).",
+      "response": "Levels before 21 March 2024 are converted to the later zero by -0.47 m, as an earlier epoch. Epochs start on a whole day, so the 43 minutes from 23:17 UTC on 20 March are left out.",
+      "evidence": "UHSLC's hourly Tauranga (`uhslc/073a`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-korotiti-bay-step-2024",
+      "stations": ["linz/GBIT"],
+      "since": null,
+      "until": "2024-09-10",
+      "handling": "kept",
+      "error": "Korotiti Bay's zero steps down on 10 September 2024, when the README lists sensors replaced on the 11th (NZ time): both sensors read 4.6 to 5.0 m from 21:39 UTC, when the file for the day begins after a gap, against 5.2 m on the 9th, and 4.4 to 4.5 m from the 11th. No other record of the gauge exists to measure the step against.",
+      "response": "Values from 10 September 2024 are in a later epoch, and the earlier epoch has no `to_current`, so the API doesn't convert across the step.",
+      "evidence": "The 2024 sensor 40 and 41 files, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-devonport-sensor-fault-2012",
+      "stations": ["linz/AUCT"],
+      "since": "2012-07-11",
+      "until": "2012-08-28",
+      "handling": "flagged",
+      "error": "Sensor 40 at Devonport is erratic from 11 July to 27 August 2012: its daily medians run from 1.2 to 5.1 m and its daily ranges up to 5.8 m, while sensor 41's medians are 5.4 to 6.0 m with ranges of 1.8 to 3.0 m. The README lists sensors replaced on 28 August.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 5.61 m, against sensor 40's 5.36 m in the 60 days before and 5.03 m after.",
+      "evidence": "The sensor 40 and 41 files for the years, November 2026."
+    },
+    {
+      "id": "linz-boat-cove-sensor-fault-2013",
+      "stations": ["linz/RBCT"],
+      "since": "2013-07-16",
+      "until": "2013-11-12",
+      "handling": "flagged",
+      "error": "Sensor 40 at Boat Cove is erratic from 16 July to 11 November 2013: its daily medians run from 2.8 to 4.9 m and its daily ranges up to 11.7 m, and it is stuck on some days. Sensor 41's own range is 0.0 to 5.5 m, so it is stuck or erratic on some days too.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
+      "evidence": "The sensor 40 and 41 files for the years, November 2026."
+    },
+    {
+      "id": "linz-boat-cove-sensor-fault-2014",
+      "stations": ["linz/RBCT"],
+      "since": "2014-09-15",
+      "until": "2014-10-03",
+      "handling": "flagged",
+      "error": "Sensor 40 at Boat Cove reads daily medians of 33.4 to 33.6 m, with ranges up to 28.7 m, from 15 September to 2 October 2014, while sensor 41's medians are 4.0 to 4.5 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
+      "evidence": "The sensor 40 and 41 files for the years, November 2026."
+    },
+    {
+      "id": "linz-fishing-rock-sensor-fault",
+      "stations": ["linz/RFRT"],
+      "since": "2016-12-22",
+      "until": "2017-03-25",
+      "handling": "flagged",
+      "error": "Sensor 40 at Fishing Rock reads daily medians of -4.84 to -4.83 m, with ranges up to 9.3 m, from 22 December 2016 to 24 March 2017, while sensor 41's medians are 3.4 to 4.0 m with ranges of 0.8 to 1.6 m.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.65 m, against sensor 40's 3.16 m in the 60 days before and 3.58 m after.",
+      "evidence": "The sensor 40 and 41 files for the years, November 2026."
+    },
+    {
+      "id": "linz-napier-sensor-fault-2010-12",
+      "stations": ["linz/NAPT"],
+      "since": "2010-12-07",
+      "until": "2010-12-15",
+      "handling": "flagged",
+      "error": "Sensor 40 at Napier is erratic from 7 to 14 December 2010: its daily medians run from 2.7 to 27.9 m and its daily ranges up to 30 m, while sensor 41's medians are 3.0 to 3.1 m. The README lists sensors replaced on 15 December.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.07 m, against sensor 40's 2.70 m in the 60 days before and 2.76 m after.",
+      "evidence": "The sensor 40 and 41 files for the years, November 2026."
+    },
+    {
+      "id": "linz-gisborne-step-2013",
+      "stations": ["linz/GIST"],
+      "since": null,
+      "until": "2013-09-26",
+      "handling": "corrected",
+      "error": "Gisborne's zero steps down on 25 or 26 September 2013, in a gap in the record from 20:48 UTC to 03:23, and the README lists nothing then: sensor 40's median offset from UHSLC's Gisborne is 3.304 m over the 30 days before and 2.730 m after (0.574 m), and sensor 41's 3.392 and 2.736 m (0.656 m).",
+      "response": "Levels before 26 September 2013 are converted to the later zero by -0.57 m, as an earlier epoch. The step falls in the gap, so no minute is left out.",
+      "evidence": "UHSLC's hourly Gisborne (`uhslc/078b`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-gisborne-step-2021",
+      "stations": ["linz/GIST"],
+      "since": null,
+      "until": "2021-05-12",
+      "handling": "corrected",
+      "error": "Gisborne's zero steps down on 11 or 12 May 2021, after a gap from 23:07 to 23:56 UTC, and the README lists nothing then: sensor 40's median offset from UHSLC's Gisborne is 2.721 m over the 30 days before and 2.308 m after (0.413 m), and sensor 41's 2.804 and 2.417 m (0.387 m).",
+      "response": "Levels before 12 May 2021 are converted to the later zero by -0.41 m, as an earlier epoch. Epochs start on a whole day, so the 4 minutes from 23:56 UTC on 11 May are left out.",
+      "evidence": "UHSLC's hourly Gisborne (`uhslc/078b`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
+    },
+    {
+      "id": "linz-gisborne-step-2024",
+      "stations": ["linz/GIST"],
+      "since": null,
+      "until": "2024-12-13",
+      "handling": "corrected",
+      "error": "Gisborne's zero steps down on 12 or 13 December 2024, with no file for the 12th, when the README lists sensors replaced in 2024: sensor 40's median offset from UHSLC's Gisborne is 2.323 m over the 30 days before and 1.781 m after (0.542 m), and sensor 41's 2.368 and 1.826 m (0.542 m).",
+      "response": "Levels before 13 December 2024 are converted to the later zero by -0.54 m, as an earlier epoch. The step falls in the gap before the file for the 13th, so no minute is left out.",
+      "evidence": "UHSLC's hourly Gisborne (`uhslc/078b`) at the same instants, the medians of both sensors' offsets over the 30 days either side, November 2026; the README's gauge history."
     }
   ],
   "retired": []

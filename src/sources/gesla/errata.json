@@ -1049,6 +1049,19 @@
       "error": "These 31 GESLA records hold levels no gauge can read, outside the store's span of −500 to 9,000 m, as values rather than as GESLA's null of −99.9999: 42,040 values in 142 record-years from 2008 to 2026. Most are fill values: 999,999.06 m in CMEMS's AWG, K14 and L9 records, 99,999.01 m at Ceuta, −9,999.99 m at Pont Seudre, −10,000 m at Bayonne and Villefranque, and −6,999 m in Toitū Te Whenua's Cape Roberts. The CCO and CMEMS records of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing, Swanage Pier and Teignmouth) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, and Marienleuchte's and Saint-Pierre-et-Miquelon's records similar ones.",
       "response": "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, and requalify drops any the store holds.",
       "evidence": "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
+    },
+    {
+      "id": "gesla-kornwerderzand-2025-10-05-ramp",
+      "stations": [
+        "gesla/kornwerderzandbuitentg-kor-nld-cmems",
+        "gesla/kornwerderzandtg-kor-nld-cmems"
+      ],
+      "since": "2025-10-05",
+      "until": "2025-10-06",
+      "handling": "flagged",
+      "error": "GESLA's CMEMS records of Kornwerderzand fall slowly from 1.60 m at 04:40 UTC to 1.49 m at 08:30 UTC on 5 October 2025, with GESLA's good flag, through a storm high water of about 2.75 m, as CMEMS's own records do.",
+      "response": "5 October 2025 is flagged `suspect` in both CMEMS records, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's RWS record (`gesla/kornwerderzand_waddenzee_buitenhaven-kor-nld-rws`) reads the storm as RWS does, so it isn't listed.",
+      "evidence": "In the store, checked in November 2026: both records hold the same 10-minute values as CMEMS's on that morning (erratum `cmems-kornwerderzand-2025-10-05-ramp`), 1.59 m at 05:00 UTC and 1.49 m at 08:30 UTC, while GESLA's RWS record reads 2.75 m and 1.83 m and RWS Harlingen peaks at 2.86 m at 05:30 UTC. GESLA's CMEMS records rise again from 08:40 UTC and match the RWS record at 09:00 UTC. They end on 2026-05-31, before CMEMS's July 2026 offsets."
     }
   ],
   "retired": []

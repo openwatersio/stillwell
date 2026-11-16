@@ -145,6 +145,8 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}
       # The stations that are due judged from their levels in the store
       # (src/store/analysis.ts), after the list so new stations are judged too,
       # and in this job so it keeps the source's group, since a verdict that
@@ -400,6 +402,12 @@ jobs:
             # reaches a gauge's last months after it leaves the latest window;
             # one that stopped earlier asks for nothing past its last day.
             cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
+            # CCO's monthly check flags the readings of a finished month, but
+            # only from 2026 on; older readings stay preliminary for good, so reading from the earliest preliminary reading would
+            # fetch the whole archive each month, and a station with none
+            # preliminary would be left out. Every active station is read
+            # again from 12 months back to this month, finished years included.
+            cco) which=all from=$(date -u -d "$year-$month-01 -12 months" +%F) && set -- "$year-$month-01" --refetch ;;
             # BOM isn't hourly: its archives are rebuilt about monthly, weeks
             # behind, and a finished year's again in the new year's first weeks,
             # and nothing else brings its new values, so every active gauge is
@@ -435,6 +443,8 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}
 
   # The cross-station checks (scripts/cross-check.ts) over each region's year
   # so far and the five before: months one gauge holds another's data, clock errors and level

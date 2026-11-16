@@ -188,11 +188,20 @@ export async function withFiles(store: string, source: string, ids: string[]): P
 
 /** `aws` arguments that delete everything under an `s3://` prefix on the store's endpoint. */
 export function awsRemoveArgs(prefix: string, endpoint: string): string[] {
-  if (!/^s3:\/\/[^/]+\/.+\/$/.test(prefix))
-    throw new Error(`${prefix} isn't a directory in a bucket`);
+  const file = /^s3:\/\/[^/]+\/.+\.parquet$/.test(prefix);
+  if (!file && !/^s3:\/\/[^/]+\/.+\/$/.test(prefix))
+    throw new Error(`${prefix} isn't a directory or a Parquet file in a bucket`);
   // DuckDB's setup takes S3_ENDPOINT with or without a scheme; the CLI needs one.
   const url = /^https?:\/\//.test(endpoint) ? endpoint : `https://${endpoint}`;
-  return ["s3", "rm", prefix, "--recursive", "--endpoint-url", url, "--only-show-errors"];
+  return [
+    "s3",
+    "rm",
+    prefix,
+    ...(file ? [] : ["--recursive"]),
+    "--endpoint-url",
+    url,
+    "--only-show-errors",
+  ];
 }
 
 /** Refuses a store `withhold` can't delete from: anything but `s3://` or a local path. */
@@ -204,7 +213,7 @@ function deletable(store: string): void {
 }
 
 /**
- * Delete everything under each prefix: from disk for a local store, or with
+ * Delete everything under each prefix, or a single Parquet file: from disk for a local store, or with
  * the AWS CLI for an `s3://` one, since DuckDB can't delete objects. The CLI
  * takes the store's `S3_*` credentials.
  */
