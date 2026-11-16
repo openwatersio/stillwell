@@ -24,7 +24,7 @@ import { totalmem } from "node:os";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ALL, actionsWriting, mainPhases } from "../src/jobs/actions.ts";
-import { dryDrop, serverRuns } from "../src/jobs/commands.ts";
+import { serverRuns } from "../src/jobs/commands.ts";
 import { advance, baseline, loadMigrations, setBaseline, stuck } from "../src/jobs/migrations.ts";
 import {
   allJobs,
@@ -136,7 +136,7 @@ async function tick(): Promise<void> {
   // A source that left the server phase takes its waiting jobs with it, so none starts if it comes back.
   for (const job of cancelQueuedUnless(
     db,
-    (j) => !j.lane.startsWith("store-") || serverRuns(j.lane, j.command.slice(1)),
+    (j) => !j.lane.startsWith("store-") || serverRuns(j.lane),
     "its source left the server",
     now,
   ))
@@ -153,10 +153,10 @@ async function tick(): Promise<void> {
     const source = j.lane.slice("store-".length);
     return (
       !notReady &&
-      serverRuns(j.lane, j.command.slice(1)) &&
+      serverRuns(j.lane) &&
       // main's server.json too, so a box deployed from a branch, or one a failed deploy left behind, writes
       // only what main gives it, as Actions writes only what main doesn't.
-      (onServer.has(source) || !j.lane.startsWith("store-") || dryDrop(j.command.slice(1))) &&
+      onServer.has(source) &&
       !writing.has(ALL) &&
       !writing.has(source)
     );

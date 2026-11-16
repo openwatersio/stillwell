@@ -17,12 +17,12 @@ export const JOBS = ["hourly", "compact", "lists", "refetch"] as const;
 export type Job = (typeof JOBS)[number];
 
 /**
- * Where a source in server.json is in its move to the server's job queue
- * (docs/plans/jobs.md): `draining` while Actions runs that started before it
- * joined finish, `server` once the server writes it, `returning` while the
- * server's jobs for it finish before it leaves the file.
+ * Where a source in server.json is on the server's job queue
+ * (docs/plans/jobs.md): `server` while the server writes it, once no Actions
+ * run still does, and `returning` while the server's jobs for it finish
+ * before it leaves the file and Actions writes it again.
  */
-export type Phase = "draining" | "server" | "returning";
+export type Phase = "server" | "returning";
 
 export const PHASES: ReadonlyMap<string, Phase> = new Map(
   Object.entries(serverList as Record<string, Phase>),

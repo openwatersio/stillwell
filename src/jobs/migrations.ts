@@ -141,9 +141,7 @@ export function setBaseline(db: DatabaseSync, id: string, ids: string[], now = n
  */
 export function waiting(migration: Migration): string[] {
   const ingest = migration.steps.filter((s) => "ingest" in s);
-  const out = ingest.flatMap((step) =>
-    serverRuns(laneOf(argsOf(step)), argsOf(step)) ? [] : [step.ingest],
-  );
+  const out = ingest.flatMap((step) => (serverRuns(laneOf(argsOf(step))) ? [] : [step.ingest]));
   if (out.length || !ingest.length)
     out.push(...migration.steps.flatMap((s) => ("check" in s ? [`check ${s.check}`] : [])));
   return out;
@@ -171,7 +169,7 @@ export function advance(
   db: DatabaseSync,
   migrations: [string, Migration][],
   now = new Date(),
-  runs: (lane: string, args: string[]) => boolean = serverRuns,
+  runs: (lane: string) => boolean = serverRuns,
 ): string | null {
   if (baseline(db) === null)
     return "no baseline: run `stillwell-jobs baseline` with the last migration done";
@@ -213,7 +211,7 @@ export function advance(
         "check" in step
           ? [["server/check.ts", id, String(row.step)], "check", step.timeout ?? 30]
           : [["scripts/ingest.ts", ...argsOf(step)], laneOf(argsOf(step)), step.timeout ?? 180];
-      if (!runs(lane, command.slice(1))) {
+      if (!runs(lane)) {
         save(db, row);
         return `${id} waits for the server to run ${lane}`;
       }

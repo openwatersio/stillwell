@@ -4,7 +4,6 @@
  *
  *   stillwell-jobs enqueue [--timeout minutes] <ingest args...>
  *   stillwell-jobs list
- *   stillwell-jobs show <id>
  *   stillwell-jobs cancel <id>
  *   stillwell-jobs migrations
  *   stillwell-jobs retry <migration>
@@ -29,7 +28,7 @@ import {
   setBaseline,
   skip,
 } from "../src/jobs/migrations.ts";
-import { cancel, enqueue, getJob, jobs, openQueue } from "../src/jobs/queue.ts";
+import { cancel, enqueue, jobs, openQueue } from "../src/jobs/queue.ts";
 import { unitOf } from "../src/jobs/units.ts";
 
 const db = openQueue(process.env.STILLWELL_JOBS_DB ?? "/var/lib/stillwell-jobs/jobs.db");
@@ -42,7 +41,7 @@ switch (command) {
       rest[0] === "--timeout" ? [Number(rest[1]), rest.slice(2)] : [180, rest];
     const lane = laneOf(args);
     const problems = commandProblems(args, timeout);
-    if (!serverRuns(lane, args))
+    if (!serverRuns(lane))
       problems.push(
         `the server doesn't run ${lane} yet: use the Ingest workflow (docs/plans/jobs.md)`,
       );
@@ -58,7 +57,7 @@ switch (command) {
       lane: "check",
       timeout: 5,
     })!;
-    console.log(`queued job ${job.id}; see it with: stillwell-jobs show ${job.id}`);
+    console.log(`queued job ${job.id}; see it with: stillwell-jobs list`);
     break;
   }
   case "list":
@@ -78,13 +77,6 @@ switch (command) {
         ].join("\t"),
       );
     break;
-  case "show": {
-    const job = getJob(db, Number(rest[0]));
-    if (!job) fail(`no job ${rest[0]}`);
-    console.log(JSON.stringify(job, null, 2));
-    console.log(`its log: journalctl -u ${unitOf(job!.id)}`);
-    break;
-  }
   case "cancel": {
     const done = cancel(db, Number(rest[0]));
     if (!done) fail(`no job ${rest[0]} that is queued or running`);
@@ -132,7 +124,7 @@ switch (command) {
   }
   default:
     fail(
-      "usage: stillwell-jobs enqueue [--timeout minutes] <ingest args...> | list | show <id> | cancel <id> | migrations | retry <migration> | skip <migration> | baseline <migration|none> | selftest [fail]",
+      "usage: stillwell-jobs enqueue [--timeout minutes] <ingest args...> | list | cancel <id> | migrations | retry <migration> | skip <migration> | baseline <migration|none> | selftest [fail]",
     );
 }
 

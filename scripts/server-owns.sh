@@ -26,7 +26,7 @@ status=0
 jq -e --arg s "$source" 'if type == "object" then has($s) else error("not an object") end' <<<"$list" >/dev/null || status=$?
 case $status in
   0)
-    echo "::error::$source is in server.json, so the server's job queue writes it: queue its work with the Jobs workflow (docs/plans/jobs.md)"
+    echo "::error::$source is in server.json, so the server's job queue writes it: queue its work on the box with stillwell-jobs enqueue (docs/plans/jobs.md)"
     exit 1
     ;;
   1) ;;

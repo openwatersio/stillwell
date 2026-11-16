@@ -14,13 +14,14 @@ const ARITY: Record<string, number> = {
   compact: 1,
   withhold: 1,
   drop: 1,
+  misplaced: 1,
   years: 1,
   analyze: 1,
   stations: 1,
 };
 
 /** Commands that delete through the `aws` CLI (src/withhold.ts), which the box doesn't have. */
-const NEEDS_AWS = new Set(["drop", "withhold"]);
+const NEEDS_AWS = new Set(["drop", "withhold", "misplaced"]);
 
 /** The ingest flags that take no value, which ingest.yml's group job must list too. */
 export const FLAGS = new Set(
@@ -52,16 +53,12 @@ export function laneOf(args: string[]): string {
   return ARITY[command] > 0 && source ? `store-${source}` : "store";
 }
 
-/** Whether the run is `drop --dry-run`, which writes nothing. */
-export function dryDrop(args: string[]): boolean {
-  // After `--`, ingest reads --dry-run as a word and drops for real; commandProblems refuses it too.
-  return words(args)[0] === "drop" && args.includes("--dry-run") && !args.includes("--");
-}
-
-/** Whether the server runs jobs in `lane` now: its source is in the `server` phase, or the job writes nothing. */
-export function serverRuns(lane: string, args: string[] = []): boolean {
-  if (lane === "check" || dryDrop(args)) return true;
-  return lane.startsWith("store-") && PHASES.get(lane.slice("store-".length)) === "server";
+/** Whether the server runs jobs in `lane` now: a check, which only reads, or one of a source in the `server` phase. */
+export function serverRuns(lane: string): boolean {
+  return (
+    lane === "check" ||
+    (lane.startsWith("store-") && PHASES.get(lane.slice("store-".length)) === "server")
+  );
 }
 
 /** Why ingest arguments can't run as a job, or nothing when they can. */
@@ -84,7 +81,7 @@ export function commandProblems(args: string[], timeout: number): string[] {
     // stations.parquet is published in Actions until every source has moved (docs/plans/jobs.md).
     if (command === "stations" && !args.includes("--no-publish"))
       out.push(`${text}: stations runs on the server only with --no-publish`);
-    if (NEEDS_AWS.has(command) && !dryDrop(args))
+    if (NEEDS_AWS.has(command))
       out.push(`${text}: ${command} deletes with the aws CLI, which the server doesn't have yet`);
     if (ARITY[command] > 0 && rest[0])
       try {

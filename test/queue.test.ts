@@ -59,13 +59,9 @@ describe("commands", () => {
     assert.equal(laneOf(words("matches --accept-matches --concurrency 16")), "matches");
   });
 
-  it("runs on the server only the lanes of its sources, checks and dry runs", () => {
+  it("runs on the server only checks and the lanes of its sources", () => {
     assert.equal(serverRuns("check"), true);
-    assert.equal(serverRuns("store-gesla", words("drop gesla --dry-run")), true);
-    // After --, ingest reads --dry-run as a word and drops for real.
-    const onServer = PHASES.get("gesla") === "server";
-    assert.equal(serverRuns("store-gesla", words("drop gesla -- --dry-run")), onServer);
-    assert.equal(serverRuns("store-gesla", words("drop gesla")), onServer);
+    assert.equal(serverRuns("store-gesla"), PHASES.get("gesla") === "server");
     assert.equal(serverRuns("store"), false);
   });
 
@@ -74,12 +70,12 @@ describe("commands", () => {
     const sources = SERVER_SOURCES as Set<string>;
     const before = phases.get("ea");
     try {
-      for (const phase of ["draining", "server", "returning"] as const) {
+      for (const phase of ["server", "returning"] as const) {
         phases.set("ea", phase);
         sources.add("ea");
         for (const job of ["hourly", "compact", "lists"] as const)
           assert.ok(!sourcesFor(job).includes("ea"), `${phase} ${job}`);
-        assert.equal(serverRuns("store-ea", words("compact ea")), phase === "server", phase);
+        assert.equal(serverRuns("store-ea"), phase === "server", phase);
       }
     } finally {
       if (before) phases.set("ea", before);
@@ -97,7 +93,7 @@ describe("commands", () => {
     >;
     assert.ok(list && typeof list === "object" && !Array.isArray(list));
     for (const [id, phase] of Object.entries(list)) {
-      assert.ok(["draining", "server", "returning"].includes(phase), `${id}: ${phase}`);
+      assert.ok(["server", "returning"].includes(phase), `${id}: ${phase}`);
       assert.ok(sources[id]?.metadata.license.redistribution, id);
       assert.notEqual(id, "sfwmd");
     }
@@ -111,8 +107,9 @@ describe("commands", () => {
     assert.deepEqual(commandProblems(words("compact ea --days 6"), 180), []);
     assert.match(commandProblems(words("drop gesla -- --dry-run"), 180)[0], /can't hold --/);
     assert.match(commandProblems(words("withhold ea"), 180)[0], /aws CLI/);
-    assert.deepEqual(commandProblems(words("drop gesla --dry-run"), 180), []);
-    assert.match(commandProblems(words("withhold ea --dry-run"), 180)[0], /aws CLI/);
+    assert.match(commandProblems(words("drop gesla --dry-run"), 180)[0], /aws CLI/);
+    assert.equal(laneOf(words("misplaced rws --dry-run")), "store-rws");
+    assert.match(commandProblems(words("misplaced rws"), 180)[0], /aws CLI/);
     assert.match(commandProblems(words("requalify ea all"), 180)[0], /takes 4 arguments, not 2/);
     assert.match(commandProblems(words("compact ea --rebuild-bound"), 180)[0], /Unknown option/);
     assert.match(commandProblems(words("stations ea"), 180)[0], /--no-publish/);
@@ -153,12 +150,20 @@ describe("migration problems", () => {
 
   it("holds a migration's checks unless the server runs every other step", () => {
     const check = { check: "c", verify: ok };
-    assert.deepEqual(waiting(steps(check)), ["check c"]);
-    assert.deepEqual(waiting(steps({ ingest: "drop gesla --dry-run" }, check)), []);
-    assert.deepEqual(
-      waiting(steps({ ingest: "drop gesla --dry-run" }, { ingest: "compact zz-nowhere" }, check)),
-      ["compact zz-nowhere", "check c"],
-    );
+    const phases = PHASES as Map<string, Phase>;
+    const before = phases.get("ea");
+    phases.set("ea", "server");
+    try {
+      assert.deepEqual(waiting(steps(check)), ["check c"]);
+      assert.deepEqual(waiting(steps({ ingest: "compact ea" }, check)), []);
+      assert.deepEqual(waiting(steps({ ingest: "compact ea" }, { ingest: "compact bom" }, check)), [
+        "compact bom",
+        "check c",
+      ]);
+    } finally {
+      if (before) phases.set("ea", before);
+      else phases.delete("ea");
+    }
   });
 
   it("orders migrations by ID, as advance compares them", async () => {
@@ -193,7 +198,7 @@ describe("migration problems", () => {
 describe("schedule", () => {
   const phases = new Map([
     ["ea", "server"],
-    ["bom", "draining"],
+    ["bom", "returning"],
   ]);
   const at = (iso: string) => due(new Date(iso), phases).map((p) => p.key);
 
