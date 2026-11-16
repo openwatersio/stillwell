@@ -121,6 +121,8 @@ interface Series {
     Eenheid?: { Code: string };
     Groepering?: { Code: string };
     Typering?: { Code: string };
+    /** How values were derived: `NVT` for each reading as measured, `GEM24H` for a daily mean. */
+    WaardeBewerkingsMethode?: { Code: string };
   };
   MetingenLijst: Measurement[];
 }
@@ -317,15 +319,18 @@ export async function levels(
       fresh,
     );
     // A request without a grouping also returns grouped channels (e.g. extremes).
-    const channel = series.find((s) => !s.AquoMetadata.Groepering?.Code);
-    if (!channel) continue;
-    assertCentimeters(channel, datum);
-    for (const m of channel.MetingenLijst) {
-      const value = m.Meetwaarde.Waarde_Numeriek;
-      // RWS marks missing values with large sentinels (e.g. 999999999).
-      if (value === undefined || Math.abs(value) > 10_000) continue;
-      const time = Date.parse(m.Tijdstip);
-      samples.push({ time, level: onRevisedNap(value, time, cm), flag: flagOf(m, process) });
+    for (const channel of readings(
+      location,
+      series.filter((s) => !s.AquoMetadata.Groepering?.Code),
+    )) {
+      assertCentimeters(channel, datum);
+      for (const m of channel.MetingenLijst) {
+        const value = m.Meetwaarde.Waarde_Numeriek;
+        // RWS marks missing values with large sentinels (e.g. 999999999).
+        if (value === undefined || Math.abs(value) > 10_000) continue;
+        const time = Date.parse(m.Tijdstip);
+        samples.push({ time, level: onRevisedNap(value, time, cm), flag: flagOf(m, process) });
+      }
     }
   }
   return dedupe(samples).filter((s) => s.time >= start.getTime() && s.time < end.getTime());
@@ -362,22 +367,29 @@ export async function extremes(
       to,
       fresh,
     );
-    const types = series.find((s) => s.AquoMetadata.Typering?.Code === "GETETTPE");
+    // Every series of each kind, since RWS can split one channel's year into several.
+    const types = readings(
+      location,
+      series.filter((s) => s.AquoMetadata.Typering?.Code === "GETETTPE"),
+    );
     const all = series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE");
-    const heights = all.find((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
+    const inDatum = all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
+    const heights = readings(location, inDatum);
     // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
-    if (types && all.length && !heights)
+    if (types.length && all.length && !inDatum.length)
       throw new DatumChanged(
         `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
         all[0]!.AquoMetadata.Hoedanigheid.Code,
         null,
       );
-    if (!types || !heights) continue;
-    assertCentimeters(heights, datum);
+    if (!types.length || !heights.length) continue;
+    for (const h of heights) assertCentimeters(h, datum);
     const typeAt = new Map(
-      types.MetingenLijst.map((m) => [Date.parse(m.Tijdstip), m.Meetwaarde.Waarde_Alfanumeriek]),
+      types.flatMap((t) =>
+        t.MetingenLijst.map((m) => [Date.parse(m.Tijdstip), m.Meetwaarde.Waarde_Alfanumeriek]),
+      ),
     );
-    for (const m of heights.MetingenLijst) {
+    for (const m of heights.flatMap((h) => h.MetingenLijst)) {
       const time = Date.parse(m.Tijdstip);
       const kind = typeAt.get(time);
       const value = m.Meetwaarde.Waarde_Numeriek;
@@ -455,6 +467,52 @@ function assertCentimeters(series: Series, datum: string): void {
 function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
   for (let t = start.getTime(); t < end.getTime(); t += CHUNK_MS)
     yield [new Date(t), new Date(Math.min(t + CHUNK_MS, end.getTime()))];
+}
+
+/** Ways RWS derives values that aren't readings as measured, which are left out. */
+const MEANS = new Set(["GEM24H"]);
+
+/**
+ * The readings as measured from every series of one height. RWS answers a year
+ * with a series per instrument and per way of deriving values: at Katsbinnen in
+ * 1999 a float gauge's year and 7 values from the next year's pressure sensor,
+ * at Maastricht Borgharen in 1988 a daily mean (`GEM24H`) beside the 10-minute
+ * readings, and at Europlatform in 2024 two parts split on 24 January with the
+ * same metadata. The longest series counts whole (the earliest-starting of
+ * equal ones), and each other only outside its first and last time, so two
+ * instruments never mix within it and a tide never gets a second extreme. A
+ * mean is left out; any other way of deriving values fails, rather than vanish.
+ */
+function readings(location: string, series: Series[]): Series[] {
+  const kept = series.filter((s) => {
+    const how = s.AquoMetadata.WaardeBewerkingsMethode?.Code ?? "NVT";
+    if (how !== "NVT" && !MEANS.has(how))
+      throw new Error(`RWS ${location}: unknown WaardeBewerkingsMethode ${how}`);
+    return how === "NVT" && s.MetingenLijst.length;
+  });
+  // A loop, not Math.min(...): a year of minutes has too many values to spread.
+  const span = (s: Series) => {
+    let [from, to] = [Infinity, -Infinity];
+    for (const m of s.MetingenLijst) {
+      const t = Date.parse(m.Tijdstip);
+      [from, to] = [Math.min(from, t), Math.max(to, t)];
+    }
+    return [from, to] as const;
+  };
+  kept.sort((a, b) => b.MetingenLijst.length - a.MetingenLijst.length || span(a)[0] - span(b)[0]);
+  const [longest, ...others] = kept;
+  if (!longest) return [];
+  const [from, to] = span(longest);
+  return [
+    longest,
+    ...others.map((s) => ({
+      ...s,
+      MetingenLijst: s.MetingenLijst.filter((m) => {
+        const t = Date.parse(m.Tijdstip);
+        return t < from || t > to;
+      }),
+    })),
+  ];
 }
 
 // Chunk boundaries are inclusive on both ends, so the shared sample repeats.

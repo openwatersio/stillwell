@@ -120,6 +120,91 @@ describe("rws", () => {
     );
   });
 
+  it("reads every series of readings RWS answers a year with, and no mean", async () => {
+    const msl = { ...nap, Hoedanigheid: { Code: "MSL" } };
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    const times = [
+      "2023-01-01T01:00:00.000+01:00",
+      "2023-06-01T10:30:00.000+01:00",
+      "2023-12-30T23:50:00.000+01:00",
+      "2023-12-31T00:00:00.000+01:00",
+      "2023-12-31T08:00:00.000+01:00",
+    ];
+    const other = { ...msl, MeetApparaat: { Code: "155" } };
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Listed first, as at Katsbinnen in 1999: another instrument, counted only outside the longest series' span.
+          [other, [[times[1]!, 99]]],
+          [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          // A second part with the same metadata, as at Europlatform in 2024.
+          [msl, [[times[3]!, 20]]],
+          // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[4]!, 30]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.levels("goeree.lichteiland", ...range, { datum: "MSL" })).map((l) => [
+        new Date(l.time).toISOString(),
+        l.level,
+      ]),
+      [
+        ["2023-01-01T00:00:00.000Z", 0.1],
+        ["2023-12-30T22:50:00.000Z", 0.1],
+        ["2023-12-30T23:00:00.000Z", 0.2],
+      ],
+    );
+    // Another instrument's turning point within the longest series' span would be a second extreme of the tide.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [{ ...typeChannel, MeetApparaat: { Code: "155" } }, [[times[1]!, "hoogwater"]]],
+          [typeChannel, [times[0]!, times[2]!].map((t) => [t, "hoogwater"])],
+          [typeChannel, [[times[3]!, "laagwater"]]],
+          [other, [[times[1]!, 99]]],
+          [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          [msl, [[times[3]!, 20]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" })).map((e) => [
+        e.type,
+        e.level,
+      ]),
+      [
+        ["high", 0.1],
+        ["high", 0.1],
+        ["low", 0.2],
+      ],
+    );
+    // Extremes whose only heights in the datum are a mean aren't a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }), []);
+    // A way of deriving values the adapter doesn't know fails rather than vanish.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([{ ...msl, WaardeBewerkingsMethode: { Code: "GEM10M" } }, [[times[0]!, 10]]]),
+      ],
+    ]);
+    await assert.rejects(
+      rws.levels("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /unknown WaardeBewerkingsMethode GEM10M/,
+    );
+  });
+
   it("reads both lows of a double low water, and not the rise between them", async () => {
     const times = [
       "2024-01-01T02:00:00+01:00",
