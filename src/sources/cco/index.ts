@@ -100,15 +100,15 @@ interface Feature {
   };
 }
 
-async function tides(time: string, query = ""): Promise<Feature[]> {
+async function tides(time: string, query = "", hours?: number): Promise<Feature[]> {
   const text = await getText(`${API}/tides/${time}.geojson${query}`, {
     fresh: true,
     pace,
     headers: credentials(),
-    // A year of one site can take minutes to answer.
-    timeout: 900,
+    // A year of one site can take minutes to answer; a short window or the list shouldn't hold a run for that long.
+    timeout: hours !== undefined && hours > 24 ? 900 : undefined,
   });
-  // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON.
+  // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON (erratum `cco-empty-window-answers`).
   if (/"features"\s*:\s*\]/.test(text)) return [];
   const body = JSON.parse(text) as { features?: Feature[] };
   if (!Array.isArray(body.features)) throw new Error("CCO answered without a feature list");
@@ -124,8 +124,10 @@ export async function stations(_previous?: Station[], now = Date.now()): Promise
   let dated = false;
   for (const { geometry, properties: p } of await tides("latest")) {
     const [lon, lat] = geometry?.coordinates ?? [];
-    if (!/^\d+$/.test(String(p?.id)) || typeof p?.sensor !== "string") continue;
-    if (typeof lat !== "number" || typeof lon !== "number") continue;
+    if (!/^\d+$/.test(String(p?.id))) continue;
+    // A site that loses its name or position would otherwise be retired by the next refresh.
+    if (typeof p?.sensor !== "string" || typeof lat !== "number" || typeof lon !== "number")
+      throw new Error(`CCO site ${p?.id} has no name or position`);
     // A layer can answer in British National Grid, or with the axes swapped; the network's gauges are around Great Britain.
     if (lat < 49 || lat > 61 || lon < -9 || lon > 3)
       throw new Error(
@@ -180,6 +182,7 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
     const features = await tides(
       new Date(cursor).toISOString().replace(/[-:T]|\.\d+Z/g, ""),
       `?sensor=${sourceId}&duration=${hours}`,
+      hours,
     );
     // Several sites can answer a request that names one; keep only the one asked for.
     const mine = features.filter(({ properties: p }) => String(p?.id) === sourceId);

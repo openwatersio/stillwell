@@ -202,6 +202,29 @@ describe("cco", () => {
     await assert.rejects(cco.stations(), /no site with a date/);
   });
 
+  it("fails on a site with no name or position rather than retire it", async () => {
+    const list = JSON.parse(fixture("cco-tides-latest.geojson"));
+    list.features.find((f: any) => f.properties.id === "90").geometry = null;
+    serve([[/latest/, JSON.stringify(list)]]);
+    await assert.rejects(cco.stations(), /CCO site 90 has no name or position/);
+  });
+
+  it("leaves out the reading at the end of the window and keeps the one at the start", async () => {
+    const at = (date: string) => ({ properties: { id: "90", date, value: "2", QCflag: null } });
+    serve([
+      [/tides\//, JSON.stringify({ features: [at("20261114#010000"), at("20261114#000000")] })],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => o.time),
+      [Date.parse("2026-11-14T00:00:00Z")],
+    );
+  });
+
   it("fails on an answer it can't read rather than read it as no values", async () => {
     const ask = (feature: object) => {
       serve([[/tides\//, JSON.stringify({ features: [{ properties: feature }] })]]);

@@ -402,9 +402,8 @@ jobs:
             # reaches a gauge's last months after it leaves the latest window;
             # one that stopped earlier asks for nothing past its last day.
             cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
-            # CCO's monthly check flags the readings of a finished month, and
-            # only the last year's carry flags; older readings stay preliminary
-            # for good, so reading from the earliest preliminary reading would
+            # CCO's monthly check flags the readings of a finished month, but
+            # only from 2026 on; older readings stay preliminary for good, so reading from the earliest preliminary reading would
             # fetch the whole archive each month, and a station with none
             # preliminary would be left out. Every active station is read
             # again from 12 months back to this month, finished years included.
