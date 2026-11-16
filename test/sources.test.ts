@@ -4501,6 +4501,28 @@ describe("ea", () => {
       );
       assert.equal(asked, 3);
 
+      // A refusal holds a download already under way, which waits before it sends.
+      ea.forgetArchive();
+      ea.archivePacing.blockedMs = 40;
+      const sent: [string, number][] = [];
+      let refusedAt = 0;
+      let first = true;
+      setTransport(async (url, options) => {
+        const day = /readings-(\d{4}-\d\d-\d\d)/.exec(url)![1]!;
+        if (day === "2025-11-11") await new Promise((resolve) => setTimeout(resolve, 10));
+        await options.pace?.();
+        sent.push([day, Date.now()]);
+        if (day === "2025-11-10" && first) {
+          first = false;
+          refusedAt = Date.now();
+          throw new Error(`GET ${url} returned 429`);
+        }
+        return day === "2025-11-10" ? fixture("ea-archive.csv") : OTHER_GAUGE;
+      });
+      await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-12Z"));
+      const next = sent.find(([day]) => day === "2025-11-11")!;
+      assert.ok(next[1] - refusedAt >= 35, `sent ${next[1] - refusedAt} ms into the hold`);
+
       // A Retry-After past the longest hold stops the run at once.
       ea.forgetArchive();
       asked = 0;

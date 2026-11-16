@@ -287,19 +287,25 @@ export const archivePacing = { blockedMs: 5 * 60_000, maxHoldMs: 15 * 60_000, tr
 let heldUntil = 0;
 let refused: Blocked | undefined;
 
+/** Waits out the archive's hold before each request, `fetchText`'s retries too, and throws once the run is stopped. */
+async function holdOff(): Promise<void> {
+  // Another download's refusal can move the hold, or stop the run, while this one waits.
+  while (!refused && Date.now() < heldUntil)
+    await new Promise((resolve) => setTimeout(resolve, heldUntil - Date.now()));
+  if (refused) throw refused;
+}
+
 async function archiveText(url: string): Promise<string> {
   for (let attempt = 1; ; attempt++) {
-    // Another download's refusal can move the hold, or stop the run, while this one waits.
-    while (!refused && Date.now() < heldUntil)
-      await new Promise((resolve) => setTimeout(resolve, heldUntil - Date.now()));
-    if (refused) throw refused;
+    await holdOff();
     try {
       return await getText(url, {
         fresh: true,
+        pace: holdOff,
         throttled: (seconds) => (heldUntil = Math.max(heldUntil, Date.now() + seconds * 1000)),
       });
     } catch (error) {
-      if (!/returned 429\b/.test(String(error))) throw error;
+      if (error instanceof Blocked || !/returned 429\b/.test(String(error))) throw error;
       const asked = /retry after (\d+) s/.exec(String(error))?.[1];
       const wait = Math.max(asked ? Number(asked) * 1000 : 0, archivePacing.blockedMs);
       if (attempt >= archivePacing.tries || wait > archivePacing.maxHoldMs) {
