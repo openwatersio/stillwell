@@ -42,7 +42,7 @@ The Ingest, Ingest hourly, Monthly and Canary workflows pass `CCO_API_KEY` and `
 
 ### Backfill
 
-The station list refreshes on the 2nd of each month by the Monthly workflow. Before the first backfill, dispatch Monthly with `sources` set to `cco`. Then read each site from its first year. The runs go separately because Brighton and Lymington answer 500 before their first reading; a year with nothing in it at another site answers empty. A year is one request, or two in a leap year, whose 8,784 hours pass the API's 8,760. The three runs are about 400 requests. Readings before 2026 stay preliminary, so every year of a station counts as unfinished, and `--skip-written` keeps a run that stops partway from starting over:
+The station list refreshes on the 2nd of each month by the Monthly workflow. Before the first backfill, dispatch Monthly with `sources` set to `cco`. Then read each site from its first year. The runs go separately because Brighton and Lymington answer 500 before their first reading; a year with nothing in it at another site answers empty. A year is one request, or two in a leap year, whose 8,784 hours pass the API's 8,760. The three runs are about 400 requests. Readings before 2026 stay preliminary, so every year of a station counts as unfinished, and `--skip-written` keeps a run that stops partway from starting over, and skips for 30 days the years a site has no readings in:
 
 ```bash
 node scripts/ingest.ts backfill cco 86,89,90,92,93,95,102,106,111,112,117,119,126 2005 2027 --skip-written

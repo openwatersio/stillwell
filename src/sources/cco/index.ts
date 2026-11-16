@@ -40,6 +40,8 @@ export const metadata: SourceMetadata = {
   hourly: true,
   // Readings carry no flag until the monthly check, which can flag them.
   finalizes: true,
+  // An outage is an error, so a year with no readings has none.
+  empty_means_none: true,
 };
 
 /** Requests that go out start this far apart; the API publishes no rate limit. */
