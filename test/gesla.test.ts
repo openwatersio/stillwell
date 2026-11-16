@@ -835,6 +835,16 @@ describe("gesla clocks", () => {
     assert.equal(iso(parsed[0]!), "2019-12-31T14:00:00.000Z");
   });
 
+  it("moves Scott Base's record an hour more over the stretch its logger was on UTC+13", () => {
+    const at = (time: string) =>
+      iso(gesla.parse(lines([time]), "scott_base_antarctica-scot-nzl-ttw", null).times[0]!);
+    assert.equal(at("2023/11/24 23:59:00"), "2023-11-24T11:59:00.000Z");
+    assert.equal(at("2023/11/25 00:00:00"), "2023-11-24T11:00:00.000Z");
+    assert.equal(at("2024/10/28 23:59:00"), "2024-10-28T10:59:00.000Z");
+    assert.equal(at("2024/10/29 00:00:00"), "2024-10-28T12:00:00.000Z");
+    assert.equal(at("2024/11/01 00:00:00"), "2024-10-31T12:00:00.000Z");
+  });
+
   it("moves exactly the records each clock erratum lists, by its hours", () => {
     const hours: Record<string, number> = {
       "gesla-hong-kong-hour-early": 1,

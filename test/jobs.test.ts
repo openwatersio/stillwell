@@ -195,21 +195,28 @@ describe("Monthly workflow", () => {
   };
 
   it("requalifies last month's year in the list job, which holds the source's group", () => {
-    const step = jobs.lists!.steps.find((s) => s.run?.includes("ingest.ts requalify"));
+    const step = jobs.lists!.steps.find((s) => s.run?.includes("monthly.sh requalify-recent"));
     assert.ok(step, "the lists job requalifies");
     assert.equal(jobs.lists!.concurrency?.group, "store-${{ matrix.source }}");
     // A dispatched refresh of named sources, such as Ingest hourly's on a datum change, skips it.
-    assert.equal(step.if, "${{ !cancelled() && !inputs.sources }}");
+    assert.equal(
+      step.if,
+      "${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}",
+    );
     // From the year two months back, since compaction refolds a month's last
     // days with the window's flags after the run, so December's are judged in
-    // February; to last month's year, the end exclusive.
-    assert.match(step.run!, /from=\$\(date -u -d "\$month -2 months" \+%Y\)/);
-    assert.match(step.run!, /to=\$\(date -u -d "\$month -1 month" \+%Y\)/);
-    assert.match(step.run!, /all "\$from" "\$\(\(to \+ 1\)\)" --budget "\$budget" /);
-    // After analysis, whose verdicts pick the rules it judges with.
+    // February; to last month's year, the end exclusive. scripts/monthly.sh
+    // holds the step, which the server runs too.
+    const script = readFileSync("scripts/monthly.sh", "utf8");
+    assert.match(script, /from=\$\(date -u -d "\$month -2 months" \+%Y\)/);
+    assert.match(script, /to=\$\(date -u -d "\$month -1 month" \+%Y\)/);
+    assert.match(script, /all "\$from" "\$\(\(to \+ 1\)\)" --budget "\$budget" /);
+    // After analysis, whose verdicts pick the rules it judges with, in the workflow and the script's lists.
     const index = (text: string) => jobs.lists!.steps.findIndex((s) => s.run?.includes(text));
-    assert.ok(index("ingest.ts analyze") >= 0);
-    assert.ok(index("ingest.ts analyze") < index("ingest.ts requalify"));
+    assert.ok(index("monthly.sh analyze") >= 0);
+    assert.ok(index("monthly.sh analyze") < index("monthly.sh requalify-recent"));
+    const lists = script.slice(script.indexOf("  lists)"));
+    assert.ok(lists.indexOf("analyze ||") < lists.indexOf("requalify_recent ||"));
   });
 
   it("puts no job but the lists and refetch in a source's group", () => {

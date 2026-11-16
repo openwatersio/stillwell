@@ -30,12 +30,6 @@ Tide levels every 10 minutes at 15 gauges of the National Network of Regional Co
 - **Times:** UTC, `YYYYMMDD#hhmmss`; a stamp that isn't a real time fails the request. The clock check against TICON's records for 2025, a year that includes British Summer Time, fits Herne Bay and Penarth at 0 minutes (K1 5 and 17 minutes). TICON's records of these gauges were fitted to CCO's own series, so that fit shows only that the clock hasn't changed since. Whitby Harbour's 2023 levels against BODC's Whitby levels, an independent gauge, fit best at 0 minutes within 30 either way (RMS difference 0.17 m, and 0.20 to 0.36 m at 10 to 30 minutes).
 - **Freshness:** `hourly` is true: the hourly job reads each site's last 12 hours, and the poller fills ClickHouse from the files it writes. The `latest` feed's `date` is a site's last reading, with or without a value.
 
-## Errata
-
-- **West Bay Harbour's position** (erratum `cco-west-bay-position`). CCO's list puts the gauge 3.9 km west of the harbour, and the store moves it to where GESLA's and CMEMS's records of it have it.
-- **Fill values** (erratum `cco-fill-values`). Exmouth, Hastings Pier and Swanage Pier hold readings of 999.9999 and −999.9999 where the gauge sent nothing, and the store leaves them out.
-- **Windows with no readings** (erratum `cco-empty-window-answers`). A window with no readings answers a body that isn't JSON, which reads as no values, and Lymington and Brighton answer HTTP 500 before their first reading.
-
 ## Running ingest
 
 The Ingest, Ingest hourly, Monthly and Canary workflows pass `CCO_API_KEY` and `CCO_REFERER` as the repository secrets of the same names. The poller doesn't ask CCO: `stillwell-ingest.service` names it in `STILLWELL_FROM_RECENT`, so the hourly workflow's read of each site's last 12 hours is the one request a site an hour that Stillwell told the observatory to expect, and the server needs no key. The adapter starts requests a second apart (a request that fails with a timeout or a 5xx is sent again, up to four times in all, and a backfill reads four stations at once), and waits up to 15 minutes for a request of more than a day, as a year takes minutes. The canary reads Deal Pier's last few days and is skipped without the key. It isn't recorded: its levels path names the request's time, so it has only to return values.

@@ -1244,6 +1244,11 @@ async function prepare(path: string): Promise<void> {
   if (!isRemote(path)) await mkdir(dirname(path), { recursive: true });
 }
 
+/** Whether files under `path` can be listed by glob: on disk or over S3, not over HTTP(S). */
+export function listable(path: string): boolean {
+  return !/^https?:\/\//.test(path);
+}
+
 function isRemote(path: string): boolean {
   return /^[a-z0-9]+:\/\//.test(path);
 }

@@ -1,0 +1,101 @@
+{
+  "gauge": "ROBT",
+  "description": "SITE INFORMATION\r\n-----------------\r\nNAME:             Cape Roberts\r\nCODE:             ROBT\r\nWGS-84 POSITION:   77\u00b0 02'S\r\n                  163\u00b0 11'E\r\nUTM COORDINATES:    604 700 mE\r\nZONE 57 (SOUTH)   1 445 800 mN\t\r\n\r\n===========================================================\r\n\r\nPRESSURE SENSOR DETAILS\r\n------------------------\r\nDATA COMMENCED:   20 November 1990 (UTC), julian day 324\r\nRECORD INTERVAL:  5 minutes\r\nTIME SYSTEM:      UTC\r\nMANUFACTURER:     Geokon \r\nSENSOR MODEL:     4500\r\nRANGE:            350kPa\r\n           \r\n===========================================================\r\n\r\nGAUGE HISTORY\r\n------------------------\r\n1988 - site established 15 November, recording commenced 4 days later.\r\n1989 - transducer lost 5 February.\r\n1990 - gauge reinstated 20 November.\r\n1993 - gauge failed 26 September.\r\n1994 - gauge reinstated 27 November.\r\n2003 - data ends 18 March; re-established 23 November.\r\n2009 - sensor malfunction late August. New sensor installed 4 December but failed 4 days later.\r\n2010 - gauge re-established early November, recording recommended 5 November.\r\n2021 - gauge failed 16 March, re-established 6 November.\r\n\r\n===========================================================\r\n\r\nDATA AVAILABILITY\t\t\r\n------------------\t\t  \r\nContact LINZ (customer support@linz.govt.nz) for data prior\r\nto 8 November 2007.  \r\n\r\n************************************************\r\n* DATA UNRELIABLE: 29 August - 7 December 2009 *\r\n************************************************\r\n\r\n===========================================================\r\n\r\nREFERENCE BENCH MARKS\t\t\r\n----------------------\t\t  \r\nCAPE ROBERTS TGBM1, LINZ geodetic code B93M  \r\nROB3, LINZ geodetic code ROB3 \r\n\r\n===========================================================\r\n\r\nSUMMARY OF TIDE GAUGE ZERO BELOW B93M (metres)\r\n-----------------------------------------------\r\n\r\nCalibration Date:\tValue (m):\r\nDecember 1991\t\t7.668\r\nDecember 1992\t\t7.824\r\nNovember 1994\t\t8.992\r\nDecember 1996\t\t9.015\r\nNovember 2000\t\t8.556\r\nJanuary  2002\t\t8.446\r\nDecember 2002\t\t8.332\r\nDecember 2003\t\t8.336\r\nNovember 2004\t\t8.307\r\nNovember 2005\t\t8.327\r\nNovember 2006\t\t8.318\r\nNovember 2007 \t\t8.310\r\nNovember 2008 \t\t8.234\r\nNovember 2011\t\t7.993\r\nNovember 2012\t\t8.022\r\nNovember 2013\t\t8.019\r\nNovember 2014\t\t7.997\r\nNovember 2015\t\t8.075\r\nDecember 2016\t\t8.050\t\t\r\nNovember 2017\t\t8.013\r\nNovember 2018\t\t8.215\r\nOctober  2019\t\t9.534 - unreliable\r\nNovember 2021\t\t7.766\r\nNovember 2022\t\t7.726\r\nNovember 2023\t\t7.691\r\nNovember 2024\t\t7.768\r\nNovember 2025  \t\t7.820\r\n\r\n===========================================================\r\n\r\nFILE NAME FORMAT NOTES\r\n-----------------------\r\n\r\nThe sea level data .zip file is named using the format\r\nROBT_yyyyddd.zip, where:\r\n\r\nyyyy is the year (eg 2009)\r\nddd is the day of the year (eg 110, for 20 April).\r\n\r\nThe .zip file contains a single file of sea level data, \r\nnamed in the same format but using a .csv file extension.\r\n\r\n===========================================================\r\n\r\nSEA LEVEL DATA FORMAT - comma delimited yearly files\r\n---------------------------------------------------\r\n\r\n2008-2009:\r\n1st field: site code (ROBT)\r\n2nd field: date (yyyymmdd) UTC, 24 hour\r\n3rd field: time (hh:mm:ss) UTC, 24 hour\r\n4th field: sea level height (metres)\r\n\r\neg:\r\nROBT,20080117,00:05:00,6.047\r\nROBT,20080117,00:10:00,6.004\r\nROBT,20080117,00:15:00,5.992\r\n\r\n\r\n2011-2017, 2023 (excl. 2014): \r\n1st field: site code (ROBT)\r\n2nd field: date (yyyymmdd) UTC, 24 hour\r\n3rd field: time (hh:mm:ss) UTC, 24 hour\r\n4th field: sea level height (metres)\r\n5th field: number of measurements per 5 min sample (max 30)\r\n6th field: sea water temperature \u00b0C\r\n7th field: atmospheric pressure hPa \r\n\r\neg:\r\nROBT,20110101,0:00:00,5.345,30,-2.338,993.15\r\nROBT,20110101,0:05:00,5.38,30,-2.338,992.99\r\nROBT,20110101,0:10:00,5.389,30,-2.338,992.82\r\n\r\n\r\n2014, 2018-2025 (excl. 2023): \r\n1st field: year (yyyy)\r\n2nd field: Julian Day\r\n3rd field: time UTC, 24 hour\r\n4th field: number of measurements per 5 min sample (max 30)\r\n5th field: sea level height (metres)\r\n6th field: sea water temperature \u00b0C\r\n7th field: atmospheric pressure hPa \r\n\r\neg:\r\n2024,1,1000,30,5.676,-3.458,973.02\r\n2024,1,1005,30,5.675,-3.458,973.02\r\n2024,1,1010,30,5.689,-3.458,973.02\r\n\r\n===========================================================\r\n\r\n",
+  "datasets": [
+    {
+      "year": "2007",
+      "sensor": "00",
+      "datasetid": "ROBT/2007/00"
+    },
+    {
+      "year": "2008",
+      "sensor": "00",
+      "datasetid": "ROBT/2008/00"
+    },
+    {
+      "year": "2009",
+      "sensor": "00",
+      "datasetid": "ROBT/2009/00"
+    },
+    {
+      "year": "2010",
+      "sensor": "00",
+      "datasetid": "ROBT/2010/00"
+    },
+    {
+      "year": "2011",
+      "sensor": "00",
+      "datasetid": "ROBT/2011/00"
+    },
+    {
+      "year": "2012",
+      "sensor": "00",
+      "datasetid": "ROBT/2012/00"
+    },
+    {
+      "year": "2013",
+      "sensor": "00",
+      "datasetid": "ROBT/2013/00"
+    },
+    {
+      "year": "2014",
+      "sensor": "00",
+      "datasetid": "ROBT/2014/00"
+    },
+    {
+      "year": "2015",
+      "sensor": "00",
+      "datasetid": "ROBT/2015/00"
+    },
+    {
+      "year": "2016",
+      "sensor": "00",
+      "datasetid": "ROBT/2016/00"
+    },
+    {
+      "year": "2017",
+      "sensor": "00",
+      "datasetid": "ROBT/2017/00"
+    },
+    {
+      "year": "2018",
+      "sensor": "00",
+      "datasetid": "ROBT/2018/00"
+    },
+    {
+      "year": "2019",
+      "sensor": "00",
+      "datasetid": "ROBT/2019/00"
+    },
+    {
+      "year": "2020",
+      "sensor": "00",
+      "datasetid": "ROBT/2020/00"
+    },
+    {
+      "year": "2021",
+      "sensor": "00",
+      "datasetid": "ROBT/2021/00"
+    },
+    {
+      "year": "2022",
+      "sensor": "00",
+      "datasetid": "ROBT/2022/00"
+    },
+    {
+      "year": "2023",
+      "sensor": "00",
+      "datasetid": "ROBT/2023/00"
+    },
+    {
+      "year": "2024",
+      "sensor": "00",
+      "datasetid": "ROBT/2024/00"
+    },
+    {
+      "year": "2025",
+      "sensor": "00",
+      "datasetid": "ROBT/2025/00"
+    }
+  ]
+}
