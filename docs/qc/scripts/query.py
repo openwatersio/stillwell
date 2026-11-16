@@ -3,7 +3,7 @@
     python -I docs/qc/scripts/query.py "SELECT ... FROM 'https://stillwell.openwaters.io/...'"
 """
 import sys, duckdb
-con = duckdb.connect()
+con = duckdb.connect(config={"custom_user_agent": "openwaters-stillwell-qc/1 (+https://github.com/openwatersio/stillwell)"})
 con.execute("install httpfs; load httpfs; set TimeZone='UTC'")
 for q in sys.argv[1:]:
     r = con.execute(q)

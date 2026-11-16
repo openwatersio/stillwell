@@ -1,4 +1,4 @@
-import { getJson, getText } from "../../http.ts";
+import { Blocked, getJson, getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -273,11 +273,57 @@ export function archiveDay(day: number): Promise<Day> {
   return parsed;
 }
 
+/**
+ * The archive answers 429 for a while after a run downloads many day files,
+ * longer than `fetchText`'s retries over a few seconds. A day file it refuses
+ * waits `blockedMs`, or longer if Retry-After asks, holding every other
+ * download back too, as `fetchText`'s own throttled retries do, and is asked
+ * again, `tries` times in all; past
+ * those, or for a Retry-After over `maxHoldMs`, the archive is taken to be
+ * refusing this client, and every download after throws `Blocked`, which stops
+ * the run rather than fail each station-year. Tests shrink the waits.
+ */
+export const archivePacing = { blockedMs: 5 * 60_000, maxHoldMs: 15 * 60_000, tries: 3 };
+let heldUntil = 0;
+let refused: Blocked | undefined;
+
+/** Waits out the archive's hold before each request, `fetchText`'s retries too, and throws once the run is stopped. */
+async function holdOff(): Promise<void> {
+  // Another download's refusal can move the hold, or stop the run, while this one waits.
+  while (!refused && Date.now() < heldUntil)
+    await new Promise((resolve) => setTimeout(resolve, heldUntil - Date.now()));
+  if (refused) throw refused;
+}
+
+async function archiveText(url: string): Promise<string> {
+  for (let attempt = 1; ; attempt++) {
+    await holdOff();
+    try {
+      return await getText(url, {
+        fresh: true,
+        pace: holdOff,
+        throttled: (seconds) => (heldUntil = Math.max(heldUntil, Date.now() + seconds * 1000)),
+      });
+    } catch (error) {
+      if (error instanceof Blocked || !/returned 429\b/.test(String(error))) throw error;
+      const asked = /retry after (\d+) s/.exec(String(error))?.[1];
+      const wait = Math.max(asked ? Number(asked) * 1000 : 0, archivePacing.blockedMs);
+      if (attempt >= archivePacing.tries || wait > archivePacing.maxHoldMs) {
+        refused ??= new Blocked(
+          `EA's archive is still refusing requests after ${attempt} tries (${(error as Error).message}); stopping`,
+        );
+        throw refused;
+      }
+      heldUntil = Math.max(heldUntil, Date.now() + wait);
+    }
+  }
+}
+
 async function fetchDay(day: number): Promise<Day> {
   const date = new Date(day).toISOString().slice(0, 10);
   let csv: string;
   try {
-    csv = await getText(`${API}/archive/readings-${date}.csv`, { fresh: true });
+    csv = await archiveText(`${API}/archive/readings-${date}.csv`);
   } catch (error) {
     // The archive keeps about a year; a day outside it answers 404. One well
     // inside it is a gap, reported loudly, but gives only that day nothing, so
@@ -337,9 +383,11 @@ function intern(id: string): string {
 
 const TIDE_GAUGE = /-tidal_level-Mean-15_min-m(AOD)?,/;
 
-/** For tests: forget the archive days read so far. */
+/** For tests: forget the archive days read so far, and any refusal. */
 export function forgetArchive(): void {
   days.clear();
+  heldUntil = 0;
+  refused = undefined;
 }
 
 export const source: Source = {

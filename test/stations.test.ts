@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import type { StoredStation, ListedStation, Station } from "../src/schema.ts";
 import { seriesPath } from "../src/store/paths.ts";
 import { mergeStationList } from "../src/stations.ts";
+import * as usgs from "../src/sources/usgs/index.ts";
 
 const base = {
   source: "rws",
@@ -339,6 +340,61 @@ describe("mergeStationList", () => {
       options,
     );
     assert.deepEqual(stations[0]!.datums, { MLLW: -2.4 });
+  });
+
+  it("clears committed offsets the source marks as wrong", () => {
+    const { stations, changes } = mergeStationList(
+      [held("a", { datums: { MLLW: -2.4 } })],
+      [{ ...station("a", { datums: {} }), no_datums: true }],
+      options,
+    );
+    assert.deepEqual(changes, []);
+    assert.deepEqual(stations[0]!.datums, {});
+    assert.deepEqual(stations[0]!.epochs.at(-1)!.datums, {});
+    assert.equal("no_datums" in stations[0]!, false);
+  });
+
+  it("lets a source see its own no_datums flag when it says a zero may have moved", () => {
+    // A decided USGS gage whose decision USGS's new altitude sets aside.
+    const stored = {
+      ...held("422206071033901", { datum: "GAGE", datums: { NAVD88: -32.516 } }),
+      id: "usgs/422206071033901",
+      source: "usgs",
+    };
+    const listed = {
+      ...station("422206071033901", { datum: "GAGE", datums: {} }),
+      id: "usgs/422206071033901",
+      source: "usgs",
+      no_datums: true,
+    };
+    const { changes } = mergeStationList([stored], [listed], {
+      ...options,
+      seriesChanged: usgs.seriesChanged,
+    });
+    assert.deepEqual(
+      changes.map((c) => [c.id, c.reason]),
+      [["usgs/422206071033901", "USGS lists another altitude than GAGE_DATUMS decided against"]],
+    );
+  });
+
+  it("leaves a held epoch's offsets for its decision to settle", () => {
+    const stored = held("a", { datums: { MLLW: -2.4 } });
+    // A change held for a decision: the open epoch carries on beside it.
+    stored.epochs.push({
+      ...stored.epochs[0]!,
+      id: 2,
+      since: "2026-11-01T00:00:00Z",
+      state: "held",
+    });
+    const { stations } = mergeStationList(
+      [stored],
+      [{ ...station("a", { datums: {} }), no_datums: true }],
+      options,
+    );
+    assert.deepEqual(
+      stations[0]!.epochs.map((e) => e.datums),
+      [{ MLLW: -2.4 }, { MLLW: -2.4 }],
+    );
   });
 
   it("refuses an ID that isn't <source>/<source_id>", () => {

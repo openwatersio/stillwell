@@ -22,7 +22,7 @@ if len(sys.argv) not in (4, 5):
 sid, year, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 source, source_id = sid.split("/", 1)
 
-con = duckdb.connect()
+con = duckdb.connect(config={"custom_user_agent": "openwaters-stillwell-qc/1 (+https://github.com/openwatersio/stillwell)"})
 con.execute("install httpfs; load httpfs; set TimeZone='UTC'")
 
 station = con.execute(
