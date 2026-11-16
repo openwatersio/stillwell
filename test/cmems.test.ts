@@ -371,6 +371,29 @@ describe("cmems", () => {
       ]);
     });
 
+    it("drops a level no gauge can read, such as AWG's fill of 999,999.06 m, as missing", async () => {
+      serve(
+        routes(
+          chunk([
+            [t("2026-10-31T12:00:00Z"), 999999.06, 4],
+            [t("2026-10-31T12:10:00Z"), -105e9, 4],
+            [t("2026-10-31T12:20:00Z"), 0.3, 1],
+          ]),
+          chunk([[t("2026-10-31T12:00:00Z"), 0.4, 1]]),
+        ),
+      );
+      const values = await cmems.levels(
+        "Aarhus",
+        new Date("2026-10-31T00:00:00Z"),
+        new Date("2026-11-01T00:00:00Z"),
+      );
+      // The latest window's value stands where the history copy held a fill.
+      assert.deepEqual(values, [
+        { time: Date.parse("2026-10-31T12:00:00Z"), level: 0.4, flag: Flag.preliminary },
+        { time: Date.parse("2026-10-31T12:20:00Z"), level: 0.3, flag: Flag.good },
+      ]);
+    });
+
     it("asks the latest window only for its last two months", async () => {
       const asked = serve(routes(chunk([]), chunk([])));
       await cmems.levels(

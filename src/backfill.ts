@@ -16,6 +16,7 @@ import {
 import { csvFields } from "./csv.ts";
 import { qcFor, refuseOtherDatum } from "./store/recent.ts";
 import { judgeFetched } from "./store/requalify.ts";
+import { possible } from "./span.ts";
 import type {
   Epoch,
   StoredStation,
@@ -482,8 +483,10 @@ export async function backfillYear(
     // An empty fetch is an outage, a year the source no longer publishes, or a
     // datum it no longer serves; it never empties a file.
     if (!rows.length) return "empty";
-    const { rows: existing, datums } = await series.get(year);
+    const { rows: stored, datums } = await series.get(year);
     await refuseOtherDatum(path, station, datums);
+    // A stored level outside `SPAN_M` goes, as a fetch drops one.
+    const existing = product === "levels" ? stored.filter((r) => possible(r.level)) : stored;
     const keepAll = product === "levels" && source.keepsStored;
     let merged = mergeFetched(existing, rows, ...range, undefined, keepAll);
     if (product === "levels")
@@ -495,7 +498,7 @@ export async function backfillYear(
         [...(await series.get(year - 1)).rows, ...(await series.get(year + 1)).rows],
         keepAll,
       );
-    if (!merged.length || sameRows(existing, merged)) return undefined;
+    if (!merged.length || sameRows(stored, merged)) return undefined;
     let stats: YearStats;
     try {
       stats = await writeObservations(path, merged, station.datum);

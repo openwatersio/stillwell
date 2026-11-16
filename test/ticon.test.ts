@@ -467,6 +467,38 @@ describe("TICON originators", () => {
       const match = originatorSeries(record(id, at), lists);
       assert.deepEqual([match.id, match.status], ["ea/E70739", "ready"]);
     }
+    // A gauge's retired listing, linked to its current one, is no rival; the active series wins.
+    const old = {
+      ...station("ea/E72624", "Avonmouth Portbury", 51.50291, -2.6988),
+      status: "inactive" as const,
+    };
+    const now = {
+      ...station("ea/E72639", "Avonmouth Portbury", 51.49999, -2.728468),
+      same_as: ["ea/E72624"],
+    };
+    const twins = originatorSeries(
+      record("avonmouth-avo-gbr-bodc", { name: "Avonmouth", lat: 51.508, lon: -2.713 }),
+      {
+        ea: [old, now],
+      },
+    );
+    assert.deepEqual([twins.id, twins.status], ["ea/E72639", "ready"]);
+    // An unlinked active gauge doesn't displace a retired one at the record's own position.
+    const lock = originatorSeries(
+      record("avonmouth-avo-gbr-bodc", { name: "Avonmouth", ...{ lat: 51.50291, lon: -2.6988 } }),
+      {
+        ea: [old, { ...station("ea/E79939", "Avonmouth", 51.5031, -2.6986), same_as: [] }],
+      },
+    );
+    assert.equal(lock.id, "ea/E72624");
+    // Unlinked, the two are ambiguous, and the record waits for BODC's.
+    const apart = originatorSeries(
+      record("avonmouth-avo-gbr-bodc", { name: "Avonmouth", lat: 51.508, lon: -2.713 }),
+      {
+        ea: [old, { ...now, same_as: [] }],
+      },
+    );
+    assert.deepEqual([apart.source, apart.status], ["bodc", "planned"]);
     // NOC's gauges outside the UK network aren't in BODC's open data.
     const ascension = originatorSeries(
       record("ascension-asc-gbr-noc", { lat: -7.9, lon: -14.4 }),

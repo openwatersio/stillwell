@@ -218,9 +218,9 @@
       "since": "2019-12-31",
       "until": "2026-01-01",
       "handling": "corrected",
-      "error": "From 2020, GESLA 4.1's seven Queensland records that run past 2019 (Cape Ferguson, Cardwell, Cooktown, Fishermans Landing, Half Tide Tug Harbour, South Trees and Thursday Island) are on Australian Eastern Standard Time (UTC+10), labeled UTC: the height labeled T was measured at T − 10 h UTC. Before 2020 they're on UTC, and each ends at 13:50 UTC on 31 December 2019, local midnight; each 2020 part starts at a label of 00:00 on 1 January.",
-      "response": "The adapter moves the records' times labeled from 1 January 2020 10 hours earlier, which joins the two parts with no gap or overlap. After the move Cape Ferguson's record still differs from UHSLC's on about a quarter of the days in 2020 and 2021; those values are kept as served.",
-      "evidence": "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before 2020 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more, 3 to 4 cm). The store's level match of November 2026 found the record 75 cm from UHSLC's."
+      "error": "From 2020, GESLA 4.1's seven Queensland records that run past 2019 (Cape Ferguson, Cardwell, Cooktown, Fishermans Landing, Half Tide Tug Harbour, South Trees and Thursday Island) are on Australian Eastern Standard Time (UTC+10), labeled UTC: the height labeled T was measured at T − 10 h UTC. Before 2020 they're on UTC, and each ends at 13:50 UTC on 31 December 2019, local midnight; each 2020 part starts at a label of 00:00 on 1 January. From 2020 a label on day 1 to 12 of a month also has its day and month swapped: the values labeled 1 March were measured on 3 January, and those labeled 3 January on 1 March.",
+      "response": "For the records' times labeled from 1 January 2020, the adapter swaps the day and month of a date whose day is 12 or less, then moves the time 10 hours earlier. That joins the two parts with no gap or overlap and gives one time for each label.",
+      "evidence": "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before 2020 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more a day, 3 to 4 cm). Most of the hours that differ are on days 1 to 12 of a month: in 2020, after the 10-hour move, 2,704 of 3,456 hours on those days are more than 10 cm from UHSLC's (standard deviation 50 cm), and with day and month swapped 26 are (1.6 cm). On days 13 to 31, 47 of 5,328 hours are. With both fixes, Cape Ferguson's record differs from UHSLC's by 1.7 cm (standard deviation) in 2020 and 4.4 cm in 2021, 10 minutes after UHSLC's times as in 2019 (3.3 cm), against 32 and 35 cm with the 10-hour move alone. In the raw file the label 2020/03/01 00:00 follows 2020/02/29 23:50 with a step of 84 cm, both flagged correct. In all seven records the mean step where day 12 meets day 13 and where a month meets the next is 3 to 13 cm a year to 2019, the size of the records' 10-minute steps, and 38 to 113 cm from 2020 to 2025; with day and month swapped back they're 1 to 12 cm in every record and year, against 3.5 to 10.6 cm for the records' other 10-minute steps, and no two values share a time. The same step test on the stored values of every other GESLA record with values from 2020 (3,131 with such joins) finds no other record with the swap. The store's level match of November 2026 found the record 75 cm from UHSLC's."
     },
     {
       "id": "gesla-sfwmd-est",
@@ -998,6 +998,57 @@
       "error": "GESLA 4.1 gives Boat Cove and Fishing Rock (Raoul Island) longitudes of 177.9°E, and Owenga (Chatham Islands) 176.37°E, where LINZ's READMEs give 177.89°W, 177.90°W and 176.37°W. Each record sits about 410 to 580 km from its gauge, on the wrong side of the antimeridian.",
       "response": "The three records keep GESLA's positions. Each is linked to LINZ's gauge by decision in `LINKS` (`src/same-as.ts`), so the copy rule's distance limit doesn't leave it unlinked.",
       "evidence": "LINZ's READMEs for RBCT, RFRT and CHIT, November 2026; the three GESLA TTW records' positions in the store's list."
+    },
+    {
+      "id": "gesla-petten-meetraai3-2012-zero",
+      "stations": ["gesla/petten_meetraai_03-pet-nld-rws"],
+      "since": "2012-10-22",
+      "until": "2013-05-16",
+      "handling": "flagged",
+      "error": "GESLA's copy of RWS's Petten meetraai 03 holds exactly 0.00 m NAP for hours at a time through high and low water from 22 October 2012 to the record's end on 15 May 2013, as RWS's own series does (erratum `rws-petten-meetraai3-2012-zero`).",
+      "response": "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
+      "evidence": "The same 778 values of 0.00 m in 2012 and 466 in 2013 as RWS's series. Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row."
+    },
+    {
+      "id": "gesla-fill-values",
+      "stations": [
+        "gesla/arun_platform-arn-gbr-cco",
+        "gesla/arunplatformtg-aru-gbr-cmems",
+        "gesla/awgtg-awg-nld-cmems",
+        "gesla/bayonnepontblanctg_05minute-bay-fra-cmems",
+        "gesla/brighton-btn-gbr-cco",
+        "gesla/brightontg-bri-gbr-cmems",
+        "gesla/cape_roberts-robt-nzl-ttw",
+        "gesla/deal_pier-dlp-gbr-cco",
+        "gesla/dealpiertg-dea-gbr-cmems",
+        "gesla/exmouth-exm-gbr-cco",
+        "gesla/exmouthtg-exm-gbr-cmems",
+        "gesla/hastings_pier-hgp-gbr-cco",
+        "gesla/hastingspiertg-has-gbr-cmems",
+        "gesla/idsl_ceuta-ids-esp-cmems",
+        "gesla/k141tg-k14-nld-cmems",
+        "gesla/l91tg-l91-nld-cmems",
+        "gesla/marienleuchtetg-mar-deu-cmems",
+        "gesla/pontseudretg_05minute-pon-fra-cmems",
+        "gesla/saint_pierre_et_miquelon-115-fra-refmar",
+        "gesla/saintpierreetmiquelontg_60minute-sai-fra-cmems",
+        "gesla/sandown_pier-sdp-gbr-cco",
+        "gesla/sandownpiertg-san-gbr-cmems",
+        "gesla/scarborough-sca-gbr-cco",
+        "gesla/scarboroughtg-sca-gbr-cmems",
+        "gesla/secondseverncrossingtg-sec-gbr-cmems",
+        "gesla/severn_bridge-ssc-gbr-cco",
+        "gesla/swanage_pier-swp-gbr-cco",
+        "gesla/swanagepiertg-swa-gbr-cmems",
+        "gesla/teignbridgepiertg-tei-gbr-cmems",
+        "gesla/teignmouth_pier-tnp-gbr-cco",
+        "gesla/villefranquetg_05minute-vil-fra-cmems"
+      ],
+      "since": "2008-01-01",
+      "handling": "dropped",
+      "error": "These 31 GESLA records hold levels no gauge can read, outside the store's span of −500 to 9,000 m, as values rather than as GESLA's null of −99.9999: 42,040 values in 142 record-years from 2008 to 2026. Most are fill values: 999,999.06 m in CMEMS's AWG, K14 and L9 records, 99,999.01 m at Ceuta, −9,999.99 m at Pont Seudre, −10,000 m at Bayonne and Villefranque, and −6,999 m in Toitū Te Whenua's Cape Roberts. The CCO and CMEMS records of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing, Swanage Pier and Teignmouth) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, and Marienleuchte's and Saint-Pierre-et-Miquelon's records similar ones.",
+      "response": "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, and requalify drops any the store holds.",
+      "evidence": "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
     }
   ],
   "retired": []

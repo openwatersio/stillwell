@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
-import { Flag } from "../src/schema.ts";
+import { Flag, type Station } from "../src/schema.ts";
+import { sources } from "../src/sources/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
 import { mergeStationList } from "../src/stations.ts";
 
@@ -280,6 +281,25 @@ describe("cdec", () => {
     assert.ok(levels.every((l, i) => i === 0 || l.time > levels[i - 1]!.time));
     // 193 rows, 1 November 00:00 to 3 November 00:00, less that 00:45 and the last, at the range end.
     assert.equal(levels.length, 191);
+  });
+
+  it("drops CDEC's −7,999 ft placeholder through the registry, not in the adapter", async () => {
+    // The fixture with its 00:15 reading replaced by the placeholder.
+    const csv = fixture("cdec-MRZ-dst.csv").replace(
+      "20251101 0015,20251101 0015,3.92,",
+      "20251101 0015,20251101 0015,-7999,",
+    );
+    serve(() => csv);
+    const range = [new Date("2025-11-01T07:00:00Z"), new Date("2025-11-01T08:00:00Z")] as const;
+    const placeholder = Date.parse("2025-11-01T07:15:00Z");
+    const raw = await cdec.levels({ source_id: "MRZ" }, ...range);
+    assert.ok(raw.some((l) => l.time === placeholder));
+    const kept = await sources.cdec!.observations!(
+      { id: "cdec/MRZ", source_id: "MRZ" } as Station,
+      ...range,
+    );
+    assert.equal(kept.length, raw.length - 1);
+    assert.ok(!kept.some((l) => l.time === placeholder));
   });
 
   it("asks to the next Pacific day across the end of daylight saving", async () => {

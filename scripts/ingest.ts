@@ -1107,7 +1107,7 @@ async function requalifyStations(
       const died = new Set<string>();
       const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
         try {
-          const { files, changed, warnings } = await requalifyInWorker(
+          const { files, changed, dropped, warnings } = await requalifyInWorker(
             sourceId,
             station,
             storeFor(station),
@@ -1118,6 +1118,7 @@ async function requalifyStations(
           if (files) s.updated++;
           s.files += files;
           s.values += changed;
+          if (dropped) s.dropped = (s.dropped ?? 0) + dropped;
           for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);

@@ -161,14 +161,17 @@ describe("mergeStationList", () => {
     }
   });
 
-  it("keeps stations the source dropped, inactive, and the committed tide_station", () => {
-    const previous = [held("a", { tide_station: "ticon/a" }), held("b")];
-    const { stations } = mergeStationList(previous, [station("a")], options);
+  it("keeps stations the source dropped, inactive and not live, and the committed tide_station", () => {
+    const previous = [
+      held("a", { tide_station: "ticon/a", live: true }),
+      held("b", { live: true }),
+    ];
+    const { stations } = mergeStationList(previous, [station("a", { live: true })], options);
     assert.deepEqual(
-      stations.map((s) => [s.id, s.status, s.tide_station]),
+      stations.map((s) => [s.id, s.status, s.live, s.tide_station]),
       [
-        ["rws/a", "active", "ticon/a"],
-        ["rws/b", "inactive", null],
+        ["rws/a", "active", true, "ticon/a"],
+        ["rws/b", "inactive", false, null],
       ],
     );
   });
