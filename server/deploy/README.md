@@ -34,7 +34,7 @@ The box that runs `stillwell-ingest`, the realtime poller ([docs/plans/realtime.
 
 1. Create the server in Hetzner's console or API, Ubuntu 26.04, with the maintainers' ssh keys and the CI deploy key's public half.
 2. Deploy to it: `server/deploy/deploy.sh root@<ip>`. The first run creates `/etc/stillwell.env` and `/etc/alloy.env` from the templates.
-3. Fill in `/etc/stillwell.env`: `USGS_API_KEY`, a key of the server's own, and `GITHUB_TOKEN`, a fine-grained token for openwatersio/stillwell with Actions read and write. Fill in `/etc/alloy.env` to ship metrics. Then run `deploy.sh` again.
+3. Fill in `/etc/stillwell.env`: `USGS_API_KEY`, a key of the server's own, `CCO_API_KEY` and `CCO_REFERER` for the Channel Coastal Observatory (a box with an `/etc/stillwell.env` already needs these added by hand; the poller doesn't read CCO while the unit names it in `STILLWELL_FROM_RECENT`, so they wait for ingest to move here), and `GITHUB_TOKEN`, a fine-grained token for openwatersio/stillwell with Actions read and write. Fill in `/etc/alloy.env` to ship metrics. Then run `deploy.sh` again.
 4. For deploys from CI: set the repository variable `DEPLOY_HOST` to the box's address, and in the `server` environment the secrets `DEPLOY_SSH_KEY` (the deploy key's private half) and `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <ip>`).
 5. Once metrics reach Grafana Cloud, apply the alerts with [`grafana/push.sh`](grafana/push.sh) ([Alerts](#alerts)).
 6. To publish `stillwell-api`, set up the Tunnel and the Worker as [workers/api/README.md](../../workers/api/README.md#setup) says, put the Tunnel's token in `/etc/cloudflared.env` as `TUNNEL_TOKEN`, and run `deploy.sh` again.
