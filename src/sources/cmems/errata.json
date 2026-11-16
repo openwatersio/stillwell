@@ -67,6 +67,16 @@
       "error": "The Baltic production unit's files cut a `platform_name` with letters beyond ASCII short, a byte for each byte past the first that such a letter takes in UTF-8 (\"Fåbor\" for Fåborg, \"Göteborg-Agnesber\" for Göteborg-Agnesberg), and in five put U+FFFD in a letter's place (\"Ark�\" for Arkö, \"Malm�\", \"Verk�\", \"Gren�\", \"Hanko Pikku Kolalahti / Hang�\"). The attribute's length counts the name's letters, not its bytes.",
       "response": "Every station from a Baltic file (`BO_TS_TG_`) whose name has a letter beyond ASCII is named by its platform code instead, such as `Faaborg`, which is whole.",
       "evidence": "`ncdump -h` of the latest window's files on 14 November 2026, such as `BO_TS_TG_Faaborg_20261015.nc` (`platform_name = \"Fåbor\"`, 6 bytes `46 c3 a5 62 6f 72`) and `BO_TS_TG_Arko_20261015.nc` (`Ark` and `ef bf bd`). Names from the other units' files, such as Puertos del Estado's \"A Coruña 2 tide gauge\", are whole."
+    },
+    {
+      "id": "cmems-wangerooge-west-2026-dropout",
+      "stations": ["cmems/WangeroogeTG"],
+      "since": "2026-10-26",
+      "until": "2026-10-30",
+      "handling": "flagged",
+      "error": "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
+      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
+      "evidence": "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged."
     }
   ],
   "retired": []
