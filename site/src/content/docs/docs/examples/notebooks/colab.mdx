@@ -23,6 +23,8 @@ import duckdb
 STORE = "https://stillwell.openwaters.io"
 con = duckdb.connect()
 con.sql("SET TimeZone = 'UTC'")
+# Your project, its version, and a URL or email address.
+con.sql("CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'})")
 ```
 
 A year of Hoek van Holland's levels, leaving out values flagged as suspect or bad:

@@ -47,6 +47,8 @@ Everything is Parquet at `https://stillwell.openwaters.io/`, readable without an
 
 ```sql
 SET TimeZone = 'UTC';
+-- Your project, its version, and a URL or email address.
+CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'});
 SELECT time, level_m, flag, datum
 FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
 WHERE flag <= 2

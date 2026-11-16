@@ -1,6 +1,7 @@
 import { availableParallelism, totalmem } from "node:os";
 import { Worker } from "node:worker_threads";
 import { fromSource, nearContext, qc, withSourceFlag, type QcOptions } from "../qc.ts";
+import { possible } from "../span.ts";
 import { Flag, Unjudged, type StoredStation, type Observation, type Source } from "../schema.ts";
 import { mergeFetched, sameRows } from "./merge.ts";
 import {
@@ -29,7 +30,7 @@ export async function requalify(
   start: number,
   end: number,
   written = new Map<string, YearStats>(),
-): Promise<{ files: number; changed: number; warnings: string[] }> {
+): Promise<{ files: number; changed: number; dropped: number; warnings: string[] }> {
   // Every epoch's datums and errata spans first, so a file to resolve by hand,
   // or a source's error, stops the station before any is written.
   const plans = [];
@@ -66,6 +67,7 @@ export async function requalify(
   const opts = qcFor(station);
   let files = 0;
   let changed = 0;
+  let dropped = 0;
   for (const { years, wanted, path, suspect, unjudged } of plans) {
     // Each year once, and only the three a step needs.
     const cache = new Map<number, Promise<{ rows: Observation[]; datums: string[] }>>();
@@ -81,7 +83,7 @@ export async function requalify(
     };
     for (const year of wanted) {
       for (const y of cache.keys()) if (y < year - 1) cache.delete(y);
-      const [{ rows: had, datums }, before, after] = await Promise.all([
+      const [{ rows: stored, datums }, before, after] = await Promise.all([
         read(year),
         read(year - 1),
         read(year + 1),
@@ -89,19 +91,27 @@ export async function requalify(
       // writeObservations stamps one datum on every row; the check above is only as fresh as its read.
       if (datums.length !== 1)
         throw new Error(`${path(year)}'s datums changed while requalify ran`);
+      // A level outside `SPAN_M` goes, as a fetch drops one.
+      const had = stored.filter((r) => possible(r.level));
+      // A year that would be left with no rows keeps its file, since a year file always has some.
+      if (!had.length && stored.length) {
+        warnings.push(`${year} holds only levels outside −500 to 9,000 m, so its file is kept`);
+        continue;
+      }
       // Kept flags can only get worse, so a looser rule doesn't clear a mark there.
       const start = unjudged ? withSpans(had, suspect) : fromSource(had, suspect);
       const next = qc(start, opts, nearContext(start, opts, [...before.rows, ...after.rows]));
       // From here this year is only the next one's context, so only the part qc sees stays in memory.
       cache.set(year, Promise.resolve({ rows: nearContext(after.rows, opts, had), datums }));
-      if (sameRows(had, next)) continue;
+      if (sameRows(stored, next)) continue;
       const flags = new Map(had.map((r) => [r.time, r.flag]));
       changed += next.filter((r) => flags.get(r.time) !== r.flag).length;
+      dropped += stored.length - had.length;
       written.set(path(year), await writeObservations(path(year), next, datums[0]!));
       files++;
     }
   }
-  return { files, changed, warnings };
+  return { files, changed, dropped, warnings };
 }
 
 /** A worker thread and the stations it's requalifying, by task ID. */

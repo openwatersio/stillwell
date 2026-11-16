@@ -7,6 +7,8 @@ import QueryResult from "../../../components/QueryResult.astro";
 
 Stillwell is a set of Parquet and JSON files at `https://stillwell.openwaters.io/`. Anything that reads Parquet over HTTPS can query it directly, without an account and without downloading the whole store, including [DuckDB](/docs/examples/tools/duckdb/), [Python](/docs/examples/tools/python/), [JavaScript](/docs/examples/tools/javascript/) and [R](/docs/examples/tools/r/).
 
+Outside a browser, send a `User-Agent` that names your project and its version and gives a URL or email address where its author can be reached, such as `my-project/1.0 (you@example.org)`. The examples show how for each tool that can; Polars sends its own, `polars/<version>`, and has no setting to change it. Browsers send their own and need nothing.
+
 This guide follows one station, Hoek van Holland at the mouth of the Port of Rotterdam, from finding it to comparing this year's water with the last ten.
 
 ## Find a station

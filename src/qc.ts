@@ -1,5 +1,6 @@
 import { fit, type HarmonicModel, STANDARD, timeline } from "./harmonic.ts";
 import { Flag, type Observation } from "./schema.ts";
+import { SPAN_M, possible } from "./span.ts";
 
 /**
  * Quality control for observed levels. Deliberately small: per-source quirks
@@ -55,19 +56,6 @@ export const SWITCHES = { outliers: true, held: true, jumps: false };
 
 /** How long a level unchanged is suspect, where a source's settings don't say. */
 export const FLATLINE_S = 6 * 3600;
-
-/**
- * Levels no gauge can read in any datum the store holds, in meters: below the
- * Dead Sea's shore or above Everest. QARTOD's gross range test fails a value
- * outside the sensor's span whatever the window holds, which catches a year
- * that is all placeholder, such as USACE's 30,479.695 m (99,999 ft), where
- * the window's own median is the placeholder. A scan of every year file in
- * November 2026 found no real level above 1,817 m, at USGS's Lyman Lake.
- */
-export const SPAN_M = [-500, 9000] as const;
-
-/** Whether a level is finite and within `SPAN_M`. */
-const possible = (level: number) => level >= SPAN_M[0] && level <= SPAN_M[1];
 
 /**
  * Rows as a source sent them, with `source_flag` set to their flag before QC

@@ -393,6 +393,10 @@ function byCode(
   return { source, id: station.id, status: "ready", distance_km: round(km(record, station)) };
 }
 
+const active = (s: Station) => s.status === "active";
+/** Whether `same_as` names either as the other's gauge. */
+const linked = (a: Station, b: Station) => a.same_as.includes(b.id) || b.same_as.includes(a.id);
+
 /** A station with levels, retired or not, since a record's epoch is history. */
 function usable(station: Station): boolean {
   return station.products.includes("levels");
@@ -402,9 +406,11 @@ function usable(station: Station): boolean {
  * The best station near the record. Stations within 5 km whose names share an
  * identifying word come first, ranked by how many words they share (counting
  * words like "buiten" that can't identify a gauge alone), then by distance.
- * Without one, the nearest station within 1 km. A station within 50 m wins
- * outright, and two equally good gauges farther apart leave the record
- * unmatched. Never by name alone: RWS and CMEMS spell places differently.
+ * Without one, the nearest station within 1 km. Between two that `same_as`
+ * links as one gauge, the active one comes first, as a gauge's current series
+ * before an old listing of it. A station within 50 m wins outright, and two equally good
+ * gauges farther apart leave the record unmatched, unless `same_as` links
+ * them as one gauge. Never by name alone: RWS and CMEMS spell places differently.
  */
 function nearest(
   record: TiconRecord,
@@ -424,7 +430,13 @@ function nearest(
     if (score.identifying === 0 && d > 1) continue;
     const rank = (score.identifying > 0 ? 1000 : 0) + score.total;
     candidates.push({ station, score: rank });
-    const better = !best || rank > best.score || (rank === best.score && d < best.km);
+    const better =
+      !best ||
+      rank > best.score ||
+      (rank === best.score &&
+        (linked(station, best.station) && active(station) !== active(best.station)
+          ? active(station)
+          : d < best.km));
     if (better) best = { station, km: d, score: rank };
   }
   if (!best)
@@ -440,12 +452,29 @@ function nearest(
     .map((c) => ({ ...c, km: km(record, c.station) }))
     .filter((c) => c.km <= 0.05)
     .sort((x, y) => x.km - y.km)[0];
-  if (exact)
-    return { source, id: exact.station.id, status: "ready", distance_km: round(exact.km), note };
+  if (exact) {
+    // The gauge's current series, where the nearest is an old listing of it.
+    const current = active(exact.station)
+      ? exact
+      : (candidates
+          .filter((c) => active(c.station) && linked(c.station, exact.station))
+          .map((c) => ({ ...c, km: km(record, c.station) }))
+          .sort((x, y) => x.km - y.km)[0] ?? exact);
+    return {
+      source,
+      id: current.station.id,
+      status: "ready",
+      distance_km: round(current.km),
+      note,
+    };
+  }
   // Two equally good gauges more than 100 m apart: the name doesn't say which.
   const rival = candidates.find(
     (c) =>
-      c.score === best!.score && c.station !== best!.station && km(c.station, best!.station) > 0.1,
+      c.score === best!.score &&
+      c.station !== best!.station &&
+      !linked(c.station, best!.station) &&
+      km(c.station, best!.station) > 0.1,
   );
   if (rival)
     return {

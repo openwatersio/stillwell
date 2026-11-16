@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readBackfilled } from "../src/backfilled.ts";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -653,6 +654,102 @@ describe("compactRecent", () => {
       ["2026-11-04T00:00:00.000Z", "2026-11-05T00:00:00.000Z"],
     );
     assert.equal(new Date(lastDays(NOW, 6)[0]).toISOString(), "2026-10-30T00:00:00.000Z");
+  });
+
+  it("records a year it folds a station's values from its first hour of, and no other", async () => {
+    const root = store();
+    const a = station("a");
+    const day = Date.UTC(2027, 0, 1);
+    await writeRecent(recentPath(root, "test"), [
+      [
+        { ...at(day - HOUR, 1, day), station: a.id, epoch: 1 },
+        { ...at(day + 10 * 60_000, 1, day + HOUR), station: a.id, epoch: 1 },
+        { ...at(day + DAY + HOUR, 1, day + DAY + HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    const fold = (from: number) =>
+      compactRecent({
+        source: source({}),
+        stations: [a],
+        storeFor: () => root,
+        start: from,
+        end: from + DAY,
+      });
+    await fold(day - DAY);
+    assert.equal((await readBackfilled(root, "test")).size, 0);
+    await fold(day + DAY);
+    assert.equal((await readBackfilled(root, "test")).size, 0);
+    await fold(day);
+    assert.deepEqual([...(await readBackfilled(root, "test")).get(a.id)!], [[1, [[2027, 2028]]]]);
+  });
+
+  it("takes a station with no interval to step by its values' shortest gap", async () => {
+    const root = store();
+    const b = station("b", { interval_s: null });
+    const day = Date.UTC(2027, 0, 1);
+    // Two-hourly, from 02:00.
+    await writeRecent(recentPath(root, "test"), [
+      [2, 4, 6].map((h) => ({ ...at(day + h * HOUR, 1, day + h * HOUR), station: b.id, epoch: 1 })),
+    ]);
+    await compactRecent({
+      source: source({}),
+      stations: [b],
+      storeFor: () => root,
+      start: day,
+      end: day + DAY,
+    });
+    assert.deepEqual([...(await readBackfilled(root, "test")).get(b.id)!], [[1, [[2027, 2028]]]]);
+  });
+
+  it("drops a stored level outside the span among the rows it folds", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(
+      file,
+      [
+        at(start - DAY, 30479.695), // before the fold: left for requalify
+        at(start + HOUR, 0.6),
+        at(start + 2 * HOUR, 30479.695), // USACE's 99,999 ft, which the window doesn't bring again
+      ],
+      "NAP",
+    );
+    await writeRecent(recentPath(root, "test"), [
+      [
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        // Fetched before fetches dropped such levels.
+        { ...at(start + 3 * HOUR, -2438.095, start + 4 * HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => [
+        r.time - start,
+        r.level > 9000 ? "fill" : r.level,
+      ]),
+      [
+        [-DAY, "fill"],
+        [HOUR, 0.65],
+      ],
+    );
+  });
+
+  it("leaves a year file as it is when every row it would fold is outside the span", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    // The stored fill comes after the window's first row, so the fold reads it.
+    await writeObservations(file, [at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: a.id, epoch: 1 }],
+    ]);
+    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => r.time - start),
+      [2 * HOUR],
+    );
   });
 
   it("folds yesterday into the year file, carrying received and keeping what it had", async () => {

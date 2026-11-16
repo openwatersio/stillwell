@@ -88,7 +88,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "datums",
     type: "MAP(VARCHAR, DOUBLE)",
     description:
-      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they're the source's latest offsets, kept as they were when a refresh brings none and while the station is held; they're frozen when the epoch closes.",
+      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they're the source's latest offsets, kept as they were when a refresh brings none, unless the source marks the ones it gave wrong, and while the station is held; they're frozen when the epoch closes.",
   },
   {
     name: "to_current",
@@ -220,6 +220,13 @@ const STATION_COLUMNS: Column[] = [
     description: "The station's last observation; null before it has any.",
   },
   {
+    name: "missing_years",
+    type: "INTEGER[]",
+    nullable: true,
+    description:
+      "The UTC years of observed levels the store doesn't have yet, from the source's `backfill.since` in `sources.json` to this year for a live station, or for another to the year after its last stored one or the last year a backfill asked for, whichever is later, but not this year. A year counts as had when no backfill can ask the source for it in the station's datum; when its file is in the station's series, and at a source polled hourly from 2026 on a backfill also covered it or compaction carried it from the year's start, since compaction began in November 2026 and writes a station's first year from when it was first polled; or when a backfill asked for it, got nothing, and that answer is sure: the source answers an outage with an error, or the year is before the station's first stored year or, for an inactive station, after its last. An empty year inside the record, or after an active station's, stays listed, since it may have been an outage. Empty when the station's history is complete; null where it isn't known, while a run is writing the station's files, or where the station has no levels.",
+  },
+  {
     name: "license",
     type: "VARCHAR",
     description: "The license of the station's data, as its source's `license.id`.",
@@ -325,6 +332,7 @@ export const IN_LIST_EXTRA = ["source_qc_start", "source_qc_start_inferred"];
 const NOT_IN_LISTS = new Set([
   "first",
   "last",
+  "missing_years",
   "preferred",
   "errata",
   "tidal",
@@ -671,6 +679,15 @@ export const FILES = {
           "The most common step between the last year's values, in seconds; null with under two values, or in a row judged before it was kept.",
       },
       {
+        name: "sea_level",
+        type: "VARCHAR",
+        nullable: true,
+        // A file written before it was kept has no such column.
+        optional: true,
+        description:
+          "What the 10 m sea-level check read from the station's list when it was judged: `datum` and its gauge zero's height in meters above a sea-level datum, `ground` and its ground's altitude where it has no such offset, or null where it had neither. A station whose list gives something else is judged again.",
+      },
+      {
         name: "requalified",
         type: "TIMESTAMPTZ",
         nullable: true,
@@ -804,7 +821,17 @@ export const SOURCES_SCHEMA: JsonSchema = {
   items: {
     type: "object",
     additionalProperties: false,
-    required: ["id", "name", "url", "license", "attribution", "contact", "finalizes", "stations"],
+    required: [
+      "id",
+      "name",
+      "url",
+      "license",
+      "attribution",
+      "contact",
+      "finalizes",
+      "stations",
+      "backfill",
+    ],
     properties: {
       id: { type: "string", description: "The source's ID, as in each station's `source`." },
       name: { type: "string", description: "The agency or service's name." },
@@ -853,6 +880,30 @@ export const SOURCES_SCHEMA: JsonSchema = {
           "Whether values the source publishes as preliminary become final later. Where false, `preliminary` values stay so.",
       },
       stations: { type: "integer", description: "How many active stations the source has." },
+      backfill: {
+        type: nullable("object"),
+        description:
+          "How much of the source's history the store has, from `stations.parquet`'s `missing_years`; null where that isn't known.",
+        additionalProperties: false,
+        required: ["since", "complete", "incomplete"],
+        properties: {
+          since: {
+            type: nullable("integer"),
+            description:
+              "The first UTC year any of the source's stations has a file of levels for; null before it has one.",
+          },
+          complete: {
+            type: "integer",
+            description:
+              "How many stations with levels, active or not, have every year from `since` on, or a source's answer that it has none.",
+          },
+          incomplete: {
+            type: "integer",
+            description:
+              "How many stations with levels have a year in `missing_years`. A station a run is writing, whose `missing_years` is null, is in neither count.",
+          },
+        },
+      },
     },
   },
 };

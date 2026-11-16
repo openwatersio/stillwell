@@ -9,6 +9,7 @@ describe("decideKinds", () => {
   it("gives a station its KINDS kind where its source gives none", () => {
     const { stations, stale } = decideKinds("rws", [
       { id: "rws/uithuizerwad", kind: null as Kind | null },
+      { id: "rws/wierumerwad", kind: null as Kind | null },
       { id: "rws/hoekvanholland", kind: null as Kind | null },
       { id: "rws/werkendam.kleinezalm", kind: null as Kind | null },
       // A source that gives the decided kind is no conflict.
@@ -16,7 +17,7 @@ describe("decideKinds", () => {
     ]);
     assert.deepEqual(
       stations.map((s) => s.kind),
-      ["coastal", null, "river", "river"],
+      ["coastal", "coastal", null, "river", "river"],
     );
     assert.deepEqual(stale, []);
   });

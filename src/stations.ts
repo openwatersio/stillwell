@@ -23,7 +23,7 @@ export interface EpochChange {
 
 /**
  * Merge a source's fresh station list into the store's. A station the source
- * stopped listing stays, marked inactive, so its ID is never reused. The
+ * stopped listing stays, marked inactive and not live, so its ID is never reused. The
  * refresh takes withheld stations out of both lists first, so they leave. What the
  * store can answer (`first`, `last`) isn't kept here; `stations.parquet` gets
  * it from the bounds compaction writes.
@@ -34,7 +34,8 @@ export interface EpochChange {
  * had, and a new station without a datum isn't listed until the source names
  * it. A source that sends no offsets at all keeps the old ones while the datum
  * stays the same, so a refresh that loses them doesn't erase them; one that
- * sends some replaces them all.
+ * sends some replaces them all. One that marks a station `no_datums` clears
+ * them, since the source says the ones it gave were wrong.
  *
  * `seriesChanged` lets a source say a station kept its datum's name but not
  * the series or zero it measures from, such as a USGS gage whose datum moved.
@@ -57,7 +58,7 @@ export function mergeStationList(
   const listed = new Set<string>();
   const changes: EpochChange[] = [];
   const merged: StoredStation[] = [];
-  for (const { reference, ...s } of fetched) {
+  for (const { reference, no_datums, ...s } of fetched) {
     if (s.id !== `${s.source}/${s.source_id}` || s.source.includes("/"))
       throw new Error(`Station ${s.id} isn't <source>/<source_id>`);
     if (!isUrlSafe(s.source_id))
@@ -70,7 +71,7 @@ export function mergeStationList(
     // Offsets the source left out this time are kept, rather than erased, but
     // only for the same datum: another datum's offsets would be wrong for it.
     const sameDatum = old && (s.datum === null || s.datum === old.datum);
-    const omitted = s.datum === null || !Object.keys(s.datums).length;
+    const omitted = s.datum === null || (!Object.keys(s.datums).length && !no_datums);
     const datums = omitted && sameDatum ? old.datums : s.datums;
     let epochs;
     const restart = restarts?.[s.id];
@@ -102,7 +103,8 @@ export function mergeStationList(
           datums,
           sent: s.datums,
           reference,
-          changed: s.datum === null ? null : seriesChanged?.(old, s),
+          // The source's own flag goes with it, though the stored list leaves it out.
+          changed: s.datum === null ? null : seriesChanged?.(old, { ...s, no_datums }),
         },
         { ...options, station: s.id },
       );
@@ -153,7 +155,8 @@ export function mergeStationList(
     ...merged,
     ...previous
       .filter((s) => !listed.has(s.id))
-      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const })),
+      // Nothing asks for a station the source no longer lists.
+      .map((s) => ({ ...s, first: null, last: null, status: "inactive" as const, live: false })),
   ].sort((a, b) => a.id.localeCompare(b.id));
   return { stations, changes };
 }

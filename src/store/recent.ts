@@ -1,7 +1,9 @@
 import { commitYears, markYears, reconcileYears } from "./years.ts";
+import { readBackfilled, recordYear, writeBackfilled } from "../backfilled.ts";
 import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
+import { possible } from "../span.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
@@ -72,6 +74,8 @@ export interface RunSummary {
   values: number;
   /** Files written. */
   files: number;
+  /** Stored levels outside `SPAN_M` that requalify dropped. */
+  dropped?: number;
   /** Seconds spent in each phase of the run, in the order they first ran. */
   seconds?: Record<string, number>;
 }
@@ -391,6 +395,8 @@ export async function compactRecent({
   const spans = new Map<string, FileBounds | null>();
   // Stations whose fold the years file may not have recorded, for the reconcile to read.
   const unmarked: string[] = [];
+  // Each station's years folded from January 1, which compaction carries whole, by store.
+  const carried = new Map<string, [string, number, number][]>();
 
   for (const path of new Set(pathOf.values())) {
     for (const batch of chunks(
@@ -482,7 +488,17 @@ export async function compactRecent({
                 window,
                 async (existing, datums) => {
                   await refuseOtherDatum(file, { ...station, datum: epoch.datum }, datums);
-                  const merged = upsert(existing, incoming);
+                  // A level outside `SPAN_M` goes, among the stored rows the fold rewrites
+                  // and the window's, which may hold some fetched before fetches dropped them.
+                  const merged = upsert(
+                    existing.filter((r) => possible(r.level)),
+                    incoming.filter((r) => possible(r.level)),
+                  );
+                  // Rows that would all go stay as they are, since a year file always has some.
+                  if (!merged.length) {
+                    later = spanOf(existing, window);
+                    return null;
+                  }
                   later = spanOf(merged, window);
                   if (sameRows(existing, merged)) return null;
                   const had = new Map(existing.map((r) => [r.time, r]));
@@ -494,6 +510,21 @@ export async function compactRecent({
                 },
               );
               spans.set(spanKey(station, epochId, year), joinSpans(before, later));
+              // From within its first step, or hour, so it was polled as the year began. A
+              // station with no interval steps by its values' shortest gap here.
+              const times = incoming.map((r) => r.time).sort((a, b) => a - b);
+              let gap = Infinity;
+              for (let i = 1; i < times.length; i++)
+                if (times[i]! > times[i - 1]!) gap = Math.min(gap, times[i]! - times[i - 1]!);
+              const step = station.interval_s
+                ? station.interval_s * 1000
+                : Number.isFinite(gap)
+                  ? gap
+                  : 0;
+              if (from <= Date.UTC(year, 0, 1) + Math.max(3_600_000, step)) {
+                const store = storeFor(station);
+                carried.set(store, [...(carried.get(store) ?? []), [station.id, epochId, year]]);
+              }
               if (!stats) continue;
               written.set(file, stats);
               summary.files++;
@@ -514,6 +545,14 @@ export async function compactRecent({
       }
     }
   }
+  for (const [store, years] of carried)
+    try {
+      const record = await readBackfilled(store, id);
+      for (const [station, epoch, year] of years) recordYear(record, station, epoch, year);
+      await writeBackfilled(store, id, record);
+    } catch (error) {
+      summary.failed.push(`backfilled years: ${message(error)}`);
+    }
   // A source's stations share its store, so this is one store. A failure goes
   // first, so the summary's list of failures shows it.
   for (const [store, members] of Map.groupBy(stations, (s) => storeFor(s)))
@@ -972,6 +1011,11 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
+  if (s.dropped)
+    lines.push(
+      "",
+      `Dropped ${s.dropped} stored levels outside −500 to 9,000 m. Run \`compact <source> --rebuild-bounds\` and \`publish\`, since a station's first or last value may be among them.`,
+    );
   const phases = Object.entries(s.seconds ?? {});
   if (phases.length) {
     lines.push("", "| Phase | Seconds |", "| - | -: |");

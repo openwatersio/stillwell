@@ -1,6 +1,6 @@
 {
   "rules": "outliers-1",
-  "judge": "step-1",
+  "judge": "ground-1",
   "options": {
     "coastal tidal true tide 0.09": "{\"flatline_m\":0.002,\"centimeter_flatline_s\":172800,\"jumps\":true}",
     "coastal tidal true tide 1": "{\"flatline_m\":0.002,\"jumps\":true}",

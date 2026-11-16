@@ -22,6 +22,10 @@ export const KINDS: Record<string, { kind: Kind; note: string }> = {
     kind: "coastal",
     note: "A Wadden Sea gauge on the tidal flats off Uithuizen, which runs dry at low water.",
   },
+  "rws/wierumerwad": {
+    kind: "coastal",
+    note: "A Wadden Sea gauge on the tidal flats off Wierum, which runs dry at low water: from November 2021 to March 2022 it held 0.00 to 0.11 m NAP, its year's lowest 5%, for six hours or more six times.",
+  },
   "rws/werkendam.kleinezalm": {
     kind: "river",
     note: "On the Nieuwe Merwede at Werkendam, a Rhine distributary on the edge of the Biesbosch: tidal, about 12 cm of M2 and O1, and in flood with the Rhine.",

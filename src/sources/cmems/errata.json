@@ -67,6 +67,40 @@
       "error": "The Baltic production unit's files cut a `platform_name` with letters beyond ASCII short, a byte for each byte past the first that such a letter takes in UTF-8 (\"Fåbor\" for Fåborg, \"Göteborg-Agnesber\" for Göteborg-Agnesberg), and in five put U+FFFD in a letter's place (\"Ark�\" for Arkö, \"Malm�\", \"Verk�\", \"Gren�\", \"Hanko Pikku Kolalahti / Hang�\"). The attribute's length counts the name's letters, not its bytes.",
       "response": "Every station from a Baltic file (`BO_TS_TG_`) whose name has a letter beyond ASCII is named by its platform code instead, such as `Faaborg`, which is whole.",
       "evidence": "`ncdump -h` of the latest window's files on 14 November 2026, such as `BO_TS_TG_Faaborg_20261015.nc` (`platform_name = \"Fåbor\"`, 6 bytes `46 c3 a5 62 6f 72`) and `BO_TS_TG_Arko_20261015.nc` (`Ark` and `ef bf bd`). Names from the other units' files, such as Puertos del Estado's \"A Coruña 2 tide gauge\", are whole."
+    },
+    {
+      "id": "cmems-wangerooge-west-2026-dropout",
+      "stations": ["cmems/WangeroogeTG"],
+      "since": "2026-10-26",
+      "until": "2026-10-30",
+      "handling": "flagged",
+      "error": "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
+      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
+      "evidence": "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged."
+    },
+    {
+      "id": "cmems-fill-values",
+      "stations": [
+        "cmems/AWGTG",
+        "cmems/ArunPlatformTG",
+        "cmems/BrightonTG",
+        "cmems/DealPierTG",
+        "cmems/ExmouthTG",
+        "cmems/HastingsPierTG",
+        "cmems/K141TG",
+        "cmems/L91TG",
+        "cmems/MarienleuchteTG",
+        "cmems/SaintPierreEtMiquelonTG",
+        "cmems/SandownPierTG",
+        "cmems/ScarboroughTG",
+        "cmems/SecondSevernCrossingTG",
+        "cmems/SwanagePierTG"
+      ],
+      "since": "2013-01-01",
+      "handling": "dropped",
+      "error": "These 14 CMEMS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 17,626 values in 63 station-years from 2013 to 2026. AWG, K14 and L9 use 999,999.06 m as a fill value. The series of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing and Swanage Pier) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, Marienleuchte −3,350 m in 2026 and Saint-Pierre-et-Miquelon up to 2.4 × 10¹² m.",
+      "response": "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, and requalify drops any the store holds, values CMEMS keeps (`keepsStored`) among them.",
+      "evidence": "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span. GESLA's copies of the same gauges hold the same values (erratum `gesla-fill-values`). GESLA's records of Bayonne, Villefranque, Pont Seudre and Teignmouth also hold fill values in years CMEMS's own series no longer serve, and CMEMS's Ceuta series (`IDSL-Ceuta`) has no value outside the span. REFMAR's own Saint-Pierre-et-Miquelon series (`refmar/115`) holds levels of 0.2 to 2.9 m in 2024, with no value outside the span."
     }
   ],
   "retired": []

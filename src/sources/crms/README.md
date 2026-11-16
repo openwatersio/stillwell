@@ -28,7 +28,7 @@ Hourly water levels at about 430 surface-water gauges on the Louisiana coast, fr
 Dispatch Monthly with `sources: crms` to start the list, then backfill through the Ingest workflow. Each run downloads the export once, and `backfill … all` skips inactive stations, about 50 of which hold years of record, so the history is one run naming every station in the list, active or not, from 2006, both epochs, dispatched with `timeout` at 360 minutes. The IDs come from the list:
 
 ```bash
-duckdb -noheader -list -c "select string_agg(source_id, ',' order by source_id) from 'https://stillwell.openwaters.io/stations/crms.parquet'"
+duckdb -noheader -list -c "CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'openwaters-stillwell/1 (+https://github.com/openwatersio/stillwell)'}); select string_agg(source_id, ',' order by source_id) from 'https://stillwell.openwaters.io/stations/crms.parquet'" | tail -n 1
 ```
 
 ```bash

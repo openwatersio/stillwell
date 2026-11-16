@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -34,6 +35,7 @@ import {
   type Source,
 } from "../src/schema.ts";
 import { DRAINS_RUNS, TIDE_M, drains } from "../src/tidal.ts";
+import { sources } from "../src/sources/index.ts";
 import { fromSource, qc } from "../src/qc.ts";
 
 const QUARTER = 900_000;
@@ -100,6 +102,13 @@ describe("judge", () => {
     const verdict = judge(high, series(90, tide(TIDE_M * 2)));
     assert.equal(verdict.tidal, false);
     assert.ok(verdict.tide_m! >= TIDE_M);
+    // With no offset, ground well above the sea keeps it out too, and ground near it doesn't.
+    const gage = { datum: "GAGE", datums: {} };
+    assert.equal(
+      judge({ ...river("14", gage), ground_m: 248 }, series(90, tide(0.5))).tidal,
+      false,
+    );
+    assert.equal(judge({ ...river("15", gage), ground_m: 8 }, series(90, tide(0.5))).tidal, true);
   });
 
   it("leaves water that drains between tides still", () => {
@@ -118,6 +127,47 @@ describe("judge", () => {
     // On the coast those runs are a stuck or dry gauge, for QC to flag, not still water.
     const coast = judge(river("5", { kind: "coastal" }), series(90, level));
     assert.equal(coast.tidal, true);
+  });
+
+  it("judges Wangerooge West tidal once its erratum flags its failed sensor", async () => {
+    // PEGELONLINE's minutes from October to 14 November 2026, in cm, one a line, empty where
+    // none: from 25 October its sensor reads -2.40 m whenever the water falls below about 7.1 m.
+    const start = Date.UTC(2026, 9, 1);
+    const minutes = gunzipSync(
+      readFileSync(new URL("fixtures/pegelonline-9420040-2026.gz", import.meta.url)),
+    )
+      .toString()
+      .replace(/\n$/, "")
+      .split("\n");
+    // One line a minute, so a lost line can't shift the times after it.
+    assert.equal(minutes.length, 45 * 1440);
+    const rows = minutes.flatMap((cm, i) =>
+      cm === ""
+        ? []
+        : [
+            {
+              time: start + i * 60_000,
+              level: Number(cm) / 100,
+              flag: Flag.preliminary,
+              source_flag: Flag.preliminary,
+            } as Observation,
+          ],
+    );
+    const station = {
+      ...river("9420040", { kind: "estuary", datum: "PNP" }),
+      id: "pegelonline/9420040",
+    };
+    const failed = judge(station, rows);
+    assert.ok(failed.drains! > DRAINS_RUNS);
+    assert.equal(failed.tidal, false);
+    const spans = await sources.pegelonline!.suspect!(station, async function* () {
+      yield rows;
+    });
+    const verdict = judge(station, rows, spans);
+    // The hold from 20:28 on 25 October, before the erratum's first day, is the one left.
+    assert.equal(verdict.drains, 1);
+    assert.equal(verdict.tidal, true);
+    assert.ok(verdict.tide_m! > 1);
   });
 
   it("doesn't count holds that a small whole-centimeter tide's rules let stand", () => {
@@ -276,6 +326,22 @@ describe("analyze", () => {
     const later = await analyze(store, source, stations, { now: new Date(Date.UTC(2026, 4, 1)) });
     assert.equal(later.judged, 0);
     assert.equal((await readAnalysis(store, "test")).size, 2);
+    // A station whose list now gives another sea-level input is judged again,
+    // such as one whose offsets a refresh cleared, leaving its ground.
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.sea_level, "datum 0");
+    const cleared = [{ ...river("1", { datum: "GAGE", datums: {} }), ground_m: 300 }, river("2")];
+    const rejudged1 = await analyze(store, source, cleared, {
+      now: new Date(Date.UTC(2026, 4, 2)),
+    });
+    assert.equal(rejudged1.judged, 1);
+    assert.deepEqual(
+      rejudged1.changed.map((c) => [c.id, c.from, c.to]),
+      [["test/1", true, false]],
+    );
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.sea_level, "ground 300");
+    await markRequalified(store, "test", ["test/1"], now);
+    await analyze(store, source, stations, { now: new Date(Date.UTC(2026, 4, 3)) });
+    await markRequalified(store, "test", ["test/1"], now);
     // `all` judges every station again, and nothing changes.
     const all = await analyze(store, source, stations, { now, all: true });
     assert.equal(all.judged, 2);

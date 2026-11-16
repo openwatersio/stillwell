@@ -55,6 +55,7 @@ const STATION: Required<StoredStation> = {
   products: ["levels"],
   first: "2001-01-01T00:00:00Z",
   last: "2026-11-01T00:00:00Z",
+  missing_years: [2003],
   license: "CC0-1.0",
   commercial_use: true,
   attribution: "Test",
@@ -151,6 +152,7 @@ describe("published file definitions", () => {
           days: null,
           drains: null,
           step_s: null,
+          sea_level: null,
           requalified: null,
         },
       ]),
@@ -244,8 +246,13 @@ describe("published file definitions", () => {
     const path = join(store, "sources.json");
     await writeJsonArray(
       path,
-      Object.values(sources).map((s) =>
-        sourceEntry(s.metadata, [{ status: "active", commercial_use: true }]),
+      // Every other source with its backfill known, so both forms are checked.
+      Object.values(sources).map((s, i) =>
+        sourceEntry(
+          s.metadata,
+          [{ status: "active", commercial_use: true, missing_years: [2003] }],
+          i % 2 ? 1990 : undefined,
+        ),
       ),
     );
     const published = JSON.parse(await readFile(path, "utf8"));
@@ -278,9 +285,9 @@ describe("published file definitions", () => {
     assert.deepEqual(ERRATA_SCHEMA.items!.properties!.handling!.enum, [...HANDLING]);
   });
 
-  it("passes an analysis file written before `judge` or `step_s` was kept", async () => {
+  it("passes an analysis file written before `judge`, `step_s` or `sea_level` was kept", async () => {
     const path = join(store, "old-analysis.parquet");
-    const { judge: _, step_s: __, ...columns } = columnTypes(FILES.analysis);
+    const { judge: _, step_s: __, sea_level: ___, ...columns } = columnTypes(FILES.analysis);
     await writeRows(
       path,
       [{ id: "test/a", analyzed: "2026-01-01T00:00:00Z", rules: "r" }],
@@ -291,7 +298,7 @@ describe("published file definitions", () => {
   });
 
   it("reads an analysis file an older build rewrote without `step_s` as judged under no `JUDGE`", async () => {
-    const { step_s: _, ...columns } = columnTypes(FILES.analysis);
+    const { step_s: _, sea_level: __, ...columns } = columnTypes(FILES.analysis);
     await writeRows(
       analysisPath(store, "older"),
       [{ id: "older/a", analyzed: "2026-01-01T00:00:00Z", rules: "r", judge: JUDGE }],
@@ -299,7 +306,7 @@ describe("published file definitions", () => {
       "id",
     );
     const row = (await readAnalysis(store, "older")).get("older/a")!;
-    assert.deepEqual([row.judge, row.step_s], [null, null]);
+    assert.deepEqual([row.judge, row.step_s, row.sea_level], [null, null, null]);
   });
 
   it("refuses to check a local path that would glob other files", async () => {
