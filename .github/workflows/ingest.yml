@@ -50,7 +50,7 @@ jobs:
             # links reads levels and writes only its own file, in the group Monthly's job takes.
             links) group=links ;;
             matches) group=matches ;;
-            backfill | recent | compact | requalify | withhold | drop | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
+            backfill | recent | compact | requalify | withhold | drop | misplaced | years | analyze) [ -n "${words[1]:-}" ] && group="store-${words[1]}" || group=store ;;
             stations)
               echo "::error::Refresh station lists with the Monthly workflow, which runs each source in its own group and then publishes"
               exit 1

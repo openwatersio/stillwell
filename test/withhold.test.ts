@@ -722,6 +722,15 @@ describe("withhold", () => {
       awsRemoveArgs("s3://water-levels/obs/gesla/x/", "http://localhost:9000").at(-2),
       "http://localhost:9000",
     );
+    // A single Parquet file goes without --recursive, so it can't take its neighbors.
+    assert.deepEqual(awsRemoveArgs("s3://water-levels/obs/rws/x/2026.parquet", "r2.example"), [
+      "s3",
+      "rm",
+      "s3://water-levels/obs/rws/x/2026.parquet",
+      "--endpoint-url",
+      "https://r2.example",
+      "--only-show-errors",
+    ]);
     for (const prefix of ["s3://water-levels/", "s3://water-levels/obs/gesla", "obs/gesla/x/"])
       assert.throws(() => awsRemoveArgs(prefix, "https://r2.example"), /isn't a directory/);
   });
