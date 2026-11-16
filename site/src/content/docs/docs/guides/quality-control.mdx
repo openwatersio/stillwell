@@ -130,7 +130,7 @@ Still water gets the looser rules for good reasons. A pooled river, a lake or a 
 `tidal` is measured from the station's own levels, not taken from its kind, so a river can be tidal and the Baltic isn't. Stillwell fits the main lunar tides (M2 and O1) to the last year of usable values and records their combined amplitude as [`tide_m`](/docs/reference/stations/#column-tide_m). A station is tidal when:
 
 - `tide_m` is at least 8 cm;
-- its levels are not more than 10 m above sea level, where its datum says;
+- its levels are not more than 10 m above sea level, where its datum says, and where it doesn't, the ground at the site is not more than 20 m above it, where the source gives that;
 - and it is on the coast, or its levels rarely sit still the way a drained creek does.
 
 A station needs at least 30 days of values in its last year to be judged. Each verdict is redone once a year, or sooner when the rules change, and a change in verdict rechecks the station's whole record.

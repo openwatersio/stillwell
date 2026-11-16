@@ -102,6 +102,13 @@ describe("judge", () => {
     const verdict = judge(high, series(90, tide(TIDE_M * 2)));
     assert.equal(verdict.tidal, false);
     assert.ok(verdict.tide_m! >= TIDE_M);
+    // With no offset, ground well above the sea keeps it out too, and ground near it doesn't.
+    const gage = { datum: "GAGE", datums: {} };
+    assert.equal(
+      judge({ ...river("14", gage), ground_m: 248 }, series(90, tide(0.5))).tidal,
+      false,
+    );
+    assert.equal(judge({ ...river("15", gage), ground_m: 8 }, series(90, tide(0.5))).tidal, true);
   });
 
   it("leaves water that drains between tides still", () => {
@@ -319,6 +326,22 @@ describe("analyze", () => {
     const later = await analyze(store, source, stations, { now: new Date(Date.UTC(2026, 4, 1)) });
     assert.equal(later.judged, 0);
     assert.equal((await readAnalysis(store, "test")).size, 2);
+    // A station whose list now gives another sea-level input is judged again,
+    // such as one whose offsets a refresh cleared, leaving its ground.
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.sea_level, "datum 0");
+    const cleared = [{ ...river("1", { datum: "GAGE", datums: {} }), ground_m: 300 }, river("2")];
+    const rejudged1 = await analyze(store, source, cleared, {
+      now: new Date(Date.UTC(2026, 4, 2)),
+    });
+    assert.equal(rejudged1.judged, 1);
+    assert.deepEqual(
+      rejudged1.changed.map((c) => [c.id, c.from, c.to]),
+      [["test/1", true, false]],
+    );
+    assert.equal((await readAnalysis(store, "test")).get("test/1")!.sea_level, "ground 300");
+    await markRequalified(store, "test", ["test/1"], now);
+    await analyze(store, source, stations, { now: new Date(Date.UTC(2026, 4, 3)) });
+    await markRequalified(store, "test", ["test/1"], now);
     // `all` judges every station again, and nothing changes.
     const all = await analyze(store, source, stations, { now, all: true });
     assert.equal(all.judged, 2);

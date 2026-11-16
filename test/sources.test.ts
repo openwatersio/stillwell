@@ -2722,6 +2722,14 @@ describe("usgs", () => {
             end: new Date(Date.now() - 30 * 86_400_000).toISOString(),
           }),
           series("07020500", "00065", { id: "replacement", begin: "2026-10-01T00:00:00+00:00" }),
+          series("381142122015801", "00065"),
+          series("422206071033901", "00065"),
+          series("02035000", "00065"),
+          series("422340071043201", "00065"),
+          series("02037500", "00065"),
+          series("09469000", "00065"),
+          series("08000001", "00065"),
+          series("08000002", "00065"),
         ]),
       ],
       [/parameter_code=62620/, collection([series("0158540095", "62620")])],
@@ -2743,37 +2751,86 @@ describe("usgs", () => {
           location("02198820", -81.15, 32.25, {
             site_type_code: "ST-TS",
             altitude: 0,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
           }),
           location("07010000", -90.18, 38.63, {
             hydrologic_unit_code: "07140101",
             altitude: 379.58,
+            altitude_method_code: "X",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
             state_name: "Missouri",
           }),
           location("03612600", -89.06, 37.17, {
             hydrologic_unit_code: "05140206",
             altitude: 270,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NGVD29",
           }),
           // The Missouri at Hermann, outside the Mississippi and Ohio basins, is listed too.
           location("06934500", -91.44, 38.71, {
             hydrologic_unit_code: "10300200",
             altitude: 481.6,
+            altitude_method_code: "D",
             vertical_datum: "NAVD88",
           }),
           location("0158540095", -76.4, 39.2, { site_type_code: "ES" }),
           location("02171645", -80.0, 33.2, { state_name: "Puerto Rico" }),
           location("07022000", -89.5, 37.0, { hydrologic_unit_code: "07140105" }),
           location("07020500", -89.8, 37.6, { hydrologic_unit_code: "07140105" }),
+          // First Mallard Branch, Suisun Marsh: an altitude from a DEM is the ground, not the gage's zero.
+          location("381142122015801", -122.03, 38.19, {
+            site_type_code: "ES",
+            altitude: 6,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
+          // USGS now lists another altitude than the decision's, so the decision is set aside.
+          location("422340071043201", -71.07, 42.39, {
+            site_type_code: "ES",
+            altitude: -4,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
+          // An estimated method with the altitude missing still clears the stored offsets.
+          location("02037500", -77.55, 37.56, { altitude_method_code: "N" }),
+          // A decided site answering with no altitude is a gap, and keeps what the store holds.
+          location("09469000", -110.5, 33.2, {}),
+          // A surveyed altitude in a datum the store doesn't name gives no offsets, but clears none.
+          location("08000001", -97, 30, {
+            altitude: 50,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
+            vertical_datum: "COE1912",
+          }),
+          // A survey method with the altitude missing is a gap, and clears nothing.
+          location("08000002", -97.1, 30.1, { altitude_method_code: "L" }),
+          // An altitude with no method is no evidence of a survey.
+          location("02035000", -77.5, 37.6, { altitude: 120, vertical_datum: "NAVD88" }),
+          // Charles River below the dam, Boston: a decision gives its gage datum in place of a DEM's -5 ft.
+          location("422206071033901", -71.06, 42.37, {
+            site_type_code: "ES",
+            altitude: -5,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
         ]),
       ],
     ]);
-    const list = await usgs.stations();
+    // The store's list, whose ground a gap keeps.
+    const list = await usgs.stations([
+      { id: "usgs/09469000", ground_m: 762.6 },
+      { id: "usgs/02037500", ground_m: 75.6 },
+    ] as never);
     assert.deepEqual(
       list.map((s) => [s.id, s.kind, s.datum, s.datums, s.time_series_id, s.live, s.country_code]),
       [
         ["usgs/0158540095", "estuary", "NAVD88", {}, "0158540095-62620", true, "US"],
+        ["usgs/02035000", "river", "GAGE", {}, "02035000-00065", true, "US"],
+        ["usgs/02037500", "river", "GAGE", {}, "02037500-00065", true, "US"],
         // Daily tidal highs and lows mark a stream as tidal.
         ["usgs/02171645", "estuary", "GAGE", {}, "02171645-00065", true, "PR"],
         // Gage height is preferred to an elevation series at the same site.
@@ -2784,6 +2841,32 @@ describe("usgs", () => {
         ["usgs/07010000", "river", "GAGE", { NAVD88: 115.696 }, "07010000-00065", true, "US"],
         ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
         ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
+        ["usgs/08000001", "river", "GAGE", {}, "08000001-00065", true, "US"],
+        ["usgs/08000002", "river", "GAGE", {}, "08000002-00065", true, "US"],
+        ["usgs/09469000", "river", "GAGE", {}, "09469000-00065", true, "US"],
+        ["usgs/381142122015801", "estuary", "GAGE", {}, "381142122015801-00065", true, "US"],
+        [
+          "usgs/422206071033901",
+          "estuary",
+          "GAGE",
+          { NAVD88: -32.516 },
+          "422206071033901-00065",
+          true,
+          "US",
+        ],
+        ["usgs/422340071043201", "estuary", "GAGE", {}, "422340071043201-00065", true, "US"],
+      ],
+    );
+    assert.equal(list.find((s) => s.id === "usgs/09469000")!.ground_m, 762.6);
+    // Only an unsurveyed altitude clears what the store holds; a site with none keeps it.
+    assert.deepEqual(
+      list.filter((s) => s.no_datums).map((s) => [s.id, s.ground_m]),
+      [
+        ["usgs/02035000", 36.576],
+        // A reply with no altitude keeps the ground the store held.
+        ["usgs/02037500", 75.6],
+        ["usgs/381142122015801", 1.829],
+        ["usgs/422340071043201", -1.219],
       ],
     );
     assert.equal(
@@ -2850,6 +2933,37 @@ describe("usgs", () => {
       [/monitoring-locations/, collection([location("02198820", -81.15, 32.25, {})])],
     ]);
     await assert.rejects(usgs.stations(), /no monitoring location for 1 sites, e.g. USGS-07010000/);
+    // A reply that drops the altitude method would clear every offset.
+    const sites = Array.from({ length: 12 }, (_, i) => String(1000 + i));
+    serve([
+      [/parameter_code=/, collection(sites.map((site) => series(site, "00065")))],
+      [/statistic_id=00021/, collection([tidal])],
+      [
+        /monitoring-locations/,
+        collection(
+          sites.map((site) => location(site, -81, 32, { altitude: 10, vertical_datum: "NAVD88" })),
+        ),
+      ],
+    ]);
+    await assert.rejects(usgs.stations(), /no known altitude method for 12 of 12 sites/);
+    // A reply that drops the accuracy would clear every surveyed offset.
+    serve([
+      [/parameter_code=/, collection(sites.map((site) => series(site, "00065")))],
+      [/statistic_id=00021/, collection([tidal])],
+      [
+        /monitoring-locations/,
+        collection(
+          sites.map((site) =>
+            location(site, -81, 32, {
+              altitude: 10,
+              altitude_method_code: "L",
+              vertical_datum: "NAVD88",
+            }),
+          ),
+        ),
+      ],
+    ]);
+    await assert.rejects(usgs.stations(), /no altitude accuracy for 12 of 12 surveyed sites/);
     // A site a short answer left out is asked for again.
     let asked = 0;
     setTransport(async (url) => {
@@ -2877,6 +2991,50 @@ describe("usgs", () => {
       end: new Date(Date.now() - 90 * 86_400_000).toISOString(),
     }).properties;
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
+  });
+
+  it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {
+    const sites = (n: number, bad: number, field: "method" | "accuracy") =>
+      Array.from({ length: n }, (_, i) => ({
+        altitude: 10,
+        altitude_method_code: field === "method" && i < bad ? null : "L",
+        altitude_accuracy: field === "accuracy" && i < bad ? null : 0.1,
+      }));
+    for (const field of ["method", "accuracy"] as const) {
+      // 1 in 30 of 600 is 20.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(600, 20, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(600, 21, field)), /of 600/);
+      // Under 300, up to 10 pass.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(100, 10, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(100, 11, field)));
+    }
+    // A site with no altitude isn't counted.
+    assert.doesNotThrow(() =>
+      usgs.checkAltitudes(
+        Array.from({ length: 50 }, () => ({
+          altitude: null,
+          altitude_method_code: null,
+          altitude_accuracy: null,
+        })),
+      ),
+    );
+  });
+
+  it("counts an altitude as surveyed only by a survey method accurate to under a foot", () => {
+    const surveyed = (altitude_method_code: string | null, altitude_accuracy: number | null) =>
+      usgs.isSurveyed({ altitude_method_code, altitude_accuracy });
+    // Every survey method counts under a foot, and none at a foot or more.
+    for (const code of ["L", "D", "G", "F", "W", "X", "Y", "Z"]) {
+      assert.equal(surveyed(code, 0.1), true);
+      assert.equal(surveyed(code, 1), false);
+    }
+    // With no accuracy, only corrected and survey-grade GPS count.
+    assert.equal(surveyed("D", null), true);
+    assert.equal(surveyed("F", null), true);
+    for (const code of ["G", "L", "W", "X", "Y", "Z"]) assert.equal(surveyed(code, null), false);
+    // Estimates, reported and unknown methods, and none.
+    for (const code of ["M", "N", "J", "A", "R", "U", null])
+      assert.equal(surveyed(code, 0.1), false);
   });
 
   it("notices a station's series or gage zero changing under the same datum name", () => {
@@ -2909,6 +3067,31 @@ describe("usgs", () => {
     );
     // A site that lists no altitude keeps its offsets.
     assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
+    // A decided gage datum corrects the offset rather than moving the zero.
+    const boston = { id: "usgs/422206071033901", datum: "GAGE", datums: { NAVD88: -1.524 } };
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: { NAVD88: -32.516 } }),
+      ),
+      null,
+    );
+    // A decision set aside, because USGS lists another altitude, may be a moved zero.
+    assert.match(
+      usgs.seriesChanged(
+        { ...boston, datums: { NAVD88: -32.516 } } as never,
+        listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
+      )!,
+      /another altitude than GAGE_DATUMS decided/,
+    );
+    // Offsets the store held from before the decision aren't the decision's, so nothing moved from it.
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
+      ),
+      null,
+    );
   });
 
   it("asks only for the years a station's series covers", async () => {

@@ -88,7 +88,7 @@ const EPOCH_FIELDS: Column[] = [
     name: "datums",
     type: "MAP(VARCHAR, DOUBLE)",
     description:
-      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they're the source's latest offsets, kept as they were when a refresh brings none and while the station is held; they're frozen when the epoch closes.",
+      "Meters to add to a level in the epoch's `datum` to refer it to each other datum that the source gives, without the MSL, LAT and chart datum offsets that the station's `datums` adds from slackwater-database or linked stations. In the current epoch they're the source's latest offsets, kept as they were when a refresh brings none, unless the source marks the ones it gave wrong, and while the station is held; they're frozen when the epoch closes.",
   },
   {
     name: "to_current",
@@ -677,6 +677,15 @@ export const FILES = {
         optional: true,
         description:
           "The most common step between the last year's values, in seconds; null with under two values, or in a row judged before it was kept.",
+      },
+      {
+        name: "sea_level",
+        type: "VARCHAR",
+        nullable: true,
+        // A file written before it was kept has no such column.
+        optional: true,
+        description:
+          "What the 10 m sea-level check read from the station's list when it was judged: `datum` and its gauge zero's height in meters above a sea-level datum, `ground` and its ground's altitude where it has no such offset, or null where it had neither. A station whose list gives something else is judged again.",
       },
       {
         name: "requalified",
