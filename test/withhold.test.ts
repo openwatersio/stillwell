@@ -171,6 +171,7 @@ describe("refreshSource with withheld stations", () => {
       days: 366,
       drains: 0,
       step_s: 600,
+      sea_level: null,
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/k12"), verdict("test/x0")]);
@@ -550,6 +551,7 @@ describe("withhold", () => {
       days: 366,
       drains: 0,
       step_s: 600,
+      sea_level: null,
       requalified: null,
     });
     await writeAnalysis(store, "test", [verdict("test/d1"), verdict("test/k")]);

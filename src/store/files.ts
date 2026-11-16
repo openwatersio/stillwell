@@ -679,6 +679,15 @@ export const FILES = {
           "The most common step between the last year's values, in seconds; null with under two values, or in a row judged before it was kept.",
       },
       {
+        name: "sea_level",
+        type: "VARCHAR",
+        nullable: true,
+        // A file written before it was kept has no such column.
+        optional: true,
+        description:
+          "What the 10 m sea-level check read from the station's list when it was judged: `datum` and its gauge zero's height in meters above a sea-level datum, `ground` and its ground's altitude where it has no such offset, or null where it had neither. A station whose list gives something else is judged again.",
+      },
+      {
         name: "requalified",
         type: "TIMESTAMPTZ",
         nullable: true,
