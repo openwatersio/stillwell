@@ -55,6 +55,7 @@ const STATION: Required<StoredStation> = {
   products: ["levels"],
   first: "2001-01-01T00:00:00Z",
   last: "2026-11-01T00:00:00Z",
+  missing_years: [2003],
   license: "CC0-1.0",
   commercial_use: true,
   attribution: "Test",
@@ -244,8 +245,13 @@ describe("published file definitions", () => {
     const path = join(store, "sources.json");
     await writeJsonArray(
       path,
-      Object.values(sources).map((s) =>
-        sourceEntry(s.metadata, [{ status: "active", commercial_use: true }]),
+      // Every other source with its backfill known, so both forms are checked.
+      Object.values(sources).map((s, i) =>
+        sourceEntry(
+          s.metadata,
+          [{ status: "active", commercial_use: true, missing_years: [2003] }],
+          i % 2 ? 1990 : undefined,
+        ),
       ),
     );
     const published = JSON.parse(await readFile(path, "utf8"));

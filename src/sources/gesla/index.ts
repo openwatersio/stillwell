@@ -1,5 +1,6 @@
 import { isUrlSafe, urlSafe } from "../../store/paths.ts";
 import { csvFields } from "../../csv.ts";
+import { possible } from "../../span.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -87,10 +88,15 @@ export interface Clock {
   hours: number;
   since?: number;
   until?: number;
+  /** Whether a date in the span whose day is 12 or less has its day and month swapped. */
+  dayMonth?: boolean;
 }
 
-/** From GESLA's first time in 2020, Queensland's records are on AEST (UTC+10). */
-const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1) };
+/**
+ * From GESLA's first time in 2020, Queensland's records are on AEST (UTC+10),
+ * and a label on day 1 to 12 of a month has its day and month swapped.
+ */
+const QUEENSLAND_AEST: Clock = { hours: -10, since: Date.UTC(2020, 0, 1), dayMonth: true };
 
 /**
  * Clock fixes by file. GESLA's copies of UHSLC's Vigo and Las Palmas versions
@@ -485,6 +491,21 @@ function timeOf(s: string, at = 0): number {
   );
 }
 
+/** `time` with its day and month swapped, when its day is 12 or less. */
+function swapDayMonth(time: number): number {
+  const d = new Date(time);
+  const day = d.getUTCDate();
+  if (day > 12) return time;
+  return Date.UTC(
+    d.getUTCFullYear(),
+    day - 1,
+    d.getUTCMonth() + 1,
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+  );
+}
+
 /** A record's values, sorted by time, with flags already the store's. */
 export interface GeslaRecord {
   times: Float64Array;
@@ -517,6 +538,7 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
   const [shift, since, until] = clock
     ? [clock.hours * HOUR_MS, clock.since ?? -Infinity, clock.until ?? Infinity]
     : [0, Infinity, -Infinity];
+  const dayMonth = clock?.dayMonth ?? false;
   // Typed arrays sized by the line count, since the largest records hold 6 million values.
   let lines = 1;
   for (let at = text.indexOf("\n"); at >= 0; at = text.indexOf("\n", at + 1)) lines++;
@@ -535,10 +557,13 @@ export function parse(text: string, file: string, kind: Kind | null): GeslaRecor
         .split(/\s+/);
       const qc = Number(fields[1]);
       const level = Number(fields[0]);
-      if (qc >= 0 && qc <= 4 && fields[0] !== nul && Number.isFinite(level)) {
+      // A level no gauge can read is a fill value, such as CMEMS's 999,999.06 m, so it's
+      // missing (erratum `gesla-fill-values`).
+      if (qc >= 0 && qc <= 4 && fields[0] !== nul && possible(level)) {
         const flag = QC_FLAGS[qc]!;
         const time = timeOf(text, at);
-        times[n] = time >= since && time < until ? time + shift : time;
+        times[n] =
+          time < since || time >= until ? time : (dayMonth ? swapDayMonth(time) : time) + shift;
         if (n && times[n]! < times[n - 1]!) sorted = false;
         levels[n] = level;
         source[n] = fields[2] === "0" ? Math.max(flag, Flag.suspect) : flag;
@@ -837,11 +862,13 @@ export async function levels(
 ): Promise<Observation[]> {
   const refused = withheld(station.source_id);
   if (refused) throw new Error(`GESLA's ${station.source_id} is withheld: ${refused}`);
-  // The record's own span, with a margin for the clock fixes.
-  if (station.record_start && Date.parse(station.record_start) - CLOCK_MARGIN_MS >= end.getTime())
-    return [];
-  if (station.record_end && Date.parse(station.record_end) + CLOCK_MARGIN_MS < start.getTime())
-    return [];
+  // The record's own span, with a margin for the clock fixes. A swapped day and
+  // month can move a value to any month of its year.
+  const margin = clockOf(station.file ?? station.source_id)?.dayMonth
+    ? 366 * 24 * HOUR_MS
+    : CLOCK_MARGIN_MS;
+  if (station.record_start && Date.parse(station.record_start) - margin >= end.getTime()) return [];
+  if (station.record_end && Date.parse(station.record_end) + margin < start.getTime()) return [];
   if (isDropped(station.source_id))
     throw new Error(`GESLA's ${station.source_id} holds another gauge's values (see isDropped)`);
   const r = await record(station);
@@ -883,6 +910,8 @@ export const source: Source = {
     const [times, levels, source]: number[][] = [[], [], []];
     for await (const rows of record())
       for (const r of rows) {
+        // As `parse` leaves them out (erratum `gesla-fill-values`), until the store no longer holds any.
+        if (!possible(r.level)) continue;
         times.push(r.time);
         levels.push(r.level);
         source.push(r.source_flag ?? r.flag);

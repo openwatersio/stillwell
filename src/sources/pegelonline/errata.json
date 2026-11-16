@@ -8,7 +8,7 @@
       "response": "History comes from the download and the last 31 days from the REST API, so the series can step by a few centimeters where one hands over to the other.",
       "evidence": "At Cuxhaven Steubenhöft (`pegelonline/5990020`) and Husum (`pegelonline/9530020`), PEGELONLINE's raw-data download and its REST API give different water levels for the same minutes. The store takes history from the download and recent values from the REST API, so at these two gauges the record can step by a few centimeters where one source hands over to the other.\n\n#### What was compared\n\nOn 5 November 2026, about 16 hours of 1-minute values at 14 tide gauges, downloaded the way backfill does and compared with what hourly ingest stored from the REST API:\n\n| Gauges | Equal values | Largest difference |\n|---|---|---|\n| Helgoland Binnenhafen, Kiel-Holtenau | all | 0 |\n| 9 more tide gauges from [docs/ticon-inventory.csv](docs/ticon-inventory.csv) | 92 to 99% | 1 to 2 cm |\n| Cuxhaven Steubenhöft | 24% | 6 cm |\n| Husum | 3% | 8 cm |\n\n- **Not a clock error:** both sources match best with no time shift (0 to 7% of values match at a one- or two-hour offset), and the download's timestamps carry their MEZ/MESZ offset.\n- **Not a later correction:** the REST API still returns exactly what hourly ingest stored the day before, so its values weren't revised.\n- **Same metadata:** both sides describe the series as `WASSERSTAND ROHDATEN`, unchecked, in cm, on the same gauge zero.\n- At Cuxhaven the REST value is 0 to 6 cm higher, most around high water and close to zero around low water.\n\n#### Open questions\n\nAsked PEGELONLINE (pegelonline@itzbund.de) on 2026-11-07, in German, which sensor each endpoint serves at the two gauges, whether the Husum download is about 5 cm low this autumn, and about the May to June 2025 Cuxhaven correction. No answer yet.\n\n- [ ] Which series is right? Compare an older year of the download with GESLA's WSV record and with a TICON fit at both gauges.\n- [x] If that doesn't settle it, ask WSV which series the download and the REST API serve at these gauges.\n- [ ] Check whether more gauges do this, once the backfill has written more of them.\n- [ ] If the download is the wrong one, refetch the two gauges with `--refetch` once it's fixed or once we switch sources.\n\nThe backfill goes ahead in the meantime. Files it writes for these gauges can be replaced with `--refetch`.",
       "reported": "2026-11-07",
-      "report": "Asked in the same message as pegelonline-wachendorf-zero-date ([#75](https://github.com/openwatersio/stillwell/issues/75)), to pegelonline@itzbund.de on 2026-11-07. No answer yet."
+      "report": "Asked in the same message as pegelonline-wachendorf-zero-date ([#75](https://github.com/openwatersio/stillwell/issues/75)), to pegelonline@itzbund.de on 2026-11-07. Answered 2026-11-16: the download comes from a different data store than the REST API, and the WSV knows the two can give different values for the same timestamp. The REST API will be moved onto that store, which is in progress, and the WSV recommends the download for an open database. The answer doesn't say which sensor serves which endpoint or whether Husum's download is about 5 cm low. Text in [#26](https://github.com/openwatersio/stillwell/issues/26)."
     },
     {
       "id": "pegelonline-wachendorf-zero-date",
@@ -30,7 +30,7 @@
       "response": "Kept as the download serves it, so Cuxhaven's store values from 13 May to 24 June 2025 are the revised ones.",
       "evidence": "While comparing the store's 2024 and 2025 Cuxhaven Steubenhöft files, which come from PEGELONLINE's raw-data download, with other records of the same gauge for [#26](https://github.com/openwatersio/stillwell/issues/26), the download sat 4 to 6 cm above GESLA's copy from 13 May to 24 June 2025, and matched it before and after. Both describe the series as unchecked raw data, so the WSV changed values after GESLA copied them without relabeling them. The comparison is in [#26's comment](https://github.com/openwatersio/stillwell/issues/26#issuecomment-6700549671).",
       "reported": "2026-11-07",
-      "report": "Asked in the same message as [#26](https://github.com/openwatersio/stillwell/issues/26), to pegelonline@itzbund.de on 2026-11-07. No answer yet."
+      "report": "Asked in the same message as [#26](https://github.com/openwatersio/stillwell/issues/26), to pegelonline@itzbund.de on 2026-11-07. The 2026-11-16 answer doesn't mention the 2025 correction or where the WSV notes later corrections to raw data."
     },
     {
       "id": "pegelonline-wangerooge-ost-filled",
@@ -148,6 +148,55 @@
       "error": "PEGELONLINE gives Eichhorst OP and Eichhorst UP 0 cm at 03:30 UTC on 10 November 2026, then nothing until 05:15, between steady levels of 389 and 107 cm.",
       "response": "The values are kept as served. No rule in the store's QC flags it yet: the spike test judges a value only when it has neighbors within three sampling intervals on both sides, and the next value comes after a gap, and errata spans are whole days, so flagging it here would mark the rest of the day suspect too.",
       "evidence": "PEGELONLINE's REST API (`/stations/693320/W/measurements.json` and the same for 693330), checked on 11 November 2026, returns 389 and 107 cm at 04:00 and 04:15 CET, 0.0 at 04:30 CET, and nothing until 06:15 CET. The store holds the same values."
+    },
+    {
+      "id": "pegelonline-wangerooge-west-2026-dropout",
+      "stations": ["pegelonline/9420040"],
+      "since": "2026-10-26",
+      "until": "2026-10-30",
+      "handling": "flagged",
+      "error": "From the storm surge of 25 October 2026 to 29 October, PEGELONLINE's Wangerooge West gauge reads −2.40 m, 7.5 m below its median and 6 m below any low water, whenever the water is below about 7.1 m, and all day on 27 and 28 October.",
+      "response": "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The −2.40 m values from 20:28 UTC on 25 October are flagged by QC once the station is judged tidal: with this span, its last year has one hold that drains count, and tidal QC flags every −2.40 m value of 2026.",
+      "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged the gauge not tidal. 5,086 values read −2.40 m from 25 October 20:28 to 29 October 13:43 UTC, each run starting with a drop of up to 10 m in a minute. Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`) reads normal tides throughout, with a high water of 8.83 m on 25 October. CMEMS's copy carries the same values (erratum `cmems-wangerooge-west-2026-dropout`). Every value from 30 October to 14 November is a normal tide."
+    },
+    {
+      "id": "pegelonline-schillig-2026-dropout",
+      "stations": ["pegelonline/9430030"],
+      "since": "2026-10-26",
+      "until": "2026-11-14",
+      "handling": "flagged",
+      "error": "From 26 October to 13 November 2026, after the storm surge of 25 October, PEGELONLINE's Schillig gauge reads −2.50 m, 7.6 m below its median, for most of each day and all of some. Single values and runs of up to a few hours read −2.50 m from 13 July.",
+      "response": "26 October to 13 November 2026 is flagged `suspect`, keeping the source flag as `source_flag`. The earlier −2.50 m values are flagged by QC once the station is judged tidal: with this span, its last year has no hold that drains count, and tidal QC flags every −2.50 m value of 2026.",
+      "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged the gauge not tidal. 22,411 values read −2.50 m in 2026, 22,014 of them from 26 October 02:47 to 13 November 06:20 UTC. Wilhelmshaven Alter Vorhafen (`pegelonline/9440020`), 12 km away, reads normal tides throughout. Every value from 14 November is a normal tide."
+    },
+    {
+      "id": "pegelonline-mellumplate-2026-dropout",
+      "stations": ["pegelonline/9420010"],
+      "since": "2026-09-16",
+      "until": "2026-09-18",
+      "handling": "flagged",
+      "error": "On 16 and 17 September 2026 PEGELONLINE's Mellumplate gauge reads −2.50 m, 7.6 m below its median, for half of the 16th and a few minutes of the 17th, and values from 0.31 to 10.0 m in between. −2.50 m is the value Schillig's sensor reads from October (erratum `pegelonline-schillig-2026-dropout`).",
+      "response": "16 and 17 September 2026 are flagged `suspect`, keeping the source flag as `source_flag`. QC flags the −2.50 m values of its other days in 2026.",
+      "evidence": "Found from the dropouts at Wangerooge West and Schillig, November 2026: Mellumplate has 1,202 values of −2.50 m from 14 July to 5 October 2026, all flagged by QC except 46 on 16 and 17 September. On the 16th, 732 of the day's values are −2.50 m in runs under 6 hours, so the flatline rule doesn't reach them and they widen the spread the outlier check judges by."
+    },
+    {
+      "id": "pegelonline-rechtenfleth-2026-11-11",
+      "stations": ["pegelonline/4970030"],
+      "since": "2026-11-11",
+      "until": "2026-11-12",
+      "handling": "flagged",
+      "error": "From 08:33 to about 11:30 UTC on 11 November 2026 PEGELONLINE's Rechtenfleth gauge falls from 3.17 to 0.15 m in ten minutes, holds 0.56 m for 40 minutes, then holds 10.56 m for about two hours, above any other value of its year.",
+      "response": "11 November 2026 is flagged `suspect`, keeping the source flag as `source_flag`.",
+      "evidence": "Found from the dropouts at Wangerooge West and Schillig, November 2026: 0.1% of Rechtenfleth's values before November 2026 are below 2.14 m and 0.1% above 8.24 m. QC flags 7 values of the episode: the holds are shorter than the 6-hour flatline, and the outlier check judges them against a spread they widen. The tide before 08:33 and from 12:00 is normal."
+    },
+    {
+      "id": "pegelonline-fill-values",
+      "stations": ["pegelonline/9520050", "pegelonline/9520070"],
+      "since": "2019-01-01",
+      "handling": "dropped",
+      "error": "These 2 PEGELONLINE gauges hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 14 values from 2019 to 2022, from 10,635 to 25,689 m.",
+      "response": "The store leaves out a level outside its span (`SPAN_M` in src/span.ts) wherever it fetches levels, and requalify drops any it holds. A year file of nothing else keeps its rows, flagged `bad`, with a warning.",
+      "evidence": "November 2026. A scan of the range of levels in every year file of every source in the store (335,320 files) found 383 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
     }
   ],
   "retired": []
