@@ -397,8 +397,9 @@ export async function extremes(
     // own heights' times, so one padded with sentinels can't relabel another's extremes.
     const chosen = new Set(heights.flatMap(valueTimes));
     const fit = (t: Series) => {
-      const at = t.MetingenLijst.filter((m) => chosen.has(Date.parse(m.Tijdstip))).length;
-      return [at, t.MetingenLijst.length - at] as const;
+      const times = valueTimes(t);
+      const at = times.filter((time) => chosen.has(time)).length;
+      return [at, times.length - at] as const;
     };
     const typeAt = new Map<number, string | undefined>();
     for (const t of types
@@ -407,7 +408,8 @@ export async function extremes(
       .map(({ t }) => t))
       for (const m of t.MetingenLijst) {
         const time = Date.parse(m.Tijdstip);
-        if (!typeAt.has(time)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
+        // A sentinel isn't a label, so the next selection's label can stand.
+        if (!typeAt.has(time) && isValue(m)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
       }
     for (const m of heights.flatMap((h) => h.MetingenLijst)) {
       const time = Date.parse(m.Tijdstip);
@@ -492,12 +494,15 @@ function* chunks(start: Date, end: Date): Generator<[Date, Date]> {
 /** Ways RWS derives values that aren't readings as measured, which are left out. */
 const MEANS = new Set(["GEM24H"]);
 
-/** The times of a series' values, in order; a missing-value sentinel isn't a value. */
+/** Whether a measurement holds a value: a label, or a number that isn't a missing-value sentinel. */
+function isValue(m: Measurement): boolean {
+  const v = m.Meetwaarde.Waarde_Numeriek;
+  return v === undefined ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined : Math.abs(v) <= 10_000;
+}
+
+/** The times of a series' values, in order. */
 function valueTimes(s: Series): number[] {
-  return s.MetingenLijst.filter((m) => {
-    const v = m.Meetwaarde.Waarde_Numeriek;
-    return v === undefined ? m.Meetwaarde.Waarde_Alfanumeriek !== undefined : Math.abs(v) <= 10_000;
-  })
+  return s.MetingenLijst.filter(isValue)
     .map((m) => Date.parse(m.Tijdstip))
     .sort((a, b) => a - b);
 }

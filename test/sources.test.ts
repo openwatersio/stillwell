@@ -365,6 +365,23 @@ describe("rws", () => {
         ["2024-01-01T09:00:00.000Z", "high"],
       ],
     );
+    // A type entry holding a missing-value sentinel isn't a label, however many such entries a selection has.
+    const padded = JSON.parse(
+      answer(
+        // Labels at exactly the chosen heights' times, each holding a sentinel.
+        [typeChannel, [1, 7, 10].map((h) => [t(h), "topagger"])],
+        // Real labels, with one more at a time with no height.
+        [typeChannel, [1, 4, 7, 10].map((h) => [t(h), h === 7 ? "laagwater" : "hoogwater"])],
+        [nap, [1, 7, 10].map((h) => [t(h), 50])],
+      ),
+    );
+    for (const m of padded.WaarnemingenLijst[0].MetingenLijst)
+      m.Meetwaarde.Waarde_Numeriek = 999_999_999;
+    serve([[/OphalenWaarnemingen/, JSON.stringify(padded)]]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => e.type),
+      ["high", "low", "high"],
+    );
     // Heights in the datum that are all sentinels are an outage, not a datum change.
     serve([
       [
