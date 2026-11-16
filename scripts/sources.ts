@@ -7,7 +7,7 @@
  * Given sources, it prints those of them the job runs for, and fails when
  * one isn't registered or none is left.
  */
-import { JOBS, sourcesFor, type Job } from "../src/sources/jobs.ts";
+import { JOBS, SERVER_SOURCES, sourcesFor, type Job } from "../src/sources/jobs.ts";
 
 const [job, ...ids] = process.argv.slice(2);
 if (!JOBS.includes(job as Job)) {
@@ -17,7 +17,11 @@ if (!JOBS.includes(job as Job)) {
 try {
   const picked = sourcesFor(job as Job, ids);
   if (!picked.length)
-    throw new Error(ids.length ? `None of ${ids.join(", ")} runs ${job}` : `No source runs ${job}`);
+    throw new Error(
+      ids.length
+        ? `None of ${ids.join(", ")} runs ${job} in Actions${ids.some((id) => SERVER_SOURCES.has(id)) ? ": the server's job queue writes those in src/sources/server.json" : ""}`
+        : `No source runs ${job}`,
+    );
   console.log(JSON.stringify(picked));
 } catch (error) {
   console.error((error as Error).message);

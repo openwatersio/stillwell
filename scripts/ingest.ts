@@ -187,6 +187,7 @@ import {
   type DataMatch,
 } from "../src/matches.ts";
 import { ID_KM } from "../src/same-as.ts";
+import { INGEST_OPTIONS } from "../src/ingest-options.ts";
 
 useDiskCache();
 
@@ -195,28 +196,7 @@ const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFil
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
-  options: {
-    hours: { type: "string", default: "24" },
-    "keep-days": { type: "string", default: "7" },
-    days: { type: "string", default: "1" },
-    concurrency: { type: "string", default: "4" },
-    "accept-epochs": { type: "boolean", default: false },
-    "accept-withheld": { type: "boolean", default: false },
-    "accept-matches": { type: "boolean", default: false },
-    "no-publish": { type: "boolean", default: false },
-    first: { type: "string" },
-    shard: { type: "string" },
-    refetch: { type: "boolean", default: false },
-    "skip-written": { type: "boolean", default: false },
-    "with-inactive": { type: "boolean", default: false },
-    "skip-unscreened": { type: "boolean", default: false },
-    "rebuild-bounds": { type: "boolean", default: false },
-    "rebuild-years": { type: "boolean", default: false },
-    all: { type: "boolean", default: false },
-    requalify: { type: "boolean", default: false },
-    budget: { type: "string" },
-    "dry-run": { type: "boolean", default: false },
-  },
+  options: INGEST_OPTIONS,
 });
 const [command, ...args] = positionals;
 

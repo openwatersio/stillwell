@@ -34,14 +34,14 @@ jobs:
         run: |
           set -f
           # The command and sources are the words that aren't an option or
-          # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --no-publish,
+          # its value; every ingest option takes a value but --accept-epochs, --accept-withheld, --accept-matches, --no-publish,
           # --refetch, --skip-written, --skip-unscreened, --with-inactive, --rebuild-bounds, --rebuild-years, --all, --requalify and --dry-run.
           words=()
           skip=
           for arg in $ARGS; do
             if [ -n "$skip" ]; then skip=; continue; fi
             case "$arg" in
-              --accept-epochs | --accept-withheld | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --dry-run | --*=* | --) ;;
+              --accept-epochs | --accept-withheld | --accept-matches | --no-publish | --refetch | --skip-written | --skip-unscreened | --with-inactive | --rebuild-bounds | --rebuild-years | --all | --requalify | --dry-run | --*=* | --) ;;
               --*) skip=1 ;;
               *) words+=("$arg") ;;
             esac
@@ -90,6 +90,15 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
+      # A source whose writers run on the server's job queue is written only there (docs/plans/jobs.md), by
+      # main's list, so a run that waited in its group from before the source moved doesn't write it.
+      - run: |
+          lane=$(node --input-type=module -e '
+            import { laneOf } from "./src/jobs/commands.ts";
+            console.log(laneOf(process.env.ARGS.split(/\s+/).filter(Boolean)));')
+          case "$lane" in store-*) scripts/server-owns.sh "${lane#store-}" ;; esac
+        env:
+          ARGS: ${{ inputs.args }}
       # The arguments come through the environment, never into the script text.
       - run: |
           set -f

@@ -34,7 +34,7 @@ export const metadata: SourceMetadata = {
   // The export is weekly and its newest values are months old.
   hourly: false,
   // CPRA sends no preliminary values, but re-adjusts recent months from field
-  // visits, so the monthly refetch reads the last three years again (monthly.yml).
+  // visits, so the monthly refetch reads the last three years again (scripts/monthly.sh).
   finalizes: true,
   // Values before the GEOID12B switch are served against GEOID99 (README.md).
   archive: "previous",

@@ -11,7 +11,8 @@
  * STILLWELL_STORE and STILLWELL_RESTRICTED_STORE are the stores, as for
  * scripts/ingest.ts; the server reads them and never writes them. With
  * GITHUB_TOKEN set, a source reporting a station in another datum starts the
- * Monthly refresh of that source, unless one started in the last day. With
+ * Monthly refresh of that source, unless one started in the last day, or for a
+ * source on the server's job queue asks the job service for it. With
  * STILLWELL_METRICS set, it writes each source's pass metrics to that file
  * after every pass, in Prometheus's text format.
  */
@@ -21,6 +22,8 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sources, sourceOf } from "../src/sources/index.ts";
 import { storeOfSource } from "../src/store/stores.ts";
+import { REFRESH_REQUESTS } from "../src/jobs/schedule.ts";
+import { PHASES, SERVER_SOURCES } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
 import { clickhouse, databaseFor, migrate } from "../src/realtime/clickhouse.ts";
 import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
@@ -187,9 +190,28 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
 /**
  * Start the Monthly refresh of one source, as the hourly workflow does on a
  * datum change: unless one that refreshes it started on `main` in the last day.
- * Returns whether a refresh started or one already had.
+ * For a source on the server's job queue, ask the job service for it instead,
+ * which queues one a day. Returns whether a refresh started or one already had.
  */
 async function refresh(source: string): Promise<boolean> {
+  // A source on the server's job queue is refreshed there: the job service queues it from this request.
+  if (SERVER_SOURCES.has(source)) {
+    if (PHASES.get(source) !== "server") {
+      console.error(
+        `${source}: a datum changed while it moves to or from the server; its stations fail until the server writes it and refreshes its list`,
+      );
+      return false;
+    }
+    try {
+      writeFileSync(`${REFRESH_REQUESTS}/${source}`, "");
+      return true;
+    } catch (error) {
+      console.error(
+        `${source}: a datum changed; can't ask for its refresh: ${(error as Error).message}`,
+      );
+      return false;
+    }
+  }
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     console.error(`${source}: a datum changed; set GITHUB_TOKEN to start its refresh`);

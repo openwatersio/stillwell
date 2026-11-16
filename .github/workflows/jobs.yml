@@ -1,0 +1,58 @@
+name: Jobs
+
+# Queue a job on the Stillwell server's job queue (docs/plans/jobs.md), such as
+# `backfill ea all 2025 2027 --skip-written`, for a source whose writers run
+# there; the Ingest workflow refuses those. The job runs on the box, and its
+# log is there: `ssh root@<box> journalctl -fu stillwell-job-<id>`.
+run-name: Jobs ${{ inputs.args }}
+on:
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "ingest.ts arguments, or `list`"
+        required: true
+      timeout:
+        description: "Minutes before the job is stopped (up to 600)"
+        required: true
+        default: "180"
+
+permissions: {}
+
+jobs:
+  enqueue:
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_HOST != ''
+    runs-on: ubuntu-latest
+    # The deploy key, which reaches the box as root.
+    environment: server
+    timeout-minutes: 5
+    steps:
+      - name: ssh setup
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      # ssh hands the words to a shell on the box, so only words that shell reads as they are go through.
+      - shell: bash
+        run: |
+          set -f -o pipefail
+          for word in $ARGS $TIMEOUT; do
+            case "$word" in
+              *[!A-Za-z0-9_.,/:=+-]*)
+                echo "::error::$word: only letters, digits and _.,/:=+- are allowed"
+                exit 1
+                ;;
+            esac
+          done
+          if [ "$ARGS" = list ]; then
+            ssh root@"$DEPLOY_HOST" stillwell-jobs list
+          else
+            # A refusal fails the step, its reason in the summary.
+            ssh root@"$DEPLOY_HOST" stillwell-jobs enqueue --timeout "$TIMEOUT" $ARGS 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          ARGS: ${{ inputs.args }}
+          TIMEOUT: ${{ inputs.timeout }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}

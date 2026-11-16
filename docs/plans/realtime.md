@@ -87,7 +87,7 @@ A station that leaves its source's list or stops being live drops out of the nex
 
 Deleting withheld stations' rows keeps the limit every other withholding keeps (`tooManyWithheld`): a rule that suddenly matches more stations than that fails the source's passes and deletes nothing, until the rule is fixed or `STILLWELL_ACCEPT_WITHHELD=1` accepts it, as `--accept-withheld` does for the other withholdings.
 
-When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks. It asks at most once a day, or an hour after one it couldn't start. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
+When the adapter throws `DatumChanged`, the station fails that pass and keeps its rows, and the poller dispatches the Monthly refresh for that source through the GitHub API unless a refresh of it started on `main` in the last day, as the hourly workflow checks, or, for a source on the server's job queue, files a request the job service queues its list refresh from ([jobs.md](jobs.md)). It asks at most once a day, or an hour after one it couldn't start. The station fails every pass until the refresh opens the new epoch, and is then fetched in it; a station whose new epoch is held for a decision (`isHeld`) isn't fetched.
 
 ## Exporting to R2
 
@@ -99,6 +99,8 @@ Exports keep the files' current schema, levels as FLOAT:
 The restricted database exports to `STILLWELL_RESTRICTED_STORE`, never the public bucket.
 
 ## Jobs
+
+[jobs.md](jobs.md) is the job queue as it's built: on the server, with `scripts/ingest.ts` writing R2 directly, before ClickHouse holds the history. What follows is how jobs work once it does.
 
 From step 2, backfill, the monthly refetch, requalify, analysis, withhold and the export are jobs, and from step 3 the station refresh and `publish` too. `stillwell-jobs` runs them from a queue in SQLite (`node:sqlite`, built into Node), a file on the server in WAL mode that both services open:
 
