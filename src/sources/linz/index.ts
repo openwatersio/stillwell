@@ -354,16 +354,23 @@ async function sensorLevels(
     });
     for (const [file, csv] of await unzip(zip)) {
       if (!file.toLowerCase().endsWith(".csv")) continue;
+      let rows = 0;
       let read = 0;
+      let marked = 0;
       for (const row of parse(csv, code, !final)) {
+        rows++;
+        if (Math.abs(row.level) === 6999) marked++;
         const o = ANTARCTIC.has(code) ? atGauge(code, row, year) : row;
         if (!o) continue;
         read++;
         if (ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
       }
-      // A year's file in a layout or unit the adapter doesn't know would otherwise read as no data.
-      if (ANTARCTIC.has(code) && !read && csv.split("\n").length > 100)
+      // A file in a layout or unit the adapter doesn't know would otherwise read as no data,
+      // and replace what the store holds. One of nothing but missing marks is a gauge that was off.
+      if (ANTARCTIC.has(code) && !read && rows > marked)
         throw new Error(`LINZ ${name} has rows, and none of a layout or unit this reads`);
+      if (ANTARCTIC.has(code) && !rows && /[^\s,]/.test(csv))
+        throw new Error(`LINZ ${name} has content, and none of a layout this reads`);
     }
   }
   return out;

@@ -1121,8 +1121,8 @@ describe("linz parseReadme", () => {
 describe("linz Antarctic files in a layout it doesn't know", () => {
   linz.pacing.requestMs = 0;
 
-  it("fails a file of many rows that none of its layouts read, rather than read it as no data", async () => {
-    const rows = Array.from({ length: 200 }, (_, i) => `ROBT,2026010${1 + (i % 9)},00:05:00,5912`);
+  it("fails a file whose rows none of its layouts or units read, rather than read it as no data", async () => {
+    const rows = Array.from({ length: 3 }, (_, i) => `ROBT,2026010${1 + i},00:05:00,5912`);
     serve([
       [
         /listDatasetFiles\/ROBT\/2026\/00$/,
@@ -1134,5 +1134,24 @@ describe("linz Antarctic files in a layout it doesn't know", () => {
       linz.levels("ROBT", new Date("2026-01-01T00:00:00Z"), new Date("2026-02-01T00:00:00Z")),
       /none of a layout or unit this reads/,
     );
+  });
+
+  it("reads a file of nothing but missing marks, and fails one of a layout it doesn't know", async () => {
+    const route = (csv: string): [RegExp, string][] => [
+      [
+        /listDatasetFiles\/ROBT\/2025\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2025.zip" }] }),
+      ],
+      [
+        /listDatasetFiles\/ROBT\/2026\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2026.zip" }] }),
+      ],
+      [/tidegauge\/ROBT\/2026\/00\/ROBT_00_2026\.zip$/, zipOf("ROBT_00_2026.zip", csv)],
+    ];
+    const span = [new Date("2026-01-01T00:00:00Z"), new Date("2026-02-01T00:00:00Z")] as const;
+    serve(route("ROBT,20260101,00:05:00,-6999.000\nROBT,20260101,00:10:00,-6999.000"));
+    assert.deepEqual(await linz.levels("ROBT", ...span), []);
+    serve(route("not,a,layout"));
+    await assert.rejects(linz.levels("ROBT", ...span), /none of a layout this reads/);
   });
 });
