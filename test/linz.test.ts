@@ -760,7 +760,7 @@ describe("linz Antarctic gauges", () => {
     );
   });
 
-  it("reads Cape Roberts' last year, before its file is issued in March, as no data", async () => {
+  it("reads Cape Roberts' last year, before its file is issued by May, as no data", async () => {
     const span = [new Date("2026-12-01T00:00:00Z"), new Date("2027-01-01T00:00:00Z")] as const;
     const was = { record_start: "2007-01-01T00:00:00.000Z" };
     mock.timers.reset();
@@ -768,7 +768,7 @@ describe("linz Antarctic gauges", () => {
     serve([list("ROBT", 2026), list("ROBT", 2025, "ROBT_00_2025.zip")]);
     assert.deepEqual(await linz.levels("ROBT", ...span, was), []);
     mock.timers.reset();
-    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-03-09T00:00:00Z") });
+    mock.timers.enable({ apis: ["Date"], now: Date.parse("2027-05-09T00:00:00Z") });
     await assert.rejects(linz.levels("ROBT", ...span, was), /lists no files for ROBT in 2026/);
   });
 
@@ -914,8 +914,8 @@ describe("linz Antarctic gauges", () => {
     assert.deepEqual(
       obs.map((o) => [iso(o), o.level, o.flag]),
       [
-        ["2026-01-01T12:00", 2.476, Flag.preliminary],
-        ["2026-03-04T23:49", 1.065, Flag.preliminary],
+        ["2026-01-01T12:00", 2.476, Flag.good],
+        ["2026-03-04T23:49", 1.065, Flag.good],
       ],
     );
     assert.equal(requests.filter(([url]) => /SCOT_00_2026_01-03/.test(url)).length, 1);
@@ -1093,5 +1093,24 @@ describe("linz parseReadme", () => {
   it("refuses a README without a name or a position", () => {
     assert.equal(linz.parseReadme("WGS-84 POSITION: 41° 17' 04\"S 174° 46' 47\"E"), null);
     assert.equal(linz.parseReadme("NAME: X\nWGS-84 POSITION: 41° 17' 04\"S"), null);
+  });
+});
+
+describe("linz Antarctic files in a layout it doesn't know", () => {
+  linz.pacing.requestMs = 0;
+
+  it("fails a file of many rows that none of its layouts read, rather than read it as no data", async () => {
+    const rows = Array.from({ length: 200 }, (_, i) => `ROBT,2026010${1 + (i % 9)},00:05:00,5912`);
+    serve([
+      [
+        /listDatasetFiles\/ROBT\/2026\/00$/,
+        JSON.stringify({ files: [{ name: "ROBT_00_2026.zip" }] }),
+      ],
+      [/tidegauge\/ROBT\/2026\/00\/ROBT_00_2026\.zip$/, zipOf("ROBT_00_2026.zip", rows.join("\n"))],
+    ]);
+    await assert.rejects(
+      linz.levels("ROBT", new Date("2026-01-01T00:00:00Z"), new Date("2026-02-01T00:00:00Z")),
+      /none of a layout or unit this reads/,
+    );
   });
 });

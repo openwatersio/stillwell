@@ -120,6 +120,10 @@ export async function stations(previous: Station[] = []): Promise<LinzStation[]>
     }
     // Sensor 40 stopped before last year: Sumner closed in 2022.
     const closed = CLOSED[code];
+    if (closed && last > new Date(closed).getUTCFullYear())
+      console.warn(
+        `  linz ${code}: files after its removal (${closed.slice(0, 10)}); still closed`,
+      );
     // Cape Roberts' year's file comes out in the next January or February.
     const active = !closed && last >= thisYear - (code === "ROBT" ? 2 : 1);
     out.push({
@@ -231,7 +235,7 @@ export async function levels(
       const unissued =
         sourceId === "ROBT" &&
         year === now.getUTCFullYear() - 1 &&
-        now.getTime() < Date.UTC(year + 1, 2, 1);
+        now.getTime() < Date.UTC(year + 1, 4, 1);
       if (!names.length && record_start && year < now.getUTCFullYear() && !unissued)
         throw new Error(`LINZ lists no files for ${sourceId} in ${year}`);
       for (const o of await sensorLevels(sourceId, sensor, year, names, stretches)) out.push(o);
@@ -339,7 +343,8 @@ async function sensorLevels(
         );
       });
   for (const name of files) {
-    const final = name === yearly;
+    // Scott Base's months file is its last: nothing will replace it.
+    const final = name === yearly || /_\d{2}-\d{2}\.zip$/.test(name);
     const zip = await getText(`${API}/tidegauge/${code}/${year}/${sensor}/${name}`, {
       base64: true,
       pace,
@@ -349,10 +354,16 @@ async function sensorLevels(
     });
     for (const [file, csv] of await unzip(zip)) {
       if (!file.toLowerCase().endsWith(".csv")) continue;
+      let read = 0;
       for (const row of parse(csv, code, !final)) {
         const o = atGauge(code, row, year);
-        if (o && ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
+        if (!o) continue;
+        read++;
+        if (ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
       }
+      // A year's file in a layout or unit the adapter doesn't know would otherwise read as no data.
+      if (ANTARCTIC.has(code) && !read && csv.split("\n").length > 100)
+        throw new Error(`LINZ ${name} has rows, and none of a layout or unit this reads`);
     }
   }
   return out;
@@ -451,7 +462,7 @@ export const SENSOR_41: Record<string, { from: string; to: string; sensor: "41" 
  * (`47.80/`), and its daily files hold 0.001 where a sensor was off, which the
  * year's file replaces with the missing mark (erratum `linz-sensor-off-values`);
  * none of those are levels, nor is a 0.000. The Antarctic files add layouts, and
- * their rows are kept only where every field is where its layout puts it (erratum
+ * their rows are kept only where the fields that give a time and a level are where its layout puts them (erratum
  * `linz-antarctic-file-rows`):
  *
  * - `ROBT,20110101,0:00:00,5.345,30,-2.338,993.15`: code, date, time, level, then
@@ -518,7 +529,7 @@ export function parse(csv: string, code: string, daily: boolean): Observation[] 
  * null where the label or unit can't be settled (erratum `linz-scott-base-clock`).
  *
  * - Cape Roberts' labels are UTC, as its README says, in meters; -6999 and 6999 mark
- *   a missing level.
+ *   a missing level, and 20 m or more isn't a level there, nor 5 m or more at Scott Base.
  * - Scott Base's labels are NZST, UTC+12, as its README says only of the first
  *   format, except from 25 November 2023, when the logger was reinstalled, to
  *   some day from 29 to 31 October 2024, when they are UTC+13; those three days,
@@ -532,7 +543,9 @@ function atGauge(code: string, row: Observation, fileYear: number): Observation 
     time -= (time >= Date.UTC(2023, 10, 25) && time < Date.UTC(2024, 9, 29) ? 13 : 12) * 3_600_000;
     if (fileYear >= 2024) level /= 1000;
   }
-  return Math.abs(level) >= 20 ? null : { ...row, time, level: Math.round(level * 1000) / 1000 };
+  return Math.abs(level) >= (code === "SCOT" ? 5 : 20)
+    ? null
+    : { ...row, time, level: Math.round(level * 1000) / 1000 };
 }
 
 /**
