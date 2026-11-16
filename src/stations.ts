@@ -103,7 +103,8 @@ export function mergeStationList(
           datums,
           sent: s.datums,
           reference,
-          changed: s.datum === null ? null : seriesChanged?.(old, s),
+          // The source's own flag goes with it, though the stored list leaves it out.
+          changed: s.datum === null ? null : seriesChanged?.(old, { ...s, no_datums }),
         },
         { ...options, station: s.id },
       );

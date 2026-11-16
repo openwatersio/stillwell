@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import type { StoredStation, ListedStation, Station } from "../src/schema.ts";
 import { seriesPath } from "../src/store/paths.ts";
 import { mergeStationList } from "../src/stations.ts";
+import * as usgs from "../src/sources/usgs/index.ts";
 
 const base = {
   source: "rws",
@@ -348,6 +349,29 @@ describe("mergeStationList", () => {
     assert.deepEqual(stations[0]!.datums, {});
     assert.deepEqual(stations[0]!.epochs.at(-1)!.datums, {});
     assert.equal("no_datums" in stations[0]!, false);
+  });
+
+  it("lets a source see its own no_datums flag when it says a zero may have moved", () => {
+    // A decided USGS gage whose decision USGS's new altitude sets aside.
+    const stored = {
+      ...held("422206071033901", { datum: "GAGE", datums: { NAVD88: -32.516 } }),
+      id: "usgs/422206071033901",
+      source: "usgs",
+    };
+    const listed = {
+      ...station("422206071033901", { datum: "GAGE", datums: {} }),
+      id: "usgs/422206071033901",
+      source: "usgs",
+      no_datums: true,
+    };
+    const { changes } = mergeStationList([stored], [listed], {
+      ...options,
+      seriesChanged: usgs.seriesChanged,
+    });
+    assert.deepEqual(
+      changes.map((c) => [c.id, c.reason]),
+      [["usgs/422206071033901", "USGS lists another altitude than GAGE_DATUMS decided against"]],
+    );
   });
 
   it("leaves a held epoch's offsets for its decision to settle", () => {

@@ -540,11 +540,11 @@ function toStation(
   // An unsurveyed altitude, or a method with no altitude, says the stored offsets aren't the gage's zero.
   else if (datum === GAGE && !decided && !gap) noDatums = !surveyed;
   // The ground's altitude still says how far above the sea the site is, for the tidal judgment.
-  // A gap keeps the ground the store held, as it keeps the offsets.
+  // An answer with no altitude keeps the ground the store held.
   const ground =
     noDatums && vertical && typeof location.altitude === "number"
       ? Math.round(location.altitude * FEET * 1000) / 1000 + 0
-      : gap
+      : typeof location.altitude !== "number"
         ? (grounds.get(`usgs/${site}`) ?? null)
         : null;
   const live = reporting(series);

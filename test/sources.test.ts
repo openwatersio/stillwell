@@ -2761,7 +2761,10 @@ describe("usgs", () => {
       ],
     ]);
     // The store's list, whose ground a gap keeps.
-    const list = await usgs.stations([{ id: "usgs/09469000", ground_m: 762.6 } as never]);
+    const list = await usgs.stations([
+      { id: "usgs/09469000", ground_m: 762.6 },
+      { id: "usgs/02037500", ground_m: 75.6 },
+    ] as never);
     assert.deepEqual(
       list.map((s) => [s.id, s.kind, s.datum, s.datums, s.time_series_id, s.live, s.country_code]),
       [
@@ -2799,7 +2802,8 @@ describe("usgs", () => {
       list.filter((s) => s.no_datums).map((s) => [s.id, s.ground_m]),
       [
         ["usgs/02035000", 36.576],
-        ["usgs/02037500", undefined],
+        // A reply with no altitude keeps the ground the store held.
+        ["usgs/02037500", 75.6],
         ["usgs/381142122015801", 1.829],
         ["usgs/422340071043201", -1.219],
       ],
