@@ -331,6 +331,50 @@ describe("rws", () => {
     );
   });
 
+  it("labels the chosen heights from the selection that matches them, and reads an outage as an outage", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    const range = [new Date("2023-12-31T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // More labels, but only one real height: its labels mustn't win at the other's times.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "topagger"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          [typeChannel, [1, 7, 10].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [1, 7, 10].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => [
+        new Date(e.time).toISOString(),
+        e.type,
+      ]),
+      [
+        ["2024-01-01T00:00:00.000Z", "high"],
+        ["2024-01-01T06:00:00.000Z", "low"],
+        ["2024-01-01T09:00:00.000Z", "high"],
+      ],
+    );
+    // Heights in the datum that are all sentinels are an outage, not a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([typeChannel, [[t(5), "hoogwater"]]], [nap, [[t(5), 999_999_999]]]),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("hoekvanholland", ...range), []);
+  });
+
   it("reads both lows of a double low water, and not the rise between them", async () => {
     const times = [
       "2024-01-01T02:00:00+01:00",

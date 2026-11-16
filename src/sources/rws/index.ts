@@ -380,19 +380,31 @@ export async function extremes(
       location,
       series.filter((s) => s.AquoMetadata.Grootheid.Code === "WATHTE"),
     );
-    const heights = consecutive(all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum));
+    const inDatum = all.filter((s) => s.AquoMetadata.Hoedanigheid.Code === datum);
     // Heights only in another datum mean RWS moved the grouping; refuse rather than skip.
-    if (types.length && all.length && !heights.length)
+    // Heights in the datum that are all missing-value sentinels are an outage, not a move.
+    if (types.length && all.length && !inDatum.length)
       throw new DatumChanged(
         `RWS ${location} extremes are in ${all[0]!.AquoMetadata.Hoedanigheid.Code}, not ${datum}`,
         all[0]!.AquoMetadata.Hoedanigheid.Code,
         null,
       );
+    const heights = consecutive(inDatum);
     if (!types.length || !heights.length) continue;
     for (const h of heights) assertCentimeters(h, datum);
-    // The fullest selection's type wins at a time two share, as its heights do in `consecutive`.
+    // At a time two type selections share, the one that labels more of the chosen heights'
+    // values wins, then the one with fewer labels elsewhere: a selection's labels sit at its
+    // own heights' times, so one padded with sentinels can't relabel another's extremes.
+    const chosen = new Set(heights.flatMap(valueTimes));
+    const fit = (t: Series) => {
+      const at = t.MetingenLijst.filter((m) => chosen.has(Date.parse(m.Tijdstip))).length;
+      return [at, t.MetingenLijst.length - at] as const;
+    };
     const typeAt = new Map<number, string | undefined>();
-    for (const t of byValues(types))
+    for (const t of types
+      .map((t) => ({ t, f: fit(t) }))
+      .sort((a, b) => b.f[0] - a.f[0] || a.f[1] - b.f[1])
+      .map(({ t }) => t))
       for (const m of t.MetingenLijst) {
         const time = Date.parse(m.Tijdstip);
         if (!typeAt.has(time)) typeAt.set(time, m.Meetwaarde.Waarde_Alfanumeriek);
