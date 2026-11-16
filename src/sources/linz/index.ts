@@ -356,7 +356,7 @@ async function sensorLevels(
       if (!file.toLowerCase().endsWith(".csv")) continue;
       let read = 0;
       for (const row of parse(csv, code, !final)) {
-        const o = atGauge(code, row, year);
+        const o = ANTARCTIC.has(code) ? atGauge(code, row, year) : row;
         if (!o) continue;
         read++;
         if (ranges.some(([from, to]) => o.time >= from && o.time < to)) out.push(o);
@@ -491,7 +491,13 @@ export function parse(csv: string, code: string, daily: boolean): Observation[] 
     } else if (/^\d{4}$/.test(f[0]!) && f.length === 7) {
       const [year, day, hhmm] = [Number(f[0]), Number(f[1]), Number(f[2])];
       const date = new Date(Date.UTC(year, 0, day));
-      if (day >= 1 && date.getUTCFullYear() === year && /^\d+$/.test(f[3]!) && /^\d+$/.test(f[2]!))
+      if (
+        day >= 1 &&
+        date.getUTCFullYear() === year &&
+        /^\d+$/.test(f[1]!) &&
+        /^\d+$/.test(f[3]!) &&
+        /^\d+$/.test(f[2]!)
+      )
         [stamp, value] = [
           `${date.toISOString().slice(0, 10)} ${Math.floor(hhmm / 100)}:${String(hhmm % 100).padStart(2, "0")}`,
           f[4],

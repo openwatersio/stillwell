@@ -793,6 +793,28 @@ describe("linz Antarctic gauges", () => {
     );
   });
 
+  it("keeps a level of 20 m or more at a New Zealand gauge for QC to judge", async () => {
+    serve([
+      [
+        /listDatasetFiles\/WLGT\/2025\/40$/,
+        JSON.stringify({ files: [{ name: "WLGT_40_2025.zip" }] }),
+      ],
+      [
+        /WLGT\/2025\/40\/WLGT_40_2025\.zip$/,
+        zipOf("WLGT_40_2025.zip", "WLGT,20250410,00:00:00,47.800"),
+      ],
+    ]);
+    const obs = await linz.levels(
+      "WLGT",
+      new Date("2025-04-10T00:00:00Z"),
+      new Date("2025-04-11T00:00:00Z"),
+    );
+    assert.deepEqual(
+      obs.map((o) => o.level),
+      [47.8],
+    );
+  });
+
   it("reads the Antarctic layouts only at the Antarctic gauges", () => {
     assert.deepEqual(linz.parse("2024,1,1000,30,5.676,-3.458,973.02", "WLGT", false), []);
     assert.deepEqual(linz.parse("2023-01-01,00:00:00,2.504", "WLGT", false), []);

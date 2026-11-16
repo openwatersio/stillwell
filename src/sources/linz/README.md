@@ -89,7 +89,7 @@ That's 80 station-years, each one listing and a 2.3 MB zip for each sensor read,
 
 ### Antarctic gauges
 
-Cape Roberts and Scott Base are new to the store, so their first backfill needs no `--refetch`. Their splits open 10 epochs, which Monthly with `sources: linz` accepts together with the others' only with `accept_epochs` checked. Backfill writes each epoch's years under the erratum flags (`linz-cape-roberts-unreliable-2009`, `linz-scott-base-step-2018`, `linz-scott-base-steps-2019-01` and `linz-scott-base-unreliable-2021`), so they need no `requalify`:
+Cape Roberts and Scott Base are new to the store, so their first backfill needs no `--refetch`. Their splits open 10 epochs at two stations, which Monthly with `sources: linz` accepts, with the other gauges', only with `accept_epochs` checked once more than five stations open one. Backfill writes each epoch's years under the erratum flags (`linz-cape-roberts-unreliable-2009`, `linz-scott-base-step-2018`, `linz-scott-base-steps-2019-01` and `linz-scott-base-unreliable-2021`), so they need no `requalify`:
 
 ```bash
 node scripts/ingest.ts backfill linz ROBT,SCOT 2007 2026
