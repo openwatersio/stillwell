@@ -3,6 +3,7 @@ import { readBackfilled, recordYear, writeBackfilled } from "../backfilled.ts";
 import { withheldReason } from "../withhold.ts";
 import { Blocked } from "../http.ts";
 import { FLATLINE_S, fromSource, qc, withSourceFlag, type QcOptions } from "../qc.ts";
+import { possible } from "../span.ts";
 import { DatumChanged, isHeld, recentWindow } from "../epochs.ts";
 import {
   Flag,
@@ -73,6 +74,8 @@ export interface RunSummary {
   values: number;
   /** Files written. */
   files: number;
+  /** Stored levels outside `SPAN_M` that requalify dropped. */
+  dropped?: number;
   /** Seconds spent in each phase of the run, in the order they first ran. */
   seconds?: Record<string, number>;
 }
@@ -482,7 +485,17 @@ export async function compactRecent({
                 window,
                 async (existing, datums) => {
                   await refuseOtherDatum(file, { ...station, datum: epoch.datum }, datums);
-                  const merged = upsert(existing, incoming);
+                  // A level outside `SPAN_M` goes, among the stored rows the fold rewrites
+                  // and the window's, which may hold some fetched before fetches dropped them.
+                  const merged = upsert(
+                    existing.filter((r) => possible(r.level)),
+                    incoming.filter((r) => possible(r.level)),
+                  );
+                  // Rows that would all go stay as they are, since a year file always has some.
+                  if (!merged.length) {
+                    later = spanOf(existing, window);
+                    return null;
+                  }
                   later = spanOf(merged, window);
                   if (sameRows(existing, merged)) return null;
                   const had = new Map(existing.map((r) => [r.time, r]));
@@ -995,6 +1008,11 @@ export function formatSummary(s: RunSummary, listed = 20): string {
     "| -: | -: | -: | -: | -: | -: |",
     `| ${s.stations} | ${s.updated} | ${s.stale.length} | ${s.failed.length} | ${s.values} | ${s.files} |`,
   ];
+  if (s.dropped)
+    lines.push(
+      "",
+      `Dropped ${s.dropped} stored levels outside −500 to 9,000 m. Run \`compact <source> --rebuild-bounds\` and \`publish\`, since a station's first or last value may be among them.`,
+    );
   const phases = Object.entries(s.seconds ?? {});
   if (phases.length) {
     lines.push("", "| Phase | Seconds |", "| - | -: |");

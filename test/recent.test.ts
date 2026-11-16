@@ -701,6 +701,57 @@ describe("compactRecent", () => {
     assert.deepEqual([...(await readBackfilled(root, "test")).get(b.id)!], [[1, [[2027, 2028]]]]);
   });
 
+  it("drops a stored level outside the span among the rows it folds", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    await writeObservations(
+      file,
+      [
+        at(start - DAY, 30479.695), // before the fold: left for requalify
+        at(start + HOUR, 0.6),
+        at(start + 2 * HOUR, 30479.695), // USACE's 99,999 ft, which the window doesn't bring again
+      ],
+      "NAP",
+    );
+    await writeRecent(recentPath(root, "test"), [
+      [
+        { ...at(start + HOUR, 0.65, start + 3 * HOUR), station: a.id, epoch: 1 },
+        // Fetched before fetches dropped such levels.
+        { ...at(start + 3 * HOUR, -2438.095, start + 4 * HOUR), station: a.id, epoch: 1 },
+      ],
+    ]);
+    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => [
+        r.time - start,
+        r.level > 9000 ? "fill" : r.level,
+      ]),
+      [
+        [-DAY, "fill"],
+        [HOUR, 0.65],
+      ],
+    );
+  });
+
+  it("leaves a year file as it is when every row it would fold is outside the span", async () => {
+    setConnections(4);
+    const root = store();
+    const a = station("a");
+    const file = seriesPath(root, "levels", "test", "a", 2026);
+    // The stored fill comes after the window's first row, so the fold reads it.
+    await writeObservations(file, [at(start + 2 * HOUR, 30479.695)], "NAP");
+    await writeRecent(recentPath(root, "test"), [
+      [{ ...at(start + HOUR, 30479.695, start + 3 * HOUR), station: a.id, epoch: 1 }],
+    ]);
+    await compactRecent({ source: source({}), stations: [a], storeFor: () => root, start, end });
+    assert.deepEqual(
+      (await readObservations(file)).map((r) => r.time - start),
+      [2 * HOUR],
+    );
+  });
+
   it("folds yesterday into the year file, carrying received and keeping what it had", async () => {
     setConnections(4);
     const root = store();

@@ -1519,6 +1519,42 @@ describe("backfillYear", () => {
     assert.ok(rows.filter((r) => r.time < missing).every((r) => r.level > 1.5));
   });
 
+  it("drops stored levels outside the span, even where a keepsStored source fetches nothing", async () => {
+    const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
+    const [from, to] = [Date.UTC(2000, 6, 1), Date.UTC(2000, 7, 1)];
+    const hours = [...Array((to - from) / HOUR).keys()].map((h) => ({
+      time: from + h * HOUR,
+      level: 1 + 0.3 * Math.sin((h / 12.42) * 2 * Math.PI),
+      flag: Flag.good,
+    }));
+    const path = seriesPath(store, "levels", "coops", "8000001", 2000);
+    // AWG's fill, at an hour the fetch below doesn't bring again.
+    const fill = { time: from + 5 * HOUR, level: 999999.06, flag: Flag.bad };
+    await writeObservations(
+      path,
+      hours.map((r, i) => (i === 5 ? fill : r)),
+      "STND",
+    );
+    const keeping = {
+      metadata: { id: "coops" },
+      keepsStored: true,
+      observations: async () => hours.filter((_, i) => i !== 5),
+    } as unknown as Source;
+    await backfillYear(
+      keeping,
+      station,
+      "levels",
+      new Date(from),
+      new Date(to),
+      epoch,
+      seriesFiles(dirOf(store), await listYears(dirOf(store)), readObservationFile),
+      new Map(),
+    );
+    const rows = await readObservations(path);
+    assert.equal(rows.length, hours.length - 1);
+    assert.ok(!rows.some((r) => r.time === fill.time));
+  });
+
   it("reads extremes once, for their datum and rows", async () => {
     const store = join(mkdtempSync(join(tmpdir(), "stillwell-backfill-")), "store");
     const dir = seriesDir(store, "extremes", "coops", "8000001");
