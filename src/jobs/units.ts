@@ -123,8 +123,10 @@ export function systemd(store: string, memory = 0): Units {
       }
       try {
         systemctl("reset-failed", unitOf(id));
-      } catch {
-        // Only a failed unit has anything to reset.
+      } catch (error) {
+        // Only a failed unit has anything to reset; one left loaded would answer for a job of the same id later.
+        if (!/not loaded|not found/i.test((error as Error).message))
+          console.error(`job ${id}: its unit wasn't reset: ${(error as Error).message}`);
       }
       execFileSync("rm", ["-rf", jobDir(id)]);
       return true;

@@ -255,14 +255,20 @@ describe("actions", () => {
 });
 
 describe("job service", () => {
-  it("declares nothing below its loop, which never returns", () => {
-    const lines = readFileSync("server/jobs.ts", "utf8").split("\n");
-    const loop = lines.findIndex((l) => l.startsWith("while (!stopping)"));
-    assert.ok(loop > 0);
-    assert.deepEqual(
-      lines.slice(loop).filter((l) => /^(let|const|var|class) /.test(l)),
-      [],
-    );
+  it("declares nothing below a service's loop, which never returns", () => {
+    for (const [file, loopStart] of [
+      ["server/jobs.ts", "while (!stopping)"],
+      ["server/ingest.ts", "await Promise.all(chosen.map("],
+    ]) {
+      const lines = readFileSync(file, "utf8").split("\n");
+      const loop = lines.findIndex((l) => l.startsWith(loopStart));
+      assert.ok(loop > 0, file);
+      assert.deepEqual(
+        lines.slice(loop).filter((l) => /^(export )?(let|const|var|class|enum) /.test(l)),
+        [],
+        file,
+      );
+    }
   });
 });
 

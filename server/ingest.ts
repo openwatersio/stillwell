@@ -190,7 +190,8 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
  * Start the Monthly refresh of one source, as the hourly workflow does on a
  * datum change: unless one that refreshes it started on `main` in the last day.
  * For a source on the server's job queue, the job service queues one a day from
- * the pass's row in polls. Returns whether a refresh started or one already had.
+ * the pass's row in polls. Returns whether a refresh started or one already had,
+ * which a source moving back to Actions has neither of.
  */
 async function refresh(source: string): Promise<boolean> {
   // A source on the server's job queue is refreshed there: the job service reads the change from polls. One
