@@ -18,6 +18,16 @@
       "error": "RWS's Kralendijk Plazabeach Terminal levels from 27 October 2026 on sit about 0.75 m above January and February 2026's, with no change of datum marked.",
       "response": "The record splits into datum epochs on 27 October 2026, and the store keeps the values as served. No gauge nearby measures the offset, so the epoch before has none and stays out of the combined series, readable on its own zero, until RWS answers.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Monthly medians are −0.62 m in January and February 2026 and +0.12 to +0.15 m in October and November, with no values between. No other gauge in the store lies within 150 km."
+    },
+    {
+      "id": "rws-petten-meetraai3-2012-zero",
+      "stations": ["rws/petten.meetraai3"],
+      "since": "2012-10-22",
+      "until": "2013-05-16",
+      "handling": "flagged",
+      "error": "From 22 October 2012 to the record's end on 15 May 2013, RWS's Petten meetraai 03 series holds exactly 0.00 m NAP for hours at a time through high and low water, a fill value rather than the sea.",
+      "response": "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
+      "evidence": "Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row. GESLA's copy carries the same values (erratum `gesla-petten-meetraai3-2012-zero`)."
     }
   ],
   "retired": []

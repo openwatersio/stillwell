@@ -18,7 +18,7 @@ if len(sys.argv) != 3:
     sys.exit(__doc__)
 sid, year = sys.argv[1], int(sys.argv[2])
 source, source_id = sid.split("/", 1)
-con = duckdb.connect()
+con = duckdb.connect(config={"custom_user_agent": "openwaters-stillwell-qc/1 (+https://github.com/openwatersio/stillwell)"})
 con.execute("install httpfs; load httpfs")
 found = con.execute(f"select interval_s from '{STORE}/stations.parquet' where id = ?", [sid]).fetchone()
 if found is None or found[0] is None:

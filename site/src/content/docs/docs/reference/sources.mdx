@@ -1,6 +1,6 @@
 ---
 title: sources.json
-description: One entry per source, with its license, credit, contact, terms and whether its preliminary values become final.
+description: The full list of sources with each source's license, credit and contact.
 sidebar:
   order: 6
   attrs:
@@ -46,3 +46,16 @@ GROUP BY ALL ORDER BY j.id`}
 />
 
 See the [Terms](/docs/guides/terms/) for what `license`, `commercial_use` and `attribution` require.
+
+## How complete a source's history is
+
+A source's history reaches the store through backfills that can run for days or weeks, so a station's earlier years may not be there yet. `backfill` says how far that has got: `since` is the first year of the source's stations' files, and `complete` and `incomplete` count the stations with levels whose years from then on are all there. Each station's own `missing_years` in [`stations.parquet`](/docs/reference/stations/) lists the years it lacks. A year counts as there when its file is in the station's series, or when a backfill asked the source for it and got a sure answer that it has nothing: the source answers an outage with an error, or the year is before the station's first stored year or, for an inactive station, after its last, as before its record starts or after it closed. An empty year inside a station's record, or after an active station's last values, stays missing, since it may have been an outage or not yet published, and so does every year of a station with nothing stored, unless the source answers an outage with an error. An outage that answered empty for every year before a station's first values, or after an inactive station's last, would go unnoticed, and so would years outside wrong dates a source lists for a station, which aren't asked for. A year the source can't serve in the station's current datum, such as before a datum change at a source that serves only the current one, isn't counted. From 2026 on, a year with a file at a source polled hourly counts only once a backfill has covered it or the station was polled from January 1, since compaction began in November 2026. A station that isn't polled hourly is judged to the year after its last value, or the last year a backfill asked for, whichever is later, but not this year. `backfill` is null for a source whose years aren't known yet.
+
+The stations of one source still missing years, with how many:
+
+```sql
+SELECT id, name, status, len(missing_years) AS missing, missing_years[1] AS earliest
+FROM 'https://stillwell.openwaters.io/stations.parquet'
+WHERE source = 'coops' AND len(missing_years) > 0
+ORDER BY missing DESC
+```

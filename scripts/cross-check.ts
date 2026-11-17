@@ -28,6 +28,7 @@ import {
   type Hourly,
 } from "../src/cross-check.ts";
 import { STANDARD, fit, resolvable } from "../src/harmonic.ts";
+import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { seriesPath, stationsPath } from "../src/store/paths.ts";
 import { Flag } from "../src/schema.ts";
@@ -51,7 +52,7 @@ const MAX_SCATTER = 20;
 const WINDOW_DAYS = 15;
 const CONNECTIONS = 8;
 /** Bumped when what the cache holds changes, so older files aren't read. */
-const CACHE_FORMAT = 2;
+const CACHE_FORMAT = 3;
 
 const [box, fromArg, toArg, sourceArg] = process.argv.slice(2);
 const bounds = box?.split(",").map(Number);
@@ -82,13 +83,11 @@ interface Listed {
   last: number;
   same_as: string[];
   preferred: string;
-  /** Epoch 1's span, ms, where the station has later epochs. */
-  since: number | null;
-  until: number | null;
-  later: boolean;
+  /** Each epoch's span but a held one's, ms, null where unbounded, as `epochWindow` gives them; values are read from each epoch's files within its span. */
+  epochs: { id: number; since: number | null; until: number | null }[];
 }
 
-const instance = await DuckDBInstance.create(":memory:");
+const instance = await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT });
 // Loaded once: connections loading it at the same moment conflict in the catalog.
 if (/^https?:\/\//.test(STORE))
   await (await instance.connect()).run("INSTALL httpfs; LOAD httpfs;");
@@ -104,8 +103,7 @@ const listed = (
   await (
     await lanes[0]!.runAndReadAll(
       `SELECT id, source, source_id, name, lat, lon, epoch_ms(first) AS first, epoch_ms(last) AS last, coalesce(same_as, []) AS same_as, preferred,
-         epoch_ms(list_filter(epochs, lambda e: e.id = 1)[1].since) AS since, epoch_ms(list_filter(epochs, lambda e: e.id = 1)[1].until) AS until,
-         coalesce(len(list_filter(epochs, lambda e: e.id > 1)) > 0, false) AS later
+         [{id: e.id, since: epoch_ms(e.since), until: epoch_ms(e."until")} FOR e IN coalesce(epochs, []) IF e.state <> 'held'] AS epochs
        FROM read_parquet(${quote(stationsPath(STORE))})
        WHERE list_contains(products, 'levels') AND coalesce(kind, '') NOT IN ('river', 'lake')
          AND lat BETWEEN ${minLat} AND ${maxLat} AND lon BETWEEN ${minLon} AND ${maxLon}
@@ -120,8 +118,11 @@ const listed = (
       ...r,
       first: Number(r.first),
       last: Number(r.last),
-      since: r.since === null ? null : Number(r.since),
-      until: r.until === null ? null : Number(r.until),
+      epochs: (r.epochs as { id: number; since: unknown; until: unknown }[]).map((e) => ({
+        id: Number(e.id),
+        since: e.since === null ? null : Number(e.since),
+        until: e.until === null ? null : Number(e.until),
+      })),
     }) as unknown as Listed,
 );
 console.error(`${listed.length} stations`);
@@ -169,7 +170,20 @@ async function load(
   s: Listed,
 ): Promise<{ hourly: Hourly | null; values: number }> {
   // Keyed on what the values depend on, so a new epoch span, newer values or a new format read the store again.
-  const key = [CACHE_FORMAT, from, to, s.since, s.until, s.first, s.last].join("_");
+  // Hashed, since a station with many epochs would make a name past the filesystem's limit.
+  const key = createHash("sha256")
+    .update(
+      [
+        CACHE_FORMAT,
+        from,
+        to,
+        s.epochs.map((e) => [e.id, e.since, e.until].join("-")).join("+"),
+        s.first,
+        s.last,
+      ].join("_"),
+    )
+    .digest("hex")
+    .slice(0, 24);
   const file = join(CACHE, `${encodeURIComponent(s.id)}_${key}.bin`);
   const save = async (values: Float64Array) => {
     // Through a temporary file, so an interrupted run leaves no short series behind.
@@ -190,8 +204,17 @@ async function load(
   const [lowest, highest] = [Date.UTC(from, 0, 1) / HOUR_MS, Date.UTC(to, 0, 1) / HOUR_MS];
   const first = Math.max(from, new Date(s.first).getUTCFullYear());
   const last = Math.min(to - 1, new Date(s.last).getUTCFullYear());
-  for (let year = first; year <= last; year++) {
-    const path = seriesPath(STORE, "levels", s.source, s.source_id, year);
+  // Every epoch's files within its span, as matches reads them, so a station's later epochs are checked too.
+  const reads = [];
+  for (let year = first; year <= last; year++)
+    for (const e of s.epochs)
+      if (
+        (e.since ?? -Infinity) < Date.UTC(year + 1, 0, 1) &&
+        (e.until ?? Infinity) > Date.UTC(year, 0, 1)
+      )
+        reads.push({ year, ...e });
+  for (const { year, id: epoch, since, until } of reads) {
+    const path = seriesPath(STORE, "levels", s.source, s.source_id, year, epoch);
     try {
       const rows = (
         await db.runAndReadAll(
@@ -202,8 +225,8 @@ async function load(
                abs(epoch(time) - epoch(time_bucket(INTERVAL 1 HOUR, time + INTERVAL 30 MINUTE))) AS d
              FROM read_parquet(${quote(path)}, filename = true)
              WHERE filename = ${quote(path)} AND flag IN (${Flag.good}, ${Flag.preliminary}) AND level_m IS NOT NULL
-               ${s.since === null ? "" : `AND time >= epoch_ms(${s.since})`}
-               ${s.until === null ? "" : `AND time < epoch_ms(${s.until})`})
+               ${since === null ? "" : `AND time >= epoch_ms(${since})`}
+               ${until === null ? "" : `AND time < epoch_ms(${until})`})
            GROUP BY h`,
         )
       ).getRows();
@@ -250,11 +273,6 @@ if (few.length) console.log(`\nUnder 60 days of hourly values, so left out: ${fe
 if (offHour.length)
   console.log(
     `\nValues, but too few within 10 minutes of the hour, such as hourly means stamped at the half hour, so left out: ${offHour.join(", ")}.`,
-  );
-const later = listed.filter((s) => s.later).map((s) => s.id);
-if (later.length)
-  console.log(
-    `\nRead in their first datum epoch only, from its own span; their later values aren't checked: ${later.join(", ")}.`,
   );
 
 // Copies: every pair of gauges, month by month.

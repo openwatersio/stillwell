@@ -96,6 +96,10 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
+      # A source that moved to the server's job queue since this run's commit is written only there.
+      - run: scripts/server-owns.sh "$SOURCE"
+        env:
+          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # Twelve hours covers values that arrive late, and hours skipped while a
       # manual run holds the source's group; a station fetched on its own also
@@ -109,6 +113,8 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
+          CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
+          CCO_REFERER: ${{ secrets.CCO_REFERER }}
       # A station the source now reports in another datum fails until a station
       # refresh opens its epoch, or holds it for a decision, after which recent
       # skips it. One refresh a day, not counting one that was cancelled, such

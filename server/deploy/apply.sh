@@ -97,7 +97,7 @@ systemctl reload ssh
 # Seed only: secrets live on the box, never in the repo.
 if [ ! -f /etc/stillwell.env ]; then
 	install -m 600 stillwell.env.example /etc/stillwell.env
-	echo 'created /etc/stillwell.env from template: fill in USGS_API_KEY and GITHUB_TOKEN' >&2
+	echo 'created /etc/stillwell.env from template: fill in USGS_API_KEY, CCO_API_KEY, CCO_REFERER and GITHUB_TOKEN' >&2
 fi
 # ClickHouse's default user, which the poller connects as, gets a password generated once on the box, so a
 # shell on the box needs the root-only env file to reach the data, whatever the firewall does.
@@ -197,9 +197,9 @@ if [ ! -f /etc/alloy.env ]; then
 fi
 
 # The app, its unit and its environment, against the stamp of the ones the poller last restarted with, so a
-# deploy that changes none of them, such as a change to docs or to this directory, leaves the poller and its
-# schedule running.
-app_files=$(cd "$app" && find package.json package-lock.json .mise.toml src server -path server/deploy -prune -o -type f ! -name '*.md' -print |
+# deploy that changes none of them, such as a change to docs other than the TICON inventory, or to this
+# directory, leaves the poller and its schedule running.
+app_files=$(cd "$app" && find package.json package-lock.json .mise.toml src server scripts docs/ticon-inventory.csv -path server/deploy -prune -o -type f ! -name '*.md' -print |
 	LC_ALL=C sort | xargs md5sum)
 app_sum=$({
 	echo "$app_files"
@@ -214,20 +214,36 @@ api_sum=$({
 } | md5sum)
 api_stamp=/var/lib/stillwell-api.md5
 app_stamp=/var/lib/stillwell-app.md5
+# The job service runs the same app with a unit of its own, against a stamp of its own.
+jobs_sum=$({
+	echo "$app_files"
+	cat /etc/systemd/system/stillwell-jobs.service
+	readlink /opt/node
+} | md5sum)
+jobs_stamp=/var/lib/stillwell-jobs.md5
+# Each release is a directory of its own under $releases, and /opt/stillwell a link to the newest, so a job keeps
+# the release it started with until it ends (docs/plans/jobs.md).
+releases=/opt/stillwell-releases
 app_changed=
 if [ "$app_sum" != "$(cat "$app_stamp" 2>/dev/null)" ] || [ ! -d /opt/stillwell ]; then
 	app_changed=1
+	release=$releases/$(date -u +%Y%m%dT%H%M%SZ)
 	# Installed beside the running one and swapped in just before the restart, so a failed install leaves it as it was;
 	# without install scripts, which would run as root, and which no dependency has.
-	rm -rf /opt/stillwell.new
-	mkdir -p /opt/stillwell.new
-	cp -R "$app/package.json" "$app/package-lock.json" "$app/.mise.toml" "$app/src" "$app/server" /opt/stillwell.new/
-	(cd /opt/stillwell.new && PATH="/opt/node/bin:$PATH" npm ci --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error)
+	mkdir -p "$releases"
+	rm -rf "$release.new"
+	mkdir "$release.new"
+	cp -R "$app/package.json" "$app/package-lock.json" "$app/.mise.toml" "$app/src" "$app/server" "$app/scripts" "$release.new/"
+	# Station refreshes read the TICON inventory beside the code (src/datums.ts).
+	mkdir "$release.new/docs"
+	cp "$app/docs/ticon-inventory.csv" "$release.new/docs/"
+	(cd "$release.new" && PATH="/opt/node/bin:$PATH" npm ci --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error)
+	mv "$release.new" "$release"
 fi
 
 systemctl daemon-reload
 systemctl restart systemd-journald
-systemctl enable clickhouse-server fail2ban stillwell-ingest stillwell-api
+systemctl enable clickhouse-server fail2ban stillwell-ingest stillwell-api stillwell-jobs
 # ClickHouse restarts only when its own files differ from the ones it last restarted with, recorded in a
 # stamp, so a deploy does not interrupt it for nothing and one that stopped partway is caught up by the next.
 ch_sum=$(cat /etc/clickhouse-server/config.d/stillwell.xml /etc/systemd/system/clickhouse-server.service.d/10-stillwell.conf | md5sum)
@@ -285,7 +301,7 @@ done
 [ -n "$ready" ] || { echo 'apply.sh: ClickHouse refuses stillwell_api, from /etc/stillwell-api.env' >&2; exit 1; }
 # The API reads the station list through url() as that user. A refusal of the grant is this deploy's to fix; any
 # other failure, such as the store being unreachable, the API rides out on its own.
-if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q "SELECT count() FROM url('$store/stations/offsets.parquet', Parquet)" 2>&1); then
+if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password clickhouse-client -q "SELECT count() FROM url('$store/stations/offsets.parquet', Parquet, headers('User-Agent' = 'openwaters-stillwell/1 (+https://github.com/openwatersio/stillwell)'))" 2>&1); then
 	case "$out" in
 	*ACCESS_DENIED* | *READONLY*)
 		echo "apply.sh: stillwell_api may not read the store: $out" >&2
@@ -295,24 +311,44 @@ if ! out=$(CLICKHOUSE_USER=stillwell_api CLICKHOUSE_PASSWORD=$api_password click
 	esac
 fi
 if [ -n "$app_changed" ]; then
-	rm -rf /opt/stillwell.old
-	if [ -d /opt/stillwell ]; then
-		mv /opt/stillwell /opt/stillwell.old
+	# A box from before releases has the app in /opt/stillwell itself, which becomes a release, removed below.
+	if [ -d /opt/stillwell ] && [ ! -L /opt/stillwell ]; then
+		rm -rf "$releases/before-releases"
+		mv /opt/stillwell "$releases/before-releases"
 	fi
-	mv /opt/stillwell.new /opt/stillwell
+	# Swapped in one rename, so from the second release on nothing finds /opt/stillwell missing.
+	ln -sfn "$release" /opt/stillwell.link
+	mv -T /opt/stillwell.link /opt/stillwell
 	systemctl restart stillwell-ingest
-	rm -rf /opt/stillwell.old
 	echo "$app_sum" >"$app_stamp"
 else
 	systemctl start stillwell-ingest
 	echo 'stillwell-ingest unchanged: left running' >&2
 fi
-if [ "$api_sum" != "$(cat "$api_stamp" 2>/dev/null)" ]; then
+# A new release restarts it too, so the release it runs from is the current one, which the cleanup below never deletes.
+if [ -n "$app_changed" ] || [ "$api_sum" != "$(cat "$api_stamp" 2>/dev/null)" ]; then
 	systemctl restart stillwell-api
 	echo "$api_sum" >"$api_stamp"
 else
 	systemctl start stillwell-api
 fi
+# Running jobs are units of their own, which a restart of the service leaves running. It restarts with every new
+# release too, so the release it runs from is the current one, which the cleanup below never deletes.
+if [ -n "$app_changed" ] || [ "$jobs_sum" != "$(cat "$jobs_stamp" 2>/dev/null)" ]; then
+	systemctl restart stillwell-jobs
+	echo "$jobs_sum" >"$jobs_stamp"
+else
+	systemctl start stillwell-jobs
+fi
+# Releases no process runs from any more, such as a job started before this deploy, and installs that failed.
+# The services start through the /opt/stillwell link, where pgrep can't see the release, so the one before the
+# current is kept too, for a service whose restart this deploy failed or skipped.
+current=$(readlink -f /opt/stillwell)
+previous=$(find "$releases" -mindepth 1 -maxdepth 1 -type d ! -name '*.new' ! -path "$current" -printf '%T@ %p\n' | sort -n | tail -n 1 | cut -d' ' -f2-)
+for old in "$releases"/*; do
+	[ "$old" != "$current" ] && [ "$old" != "$previous" ] || continue
+	pgrep -f -- "$old/" >/dev/null || rm -rf "$old"
+done
 
 # cloudflared runs only once /etc/cloudflared.env has the Tunnel's token; without one it would crash-loop.
 tunnel=
@@ -341,6 +377,7 @@ sleep 5
 systemctl is-active clickhouse-server
 systemctl is-active stillwell-ingest
 systemctl is-active stillwell-api
+systemctl is-active stillwell-jobs
 # The API answers once it has read the station list, which takes a few seconds. One that can't, such as while the
 # store is unreachable, keeps trying on its own, so it warns rather than fail the poller's deploy.
 if ! curl -fsS --retry 30 --retry-connrefused --retry-all-errors --retry-delay 2 http://127.0.0.1:8787/health >/dev/null; then

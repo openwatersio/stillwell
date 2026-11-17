@@ -14,6 +14,7 @@
  *       [--budget <minutes>]
  *   node scripts/ingest.ts withhold <source> [--accept-withheld]
  *   node scripts/ingest.ts drop <source> [--dry-run]
+ *   node scripts/ingest.ts misplaced <source> [--dry-run]
  *   node scripts/ingest.ts years <source> [--rebuild-years]
  *   node scripts/ingest.ts analyze <source> [--all] [--requalify [--budget 120]]
  *
@@ -55,6 +56,9 @@
  * `withhold` deletes the files of a source's withheld stations, whose owner
  * refused republication, and their rows in its bounds, years and recent window
  * (src/withhold.ts); the source's next refresh drops them from its list.
+ * `misplaced` drops the rows in a datum epoch's files from outside its span that
+ * the epoch holding their time already has, as an epoch opened with a start in
+ * the past leaves them, and lists any others (src/store/misplaced.ts).
  * `years` reads the source's year files of levels into stations/years/<source>.parquet,
  * which backfill, compaction and requalify then keep (src/store/years.ts).
  * `analyze` judges the source's stations that are due from their levels in the
@@ -91,9 +95,18 @@ import {
   seriesFiles,
   shard,
   wholeEndedYear,
+  COMPACTED_SINCE,
+  years,
   yearsToFetch,
 } from "../src/backfill.ts";
 import { emptyKey, readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
+import {
+  mergeBackfilled,
+  readBackfilled,
+  recordWalk,
+  writeBackfilled,
+  type Backfilled,
+} from "../src/backfilled.ts";
 import { useDiskCache } from "../src/cache.ts";
 import { Blocked } from "../src/http.ts";
 import {
@@ -158,7 +171,8 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
-import { dropFiles, withhold, withheldReason } from "../src/withhold.ts";
+import { dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
+import { misplaced } from "../src/store/misplaced.ts";
 import { deletesFiles } from "../src/sources/gesla/dropped.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
@@ -173,33 +187,16 @@ import {
   type DataMatch,
 } from "../src/matches.ts";
 import { ID_KM } from "../src/same-as.ts";
+import { INGEST_OPTIONS } from "../src/ingest-options.ts";
 
 useDiskCache();
 
+/** The records whose files `drop` deletes, by source. */
+const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
+
 const { positionals, values } = parseArgs({
   allowPositionals: true,
-  options: {
-    hours: { type: "string", default: "24" },
-    "keep-days": { type: "string", default: "7" },
-    days: { type: "string", default: "1" },
-    concurrency: { type: "string", default: "4" },
-    "accept-epochs": { type: "boolean", default: false },
-    "accept-withheld": { type: "boolean", default: false },
-    "accept-matches": { type: "boolean", default: false },
-    "no-publish": { type: "boolean", default: false },
-    first: { type: "string" },
-    shard: { type: "string" },
-    refetch: { type: "boolean", default: false },
-    "skip-written": { type: "boolean", default: false },
-    "with-inactive": { type: "boolean", default: false },
-    "skip-unscreened": { type: "boolean", default: false },
-    "rebuild-bounds": { type: "boolean", default: false },
-    "rebuild-years": { type: "boolean", default: false },
-    all: { type: "boolean", default: false },
-    requalify: { type: "boolean", default: false },
-    budget: { type: "string" },
-    "dry-run": { type: "boolean", default: false },
-  },
+  options: INGEST_OPTIONS,
 });
 const [command, ...args] = positionals;
 
@@ -364,6 +361,12 @@ switch (command) {
     const [source] = args;
     if (!source) usage();
     await dropStations(source);
+    break;
+  }
+  case "misplaced": {
+    const [source] = args;
+    if (!source) usage();
+    await misplacedRows(source);
     break;
   }
   case "years": {
@@ -611,6 +614,12 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
           return undefined;
         })
       : undefined;
+  // The whole years each station's levels came back for, for the source's completeness, merged
+  // into the record at each write. One that can't be read now fails the run and isn't written over.
+  const backfilled: Backfilled | undefined = await readBackfilled(store, sourceId).then(
+    () => new Map(),
+    (error: Error) => void fail("backfilled years, recording none", error),
+  );
   let emptyFound = false;
   let emptySkipped = 0;
   let emptyRecorded = 0;
@@ -728,6 +737,8 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
       const spans = spansOf(station);
       const current = epochOf(station);
       let levels: string | undefined;
+      // The years of the station's levels whose fetch failed, or skipped part-written, which go unrecorded.
+      const failedYears = new Set<string>();
       for (const product of station.products)
         for (const { epoch, from: since, to: until } of spans) {
           if (stopped) break;
@@ -745,16 +756,24 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               epoch.id,
             );
             plan = await yearsToFetch(dir, since, until, mode, now, station.source_qc_start);
-            if (plan.fetch.length)
-              files = seriesFiles(dir, plan.listed ?? (await listYears(dir)), readerOf(product));
+            if (plan.fetch.length) {
+              plan.listed ??= await listYears(dir);
+              files = seriesFiles(dir, plan.listed, readerOf(product));
+            }
             // A station picked for its preliminary value is read again even with no year
             // left to fetch, so one the source finalized drops out.
             if (ownEpoch && (plan.fetch.length || ranges)) levels = dir;
           } catch (error) {
             fail(`${station.id} ${product}`, error);
+            if (product === "levels")
+              for (const [from] of years(since, until))
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             continue;
           }
           skipped += plan.skipped;
+          // A year skipped but not known to be whole goes unrecorded (`partial`).
+          if (product === "levels")
+            for (const y of plan.partial) failedYears.add(`${epoch.id} ${y}`);
           for (const [from, to] of plan.fetch) {
             if (stopped) break;
             const key = emptyKey(station.id, product, epoch.id, from.getUTCFullYear());
@@ -775,6 +794,15 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
                 files!,
                 written,
               );
+              // An empty answer for a year from 2026 on that has a file, perhaps compaction's
+              // last weeks, may be an outage, so it doesn't vouch for the rest of the year.
+              if (
+                rows === "empty" &&
+                product === "levels" &&
+                from.getUTCFullYear() >= COMPACTED_SINCE &&
+                plan.listed?.has(from.getUTCFullYear())
+              )
+                failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
               if (rows === "empty") {
                 // A year with a file keeps being asked for, so an outage never blocks its refill.
                 if (
@@ -791,6 +819,7 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
               // A failed year writes nothing, so its file keeps what it had.
               if (error instanceof Blocked) stopped ??= error;
               else fail(label, error);
+              if (product === "levels") failedYears.add(`${epoch.id} ${from.getUTCFullYear()}`);
             }
           }
         }
@@ -808,9 +837,23 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
         } catch (error) {
           fail(`${station.id} preliminary`, error);
         }
+      // A stop may have cut the station's walk short. Publish judges the empty years.
+      if (backfilled && !stopped && station.products.includes("levels")) {
+        const [begin, until] = ranges?.get(station.id) ?? [start, end];
+        recordWalk(backfilled, station, spans, begin, until, now, failedYears);
+      }
       await saveEmpty();
     });
     await saveEmpty(true);
+    // Merged into the record as it is now, so a compaction's years since this run started stay.
+    if (backfilled?.size)
+      try {
+        const record = mergeBackfilled(await readBackfilled(store, sourceId), backfilled);
+        await writeBackfilled(store, sourceId, record);
+        backfilled.clear();
+      } catch (error) {
+        fail("backfilled years", error);
+      }
     try {
       await commitYears(store, sourceId, marked, written);
     } catch (error) {
@@ -1055,7 +1098,7 @@ async function requalifyStations(
       const died = new Set<string>();
       const late = await poolUntil(batch, positive("concurrency"), until, async (station) => {
         try {
-          const { files, changed, warnings } = await requalifyInWorker(
+          const { files, changed, dropped, warnings } = await requalifyInWorker(
             sourceId,
             station,
             storeFor(station),
@@ -1066,6 +1109,7 @@ async function requalifyStations(
           if (files) s.updated++;
           s.files += files;
           s.values += changed;
+          if (dropped) s.dropped = (s.dropped ?? 0) + dropped;
           for (const w of warnings) (s.warned ??= []).push(`${station.id}: ${w}`);
         } catch (error) {
           s.failed.push(`${station.id}: ${error instanceof Error ? error.message : error}`);
@@ -1200,23 +1244,60 @@ async function withholdStations(sourceId: string): Promise<void> {
   if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
 }
 
-/** The records whose files `drop` deletes, by source. */
-const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
-
 /** Delete the files of a source's dropped records, or with --dry-run list them. */
 async function dropStations(sourceId: string): Promise<void> {
   const drop = DROPS[sourceId];
   if (!drop) throw new Error(`${sourceId} drops no records`);
   const store = storeOfSource(sourceOf(sourceId).metadata);
   const dryRun = values["dry-run"];
-  const { ids, prefixes } = await dropFiles(store, sourceId, drop, { dryRun });
+  const { ids, prefixes, cleared } = await dropFiles(store, sourceId, drop, { dryRun });
   const lines = [
     `${sourceId}: ${ids.length} dropped stations with files, ${prefixes.length} directories ${dryRun ? "to delete (dry run)" : "deleted"}`,
     ...ids.map((id) => `  ${id}`),
+    `${sourceId}: ${cleared.length} dropped stations' backfilled years ${dryRun ? "to clear (dry run)" : "cleared"}`,
   ];
   if (ids.length && !dryRun)
     lines.push(
       `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them.`,
+    );
+  for (const line of lines) console.log(line);
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) await appendFile(file, ["```", ...lines, "```", ""].join("\n"));
+}
+
+/** Drop rows outside their epoch's span that the right epoch holds, or with --dry-run list them. */
+async function misplacedRows(sourceId: string): Promise<void> {
+  const store = storeOfSource(sourceOf(sourceId).metadata);
+  const list = await listOf(store, sourceOf(sourceId));
+  const dryRun = values["dry-run"];
+  const { files, unlisted, failed } = await misplaced(store, sourceId, list, removePrefixes, {
+    dryRun,
+    keep: (id) => withheldReason(sourceOf(sourceId), id) === null,
+  });
+  const iso = (t: number) => new Date(t).toISOString();
+  const lines = [
+    `${sourceId}: ${files.length} files with rows outside their epoch's span; ${files.reduce((n, f) => n + f.dropped, 0)} rows ${dryRun ? "to drop (dry run)" : "dropped"}, ${files.filter((f) => f.emptied).length} files ${dryRun ? "to delete" : "deleted"}, ${files.reduce((n, f) => n + f.kept.length, 0)} rows kept`,
+    ...files.map(
+      (f) =>
+        `  ${f.file}: ${f.dropped} ${dryRun ? "to drop" : "dropped"}${f.emptied ? ", empty" : ""}${f.kept.length ? `, ${f.kept.length} kept (${f.kept.filter((k) => k.epoch === null).length} in no epoch's span) from ${iso(f.kept[0]!.time)}` : ""}`,
+    ),
+    ...(unlisted.length
+      ? [
+          `${sourceId}: ${unlisted.length} files of no listed station or epoch, left as they are`,
+          ...unlisted.map((f) => `  ${f}`),
+        ]
+      : []),
+  ];
+  if (failed.length) {
+    lines.push(
+      `${sourceId}: ${failed.length} year files the years file couldn't read; their stations stay marked for compaction to read again`,
+      ...failed.map((f) => `  ${f}`),
+    );
+    process.exitCode = 1;
+  }
+  if (!dryRun && files.some((f) => f.dropped))
+    lines.push(
+      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` to rebuild the bounds and stations.parquet.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1236,7 +1317,7 @@ function parseDate(value: string): Date {
 
 function usage(): never {
   console.error(
-    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
+    "usage: ingest.ts stations [source...] [--accept-epochs] [--accept-withheld] [--no-publish] | publish | links [--concurrency N] | matches [--concurrency N] [--accept-matches] | backfill <source> <station,...|all|preliminary> <start> <end> [--first FILE] [--shard I/N] [--refetch | --skip-written] [--skip-unscreened] [--with-inactive] | recent <source> [--hours N] [--keep-days N] | compact <source> [--days N] [--rebuild-bounds] | requalify <source> <station,...|all> <start> <end> [--shard I/N] [--budget MINUTES] | withhold <source> [--accept-withheld] | drop <source> [--dry-run] | misplaced <source> [--dry-run] | years <source> [--rebuild-years] | analyze <source> [--all] [--requalify [--budget MINUTES]]",
   );
   process.exit(1);
 }

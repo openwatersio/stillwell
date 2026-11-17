@@ -1,6 +1,6 @@
 ---
 title: DuckDB CLI
-description: Read the store from the DuckDB command line, with no download step.
+description: Query Stillwell from the DuckDB command line.
 sidebar:
   order: 1
 ---
@@ -19,6 +19,12 @@ Start a session and set it to UTC before reading times:
 
 ```sql
 SET TimeZone = 'UTC';
+```
+
+Then name your project in the `User-Agent` DuckDB sends, as [Getting started](/docs/getting-started/) asks, with its version and a URL or email address:
+
+```sql
+CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'});
 ```
 
 ## Read the station list

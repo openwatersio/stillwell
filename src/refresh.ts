@@ -10,6 +10,8 @@ import {
   exists,
   anyFile,
   highestEpochs,
+  listable,
+  publishedSources,
   recentEpochs,
   readStationBounds,
   readStationList,
@@ -48,6 +50,7 @@ import {
   type DatumReport,
 } from "./datums.ts";
 import { isDropped } from "./sources/gesla/dropped.ts";
+import { backfillStatus } from "./backfilled.ts";
 import { usableShares, writeYears } from "./store/years.ts";
 import { readAnalysis, withAnalysis } from "./store/analysis.ts";
 import { mergeStationList, type EpochChange } from "./stations.ts";
@@ -270,7 +273,7 @@ export async function publishStations(
 > {
   const built = await linkedStations(store, all, expected);
   if ("missing" in built) return built;
-  const { gauges, listed, report, steps } = built;
+  const { gauges, listed, report, steps, since } = built;
   const { stations: linked, report: datums } = withDatums(
     gauges,
     await tideStations(),
@@ -295,6 +298,7 @@ export async function publishStations(
       sourceEntry(
         s.metadata,
         linked.filter((st) => st.source === s.metadata.id),
+        since.get(s.metadata.id),
       ),
     ),
   );
@@ -335,6 +339,8 @@ async function linkedStations(
       report: LinkReport;
       /** Each station's measured step where its source gives no interval. */
       steps: Map<string, number>;
+      /** Each source's `backfillStatus` `since`, absent where it isn't known. */
+      since: Map<string, number | null>;
     }
   | { missing: string[] }
 > {
@@ -343,6 +349,8 @@ async function linkedStations(
   const missing: string[] = [];
   const usable = new Map<string, number>();
   const steps = new Map<string, number>();
+  const since = new Map<string, number | null>();
+  const now = Date.now();
   for (const source of all) {
     const list = await readStationList(stationListPath(store, source.metadata.id));
     if (!list) {
@@ -352,14 +360,19 @@ async function linkedStations(
     listed.push(source);
     const bounds = await readStationBounds(boundsPath(store, source.metadata.id));
     const analysis = await readAnalysis(store, source.metadata.id);
-    stations.push(
-      ...withoutWithheld(source, list).map((s) => ({
-        ...s,
-        ...bounds.get(s.id),
-        tidal: analysis.get(s.id)?.tidal ?? null,
-        tide_m: analysis.get(s.id)?.tide_m ?? null,
-      })),
-    );
+    const kept = withoutWithheld(source, list).map((s) => ({
+      ...s,
+      ...bounds.get(s.id),
+      tidal: analysis.get(s.id)?.tidal ?? null,
+      tide_m: analysis.get(s.id)?.tide_m ?? null,
+    }));
+    // Readers' business, not publishing's, so a file that can't be read leaves it unknown.
+    const status = await backfillStatus(store, source, kept, now).catch((error: unknown) => {
+      console.warn(`${source.metadata.id}: no backfill status: ${String(error)}`);
+      return null;
+    });
+    if (status) since.set(source.metadata.id, status.since);
+    stations.push(...kept.map((s) => ({ ...s, missing_years: status?.missing.get(s.id) ?? null })));
     for (const s of list) {
       const step = analysis.get(s.id)?.step_s;
       if (s.interval_s === null && step != null) steps.set(s.id, step);
@@ -378,7 +391,7 @@ async function linkedStations(
     usable,
     await readMatches(store),
   );
-  return { gauges, listed, report, steps };
+  return { gauges, listed, report, steps, since };
 }
 
 /**
@@ -402,13 +415,18 @@ const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_no
 
 /**
  * A source's entry in `sources.json`: its metadata less what only ingest uses,
- * and the number of its `stations` that are active. `license.commercial_use` is
- * true only where every station allows it, inactive ones too, since their series stay.
+ * the number of its `stations` that are active, and its `backfill`, from
+ * `since` and the stations' `missing_years`, null where `since` isn't known.
+ * `license.commercial_use` is true only where every station allows it,
+ * inactive ones too, since their series stay.
  */
 export function sourceEntry(
   metadata: SourceMetadata,
-  stations: Pick<Station, "status" | "commercial_use">[],
+  stations: Pick<Station, "status" | "commercial_use" | "missing_years">[],
+  since?: number | null,
 ): object {
+  const judged = stations.filter((st) => st.missing_years);
+  const complete = judged.filter((st) => !st.missing_years!.length).length;
   return {
     ...Object.fromEntries(Object.entries(metadata).filter(([key]) => !INGEST_ONLY.has(key))),
     license: {
@@ -416,6 +434,8 @@ export function sourceEntry(
       commercial_use: metadata.license.commercial_use && stations.every((st) => st.commercial_use),
     },
     stations: stations.filter((st) => st.status === "active").length,
+    backfill:
+      since === undefined ? null : { since, complete, incomplete: judged.length - complete },
   };
 }
 
@@ -439,7 +459,8 @@ export function withoutWithheld(source: Source, list: StoredStation[]): StoredSt
 /**
  * A source's list from the store, with each station's analysis, or null for a source whose list was never
  * started, such as one registered since the last Monthly refresh. A list that
- * existed and is gone, or series with no list, are still errors.
+ * existed and is gone, or series with no list, are still errors. Over HTTP, which can't list files, a list
+ * counts as having existed when the published `stations.parquet` names the source, and series as a recent window.
  */
 export async function startedListOf(
   store: string,
@@ -448,6 +469,17 @@ export async function startedListOf(
   const sourceId = source.metadata.id;
   const list = await readStationList(stationListPath(store, sourceId));
   if (list) return withAnalysis(store, sourceId, withoutWithheld(source, list));
+  // HTTP can't list the history or series files, so a reader there checks the published list and the recent
+  // window; a list lost before its source was first published reads as never started.
+  if (!listable(store)) {
+    // Every store has a stations.parquet once it publishes, so none means a wrong store URL.
+    if (!(await exists(stationsPath(store)))) throw new Error(`no ${stationsPath(store)}`);
+    if ((await publishedSources(stationsPath(store))).includes(sourceId))
+      throw new Error(lostList(store, sourceId));
+    if (await exists(recentPath(store, sourceId)))
+      throw new Error(`the store has ${sourceId} series but no list for it`);
+    return null;
+  }
   if (await hasHistory(store, sourceId)) throw new Error(lostList(store, sourceId));
   // The refresh refuses such a store too, so waiting for it would wait for good.
   if (await hasSeries(store, sourceId))

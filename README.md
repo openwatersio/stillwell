@@ -15,8 +15,9 @@ Data from each agency is fetched, quality checked, and written with:
 The public store aims to hold any source that publishes water level data and allows republishing. See [open issues for new sources](https://github.com/openwatersio/stillwell/issues?q=is%3Aissue+state%3Aopen+label%3Asource).
 
 - [BODC](src/sources/bodc/README.md): quality-controlled 15-minute levels from the UK National Tide Gauge Network.
-- [BOM](src/sources/bom/README.md): hourly sea levels at 29 gauges of the Bureau of Meteorology's National Tidal Centre in Australia and the Pacific, back to 1996, from its FTP archives.
+- [BOM](src/sources/bom/README.md): hourly sea levels at 31 gauges of the Bureau of Meteorology's National Tidal Centre in Australia and the Pacific, back to 1996, from its FTP archives.
 - [BSH](src/sources/bsh/README.md): predicted high and low waters and tide curves at German gauges.
+- [CCO](src/sources/cco/README.md): 10-minute levels at the Channel Coastal Observatory's tide gauges around England and Wales.
 - [CDEC](src/sources/cdec/README.md): 15-minute river stage at tidal gauges in the Sacramento–San Joaquin Delta and San Francisco Bay.
 - [CO-OPS](src/sources/coops/README.md): NOAA's observed levels and verified high and low waters, nearly all in the US and the Great Lakes.
 - [Copernicus Marine](src/sources/cmems/README.md): sea level at about 790 tide gauges relayed from European national networks and SHOM's worldwide network, from the In Situ TAC's near-real-time product.
@@ -28,7 +29,7 @@ The public store aims to hold any source that publishes water level data and all
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
 - [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
 - [Kartverket](src/sources/kartverket/README.md): 10-minute levels at Norway's and Svalbard's permanent tide gauges.
-- [LINZ](src/sources/linz/README.md): 1-minute levels at 19 of Land Information New Zealand's tsunami gauges, from 2007.
+- [LINZ](src/sources/linz/README.md): 1-minute levels at 19 of Land Information New Zealand's tsunami gauges, and 5-minute and 1-minute levels at its two Antarctic gauges, from 2007.
 - [Marine Institute](src/sources/marine-institute/README.md): 5-minute levels from the Irish National Tide Gauge Network.
 - [PEGELONLINE](src/sources/pegelonline/README.md): observed levels at German federal gauges on the coast and the rivers.
 - [REFMAR](src/sources/refmar/README.md): SHOM's and its partners' tide gauges in France and its overseas territories.
@@ -46,6 +47,8 @@ Everything is Parquet at `https://stillwell.openwaters.io/`, readable without an
 
 ```sql
 SET TimeZone = 'UTC';
+-- Your project, its version, and a URL or email address.
+CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {'User-Agent': 'my-project/1.0 (you@example.org)'});
 SELECT time, level_m, flag, datum
 FROM 'https://stillwell.openwaters.io/obs/rws/hoekvanholland/2024.parquet'
 WHERE flag <= 2

@@ -11,6 +11,7 @@
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 import { DuckDBInstance } from "@duckdb/node-api";
+import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { stationListPath, stationsPath, yearsPath } from "../src/store/paths.ts";
 import { CONTRIBUTORS } from "../src/sources/gesla/contributors.ts";
@@ -24,7 +25,7 @@ const STORE = (process.env.STILLWELL_STORE ?? "https://stillwell.openwaters.io")
 const BACKFILLING = ["usgs", "coops"];
 // Whether a source's own service has the years before the store's first, from
 // its README or a spot check of one week of July against the adapter on
-// 2026-11-12 (a year the store has returned values at each). A check is one
+// 2026-11-12, CMEMS's on 2026-11-15 (a year the store has returned values at each). A check is one
 // gauge's answer, applied to the source's other gauges. `served` years are a
 // backfill shortfall, unserved ones years only GESLA has; without `served` the
 // question is still open.
@@ -41,6 +42,7 @@ const REACH: Record<string, { served?: boolean; note: string }> = {
   crms: {
     note: "Links to only the site's `H01`; see below",
   },
+  cmems: { served: false, note: "Not served: Aberdeen 1980" },
   refmar: { served: false, note: "Not served: Socoa 1900" },
   pegelonline: { served: false, note: "Raw-data download from 2000 at most; Cuxhaven 1995 empty" },
   jma: { served: false, note: "Not served: Shimonoseki 1980" },
@@ -54,7 +56,9 @@ const REACH: Record<string, { served?: boolean; note: string }> = {
 
 const OUT = new URL("../src/sources/gesla/", import.meta.url);
 
-const db = await (await DuckDBInstance.create(":memory:")).connect();
+const db = await (
+  await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT })
+).connect();
 if (/^https?:\/\//.test(STORE)) await db.run("INSTALL httpfs; LOAD httpfs;");
 await db.run("SET TimeZone = 'UTC'");
 const quote = (s: string) => `'${s.replaceAll("'", "''")}'`;
@@ -381,7 +385,7 @@ CMEMS's records come from national agencies, so their countries say which feed w
 
 ## Year gaps by source
 
-Linked gauges, each once, by the source holding the originator's first year, or the first originator series where none has years yet. "Not backfilled" counts gauges whose originator series have no years in the store yet, and the GESLA years they hold. The rest split GESLA's extra years by where they fall against the originator's years in the store: before its first year, in a gap between its first and last, or after its last. Years before the first are a backfill shortfall where the source serves them, and years only GESLA has where it doesn't. "Reach" says which, from the source's README or a spot check through the adapter, on 2026-11-12, of one week of July at one or two gauges, in a year GESLA has; a check speaks for the source's other gauges only as a sample.
+Linked gauges, each once, by the source holding the originator's first year, or the first originator series where none has years yet. "Not backfilled" counts gauges whose originator series have no years in the store yet, and the GESLA years they hold. The rest split GESLA's extra years by where they fall against the originator's years in the store: before its first year, in a gap between its first and last, or after its last. Years before the first are a backfill shortfall where the source serves them, and years only GESLA has where it doesn't. "Reach" says which, from the source's README or a spot check through the adapter, on 2026-11-12 (CMEMS on 2026-11-15), of one week of July at one or two gauges, in a year GESLA has; a check speaks for the source's other gauges only as a sample.
 
 Of the ${total} GESLA-only station-years at linked gauges, ${shortfall} (not backfilled, or before the first year) are at gauges one of whose sources serves them, by the checks: a backfill shortfall. ${notServed} are before the first year at gauges whose every source, by the checks, doesn't reach them, so GESLA is the store's only copy. ${open} are still open: at gauges whose originator series have no years yet at a source no check shows serving them, or at sources without a settled check, such as USGS, whose backfill is still running, and CRMS, whose site's later gauge would cover most. The other ${total - shortfall - notServed - open} fall in gaps or after the originator's last year.
 

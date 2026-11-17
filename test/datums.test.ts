@@ -251,6 +251,12 @@ describe("withDatums against operators' published levels", () => {
     assert.equal(s.frame, "source");
     assert.equal(byId(out, "gesla/aberdeen-abe-gbr-bodc").frame, "gauge");
   });
+
+  it("gives a CCO gauge its own chart datum, the Admiralty one", () => {
+    const cco = station("cco/54", { datum: "CD" });
+    const s = byId(withDatums([cco], []).stations, "cco/54");
+    assert.equal(s.chart_datum, "CD");
+  });
 });
 
 describe("withDatums", () => {

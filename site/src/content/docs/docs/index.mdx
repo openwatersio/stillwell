@@ -1,9 +1,10 @@
 ---
 title: Introduction
-description: What Stillwell is, what the store holds, and where the data comes from.
+description: Stillwell is an open dataset of observed and predicted water levels from tide, river and lake gauges around the world.
 ---
 
 import { rows, json } from "../../../lib/store";
+import { USER_AGENT } from "../../../lib/paths";
 
 export const sources = await json("sources.json");
 export const [totals] = await rows(`
@@ -16,7 +17,7 @@ export const yearFiles = (
   await Promise.all(
     sources.map(async (s) => {
       const file = `https://stillwell.openwaters.io/stations/years/${s.id}.parquet`;
-      const response = await fetch(file, { method: "HEAD" });
+      const response = await fetch(file, { method: "HEAD", headers: { "User-Agent": USER_AGENT } });
       if (response.status === 404) return undefined;
       if (!response.ok) throw new Error(`${file}: HTTP ${response.status}`);
       return `'${file}'`;

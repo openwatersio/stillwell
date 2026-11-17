@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ params }) => {
   const list = (await stations())
     .filter((d) => d.source === params.source)
     .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
-    // Rows rather than objects keep the file small: [name, path or null without a page, source_id, kind, status, live, datum, first year, last year].
+    // Rows rather than objects keep the file small: [name, path or null without a page, source_id, kind, status, live, datum, first year, last year, years missing or null where unknown].
     .map((d) => [
       d.name,
       stationLink(d.id) ?? null,
@@ -21,6 +21,7 @@ export const GET: APIRoute = async ({ params }) => {
       d.datum,
       d.first?.getUTCFullYear() ?? null,
       d.last?.getUTCFullYear() ?? null,
+      d.missing_years?.length ?? null,
     ]);
   return new Response(JSON.stringify(list), { headers: { "Content-Type": "application/json" } });
 };

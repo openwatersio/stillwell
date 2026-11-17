@@ -1,11 +1,12 @@
 name: Bucket check
 
-# Read the public bucket from outside Cloudflare, the ways people do: pandas
-# and plain urllib for the root files, and DuckDB for a series file. Without
-# fsspec installed, pandas fetches a URL through urllib with Python's default
-# agent, which a zone setting once refused with a 403
-# (issue #1), so a rule change that blocks either client fails here instead of
-# in someone's notebook. Then it compares a sample of the files with their
+# Read the public bucket from outside Cloudflare, the ways the docs show:
+# pandas and plain urllib for the root files, and DuckDB for a series file,
+# each sending a User-Agent with a name, a version and a contact, as the Open
+# Waters User-Agent policy asks. Without fsspec installed, pandas fetches a URL
+# through urllib, which a zone setting once refused with a 403 (issue #1), so a
+# rule change that blocks a client following the docs fails here instead of in
+# someone's notebook. Then it compares a sample of the files with their
 # definitions in src/store/files.ts (scripts/check-files.ts).
 on:
   schedule:
@@ -37,19 +38,28 @@ jobs:
           assert importlib.util.find_spec("fsspec") is None
 
           base = "https://stillwell.openwaters.io"
-          stations = pd.read_parquet(f"{base}/stations.parquet")
+          ua = "openwaters-stillwell-bucket-check/1 (+https://github.com/openwatersio/stillwell)"
+          stations = pd.read_parquet(
+              f"{base}/stations.parquet", storage_options={"User-Agent": ua}
+          )
           print(f"stations.parquet with pandas: {len(stations)} stations")
           assert len(stations) > 0
-          with urllib.request.urlopen(f"{base}/sources.json") as response:
+          with urllib.request.urlopen(
+              urllib.request.Request(f"{base}/sources.json", headers={"User-Agent": ua})
+          ) as response:
               sources = json.load(response)
           print(f"sources.json with urllib: {len(sources)} sources")
           assert len(sources) > 0
-          with urllib.request.urlopen(f"{base}/errata.json") as response:
+          with urllib.request.urlopen(
+              urllib.request.Request(f"{base}/errata.json", headers={"User-Agent": ua})
+          ) as response:
               errata = json.load(response)
           # Empty once every erratum is retired.
           print(f"errata.json with urllib: {len(errata)} errata")
           assert isinstance(errata, list)
-          rows = duckdb.sql(
+          con = duckdb.connect()
+          con.sql(f"CREATE SECRET (TYPE http, EXTRA_HTTP_HEADERS MAP {{'User-Agent': '{ua}'}})")
+          rows = con.sql(
               f"SELECT count(*) FROM '{base}/obs/rws/hoekvanholland/2024.parquet'"
           ).fetchone()[0]
           print(f"obs/rws/hoekvanholland/2024.parquet with DuckDB: {rows} rows")

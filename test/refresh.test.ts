@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { once } from "node:events";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, afterEach, before, beforeEach, describe, it } from "node:test";
@@ -181,7 +184,7 @@ describe("refreshSource", () => {
     assert.deepEqual(next.report.retired, ["test/b"]);
     assert.deepEqual(next.report.changed, [
       { id: "test/a", fields: ["name"] },
-      { id: "test/b", fields: ["status"] },
+      { id: "test/b", fields: ["live", "status"] },
     ]);
     const history = (await readdir(join(store, "history/stations/test"))).sort();
     assert.deepEqual(history, [
@@ -515,6 +518,7 @@ describe("publishStations", () => {
       days: 366,
       drains: 0,
       step_s,
+      sea_level: null,
       requalified: NOW,
     });
     await writeAnalysis(store, "test", [row("test/a", 10800), row("test/b", 3600)]);
@@ -731,5 +735,35 @@ describe("startedListOf", () => {
   it("fails for a store with the source's series but no list or history", async () => {
     await writeRecent(recentPath(store, "test"), []);
     await assert.rejects(startedListOf(store, sourceOf([])), /test series but no list or history/);
+  });
+
+  it("reads a store over HTTP, which can't list its history", async () => {
+    const server = createServer((request, response) =>
+      readFile(join(store, request.url!)).then(
+        (body) => response.end(body),
+        () => ((response.statusCode = 404), response.end()),
+      ),
+    ).listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const http = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    try {
+      // A wrong store URL has no stations.parquet.
+      await assert.rejects(
+        startedListOf(`${http}/x`, sourceOf([])),
+        /no http:.*\/x\/stations\.parquet/,
+      );
+      await writeStations(stationsPath(store), []);
+      assert.equal(await startedListOf(http, sourceOf([])), null);
+      await writeRecent(recentPath(store, "test"), []);
+      await assert.rejects(startedListOf(http, sourceOf([])), /test series but no list/);
+      await rm(recentPath(store, "test"));
+      await refreshSource(store, sourceOf([listed("a")]), { now: NOW });
+      await publishStations(store, [sourceOf([])], ["test"], []);
+      assert.equal((await startedListOf(http, sourceOf([])))!.length, 1);
+      await rm(stationListPath(store, "test"));
+      await assert.rejects(startedListOf(http, sourceOf([])), /history for test but no list/);
+    } finally {
+      server.close();
+    }
   });
 });

@@ -99,6 +99,10 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
+      # A source that moved to the server's job queue since this run's commit is written only there.
+      - run: scripts/server-owns.sh "$SOURCE"
+        env:
+          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # Every whole day the window holds, not just yesterday, so late values,
       # QC flags the window revised and missed runs still reach the year file.

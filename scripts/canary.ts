@@ -10,7 +10,7 @@
  * response is shaped by its URL path; `--record` writes those shapes as the
  * new reference, after a change has been checked and the adapter handles it.
  * A source with no recording yet prints its shape and has only to return
- * values. USGS is skipped without USGS_API_KEY.
+ * values. USGS is skipped without USGS_API_KEY, and CCO without CCO_API_KEY and CCO_REFERER.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fetchText, setTransport } from "../src/http.ts";
@@ -19,6 +19,7 @@ import { drift, merge, type Shape, shapeOf } from "../src/shape.ts";
 import * as bodc from "../src/sources/bodc/index.ts";
 import * as bom from "../src/sources/bom/index.ts";
 import * as bsh from "../src/sources/bsh/index.ts";
+import * as cco from "../src/sources/cco/index.ts";
 import * as cdec from "../src/sources/cdec/index.ts";
 import * as cmems from "../src/sources/cmems/index.ts";
 import * as coops from "../src/sources/coops/index.ts";
@@ -70,6 +71,12 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   crms: async () => {
     await crmsHeader(crms.parser);
     return crms.stations();
+  },
+  // Deal Pier, found by name in the site list; needs a key, so it is skipped without one.
+  cco: async () => {
+    const deal = (await cco.stations()).find((s) => s.name === "Deal Pier");
+    if (!deal) throw new Error("CCO no longer lists Deal Pier");
+    return cco.levels(deal.source_id, start, end);
   },
   // Martinez, on the Carquinez Strait.
   cdec: () => cdec.levels({ source_id: "MRZ" }, start, end),
@@ -132,7 +139,8 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   // Vardø, since 1989.
   kartverket: () => kartverket.levels("VAW", start, end),
   // Wellington, since 2007: three days of daily files from about two weeks back, since
-  // they appear 6 to 12 days late, and three days of a year's file from four years back. Its paths name the
+  // they appear 6 to 12 days late, and three days of a year's file from four years back; Cape Roberts and
+  // Scott Base, three days of a year's file each. Its paths name the
   // year and the day, so it's in UNRECORDED and only has to return values.
   linz: async () => {
     const latest = await linz.levels(
@@ -148,7 +156,14 @@ const probes: Record<string, () => Promise<unknown[]>> = {
     // A listing that lost its yearly zip falls back to the day files, which are preliminary. In early
     // January the latest days can come from last year's zip, so only the old year is held to its flag.
     const read = final.every((o) => o.flag === Flag.good);
-    return latest.length && final.length && read ? [...latest, ...final] : [];
+    // The Antarctic gauges' files change layout from year to year, so one year of each is read too,
+    // on fixed days since one gauge is closed and the other issues a year at a time: Cape Roberts'
+    // Julian-day layout of 2025 and Scott Base's day-first millimeters of 2025.
+    const robt = await linz.levels("ROBT", new Date("2025-03-01"), new Date("2025-03-04"));
+    const scot = await linz.levels("SCOT", new Date("2025-01-10"), new Date("2025-01-13"));
+    return latest.length && final.length && read && robt.length && scot.length
+      ? [...latest, ...final, ...robt, ...scot]
+      : [];
   },
   // Ballycotton, since 2010.
   "marine-institute": () => marineInstitute.levels("Ballycotton Harbour", start, end),
@@ -228,7 +243,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
  * day, and GESLA's iCloud links are signed anew every 15 minutes. kuestendaten.de's catalog covers the
  * whole portal, so `catalog()` checks only the six entries backfill needs.
  */
-const UNRECORDED = new Set(["bom", "cmems", "gesla", "jma", "kuestendaten", "linz"]);
+const UNRECORDED = new Set(["bom", "cco", "cmems", "gesla", "jma", "kuestendaten", "linz"]);
 
 const args = process.argv.slice(2);
 const record = args.includes("--record");
@@ -237,8 +252,10 @@ for (const id of named) if (!probes[id]) throw new Error(`No canary for ${id}`);
 
 let failed = false;
 for (const id of named.length ? named : Object.keys(probes)) {
-  if (id === "usgs" && !process.env.USGS_API_KEY) {
-    console.log(`${id}: skipped, no USGS_API_KEY`);
+  const needs = { usgs: ["USGS_API_KEY"], cco: ["CCO_API_KEY", "CCO_REFERER"] }[id];
+  const missing = needs?.filter((name) => !process.env[name]);
+  if (missing?.length) {
+    console.log(`${id}: skipped, no ${missing.join(" and no ")}`);
     continue;
   }
   const shapes: Record<string, Shape[]> = {};

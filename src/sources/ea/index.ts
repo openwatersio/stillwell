@@ -1,4 +1,4 @@
-import { getJson, getText } from "../../http.ts";
+import { Blocked, getJson, getText } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -77,13 +77,26 @@ const UNITS: Record<string, string> = { mAOD: "AOD", m: "CD" };
  * Every `TideGauge` station with a tidal level in meters. Most National Tide
  * Gauge Network gauges are listed twice, once in mAOD and once in meters above
  * chart datum, with the same readings, so a gauge's chart datum series is kept
- * only where it has no mAOD one (Avonmouth, Bournemouth, Hinkley Point and
- * Immingham). Series in millimeters copy one in meters.
+ * only where it has no mAOD one, which none has had since November 2026. An
+ * mAOD station names in `same_as` its gauge's chart datum series the store
+ * lists, and keeps a link it had. Series in millimeters copy one in meters. A station is inactive
+ * and not polled when the measures list gives its series no latest reading,
+ * as for one that has never reported (Mumbles and Stornoway) or stopped months
+ * ago (Jersey and Washpile, in November 2026), and its readings hold nothing in
+ * the API's 28 days, so a day's outage retires nothing. A series the list
+ * leaves out keeps its station active.
  */
-export async function stations(): Promise<ListedStation[]> {
+export async function stations(previous: Station[] = []): Promise<ListedStation[]> {
   const { items } = await getJson<{ items: ApiStation[] }>(
     `${API}/id/stations?type=TideGauge&_limit=1000`,
     { fresh: true },
+  );
+  const measures = await getJson<{ items: { "@id": string; latestReading?: unknown }[] }>(
+    `${API}/id/measures?qualifier=Tidal%20Level&_limit=10000`,
+    { fresh: true },
+  );
+  const silent = new Set(
+    measures.items.filter((m) => !m.latestReading).map((m) => m["@id"].split("/").at(-1)),
   );
   const tidal = items.flatMap((s) => {
     // Only the series the archive's day files are read for, so backfill and
@@ -105,12 +118,60 @@ export async function stations(): Promise<ListedStation[]> {
   const near = (a: ApiStation, b: ApiStation) =>
     labelOf(a) === labelOf(b) ||
     [a.lat, a.long].every((v, i) => Math.abs(firstOf(v) - firstOf([b.lat, b.long][i])) < 0.02);
+  const kept = tidal.filter(
+    ({ s, datum }) =>
+      [s.lat, s.long].every((v) => [v].flat()[0] !== undefined) &&
+      !(datum === "CD" && aod.some((a) => near(a, s))),
+  );
+  // A listed series the measures list gives no reading is asked for its latest within the API's days.
+  const since = new Date(dayOf(Date.now()) - API_DAYS * DAY_MS).toISOString();
+  const stopped = new Set<string>();
+  for (const { measure } of kept) {
+    const id = measure["@id"].split("/").at(-1)!;
+    if (!silent.has(id)) continue;
+    const { items: latest } = await getJson<{ items: unknown[] }>(
+      `${API}/id/measures/${id}/readings?since=${since}&_sorted&_limit=1`,
+      { fresh: true },
+    );
+    if (!latest.length) stopped.add(id);
+  }
+  // None reporting is a broken response; taken at its word, it would retire every station.
+  if (kept.length && stopped.size === kept.length) throw new Error("EA reported no tidal readings");
+  if (stopped.size)
+    console.log(`  ea: no readings in ${API_DAYS} days: ${[...stopped].join(", ")}`);
+  // A chart datum series the store lists, such as Bournemouth's until November 2026, is the
+  // same gauge as the listed mAOD station with its label, or else the nearest within about
+  // 2 km, and keeps its history in that station's group. A link the store holds stays.
+  const aodListed = kept.filter((k) => k.datum === "AOD").map((k) => k.s);
+  const at = (v: number | number[] | undefined) => firstOf(v);
+  const twin = new Map<string, string[]>();
+  for (const p of previous) {
+    if (p.datum !== "CD") continue;
+    const close = aodListed.filter(
+      (a) =>
+        labelOf(a) === p.name ||
+        (Math.abs(at(a.lat) - p.lat) < 0.02 && Math.abs(at(a.long) - p.lon) < 0.02),
+    );
+    const best =
+      close.find((a) => labelOf(a) === p.name) ??
+      close.sort(
+        (a, b) =>
+          Math.hypot(at(a.lat) - p.lat, at(a.long) - p.lon) -
+          Math.hypot(at(b.lat) - p.lat, at(b.long) - p.lon),
+      )[0];
+    if (best) twin.set(`ea/${best.notation}`, [...(twin.get(`ea/${best.notation}`) ?? []), p.id]);
+  }
+  const known = new Set(previous.map((p) => p.id));
+  const held = new Map(previous.map((p) => [p.id, p.same_as ?? []]));
+  const twinsOf = (s: ApiStation) =>
+    [...new Set([...(twin.get(`ea/${s.notation}`) ?? []), ...(held.get(`ea/${s.notation}`) ?? [])])]
+      .filter((id) => known.has(id))
+      .sort();
   const listed: ListedStation[] = [];
-  for (const { s, measure, datum } of tidal) {
-    const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]);
+  for (const { s, measure, datum } of kept) {
+    const [lat, lon] = [s.lat, s.long].map((v) => [v].flat()[0]!);
     const name = labelOf(s);
-    if (lat === undefined || lon === undefined || (datum === "CD" && aod.some((a) => near(a, s))))
-      continue;
+    const live = !stopped.has(measure["@id"].split("/").at(-1)!);
     listed.push({
       ...stationDefaults(metadata),
       id: `ea/${s.notation}`,
@@ -127,9 +188,9 @@ export async function stations(): Promise<ListedStation[]> {
       first: null,
       last: null,
       tide_station: null,
-      same_as: [],
-      status: "active",
-      live: true,
+      same_as: twinsOf(s),
+      status: live ? "active" : "inactive",
+      live,
       min_interval_s: 900,
       // Check for Flooding's page is keyed by the River Levels on the Internet ID.
       source_url: s.RLOIid ? `https://check-for-flooding.service.gov.uk/station/${s.RLOIid}` : null,
@@ -212,11 +273,57 @@ export function archiveDay(day: number): Promise<Day> {
   return parsed;
 }
 
+/**
+ * The archive answers 429 for a while after a run downloads many day files,
+ * longer than `fetchText`'s retries over a few seconds. A day file it refuses
+ * waits `blockedMs`, or longer if Retry-After asks, holding every other
+ * download back too, as `fetchText`'s own throttled retries do, and is asked
+ * again, `tries` times in all; past
+ * those, or for a Retry-After over `maxHoldMs`, the archive is taken to be
+ * refusing this client, and every download after throws `Blocked`, which stops
+ * the run rather than fail each station-year. Tests shrink the waits.
+ */
+export const archivePacing = { blockedMs: 5 * 60_000, maxHoldMs: 15 * 60_000, tries: 3 };
+let heldUntil = 0;
+let refused: Blocked | undefined;
+
+/** Waits out the archive's hold before each request, `fetchText`'s retries too, and throws once the run is stopped. */
+async function holdOff(): Promise<void> {
+  // Another download's refusal can move the hold, or stop the run, while this one waits.
+  while (!refused && Date.now() < heldUntil)
+    await new Promise((resolve) => setTimeout(resolve, heldUntil - Date.now()));
+  if (refused) throw refused;
+}
+
+async function archiveText(url: string): Promise<string> {
+  for (let attempt = 1; ; attempt++) {
+    await holdOff();
+    try {
+      return await getText(url, {
+        fresh: true,
+        pace: holdOff,
+        throttled: (seconds) => (heldUntil = Math.max(heldUntil, Date.now() + seconds * 1000)),
+      });
+    } catch (error) {
+      if (error instanceof Blocked || !/returned 429\b/.test(String(error))) throw error;
+      const asked = /retry after (\d+) s/.exec(String(error))?.[1];
+      const wait = Math.max(asked ? Number(asked) * 1000 : 0, archivePacing.blockedMs);
+      if (attempt >= archivePacing.tries || wait > archivePacing.maxHoldMs) {
+        refused ??= new Blocked(
+          `EA's archive is still refusing requests after ${attempt} tries (${(error as Error).message}); stopping`,
+        );
+        throw refused;
+      }
+      heldUntil = Math.max(heldUntil, Date.now() + wait);
+    }
+  }
+}
+
 async function fetchDay(day: number): Promise<Day> {
   const date = new Date(day).toISOString().slice(0, 10);
   let csv: string;
   try {
-    csv = await getText(`${API}/archive/readings-${date}.csv`, { fresh: true });
+    csv = await archiveText(`${API}/archive/readings-${date}.csv`);
   } catch (error) {
     // The archive keeps about a year; a day outside it answers 404. One well
     // inside it is a gap, reported loudly, but gives only that day nothing, so
@@ -276,9 +383,11 @@ function intern(id: string): string {
 
 const TIDE_GAUGE = /-tidal_level-Mean-15_min-m(AOD)?,/;
 
-/** For tests: forget the archive days read so far. */
+/** For tests: forget the archive days read so far, and any refusal. */
 export function forgetArchive(): void {
   days.clear();
+  heldUntil = 0;
+  refused = undefined;
 }
 
 export const source: Source = {

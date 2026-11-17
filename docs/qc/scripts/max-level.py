@@ -13,9 +13,10 @@ from concurrent.futures import ThreadPoolExecutor
 import duckdb
 
 STORE = "https://stillwell.openwaters.io"
+UA = "openwaters-stillwell-qc/1 (+https://github.com/openwatersio/stillwell)"
 SOURCES = sys.argv[1].split(",")
 LIMIT = int(sys.argv[2]) if len(sys.argv) > 2 else None
-main = duckdb.connect(); main.execute("install httpfs; load httpfs")
+main = duckdb.connect(config={"custom_user_agent": UA}); main.execute("install httpfs; load httpfs")
 files = []
 for s in SOURCES:
     for sid, epoch, year in main.execute(f"select id, epoch, year from '{STORE}/stations/years/{s}.parquet' where epoch is not null and year is not null").fetchall():
@@ -25,7 +26,7 @@ if LIMIT: files = files[:LIMIT]
 local = threading.local()
 def stat(f):
     if not hasattr(local, "c"):
-        local.c = duckdb.connect(); local.c.execute("load httpfs")
+        local.c = duckdb.connect(config={"custom_user_agent": UA}); local.c.execute("load httpfs")
     for attempt in range(3):
         try:
             r = local.c.execute(f"select min(stats_min::double), max(stats_max::double), sum(stats_null_count) from parquet_metadata('{f[4]}') where path_in_schema = 'level_m'").fetchone()

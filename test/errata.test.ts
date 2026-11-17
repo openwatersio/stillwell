@@ -14,7 +14,7 @@ import {
   type Erratum,
 } from "../src/errata.ts";
 import { Flag, Unjudged, type Observation, type Source, type Station } from "../src/schema.ts";
-import { errata, errataFiles, errataProblems, sources } from "../src/sources/index.ts";
+import { errata, errataFiles, errataProblems, sources, withinSpan } from "../src/sources/index.ts";
 
 const entry = (fields: Record<string, unknown> = {}) => ({
   id: "uhslc-hong-kong-hour-early",
@@ -192,6 +192,36 @@ describe("withErrata", () => {
         [Flag.good, undefined],
       ],
     );
+  });
+
+  it("leaves out every fetched level outside the span, recent or not", async () => {
+    const rows = [
+      { time: 1, level: 1, flag: Flag.good },
+      { time: 2, level: 30479.695, flag: Flag.good },
+      { time: 3, level: -2438.095, flag: Flag.bad },
+      { time: 4, level: Number.NaN, flag: Flag.good },
+      { time: 5, level: -1, flag: Flag.good },
+    ];
+    const fills = {
+      metadata: { id: "usace" },
+      observations: async () => rows,
+      recent: async () =>
+        new Map<string, Observation[] | Error>([
+          ["usace/x", rows],
+          ["usace/y", new Error("down")],
+        ]),
+    } as unknown as Source;
+    const kept = withinSpan(fills);
+    assert.deepEqual(
+      (await kept.observations!(station, new Date(0), new Date())).map((o) => o.time),
+      [1, 5],
+    );
+    const recent = await kept.recent!([station], new Date(0), new Date());
+    assert.deepEqual(
+      (recent.get("usace/x") as Observation[]).map((o) => o.time),
+      [1, 5],
+    );
+    assert.ok(recent.get("usace/y") instanceof Error);
   });
 
   it("adds the span to the adapter's own", async () => {

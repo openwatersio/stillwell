@@ -111,6 +111,36 @@ describe("qc with context", () => {
 });
 
 describe("requalify", () => {
+  it("drops stored levels outside the span, and writes nothing once they're gone", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
+    const path = seriesPath(root, "levels", "test", "1", 2024);
+    const rows = withSourceFlag(hourly(Date.UTC(2024, 0, 1), NEW_YEAR));
+    // USACE's 99,999 ft placeholder and CDEC's −7,999 ft, flagged bad as QC left them.
+    rows[100] = { ...rows[100]!, level: 30479.695, flag: Flag.bad };
+    rows[200] = { ...rows[200]!, level: -2438.095, flag: Flag.bad };
+    await writeObservations(path, qc(rows), "NAP");
+    const result = await requalify(source(), station, root, 2024, 2025);
+    assert.deepEqual([result.files, result.dropped], [1, 2]);
+    const after = await readObservations(path);
+    assert.equal(after.length, rows.length - 2);
+    assert.ok(after.every((r) => Math.abs(r.level) < 500));
+    assert.deepEqual((await requalify(source(), station, root, 2024, 2025)).files, 0);
+    // A year of nothing but placeholders, as USACE's Carthage has, keeps its file with a warning.
+    const fills = hourly(Date.UTC(2023, 0, 1), Date.UTC(2023, 0, 2)).map((r) => ({
+      ...r,
+      level: 30479.695,
+      flag: Flag.bad,
+    }));
+    await writeObservations(seriesPath(root, "levels", "test", "1", 2023), fills, "NAP");
+    const kept = await requalify(source(), station, root, 2023, 2024);
+    assert.deepEqual([kept.files, kept.dropped], [0, 0]);
+    assert.match(kept.warnings.join(), /2023 holds only levels outside/);
+    assert.equal(
+      (await readObservations(seriesPath(root, "levels", "test", "1", 2023))).length,
+      24,
+    );
+  });
+
   it("clears what a stricter rule flagged once the rule loosens, without fetching", async () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
     const path = (year: number) => seriesPath(root, "levels", "test", "1", year);
@@ -129,6 +159,7 @@ describe("requalify", () => {
     assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
       files: 1,
       changed: 9,
+      dropped: 0,
       warnings: [],
     });
     const after = await readObservations(path(2024));
@@ -140,6 +171,7 @@ describe("requalify", () => {
     assert.deepEqual(await requalify(source(), pooled, root, 2024, 2025), {
       files: 0,
       changed: 0,
+      dropped: 0,
       warnings: [],
     });
     // A stricter rule again flags them, and an erratum's span comes back from the source.
@@ -285,6 +317,7 @@ describe("requalify", () => {
       {
         files: 0,
         changed: 0,
+        dropped: 0,
         warnings: [],
       },
     );

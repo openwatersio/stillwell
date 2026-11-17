@@ -35,7 +35,7 @@ export const metadata: SourceMetadata = {
   hourly: false,
   // BODC sends no preliminary values, but it adds months late, fills gaps and
   // reflags months it has published, so the monthly refetch reads the last
-  // three years again (monthly.yml).
+  // three years again (scripts/monthly.sh).
   finalizes: true,
 };
 

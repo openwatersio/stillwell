@@ -14,11 +14,6 @@ Stage at 43 tidal gauges in South Florida, back to 1974 at the oldest, from [DBH
 - **Not USGS or NOAA:** every series read is the District's own (`agency` `WMD`). The catalog also lists USGS series, which the adapter doesn't read.
 - **Clock check:** against NOAA's Virginia Key (8723214), January against July of 1995 and of 2010, S-123's tailwater lags Virginia Key by 45 to 55 minutes and S-155's by 25 to 40, with r 0.97 to 0.99, the same in winter and summer within 15 minutes. S-123 in January and July 1982 against Virginia Key's predicted tide lags 55 and 65 minutes. So the derived series is in EST all year back to 1982 at least, with no daylight-saving hour, as the telemetry is. Its January and July 1982 values are all quality A. S-21A's derived series in January and July 1975 lags 135 and 110 minutes, from fewer July readings, so no hour shift there either; earlier years aren't checked.
 
-## Errata
-
-- **Manatee Bay before August 1992** (erratum `sfwmd-mbts-1992-datum`). MBTS levels before 20 August 1992 read about 1 m lower than on the current zero and are flagged `suspect`.
-- **Thursday Point, spring 2001** (erratum `sfwmd-tpts-2001-offset`). TPTS levels sit about 1.1 m low from 28 March to 21 June 2001, and that span is flagged `suspect`.
-
 ## Running ingest
 
 - **API:** the adapter reads the JSON and CSV API behind DBHYDRO Insights, `https://insightsdata.api.sfwmd.gov/v1/insights-data`, which needs no key. The [Insights user's guide](https://www.sfwmd.gov/sites/default/files/documents/dbhydroinsightsuserdocumentation.pdf) documents its report URLs, but not the API itself. The documented [Hydro Data Service](https://www.sfwmd.gov/sites/default/files/documents/hydrodataservicedocumentation.pdf) serves the same data with a client ID, which datarequests@sfwmd.gov issues on request; it caps a response at 100,000 rows.

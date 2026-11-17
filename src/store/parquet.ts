@@ -15,6 +15,7 @@ import {
 import type { EventIndex } from "../types.ts";
 import type { OffsetRow } from "../datums.ts";
 import { FILES, IN_LIST_EXTRA, columnTypes, type Column, type ParquetFile } from "./files.ts";
+import { USER_AGENT } from "../http.ts";
 // Refuses the store and cache variables under their old names.
 import "../cache.ts";
 
@@ -104,7 +105,10 @@ export function limitDuckDb(options: Record<string, string>): void {
  */
 async function connect(): Promise<DuckDBConnection> {
   instance ??= (async () => {
-    const created = await DuckDBInstance.create(":memory:", settings);
+    const created = await DuckDBInstance.create(":memory:", {
+      custom_user_agent: USER_AGENT,
+      ...settings,
+    });
     const endpoint = process.env.S3_ENDPOINT;
     if (endpoint) {
       const setup = await created.connect();
@@ -810,6 +814,58 @@ export async function writeStationBounds(
   );
 }
 
+/** A series file's times, in milliseconds; none when there's no file. */
+export async function readTimes(path: string): Promise<number[]> {
+  // read_parquet globs, so only this exact file counts, as in readObservationFile.
+  return (
+    await read(
+      path,
+      "SELECT epoch_ms(time) AS time",
+      "time",
+      "",
+      `WHERE filename = ${quote(path)}`,
+      true,
+    )
+  ).map((r) => Number(r.time));
+}
+
+/**
+ * Rewrite a series file of any product without its rows at `times`, in
+ * milliseconds, keeping its columns, types and order. Returns how many rows
+ * are left; with none it writes nothing, for the caller to delete the file.
+ */
+export function dropTimes(path: string, times: number[]): Promise<number> {
+  return serial(async () => {
+    const db = await connection();
+    const id = Math.random().toString(36).slice(2);
+    // The times go through a table, since a year of minutes is too many for the query's text.
+    await db.run(`CREATE TABLE drop_${id} (t BIGINT)`);
+    try {
+      const appender = await db.createAppender(`drop_${id}`);
+      for (const t of times) {
+        appender.appendBigInt(BigInt(Math.round(t)));
+        appender.endRow();
+      }
+      appender.closeSync();
+      // read_parquet globs, so only this exact file counts, as in readObservationFile.
+      await db.run(
+        `CREATE TABLE kept_${id} AS SELECT * EXCLUDE (filename) FROM read_parquet(${quote(path)}, filename = true) WHERE filename = ${quote(path)} AND epoch_ms(time) NOT IN (SELECT t FROM drop_${id})`,
+      );
+      const left = Number(
+        (await db.runAndReadAll(`SELECT count(*) AS n FROM kept_${id}`)).getRowObjects()[0]!.n,
+      );
+      if (left)
+        await db.run(
+          `COPY (SELECT * FROM kept_${id} ORDER BY time) TO ${quote(path)} (FORMAT parquet, COMPRESSION zstd)`,
+        );
+      return left;
+    } finally {
+      await db.run(`DROP TABLE IF EXISTS drop_${id}`);
+      await db.run(`DROP TABLE IF EXISTS kept_${id}`);
+    }
+  });
+}
+
 /** Every row of a Parquet file, by column name; none when there's no file. */
 export function readRows(path: string): Promise<Record<string, unknown>[]> {
   return read(path, "SELECT *", "ALL");
@@ -1186,6 +1242,11 @@ export function isMissing(error: unknown): boolean {
 
 async function prepare(path: string): Promise<void> {
   if (!isRemote(path)) await mkdir(dirname(path), { recursive: true });
+}
+
+/** Whether files under `path` can be listed by glob: on disk or over S3, not over HTTP(S). */
+export function listable(path: string): boolean {
+  return !/^https?:\/\//.test(path);
 }
 
 function isRemote(path: string): boolean {

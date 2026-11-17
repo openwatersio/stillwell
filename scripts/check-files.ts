@@ -9,6 +9,7 @@
  *
  *   node scripts/check-files.ts [https://stillwell.openwaters.io]
  */
+import { USER_AGENT } from "../src/http.ts";
 import { FILES, JSON_FILES, jsonProblems, type ParquetFile } from "../src/store/files.ts";
 import { checkFile, isMissing, readRows } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
@@ -26,7 +27,7 @@ const report = (path: string, problems: string[]) => {
 
 const json: Record<string, unknown> = {};
 for (const [path, schema] of Object.entries(JSON_FILES)) {
-  const response = await fetch(`${base}/${path}`);
+  const response = await fetch(`${base}/${path}`, { headers: { "User-Agent": USER_AGENT } });
   if (!response.ok) report(path, [`HTTP ${response.status}`]);
   else report(path, jsonProblems(schema, (json[path] = await response.json())));
 }

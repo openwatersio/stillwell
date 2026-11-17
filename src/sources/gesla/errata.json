@@ -200,7 +200,7 @@
       "since": "2016-01-05",
       "until": "2025-01-01",
       "handling": "corrected",
-      "error": "GESLA 4.1's Toitū Te Whenua record of Scott Base, Antarctica (`scott_base_antarctica-scot-nzl-ttw`, 2016 to 2024) is on New Zealand Standard Time (UTC+12) all year, labeled UTC: the height labeled T was measured at T − 12 h UTC.",
+      "error": "GESLA 4.1's Toitū Te Whenua record of Scott Base, Antarctica (`scott_base_antarctica-scot-nzl-ttw`, 2016 to 2024) is on New Zealand Standard Time (UTC+12) labeled UTC, except from November 2023 to October 2024, when it is on UTC+13 (erratum `gesla-scott-base-ttw-nzdt-2023`): the height labeled T was measured at T − 12 h UTC.",
       "response": "The adapter moves the record's times 12 hours earlier.",
       "evidence": "November 2026. The record equals UHSLC's Scott Base (`uhslc/663a`) 12 hours earlier in every month they share, February 2016 to June 2017 (r 0.93 to 1.00 a month, 0.97 in all, standard deviation 5.9 cm, slope 0.97); at its own times they're anti-correlated (r −0.4 to −0.86), since Scott Base's tide is diurnal. K1's phase in the record is 18 to 32° a year from 2016 to 2024, against 182 to 204° in UHSLC's record (2001 to 2017) and 181 to 217° in Toitū Te Whenua's Cape Roberts record nearby; 12 hours moves K1 by 180°. Toitū Te Whenua's other GESLA records match UHSLC's at the same times. LINZ's README for the gauge says its early times are NZST (see the `linz` source's README). The store's level match of November 2026 found the two 45 cm apart at every lag up to 2 hours."
     },
@@ -218,9 +218,9 @@
       "since": "2019-12-31",
       "until": "2026-01-01",
       "handling": "corrected",
-      "error": "From 2020, GESLA 4.1's seven Queensland records that run past 2019 (Cape Ferguson, Cardwell, Cooktown, Fishermans Landing, Half Tide Tug Harbour, South Trees and Thursday Island) are on Australian Eastern Standard Time (UTC+10), labeled UTC: the height labeled T was measured at T − 10 h UTC. Before 2020 they're on UTC, and each ends at 13:50 UTC on 31 December 2019, local midnight; each 2020 part starts at a label of 00:00 on 1 January.",
-      "response": "The adapter moves the records' times labeled from 1 January 2020 10 hours earlier, which joins the two parts with no gap or overlap. After the move Cape Ferguson's record still differs from UHSLC's on about a quarter of the days in 2020 and 2021; those values are kept as served.",
-      "evidence": "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before 2020 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more, 3 to 4 cm). The store's level match of November 2026 found the record 75 cm from UHSLC's."
+      "error": "From 2020, GESLA 4.1's seven Queensland records that run past 2019 (Cape Ferguson, Cardwell, Cooktown, Fishermans Landing, Half Tide Tug Harbour, South Trees and Thursday Island) are on Australian Eastern Standard Time (UTC+10), labeled UTC: the height labeled T was measured at T − 10 h UTC. Before 2020 they're on UTC, and each ends at 13:50 UTC on 31 December 2019, local midnight; each 2020 part starts at a label of 00:00 on 1 January. From 2020 a label on day 1 to 12 of a month also has its day and month swapped: the values labeled 1 March were measured on 3 January, and those labeled 3 January on 1 March.",
+      "response": "For the records' times labeled from 1 January 2020, the adapter swaps the day and month of a date whose day is 12 or less, then moves the time 10 hours earlier. That joins the two parts with no gap or overlap and gives one time for each label.",
+      "evidence": "November 2026. In each of the seven records K1's phase moves by +148 to +152° and M2's by −69 to −72° from 2019 to 2020 and stays there through 2025, the shift 10 hours makes (+150° and −70°), while UHSLC's and BOM's own Cape Ferguson series (`uhslc/343a`, `gesla/cape_ferguson-59260-aus-bom`) hold their phases. Before 2020 Cape Ferguson's record equals UHSLC's at the same times to 1 to 3 cm (standard deviation) a year; in 2020 and 2021 it equals it 10 hours earlier on 409 of 730 days (r 0.99 or more a day, 3 to 4 cm). Most of the hours that differ are on days 1 to 12 of a month: in 2020, after the 10-hour move, 2,704 of 3,456 hours on those days are more than 10 cm from UHSLC's (standard deviation 50 cm), and with day and month swapped 26 are (1.6 cm). On days 13 to 31, 47 of 5,328 hours are. With both fixes, Cape Ferguson's record differs from UHSLC's by 1.7 cm (standard deviation) in 2020 and 4.4 cm in 2021, 10 minutes after UHSLC's times as in 2019 (3.3 cm), against 32 and 35 cm with the 10-hour move alone. In the raw file the label 2020/03/01 00:00 follows 2020/02/29 23:50 with a step of 84 cm, both flagged correct. In all seven records the mean step where day 12 meets day 13 and where a month meets the next is 3 to 13 cm a year to 2019, the size of the records' 10-minute steps, and 38 to 113 cm from 2020 to 2025; with day and month swapped back they're 1 to 12 cm in every record and year, against 3.5 to 10.6 cm for the records' other 10-minute steps, and no two values share a time. The same step test on the stored values of every other GESLA record with values from 2020 (3,131 with such joins) finds no other record with the swap. The store's level match of November 2026 found the record 75 cm from UHSLC's."
     },
     {
       "id": "gesla-sfwmd-est",
@@ -273,6 +273,16 @@
       "error": "GESLA 4.1's 43 South Florida Water Management District records are on Eastern Standard Time (UTC−5) all year, labeled UTC: the height labeled T was measured at T + 5 h UTC.",
       "response": "The adapter moves every SFWMD record's times 5 hours later. They also sit on another zero than SFWMD's own NAVD88 series, about 47 cm apart, which the store measures as a link offset.",
       "evidence": "November 2026. Each of the 36 records with an SFWMD series of its gauge in the store and a year in common was compared with it, in its first, middle and last such year, at every whole hour from −8 to +8. 34 fit best 5 hours later, from 1974 to 2024, at r 0.98 to 1.00 and a standard deviation of 0.0 to 3.7 cm, against r 0.94 or less at any other hour, but for S-197 from January to June 1998, which fits best 4 hours later and is moved 5 like the rest. Thursday Point and West Coconut Grove, where the tide is weak, fit at r 0.8 or less at 5 to 8 hours; Thursday Point's M2 phase is 140° from SFWMD's, about 5 hours. Gordon River and Haldeman Creek equal SFWMD's `GORDON_2_T` and `HALDEMAN_T` 5 hours later (r 1.00). S-79, S-37A, S-46 and Henderson Creek have no series to compare in the same years and are moved with the rest. Lake Worth Lagoon's S155 record equals CO-OPS's Lake Worth ICW gauge (8722669) 5 hours later too (r 0.997, 2009). The store's level match of November 2026 found GESLA's SFWMD records 20 to 54 cm from SFWMD's own series at the same times."
+    },
+    {
+      "id": "gesla-vardo-uhslc-2007-2018-five-minutes-late",
+      "stations": ["gesla/vardo-805-nor-uhslc_fd", "gesla/vardo-805a-nor-uhslc_rq"],
+      "since": "2007-01-01",
+      "until": "2019-01-01",
+      "handling": "kept",
+      "error": "GESLA 4.1 copies UHSLC's Vardø records (805 and 805a) with UHSLC's times, whose values from 2007 to 2018 are 5 minutes late (erratum `uhslc-vardo-2007-2018-five-minutes-late`).",
+      "response": "Kept as served, as UHSLC's own series is (erratum `uhslc-vardo-2007-2018-five-minutes-late`). Kartverket's own series of the gauge is the group's preferred series.",
+      "evidence": "Both copies fit Kartverket's series best 300 seconds earlier in 2010 and 2016, and at their own times in 2005, as UHSLC's own series does. GESLA's NHS and CMEMS copies of the gauge fit at their own times in all three years."
     },
     {
       "id": "gesla-crms-hour-early",
@@ -988,6 +998,190 @@
       "error": "GESLA 4.1 gives Boat Cove and Fishing Rock (Raoul Island) longitudes of 177.9°E, and Owenga (Chatham Islands) 176.37°E, where LINZ's READMEs give 177.89°W, 177.90°W and 176.37°W. Each record sits about 410 to 580 km from its gauge, on the wrong side of the antimeridian.",
       "response": "The three records keep GESLA's positions. Each is linked to LINZ's gauge by decision in `LINKS` (`src/same-as.ts`), so the copy rule's distance limit doesn't leave it unlinked.",
       "evidence": "LINZ's READMEs for RBCT, RFRT and CHIT, November 2026; the three GESLA TTW records' positions in the store's list."
+    },
+    {
+      "id": "gesla-petten-meetraai3-2012-zero",
+      "stations": ["gesla/petten_meetraai_03-pet-nld-rws"],
+      "since": "2012-10-22",
+      "until": "2013-05-16",
+      "handling": "flagged",
+      "error": "GESLA's copy of RWS's Petten meetraai 03 holds exactly 0.00 m NAP for hours at a time through high and low water from 22 October 2012 to the record's end on 15 May 2013, as RWS's own series does (erratum `rws-petten-meetraai3-2012-zero`).",
+      "response": "22 October 2012 to 15 May 2013 is flagged `suspect`, keeping the source flag as `source_flag`. About 800 of the span's 19,000 values are the held fill, and the rest is sound tide, but the fill comes and goes within hours, so only the whole span covers it: QC of a tidal gauge flags 199 of the 797 held values.",
+      "evidence": "The same 778 values of 0.00 m in 2012 and 466 in 2013 as RWS's series. Found from the station's analysis, November 2026: the held values counted as drains and judged it not tidal. 0.00 m NAP is about mid-tide at Petten, where the tide runs from about −1.0 to 0.8 m. From 22 October 2012 to 3 May 2013 the series jumps from the tide to exactly 0.00 m and holds it in 33 runs of an hour or more, 5 of them 6 hours or more, through high and low water. Before that, 0.00 m appears 60 to 125 times a year as the tide passes through it, rarely twice in a row."
+    },
+    {
+      "id": "gesla-fill-values",
+      "stations": [
+        "gesla/arun_platform-arn-gbr-cco",
+        "gesla/arunplatformtg-aru-gbr-cmems",
+        "gesla/awgtg-awg-nld-cmems",
+        "gesla/bayonnepontblanctg_05minute-bay-fra-cmems",
+        "gesla/brighton-btn-gbr-cco",
+        "gesla/brightontg-bri-gbr-cmems",
+        "gesla/cape_roberts-robt-nzl-ttw",
+        "gesla/deal_pier-dlp-gbr-cco",
+        "gesla/dealpiertg-dea-gbr-cmems",
+        "gesla/exmouth-exm-gbr-cco",
+        "gesla/exmouthtg-exm-gbr-cmems",
+        "gesla/hastings_pier-hgp-gbr-cco",
+        "gesla/hastingspiertg-has-gbr-cmems",
+        "gesla/idsl_ceuta-ids-esp-cmems",
+        "gesla/k141tg-k14-nld-cmems",
+        "gesla/l91tg-l91-nld-cmems",
+        "gesla/marienleuchtetg-mar-deu-cmems",
+        "gesla/pontseudretg_05minute-pon-fra-cmems",
+        "gesla/saint_pierre_et_miquelon-115-fra-refmar",
+        "gesla/saintpierreetmiquelontg_60minute-sai-fra-cmems",
+        "gesla/sandown_pier-sdp-gbr-cco",
+        "gesla/sandownpiertg-san-gbr-cmems",
+        "gesla/scarborough-sca-gbr-cco",
+        "gesla/scarboroughtg-sca-gbr-cmems",
+        "gesla/secondseverncrossingtg-sec-gbr-cmems",
+        "gesla/severn_bridge-ssc-gbr-cco",
+        "gesla/swanage_pier-swp-gbr-cco",
+        "gesla/swanagepiertg-swa-gbr-cmems",
+        "gesla/teignbridgepiertg-tei-gbr-cmems",
+        "gesla/teignmouth_pier-tnp-gbr-cco",
+        "gesla/villefranquetg_05minute-vil-fra-cmems"
+      ],
+      "since": "2008-01-01",
+      "handling": "dropped",
+      "error": "These 31 GESLA records hold levels no gauge can read, outside the store's span of −500 to 9,000 m, as values rather than as GESLA's null of −99.9999: 42,040 values in 142 record-years from 2008 to 2026. Most are fill values: 999,999.06 m in CMEMS's AWG, K14 and L9 records, 99,999.01 m at Ceuta, −9,999.99 m at Pont Seudre, −10,000 m at Bayonne and Villefranque, and −6,999 m in Toitū Te Whenua's Cape Roberts. The CCO and CMEMS records of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing, Swanage Pier and Teignmouth) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, and Marienleuchte's and Saint-Pierre-et-Miquelon's records similar ones.",
+      "response": "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, as it does GESLA's null, and requalify drops any the store holds.",
+      "evidence": "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span."
+    },
+    {
+      "id": "gesla-kornwerderzand-2025-10-05-ramp",
+      "stations": [
+        "gesla/kornwerderzandbuitentg-kor-nld-cmems",
+        "gesla/kornwerderzandtg-kor-nld-cmems"
+      ],
+      "since": "2025-10-05",
+      "until": "2025-10-06",
+      "handling": "flagged",
+      "error": "GESLA's CMEMS records of Kornwerderzand fall slowly from 1.60 m at 04:40 UTC to 1.49 m at 08:30 UTC on 5 October 2025, with GESLA's good flag, through a storm high water of about 2.75 m, as CMEMS's own records do.",
+      "response": "5 October 2025 is flagged `suspect` in both CMEMS records, keeping GESLA's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's RWS record (`gesla/kornwerderzand_waddenzee_buitenhaven-kor-nld-rws`) reads the storm as RWS does, so it isn't listed.",
+      "evidence": "In the store, checked in November 2026: both records hold the same 10-minute values as CMEMS's on that morning (erratum `cmems-kornwerderzand-2025-10-05-ramp`), 1.59 m at 05:00 UTC and 1.49 m at 08:30 UTC, while GESLA's RWS record reads 2.75 m and 1.83 m and RWS Harlingen peaks at 2.86 m at 05:30 UTC. GESLA's CMEMS records rise again from 08:40 UTC and match the RWS record at 09:00 UTC. They end on 2026-05-31, before CMEMS's July 2026 offsets."
+    },
+    {
+      "id": "gesla-scott-base-ttw-nzdt-2023",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-11-24",
+      "until": "2024-10-29",
+      "handling": "corrected",
+      "error": "From the logger's reinstallation on 25 November 2023 to late October 2024, the Toitū Te Whenua record of Scott Base is on UTC+13, not the New Zealand Standard Time (UTC+12) of the rest of the record (erratum `gesla-scott-base-ttw-nzst`), so after the 12-hour move its times are an hour late: the height labeled T was measured at T − 13 h UTC. The labels of 29 to 31 October 2024, in which the clock changed back, can't be placed (erratum `gesla-scott-base-ttw-clock-2024-10`).",
+      "response": "The adapter moves the record's times 13 hours earlier from labels of 25 November 2023 to before 29 October 2024.",
+      "evidence": "November 2026. The record's hourly values equal the `linz` source's Scott Base levels at the same minute at a lag of one hour from December 2023 to October 2024 (83% of 8,693 hours of 2024 within 1.5 mm, against 18% at none), and at none in 2016 to 2022. Against Cape Roberts' record (UTC) the phases of K1, O1, M2 and S2 are 9, 9, 12 and 19 degrees at UTC+13 and -7, -5, -19 and -11 at UTC+12 over the span."
+    },
+    {
+      "id": "gesla-scott-base-ttw-clock-2024-10",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2024-10-28",
+      "until": "2024-11-01",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base changes from UTC+13 to UTC+12 on a day from 29 to 31 October 2024, and its labels run on without a break, so the clock of those three days can't be settled: the fit of the tide moves from UTC+13 on 28 October to UTC+12 on 1 November.",
+      "response": "The labels of 29 to 31 October 2024 are moved 12 hours earlier and flagged `suspect`, keeping the source's own flag as `source_flag`. The `linz` source leaves those days out (erratum `linz-scott-base-clock`).",
+      "evidence": "November 2026. Daily fits of the tide against the prediction from UHSLC's Scott Base (`uhslc/663a`) favor UTC+13 until 28 October, are even on the 29th to 31st (by 0.013 m, 0.017 m the other way and 0.004 m), and favor UTC+12 from 1 November."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2016",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2016-03-02",
+      "until": "2016-03-30",
+      "handling": "flagged",
+      "error": "From 06:00 UTC on 2 March to 00:00 on 29 March 2016 the Toitū Te Whenua record of Scott Base holds one value for all 643 hours, the last before the gauge failed, where LINZ's files have no levels. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2016 file, November 2026: all 643 hourly steps are 0.000 m; the `linz` source's Scott Base has no level from 3 March to 29 March."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2022",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2022-03-09",
+      "until": "2022-10-31",
+      "handling": "flagged",
+      "error": "From 02:00 UTC on 9 March to 23:00 UTC on 30 October 2022 the Toitū Te Whenua record of Scott Base holds one value, changing by at most 0.0001 m an hour, for all 5,662 hours, where LINZ's file has no levels. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2022 file, November 2026: every hourly step is 0.0000 to 0.0001 m; the `linz` source's Scott Base has no level from 9 March to 30 October 2022."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2023-08",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-08-02",
+      "until": "2023-11-25",
+      "handling": "flagged",
+      "error": "From 03:00 UTC on 2 August to 11:00 on 24 November 2023, the gauge's failure and its reinstallation, the Toitū Te Whenua record of Scott Base changes by 0.0001 to 0.0002 m an hour for all 2,745 hours. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2023 file, November 2026: every hourly step in the span is between -0.0002 and -0.0001 m; LINZ's file has no levels from 2 August to 25 November (erratum `linz-scott-base-clock` for its labels). The span's first and last day also hold the hours either side, which are measured."
+    },
+    {
+      "id": "gesla-scott-base-ttw-held-2023-12",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2023-11-30",
+      "until": "2024-01-01",
+      "handling": "flagged",
+      "error": "From 12:00 UTC on 30 November to 10:00 on 31 December 2023 the Toitū Te Whenua record of Scott Base falls by 0.0004 to 0.0005 m an hour for all 743 hours, from 2.48 m to 2.27 m, where LINZ's files have measured levels from 10 December. These aren't measurements: a tide at Scott Base changes by up to 0.05 m an hour, and the record is flagged good throughout.",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay. The `linz` source's Scott Base series is the measured record and has no values in these gaps.",
+      "evidence": "The store's 2023 file, November 2026: every hourly step in the span is between -0.0005 and -0.0004 m. For the 528 hours from 10 to 31 December that the `linz` source also holds, the correlation with its levels is 0.06 at lags of -3 to +3 hours, the mean absolute difference 0.30 m, and LINZ's range 1.39 m against 0.47 m. The span's first day also holds measured hours."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2016",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2016-02-28",
+      "until": "2016-03-02",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 to 0.4 m from 23:00 UTC on 28 February), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2016`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2018-12",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2018-12-13",
+      "until": "2018-12-19",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (spikes to 0.02 m and a constant 2.10 m from 09:35 UTC on 13 December to 19:55 on 18 December), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-stuck-2018-12`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2019",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2019-02-24",
+      "until": "2019-11-04",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 m, with spells of 7.999 m, from about 12:00 UTC on 24 February to 01:00 UTC on 3 November), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2019`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2020",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2020-01-25",
+      "until": "2020-05-13",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.27, 0.03, 0.000 and 0.01 m from 06:40 UTC on 25 January to 04:05 UTC on 12 May), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2020`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2021",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2021-03-16",
+      "until": "2021-11-18",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (a drift from 1.5 to 0.1 m with a shrunken tide, from 19:45 UTC on 16 March to 01:45 UTC on 17 November), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2021`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-scott-base-ttw-failed-2022",
+      "stations": ["gesla/scott_base_antarctica-scot-nzl-ttw"],
+      "since": "2022-03-06",
+      "until": "2022-03-09",
+      "handling": "flagged",
+      "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 to 0.04 m and a spell of 8.0 m from 08:15 UTC on 6 March to 01:45 on the 8th), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2022`).",
+      "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
+      "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
     }
   ],
   "retired": []

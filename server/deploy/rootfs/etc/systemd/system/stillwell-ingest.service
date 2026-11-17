@@ -16,9 +16,9 @@ StateDirectory=stillwell
 Environment=HOME=/var/lib/stillwell
 # Each source's pass metrics, which Alloy's textfile collector ships to Grafana Cloud for the alerts.
 Environment=STILLWELL_METRICS=/var/lib/stillwell/metrics/stillwell.prom
-# Sources that refuse the box's address, filled hourly from the recent/ the hourly workflow writes instead
-# (server/pass.ts): SFWMD drops connections from Helsinki.
-Environment=STILLWELL_FROM_RECENT=sfwmd
+# Sources the poller doesn't ask, filled hourly from the recent/ the hourly workflow writes instead
+# (server/pass.ts): SFWMD drops connections from Helsinki, and CCO's key is for one read of each site an hour.
+Environment=STILLWELL_FROM_RECENT=sfwmd,cco
 WorkingDirectory=/var/lib/stillwell
 ExecStart=/opt/node/bin/node /opt/stillwell/server/ingest.ts
 Restart=always
@@ -28,8 +28,8 @@ RestartSec=10
 KillSignal=SIGTERM
 TimeoutStopSec=60
 # Every pass runs in this unit's cgroup, so this caps the poller and its passes together; with
-# ClickHouse's 1.5 GB, stillwell-api's 400 MB and cloudflared's 100 MB the caps reach the 4 GB box's whole
-# memory, though they're ceilings: the units together use about half of it between passes.
+# ClickHouse's 1.5 GB, stillwell-api's 400 MB, cloudflared's 100 MB, stillwell-jobs's 600 MB and its three
+# jobs at a fifth of the box each, the caps come to about 14 GB of the 16 GB box, though they're ceilings.
 MemoryMax=1800M
 # A pass the kernel stops for memory fails alone and is tried again; the poller and other passes go on.
 OOMPolicy=continue

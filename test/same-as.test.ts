@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
+import type { DataMatch } from "../src/matches.ts";
 import type { Station } from "../src/schema.ts";
 import {
   copyPairs,
@@ -28,6 +29,14 @@ after(() => {
   UNLINKS.push(...APART);
   Object.assign(PREFER, PREFERRED);
 });
+
+/** Rows saying each pair's levels agree, as `stations/matches.parquet` would. */
+const agree = (...pairs: [string, string][]): DataMatch[] =>
+  pairs.map(([x, y]) => {
+    const [a, b] = [x, y].sort() as [string, string];
+    const window = { since: "2024-01-01T00:00:00.000Z", until: "2027-01-01T00:00:00.000Z" };
+    return { a, b, ...window, months: 29, hours: 20000, rms_m: 0, lag_h: 0, lag_rms_m: 0 };
+  });
 
 /** A station at `source/id`, by default at 0,0 with levels and no record yet. */
 const station = (
@@ -243,25 +252,21 @@ describe("linkGauges's limits", () => {
     }
   });
 
-  it("links GESLA's CMEMS copy of Uddevalla to SMHI's gauge, which the copy rule skips", () => {
+  it("links GESLA's CMEMS copy of Uddevalla to SMHI's gauge by levels, which the copy rule skips", () => {
     const uddevalla = { name: "Uddevalla", lat: 58.3475, lon: 11.8948, kind: "river" as const };
     const list = [
       station("gesla/uddevalla-udd-swe-cmems", uddevalla),
       station("smhi/2541", { name: "Uddevalla", lat: 58.3451, lon: 11.9069, kind: "coastal" }),
     ];
     assert.equal(linkGauges(list, NOW).stations[0]!.same_as.length, 0);
-    LINKS.push(...DECISIONS.filter((d) => d.b === "smhi/2541"));
-    try {
-      const { stations, report } = linkGauges(list, NOW);
-      assert.deepEqual(stations[0]!.same_as, ["smhi/2541"]);
-      assert.equal(stations[0]!.preferred, "smhi/2541");
-      assert.deepEqual(report.dropped, []);
-    } finally {
-      LINKS.splice(0);
-    }
+    const matches = agree(["gesla/uddevalla-udd-swe-cmems", "smhi/2541"]);
+    const { stations, report } = linkGauges(list, NOW, new Map(), matches);
+    assert.deepEqual(stations[0]!.same_as, ["smhi/2541"]);
+    assert.equal(stations[0]!.preferred, "smhi/2541");
+    assert.deepEqual(report.dropped, []);
   });
 
-  it("links the gauges listed in LINKS that no rule matches", () => {
+  it("links by levels the gauges no other rule matches", () => {
     const list = [
       station("bodc/dev", { name: "Devonport", lat: 50.36839, lon: -4.18525 }),
       station("ea/E72139", { name: "Plymouth", lat: 50.368401, lon: -4.185217 }),
@@ -274,21 +279,21 @@ describe("linkGauges's limits", () => {
     const pairs = (linked: Station[]) =>
       linked.flatMap((s) => s.same_as.filter((o) => s.id < o).map((o) => `${s.id}~${o}`));
     assert.deepEqual(pairs(linkGauges(list, NOW).stations), []);
-    LINKS.push(...DECISIONS.filter((d) => ["bodc/dev", "uhslc/805", "uhslc/850a"].includes(d.a)));
-    try {
-      const { stations, report } = linkGauges(list, NOW);
-      assert.deepEqual(pairs(stations).sort(), [
-        "bodc/dev~ea/E72139",
-        "kartverket/VAW~uhslc/805",
-        "refmar/749~uhslc/850a",
-      ]);
-      assert.deepEqual(report.dropped, []);
-    } finally {
-      LINKS.splice(0);
-    }
+    const matches = agree(
+      ["bodc/dev", "ea/E72139"],
+      ["uhslc/805", "kartverket/VAW"],
+      ["uhslc/850a", "refmar/749"],
+    );
+    const { stations, report } = linkGauges(list, NOW, new Map(), matches);
+    assert.deepEqual(pairs(stations).sort(), [
+      "bodc/dev~ea/E72139",
+      "kartverket/VAW~uhslc/805",
+      "refmar/749~uhslc/850a",
+    ]);
+    assert.deepEqual(report.dropped, []);
   });
 
-  it("links the records of one gauge the cross-station checks found", () => {
+  it("links one gauge's GESLA records by levels", () => {
     const list = [
       station("gesla/delfzijl-del-nld-rws", { name: "Delfzijl", lat: 53.328, lon: 6.931 }),
       station("gesla/delfzijl-delfzl-nld-rws_hist", {
@@ -319,23 +324,35 @@ describe("linkGauges's limits", () => {
       }),
       station("gesla/eidersptg-eid-deu-cmems", { name: "EiderSPTG", lat: 54.265999, lon: 8.842 }),
       station("pegelonline/9530010", { name: "EIDER-SPERRWERK AP", lat: 54.265924, lon: 8.84213 }),
-      station("gesla/degerby-deg-fin-cmems", { name: "Degerby", lat: 60.031898, lon: 20.3848 }),
+      // On the Baltic, so the levels rule skips them and a decision links them.
+      station("gesla/degerby-deg-fin-cmems", {
+        name: "Degerby",
+        lat: 60.031898,
+        lon: 20.3848,
+        tidal: false,
+      }),
       station("gesla/foglo_degerby-134252-fin-fmi", {
         name: "Foglo Degerby",
         lat: 60.03,
         lon: 20.38,
+        tidal: false,
       }),
     ];
     const pairs = (linked: Station[]) =>
       linked.flatMap((s) => s.same_as.filter((o) => s.id < o).map((o) => `${s.id}~${o}`));
-    const ids = new Set(list.map((s) => s.id));
-    const ours = DECISIONS.filter((d) => ids.has(d.a) && ids.has(d.b));
-    assert.equal(ours.length, 6);
-    // Only the decisions link them: no rule links one source's own records, or these names.
+    // Only their levels or a decision link them: no other rule links one source's own records, or these names.
     assert.deepEqual(pairs(linkGauges(list, NOW).stations), []);
-    LINKS.push(...ours);
+    LINKS.push(...DECISIONS.filter((d) => d.a === "gesla/degerby-deg-fin-cmems"));
+    const matches = agree(
+      ["gesla/delfzijl-delfzl-nld-rws_hist", "gesla/delfzijl-del-nld-rws"],
+      ["gesla/delfzijltg-del-nld-cmems", "gesla/delfzijl-del-nld-rws"],
+      ["gesla/eemshaventg-eem-nld-cmems", "gesla/eemshaven_haven-eem-nld-rws"],
+      ["gesla/eemsmeetpaaltg-eem-nld-cmems", "gesla/eemshaven_waddenzee-eem-nld-rws"],
+      ["gesla/eidersptg-eid-deu-cmems", "pegelonline/9530010"],
+      ["gesla/degerby-deg-fin-cmems", "gesla/foglo_degerby-134252-fin-fmi"],
+    );
     try {
-      const { stations, report } = linkGauges(list, NOW);
+      const { stations, report } = linkGauges(list, NOW, new Map(), matches);
       const group = (id: string) => [id, ...stations.find((s) => s.id === id)!.same_as].sort();
       assert.deepEqual(group("gesla/delfzijltg-del-nld-cmems"), [
         "gesla/delfzijl-del-nld-rws",
@@ -392,17 +409,26 @@ describe("linkGauges's limits", () => {
   });
 
   it("links CMEMS's copies of WSV gauges that GESLA places too far off or names no side of", () => {
+    // The levels rule links tidal water only, so decisions link the Baltic gauges, Lübeck's
+    // at the edge of tidal, and Wangerooge West, which the store marks non-tidal.
     const list = [
-      station("gesla/rostocktg-ros-deu-cmems", { name: "RostockTG", lat: 54.083, lon: 12.155 }),
+      station("gesla/rostocktg-ros-deu-cmems", {
+        name: "RostockTG",
+        lat: 54.083,
+        lon: 12.155,
+        tidal: false,
+      }),
       station("pegelonline/9640018", {
         name: "ROSTOCK MÜHLENDAMM UW",
         lat: 54.083064,
         lon: 12.155109,
+        tidal: false,
       }),
       station("pegelonline/9640002", {
         name: "ROSTOCK MÜHLENDAMM OW",
         lat: 54.082438,
         lon: 12.154273,
+        tidal: false,
       }),
       station("gesla/wangeroogetg-wan-deu-cmems", {
         name: "WangeroogeTG",
@@ -410,7 +436,12 @@ describe("linkGauges's limits", () => {
         lon: 7.929,
       }),
       station("pegelonline/9420030", { name: "WANGEROOGE NORD", lat: 53.806299, lon: 7.9292 }),
-      station("pegelonline/9420040", { name: "WANGEROOGE WEST", lat: 53.776238, lon: 7.867938 }),
+      station("pegelonline/9420040", {
+        name: "WANGEROOGE WEST",
+        lat: 53.776238,
+        lon: 7.867938,
+        tidal: false,
+      }),
       // GESLA's WSV record of the gauge, which its adapter links by number.
       station("gesla/wangeroogewest-9420040-deu-wsv", {
         name: "Wangeroogewest",
@@ -422,8 +453,14 @@ describe("linkGauges's limits", () => {
         name: "KielHoltenauTG",
         lat: 54.383,
         lon: 10.204,
+        tidal: false,
       }),
-      station("pegelonline/9610066", { name: "KIEL-HOLTENAU", lat: 54.372087, lon: 10.15705 }),
+      station("pegelonline/9610066", {
+        name: "KIEL-HOLTENAU",
+        lat: 54.372087,
+        lon: 10.15705,
+        tidal: false,
+      }),
       station("gesla/luebecktg-lue-deu-cmems", { name: "LuebeckTG", lat: 53.9025, lon: 10.7745 }),
       station("pegelonline/9620090", { name: "LÜBECK-BAUHOF", lat: 53.893008, lon: 10.703065 }),
     ];
@@ -433,10 +470,23 @@ describe("linkGauges's limits", () => {
       preferred(linkGauges(list, NOW).stations).filter((p) => p.includes("pegelonline")),
       [],
     );
+    const matches = agree(
+      ["gesla/rostocktg-ros-deu-cmems", "pegelonline/9640018"],
+      ["gesla/wangeroogetg-wan-deu-cmems", "pegelonline/9420040"],
+      ["gesla/kielholtenautg-kie-deu-cmems", "pegelonline/9610066"],
+      ["gesla/luebecktg-lue-deu-cmems", "pegelonline/9620090"],
+    );
+    // Their levels agree, but only Lübeck's, judged tidal here, link by them.
+    assert.deepEqual(
+      preferred(linkGauges(list, NOW, new Map(), matches).stations).filter((p) =>
+        p.includes("pegelonline"),
+      ),
+      ["gesla/luebecktg-lue-deu-cmems~pegelonline/9620090"],
+    );
     const ids = new Set(list.map((s) => s.id));
     LINKS.push(...DECISIONS.filter((d) => ids.has(d.a) && ids.has(d.b)));
     try {
-      const { stations, report } = linkGauges(list, NOW);
+      const { stations, report } = linkGauges(list, NOW, new Map(), matches);
       assert.deepEqual(preferred(stations), [
         "gesla/rostocktg-ros-deu-cmems~pegelonline/9640018",
         "gesla/wangeroogetg-wan-deu-cmems~pegelonline/9420040",
@@ -449,6 +499,33 @@ describe("linkGauges's limits", () => {
         "pegelonline/9420040",
       ]);
       assert.deepEqual(report.dropped, []);
+    } finally {
+      LINKS.splice(0);
+    }
+  });
+
+  it("keeps both of CMEMS's records of one RWS gauge in its group by a decision", () => {
+    const list = [
+      station("cmems/IJgeulstroompaal1TG", { lat: 52.46605, lon: 4.51893 }),
+      station("cmems/IJmondstroompaalTG", { lat: 52.46497, lon: 4.5179 }),
+      station("rws/ijgeul.1", { lat: 52.4639, lon: 4.5162 }),
+    ];
+    const matches = agree(
+      ["cmems/IJgeulstroompaal1TG", "rws/ijgeul.1"],
+      ["cmems/IJmondstroompaalTG", "rws/ijgeul.1"],
+    );
+    const group = () =>
+      linkGauges(list, NOW, new Map(), matches).stations.find((s) => s.id === "rws/ijgeul.1")!
+        .same_as;
+    // Levels link one record, and refuse the other as a second CMEMS station.
+    assert.equal(group().length, 1);
+    LINKS.push(
+      ...DECISIONS.filter(
+        (d) => d.a === "cmems/IJgeulstroompaal1TG" && d.b === "cmems/IJmondstroompaalTG",
+      ),
+    );
+    try {
+      assert.deepEqual(group(), ["cmems/IJgeulstroompaal1TG", "cmems/IJmondstroompaalTG"]);
     } finally {
       LINKS.splice(0);
     }

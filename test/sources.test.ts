@@ -120,6 +120,278 @@ describe("rws", () => {
     );
   });
 
+  it("reads every series of readings RWS answers a year with, and no mean", async () => {
+    const msl = { ...nap, Hoedanigheid: { Code: "MSL" } };
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    const times = [
+      "2023-01-01T01:00:00.000+01:00",
+      "2023-06-01T10:30:00.000+01:00",
+      "2023-12-30T23:50:00.000+01:00",
+      "2023-12-31T00:00:00.000+01:00",
+      "2023-12-31T08:00:00.000+01:00",
+    ];
+    const other = { ...msl, MeetApparaat: { Code: "155" } };
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Listed first, as at Katsbinnen in 1999: another instrument fills a time the fuller
+          // series lacks, and loses where both have one. Its sentinel isn't a value.
+          [
+            other,
+            [
+              [times[0]!, 99],
+              [times[1]!, 99],
+              [times[2]!, 999_999_999],
+            ],
+          ],
+          // The finest series: it wins where both have a time.
+          [
+            msl,
+            [
+              times[0]!,
+              "2023-01-01T01:10:00.000+01:00",
+              "2023-01-01T01:20:00.000+01:00",
+              times[2]!,
+            ].map((t) => [t, 10]),
+          ],
+          // A second part with the same metadata, as at Goeree Lichteiland in 2023.
+          [msl, [[times[3]!, 20]]],
+          // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[4]!, 30]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.levels("goeree.lichteiland", ...range, { datum: "MSL" })).map((l) => [
+        new Date(l.time).toISOString(),
+        l.level,
+      ]),
+      [
+        ["2023-01-01T00:00:00.000Z", 0.1],
+        ["2023-01-01T00:10:00.000Z", 0.1],
+        ["2023-01-01T00:20:00.000Z", 0.1],
+        ["2023-06-01T09:30:00.000Z", 0.99],
+        ["2023-12-30T22:50:00.000Z", 0.1],
+        ["2023-12-30T23:00:00.000Z", 0.2],
+      ],
+    );
+    // Extremes take series that follow each other, and leave out one that overlaps, as Hoek van
+    // Holland's second selection of the same tides does in early 2024.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // The fuller selection, as Hoek van Holland's 314 extremes are against 224.
+          [
+            typeChannel,
+            [times[0]!, "2023-03-01T00:00:00.000+01:00", times[2]!].map((t) => [t, "hoogwater"]),
+          ],
+          // The overlapping selection labels a shared time otherwise; the fuller one's label wins.
+          [
+            typeChannel,
+            [
+              [times[1]!, "laagwater"],
+              [times[2]!, "laagwater"],
+            ],
+          ],
+          [typeChannel, [[times[3]!, "laagwater"]]],
+          [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          [msl, [[times[1]!, 99]]],
+          [msl, [[times[3]!, 20]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" })).map((e) => [
+        e.type,
+        e.level,
+      ]),
+      [
+        ["high", 0.1],
+        ["high", 0.1],
+        ["low", 0.2],
+      ],
+    );
+    // Extremes whose only heights in the datum are a mean aren't a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }), []);
+    // But a mean in the datum doesn't hide readings that are now in another.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+          [nap, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    await assert.rejects(
+      rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /extremes are in NAP, not MSL/,
+    );
+    // A way of deriving values the adapter doesn't know fails rather than vanish.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([{ ...msl, WaardeBewerkingsMethode: { Code: "GEM10M" } }, [[times[0]!, 10]]]),
+      ],
+    ]);
+    await assert.rejects(
+      rws.levels("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /unknown WaardeBewerkingsMethode GEM10M/,
+    );
+  });
+
+  it("keeps a finer series' value where a coarser one with more values shares its time", async () => {
+    // A staff gauge read once a day for 30 days, and a 10-minute gauge that runs 07:00 to 08:50 on 2 of them.
+    const at = (d: number, h: number, m: number) =>
+      `2023-03-${String(d).padStart(2, "0")}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00.000+01:00`;
+    const daily = Array.from({ length: 30 }, (_, i) => [at(i + 1, 8, 0), 50] as [string, number]);
+    const tenMinute: [string, number][] = [];
+    for (const d of [4, 5])
+      for (let m = 7 * 60; m < 9 * 60; m += 10)
+        tenMinute.push([at(d, Math.floor(m / 60), m % 60), 20]);
+    // A burst from a third instrument: two values 5 minutes apart, finer than the gauge, one at a shared time.
+    const burst: [string, number][] = [
+      [at(4, 8, 0), 77],
+      [at(4, 8, 5), 77],
+    ];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [{ ...nap, MeetApparaat: { Code: "burst" } }, burst],
+          [{ ...nap, MeetApparaat: { Code: "peilschaal" } }, daily],
+          [{ ...nap, MeetApparaat: { Code: "vlotter" } }, tenMinute],
+        ),
+      ],
+    ]);
+    const levels = await rws.levels(
+      "x",
+      new Date("2023-03-01T00:00:00Z"),
+      new Date("2023-04-01T00:00:00Z"),
+    );
+    const level = (iso: string) => levels.find((l) => l.time === Date.parse(iso))?.level;
+    // 24 ten-minute values against 30 daily ones: the 10-minute value wins at 08:00, over the burst too.
+    assert.equal(level("2023-03-04T07:00:00.000Z"), 0.2);
+    assert.equal(level("2023-03-05T07:00:00.000Z"), 0.2);
+    // The daily series fills the days the 10-minute one lacks.
+    assert.equal(level("2023-03-01T07:00:00.000Z"), 0.5);
+    assert.equal(level("2023-03-30T07:00:00.000Z"), 0.5);
+    // The burst spans less than a day, so it ranks last and only fills a time the others lack.
+    assert.equal(level("2023-03-04T07:05:00.000Z"), 0.77);
+    assert.equal(levels.length, 30 - 2 + 24 + 1);
+  });
+
+  it("ranks extremes selections by real values, not by entries", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Padded with missing-value sentinels: 4 entries, 1 value, inside the other's span.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "hoogwater"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          // Overlapping it, with 3 values.
+          [typeChannel, [2, 8, 11].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [2, 8, 11].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    const extremes = await rws.extremes(
+      "hoekvanholland",
+      new Date("2023-12-31T00:00:00Z"),
+      new Date("2024-01-02T00:00:00Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [new Date(e.time).toISOString(), e.type]),
+      [
+        ["2024-01-01T01:00:00.000Z", "high"],
+        ["2024-01-01T07:00:00.000Z", "low"],
+        ["2024-01-01T10:00:00.000Z", "high"],
+      ],
+    );
+  });
+
+  it("labels the chosen heights from the selection that matches them, and reads an outage as an outage", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    const range = [new Date("2023-12-31T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // More labels, but only one real height: its labels mustn't win at the other's times.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "topagger"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          [typeChannel, [1, 7, 10].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [1, 7, 10].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => [
+        new Date(e.time).toISOString(),
+        e.type,
+      ]),
+      [
+        ["2024-01-01T00:00:00.000Z", "high"],
+        ["2024-01-01T06:00:00.000Z", "low"],
+        ["2024-01-01T09:00:00.000Z", "high"],
+      ],
+    );
+    // A type entry holding a missing-value sentinel isn't a label, however many such entries a selection has.
+    const padded = JSON.parse(
+      answer(
+        // Labels at exactly the chosen heights' times, each holding a sentinel.
+        [typeChannel, [1, 7, 10].map((h) => [t(h), "topagger"])],
+        // Real labels, with one more at a time with no height.
+        [typeChannel, [1, 4, 7, 10].map((h) => [t(h), h === 7 ? "laagwater" : "hoogwater"])],
+        [nap, [1, 7, 10].map((h) => [t(h), 50])],
+      ),
+    );
+    for (const m of padded.WaarnemingenLijst[0].MetingenLijst)
+      m.Meetwaarde.Waarde_Numeriek = 999_999_999;
+    serve([[/OphalenWaarnemingen/, JSON.stringify(padded)]]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => e.type),
+      ["high", "low", "high"],
+    );
+    // Heights in the datum that are all sentinels are an outage, not a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([typeChannel, [[t(5), "hoogwater"]]], [nap, [[t(5), 999_999_999]]]),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("hoekvanholland", ...range), []);
+  });
+
   it("reads both lows of a double low water, and not the rise between them", async () => {
     const times = [
       "2024-01-01T02:00:00+01:00",
@@ -1351,6 +1623,59 @@ describe("coops", () => {
       new Date("2011-01-01T00:00:00Z"),
     );
     assert.deepEqual([levels, asked.length], [[], 1]);
+  });
+
+  it("asks for a year's hourly heights at once, in halves in a leap year", async () => {
+    const asked: string[] = [];
+    const day = (d: Date) => d.toISOString().slice(0, 10);
+    setTransport(async (url) => {
+      const params = new URL(url).searchParams;
+      const [from, to] = ["begin_date", "end_date"].map((k) => {
+        const s = params.get(k)!;
+        return Date.UTC(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8));
+      });
+      // October alone has 6-minute values, from its first minute.
+      if (params.get("product") === "water_level")
+        return from === Date.UTC(1952, 9, 1)
+          ? JSON.stringify({ data: [{ t: "1952-10-01 00:00", v: "6", f: "0,0,0,0", q: "v" }] })
+          : JSON.stringify({ error: { message: "No data was found." } });
+      asked.push(`${params.get("begin_date")}-${params.get("end_date")}`);
+      // An hourly height on the 15th of each month asked for, at the month's number.
+      const data = [];
+      for (let m = 0; m < 12; m++) {
+        const t = new Date(Date.UTC(new Date(from).getUTCFullYear(), m, 15));
+        if (t.getTime() >= from && t.getTime() <= to)
+          data.push({ t: `${day(t)} 00:00`, v: String(m + 1), f: "0,0" });
+      }
+      return JSON.stringify({ data });
+    });
+    const span = { established: "1899-01-01T00:00:00Z", removed: null };
+    const leap = await coops.levels(
+      "1495000",
+      new Date("1952-01-01Z"),
+      new Date("1953-01-01Z"),
+      span,
+    );
+    // October's hourly height gives way to its 6-minute value; every other month keeps its own.
+    assert.deepEqual(
+      [asked, leap.map((l) => l.level)],
+      [
+        ["19520101 00:00-19520630 23:59", "19520701 00:00-19521231 23:59"],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 11, 12],
+      ],
+    );
+    asked.length = 0;
+    // From May, a year that isn't a leap year takes one request, ending with the range.
+    const plain = await coops.levels(
+      "1495000",
+      new Date("1951-05-01Z"),
+      new Date("1951-08-01Z"),
+      span,
+    );
+    assert.deepEqual(
+      [asked, plain.map((l) => l.level)],
+      [["19510501 00:00-19510731 23:59"], [5, 6, 7]],
+    );
   });
 
   it("reads high and low waters, keeping higher and lower ones as high and low", async () => {
@@ -2669,6 +2994,14 @@ describe("usgs", () => {
             end: new Date(Date.now() - 30 * 86_400_000).toISOString(),
           }),
           series("07020500", "00065", { id: "replacement", begin: "2026-10-01T00:00:00+00:00" }),
+          series("381142122015801", "00065"),
+          series("422206071033901", "00065"),
+          series("02035000", "00065"),
+          series("422340071043201", "00065"),
+          series("02037500", "00065"),
+          series("09469000", "00065"),
+          series("08000001", "00065"),
+          series("08000002", "00065"),
         ]),
       ],
       [/parameter_code=62620/, collection([series("0158540095", "62620")])],
@@ -2690,37 +3023,86 @@ describe("usgs", () => {
           location("02198820", -81.15, 32.25, {
             site_type_code: "ST-TS",
             altitude: 0,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
           }),
           location("07010000", -90.18, 38.63, {
             hydrologic_unit_code: "07140101",
             altitude: 379.58,
+            altitude_method_code: "X",
+            altitude_accuracy: 0.1,
             vertical_datum: "NAVD88",
             state_name: "Missouri",
           }),
           location("03612600", -89.06, 37.17, {
             hydrologic_unit_code: "05140206",
             altitude: 270,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
             vertical_datum: "NGVD29",
           }),
           // The Missouri at Hermann, outside the Mississippi and Ohio basins, is listed too.
           location("06934500", -91.44, 38.71, {
             hydrologic_unit_code: "10300200",
             altitude: 481.6,
+            altitude_method_code: "D",
             vertical_datum: "NAVD88",
           }),
           location("0158540095", -76.4, 39.2, { site_type_code: "ES" }),
           location("02171645", -80.0, 33.2, { state_name: "Puerto Rico" }),
           location("07022000", -89.5, 37.0, { hydrologic_unit_code: "07140105" }),
           location("07020500", -89.8, 37.6, { hydrologic_unit_code: "07140105" }),
+          // First Mallard Branch, Suisun Marsh: an altitude from a DEM is the ground, not the gage's zero.
+          location("381142122015801", -122.03, 38.19, {
+            site_type_code: "ES",
+            altitude: 6,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
+          // USGS now lists another altitude than the decision's, so the decision is set aside.
+          location("422340071043201", -71.07, 42.39, {
+            site_type_code: "ES",
+            altitude: -4,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
+          // An estimated method with the altitude missing still clears the stored offsets.
+          location("02037500", -77.55, 37.56, { altitude_method_code: "N" }),
+          // A decided site answering with no altitude is a gap, and keeps what the store holds.
+          location("09469000", -110.5, 33.2, {}),
+          // A surveyed altitude in a datum the store doesn't name gives no offsets, but clears none.
+          location("08000001", -97, 30, {
+            altitude: 50,
+            altitude_method_code: "L",
+            altitude_accuracy: 0.1,
+            vertical_datum: "COE1912",
+          }),
+          // A survey method with the altitude missing is a gap, and clears nothing.
+          location("08000002", -97.1, 30.1, { altitude_method_code: "L" }),
+          // An altitude with no method is no evidence of a survey.
+          location("02035000", -77.5, 37.6, { altitude: 120, vertical_datum: "NAVD88" }),
+          // Charles River below the dam, Boston: a decision gives its gage datum in place of a DEM's -5 ft.
+          location("422206071033901", -71.06, 42.37, {
+            site_type_code: "ES",
+            altitude: -5,
+            altitude_method_code: "N",
+            vertical_datum: "NAVD88",
+          }),
         ]),
       ],
     ]);
-    const list = await usgs.stations();
+    // The store's list, whose ground a gap keeps.
+    const list = await usgs.stations([
+      { id: "usgs/09469000", ground_m: 762.6 },
+      { id: "usgs/02037500", ground_m: 75.6 },
+    ] as never);
     assert.deepEqual(
       list.map((s) => [s.id, s.kind, s.datum, s.datums, s.time_series_id, s.live, s.country_code]),
       [
         ["usgs/0158540095", "estuary", "NAVD88", {}, "0158540095-62620", true, "US"],
+        ["usgs/02035000", "river", "GAGE", {}, "02035000-00065", true, "US"],
+        ["usgs/02037500", "river", "GAGE", {}, "02037500-00065", true, "US"],
         // Daily tidal highs and lows mark a stream as tidal.
         ["usgs/02171645", "estuary", "GAGE", {}, "02171645-00065", true, "PR"],
         // Gage height is preferred to an elevation series at the same site.
@@ -2731,6 +3113,32 @@ describe("usgs", () => {
         ["usgs/07010000", "river", "GAGE", { NAVD88: 115.696 }, "07010000-00065", true, "US"],
         ["usgs/07020500", "river", "GAGE", {}, "replacement", true, "US"],
         ["usgs/07022000", "river", "GAGE", {}, "current", true, "US"],
+        ["usgs/08000001", "river", "GAGE", {}, "08000001-00065", true, "US"],
+        ["usgs/08000002", "river", "GAGE", {}, "08000002-00065", true, "US"],
+        ["usgs/09469000", "river", "GAGE", {}, "09469000-00065", true, "US"],
+        ["usgs/381142122015801", "estuary", "GAGE", {}, "381142122015801-00065", true, "US"],
+        [
+          "usgs/422206071033901",
+          "estuary",
+          "GAGE",
+          { NAVD88: -32.516 },
+          "422206071033901-00065",
+          true,
+          "US",
+        ],
+        ["usgs/422340071043201", "estuary", "GAGE", {}, "422340071043201-00065", true, "US"],
+      ],
+    );
+    assert.equal(list.find((s) => s.id === "usgs/09469000")!.ground_m, 762.6);
+    // Only an unsurveyed altitude clears what the store holds; a site with none keeps it.
+    assert.deepEqual(
+      list.filter((s) => s.no_datums).map((s) => [s.id, s.ground_m]),
+      [
+        ["usgs/02035000", 36.576],
+        // A reply with no altitude keeps the ground the store held.
+        ["usgs/02037500", 75.6],
+        ["usgs/381142122015801", 1.829],
+        ["usgs/422340071043201", -1.219],
       ],
     );
     assert.equal(
@@ -2797,6 +3205,37 @@ describe("usgs", () => {
       [/monitoring-locations/, collection([location("02198820", -81.15, 32.25, {})])],
     ]);
     await assert.rejects(usgs.stations(), /no monitoring location for 1 sites, e.g. USGS-07010000/);
+    // A reply that drops the altitude method would clear every offset.
+    const sites = Array.from({ length: 12 }, (_, i) => String(1000 + i));
+    serve([
+      [/parameter_code=/, collection(sites.map((site) => series(site, "00065")))],
+      [/statistic_id=00021/, collection([tidal])],
+      [
+        /monitoring-locations/,
+        collection(
+          sites.map((site) => location(site, -81, 32, { altitude: 10, vertical_datum: "NAVD88" })),
+        ),
+      ],
+    ]);
+    await assert.rejects(usgs.stations(), /no known altitude method for 12 of 12 sites/);
+    // A reply that drops the accuracy would clear every surveyed offset.
+    serve([
+      [/parameter_code=/, collection(sites.map((site) => series(site, "00065")))],
+      [/statistic_id=00021/, collection([tidal])],
+      [
+        /monitoring-locations/,
+        collection(
+          sites.map((site) =>
+            location(site, -81, 32, {
+              altitude: 10,
+              altitude_method_code: "L",
+              vertical_datum: "NAVD88",
+            }),
+          ),
+        ),
+      ],
+    ]);
+    await assert.rejects(usgs.stations(), /no altitude accuracy for 12 of 12 surveyed sites/);
     // A site a short answer left out is asked for again.
     let asked = 0;
     setTransport(async (url) => {
@@ -2824,6 +3263,50 @@ describe("usgs", () => {
       end: new Date(Date.now() - 90 * 86_400_000).toISOString(),
     }).properties;
     assert.equal(usgs.choose([paused, live]).get("USGS-01646500")!.parameter_code, "00065");
+  });
+
+  it("refuses a reply with more than 1 in 30 altitudes missing a method or accuracy, past 10", () => {
+    const sites = (n: number, bad: number, field: "method" | "accuracy") =>
+      Array.from({ length: n }, (_, i) => ({
+        altitude: 10,
+        altitude_method_code: field === "method" && i < bad ? null : "L",
+        altitude_accuracy: field === "accuracy" && i < bad ? null : 0.1,
+      }));
+    for (const field of ["method", "accuracy"] as const) {
+      // 1 in 30 of 600 is 20.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(600, 20, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(600, 21, field)), /of 600/);
+      // Under 300, up to 10 pass.
+      assert.doesNotThrow(() => usgs.checkAltitudes(sites(100, 10, field)));
+      assert.throws(() => usgs.checkAltitudes(sites(100, 11, field)));
+    }
+    // A site with no altitude isn't counted.
+    assert.doesNotThrow(() =>
+      usgs.checkAltitudes(
+        Array.from({ length: 50 }, () => ({
+          altitude: null,
+          altitude_method_code: null,
+          altitude_accuracy: null,
+        })),
+      ),
+    );
+  });
+
+  it("counts an altitude as surveyed only by a survey method accurate to under a foot", () => {
+    const surveyed = (altitude_method_code: string | null, altitude_accuracy: number | null) =>
+      usgs.isSurveyed({ altitude_method_code, altitude_accuracy });
+    // Every survey method counts under a foot, and none at a foot or more.
+    for (const code of ["L", "D", "G", "F", "W", "X", "Y", "Z"]) {
+      assert.equal(surveyed(code, 0.1), true);
+      assert.equal(surveyed(code, 1), false);
+    }
+    // With no accuracy, only corrected and survey-grade GPS count.
+    assert.equal(surveyed("D", null), true);
+    assert.equal(surveyed("F", null), true);
+    for (const code of ["G", "L", "W", "X", "Y", "Z"]) assert.equal(surveyed(code, null), false);
+    // Estimates, reported and unknown methods, and none.
+    for (const code of ["M", "N", "J", "A", "R", "U", null])
+      assert.equal(surveyed(code, 0.1), false);
   });
 
   it("notices a station's series or gage zero changing under the same datum name", () => {
@@ -2856,6 +3339,31 @@ describe("usgs", () => {
     );
     // A site that lists no altitude keeps its offsets.
     assert.equal(usgs.seriesChanged(committed, listed({ datums: {} })), null);
+    // A decided gage datum corrects the offset rather than moving the zero.
+    const boston = { id: "usgs/422206071033901", datum: "GAGE", datums: { NAVD88: -1.524 } };
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: { NAVD88: -32.516 } }),
+      ),
+      null,
+    );
+    // A decision set aside, because USGS lists another altitude, may be a moved zero.
+    assert.match(
+      usgs.seriesChanged(
+        { ...boston, datums: { NAVD88: -32.516 } } as never,
+        listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
+      )!,
+      /another altitude than GAGE_DATUMS decided/,
+    );
+    // Offsets the store held from before the decision aren't the decision's, so nothing moved from it.
+    assert.equal(
+      usgs.seriesChanged(
+        boston as never,
+        listed({ source_id: "422206071033901", datums: {}, no_datums: true }),
+      ),
+      null,
+    );
   });
 
   it("asks only for the years a station's series covers", async () => {
@@ -4210,8 +4718,53 @@ describe("ea", () => {
   beforeEach(() => ea.forgetArchive());
 
   it("lists each tide gauge's mAOD series, or its chart datum series where it has no other", async () => {
-    serve([[/id\/stations\?type=TideGauge/, fixture("ea-stations.json")]]);
-    const stations = await ea.stations();
+    // Heysham's and Jersey's series are listed with no latest reading; only Jersey's readings hold one.
+    const reading = (notation: string, latestReading?: object) => ({
+      "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}`,
+      ...(latestReading ? { latestReading } : {}),
+    });
+    const now = { dateTime: "2026-11-15T17:45:00Z", value: 1 };
+    serve([
+      [/id\/stations\?type=TideGauge/, fixture("ea-stations.json")],
+      [
+        /id\/measures\?qualifier=Tidal/,
+        JSON.stringify({
+          items: [
+            // Newlyn's series is left out, which retires nothing.
+            ...[
+              "E70039-level-tidal_level-Mean-15_min-mAOD",
+              "E71924-level-tidal_level-Mean-15_min-m",
+            ].map((n) => reading(n, now)),
+            reading("E70239-level-tidal_level-Mean-15_min-mAOD"),
+            reading("E73439-anglian-level-tidal_level-Mean-15_min-mAOD"),
+          ],
+        }),
+      ],
+      [
+        /E70239-level-tidal_level-Mean-15_min-mAOD\/readings\?since=/,
+        JSON.stringify({ items: [now] }),
+      ],
+      [
+        /E73439-anglian-level-tidal_level-Mean-15_min-mAOD\/readings\?since=/,
+        JSON.stringify({ items: [] }),
+      ],
+    ]);
+    // The store listed Newlyn's chart datum series, but not Jersey's.
+    const cd = (id: string, name: string, lat: number, lon: number) =>
+      ({ id, datum: "CD", name, lat, lon, same_as: [] }) as unknown as Station;
+    const stations = await ea.stations([cd("ea/E72224", "Newlyn", 50.1, -5.5)]);
+    assert.deepEqual(
+      stations.filter((s) => s.same_as.length).map((s) => [s.id, s.same_as]),
+      [["ea/E72239", ["ea/E72224"]]],
+    );
+    // A twin the EA no longer lists is found in the store by label, and a link the store holds stays.
+    const kept = await ea.stations([
+      cd("ea/E70299", "Jersey", 0, 0),
+      cd("ea/E79924", "Elsewhere", 0, 0),
+      { id: "ea/E72239", same_as: ["ea/E79924"] } as unknown as Station,
+    ]);
+    assert.deepEqual(kept.find((s) => s.id === "ea/E70239")!.same_as, ["ea/E70299"]);
+    assert.deepEqual(kept.find((s) => s.id === "ea/E72239")!.same_as, ["ea/E79924"]);
     assert.deepEqual(
       stations.map((s) => [s.id, s.name, s.datum, s.country_code, ea.measureOf(s)]),
       [
@@ -4230,6 +4783,73 @@ describe("ea", () => {
     );
     assert.equal(stations[0]!.interval_s, 900);
     assert.equal(stations[0]!.commercial_use, true);
+    assert.deepEqual(
+      stations.filter((s) => !s.live).map((s) => [s.id, s.status]),
+      [["ea/E73439-anglian", "inactive"]],
+    );
+  });
+
+  it("links Avonmouth Portbury's mAOD series to its chart datum one by label, 2 km apart", async () => {
+    // The EA's November 2026 answer for the gauge, and the store's listing of its old series.
+    const series = (notation: string, unit: string, lat: number, long: number) => ({
+      notation,
+      label: "Avonmouth Portbury",
+      lat,
+      long,
+      measures: {
+        "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}-level-tidal_level-Mean-15_min-${unit}`,
+        qualifier: "Tidal Level",
+        unitName: unit,
+        period: 900,
+      },
+    });
+    const reporting = (notation: string, unit: string) => ({
+      "@id": `http://environment.data.gov.uk/flood-monitoring/id/measures/${notation}-level-tidal_level-Mean-15_min-${unit}`,
+      latestReading: { dateTime: "2026-11-15T17:45:00Z", value: 1 },
+    });
+    serve([
+      [
+        /id\/stations\?type=TideGauge/,
+        JSON.stringify({
+          items: [
+            series("E72639", "mAOD", 51.49999, -2.728468),
+            series("E72624", "m", 51.50291, -2.6988),
+          ],
+        }),
+      ],
+      [
+        /id\/measures\?qualifier=Tidal/,
+        JSON.stringify({ items: [reporting("E72639", "mAOD"), reporting("E72624", "m")] }),
+      ],
+    ]);
+    const old = {
+      id: "ea/E72624",
+      datum: "CD",
+      name: "Avonmouth Portbury",
+      lat: 51.50291,
+      lon: -2.6988,
+      same_as: [],
+    } as unknown as Station;
+    const listed = await ea.stations([old]);
+    assert.deepEqual(
+      listed.map((s) => [s.id, s.same_as]),
+      [["ea/E72639", ["ea/E72624"]]],
+    );
+  });
+
+  it("refuses an answer where no station's series reports, which would retire every station", async () => {
+    const stations = JSON.parse(fixture("ea-stations.json")) as {
+      items: { measures?: { "@id": string } | { "@id": string }[] }[];
+    };
+    const silent = stations.items.flatMap((s) =>
+      [s.measures ?? []].flat().map((m) => ({ "@id": m["@id"] })),
+    );
+    serve([
+      [/id\/stations\?type=TideGauge/, fixture("ea-stations.json")],
+      [/id\/measures\?qualifier=Tidal/, JSON.stringify({ items: silent })],
+      [/\/readings/, JSON.stringify({ items: [] })],
+    ]);
+    await assert.rejects(ea.stations(), /EA reported no tidal readings/);
   });
 
   it("reads a station from stations.parquet, without the list's extra fields", async () => {
@@ -4299,6 +4919,81 @@ describe("ea", () => {
       now.map((v) => [new Date(v.time).toISOString(), v.level]),
       [[recent, 1.25]],
     );
+  });
+
+  it("waits out the archive's 429s, then stops the run once it keeps refusing", async () => {
+    const pacing = { ...ea.archivePacing };
+    ea.archivePacing.blockedMs = 5;
+    try {
+      const measure = "E72239-level-tidal_level-Mean-15_min-mAOD";
+      let refusals = 2;
+      setTransport(async (url) => {
+        if (/readings-2025-11-10\.csv$/.test(url)) {
+          if (refusals-- > 0) throw new Error(`GET ${url} returned 429`);
+          return fixture("ea-archive.csv");
+        }
+        throw new Error(`GET ${url} returned 404`);
+      });
+      // Refused twice, then served on the third of three tries.
+      const day = await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z"));
+      assert.equal(day.length, 3);
+
+      ea.forgetArchive();
+      let asked = 0;
+      setTransport(async (url) => {
+        asked++;
+        throw new Error(`GET ${url} returned 429`);
+      });
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z")),
+        (error) => error instanceof Blocked && /still refusing/.test(error.message),
+      );
+      assert.equal(asked, 3);
+      // Every download after asks for nothing.
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-12Z"), new Date("2025-11-13Z")),
+        Blocked,
+      );
+      assert.equal(asked, 3);
+
+      // A refusal holds a download already under way, which waits before it sends.
+      ea.forgetArchive();
+      ea.archivePacing.blockedMs = 40;
+      const sent: [string, number][] = [];
+      let refusedAt = 0;
+      let first = true;
+      setTransport(async (url, options) => {
+        const day = /readings-(\d{4}-\d\d-\d\d)/.exec(url)![1]!;
+        if (day === "2025-11-11") await new Promise((resolve) => setTimeout(resolve, 10));
+        await options.pace?.();
+        sent.push([day, Date.now()]);
+        if (day === "2025-11-10" && first) {
+          first = false;
+          refusedAt = Date.now();
+          throw new Error(`GET ${url} returned 429`);
+        }
+        return day === "2025-11-10" ? fixture("ea-archive.csv") : OTHER_GAUGE;
+      });
+      await ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-12Z"));
+      const next = sent.find(([day]) => day === "2025-11-11")!;
+      assert.ok(next[1] - refusedAt >= 35, `sent ${next[1] - refusedAt} ms into the hold`);
+
+      // A Retry-After past the longest hold stops the run at once.
+      ea.forgetArchive();
+      asked = 0;
+      setTransport(async (url) => {
+        asked++;
+        throw new Error(`GET ${url} returned 429 (retry after 3600 s)`);
+      });
+      await assert.rejects(
+        ea.levels(measure, new Date("2025-11-10Z"), new Date("2025-11-11Z")),
+        Blocked,
+      );
+      assert.equal(asked, 1);
+    } finally {
+      Object.assign(ea.archivePacing, pacing);
+      ea.forgetArchive();
+    }
   });
 
   it("reads no archive file for a start within the API's days", async () => {
