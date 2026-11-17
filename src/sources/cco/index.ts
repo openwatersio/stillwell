@@ -17,6 +17,8 @@ import {
  */
 const API = "https://coastalmonitoring.org/observations";
 const HOUR_MS = 3_600_000;
+/** Levels a gauge sends where it has none, besides 9999 and ±999.9999. */
+const FILL = new Set([99.999, -99.999, -10]);
 /** The most hours one site's request covers; the API caps a longer one. */
 const MAX_HOURS = 8760;
 
@@ -215,16 +217,29 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
           : text;
       if (typeof level !== "number" || !Number.isFinite(level))
         throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
-      // Fill values, 9999 and ±999.9999 (erratum `cco-fill-values`); no tide reaches 999 m.
-      if (Math.abs(level) >= 999) continue;
-      if (time >= start.getTime() && time < end.getTime())
-        out.set(time, { time, level, flag: flagOf(p?.QCflag) });
+      // Fill values (erratum `cco-fill-values`): 9999 and ±999.9999, which no tide reaches, and the exact ±99.999 and −10 that gauges send in their place.
+      if (Math.abs(level) >= 999 || FILL.has(level)) continue;
+      out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }
     // Each request starts one reading inside the last, so a reading at the edge the API leaves out of a window isn't lost; the Map drops the repeat.
     if (cursor - hours * HOUR_MS <= start.getTime()) break;
     cursor -= hours * HOUR_MS - 600_000;
   }
-  return [...out.values()].sort((a, b) => a.time - b.time);
+  // The same reading twice, a second apart (erratum `cco-duplicate-stamps`): keep the first. This runs on every
+  // reading the requests brought, so the pair's first stays whichever window asked for it, but for a window whose own edge falls between the two stamps.
+  const kept: Observation[] = [];
+  for (const o of [...out.values()].sort((a, b) => a.time - b.time)) {
+    const last = kept.at(-1);
+    // Levels differ in tenths of a millimeter as integers, so a pair 5 mm apart falls on one side whatever the doubles round to.
+    if (
+      last &&
+      o.time - last.time <= 2000 &&
+      Math.round(Math.abs(o.level - last.level) * 10_000) <= 50
+    )
+      continue;
+    kept.push(o);
+  }
+  return kept.filter((o) => o.time >= start.getTime() && o.time < end.getTime());
 }
 
 /** A `YYYYMMDD#hhmmss` stamp, in UTC, as milliseconds; null where it isn't a real time. */
