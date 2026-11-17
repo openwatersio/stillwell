@@ -71,7 +71,8 @@ describe("IGN", () => {
     assert.equal(list.find((s) => s.source_id === "ALAC1-0301")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "ALAC1-0702")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "TN013")!.datums.NMMA, undefined);
-    assert.ok(list.every((s) => !s.commercial_use));
+    assert.ok(list.every((s) => s.commercial_use));
+    assert.ok(list.every((s) => s.license === "CC-BY-4.0"));
     assert.equal(ign.metadata.license.redistribution, true);
     assert.ok(alac.same_as.includes("ign/ALAC1-1633"));
   });

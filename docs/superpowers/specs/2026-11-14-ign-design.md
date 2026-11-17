@@ -16,7 +16,7 @@ Use a normal `ign` source adapter. Follow JMA's provisional/final distinction, C
 - Read reviewed `procesados/integros` and `horarios` files, preferring minute values at shared timestamps on the same reference. Read raw sensor archives separately and poll the newer radar for live values. Raw and reviewed series link through `same_as`.
 - Store meters increasing upward. Retain Join Mark as the reference for reviewed series. Raw readings may join them only with an evidenced sensor-to-JM conversion; never infer a surveyed offset from a mean difference. Preserve separately referenced series where the source does not establish a conversion.
 - Publish NMMA offsets only where the station sheet establishes that reference. Island orthometric heights alone do not establish NMMA.
-- Keep commercial use false pending IGN's confirmation. Record the README's attribution condition and distinguish it from the broader IGN license.
+- Use CC BY 4.0 with commercial use and redistribution permitted, as confirmed by IGN on 17 November 2026 in issue #181. Preserve the server README’s credit and IGN’s citation formula.
 - Link verified GESLA counterparts through existing same-as rules and decisions. Use shared preferred-series ranking.
 - Include recorded-response tests, source documentation, a canary, registry integration, and the planning research-table entry.
 
