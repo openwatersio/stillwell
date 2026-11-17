@@ -18,7 +18,7 @@ import {
 const API = "https://coastalmonitoring.org/observations";
 const HOUR_MS = 3_600_000;
 /** Levels a gauge sends where it has none, besides 9999 and ±999.9999. */
-const FILL = new Set([99.999, -99.999, -10]);
+const FILL = new Set([99.999, -99.999, -10, -9.99999]);
 /** The most hours one site's request covers; the API caps a longer one. */
 const MAX_HOURS = 8760;
 
@@ -217,7 +217,7 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
           : text;
       if (typeof level !== "number" || !Number.isFinite(level))
         throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
-      // Fill values (erratum `cco-fill-values`): 9999 and ±999.9999, which no tide reaches, and the exact ±99.999 and −10 that gauges send in their place.
+      // Fill values (erratum `cco-fill-values`): 9999 and ±999.9999, which no tide reaches, and the exact ±99.999, −10 and −9.99999 that gauges send in their place.
       if (Math.abs(level) >= 999 || FILL.has(level)) continue;
       out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }
