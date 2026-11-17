@@ -8,7 +8,7 @@
       "response": "The station refresh moves it to 50.70888, −2.76411, listed in `POSITIONS` in `src/positions.ts`. If CCO moves the station, the refresh reports the entry and fails the run until a person checks it.",
       "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. No answer yet."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: its coastal monitoring team will check whether the listed position is the sensor's actual position or a mistake."
     },
     {
       "id": "cco-fill-values",
@@ -18,7 +18,7 @@
       "response": "A level of 999 m or more in either direction is left out as missing, as is 9999.",
       "evidence": "One year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of these sites, and the other nine sites, weren't scanned.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. No answer yet."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: it is importing quality-controlled data, which may resolve it."
     },
     {
       "id": "cco-empty-window-answers",
@@ -28,7 +28,7 @@
       "response": "The adapter reads the first as no values. The second is an error, so a backfill of those two sites starts at their first year (README, Running ingest).",
       "evidence": "Requests of 2026-11-16: Herne Bay for 1 June 2001 answers the first body; Lymington for 1 June 2008 and Brighton for 1 June 2005 answer 500 with `Internal Server Error`.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. No answer yet."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: it expects this to be a quick fix."
     }
   ],
   "retired": []
