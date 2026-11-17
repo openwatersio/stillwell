@@ -11,18 +11,18 @@ Tide levels every 10 minutes at 15 gauges of the National Network of Regional Co
 - **Datum:** `CD`, chart datum: `value` is meters above Chart Datum. The tide QC manual measures from Ordnance Datum Newlyn and adds the Admiralty Tide Tables' offset, so there are no `datums` yet. Whitby Harbour's 2023 levels against BODC's Whitby, 150 m away and in Admiralty Chart Datum, differ by −0.13 m on average, so both are in chart datum, where Ordnance Datum would differ by meters on this coast. The other 14 gauges have no gauge of another originator to compare with, and their levels are positive through the cycle, 9.5 m near high water at Penarth and 2.3 to 5.5 m between a day's low and high water at Brighton, as heights above chart datum are and heights above Ordnance Datum Newlyn, which centers on zero, are not.
 - **Levels:** `GET /observations/tides/<YYYYMMDDhhmmss>.geojson?sensor=<id>&duration=<hours>` answers with every reading from `duration` hours before the time up to the time, both ends included, newest first, as one feature each, with `id`, `date`, `value` and `QCflag`. The adapter asks a year at a time, from the end back, a second apart, each request starting one reading inside the last. `id`, `value` and `QCflag` arrive as text, such as `"3.88300"` and `"1"`. A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON, and reads as no values. An answer whose features carry none of the site's id, or a date or value it can't read, fails the request rather than read as no values. A `value` of null or empty, or of 999 m or more either way, is not stored: CCO's levels hold 999.9999 and −999.9999 where a gauge sent nothing; Port Isaac's last readings, to 31 October 2026, have no value and flag 9.
 - **Interval:** 10 minutes now. Brighton's readings are 5 minutes apart in 2006 and 2010, and a day of Scarborough's in 2008 holds 288 readings. `interval_s` is 600. `min_interval_s` is 3600, since Stillwell told the observatory it reads each site once an hour.
-- **Archive:** the API's readings start on the dates below, the earliest reading in the store. GESLA's CCO records start earlier than the API's at Herne Bay (March 1996, against December 2004 here) and Lymington (2007, against 2009), and later at Brighton (2018), Scarborough (2012), Second Severn Crossing (2012) and Penarth (2021).
+- **Archive:** the table gives each site's first reading in the store, in UTC. Herne Bay's is the API's own start, since a request for the day before answers with no readings. A request for a window that starts before Brighton's or Lymington's first reading answers 500, so their backfills start the day after the API's first reading (about 11 February 2006 and 12 February 2009), and the store lacks up to a day of each. GESLA's CCO records start earlier than the API's at Herne Bay (March 1996, against January 2005 here) and Lymington (2007, against 2009), and later at Brighton (2018), Scarborough (2012), Second Severn Crossing (2012) and Penarth (2021).
 
-  | Site                  | First reading | Site                         | First reading |
-  | --------------------- | ------------: | ---------------------------- | ------------: |
-  | Herne Bay (89)        |    2004-12-31 | Port Isaac (102)             |    2010-06-30 |
-  | Deal Pier (90)        |    2005-09-15 | Second Severn Crossing (106) |    2011-06-29 |
-  | Brighton (88)         |    2006-02-11 | Whitby Harbour (112)         |    2013-06-11 |
-  | Scarborough (111)     |    2006-10-12 | Exmouth (117)                |    2015-09-25 |
-  | Sandown Pier (92)     |    2006-05-04 | Hastings Pier (126)          |    2017-01-27 |
-  | Swanage Pier (93)     |    2007-03-07 | Penarth (119)                |    2017-03-14 |
-  | West Bay Harbour (95) |    2008-01-25 | Arun Platform (86)           |    2008-05-14 |
-  | Lymington (87)        |    2009-02-12 |                              |               |
+  | Site                  | First reading (UTC) | Site                         | First reading (UTC) |
+  | --------------------- | ------------------: | ---------------------------- | ------------------: |
+  | Herne Bay (89)        |    2005-01-01 00:00 | Port Isaac (102)             |    2010-06-30 11:26 |
+  | Deal Pier (90)        |    2005-09-16 00:00 | Second Severn Crossing (106) |    2011-06-29 14:10 |
+  | Brighton (88)         |    2006-02-12 00:00 | Whitby Harbour (112)         |    2013-06-11 14:20 |
+  | Sandown Pier (92)     |    2006-05-04 13:59 | Exmouth (117)                |    2015-09-25 09:00 |
+  | Scarborough (111)     |    2006-10-12 15:51 | Hastings Pier (126)          |    2017-01-27 14:50 |
+  | Swanage Pier (93)     |    2007-03-07 14:51 | Penarth (119)                |    2017-03-14 15:30 |
+  | West Bay Harbour (95) |    2008-01-25 14:21 | Arun Platform (86)           |    2008-05-14 16:09 |
+  | Lymington (87)        |    2009-02-13 00:06 |                              |                     |
 
   Several sites have gaps within these years: the 24 hours to 1 July 2024 hold one Herne Bay reading, and the 24 hours to 1 June 2015 none of Brighton's.
 
@@ -36,7 +36,7 @@ The Ingest, Ingest hourly, Monthly and Canary workflows pass `CCO_API_KEY` and `
 
 ### Backfill
 
-The station list refreshes on the 2nd of each month by the Monthly workflow; dispatch Monthly with `sources` set to `cco` before the first backfill. Brighton and Lymington answer 500 for a window that starts before their first reading, so a year they begin in starts the day after, and the years before 2009 of the sites that have them run by name. Every run takes `--concurrency 1`, and the adapter sends one request at a time whatever the run says. A full backfill is about 11 million rows and takes about an hour:
+The station list refreshes on the 2nd of each month by the Monthly workflow; dispatch Monthly with `sources` set to `cco` before the first backfill. Brighton and Lymington answer 500 for a window that starts before their first reading, so a year they begin in starts the day after their first reading, and the years before 2009 of the sites that have them run by name. Every run takes `--concurrency 1`, and the adapter sends one request at a time whatever the run says. A full backfill is about 11 million rows and takes about an hour:
 
 ```bash
 node scripts/ingest.ts backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
