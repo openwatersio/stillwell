@@ -102,14 +102,26 @@ interface Feature {
   };
 }
 
+/** The last request's end: the next one starts after it, so the observatory sees one request at a time. */
+let inFlight: Promise<unknown> = Promise.resolve();
+
+/** Runs one request at a time, however many stations a run reads at once. */
+function alone<T>(request: () => Promise<T>): Promise<T> {
+  const turn = inFlight.then(request, request);
+  inFlight = turn.catch(() => undefined);
+  return turn;
+}
+
 async function tides(time: string, query = "", hours?: number): Promise<Feature[]> {
-  const text = await getText(`${API}/tides/${time}.geojson${query}`, {
-    fresh: true,
-    pace,
-    headers: credentials(),
-    // A year of one site can take minutes to answer; a short window or the list shouldn't hold a run for that long.
-    timeout: hours !== undefined && hours > 24 ? 900 : undefined,
-  });
+  const text = await alone(() =>
+    getText(`${API}/tides/${time}.geojson${query}`, {
+      fresh: true,
+      pace,
+      headers: credentials(),
+      // A year of one site can take minutes to answer; a short window or the list shouldn't hold a run for that long.
+      timeout: hours !== undefined && hours > 24 ? 900 : undefined,
+    }),
+  );
   // A window with no readings answers `{"type":"FeatureCollection","features":]}`, which isn't JSON (erratum `cco-empty-window-answers`).
   if (/"features"\s*:\s*\]/.test(text)) return [];
   const body = JSON.parse(text) as { features?: Feature[] };
