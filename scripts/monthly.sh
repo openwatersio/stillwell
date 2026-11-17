@@ -122,10 +122,11 @@ refetch() {
     # copy reaches a gauge's last months after it leaves the latest window; one that stopped earlier asks for
     # nothing past its last day.
     cmems) which=all from=$(date -u -d "$year-$month-01 -6 months" +%F) && set -- "$(date -u -d "$year-$month-01 +1 month" +%F)" --with-inactive ;;
-    # CCO's monthly check flags the readings of a finished month, but only from 2026 on; older readings stay
-    # preliminary for good, so reading from the earliest preliminary reading would fetch the whole archive each
-    # month, and a station with none preliminary would be left out. Every active station is read again from 12
-    # months back to this month, finished years included.
+    # CCO flags the readings of a finished month within weeks, and its quality-controlled archive arrives in
+    # blocks of years, so a flag can reach an old year at any time, which only a backfill by hand reads again.
+    # Reading from the earliest preliminary reading would fetch the whole archive each month, and a station with
+    # none preliminary would be left out, so every active station is read again from 12 months back to this
+    # month, finished years included.
     cco) which=all from=$(date -u -d "$year-$month-01 -12 months" +%F) && set -- "$year-$month-01" --refetch ;;
     # BOM isn't hourly: its archives are rebuilt about monthly, weeks behind, and a finished year's again in the
     # new year's first weeks, and nothing else brings its new values, so every active gauge is read again from the
