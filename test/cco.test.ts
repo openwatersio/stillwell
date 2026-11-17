@@ -119,7 +119,7 @@ describe("cco", () => {
     const reading = (n: number, QCflag: unknown, value: unknown = "1.5") => ({
       properties: {
         id: "90",
-        date: `20261114#00${String(n * 3).padStart(2, "0")}00`,
+        date: `20261114#00${String(n * 2).padStart(2, "0")}00`,
         value,
         QCflag,
       },
@@ -148,6 +148,9 @@ describe("cco", () => {
             reading(14, "1", "9999"),
             reading(16, "1", "999.9999"),
             reading(17, "1", "-999.9999"),
+            reading(18, "1", "99.99900"),
+            reading(19, "1", "-99.999"),
+            reading(20, "1", "-10.00000"),
             reading(15, "1", " "),
           ],
         }),
@@ -190,6 +193,40 @@ describe("cco", () => {
     const day = [new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z")] as const;
     await Promise.all(["86", "87", "88", "89", "90"].map((id) => cco.levels(id, ...day)));
     assert.equal(most, 1);
+  });
+
+  it("keeps the first of a reading stamped twice a second apart, and both when the levels differ", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            at("20261114#000002", "2.081"),
+            at("20261114#000003", "2.080"),
+            at("20261114#001002", "2.100"),
+            at("20261114#001003", "2.900"),
+            at("20261114#002000", "2.200"),
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => [new Date(o.time).toISOString().slice(11, 19), o.level]),
+      [
+        ["00:00:02", 2.081],
+        ["00:10:02", 2.1],
+        ["00:10:03", 2.9],
+        ["00:20:00", 2.2],
+      ],
+    );
   });
 
   it("asks a year at a time", async () => {
