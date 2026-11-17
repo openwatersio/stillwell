@@ -178,6 +178,20 @@ describe("cco", () => {
     assert.ok(out.every((o) => o.level === 1.5));
   });
 
+  it("sends one request at a time, however many sites are read at once", async () => {
+    let running = 0;
+    let most = 0;
+    setTransport(async () => {
+      most = Math.max(most, ++running);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      running--;
+      return fixture("cco-tides-empty.geojson");
+    });
+    const day = [new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z")] as const;
+    await Promise.all(["86", "87", "88", "89", "90"].map((id) => cco.levels(id, ...day)));
+    assert.equal(most, 1);
+  });
+
   it("asks a year at a time", async () => {
     serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
     await cco.levels("90", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));
