@@ -229,6 +229,26 @@ describe("cco", () => {
     );
   });
 
+  it("drops the second of a doubled reading even when the window starts between the two", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [at("20261114#112002", "2.081"), at("20261114#112003", "2.080")],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T11:20:03Z"),
+      new Date("2026-11-14T11:30:00Z"),
+    );
+    assert.deepEqual(out, []);
+  });
+
   it("asks a year at a time", async () => {
     serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
     await cco.levels("90", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));

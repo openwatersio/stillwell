@@ -219,21 +219,21 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
         throw new Error(`CCO reading of site ${sourceId} has value ${p?.value}`);
       // Fill values (erratum `cco-fill-values`): 9999 and ±999.9999, which no tide reaches, and the exact ±99.999 and −10 that gauges send in their place.
       if (Math.abs(level) >= 999 || FILL.has(level)) continue;
-      if (time >= start.getTime() && time < end.getTime())
-        out.set(time, { time, level, flag: flagOf(p?.QCflag) });
+      out.set(time, { time, level, flag: flagOf(p?.QCflag) });
     }
     // Each request starts one reading inside the last, so a reading at the edge the API leaves out of a window isn't lost; the Map drops the repeat.
     if (cursor - hours * HOUR_MS <= start.getTime()) break;
     cursor -= hours * HOUR_MS - 600_000;
   }
-  // The same reading twice, a second apart (erratum `cco-duplicate-stamps`): keep the first.
+  // The same reading twice, a second apart (erratum `cco-duplicate-stamps`): keep the first. This runs on every
+  // reading the requests brought, so the pair's first stays whichever window asked for it.
   const kept: Observation[] = [];
   for (const o of [...out.values()].sort((a, b) => a.time - b.time)) {
     const last = kept.at(-1);
     if (last && o.time - last.time <= 2000 && Math.abs(o.level - last.level) <= 0.005) continue;
     kept.push(o);
   }
-  return kept;
+  return kept.filter((o) => o.time >= start.getTime() && o.time < end.getTime());
 }
 
 /** A `YYYYMMDD#hhmmss` stamp, in UTC, as milliseconds; null where it isn't a real time. */
