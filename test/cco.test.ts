@@ -249,6 +249,38 @@ describe("cco", () => {
     assert.deepEqual(out, []);
   });
 
+  it("treats a pair exactly 5 mm apart the same whatever the doubles round to", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            at("20261114#000002", "8.340"),
+            at("20261114#000003", "8.345"),
+            at("20261114#001002", "8.340"),
+            at("20261114#001003", "8.346"),
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => [new Date(o.time).toISOString().slice(14, 19), o.level]),
+      [
+        ["00:02", 8.34],
+        ["10:02", 8.34],
+        ["10:03", 8.346],
+      ],
+    );
+  });
+
   it("asks a year at a time", async () => {
     serve([[/tides\//, fixture("cco-tides-empty.geojson")]]);
     await cco.levels("90", new Date("2024-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"));

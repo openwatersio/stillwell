@@ -226,11 +226,17 @@ export async function levels(sourceId: string, start: Date, end: Date): Promise<
     cursor -= hours * HOUR_MS - 600_000;
   }
   // The same reading twice, a second apart (erratum `cco-duplicate-stamps`): keep the first. This runs on every
-  // reading the requests brought, so the pair's first stays whichever window asked for it.
+  // reading the requests brought, so the pair's first stays whichever window asked for it, but for a window whose own edge falls between the two stamps.
   const kept: Observation[] = [];
   for (const o of [...out.values()].sort((a, b) => a.time - b.time)) {
     const last = kept.at(-1);
-    if (last && o.time - last.time <= 2000 && Math.abs(o.level - last.level) <= 0.005) continue;
+    // Levels differ in tenths of a millimeter as integers, so a pair 5 mm apart falls on one side whatever the doubles round to.
+    if (
+      last &&
+      o.time - last.time <= 2000 &&
+      Math.round(Math.abs(o.level - last.level) * 10_000) <= 50
+    )
+      continue;
     kept.push(o);
   }
   return kept.filter((o) => o.time >= start.getTime() && o.time < end.getTime());

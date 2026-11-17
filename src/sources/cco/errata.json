@@ -20,8 +20,8 @@
       "id": "cco-duplicate-stamps",
       "stations": ["cco/87", "cco/95", "cco/102"],
       "handling": "dropped",
-      "error": "For stretches of 2011 at West Bay Harbour and of 2010 and 2011 at Port Isaac, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, 6,504 of them within 5 mm and 6,154 within 2 mm, and Port Isaac 4,184, 4,082 within 5 mm and 3,442 within 2 mm. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
-      "response": "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: 10,588 readings. A pair whose levels differ by more is kept.",
+      "error": "For stretches of 2011 at West Bay Harbour and of 2010 and 2011 at Port Isaac, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, about 6,500 of them within 5 mm and about 6,150 within 2 mm, and Port Isaac 4,184, about 4,100 within 5 mm and about 3,450 within 2 mm, counted on the stored levels, which are single-precision. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
+      "response": "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 10,600 readings. A pair whose levels differ by more is kept.",
       "evidence": "Every stored CCO reading, read on 2026-11-17, compared with the one before it at the same site: West Bay Harbour on 30 March 2011 has 11:20:02 and 11:20:03, 2.081 and 2.080 m, then 11:30:02 and 11:30:03, 2.099 m twice."
     },
     {
