@@ -120,6 +120,278 @@ describe("rws", () => {
     );
   });
 
+  it("reads every series of readings RWS answers a year with, and no mean", async () => {
+    const msl = { ...nap, Hoedanigheid: { Code: "MSL" } };
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    const times = [
+      "2023-01-01T01:00:00.000+01:00",
+      "2023-06-01T10:30:00.000+01:00",
+      "2023-12-30T23:50:00.000+01:00",
+      "2023-12-31T00:00:00.000+01:00",
+      "2023-12-31T08:00:00.000+01:00",
+    ];
+    const other = { ...msl, MeetApparaat: { Code: "155" } };
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Listed first, as at Katsbinnen in 1999: another instrument fills a time the fuller
+          // series lacks, and loses where both have one. Its sentinel isn't a value.
+          [
+            other,
+            [
+              [times[0]!, 99],
+              [times[1]!, 99],
+              [times[2]!, 999_999_999],
+            ],
+          ],
+          // The finest series: it wins where both have a time.
+          [
+            msl,
+            [
+              times[0]!,
+              "2023-01-01T01:10:00.000+01:00",
+              "2023-01-01T01:20:00.000+01:00",
+              times[2]!,
+            ].map((t) => [t, 10]),
+          ],
+          // A second part with the same metadata, as at Goeree Lichteiland in 2023.
+          [msl, [[times[3]!, 20]]],
+          // A daily mean, as at Maastricht Borgharen in 1988, isn't a reading.
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[4]!, 30]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.levels("goeree.lichteiland", ...range, { datum: "MSL" })).map((l) => [
+        new Date(l.time).toISOString(),
+        l.level,
+      ]),
+      [
+        ["2023-01-01T00:00:00.000Z", 0.1],
+        ["2023-01-01T00:10:00.000Z", 0.1],
+        ["2023-01-01T00:20:00.000Z", 0.1],
+        ["2023-06-01T09:30:00.000Z", 0.99],
+        ["2023-12-30T22:50:00.000Z", 0.1],
+        ["2023-12-30T23:00:00.000Z", 0.2],
+      ],
+    );
+    // Extremes take series that follow each other, and leave out one that overlaps, as Hoek van
+    // Holland's second selection of the same tides does in early 2024.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // The fuller selection, as Hoek van Holland's 314 extremes are against 224.
+          [
+            typeChannel,
+            [times[0]!, "2023-03-01T00:00:00.000+01:00", times[2]!].map((t) => [t, "hoogwater"]),
+          ],
+          // The overlapping selection labels a shared time otherwise; the fuller one's label wins.
+          [
+            typeChannel,
+            [
+              [times[1]!, "laagwater"],
+              [times[2]!, "laagwater"],
+            ],
+          ],
+          [typeChannel, [[times[3]!, "laagwater"]]],
+          [msl, [times[0]!, times[2]!].map((t) => [t, 10])],
+          [msl, [[times[1]!, 99]]],
+          [msl, [[times[3]!, 20]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" })).map((e) => [
+        e.type,
+        e.level,
+      ]),
+      [
+        ["high", 0.1],
+        ["high", 0.1],
+        ["low", 0.2],
+      ],
+    );
+    // Extremes whose only heights in the datum are a mean aren't a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }), []);
+    // But a mean in the datum doesn't hide readings that are now in another.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [typeChannel, [[times[0]!, "hoogwater"]]],
+          [{ ...msl, WaardeBewerkingsMethode: { Code: "GEM24H" } }, [[times[0]!, 10]]],
+          [nap, [[times[0]!, 10]]],
+        ),
+      ],
+    ]);
+    await assert.rejects(
+      rws.extremes("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /extremes are in NAP, not MSL/,
+    );
+    // A way of deriving values the adapter doesn't know fails rather than vanish.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([{ ...msl, WaardeBewerkingsMethode: { Code: "GEM10M" } }, [[times[0]!, 10]]]),
+      ],
+    ]);
+    await assert.rejects(
+      rws.levels("goeree.lichteiland", ...range, { datum: "MSL" }),
+      /unknown WaardeBewerkingsMethode GEM10M/,
+    );
+  });
+
+  it("keeps a finer series' value where a coarser one with more values shares its time", async () => {
+    // A staff gauge read once a day for 30 days, and a 10-minute gauge that runs 07:00 to 08:50 on 2 of them.
+    const at = (d: number, h: number, m: number) =>
+      `2023-03-${String(d).padStart(2, "0")}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00.000+01:00`;
+    const daily = Array.from({ length: 30 }, (_, i) => [at(i + 1, 8, 0), 50] as [string, number]);
+    const tenMinute: [string, number][] = [];
+    for (const d of [4, 5])
+      for (let m = 7 * 60; m < 9 * 60; m += 10)
+        tenMinute.push([at(d, Math.floor(m / 60), m % 60), 20]);
+    // A burst from a third instrument: two values 5 minutes apart, finer than the gauge, one at a shared time.
+    const burst: [string, number][] = [
+      [at(4, 8, 0), 77],
+      [at(4, 8, 5), 77],
+    ];
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          [{ ...nap, MeetApparaat: { Code: "burst" } }, burst],
+          [{ ...nap, MeetApparaat: { Code: "peilschaal" } }, daily],
+          [{ ...nap, MeetApparaat: { Code: "vlotter" } }, tenMinute],
+        ),
+      ],
+    ]);
+    const levels = await rws.levels(
+      "x",
+      new Date("2023-03-01T00:00:00Z"),
+      new Date("2023-04-01T00:00:00Z"),
+    );
+    const level = (iso: string) => levels.find((l) => l.time === Date.parse(iso))?.level;
+    // 24 ten-minute values against 30 daily ones: the 10-minute value wins at 08:00, over the burst too.
+    assert.equal(level("2023-03-04T07:00:00.000Z"), 0.2);
+    assert.equal(level("2023-03-05T07:00:00.000Z"), 0.2);
+    // The daily series fills the days the 10-minute one lacks.
+    assert.equal(level("2023-03-01T07:00:00.000Z"), 0.5);
+    assert.equal(level("2023-03-30T07:00:00.000Z"), 0.5);
+    // The burst spans less than a day, so it ranks last and only fills a time the others lack.
+    assert.equal(level("2023-03-04T07:05:00.000Z"), 0.77);
+    assert.equal(levels.length, 30 - 2 + 24 + 1);
+  });
+
+  it("ranks extremes selections by real values, not by entries", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // Padded with missing-value sentinels: 4 entries, 1 value, inside the other's span.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "hoogwater"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          // Overlapping it, with 3 values.
+          [typeChannel, [2, 8, 11].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [2, 8, 11].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    const extremes = await rws.extremes(
+      "hoekvanholland",
+      new Date("2023-12-31T00:00:00Z"),
+      new Date("2024-01-02T00:00:00Z"),
+    );
+    assert.deepEqual(
+      extremes.map((e) => [new Date(e.time).toISOString(), e.type]),
+      [
+        ["2024-01-01T01:00:00.000Z", "high"],
+        ["2024-01-01T07:00:00.000Z", "low"],
+        ["2024-01-01T10:00:00.000Z", "high"],
+      ],
+    );
+  });
+
+  it("labels the chosen heights from the selection that matches them, and reads an outage as an outage", async () => {
+    const t = (h: number) => `2024-01-01T${String(h).padStart(2, "0")}:00:00.000+01:00`;
+    const range = [new Date("2023-12-31T00:00:00Z"), new Date("2024-01-02T00:00:00Z")] as const;
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer(
+          // More labels, but only one real height: its labels mustn't win at the other's times.
+          [typeChannel, [1, 5, 7, 10].map((h) => [t(h), "topagger"])],
+          [
+            nap,
+            [
+              [t(1), 999_999_999],
+              [t(5), 100],
+              [t(7), 999_999_999],
+              [t(10), 999_999_999],
+            ],
+          ],
+          [typeChannel, [1, 7, 10].map((h, i) => [t(h), i % 2 ? "laagwater" : "hoogwater"])],
+          [nap, [1, 7, 10].map((h) => [t(h), 50])],
+        ),
+      ],
+    ]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => [
+        new Date(e.time).toISOString(),
+        e.type,
+      ]),
+      [
+        ["2024-01-01T00:00:00.000Z", "high"],
+        ["2024-01-01T06:00:00.000Z", "low"],
+        ["2024-01-01T09:00:00.000Z", "high"],
+      ],
+    );
+    // A type entry holding a missing-value sentinel isn't a label, however many such entries a selection has.
+    const padded = JSON.parse(
+      answer(
+        // Labels at exactly the chosen heights' times, each holding a sentinel.
+        [typeChannel, [1, 7, 10].map((h) => [t(h), "topagger"])],
+        // Real labels, with one more at a time with no height.
+        [typeChannel, [1, 4, 7, 10].map((h) => [t(h), h === 7 ? "laagwater" : "hoogwater"])],
+        [nap, [1, 7, 10].map((h) => [t(h), 50])],
+      ),
+    );
+    for (const m of padded.WaarnemingenLijst[0].MetingenLijst)
+      m.Meetwaarde.Waarde_Numeriek = 999_999_999;
+    serve([[/OphalenWaarnemingen/, JSON.stringify(padded)]]);
+    assert.deepEqual(
+      (await rws.extremes("hoekvanholland", ...range)).map((e) => e.type),
+      ["high", "low", "high"],
+    );
+    // Heights in the datum that are all sentinels are an outage, not a datum change.
+    serve([
+      [
+        /OphalenWaarnemingen/,
+        answer([typeChannel, [[t(5), "hoogwater"]]], [nap, [[t(5), 999_999_999]]]),
+      ],
+    ]);
+    assert.deepEqual(await rws.extremes("hoekvanholland", ...range), []);
+  });
+
   it("reads both lows of a double low water, and not the rise between them", async () => {
     const times = [
       "2024-01-01T02:00:00+01:00",
