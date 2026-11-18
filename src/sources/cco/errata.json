@@ -8,7 +8,7 @@
       "response": "The station refresh moves it to 50.70888, −2.76411, listed in `POSITIONS` in `src/positions.ts`. If CCO moves the station, the refresh reports the entry and fails the run until a person checks it.",
       "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: its coastal monitoring team will check whether the listed position is the sensor's actual position or a mistake."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory confirmed on 2026-11-18 that the position in its station record is wrong, gave the gauge's position as 50.70888, −2.76411, and said it will correct the record."
     },
     {
       "id": "cco-fill-values",
@@ -18,7 +18,7 @@
       "response": "A level of 999 m or more in either direction, or exactly 99.999, −99.999 or −10, is left out as missing, as is 9999. No tide reaches those, and no gauge here reads exactly −10.",
       "evidence": "Every stored CCO reading, 13.1 million from 2005 to 2026, read on 2026-11-17: the sentinels above, found by the exact level. 999.9999 and −999.9999 were found in one year of readings at six sites, 2013 to 2020, read from the API on 2026-11-16: Deal Pier 2015, Arun Platform 2012, Brighton 2020, Swanage Pier 2018, Exmouth 2019 and Hastings Pier 2019. The other years of those, and the other sites, weren't scanned from the API.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: it is importing quality-controlled data, which may resolve it."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that these were old raw readings and that its quality-controlled annual files now replace them at Deal, Brighton, Exmouth, Hastings and Swanage Pier; a missing valid reading is now null with its QC flag."
     },
     {
       "id": "cco-duplicate-stamps",
@@ -26,7 +26,9 @@
       "handling": "dropped",
       "error": "For stretches of 2011 at West Bay Harbour and of 2010 and 2011 at Port Isaac, CCO sends each reading twice, stamped a second apart, as 11:20:02 and 11:20:03, with nearly the same level. West Bay Harbour has 6,513 such pairs, about 6,500 of them within 5 mm and about 6,150 within 2 mm, and Port Isaac 4,184, about 4,100 within 5 mm and about 3,450 within 2 mm, counted on the stored levels, which are single-precision. Lymington has 5 pairs a second apart between 2013 and 2017, 2 within 5 mm. Arun Platform has 11 pairs in 2012 and 2013 and Sandown Pier 1 in 2017, on the days the clocks changed, whose levels differ.",
       "response": "A reading within 2 seconds of the last one kept, with a level within 5 mm of it, is left out, so the first of each pair stays: about 10,600 readings. A pair whose levels differ by more is kept.",
-      "evidence": "Every stored CCO reading, read on 2026-11-17, compared with the one before it at the same site: West Bay Harbour on 30 March 2011 has 11:20:02 and 11:20:03, 2.081 and 2.080 m, then 11:30:02 and 11:30:03, 2.099 m twice."
+      "evidence": "Every stored CCO reading, read on 2026-11-17, compared with the one before it at the same site: West Bay Harbour on 30 March 2011 has 11:20:02 and 11:20:03, 2.081 and 2.080 m, then 11:30:02 and 11:30:03, 2.099 m twice.",
+      "reported": "2026-11-17",
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that the Port Isaac duplicates are gone after its quality-controlled files were loaded; West Bay Harbour's remain until its quality-controlled files are loaded."
     },
     {
       "id": "cco-empty-window-answers",
@@ -36,7 +38,7 @@
       "response": "The adapter reads the first as no values. The second is an error, so a backfill of those two sites starts at their first year (README, Running ingest).",
       "evidence": "Requests of 2026-11-16: Herne Bay for 1 June 2001 answers the first body; Lymington for 1 June 2008 and Brighton for 1 June 2005 answer 500 with `Internal Server Error`.",
       "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17 as a heads-up, with a full errata report to follow once the history is imported. The observatory answered the same day: it expects this to be a quick fix."
+      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that it fixed both bugs on the morning of 2026-11-17: an empty window now returns a valid empty FeatureCollection, and requests before Lymington's or Brighton's first reading no longer return HTTP 500."
     }
   ],
   "retired": []
