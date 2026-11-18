@@ -1,0 +1,30 @@
+{
+  "publishedCount": 1,
+  "unknownErrata": [],
+  "station": {
+    "id": "ign/ACOR1",
+    "datum": "JM",
+    "status": "inactive",
+    "live": false,
+    "interval_s": 3600,
+    "first": "2000-01-01",
+    "last": "2023-12-31",
+    "attribution": "Obra derivada de Red de Mareógrafos 2000-01-01–2023-12-31 CC-BY 4.0 ign.es; Área de Geodesia, Instituto Geográfico Nacional (IGN)",
+    "errata": [
+      "ign-coruna-clock",
+      "ign-release-coverage",
+      "ign-coruna-hourly-gaps",
+      "ign-coruna-hourly-grid"
+    ],
+    "datums": {
+      "NMMA": 4.998
+    }
+  },
+  "flags": [
+    {
+      "flag": 3,
+      "source_flag": 0,
+      "count": 209544
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "inputUrl": "https://stillwell.openwaters.io/stations.parquet plus source-owned station lists for identity metadata",
+  "snapshotDate": "2026-11-18",
+  "publicCorunaStations": 6,
+  "admittedGroup": {
+    "id": "ign/ACOR1",
+    "name": "A Coruña",
+    "source": "ign",
+    "commercial_use": true,
+    "first": "2000-01-01 00:00:00+00",
+    "last": "2023-12-31 23:00:00+00",
+    "preferred": "ign/ACOR1",
+    "same_as": [
+      "gesla/coruna2tg-cor-esp-cmems"
+    ],
+    "originator": null
+  },
+  "stations": [
+    {
+      "id": "gesla/coruna-coru-esp-ieo",
+      "name": "Coruna",
+      "source": "gesla",
+      "commercial_use": true,
+      "first": "1943-03-01 00:00:00+00",
+      "last": "2016-12-31 23:55:00+00",
+      "preferred": "uhslc/830",
+      "same_as": [
+        "gesla/corunatg-cor-esp-cmems",
+        "gesla/la_coruna-830-esp-uhslc_fd",
+        "gesla/la_coruna-830a-esp-uhslc_rq",
+        "uhslc/830"
+      ],
+      "originator": "Instituto Español de Oceanografía (Spanish Istitute of Oceanography)"
+    },
+    {
+      "id": "gesla/coruna2tg-cor-esp-cmems",
+      "name": "Coruna2TG",
+      "source": "gesla",
+      "commercial_use": false,
+      "first": "2019-11-01 05:00:00+00",
+      "last": "2024-06-04 06:00:00+00",
+      "preferred": "ign/ACOR1",
+      "same_as": [
+        "ign/ACOR1"
+      ],
+      "originator": "Instituto Geográfico Nacional"
+    },
+    {
+      "id": "gesla/corunatg-cor-esp-cmems",
+      "name": "CorunaTG",
+      "source": "gesla",
+      "commercial_use": false,
+      "first": "1992-07-01 05:00:00+00",
+      "last": "2026-05-31 23:00:00+00",
+      "preferred": "uhslc/830",
+      "same_as": [
+        "gesla/coruna-coru-esp-ieo",
+        "gesla/la_coruna-830-esp-uhslc_fd",
+        "gesla/la_coruna-830a-esp-uhslc_rq",
+        "uhslc/830"
+      ],
+      "originator": "Puertos del Estado"
+    },
+    {
+      "id": "gesla/la_coruna-830-esp-uhslc_fd",
+      "name": "La Coruna",
+      "source": "gesla",
+      "commercial_use": true,
+      "first": "1943-03-01 00:00:00+00",
+      "last": "2024-03-20 07:00:00+00",
+      "preferred": "uhslc/830",
+      "same_as": [
+        "gesla/coruna-coru-esp-ieo",
+        "gesla/corunatg-cor-esp-cmems",
+        "gesla/la_coruna-830a-esp-uhslc_rq",
+        "uhslc/830"
+      ],
+      "originator": "Unspecified"
+    },
+    {
+      "id": "gesla/la_coruna-830a-esp-uhslc_rq",
+      "name": "La Coruna",
+      "source": "gesla",
+      "commercial_use": true,
+      "first": "1943-03-01 00:00:00+00",
+      "last": "2017-12-31 23:00:00+00",
+      "preferred": "uhslc/830",
+      "same_as": [
+        "gesla/coruna-coru-esp-ieo",
+        "gesla/corunatg-cor-esp-cmems",
+        "gesla/la_coruna-830-esp-uhslc_fd",
+        "uhslc/830"
+      ],
+      "originator": "Instituto Espanol de Oceanografia  ESP"
+    },
+    {
+      "id": "uhslc/830",
+      "name": "La Coruna",
+      "source": "uhslc",
+      "commercial_use": true,
+      "first": "1943-03-01 00:00:00+00",
+      "last": "2024-03-20 07:00:00+00",
+      "preferred": "uhslc/830",
+      "same_as": [
+        "gesla/coruna-coru-esp-ieo",
+        "gesla/corunatg-cor-esp-cmems",
+        "gesla/la_coruna-830-esp-uhslc_fd",
+        "gesla/la_coruna-830a-esp-uhslc_rq"
+      ],
+      "originator": "005"
+    },
+    {
+      "id": "ign/ACOR1",
+      "name": "A Coruña",
+      "source": "ign",
+      "commercial_use": true,
+      "first": "2000-01-01 00:00:00+00",
+      "last": "2023-12-31 23:00:00+00",
+      "preferred": "ign/ACOR1",
+      "same_as": [
+        "gesla/coruna2tg-cor-esp-cmems"
+      ],
+      "originator": null
+    }
+  ]
+}

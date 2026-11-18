@@ -122,12 +122,11 @@ const probes: Record<string, () => Promise<unknown[]>> = {
   ],
   // Hornbæk, on DVR90 since 1997.
   dmi: () => dmi.levels("30017", start, end),
-  // Separate references: both the live BM feed and a reviewed JM year must work.
-  ign: async () => {
-    const latest = await ign.levels("ALAC1-1633", start, end);
-    const final = await ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2024-01-04Z"));
-    return latest.length && final.length ? [...latest, ...final] : [];
-  },
+  // The admitted hourly archive; no raw or minute fallback.
+  ign: async () =>
+    (await ign.corunaHourly(new Date("2000-01-02Z"), new Date("2000-01-04Z"))).filter(
+      (r) => !r.withdrawn,
+    ),
   // Mitajiri-Nakanoseki's whole record, 2011 to 2013, the smallest zip (34 KB).
   jodc: () => jodc.levels("8413", new Date("2012-01-01Z"), new Date("2012-01-04Z")),
   // Kushimoto, since 1924: a week of provisional values, which arrive a day or
@@ -245,7 +244,7 @@ const probes: Record<string, () => Promise<unknown[]>> = {
 };
 
 /**
- * Sources never recorded. IGN daily paths change with the date. JMA's, LINZ's and GESLA's paths also change:
+ * Sources never recorded. IGN is plain text. JMA's, LINZ's and GESLA's paths also change:
  * JMA's name the month, LINZ's the year and day, and GESLA's links are signed anew every 15 minutes.
  * kuestendaten.de's catalog covers the whole portal, so catalog() checks only the entries backfill needs.
  */

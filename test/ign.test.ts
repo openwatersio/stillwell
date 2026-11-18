@@ -3,12 +3,15 @@ import { readFileSync } from "node:fs";
 import { afterEach, describe, it, mock } from "node:test";
 import { fetchText, HttpError, setTransport } from "../src/http.ts";
 import { Flag } from "../src/schema.ts";
+import { fromSource } from "../src/qc.ts";
+import { spans } from "../src/errata.ts";
 import * as ign from "../src/sources/ign/index.ts";
-import { sourceOf } from "../src/sources/index.ts";
+import { sourceOf, errata } from "../src/sources/index.ts";
 import { linkGauges } from "../src/same-as.ts";
-import type { Station } from "../src/schema.ts";
+import type { Observation, Station } from "../src/schema.ts";
 import type { StoredStation } from "../src/schema.ts";
 import { refreshStation } from "../src/store/recent.ts";
+import { judgeFetched } from "../src/store/requalify.ts";
 
 ign.pacing.requestMs = 0;
 
@@ -26,7 +29,486 @@ function serve(routes: Record<string, string>): void {
 }
 afterEach(() => setTransport(fetchText));
 
+function hourlyYear(year: number, value = "-4000"): string {
+  const start = Date.UTC(year, 0, 1);
+  const hours = (Date.UTC(year + 1, 0, 1) - start) / 3_600_000;
+  return (
+    "200 NORTE 031 ACOR1 Datos horarios en mm respecto JM NP-615\n" +
+    Array.from({ length: hours }, (_, i) => {
+      const stamp = new Date(start + i * 3_600_000).toISOString();
+      return (
+        stamp.slice(0, 10).split("-").reverse().join("/") + " " + stamp.slice(11, 16) + " " + value
+      );
+    }).join("\n")
+  );
+}
+
 describe("IGN", () => {
+  it("publishes only errata relevant to the admitted Coruña product", () => {
+    const ids = errata
+      .filter(
+        (e) => e.source === "ign" && (e.stations === null || e.stations.includes("ign/ACOR1")),
+      )
+      .map((e) => e.id)
+      .sort();
+    assert.deepEqual(ids, [
+      "ign-coruna-clock",
+      "ign-coruna-hourly-gaps",
+      "ign-coruna-hourly-grid",
+      "ign-release-coverage",
+    ]);
+  });
+
+  it("reads the real recorded Coruña hourly leap-year file", async () => {
+    serve({
+      "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": fixture("coruna-hourly-2000.txt"),
+    });
+    const rows = await ign.corunaHourly(new Date("2000-01-02Z"), new Date("2000-01-04Z"));
+    assert.equal(rows.length, 48);
+    assert.equal(rows[0]!.time, Date.UTC(2000, 0, 2));
+    assert.ok(
+      rows.every(
+        (r) => Number.isFinite(r.level) && r.flag === Flag.suspect && r.source_flag === Flag.good,
+      ),
+    );
+  });
+
+  it("ties stored clock requalification to exactly the admitted interval", () => {
+    const expected = [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)];
+    assert.deepEqual(ign.CORUNA_PERIOD, expected);
+    const covered = spans({ id: "ign/ACOR1" }, errata);
+    assert.deepEqual(covered, [ign.CORUNA_PERIOD]);
+    const rows = [expected[0]! - 1, expected[0]!, expected[1]! - 1, expected[1]!].map((time) => ({
+      time,
+      level: -4,
+      flag: Flag.suspect,
+      source_flag: Flag.good,
+    }));
+    assert.deepEqual(
+      fromSource(rows, covered).map((r) => r.flag),
+      [Flag.good, Flag.suspect, Flag.suspect, Flag.good],
+    );
+  });
+
+  it("credits source-only metadata with the known product period without inventing stored bounds", () => {
+    const credit = ign.source.attribution?.({ first: null, last: null } as Station)!;
+    assert.ok(credit.startsWith("Obra derivada de"));
+    assert.ok(credit.includes("2000–2023 CC-BY 4.0 ign.es"));
+    assert.equal(credit, ign.metadata.attribution);
+  });
+
+  it("publishes only the inactive Coruña hourly series", async () => {
+    setTransport(async () => {
+      throw new Error("closed historical metadata must not depend on the live network catalog");
+    });
+    const list = await sourceOf("ign").stations();
+    assert.deepEqual(
+      list.map((s) => s.source_id),
+      ["ACOR1"],
+    );
+    const station = list[0]!;
+    assert.equal(station.live, false);
+    assert.equal(station.status, "inactive");
+    assert.equal(station.interval_s, 3600);
+    assert.equal(station.datum, "JM");
+    assert.equal(station.datums.NMMA, 4.998);
+    assert.equal(station.attribution, ign.metadata.attribution);
+    assert.deepEqual(station.same_as, []);
+  });
+
+  it("admits only checked hourly years and flags every published clock", async () => {
+    const files = [
+      "200031_horarios_1999_JM.txt",
+      "200031_horarios_2024_JM.txt",
+      "200031_horarios_2000_BM.txt",
+    ];
+    const routes: Record<string, string> = {};
+    for (let year = 2000; year <= 2023; year++) {
+      const file = `200031_horarios_${year}_JM.txt`;
+      files.push(file);
+      routes[`ACOR1/procesados/horarios/${file}`] = hourlyYear(year);
+    }
+    routes["ACOR1/procesados/horarios/"] = listing("ACOR1/procesados/horarios", files);
+    serve(routes);
+    const station = { id: "ign/ACOR1", source_id: "ACOR1", datum: "JM" } as Station;
+    const rows = await sourceOf("ign").observations!(
+      station,
+      new Date("1999-01-01Z"),
+      new Date("2025-01-01Z"),
+    );
+    assert.equal(rows.length, 210384);
+    assert.ok(rows.every((r) => r.flag === Flag.suspect && r.source_flag === Flag.good));
+    assert.equal(rows[0]!.time, Date.UTC(2000, 0, 1));
+    assert.equal(rows.at(-1)!.time, Date.UTC(2023, 11, 31, 23));
+    assert.ok(
+      (
+        await ign.source.observations!(station, new Date("2000-01-01Z"), new Date("2000-01-02Z"))
+      ).every((r) => r.flag === Flag.suspect),
+    );
+    await assert.rejects(
+      () =>
+        sourceOf("ign").observations!(
+          { ...station, source_id: "ALAC1" },
+          new Date("2000-01-01Z"),
+          new Date("2001-01-01Z"),
+        ),
+      /withheld/,
+    );
+    await assert.rejects(
+      () =>
+        sourceOf("ign").observations!(
+          { ...station, datum: "BM" },
+          new Date("2000-01-01Z"),
+          new Date("2001-01-01Z"),
+        ),
+      /datum/,
+    );
+  });
+
+  it("does not treat a missing admitted hourly file as a deliberate coverage exclusion", async () => {
+    serve({
+      "ACOR1/procesados/horarios/": listing("ACOR1/procesados/horarios", [
+        "200031_horarios_2004_JM.txt",
+      ]),
+      "ACOR1/procesados/horarios/200031_horarios_2004_JM.txt":
+        "200 NORTE 031 ACOR1 Datos horarios en mm respecto JM NP-615\n31/12/2004 23:00 -4100",
+    });
+    const station = { id: "ign/ACOR1", source_id: "ACOR1", datum: "JM" } as Station;
+    await assert.rejects(
+      () =>
+        sourceOf("ign").observations!(station, new Date("2005-01-01Z"), new Date("2006-01-01Z")),
+      /missing.*2005|404/i,
+    );
+    setTransport(async () => {
+      throw new Error("an excluded range must not fetch");
+    });
+    assert.deepEqual(
+      await sourceOf("ign").observations!(
+        station,
+        new Date("2024-01-01Z"),
+        new Date("2027-01-01Z"),
+      ),
+      [],
+    );
+  });
+
+  it("uses the complete requested hourly year without fetching a predecessor", async () => {
+    serve({ "ACOR1/procesados/horarios/200031_horarios_2001_JM.txt": hourlyYear(2001, "-4100") });
+    const rows = await ign.corunaHourly(new Date("2001-01-01Z"), new Date("2001-01-02Z"));
+    assert.equal(rows.length, 24);
+    assert.equal(rows[0]!.level, -4.1);
+    assert.equal(rows[0]!.flag, Flag.suspect);
+    serve({
+      "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": hourlyYear(2000).replace(
+        "NP-615",
+        "OTHER",
+      ),
+    });
+    await assert.rejects(
+      () => ign.corunaHourly(new Date("2000-01-01Z"), new Date("2000-01-02Z")),
+      /benchmark mark/,
+    );
+  });
+
+  it("refuses truncated, missing-hour and off-hour admitted files even for a one-day request", async () => {
+    const complete = hourlyYear(2000);
+    const lines = complete.split("\n");
+    for (const body of [
+      lines.slice(0, -1).join("\n"),
+      lines.filter((_, i) => i !== 4).join("\n"),
+      complete.replace("01/01/2000 01:00", "01/01/2000 01:30"),
+    ]) {
+      serve({ "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": body });
+      await assert.rejects(
+        () => ign.corunaHourly(new Date("2000-01-01Z"), new Date("2000-01-02Z")),
+        /hourly grid/,
+      );
+    }
+  });
+
+  it("treats Coruña hourly -9999 as an unusable aggregate without inventing a level", async () => {
+    serve({
+      "ACOR1/procesados/horarios/200031_horarios_2000_JM.txt": hourlyYear(2000).replace(
+        "01/01/2000 01:00 -4000",
+        "01/01/2000 01:00 -9999",
+      ),
+    });
+    const rows = await ign.corunaHourly(new Date("2000-01-01Z"), new Date("2000-01-02Z"));
+    const marker = rows[1]!;
+    assert.equal(marker.withdrawn, true);
+    assert.equal(marker.flag, Flag.bad);
+    assert.equal(marker.source_flag, Flag.bad);
+    assert.ok(Number.isNaN(marker.level));
+    const prior = { time: marker.time, level: -4.1, flag: Flag.suspect, source_flag: Flag.good };
+    const merged = judgeFetched(
+      [prior],
+      [marker],
+      rows[0]!.time,
+      rows.at(-1)!.time + 3_600_000,
+      {},
+      [],
+      true,
+    );
+    assert.deepEqual(
+      merged.map((r) => [r.level, r.flag, r.source_flag]),
+      [[-4.1, Flag.bad, Flag.bad]],
+    );
+    assert.deepEqual(
+      judgeFetched([], [marker], rows[0]!.time, rows.at(-1)!.time + 3_600_000, {}, [], true),
+      [],
+    );
+  });
+
+  it("drops impossible-date missing placeholders without rolling them onto a real day", () => {
+    const header = "220 MEDITERRANEO 047 MURC2 mm respecto JM NP1\n";
+    const options = {
+      year: 2024,
+      gauge: "MURC2",
+      raw: false,
+      reference: "JM",
+      sign: 1 as const,
+      offset: 0,
+    };
+    const rows = ign.parse(
+      header + "30/11/2024 23:59:00 -1000\n31/11/2024 00:00:00 ---\n01/12/2024 00:00:00 -1001",
+      options,
+    );
+    assert.deepEqual(
+      rows.map((r) => [r.time, r.level]),
+      [
+        [Date.UTC(2024, 10, 30, 23, 59), -1],
+        [Date.UTC(2024, 11, 1), -1.001],
+      ],
+    );
+    assert.throws(() => ign.parse(header + "31/11/2024 00:00:00 -1000", options));
+    assert.throws(() => ign.parse(header + "31/11/2024 00:00:00 ---", options), /valid timestamp/);
+  });
+  it("keeps one identical reviewed export row, but refuses a conflicting duplicate", () => {
+    const header = "370 CANARIAS 032 TN021 mm respecto BM NGZ-581\n";
+    const options = {
+      year: 2010,
+      gauge: "TN021",
+      raw: false,
+      reference: "BM",
+      sign: 1 as const,
+      offset: 0,
+    };
+    const row = "15/02/2010 12:11:00 -2251";
+    assert.equal(ign.parse(header + row + "\n" + row, options).length, 1);
+    assert.throws(() => ign.parse(header + row + "\n15/02/2010 12:11:00 -2250", options));
+  });
+  it("refuses an unrecognized reviewed reference filename instead of silently omitting it", async () => {
+    serve({
+      "ALAC1/procesados/integros/": listing("ALAC1/procesados/integros", ["220051_2024_NMMA.txt"]),
+      "ALAC1/procesados/horarios/": listing("ALAC1/procesados/horarios", []),
+    });
+    await assert.rejects(
+      ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2025-01-01Z")),
+      /filename/,
+    );
+  });
+  it("refuses encoded or uppercase reviewed filenames before inventory filtering", async () => {
+    for (const file of ["220051_2024_JM%20(1).txt", "220051_2024_JM.TXT"]) {
+      serve({ "ALAC1/procesados/integros/": listing("ALAC1/procesados/integros", [file]) });
+      await assert.rejects(
+        () => ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2025-01-01Z")),
+        /unsupported reviewed filename/,
+      );
+    }
+  });
+  it("renders the derived-product credit using actual stored observation dates", () => {
+    const credit = ign.source.attribution?.({
+      first: "1927-01-01T01:00:00Z",
+      last: "2026-11-17T10:00:00Z",
+    } as Station);
+    assert.equal(
+      credit,
+      "Obra derivada de Red de Mareógrafos 1927-01-01–2026-11-17 CC-BY 4.0 ign.es; Área de Geodesia, Instituto Geográfico Nacional (IGN)",
+    );
+  });
+  it("reads legacy unitless water-level exports using the agency-documented millimeters", () => {
+    assert.equal(
+      ign.parse("01/01/2022 00:00:00 1234", {
+        year: 2022,
+        gauge: "ACOR1",
+        raw: true,
+        sign: -1,
+        offset: 0,
+      })[0]!.level,
+      -1.234,
+    );
+  });
+  it("reads unquoted millimeters and blank invalidations in the historical ACOR1 format", () => {
+    const rows = ign.parse("06/03/1950 12:00:00 2500 mm\n06/03/1950 13:00:00   mm", {
+      year: 1950,
+      gauge: "ACOR1",
+      raw: true,
+      sign: 1,
+      offset: 0,
+    });
+    assert.equal(rows[0]!.level, 2.5);
+    assert.equal(rows[1]!.flag, Flag.bad);
+    assert.ok(rows[1]!.withdrawn);
+  });
+  it("invalidates stored readings through refetch and research refresh without inventing levels", async () => {
+    const time = Date.UTC(2026, 10, 15, 5);
+    const old: Observation = { time, level: -1.1, flag: Flag.good, source_flag: Flag.good };
+    const header = "220 MEDITERRANEO 051 ALAC1 mm respecto JM NP1\n";
+    const fetched = ign.parse(header + "15/11/2026 05:00:00 ---", {
+      year: 2026,
+      gauge: "ALAC1",
+      raw: false,
+      reference: "JM",
+      sign: 1,
+      offset: 0,
+    });
+    const expected = { ...old, flag: Flag.bad, source_flag: Flag.bad };
+    assert.deepEqual(judgeFetched([old], fetched, time, time + 3600000, {}, [], true), [expected]);
+    assert.deepEqual(judgeFetched([], fetched, time, time + 3600000, {}, [], true), []);
+    serve({ "": fixture("root.html") });
+    const listed = (await ign.stations()).find((s) => s.source_id === "ALAC1")!;
+    const station = {
+      ...listed,
+      epochs: [
+        {
+          id: 1,
+          datum: "JM",
+          since: null,
+          until: null,
+          seen: null,
+          reference: "NP1",
+          reference_since: null,
+          datums: {},
+          to_current: 0,
+          state: "open",
+        },
+      ],
+    } as StoredStation;
+    const summary = {
+      title: "withdrawal",
+      stations: 1,
+      updated: 0,
+      stale: [],
+      failed: [],
+      waiting: [],
+      values: 0,
+      files: 0,
+    };
+    const result = await refreshStation({
+      source: { ...ign.source, observations: async () => fetched },
+      station,
+      previous: [{ ...old, station: station.id, epoch: 1 }],
+      swept: undefined,
+      since: time,
+      now: time + 3600000,
+      keepFrom: time - 86400000,
+      summary,
+    });
+    assert.deepEqual(summary.failed, []);
+    assert.equal(result.rows[0]!.source_flag, Flag.bad);
+    assert.equal(result.rows[0]!.level, old.level);
+    assert.equal(result.rows[0]!.received, undefined);
+  });
+
+  it("keeps explicit minute invalidations ahead of lower-precedence hourly values", async () => {
+    serve({
+      "ALAC1/procesados/integros/": listing("ALAC1/procesados/integros", ["220051_2024_JM.txt"]),
+      "ALAC1/procesados/horarios/": listing("ALAC1/procesados/horarios", [
+        "220051_horarios_2024_JM.txt",
+      ]),
+      "ALAC1/procesados/integros/220051_2024_JM.txt":
+        "220 MEDITERRANEO 051 ALAC1 mm respecto JM NP1\n01/01/2024 00:00:00 9999",
+      "ALAC1/procesados/horarios/220051_horarios_2024_JM.txt":
+        "220 MEDITERRANEO 051 ALAC1 mm respecto JM NP1\n01/01/2024 00:00 -3300",
+    });
+    const out = await ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2024-01-02Z"));
+    assert.equal(out[0]!.flag, Flag.bad);
+  });
+
+  it("reads a terminal annual boundary in its actual year even without the next year's file", async () => {
+    serve({
+      "TN031/procesados/integros/": listing("TN031/procesados/integros", ["370033_2021_BM.txt"]),
+      "TN031/procesados/horarios/": listing("TN031/procesados/horarios", []),
+      "TN031/procesados/integros/370033_2021_BM.txt":
+        "370 CANARIAS 033 TN031 mm respecto BM NGAB161\n31/12/2021 23:59:00 -1530\n01/01/2022 00:00:00 -1525",
+    });
+    assert.equal(
+      (await ign.levels("TN031", new Date("2021-01-01Z"), new Date("2022-01-01Z"))).length,
+      1,
+    );
+    const next = await ign.levels("TN031", new Date("2022-01-01Z"), new Date("2022-01-02Z"));
+    assert.deepEqual(
+      next.map((r) => [r.time, r.level]),
+      [[Date.UTC(2022, 0, 1), -1.525]],
+    );
+  });
+
+  it("reads only the preceding file's terminal row when its other rows are malformed", async () => {
+    serve({
+      "TN031/procesados/integros/": listing("TN031/procesados/integros", ["370033_2021_BM.txt"]),
+      "TN031/procesados/horarios/": listing("TN031/procesados/horarios", []),
+      "TN031/procesados/integros/370033_2021_BM.txt":
+        "370 CANARIAS 033 TN031 mm respecto BM NGAB161\n07/05/2109 00:17:00 -9999\n01/01/2022 00:00:00 -1525",
+    });
+    await assert.rejects(() =>
+      ign.levels("TN031", new Date("2021-01-01Z"), new Date("2022-01-01Z")),
+    );
+    assert.equal(
+      (await ign.levels("TN031", new Date("2022-01-01Z"), new Date("2022-01-02Z")))[0]!.level,
+      -1.525,
+    );
+  });
+  it("ignores a malformed preceding raw file without a terminal row", async () => {
+    serve({
+      "ALAC1/observados/": listing("ALAC1/observados", []),
+      "ALAC1/observados/ficheros_anuales/": listing("ALAC1/observados/ficheros_anuales", [
+        "220051_1633_2024.txt",
+        "220051_1633_2025.txt",
+      ]),
+      "ALAC1/observados/ficheros_anuales/220051_1633_2024.txt": "malformed",
+      "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt": "01/01/2025 00:00:00 1000 mm",
+    });
+    assert.equal(
+      (await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date("2026-01-01Z")))[0]!.level,
+      -1,
+    );
+  });
+  it("does not let an unrelated out-of-range reviewed object block a valid year", async () => {
+    serve({
+      "ALAC1/procesados/integros/": listing("ALAC1/procesados/integros", [
+        "220052_1990_JM.txt",
+        "220051_1990_NMMA.txt",
+        "220051_2024_JM.txt",
+      ]),
+      "ALAC1/procesados/horarios/": listing("ALAC1/procesados/horarios", []),
+      "ALAC1/procesados/integros/220051_2024_JM.txt":
+        "220 MEDITERRANEO 051 ALAC1 mm respecto JM NP1\n01/01/2024 00:00:00 -3300",
+    });
+    assert.equal(
+      (await ign.levels("ALAC1", new Date("2024-01-01Z"), new Date("2025-01-01Z")))[0]!.level,
+      -3.3,
+    );
+  });
+
+  it("fills internal annual gaps from daily exports and lets the daily revision win", async () => {
+    serve({
+      "ALAC1/observados/": listing("ALAC1/observados", ["2025/"]),
+      "ALAC1/observados/ficheros_anuales/": listing("ALAC1/observados/ficheros_anuales", [
+        "220051_1633_2025.txt",
+      ]),
+      "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt":
+        '01/01/2025 00:00:00 1000 "mm"\n01/01/2025 00:02:00 1002 "mm"',
+      "ALAC1/observados/2025/": listing("ALAC1/observados/2025", ["220051_1633_20250101.txt"]),
+      "ALAC1/observados/2025/220051_1633_20250101.txt":
+        '01/01/2025 00:01:00 1001 "mm"\n01/01/2025 00:02:00 9999 "mm"',
+    });
+    const out = await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date("2026-01-01Z"));
+    assert.deepEqual(
+      out.map((r) => r.time),
+      [0, 1, 2].map((m) => Date.UTC(2025, 0, 1, 0, m)),
+    );
+    assert.equal(out[2]!.flag, Flag.bad);
+  });
   it("registers the adapter and links the two Alicante gauges to distinct GESLA copies", async () => {
     assert.equal(sourceOf("ign").metadata.id, "ign");
     serve({ "": fixture("root.html") });
@@ -68,6 +550,9 @@ describe("IGN", () => {
     assert.equal(list.find((s) => s.source_id === "ALAC1-1633")!.live, true);
     assert.equal(list.find((s) => s.source_id === "FUER1")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "MURC1")!.status, "inactive");
+    assert.equal(list.find((s) => s.source_id === "TN031")!.status, "inactive");
+    assert.equal(list.find((s) => s.source_id === "TN021-NGZ581")!.status, "inactive");
+    assert.equal(list.find((s) => s.source_id === "ALAC2-0806")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "ALAC1-0301")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "ALAC1-0702")!.status, "inactive");
     assert.equal(list.find((s) => s.source_id === "TN013")!.datums.NMMA, undefined);
@@ -80,6 +565,7 @@ describe("IGN", () => {
   it("keeps archived observations outside the sheet's stated sensor period", async () => {
     serve({
       "MURC1/observados/": listing("MURC1/observados", ["2001/"]),
+      "MURC1/observados/2001/": listing("MURC1/observados/2001", []),
       "MURC1/observados/ficheros_anuales/": listing("MURC1/observados/ficheros_anuales", [
         "220046_0503_2001.txt",
       ]),
@@ -114,59 +600,6 @@ describe("IGN", () => {
     );
   });
 
-  it("preserves recent IGN observations when a later directory listing omits their day", async () => {
-    serve({
-      "": fixture("root.html"),
-      "ALAC1/observados/": listing("ALAC1/observados", ["2026/"]),
-      "ALAC1/observados/2026/": listing("ALAC1/observados/2026", ["220051_1633_20261115.txt"]),
-      "ALAC1/observados/2026/220051_1633_20261115.txt": '15/11/2026 05:00:00 1100 "mm"',
-    });
-    const listed = (await ign.stations()).find((s) => s.source_id === "ALAC1-1633")!;
-    const station = {
-      ...listed,
-      epochs: [
-        {
-          id: 1,
-          datum: "BM",
-          since: null,
-          until: null,
-          seen: null,
-          reference: "ALAC1/1633",
-          reference_since: null,
-          datums: {},
-          to_current: 0,
-          state: "open",
-        },
-      ],
-    } as StoredStation;
-    const prior = Date.UTC(2026, 10, 14, 23);
-    const summary = {
-      title: "IGN regression",
-      stations: 1,
-      updated: 0,
-      stale: [],
-      failed: [],
-      waiting: [],
-      values: 0,
-      files: 0,
-    };
-    const { rows } = await refreshStation({
-      source: ign.source,
-      station,
-      previous: [{ station: station.id, epoch: 1, time: prior, level: -1, flag: Flag.preliminary }],
-      swept: undefined,
-      since: Date.UTC(2026, 10, 14, 18),
-      now: Date.UTC(2026, 10, 15, 6),
-      keepFrom: Date.UTC(2026, 10, 8),
-      summary,
-    });
-    assert.deepEqual(summary.failed, []);
-    assert.deepEqual(
-      rows.map((r) => r.time),
-      [prior, Date.UTC(2026, 10, 15, 5)],
-    );
-  });
-
   it("refuses an empty, shortened or unknown station catalog", async () => {
     for (const html of [
       listing("", []),
@@ -194,11 +627,14 @@ describe("IGN", () => {
       sign: 1,
       offset: 0,
     });
-    assert.deepEqual(historic[0], {
-      time: Date.UTC(1927, 0, 1, 1),
-      level: 1.499,
-      flag: Flag.preliminary,
-    });
+    assert.deepEqual(
+      historic.find((r) => !r.withdrawn),
+      {
+        time: Date.UTC(1927, 0, 1, 1),
+        level: 1.499,
+        flag: Flag.preliminary,
+      },
+    );
   });
 
   it("converts a reviewed BM file only using its documented mark", () => {
@@ -264,14 +700,18 @@ describe("IGN", () => {
     );
   });
 
-  it("drops documented missing markers, retains ambiguous -9999 as suspect and rejects invalid rows", () => {
+  it("carries explicit missing markers, retains ambiguous -9999 as suspect and rejects invalid rows", () => {
     const options = { year: 2024, gauge: "ALAC1", raw: true, sign: -1 as const, offset: 0 };
     assert.deepEqual(
       ign.parse(
         '01/01/2024 00:00:00 9999 "mm"\n01/01/2024 00:01:00 -9999 "mm"\n01/01/2024 00:02:00 --- "mm"',
         options,
       ),
-      [{ time: Date.UTC(2024, 0, 1, 0, 1), level: 9.999, flag: Flag.suspect }],
+      [
+        { time: Date.UTC(2024, 0, 1), level: Number.NaN, flag: Flag.bad, withdrawn: true },
+        { time: Date.UTC(2024, 0, 1, 0, 1), level: 9.999, flag: Flag.suspect },
+        { time: Date.UTC(2024, 0, 1, 0, 2), level: Number.NaN, flag: Flag.bad, withdrawn: true },
+      ],
     );
     for (const line of [
       '01/01/2024 00:00:00 14.2 "V"',
@@ -407,9 +847,10 @@ describe("IGN", () => {
         "220051_0301_1927.txt",
       ]),
       "ALAC1/observados/ficheros_anuales/220051_0301_1927.txt": fixture("historic.txt"),
+      "ALAC1/observados/1927/": listing("ALAC1/observados/1927", []),
     });
     const out = await ign.levels("ALAC1-0301", new Date("1927-01-01Z"), new Date("1928-01-01Z"));
-    assert.equal(out[0]!.level, 1.499);
+    assert.equal(out.find((r) => !r.withdrawn)!.level, 1.499);
     await assert.rejects(
       ign.levels("ALAC1-2000", new Date("1927-01-01Z"), new Date("1928-01-01Z")),
       /station/,
@@ -459,7 +900,7 @@ describe("IGN", () => {
         .join("\n"),
     });
     const out = await ign.levels("ALAC1-0301", new Date("1927-01-01Z"), new Date("1928-01-01Z"));
-    assert.equal(out[0]!.level, 1.499);
+    assert.equal(out.find((r) => !r.withdrawn)!.level, 1.499);
   });
 
   it("reads a minute-resolution annual export without exceeding the argument limit", async () => {
@@ -473,6 +914,7 @@ describe("IGN", () => {
         "220051_1633_2025.txt",
       ]),
       "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt": rows,
+      "ALAC1/observados/2025/": listing("ALAC1/observados/2025", []),
     });
     assert.equal(
       (await ign.levels("ALAC1-1633", new Date("2025-01-01Z"), new Date("2026-01-01Z"))).length,
@@ -490,6 +932,7 @@ describe("IGN", () => {
           "220051_1633_2026.txt",
         ]),
         "ALAC1/observados/ficheros_anuales/220051_1633_2025.txt": '31/12/2025 00:00:00 1050 "mm"',
+        "ALAC1/observados/2025/": listing("ALAC1/observados/2025", []),
         "ALAC1/observados/ficheros_anuales/220051_1633_2026.txt": '01/01/2026 00:00:00 900 "mm"',
         "ALAC1/observados/2026/": listing("ALAC1/observados/2026", ["220051_1633_20260101.txt"]),
         "ALAC1/observados/2026/220051_1633_20260101.txt": '01/01/2026 00:00:00 1000 "mm"',

@@ -1,0 +1,383 @@
+{
+  "years": 24,
+  "numeric_negative_missing_hours": 840,
+  "hours_all_minute_missing": 798,
+  "ordinary_min_mm": -7046,
+  "ordinary_max_mm": -1528,
+  "results": [
+    {
+      "year": 2000,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6809,
+      "ordinary_max_mm": -2651
+    },
+    {
+      "year": 2001,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6875,
+      "ordinary_max_mm": -2441
+    },
+    {
+      "year": 2002,
+      "rows": 8760,
+      "negative_missing": 46,
+      "ordinary_min_mm": -6863,
+      "ordinary_max_mm": -2518,
+      "minute_counts": {
+        "6": 46
+      },
+      "minute_value_counts": {
+        "-9999": 271,
+        "-5707": 1,
+        "-5747": 1,
+        "-5765": 1,
+        "-5771": 1,
+        "-5780": 1
+      },
+      "hours_all_minute_missing": 45
+    },
+    {
+      "year": 2003,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6797,
+      "ordinary_max_mm": -2594
+    },
+    {
+      "year": 2004,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6721,
+      "ordinary_max_mm": -2622
+    },
+    {
+      "year": 2005,
+      "rows": 8760,
+      "negative_missing": 27,
+      "ordinary_min_mm": -7003,
+      "ordinary_max_mm": -2678,
+      "minute_counts": {
+        "6": 27
+      },
+      "minute_value_counts": {
+        "-9999": 157,
+        "-5543": 1,
+        "-5574": 1,
+        "-5653": 1,
+        "-5712": 1,
+        "-5745": 1
+      },
+      "hours_all_minute_missing": 26
+    },
+    {
+      "year": 2006,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6898,
+      "ordinary_max_mm": -2388
+    },
+    {
+      "year": 2007,
+      "rows": 8760,
+      "negative_missing": 539,
+      "ordinary_min_mm": -6909,
+      "ordinary_max_mm": -2455,
+      "minute_counts": {
+        "6": 539
+      },
+      "minute_value_counts": {
+        "-9999": 3231,
+        "-4213": 1,
+        "-4194": 1,
+        "-4182": 1
+      },
+      "hours_all_minute_missing": 538
+    },
+    {
+      "year": 2008,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6641,
+      "ordinary_max_mm": -2574
+    },
+    {
+      "year": 2009,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6833,
+      "ordinary_max_mm": -2648
+    },
+    {
+      "year": 2010,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6857,
+      "ordinary_max_mm": -2348
+    },
+    {
+      "year": 2011,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6918,
+      "ordinary_max_mm": -2407
+    },
+    {
+      "year": 2012,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -7046,
+      "ordinary_max_mm": -2482
+    },
+    {
+      "year": 2013,
+      "rows": 8760,
+      "negative_missing": 110,
+      "ordinary_min_mm": -6879,
+      "ordinary_max_mm": -2561,
+      "minute_counts": {
+        "60": 110
+      },
+      "minute_value_counts": {
+        "-9999": 6536,
+        "-4889": 1,
+        "-4900": 1,
+        "-4917": 1,
+        "-4922": 1,
+        "-4933": 1,
+        "-4939": 1,
+        "-4950": 1,
+        "-4961": 1,
+        "-4967": 1,
+        "-4972": 1,
+        "-4984": 1,
+        "-4989": 1,
+        "-4995": 1,
+        "-5005": 1,
+        "-5011": 1,
+        "-5022": 1,
+        "-5034": 1,
+        "-5045": 1,
+        "-5056": 1,
+        "-5062": 1,
+        "-5073": 2,
+        "-5079": 1,
+        "-5085": 1,
+        "-5094": 1,
+        "-5101": 1,
+        "-5113": 1,
+        "-5117": 1,
+        "-5129": 1,
+        "-5134": 1,
+        "-5145": 1,
+        "-5151": 1,
+        "-5161": 1,
+        "-5167": 1,
+        "-5173": 1,
+        "-5172": 1,
+        "-5185": 2,
+        "-5190": 2,
+        "-5202": 1,
+        "-5207": 2,
+        "-5213": 1,
+        "-5219": 1,
+        "-5224": 1,
+        "-5228": 1,
+        "-5230": 1,
+        "-5235": 1,
+        "-5240": 1,
+        "-5246": 1,
+        "-5257": 1,
+        "-5269": 1,
+        "-5280": 1,
+        "-5291": 2,
+        "-5308": 1,
+        "-5318": 1,
+        "-5324": 1,
+        "-4603": 1,
+        "-4645": 1,
+        "-4723": 1,
+        "-4772": 1,
+        "-4803": 1
+      },
+      "hours_all_minute_missing": 108
+    },
+    {
+      "year": 2014,
+      "rows": 8760,
+      "negative_missing": 37,
+      "ordinary_min_mm": -6830,
+      "ordinary_max_mm": -2399,
+      "minute_counts": {
+        "60": 37
+      },
+      "minute_value_counts": {
+        "-9999": 2162,
+        "-5039": 3,
+        "-5034": 1,
+        "-5045": 1,
+        "-5057": 1,
+        "-5056": 1,
+        "-5062": 5,
+        "-5055": 1,
+        "-5061": 1,
+        "-5066": 1,
+        "-5073": 3,
+        "-5078": 1,
+        "-5079": 1,
+        "-5084": 1,
+        "-5095": 1,
+        "-5101": 1,
+        "-5112": 1,
+        "-5118": 1,
+        "-5119": 1,
+        "-5123": 1,
+        "-5130": 1,
+        "-5134": 1,
+        "-5146": 1,
+        "-5151": 1,
+        "-5162": 1,
+        "-5173": 2,
+        "-5174": 2,
+        "-5179": 1,
+        "-5184": 1,
+        "-5190": 12,
+        "-5196": 3,
+        "-5197": 1,
+        "-5195": 1,
+        "-5191": 2,
+        "-5201": 1
+      },
+      "hours_all_minute_missing": 36
+    },
+    {
+      "year": 2015,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6925,
+      "ordinary_max_mm": -2377
+    },
+    {
+      "year": 2016,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6947,
+      "ordinary_max_mm": -2400
+    },
+    {
+      "year": 2017,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6779,
+      "ordinary_max_mm": -2641
+    },
+    {
+      "year": 2018,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6825,
+      "ordinary_max_mm": -2274
+    },
+    {
+      "year": 2019,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6909,
+      "ordinary_max_mm": -1528
+    },
+    {
+      "year": 2020,
+      "rows": 8784,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6844,
+      "ordinary_max_mm": -2431
+    },
+    {
+      "year": 2021,
+      "rows": 8760,
+      "negative_missing": 0,
+      "ordinary_min_mm": -6761,
+      "ordinary_max_mm": -2550
+    },
+    {
+      "year": 2022,
+      "rows": 8760,
+      "negative_missing": 33,
+      "ordinary_min_mm": -6673,
+      "ordinary_max_mm": -2506,
+      "minute_counts": {
+        "60": 33
+      },
+      "minute_value_counts": {
+        "-4154": 1971,
+        "-5702": 1,
+        "-5696": 1,
+        "-5695": 1,
+        "-5685": 1,
+        "-5684": 1,
+        "-5679": 1,
+        "-5673": 1,
+        "-5674": 1,
+        "-5668": 1
+      },
+      "hours_all_minute_missing": 0
+    },
+    {
+      "year": 2023,
+      "rows": 8760,
+      "negative_missing": 48,
+      "ordinary_min_mm": -6769,
+      "ordinary_max_mm": -2295,
+      "minute_counts": {
+        "60": 48
+      },
+      "minute_value_counts": {
+        "-9999": 2801,
+        "-3362": 1,
+        "-3367": 1,
+        "-3373": 1,
+        "-3379": 2,
+        "-3378": 1,
+        "-3385": 1,
+        "-3391": 1,
+        "-3395": 1,
+        "-3401": 1,
+        "-2926": 2,
+        "-2932": 3,
+        "-2931": 2,
+        "-2927": 1,
+        "-2920": 2,
+        "-6394": 4,
+        "-6388": 3,
+        "-6389": 7,
+        "-6383": 2,
+        "-6395": 2,
+        "-6405": 5,
+        "-6417": 2,
+        "-6433": 3,
+        "-6434": 2,
+        "-6422": 2,
+        "-6416": 1,
+        "-6427": 1,
+        "-6428": 1,
+        "-6432": 1,
+        "-6413": 1,
+        "-6400": 2,
+        "-6391": 1,
+        "-6390": 1,
+        "-6406": 2,
+        "-6384": 1,
+        "-6366": 1,
+        "-6344": 1,
+        "-6333": 1,
+        "-6316": 1,
+        "-6305": 1,
+        "-6293": 1,
+        "-6288": 8,
+        "-6289": 1
+      },
+      "hours_all_minute_missing": 45
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /**
- * Stations withheld from the store because their owner refused republication
+ * Stations withheld from the store for licensing, identity or evidence reasons
  * (`Source.withheld`). A refresh drops them from the source's list and their
  * rows from its bounds, years, recent window, empty-years record, backfilled years, requalify list and analysis, and publishing
  * leaves them out of stations.parquet. `ingest withhold <source>` deletes

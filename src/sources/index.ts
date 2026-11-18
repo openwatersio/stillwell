@@ -123,9 +123,10 @@ export const { errata, problems: errataProblems } = readErrata(errataFiles);
  * gauge reads one: it's a fill value or junk, missing rather than a bad value
  * (errata `usace-fill-values`, `cdec-fill-values`, `usgs-fill-values` and
  * `pegelonline-fill-values`, and GESLA's and CMEMS's, whose adapters drop them too).
+ * Transient withdrawals reach the merge without being treated as numerical levels.
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => rows.filter((r) => possible(r.level));
+  const keep = (rows: Observation[]) => rows.filter((r) => r.withdrawn || possible(r.level));
   const { observations, recent } = source;
   return {
     ...source,

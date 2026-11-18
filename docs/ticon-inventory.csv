@@ -63,7 +63,7 @@ albany-62120-aus-bom,Albany,Australia,bom,true,true,au/albany-western-australia,
 albany-8518995-usa-noaa,Albany,United States,noaa,true,false,us/albany,true,1981-10-02,1987-07-25,noaa/8518995,coops,coops/8518995,0,ready,,gesla/albany-8518995-usa-noaa,true
 albert_harbour-5803-can-meds,Albert_Harbour,Canada,meds,true,true,ca/albert-harbour,true,1984-08-20,1986-05-17,,chs,,,restricted,CHS license bars commercial derivatives,gesla/albert_harbour-5803-can-meds,false
 alblasserdam-albsdm-nld-rws_hist,Alblasserdam,Netherlands,rws_hist,true,false,nl/alblasserdam,true,1971-01-01,1985-05-31,,rws,rws/alblasserdam.pijlstoep,0,ready,,gesla/alblasserdam-albsdm-nld-rws_hist,true
-alborantg-alb-esp-cmems,AlboranTG,Spain,cmems,true,true,es/alboran,false,2019-11-01,2022-04-07,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/alborantg-alb-esp-cmems,false
+alborantg-alb-esp-cmems,AlboranTG,Spain,cmems,true,true,es/alboran,false,2019-11-01,2022-04-07,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/alborantg-alb-esp-cmems,false
 alcudiatg-alc-esp-cmems,AlcudiaTG,Spain,cmems,true,true,es/alcudia,false,2009-09-11,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/alcudiatg-alc-esp-cmems,false
 alert-3765-can-meds,Alert,Canada,meds,true,true,ca/alert,true,1961-11-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/alert-3765-can-meds,false
 alert-836-can-uhslc_fd,Alert,Canada,uhslc_fd,true,false,ca/alert,true,2018-09-01,2024-01-01,,uhslc,uhslc/836,0,ready,,gesla/alert-836-can-uhslc_fd,true
@@ -73,19 +73,19 @@ alexandria-807-egy-uhslc_fd,Alexandria,Egypt,uhslc_fd,true,false,eg/alexandria,t
 alexandria-807a-egy-uhslc_rq,Alexandria,Egypt,uhslc_rq,true,true,eg/alexandria,true,2009-11-06,2016-01-17,,uhslc,uhslc/807,0.04,ready,,gesla/alexandria-807a-egy-uhslc_rq,true
 alexandria-ale-egy-noc,Alexandria,Egypt,noc,true,true,eg/alexandria-alexandria,true,1958-01-01,1976-12-31,,bodc,,,restricted,NOC's gauges outside the UK network aren't in BODC's open data,gesla/alexandria-ale-egy-noc,true
 alexandria_bay_ny-8311062-usa-noaa,Alexandria_Bay_Ny,United States,noaa,true,false,us/alexandria-bay,true,1983-06-01,2025-07-01,noaa/8311062,coops,coops/8311062,0,ready,,gesla/alexandria_bay_ny-8311062-usa-noaa,true
-algeciras-alge-esp-ieo,Algeciras,Spain,ieo,true,true,es/algeciras,true,1943-07-01,2016-12-31,,redmar,,,license,,gesla/algeciras-alge-esp-ieo,true
+algeciras-alge-esp-ieo,Algeciras,Spain,ieo,true,true,es/algeciras,true,1943-07-01,2016-12-31,,ieo,,,license,,gesla/algeciras-alge-esp-ieo,true
 algecirastg-alg-esp-cmems,AlgecirasTG,Spain,cmems,true,true,es/algeciras-ticon-algecirastg-alg-esp-cmems,false,2009-07-16,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/algecirastg-alg-esp-cmems,false
 algonac_mi-9014070-usa-noaa,Algonac_Mi,United States,noaa,true,false,us/algonac,true,1970-01-01,2025-06-30,noaa/9014070,coops,coops/9014070,0,ready,,gesla/algonac_mi-9014070-usa-noaa,true
-alicante2tg-ali-esp-cmems,Alicante2TG,Spain,cmems,true,false,es/alicante,false,2019-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/alicante2tg-ali-esp-cmems,false
+alicante2tg-ali-esp-cmems,Alicante2TG,Spain,cmems,true,false,es/alicante,false,2019-11-01,2025-06-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/alicante2tg-ali-esp-cmems,false
 alicante_i-ali-esp-da_mm,Alicante_I,Spain,da_mm,true,true,es/alicante-i,true,1957-03-01,2018-12-31,,da_mm,,,license,Terms not reviewed,gesla/alicante_i-ali-esp-da_mm,true
 alicante_i_outer_harbour-alio-esp-da_mm,Alicante_I_Outer_Harbour,Spain,da_mm,true,false,es/alicante-i-outer-harbour,true,1870-07-02,2018-12-31,,da_mm,,,license,Terms not reviewed,gesla/alicante_i_outer_harbour-alio-esp-da_mm,true
-alicantetg-ali-esp-cmems,AlicanteTG,Spain,cmems,true,false,es/alicante-valencia,false,2019-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/alicantetg-ali-esp-cmems,false
+alicantetg-ali-esp-cmems,AlicanteTG,Spain,cmems,true,false,es/alicante-valencia,false,2019-11-01,2025-06-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/alicantetg-ali-esp-cmems,false
 alitak-9457804-usa-noaa,Alitak,United States,noaa,true,false,us/alitak,true,2006-05-18,2025-06-30,noaa/9457804,coops,coops/9457804,0,ready,,gesla/alitak-9457804-usa-noaa,true
 alliance-8761727-usa-noaa,Alliance,United States,noaa,true,false,us/alliance,true,1996-09-24,1999-01-19,noaa/8761727,coops,coops/8761727,0,ready,,gesla/alliance-8761727-usa-noaa,true
 alligator_creek_near_garfield_bight_fl-251032080473400-usa-usgs,Alligator_Creek_Near_Garfield_Bight_Fl,United States,usgs,true,true,us/alligator-creek-near-garfield-bight-fl,true,2007-10-01,2025-05-01,,usgs,usgs/251032080473400,0,ready,,gesla/alligator_creek_near_garfield_bight_fl-251032080473400-usa-usgs,true
 alloway_creek_at_hancocks_bridge_nj-1483050-usa-usgs,Alloway_Creek_At_Hancocks_Bridge_Nj,United States,usgs,true,true,us/alloway-creek-at-hancocks-bridge-nj,true,2018-10-12,2025-05-01,,usgs,usgs/01483050,0,ready,,gesla/alloway_creek_at_hancocks_bridge_nj-1483050-usa-usgs,true
 almeria2tg-alm-esp-cmems,Almeria2TG,Spain,cmems,true,false,es/almeria-andalusia,false,2016-01-01,2025-02-06,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/almeria2tg-alm-esp-cmems,false
-almeria3tg-alm-esp-cmems,Almeria3TG,Spain,cmems,true,true,es/almeria-ticon-almeria3tg-alm-esp-cmems,false,2019-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/almeria3tg-alm-esp-cmems,false
+almeria3tg-alm-esp-cmems,Almeria3TG,Spain,cmems,true,true,es/almeria-ticon-almeria3tg-alm-esp-cmems,false,2019-11-01,2025-06-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/almeria3tg-alm-esp-cmems,false
 almeriatg-alm-esp-cmems,AlmeriaTG,Spain,cmems,true,true,es/almeria,false,2006-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/almeriatg-alm-esp-cmems,false
 alofi-598-niu-uhslc_fd,Alofi,Niue,uhslc_fd,true,true,nu/alofi,true,2015-08-06,2025-05-31,,uhslc,uhslc/598,1.89,ready,,gesla/alofi-598-niu-uhslc_fd,true
 alofi-598a-niu-uhslc_rq,Alofi,Niue,uhslc_rq,true,false,nu/alofi,true,2015-08-06,2020-01-17,,uhslc,uhslc/598,0.03,ready,,gesla/alofi-598a-niu-uhslc_rq,true
@@ -174,12 +174,12 @@ armitage_island-9449932-usa-noaa,Armitage_Island,United States,noaa,true,false,u
 arrecife-205a-esp-uhslc_rq,Arrecife,Spain,uhslc_rq,true,true,es/arrecife,true,1959-04-01,1973-01-27,,uhslc,uhslc/205a,0.03,ready,,gesla/arrecife-205a-esp-uhslc_rq,true
 arrecife-205b-esp-uhslc_rq,Arrecife,Spain,uhslc_rq,true,false,es/arrecife,true,1973-01-27,1985-07-30,,uhslc,uhslc/205b,0.03,ready,,gesla/arrecife-205b-esp-uhslc_rq,true
 arrecife-205d-esp-uhslc_rq,Arrecife,Spain,uhslc_rq,true,false,es/arrecife,true,1987-01-01,1991-12-31,,uhslc,uhslc/205d,0.03,ready,,gesla/arrecife-205d-esp-uhslc_rq,true
-arrecife-arre-esp-ieo,Arrecife,Spain,ieo,true,true,es/arrecife-ticon-arrecife-arre-esp-ieo,true,1949-04-05,2016-12-31,,redmar,,,license,,gesla/arrecife-arre-esp-ieo,true
+arrecife-arre-esp-ieo,Arrecife,Spain,ieo,true,true,es/arrecife-ticon-arrecife-arre-esp-ieo,true,1949-04-05,2016-12-31,,ieo,,,license,,gesla/arrecife-arre-esp-ieo,true
 arrecifetg-arr-esp-cmems,ArrecifeTG,Spain,cmems,true,true,es/arrecife-ticon-arrecifetg-arr-esp-cmems,false,2008-03-10,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/arrecifetg-arr-esp-cmems,false
 arroyo_colorado_at_fm_106_rio_hondo_tx-8470500-usa-usgs,Arroyo_Colorado_At_Fm_106_Rio_Hondo_Tx,United States,usgs,true,true,us/arroyo-colorado-at-fm-106-rio-hondo-tx,true,2014-08-10,2025-04-30,,usgs,usgs/08470500,0,ready,,gesla/arroyo_colorado_at_fm_106_rio_hondo_tx-8470500-usa-usgs,true
 arthur_kill_at_perth_amboy_nj-1396060-usa-usgs,Arthur_Kill_At_Perth_Amboy_Nj,United States,usgs,true,true,us/arthur-kill-at-perth-amboy-nj,true,2016-08-19,2025-05-01,,usgs,usgs/01396060,0,ready,,gesla/arthur_kill_at_perth_amboy_nj-1396060-usa-usgs,true
 artificial_is-8537614-usa-noaa,Artificial_Is,United States,noaa,true,false,us/artificial-island,true,1978-12-01,1987-11-14,noaa/8537614,coops,coops/8537614,0,ready,,gesla/artificial_is-8537614-usa-noaa,true
-arun_platform-arn-gbr-cco,Arun_Platform,United Kingdom,cco,true,true,gb/arun-platform,true,2008-08-01,2023-09-18,,cco,,,license,Terms not reviewed,gesla/arun_platform-arn-gbr-cco,true
+arun_platform-arn-gbr-cco,Arun_Platform,United Kingdom,cco,true,true,gb/arun-platform,true,2008-08-01,2023-09-18,,cco,cco/86,0,ready,,gesla/arun_platform-arn-gbr-cco,true
 arunplatformtg-aru-gbr-cmems,ArunPlatformTG,United Kingdom,cmems,true,false,gb/arun-platform,false,2008-08-01,2024-02-09,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/arunplatformtg-aru-gbr-cmems,false
 asamushi-gs06-jpn-jodc_giaj,Asamushi,Japan,jodc_giaj,true,true,jp/asamushi,true,1954-05-31,2023-12-31,,jodc,jodc/GS06,0,restricted,JODC's terms ask for permission to republish,gesla/asamushi-gs06-jpn-jodc_giaj,false
 ascension-291-gbr-uhslc_fd,Ascension,United Kingdom,uhslc_fd,true,false,gb/ascension,true,2023-03-29,2025-06-30,,uhslc,uhslc/291,0.05,ready,,gesla/ascension-291-gbr-uhslc_fd,true
@@ -457,7 +457,7 @@ bridgetown-249a-brb-uhslc_rq,Bridgetown,Barbados,uhslc_rq,true,false,bb/bridgeto
 bridgetown-249b-brb-uhslc_rq,Bridgetown,Barbados,uhslc_rq,true,false,bb/bridgetown,true,1990-05-01,1991-08-30,,uhslc,uhslc/249b,0.03,ready,,gesla/bridgetown-249b-brb-uhslc_rq,true
 bridgetown-249c-brb-uhslc_rq,Bridgetown,Barbados,uhslc_rq,true,false,bb/bridgetown,true,1993-01-20,1996-02-23,,uhslc,uhslc/249c,0.03,ready,,gesla/bridgetown-249c-brb-uhslc_rq,true
 bridgetown-249d-brb-uhslc_rq,Bridgetown,Barbados,uhslc_rq,true,true,bb/bridgetown,true,2008-02-20,2010-12-31,,uhslc,uhslc/249d,2.06,ready,,gesla/bridgetown-249d-brb-uhslc_rq,true
-brighton-btn-gbr-cco,Brighton,United Kingdom,cco,true,true,gb/brighton,true,2018-06-18,2025-03-31,,cco,,,license,Terms not reviewed,gesla/brighton-btn-gbr-cco,true
+brighton-btn-gbr-cco,Brighton,United Kingdom,cco,true,true,gb/brighton,true,2018-06-18,2025-03-31,,cco,cco/88,0.01,ready,,gesla/brighton-btn-gbr-cco,true
 brightontg-bri-gbr-cmems,BrightonTG,United Kingdom,cmems,true,false,gb/brighton,false,2018-06-18,2025-04-07,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/brightontg-bri-gbr-cmems,false
 brisbane-331-aus-uhslc_fd,Brisbane,Australia,uhslc_fd,true,true,au/brisbane,true,1984-01-01,2025-05-31,,uhslc,uhslc/331,0.04,ready,,gesla/brisbane-331-aus-uhslc_fd,true
 brisbane-331a-aus-uhslc_rq,Brisbane,Australia,uhslc_rq,true,false,au/brisbane,true,1984-01-01,2021-12-31,,uhslc,uhslc/331,0.04,ready,,gesla/brisbane-331a-aus-uhslc_rq,true
@@ -525,7 +525,7 @@ cache_slough_above_ryer_island_ferry-ryf-usa-cdwr,Cache_Slough_Above_Ryer_Island
 cache_slough_at_ryer_island-ryi-usa-cdwr,Cache_Slough_At_Ryer_Island,United States,cdwr,true,true,us/cache-slough-at-ryer-island,true,2006-05-17,2019-04-29,,cdec,,,unmatched,No cdec/RYI in the list,gesla/cache_slough_at_ryer_island-ryi-usa-cdwr,true
 cache_slough_nr_hastings_tract_nr_rio_vista_ca-11455280-usa-usgs,Cache_Slough_Nr_Hastings_Tract_Nr_Rio_Vista_Ca,United States,usgs,true,true,us/cache-slough-nr-hastings-tract-nr-rio-vista-ca,true,2018-08-10,2023-01-07,,usgs,usgs/11455280,0,ready,,gesla/cache_slough_nr_hastings_tract_nr_rio_vista_ca-11455280-usa-usgs,true
 caddadup-dvcad01-aus-bom,Caddadup,Australia,bom,true,true,au/caddadup,true,1994-09-16,2019-12-31,,bom,,,unmatched,,gesla/caddadup-dvcad01-aus-bom,false
-cadiz-cadi-esp-ieo,Cadiz,Spain,ieo,true,true,es/cadiz,true,1961-01-01,2016-12-31,,redmar,,,license,,gesla/cadiz-cadi-esp-ieo,true
+cadiz-cadi-esp-ieo,Cadiz,Spain,ieo,true,true,es/cadiz,true,1961-01-01,2016-12-31,,ieo,,,license,,gesla/cadiz-cadi-esp-ieo,true
 cadzand-cadzd-nld-rws,Cadzand,Netherlands,rws,true,true,nl/cadzand,true,1971-01-01,2022-12-30,,rws,rws/cadzand.2,0,ready,,,
 cadzand-cadzd-nld-rws_hist,Cadzand,Netherlands,rws_hist,true,false,nl/cadzand,true,1971-01-01,2018-09-07,,rws,rws/cadzand.2,0,ready,,gesla/cadzand-cadzd-nld-rws_hist,true
 cadzandtg-cad-nld-cmems,CadzandTG,Netherlands,cmems,true,false,nl/cadzand-ticon-cadzandtg-cad-nld-cmems,false,2014-07-30,2025-06-30,,rws,rws/cadzand.2,0.08,ready,CMEMS record of a gauge the national feed publishes,gesla/cadzandtg-cad-nld-cmems,false
@@ -601,7 +601,7 @@ carpenters_bayou-car-usa-hct,Carpenters_Bayou,United States,hct,true,false,us/ca
 carrollton-8761955-usa-noaa,Carrollton,United States,noaa,true,false,us/carrollton,true,1996-09-24,2025-06-30,noaa/8761955,coops,coops/8761955,0,ready,,gesla/carrollton-8761955-usa-noaa,true
 cartagena-265a-col-uhslc_rq,Cartagena,Colombia,uhslc_rq,true,true,co/cartagena,true,1951-11-02,1993-04-26,,uhslc,uhslc/265a,0.05,ready,,gesla/cartagena-265a-col-uhslc_rq,true
 cartagena-265b-col-uhslc_rq,Cartagena,Colombia,uhslc_rq,true,false,co/cartagena,true,1993-05-01,2019-07-30,,uhslc,uhslc/265b,0.03,ready,,gesla/cartagena-265b-col-uhslc_rq,true
-cartagenatg-car-esp-cmems,CartagenaTG,Spain,cmems,true,true,es/cartagena-murcia,false,2019-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/cartagenatg-car-esp-cmems,false
+cartagenatg-car-esp-cmems,CartagenaTG,Spain,cmems,true,true,es/cartagena-murcia,false,2019-11-01,2025-06-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/cartagenatg-car-esp-cmems,false
 cascais-209-prt-uhslc_fd,Cascais,Portugal,uhslc_fd,true,true,pt/cascais,true,2008-11-06,2025-06-30,,uhslc,uhslc/209,0.04,ready,,gesla/cascais-209-prt-uhslc_fd,true
 cascais-209a-prt-uhslc_rq,Cascais,Portugal,uhslc_rq,true,false,pt/cascais,true,1959-01-01,2005-12-31,,uhslc,uhslc/209,0.04,ready,,gesla/cascais-209a-prt-uhslc_rq,true
 casey-130-aus-uhslc_fd,Casey,Australia,uhslc_fd,true,true,au/casey,true,1996-01-08,2008-11-16,,uhslc,uhslc/130,0.04,ready,,gesla/casey-130-aus-uhslc_fd,true
@@ -635,7 +635,7 @@ centuri-807-fra-refmar,Centuri,France,refmar,true,true,fr/centuri,true,2010-10-2
 centuritg_60minute-cen-fra-cmems,CenturiTG_60minute,France,cmems,true,false,fr/centuri,false,2010-10-21,2025-03-31,,refmar,refmar/807,0,ready,CMEMS record of a gauge the national feed publishes,gesla/centuritg_60minute-cen-fra-cmems,false
 ceuta-207-esp-uhslc_fd,Ceuta,Spain,uhslc_fd,true,true,es/ceuta,true,1944-03-01,2024-09-24,,uhslc,uhslc/207,0.03,ready,,gesla/ceuta-207-esp-uhslc_fd,true
 ceuta-207a-esp-uhslc_rq,Ceuta,Spain,uhslc_rq,true,false,es/ceuta,true,1944-03-01,2017-12-31,,uhslc,uhslc/207,0.03,ready,,gesla/ceuta-207a-esp-uhslc_rq,true
-ceuta-ceta-esp-ieo,Ceuta,Spain,ieo,true,true,es/ceuta-ticon-ceuta-ceta-esp-ieo,true,1944-03-01,2016-12-31,,redmar,,,license,,gesla/ceuta-ceta-esp-ieo,true
+ceuta-ceta-esp-ieo,Ceuta,Spain,ieo,true,true,es/ceuta-ticon-ceuta-ceta-esp-ieo,true,1944-03-01,2016-12-31,,ieo,,,license,,gesla/ceuta-ceta-esp-ieo,true
 chabahar-915-irn-uhslc_fd,Chabahar,Iran,uhslc_fd,true,true,ir/chabahar,true,2007-10-31,2019-06-23,,uhslc,uhslc/915,0.04,ready,,gesla/chabahar-915-irn-uhslc_fd,true
 chabahar-915a-irn-uhslc_rq,Chabahar,Iran,uhslc_rq,true,false,ir/chabahar,true,2007-10-31,2016-12-31,,uhslc,uhslc/915,0.04,ready,,gesla/chabahar-915a-irn-uhslc_rq,true
 chaleix_noumea-16-fra-refmar,Chaleix_Noumea,France,refmar,true,true,fr/chaleix-noumea,true,1967-02-24,2005-06-30,,refmar,refmar/16,0,ready,,gesla/chaleix_noumea-16-fra-refmar,true
@@ -787,8 +787,8 @@ cordova_alaska-583b-usa-uhslc_rq,Cordova_Alaska,United States,uhslc_rq,true,fals
 cornwall_ontario-14870-can-meds,Cornwall_Ontario,Canada,meds,true,true,ca/cornwall,true,1961-12-01,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/cornwall_ontario-14870-can-meds,false
 corpus_cristi_tx-770a-usa-uhslc_rq,Corpus_Cristi_TX,United States,uhslc_rq,true,false,us/corpus-christi,true,1983-12-01,2021-12-31,noaa/8775870,coops,coops/8775870,0.03,ready,UHSLC relay of noaa/8775870,gesla/corpus_cristi_tx-770a-usa-uhslc_rq,true
 corte_madera_creek-9414874-usa-noaa,Corte_Madera_Creek,United States,noaa,true,false,us/corte-madera-creek,true,1977-05-11,1979-04-27,noaa/9414874,coops,coops/9414874,0,ready,,gesla/corte_madera_creek-9414874-usa-noaa,true
-coruna-coru-esp-ieo,Coruna,Spain,ieo,true,false,es/coruna,true,1943-03-01,2016-12-31,,redmar,,,license,,gesla/coruna-coru-esp-ieo,true
-coruna2tg-cor-esp-cmems,Coruna2TG,Spain,cmems,true,false,es/coruna-ticon-coruna2tg-cor-esp-cmems,false,2019-11-01,2024-06-04,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/coruna2tg-cor-esp-cmems,false
+coruna-coru-esp-ieo,Coruna,Spain,ieo,true,false,es/coruna,true,1943-03-01,2016-12-31,,ieo,,,license,,gesla/coruna-coru-esp-ieo,true
+coruna2tg-cor-esp-cmems,Coruna2TG,Spain,cmems,true,false,es/coruna-ticon-coruna2tg-cor-esp-cmems,false,2019-11-01,2024-06-04,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/coruna2tg-cor-esp-cmems,false
 corunatg-cor-esp-cmems,CorunaTG,Spain,cmems,true,true,es/coruna-galicia,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/corunatg-cor-esp-cmems,false
 cote_ste_catherine-15450-can-meds,Cote_Ste_Catherine,Canada,meds,true,true,ca/cote-ste-catherine,true,1961-11-01,1997-08-28,,chs,,,restricted,CHS license bars commercial derivatives,gesla/cote_ste_catherine-15450-can-meds,false
 coteau_du_lac-15140-can-meds,Coteau_Du_Lac,Canada,meds,true,true,ca/coteau-du-lac,true,1961-12-01,1997-07-08,,chs,,,restricted,CHS license bars commercial derivatives,gesla/coteau_du_lac-15140-can-meds,false
@@ -1150,7 +1150,7 @@ crozet-178-fra-uhslc_fd,Crozet,France,uhslc_fd,true,true,fr/crozet,true,1995-11-
 crozet-178a-fra-uhslc_rq,Crozet,France,uhslc_rq,true,false,fr/crozet,true,1995-11-18,1999-06-27,,uhslc,uhslc/178a,0,ready,,gesla/crozet-178a-fra-uhslc_rq,true
 crozet-178b-fra-uhslc_rq,Crozet,France,uhslc_rq,true,false,fr/crozet,true,2000-03-12,2001-07-29,,uhslc,uhslc/178,0,ready,,gesla/crozet-178b-fra-uhslc_rq,true
 crumpton-8573349-usa-noaa,Crumpton,United States,noaa,true,false,us/crumpton,true,2005-04-21,2010-12-13,noaa/8573349,coops,coops/8573349,0,ready,,gesla/crumpton-8573349-usa-noaa,true
-cruz-cruz-esp-ieo,Cruz,Spain,ieo,true,true,es/cruz,true,1949-05-01,2016-12-31,,redmar,,,license,,gesla/cruz-cruz-esp-ieo,true
+cruz-cruz-esp-ieo,Cruz,Spain,ieo,true,true,es/cruz,true,1949-05-01,2016-12-31,,ieo,,,license,,gesla/cruz-cruz-esp-ieo,true
 crystal_river_at_bagley_cove_near_crystal_river_fl-2310747-usa-usgs,Crystal_River_At_Bagley_Cove_Near_Crystal_River_Fl,United States,usgs,true,true,us/crystal-river-at-bagley-cove-near-crystal-river-fl,true,2007-10-01,2022-10-05,,usgs,usgs/02310747,0,ready,,gesla/crystal_river_at_bagley_cove_near_crystal_river_fl-2310747-usa-usgs,true
 crystal_river_at_mouth_of_kings_bay_fl-2310742-usa-usgs,Crystal_River_At_Mouth_Of_Kings_Bay_Fl,United States,usgs,true,true,us/crystal-river-at-mouth-of-kings-bay-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02310742,0,ready,,gesla/crystal_river_at_mouth_of_kings_bay_fl-2310742-usa-usgs,true
 crystal_river_near_crystal_river_fl-2310750-usa-usgs,Crystal_River_Near_Crystal_River_Fl,United States,usgs,true,true,us/crystal-river-near-crystal-river-fl,true,2020-11-18,2025-04-30,,usgs,usgs/02310750,0,ready,,gesla/crystal_river_near_crystal_river_fl-2310750-usa-usgs,true
@@ -1203,7 +1203,7 @@ davis-173-aus-uhslc_fd,Davis,Australia,uhslc_fd,true,true,au/davis-australia,tru
 davis-173a-aus-uhslc_rq,Davis,Australia,uhslc_rq,true,false,au/davis-australia,true,1993-04-22,2010-01-28,,uhslc,uhslc/173,0.01,ready,,gesla/davis-173a-aus-uhslc_rq,true
 daytona_beach_shores-8721120-usa-noaa,Daytona_Beach_Shores,United States,noaa,true,false,us/daytona-beach-shores,true,1980-01-01,1984-01-20,noaa/8721120,coops,coops/8721120,0,ready,,gesla/daytona_beach_shores-8721120-usa-noaa,true
 de_tour_village_mi-9075099-usa-noaa,De_Tour_Village_Mi,United States,noaa,true,true,us/de-tour-village-mi,true,1977-11-17,2025-07-01,noaa/9075099,coops,coops/9075099,0,ready,,gesla/de_tour_village_mi-9075099-usa-noaa,true
-deal_pier-dlp-gbr-cco,Deal_Pier,United Kingdom,cco,true,true,gb/deal-pier,true,2006-01-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/deal_pier-dlp-gbr-cco,true
+deal_pier-dlp-gbr-cco,Deal_Pier,United Kingdom,cco,true,true,gb/deal-pier,true,2006-01-01,2025-05-31,,cco,cco/90,0,ready,,gesla/deal_pier-dlp-gbr-cco,true
 dealpiertg-dea-gbr-cmems,DealPierTG,United Kingdom,cmems,true,false,gb/deal-pier,false,2006-01-01,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/dealpiertg-dea-gbr-cmems,false
 deeneplaat-deenpt-nld-rws_hist,Deeneplaat,Netherlands,rws_hist,true,false,nl/deeneplaat,true,1970-11-01,1996-01-10,,rws,rws/deeneplaat,0,ready,,gesla/deeneplaat-deenpt-nld-rws_hist,true
 deep_creek_at_spuds_fl-2245260-usa-usgs,Deep_Creek_At_Spuds_Fl,United States,usgs,true,true,us/deep-creek-at-spuds-fl,true,2007-10-03,2025-05-01,,usgs,usgs/02245260,0,ready,,gesla/deep_creek_at_spuds_fl-2245260-usa-usgs,true
@@ -1405,7 +1405,7 @@ euro_platform-eurpfm-nld-rws_hist,Euro_platform,Netherlands,rws_hist,true,false,
 europlatformtg-eur-nld-cmems,EuroplatformTG,Netherlands,cmems,true,false,nl/europlatform,false,2014-01-06,2025-06-30,,rws,rws/europlatform,0.42,ready,CMEMS record of a gauge the national feed publishes,gesla/europlatformtg-eur-nld-cmems,false
 evandale-98-can-meds,Evandale,Canada,meds,true,true,ca/evandale,true,1965-04-03,1969-08-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/evandale-98-can-meds,false
 exmouth-62435-aus-bom,Exmouth,Australia,bom,true,true,au/exmouth,true,1989-11-30,2022-12-31,,bom,,,unmatched,,gesla/exmouth-62435-aus-bom,false
-exmouth-exm-gbr-cco,Exmouth,United Kingdom,cco,true,true,gb/exmouth-england,true,2015-10-16,2025-05-30,,cco,,,license,Terms not reviewed,gesla/exmouth-exm-gbr-cco,true
+exmouth-exm-gbr-cco,Exmouth,United Kingdom,cco,true,true,gb/exmouth-england,true,2015-10-16,2025-05-30,,cco,cco/117,0,ready,,gesla/exmouth-exm-gbr-cco,true
 exmouthtg-exm-gbr-cmems,ExmouthTG,United Kingdom,cmems,true,false,gb/exmouth-england,false,2015-10-16,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/exmouthtg-exm-gbr-cmems,false
 exuma_cays-256a-bhs-uhslc_rq,Exuma_Cays,The Bahamas,uhslc_rq,true,true,bs/exuma-cays,true,1992-03-23,1993-04-23,,uhslc,uhslc/256a,0.03,ready,,gesla/exuma_cays-256a-bhs-uhslc_rq,true
 f3platformtg-f3p-nld-cmems,F3platformTG,Netherlands,cmems,true,true,nl/f3platform,false,2014-08-01,2025-06-30,,rws,rws/f3,0.53,ready,CMEMS record of a gauge the national feed publishes,gesla/f3platformtg-f3p-nld-cmems,false
@@ -1521,7 +1521,7 @@ fripps_inlet-8668498-usa-noaa,Fripps_Inlet,United States,noaa,true,false,us/frip
 frog_creek_near_rubonia_fl-2300082-usa-usgs,Frog_Creek_Near_Rubonia_Fl,United States,usgs,true,false,us/frog-creek-near-rubonia-fl,true,2007-10-01,2025-05-01,,usgs,usgs/02300082,0,ready,,gesla/frog_creek_near_rubonia_fl-2300082-usa-usgs,true
 frontera_radar-6-mex-unam,Frontera_Radar,Mexico,unam,true,true,mx/frontera-radar,true,2021-04-01,2024-06-01,,unam,,,unmatched,No unam/6-radar in the list,gesla/frontera_radar-6-mex-unam,false
 frost_creek_at_sheep_ln_bridge_at_lattingtown_ny-1302845-usa-usgs,Frost_Creek_At_Sheep_Ln_Bridge_At_Lattingtown_Ny,United States,usgs,true,true,us/frost-creek-at-sheep-ln-bridge-at-lattingtown-ny,true,2007-12-13,2025-05-01,,usgs,usgs/01302845,0,ready,,gesla/frost_creek_at_sheep_ln_bridge_at_lattingtown_ny-1302845-usa-usgs,true
-fuerteventura3tg-fue-esp-cmems,Fuerteventura3TG,Spain,cmems,true,true,es/fuerteventura,false,2019-11-01,2025-04-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/fuerteventura3tg-fue-esp-cmems,false
+fuerteventura3tg-fue-esp-cmems,Fuerteventura3TG,Spain,cmems,true,true,es/fuerteventura,false,2019-11-01,2025-04-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/fuerteventura3tg-fue-esp-cmems,false
 fuerteventuratg-fue-esp-cmems,FuerteventuraTG,Spain,cmems,true,true,es/fuerteventura-ticon-fuerteventuratg-fue-esp-cmems,false,2004-01-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/fuerteventuratg-fue-esp-cmems,false
 fukaura-ma57-jpn-jodc_jma,Fukaura,Japan,jodc_jma,true,false,jp/fukaura,true,1972-03-31,2023-12-31,jma/FK,jma,jma/FK,0.66,ready,JODC relay of jma/FK,gesla/fukaura-ma57-jpn-jodc_jma,false
 fukue-ma50-jpn-jodc_jma,Fukue,Japan,jodc_jma,true,false,jp/fukue,true,1964-12-31,2023-12-31,jma/FE,jma,jma/FE,0.43,ready,JODC relay of jma/FE,gesla/fukue-ma50-jpn-jodc_jma,false
@@ -1763,7 +1763,7 @@ harvest_oil_p_ca-594a-usa-uhslc_rq,Harvest_Oil_P_CA,United States,uhslc_rq,true,
 harvey-dvhar01-aus-bom,Harvey,Australia,bom,true,true,au/harvey,true,1989-12-18,2022-12-31,,bom,,,unmatched,,gesla/harvey-dvhar01-aus-bom,false
 harwich-har-gbr-bodc,Harwich,United Kingdom,bodc,true,true,gb/harwich,true,1954-01-02,2025-05-31,,ea,ea/E71439,0,ready,The EA's real-time readings of the gauge,gesla/harwich-har-gbr-bodc,true
 harwich-har-gbr-cmems,Harwich,United Kingdom,cmems,true,false,gb/harwich,false,2004-04-24,2025-06-30,,ea,ea/E71439,0.01,ready,The EA's real-time readings of the gauge,gesla/harwich-har-gbr-cmems,false
-hastings_pier-hgp-gbr-cco,Hastings_Pier,United Kingdom,cco,true,true,gb/hastings-pier,true,2017-01-27,2025-05-31,,cco,,,license,Terms not reviewed,gesla/hastings_pier-hgp-gbr-cco,true
+hastings_pier-hgp-gbr-cco,Hastings_Pier,United Kingdom,cco,true,true,gb/hastings-pier,true,2017-01-27,2025-05-31,,cco,cco/126,0,ready,,gesla/hastings_pier-hgp-gbr-cco,true
 hastingspiertg-has-gbr-cmems,HastingsPierTG,United Kingdom,cmems,true,false,gb/hastings-pier,false,2017-01-27,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/hastingspiertg-has-gbr-cmems,false
 hatfield_point-97-can-meds,Hatfield_Point,Canada,meds,true,false,ca/hatfield-point,true,1965-11-19,1969-08-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/hatfield_point-97-can-meds,false
 haulover_canal_near_mimsfl-2248380-usa-usgs,Haulover_Canal_Near_MimsFl,United States,usgs,true,false,us/haulover-canal-near-mims-fl,true,2010-10-01,2025-04-30,,usgs,usgs/02248380,0,ready,,gesla/haulover_canal_near_mimsfl-2248380-usa-usgs,true
@@ -1798,7 +1798,7 @@ henslung_cove-9958-can-meds,Henslung_Cove,Canada,meds,true,true,ca/henslung-cove
 herbaudiere-198-fra-refmar,Herbaudiere,France,refmar,true,true,fr/herbaudiere,true,1985-05-11,2025-03-31,,refmar,refmar/198,0,ready,,gesla/herbaudiere-198-fra-refmar,true
 herbaudieretg_60minute-her-fra-cmems,HerbaudiereTG_60minute,France,cmems,true,false,fr/herbaudiere,false,1985-05-11,2025-03-31,,refmar,refmar/198,0.05,ready,CMEMS record of a gauge the national feed publishes,gesla/herbaudieretg_60minute-her-fra-cmems,false
 herbrumhafendamm-3770030-deu-wsv,Herbrumhafendamm,Germany,wsv,true,true,de/herbrumhafendamm,true,2001-10-30,2025-07-11,,pegelonline,pegelonline/3770030,0.18,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/herbrumhafendamm-3770030-deu-wsv,true
-herne_bay-hby-gbr-cco,Herne_Bay,United Kingdom,cco,true,true,gb/herne-bay,true,1996-03-19,2025-05-31,,cco,,,license,Terms not reviewed,gesla/herne_bay-hby-gbr-cco,true
+herne_bay-hby-gbr-cco,Herne_Bay,United Kingdom,cco,true,true,gb/herne-bay,true,1996-03-19,2025-05-31,,cco,cco/89,0.03,ready,,gesla/herne_bay-hby-gbr-cco,true
 hernebaytg-her-gbr-cmems,HerneBayTG,United Kingdom,cmems,true,false,gb/herne-bay,false,1997-01-01,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/hernebaytg-her-gbr-cmems,false
 herring_r_at_chequessett_neck_rd_at_wellfleet_ma-11058798-usa-usgs,Herring_R_At_Chequessett_Neck_Rd_At_Wellfleet_Ma,United States,usgs,true,true,us/herring-r-at-chequessett-neck-rd-at-wellfleet-ma,true,2017-09-27,2022-10-24,,usgs,usgs/011058798,0,ready,,gesla/herring_r_at_chequessett_neck_rd_at_wellfleet_ma-11058798-usa-usgs,true
 herwijnen-herwnn-nld-rws_hist,Herwijnen,Netherlands,rws_hist,true,false,nl/herwijnen,true,1876-01-03,1991-05-31,,rws,rws/herwijnen,0,ready,,gesla/herwijnen-herwnn-nld-rws_hist,true
@@ -2530,7 +2530,7 @@ lunde_sjov-35209-swe-smhi,Lunde_Sjov,Sweden,smhi,true,true,se/lunde-sjov,true,20
 lungsurannaga-410a-idn-uhslc_rq,Lungsurannaga,Indonesia,uhslc_rq,true,true,id/lungsurannaga,true,1943-01-01,1944-11-30,,uhslc,uhslc/410a,0,ready,,gesla/lungsurannaga-410a-idn-uhslc_rq,true
 lusi-633a-chn-uhslc_rq,Lusi,China,uhslc_rq,true,true,cn/lusi,true,1975-01-01,1996-10-31,,uhslc,uhslc/633a,0.04,ready,,gesla/lusi-633a-chn-uhslc_rq,true
 lyell_bay_bc-9756-can-meds,Lyell_Bay_BC,Canada,meds,true,true,ca/lyell-bay-bc,true,2016-05-31,2017-11-15,,chs,,,restricted,CHS license bars commercial derivatives,gesla/lyell_bay_bc-9756-can-meds,false
-lymington-lym-gbr-cco,Lymington,United Kingdom,cco,true,true,gb/lymington,true,2007-08-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/lymington-lym-gbr-cco,true
+lymington-lym-gbr-cco,Lymington,United Kingdom,cco,true,true,gb/lymington,true,2007-08-01,2025-05-31,,cco,cco/87,0,ready,,gesla/lymington-lym-gbr-cco,true
 lymingtontg-lym-gbr-cmems,LymingtonTG,United Kingdom,cmems,true,false,gb/lymington,false,2007-08-01,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/lymingtontg-lym-gbr-cmems,false
 lynchburg_landing-8770733-usa-noaa,Lynchburg_Landing,United States,noaa,true,false,us/lynchburg-landing,true,1996-01-01,2017-08-29,noaa/8770733,coops,coops/8770733,0.06,ready,,gesla/lynchburg_landing-8770733-usa-noaa,true
 lynnhaven_riv_off_vista_cir_nr_virginia_beach_va-365423076051300-usa-usgs,Lynnhaven_Riv_Off_Vista_Cir_Nr_Virginia_Beach_Va,United States,usgs,true,true,us/lynnhaven-riv-off-vista-cir-nr-virginia-beach-va,true,2015-09-25,2019-11-25,,usgs,usgs/365423076051300,0,ready,,gesla/lynnhaven_riv_off_vista_cir_nr_virginia_beach_va-365423076051300-usa-usgs,true
@@ -2570,7 +2570,7 @@ makemo-454-pyf-uhslc_fd,Makemo,French Polynesia,uhslc_fd,true,true,pf/makemo,tru
 makemo-586-fra-refmar,Makemo,France,refmar,true,true,fr/makemo-france,true,1990-06-27,2021-04-08,,refmar,refmar/586,0,ready,,gesla/makemo-586-fra-refmar,true
 makemotg_60minute-mak-fra-cmems,MakemoTG_60minute,France,cmems,true,false,fr/makemo-france,false,1990-06-27,2021-04-08,,refmar,refmar/586,0,ready,CMEMS record of a gauge the national feed publishes,gesla/makemotg_60minute-mak-fra-cmems,false
 makurazaki-ma43-jpn-jodc_jma,Makurazaki,Japan,jodc_jma,true,false,jp/makurazaki,true,1965-06-30,2023-12-31,jma/MK,jma,jma/MK,0.67,ready,JODC relay of jma/MK,gesla/makurazaki-ma43-jpn-jodc_jma,false
-malaga-mala-esp-ieo,Malaga,Spain,ieo,true,true,es/malaga,true,1944-01-01,2012-12-31,,redmar,,,license,,gesla/malaga-mala-esp-ieo,true
+malaga-mala-esp-ieo,Malaga,Spain,ieo,true,true,es/malaga,true,1944-01-01,2012-12-31,,ieo,,,license,,gesla/malaga-mala-esp-ieo,true
 malagatg-mal-esp-cmems,MalagaTG,Spain,cmems,true,false,es/malaga-andalusia,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/malagatg-mal-esp-cmems,false
 malakal-007-plw-uhslc_fd,Malakal,Palau,uhslc_fd,true,true,pw/malakal-koror,true,1969-05-18,2025-06-30,,uhslc,uhslc/007,1.43,ready,,gesla/malakal-007-plw-uhslc_fd,true
 malakal-007a-plw-uhslc_rq,Malakal,Palau,uhslc_rq,true,false,pw/malakal,true,1926-01-01,1939-12-10,,uhslc,uhslc/007a,0.05,ready,,gesla/malakal-007a-plw-uhslc_rq,true
@@ -3211,7 +3211,7 @@ paleochora-pal-grc-cmems,Paleochora,Greece,cmems,true,true,gr/paleochora,false,2
 palermo-pal-ita-ispra,Palermo,Italy,ispra,true,true,it/palermo,true,1992-03-19,2025-07-06,,ispra,,,license,,gesla/palermo-pal-ita-ispra,true
 palinuro-pal-ita-ispra,Palinuro,Italy,ispra,true,true,it/palinuro,true,1987-12-16,2025-07-06,,ispra,,,license,,gesla/palinuro-pal-ita-ispra,true
 palm_river_near_goodland_fl-255732081363700-usa-usgs,Palm_River_Near_Goodland_Fl,United States,usgs,true,true,us/palm-river-near-goodland-fl,true,2011-11-18,2015-10-22,,usgs,usgs/255732081363700,0,ready,,gesla/palm_river_near_goodland_fl-255732081363700-usa-usgs,true
-palma-palm-esp-ieo,Palma,Spain,ieo,true,true,es/palma,true,1997-04-07,2016-12-31,,redmar,,,license,,gesla/palma-palm-esp-ieo,true
+palma-palm-esp-ieo,Palma,Spain,ieo,true,true,es/palma,true,1997-04-07,2016-12-31,,ieo,,,license,,gesla/palma-palm-esp-ieo,true
 palmademallorcatg-pal-esp-cmems,PalmadeMallorcaTG,Spain,cmems,true,true,es/palmade-mallorca,false,2009-09-11,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/palmademallorcatg-pal-esp-cmems,false
 palmeira-235-cpv-uhslc_fd,Palmeira,Cabo Verde,uhslc_fd,true,true,cv/palmeira,true,2000-03-12,2025-06-30,,uhslc,uhslc/235,0.53,ready,,gesla/palmeira-235-cpv-uhslc_fd,true
 palmeira-235a-cpv-uhslc_rq,Palmeira,Cabo Verde,uhslc_rq,true,false,cv/palmeira,true,2000-03-12,2018-12-31,,uhslc,uhslc/235,0.03,ready,,gesla/palmeira-235a-cpv-uhslc_rq,true
@@ -3270,7 +3270,7 @@ pemba-192-moz-uhslc_fd,Pemba,Mozambique,uhslc_fd,true,true,mz/pemba,true,2007-04
 pemba-192b-moz-uhslc_rq,Pemba,Mozambique,uhslc_rq,true,false,mz/pemba,true,1982-12-14,1984-11-30,,uhslc,uhslc/192b,0.05,ready,,gesla/pemba-192b-moz-uhslc_rq,true
 pemba-192c-moz-uhslc_rq,Pemba,Mozambique,uhslc_rq,true,false,mz/pemba,true,2007-04-19,2013-06-28,,uhslc,uhslc/192,0.05,ready,,gesla/pemba-192c-moz-uhslc_rq,true
 penang-144a-mys-uhslc_rq,Penang,Malaysia,uhslc_rq,true,true,my/penang,true,1984-11-15,2023-01-06,,uhslc,uhslc/144a,0.05,ready,,gesla/penang-144a-mys-uhslc_rq,true
-penarth-pen-gbr-cco,Penarth,United Kingdom,cco,true,true,gb/penarth,true,2021-01-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/penarth-pen-gbr-cco,true
+penarth-pen-gbr-cco,Penarth,United Kingdom,cco,true,true,gb/penarth,true,2021-01-01,2025-05-31,,cco,cco/119,0.02,ready,,gesla/penarth-pen-gbr-cco,true
 penichetg-pen-prt-cmems,PenicheTG,Portugal,cmems,true,true,pt/peniche,false,2014-09-20,2024-04-10,,cmems,,,restricted,GESLA lists CMEMS as research only,gesla/penichetg-pen-prt-cmems,false
 penikese_island-8448248-usa-noaa,Penikese_Island,United States,noaa,true,false,us/penikese-island,true,1993-03-22,1994-10-05,noaa/8448248,coops,coops/8448248,0,ready,,gesla/penikese_island-8448248-usa-noaa,true
 penobscot_river_at_bangor_maine-1037050-usa-usgs,Penobscot_River_At_Bangor_Maine,United States,usgs,true,true,us/penobscot-river-at-bangor-maine,true,2012-10-01,2025-05-01,,usgs,usgs/01037050,0,ready,,gesla/penobscot_river_at_bangor_maine-1037050-usa-usgs,true
@@ -3312,7 +3312,7 @@ platform_hoorn_q1_a-q1-nld-rws,Platform_Hoorn_Q1_A,Netherlands,rws,true,true,nl/
 platform_j6-j6-nld-rws,Platform_J6,Netherlands,rws,true,true,nl/platform-j6,true,2009-02-01,2023-12-31,,rws,rws/j6,0,ready,,,
 plimiri-pli-grc-cmems,Plimiri,Greece,cmems,true,true,gr/plimiri,false,2015-11-11,2023-09-01,,cmems,,,restricted,GESLA lists CMEMS as research only,gesla/plimiri-pli-grc-cmems,false
 plum_island_plum_gut_harbor-8511236-usa-noaa,Plum_Island_Plum_Gut_Harbor,United States,noaa,true,false,us/plum-gut-harbor,true,1963-01-01,1990-07-27,noaa/8511236,coops,coops/8511236,0,ready,,gesla/plum_island_plum_gut_harbor-8511236-usa-noaa,true
-pluz-pluz-esp-ieo,Pluz,Spain,ieo,true,false,es/pluz,true,1949-04-17,2016-12-31,,redmar,,,license,,gesla/pluz-pluz-esp-ieo,true
+pluz-pluz-esp-ieo,Pluz,Spain,ieo,true,false,es/pluz,true,1949-04-17,2016-12-31,,ieo,,,license,,gesla/pluz-pluz-esp-ieo,true
 plymouth-ply-gbr-cmems,Plymouth,United Kingdom,cmems,true,false,gb/plymouth-england,false,1991-03-14,2025-06-30,,ea,ea/E72139,0,ready,The EA's real-time readings of the gauge,gesla/plymouth-ply-gbr-cmems,false
 pogum-3950020-deu-wsv,Pogum,Germany,wsv,true,true,de/pogum,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3950020,0.18,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/pogum-3950020-deu-wsv,true
 pohnpei-001-fsm-uhslc_fd,Pohnpei,Federated States of Micronesia,uhslc_fd,true,true,fm/pohnpei,true,2001-12-16,2025-05-31,,uhslc,uhslc/001,0.05,ready,,gesla/pohnpei-001-fsm-uhslc_fd,true
@@ -3406,7 +3406,7 @@ port_hedland-169-aus-uhslc_fd,Port_Hedland,Australia,uhslc_fd,true,true,au/port-
 port_hedland-169a-aus-uhslc_rq,Port_Hedland,Australia,uhslc_rq,true,false,au/port-hedland,true,1984-01-01,2021-12-31,,uhslc,uhslc/169,0.03,ready,,gesla/port_hedland-169a-aus-uhslc_rq,true
 port_hedland-62590-aus-bom,Port_Hedland,Australia,bom,true,false,au/port-hedland-ticon-port-hedland-62590-aus-bom,true,1960-05-31,2022-12-31,,bom,,,unmatched,,gesla/port_hedland-62590-aus-bom,false
 port_inland_mi-9087096-usa-noaa,Port_Inland_Mi,United States,noaa,true,true,us/port-inland,true,1970-01-01,2025-07-01,noaa/9087096,coops,coops/9087096,0,ready,,gesla/port_inland_mi-9087096-usa-noaa,true
-port_isaac-pti-gbr-cco,Port_Isaac,United Kingdom,cco,true,true,gb/port-isaac,true,2010-07-26,2025-05-31,,cco,,,license,Terms not reviewed,gesla/port_isaac-pti-gbr-cco,true
+port_isaac-pti-gbr-cco,Port_Isaac,United Kingdom,cco,true,true,gb/port-isaac,true,2010-07-26,2025-05-31,,cco,cco/102,0,ready,,gesla/port_isaac-pti-gbr-cco,true
 port_isabel-8779770-usa-noaa,Port_Isabel,United States,noaa,true,false,us/port-isabel,true,1944-04-01,2025-06-30,noaa/8779770,coops,coops/8779770,0,ready,,gesla/port_isabel-8779770-usa-noaa,true
 port_isabel_tx-772a-usa-uhslc_rq,Port_Isabel_TX,United States,uhslc_rq,true,false,us/port-isabel,true,1944-04-01,2021-12-31,noaa/8779770,coops,coops/8779770,0.14,ready,UHSLC relay of noaa/8779770,gesla/port_isabel_tx-772a-usa-uhslc_rq,true
 port_jefferson-8514560-usa-noaa,Port_Jefferson,United States,noaa,true,false,us/port-jefferson,true,1957-09-17,1992-10-01,noaa/8514560,coops,coops/8514560,0,ready,,gesla/port_jefferson-8514560-usa-noaa,true
@@ -3931,7 +3931,7 @@ sand_point_ak-574-usa-uhslc_fd,Sand_Point_AK,United States,uhslc_fd,true,false,u
 sand_point_ak-574a-usa-uhslc_rq,Sand_Point_AK,United States,uhslc_rq,true,false,us/sand-point-popof-island,true,1972-09-10,2022-12-31,noaa/9459450,coops,coops/9459450,0.61,ready,UHSLC relay of noaa/9459450,gesla/sand_point_ak-574a-usa-uhslc_rq,true
 sandakan-389a-mys-uhslc_rq,Sandakan,Malaysia,uhslc_rq,true,true,my/sandakan,true,1993-12-24,2023-01-07,,uhslc,uhslc/389a,0.03,ready,,gesla/sandakan-389a-mys-uhslc_rq,true
 sandnestg-san-nor-cmems,SandnesTG,Norway,cmems,true,false,no/sandnes,false,2021-11-30,2025-01-09,,kartverket,kartverket/SBG,0,ready,CMEMS record of a gauge the national feed publishes,gesla/sandnestg-san-nor-cmems,false
-sandown_pier-sdp-gbr-cco,Sandown_Pier,United Kingdom,cco,true,true,gb/sandown-pier,true,2006-06-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/sandown_pier-sdp-gbr-cco,true
+sandown_pier-sdp-gbr-cco,Sandown_Pier,United Kingdom,cco,true,true,gb/sandown-pier,true,2006-06-01,2025-05-31,,cco,cco/92,0,ready,,gesla/sandown_pier-sdp-gbr-cco,true
 sandownpiertg-san-gbr-cmems,SandownPierTG,United Kingdom,cmems,true,false,gb/sandown-pier,false,2006-06-01,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/sandownpiertg-san-gbr-cmems,false
 sandwich-8447180-usa-noaa,Sandwich,United States,noaa,true,false,us/sandwich,true,1969-08-06,2001-08-31,noaa/8447180,coops,coops/8447180,0,ready,,gesla/sandwich-8447180-usa-noaa,true
 sandy_cove_bc-7786-can-meds,Sandy_Cove_BC,Canada,meds,true,true,ca/sandy-cove-bc,true,2009-10-23,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/sandy_cove_bc-7786-can-meds,false
@@ -3951,7 +3951,7 @@ santana-716b-bra-uhslc_rq,Santana,Brazil,uhslc_rq,true,false,br/santana,true,197
 santana-716c-bra-uhslc_rq,Santana,Brazil,uhslc_rq,true,false,br/santana,true,1984-01-01,1985-07-01,,uhslc,uhslc/716c,0.03,ready,,gesla/santana-716c-bra-uhslc_rq,true
 santana-716e-bra-uhslc_rq,Santana,Brazil,uhslc_rq,true,true,br/santana,true,2006-01-01,2007-12-31,,uhslc,uhslc/716e,0.05,ready,,gesla/santana-716e-bra-uhslc_rq,true
 santana_ssn-717b-bra-uhslc_rq,Santana_SSN,Brazil,uhslc_rq,true,true,br/santana-ssn,true,1999-01-01,2000-02-01,,uhslc,uhslc/717b,0.03,ready,,gesla/santana_ssn-717b-bra-uhslc_rq,true
-santander-sant-esp-ieo,Santander,Spain,ieo,true,true,es/santander,true,1943-05-08,2016-12-31,,redmar,,,license,,gesla/santander-sant-esp-ieo,true
+santander-sant-esp-ieo,Santander,Spain,ieo,true,true,es/santander,true,1943-05-08,2016-12-31,,ieo,,,license,,gesla/santander-sant-esp-ieo,true
 santandertg-san-esp-cmems,SantanderTG,Spain,cmems,true,false,es/santander,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/santandertg-san-esp-cmems,false
 santee_river_nr_jamestown_sc-2171700-usa-usgs,Santee_River_Nr_Jamestown_Sc,United States,usgs,true,false,us/santee-river-nr-jamestown-sc,true,2011-08-01,2025-04-30,,usgs,usgs/02171700,0,ready,,gesla/santee_river_nr_jamestown_sc-2171700-usa-usgs,true
 sao_tome-225-stp-uhslc_fd,Sao_Tome,Sao Tome and Principe,uhslc_fd,true,true,st/sao-tome,true,2004-08-27,2010-08-09,,uhslc,uhslc/225,0.05,ready,,gesla/sao_tome-225-stp-uhslc_fd,true
@@ -3978,7 +3978,7 @@ savannah_river_at_garden_city_ga-21989715-usa-usgs,Savannah_River_At_Garden_City
 savannah_river_at_usace_dock_at_savannah_ga-21989773-usa-usgs,Savannah_River_At_Usace_Dock_At_Savannah_Ga,United States,usgs,true,true,us/savannah-river-at-usace-dock-at-savannah-ga,true,2007-10-01,2025-05-01,,usgs,usgs/021989773,0,ready,,gesla/savannah_river_at_usace_dock_at_savannah_ga-21989773-usa-usgs,true
 savannah_river_i_95_near_port_wentworth_ga-2198840-usa-usgs,Savannah_River_I_95_Near_Port_Wentworth_Ga,United States,usgs,true,true,us/savannah-river-i-95-near-port-wentworth-ga,true,2007-10-01,2025-05-01,,usgs,usgs/02198840,0,ready,,gesla/savannah_river_i_95_near_port_wentworth_ga-2198840-usa-usgs,true
 sayreville-8531390-usa-noaa,Sayreville,United States,noaa,true,false,us/sayreville,true,1976-02-18,1977-05-06,noaa/8531390,coops,coops/8531390,0,ready,,gesla/sayreville-8531390-usa-noaa,true
-scarborough-sca-gbr-cco,Scarborough,United Kingdom,cco,true,true,gb/scarborough,true,2012-01-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/scarborough-sca-gbr-cco,true
+scarborough-sca-gbr-cco,Scarborough,United Kingdom,cco,true,true,gb/scarborough,true,2012-01-01,2025-05-31,,cco,cco/111,0,ready,,gesla/scarborough-sca-gbr-cco,true
 scarboroughtg-sca-gbr-cmems,ScarboroughTG,United Kingdom,cmems,true,false,gb/scarborough,false,2013-06-13,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/scarboroughtg-sca-gbr-cmems,false
 schaar_van_de_noord-schaarvdnd-nld-rws,Schaar_van_de_Noord,Netherlands,rws,true,true,nl/schaar-van-de-noord,true,1997-11-19,2023-12-31,,rws,rws/schaarvandenoord,0,ready,,,
 scharhrn-9510060-deu-wsv,Scharhrn,Germany,wsv,true,true,de/scharhorn,true,2000-01-01,2025-07-12,,pegelonline,pegelonline/9510060,0.19,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/scharhrn-9510060-deu-wsv,true
@@ -4023,7 +4023,7 @@ settlement_point-257-bhs-uhslc_fd,Settlement_Point,The Bahamas,uhslc_fd,true,tru
 settlement_point-257a-bhs-uhslc_rq,Settlement_Point,The Bahamas,uhslc_rq,true,false,bs/settlement-point-ticon-settlement-point-257a-bhs-uhslc-rq,true,1985-10-19,2002-05-31,,uhslc,uhslc/257a,0.03,ready,,gesla/settlement_point-257a-bhs-uhslc_rq,true
 settlement_point-257b-bhs-uhslc_rq,Settlement_Point,The Bahamas,uhslc_rq,true,false,bs/settlement-point-west-grand-bahama,true,2002-06-04,2018-12-31,,uhslc,uhslc/257,1.59,ready,,gesla/settlement_point-257b-bhs-uhslc_rq,true
 settlement_point-9710441-usa-noaa,Settlement_Point,United States,noaa,true,false,bs/settlement-point,true,1996-01-01,2001-10-22,noaa/9710441,coops,coops/9710441,0,ready,,gesla/settlement_point-9710441-usa-noaa,true
-severn_bridge-ssc-gbr-cco,Severn_Bridge,United Kingdom,cco,true,true,gb/severn-bridge,true,2012-01-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/severn_bridge-ssc-gbr-cco,true
+severn_bridge-ssc-gbr-cco,Severn_Bridge,United Kingdom,cco,true,true,gb/severn-bridge,true,2012-01-01,2025-05-31,,cco,cco/106,0,ready,,gesla/severn_bridge-ssc-gbr-cco,true
 severn_river_below_whittaker_creek_near_severn_va-1670080-usa-usgs,Severn_River_Below_Whittaker_Creek_Near_Severn_Va,United States,usgs,true,true,us/severn-river-below-whittaker-creek-near-severn-va,true,2015-01-08,2019-05-30,,usgs,usgs/01670080,0,ready,,gesla/severn_river_below_whittaker_creek_near_severn_va-1670080-usa-usgs,true
 sevilla2tg-sev-esp-cmems,Sevilla2TG,Spain,cmems,true,true,es/sevilla,false,2012-03-07,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/sevilla2tg-sev-esp-cmems,false
 seward-9455090-usa-noaa,Seward,United States,noaa,true,false,us/seward,true,1977-08-01,2025-06-30,noaa/9455090,coops,coops/9455090,0.11,ready,,gesla/seward-9455090-usa-noaa,true
@@ -4278,7 +4278,7 @@ suwannee_river_at_manatee_springs_nr_old_town_fl-2323567-usa-usgs,Suwannee_River
 suwannee_river_near_wilcox_fla-2323500-usa-usgs,Suwannee_River_Near_Wilcox_Fla,United States,usgs,true,false,us/suwannee-river-near-wilcox-fla,true,2014-10-01,2025-05-01,,usgs,usgs/02323500,0,ready,,gesla/suwannee_river_near_wilcox_fla-2323500-usa-usgs,true
 sw_pass-8760943-usa-noaa,Sw_Pass,United States,noaa,true,false,us/sw-pass,true,1996-10-21,2004-03-10,noaa/8760943,coops,coops/8760943,0,ready,,gesla/sw_pass-8760943-usa-noaa,true
 sw_pier_st_marys_river_mi-9076070-usa-noaa,SW_Pier_St_Marys_River_Mi,United States,noaa,true,true,us/sw-pier-st-marys-river,true,1962-03-01,2025-07-01,noaa/9076070,coops,coops/9076070,0,ready,,gesla/sw_pier_st_marys_river_mi-9076070-usa-noaa,true
-swanage_pier-swp-gbr-cco,Swanage_Pier,United Kingdom,cco,true,true,gb/swanage-pier,true,2008-01-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/swanage_pier-swp-gbr-cco,true
+swanage_pier-swp-gbr-cco,Swanage_Pier,United Kingdom,cco,true,true,gb/swanage-pier,true,2008-01-01,2025-05-31,,cco,cco/93,0,ready,,gesla/swanage_pier-swp-gbr-cco,true
 swanagepiertg-swa-gbr-cmems,SwanagePierTG,United Kingdom,cmems,true,false,gb/swanage-pier,false,2008-01-01,2025-06-30,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/swanagepiertg-swa-gbr-cmems,false
 swinomish-9448682-usa-noaa,Swinomish,United States,noaa,true,false,us/swinomish,true,2015-07-20,2016-09-05,noaa/9448682,coops,coops/9448682,0,ready,,gesla/swinomish-9448682-usa-noaa,true
 sydney_fort_denison-60370-aus-bom,Sydney_Fort_Denison,Australia,bom,true,false,au/sydney-fort-denison,true,1914-05-31,2022-12-31,,bom,,,unmatched,,gesla/sydney_fort_denison-60370-aus-bom,false
@@ -4324,7 +4324,7 @@ tarawa_betio-002a-kir-uhslc_rq,Tarawa_Betio,Kiribati,uhslc_rq,true,false,ki/tara
 tarawa_betio-002c-kir-uhslc_rq,Tarawa_Betio,Kiribati,uhslc_rq,true,false,ki/tarawa-betio,true,1988-01-20,1997-12-31,,uhslc,uhslc/002c,0.03,ready,,gesla/tarawa_betio-002c-kir-uhslc_rq,true
 tarawa_betio-002d-kir-uhslc_rq,Tarawa_Betio,Kiribati,uhslc_rq,true,false,ki/tarawa-betio,true,1992-12-04,2021-12-31,,uhslc,uhslc/002,0.03,ready,,gesla/tarawa_betio-002d-kir-uhslc_rq,true
 tarawa_betio-67590-kir-bom,Tarawa_Betio,Kiribati,bom,true,false,ki/tarawa-betio-ticon-tarawa-betio-67590-kir-bom,true,1992-12-04,2022-12-31,,bom,bom/002,0.01,ready,,gesla/tarawa_betio-67590-kir-bom,false
-tarifa-tari-esp-ieo,Tarifa,Spain,ieo,true,true,es/tarifa,true,1944-01-01,2016-12-31,,redmar,,,license,,gesla/tarifa-tari-esp-ieo,true
+tarifa-tari-esp-ieo,Tarifa,Spain,ieo,true,true,es/tarifa,true,1944-01-01,2016-12-31,,ieo,,,license,,gesla/tarifa-tari-esp-ieo,true
 tarifatg-tar-esp-cmems,TarifaTG,Spain,cmems,true,false,es/tarifa-andalusia,false,2009-07-17,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tarifatg-tar-esp-cmems,false
 tarragonatg-tar-esp-cmems,TarragonaTG,Spain,cmems,true,true,es/tarragona,false,2011-05-27,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tarragonatg-tar-esp-cmems,false
 tasiujaq-4315-can-meds,Tasiujaq,Canada,meds,true,true,ca/tasiujaq,true,1998-07-12,2002-05-05,,chs,,,restricted,CHS license bars commercial derivatives,gesla/tasiujaq-4315-can-meds,false
@@ -4341,7 +4341,7 @@ taylors_bayou_shoreacres_boulevard-tay-usa-hct,Taylors_Bayou_Shoreacres_Boulevar
 tchoutacabouffa_river_nr_diberville_ms-2480590-usa-usgs,Tchoutacabouffa_River_Nr_Diberville_Ms,United States,usgs,true,true,us/tchoutacabouffa-river-nr-diberville-ms,true,2014-10-17,2025-05-01,,usgs,usgs/02480590,0,ready,,gesla/tchoutacabouffa_river_nr_diberville_ms-2480590-usa-usgs,true
 tecumseh_ontario-11975-can-meds,Tecumseh_Ontario,Canada,meds,true,false,ca/tecumseh,true,1961-11-01,1994-10-20,,chs,,,restricted,CHS license bars commercial derivatives,gesla/tecumseh_ontario-11975-can-meds,false
 teignbridgepiertg-tei-gbr-cmems,TeignbridgePierTG,United Kingdom,cmems,true,false,gb/teignbridge-pier,false,2008-07-04,2014-02-03,,bodc,,,unmatched,"CMEMS record of a gauge the national feed publishes; no station within 1 km, or 5 km with a shared name",gesla/teignbridgepiertg-tei-gbr-cmems,false
-teignmouth_pier-tnp-gbr-cco,Teignmouth_Pier,United Kingdom,cco,true,true,gb/teignmouth-pier,true,2008-07-04,2014-02-03,,cco,,,license,Terms not reviewed,gesla/teignmouth_pier-tnp-gbr-cco,true
+teignmouth_pier-tnp-gbr-cco,Teignmouth_Pier,United Kingdom,cco,true,true,gb/teignmouth-pier,true,2008-07-04,2014-02-03,,cco,,,unmatched,,gesla/teignmouth_pier-tnp-gbr-cco,true
 tejn-tej-dnk-cmems,Tejn,Denmark,cmems,true,true,dk/tejn,false,2005-01-01,2025-07-01,,dmi,dmi/32048,0.25,ready,CMEMS record of a gauge the national feed publishes,gesla/tejn-tej-dnk-cmems,false
 teknaf-137a-bgd-uhslc_rq,Teknaf,Bangladesh,uhslc_rq,true,true,bd/teknaf,true,1983-06-19,1988-11-24,,uhslc,uhslc/137a,0.03,ready,,gesla/teknaf-137a-bgd-uhslc_rq,true
 telchac-415-mex-unam_hist,Telchac,Mexico,unam_hist,true,false,mx/telchac,true,2011-12-01,2012-12-31,,unam,,,license,"SMN sends its historical records only on request, asked for in #48",gesla/telchac-415-mex-unam_hist,false
@@ -4353,8 +4353,8 @@ temco_kalama_terminal-9440357-usa-noaa,Temco_Kalama_Terminal,United States,noaa,
 tenerife-228a-esp-uhslc_rq,Tenerife,Spain,uhslc_rq,true,true,es/tenerife,true,1992-07-01,2019-07-18,,uhslc,uhslc/228a,0.03,ready,,gesla/tenerife-228a-esp-uhslc_rq,true
 tenerife-ten-esp-da_mm,Tenerife,Spain,da_mm,true,false,es/tenerife-ticon-tenerife-ten-esp-da-mm,true,1927-01-03,2012-12-29,,da_mm,,,license,Terms not reviewed,gesla/tenerife-ten-esp-da_mm,true
 tenerife2tg-ten-esp-cmems,Tenerife2TG,Spain,cmems,true,false,es/tenerife-ticon-tenerife2tg-ten-esp-cmems,false,2019-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tenerife2tg-ten-esp-cmems,false
-tenerife3tg-ten-esp-cmems,Tenerife3TG,Spain,cmems,true,true,es/tenerife-puerto-de-la-cruz-canary-islands,false,2019-11-02,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tenerife3tg-ten-esp-cmems,false
-tenerife4tg-ten-esp-cmems,Tenerife4TG,Spain,cmems,true,true,es/tenerife-playa-de-las-americas-canary-islands,false,2019-11-01,2025-03-10,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tenerife4tg-ten-esp-cmems,false
+tenerife3tg-ten-esp-cmems,Tenerife3TG,Spain,cmems,true,true,es/tenerife-puerto-de-la-cruz-canary-islands,false,2019-11-02,2025-06-30,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/tenerife3tg-ten-esp-cmems,false
+tenerife4tg-ten-esp-cmems,Tenerife4TG,Spain,cmems,true,true,es/tenerife-playa-de-las-americas-canary-islands,false,2019-11-01,2025-03-10,,ign,,,to_match,CMEMS record of a gauge the national feed publishes,gesla/tenerife4tg-ten-esp-cmems,false
 tenerifetg-ten-esp-cmems,TenerifeTG,Spain,cmems,true,false,es/tenerife-ticon-tenerifetg-ten-esp-cmems,false,1992-07-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/tenerifetg-ten-esp-cmems,false
 terborg-3910020-deu-wsv,Terborg,Germany,wsv,true,true,de/terborg,true,2000-01-01,2025-07-13,,pegelonline,pegelonline/3910020,0.18,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/terborg-3910020-deu-wsv,true
 termisa-284a-bra-uhslc_rq,Termisa,Brazil,uhslc_rq,true,true,br/termisa,true,1993-07-01,1995-04-30,,uhslc,uhslc/284a,0.03,ready,,gesla/termisa-284a-bra-uhslc_rq,true
@@ -4588,7 +4588,7 @@ vienna-8571773-usa-noaa,Vienna,United States,noaa,true,false,us/vienna,true,2005
 vieste-vie-ita-ispra,Vieste,Italy,ispra,true,true,it/vieste,true,1990-10-08,2025-07-06,,ispra,,,license,,gesla/vieste-vie-ita-ispra,true
 vieux_quebec-3248-can-meds,Vieux_Quebec,Canada,meds,true,true,ca/vieux-quebec,true,2009-01-21,2025-01-01,,chs,,,restricted,CHS license bars commercial derivatives,gesla/vieux_quebec-3248-can-meds,false
 vigo-208a-esp-uhslc_rq,Vigo,Spain,uhslc_rq,true,true,es/vigo,true,1943-03-08,1990-12-31,,uhslc,uhslc/208a,0.04,ready,,gesla/vigo-208a-esp-uhslc_rq,true
-vigo-vigo-esp-ieo,Vigo,Spain,ieo,true,true,es/vigo-ticon-vigo-vigo-esp-ieo,true,1943-03-09,2016-12-31,,redmar,,,license,,gesla/vigo-vigo-esp-ieo,true
+vigo-vigo-esp-ieo,Vigo,Spain,ieo,true,true,es/vigo-ticon-vigo-vigo-esp-ieo,true,1943-03-09,2016-12-31,,ieo,,,license,,gesla/vigo-vigo-esp-ieo,true
 vigotg-vig-esp-cmems,VigoTG,Spain,cmems,true,true,es/vigo-ticon-vigotg-vig-esp-cmems,false,1992-11-01,2025-06-30,,redmar,,,license,CMEMS record of a gauge the national feed publishes,gesla/vigotg-vig-esp-cmems,false
 viken-2228-swe-smhi,Viken,Sweden,smhi,true,true,se/viken,true,1976-04-22,2025-07-02,,smhi,smhi/2228,0,ready,,gesla/viken-2228-swe-smhi,true
 viken-vik-swe-cmems,Viken,Sweden,cmems,true,false,se/viken,false,1976-04-22,2025-07-01,,smhi,smhi/2228,0,ready,CMEMS record of a gauge the national feed publishes,gesla/viken-vik-swe-cmems,false
@@ -4694,7 +4694,7 @@ werkendam_buiten-werkdbtn-nld-rws_hist,Werkendam_buiten,Netherlands,rws_hist,tru
 werkendambuitentg-wer-nld-cmems,WerkendamBuitenTG,Netherlands,cmems,true,false,nl/werkendam-buiten-ticon-werkendambuitentg-wer-nld-cmems,false,2015-06-28,2025-06-30,,rws,rws/werkendam.nieuwemerwede,0.11,ready,CMEMS record of a gauge the national feed publishes,gesla/werkendambuitentg-wer-nld-cmems,false
 weserwehruw-4910040-deu-wsv,Weserwehruw,Germany,wsv,true,true,de/weserwehruw,true,2000-01-01,2025-07-11,,pegelonline,pegelonline/4910040,0.18,ready,"PEGELONLINE's history starts in 2000 at most, or not at all without a download; the rest comes from `gesla`",gesla/weserwehruw-4910040-deu-wsv,true
 west_bank_1-8762482-usa-noaa,West_Bank_1,United States,noaa,true,true,us/west-bank-1,true,2003-05-16,2025-05-31,noaa/8762482,coops,coops/8762482,0,ready,,gesla/west_bank_1-8762482-usa-noaa,true
-west_bay_harbour-wbh-gbr-cco,West_Bay_Harbour,United Kingdom,cco,true,true,gb/west-bay-harbour,true,2008-02-01,2025-05-31,,cco,,,license,Terms not reviewed,gesla/west_bay_harbour-wbh-gbr-cco,true
+west_bay_harbour-wbh-gbr-cco,West_Bay_Harbour,United Kingdom,cco,true,true,gb/west-bay-harbour,true,2008-02-01,2025-05-31,,cco,cco/95,0,ready,,gesla/west_bay_harbour-wbh-gbr-cco,true
 west_canal_clifton_court_intake-b95338-usa-cdwr,West_Canal_Clifton_Court_Intake,United States,cdwr,true,false,us/west-canal-clifton-court-intake,true,2015-10-07,2025-05-24,,dwr,dwr/B95338Q,0,ready,,gesla/west_canal_clifton_court_intake-b95338-usa-cdwr,true
 west_channel_pile-60739-aus-bom,West_Channel_Pile,Australia,bom,true,true,au/west-channel-pile,true,1991-05-31,2022-12-31,,bom,,,unmatched,,gesla/west_channel_pile-60739-aus-bom,false
 west_dipper_harbour-46-can-meds,West_Dipper_Harbour,Canada,meds,true,true,ca/west-dipper-harbour,true,1974-11-22,1988-06-08,,chs,,,restricted,CHS license bars commercial derivatives,gesla/west_dipper_harbour-46-can-meds,false
@@ -4727,7 +4727,7 @@ whaler_bay_bc-7532-can-meds,Whaler_Bay_BC,Canada,meds,true,true,ca/whaler-bay,tr
 whaletown_bc-8038-can-meds,Whaletown_BC,Canada,meds,true,true,ca/whaletown,true,2017-06-17,2019-06-14,,chs,,,restricted,CHS license bars commercial derivatives,gesla/whaletown_bc-8038-can-meds,false
 whitby-whi-gbr-bodc,Whitby,United Kingdom,bodc,true,true,gb/whitby,true,1980-05-15,2025-04-30,,ea,ea/E71039,0.01,ready,The EA's real-time readings of the gauge,gesla/whitby-whi-gbr-bodc,true
 whitby-whi-gbr-cmems,Whitby,United Kingdom,cmems,true,false,gb/whitby,false,1990-01-01,2025-06-30,,ea,ea/E71039,0.75,ready,The EA's real-time readings of the gauge,gesla/whitby-whi-gbr-cmems,false
-whitby_harbour-wtb-gbr-cco,Whitby_Harbour,United Kingdom,cco,true,false,gb/whitby-harbour,true,2014-01-16,2025-05-31,,cco,,,license,Terms not reviewed,gesla/whitby_harbour-wtb-gbr-cco,true
+whitby_harbour-wtb-gbr-cco,Whitby_Harbour,United Kingdom,cco,true,false,gb/whitby-harbour,true,2014-01-16,2025-05-31,,cco,cco/112,0,ready,,gesla/whitby_harbour-wtb-gbr-cco,true
 whitbyharbourtg-whi-gbr-cmems,WhitbyHarbourTG,United Kingdom,cmems,true,false,gb/whitby-harbour,false,2014-01-16,2025-06-30,,ea,ea/E71039,0.15,ready,The EA's real-time readings of the gauge,gesla/whitbyharbourtg-whi-gbr-cmems,false
 white_beach-8728694-usa-noaa,White_Beach,United States,noaa,true,false,us/white-beach,true,1978-09-13,1984-04-25,noaa/8728694,coops,coops/8728694,0,ready,,gesla/white_beach-8728694-usa-noaa,true
 white_city-8728853-usa-noaa,White_City,United States,noaa,true,false,us/white-city,true,2008-10-27,2011-03-10,noaa/8728853,coops,coops/8728853,0,ready,,gesla/white_city-8728853-usa-noaa,true

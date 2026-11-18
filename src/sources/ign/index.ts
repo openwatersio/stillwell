@@ -14,6 +14,8 @@ const periods: Record<string, (number | null)[]> = recordedPeriods;
 
 const BASE = "https://datos-geodesia.ign.es/Red_de_Mareografos/";
 const DAY = 86_400_000;
+export const CORUNA_PERIOD = [Date.UTC(2000, 0, 1), Date.UTC(2024, 0, 1)] as const;
+const productYears = `${new Date(CORUNA_PERIOD[0]).getUTCFullYear()}–${new Date(CORUNA_PERIOD[1]).getUTCFullYear() - 1}`;
 
 export const metadata: SourceMetadata = {
   id: "ign",
@@ -26,13 +28,13 @@ export const metadata: SourceMetadata = {
     commercial_use: true,
     redistribution: true,
   },
-  attribution: "Área de Geodesia, Instituto Geográfico Nacional (IGN); CC-BY 4.0 ign.es",
+  attribution: `Obra derivada de Red de Mareógrafos, Coruña horarios ${productYears} CC-BY 4.0 ign.es; Área de Geodesia, Instituto Geográfico Nacional (IGN)`,
   contact: { email: "ign@transportes.gob.es", url: "https://www.ign.es/web/gds-red-mareografos" },
   terms:
-    "IGN confirmed on 2026-11-17 that its tide-gauge series are CC BY 4.0 under Orden FOM/2807/2015, including commercial use and redistribution. Cite Área de Geodesia, IGN and use the product and data date in IGN's attribution formula: <product> <date> CC-BY 4.0 ign.es; prefix derived products with Obra derivada de. See https://github.com/openwatersio/stillwell/issues/181#issuecomment-6945552785. Times are read as UTC, millimeters converted to meters and raw digital distances reversed. Raw sensors and differently named historical references remain separate; surveyed offsets are applied only to reviewed files with matching named marks.",
+    "IGN confirmed on 2026-11-17 that its tide-gauge series are CC BY 4.0 under Orden FOM/2807/2015, including commercial use and redistribution. Cite Área de Geodesia, IGN and use the product and data date in IGN's attribution formula: <product> <date> CC-BY 4.0 ign.es; prefix derived products with Obra derivada de. See https://github.com/openwatersio/stillwell/issues/181#issuecomment-6945552785. The public release contains only Coruña reviewed hourly JM observations from 2000 through 2023, converted from millimeters to meters. Historical clock labels are unconfirmed and every released observation is suspect. Other series, products and periods are withheld pending issue #181.",
   archive: "current",
-  hourly: true,
-  finalizes: true,
+  hourly: false,
+  finalizes: false,
 };
 
 export const pacing = { requestMs: 350 };
@@ -56,14 +58,18 @@ async function inventory(path: string, optional = false): Promise<string[]> {
   const heading = `Index of /Red_de_Mareografos${path ? `/${path.replace(/\/$/, "")}` : ""}`;
   if (!html.includes(`<h1>${heading}</h1>`) || !html.includes("</html>"))
     throw new Error(`IGN invalid catalog at ${path}`);
-  return [...html.matchAll(/href="([^"<>]+)"/g)]
-    .map((m) => m[1]!)
-    .filter((f) => /^[A-Za-z0-9_.-]+\/?$/.test(f));
+  const links = [...html.matchAll(/href="([^"<>]+)"/g)].map((m) => m[1]!);
+  if (path.includes("/procesados/"))
+    for (const file of links)
+      if (/\.txt$/i.test(file) && !/^[A-Za-z0-9_.-]+\.txt$/.test(file))
+        throw new Error(`IGN ${path}: unsupported reviewed filename ${file}`);
+  return links.filter((f) => /^[A-Za-z0-9_.-]+\/?$/.test(f));
 }
 
 const oldBm: Record<string, string> = { TN021: "NGZ581", TN031: "NGAB161" };
 const normalizedMark = (mark: string) => mark.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
+/** Candidate research catalog; the registered source admits only the closed Coruña series. */
 export async function stations(): Promise<ListedStation[]> {
   const codes = (await inventory(""))
     .filter((f) => f.endsWith("/") && f !== "fichas/")
@@ -74,6 +80,10 @@ export async function stations(): Promise<ListedStation[]> {
     codes.some((c) => !gauges[c])
   )
     throw new Error("IGN station catalog changed; check the station sheets");
+  return candidateStations(codes);
+}
+
+function candidateStations(codes: string[]): ListedStation[] {
   return codes
     .flatMap((code) => {
       const g = gauges[code]!;
@@ -85,7 +95,7 @@ export async function stations(): Promise<ListedStation[]> {
       return ids.map((id): ListedStation => {
         const part = id.slice(code.length + 1);
         const endYear = periods[id]?.[1];
-        const ended = endYear != null && endYear < new Date().getUTCFullYear();
+        const ended = endYear != null && endYear <= new Date().getUTCFullYear();
         const historicalBm = part === oldBm[code] || (!part && code === "TN031");
         const raw = g.sensors.includes(part) || g.charts.includes(part);
         const datum = historicalBm || g.sensors.includes(part) ? "BM" : part ? "ZERO" : "JM";
@@ -127,10 +137,28 @@ interface ParseOptions {
   sign: 1 | -1;
   offset: number;
   day?: string;
+  boundaryOnly?: boolean;
 }
 export function parse(body: string, options: ParseOptions): Observation[] {
+  // Malformed published exports stay refused: erratum `ign-export-integrity`.
   const { year, gauge, raw, reference, sign, offset, day, mark } = options;
-  const lines = body.trim().split(/\r?\n/);
+  let lines = body.trim().split(/\r?\n/);
+  // Only the closing row belongs to this request: erratum `ign-export-boundaries`.
+  if (options.boundaryOnly) {
+    const last = lines.at(-1)!;
+    const boundary = day
+      ? new Date(Date.UTC(year, Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8))) + DAY)
+      : new Date(Date.UTC(year + 1, 0, 1));
+    const date = boundary.toISOString().slice(0, 10).split("-").reverse().join("/");
+    if (!last.startsWith(date + " ") || !/\s00:00(?::00)?\s/.test(last)) return [];
+    lines = raw ? [last] : [lines[0]!, last];
+  }
+  const fileStart = day
+    ? Date.UTC(year, Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8)))
+    : Date.UTC(year, 0, 1);
+  if (day && new Date(fileStart).toISOString().slice(0, 10).replaceAll("-", "") !== day)
+    throw new Error(`IGN ${gauge}: invalid file day ${day}`);
+  const fileEnd = day ? fileStart + DAY : Date.UTC(year + 1, 0, 1);
   if (!raw) {
     const header = lines.shift()!;
     const actualMark = /respecto\s+(?:JM|BM)\s+(.+?)\s*$/i.exec(header)?.[1];
@@ -146,29 +174,40 @@ export function parse(body: string, options: ParseOptions): Observation[] {
   const out: Observation[] = [];
   let previous = -Infinity;
   let previousLine = "";
-  for (const line of lines) {
+  const records = lines.filter((line) => line.trim());
+  for (const [i, line] of records.entries()) {
     if (!line.trim()) continue;
     // IGN's hourly means omit seconds; minute and raw files include them.
+    // Inline units follow the documented export convention: erratum `ign-export-boundaries`.
     const m =
-      /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?\s+(-?\d+(?:\.\d+)?|---)(?:\s+"(mm)")?\s*$/.exec(
+      /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?\s+(-?\d+(?:\.\d+)?|---)?\s*(?:"(mm)"|(mm))?\s*$/.exec(
         line,
       );
-    if (!m || (raw && !m[8])) throw new Error(`IGN ${gauge}: invalid water-level row: ${line}`);
+    if (!m || (m[7] === undefined && (!raw || (!m[8] && !m[9]))))
+      throw new Error(`IGN ${gauge}: invalid water-level row: ${line}`);
     const stamp = `${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:${m[6] ?? "00"}.000Z`;
     const time = Date.parse(stamp);
-    // Exact duplicate logger rows carry no second observation: erratum `ign-duplicate-raw-rows`.
-    if (raw && time === previous && line === previousLine) continue;
+    const missing = m[7] === undefined || m[7] === "---" || Number(m[7]) === 9999;
+    if (!Number.isFinite(time) || new Date(time).toISOString() !== stamp) {
+      // A nonexistent missing date cannot invalidate a real observation: erratum `ign-invalid-missing-dates`.
+      if (missing) continue;
+      throw new Error(`IGN ${gauge}: invalid timestamp: ${stamp}`);
+    }
+    // Exact duplicate export rows carry no second observation: erratum `ign-duplicate-raw-rows`.
+    if (time === previous && line === previousLine) continue;
     if (
-      !Number.isFinite(time) ||
-      new Date(time).toISOString() !== stamp ||
-      Number(m[3]) !== year ||
-      (day && `${m[3]}${m[2]}${m[1]}` !== day) ||
+      time < fileStart ||
+      time > fileEnd ||
+      (time === fileEnd && i !== records.length - 1) ||
       time <= previous
     )
       throw new Error(`IGN ${gauge}: invalid or out-of-order timestamp: ${stamp}`);
     previous = time;
     previousLine = line;
-    if (m[7] === "---" || Number(m[7]) === 9999) continue;
+    if (missing) {
+      out.push({ time, level: Number.NaN, flag: Flag.bad, withdrawn: true });
+      continue;
+    }
     out.push({
       time,
       level: Math.round(((sign * Number(m[7])) / 1000 + offset) * 1e6) / 1e6,
@@ -177,6 +216,7 @@ export function parse(body: string, options: ParseOptions): Observation[] {
     });
   }
   if (!lines.some((l) => l.trim())) throw new Error(`IGN ${gauge}: empty data file`);
+  if (!out.length) throw new Error(`IGN ${gauge}: no valid timestamps in data file`);
   return out;
 }
 
@@ -196,19 +236,37 @@ async function reviewed(
   for (const folder of ["integros", "horarios"]) {
     const path = `${code}/procesados/${folder}/`;
     const files = (await inventory(path)).sort(
-      (a, b) => Number(a.endsWith("_BM.txt")) - Number(b.endsWith("_BM.txt")) || a.localeCompare(b),
+      (a, b) => Number(a.endsWith("_BM.txt")) - Number(b.endsWith("_BM.txt")) || b.localeCompare(a),
     );
     for (const file of files) {
+      const namedYear = /_(\d{4})_/.exec(file)?.[1];
+      if (
+        namedYear &&
+        (Date.UTC(Number(namedYear), 0, 1) >= to || Date.UTC(Number(namedYear) + 1, 0, 1) < from)
+      )
+        continue;
       const m = /^(\d{6})_(?:horarios_)?(\d{4})_(JM|BM)\.txt$/.exec(file);
-      if (!m) continue;
+      if (!m) {
+        if (file.endsWith(".txt") && !/_old\.txt$/.test(file))
+          throw new Error(`IGN ${code}: unsupported reviewed filename ${file}`);
+        continue;
+      }
       if (m[1] !== g.number) throw new Error(`IGN ${code}: another station in catalog: ${file}`);
       const year = Number(m[2]);
-      if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) <= from) continue;
+      if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) < from) continue;
       const body = await text(path + file);
+      if (
+        Date.UTC(year + 1, 0, 1) === from &&
+        !new RegExp(`01/01/${year + 1}\\s+00:00(?::00)?\\s`).test(
+          body.trim().split(/\r?\n/).at(-1)!,
+        )
+      )
+        continue;
       const named = /respecto\s+(JM|BM)\s+(.+?)\s*$/i.exec(body.split(/\r?\n/)[0]!);
       if (!named || named[1]!.toUpperCase() !== m[3])
         throw new Error(`IGN ${code}: invalid reference in ${file}`);
       const historical = m[3] === "BM" && normalizedMark(named[2]!) === oldBm[code];
+      // Alborán’s sheet/header spelling differs: erratum `ign-reviewed-marks`.
       const currentMark = m[3] === "JM" ? g.jm : code === "ALBO1" ? "C_Mfo" : g.bm;
       if (!historical && normalizedMark(named[2]!) !== normalizedMark(currentMark))
         throw new Error(`IGN ${code}: unexpected benchmark mark ${named[2]}`);
@@ -227,8 +285,9 @@ async function reviewed(
         raw: false,
         sign: 1,
         offset,
+        boundaryOnly: Date.UTC(year + 1, 0, 1) === from,
       }))
-        if (!out.has(o.time)) out.set(o.time, o);
+        if (o.time >= from && o.time < to && !out.has(o.time)) out.set(o.time, o);
     }
   }
   return [...out.values()];
@@ -247,51 +306,51 @@ async function rawLevels(
     yearLinks.filter((f) => /^\d{4}\/$/.test(f)).map((f) => Number(f.slice(0, 4))),
   );
   const yearStart = Date.UTC(new Date().getUTCFullYear(), 0, 1);
-  const annualNames = from < yearStart ? await inventory(`${path}ficheros_anuales/`, true) : [];
+  const annualNames = await inventory(`${path}ficheros_anuales/`, true);
   const annualYears = annualNames.flatMap((file) => {
     const m = /^(\d{6})_(\d{4})_(\d{4})\.txt$/.exec(file);
     return m && m[1] === g.number && m[2] === sensor ? [Number(m[3])] : [];
   });
-  const out: Observation[] = [];
+  const out = new Map<number, Observation>();
   for (const year of [...new Set([...dailyYears, ...annualYears])].sort((a, b) => a - b)) {
-    if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) <= from) continue;
-    const annual =
-      annualYears.includes(year) &&
-      ((to - from > 7 * DAY && Date.UTC(year, 0, 1) < yearStart) || !dailyYears.has(year));
-    let dir = annual ? `${path}ficheros_anuales/` : `${path}${year}/`;
-    const matching = (files: string[], size: number) =>
-      files
-        .map((file) => ({ file, match: /^(\d{6})_(\d{4})_(\d{4}|\d{8})\.txt$/.exec(file) }))
-        .filter(
-          ({ match: m }) =>
-            m &&
-            m[1] === g.number &&
-            m[2] === sensor &&
-            Number(m[3]!.slice(0, 4)) === year &&
-            m[3]!.length === size,
-        );
-    let files = matching(annual ? annualNames : await inventory(dir), annual ? 4 : 8);
-    for (const { file, match: m } of files) {
-      const day = annual ? undefined : m![3]!;
-      if (day) {
+    if (Date.UTC(year, 0, 1) >= to || Date.UTC(year + 1, 0, 1) < from) continue;
+    const candidates: { file: string; dir: string; day?: string }[] = [];
+    if (annualYears.includes(year) && (Date.UTC(year, 0, 1) < yearStart || !dailyYears.has(year))) {
+      for (const file of annualNames)
+        if (file === `${g.number}_${sensor}_${year}.txt`)
+          candidates.push({ file, dir: `${path}ficheros_anuales/` });
+    }
+    if (dailyYears.has(year)) {
+      const dir = `${path}${year}/`;
+      for (const file of (await inventory(dir)).sort()) {
+        const m = /^(\d{6})_(\d{4})_(\d{8})\.txt$/.exec(file);
+        if (!m || m[1] !== g.number || m[2] !== sensor || Number(m[3]!.slice(0, 4)) !== year)
+          continue;
+        const day = m[3]!;
         const start = Date.UTC(year, Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8)));
-        if (start >= to || start + DAY <= from) continue;
+        if (start >= to || start + DAY < from) continue;
+        candidates.push({ file, dir, day });
       }
+    }
+    for (const { file, dir, day } of candidates) {
       for (const o of parse(await text(dir + file), {
         year,
         gauge: code,
         raw: true,
-        // MURC1's 0503 archive increases downward despite its sheet: erratum `ign-murc1-chart-archive`.
         sign: g.charts.includes(sensor) && !(code === "MURC1" && sensor === "0503") ? 1 : -1,
         offset: 0,
         day,
+        boundaryOnly: day
+          ? Date.UTC(year, Number(day.slice(4, 6)) - 1, Number(day.slice(6, 8))) + DAY === from
+          : Date.UTC(year + 1, 0, 1) === from,
       }))
-        out.push(o);
+        if (o.time >= from && o.time < to) out.set(o.time, o);
     }
   }
-  return out;
+  return [...out.values()];
 }
 
+/** Candidate research parser; registered observations use corunaHourly admission instead. */
 export async function levels(
   id: string,
   start: Date,
@@ -326,10 +385,79 @@ export async function levels(
   return out.filter((o) => o.time >= from && o.time < to).sort((a, b) => a.time - b.time);
 }
 
+/** The admitted hourly archive; other products and periods remain research-only. */
+export async function corunaHourly(start: Date, end: Date, datum = "JM"): Promise<Observation[]> {
+  if (datum !== "JM") throw new Error(`IGN ACOR1: expected datum JM, got ${datum}`);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()))
+    throw new Error("IGN needs finite dates");
+  const from = Math.max(start.getTime(), CORUNA_PERIOD[0]);
+  const to = Math.min(end.getTime(), CORUNA_PERIOD[1]);
+  if (from >= to) return [];
+  const path = "ACOR1/procesados/horarios/";
+  const out = new Map<number, Observation>();
+  // Admission and clock uncertainty: errata `ign-release-coverage` and `ign-coruna-clock`.
+  for (
+    let year = new Date(CORUNA_PERIOD[0]).getUTCFullYear();
+    year < new Date(CORUNA_PERIOD[1]).getUTCFullYear();
+    year++
+  ) {
+    const nextYear = Date.UTC(year + 1, 0, 1);
+    if (Date.UTC(year, 0, 1) >= to || nextYear <= from) continue;
+    const file = `200031_horarios_${year}_JM.txt`;
+    const rows = parse(await text(path + file), {
+      year,
+      gauge: "ACOR1",
+      raw: false,
+      reference: "JM",
+      mark: gauges.ACOR1!.jm,
+      sign: 1,
+      offset: 0,
+    }).filter((row) => row.time < nextYear);
+    // A changed/truncated annual grid is not an admitted file: erratum `ign-coruna-hourly-grid`.
+    const first = Date.UTC(year, 0, 1);
+    if (
+      rows.length !== (nextYear - first) / 3_600_000 ||
+      rows.some((row, i) => row.time !== first + i * 3_600_000)
+    )
+      throw new Error(`IGN ACOR1 ${year}: incomplete or off-hour hourly grid`);
+    for (const row of rows)
+      if (row.time >= from && row.time < to) {
+        // This hourly product uses -9999 for unusable aggregates: erratum `ign-coruna-hourly-gaps`.
+        const value =
+          row.level === -9.999
+            ? { ...row, level: Number.NaN, flag: Flag.bad, withdrawn: true as const }
+            : row;
+        out.set(row.time, {
+          ...value,
+          source_flag: value.flag,
+          flag: Math.max(value.flag, Flag.suspect) as Flag,
+        });
+      }
+  }
+  return [...out.values()].sort((a, b) => a.time - b.time);
+}
+
 export const source: Source = {
   metadata,
-  stations,
-  observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
+  attribution: (station) => {
+    if (!station.first || !station.last) return metadata.attribution;
+    const first = station.first.slice(0, 10);
+    const last = station.last.slice(0, 10);
+    const date = first === last ? first : `${first}–${last}`;
+    return `Obra derivada de Red de Mareógrafos ${date} CC-BY 4.0 ign.es; Área de Geodesia, Instituto Geográfico Nacional (IGN)`;
+  },
+  withheld: (id) =>
+    id === "ACOR1"
+      ? null
+      : "IGN coverage withheld pending calibration and clock evidence; see ign-release-coverage and issue #181",
+  stations: async () =>
+    candidateStations(["ACOR1"])
+      .filter((s) => s.source_id === "ACOR1")
+      .map((s) => ({ ...s, interval_s: 3600, status: "inactive", live: false, same_as: [] })),
+  observations: (s, start, end) => {
+    if (s.source_id !== "ACOR1")
+      throw new Error(`IGN ${s.source_id}: withheld; see ign-release-coverage and issue #181`);
+    return corunaHourly(start, end, s.datum);
+  },
   keepsStored: true,
-  keepsRecent: true,
 };

@@ -18,8 +18,8 @@ export type Status =
   /** Cleared for commercial use; the adapter is in the plan. */
   | "planned"
   /**
-   * Cleared source with an adapter in the plan, but the record is a CMEMS copy
-   * that still has to be matched to one of its stations once the adapter exists.
+   * Commercial-use terms are cleared, but a CMEMS copy has no admitted matching
+   * station yet (including evidence-withheld coverage). This is not scientific clearance.
    */
   | "to_match"
   /** The source's terms need confirming before it can ship. */
@@ -103,7 +103,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
     note: "SMN sends its historical records only on request, asked for in #48",
   },
   ispra: { source: "ispra", status: "license" },
-  ieo: { source: "redmar", status: "license" },
+  ieo: { source: "ieo", status: "license" },
   meds: { source: "chs", status: "restricted", note: "CHS license bars commercial derivatives" },
   bodc: { source: "bodc", status: "planned" },
   cco: { source: "cco", status: "planned" },
@@ -277,14 +277,15 @@ export function originatorSeries(
   }
 
   if (contributor === "cmems") {
-    const national = NATIONAL[iso3];
+    const copy = `gesla/${urlSafe(record.id)}`;
+    const linkedIds = links.flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : []));
+    const national = linkedIds.some((id) => id.startsWith("ign/"))
+      ? { source: "ign", status: "ready" as const }
+      : NATIONAL[iso3];
     const note = "CMEMS record of a gauge the national feed publishes";
     // A link made by comparing the series knows the gauge better than CMEMS's position
     // does. Only a link to the national feed's station names the originator.
-    const copy = `gesla/${urlSafe(record.id)}`;
-    const ids = links
-      .flatMap(({ a, b }) => (a === copy ? [b] : b === copy ? [a] : []))
-      .filter((id) => national && id.startsWith(`${national.source}/`));
+    const ids = linkedIds.filter((id) => national && id.startsWith(`${national.source}/`));
     if (national && ids.length > 0 && lists[national.source]) {
       const linked = lists[national.source]!.find((s) => ids.includes(s.id) && usable(s));
       if (linked)

@@ -318,13 +318,10 @@ export async function refreshStation({
               ),
             ];
       // Seven days can't fit a tide, so residual jumps wait for the year's requalify.
-      merged = qc(
-        mergeFetched(start, withSourceFlag(got), window.from, now, now, source.keepsRecent),
-        {
-          ...opts,
-          jumps: false,
-        },
-      );
+      merged = qc(mergeFetched(start, withSourceFlag(got), window.from, now, now), {
+        ...opts,
+        jumps: false,
+      });
     }
   } catch (error) {
     // Keep what we had; a failed fetch mustn't empty the window.

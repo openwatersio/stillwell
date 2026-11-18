@@ -136,8 +136,6 @@ refetch() {
     # it has published; nothing else fetches them, so every station's last three years are read again, finished
     # ones included.
     bodc) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch ;;
-    # Reviewed and raw IGN references are separate series, so a preliminary-only pass misses new reviewed files.
-    ign) which=all from=$((year - 2)) && set -- "$((year + 1))" --refetch --with-inactive ;;
     # CRMS's only source is CPRA's weekly export of the whole record, read once a run and months behind, and CPRA
     # re-adjusts recent months after field visits, so every station's last three years are read again, as BODC's
     # are. Every station is named, since `all` skips inactive ones and CIMS retires a gauge before its last

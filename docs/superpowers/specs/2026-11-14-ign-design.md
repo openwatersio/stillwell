@@ -1,6 +1,6 @@
 # IGN tide gauges
 
-Approved in chat: https://github.com/openwatersio/stillwell/issues/181.
+Original full-network design. The public release is superseded by the maintainer-approved [flagged Coruña subset](2026-11-18-ign-coruna-design.md); the remaining design describes candidate research coverage tracked in https://github.com/openwatersio/stillwell/issues/181.
 
 ## Intent
 
@@ -34,4 +34,4 @@ Record each station's sensor codes, reference relationships and time convention 
 
 ## Reference decisions
 
-Raw series are isolated per sensor. Current sheets do not establish every historical sensor-to-mark relationship; they provide no safe basis for merging those raw records into reviewed series. Reviewed headers validate mark identity as well as BM/JM role. Historical Tenerife BMs with different names remain separate and carry no surveyed offsets. MURC1’s reviewed NAP-943 reference uses its published 2.313 m NMMA height from MURC2’s sheet. Ambiguous numeric -9999 readings are retained as suspect; documented positive 9999 and explicit --- gaps are dropped.
+Raw series are isolated per sensor. Current sheets do not establish every historical sensor-to-mark relationship; they provide no safe basis for merging those raw records into reviewed series. Reviewed headers validate mark identity as well as BM/JM role. Historical Tenerife BMs with different names remain separate and carry no surveyed offsets. MURC1’s reviewed NAP-943 reference uses its published 2.313 m NMMA height from MURC2’s sheet. Ambiguous numeric -9999 readings are retained as suspect; documented positive 9999 and explicit --- gaps invalidate stored values without inventing observations.

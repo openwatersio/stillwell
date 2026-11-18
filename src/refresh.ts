@@ -366,6 +366,8 @@ async function linkedStations(
       tidal: analysis.get(s.id)?.tidal ?? null,
       tide_m: analysis.get(s.id)?.tide_m ?? null,
     }));
+    for (const station of kept)
+      if (source.attribution) station.attribution = source.attribution(station);
     // Readers' business, not publishing's, so a file that can't be read leaves it unknown.
     const status = await backfillStatus(store, source, kept, now).catch((error: unknown) => {
       console.warn(`${source.metadata.id}: no backfill status: ${String(error)}`);

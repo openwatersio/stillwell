@@ -263,11 +263,18 @@ function copiesIn(group: Station[]): Set<string> {
 const ASSEMBLED = new Set(["gesla"]);
 
 /**
- * Source pairs whose agencies each run their own gauges, so two of their
- * stations at one pier are separate instruments that check each other, never
- * one gauge. Only an ID or an entry in `LINKS` joins them.
+ * These sources run independent gauges or redistribute several originators at
+ * one port. Nearness and matching tides do not establish instrument identity;
+ * only an ID or an entry in `LINKS` joins them.
  */
-const SEPARATE = new Set(["coops~usgs", "coops~usace", "jma~jodc"]);
+const SEPARATE = new Set([
+  "coops~usgs",
+  "coops~usace",
+  "jma~jodc",
+  "cmems~ign",
+  "gesla~ign",
+  "ign~uhslc",
+]);
 
 function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));
@@ -452,7 +459,9 @@ export function linkGauges<T extends Station>(
     // Checked across the whole of both groups, so a third station can't bridge them.
     if (how === "data" || how === "near" || how === "copy") {
       const clash = ga.flatMap((x) =>
-        gb.filter((y) => separate(x, y) && !ASSEMBLED.has(x.source)).map((y) => [x, y]),
+        gb
+          .filter((y) => separate(x, y) && !(x.source === y.source && ASSEMBLED.has(x.source)))
+          .map((y) => [x, y]),
       )[0];
       if (clash) {
         const [x, y] = clash as [T, T];
