@@ -410,7 +410,7 @@ describe("linkGauges's limits", () => {
 
   it("links CMEMS's copies of WSV gauges that GESLA places too far off or names no side of", () => {
     // The levels rule links tidal water only, so decisions link the Baltic gauges, Lübeck's
-    // at the edge of tidal, and Wangerooge West, which the store marks non-tidal.
+    // at the edge of tidal, and Wangerooge West, whose verdict a failed sensor can make non-tidal.
     const list = [
       station("gesla/rostocktg-ros-deu-cmems", {
         name: "RostockTG",
