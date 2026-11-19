@@ -126,7 +126,7 @@ async function tick(): Promise<void> {
   ))
     console.log(`job ${job.id} cancelled, as its source left the server: ${job.command.join(" ")}`);
 
-  const { writing, onServer } = await askGithub();
+  let gh = await askGithub();
   const noStore = storeMissing();
   const notReady = noStore;
   if (notReady !== lastReadiness) console.log(notReady ?? "store jobs can run");
@@ -140,12 +140,19 @@ async function tick(): Promise<void> {
       serverRuns(j.lane) &&
       // main's server.json too, so a box deployed from a branch, or one a failed deploy left behind, writes
       // only what main gives it, as Actions writes only what main doesn't.
-      onServer.has(source) &&
-      !writing.has(ALL) &&
-      !writing.has(source)
+      gh.onServer.has(source) &&
+      !gh.writing.has(ALL) &&
+      !gh.writing.has(source)
     );
   };
-  for (const job of startable(db, SLOTS, runs, LONG_SLOTS)) {
+  let picked = startable(db, SLOTS, runs, LONG_SLOTS);
+  // A store job starts only on a fresh answer, since an Actions run, such as a re-run, may have begun since the
+  // cached one.
+  if (picked.some((j) => j.lane !== "check") && Date.now() - github.at > 15_000) {
+    gh = await askGithub(true);
+    picked = startable(db, SLOTS, runs, LONG_SLOTS);
+  }
+  for (const job of picked) {
     // Claimed first, so a job cancelled since it was picked never starts, and a failed start never repeats.
     if (!markStarted(db, job.id, release)) continue;
     try {
@@ -227,9 +234,9 @@ function storeMissing(): string | null {
  * GitHub every few minutes while a source is on the server. When GitHub can't answer, or without a token, every
  * source is being written and none is on the server, so the server writes none.
  */
-async function askGithub(): Promise<{ writing: Set<string>; onServer: Set<string> }> {
+async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServer: Set<string> }> {
   if (![...PHASES.values()].includes("server")) return { writing: new Set(), onServer: new Set() };
-  if (Date.now() - github.at < GITHUB_MS) return github;
+  if (!fresh && Date.now() - github.at < GITHUB_MS) return github;
   const token = process.env.GITHUB_TOKEN;
   let answer = { writing: new Set([ALL]), onServer: new Set<string>() };
   if (!token)

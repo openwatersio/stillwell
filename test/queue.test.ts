@@ -239,6 +239,8 @@ describe("actions", () => {
       ["ea"],
     );
     assert.deepEqual(writing("ingest.yml", { id: 1, display_title: "Ingest publish" }, []), []);
+    // A re-run of one from before run-name names its arguments nowhere.
+    assert.deepEqual(writing("ingest.yml", { id: 1, display_title: "Ingest" }, []), [ALL]);
     assert.deepEqual(
       writing("ingest-hourly.yml", { id: 1, display_title: "Ingest hourly" }, [
         job("gate", "completed"),

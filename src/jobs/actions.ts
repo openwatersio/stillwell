@@ -22,6 +22,8 @@ interface RunJob {
 /** The sources a run of `workflow` may still write, from its title and jobs; `ALL` when it can't tell. */
 export function writing(workflow: string, run: Run, jobs: RunJob[]): string[] {
   if (workflow === "ingest.yml") {
+    // A run from before ingest.yml named its runs by their arguments is titled "Ingest" alone, so it may write any source.
+    if (!run.display_title.startsWith("Ingest ")) return [ALL];
     const lane = laneOf(
       run.display_title
         .replace(/^Ingest /, "")
