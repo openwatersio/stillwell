@@ -1,16 +1,6 @@
 {
   "errata": [
     {
-      "id": "cco-west-bay-position",
-      "stations": ["cco/95"],
-      "handling": "corrected",
-      "error": "CCO's list puts West Bay Harbour at 50.7102° N, 2.8200° W, 3.9 km west of the harbour. GESLA's record of the gauge, which CCO supplied, and CMEMS's copy of it both put it at 50.7089° N, 2.7641° W.",
-      "response": "The station refresh moves it to 50.70888, −2.76411, listed in `POSITIONS` in `src/positions.ts`. If CCO moves the station, the refresh reports the entry and fails the run until a person checks it.",
-      "evidence": "`tides/latest.geojson` of 2026-11-16 for site 95; `stations.parquet` for `gesla/west_bay_harbour-wbh-gbr-cco` and `cmems/WestBayHarbourTG`.",
-      "reported": "2026-11-17",
-      "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory confirmed on 2026-11-18 that the position in its station record is wrong, gave the gauge's position as 50.70888, −2.76411, and said it will correct the record."
-    },
-    {
       "id": "cco-fill-values",
       "stations": ["cco/86", "cco/88", "cco/90", "cco/93", "cco/117", "cco/126"],
       "handling": "dropped",
@@ -41,5 +31,5 @@
       "report": "Sent to the Channel Coastal Observatory's API team on 2026-11-17. The observatory said on 2026-11-18 that it fixed both bugs on the morning of 2026-11-17: an empty window now returns a valid empty FeatureCollection, and requests before Lymington's or Brighton's first reading no longer return HTTP 500."
     }
   ],
-  "retired": []
+  "retired": ["cco-west-bay-position"]
 }
