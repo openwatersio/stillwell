@@ -24,3 +24,11 @@ updates:
       site:
         update-types: ["minor", "patch"]
         patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /notebooks/observable
+    schedule:
+      interval: weekly
+    groups:
+      notebooks:
+        update-types: ["minor", "patch"]
+        patterns: ["*"]

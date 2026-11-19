@@ -1,6 +1,7 @@
 name: Site
 
-# Build the site in site/ and deploy it to GitHub Pages. The build runs the docs' result tables against the public
+# Build the site in site/, with the Observable notebooks in notebooks/observable/, and deploy it to GitHub
+# Pages. The build runs the docs' result tables against the public
 # store and fails where a query breaks or a reference page's columns and the live files disagree. Pull requests that
 # change the site only build it. Pushes to main deploy it, and so does a daily run, which picks up the store's own
 # changes. Monthly keeps the schedule enabled.
@@ -8,6 +9,7 @@ on:
   pull_request:
     paths:
       - "site/**"
+      - "notebooks/observable/**"
       - ".mise.toml"
       - ".github/workflows/site.yml"
       # Source pages render each adapter's README.
@@ -16,6 +18,7 @@ on:
     branches: [main]
     paths:
       - "site/**"
+      - "notebooks/observable/**"
       - ".mise.toml"
       - ".github/workflows/site.yml"
       # Source pages render each adapter's README.
@@ -47,14 +50,21 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-          cache-dependency-path: site/package-lock.json
-      - name: Check the lockfile regenerates from package.json
+          cache-dependency-path: |
+            site/package-lock.json
+            notebooks/observable/package-lock.json
+      - name: Check the lockfiles regenerate from package.json
         run: |
-          git ls-files --error-unmatch package-lock.json
-          npm install --package-lock-only --ignore-scripts
-          git diff --exit-code -- package-lock.json
+          for dir in . ../notebooks/observable; do
+            git ls-files --error-unmatch $dir/package-lock.json
+            (cd $dir && npm install --package-lock-only --ignore-scripts)
+            git diff --exit-code -- $dir/package-lock.json
+          done
       - name: Check every package resolves from the npm registry
-        run: npx -y lockfile-lint@5.1.0 --path package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names
+        run: |
+          for dir in . ../notebooks/observable; do
+            npx -y lockfile-lint@5.1.0 --path $dir/package-lock.json --allowed-hosts npm --validate-https --validate-integrity --validate-package-names
+          done
       - run: npm ci
       # The deployed site has no station pages. A pull request builds two small sources' pages, to render the
       # station page and bundle its chart: BSH's stations have predictions and no observations, and every Marine
@@ -62,6 +72,15 @@ jobs:
       - run: npm run build
         env:
           STATIONS: ${{ github.event_name == 'pull_request' && 'bsh,marine-institute' || '' }}
+      # The Observable notebooks build with Notebook Kit, which has its own package.json since its optional DuckDB
+      # peer conflicts with the site's. Their assets load from relative paths, so they serve from any path.
+      - name: Build the Observable notebooks
+        working-directory: notebooks/observable
+        run: |
+          npm ci
+          npm run build
+          mkdir -p ../../site/dist/notebooks
+          cp -R dist ../../site/dist/notebooks/observable
       # Pages serves the site under /stillwell, so a root path in any HTML attribute needs it, once.
       - name: Check every root path in the HTML carries the base path
         run: |

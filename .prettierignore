@@ -10,5 +10,9 @@ src/sources/gesla/contributors.md
 src/sources/gesla/coverage.md
 .cla.json
 site/dist/
+notebooks/observable/dist/
+notebooks/observable/.observable/
+# Prettier ends expression cells with a semicolon, which turns them into statements that display nothing.
+notebooks/observable/*.html
 site/.astro/
 site/.shots/
