@@ -89,3 +89,13 @@ groups:
         annotations:
           summary: A store job has waited over 12 hours to start
           description: Run stillwell-jobs list on the box for what waits and what runs, and journalctl -u stillwell-jobs -n 50 for why store jobs can't run, such as STILLWELL_WRITE_STORE or its credentials missing from /etc/stillwell.env.
+      # Merging a move takes the source out of Actions at once, but the box writes it only once it deploys that
+      # change, so a failed or skipped deploy leaves the source written by nothing, which no job failure shows.
+      - alert: StillwellJobsBehindMain
+        # Absent too: a release from before the metric, which a failed deploy of a move leaves running, never writes it.
+        expr: (stillwell_jobs_sources_behind_main{project="stillwell"} > 0) or absent(stillwell_jobs_sources_behind_main{project="stillwell"})
+        for: 30m
+        labels: { severity: critical }
+        annotations:
+          summary: main puts a source on the job queue that the box's release doesn't, so nothing writes it
+          description: The deploy of the change that moved it failed or hasn't run. Check the CI run's deploy job, and cat /var/lib/stillwell-deployed on the box against main.

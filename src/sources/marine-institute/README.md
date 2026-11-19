@@ -18,14 +18,14 @@ Sea levels every 5 minutes from the Irish National Tide Gauge Network, run by th
 
 - **Stations:** the adapter sends a station's `name` back to ERDDAP as `station_id`. Each station's `record_start` and `record_end` bound what a backfill asks for.
 - **Limits:** ERDDAP publishes none. Requests start at least a second apart, a calendar year per request. A year of one gauge is about 4.5 MB, 560 KB compressed, and takes about 5 seconds (Dublin Port, 2023). A query with no matching rows answers 404 with "Your query produced no matching results" in the body, read as no values; any other 404, such as a renamed dataset, fails. Every gauge's first and last time in one query takes about 60 seconds and hits ERDDAP's gateway timeout, so the station refresh asks each gauge for its own (`orderByMinMax`, up to 7 seconds each), and backfill asks only for the years from a gauge's first day on, and to its last day for one that has stopped.
-- **Cache:** the station list and its spans are never cached. A year's response is cached only when every value in it has QC flag 1 and they run to the year's last hour; any unchecked value, or a year still running, is fetched again. An ended year with unchecked values stays preliminary, so Monthly's refetch asks for it again.
+- **Cache:** the station list and its spans are never cached. A year's response is cached only when every value in it has QC flag 1 and they run to the year's last hour; any unchecked value, or a year still running, is fetched again. An ended year with unchecked values stays preliminary, so the refetch on the 9th asks for it again.
 
 ### Backfill
 
-The Monthly workflow refreshes the list on the 2nd; Ingest hourly and Compact daily need the list in the store. A full backfill goes through the Ingest workflow:
+The Marine Institute is on the server's job queue ([src/sources/server.json](../server.json), [docs/plans/jobs.md](../../../docs/plans/jobs.md)), which refreshes the list on the 2nd, reads new values hourly, compacts them nightly and refetches on the 9th, at the times the Actions workflows run for other sources. A backfill is a job, queued on the box:
 
 ```bash
-node scripts/ingest.ts backfill marine-institute all 2006 2026 --skip-written
+stillwell-jobs enqueue backfill marine-institute all 2006 2026 --skip-written
 ```
 
-Without `--first`, since [ticon-inventory.csv](../../../docs/ticon-inventory.csv) names no station of this source until the inventory has run against a store with its list. That's about 300 station-years, each one request of about 5 seconds and 560 KB compressed (about 170 MB in all), so under half an hour: one Ingest run. The current year is fetched whole on every run, so it's backfilled on its own, `backfill marine-institute all 2026 2027`. Ingest hourly brings new values, and Monthly's refetch on the 9th (`backfill marine-institute preliminary`) picks up values the institute has checked since.
+Without `--first`, since [ticon-inventory.csv](../../../docs/ticon-inventory.csv) names no station of this source until the inventory has run against a store with its list. That's about 300 station-years, each one request of about 5 seconds and 560 KB compressed (about 170 MB in all), so under half an hour: one job. The current year is fetched whole on every run, so it's backfilled on its own, `backfill marine-institute all 2026 2027`. The hourly run brings new values, and the refetch on the 9th (`backfill marine-institute preliminary`) picks up values the institute has checked since.

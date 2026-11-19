@@ -22,6 +22,8 @@ interface RunJob {
 /** The sources a run of `workflow` may still write, from its title and jobs; `ALL` when it can't tell. */
 export function writing(workflow: string, run: Run, jobs: RunJob[]): string[] {
   if (workflow === "ingest.yml") {
+    // A run from before ingest.yml named its runs by their arguments is titled "Ingest" alone, so it may write any source.
+    if (!run.display_title.startsWith("Ingest ")) return [ALL];
     const lane = laneOf(
       run.display_title
         .replace(/^Ingest /, "")
@@ -76,6 +78,7 @@ async function all<T>(
 export async function actionsWriting(token: string, repo: string): Promise<Set<string>> {
   const get = client(token, repo);
   const out = new Set<string>();
+  const seen = new Set<number>();
   for (const workflow of ["ingest.yml", ...Object.keys(WORKFLOWS)])
     // In the order a run moves through them, so one that moves on between reads lands in a list still to be read,
     // and in_progress first too, since a run can go back to waiting on an environment or a concurrency group.
@@ -92,6 +95,9 @@ export async function actionsWriting(token: string, repo: string): Promise<Set<s
         `actions/workflows/${workflow}/runs?status=${status}`,
         "workflow_runs",
       )) {
+        // A run seen in an earlier list, such as in_progress read twice, isn't read again.
+        if (seen.has(run.id)) continue;
+        seen.add(run.id);
         const jobs =
           workflow === "ingest.yml"
             ? []
