@@ -385,7 +385,8 @@ export interface Source {
    * after `backfill <source>`, given the day the job runs (scripts/schedule.ts).
    * `lists` runs after the list refresh; none by default. `refetch` replaces
    * the default refetch, `preliminary` from January `REFETCH_YEARS` back to this
-   * month, for a source whose new or final values that doesn't reach.
+   * month, for a source with new or final values the default refetch doesn't
+   * reach.
    */
   schedule?: {
     lists?(today: Date): string[][] | Promise<string[][]>;

@@ -193,7 +193,10 @@ describe("scheduled jobs for a source with no list yet", () => {
 });
 
 describe("Monthly workflow", () => {
-  type Job = { concurrency?: { group: string }; steps: { run?: string; if?: string }[] };
+  type Job = {
+    concurrency?: { group: string };
+    steps: { run?: string; if?: string; env?: Record<string, string> }[];
+  };
   const { jobs } = parse(readFileSync(".github/workflows/monthly.yml", "utf8")) as {
     jobs: Record<string, Job>;
   };
@@ -221,6 +224,23 @@ describe("Monthly workflow", () => {
     assert.ok(index("monthly.sh analyze") < index("monthly.sh requalify-recent"));
     const lists = script.slice(script.indexOf("  lists)"));
     assert.ok(lists.indexOf("analyze ||") < lists.indexOf("requalify_recent ||"));
+  });
+
+  it("runs every source's list backfills after its refresh, with the refresh's source keys", () => {
+    const steps = jobs.lists!.steps;
+    const at = steps.findIndex((s) => s.run?.includes("monthly.sh list-backfills"));
+    const refresh = steps.findIndex((s) => s.run?.includes("monthly.sh refresh"));
+    assert.ok(at > refresh && refresh >= 0, "list-backfills follows the refresh");
+    // For every source, since a source without list backfills runs none.
+    assert.equal(steps[at]!.if, "${{ !cancelled() && steps.owns.outcome == 'success' }}");
+    const keys = (env: Record<string, string> = {}) =>
+      Object.keys(env).filter(
+        (k) => !k.startsWith("S3_") && !["SOURCE", "STILLWELL_STORE"].includes(k),
+      );
+    assert.deepEqual(
+      keys(steps[at]!.env),
+      keys(steps[refresh]!.env).filter((k) => !k.startsWith("ACCEPT_")),
+    );
   });
 
   it("puts no job but the lists and refetch in a source's group", () => {
