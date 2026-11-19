@@ -55,6 +55,30 @@ function station(id: string, name: string, lat: number, lon: number): Station {
 }
 
 describe("TICON originators", () => {
+  it("keeps IEO's separate Spanish network distinct from IGN and REDMAR", () => {
+    assert.equal(originatorSeries(record("coruna-coru-esp-ieo"), {}).source, "ieo");
+  });
+  it("uses the evidenced IGN link instead of Spain's REDMAR fallback", () => {
+    const gauge = station("ign/ALAC1", "Alicante", 38.33, -0.49);
+    const match = originatorSeries(record("alicantetg-ali-esp-cmems", { lat: 38.33, lon: -0.49 }), {
+      ign: [gauge],
+    });
+    assert.equal(match.source, "ign");
+    assert.equal(match.id, "ign/ALAC1");
+    assert.equal(match.status, "ready");
+    assert.equal(originatorSeries(record("alicantetg-ali-esp-cmems"), {}).source, "ign");
+    assert.equal(originatorSeries(record("other-oth-esp-cmems"), {}).source, "redmar");
+  });
+  it("keeps an unlisted IGN target pending without inventing scientific readiness", () => {
+    const coruna = station("ign/ACOR1", "Coruna", 43.36, -8.4);
+    const match = originatorSeries(record("alicantetg-ali-esp-cmems", { lat: 38.33, lon: -0.49 }), {
+      ign: [coruna],
+    });
+    assert.equal(match.source, "ign");
+    assert.equal(match.id, null);
+    assert.equal(match.status, "to_match");
+  });
+
   it("reads the originator's code from the id", () => {
     assert.deepEqual(parseId("seattle-9447130-usa-noaa"), {
       code: "9447130",

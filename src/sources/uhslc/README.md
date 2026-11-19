@@ -22,6 +22,8 @@ Hourly sea level from the University of Hawaii Sea Level Center's [ERDDAP](https
 - **Freshness:** UHSLC can still reissue a version's values in place. An ended year that holds only RQ values counts as complete and isn't read again, so such a reissue doesn't reach the store on its own.
 - **Refresh:** none of UHSLC's series is live, so none is read hourly. Monthly, on the 9th, each station is read again from its earliest preliminary value to the end of the last year the store holds for it, which replaces FD with RQ as UHSLC releases it and fills in new FD values within that year. FD values in a later year reach the store only through a backfill. Each station's first and last values reach `stations.parquet` daily.
 
+IGN is a separate originator: only verified IDs or explicit links join its records to UHSLC copies. Same-port Coruña records are not matched to IGN by proximity or tidal agreement.
+
 ## Running ingest
 
 - **Contributor scan:** `node scripts/uhslc-contributors.ts` reads every documentation file again (about 720, a second apart) and rewrites [`contributors.ts`](contributors.ts) and the table in [contributors.md](contributors.md). Run it (`npm run uhslc:contributors`) after each UHSLC release. A rescan that would lose a refusal, because UHSLC reworded the notice or dropped the version that carried it, fails rather than list the station again, unless `--allow-lost-refusal` says the loss was checked. [CONTRIBUTING.md](../../../CONTRIBUTING.md#withheld-stations) has how withheld stations leave the store.

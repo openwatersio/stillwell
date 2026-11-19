@@ -26,6 +26,7 @@ The public store aims to hold any source that publishes water level data and all
 - [California DWR](src/sources/dwr/README.md): 15-minute stage at tidal gauges in the Sacramento–San Joaquin Delta.
 - [Environment Agency](src/sources/ea/README.md): real-time 15-minute tidal levels around England and the UK network.
 - [GESLA](src/sources/gesla/README.md): GESLA 4.1's static release of sea level records from more than 40 agencies.
+- [IGN Spain](src/sources/ign/README.md): Coruña reviewed hourly observations, 2000–2023, with suspect clocks; other IGN coverage withheld.
 - [JMA](src/sources/jma/README.md): hourly tide levels at Japanese gauges.
 - [JODC](src/sources/jodc/README.md): hourly tide levels back to 1910 at Japanese gauges of the Japan Coast Guard, GSI and port authorities.
 - [Kartverket](src/sources/kartverket/README.md): 10-minute levels at Norway's and Svalbard's permanent tide gauges.

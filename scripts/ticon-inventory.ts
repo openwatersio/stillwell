@@ -232,7 +232,7 @@ function summary(rows: Row[]): string {
     ready: "An adapter exists and the record matched one of its stations",
     planned: "Cleared source, adapter in the plan",
     to_match:
-      "Cleared source, adapter in the plan, but a CMEMS copy that has to match one of its stations first",
+      "Commercial-use terms cleared, but the CMEMS copy still needs an admitted matching station; not a scientific-clearance label",
     license: "The source's terms need confirming first",
     unmatched: "An adapter exists, but no station matched, or two matched equally; check by hand",
     restricted: "The source forbids it; stays on TICON",

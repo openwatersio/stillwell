@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://stillwell.openwaters.io/stations.parquet",
+    "sha256": "d9f9d19ccefe58e867ff1c289d97684b349817ba79d652fe7165a7c0952aabe4",
+    "bytes": 2801535,
+    "snapshotDate": "2026-11-18"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/gesla.parquet",
+    "sha256": "58b86cef8df804921e34363998a72a25fcc98e11763b7f32bf55358133a16f8c",
+    "bytes": 565195,
+    "snapshotDate": "2026-11-18"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/cmems.parquet",
+    "sha256": "632c176b2d6ebb8a35eb84ea9b7d231701ea4b59e4c64f55635bb4763be7db64",
+    "bytes": 51218,
+    "snapshotDate": "2026-11-18"
+  },
+  {
+    "url": "https://stillwell.openwaters.io/stations/uhslc.parquet",
+    "sha256": "6983f7ec6c9b96ca4370c4f967405bcbc0ab64dcf599fae18aed4759e3ecf8c0",
+    "bytes": 43433,
+    "snapshotDate": "2026-11-18"
+  }
+]

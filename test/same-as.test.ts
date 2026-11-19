@@ -784,6 +784,55 @@ describe("copyPairs", () => {
   });
 });
 
+describe("IGN originator identity", () => {
+  it("requires explicit identity before joining same-port IGN and other agencies' copies", () => {
+    const original = station("ign/ACOR1", { name: "Coruna", kind: "coastal" });
+    const copy = station("gesla/coruna2tg-cor-esp-cmems", { name: "Coruna", kind: "coastal" });
+    LINKS.push({ a: original.id, b: copy.id, note: "Verified IGN copy" });
+    try {
+      const result = linkGauges(
+        [
+          original,
+          copy,
+          station("gesla/coruna-coru-esp-ieo", { name: "Coruna", kind: "coastal" }),
+          station("cmems/corunatg", { name: "Coruna", kind: "coastal" }),
+          station("uhslc/830", { name: "Coruna", kind: "coastal" }),
+        ],
+        NOW,
+      ).stations;
+      assert.deepEqual(result.find((s) => s.id === original.id)!.same_as, [copy.id]);
+      assert.ok(
+        result
+          .filter((s) => ![original.id, copy.id].includes(s.id))
+          .every((s) => !s.same_as.includes(original.id)),
+      );
+    } finally {
+      LINKS.pop();
+    }
+  });
+});
+
+describe("assembled identity clashes", () => {
+  it("blocks an independent GESLA data-match bridge in either lexical order", () => {
+    for (const other of ["gesla/a-independent", "gesla/z-independent"]) {
+      const original = station("ign/ACOR1", { name: "Coruna", kind: "coastal" });
+      const copy = station("gesla/m-copy", { name: "Coruna", kind: "coastal" });
+      LINKS.push({ a: original.id, b: copy.id, note: "Verified originator" });
+      try {
+        const result = linkGauges(
+          [original, copy, station(other, { name: "Coruna", kind: "coastal" })],
+          NOW,
+          new Map(),
+          agree([other, copy.id]),
+        ).stations;
+        assert.deepEqual(result.find((s) => s.id === original.id)!.same_as, [copy.id]);
+      } finally {
+        LINKS.pop();
+      }
+    }
+  });
+});
+
 describe("rank", () => {
   const best = (...stations: Station[]) =>
     stations.reduce((a, b) => (rank(a, b, NOW) < 0 ? a : b)).id;

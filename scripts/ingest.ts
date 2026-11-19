@@ -27,7 +27,7 @@
  * so a rerun gives the same files. A calendar month the fetch returned nothing
  * for keeps what it had, so an outage never deletes stored values; a value the
  * source withdraws stays until its month is fetched again with others. A
- * source that never withdraws one (`keepsStored`, the EA) keeps every stored
+ * source whose omitted timestamps are not withdrawals (`keepsStored`, such as EA or IGN) keeps every stored
  * level, so a day its archive lacks keeps what the store has.
  * Backfill skips a year whose file is already complete (see `yearDone` in
  * src/backfill.ts), so a run cut short doesn't fetch those again; `--refetch`

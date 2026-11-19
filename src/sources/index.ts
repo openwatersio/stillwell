@@ -13,6 +13,7 @@ import { source as dmi } from "./dmi/index.ts";
 import { source as dwr } from "./dwr/index.ts";
 import { source as ea } from "./ea/index.ts";
 import { source as gesla } from "./gesla/index.ts";
+import { source as ign } from "./ign/index.ts";
 import { source as jma } from "./jma/index.ts";
 import { source as jodc } from "./jodc/index.ts";
 import { source as kartverket } from "./kartverket/index.ts";
@@ -38,6 +39,7 @@ import dmiErrata from "./dmi/errata.json" with { type: "json" };
 import dwrErrata from "./dwr/errata.json" with { type: "json" };
 import eaErrata from "./ea/errata.json" with { type: "json" };
 import geslaErrata from "./gesla/errata.json" with { type: "json" };
+import ignErrata from "./ign/errata.json" with { type: "json" };
 import jmaErrata from "./jma/errata.json" with { type: "json" };
 import jodcErrata from "./jodc/errata.json" with { type: "json" };
 import linzErrata from "./linz/errata.json" with { type: "json" };
@@ -64,6 +66,7 @@ const adapters: Record<string, Source> = {
   dwr,
   ea,
   gesla,
+  ign,
   jma,
   jodc,
   kartverket,
@@ -97,6 +100,7 @@ export const errataFiles: Record<string, unknown> = {
   dwr: dwrErrata,
   ea: eaErrata,
   gesla: geslaErrata,
+  ign: ignErrata,
   jma: jmaErrata,
   jodc: jodcErrata,
   linz: linzErrata,
@@ -119,9 +123,10 @@ export const { errata, problems: errataProblems } = readErrata(errataFiles);
  * gauge reads one: it's a fill value or junk, missing rather than a bad value
  * (errata `usace-fill-values`, `cdec-fill-values`, `usgs-fill-values` and
  * `pegelonline-fill-values`, and GESLA's and CMEMS's, whose adapters drop them too).
+ * Transient withdrawals reach the merge without being treated as numerical levels.
  */
 export function withinSpan(source: Source): Source {
-  const keep = (rows: Observation[]) => rows.filter((r) => possible(r.level));
+  const keep = (rows: Observation[]) => rows.filter((r) => r.withdrawn || possible(r.level));
   const { observations, recent } = source;
   return {
     ...source,

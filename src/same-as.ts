@@ -49,6 +49,21 @@ export interface Decision {
 
 /** Pairs that share a gauge the rules below miss. */
 export const LINKS: Decision[] = [
+  ...[
+    ["alicantetg-ali-esp-cmems", "ALAC1"],
+    ["alicante2tg-ali-esp-cmems", "ALAC2"],
+    ["alborantg-alb-esp-cmems", "ALBO1"],
+    ["coruna2tg-cor-esp-cmems", "ACOR1"],
+    ["almeria3tg-alm-esp-cmems", "ALME2"],
+    ["cartagenatg-car-esp-cmems", "MURC2"],
+    ["fuerteventura3tg-fue-esp-cmems", "FUER2"],
+    ["tenerife3tg-ten-esp-cmems", "TN021"],
+    ["tenerife4tg-ten-esp-cmems", "TN031"],
+  ].map(([copy, gauge]) => ({
+    a: `gesla/${copy}`,
+    b: `ign/${gauge}`,
+    note: "IGN gauge identified in openwatersio/stillwell#181; GESLA's CMEMS position matches IGN's station sheet (checked against the store's station list on 15 November 2026). Explicit IDs keep neighboring gauges, particularly Alicante's two, distinct.",
+  })),
   {
     a: "gesla/degerby-deg-fin-cmems",
     b: "gesla/foglo_degerby-134252-fin-fmi",
@@ -248,11 +263,18 @@ function copiesIn(group: Station[]): Set<string> {
 const ASSEMBLED = new Set(["gesla"]);
 
 /**
- * Source pairs whose agencies each run their own gauges, so two of their
- * stations at one pier are separate instruments that check each other, never
- * one gauge. Only an ID or an entry in `LINKS` joins them.
+ * These sources run independent gauges or redistribute several originators at
+ * one port. Nearness and matching tides do not establish instrument identity;
+ * only an ID or an entry in `LINKS` joins them.
  */
-const SEPARATE = new Set(["coops~usgs", "coops~usace", "jma~jodc"]);
+const SEPARATE = new Set([
+  "coops~usgs",
+  "coops~usace",
+  "jma~jodc",
+  "cmems~ign",
+  "gesla~ign",
+  "ign~uhslc",
+]);
 
 function separate(a: Station, b: Station): boolean {
   return a.source === b.source || SEPARATE.has([a.source, b.source].sort().join("~"));
@@ -437,7 +459,9 @@ export function linkGauges<T extends Station>(
     // Checked across the whole of both groups, so a third station can't bridge them.
     if (how === "data" || how === "near" || how === "copy") {
       const clash = ga.flatMap((x) =>
-        gb.filter((y) => separate(x, y) && !ASSEMBLED.has(x.source)).map((y) => [x, y]),
+        gb
+          .filter((y) => separate(x, y) && !(x.source === y.source && ASSEMBLED.has(x.source)))
+          .map((y) => [x, y]),
       )[0];
       if (clash) {
         const [x, y] = clash as [T, T];

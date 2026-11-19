@@ -5,8 +5,10 @@ import { Flag } from "../schema.ts";
  * everything outside that range. A value seen before keeps its first `received`
  * time; a new one gets `receivedAt`, which is unset for backfilled history.
  * Later fetches win on level and flag, so verified data replaces preliminary.
+ * Explicit withdrawals retain the prior numeric reading as source-bad; a marker
+ * without a prior reading writes nothing, so no missing level is invented.
  */
-export function mergeRange<T extends { time: number; received?: number }>(
+export function mergeRange<T extends { time: number; received?: number; withdrawn?: true }>(
   existing: T[],
   incoming: T[],
   start: number,
@@ -17,8 +19,13 @@ export function mergeRange<T extends { time: number; received?: number }>(
   const merged = existing.filter((r) => r.time < start || r.time >= end);
   for (const row of incoming) {
     if (row.time < start || row.time >= end) continue;
-    const received = before.get(row.time)?.received ?? row.received ?? receivedAt;
-    const next = { ...row };
+    const prior = before.get(row.time);
+    const received = row.withdrawn
+      ? prior?.received
+      : (prior?.received ?? row.received ?? receivedAt);
+    if (row.withdrawn && !prior) continue;
+    const next = row.withdrawn ? { ...prior!, flag: Flag.bad, source_flag: Flag.bad } : { ...row };
+    delete next.withdrawn;
     if (received === undefined) delete next.received;
     else next.received = received;
     merged.push(next);
@@ -32,10 +39,10 @@ export function mergeRange<T extends { time: number; received?: number }>(
  * the rows it had. Sources that fetch a month per request, or answer a month
  * with "no data" during an outage, shouldn't delete what the store already holds;
  * a value is only replaced by a fetch that covered its month. With `keepAll`,
- * every row it had is kept unless `incoming` has its time, for a source that
- * never withdraws a value.
+ * every row it had is kept unless `incoming` has its time, including an explicit
+ * withdrawal, so an incomplete listing does not erase unrelated observations.
  */
-export function mergeFetched<T extends { time: number; received?: number }>(
+export function mergeFetched<T extends { time: number; received?: number; withdrawn?: true }>(
   existing: T[],
   incoming: T[],
   start: number,
