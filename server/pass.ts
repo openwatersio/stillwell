@@ -10,7 +10,8 @@
  * Every pass that ends, failed or not, adds a row to `polls`. Prints the pass's result
  * as JSON on stdout; everything else goes to stderr.
  *
- * A source named in STILLWELL_FROM_RECENT (comma-separated) isn't asked at all:
+ * A source whose metadata sets `poller: "recent"`, or one named in
+ * STILLWELL_FROM_RECENT (comma-separated), isn't asked at all:
  * each pass, hourly, brings ClickHouse's window into line with the
  * recent/<source>.parquet the hourly workflow writes (`fillFromRecent`), for a
  * source that refuses the server.
@@ -34,10 +35,12 @@ const due = intervals === "all" ? null : new Set(intervals.split(",").map(Number
 const ch = clickhouse(databaseFor(source));
 const store = observationStore(ch);
 
-const fromRecent = (process.env.STILLWELL_FROM_RECENT ?? "")
-  .split(",")
-  .map((s) => s.trim())
-  .includes(id);
+const fromRecent =
+  source.metadata.poller === "recent" ||
+  (process.env.STILLWELL_FROM_RECENT ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .includes(id);
 
 let summary: RunSummary;
 let groups: number[] = [];

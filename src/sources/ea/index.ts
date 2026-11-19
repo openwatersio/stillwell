@@ -37,6 +37,9 @@ export const metadata: SourceMetadata = {
     "This uses Environment Agency flood and river level data from the real-time data API (Beta)",
   contact: { url: "https://environment.data.gov.uk/support" },
   terms: "Real-time readings, not quality-controlled.",
+  chart_datum: "CD",
+  // Admiralty Chart Datum.
+  datum_aliases: { CD: "ACD" },
   // The readings API has each reading within the hour.
   hourly: true,
   // The EA never quality-controls or revises a reading, so none becomes final.

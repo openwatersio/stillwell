@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson, getText } from "../../http.ts";
 import {
   Flag,
@@ -724,6 +725,19 @@ const overrides: Overrides = {
 
 export const source: Source = {
   metadata,
+  // LINZ isn't hourly: its daily files appear 6 to 12 days late, so the refetch brings its new values. Every
+  // open station is read from two months back to the end of this month, since the preliminary run stops at the
+  // year of a station's last value and skips one with no preliminary value, which leaves out a new year's first
+  // days and a new gauge. Cape Roberts has only year's files, issued early in the next year, which nothing else
+  // leads to. The preliminary run then reads each station from its earliest preliminary value, which brings in
+  // the year's file that replaces a year's daily files.
+  schedule: {
+    refetch: (today) => [
+      ["all", firstOfMonth(today, -2), firstOfMonth(today, 1)],
+      ["ROBT", `${yearOf(today) - 1}`, `${yearOf(today)}`, "--refetch"],
+      ["preliminary", `${yearOf(today) - REFETCH_YEARS}`, firstOfMonth(today, 1)],
+    ],
+  },
   overrides,
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s as Partial<LinzStation>),

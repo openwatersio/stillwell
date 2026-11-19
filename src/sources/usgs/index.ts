@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson, type RequestOptions } from "../../http.ts";
 import {
   Flag,
@@ -976,6 +977,20 @@ function checked(station: Station): string {
 
 export const source: Source = {
   metadata,
+  // USGS approves months to years later, a year a request at one every 4.8 seconds, too many for one run across
+  // 11,000 stations, so each month takes a twelfth of them, by --shard, and each station comes round once a
+  // year; the current year is left to compaction. A run that stops partway needs a rerun within the month.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        `${yearOf(today)}`,
+        "--shard",
+        `${today.getUTCMonth() + 1}/12`,
+      ],
+    ],
+  },
   stations,
   seriesChanged,
   observations: async (s: Station, start, end) => {

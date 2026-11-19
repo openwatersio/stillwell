@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getText, HttpError } from "../../http.ts";
 import {
   Flag,
@@ -428,6 +429,14 @@ async function pace(): Promise<void> {
 
 export const source: Source = {
   metadata,
+  // JMA isn't hourly, so the refetch also brings its new values: every open station from two months back,
+  // whose final file is out by now, to this month's provisional one, then the default refetch.
+  schedule: {
+    refetch: (today) => [
+      ["all", firstOfMonth(today, -2), firstOfMonth(today, 1)],
+      ["preliminary", `${yearOf(today) - REFETCH_YEARS}`, firstOfMonth(today)],
+    ],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s as JmaStation),
 };

@@ -78,6 +78,11 @@ describe("readmeText", () => {
       // What the page shows: none of the runbook, and no link a reader can't follow.
       checked++;
       const shown = readmeText(markdown);
+      assert.match(
+        shown,
+        /^- \*\*Flags:\*\*/m,
+        `${id.name}: the source page needs a **Flags:** bullet above Running ingest, which the quality-control guide points to`,
+      );
       assert.doesNotMatch(
         shown,
         /^#+ (Running ingest|Backfill)/m,

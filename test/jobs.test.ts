@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { describe, it } from "node:test";
@@ -8,6 +8,8 @@ import { parse } from "yaml";
 import { sources } from "../src/sources/index.ts";
 import { sourcesFor } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
+import { writeStationList } from "../src/store/parquet.ts";
+import { stationListPath } from "../src/store/paths.ts";
 
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
@@ -227,5 +229,33 @@ describe("Monthly workflow", () => {
       .filter(([, job]) => job.concurrency?.group.startsWith("store-"))
       .map(([name]) => name);
     assert.deepEqual(grouped.sort(), ["lists", "refetch"]);
+  });
+});
+
+describe("backfill over an empty station list", () => {
+  it("fails rather than pass having read nothing", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-jobs-"));
+    const store = join(root, "store");
+    mkdirSync(dirname(stationListPath(store, "crms")), { recursive: true });
+    await writeStationList(stationListPath(store, "crms"), []);
+    const run = spawnSync(
+      process.execPath,
+      [
+        "scripts/ingest.ts",
+        "backfill",
+        "crms",
+        "all",
+        "2024",
+        "2027",
+        "--refetch",
+        "--with-inactive",
+      ],
+      {
+        encoding: "utf8",
+        env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(root, "cache") },
+      },
+    );
+    assert.notEqual(run.status, 0);
+    assert.match(run.stderr, /crms: no station to backfill/);
   });
 });

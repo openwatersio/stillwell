@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { gunzipSync } from "node:zlib";
 import { FtpError } from "../../ftp.ts";
 import { getText } from "../../http.ts";
@@ -715,6 +716,12 @@ async function pace(): Promise<void> {
 
 export const source: Source = {
   metadata,
+  // The archives are rebuilt about monthly, and a finished year's again in the new year's first weeks, and
+  // nothing else brings new values, so every active gauge is read again from the year before last, past the
+  // year of its last value, which the default would stop at.
+  schedule: {
+    refetch: (today) => [["all", `${yearOf(today) - 2}`, `${yearOf(today) + 1}`, "--refetch"]],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s),
 };

@@ -23,6 +23,7 @@ Observed water levels at about 690 German federal gauges on the coast, rivers an
   - `estuary` (81): any other station whose `W` series has the WSV's tidal values (MThw, MTnw, HThw or NTnw), which it gives only for a gauge in tidal water: the tidal Elbe (17, from Wehr Geesthacht down to Cuxhaven), Weser (13, from the Weserwehr down), Ems (9), Jade (9), their tidal tributaries (Hunte, Eider, Stör, Oste, Leda, Ilmenau, Krückau, Pinnau, Wümme, Este, Hamme, Lesum, Lühe), and the two Dortmund-Ems-Kanal gauges on the tidal Ems at Herbrum and Rhede.
   - `lake` (1): Konstanz, on the `BODENSEE`.
   - null (560): every other water. PEGELONLINE doesn't say which waters are rivers and which are canals (133 stations are on a Kanal), so those stay null. About 20 gauges in tidal water have no tidal values, such as siels, storm-surge barrier sides and Brunsbüttel MPM, and stay null too. No Baltic river or lagoon gauge (Trave, Warnow, Peene, Kleines Haff) has them.
+- **Flags:** the API sends no quality code, so every value is `preliminary`. The source checks its values: no.
 
 ## Running ingest
 

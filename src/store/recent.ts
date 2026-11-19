@@ -587,12 +587,8 @@ export async function compactRecent({
 
 type Span = [number, number];
 
-/**
- * How many years before the current one the monthly refetch reaches back
- * (`backfill … preliminary` from January of that year, in scripts/monthly.sh), and
- * so how far back compaction looks for a station's first preliminary value.
- */
-export const REFETCH_YEARS = 3;
+export { REFETCH_YEARS } from "../sources/schedule.ts";
+import { REFETCH_YEARS } from "../sources/schedule.ts";
 
 /** The bounds of a file's rows before some time, `a`, and of its rows from then on, `b`, as one. */
 function joinSpans(a: FileBounds | null, b: FileBounds | null): FileBounds | null {
