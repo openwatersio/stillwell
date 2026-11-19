@@ -17,7 +17,7 @@ Observed water levels, observed high and low waters, and RWS's astronomical tide
 
 ## Running ingest
 
-- **Limits:** at most 160,000 values per request, so requests go a year at a time. Fair use, no uptime guarantee, and no published rate; throttling comes back as 429 or 503, which [`src/http.ts`](../../http.ts) retries. An empty range comes back as an empty body. A year takes 20 seconds and 15 MB for levels, 35 seconds for the astronomical tide, and 2 to 3 seconds for either set of extremes.
+- **Limits:** at most 160,000 values per request, so requests go a year at a time. Fair use, no uptime guarantee, and no published rate; throttling comes back as 429 or 503, which [`src/http.ts`](../../http.ts) retries. An empty range comes back as an empty body. During an outage the whole host answers every path, the catalog and the root included, with the body `404 page not found`, so the adapter waits out such a 404 on a catalog request or a read of a range over 7 days, then stops the run as blocked, as `outage` in [`index.ts`](index.ts) sets. A shorter read, as in the hourly run, the realtime poller and the canary, fails at once and the next run reads the same hours. RWS publishes no status page, and its [documentation](https://github.com/Rijkswaterstaat/WaterWebservices) lists no maintenance calendar.
 - **Workflows:** Ingest hourly reads the last 12 hours at the 661 stations with levels, and Compact daily folds the last 6 days into the year files. The Monthly workflow re-reads each station from its earliest preliminary value on the 9th and refreshes the station list on the 2nd.
 
 ### Backfill
