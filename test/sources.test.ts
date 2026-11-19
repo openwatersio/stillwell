@@ -70,6 +70,8 @@ describe("rws", () => {
       // The block is shared: other requests, and the catalog, fail without asking.
       await assert.rejects(rws.extremes("dordrecht", ...range), Blocked);
       await assert.rejects(rws.stations(), Blocked);
+      const day = new Date(+range[1] - 86_400_000);
+      await assert.rejects(rws.levels("hoekvanholland", day, range[1]), Blocked);
       assert.equal(calls, 3);
     } finally {
       rws.outage.waits = waits;

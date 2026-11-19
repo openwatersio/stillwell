@@ -471,6 +471,7 @@ const isOutage = (error: unknown) =>
 const patient = (start: Date, end: Date) => end.getTime() - start.getTime() > 7 * 86_400_000;
 
 async function throughOutage<T>(call: () => Promise<T>, patient = true): Promise<T> {
+  if (outage.blocked) throw outage.blocked;
   if (!patient) return call();
   for (let attempt = 0; ; attempt++) {
     if (outage.blocked) throw outage.blocked;
