@@ -3,6 +3,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import { url, stationPath, USER_AGENT } from "./paths";
+import { retryRewrite } from "./retry";
 
 const connection = await (
   await DuckDBInstance.create(":memory:", { custom_user_agent: USER_AGENT })
@@ -13,7 +14,7 @@ type Row = Record<string, any>;
 
 /** Rows as JavaScript values: Dates for times, BigInts for 64-bit integers. */
 export async function rows(sql: string): Promise<Row[]> {
-  return (await connection.runAndReadAll(sql)).getRowObjectsJS() as Row[];
+  return retryRewrite(async () => (await connection.runAndReadAll(sql)).getRowObjectsJS() as Row[]);
 }
 
 /**
@@ -70,7 +71,7 @@ async function cachedTable(key: string, sql: string, limit: number): Promise<Tab
 let queue: Promise<unknown> = Promise.resolve();
 
 function runTable(sql: string, limit: number): Promise<Table> {
-  const run = queue.then(() => readTable(sql, limit));
+  const run = queue.then(() => retryRewrite(() => readTable(sql, limit)));
   queue = run.catch(() => undefined);
   return run;
 }
