@@ -56,6 +56,7 @@ let github: { at: number; writing: Set<string>; onServer: Set<string> } = {
   onServer: new Set(),
 };
 let lastPollsError = "";
+let lastGithubError = "";
 let lastStopped: string | null = null;
 let lastMetricsError = "";
 let stopping = false;
@@ -126,7 +127,7 @@ async function tick(): Promise<void> {
   ))
     console.log(`job ${job.id} cancelled, as its source left the server: ${job.command.join(" ")}`);
 
-  const { writing, onServer } = await askGithub();
+  let gh = await askGithub();
   const noStore = storeMissing();
   const notReady = noStore;
   if (notReady !== lastReadiness) console.log(notReady ?? "store jobs can run");
@@ -140,12 +141,19 @@ async function tick(): Promise<void> {
       serverRuns(j.lane) &&
       // main's server.json too, so a box deployed from a branch, or one a failed deploy left behind, writes
       // only what main gives it, as Actions writes only what main doesn't.
-      onServer.has(source) &&
-      !writing.has(ALL) &&
-      !writing.has(source)
+      gh.onServer.has(source) &&
+      !gh.writing.has(ALL) &&
+      !gh.writing.has(source)
     );
   };
-  for (const job of startable(db, SLOTS, runs, LONG_SLOTS)) {
+  let picked = startable(db, SLOTS, runs, LONG_SLOTS);
+  // A store job starts only on a fresh answer, since an Actions run, such as a re-run, may have begun since the
+  // cached one.
+  if (picked.some((j) => j.lane !== "check") && Date.now() - github.at > 15_000) {
+    gh = await askGithub(true);
+    picked = startable(db, SLOTS, runs, LONG_SLOTS);
+  }
+  for (const job of picked) {
     // Claimed first, so a job cancelled since it was picked never starts, and a failed start never repeats.
     if (!markStarted(db, job.id, release)) continue;
     try {
@@ -177,6 +185,9 @@ function writeMetrics(stopped: string | null): void {
     "# HELP stillwell_migrations_stuck Whether migrations have stopped for something a person must fix.",
     "# TYPE stillwell_migrations_stuck gauge",
     `stillwell_migrations_stuck ${stuck(stopped) ? 1 : 0}`,
+    "# HELP stillwell_jobs_sources_behind_main Sources main's server.json puts on the server that this release doesn't, as after a failed deploy, which nothing writes.",
+    "# TYPE stillwell_jobs_sources_behind_main gauge",
+    `stillwell_jobs_sources_behind_main ${[...github.onServer].filter((s) => PHASES.get(s) !== "server").length}`,
     "# HELP stillwell_jobs_tick_timestamp_seconds When the service last went round its loop.",
     "# TYPE stillwell_jobs_tick_timestamp_seconds gauge",
     `stillwell_jobs_tick_timestamp_seconds ${Math.round(Date.now() / 1000)}`,
@@ -227,20 +238,25 @@ function storeMissing(): string | null {
  * GitHub every few minutes while a source is on the server. When GitHub can't answer, or without a token, every
  * source is being written and none is on the server, so the server writes none.
  */
-async function askGithub(): Promise<{ writing: Set<string>; onServer: Set<string> }> {
-  if (![...PHASES.values()].includes("server")) return { writing: new Set(), onServer: new Set() };
-  if (Date.now() - github.at < GITHUB_MS) return github;
+async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServer: Set<string> }> {
+  if (!fresh && Date.now() - github.at < GITHUB_MS) return github;
+  // main's map is read even with no source on the server here, so a box whose deploy lagged a move shows it.
+  const local = [...PHASES.values()].includes("server");
   const token = process.env.GITHUB_TOKEN;
-  let answer = { writing: new Set([ALL]), onServer: new Set<string>() };
+  // Unknown, every source may be written, and main's map stays the last one read, so the behind-main metric holds.
+  let answer = { writing: new Set([ALL]), onServer: github.onServer };
+  let failure = "";
   if (!token)
-    console.error("store jobs wait for GITHUB_TOKEN, to read Actions' runs and main's server.json");
+    failure = "store jobs wait for GITHUB_TOKEN, to read Actions' runs and main's server.json";
   else
     try {
       // A slow GitHub holds the loop for at most two minutes, after which it counts as unknown.
       const [phases, writing] = await Promise.race([
         Promise.all([
           mainPhases(token, "openwatersio/stillwell"),
-          actionsWriting(token, "openwatersio/stillwell"),
+          local
+            ? actionsWriting(token, "openwatersio/stillwell")
+            : Promise.resolve(new Set<string>()),
         ]),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error("no answer in two minutes")), 120_000).unref(),
@@ -251,9 +267,15 @@ async function askGithub(): Promise<{ writing: Set<string>; onServer: Set<string
         onServer: new Set([...phases].filter(([, p]) => p === "server").map(([s]) => s)),
       };
     } catch (error) {
-      console.error(`can't read GitHub: ${(error as Error).message}`);
+      failure = `can't read GitHub: ${(error as Error).message}`;
     }
-  github = { at: Date.now(), ...answer };
+  if (failure && failure !== lastGithubError) console.error(failure);
+  lastGithubError = failure;
+  // An answer that holds back a source of the server's is asked again in 30 seconds, as a run just dispatched may
+  // not have listed its jobs yet; one that holds back only Actions' own sources stands for the full while.
+  const holdsBack =
+    answer.writing.has(ALL) || [...answer.writing].some((s) => PHASES.get(s) === "server");
+  github = { at: holdsBack ? Date.now() - GITHUB_MS + 30_000 : Date.now(), ...answer };
   return answer;
 }
 

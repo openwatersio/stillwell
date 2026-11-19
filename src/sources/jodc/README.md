@@ -12,6 +12,7 @@ Hourly tide levels at 126 Japanese tide gauges that the Japan Coast Guard (31, S
 - **Datum:** each station's zero of tide height, `ZERO`, the name GESLA gives it. Each station's [attribute page](https://www.jodc.go.jp/TideAttrib/tide_attrib_8413_e.htm) gives it below the station's standard mark and T.P., but `datums` is empty: JODC doesn't say whether a zero moved during a record or whether earlier years were shifted to it.
 - **Freshness:** JODC adds each agency's year in a batch: the Coast Guard's zips were last written in February 2026, GSI's and the ports' in June 2025. No value is preliminary, so the store doesn't read JODC again each month; a new year reaches the store from a yearly backfill once JODC has added it, which also picks up values JODC revised.
 - **Not used:** JMA's gauges (`MA` codes), and JODC's other products, such as tidal constants.
+- **Flags:** JODC publishes final values only and flags nothing, so every value is `good`. The source checks its values: no.
 
 ## Running ingest
 

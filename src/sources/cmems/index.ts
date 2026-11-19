@@ -1,3 +1,4 @@
+import { firstOfMonth } from "../schedule.ts";
 import { DatabaseSync } from "node:sqlite";
 import { getJson, getText, HttpError } from "../../http.ts";
 import { possible } from "../../span.ts";
@@ -422,6 +423,14 @@ export async function levels(
 
 export const source: Source = {
   metadata,
+  // The latest window holds about the last month and the history copy reaches about two months back, so every
+  // gauge is read again from six months back, closing the gap and finalizing what the history copy replaced.
+  // Stopped gauges too, since the history copy reaches a gauge's last months after it leaves the latest window.
+  schedule: {
+    refetch: (today) => [
+      ["all", firstOfMonth(today, -6), firstOfMonth(today, 1), "--with-inactive"],
+    ],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s as CmemsStation),
   // A file's datum text names its gauge's zero; a new one is a new reference,

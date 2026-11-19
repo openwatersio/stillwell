@@ -520,6 +520,12 @@ async function backfill(sourceId: string, ids: string, start: Date, end: Date): 
   // Each worker writes its stations' years; on one connection they'd wait on each other's uploads.
   setConnections(positive("concurrency"));
   const list = await listOf(store, source);
+  // A refresh never stores an empty list, so this is a broken file or every station withheld, and a run would
+  // pass having read nothing.
+  if (!list.length)
+    throw new Error(
+      `${sourceId}: no station to backfill: the store's list is empty or all withheld`,
+    );
   // `preliminary` takes each station from its earliest preliminary value, active or not.
   let ranges: Map<string, [Date, Date]> | undefined;
   // Stations listed past the cutoff with nothing after it to fetch, whose value is cleared.

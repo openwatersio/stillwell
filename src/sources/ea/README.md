@@ -11,6 +11,7 @@ Tidal levels every 15 minutes at the Environment Agency's tide gauges, from its 
 - **Freshness:** live readings are read hourly, the last 12 hours each time, and the store's record reaches back as far as the first backfill. The EA never finalizes a reading (`finalizes` false), so nothing reads a month again; a gap longer than hourly ingest's 12 hours, such as an Actions outage, stays until someone backfills that stretch, from the API within 28 days or the archive within the year. Mumbles and Stornoway, which have never reported, have no values in the store.
 - **Clock check:** the readings API's 30 days (`2026-10-09/2026-11-08` when checked) fit best at 0 minutes at Newlyn (against UHSLC's record and BODC's), Lowestoft, Dover and Aberdeen (BODC's), with r from 0.88 at Lowestoft to 0.995 at Newlyn. Thirty days don't separate K1, so it shows `no K1`, and the check then fails a lag of 20 minutes or more, where a 12-hour error in a tide this semidiurnal shows; all five are 0.
 - **TICON:** the TICON records of these gauges are BODC's and CMEMS's copies of the National Tide Gauge Network. The inventory matches them by position to the EA's gauge, `ready`. That record starts with the archive's year, so a fit from it needs the year or more the store gathers from now on.
+- **Flags:** the API sends no quality code, so every value is `preliminary`. The source checks its values: no.
 
 ## Running ingest
 

@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { getText } from "../../http.ts";
 import {
   Flag,
@@ -433,6 +434,13 @@ function wantedOf(station: Station): Wanted {
 
 export const source: Source = {
   metadata,
+  // DWR's files run days to months behind and nothing else fetches them, so every active station is read
+  // again from January of last year to today, finished years included.
+  schedule: {
+    refetch: (today) => [
+      ["all", `${yearOf(today) - 1}`, today.toISOString().slice(0, 10), "--refetch"],
+    ],
+  },
   stations,
   observations: async (s, start, end) => levels(wantedOf(s), start, end),
 };

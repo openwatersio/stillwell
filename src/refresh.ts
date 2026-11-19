@@ -407,11 +407,19 @@ export async function stationsToMeasure(store: string, all: Source[]): Promise<S
 
 /**
  * Metadata that is ingest's business, not part of a source's terms, so
- * `sources.json` leaves it out: offsets, the archive's reference,
- * and which scheduled jobs run for the source. `finalizes` stays in, since it
+ * `sources.json` leaves it out: offsets, the archive's reference, the datum
+ * names datums.ts reads, and which jobs and poller run for the source. `finalizes` stays in, since it
  * tells a reader whether the source's `preliminary` values will ever change.
  */
-const INGEST_ONLY = new Set(["utc_offsets", "archive", "hourly", "empty_means_none"]);
+const INGEST_ONLY = new Set([
+  "utc_offsets",
+  "archive",
+  "hourly",
+  "empty_means_none",
+  "poller",
+  "chart_datum",
+  "datum_aliases",
+]);
 
 /**
  * A source's entry in `sources.json`: its metadata less what only ingest uses,

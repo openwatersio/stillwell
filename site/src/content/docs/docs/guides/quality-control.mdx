@@ -18,7 +18,7 @@ For most work, filter with `flag <= 2`. That keeps every value not flagged suspe
 
 ## How a value gets its flag
 
-1. **The source's flag.** The adapter for each source maps the source's own quality codes onto Stillwell's scale. That becomes `source_flag`. [Source flags by source](#source-flags-by-source) gives every mapping.
+1. **The source's flag.** The adapter for each source maps the source's own quality codes onto Stillwell's scale. That becomes `source_flag`. [Source flags by source](#source-flags-by-source) says where to find each mapping.
 2. **Errata.** Where an error is recorded against a source's values for a span of time, those values are marked suspect. See [Errata](#errata).
 3. **Automatic checks.** Stillwell's checks look at each station's series for values that can't be right or that a failing gauge would send. See [Stillwell's checks](#stillwells-checks).
 4. **Checks chosen per station.** Which checks apply depends on whether the station's levels carry a tide, measured from the levels themselves. See [Which checks apply](#which-checks-apply).
@@ -63,37 +63,7 @@ A source's own flags can account for most of its suspect values. BODC marks whol
 
 ### Source flags by source
 
-Each source reports quality its own way, or not at all. This is how each one's codes map onto the scale. Values a source marks missing are not stored. Where a source sends no quality information, every value gets the same flag. "Checks its values" says whether the source reviews its preliminary values later; [Preliminary values](#preliminary-values) explains why that matters.
-
-- **[BODC](/sources/bodc/)**, from the ERDDAP qualifier. Blank is good. `T` (interpolated) is interpolated. Any other letter, including `M` (improbable), is suspect, and an `M` at a level within 1 mm of zero is bad. `N` (null) is not stored. Checks its values: yes.
-- **[BOM](/sources/bom/)** sends no quality code. Values in the year under way are preliminary, and until April so are the two years before it, since BOM rebuilds an archive in the new year's first weeks and again a year later. Earlier years are good. Checks its values: yes, as BOM rebuilds an archive.
-- **[BSH](/sources/bsh/)** publishes predictions only, all good.
-- **[CCO](/sources/cco/)**, from `QCflag`, which is empty until the monthly check and then follows the IOC's flags. Empty is preliminary. CCO's check has flagged readings from 2026 on, at three gauges from later in the year, and older readings are empty. 1 (good) and 5 (correct but extreme) are good. 2 is interpolated. 4 (spike) and 8 (out of range) are bad. 3 (doubtful), 6 (reference change), 7 (flat-lining) and any other code are suspect. 9 (missing) is bad, since a value the API still sends is one the check rejected. Checks its values: yes, monthly in arrears.
-- **[CDEC](/sources/cdec/)** sends no usable quality code. Every value is preliminary. Checks its values: no.
-- **[CMEMS](/sources/cmems/)**, from `value_qc`. 1 (good), 2 (probably good) and 5 (changed) are good. 0 (no QC) is preliminary. 3 (probably bad) is suspect, 4 (bad) bad and 8 interpolated. 9 (missing) is not stored. Any other code is suspect. Values from the latest window, the last month or so, are at least preliminary until the history copy replaces them. Checks its values: yes, as the history copy replaces the latest window.
-- **[CO-OPS](/sources/coops/)**, from the quality (`q`) and flags (`f`) fields. Verified values are good and preliminary (`p`) values preliminary. For 6-minute levels, the flat (F) and rate-of-change (R) flags make a value suspect, and the limit flag (L) does too while the value is still preliminary. The outlier flag (O) is ignored. For hourly heights the limit flag is ignored and the inferred flag (I) makes a value at least interpolated. For highs and lows, L makes a value suspect and I at least interpolated. Checks its values: yes.
-- **[CRMS](/sources/crms/)**, from the comments on each reading. A comment saying the sensor was dry or out of the water, the water was low, the value is a daily median, the clock was reset, or the desiccant failed makes the value suspect. Everything else is good. Marsh well readings are not stored. Checks its values: yes.
-- **[DMI](/sources/dmi/)**, from `qcResult` and `qcStatus`. A result of 6 (erroneous) is bad. A result of 1 to 5 (failed a value, step or consistency check) is suspect. Otherwise a manually checked value is good and anything else preliminary. Checks its values: no.
-- **[DWR](/sources/dwr/)**, from the Hydstra quality code. 1, 2 and 40 are good. 70 and 76 are interpolated. Other codes are suspect. 151 (missing) and 255 (no data) are not stored. The current month and the three before it are at least preliminary, since DWR may still revise them. Checks its values: yes.
-- **[EA](/sources/ea/)** sends no quality code. Every value is preliminary. Checks its values: no.
-- **[GESLA](/sources/gesla/)**, from the QC and use columns. QC 0 (no QC) and 1 (correct) are good. 2 (interpolated) is interpolated. 3 (doubtful) is suspect. 4 (isolated spike or wrong) is bad. A use flag of 0 makes a value at least suspect. Checks its values: no, since each GESLA release is fixed. GESLA treats unchecked values as good, where every other source treats them as preliminary.
-- **[ISPRA](/sources/ispra/)** publishes every value as validation level L0, raw and unvalidated. Every value is preliminary and stays so. Checks its values: no.
-- **[JMA](/sources/jma/)**, from which file served the month. The final file is good. The provisional (`sokuho`) file is preliminary, and is used only for the current and previous month in Japan time before the final file exists. Checks its values: yes.
-- **[JODC](/sources/jodc/)** publishes final values only and flags nothing. Every value is good. Checks its values: no.
-- **[Kartverket](/sources/kartverket/)**, from the XML `flag`. Anything other than `obs` is suspect. Since Kartverket marks no value as checked, an `obs` value is preliminary for its first 365 days and good after. Checks its values: yes.
-- **[LINZ](/sources/linz/)** sends no quality code. A value from a day's file is preliminary and one from a year's file good, where LINZ has replaced a missing value or a sensor that was off with its missing mark. LINZ checks none of its values, and warns that its sensors drift. Checks its values: no.
-- **[Marine Institute](/sources/marine-institute/)**, from `QC_Flag`. 1 is good. 0 (not yet checked) is preliminary. 9 (missing) is not stored. Any other code is suspect. Checks its values: yes.
-- **[PEGELONLINE](/sources/pegelonline/)** sends no quality code. Every value is preliminary. Checks its values: no.
-- **[REFMAR](/sources/refmar/)**, from which series a value came from. Validated series are good. Raw series are preliminary, and a raw value between two validated ones is not stored. Checks its values: yes.
-- **[RWS](/sources/rws/)**, from the status (`Statuswaarde`) and quality code (`Kwaliteitswaardecode`). `Gecontroleerd` (checked) or `Definitief` (final) is good, and any other status preliminary. A quality code other than `00` makes a value suspect. Predictions are good. Checks its values: yes.
-- **[SFWMD](/sources/sfwmd/)**, from `QUALITY_CODE` and `CODE`. `A` (approved) is good, `P` (provisional) preliminary, anything else suspect. A `CODE` of `E` (estimated) makes a value at least interpolated, and any other code but `V` suspect. `M` (missing) is not stored. Checks its values: yes.
-- **[SMHI](/sources/smhi/)**, from the quality letter. `G` (checked) is good. `O` (unchecked) and `Y` (roughly checked) are preliminary. Anything else is suspect. The current and previous month are at least preliminary. Checks its values: yes.
-- **[UHSLC](/sources/uhslc/)**, from the `quality` field. 4 (research quality) is good. 3 (fast delivery) is preliminary. Anything else is suspect. Checks its values: yes, as research quality replaces fast delivery.
-- **[UNAM](/sources/unam/)** flags nothing. Every value is preliminary and stays so. Checks its values: no.
-- **[USACE](/sources/usace/)**, from the CWMS quality bits. Rejected is bad. Questionable is suspect. Unscreened, or screened without an "okay" verdict, is preliminary. A value replaced by interpolation is interpolated. Otherwise good. Missing is not stored. Checks its values: yes.
-- **[USGS](/sources/usgs/)**, from the approval status and qualifiers. The qualifiers `ICE`, `EQUIP`, `DRY`, `LESSTHAN` and `BLWMIN` make a value suspect. Otherwise approved values are good and anything else preliminary. `ESTIMATED` makes a value at least interpolated. Checks its values: yes.
-
-Each source's page says how Stillwell reads that source, under "How Stillwell reads it".
+Each source reports quality its own way, or not at all. Each [source's page](/docs/sources/) gives how its own codes map onto the scale, under **Flags**, including whether the source checks its values later; [Preliminary values](#preliminary-values) explains why that matters. Values a source marks missing are not stored. Where a source sends no quality information, every value gets the same flag.
 
 ## Stillwell's checks
 
@@ -168,7 +138,7 @@ Two signals mark the preliminary values that will never be checked:
 - every preliminary value from a source whose `finalizes` is false in [`sources.json`](/docs/reference/sources/);
 - values from before a station's [`source_qc_start`](/docs/reference/stations/#column-source_qc_start), where the source's own checks begin.
 
-Those have passed only Stillwell's checks and stay preliminary. GESLA is the exception to the scale: it stores its QC flag 0, no quality control, as good, so GESLA values nobody checked are `good` rather than `preliminary` and these filters don't find them. To select the values a station's source will never check, join each station's source in `sources.json` and filter on `coalesce(source_flag, flag) = 2 AND (NOT finalizes OR time < source_qc_start)`, which also keeps the ones Stillwell's checks flagged, apart from older values stored without a `source_flag`. A station with a null `source_qc_start` has no known start, so only the `finalizes` test applies to it. A source that doesn't finalize can still revise a value; the revision reaches the store only when the value is fetched again. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
+Those have passed only Stillwell's checks and stay preliminary. A source that stores values nobody checked as `good` is the exception to the scale, and these filters don't find them; its **Flags** says so. To select the values a station's source will never check, join each station's source in `sources.json` and filter on `coalesce(source_flag, flag) = 2 AND (NOT finalizes OR time < source_qc_start)`, which also keeps the ones Stillwell's checks flagged, apart from older values stored without a `source_flag`. A station with a null `source_qc_start` has no known start, so only the `finalizes` test applies to it. A source that doesn't finalize can still revise a value; the revision reaches the store only when the value is fetched again. A null `source_qc_start` means unknown, not that every value is or will be checked. [`source_qc_start_inferred`](/docs/reference/stations/#column-source_qc_start_inferred) says whether Stillwell worked the date out from the source's flags or the source stated it. Elsewhere some preliminary values are never checked without any sign.
 
 <QueryResult
   sql={`SELECT s.id AS source, s.finalizes,
@@ -204,8 +174,8 @@ These comparisons change no flag on their own. Each finding is reviewed by hand,
 ## Known limitations
 
 - **Highs, lows and predictions aren't checked.** An observed high water from a span the levels flag suspect stays good.
-- **Sources disagree on "unchecked".** GESLA calls unchecked values good, and JODC publishes only final values, while every other source calls unchecked values preliminary.
-- **Bad comes mostly from limits.** Only BODC, CCO, CMEMS, DMI, GESLA and USACE mark values bad themselves. Other sources' codes for an erroneous value map to suspect.
+- **Sources disagree on "unchecked".** A few sources call unchecked values good, while most call them preliminary. See each source's **Flags**.
+- **Bad comes mostly from limits.** Only some sources mark values bad themselves. Other sources' codes for an erroneous value map to suspect. See each source's **Flags**.
 - **Offsets and datum shifts mostly need errata.** The per-station checks see a value against its own series, so a level shifted by a constant for more than a day passes until an erratum or the station comparisons find it.
 - **Mixed sampling.** A year that changes from hourly to 6-minute values judges spikes by its most common spacing, so the sparser part may go unchecked for spikes and held readings.
 - **Flatlines ignore gaps.** Four equal values on either side of a long gap count as one flatline.

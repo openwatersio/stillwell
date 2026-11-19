@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson } from "../../http.ts";
 import {
   Flag,
@@ -613,6 +614,19 @@ function seriesOf(station: Station): [string, string] {
 
 export const source: Source = {
   metadata,
+  // Some offices screen nothing, so their values stay preliminary for good: --skip-unscreened leaves out a
+  // station with a year of record and no screened value, but January's run takes them all, so a station whose
+  // office began screening since, or a new epoch's, can rejoin.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        firstOfMonth(today),
+        ...(today.getUTCMonth() ? ["--skip-unscreened"] : []),
+      ],
+    ],
+  },
   stations,
   observations: async (s: Station, start, end) => {
     const [office, series] = seriesOf(s);

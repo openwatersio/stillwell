@@ -1,3 +1,4 @@
+import { yearOf } from "../schedule.ts";
 import { getJson, HttpError } from "../../http.ts";
 import {
   Flag,
@@ -31,11 +32,14 @@ export const metadata: SourceMetadata = {
   contact: { email: "enquiries@bodc.ac.uk" },
   terms:
     "Open Government Licence v3.0, as each dataset's ERDDAP metadata says and BODC confirmed in writing (ticket BODCREQ-11479, 9 November 2026), which allows republishing under CC BY 4.0. Credit BODC, as part of the National Tidal and Sea Level Facility, and the Environment Agency, which owns the network.",
+  chart_datum: "CD",
+  // Admiralty Chart Datum.
+  datum_aliases: { CD: "ACD" },
   // BODC processes each month weeks to months after it ends.
   hourly: false,
   // BODC sends no preliminary values, but it adds months late, fills gaps and
   // reflags months it has published, so the monthly refetch reads the last
-  // three years again (scripts/monthly.sh).
+  // three years again (`schedule`).
   finalizes: true,
 };
 
@@ -306,6 +310,11 @@ export function reset(): void {
 
 export const source: Source = {
   metadata,
+  // Months arrive late and in batches, and BODC fills gaps and reflags months it has published, and nothing
+  // else fetches them, so every station's last three years are read again, finished ones included.
+  schedule: {
+    refetch: (today) => [["all", `${yearOf(today) - 2}`, `${yearOf(today) + 1}`, "--refetch"]],
+  },
   stations,
   observations: (s, start, end) => levels(s.source_id, start, end, s.datum),
 };

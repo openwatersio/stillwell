@@ -295,6 +295,25 @@ export interface SourceMetadata {
    * instants its day surely starts after and ends before. Defaults to [0, 0].
    */
   utc_offsets?: [number, number];
+  /**
+   * `recent` when the realtime poller never asks the source and fills its
+   * window hourly from the recent/ files the hourly job writes instead
+   * (server/pass.ts), for a source whose terms allow only the hourly job's
+   * reads. A source that refuses one server's address is named in that
+   * server's STILLWELL_FROM_RECENT instead.
+   */
+  poller?: "recent";
+  /**
+   * The chart datum the source's own offsets give, for a station
+   * slackwater-database has no record of (src/datums.ts).
+   */
+  chart_datum?: string;
+  /**
+   * The source's datum names that are another name for a reference, such as
+   * `{ CD: "ACD" }` where its chart datum is Admiralty Chart Datum, so an
+   * offset can be carried through it to another series of the gauge.
+   */
+  datum_aliases?: Record<string, string>;
 }
 
 /**
@@ -361,6 +380,18 @@ export interface Source {
   predictions?(station: Station, start: Date, end: Date): Promise<Observation[]>;
   /** The source's own predicted high and low waters over [start, end). */
   predictedExtremes?(station: Station, start: Date, end: Date): Promise<PublishedExtreme[]>;
+  /**
+   * The `backfill` runs the source's monthly jobs make, each the arguments
+   * after `backfill <source>`, given the day the job runs (scripts/schedule.ts).
+   * `lists` runs after the list refresh; none by default. `refetch` replaces
+   * the default refetch, `preliminary` from January `REFETCH_YEARS` back to this
+   * month, for a source with new or final values the default refetch doesn't
+   * reach.
+   */
+  schedule?: {
+    lists?(today: Date): string[][] | Promise<string[][]>;
+    refetch?(today: Date): string[][] | Promise<string[][]>;
+  };
 }
 
 /** Fields every station from a source shares. */

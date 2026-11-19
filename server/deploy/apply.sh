@@ -97,7 +97,7 @@ systemctl reload ssh
 # Seed only: secrets live on the box, never in the repo.
 if [ ! -f /etc/stillwell.env ]; then
 	install -m 600 stillwell.env.example /etc/stillwell.env
-	echo 'created /etc/stillwell.env from template: fill in USGS_API_KEY, CCO_API_KEY, CCO_REFERER and GITHUB_TOKEN' >&2
+	echo 'created /etc/stillwell.env from template: fill in each key it lists' >&2
 fi
 # ClickHouse's default user, which the poller connects as, gets a password generated once on the box, so a
 # shell on the box needs the root-only env file to reach the data, whatever the firewall does.

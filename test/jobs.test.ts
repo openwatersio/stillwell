@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { describe, it } from "node:test";
@@ -8,6 +8,8 @@ import { parse } from "yaml";
 import { sources } from "../src/sources/index.ts";
 import { sourcesFor } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
+import { writeStationList } from "../src/store/parquet.ts";
+import { stationListPath } from "../src/store/paths.ts";
 
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
@@ -18,7 +20,6 @@ describe("sourcesFor", () => {
       "dmi",
       "ea",
       "kartverket",
-      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -45,7 +46,6 @@ describe("sourcesFor", () => {
       "jodc",
       "kartverket",
       "linz",
-      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -56,7 +56,13 @@ describe("sourcesFor", () => {
       "usace",
       "usgs",
     ]);
-    assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
+    // The Marine Institute is on the server's job queue (src/sources/server.json), so Actions leaves it out.
+    assert.deepEqual(
+      sourcesFor("lists"),
+      Object.keys(sources)
+        .filter((id) => id !== "marine-institute")
+        .sort(),
+    );
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "bom",
@@ -68,7 +74,6 @@ describe("sourcesFor", () => {
       "jma",
       "kartverket",
       "linz",
-      "marine-institute",
       "refmar",
       "rws",
       "sfwmd",
@@ -189,7 +194,10 @@ describe("scheduled jobs for a source with no list yet", () => {
 });
 
 describe("Monthly workflow", () => {
-  type Job = { concurrency?: { group: string }; steps: { run?: string; if?: string }[] };
+  type Job = {
+    concurrency?: { group: string };
+    steps: { run?: string; if?: string; env?: Record<string, string> }[];
+  };
   const { jobs } = parse(readFileSync(".github/workflows/monthly.yml", "utf8")) as {
     jobs: Record<string, Job>;
   };
@@ -219,11 +227,56 @@ describe("Monthly workflow", () => {
     assert.ok(lists.indexOf("analyze ||") < lists.indexOf("requalify_recent ||"));
   });
 
+  it("runs every source's list backfills after its refresh, with the refresh's source keys", () => {
+    const steps = jobs.lists!.steps;
+    const at = steps.findIndex((s) => s.run?.includes("monthly.sh list-backfills"));
+    const refresh = steps.findIndex((s) => s.run?.includes("monthly.sh refresh"));
+    assert.ok(at > refresh && refresh >= 0, "list-backfills follows the refresh");
+    // For every source, since a source without list backfills runs none.
+    assert.equal(steps[at]!.if, "${{ !cancelled() && steps.owns.outcome == 'success' }}");
+    const keys = (env: Record<string, string> = {}) =>
+      Object.keys(env).filter(
+        (k) => !k.startsWith("S3_") && !["SOURCE", "STILLWELL_STORE"].includes(k),
+      );
+    assert.deepEqual(
+      keys(steps[at]!.env),
+      keys(steps[refresh]!.env).filter((k) => !k.startsWith("ACCEPT_")),
+    );
+  });
+
   it("puts no job but the lists and refetch in a source's group", () => {
     // A new job queued in a source's group would cancel the one waiting there, such as a compaction.
     const grouped = Object.entries(jobs)
       .filter(([, job]) => job.concurrency?.group.startsWith("store-"))
       .map(([name]) => name);
     assert.deepEqual(grouped.sort(), ["lists", "refetch"]);
+  });
+});
+
+describe("backfill over an empty station list", () => {
+  it("fails rather than pass having read nothing", async () => {
+    const root = mkdtempSync(join(tmpdir(), "stillwell-jobs-"));
+    const store = join(root, "store");
+    mkdirSync(dirname(stationListPath(store, "crms")), { recursive: true });
+    await writeStationList(stationListPath(store, "crms"), []);
+    const run = spawnSync(
+      process.execPath,
+      [
+        "scripts/ingest.ts",
+        "backfill",
+        "crms",
+        "all",
+        "2024",
+        "2027",
+        "--refetch",
+        "--with-inactive",
+      ],
+      {
+        encoding: "utf8",
+        env: { ...process.env, STILLWELL_STORE: store, STILLWELL_CACHE: join(root, "cache") },
+      },
+    );
+    assert.notEqual(run.status, 0);
+    assert.match(run.stderr, /crms: no station to backfill/);
   });
 });

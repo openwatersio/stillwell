@@ -12,6 +12,7 @@ One-minute sea levels from each sensor at 26 of the 27 tide gauges of Mexico's S
 - **Datum:** each sensor's zero, `ZERO`, the name GESLA gives it. SMN publishes no datum or benchmark heights, only that levels are measured from 「un nivel de referencia fijo」 (a fixed reference level), which was asked for in #48. A zero can still move: GESLA's copies of both Mazatlán sensors sit 0.5 to 2 m off their usual level for months of 2021 (erratum `gesla-datum-jumps`), and nothing in the adapter or QC detects a lasting shift like that.
 - **Freshness:** a sensor's values run about 15 minutes behind, so the source is `hourly`, and every station is `live`. The hourly refresh reads the last 12 hours, and SMN serves only 5 days, so values from a gap in ingest that isn't backfilled within 5 days are lost for good.
 - **Not used:** SMN's prediction column, its weather files (`data-<number>_<unit>.csv` for temperature, pressure, wind and the sensors' battery and noise), and the historical records (TICON's `unam_hist`, back to 1946), which SMN sends only on request.
+- **Flags:** SMN flags nothing, so every value is `preliminary` and stays so. The source checks its values: no.
 
 ## Running ingest
 

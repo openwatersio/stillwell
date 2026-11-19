@@ -119,7 +119,7 @@ describe("cco", () => {
     const reading = (n: number, QCflag: unknown, value: unknown = "1.5") => ({
       properties: {
         id: "90",
-        date: `20261114#00${String(n * 3).padStart(2, "0")}00`,
+        date: `20261114#00${String(n * 2).padStart(2, "0")}00`,
         value,
         QCflag,
       },
@@ -148,6 +148,10 @@ describe("cco", () => {
             reading(14, "1", "9999"),
             reading(16, "1", "999.9999"),
             reading(17, "1", "-999.9999"),
+            reading(18, "1", "99.99900"),
+            reading(19, "1", "-99.999"),
+            reading(20, "1", "-10.00000"),
+            reading(21, "1", "-9.99999"),
             reading(15, "1", " "),
           ],
         }),
@@ -176,6 +180,106 @@ describe("cco", () => {
       ],
     );
     assert.ok(out.every((o) => o.level === 1.5));
+  });
+
+  it("sends one request at a time, however many sites are read at once", async () => {
+    let running = 0;
+    let most = 0;
+    setTransport(async () => {
+      most = Math.max(most, ++running);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      running--;
+      return fixture("cco-tides-empty.geojson");
+    });
+    const day = [new Date("2026-11-14T00:00:00Z"), new Date("2026-11-14T12:00:00Z")] as const;
+    await Promise.all(["86", "87", "88", "89", "90"].map((id) => cco.levels(id, ...day)));
+    assert.equal(most, 1);
+  });
+
+  it("keeps the first of a reading stamped twice a second apart, and both when the levels differ", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            at("20261114#000002", "2.081"),
+            at("20261114#000003", "2.080"),
+            at("20261114#001002", "2.100"),
+            at("20261114#001003", "2.900"),
+            at("20261114#002000", "2.200"),
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => [new Date(o.time).toISOString().slice(11, 19), o.level]),
+      [
+        ["00:00:02", 2.081],
+        ["00:10:02", 2.1],
+        ["00:10:03", 2.9],
+        ["00:20:00", 2.2],
+      ],
+    );
+  });
+
+  it("drops the second of a doubled reading even when the window starts between the two", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [at("20261114#112002", "2.081"), at("20261114#112003", "2.080")],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T11:20:03Z"),
+      new Date("2026-11-14T11:30:00Z"),
+    );
+    assert.deepEqual(out, []);
+  });
+
+  it("treats a pair exactly 5 mm apart the same whatever the doubles round to", async () => {
+    const at = (date: string, value: string) => ({
+      properties: { id: "90", date, value, QCflag: null },
+    });
+    serve([
+      [
+        /tides\//,
+        JSON.stringify({
+          features: [
+            at("20261114#000002", "8.340"),
+            at("20261114#000003", "8.345"),
+            at("20261114#001002", "8.340"),
+            at("20261114#001003", "8.346"),
+          ],
+        }),
+      ],
+    ]);
+    const out = await cco.levels(
+      "90",
+      new Date("2026-11-14T00:00:00Z"),
+      new Date("2026-11-14T01:00:00Z"),
+    );
+    assert.deepEqual(
+      out.map((o) => [new Date(o.time).toISOString().slice(14, 19), o.level]),
+      [
+        ["00:02", 8.34],
+        ["10:02", 8.34],
+        ["10:03", 8.346],
+      ],
+    );
   });
 
   it("asks a year at a time", async () => {

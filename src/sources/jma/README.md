@@ -15,6 +15,7 @@ Hourly tide levels at the Japan Meteorological Agency's 70 open tide gauges and 
 - **History:** from December 1924 at the oldest gauges (Hanasaki, Ayukawa, Kushimoto, Tonoura, Sakai, Iwasaki, Fukahori). About 4,900 station-years in all.
 - **Links:** UHSLC's documentation files give the originator's station number, and where the contributor is JMA or JODC and it is a two-character JMA code, UHSLC's station gets a `same_as` link to this one. JODC's relay of JMA's gauges (GESLA's `JODC_JMA` records, TICON's `jodc_jma`) isn't read, since JMA's own files carry the same gauges. The `jodc` source reads JODC's other agencies' gauges.
 - **Not used:** JMA's 15-second values from the [tide observation map](https://www.jma.go.jp/bosai/tidelevel/), in T.P. rather than DL, kept for about 32 days, which cover 166 gauges including other agencies'; the original ledger values (`orgdata/`), which the historical set corrects; and the residuals (`dep`) and tide tables.
+- **Flags:** the flag comes from which file served the month. The final file is `good`. The provisional (`sokuho`) file is `preliminary`, and is used only for the current and previous month in Japan time before the final file exists. The source checks its values: yes.
 
 ## Compared with UHSLC
 
