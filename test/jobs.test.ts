@@ -14,7 +14,6 @@ import { stationListPath } from "../src/store/paths.ts";
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
     assert.deepEqual(sourcesFor("hourly"), [
-      "cco",
       "cdec",
       "coops",
       "dmi",
@@ -32,7 +31,6 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("compact"), [
       "bodc",
       "bom",
-      "cco",
       "cdec",
       "cmems",
       "coops",
@@ -56,17 +54,16 @@ describe("sourcesFor", () => {
       "usace",
       "usgs",
     ]);
-    // The Marine Institute is on the server's job queue (src/sources/server.json), so Actions leaves it out.
+    // CCO and the Marine Institute are on the server's job queue (src/sources/server.json), so Actions leaves them out.
     assert.deepEqual(
       sourcesFor("lists"),
       Object.keys(sources)
-        .filter((id) => id !== "marine-institute")
+        .filter((id) => id !== "cco" && id !== "marine-institute")
         .sort(),
     );
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "bom",
-      "cco",
       "cmems",
       "coops",
       "crms",

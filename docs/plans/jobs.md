@@ -30,7 +30,7 @@ A migration is a file in `src/migrations/` named `YYYYMMDD-what-it-does.ts`, exp
 - A new migration that sorts before one already recorded isn't run or recorded, and holds every migration after it until it's renamed to sort after.
 - The service reads each migration's steps when it starts, which every deploy of a new release makes it do, so a deploy that edits one under way changes what runs next, and its record keeps only a step's number: edit one only before it starts.
 
-The database records each migration's progress. A box with no database, a new one, runs no migration until a maintainer runs `stillwell-jobs baseline <id>` with the last one already done, which marks it and every earlier one done, so a replacement box never runs every migration again, and one merged later under an earlier name is caught as sorting before them. The first deploy of the queue records none and starts the record, since `src/migrations/` is empty then.
+The database records each migration's progress. A box with no database, a new one, runs no migration until a maintainer runs `stillwell-jobs baseline <id>` with the last one already done, which marks it and every earlier one done, so a replacement box never runs every migration again, and one merged later under an earlier name is caught as sorting before them.
 
 ## Starting jobs
 
