@@ -42,6 +42,85 @@ function serve(routes: [RegExp, string | (() => string)][]): void {
 afterEach(() => setTransport(fetchText));
 
 describe("rws", () => {
+  it("waits out an outage's 404, then stops the run as blocked for every later request", async () => {
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    const { waits } = rws.outage;
+    const gone = () =>
+      new HttpError(
+        "POST /OphalenWaarnemingen returned 404 (retry after 120 s)",
+        "404 page not found",
+      );
+    rws.outage.waits = [0, 0];
+    rws.outage.blocked = undefined;
+    try {
+      let calls = 0;
+      setTransport(async () => {
+        if (++calls < 3) throw gone();
+        return "";
+      });
+      assert.deepEqual(await rws.levels("hoekvanholland", ...range), []);
+      assert.equal(calls, 3);
+      calls = 0;
+      setTransport(async () => {
+        calls++;
+        throw gone();
+      });
+      await assert.rejects(rws.levels("hoekvanholland", ...range), Blocked);
+      assert.equal(calls, 3);
+      // The block is shared: other requests, and the catalog, fail without asking.
+      await assert.rejects(rws.extremes("dordrecht", ...range), Blocked);
+      await assert.rejects(rws.stations(), Blocked);
+      assert.equal(calls, 3);
+    } finally {
+      rws.outage.waits = waits;
+      rws.outage.blocked = undefined;
+    }
+  });
+
+  it("fails an outage's 404 at once for a read of a few days", async () => {
+    const { waits } = rws.outage;
+    rws.outage.blocked = undefined;
+    let calls = 0;
+    setTransport(async () => {
+      calls++;
+      throw new HttpError("POST /OphalenWaarnemingen returned 404", "404 page not found");
+    });
+    const day = new Date("2024-01-01T00:00:00Z");
+    await assert.rejects(
+      rws.levels("hoekvanholland", day, new Date(+day + 6 * 86_400_000)),
+      HttpError,
+    );
+    assert.equal(calls, 1);
+    // Seven days exactly is still a short read; a millisecond more waits.
+    const week = new Date(+day + 7 * 86_400_000);
+    rws.outage.waits = [0];
+    try {
+      await assert.rejects(rws.levels("hoekvanholland", day, week), HttpError);
+      assert.equal(calls, 2);
+      await assert.rejects(rws.levels("hoekvanholland", day, new Date(+week + 1)), Blocked);
+    } finally {
+      rws.outage.waits = waits;
+      rws.outage.blocked = undefined;
+    }
+  });
+
+  it("fails a 404 that isn't the outage's, and any other error, at once", async () => {
+    rws.outage.blocked = undefined;
+    let calls = 0;
+    const range = [new Date("2023-01-01T00:00:00Z"), new Date("2024-01-01T00:00:00Z")] as const;
+    for (const error of [
+      new HttpError("POST /OphalenWaarnemingen returned 404", '{"Foutmelding":"x"}'),
+      new HttpError("POST /OphalenWaarnemingen returned 500", "404 page not found"),
+    ]) {
+      setTransport(async () => {
+        calls++;
+        throw error;
+      });
+      await assert.rejects(rws.levels("hoekvanholland", ...range), HttpError);
+    }
+    assert.equal(calls, 2);
+  });
+
   it("reads levels in meters with flags from RWS's status and quality codes", async () => {
     serve([[/OphalenWaarnemingen/, fixture("rws-observations.json")]]);
     const levels = await rws.levels(

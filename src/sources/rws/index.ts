@@ -1,5 +1,5 @@
 import { DatumChanged } from "../../epochs.ts";
-import { getJson, getText } from "../../http.ts";
+import { Blocked, getJson, getText, HttpError } from "../../http.ts";
 import {
   Flag,
   stationDefaults,
@@ -167,18 +167,20 @@ interface Catalog {
  * with only RWS's astronomical tide, listed for their predictions.
  */
 export async function stations(): Promise<ListedStation[]> {
-  const catalog = await getJson<Catalog>(CATALOG, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      CatalogusFilter: {
-        Grootheden: true,
-        Hoedanigheden: true,
-        Groeperingen: true,
-        ProcesTypes: true,
-      },
+  const catalog = await throughOutage(() =>
+    getJson<Catalog>(CATALOG, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        CatalogusFilter: {
+          Grootheden: true,
+          Hoedanigheden: true,
+          Groeperingen: true,
+          ProcesTypes: true,
+        },
+      }),
     }),
-  });
+  );
   // What each metadata entry gives a location: a height series or a set of extremes.
   const productsOf = new Map<number, Product[]>();
   const datumOf = new Map<number, string>();
@@ -319,6 +321,7 @@ export async function levels(
       from,
       to,
       fresh,
+      patient(start, end),
     );
     // A request without a grouping also returns grouped channels (e.g. extremes).
     for (const channel of readings(
@@ -368,6 +371,7 @@ export async function extremes(
       from,
       to,
       fresh,
+      patient(start, end),
     );
     // Every series of each kind, since RWS can split one channel's year into several.
     // Every type series counts: a type is only looked up at a height's time.
@@ -444,12 +448,53 @@ function flagOf(m: Measurement, process: ProcessType): Flag {
   return code === "00" || code === undefined ? flag : Flag.suspect;
 }
 
+/**
+ * During an outage the whole host answers every path with the body "404 page not
+ * found", the catalog and the root included; a valid request with no data comes back
+ * empty, never 404. Such a 404 is waited out, `waits` seconds between tries, about 27
+ * minutes in all, as outages lasted 16 minutes and more. Then the run stops as `Blocked`,
+ * and every later request throws it at once, a request already asleep once it wakes.
+ * Only a read of a range over 7 days, a backfill's, waits: the hourly run's and the
+ * poller's 12 hours and the canary's 3 days fail at once, as `Blocked` would hold their
+ * job for the wait and rest the poller an hour, and the next run reads the same hours.
+ */
+export const outage: { waits: number[]; blocked?: Blocked } = {
+  waits: [30, 60, 120, 240, 300, 300, 300, 300],
+};
+
+const isOutage = (error: unknown) =>
+  error instanceof HttpError &&
+  / returned 404\b/.test(error.message) &&
+  /^404 page not found\s*$/.test(error.body);
+
+/** Whether a caller's whole range is a backfill's, which waits out an outage. */
+const patient = (start: Date, end: Date) => end.getTime() - start.getTime() > 7 * 86_400_000;
+
+async function throughOutage<T>(call: () => Promise<T>, patient = true): Promise<T> {
+  if (!patient) return call();
+  for (let attempt = 0; ; attempt++) {
+    if (outage.blocked) throw outage.blocked;
+    try {
+      return await call();
+    } catch (error) {
+      if (!isOutage(error)) throw error;
+      const wait = outage.waits[attempt];
+      if (wait === undefined)
+        throw (outage.blocked ??= new Blocked(
+          `RWS answered 404 for every request across an outage: ${(error as Error).message}`,
+        ));
+      await new Promise((resolve) => setTimeout(resolve, wait * 1000));
+    }
+  }
+}
+
 async function request(
   location: string,
   metadata: Record<string, unknown>,
   start: Date,
   end: Date,
   fresh = false,
+  patient = false,
 ): Promise<Series[]> {
   const body = JSON.stringify({
     Locatie: { Code: location },
@@ -459,12 +504,16 @@ async function request(
       Einddatumtijd: end.toISOString().replace("Z", "+00:00"),
     },
   });
-  const text = await getText(OBSERVATIONS, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    fresh,
-  });
+  const text = await throughOutage(
+    () =>
+      getText(OBSERVATIONS, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body,
+        fresh,
+      }),
+    patient,
+  );
   // The service answers an empty range with an empty body.
   if (!text.trim()) return [];
   const response = JSON.parse(text) as Response;
