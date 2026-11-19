@@ -1,3 +1,4 @@
+import { idOfGeslaFile } from "./sources/ispra/index.ts";
 import { urlSafe } from "./store/paths.ts";
 import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
@@ -77,7 +78,7 @@ const NATIONAL: Record<string, { source: string; status: Status }> = {
   gbr: { source: "bodc", status: "planned" },
   fin: { source: "fmi", status: "license" },
   esp: { source: "redmar", status: "license" },
-  ita: { source: "ispra", status: "license" },
+  ita: { source: "ispra", status: "planned" },
 };
 
 /** Contributors whose records all go to one planned source. */
@@ -102,7 +103,7 @@ const DIRECT: Record<string, { source: string; status: Status; note?: string }> 
     status: "license",
     note: "SMN sends its historical records only on request, asked for in #48",
   },
-  ispra: { source: "ispra", status: "license" },
+  ispra: { source: "ispra", status: "planned" },
   ieo: { source: "redmar", status: "license" },
   meds: { source: "chs", status: "restricted", note: "CHS license bars commercial derivatives" },
   bodc: { source: "bodc", status: "planned" },
@@ -332,6 +333,13 @@ export function originatorSeries(
   }
 
   const direct = DIRECT[contributor];
+  // ISPRA's records name the gauge in their file name, as GESLA's do, so a record at the position GESLA misplaces still matches.
+  if (contributor === "ispra") {
+    const id = idOfGeslaFile(record.id);
+    return id
+      ? byCode(record, "ispra", id.slice(id.indexOf("/") + 1), "planned", lists)
+      : { source: "ispra", id: null, status: "unmatched", note: "Not in ISPRA's archive" };
+  }
   // SMHI's records carry its station number; the others match by place once the list exists.
   if (direct && contributor === "smhi") return byCode(record, "smhi", code, direct.status, lists);
   // CRMS records carry the site; its surface-water gauge is the latest of H01,

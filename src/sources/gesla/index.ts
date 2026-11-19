@@ -13,6 +13,7 @@ import {
   Unjudged,
 } from "../../schema.ts";
 import { TIDAL } from "../dwr/index.ts";
+import { idOfGeslaFile as ispraId } from "../ispra/index.ts";
 import { seriesOf } from "../unam/index.ts";
 import { CONTRIBUTORS as UHSLC_CONTRIBUTORS } from "../uhslc/contributors.ts";
 import { withheld as uhslcWithheld } from "../uhslc/index.ts";
@@ -359,6 +360,11 @@ export function originatorIds(
       return [`smhi/${code}`];
     case "REFMAR":
       return [`refmar/${code}`];
+    case "ISPRA": {
+      // The file's name gives the gauge: the codes repeat (two PAL, two POR).
+      const id = ispraId(file);
+      return id ? [id] : [];
+    }
     case "NHS":
       return [`kartverket/${upper}`];
     case "CDWR":

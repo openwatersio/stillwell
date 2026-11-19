@@ -39,6 +39,7 @@ describe("sourcesFor", () => {
       "dwr",
       "ea",
       "gesla",
+      "ispra",
       "jma",
       "jodc",
       "kartverket",

@@ -17,6 +17,13 @@ interface Position {
  * metadata UHSLC had when GESLA copied it, and UHSLC has corrected most since.
  */
 export const POSITIONS: Record<string, { served: Position; at: Position }> = {
+  // GESLA's ISPRA record of Sciacca has ISPRA's longitude and a latitude 31 km
+  // south, at sea. ISPRA's own list, Copernicus's relay and GESLA's CMEMS copy
+  // agree on the gauge: erratum `gesla-sciacca-position`.
+  "gesla/sciacca-sci-ita-ispra": {
+    served: { lat: 37.22120833, lon: 13.07645556 },
+    at: { lat: 37.50454, lon: 13.07646 },
+  },
   // PSMSL's Stanley (1082) has the same years as 290A, 1964–1974. UHSLC and
   // GESLA put it in the open South Atlantic, 112 km south of Stanley.
   "uhslc/290a": {

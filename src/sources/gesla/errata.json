@@ -1182,6 +1182,14 @@
       "error": "The Toitū Te Whenua record of Scott Base holds the gauge's failed readings as LINZ's file does (0.01 to 0.04 m and a spell of 8.0 m from 08:15 UTC on 6 March to 01:45 on the 8th), as levels flagged correct and usable, where the `linz` source leaves them out (erratum `linz-scott-base-step-2022`).",
       "response": "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. The GESLA adapter can't drop a span, so the values stay; QC's own rules flag some of them worse.",
       "evidence": "November 2026. The record's hourly values in the span equal the `linz` source's raw levels at the same hour, every hour both hold, in the store's 2016 to 2022 files."
+    },
+    {
+      "id": "gesla-sciacca-position",
+      "stations": ["gesla/sciacca-sci-ita-ispra"],
+      "handling": "corrected",
+      "error": "GESLA 4.1 places its ISPRA record of Sciacca at 37.2212, 13.0765, 31 km south of the gauge and at sea. The longitude is right.",
+      "response": "The station refresh moves the record to ISPRA's position for the gauge, in `POSITIONS` in `src/positions.ts`, as it does for GESLA's UHSLC records (erratum `gesla-uhslc-positions`). The entry applies only while GESLA still serves the position it was written against. With the position corrected, the record links to ISPRA's series and Copernicus's copy of the gauge.",
+      "evidence": "ISPRA's RDF dump gives its Sciacca tide gauge at 37.50454, 13.07646, and Copernicus's In Situ TAC lists RMN-Sciacca at 37.5045, 13.0765; GESLA's own record of the Copernicus copy (`gesla/rmn_sciacca-rmn-ita-cmems`) is at 37.5045, 13.0765. Only GESLA's ISPRA record differs, checked in November 2026."
     }
   ],
   "retired": []

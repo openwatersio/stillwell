@@ -390,6 +390,7 @@ The traps this project has fallen into, for the openwaters-review skill and anyo
 - Runs outside the workflows share no concurrency group with the scheduled jobs. A local store directory also has no AWS CLI deletes, and it always lists completely. Code that deletes refuses a store it can't delete from, as `withhold` refuses any store that isn't on S3 or a local directory.
 - The monthly files measured from levels, `stations/links.parquet` and `stations/matches.parquet`, keep a pair's last row when a read fails, so one bad read never empties them. That holds for every read the run makes, the years files and lists read before the pairs as well as each pair's levels: a read that throws outside the per-pair `try` stops every store instead.
 - A change holds to [Where facts live](#where-facts-live): a new source or a change to one touches only its own directory, and a fact found in two places is cut to one, with a link. Where a source README lists a decision table's stations, such as `KINDS`, `POSITIONS`, `LINKS` or the source's `overrides`, a change to the table updates that list or replaces it with a link to the table.
+- A parser that tolerates a shape a source's files hold, such as a blank line or a date with no time, tolerates it only where the files hold it (the last line terminator, a file's first row), and the README says which rows fail. Anywhere else the shape fails the file, as it would have before the exception.
 
 ## Shared conventions
 
