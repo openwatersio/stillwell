@@ -56,6 +56,7 @@ let github: { at: number; writing: Set<string>; onServer: Set<string> } = {
   onServer: new Set(),
 };
 let lastPollsError = "";
+let lastGithubError = "";
 let lastStopped: string | null = null;
 let lastMetricsError = "";
 let stopping = false;
@@ -242,9 +243,11 @@ async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServe
   // main's map is read even with no source on the server here, so a box whose deploy lagged a move shows it.
   const local = [...PHASES.values()].includes("server");
   const token = process.env.GITHUB_TOKEN;
-  let answer = { writing: new Set([ALL]), onServer: new Set<string>() };
+  // Unknown, every source may be written, and main's map stays the last one read, so the behind-main metric holds.
+  let answer = { writing: new Set([ALL]), onServer: github.onServer };
+  let failure = "";
   if (!token)
-    console.error("store jobs wait for GITHUB_TOKEN, to read Actions' runs and main's server.json");
+    failure = "store jobs wait for GITHUB_TOKEN, to read Actions' runs and main's server.json";
   else
     try {
       // A slow GitHub holds the loop for at most two minutes, after which it counts as unknown.
@@ -264,11 +267,15 @@ async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServe
         onServer: new Set([...phases].filter(([, p]) => p === "server").map(([s]) => s)),
       };
     } catch (error) {
-      console.error(`can't read GitHub: ${(error as Error).message}`);
+      failure = `can't read GitHub: ${(error as Error).message}`;
     }
-  // An answer that holds a source back is asked again in 30 seconds, as a run just dispatched may not have
-  // listed its jobs yet; one that holds nothing back stands for the full while.
-  github = { at: answer.writing.size ? Date.now() - GITHUB_MS + 30_000 : Date.now(), ...answer };
+  if (failure && failure !== lastGithubError) console.error(failure);
+  lastGithubError = failure;
+  // An answer that holds back a source of the server's is asked again in 30 seconds, as a run just dispatched may
+  // not have listed its jobs yet; one that holds back only Actions' own sources stands for the full while.
+  const holdsBack =
+    answer.writing.has(ALL) || [...answer.writing].some((s) => PHASES.get(s) === "server");
+  github = { at: holdsBack ? Date.now() - GITHUB_MS + 30_000 : Date.now(), ...answer };
   return answer;
 }
 
