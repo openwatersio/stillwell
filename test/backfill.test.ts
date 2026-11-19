@@ -40,7 +40,6 @@ import {
   stationListPath,
 } from "../src/store/paths.ts";
 import { writeYears } from "../src/store/years.ts";
-import { REFETCH_YEARS } from "../src/store/recent.ts";
 import { readEmptyYears, writeEmptyYears } from "../src/empty-years.ts";
 import { readBackfilled } from "../src/backfilled.ts";
 import {
@@ -443,20 +442,6 @@ describe("preliminaryRuns with skipUnscreened", () => {
     const { runs, unscreened } = preliminaryRuns(stations, bounds, Y2023, Y2026);
     assert.equal(runs.length, 5);
     assert.deepEqual(unscreened, []);
-  });
-});
-
-describe("monthly refetch", () => {
-  it("reaches back as far as compaction looks for preliminary values", () => {
-    // Monthly's refetch step and the server's both run scripts/monthly.sh.
-    const workflow = readFileSync("scripts/monthly.sh", "utf8");
-    assert.match(workflow, new RegExp(`from=\\$\\(\\(year - ${REFETCH_YEARS}\\)\\)`));
-    assert.match(workflow, /backfill "\$SOURCE" "\$which" "\$from" "\$@"/);
-    // California DWR, which nothing else fetches, reads every active station from last January.
-    assert.match(
-      workflow,
-      /dwr\) which=all from=\$\(\(year - 1\)\) && set -- "\$\(date -u \+%F\)" --refetch ;;/,
-    );
   });
 });
 

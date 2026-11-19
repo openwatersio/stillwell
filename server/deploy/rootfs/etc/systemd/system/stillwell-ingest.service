@@ -16,9 +16,9 @@ StateDirectory=stillwell
 Environment=HOME=/var/lib/stillwell
 # Each source's pass metrics, which Alloy's textfile collector ships to Grafana Cloud for the alerts.
 Environment=STILLWELL_METRICS=/var/lib/stillwell/metrics/stillwell.prom
-# Sources the poller doesn't ask, filled hourly from the recent/ the hourly workflow writes instead
-# (server/pass.ts): SFWMD drops connections from Helsinki, and CCO's key is for one read of each site an hour.
-Environment=STILLWELL_FROM_RECENT=sfwmd,cco
+# Sources that refuse this box's address, filled hourly from the recent/ the hourly workflow writes instead
+# (server/pass.ts): SFWMD drops connections from Helsinki.
+Environment=STILLWELL_FROM_RECENT=sfwmd
 WorkingDirectory=/var/lib/stillwell
 ExecStart=/opt/node/bin/node /opt/stillwell/server/ingest.ts
 Restart=always

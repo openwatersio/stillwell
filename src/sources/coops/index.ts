@@ -40,6 +40,7 @@ export const metadata: SourceMetadata = {
     email: "Tide.Predictions@noaa.gov",
     url: "https://tidesandcurrents.noaa.gov/contact.html",
   },
+  chart_datum: "MLLW",
   // Preliminary 6-minute values are verified a month or two later.
   hourly: true,
   finalizes: true,

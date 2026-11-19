@@ -10,6 +10,7 @@ Predicted high and low waters and 10-minute curves for German gauges (146 of BSH
 - **Times:** from each row's Julian date, which is UTC and finer than the minute-resolution local time beside it. BSH's files run by German local time, so the last hour of each UTC year sits in the next year's file, and the store doesn't have it.
 - **Observed levels:** a gauge's `first` and `last` describe observed levels, which come from PEGELONLINE, so they're null here.
 - **Extremes** carry BSH's lunar transit number and event index (1 high water after upper transit, 2 low water after upper, 3 high after lower, 4 low after lower).
+- **Flags:** it publishes predictions only, so every value is `good`. The source checks its values: not applicable, as predictions are not observations.
 
 ## Running ingest
 

@@ -1,3 +1,4 @@
+import { firstOfMonth, REFETCH_YEARS, yearOf } from "../schedule.ts";
 import { getJson } from "../../http.ts";
 import {
   Flag,
@@ -30,6 +31,7 @@ export const metadata: SourceMetadata = {
   },
   attribution: "REFMAR, Shom (doi:10.17183/REFMAR)",
   contact: { email: "refmar@shom.fr", url: "https://refmar.shom.fr/contact" },
+  chart_datum: "ZH",
   // Raw values arrive within minutes, from the 1-minute series.
   hourly: true,
   // SHOM validates raw values weeks to months later.
@@ -398,6 +400,18 @@ function nextMonth(t: number): number {
 
 export const source: Source = {
   metadata,
+  // Partner gauges often have only raw values, so a station with none validated is skipped but in January,
+  // as USACE's are.
+  schedule: {
+    refetch: (today) => [
+      [
+        "preliminary",
+        `${yearOf(today) - REFETCH_YEARS}`,
+        firstOfMonth(today),
+        ...(today.getUTCMonth() ? ["--skip-unscreened"] : []),
+      ],
+    ],
+  },
   stations,
   observations: async (s: Station, start, end) => {
     // A hidden gauge is listed without levels, so ingest never asks; this guards direct callers.
