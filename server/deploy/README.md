@@ -52,6 +52,7 @@ The poller writes each source's pass metrics to `/var/lib/stillwell/metrics/stil
 - `StillwellJobFailed`: a store job failed. Nothing retries it on its own.
 - `StillwellMigrationsStuck`: a migration failed, or sorts before one already started, or the box has no baseline, so no migration runs.
 - `StillwellJobsStalled`: `stillwell-jobs` hasn't gone round its loop for 10 minutes.
+- `StillwellJobsBehindMain`: `main`'s `src/sources/server.json` puts a source on the job queue that the box's release doesn't, as after a failed deploy, so nothing writes it.
 - `StillwellJobWaiting`: a store job has waited over 12 hours to start, such as one on a box without `STILLWELL_WRITE_STORE` and its credentials in `/etc/stillwell.env`.
 - `StillwellApiStationListOld`: `stillwell-api` hasn't read the station list for over an hour, so it serves an old one, or answers 503 with none. `stillwell-api` writes when it last read it to `/var/lib/stillwell/metrics/api.prom`.
 - `StillwellServiceDown`: the poller, `stillwell-api`, `stillwell-jobs` or ClickHouse has not been running for 5 minutes, such as one stopped by hand or whose start keeps failing. While `stillwell-api` is down the Worker serves the last good copy of each range, marked stale.

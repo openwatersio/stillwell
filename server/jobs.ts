@@ -184,6 +184,9 @@ function writeMetrics(stopped: string | null): void {
     "# HELP stillwell_migrations_stuck Whether migrations have stopped for something a person must fix.",
     "# TYPE stillwell_migrations_stuck gauge",
     `stillwell_migrations_stuck ${stuck(stopped) ? 1 : 0}`,
+    "# HELP stillwell_jobs_sources_behind_main Sources main's server.json puts on the server that this release doesn't, as after a failed deploy, which nothing writes.",
+    "# TYPE stillwell_jobs_sources_behind_main gauge",
+    `stillwell_jobs_sources_behind_main ${[...github.onServer].filter((s) => PHASES.get(s) !== "server").length}`,
     "# HELP stillwell_jobs_tick_timestamp_seconds When the service last went round its loop.",
     "# TYPE stillwell_jobs_tick_timestamp_seconds gauge",
     `stillwell_jobs_tick_timestamp_seconds ${Math.round(Date.now() / 1000)}`,
@@ -235,8 +238,9 @@ function storeMissing(): string | null {
  * source is being written and none is on the server, so the server writes none.
  */
 async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServer: Set<string> }> {
-  if (![...PHASES.values()].includes("server")) return { writing: new Set(), onServer: new Set() };
   if (!fresh && Date.now() - github.at < GITHUB_MS) return github;
+  // main's map is read even with no source on the server here, so a box whose deploy lagged a move shows it.
+  const local = [...PHASES.values()].includes("server");
   const token = process.env.GITHUB_TOKEN;
   let answer = { writing: new Set([ALL]), onServer: new Set<string>() };
   if (!token)
@@ -247,7 +251,9 @@ async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServe
       const [phases, writing] = await Promise.race([
         Promise.all([
           mainPhases(token, "openwatersio/stillwell"),
-          actionsWriting(token, "openwatersio/stillwell"),
+          local
+            ? actionsWriting(token, "openwatersio/stillwell")
+            : Promise.resolve(new Set<string>()),
         ]),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error("no answer in two minutes")), 120_000).unref(),
@@ -260,7 +266,9 @@ async function askGithub(fresh = false): Promise<{ writing: Set<string>; onServe
     } catch (error) {
       console.error(`can't read GitHub: ${(error as Error).message}`);
     }
-  github = { at: Date.now(), ...answer };
+  // An answer that holds a source back is asked again in 30 seconds, as a run just dispatched may not have
+  // listed its jobs yet; one that holds nothing back stands for the full while.
+  github = { at: answer.writing.size ? Date.now() - GITHUB_MS + 30_000 : Date.now(), ...answer };
   return answer;
 }
 
