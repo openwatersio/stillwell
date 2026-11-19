@@ -67,7 +67,7 @@ export const LINKS: Decision[] = [
   {
     a: "gesla/wangeroogetg-wan-deu-cmems",
     b: "pegelonline/9420040",
-    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km.",
+    note: "CMEMS's copy of WSV's Wangerooge West gauge, though CMEMS places it 40 m from Wangerooge Nord: 302 of the 316 months both hold from December 1999 agree within 10 mm RMS, most to the millimeter, 5.05 m below PEGELONLINE's gauge zero, its NHN offset; the rest hold CMEMS's stuck readings. Nord differs by 101 mm RMS in the median month, and in all but one month by more than 10 mm. West is 5.2 km away, beyond the copy rule's 2 km. Since November 2026 West reads tidal and their levels agree within 6 mm RMS, so the levels rule links them too, but only while West's verdict holds: a failed sensor's held values, as in October 2026 (erratum `pegelonline-wangerooge-west-2026-dropout`), can make it read not tidal again, and the TICON inventory would then match the record to Nord.",
   },
   {
     a: "gesla/kielholtenautg-kie-deu-cmems",
