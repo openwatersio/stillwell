@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import linzErrata from "../src/sources/linz/errata.ts";
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import { crc32, deflateRawSync } from "node:zlib";
@@ -451,9 +452,7 @@ describe("linz", () => {
   });
 
   it("backs every sensor 41 span with an erratum for its station and days", () => {
-    const errata = JSON.parse(
-      readFileSync(new URL("../src/sources/linz/errata.json", import.meta.url), "utf8"),
-    ).errata as {
+    const errata = linzErrata.errata as {
       stations: string[] | null;
       since: string | null;
       until: string | null;

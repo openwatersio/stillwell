@@ -70,10 +70,10 @@ describe("readmeText", () => {
       const at = sections.indexOf("Running ingest");
       if (at >= 0)
         assert.equal(at, sections.length - 1, `${id.name}: ## Running ingest is the last section`);
-      // Errata are documented in errata.json alone, which the page lists.
+      // Errata are documented in errata.ts alone, which the page lists.
       assert.ok(
         !sections.includes("Errata"),
-        `${id.name}: errata belong in errata.json, not the README`,
+        `${id.name}: errata belong in errata.ts, not the README`,
       );
       // The page shows these from metadata, and links between sources on each gauge's page.
       const label = /^- \*\*(Licen[cs]e|Credit|Terms|Contact|Same gauge)[^*]*:?\*\*/m.exec(

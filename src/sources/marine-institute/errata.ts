@@ -1,0 +1,308 @@
+import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { Flag } from "../../schema.ts";
+import { median } from "../../stats.ts";
+
+const iso = (time: number) => new Date(time).toISOString();
+
+/** A station's levels from `since` to before `until`, a day by default; throws when the store holds none. */
+async function levels(store: StoreReader, id: string, since: string, until = dayAfter(since, 1)) {
+  const rows = await store.levels(id, since, until);
+  if (!rows.length) throw new Error(`the store holds no ${id} levels from ${since} to ${until}`);
+  return rows;
+}
+
+const dayMedian = async (store: StoreReader, id: string, day: string) =>
+  median((await levels(store, id, day)).map((o) => o.level));
+
+/** Throws unless `id`'s median on `bad` less its median on `good` is past `limit`, on the side of its sign. */
+async function offset(store: StoreReader, id: string, bad: string, good: string, limit: number) {
+  const d = (await dayMedian(store, id, bad)) - (await dayMedian(store, id, good));
+  if (limit < 0 ? d >= limit : d <= limit)
+    throw new Error(
+      `${id}'s median on ${bad} is ${d.toFixed(2)} m from ${good}'s, not past ${limit} m`,
+    );
+}
+
+export default {
+  errata: [
+    {
+      id: "marine-institute-coverage-start",
+      stations: "every station",
+      handling: "avoided",
+      error:
+        "The dataset's `time_coverage_start` says 2000, but no gauge has values before October 2006.",
+      response: "Backfills start from each gauge's first value, not the dataset's coverage.",
+      evidence:
+        "The ERDDAP dataset's global `time_coverage_start` attribute; the earliest value at any gauge, found while backfilling, is October 2006 at Skerries Harbour.",
+      reported: "2026-11-08",
+      report:
+        "Sent to the Marine Institute on 2026-11-08. On 2026-11-13 they sent each gauge's record start, the earliest being Howth's old middle-pier gauge on 2006-10-24 and Skerries on 2006-10-26; none is before October 2006. Text in [#59](https://github.com/openwatersio/stillwell/issues/59).",
+      check: async (store) => {
+        const first = (await store.rows("stations.parquet"))
+          .filter((r) => r.source === "marine-institute")
+          .map((r) => Number((r.first as { micros?: unknown } | null)?.micros) / 1000)
+          .filter(Number.isFinite);
+        if (!first.length)
+          throw new Error("stations.parquet has no Marine Institute station with a first value");
+        const earliest = Math.min(...first);
+        if (earliest < Date.UTC(2006, 9, 1))
+          throw new Error(
+            `a Marine Institute station's first value is ${iso(earliest)}, before October 2006`,
+          );
+        await levels(store, "marine-institute/skerries-harbour", "2006-10-26");
+      },
+    },
+    {
+      id: "marine-institute-lat-2026",
+      stations: [
+        "marine-institute/aranmore-island-leabgarrow",
+        "marine-institute/ballycotton-harbour",
+        "marine-institute/ballyglass-harbour",
+        "marine-institute/buncranna",
+        "marine-institute/castletownbere-port",
+        "marine-institute/dingle-harbour",
+        "marine-institute/dublin-port",
+        "marine-institute/dunmore-east-harbour",
+        "marine-institute/galway-port",
+        "marine-institute/howth-water-level-1",
+        "marine-institute/inishmore",
+        "marine-institute/killybegs-port",
+        "marine-institute/kilrush-lough",
+        "marine-institute/malin-head-portmore-pier",
+        "marine-institute/rosslare",
+        "marine-institute/skerries-harbour",
+        "marine-institute/sligo",
+        "marine-institute/union-hall-harbor",
+        "marine-institute/wexford-harbour",
+      ],
+      since: "2026-03-24",
+      handling: "kept",
+      error:
+        "On 24 March 2026 the network moved LAT by 1 to 5 cm at its gauges without noting it in the dataset; OD Malin is unbroken.",
+      response:
+        "Levels are in OD Malin, unaffected. `datums` gives only the current LAT, so a level from before 24 March 2026 converted with it is on the new LAT, not the one in use then.",
+      evidence:
+        "LAT less OD Malin is constant at each gauge from 2008 until 24 March 2026, then moves by 1 to 5 cm: Ballycotton's from 2.489 m to 2.460 m, Dublin's from 2.505 m to 2.458 m. OD Malin runs through that day unbroken.",
+      reported: "2026-11-08",
+      report:
+        "Sent to the Marine Institute on 2026-11-08 with [#59](https://github.com/openwatersio/stillwell/issues/59). On 2026-11-13 they replied that the harmonics and levels were re-evaluated and applied to the database at 11:15 UTC on 24 March 2026, and passed it to the team that does the work. They didn't say whether earlier values will be restated. On 2026-11-15 we asked whether LAT before 24 March 2026 will be restated, and for a write-up of the re-evaluation ([#247](https://github.com/openwatersio/stillwell/issues/247#issuecomment-6894846291)). On 2026-11-16 they replied that a station's harmonics are first worked up after about a year and re-evaluated periodically through the 18.6-year cycle until the observations capture all the variability, and that predictions use the latest analysis. They still haven't said whether earlier LAT values will be restated, and gave no write-up.",
+      // One epoch on OD Malin, with the current LAT, and no step in the levels when LAT moved at 11:15 UTC on 24 March 2026.
+      check: async (store, e) => {
+        for (const id of e.stations!) {
+          const s = await store.station(id);
+          if (!s) throw new Error(`the store doesn't list ${id}`);
+          if (s.datum !== "ODM" || !Number.isFinite(s.datums.LAT) || s.epochs.length !== 1)
+            throw new Error(
+              `${id} isn't one epoch in ODM with a LAT: ${s.datum}, ${JSON.stringify(s.datums)}, ${s.epochs.length} epochs`,
+            );
+        }
+        const rows = (await levels(store, "marine-institute/dublin-port", e.since!)).filter(
+          (o) => o.time >= Date.UTC(2026, 2, 24, 11) && o.time <= Date.UTC(2026, 2, 24, 11, 30),
+        );
+        if (rows.length < 5)
+          throw new Error(
+            `the store holds ${rows.length} Dublin Port levels from 11:00 to 11:30 on 24 March 2026`,
+          );
+        const step = Math.max(...rows.slice(1).map((o, i) => Math.abs(o.level - rows[i]!.level)));
+        if (step > 0.15)
+          throw new Error(
+            `Dublin Port's levels step ${step.toFixed(3)} m around 11:15 on 24 March 2026`,
+          );
+      },
+    },
+    {
+      id: "marine-institute-castletownbere-2026-offsets",
+      stations: ["marine-institute/castletownbere-port"],
+      since: "2026-02-04",
+      until: "2026-04-26",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Castletownbere levels step by up to 1.3 m on and off from 4 February to 25 April 2026.",
+      response:
+        "4 February to 25 April 2026 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS and Marine Institute copies of the gauge, which agree with the series to within 2 cm before and after: over the spans the series differs from them by up to 1.3 m.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2026-04-04", "2026-04-28", -1);
+      },
+    },
+    {
+      id: "marine-institute-kilrush-2024-offset",
+      stations: ["marine-institute/kilrush-lough"],
+      since: "2024-01-16",
+      until: "2024-02-07",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Kilrush Lough levels sit about 5.6 m low from 15:00 on 16 January to about 11:00 on 6 February 2024, flat at −5.63 m for the first hours.",
+      response:
+        "16 January to 6 February 2024 is flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the good values before 15:00 on 16 January and after 11:00 on 6 February are flagged too.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away: the difference is about −0.2 m before and after and −5.66 m over the span. The span's first and last days, checked hour by hour in November 2026: values hold at −5.62 to −5.63 m from 15:00 on 16 January, and on 6 February sit near −5.5 m until about 11:00 before a normal tide resumes.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2024-01-20", "2024-02-08", -4);
+      },
+    },
+    {
+      id: "marine-institute-kilrush-2025-offsets",
+      stations: ["marine-institute/kilrush-lough"],
+      since: "2025-09-09",
+      until: "2025-12-01",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Kilrush Lough levels step by 0.5 to 4.7 m on and off from 9 September to 30 November 2025.",
+      response:
+        "9 September to 30 November 2025 is flagged `suspect` whole, keeping the source's own flag as `source_flag`, since the offsets come and go within it. Errata spans are whole days, so 9 September's values before 22:55 are flagged too.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Fenit (`gesla/fenit-fen-irl-cmems`) and GESLA's copies of the gauge: against Fenit the difference is −0.06 to −0.08 m outside the spans and −1.8 to −4.7 m inside them; GESLA's Marine Institute copy differs from the series by about −0.5 m on the days it has. On 9 September the first 13 low values come from 22:55 to 23:55, down to −4.31 m.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2025-09-12", "2025-09-08", -3);
+      },
+    },
+    {
+      id: "marine-institute-malin-head-2026-offset",
+      stations: ["marine-institute/malin-head-portmore-pier"],
+      since: "2026-08-12",
+      until: "2026-09-20",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Malin Head (Portmore Pier) levels sit about 3.9 m low from 12 August to 9 September 2026 and about 1.2 m high from 10 to 19 September.",
+      response:
+        "12 August to 19 September 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Buncrana (`marine-institute/buncranna`), 29 km away: the difference is −0.05 m before and −0.02 to −0.03 m after, −3.92 m from 12 August and +1.18 m from 10 September.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2026-08-20", "2026-08-09", -3);
+        await offset(store, id, "2026-09-12", "2026-09-25", 0.8);
+      },
+    },
+    {
+      id: "marine-institute-sligo-2026-offset",
+      stations: ["marine-institute/sligo"],
+      since: "2026-07-22",
+      until: "2026-07-29",
+      handling: "flagged",
+      error: "The Marine Institute's Sligo levels sit about 4 m low from 22 to 28 July 2026.",
+      response:
+        "22 to 28 July 2026 is flagged `suspect`, keeping the source's own flag as `source_flag`. The store's QC already flags 3 to 21 July.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Killybegs (`marine-institute/killybegs-port`), 38 km away: the difference is −0.02 to −0.06 m before and after and −4.04 m over the span.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        // QC flags 3 to 21 July itself, so only the day after the span is read outside it.
+        await flaggedSpan(store, { ...e, since: null });
+        const first = await levels(store, id, e.since!);
+        if (first.some((o) => o.flag < Flag.suspect))
+          throw new Error(`Sligo's levels on ${e.since} aren't all suspect`);
+        await offset(store, id, "2026-07-25", "2026-07-31", -3);
+      },
+    },
+    {
+      id: "marine-institute-dublin-port-2020-offset",
+      stations: ["marine-institute/dublin-port"],
+      since: "2020-04-22",
+      until: "2020-05-07",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Dublin Port levels sit about 5.8 m low from 22 April to 6 May 2020.",
+      response:
+        "22 April to 6 May 2020 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against Howth (`marine-institute/howth-water-level-1`), 11 km away: the difference is +0.19 m before, −0.03 m after and −5.67 m over the span. GESLA's CMEMS copy of the gauge differs from the series by −2.49 m on the one day it has in the span.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2020-04-29", "2020-05-10", -4);
+      },
+    },
+    {
+      id: "marine-institute-kilrush-2025-01-09-offset",
+      stations: ["marine-institute/kilrush-lough"],
+      since: "2025-01-09",
+      until: "2025-01-10",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Kilrush Lough levels drop about 7 m, to between −5.2 and −6.2 m, from 01:20 to 05:40 UTC on 9 January 2025, and come back.",
+      response:
+        "9 January 2025 is flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too.",
+      evidence:
+        "In the Marine Institute's ERDDAP dataset `IrishNationalTideGaugeNetwork`, as the store holds it, checked in November 2026: 53 values below −4 m from 01:20 to 05:40 UTC on 9 January 2025, one 5-minute step down and one back up, against daily medians of 0.14 m on 8 January and 0.08 m on 10 January. GESLA's two copies of the gauge hold the same drop (erratum `gesla-kilrush-2025-01-09-offset`).",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const low = (await levels(store, id, e.since!)).filter((o) => o.level < -4).length;
+        if (low < 40)
+          throw new Error(
+            `the store holds ${low} Kilrush Lough levels below −4 m on 9 January 2025, not 53`,
+          );
+      },
+    },
+    {
+      id: "marine-institute-kilrush-2025-08-offsets",
+      stations: ["marine-institute/kilrush-lough"],
+      since: "2025-08-04",
+      until: "2025-08-08",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Kilrush Lough levels drift down from 4 August 2025 and sit 4 to 5.5 m low on 5 to 7 August.",
+      response:
+        "4 to 7 August 2025 is flagged `suspect`, keeping the source's own flag as `source_flag`.",
+      evidence:
+        "Daily median against GESLA's CMEMS copy of Fenit (`gesla/fenit-fen-irl-cmems`), 47 km away, checked in November 2026: −0.05 to −0.09 m from 28 July to 3 August, then −1.41 m on 4 August, −3.96, −5.14 and −5.45 m on 5 to 7 August, and +0.07 m on 8 August.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, "2025-08-06", "2025-08-02", -3);
+      },
+    },
+    {
+      id: "marine-institute-kilrush-2025-08-09-offset",
+      stations: ["marine-institute/kilrush-lough"],
+      since: "2025-08-09",
+      until: "2025-08-11",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Kilrush Lough levels sit 1.5 to 4.6 m low from 9 August 2025 to about 12:00 on 10 August.",
+      response:
+        "9 and 10 August 2025 are flagged `suspect`, keeping the source's own flag as `source_flag`. Errata spans are whole days, so the normal tide after 12:00 on 10 August is flagged too.",
+      evidence:
+        "Daily median against Fenit (`gesla/fenit-fen-irl-cmems`), checked in November 2026: −1.63 m on 9 August and −2.79 m on 10 August, against +0.07 m on 8 August and +0.05 m on 11 August. On 10 August the values move from −3.6 to −4.6 m until 12:00, then a normal tide runs from −1.7 to +2.1 m.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        await offset(store, id, e.since!, "2025-08-12", -1);
+      },
+    },
+    {
+      id: "marine-institute-skerries-2017-327m",
+      stations: ["marine-institute/skerries-harbour"],
+      since: "2017-01-06",
+      until: "2017-01-07",
+      handling: "flagged",
+      error:
+        "The Marine Institute's Skerries Harbour series has two values in 2017, both 327.73 m at 11:24 and 11:30 on 6 January, with QC flag 0, between missing values. The gauge's levels lie within a few meters of OD Malin.",
+      response:
+        "6 January 2017 is flagged `suspect` whole, keeping the source's own flag as `source_flag`. They are the only values in the store's 2017 file.",
+      evidence:
+        "The ERDDAP dataset `IrishNationalTideGaugeNetwork`, `Water_Level_OD_Malin` at Skerries Harbour for 6 January 2017, read November 2026: NaN on either side of the two values. The store has no 2016, 2018 or 2019 files for the station, and QC can't judge two values alone against neighbors or a window.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        const y = Number(e.since!.slice(0, 4));
+        const year = await levels(store, id, `${y}-01-01`, `${y + 1}-01-01`);
+        if (year.length !== 2 || year.some((o) => Math.abs(o.level - 327.73) > 0.01))
+          throw new Error(
+            `the store's ${y} Skerries Harbour levels aren't the two 327.73 m values: ${year.map((o) => `${iso(o.time)} ${o.level}`).join(", ")}`,
+          );
+        await flaggedSpan(store, e);
+      },
+    },
+  ],
+  retired: [],
+} satisfies ErrataFile;
