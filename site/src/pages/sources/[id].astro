@@ -98,8 +98,13 @@ const first = list.reduce<Date | undefined>(
       <th>Changes in the store</th>
       <td>
         <a href={sitePath("/docs/reference/sources/#column-terms")}>the same for every source</a>,
-        plus what <a href="#about">How Stillwell reads it</a> and the <a href="#errata">errata</a>
-        below describe
+        plus what{" "}
+        {about && (
+          <>
+            <a href="#about">How Stillwell reads it</a> and{" "}
+          </>
+        )}
+        the <a href="#errata">errata</a> below describe
       </td>
     </tr>
     <tr>

@@ -29,6 +29,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Norwegian Mapping Authority, Hydrographic Service",
+  terms: "Kartverket asks users not to poll its API excessively.",
   // The tide and water-level data page (`license.url`) names both for feedback.
   contact: {
     email: "kundesenter@kartverket.no",

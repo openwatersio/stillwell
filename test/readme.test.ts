@@ -76,19 +76,10 @@ describe("readmeText", () => {
         `${id.name}: errata belong in errata.json, not the README`,
       );
       // The page shows these from metadata, and links between sources on each gauge's page.
-      for (const label of [
-        "License",
-        "Licence",
-        "Credit",
-        "Terms",
-        "Contact",
-        "Contact for errors",
-        "Same gauge elsewhere",
-      ])
-        assert.ok(
-          !markdown.includes(`- **${label}:**`),
-          `${id.name}: the page already shows what a ${label} bullet would say`,
-        );
+      const label = /^- \*\*(Licen[cs]e|Credit|Terms|Contact|Same gauge)[^*]*:?\*\*/m.exec(
+        markdown,
+      )?.[0];
+      assert.ok(!label, `${id.name}: the page already shows what ${label} would say`);
       assert.ok(
         !/checks its values/i.test(markdown),
         `${id.name}: the Terms table says whether the source finalizes its data`,

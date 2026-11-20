@@ -29,6 +29,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Danish Meteorological Institute (DMI)",
+  terms: "DMI gives no warranty for its data.",
   // The open-data team, named in DMI's terms of use (`license.url`).
   contact: { email: "friedata_kontakt@dmi.dk" },
   // Values arrive a minute or two after they're measured.

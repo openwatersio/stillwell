@@ -873,7 +873,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
       terms: {
         type: nullable("string"),
         description:
-          "Anything a user of the data should know about the source's conditions of use. Stillwell changes every source's data the same way: levels in meters, times in UTC, values the source marks missing left out, and a quality flag on each value. A value the source marks bad is flagged `bad` or left out, as the source's README says. The source's README and errata describe any other change.",
+          "Anything a user of the data should know about the source's conditions of use. Stillwell changes every source's data the same way: levels in meters, times in UTC, values the source marks missing left out, and a quality flag on each value. Each source's quality codes map to the flag as its README says. The source's README and errata describe any other change.",
       },
       finalizes: {
         type: "boolean",
