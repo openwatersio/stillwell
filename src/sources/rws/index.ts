@@ -355,9 +355,8 @@ const EXTREME_TYPES: Record<string, "high" | "low"> = {
   laagwater: "low",
   "laagwater 1": "low",
   "laagwater 2": "low",
-  // The numeric codes of RWS's type table that the astronomical extremes of Dukegat, Knock and
-  // Pogum use from their first 2027 value. The table's 3, 4 and 5 (`laagwater 1`, `topagger`,
-  // `laagwater 2`) have not appeared, so they still fail the request.
+  // Numeric codes from RWS's type table, as the astronomical extremes of Dukegat, Knock and
+  // Pogum give them. The table's other codes (3 to 5) fail the request.
   "1": "high",
   "2": "low",
 };
