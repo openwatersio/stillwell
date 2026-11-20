@@ -155,7 +155,7 @@ gesla/anchorage-9455920-usa-noaa,Anchorage,US,NOAA,coops/9455920,true,,1978,2026
 gesla/anclote_lighthouse-8726917-usa-noaa,Anclote Lighthouse,US,NOAA,coops/8726917,false,,1976,1976,,,1976,1,,0,false,true,true
 gesla/anclote_river_near_holiday_fl-2310075-usa-usgs,Anclote River Near Holiday Fl,US,USGS,usgs/02310075,false,,2011,2025,2011,2025,,0,,0,false,true,true
 gesla/ancona-anx-ita-ispra,Ancona,IT,ISPRA,cmems/RMN-Ancona,false,,1986,2026,1998,2026,"1986–1989, 1991–1997",11,,0,false,true,true
-gesla/andel_waal-and-nld-rws,Andel Waal,NL,RWS,rws/andel.waal,true,,1937,1981,1937,1981,,0,,0,false,true,true
+gesla/andel_waal-and-nld-rws,Andel Waal,NL,RWS,rws/andel.waal,true,,1937,1981,1937,1981,,0,,0,true,true,true
 gesla/andenes-800-nor-uhslc_fd,Andenes,NO,UHSLC_FD,kartverket/ANX cmems/AndenesTG,true,uhslc/800,1991,2026,1991,2026,,0,,0,false,true,true
 gesla/andenes-800a-nor-uhslc_rq,Andenes,NO,UHSLC_RQ,kartverket/ANX cmems/AndenesTG,true,uhslc/800,1991,2018,1991,2026,,0,,0,false,true,true
 gesla/andenes-anx-nor-nhs,Andenes,NO,NHS,kartverket/ANX cmems/AndenesTG,true,uhslc/800,1992,2026,1991,2026,,0,,0,false,true,true
@@ -216,7 +216,7 @@ gesla/arko-2545-swe-smhi,Arko,SE,SMHI,smhi/2545 cmems/Arko,true,,2014,2026,2014,
 gesla/arko-ark-swe-cmems,Arko,SE,CMEMS,smhi/2545 cmems/Arko,true,,2014,2026,2014,2026,,0,,0,false,false,true
 gesla/armand_bayou_pasadena_lake_nasa_road_1-arm-usa-hct,Armand Bayou Pasadena Lake Nasa Road 1,US,HCT,,,,2015,2024,,,2015–2024,10,,0,false,false,
 gesla/armitage_island-9449932-usa-noaa,Armitage Island,US,NOAA,coops/9449932,false,,1997,2000,1997,2000,,0,,0,false,true,true
-gesla/army_depot-8664662-usa-noaa,Army Depot,US,NOAA,coops/8664662,false,,1999,1999,,,1999,1,,0,true,true,true
+gesla/army_depot-8664662-usa-noaa,Army Depot,US,NOAA,coops/8664662,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/arnolds_cove-818-can-meds,Arnolds Cove,CA,MEDS,,,,1968,2000,,,"1968, 2000",2,,0,false,false,
 gesla/arrecife-205a-esp-uhslc_rq,Arrecife,ES,UHSLC_RQ,cmems/ArrecifeTG,false,uhslc/205a uhslc/205b uhslc/205d,1959,1973,2008,2026,1959–1973,15,,0,false,true,true
 gesla/arrecife-205b-esp-uhslc_rq,Arrecife,ES,UHSLC_RQ,cmems/ArrecifeTG,false,uhslc/205a uhslc/205b uhslc/205d,1973,1985,2008,2026,"1973–1976, 1980–1985",10,,0,false,true,true
@@ -265,7 +265,7 @@ gesla/audiernetg_60minute-aud-fra-cmems,AudierneTG 60minute,FR,CMEMS,refmar/6305
 gesla/augusta-8417144-usa-noaa,Augusta,US,NOAA,coops/8417144,false,,2015,2015,2015,2015,,0,,0,false,true,true
 gesla/aulds_cove-1570-can-meds,Aulds Cove,CA,MEDS,,,,1953,1989,,,"1953–1954, 1989",3,,0,false,false,
 gesla/aunuu-407-asm-uhslc_fd,Aunuu,AS,UHSLC_FD,uhslc/407,false,,2023,2026,2023,2026,,0,,0,false,true,true
-gesla/avalon-8571901-usa-noaa,Avalon,US,NOAA,coops/8571901,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/avalon-8571901-usa-noaa,Avalon,US,NOAA,coops/8571901,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/avalon-9410079-usa-noaa,Avalon,US,NOAA,coops/9410079,false,,2017,2017,,,2017,1,,0,false,true,true
 gesla/avilestg-avi-esp-cmems,AvilesTG,ES,CMEMS,cmems/AvilesTG,false,,2021,2025,2021,2025,,0,,0,false,false,true
 gesla/avoca_island_cutoff_south_of_morgan_city_la-73816501-usa-usgs,Avoca Island Cutoff South Of Morgan City La,US,USGS,usgs/073816501,false,,2008,2019,2008,2019,,0,,0,false,true,true
@@ -293,7 +293,7 @@ gesla/baie_johan_beetz-2490-can-meds,Baie Johan Beetz,CA,MEDS,,,,1977,1977,,,197
 gesla/baie_ste_anne-2002-can-meds,Baie Ste Anne,CA,MEDS,,,,1975,1975,,,1975,1,,0,false,false,
 gesla/baiedulazarettg_10minute-bai-fra-cmems,BaieDuLazaretTG 10minute,FR,CMEMS,refmar/858 cmems/BaieDuLazaretTG,true,,2015,2019,2015,2026,2018–2019,2,2021–2026,6,false,false,true
 gesla/bailey_creek_at_dock_landing_rd_at_chesapeake_va-204288905-usa-usgs,Bailey Creek At Dock Landing Rd At Chesapeake Va,US,USGS,usgs/0204288905,true,,2015,2025,2015,2026,,0,2026,1,false,true,true
-gesla/bailey_cut-8678322-usa-noaa,Bailey Cut,US,NOAA,coops/8678322,false,,2012,2013,,,2012–2013,2,,0,false,true,true
+gesla/bailey_cut-8678322-usa-noaa,Bailey Cut,US,NOAA,coops/8678322,false,,2012,2013,2012,2013,,0,,0,false,true,true
 gesla/baillie_is_south_spit-6443-can-meds,Baillie Is South Spit,CA,MEDS,,,,1974,1982,,,"1974, 1977, 1981–1982",4,,0,false,false,
 gesla/bainbridge_point-9454755-usa-noaa,Bainbridge Point,US,NOAA,coops/9454755,false,,2002,2002,,,2002,1,,0,false,true,true
 gesla/bajor-414a-idn-uhslc_rq,Bajor,ID,UHSLC_RQ,uhslc/414a,false,,1943,1944,1943,1944,,0,,0,false,true,true
@@ -362,7 +362,7 @@ gesla/barnegat_bay_near_waretown_nj-1409124-usa-usgs,Barnegat Bay Near Waretown 
 gesla/barnegat_inlet_at_barnegat_light_nj-1409147-usa-usgs,Barnegat Inlet At Barnegat Light Nj,US,USGS,usgs/01409147,false,,2011,2016,2011,2016,,0,,0,false,true,true
 gesla/barnegat_inlet_inside-8533615-usa-noaa,Barnegat Inlet Inside,US,NOAA,coops/8533615,false,,1984,2013,1984,2013,,0,,0,false,true,true
 gesla/barnegat_pier-8533141-usa-noaa,Barnegat Pier,US,NOAA,coops/8533141,false,,1976,1977,1976,1977,,0,,0,false,true,true
-gesla/barren_island-8571579-usa-noaa,Barren Island,US,NOAA,coops/8571579,false,,2002,2003,,,2002–2003,2,,0,true,true,true
+gesla/barren_island-8571579-usa-noaa,Barren Island,US,NOAA,coops/8571579,false,,2002,2003,2001,2003,,0,2001,1,false,true,true
 gesla/barron_river_at_everglades_city_fl-2290928-usa-usgs,Barron River At Everglades City Fl,US,USGS,usgs/02290928,false,,2007,2025,2007,2025,,0,,0,false,true,true
 gesla/barrow_island_wapet_landing-62490-aus-bom,barrow island wapet landing,AU,BOM,,,,1990,1995,,,1990–1995,6,,0,false,false,
 gesla/barrow_offshore-9494935-usa-noaa,Barrow Offshore,US,NOAA,coops/9494935,false,,2009,2010,,,2009–2010,2,,0,false,true,true
@@ -417,7 +417,7 @@ gesla/bear_island-4648-can-meds,Bear Island,CA,MEDS,,,,1987,1987,,,1987,1,,0,fal
 gesla/beauchemin_chanel_bc-9082-can-meds,Beauchemin Chanel BC,CA,MEDS,,,,2013,2013,,,2013,1,,0,false,false,
 gesla/beaufort-8656483-usa-noaa,Beaufort,US,NOAA,coops/8656483,true,,1967,2026,1967,2026,,0,,0,false,true,true
 gesla/beaufort-8656518-usa-noaa,Beaufort,US,NOAA,coops/8656518,false,,1996,1996,1996,1996,,0,,0,false,true,true
-gesla/beaufort-8667999-usa-noaa,Beaufort,US,NOAA,coops/8667999,false,,1996,1997,,,1996–1997,2,,0,false,true,true
+gesla/beaufort-8667999-usa-noaa,Beaufort,US,NOAA,coops/8667999,false,,1996,1997,1996,1997,,0,,0,false,true,true
 gesla/beaufort_frontstreet-bea-usa-ncdem,Beaufort FrontStreet,US,NCDEM,,,,2025,2025,,,2025,1,,0,false,true,
 gesla/beaufort_river_at_beaufort_sc-2176603-usa-usgs,Beaufort River At Beaufort Sc,US,USGS,usgs/02176603,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/beauharnois_amont-15260-can-meds,Beauharnois Amont,CA,MEDS,,,,1961,1997,,,1961–1997,37,,0,false,false,
@@ -479,7 +479,7 @@ gesla/berthier_sur_mer-3200-can-meds,Berthier Sur Mer,CA,MEDS,,,,1974,1974,,,197
 gesla/berwick-8764044-usa-noaa,Berwick,US,NOAA,coops/8764044,true,,2003,2026,2003,2026,,0,,0,false,true,true
 gesla/bethany_beach_canal_at_bethany_beach_de-1484689-usa-usgs,Bethany Beach Canal At Bethany Beach De,US,USGS,usgs/01484689,true,,2023,2025,2023,2026,,0,2026,1,false,true,true
 gesla/bethel-9466477-usa-noaa,Bethel,US,NOAA,coops/9466477,false,,2010,2010,,,2010,1,,0,false,true,true
-gesla/betterton-8573704-usa-noaa,Betterton,US,NOAA,coops/8573704,false,,1983,1999,,,"1983, 1999",2,,0,true,true,true
+gesla/betterton-8573704-usa-noaa,Betterton,US,NOAA,coops/8573704,false,,1983,1999,1983,1999,,0,,0,false,true,true
 gesla/beverly-8442417-usa-noaa,Beverly,US,NOAA,coops/8442417,false,,1992,1992,1992,1992,,0,,0,false,true,true
 gesla/bhvalterleuchtturm-4990010-deu-wsv,Bhvalterleuchtturm,DE,WSV,pegelonline/4990010 cmems/BremerhavenTG,true,,2000,2026,1995,2026,,0,,0,false,true,true
 gesla/bic-2995-can-meds,Bic,CA,MEDS,,,,1910,1967,,,"1910, 1967",2,,0,false,false,
@@ -498,7 +498,7 @@ gesla/biloxi_river-8744934-usa-noaa,Biloxi River,US,NOAA,coops/8744934,false,,19
 gesla/biloxi_river_nr_lyman_ms-2481130-usa-usgs,Biloxi River Nr Lyman Ms,US,USGS,usgs/02481130,true,,2016,2025,2016,2026,,0,2026,1,false,true,true
 gesla/bings_landing-8720757-usa-noaa,Bings Landing,US,NOAA,coops/8720757,false,,2003,2026,2003,2026,,0,2006,1,false,true,true
 gesla/binnen_schaar-bin-nld-rws,Binnen Schaar,NL,RWS,rws/binnenschaar,true,,1980,1990,1980,1990,,0,,0,false,true,true
-gesla/binney_dock-8722213-usa-noaa,Binney Dock,US,NOAA,coops/8722213,false,,1999,1999,,,1999,1,,0,false,true,true
+gesla/binney_dock-8722213-usa-noaa,Binney Dock,US,NOAA,coops/8722213,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/bintulu-387a-mys-uhslc_rq,Bintulu,MY,UHSLC_RQ,uhslc/387a,false,,1992,2018,1992,2018,,0,,0,false,true,true
 gesla/biorka_village-9462645-usa-noaa,Biorka Village,US,NOAA,coops/9462645,false,,2007,2007,,,2007,1,,0,false,true,true
 gesla/bird_island-9459251-usa-noaa,Bird Island,US,NOAA,coops/9459251,false,,2013,2013,,,2013,1,,0,false,true,true
@@ -517,7 +517,7 @@ gesla/bjorn-2067-swe-smhi,Bjorn,SE,SMHI,smhi/2067 cmems/Bjorn,false,,1891,1978,1
 gesla/bjorn-bjo-swe-cmems,Bjorn,SE,CMEMS,smhi/2067 cmems/Bjorn,false,,1891,1978,1891,1978,,0,,0,false,false,true
 gesla/black_bay_nr_snake_island_nr_pointe_a_la_hache_la-7374526-usa-usgs,Black Bay Nr Snake Island Nr Pointe A La Hache La,US,USGS,usgs/07374526,true,,2024,2025,2026,2026,2024–2025,2,2026,1,false,true,true
 gesla/black_bay_nr_stone_island_nr_pointe_a_la_hache_la-73745275-usa-usgs,Black Bay Nr Stone Island Nr Pointe A La Hache La,US,USGS,usgs/073745275,true,,2014,2025,2014,2026,,0,2026,1,false,true,true
-gesla/black_creek-8720434-usa-noaa,Black Creek,US,NOAA,coops/8720434,false,,1978,2021,,,"1978, 2021",2,,0,false,true,true
+gesla/black_creek-8720434-usa-noaa,Black Creek,US,NOAA,coops/8720434,false,,1978,2021,1978,2021,,0,,0,false,true,true
 gesla/black_river_at_sc51_near_rhems_sc-2136070-usa-usgs,Black River At Sc51 Near Rhems Sc,US,USGS,usgs/02136070,true,,2023,2025,2023,2026,,0,2026,1,false,true,true
 gesla/black_river_mi-9075057-usa-noaa,Black River Mi,US,NOAA,coops/9075057,false,,2019,2019,,,2019,1,,0,false,true,true
 gesla/black_river_nc-bla-usa-ncdem,Black River NC,US,NCDEM,usgs/02107544,false,,2019,2025,,,2019–2025,7,,0,false,true,true
@@ -536,7 +536,7 @@ gesla/blackstone_bay-9454907-usa-noaa,Blackstone Bay,US,NOAA,coops/9454907,false
 gesla/blackwater_river-8729753-usa-noaa,Blackwater River,US,NOAA,coops/8729753,false,,1976,1993,1976,1993,,0,,0,false,true,true
 gesla/blackwater_river_milton-11992-usa-nwfwmd,Blackwater River Milton,US,NWFWMD,,,,2010,2021,,,2010–2021,12,,0,false,false,
 gesla/blackwater_river_near_goodland_fl-255654081350200-usa-usgs,Blackwater River Near Goodland Fl,US,USGS,usgs/255654081350200,false,,2010,2015,2010,2015,,0,,0,false,true,true
-gesla/bladensburg-8579997-usa-noaa,Bladensburg,US,NOAA,coops/8579997,false,,1995,1996,,,1995–1996,2,,0,true,true,true
+gesla/bladensburg-8579997-usa-noaa,Bladensburg,US,NOAA,coops/8579997,false,,1995,1996,1995,1996,,0,,0,false,true,true
 gesla/blaine-9449679-usa-noaa,Blaine,US,NOAA,coops/9449679,false,,2011,2011,,,2011,1,,0,false,true,true
 gesla/blankenbergetg-bla-bel-cmems,BlankenbergeTG,BE,CMEMS,cmems/BlankenbergeTide,false,,2020,2024,2014,2026,,0,"2014–2019, 2025–2026",8,false,false,true
 gesla/blauwe_slenk_oost-bla-nld-rws,Blauwe Slenk oost,NL,RWS,rws/blauweslenk.oost,true,,1995,1999,1995,1999,,0,,0,false,true,true
@@ -635,8 +635,8 @@ gesla/brementg-bre-deu-cmems,BremenTG,DE,CMEMS,pegelonline/4910060 cmems/BremenT
 gesla/bremer_bay-bbbre01-aus-bom,Bremer Bay,AU,BOM,,,,1998,2025,,,1998–2025,28,,0,false,false,
 gesla/bremerhaventg-bre-deu-cmems,BremerhavenTG,DE,CMEMS,pegelonline/4990010 cmems/BremerhavenTG,true,,1995,2026,1995,2026,,0,,0,false,false,true
 gesla/bremervrdeuw-5980010-deu-wsv,Bremervrdeuw,DE,WSV,pegelonline/5980010,true,,2000,2026,2000,2026,,0,,0,false,true,true
-gesla/breskens-bre-nld-rws,Breskens,NL,RWS,rws/breskens,true,,1973,1987,1973,1987,,0,,0,false,true,true
-gesla/breskens-bresks-nld-rws_hist,Breskens,NL,RWS_HIST,rws/breskens,true,,1973,1987,1973,1987,,0,,0,false,true,true
+gesla/breskens-bre-nld-rws,Breskens,NL,RWS,rws/breskens,true,,1973,1987,1973,1987,,0,,0,true,true,true
+gesla/breskens-bresks-nld-rws_hist,Breskens,NL,RWS_HIST,rws/breskens,true,,1973,1987,1973,1987,,0,,0,true,true,true
 gesla/breskens_handelshaven-bre-nld-rws,Breskens Handelshaven,NL,RWS,rws/breskens.handelshaven,true,,2025,2026,2025,2026,,0,,0,false,true,true
 gesla/breskens_veerhaven-bre-nld-rws,Breskens Veerhaven,NL,RWS,rws/breskens.veerhaven,true,,1994,2026,1994,2026,,0,,0,false,true,true
 gesla/brest-3-fra-refmar,Brest,FR,REFMAR,refmar/3 cmems/BrestTG,true,uhslc/822,1846,2026,1846,2026,,0,,0,false,true,true
@@ -687,7 +687,7 @@ gesla/brouwershavensegattg-bro-nld-cmems,BrouwershavensegatTG,NL,CMEMS,rws/brouw
 gesla/broward_river_bl_biscayne_blvd_nr_jacksonville_fl-2246751-usa-usgs,Broward River Bl Biscayne Blvd Nr Jacksonville Fl,US,USGS,usgs/02246751,false,,2015,2025,2015,2025,,0,,0,false,true,true
 gesla/brownsville-8779977-usa-noaa,Brownsville,US,NOAA,coops/8779977,false,,2002,2003,,,2002–2003,2,,0,false,true,true
 gesla/bruinisse-bru-nld-rws,Bruinisse,NL,RWS,rws/bruinisse,true,,1936,1986,1936,1986,,0,,0,false,true,true
-gesla/bruinisse_krammersluis_oosterschelde-bru-nld-rws,Bruinisse Krammersluis Oosterschelde,NL,RWS,rws/bruinisse.krammersluis.oosterschelde.2,true,,2025,2026,2025,2026,,0,,0,false,true,true
+gesla/bruinisse_krammersluis_oosterschelde-bru-nld-rws,Bruinisse Krammersluis Oosterschelde,NL,RWS,rws/bruinisse.krammersluis.oosterschelde.2,true,,2025,2026,2025,2026,,0,,0,true,true,true
 gesla/bruinisse_zijpe-bruinse-nld-rws_hist,Bruinisse Zijpe,NL,RWS_HIST,rws/bruinisse,true,,1936,1986,1936,1986,,0,,0,false,true,true
 gesla/brundige_inlet_bc-9333-can-meds,Brundige Inlet BC,CA,MEDS,,,,1971,1971,,,1971,1,,0,false,false,
 gesla/brunsbttelmpm-5970094-deu-wsv,Brunsbttelmpm,DE,WSV,pegelonline/5970094,true,,2018,2026,2018,2026,,0,,0,false,true,true
@@ -748,10 +748,10 @@ gesla/cache_slough_at_ryer_island-ryi-usa-cdwr,Cache Slough At Ryer Island,US,CD
 gesla/cache_slough_nr_hastings_tract_nr_rio_vista_ca-11455280-usa-usgs,Cache Slough Nr Hastings Tract Nr Rio Vista Ca,US,USGS,usgs/11455280,false,,2018,2023,2023,2023,2018–2022,5,,0,false,true,true
 gesla/caddadup-dvcad01-aus-bom,Caddadup,AU,BOM,,,,1994,2019,,,1994–2019,26,,0,false,false,
 gesla/cadiz-cadi-esp-ieo,Cadiz,ES,IEO,cmems/CadizPtoAmericaTG,false,,1961,2016,2025,2026,1961–2016,56,2025–2026,2,false,true,true
-gesla/cadzand-cadzd-nld-rws_hist,Cadzand,NL,RWS_HIST,cmems/CadzandTG rws/cadzand.2,true,,1970,2018,1970,2026,,0,,0,false,true,true
-gesla/cadzand_1-cad-nld-rws,Cadzand 1,NL,RWS,cmems/CadzandTG rws/cadzand.2,true,,2024,2026,1970,2026,,0,,0,false,true,true
-gesla/cadzand_2-cad-nld-rws,Cadzand 2,NL,RWS,cmems/CadzandTG rws/cadzand.2,true,,1970,2025,1970,2026,,0,,0,false,true,true
-gesla/cadzandtg-cad-nld-cmems,CadzandTG,NL,CMEMS,cmems/CadzandTG rws/cadzand.2,true,,2014,2026,1970,2026,,0,,0,false,false,true
+gesla/cadzand-cadzd-nld-rws_hist,Cadzand,NL,RWS_HIST,cmems/CadzandTG rws/cadzand.2,true,,1970,2018,1970,2026,,0,,0,true,true,true
+gesla/cadzand_1-cad-nld-rws,Cadzand 1,NL,RWS,cmems/CadzandTG rws/cadzand.2,true,,2024,2026,1970,2026,,0,,0,true,true,true
+gesla/cadzand_2-cad-nld-rws,Cadzand 2,NL,RWS,cmems/CadzandTG rws/cadzand.2,true,,1970,2025,1970,2026,,0,,0,true,true,true
+gesla/cadzandtg-cad-nld-cmems,CadzandTG,NL,CMEMS,cmems/CadzandTG rws/cadzand.2,true,,2014,2026,1970,2026,,0,,0,true,false,true
 gesla/caernarvon_canal_sector_gate_at_caernarvon_la-73745245-usa-usgs,Caernarvon Canal Sector Gate At Caernarvon La,US,USGS,usgs/073745245 usace/MVN.Caernarvon_SG_N,true,,2017,2025,2012,2026,,0,"2012–2016, 2026",6,false,true,true
 gesla/caernarvon_outfall_channel_at_caernarvon_la-295124089542100-usa-usgs,Caernarvon Outfall Channel At Caernarvon La,US,USGS,usgs/295124089542100,true,,2024,2025,2026,2026,2024–2025,2,2026,1,false,true,true
 gesla/cagliari-cag-ita-ispra,Cagliari,IT,ISPRA,cmems/RMN-Cagliari,false,,1986,2026,1998,2026,1986–1996,11,,0,false,true,true
@@ -919,7 +919,7 @@ gesla/cedar_beach-8514422-usa-noaa,Cedar Beach,US,NOAA,coops/8514422,false,,1988
 gesla/cedar_creek-8533295-usa-noaa,Cedar Creek,US,NOAA,coops/8533295,false,,1976,1977,1976,1977,,0,,0,false,true,true
 gesla/cedar_creek-8537101-usa-noaa,Cedar Creek,US,NOAA,coops/8537101,false,,1982,1982,1982,1982,,0,,0,false,true,true
 gesla/cedar_creek_near_slaughter_beach_de-1484235-usa-usgs,Cedar Creek Near Slaughter Beach De,US,USGS,usgs/01484235,true,,2017,2025,2017,2026,,0,2026,1,false,true,true
-gesla/cedar_heights-8720189-usa-noaa,Cedar Heights,US,NOAA,coops/8720189,false,,1977,1978,,,1977–1978,2,,0,false,true,true
+gesla/cedar_heights-8720189-usa-noaa,Cedar Heights,US,NOAA,coops/8720189,false,,1977,1978,1977,1978,,0,,0,false,true,true
 gesla/cedar_island-8325-can-meds,Cedar Island,CA,MEDS,,,,2003,2003,,,2003,1,,0,false,false,
 gesla/cedar_island-8655151-usa-noaa,Cedar Island,US,NOAA,coops/8655151,false,,1979,2026,1979,2026,,0,,0,false,true,true
 gesla/cedar_key-8727520-usa-noaa,Cedar Key,US,NOAA,coops/8727520,true,,1914,2026,1914,2026,,0,,0,false,true,true
@@ -944,7 +944,7 @@ gesla/chaleix_noumea-16-fra-refmar,Chaleix Noumea,FR,REFMAR,refmar/16 cmems/Chal
 gesla/chaleixnoumeatg_60minute-cha-fra-cmems,ChaleixNoumeaTG 60minute,FR,CMEMS,refmar/16 cmems/ChaleixNoumeaTG,false,,1967,2005,1967,2005,,0,,0,false,false,true
 gesla/champerico-670a-gtm-uhslc_rq,Champerico,GT,UHSLC_RQ,uhslc/670a,false,,1971,1975,1973,1975,1971–1972,2,,0,false,true,true
 gesla/champlain-3350-can-meds,Champlain,CA,MEDS,,,,1962,1996,,,1962–1996,35,,0,false,false,
-gesla/chance-8571351-usa-noaa,Chance,US,NOAA,coops/8571351,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/chance-8571351-usa-noaa,Chance,US,NOAA,coops/8571351,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/change_islands-1052-can-meds,Change Islands,CA,MEDS,,,,1968,1968,,,1968,1,,0,false,false,
 gesla/chankliut_island-9458849-usa-noaa,Chankliut Island,US,NOAA,coops/9458849,false,,1997,2002,,,"1997, 2001–2002",3,,0,false,true,true
 gesla/chappaquoit_point-8447685-usa-noaa,Chappaquoit Point,US,NOAA,coops/8447685,false,,1976,2000,1976,2000,,0,,0,false,true,true
@@ -986,7 +986,7 @@ gesla/chesapeake_bbt-749a-usa-uhslc_rq,Chesapeake BBT,US,UHSLC_RQ,coops/8638863,
 gesla/chesapeake_city-8573927-usa-noaa,Chesapeake City,US,NOAA,coops/8573927,true,,1972,2026,1972,2026,,0,,0,false,true,true
 gesla/chesapeake_light-8638979-usa-noaa,Chesapeake Light,US,NOAA,coops/8638979,false,,1998,1998,1998,2004,,0,1999–2004,6,false,true,true
 gesla/chesnuknuw_cr_bc-8562-can-meds,Chesnuknuw Cr BC,CA,MEDS,,,,1971,1971,,,1971,1,,0,false,false,
-gesla/chester-8638491-usa-noaa,Chester,US,NOAA,coops/8638491,false,,2012,2012,2012,2012,,0,,0,true,true,true
+gesla/chester-8638491-usa-noaa,Chester,US,NOAA,coops/8638491,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/chesterfield_inlet-5140-can-meds,Chesterfield Inlet,CA,MEDS,,,,1952,1997,,,"1952, 1973, 1997",3,,0,false,false,
 gesla/chesterfield_inlet_inside-5143-can-meds,Chesterfield Inlet Inside,CA,MEDS,,,,1973,1974,,,1973–1974,2,,0,false,false,
 gesla/cheticamp-1539-can-meds,Cheticamp,CA,MEDS,,,,1936,1936,,,1936,1,,0,false,false,
@@ -1035,8 +1035,8 @@ gesla/ciudad_del_carmen-403-mex-unam_hist,Ciudad del Carmen,MX,UNAM_HIST,unam/5-
 gesla/ciudad_del_carmen-779a-mex-uhslc_rq,Ciudad del Carmen,MX,UHSLC_RQ,uhslc/779a,false,,1957,1991,1957,1980,"1981–1982, 1986, 1991",4,,0,false,true,true
 gesla/ciudadcarmen_radar-4-mex-unam,CiudadCarmen Radar,MX,UNAM,unam/5-radar,true,,2021,2024,2026,2026,2021–2024,4,2026,1,false,false,false
 gesla/civitavecchia-civ-ita-ispra,Civitavecchia,IT,ISPRA,cmems/RMN-Civitavecchia,false,,1973,2026,1998,2026,"1973–1976, 1980–1982, 1986–1990, 1992–1997",18,,0,false,true,true
-gesla/clambank_creek_dock-8662299-usa-noaa,Clambank Creek Dock,US,NOAA,coops/8662299,false,,1976,1977,,,1976–1977,2,,0,true,true,true
-gesla/clapboard_creek-8720198-usa-noaa,Clapboard Creek,US,NOAA,coops/8720198,false,,1977,1978,,,1977–1978,2,,0,false,true,true
+gesla/clambank_creek_dock-8662299-usa-noaa,Clambank Creek Dock,US,NOAA,coops/8662299,false,,1976,1977,1976,1977,,0,,0,false,true,true
+gesla/clapboard_creek-8720198-usa-noaa,Clapboard Creek,US,NOAA,coops/8720198,false,,1977,1978,1977,1978,,0,,0,false,true,true
 gesla/clapboard_creek_nr_jacksonville_fl-2246825-usa-usgs,Clapboard Creek Nr Jacksonville Fl,US,USGS,usgs/02246825,false,,2015,2025,2015,2026,,0,2026,1,false,true,true
 gesla/clarendon_plantation-8667633-usa-noaa,Clarendon Plantation,US,NOAA,coops/8667633,false,,2008,2013,2008,2013,,0,,0,false,true,true
 gesla/clarks_harbour-405-can-meds,Clarks Harbour,CA,MEDS,,,,1961,1963,,,1961–1963,3,,0,false,false,
@@ -1052,7 +1052,7 @@ gesla/clear_passage_bc-9220-can-meds,Clear Passage BC,CA,MEDS,,,,2014,2014,,,201
 gesla/clearwater_bch_fl-773a-usa-uhslc_rq,Clearwater Bch FL,US,UHSLC_RQ,coops/8726724,true,uhslc/773a,1996,2021,1973,2026,,0,,0,false,true,true
 gesla/clearwater_beach-8726724-usa-noaa,Clearwater Beach,US,NOAA,coops/8726724,true,uhslc/773a,1973,2026,1973,2026,,0,,0,false,true,true
 gesla/cleveland_oh-9063063-usa-noaa,Cleveland Oh,US,NOAA,coops/9063063,true,,1970,2026,1970,2026,,0,,0,false,true,true
-gesla/cliff_aos_wharf-8573137-usa-noaa,Cliff Aos Wharf,US,NOAA,coops/8573137,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/cliff_aos_wharf-8573137-usa-noaa,Cliff Aos Wharf,US,NOAA,coops/8573137,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/clifton_court_intake-b95339-usa-cdwr,Clifton Court Intake,US,CDWR,dwr/B95339Q,false,,2020,2025,2020,2026,,0,2026,1,false,true,true
 gesla/clinton_harbor-8463701-usa-noaa,Clinton Harbor,US,NOAA,coops/8463701,false,,2002,2002,2002,2002,,0,,0,false,true,true
 gesla/clipperton-391c-fra-uhslc_rq,Clipperton,FR,UHSLC_RQ,refmar/797,false,,2007,2008,2011,2025,2007–2008,2,,0,false,true,true
@@ -1090,7 +1090,7 @@ gesla/coffs_harbour-205470-aus-bom,Coffs Harbour,AU,BOM,,,,1996,2022,,,"1996–2
 gesla/coffs_harbour-60180-aus-bom,coffs harbour,AU,BOM,,,,1957,1973,,,"1957–1958, 1966–1973",10,,0,false,false,
 gesla/cohansey_river_at_greenwich_nj-1413038-usa-usgs,Cohansey River At Greenwich Nj,US,USGS,usgs/01413038,true,,2000,2025,2007,2026,2000–2006,7,"2020–2021, 2026",3,false,true,true
 gesla/colborne_ontario-13640-can-meds,Colborne Ontario,CA,MEDS,,,,1972,1972,,,1972,1,,0,false,false,
-gesla/colbourn_creek-8571181-usa-noaa,Colbourn Creek,US,NOAA,coops/8571181,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/colbourn_creek-8571181-usa-noaa,Colbourn Creek,US,NOAA,coops/8571181,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/cold_bay-9459949-usa-noaa,Cold Bay,US,NOAA,coops/9459949,false,,2013,2013,,,2013,1,,0,false,true,true
 gesla/cold_springs_harbor-8516061-usa-noaa,Cold Springs Harbor,US,NOAA,coops/8516061,false,,1990,1990,1990,1990,,0,,0,false,true,true
 gesla/cole_harbour-492-can-meds,Cole Harbour,CA,MEDS,,,,1973,1975,,,"1973, 1975",2,,0,false,false,
@@ -1169,7 +1169,7 @@ gesla/corunatg-cor-esp-cmems,CorunaTG,ES,CMEMS,cmems/CorunaTG,false,,1992,2026,1
 gesla/cote_ste_catherine-15450-can-meds,Cote Ste Catherine,CA,MEDS,,,,1961,1997,,,1961–1997,37,,0,false,false,
 gesla/coteau_du_lac-15140-can-meds,Coteau Du Lac,CA,MEDS,,,,1961,1997,,,1961–1997,37,,0,false,false,
 gesla/coteau_landing-15110-can-meds,Coteau Landing,CA,MEDS,,,,1962,1999,,,1962–1999,38,,0,false,false,
-gesla/cove_point-8577188-usa-noaa,Cove Point,US,NOAA,coops/8577188,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/cove_point-8577188-usa-noaa,Cove Point,US,NOAA,coops/8577188,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/cove_point-9452346-usa-noaa,Cove Point,US,NOAA,coops/9452346,false,,1998,1999,,,1998–1999,2,,0,false,true,true
 gesla/cow_bayou_at_american_bay_nr_pointe_a_la_hache_la-73745258-usa-usgs,Cow Bayou At American Bay Nr Pointe A La Hache La,US,USGS,usgs/073745258,false,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/cow_bayou_at_fm_1442_nr_orangefield_tx-8031010-usa-usgs,Cow Bayou At Fm 1442 Nr Orangefield Tx,US,USGS,usgs/08031010,true,,2018,2025,2018,2026,,0,2026,1,false,true,true
@@ -1184,19 +1184,19 @@ gesla/coyote_hills_slough-9414621-usa-noaa,Coyote Hills Slough,US,NOAA,coops/941
 gesla/crab_creek_near_homosassa_fl-2310652-usa-usgs,Crab Creek Near Homosassa Fl,US,USGS,usgs/02310652,true,,2024,2025,2024,2026,,0,2026,1,false,true,true
 gesla/crabtree_swamp_at_conway_sc-2110701-usa-usgs,Crabtree Swamp At Conway Sc,US,USGS,usgs/02110701,true,,2014,2025,2014,2026,,0,2026,1,false,true,true
 gesla/craig-9450551-usa-noaa,Craig,US,NOAA,coops/9450551,false,,2007,2007,,,2007,1,,0,false,true,true
-gesla/crandall-8720004-usa-noaa,Crandall,US,NOAA,coops/8720004,false,,1978,1978,,,1978,1,,0,false,true,true
+gesla/crandall-8720004-usa-noaa,Crandall,US,NOAA,coops/8720004,false,,1978,1978,1978,1978,,0,,0,false,true,true
 gesla/cranz-5950070-deu-wsv,Cranz,DE,WSV,pegelonline/5950070,true,,2000,2026,2000,2026,,0,,0,false,true,true
 gesla/crater_bay-9455159-usa-noaa,Crater Bay,US,NOAA,coops/9455159,false,,2000,2000,,,2000,1,,0,false,true,true
 gesla/crawford_crk_04_mi_ups_of_chass_nr_homosassafl-2310667-usa-usgs,Crawford Crk 04 Mi Ups Of Chass Nr HomosassaFl,US,USGS,usgs/02310667,true,,2025,2025,2025,2026,,0,2026,1,false,true,true
 gesla/crescent_bay_wa-7050-can-meds,Crescent Bay Wa,CA,MEDS,coops/9443826,false,,1964,1964,,,1964,1,,0,false,false,true
 gesla/crescent_beach-8720651-usa-noaa,Crescent Beach,US,NOAA,coops/8720651,false,,1999,2005,1999,2005,,0,,0,false,true,true
-gesla/crescent_city-8720855-usa-noaa,Crescent City,US,NOAA,coops/8720855,false,,1993,1994,,,1993–1994,2,,0,false,true,true
+gesla/crescent_city-8720855-usa-noaa,Crescent City,US,NOAA,coops/8720855,false,,1993,1994,1993,1994,,0,,0,false,true,true
 gesla/crescent_city-9419750-usa-noaa,Crescent City,US,NOAA,coops/9419750,true,uhslc/556,1933,2026,1933,2026,,0,,0,false,true,true
 gesla/crescent_city_ca-556-usa-uhslc_fd,Crescent City CA,US,UHSLC_FD,coops/9419750,true,uhslc/556,1933,2026,1933,2026,,0,,0,false,true,true
 gesla/crescent_city_ca-556a-usa-uhslc_rq,Crescent City CA,US,UHSLC_RQ,coops/9419750,true,uhslc/556,1933,2021,1933,2026,,0,,0,false,true,true
 gesla/crewboat_channel_at_wax_lake_outlet_nr_calumet_la-73815925-usa-usgs,Crewboat Channel At Wax Lake Outlet Nr Calumet La,US,USGS,crms/CRMS0479-H01 usace/MVN.Crewboat_Channel usgs/073815925,false,,2008,2018,2008,2025,,0,"2019–2020, 2023–2025",5,false,true,true
-gesla/crisfield-8571091-usa-noaa,Crisfield,US,NOAA,coops/8571091,false,,1981,1981,,,1981,1,,0,true,true,true
-gesla/crispen_island-8676808-usa-noaa,Crispen Island,US,NOAA,coops/8676808,false,,1980,1980,,,1980,1,,0,false,true,true
+gesla/crisfield-8571091-usa-noaa,Crisfield,US,NOAA,coops/8571091,false,,1981,1981,1981,1981,,0,,0,false,true,true
+gesla/crispen_island-8676808-usa-noaa,Crispen Island,US,NOAA,coops/8676808,false,,1980,1980,1980,1980,,0,,0,false,true,true
 gesla/cristobal-266-pan-uhslc_fd,Cristobal,PA,UHSLC_FD,uhslc/266,false,,1907,2014,1907,2017,,0,,0,false,true,true
 gesla/cristobal-266a-pan-uhslc_rq,Cristobal,PA,UHSLC_RQ,uhslc/266,false,,1907,2017,1907,2017,,0,,0,false,true,true
 gesla/crms0002-crms0002-usa-crms,CRMS0002,US,CRMS,crms/CRMS0002-H01,false,,2007,2025,2007,2025,,0,,0,false,true,true
@@ -1274,9 +1274,9 @@ gesla/currituck_sound_on_east_bank_at_corolla_nc-2043433-usa-usgs,Currituck Soun
 gesla/curry_creek_at_highway_41_at_nokomis_fl-2299734-usa-usgs,Curry Creek At Highway 41 At Nokomis Fl,US,USGS,usgs/02299734,true,,2016,2025,2016,2026,,0,2026,1,false,true,true
 gesla/cushman-9434068-usa-noaa,Cushman,US,NOAA,coops/9434068,false,,2017,2018,,,2017–2018,2,,0,false,true,true
 gesla/custom_house_cove-9450296-usa-noaa,Custom House Cove,US,NOAA,coops/9450296,false,,2010,2010,,,2010,1,,0,false,true,true
-gesla/cut_1n_front_range-8720011-usa-noaa,Cut 1N Front Range,US,NOAA,coops/8720011,false,,1997,1998,,,1997–1998,2,,0,false,true,true
-gesla/cut_2n_front_range-8720012-usa-noaa,Cut 2N Front Range,US,NOAA,coops/8720012,false,,1998,1999,,,1998–1999,2,,0,false,true,true
-gesla/cutler-8723289-usa-noaa,Cutler,US,NOAA,coops/8723289,false,,1971,1972,,,1971–1972,2,,0,false,true,true
+gesla/cut_1n_front_range-8720011-usa-noaa,Cut 1N Front Range,US,NOAA,coops/8720011,false,,1997,1998,1998,1998,1997,1,,0,false,true,true
+gesla/cut_2n_front_range-8720012-usa-noaa,Cut 2N Front Range,US,NOAA,coops/8720012,false,,1998,1999,1998,1999,,0,,0,false,true,true
+gesla/cutler-8723289-usa-noaa,Cutler,US,NOAA,coops/8723289,false,,1971,1972,,,1971–1972,2,,0,true,true,true
 gesla/cutler_farris_wharf-8411060-usa-noaa,Cutler Farris Wharf,US,NOAA,coops/8411060,true,,2010,2026,2010,2026,,0,,0,false,true,true
 gesla/cutler_naval_base-8411250-usa-noaa,Cutler Naval Base,US,NOAA,coops/8411250,false,,1979,2010,1979,2010,,0,1998,1,false,true,true
 gesla/cutoff_south-8725685-usa-noaa,Cutoff South,US,NOAA,coops/8725685,false,,1978,1978,,,1978,1,,0,false,true,true
@@ -1328,17 +1328,17 @@ gesla/davis-173-aus-uhslc_fd,Davis,AU,UHSLC_FD,uhslc/173,false,,1993,2010,1993,2
 gesla/davis-173a-aus-uhslc_rq,Davis,AU,UHSLC_RQ,uhslc/173,false,,1993,2010,1993,2010,,0,,0,false,true,true
 gesla/davis-20100-aus-bom,davis,AU,BOM,,,,1993,2010,,,1993–2010,18,,0,false,false,
 gesla/davis_inlet-1416-can-meds,Davis Inlet,CA,MEDS,,,,1971,1974,,,1971–1974,4,,0,false,false,
-gesla/daymark_135-8674301-usa-noaa,Daymark 135,US,NOAA,coops/8674301,false,,2012,2012,,,2012,1,,0,false,true,true
-gesla/daymark_156-8674975-usa-noaa,Daymark 156,US,NOAA,coops/8674975,false,,2012,2012,,,2012,1,,0,false,true,true
-gesla/daymark_185-8675761-usa-noaa,Daymark 185,US,NOAA,coops/8675761,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/daymark_135-8674301-usa-noaa,Daymark 135,US,NOAA,coops/8674301,false,,2012,2012,2012,2012,,0,,0,false,true,true
+gesla/daymark_156-8674975-usa-noaa,Daymark 156,US,NOAA,coops/8674975,false,,2012,2012,2012,2012,,0,,0,false,true,true
+gesla/daymark_185-8675761-usa-noaa,Daymark 185,US,NOAA,coops/8675761,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/daytona_beach_shores-8721120-usa-noaa,Daytona Beach Shores,US,NOAA,coops/8721120,false,,1980,1984,1980,1984,,0,,0,false,true,true
 gesla/de_tour_village_mi-9075099-usa-noaa,De Tour Village Mi,US,NOAA,coops/9075099,true,,1977,2026,1977,2026,,0,,0,false,true,true
 gesla/deal_pier-dlp-gbr-cco,Deal Pier,GB,CCO,cco/90 cmems/DealPierTG,true,,2006,2026,2005,2026,,0,2005,1,false,true,true
 gesla/dealpiertg-dea-gbr-cmems,DealPierTG,GB,CMEMS,cco/90 cmems/DealPierTG,true,,2006,2026,2005,2026,,0,2005,1,false,false,true
 gesla/dease_penninsula-65998-can-meds,Dease Penninsula,CA,MEDS,,,,1986,1986,,,1986,1,,0,false,false,
 gesla/deception_bay-4460-can-meds,Deception Bay,CA,MEDS,,,,1960,1997,,,"1960, 1965, 1997",3,,0,false,false,
-gesla/deeneplaat-dee-nld-rws,Deeneplaat,NL,RWS,rws/deeneplaat,true,,1970,2005,1970,2005,,0,,0,false,true,true
-gesla/deeneplaat-deenpt-nld-rws_hist,Deeneplaat,NL,RWS_HIST,rws/deeneplaat,true,,1970,1996,1970,2005,,0,,0,false,true,true
+gesla/deeneplaat-dee-nld-rws,Deeneplaat,NL,RWS,rws/deeneplaat,true,,1970,2005,1970,2005,,0,,0,true,true,true
+gesla/deeneplaat-deenpt-nld-rws_hist,Deeneplaat,NL,RWS_HIST,rws/deeneplaat,true,,1970,1996,1970,2005,,0,,0,true,true,true
 gesla/deep_cove_bc-7765-can-meds,Deep Cove BC,CA,MEDS,,,,1964,1964,,,1964,1,,0,false,false,
 gesla/deep_creek_at_spuds_fl-2245260-usa-usgs,Deep Creek At Spuds Fl,US,USGS,usgs/02245260,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/deepwater-8538231-usa-noaa,Deepwater,US,NOAA,coops/8538231,false,,1982,1983,1982,1983,,0,,0,false,true,true
@@ -1349,7 +1349,7 @@ gesla/degerby-deg-fin-cmems,Degerby,FI,CMEMS,cmems/Degerby,false,,2023,2026,2023
 gesla/degrad_des_cannes-241-fra-refmar,Degrad Des Cannes,FR,REFMAR,refmar/241 cmems/DegradDesCannesTG,true,,1989,2022,1989,2024,,0,"2020, 2023–2024",3,false,true,true
 gesla/degraddescannestg_60minute-deg-fra-cmems,DegradDesCannesTG 60minute,FR,CMEMS,refmar/241 cmems/DegradDesCannesTG,true,,1989,2022,1989,2024,,0,"2020, 2023–2024",3,false,false,true
 gesla/delaware_city-8551762-usa-noaa,Delaware City,US,NOAA,coops/8551762,true,,2001,2026,2001,2026,,0,,0,false,true,true
-gesla/delaware_city_bridge-8551851-usa-noaa,Delaware City Bridge,US,NOAA,coops/8551851,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/delaware_city_bridge-8551851-usa-noaa,Delaware City Bridge,US,NOAA,coops/8551851,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/delaware_river_at_del_mem_bridge_at_wilmington_de-1482100-usa-usgs,Delaware River At Del Mem Bridge At Wilmington De,US,USGS,usgs/01482100,true,,2020,2025,2020,2026,,0,2026,1,false,true,true
 gesla/delaware_river_at_marine_terminal_at_trenton_nj-1464040-usa-usgs,Delaware River At Marine Terminal At Trenton Nj,US,USGS,usgs/01464040,true,,2018,2025,2018,2026,,0,2026,1,false,true,true
 gesla/delaware_river_at_new_castle_de-1482170-usa-usgs,Delaware River At New Castle De,US,USGS,usgs/01482170,true,,2024,2025,2012,2026,,0,"2012–2023, 2026",13,false,true,true
@@ -1408,13 +1408,13 @@ gesla/dixon_entrance-9335-can-meds,Dixon Entrance,CA,MEDS,,,,1991,1992,,,1991–
 gesla/djibouti-119-dji-uhslc_fd,Djibouti,DJ,UHSLC_FD,uhslc/119,false,,2007,2016,2007,2016,,0,,0,false,true,true
 gesla/djibouti-119a-dji-uhslc_rq,Djibouti,DJ,UHSLC_RQ,uhslc/119,false,,2007,2016,2007,2016,,0,,0,false,true,true
 gesla/dock_e-8741041-usa-noaa,Dock E,US,NOAA,coops/8741041,false,,2008,2018,2008,2018,,0,,0,false,true,true
-gesla/doctors_lake-8720406-usa-noaa,Doctors Lake,US,NOAA,coops/8720406,false,,1978,1978,,,1978,1,,0,false,true,true
+gesla/doctors_lake-8720406-usa-noaa,Doctors Lake,US,NOAA,coops/8720406,false,,1978,1978,1978,1978,,0,,0,false,true,true
 gesla/dog_island-8728408-usa-noaa,Dog Island,US,NOAA,coops/8728408,false,,1979,1979,,,1979,1,,0,false,true,true
 gesla/dog_island-9751494-usa-noaa,Dog Island,US,NOAA,coops/9751494,false,,2011,2011,,,2011,1,,0,false,true,true
 gesla/dog_river_bridge-8735391-usa-noaa,Dog River Bridge,US,NOAA,coops/8735391,true,,2011,2026,2011,2026,,0,,0,false,true,true
 gesla/dolgoi_harbor-9459758-usa-noaa,Dolgoi Harbor,US,NOAA,coops/9459758,false,,2005,2005,,,2005,1,,0,false,true,true
 gesla/dollard_hoogzand-dol-nld-rws,Dollard Hoogzand,NL,RWS,rws/dollard.hoogzand,true,,1996,1996,1996,1996,,0,,0,false,true,true
-gesla/dollard_west-dol-nld-rws,Dollard west,NL,RWS,rws/dollard.west,true,,1996,1996,1996,1996,,0,,0,false,true,true
+gesla/dollard_west-dol-nld-rws,Dollard west,NL,RWS,rws/dollard.west,true,,1996,1996,1996,1996,,0,,0,true,true,true
 gesla/donges-396-fra-refmar,Donges,FR,REFMAR,refmar/396 cmems/DongesTG,false,,1982,2011,1982,2011,,0,,0,false,true,true
 gesla/dongestg_60minute-don-fra-cmems,DongesTG 60minute,FR,CMEMS,refmar/396 cmems/DongesTG,false,,1982,2011,1982,2011,,0,,0,false,false,true
 gesla/dongfang-637a-chn-uhslc_rq,Dongfang,CN,UHSLC_RQ,uhslc/637a,false,,1975,1997,1975,1997,,0,,0,false,true,true
@@ -1491,7 +1491,7 @@ gesla/e_isle_dernieres-8762888-usa-noaa,E Isle Dernieres,US,NOAA,coops/8762888,f
 gesla/eagle_harbor_mi-9099039-usa-noaa,Eagle Harbor Mi,US,NOAA,coops/9099039,false,,2018,2018,,,2018,1,,0,false,true,true
 gesla/eagle_point-8771013-usa-noaa,Eagle Point,US,NOAA,coops/8771013,true,,1993,2026,1993,2026,,0,,0,false,true,true
 gesla/east_41st_street_pier-8518695-usa-noaa,East 41St Street Pier,US,NOAA,coops/8518695,false,,1979,1981,1979,1981,,0,,0,false,true,true
-gesla/east_arsenicker-8723465-usa-noaa,East Arsenicker,US,NOAA,coops/8723465,false,,1971,1972,,,1971–1972,2,,0,false,true,true
+gesla/east_arsenicker-8723465-usa-noaa,East Arsenicker,US,NOAA,coops/8723465,false,,1971,1972,,,1971–1972,2,,0,true,true,true
 gesla/east_bank_1-8762372-usa-noaa,East Bank 1,US,NOAA,coops/8762372,false,,2003,2012,2003,2012,,0,,0,false,true,true
 gesla/east_bay-8726674-usa-noaa,East Bay,US,NOAA,coops/8726674,true,,2019,2026,2019,2026,,0,,0,false,true,true
 gesla/east_bay-8729702-usa-noaa,East Bay,US,NOAA,coops/8729702,false,,1992,1993,,,1992–1993,2,,0,false,true,true
@@ -1501,7 +1501,7 @@ gesla/east_creek_near_homestead_fl-251152080370900-usa-usgs,East Creek Near Home
 gesla/east_fowl_river_bridge-8735523-usa-noaa,East Fowl River Bridge,US,NOAA,coops/8735523,true,,2011,2026,2011,2026,,0,,0,false,true,true
 gesla/east_greenwich-8454578-usa-noaa,East Greenwich,US,NOAA,coops/8454578,false,,2015,2015,2015,2015,,0,,0,false,true,true
 gesla/east_highway_creek_nr_key_largo_fl-251440080262800-usa-usgs,East Highway Creek Nr Key Largo Fl,US,USGS,usgs/251440080262800,false,,2007,2011,2007,2011,,0,,0,false,true,true
-gesla/east_lake-8593909-usa-noaa,East Lake,US,NOAA,coops/8593909,false,,1995,1995,,,1995,1,,0,true,true,true
+gesla/east_lake-8593909-usa-noaa,East Lake,US,NOAA,coops/8593909,false,,1995,1995,1995,1995,,0,,0,false,true,true
 gesla/east_margaree_bridge-1548-can-meds,East Margaree Bridge,CA,MEDS,,,,1968,1968,,,1968,1,,0,false,false,
 gesla/east_narrows_1_dolphin_bc-9827-can-meds,East Narrows 1 Dolphin BC,CA,MEDS,,,,1957,1963,,,"1957, 1963",2,,0,false,false,
 gesla/east_pearl_river_at_csx_railroad_nr_claiborne_ms-301141089320300-usa-usgs,East Pearl River At Csx Railroad Nr Claiborne Ms,US,USGS,usgs/301141089320300,true,,2001,2025,2007,2026,"2001–2002, 2005–2006",4,2026,1,false,true,true
@@ -1530,7 +1530,7 @@ gesla/eckernfoerdetg-eck-deu-cmems,EckernfoerdeTG,DE,CMEMS,pegelonline/9610045 c
 gesla/eckernfrde-9610045-deu-wsv,Eckernfrde,DE,WSV,pegelonline/9610045 cmems/EckernfoerdeTG,true,,2000,2026,1997,2026,,0,,0,false,true,true
 gesla/econfina_rv_at_econfina_rv_state_park_nr_perry_fl-2326050-usa-usgs,Econfina Rv At Econfina Rv State Park Nr Perry Fl,US,USGS,usgs/02326050,true,,2021,2025,2021,2026,,0,2026,1,false,true,true
 gesla/ecum_secum-514-can-meds,Ecum Secum,CA,MEDS,,,,1990,1990,,,1990,1,,0,false,false,
-gesla/edamtg-eda-nld-cmems,EdamTG,NL,CMEMS,rws/edam cmems/EdamTG,true,,2014,2026,1975,2026,,0,"1975–1988, 2000–2001, 2005–2013",25,false,false,true
+gesla/edamtg-eda-nld-cmems,EdamTG,NL,CMEMS,rws/edam cmems/EdamTG,true,,2014,2026,1975,2026,,0,"1975–1988, 2000–2001, 2005–2013",25,true,false,true
 gesla/eden-60530-aus-bom,Eden,AU,BOM,,,,1957,2023,,,"1957–1958, 1960–1972, 1983–1984, 1986–2023",55,,0,false,false,
 gesla/edenhouse_point-8651817-usa-noaa,Edenhouse Point,US,NOAA,coops/8651817,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/edgartown-8448558-usa-noaa,Edgartown,US,NOAA,coops/8448558,false,,2004,2004,2004,2004,,0,,0,false,true,true
@@ -1563,7 +1563,7 @@ gesla/elim-9468863-usa-noaa,Elim,US,NOAA,coops/9468863,false,,2012,2012,,,2012,1
 gesla/elizabeth_riv_at_midtown_tunnel_at_norfolk_va-204288831-usa-usgs,Elizabeth Riv At Midtown Tunnel At Norfolk Va,US,USGS,usgs/0204288831,true,,2020,2025,2020,2026,,0,2026,1,false,true,true
 gesla/elkhorn_slough_at_elkhorn-9413631-usa-noaa,Elkhorn Slough At Elkhorn,US,NOAA,coops/9413631,false,,2007,2007,,,2007,1,,0,false,true,true
 gesla/elkhorn_slough_railroad_bridge-9413663-usa-noaa,Elkhorn Slough Railroad Bridge,US,NOAA,coops/9413663,false,,2007,2008,,,2007–2008,2,,0,false,true,true
-gesla/elliott_key_harbor-8723409-usa-noaa,Elliott Key Harbor,US,NOAA,coops/8723409,false,,1974,1974,,,1974,1,,0,false,true,true
+gesla/elliott_key_harbor-8723409-usa-noaa,Elliott Key Harbor,US,NOAA,coops/8723409,false,,1974,1974,,,1974,1,,0,true,true,true
 gesla/ellsworth-8413801-usa-noaa,Ellsworth,US,NOAA,coops/8413801,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/elmshornhafen-5970022-deu-wsv,Elmshornhafen,DE,WSV,pegelonline/5970022,true,,2014,2026,2014,2026,,0,,0,false,true,true
 gesla/elsfleth-4970010-deu-wsv,Elsfleth,DE,WSV,pegelonline/4970010,true,,2000,2026,2000,2026,,0,,0,false,true,true
@@ -1572,7 +1572,7 @@ gesla/emdenneueseeschleuse-3970010-deu-wsv,Emdenneueseeschleuse,DE,WSV,pegelonli
 gesla/emdentg-emd-deu-cmems,EmdenTG,DE,CMEMS,pegelonline/3970010 cmems/EmdenTG,true,,1998,2026,1998,2026,,0,,0,false,false,true
 gesla/emerald_isle-eme-usa-ncdem,Emerald Isle,US,NCDEM,,,,2024,2025,,,2024–2025,2,,0,false,true,
 gesla/emmonak-9467701-usa-noaa,Emmonak,US,NOAA,coops/9467701,false,,2019,2019,,,2019,1,,0,false,true,true
-gesla/empel_beneden-emp-nld-rws,Empel beneden,NL,RWS,rws/shertogenbosch.empel.maas,true,,2016,2026,2016,2026,,0,,0,false,true,true
+gesla/empel_beneden-emp-nld-rws,Empel beneden,NL,RWS,rws/shertogenbosch.empel.maas,true,,2016,2026,2016,2026,,0,,0,true,true,true
 gesla/empire-8761193-usa-noaa,Empire,US,NOAA,coops/8761193,false,,1996,1999,1996,1999,,0,,0,false,true,true
 gesla/empire_waterway_south_of_empire_la-7380260-usa-usgs,Empire Waterway South Of Empire La,US,USGS,usgs/07380260,true,,2017,2025,2017,2026,,0,2026,1,false,true,true
 gesla/emshrn-9340010-deu-wsv,Emshrn,DE,WSV,pegelonline/9340010,true,,2000,2026,2000,2026,,0,,0,false,true,true
@@ -1630,7 +1630,7 @@ gesla/europoort_harmsenbrug-eur-nld-rws,Europoort Harmsenbrug,NL,RWS,rws/europoo
 gesla/europoort_hartelbrug-eur-nld-rws,Europoort Hartelbrug,NL,RWS,rws/europoort.hartelbrug,true,,1997,2026,1997,2026,,0,,0,false,true,true
 gesla/evandale-98-can-meds,Evandale,CA,MEDS,,,,1965,1969,,,1965–1969,5,,0,false,false,
 gesla/everett-9447659-usa-noaa,Everett,US,NOAA,coops/9447659,false,,1995,1996,,,1995–1996,2,,0,false,true,true
-gesla/ewell-8571117-usa-noaa,Ewell,US,NOAA,coops/8571117,false,,1997,2010,,,"1997, 2010",2,,0,true,true,true
+gesla/ewell-8571117-usa-noaa,Ewell,US,NOAA,coops/8571117,false,,1997,2010,1997,2010,,0,,0,false,true,true
 gesla/excursion_inlet_south_end-9452437-usa-noaa,Excursion Inlet South End,US,NOAA,coops/9452437,false,,1999,1999,,,1999,1,,0,false,true,true
 gesla/exmouth-62435-aus-bom,Exmouth,AU,BOM,,,,1989,2023,,,"1989–1993, 1997–2023",32,,0,false,false,
 gesla/exmouth-exm-gbr-cco,Exmouth,GB,CCO,cco/117 cmems/ExmouthTG,true,,2015,2026,2015,2026,,0,,0,false,true,true
@@ -1730,13 +1730,13 @@ gesla/fort_de_france-271-fra-uhslc_fd,Fort de France,FR,UHSLC_FD,refmar/126 cmem
 gesla/fort_de_france-271a-fra-uhslc_rq,Fort de France,FR,UHSLC_RQ,refmar/126 cmems/FortDeFranceTG,true,uhslc/271,1976,2018,1976,2026,,0,,0,false,true,true
 gesla/fort_denison-333-aus-uhslc_fd,Fort Denison,AU,UHSLC_FD,,,uhslc/333,1965,2026,,,"1965–1981, 1984–2026",60,,0,false,true,
 gesla/fort_denison-333a-aus-uhslc_rq,Fort Denison,AU,UHSLC_RQ,,,uhslc/333,1965,2021,,,"1965–1981, 1984–2021",55,,0,false,true,
-gesla/fort_eustis_marad-8638017-usa-noaa,Fort Eustis Marad,US,NOAA,coops/8638017,false,,2010,2010,2010,2010,,0,,0,true,true,true
+gesla/fort_eustis_marad-8638017-usa-noaa,Fort Eustis Marad,US,NOAA,coops/8638017,false,,2010,2010,2010,2010,,0,,0,false,true,true
 gesla/fort_gratiot_mi-9014098-usa-noaa,Fort Gratiot Mi,US,NOAA,coops/9014098,true,,1970,2026,1970,2026,1997,1,,0,false,true,true
 gesla/fort_hamilton_new_york_1-8517942-usa-da_sat,Fort Hamilton New York 1,US,DA_SAT,coops/8519024,false,,1893,1936,1979,1981,1893–1936,44,,0,false,true,true
 gesla/fort_hamilton_new_york_2-8517942-usa-da_sat,Fort Hamilton New York 2,US,DA_SAT,coops/8519024,false,,1951,1953,1979,1981,1951–1953,3,,0,false,true,true
 gesla/fort_kamehameha-1612366-usa-noaa,Fort Kamehameha,US,NOAA,coops/1612366,false,,1987,1987,1987,1987,,0,,0,false,true,true
 gesla/fort_liefkenshoek-for-nld-rws,Fort Liefkenshoek,NL,RWS,rws/fortliefkenshoek,true,,1989,2026,1989,2026,,0,,0,false,true,true
-gesla/fort_mchenry_marsh-8574683-usa-noaa,Fort Mchenry Marsh,US,NOAA,coops/8574683,false,,2004,2005,,,2004–2005,2,,0,true,true,true
+gesla/fort_mchenry_marsh-8574683-usa-noaa,Fort Mchenry Marsh,US,NOAA,coops/8574683,false,,2004,2005,2004,2005,,0,,0,false,true,true
 gesla/fort_medoc-6117-fra-refmar,Fort Medoc,FR,REFMAR,refmar/6117 cmems/FortMedocTG,true,,2006,2015,2005,2026,,0,"2005, 2016–2026",12,false,true,true
 gesla/fort_myers-8725520-usa-noaa,Fort Myers,US,NOAA,coops/8725520,true,,1969,2026,1969,2026,,0,,0,false,true,true
 gesla/fort_niagara_ny-9052090-usa-noaa,Fort Niagara Ny,US,NOAA,coops/9052090,false,,2018,2018,,,2018,1,,0,false,true,true
@@ -1836,14 +1836,14 @@ gesla/gan-109a-mdv-uhslc_rq,Gan,MV,UHSLC_RQ,uhslc/109,false,,1987,2018,1987,2026
 gesla/gandiatg-gan-esp-cmems,GandiaTG,ES,CMEMS,cmems/GandiaTG,false,,2007,2026,2007,2026,,0,,0,false,false,true
 gesla/ganges_bc-7407-can-meds,Ganges BC,CA,MEDS,,,,1915,2017,,,"1915, 2016–2017",3,,0,false,false,
 gesla/garden_city_bridge-8661419-usa-noaa,Garden City Bridge,US,NOAA,coops/8661419,false,,1974,1976,1974,1976,,0,,0,false,true,true
-gesla/garden_city_pier-8661437-usa-noaa,Garden City Pier,US,NOAA,coops/8661437,false,,1976,1976,,,1976,1,,0,true,true,true
+gesla/garden_city_pier-8661437-usa-noaa,Garden City Pier,US,NOAA,coops/8661437,false,,1976,1976,1976,1976,,0,,0,false,true,true
 gesla/gardiner-8417134-usa-noaa,Gardiner,US,NOAA,coops/8417134,false,,2005,2005,2005,2005,,0,,0,false,true,true
 gesla/garibaldi-9437540-usa-noaa,Garibaldi,US,NOAA,coops/9437540,true,,1970,2026,1970,2026,,0,,0,false,true,true
 gesla/garnet_point-8410715-usa-noaa,Garnet Point,US,NOAA,coops/8410715,false,,1985,1985,1985,1985,,0,,0,false,true,true
 gesla/garry_island-6499-can-meds,Garry Island,CA,MEDS,,,,1975,1981,,,"1975–1977, 1981",4,,0,false,false,
 gesla/garry_island_west-6498-can-meds,Garry Island West,CA,MEDS,,,,1964,1966,,,1964–1966,3,,0,false,false,
 gesla/gascons-2253-can-meds,Gascons,CA,MEDS,,,,1984,1984,,,1984,1,,0,false,false,
-gesla/gaskins_pt-8632869-usa-noaa,Gaskins Pt,US,NOAA,coops/8632869,false,,2007,2007,2007,2007,,0,,0,true,true,true
+gesla/gaskins_pt-8632869-usa-noaa,Gaskins Pt,US,NOAA,coops/8632869,false,,2007,2007,2007,2007,,0,,0,false,true,true
 gesla/gat_van_borssele-gat-nld-rws,Gat van Borssele,NL,RWS,rws/gatvanborssele,true,,1991,2026,1991,2026,,0,,0,false,true,true
 gesla/gatineau-16105-can-meds,Gatineau,CA,MEDS,,,,1964,1982,,,1964–1982,19,,0,false,false,
 gesla/gautier-8741798-usa-noaa,Gautier,US,NOAA,coops/8741798,false,,1983,1984,,,1983–1984,2,,0,false,true,true
@@ -1953,10 +1953,10 @@ gesla/goteborgtingstadstunneln-got-swe-cmems,GoteborgTingstadstunneln,SE,CMEMS,s
 gesla/goteborgtorshamnen-got-swe-cmems,GoteborgTorshamnen,SE,CMEMS,smhi/2109 cmems/GoteborgTorshamnen,false,uhslc/819,1967,2023,1967,2023,,0,,0,false,false,true
 gesla/gouda-gou-nld-rws,Gouda,NL,RWS,rws/gouda,true,,1970,1977,1970,1977,,0,,0,false,true,true
 gesla/gouda-gouda-nld-rws_hist,Gouda,NL,RWS_HIST,rws/gouda,true,,1970,1977,1970,1977,,0,,0,false,true,true
-gesla/gouda_brug-goudbg-nld-rws_hist,Gouda brug,NL,RWS_HIST,rws/gouda.hollandscheijssel,true,,1981,2018,1981,2026,,0,,0,false,true,true
+gesla/gouda_brug-goudbg-nld-rws_hist,Gouda brug,NL,RWS_HIST,rws/gouda.hollandscheijssel,true,,1981,2018,1981,2026,,0,,0,true,true,true
 gesla/gouda_hanepraaisluis-gou-nld-rws,Gouda Hanepraaisluis,NL,RWS,rws/gouda.hanepraaisluis,true,,1977,1981,1977,1981,,0,,0,false,true,true
 gesla/gouda_hanepraaisluis-goudhnpss-nld-rws_hist,Gouda Hanepraaisluis,NL,RWS_HIST,rws/gouda.hanepraaisluis,true,,1977,1981,1977,1981,,0,,0,false,true,true
-gesla/gouda_hollandsche_ijssel-gou-nld-rws,Gouda Hollandsche IJssel,NL,RWS,rws/gouda.hollandscheijssel,true,,1981,2026,1981,2026,,0,,0,false,true,true
+gesla/gouda_hollandsche_ijssel-gou-nld-rws,Gouda Hollandsche IJssel,NL,RWS,rws/gouda.hollandscheijssel,true,,1981,2026,1981,2026,,0,,0,true,true,true
 gesla/gowanus_bay-8517921-usa-noaa,Gowanus Bay,US,NOAA,coops/8517921,false,,1979,1979,1979,1979,,0,,0,false,true,true
 gesla/granby_bay_bc-9443-can-meds,Granby Bay BC,CA,MEDS,,,,1965,1965,,,1965,1,,0,false,false,
 gesla/grand_bay-663-can-meds,Grand Bay,CA,MEDS,,,,1974,1974,,,1974,1,,0,false,false,
@@ -2063,7 +2063,7 @@ gesla/haleiwa-422-usa-uhslc_fd,Haleiwa,US,UHSLC_FD,uhslc/422,false,,2023,2026,20
 gesla/half_moon_bay-9433445-usa-noaa,Half Moon Bay,US,NOAA,coops/9433445,false,,2013,2013,,,2013,1,,0,false,true,true
 gesla/half_tide_tug_harbour-h060010a-aus-bom,Half Tide Tug Harbour,AU,BOM,,,,2015,2025,,,2015–2025,11,,0,false,false,
 gesla/halfmoon_bay_bc-7830-can-meds,Halfmoon Bay BC,CA,MEDS,,,,1967,2016,,,"1967–1969, 2016",4,,0,false,false,
-gesla/halfmoon_reef-8671314-usa-noaa,Halfmoon Reef,US,NOAA,coops/8671314,false,,1994,1994,,,1994,1,,0,false,true,true
+gesla/halfmoon_reef-8671314-usa-noaa,Halfmoon Reef,US,NOAA,coops/8671314,false,,1994,1994,1994,1994,,0,,0,false,true,true
 gesla/halifax-275-can-uhslc_fd,Halifax,CA,UHSLC_FD,,,uhslc/275,1895,2023,,,"1895–1897, 1919–2021, 2023",107,,0,false,true,
 gesla/halifax-275a-can-uhslc_rq,Halifax,CA,UHSLC_RQ,,,uhslc/275,1895,2014,,,"1895–1897, 1919–2014",99,,0,false,true,
 gesla/halifax-490-can-meds,Halifax,CA,MEDS,,,uhslc/275,1895,2014,,,"1895–1898, 1919–2014",100,,0,false,false,
@@ -2104,7 +2104,7 @@ gesla/hansweert-hanswt-nld-rws_hist,Hansweert,NL,RWS_HIST,rws/hansweert,true,,19
 gesla/hantsport-282-can-meds,Hantsport,CA,MEDS,,,,1969,1969,,,1969,1,,0,false,false,
 gesla/haparanda-hap-swe-cmems,Haparanda,SE,CMEMS,cmems/Haparanda,false,,2014,2017,2014,2017,,0,,0,false,false,true
 gesla/harbor_beach_mi-9075014-usa-noaa,Harbor Beach Mi,US,NOAA,coops/9075014,true,,1970,2026,1970,2026,,0,,0,false,true,true
-gesla/harbor_of_refuge_light-8557125-usa-noaa,Harbor Of Refuge Light,US,NOAA,coops/8557125,false,,1984,1984,,,1984,1,,0,true,true,true
+gesla/harbor_of_refuge_light-8557125-usa-noaa,Harbor Of Refuge Light,US,NOAA,coops/8557125,false,,1984,1984,1984,1984,,0,,0,false,true,true
 gesla/harbour_heights-8725791-usa-noaa,Harbour Heights,US,NOAA,coops/8725791,false,,1977,1978,,,1977–1978,2,,0,false,true,true
 gesla/hardinge_is_bc-8127-can-meds,Hardinge Is BC,CA,MEDS,,,,2011,2011,,,2011,1,,0,false,false,
 gesla/haringvliet10tg-har-nld-cmems,Haringvliet10TG,NL,CMEMS,rws/haringvliet.10 cmems/Haringvliet10TG,true,,2014,2026,1981,2026,,0,,0,false,false,true
@@ -2119,9 +2119,9 @@ gesla/haringvlietsluizen_binnen_noord-har-nld-rws,Haringvlietsluizen binnen noor
 gesla/haringvlietsluizen_binnen_zuid-har-nld-rws,Haringvlietsluizen binnen zuid,NL,RWS,rws/haringvlietsluizen.binnen.zuid,true,,1975,1980,1975,1980,,0,,0,false,true,true
 gesla/haringvlietsluizen_buiten-har-nld-rws,Haringvlietsluizen buiten,NL,RWS,rws/haringvlietsluizen.buiten,true,,1972,1988,1972,1988,,0,,0,false,true,true
 gesla/haringvlietsluizen_buiten-harvszbtn-nld-rws_hist,Haringvlietsluizen buiten,NL,RWS_HIST,rws/haringvlietsluizen.buiten,true,,1972,1988,1972,1988,,0,,0,false,true,true
-gesla/harlingen-harlgn-nld-rws_hist,Harlingen,NL,RWS_HIST,rws/harlingen.waddenzee cmems/HarlingenTG,true,,1935,2018,1935,2026,,0,,0,false,true,true
-gesla/harlingen_waddenzee-har-nld-rws,Harlingen Waddenzee,NL,RWS,rws/harlingen.waddenzee cmems/HarlingenTG,true,,1935,2026,1935,2026,,0,,0,false,true,true
-gesla/harlingentg-har-nld-cmems,HarlingenTG,NL,CMEMS,rws/harlingen.waddenzee cmems/HarlingenTG,true,,2014,2026,1935,2026,,0,,0,false,false,true
+gesla/harlingen-harlgn-nld-rws_hist,Harlingen,NL,RWS_HIST,rws/harlingen.waddenzee cmems/HarlingenTG,true,,1935,2018,1935,2026,,0,,0,true,true,true
+gesla/harlingen_waddenzee-har-nld-rws,Harlingen Waddenzee,NL,RWS,rws/harlingen.waddenzee cmems/HarlingenTG,true,,1935,2026,1935,2026,,0,,0,true,true,true
+gesla/harlingentg-har-nld-cmems,HarlingenTG,NL,CMEMS,rws/harlingen.waddenzee cmems/HarlingenTG,true,,2014,2026,1935,2026,,0,,0,true,false,true
 gesla/harmac_bc-7913-can-meds,Harmac BC,CA,MEDS,,,,2019,2020,,,2019–2020,2,,0,false,false,
 gesla/harney_river_near_flamingo_fl-252551081050900-usa-usgs,Harney River Near Flamingo Fl,US,USGS,usgs/252551081050900,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/harriman_fiord-9454824-usa-noaa,Harriman Fiord,US,NOAA,coops/9454824,false,,1992,1992,,,1992,1,,0,false,true,true
@@ -2222,8 +2222,8 @@ gesla/hill_slough-hsl-usa-cdwr,Hill Slough,US,CDWR,cdec/HSL,true,,2020,2025,2020
 gesla/hill_slough_at_grizzly_island_road-e32750-usa-cdwr,Hill Slough At Grizzly Island Road,US,CDWR,,,,1982,1983,,,1982–1983,2,,0,false,true,
 gesla/hillarys-132a-aus-uhslc_rq,Hillarys,AU,UHSLC_RQ,bom/958,false,uhslc/132a,1992,2021,1996,2026,"1992–1995, 1997–2004, 2015–2018",16,2024–2026,3,false,true,true
 gesla/hillarys-62237-aus-bom,Hillarys,AU,BOM,bom/958,false,uhslc/132a,1991,2023,1996,2026,"1991–1995, 1997–2004, 2015–2018",17,2024–2026,3,false,false,true
-gesla/hillsboro-8572669-usa-noaa,Hillsboro,US,NOAA,coops/8572669,false,,2005,2005,,,2005,1,,0,true,true,true
-gesla/hillsboro-8722859-usa-noaa,Hillsboro,US,NOAA,coops/8722859,false,,1973,1973,,,1973,1,,0,false,true,true
+gesla/hillsboro-8572669-usa-noaa,Hillsboro,US,NOAA,coops/8572669,false,,2005,2005,2005,2005,,0,,0,false,true,true
+gesla/hillsboro-8722859-usa-noaa,Hillsboro,US,NOAA,coops/8722859,false,,1973,1973,,,1973,1,,0,true,true,true
 gesla/hillsborough_r_at_i_275_bridge_at_sulphur_spgs_fl-23060013-usa-usgs,Hillsborough R At I 275 Bridge At Sulphur Spgs Fl,US,USGS,usgs/023060013,true,,2011,2025,2011,2026,,0,2026,1,false,true,true
 gesla/hillsborough_river_at_platt_street_at_tampa_fl-2306028-usa-usgs,Hillsborough River At Platt Street At Tampa Fl,US,USGS,usgs/02306028,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/hillsborough_river_at_rowlett_pk_dr_near_tampa_fl-2304510-usa-usgs,Hillsborough River At Rowlett Pk Dr Near Tampa Fl,US,USGS,usgs/02304510,true,,2011,2025,2007,2026,,0,"2007–2010, 2026",5,false,true,true
@@ -2256,12 +2256,12 @@ gesla/hog_island_channel_at_island_park_ny-1311143-usa-usgs,Hog Island Channel A
 gesla/hogland-hog-rus-cmems,Hogland,RU,CMEMS,cmems/Hogland,false,,2010,2018,2010,2018,,0,,0,false,false,true
 gesla/holbaek-hol-dnk-cmems,Holbaek,DK,CMEMS,dmi/29038 cmems/Holbaek,true,,2011,2026,2011,2026,,0,,0,false,false,true
 gesla/holdenbeach_brunswickcounty-hol-usa-ncdem,HoldenBeach BrunswickCounty,US,NCDEM,,,,2024,2025,,,2024–2025,2,,0,false,true,
-gesla/holland_bar_light-8571214-usa-noaa,Holland Bar Light,US,NOAA,coops/8571214,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/holland_bar_light-8571214-usa-noaa,Holland Bar Light,US,NOAA,coops/8571214,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/holland_cut_near_bethel_island-hol-usa-cdwr,Holland Cut Near Bethel Island,US,CDWR,cdec/HOL usgs/11313431,true,,2006,2025,2006,2026,,0,2026,1,false,true,true
 gesla/holland_cut_nr_bethel_island_ca-11313431-usa-usgs,Holland Cut Nr Bethel Island Ca,US,USGS,cdec/HOL usgs/11313431,true,,2007,2025,2006,2026,,0,2026,1,false,true,true
 gesla/holland_mi-9087031-usa-noaa,Holland Mi,US,NOAA,coops/9087031,true,,1970,2026,1970,2026,1997–1999,3,,0,false,true,true
 gesla/hollandse_kust_noord__deelgebied-hol-nld-rws,Hollandse kust noord deelgebied,NL,RWS,rws/hollandsekust.noord.deelgebied,true,,2023,2025,2023,2025,,0,,0,false,true,true
-gesla/hollandse_kust_zuid_platform_alpha-hol-nld-rws,Hollandse Kust Zuid platform Alpha,NL,RWS,rws/hollandsekust.zuid.alpha,true,,2023,2025,2023,2025,,0,,0,false,true,true
+gesla/hollandse_kust_zuid_platform_alpha-hol-nld-rws,Hollandse Kust Zuid platform Alpha,NL,RWS,rws/hollandsekust.zuid.alpha,true,,2023,2025,2023,2025,,0,,0,true,true,true
 gesla/hollandsebrugtg-hol-nld-cmems,HollandseBrugTG,NL,CMEMS,rws/almere.hollandsebrug cmems/HollandseBrugTG,true,,2014,2026,2000,2026,,0,"2000–2001, 2005–2013",11,false,false,true
 gesla/hollersiel-4960050-deu-wsv,Hollersiel,DE,WSV,pegelonline/4960050,true,,2000,2026,2000,2026,,0,,0,false,true,true
 gesla/hollingsworth_point-8743081-usa-noaa,Hollingsworth Point,US,NOAA,coops/8743081,false,,1979,1980,1979,1980,,0,,0,false,true,true
@@ -2306,7 +2306,7 @@ gesla/hook_island-4688-can-meds,Hook Island,CA,MEDS,,,,1972,1972,,,1972,1,,0,fal
 gesla/hooksielplate-9430020-deu-wsv,Hooksielplate,DE,WSV,pegelonline/9430020,true,,2000,2026,2000,2026,,0,,0,false,true,true
 gesla/hoonah-9452438-usa-noaa,Hoonah,US,NOAA,coops/9452438,false,,2009,2009,,,2009,1,,0,false,true,true
 gesla/hooper_island-6495-can-meds,Hooper Island,CA,MEDS,,,,1970,1970,,,1970,1,,0,false,false,
-gesla/hooper_strait_lighthouse-8571402-usa-noaa,Hooper Strait Lighthouse,US,NOAA,coops/8571402,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/hooper_strait_lighthouse-8571402-usa-noaa,Hooper Strait Lighthouse,US,NOAA,coops/8571402,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/hope_bay_bc-7360-can-meds,Hope Bay BC,CA,MEDS,,,,1961,2016,,,"1961, 2009, 2016",3,,0,false,false,
 gesla/hope_island_ontario-11475-can-meds,Hope Island Ontario,CA,MEDS,,,,1992,1992,,,1992,1,,0,false,false,
 gesla/hopedale-1405-can-meds,Hopedale,CA,MEDS,,,,1950,1984,,,"1950, 1972, 1983–1984",4,,0,false,false,
@@ -2334,7 +2334,7 @@ gesla/houtribsluizennoordtg-hou-nld-cmems,HoutribsluizenNoordTG,NL,CMEMS,rws/lel
 gesla/houtribsluizenzuidtg-hou-nld-cmems,HoutribsluizenZuidTG,NL,CMEMS,rws/lelystad.houtribsluis.zuid cmems/HoutribsluizenZuidTG,true,,2014,2026,1975,2026,,0,1975–2013,39,false,false,true
 gesla/hov-hov-dnk-cmems,Hov,DK,CMEMS,dmi/22598 cmems/Hov,true,,2011,2026,2011,2026,,0,,0,false,false,true
 gesla/hovell_pile-60721-aus-bom,Hovell Pile,AU,BOM,,,,1991,2023,,,1991–2023,33,,0,false,false,
-gesla/howe_street_pier-8677406-usa-noaa,Howe Street Pier,US,NOAA,coops/8677406,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/howe_street_pier-8677406-usa-noaa,Howe Street Pier,US,NOAA,coops/8677406,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/howth-how-irl-cmems,Howth,IE,CMEMS,marine-institute/howth-water-level-2 cmems/Howth,true,,2018,2020,2018,2026,,0,,0,false,false,true
 gesla/howth2-how-irl-cmems,Howth2,IE,CMEMS,marine-institute/howth-water-level-1 cmems/Howth2,true,,2020,2026,2018,2026,,0,,0,false,false,true
 gesla/howth_water_level_1-how-irl-mi_c,Howth Water Level 1,IE,MI_C,marine-institute/howth-water-level-1 cmems/Howth2,true,,2018,2026,2018,2026,,0,,0,false,true,true
@@ -2361,9 +2361,9 @@ gesla/hudson_river_at_south_dock_at_west_point_ny-1374019-usa-usgs,Hudson River 
 gesla/hudson_river_below_poughkeepsie_ny-1372058-usa-usgs,Hudson River Below Poughkeepsie Ny,US,USGS,usgs/01372058,true,,1993,2019,2025,2026,1993–2019,27,2025–2026,2,false,true,true
 gesla/hudson_river_near_poughkeepsie_ny-1372043-usa-usgs,Hudson River Near Poughkeepsie Ny,US,USGS,usgs/01372043,true,,2012,2025,2012,2026,,0,2026,1,false,true,true
 gesla/huelvatg-hue-esp-cmems,HuelvaTG,ES,CMEMS,cmems/HuelvaTG,false,,1996,2026,1996,2026,,0,,0,false,false,true
-gesla/huibertgat-hui-nld-rws,Huibertgat,NL,RWS,rws/huibertgat cmems/HuibertgatTG,true,,1972,2026,1972,2026,,0,,0,false,true,true
-gesla/huibertgat-huibgt-nld-rws_hist,Huibertgat,NL,RWS_HIST,rws/huibertgat cmems/HuibertgatTG,true,,1972,2018,1972,2026,,0,,0,false,true,true
-gesla/huibertgattg-hui-nld-cmems,HuibertgatTG,NL,CMEMS,rws/huibertgat cmems/HuibertgatTG,true,,2014,2026,1972,2026,,0,,0,false,false,true
+gesla/huibertgat-hui-nld-rws,Huibertgat,NL,RWS,rws/huibertgat cmems/HuibertgatTG,true,,1972,2026,1972,2026,,0,,0,true,true,true
+gesla/huibertgat-huibgt-nld-rws_hist,Huibertgat,NL,RWS_HIST,rws/huibertgat cmems/HuibertgatTG,true,,1972,2018,1972,2026,,0,,0,true,true,true
+gesla/huibertgattg-hui-nld-cmems,HuibertgatTG,NL,CMEMS,rws/huibertgat cmems/HuibertgatTG,true,,2014,2026,1972,2026,,0,,0,true,false,true
 gesla/humboldt_bay_ca-576a-usa-uhslc_rq,Humboldt Bay CA,US,UHSLC_RQ,coops/9418767,true,uhslc/576a,1977,2021,1977,2026,,0,,0,false,true,true
 gesla/hump_island-9458964-usa-noaa,Hump Island,US,NOAA,coops/9458964,false,,2003,2003,,,2003,1,,0,false,true,true
 gesla/hundsmhlen-4960020-deu-wsv,Hundsmhlen,DE,WSV,pegelonline/4960020,true,,2000,2026,2000,2026,,0,,0,false,true,true
@@ -2386,7 +2386,7 @@ gesla/hyde_parker_island-66770-can-meds,Hyde Parker Island,CA,MEDS,,,,1979,1979,
 gesla/hyperite_point-66605-can-meds,Hyperite Point,CA,MEDS,,,,1981,1981,,,1981,1,,0,false,false,
 gesla/i_10_bonnet_carre_floodway-8762483-usa-noaa,I 10 Bonnet Carre Floodway,US,NOAA,coops/8762483,false,,2015,2020,2015,2021,,0,2021,1,false,true,true
 gesla/i_295_bridge-8720357-usa-noaa,I 295 Bridge,US,NOAA,coops/8720357,true,,1997,2026,1997,2026,,0,,0,false,true,true
-gesla/i_526_bridge-8665099-usa-noaa,I 526 Bridge,US,NOAA,coops/8665099,false,,1999,2000,,,1999–2000,2,,0,true,true,true
+gesla/i_526_bridge-8665099-usa-noaa,I 526 Bridge,US,NOAA,coops/8665099,false,,1999,2000,1999,2000,,0,,0,false,true,true
 gesla/i_royal_anselegoff-851a-fra-uhslc_rq,I Royal AnseLegoff,FR,UHSLC_RQ,refmar/127 cmems/IleRoyaleAnseLegoffTG,false,uhslc/851a,1989,2007,1989,2007,,0,,0,false,true,true
 gesla/ibis-ibs-usa-cdwr,Ibis,US,CDWR,cdec/IBS,true,,1994,2023,2009,2023,"1994–1998, 2001, 2004–2008",11,,0,false,true,true
 gesla/ibizatg-ibi-esp-cmems,IbizaTG,ES,CMEMS,cmems/IbizaTG,false,,2003,2026,2003,2026,,0,,0,false,false,true
@@ -2413,12 +2413,12 @@ gesla/ijgeulstroompaal1tg-ijg-nld-cmems,IJgeulstroompaal1TG,NL,CMEMS,rws/ijgeul.
 gesla/ijmondstroompaaltg-ijm-nld-cmems,IJmondstroompaalTG,NL,CMEMS,rws/ijgeul.1 cmems/IJgeulstroompaal1TG cmems/IJmondstroompaalTG,true,,2014,2026,2002,2026,,0,,0,false,false,true
 gesla/ijmuiden_buitenhaven-ijm-nld-rws,IJmuiden buitenhaven,NL,RWS,rws/ijmuiden.buitenhaven cmems/IjmuidenTG,true,,1980,2026,1980,2026,,0,,0,false,true,true
 gesla/ijmuiden_buitenhaven-ijmdbthvn-nld-rws_hist,Ijmuiden buitenhaven,NL,RWS_HIST,rws/ijmuiden.buitenhaven cmems/IjmuidenTG,true,,1980,2018,1980,2026,,0,,0,false,true,true
-gesla/ijmuiden_havenhoofd_zuid-ijm-nld-rws,IJmuiden havenhoofd zuid,NL,RWS,rws/ijmuiden.havenhoofd.zuid,true,,1975,2006,1975,2006,,0,,0,false,true,true
+gesla/ijmuiden_havenhoofd_zuid-ijm-nld-rws,IJmuiden havenhoofd zuid,NL,RWS,rws/ijmuiden.havenhoofd.zuid,true,,1975,2006,1975,2006,,0,,0,true,true,true
 gesla/ijmuiden_noordersluis-ijmdndss-nld-rws_hist,Ijmuiden Noordersluis,NL,RWS_HIST,rws/ijmuiden.noordersluis.west,true,,1924,1983,1924,2026,,0,,0,false,true,true
 gesla/ijmuiden_noordersluis_west-ijm-nld-rws,IJmuiden noordersluis west,NL,RWS,rws/ijmuiden.noordersluis.west,true,,1924,2026,1924,2026,,0,,0,false,true,true
 gesla/ijmuiden_semafoor-ijm-nld-rws,IJmuiden semafoor,NL,RWS,rws/ijmuiden.semafoor,true,,1970,1978,1970,1978,,0,,0,false,true,true
 gesla/ijmuiden_semafoor-ijmdsmfr-nld-rws_hist,Ijmuiden semafoor,NL,RWS_HIST,rws/ijmuiden.semafoor,true,,1970,1978,1970,1978,,0,,0,false,true,true
-gesla/ijmuiden_zuidelijk_havenhoofd-ijmdzdlhvhd-nld-rws_hist,Ijmuiden zuidelijk havenhoofd,NL,RWS_HIST,rws/ijmuiden.havenhoofd.zuid,true,,1975,1987,1975,2006,,0,,0,false,true,true
+gesla/ijmuiden_zuidelijk_havenhoofd-ijmdzdlhvhd-nld-rws_hist,Ijmuiden zuidelijk havenhoofd,NL,RWS_HIST,rws/ijmuiden.havenhoofd.zuid,true,,1975,1987,1975,2006,,0,,0,true,true,true
 gesla/ijmuidentg-ijm-nld-cmems,IjmuidenTG,NL,CMEMS,rws/ijmuiden.buitenhaven cmems/IjmuidenTG,true,,2014,2026,1980,2026,,0,,0,false,false,true
 gesla/ile_aux_lievres-3140-can-meds,Ile Aux Lievres,CA,MEDS,,,,1963,1977,,,"1963, 1967, 1977",3,,0,false,false,
 gesla/ile_brion-41987-can-meds,Ile Brion,CA,MEDS,,,,1984,1984,,,1984,1,,0,false,false,
@@ -2461,7 +2461,7 @@ gesla/indian_river_at_rosedale_beach_de-1484540-usa-usgs,Indian River At Rosedal
 gesla/indian_river_at_wabasso_fl-2251800-usa-usgs,Indian River At Wabasso Fl,US,USGS,usgs/02251800,true,,2010,2025,2007,2026,,0,"2007–2009, 2026",4,false,true,true
 gesla/indian_river_bay_inlet_near_bethany_beach_de-1484683-usa-usgs,Indian River Bay Inlet Near Bethany Beach De,US,USGS,usgs/01484683,true,,2007,2014,2014,2026,2007–2013,7,2015–2026,12,false,true,true
 gesla/indian_river_inlet-8558690-usa-noaa,Indian River Inlet,US,NOAA,coops/8558690,false,,1977,1986,1977,1986,,0,,0,false,true,true
-gesla/indian_river_inlet-8558695-usa-noaa,Indian River Inlet,US,NOAA,coops/8558695,false,,1981,1982,,,1981–1982,2,,0,true,true,true
+gesla/indian_river_inlet-8558695-usa-noaa,Indian River Inlet,US,NOAA,coops/8558695,false,,1981,1982,1981,1982,,0,,0,false,true,true
 gesla/indiana_harbor_in-9087042-usa-noaa,Indiana Harbor In,US,NOAA,coops/9087042,false,,2017,2017,,,2017,1,,0,false,true,true
 gesla/indiantown-75-can-meds,Indiantown,CA,MEDS,,,,1966,1970,,,1966–1970,5,,0,false,false,
 gesla/inenew_passage-4735-can-meds,Inenew Passage,CA,MEDS,,,,1976,1976,,,1976,1,,0,false,false,
@@ -2557,7 +2557,7 @@ gesla/jennis_bay_bc-8384-can-meds,Jennis Bay BC,CA,MEDS,,,,1964,1964,,,1964,1,,0
 gesla/jeremie-405-hti-uhslc_fd,Jeremie,HT,UHSLC_FD,uhslc/405,false,,2022,2022,2022,2022,,0,,0,false,true,true
 gesla/jervis_bay-216470-aus-bom,Jervis Bay,AU,BOM,,,,1989,2024,,,1989–2024,36,,0,false,false,
 gesla/jervis_bay-60440-aus-bom,jervis bay,AU,BOM,,,,1971,2011,,,"1971, 1980–1988, 2010–2011",12,,0,false,false,
-gesla/jesters_island-8630111-usa-noaa,Jesters Island,US,NOAA,coops/8630111,false,,1985,1985,,,1985,1,,0,true,true,true
+gesla/jesters_island-8630111-usa-noaa,Jesters Island,US,NOAA,coops/8630111,false,,1985,1985,1985,1985,,0,,0,false,true,true
 gesla/jetty_a-9440572-usa-noaa,Jetty A,US,NOAA,coops/9440572,false,,1997,1997,,,1997,1,,0,false,true,true
 gesla/jewfish_creek_at_us_1_key_largo_fl-251105080231800-usa-usgs,Jewfish Creek At Us 1 Key Largo Fl,US,USGS,usgs/251105080231800,false,,2007,2011,2007,2011,,0,,0,false,true,true
 gesla/jim_creek-9443551-usa-noaa,Jim Creek,US,NOAA,coops/9443551,false,,2016,2016,,,2016,1,,0,false,true,true
@@ -2574,7 +2574,7 @@ gesla/johor_baharu-321a-mys-uhslc_rq,Johor Baharu,MY,UHSLC_RQ,uhslc/321a,false,,
 gesla/jolo-373a-phl-uhslc_rq,Jolo,PH,UHSLC_RQ,uhslc/373a,false,,1984,1995,1984,1995,,0,,0,false,true,true
 gesla/jones_falls_at_mouth_at_baltimore_md-1589485-usa-usgs,Jones Falls At Mouth At Baltimore Md,US,USGS,usgs/01589485,false,,2017,2020,2017,2020,,0,,0,false,true,true
 gesla/jones_tract-b95480-usa-cdwr,Jones Tract,US,CDWR,dwr/B95480,false,,2012,2025,2012,2025,,0,,0,false,true,true
-gesla/jordan_point-8638476-usa-noaa,Jordan Point,US,NOAA,coops/8638476,false,,2012,2012,2012,2012,,0,,0,true,true,true
+gesla/jordan_point-8638476-usa-noaa,Jordan Point,US,NOAA,coops/8638476,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/jordans_point-1267-can-meds,Jordans Point,CA,MEDS,,,,1921,1921,,,1921,1,,0,false,false,
 gesla/jourdan_river_nr_bay_st_louis_ms-2481660-usa-usgs,Jourdan River Nr Bay St Louis Ms,US,USGS,usgs/02481660,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/juan_fernandez-021-chl-uhslc_fd,Juan Fernandez,CL,UHSLC_FD,uhslc/021 uhslc/021a,false,,1985,2026,1977,2026,,0,,0,false,true,true
@@ -2605,7 +2605,7 @@ gesla/kalix_storon-2157-swe-smhi,Kalix Storon,SE,SMHI,smhi/2157 cmems/KalixStoro
 gesla/kalixkarlsborg-kal-swe-cmems,KalixKarlsborg,SE,CMEMS,smhi/35103 cmems/KalixKarlsborg,true,,2019,2026,2009,2026,,0,,0,false,false,true
 gesla/kalixstoron-kal-swe-cmems,KalixStoron,SE,CMEMS,smhi/2157 cmems/KalixStoron,true,,1974,2026,1974,2026,,0,,0,false,false,true
 gesla/kalkgrundtg-kal-deu-cmems,KalkgrundTG,DE,CMEMS,cmems/KalkgrundTG,false,,1997,2026,1997,2026,,0,,0,false,false,true
-gesla/kallosluis_schelde-kal-nld-rws,Kallosluis schelde,NL,RWS,rws/kallosluis.schelde,true,,1989,2026,1989,2026,,0,,0,false,true,true
+gesla/kallosluis_schelde-kal-nld-rws,Kallosluis schelde,NL,RWS,rws/kallosluis.schelde,true,,1989,2026,1989,2026,,0,,0,true,true,true
 gesla/kalmar_sjov-35105-swe-smhi,Kalmar Sjov,SE,SMHI,smhi/35105,true,,2009,2026,2009,2026,,0,,0,false,true,true
 gesla/kalvehave-kal-dnk-cmems,Kalvehave,DK,CMEMS,dmi/9030201 cmems/Kalvehave,true,,2000,2026,2000,2026,,0,,0,false,false,true
 gesla/kamaishi-hd05-jpn-jodc_jcg,Kamaishi,JP,JODC_JCG,jodc/HD05,false,,1953,2025,1953,2025,,0,,0,false,false,false
@@ -2644,12 +2644,12 @@ gesla/kasitsna_bay-9455517-usa-noaa,Kasitsna Bay,US,NOAA,coops/9455517,false,,20
 gesla/kaskinen-kas-fin-cmems,Kaskinen,FI,CMEMS,cmems/Kaskinen,false,,2023,2026,2023,2026,,0,,0,false,false,true
 gesla/kaskinen_adskar-134251-fin-fmi,Kaskinen Adskar,FI,FMI,cmems/Kaskinen,false,,1971,2026,2023,2026,1971–2022,52,,0,false,true,true
 gesla/kasos-kas-grc-cmems,Kasos,GR,CMEMS,cmems/Kasos,false,,2016,2024,2016,2024,,0,,0,false,false,true
-gesla/katerveertg-kat-nld-cmems,KaterveerTG,NL,CMEMS,rws/zwolle.ijssel cmems/KaterveerTG,true,,2015,2026,1813,2026,,0,1813–2014,202,false,false,true
+gesla/katerveertg-kat-nld-cmems,KaterveerTG,NL,CMEMS,rws/zwolle.ijssel cmems/KaterveerTG,true,,2015,2026,1813,2026,,0,1813–2014,202,true,false,true
 gesla/kats_buiten-katsbtn-nld-rws_hist,Kats buiten,NL,RWS_HIST,rws/kats.zandkreeksluis,true,,1970,1986,1970,2025,,0,,0,false,true,true
 gesla/kats_zandkreeksluis-kat-nld-rws,Kats Zandkreeksluis,NL,RWS,rws/kats.zandkreeksluis,true,,1970,2025,1970,2025,,0,,0,false,true,true
 gesla/katsuura-gs11-jpn-jodc_giaj,Katsuura,JP,JODC_GIAJ,jodc/GS11,false,,1967,2023,1967,2023,,0,,0,false,false,false
-gesla/katwijk-katwk-nld-rws_hist,Katwijk,NL,RWS_HIST,rws/katwijkaanzee,true,,1805,1807,1805,1807,,0,,0,false,true,true
-gesla/katwijk_aan_zee-kat-nld-rws,Katwijk aan zee,NL,RWS,rws/katwijkaanzee,true,,1805,1807,1805,1807,,0,,0,false,true,true
+gesla/katwijk-katwk-nld-rws_hist,Katwijk,NL,RWS_HIST,rws/katwijkaanzee,true,,1805,1807,1805,1807,,0,,0,true,true,true
+gesla/katwijk_aan_zee-kat-nld-rws,Katwijk aan zee,NL,RWS,rws/katwijkaanzee,true,,1805,1807,1805,1807,,0,,0,true,true,true
 gesla/katwijk_paal-kat-nld-rws,Katwijk paal,NL,RWS,rws/katwijk.paal,true,,1970,1974,1970,1974,,0,,0,false,true,true
 gesla/katwijk_paal-katwpl-nld-rws_hist,Katwijk paal,NL,RWS_HIST,rws/katwijk.paal,true,,1970,1974,1970,1974,,0,,0,false,true,true
 gesla/kaumalapau_harbor-1614465-usa-noaa,Kaumalapau Harbor,US,NOAA,coops/1614465,false,uhslc/548,2010,2012,,,2010–2012,3,,0,false,true,true
@@ -2732,7 +2732,7 @@ gesla/kings_bay-8679511-usa-noaa,Kings Bay,US,NOAA,coops/8679511,false,,1989,199
 gesla/kings_bay_inside-9454951-usa-noaa,Kings Bay Inside,US,NOAA,coops/9454951,false,,1997,1997,,,1997,1,,0,false,true,true
 gesla/kings_point-8516945-usa-noaa,Kings Point,US,NOAA,coops/8516945,true,,1998,2026,1998,2026,,0,,0,false,true,true
 gesla/kingsborough_cc-8517756-usa-noaa,Kingsborough Cc,US,NOAA,coops/8517756,false,,2015,2015,2015,2015,,0,,0,false,true,true
-gesla/kingsmill-8638424-usa-noaa,Kingsmill,US,NOAA,coops/8638424,false,,2003,2003,2003,2003,,0,,0,true,true,true
+gesla/kingsmill-8638424-usa-noaa,Kingsmill,US,NOAA,coops/8638424,false,,2003,2003,2003,2003,,0,,0,false,true,true
 gesla/kingston_ontario-13988-can-meds,Kingston Ontario,CA,MEDS,,,,1960,2025,,,1960–2025,66,,0,false,false,
 gesla/kingstow-795-vct-uhslc_fd,Kingstow,VC,UHSLC_FD,uhslc/795,false,,2022,2026,2026,2026,2022–2025,4,,0,false,true,true
 gesla/kingsville_ontario-12065-can-meds,Kingsville Ontario,CA,MEDS,,,,1962,2025,,,1962–2025,64,,0,false,false,
@@ -2780,7 +2780,7 @@ gesla/koper_10minute-kop-svn-cmems,KOPER 10minute,SI,CMEMS,cmems/KOPER,false,,20
 gesla/koper_60minute-kop-svn-cmems,KOPER 60minute,SI,CMEMS,cmems/KOPER,false,,2015,2021,2015,2021,,0,,0,false,false,true
 gesla/kornwerderzand_buiten-kornwdzbtn-nld-rws_hist,Kornwerderzand buiten,NL,RWS_HIST,rws/kornwerderzand.waddenzee.buitenhaven cmems/KornwerderzandBuitenTG cmems/KornwerderzandTG,true,,1932,2018,1932,2026,,0,,0,false,true,true
 gesla/kornwerderzand_waddenzee_buitenhaven-kor-nld-rws,Kornwerderzand Waddenzee buitenhaven,NL,RWS,rws/kornwerderzand.waddenzee.buitenhaven cmems/KornwerderzandBuitenTG cmems/KornwerderzandTG,true,,1932,2026,1932,2026,,0,,0,false,true,true
-gesla/kornwerderzandbinnentg-kor-nld-cmems,KornwerderzandBinnenTG,NL,CMEMS,rws/kornwerderzand.ijsselmeer.binnenhaven cmems/KornwerderzandBinnenTG,true,,2015,2026,1971,2026,,0,1971–2014,44,false,false,true
+gesla/kornwerderzandbinnentg-kor-nld-cmems,KornwerderzandBinnenTG,NL,CMEMS,rws/kornwerderzand.ijsselmeer.binnenhaven cmems/KornwerderzandBinnenTG,true,,2015,2026,1971,2026,,0,1971–2014,44,true,false,true
 gesla/kornwerderzandbuitentg-kor-nld-cmems,KornwerderzandBuitenTG,NL,CMEMS,rws/kornwerderzand.waddenzee.buitenhaven cmems/KornwerderzandBuitenTG cmems/KornwerderzandTG,true,,2015,2026,1932,2026,,0,,0,false,false,true
 gesla/kornwerderzandtg-kor-nld-cmems,KornwerderzandTG,NL,CMEMS,rws/kornwerderzand.waddenzee.buitenhaven cmems/KornwerderzandBuitenTG cmems/KornwerderzandTG,true,,2014,2026,1932,2026,,0,,0,false,false,true
 gesla/koroni-kor-grc-cmems,Koroni,GR,CMEMS,cmems/Koroni,false,,2013,2022,2013,2022,,0,,0,false,false,true
@@ -2844,7 +2844,7 @@ gesla/kwajalein-055a-mhl-uhslc_rq,Kwajalein,MH,UHSLC_RQ,coops/1820000,true,uhslc
 gesla/kwajalein-1820000-usa-noaa,Kwajalein,US,NOAA,coops/1820000,true,uhslc/055,1975,2026,1975,2026,,0,,0,false,true,true
 gesla/kwigillinok-9465911-usa-noaa,Kwigillinok,US,NOAA,coops/9465911,false,,2019,2019,,,2019,1,,0,false,true,true
 gesla/kynumpt_hbr_bc-8978-can-meds,Kynumpt Hbr BC,CA,MEDS,,,,1983,1983,,,1983,1,,0,false,false,
-gesla/l91tg-l91-nld-cmems,L91TG,NL,CMEMS,rws/l9 cmems/L91TG,true,,2015,2026,2012,2026,,0,2012–2014,3,false,false,true
+gesla/l91tg-l91-nld-cmems,L91TG,NL,CMEMS,rws/l9 cmems/L91TG,true,,2015,2026,2012,2026,,0,2012–2014,3,true,false,true
 gesla/l_back_river_above_lucknow_canal_nr_limehouse_sc-21989784-usa-usgs,L Back River Above Lucknow Canal Nr Limehouse Sc,US,USGS,usgs/021989784,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/l_cataouatche_at_whiskey_canal_s_of_waggaman_la-2951190901217-usa-usgs,L Cataouatche At Whiskey Canal S Of Waggaman La,US,USGS,usgs/2951190901217,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/l_cornwallis_i-705a-can-uhslc_rq,L Cornwallis I,CA,UHSLC_RQ,,,uhslc/705a,1986,1994,,,1986–1994,9,,0,false,true,
@@ -2880,7 +2880,7 @@ gesla/ladesiradetg_60minute-lad-fra-cmems,LaDesiradeTG 60minute,FR,CMEMS,refmar/
 gesla/ladysmith_bc-7460-can-meds,Ladysmith BC,CA,MEDS,,,,1954,2018,,,"1954–1955, 2012–2018",9,,0,false,false,
 gesla/lae-067a-png-uhslc_rq,Lae,PG,UHSLC_RQ,,,uhslc/067a,1984,1998,,,1984–1998,15,,0,false,true,
 gesla/lae-55980-png-bom,lae,PG,BOM,,,uhslc/067a,1971,2000,,,"1971–1973, 1984–2000",20,,0,false,false,
-gesla/lafayette_river-8638671-usa-noaa,Lafayette River,US,NOAA,coops/8638671,false,,2011,2011,2011,2011,,0,,0,true,true,true
+gesla/lafayette_river-8638671-usa-noaa,Lafayette River,US,NOAA,coops/8638671,false,,2011,2011,2011,2011,,0,,0,false,true,true
 gesla/lafigueirettetg_60minute-laf-fra-cmems,LaFigueiretteTG 60minute,FR,CMEMS,refmar/846 cmems/LaFigueiretteTG,true,,2011,2026,2011,2026,,0,,0,false,false,true
 gesla/lafitte-8761899-usa-noaa,Lafitte,US,NOAA,coops/8761899,false,,1988,1991,1988,1991,,0,,0,false,true,true
 gesla/lagos-233-nga-uhslc_fd,Lagos,NG,UHSLC_FD,coops/7641400,false,uhslc/233 uhslc/233a,2008,2009,1994,1995,2008–2009,2,,0,false,true,true
@@ -2910,7 +2910,7 @@ gesla/lamu-149-ken-uhslc_fd,Lamu,KE,UHSLC_FD,uhslc/149 uhslc/149a,false,,1995,20
 gesla/lamu-149a-ken-uhslc_rq,Lamu,KE,UHSLC_RQ,uhslc/149 uhslc/149a,false,,1989,1991,1989,2026,1990–1991,2,,0,false,true,true
 gesla/lamu-149b-ken-uhslc_rq,Lamu,KE,UHSLC_RQ,uhslc/149 uhslc/149a,false,,1995,2018,1989,2026,,0,,0,false,true,true
 gesla/lanark-8728412-usa-noaa,Lanark,US,NOAA,coops/8728412,false,,1977,1977,,,1977,1,,0,false,true,true
-gesla/lanceford_creek-8720051-usa-noaa,Lanceford Creek,US,NOAA,coops/8720051,false,,1978,1978,,,1978,1,,0,false,true,true
+gesla/lanceford_creek-8720051-usa-noaa,Lanceford Creek,US,NOAA,coops/8720051,false,,1978,1978,1978,1978,,0,,0,false,true,true
 gesla/lancelin-lalan01-aus-bom,lancelin,AU,BOM,,,,1993,2012,,,"1993–1997, 2002–2012",16,,0,false,false,
 gesla/landon-8745555-usa-noaa,Landon,US,NOAA,coops/8745555,false,,1979,1980,,,1979–1980,2,,0,false,true,true
 gesla/landsort-2073-swe-smhi,Landsort,SE,SMHI,smhi/2073 cmems/Landsort1,false,,1886,2006,1886,2006,,0,,0,false,true,true
@@ -3012,7 +3012,7 @@ gesla/les_escoumins-2900-can-meds,Les Escoumins,CA,MEDS,,,,1910,1970,,,"1910, 19
 gesla/les_sables_d_olonne-62-fra-refmar,Les Sables D Olonne,FR,REFMAR,refmar/62 cmems/LesSablesDOlonneTG,true,,1965,2026,1965,2026,,0,,0,false,true,true
 gesla/leslie-1987-can-meds,Leslie,CA,MEDS,,,,1984,1984,,,1984,1,,0,false,false,
 gesla/lessablesdolonnetg_60minute-les-fra-cmems,LesSablesDOlonneTG 60minute,FR,CMEMS,refmar/62 cmems/LesSablesDOlonneTG,true,,1965,2026,1965,2026,,0,,0,false,false,true
-gesla/lester_manor-8636653-usa-noaa,Lester Manor,US,NOAA,coops/8636653,false,,2007,2007,2007,2007,,0,,0,true,true,true
+gesla/lester_manor-8636653-usa-noaa,Lester Manor,US,NOAA,coops/8636653,false,,2007,2007,2007,2007,,0,,0,false,true,true
 gesla/leuchtturmalteweser-9460040-deu-wsv,Leuchtturmalteweser,DE,WSV,pegelonline/9460040 cmems/AlteWeserTG,true,,2000,2026,1995,2026,,0,,0,false,true,true
 gesla/levelock-9465419-usa-noaa,Levelock,US,NOAA,coops/9465419,false,,2019,2019,,,2019,1,,0,false,true,true
 gesla/lewes-8557380-usa-noaa,Lewes,US,NOAA,coops/8557380,true,uhslc/747a,1919,2026,1919,2026,,0,,0,false,true,true
@@ -3081,7 +3081,7 @@ gesla/lobster_cove-8441571-usa-noaa,Lobster Cove,US,NOAA,coops/8441571,false,,19
 gesla/lockeport-430-can-meds,Lockeport,CA,MEDS,,,,1988,1988,,,1988,1,,0,false,false,
 gesla/lockswood_folly_river_nc-loc-usa-ncdem,Lockswood Folly River NC,US,NCDEM,,,,2018,2025,,,2018–2025,8,,0,false,true,
 gesla/locust_point-8725745-usa-noaa,Locust Point,US,NOAA,coops/8725745,false,,1978,1978,,,1978,1,,0,false,true,true
-gesla/lodijkse_gat-lod-nld-rws,Lodijkse Gat,NL,RWS,rws/lodijksegat,true,,1980,1987,1980,1987,,0,,0,false,true,true
+gesla/lodijkse_gat-lod-nld-rws,Lodijkse Gat,NL,RWS,rws/lodijksegat,true,,1980,1987,1980,1987,,0,,0,true,true,true
 gesla/loggerhead_key-8724698-usa-noaa,Loggerhead Key,US,NOAA,coops/8724698,false,,2000,2005,2000,2005,,0,,0,false,true,true
 gesla/loggieville-2033-can-meds,Loggieville,CA,MEDS,,,,1974,1974,,,1974,1,,0,false,false,
 gesla/lomavik-9466328-usa-noaa,Lomavik,US,NOAA,coops/9466328,false,,2010,2010,,,2010,1,,0,false,true,true
@@ -3182,7 +3182,7 @@ gesla/maassluis-maasss-nld-rws_hist,Maassluis,NL,RWS_HIST,rws/maassluis,true,,19
 gesla/maasvlakte_amaliahaven-maa-nld-rws,Maasvlakte Amaliahaven,NL,RWS,rws/maasvlakte.amaliahaven,true,,2013,2026,2013,2026,,0,,0,false,true,true
 gesla/maasvlakte_europahaven-maa-nld-rws,Maasvlakte Europahaven,NL,RWS,rws/maasvlakte.europahaven,true,,2025,2026,2025,2026,,0,,0,false,true,true
 gesla/maasvlakte_hartelhaven-maa-nld-rws,Maasvlakte Hartelhaven,NL,RWS,rws/maasvlakte.hartelhaven,true,,1987,2026,1987,2026,,0,,0,false,true,true
-gesla/maasvlakte_ruim1_km_uit_de_kust-maa-nld-rws,Maasvlakte ruim1 km uit de kust,NL,RWS,rws/maasvlakte.ruim1kmuitdekust,true,,1984,1987,1984,1987,,0,,0,false,true,true
+gesla/maasvlakte_ruim1_km_uit_de_kust-maa-nld-rws,Maasvlakte ruim1 km uit de kust,NL,RWS,rws/maasvlakte.ruim1kmuitdekust,true,,1984,1987,1984,1987,,0,,0,true,true,true
 gesla/macae-719a-bra-uhslc_rq,Macae,BR,UHSLC_RQ,uhslc/719a,false,,2001,2008,2001,2008,,0,,0,false,true,true
 gesla/macau-338a-prt-uhslc_rq,Macau,PT,UHSLC_RQ,uhslc/338a,false,,1978,1985,1978,1985,,0,,0,false,true,true
 gesla/macdonald_point-102-can-meds,Macdonald Point,CA,MEDS,,,,1970,1970,,,1970,1,,0,false,false,
@@ -3358,7 +3358,7 @@ gesla/mayaguez-9759394-usa-noaa,Mayaguez,US,NOAA,coops/9759394,true,uhslc/736a,2
 gesla/mayaguez_pr-736a-pri-uhslc_rq,Mayaguez PR,PR,UHSLC_RQ,coops/9759394,true,uhslc/736a,2008,2021,2008,2026,,0,,0,false,true,true
 gesla/mayottetg_60minute-may-fra-cmems,MayotteTG 60minute,FR,CMEMS,refmar/30 cmems/MayotteTG,true,uhslc/155,1963,2024,1963,2025,,0,2003,1,false,false,true
 gesla/mayport-8720220-usa-da_sat,Mayport,US,DA_SAT,coops/8720220,false,uhslc/753a,1895,1898,1928,2008,1895–1898,4,2008,1,false,true,true
-gesla/mayport-8720224-usa-noaa,Mayport,US,NOAA,coops/8720224,false,,1997,1998,,,1997–1998,2,,0,false,true,true
+gesla/mayport-8720224-usa-noaa,Mayport,US,NOAA,coops/8720224,false,,1997,1998,1997,1998,,0,,0,false,true,true
 gesla/mayport_bar_pilots_dock-8720218-usa-noaa,Mayport Bar Pilots Dock,US,NOAA,coops/8720218,true,,1995,2026,1995,2026,,0,,0,false,true,true
 gesla/mayport_ferry_depot-8720220-usa-noaa,Mayport Ferry Depot,US,NOAA,coops/8720220,false,uhslc/753a,1928,2000,1928,2008,,0,2008,1,false,true,true
 gesla/mayport_fl-753a-usa-uhslc_rq,Mayport FL,US,UHSLC_RQ,coops/8720220,false,uhslc/753a,1928,2000,1928,2008,,0,2008,1,false,true,true
@@ -3426,7 +3426,7 @@ gesla/michigan_city_in-9087038-usa-noaa,Michigan City In,US,NOAA,coops/9087038,f
 gesla/michipicoten_ontario-10750-can-meds,Michipicoten Ontario,CA,MEDS,,,,1962,2025,,,1962–2025,64,,0,false,false,
 gesla/middelharnis-mid-nld-rws,Middelharnis,NL,RWS,rws/middelharnis,true,,1970,1992,1970,1992,,0,,0,false,true,true
 gesla/middelharnis-middhns-nld-rws_hist,Middelharnis,NL,RWS_HIST,rws/middelharnis,true,,1970,1992,1970,1992,,0,,0,false,true,true
-gesla/middle_hoopers_island-8571519-usa-noaa,Middle Hoopers Island,US,NOAA,coops/8571519,false,,1985,1986,,,1985–1986,2,,0,true,true,true
+gesla/middle_hoopers_island-8571519-usa-noaa,Middle Hoopers Island,US,NOAA,coops/8571519,false,,1985,1986,1985,1986,,0,,0,false,true,true
 gesla/middle_r_at_middle_river_ca-11312676-usa-usgs,Middle R At Middle River Ca,US,USGS,usgs/11312676 cdec/BIR dwr/B95468,true,,2007,2025,1987,2026,,0,2026,1,false,true,true
 gesla/middle_r_nr_holt_ca-11312685-usa-usgs,Middle R Nr Holt Ca,US,USGS,cdec/HLT usgs/11312685,true,,2007,2025,2006,2026,,0,2026,1,false,true,true
 gesla/middle_river_above_barrier-mab-usa-cdwr,Middle River Above Barrier,US,CDWR,cdec/MAB,true,,2017,2025,2017,2026,,0,2026,1,false,true,true
@@ -3480,7 +3480,7 @@ gesla/minicoy-153-ind-uhslc_fd,Minicoy,IN,UHSLC_FD,uhslc/153,false,,2011,2025,20
 gesla/minto_head-66124-can-meds,Minto Head,CA,MEDS,,,,1980,1980,,,1980,1,,0,false,false,
 gesla/miri-388a-mys-uhslc_rq,Miri,MY,UHSLC_RQ,uhslc/388a,false,,1992,2015,1992,2015,,0,,0,false,true,true
 gesla/miscou-2090-can-meds,Miscou,CA,MEDS,,,,1964,1964,,,1964,1,,0,false,false,
-gesla/mispillion_river_entrance-8556198-usa-noaa,Mispillion River Entrance,US,NOAA,coops/8556198,false,,1983,1984,,,1983–1984,2,,0,true,true,true
+gesla/mispillion_river_entrance-8556198-usa-noaa,Mispillion River Entrance,US,NOAA,coops/8556198,false,,1983,1984,1983,1984,,0,,0,false,true,true
 gesla/mission_bay-9410196-usa-noaa,Mission Bay,US,NOAA,coops/9410196,false,,2017,2017,,,2017,1,,0,false,true,true
 gesla/mississippi_river_at_baton_rouge_la-7374000-usa-usgs,Mississippi River At Baton Rouge La,US,USGS,usgs/07374000 usace/MVK.Baton_Rouge,true,,2024,2025,1987,2026,,0,"1987–2023, 2026",38,false,true,true
 gesla/mississippi_river_at_belle_chasse_la-7374525-usa-usgs,Mississippi River At Belle Chasse La,US,USGS,usgs/07374525 usace/MVN.Belle_Chasse,true,,2024,2025,2008,2026,,0,"2008–2023, 2026",17,false,true,true
@@ -3507,8 +3507,8 @@ gesla/mobile_river_at_river_mile_310_at_bucks_al-2470629-usa-usgs,Mobile River A
 gesla/mobile_state_docks-8737048-usa-noaa,Mobile State Docks,US,NOAA,coops/8737048,true,,1980,2026,1980,2026,,0,,0,false,true,true
 gesla/mocamedes-238a-ago-uhslc_rq,Mocamedes,AO,UHSLC_RQ,uhslc/238a,false,,1971,1975,1971,1975,,0,,0,false,true,true
 gesla/moda-8775283-usa-noaa,Moda,US,NOAA,coops/8775283,true,,2002,2026,2002,2026,,0,2004–2014,11,false,true,true
-gesla/moerdijk-moe-nld-rws,Moerdijk,NL,RWS,rws/moerdijk,true,,1970,2026,1970,2026,,0,,0,false,true,true
-gesla/moerdijk-moerdk-nld-rws_hist,Moerdijk,NL,RWS_HIST,rws/moerdijk,true,,1970,2018,1970,2026,,0,,0,false,true,true
+gesla/moerdijk-moe-nld-rws,Moerdijk,NL,RWS,rws/moerdijk,true,,1970,2026,1970,2026,,0,,0,true,true,true
+gesla/moerdijk-moerdk-nld-rws_hist,Moerdijk,NL,RWS_HIST,rws/moerdijk,true,,1970,2018,1970,2026,,0,,0,true,true,true
 gesla/moffatt_islands_bc-9325-can-meds,Moffatt Islands BC,CA,MEDS,,,,1967,2016,,,"1967, 2016",2,,0,false,false,
 gesla/moji-9010-jpn-jodc_pahb,Moji,JP,JODC_PAHB,jodc/9010,false,,2011,2023,2011,2023,,0,,0,false,false,false
 gesla/moji-hd17-jpn-jodc_jcg,Moji,JP,JODC_JCG,jodc/HD17,false,,1958,2008,1958,2008,,0,,0,false,false,false
@@ -3646,7 +3646,7 @@ gesla/nantes_salorges-6143-fra-refmar,Nantes Salorges,FR,REFMAR,refmar/6143 cmem
 gesla/nantes_usine_brulee-399-fra-refmar,Nantes Usine Brulee,FR,REFMAR,refmar/399 cmems/NantesUsineBruleeTG,true,,1987,2021,1986,2026,,0,"1986, 2022–2026",6,false,true,true
 gesla/nantessalorgestg_60minute-nan-fra-cmems,NantesSalorgesTG 60minute,FR,CMEMS,refmar/6143 cmems/NantesSalorgesTG,true,,2011,2021,2011,2026,,0,2022–2026,5,false,false,true
 gesla/nantesusinebruleetg_60minute-nan-fra-cmems,NantesUsineBruleeTG 60minute,FR,CMEMS,refmar/399 cmems/NantesUsineBruleeTG,true,,1987,2021,1986,2026,,0,"1986, 2022–2026",6,false,false,true
-gesla/nanticoke-8571477-usa-noaa,Nanticoke,US,NOAA,coops/8571477,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/nanticoke-8571477-usa-noaa,Nanticoke,US,NOAA,coops/8571477,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/nanticoke_river_at_sharptown_md-1488110-usa-usgs,Nanticoke River At Sharptown Md,US,USGS,usgs/01488110,true,,2007,2013,2013,2026,2007–2012,6,2014–2026,13,false,true,true
 gesla/nantucket_island-8449130-usa-noaa,Nantucket Island,US,NOAA,coops/8449130,true,uhslc/743a,1965,2026,1965,2026,,0,,0,false,true,true
 gesla/nantucket_ma-743a-usa-uhslc_rq,Nantucket MA,US,UHSLC_RQ,coops/8449130,true,uhslc/743a,1965,2021,1965,2026,,0,,0,false,true,true
@@ -3685,7 +3685,7 @@ gesla/nauru-004a-nru-uhslc_rq,Nauru,NR,UHSLC_RQ,bom/004,false,uhslc/004 uhslc/00
 gesla/nauru-004b-nru-uhslc_rq,Nauru,NR,UHSLC_RQ,bom/004,false,uhslc/004 uhslc/004a,1993,2021,1996,2026,"1993–1995, 1997–2004, 2015–2018",15,,0,false,true,true
 gesla/nauru-67640-nru-bom,Nauru,NR,BOM,bom/004,false,uhslc/004 uhslc/004a,1993,2023,1996,2026,"1993–1995, 1997–2004, 2015–2018",15,,0,false,false,true
 gesla/navarre_beach-8729678-usa-noaa,Navarre Beach,US,NOAA,coops/8729678,false,,1980,1989,1980,1989,,0,,0,false,true,true
-gesla/navy_seaplane_basin_boathouse-8577385-usa-noaa,Navy Seaplane Basin Boathouse,US,NOAA,coops/8577385,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/navy_seaplane_basin_boathouse-8577385-usa-noaa,Navy Seaplane Basin Boathouse,US,NOAA,coops/8577385,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/nawiliwili-058-usa-uhslc_fd,Nawiliwili,US,UHSLC_FD,coops/1611400,true,uhslc/058,1954,2026,1954,2026,,0,,0,false,true,true
 gesla/nawiliwili-058a-usa-uhslc_rq,Nawiliwili,US,UHSLC_RQ,coops/1611400,true,uhslc/058,1954,2021,1954,2026,,0,,0,false,true,true
 gesla/nawiliwili-1611400-usa-noaa,Nawiliwili,US,NOAA,coops/1611400,true,uhslc/058,1954,2026,1954,2026,,0,,0,false,true,true
@@ -3724,15 +3724,15 @@ gesla/new_castle-8551201-usa-noaa,New Castle,US,NOAA,coops/8551201,false,,1985,1
 gesla/new_haven-8465705-usa-noaa,New Haven,US,NOAA,coops/8465705,true,,1999,2026,1999,2026,,0,,0,false,true,true
 gesla/new_london-8461490-usa-noaa,New London,US,NOAA,coops/8461490,true,uhslc/744a,1938,2026,1938,2026,,0,,0,false,true,true
 gesla/new_london_ct-744a-usa-uhslc_rq,New London CT,US,UHSLC_RQ,coops/8461490,true,uhslc/744a,1938,2021,1938,2026,,0,,0,false,true,true
-gesla/new_point-8637289-usa-noaa,New Point,US,NOAA,coops/8637289,false,,1982,1982,1982,1982,,0,,0,true,true,true
-gesla/new_point-8637590-usa-noaa,New Point,US,NOAA,coops/8637590,false,,1981,1981,1981,1981,,0,,0,true,true,true
+gesla/new_point-8637289-usa-noaa,New Point,US,NOAA,coops/8637289,false,,1982,1982,1982,1982,,0,,0,false,true,true
+gesla/new_point-8637590-usa-noaa,New Point,US,NOAA,coops/8637590,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/new_river_at_sc_46_near_hardeeville_sc-217689150-usa-usgs,New River At Sc 46 Near Hardeeville Sc,US,USGS,usgs/0217689150,true,,2024,2025,2024,2026,,0,2026,1,false,true,true
 gesla/new_river_at_sunday_bay_fl-2290940-usa-usgs,New River At Sunday Bay Fl,US,USGS,usgs/02290940,false,,2007,2013,2007,2013,,0,,0,false,true,true
 gesla/new_river_burnt_bridge_road-10134-usa-nwfwmd,New River Burnt Bridge Road,US,NWFWMD,,,,2013,2024,,,2013–2024,12,,0,false,false,
 gesla/new_river_canal_east_of_sorrento_la-73802284-usa-usgs,New River Canal East Of Sorrento La,US,USGS,usgs/073802284,true,,2017,2025,2017,2026,,0,2026,1,false,true,true
 gesla/new_river_near_gum_branch_nc-2093000-usa-usgs,New River Near Gum Branch Nc,US,USGS,usgs/02093000,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/new_rochelle-8518490-usa-noaa,New Rochelle,US,NOAA,coops/8518490,false,,1976,1994,1976,1994,,0,,0,false,true,true
-gesla/new_smyrna_beach-8721164-usa-noaa,New Smyrna Beach,US,NOAA,coops/8721164,false,,1999,1999,,,1999,1,,0,false,true,true
+gesla/new_smyrna_beach-8721164-usa-noaa,New Smyrna Beach,US,NOAA,coops/8721164,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/new_westminster_bc-7654-can-meds,New Westminster Bc,CA,MEDS,,,,1969,2025,,,1969–2025,57,,0,false,false,
 gesla/new_york_ny-745a-usa-uhslc_rq,New York NY,US,UHSLC_RQ,coops/8518750,true,uhslc/745a,1920,2021,1920,2026,,0,,0,false,true,true
 gesla/newark_bay_at_pvsc_at_newark_nj-1392650-usa-usgs,Newark Bay At Pvsc At Newark Nj,US,USGS,usgs/01392650,true,,2005,2025,2007,2026,2005–2006,2,2026,1,false,true,true
@@ -3808,7 +3808,7 @@ gesla/norfolk_island-57700-aus-bom,Norfolk Island,AU,BOM,,,uhslc/062b uhslc/062a
 gesla/norfolk_island_decomm-240401-aus-bom,norfolk island decomm,AU,BOM,,,uhslc/062b uhslc/062a,1994,2015,,,1994–2015,22,,0,false,false,
 gesla/norman_bay-1214-can-meds,Norman Bay,CA,MEDS,,,,1995,2000,,,"1995–1996, 2000",3,,0,false,false,
 gesla/north_arm_bc-7634-can-meds,North Arm BC,CA,MEDS,,,,1969,1969,,,1969,1,,0,false,false,
-gesla/north_beach_causeway-8722208-usa-noaa,North Beach Causeway,US,NOAA,coops/8722208,false,,1999,1999,,,1999,1,,0,false,true,true
+gesla/north_beach_causeway-8722208-usa-noaa,North Beach Causeway,US,NOAA,coops/8722208,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/north_calcasieu_lake_near_hackberry_la-8017095-usa-usgs,North Calcasieu Lake Near Hackberry La,US,USGS,usgs/08017095,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/north_cape_otou-ncpt-nzl-ttw,North Cape Otou,NZ,TTW,linz/NCPT,false,,2008,2025,2008,2026,,0,2026,1,false,true,true
 gesla/north_captiva_island-8725488-usa-noaa,North Captiva Island,US,NOAA,coops/8725488,false,,1989,1989,,,1989,1,,0,false,true,true
@@ -3825,7 +3825,7 @@ gesla/north_kopak_island-4548-can-meds,North Kopak Island,CA,MEDS,,,,1975,1976,,
 gesla/north_landing_river_at_marina_near_creeds_va-2043269-usa-usgs,North Landing River At Marina Near Creeds Va,US,USGS,usgs/02043269,true,,2016,2025,2016,2026,,0,2026,1,false,true,true
 gesla/north_mokelumne_r_at_w_walnut_grove_rd-nmr-usa-cdwr,North Mokelumne R At W Walnut Grove Rd,US,CDWR,cdec/NMR usgs/11336685,true,,2010,2025,2010,2026,,0,2026,1,false,true,true
 gesla/north_old_bridge-8531369-usa-noaa,North Old Bridge,US,NOAA,coops/8531369,false,,1975,1977,1975,1977,,0,,0,false,true,true
-gesla/north_point-8574857-usa-noaa,North Point,US,NOAA,coops/8574857,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/north_point-8574857-usa-noaa,North Point,US,NOAA,coops/8574857,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/north_river_upstream_of_cutoff_near_flamingo_fl-22908205-usa-usgs,North River Upstream Of Cutoff Near Flamingo Fl,US,USGS,usgs/022908205,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/north_santee_river_nr_north_santee_sc-2171800-usa-usgs,North Santee River Nr North Santee Sc,US,USGS,usgs/02171800,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/north_secaucus-8530531-usa-noaa,North Secaucus,US,NOAA,coops/8530531,false,,1979,1981,1979,1981,,0,,0,false,true,true
@@ -3866,9 +3866,9 @@ gesla/noumea-019a-fra-uhslc_rq,Noumea,FR,UHSLC_RQ,cmems/NoumeaNumboTG refmar/659
 gesla/noumeanumbotg_60minute-nou-fra-cmems,NoumeaNumboTG 60minute,FR,CMEMS,cmems/NoumeaNumboTG refmar/659,true,uhslc/019,2001,2026,2001,2026,,0,,0,false,false,true
 gesla/nova_zembla_island-3916-can-meds,Nova Zembla Island,CA,MEDS,,,,1988,1988,,,1988,1,,0,false,false,
 gesla/noyo_harbor-9417426-usa-noaa,Noyo Harbor,US,NOAA,coops/9417426,false,,2011,2011,,,2011,1,,0,false,true,true
-gesla/nps_1-8570435-usa-noaa,Nps 1,US,NOAA,coops/8570435,false,,1998,1999,,,1998–1999,2,,0,true,true,true
-gesla/nps_2-8570616-usa-noaa,Nps 2,US,NOAA,coops/8570616,false,,1998,1999,,,1998–1999,2,,0,true,true,true
-gesla/nps_3-8570819-usa-noaa,Nps 3,US,NOAA,coops/8570819,false,,1998,1999,,,1998–1999,2,,0,true,true,true
+gesla/nps_1-8570435-usa-noaa,Nps 1,US,NOAA,coops/8570435,false,,1998,1999,1998,1999,,0,,0,false,true,true
+gesla/nps_2-8570616-usa-noaa,Nps 2,US,NOAA,coops/8570616,false,,1998,1999,1998,1999,,0,,0,false,true,true
+gesla/nps_3-8570819-usa-noaa,Nps 3,US,NOAA,coops/8570819,false,,1998,1999,1998,1999,,0,,0,false,true,true
 gesla/nueces_bay-8775244-usa-noaa,Nueces Bay,US,NOAA,coops/8775244,false,,2012,2024,2014,2024,2012,1,"2014–2015, 2017–2020",6,false,true,true
 gesla/nueces_rv_at_calallen_tx-8211500-usa-usgs,Nueces Rv At Calallen Tx,US,USGS,usgs/08211500,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/nueces_rv_nr_odem_tx-8211502-usa-usgs,Nueces Rv Nr Odem Tx,US,USGS,usgs/08211502,true,,2019,2025,2019,2026,,0,2026,1,false,true,true
@@ -3901,7 +3901,7 @@ gesla/ocean_beach-8532885-usa-noaa,Ocean Beach,US,NOAA,coops/8532885,false,,1976
 gesla/ocean_beach-9410179-usa-noaa,Ocean Beach,US,NOAA,coops/9410179,false,,1994,1994,,,1994,1,,0,false,true,true
 gesla/ocean_city-8570280-usa-noaa,Ocean City,US,NOAA,coops/8570280,false,,1975,1991,1975,1991,,0,1980,1,false,true,true
 gesla/ocean_city_inlet-8570283-usa-noaa,Ocean City Inlet,US,NOAA,coops/8570283,true,,1997,2026,1997,2026,,0,,0,false,true,true
-gesla/ocean_ridge-8722718-usa-noaa,Ocean Ridge,US,NOAA,coops/8722718,false,,1973,1973,,,1973,1,,0,false,true,true
+gesla/ocean_ridge-8722718-usa-noaa,Ocean Ridge,US,NOAA,coops/8722718,false,,1973,1973,,,1973,1,,0,true,true,true
 gesla/ocean_springs-8743281-usa-noaa,Ocean Springs,US,NOAA,coops/8743281,false,,2005,2005,,,2005,1,,0,false,true,true
 gesla/ocean_springs-8743495-usa-noaa,Ocean Springs,US,NOAA,coops/8743495,false,,1979,1980,1979,1980,,0,,0,false,true,true
 gesla/oceanville-8414249-usa-noaa,Oceanville,US,NOAA,coops/8414249,false,,2010,2010,2010,2010,,0,,0,false,true,true
@@ -3932,7 +3932,7 @@ gesla/olands_norra_udde-2083-swe-smhi,Olands Norra Udde,SE,SMHI,smhi/2083 cmems/
 gesla/olandsnorraudde-ola-swe-cmems,OlandsNorraUdde,SE,CMEMS,smhi/2083 cmems/OlandsNorraUdde,true,,1961,2026,1961,2026,,0,,0,false,false,true
 gesla/olcott_ny-9052076-usa-noaa,Olcott Ny,US,NOAA,coops/9052076,true,,1967,2026,1967,2026,1997–1999,3,,0,false,true,true
 gesla/old_brazos_rv_nr_freeport_tx-8079120-usa-usgs,Old Brazos Rv Nr Freeport Tx,US,USGS,usgs/08079120,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
-gesla/old_ferry_landing-8570509-usa-noaa,Old Ferry Landing,US,NOAA,coops/8570509,false,,1986,1986,,,1986,1,,0,true,true,true
+gesla/old_ferry_landing-8570509-usa-noaa,Old Ferry Landing,US,NOAA,coops/8570509,false,,1986,1986,1986,1986,,0,,0,false,true,true
 gesla/old_fort_bayou-8743181-usa-noaa,Old Fort Bayou,US,NOAA,coops/8743181,false,,1980,1980,,,1980,1,,0,false,true,true
 gesla/old_fort_bayou_at_ocean_springs_ms-2481299-usa-usgs,Old Fort Bayou At Ocean Springs Ms,US,USGS,usgs/02481299,true,,2003,2025,2007,2026,2003–2006,4,2026,1,false,true,true
 gesla/old_harbor-9457527-usa-noaa,Old Harbor,US,NOAA,coops/9457527,false,,2009,2009,,,2009,1,,0,false,true,true
@@ -4080,7 +4080,7 @@ gesla/palma-palm-esp-ieo,Palma,ES,IEO,cmems/PalmadeMallorcaTG,false,,1997,2016,2
 gesla/palmademallorcatg-pal-esp-cmems,PalmadeMallorcaTG,ES,CMEMS,cmems/PalmadeMallorcaTG,false,,2009,2026,2009,2026,,0,,0,false,false,true
 gesla/palmeira-235-cpv-uhslc_fd,Palmeira,CV,UHSLC_FD,uhslc/235,false,,2000,2026,2000,2026,,0,,0,false,true,true
 gesla/palmeira-235a-cpv-uhslc_rq,Palmeira,CV,UHSLC_RQ,uhslc/235,false,,2000,2018,2000,2026,,0,,0,false,true,true
-gesla/palmer_johnson_shipyard-8670893-usa-noaa,Palmer Johnson Shipyard,US,NOAA,coops/8670893,false,,1994,1994,,,1994,1,,0,false,true,true
+gesla/palmer_johnson_shipyard-8670893-usa-noaa,Palmer Johnson Shipyard,US,NOAA,coops/8670893,false,,1994,1994,1994,1994,,0,,0,false,true,true
 gesla/palmyra_island-043-usa-uhslc_fd,Palmyra Island,US,UHSLC_FD,uhslc/043 uhslc/043a,false,,2012,2026,1947,2026,,0,,0,false,true,true
 gesla/palmyra_island-043a-usa-uhslc_rq,Palmyra Island,US,UHSLC_RQ,uhslc/043 uhslc/043a,false,,1947,1949,1947,2026,,0,,0,false,true,true
 gesla/palmyra_island-043b-usa-uhslc_rq,Palmyra Island,US,UHSLC_RQ,uhslc/043 uhslc/043a,false,,2012,2018,1947,2026,,0,,0,false,true,true
@@ -4197,7 +4197,7 @@ gesla/petten_meetraai_07-pet-nld-rws,Petten meetraai 07,NL,RWS,rws/petten.meetra
 gesla/petten_meetraai_08-pet-nld-rws,Petten meetraai 08,NL,RWS,rws/petten.meetraai8,true,,1997,2004,1997,2004,,0,,0,false,true,true
 gesla/petten_meetraai_16-pet-nld-rws,Petten meetraai 16,NL,RWS,rws/petten.meetraai16,true,,2000,2013,2000,2013,,0,,0,false,true,true
 gesla/petten_meetraai_17-pet-nld-rws,Petten meetraai 17,NL,RWS,rws/petten.meetraai17,true,,2000,2013,2000,2013,,0,,0,false,true,true
-gesla/petten_meetraai_18-pet-nld-rws,Petten meetraai 18,NL,RWS,rws/petten.meetraai18,true,,1999,2013,1999,2013,,0,,0,false,true,true
+gesla/petten_meetraai_18-pet-nld-rws,Petten meetraai 18,NL,RWS,rws/petten.meetraai18,true,,1999,2013,1999,2013,,0,,0,true,true,true
 gesla/petten_meetraai_67-pet-nld-rws,Petten meetraai 67,NL,RWS,rws/petten.meetraai67,true,,2011,2013,2011,2013,,0,,0,false,true,true
 gesla/petten_zuid-pet-nld-rws,Petten zuid,NL,RWS,rws/petten.zuid cmems/PettenZuidTG,true,,1977,2017,1977,2017,,0,,0,false,true,true
 gesla/petten_zuid-pettzd-nld-rws_hist,Petten zuid,NL,RWS_HIST,rws/petten.zuid cmems/PettenZuidTG,true,,1977,2017,1977,2017,,0,,0,false,true,true
@@ -4207,7 +4207,7 @@ gesla/philadelphia-8545240-usa-noaa,Philadelphia,US,NOAA,coops/8545240,true,,198
 gesla/philadelphia_pier_11_north-8545530-usa-noaa,Philadelphia Pier 11 North,US,NOAA,coops/8545530,false,,1900,1989,1900,1989,,0,,0,false,true,true
 gesla/philadelphia_temporary_adr-8545534-usa-noaa,Philadelphia Temporary Adr,US,NOAA,coops/8545534,false,,1989,1989,1989,1989,,0,,0,false,true,true
 gesla/phipps_pt-8417087-usa-noaa,Phipps Pt,US,NOAA,coops/8417087,false,,2015,2015,2015,2015,,0,,0,false,true,true
-gesla/phoenix_park-8720225-usa-noaa,Phoenix Park,US,NOAA,coops/8720225,false,,1977,1978,,,1977–1978,2,,0,false,true,true
+gesla/phoenix_park-8720225-usa-noaa,Phoenix Park,US,NOAA,coops/8720225,false,,1977,1978,1977,1978,,0,,0,false,true,true
 gesla/pictou-1630-can-meds,Pictou,CA,MEDS,,,,1896,2017,,,"1896, 1957–1959, 1965–1996, 2015–2017",39,,0,false,false,
 gesla/piers_island_bc-7272-can-meds,Piers Island BC,CA,MEDS,,,,1980,1980,,,1980,1,,0,false,false,
 gesla/pietarsaari-pie-fin-cmems,Pietarsaari,FI,CMEMS,cmems/Pietarsaari,false,,2023,2026,2023,2026,,0,,0,false,false,true
@@ -4260,7 +4260,7 @@ gesla/point_lay-9493300-usa-noaa,Point Lay,US,NOAA,coops/9493300,false,,2008,200
 gesla/point_lockwood-9451263-usa-noaa,Point Lockwood,US,NOAA,coops/9451263,false,,2003,2003,,,2003,1,,0,false,true,true
 gesla/point_lonsdale-60730-aus-bom,Point Lonsdale,AU,BOM,,,,1962,2023,,,1962–2023,62,,0,false,false,
 gesla/point_lookout-8516402-usa-noaa,Point Lookout,US,NOAA,coops/8516402,false,,2014,2014,2014,2014,,0,,0,false,true,true
-gesla/point_lookout-8578002-usa-noaa,Point Lookout,US,NOAA,coops/8578002,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/point_lookout-8578002-usa-noaa,Point Lookout,US,NOAA,coops/8578002,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/point_lookout_mi-9075045-usa-noaa,Point Lookout Mi,US,NOAA,coops/9075045,false,,2018,2018,,,2018,1,,0,false,true,true
 gesla/point_pelee_ontario-12120-can-meds,Point Pelee Ontario,CA,MEDS,,,,1964,1981,,,"1964–1971, 1973–1981",17,,0,false,false,
 gesla/point_petre_ontario-13750-can-meds,Point Petre Ontario,CA,MEDS,,,,1969,1978,,,1969–1978,10,,0,false,false,
@@ -4293,7 +4293,7 @@ gesla/pollensa-pol-esp-cmems,POLLENSA,ES,CMEMS,cmems/POLLENSA,false,,2015,2016,2
 gesla/pomorie-pom-bgr-cmems,Pomorie,BG,CMEMS,cmems/Pomorie,false,,2011,2018,2011,2018,,0,,0,false,false,true
 gesla/ponce_de_leon_inlet_south-8721147-usa-noaa,Ponce De Leon Inlet South,US,NOAA,coops/8721147,false,,2006,2026,2006,2026,,0,,0,false,true,true
 gesla/pond_inlet-5800-can-meds,Pond Inlet,CA,MEDS,,,,1982,1983,,,1982–1983,2,,0,false,false,
-gesla/pond_point_aberdeen_pg-8574459-usa-noaa,Pond Point Aberdeen PG,US,NOAA,coops/8574459,false,,1995,1995,,,1995,1,,0,true,true,true
+gesla/pond_point_aberdeen_pg-8574459-usa-noaa,Pond Point Aberdeen PG,US,NOAA,coops/8574459,false,,1995,1995,1995,1995,,0,,0,false,true,true
 gesla/ponquogue_point-8512451-usa-noaa,Ponquogue Point,US,NOAA,coops/8512451,false,,1989,2014,1989,2014,,0,,0,false,true,true
 gesla/pont_champlain-15497-can-meds,Pont Champlain,CA,MEDS,,,,1964,1969,,,1964–1969,6,,0,false,false,
 gesla/pont_du_brault-6269-fra-refmar,Pont Du Brault,FR,REFMAR,refmar/6269 cmems/PontDuBraultTG,true,,2013,2015,2013,2026,,0,2016–2026,11,false,true,true
@@ -4351,7 +4351,7 @@ gesla/port_chicago-9415144-usa-noaa,Port Chicago,US,NOAA,coops/9415144,true,,197
 gesla/port_clements_bc-9920-can-meds,Port Clements BC,CA,MEDS,,,,1963,1980,,,"1963, 1978, 1980",3,,0,false,false,
 gesla/port_colborne_ontario-12865-can-meds,Port Colborne Ontario,CA,MEDS,,,,1960,2025,,,1960–2025,66,,0,false,false,
 gesla/port_daniel_gascons-2250-can-meds,Port Daniel Gascons,CA,MEDS,,,,1913,1979,,,"1913, 1917, 1941, 1979",4,,0,false,false,
-gesla/port_deposit-8574008-usa-noaa,Port Deposit,US,NOAA,coops/8574008,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/port_deposit-8574008-usa-noaa,Port Deposit,US,NOAA,coops/8574008,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/port_douglas-59040-aus-bom,Port Douglas,AU,BOM,,,,1978,2013,,,"1978, 1987–2013",28,,0,false,false,
 gesla/port_dover_ontario-12710-can-meds,Port Dover Ontario,CA,MEDS,,,,1961,2025,,,1961–2025,65,,0,false,false,
 gesla/port_dufferin-511-can-meds,Port Dufferin,CA,MEDS,,,,1970,1970,,,1970,1,,0,false,false,
@@ -4443,7 +4443,7 @@ gesla/port_walcott_cape_lambert-62550-png-bom,port walcott cape lambert,PG,BOM,,
 gesla/port_washington-8516761-usa-noaa,Port Washington,US,NOAA,coops/8516761,false,,1990,1990,1990,1990,,0,,0,false,true,true
 gesla/port_weller_ontario-13030-can-meds,Port Weller Ontario,CA,MEDS,,,,1960,2025,,,1960–2025,66,,0,false,false,
 gesla/port_welshpool_pier-60590-aus-bom,Port Welshpool Pier,AU,BOM,,,,1977,2023,,,"1977–1982, 1984, 2001–2003, 2006, 2009–2023",26,,0,false,false,
-gesla/port_wentworth-8670424-usa-noaa,Port Wentworth,US,NOAA,coops/8670424,false,,2002,2002,,,2002,1,,0,false,true,true
+gesla/port_wentworth-8670424-usa-noaa,Port Wentworth,US,NOAA,coops/8670424,false,,2002,2002,2002,2002,,0,,0,false,true,true
 gesla/portage_inlet_bc-7125-can-meds,Portage Inlet BC,CA,MEDS,,,,1969,2011,,,"1969, 2011",2,,0,false,false,
 gesla/portage_island-2010-can-meds,Portage Island,CA,MEDS,,,,1963,1975,,,"1963, 1974–1975",3,,0,false,false,
 gesla/portbloctg_60minute-por-fra-cmems,PortBlocTG 60minute,FR,CMEMS,refmar/15 cmems/PortBlocTG,true,,1959,2026,1959,2026,,0,,0,false,false,true
@@ -4507,7 +4507,7 @@ gesla/price_island_bc-9058-can-meds,Price Island BC,CA,MEDS,,,,1998,2010,,,"1998
 gesla/prickley_bay-789-grd-uhslc_fd,Prickley Bay,GD,UHSLC_FD,uhslc/789,false,,2011,2026,2011,2026,,0,,0,false,true,true
 gesla/prickley_bay-789a-grd-uhslc_rq,Prickley Bay,GD,UHSLC_RQ,uhslc/789,false,,2011,2018,2011,2026,,0,,0,false,true,true
 gesla/prideaux_haven_bc-8008-can-meds,Prideaux Haven BC,CA,MEDS,,,,1967,1987,,,"1967, 1976, 1984, 1987",4,,0,false,false,
-gesla/priest_landing-8671315-usa-noaa,Priest Landing,US,NOAA,coops/8671315,false,,1994,1994,,,1994,1,,0,false,true,true
+gesla/priest_landing-8671315-usa-noaa,Priest Landing,US,NOAA,coops/8671315,false,,1994,1994,1994,1994,,0,,0,false,true,true
 gesla/priest_point-9447717-usa-noaa,Priest Point,US,NOAA,coops/9447717,false,,2014,2014,,,2014,1,,0,false,true,true
 gesla/prigi-125-idn-uhslc_fd,Prigi,ID,UHSLC_FD,uhslc/125,false,,2007,2026,2007,2026,,0,,0,false,true,true
 gesla/prigi-125a-idn-uhslc_rq,Prigi,ID,UHSLC_RQ,uhslc/125,false,,2007,2018,2007,2026,,0,,0,false,true,true
@@ -4538,8 +4538,8 @@ gesla/pt_la_rue-121a-syc-uhslc_rq,Pt La Rue,SC,UHSLC_RQ,uhslc/121,false,,1993,20
 gesla/pt_perry-9454729-usa-noaa,Pt Perry,US,NOAA,coops/9454729,false,,1997,1997,,,1997,1,,0,false,true,true
 gesla/ptm3066-ptm-bgr-cmems,PTM3066,BG,CMEMS,cmems/PTM3066,false,,2020,2023,2020,2023,,0,,0,false,false,true
 gesla/puale_bay-9458209-usa-noaa,Puale Bay,US,NOAA,coops/9458209,false,,2000,2001,,,2000–2001,2,,0,false,true,true
-gesla/public_landing-8570649-usa-noaa,Public Landing,US,NOAA,coops/8570649,false,,1985,1985,,,1985,1,,0,true,true,true
-gesla/puddledock-8638489-usa-noaa,Puddledock,US,NOAA,coops/8638489,false,,2003,2003,2003,2003,,0,,0,true,true,true
+gesla/public_landing-8570649-usa-noaa,Public Landing,US,NOAA,coops/8570649,false,,1985,1985,1985,1985,,0,,0,false,true,true
+gesla/puddledock-8638489-usa-noaa,Puddledock,US,NOAA,coops/8638489,false,,2003,2003,2003,2003,,0,,0,false,true,true
 gesla/puerto_angel-672-mex-unam_hist,Puerto Angel,MX,UNAM_HIST,unam/17-cbs,true,uhslc/672a,1962,2015,2026,2026,"1962–1971, 1973–1984, 2012–2015",26,2026,1,false,false,false
 gesla/puerto_angel-672a-mex-uhslc_rq,Puerto Angel,MX,UHSLC_RQ,unam/17-cbs,true,uhslc/672a,1962,1984,2026,2026,1962–1984,23,2026,1,false,true,false
 gesla/puerto_armuelles-304a-pan-uhslc_rq,Puerto Armuelles,PA,UHSLC_RQ,uhslc/304b uhslc/304a,false,,1955,1968,1955,2001,,0,,0,false,true,true
@@ -4587,7 +4587,7 @@ gesla/puertovallarta_radar-19-mex-unam,PuertoVallarta Radar,MX,UNAM,unam/19-rada
 gesla/pugwash-1775-can-meds,Pugwash,CA,MEDS,,,,2015,2016,,,2015–2016,2,,0,false,false,
 gesla/pulpit_harbor-8414888-usa-da_sat,Pulpit Harbor,US,DA_SAT,coops/8414888,false,,1870,1888,1983,1985,1870–1888,19,,0,false,true,true
 gesla/pulpit_harbor-8414888-usa-noaa,Pulpit Harbor,US,NOAA,coops/8414888,false,,1983,1985,1983,1985,,0,,0,false,true,true
-gesla/pumpkin_key-8723506-usa-noaa,Pumpkin Key,US,NOAA,coops/8723506,false,,1987,1987,,,1987,1,,0,false,true,true
+gesla/pumpkin_key-8723506-usa-noaa,Pumpkin Key,US,NOAA,coops/8723506,false,,1987,1987,,,1987,1,,0,true,true,true
 gesla/pumpkin_river_near_goodland_fl-255534081324000-usa-usgs,Pumpkin River Near Goodland Fl,US,USGS,usgs/255534081324000,true,,2010,2025,2007,2026,,0,"2007–2008, 2026",3,false,true,true
 gesla/punchbowl-1217-can-meds,Punchbowl,CA,MEDS,,,,1988,1988,,,1988,1,,0,false,false,
 gesla/pungo_river-pun-usa-ncdem,Pungo River,US,NCDEM,coops/8653395,false,,2024,2025,2021,2022,2024–2025,2,2021–2022,2,false,true,true
@@ -4626,10 +4626,10 @@ gesla/raahe-raa-fin-cmems,Raahe,FI,CMEMS,cmems/Raahe,false,,2023,2026,2023,2026,
 gesla/raahe_lapaluoto-100540-fin-fmi,Raahe Lapaluoto,FI,FMI,cmems/Raahe,false,,1971,2026,2023,2026,1971–2022,52,,0,false,true,true
 gesla/rabaul-010a-png-uhslc_rq,Rabaul,PG,UHSLC_RQ,,,uhslc/010,1966,1997,,,"1966–1971, 1974–1997",30,,0,false,true,
 gesla/rabaul-56200-aus-bom,rabaul,AU,BOM,,,uhslc/010,1966,2003,,,"1966–1971, 1974–2003",36,,0,false,false,
-gesla/raccoon_key_spit-8678124-usa-noaa,Raccoon Key Spit,US,NOAA,coops/8678124,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/raccoon_key_spit-8678124-usa-noaa,Raccoon Key Spit,US,NOAA,coops/8678124,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/racy_point-8720625-usa-noaa,Racy Point,US,NOAA,coops/8720625,false,,1997,2019,1997,2019,,0,2006,1,false,true,true
 gesla/rae_island-6492-can-meds,Rae Island,CA,MEDS,,,,1974,1974,,,1974,1,,0,false,false,
-gesla/ragged_key_no_5-8723355-usa-noaa,Ragged Key No 5,US,NOAA,coops/8723355,false,,1987,1987,,,1987,1,,0,false,true,true
+gesla/ragged_key_no_5-8723355-usa-noaa,Ragged Key No 5,US,NOAA,coops/8723355,false,,1987,1987,,,1987,1,,0,true,true,true
 gesla/railroad_cut_a_old_r_nr_brentwood__ca-375622121332201-usa-usgs,Railroad Cut A Old R Nr Brentwood Ca,US,USGS,usgs/375622121332201,false,,2021,2022,,,2021–2022,2,,0,false,true,true
 gesla/rainbow_bridge-8770520-usa-noaa,Rainbow Bridge,US,NOAA,coops/8770520,true,,1996,2026,1996,2026,,0,"2004–2011, 2014",9,false,true,true
 gesla/rak_noord-raknd-nld-rws_hist,Rak noord,NL,RWS_HIST,rws/willemstad.hollandschdiep,true,,1970,2018,1970,2026,,0,,0,false,true,true
@@ -4640,13 +4640,13 @@ gesla/ramspolbrugtg-ram-nld-cmems,RamspolbrugTG,NL,CMEMS,rws/ramspolbrug.ramsdie
 gesla/rancocas_creek_at_bridgeboro_nj-1467024-usa-usgs,Rancocas Creek At Bridgeboro Nj,US,USGS,usgs/01467024,true,,2019,2025,2019,2026,,0,2026,1,false,true,true
 gesla/randalls_island-8518643-usa-noaa,Randalls Island,US,NOAA,coops/8518643,false,,1981,2014,1981,2014,,0,,0,false,true,true
 gesla/randers-ran-dnk-cmems,Randers,DK,CMEMS,dmi/22058 cmems/Randers,true,,2011,2026,2011,2026,,0,,0,false,false,true
-gesla/range_a_light-8672667-usa-noaa,Range A Light,US,NOAA,coops/8672667,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/range_a_light-8672667-usa-noaa,Range A Light,US,NOAA,coops/8672667,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/ranger_islet_bc-9418-can-meds,Ranger Islet BC,CA,MEDS,,,,1966,1966,,,1966,1,,0,false,false,
 gesla/rangiroa-78-fra-refmar,Rangiroa,FR,REFMAR,refmar/78 cmems/RangiroaTG,true,uhslc/455,1966,2026,1966,2026,,0,,0,false,true,true
 gesla/rangiroa_atoll-455-fra-uhslc_fd,Rangiroa Atoll,FR,UHSLC_FD,refmar/78 cmems/RangiroaTG,true,uhslc/455,2019,2026,1966,2026,,0,,0,false,true,true
 gesla/rangiroatg_60minute-ran-fra-cmems,RangiroaTG 60minute,FR,CMEMS,refmar/78 cmems/RangiroaTG,true,uhslc/455,1966,2026,1966,2026,,0,,0,false,false,true
 gesla/rappahannock_bend-8635257-usa-noaa,Rappahannock Bend,US,NOAA,coops/8635257,false,,2007,2009,2007,2009,,0,,0,false,true,true
-gesla/rappahannock_light-8632837-usa-noaa,Rappahannock Light,US,NOAA,coops/8632837,false,,2006,2007,,,2006–2007,2,,0,true,true,true
+gesla/rappahannock_light-8632837-usa-noaa,Rappahannock Light,US,NOAA,coops/8632837,false,,2006,2007,2006,2007,,0,,0,false,true,true
 gesla/raritan_bay_at_keansburg_nj-1407081-usa-usgs,Raritan Bay At Keansburg Nj,US,USGS,usgs/01407081,true,,2000,2025,2007,2026,2000–2006,7,2026,1,false,true,true
 gesla/raritan_river_at_south_amboy_nj-1406710-usa-usgs,Raritan River At South Amboy Nj,US,USGS,usgs/01406710,false,,2007,2016,2007,2016,,0,,0,false,true,true
 gesla/rarotonga-023-cok-uhslc_fd,Rarotonga,CK,UHSLC_FD,bom/023,false,uhslc/023 uhslc/023a,1993,2026,1996,2026,"1993–1995, 1997–2004, 2015–2018",15,,0,false,true,true
@@ -4695,7 +4695,7 @@ gesla/reykjavik-288a-isl-uhslc_rq,Reykjavik,IS,UHSLC_RQ,,,uhslc/288,1984,1999,,,
 gesla/reykjavik-reyk-isl-icg,Reykjavik,IS,ICG,,,uhslc/288,1970,2020,,,1970–2020,51,,0,false,true,
 gesla/reynolds_channel_at_point_lookout_ny-1310740-usa-usgs,Reynolds Channel At Point Lookout Ny,US,USGS,usgs/01310740,true,,1997,2025,2007,2026,1997–2006,10,2026,1,false,true,true
 gesla/rhodes_port-rho-grc-cmems,Rhodes Port,GR,CMEMS,cmems/Rhodes-Port,false,,2021,2022,2021,2022,,0,,0,false,false,true
-gesla/ribaut_island-8668918-usa-noaa,Ribaut Island,US,NOAA,coops/8668918,false,,1996,1997,,,1996–1997,2,,0,false,true,true
+gesla/ribaut_island-8668918-usa-noaa,Ribaut Island,US,NOAA,coops/8668918,false,,1996,1997,1996,1997,,0,,0,false,true,true
 gesla/ribetg-rib-dnk-cmems,RibeTG,DK,CMEMS,dmi/9006701 cmems/RibeTG,true,,2015,2026,1972,2026,,0,1972–2014,43,false,false,true
 gesla/richard-150-fra-refmar,Richard,FR,REFMAR,refmar/150 cmems/RichardTG,true,,1967,2015,1967,2026,,0,"2005, 2016–2026",12,false,true,true
 gesla/richardson-9449982-usa-noaa,Richardson,US,NOAA,coops/9449982,false,,1997,2000,1997,2000,,0,,0,false,true,true
@@ -4704,7 +4704,7 @@ gesla/richardtg_60minute-ric-fra-cmems,RichardTG 60minute,FR,CMEMS,refmar/150 cm
 gesla/richibucto_cape-1820-can-meds,Richibucto Cape,CA,MEDS,,,,1970,1973,,,"1970, 1973",2,,0,false,false,
 gesla/richmond-8417208-usa-noaa,Richmond,US,NOAA,coops/8417208,false,,2005,2005,2005,2005,,0,,0,false,true,true
 gesla/richmond-9414863-usa-noaa,Richmond,US,NOAA,coops/9414863,true,,1996,2026,1996,2026,,0,,0,false,true,true
-gesla/richmond_deepwater_terminal-8636941-usa-noaa,Richmond Deepwater Terminal,US,NOAA,coops/8636941,false,,2012,2012,2012,2012,,0,,0,true,true,true
+gesla/richmond_deepwater_terminal-8636941-usa-noaa,Richmond Deepwater Terminal,US,NOAA,coops/8636941,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/richmond_river_locks-8638495-usa-noaa,Richmond River Locks,US,NOAA,coops/8638495,false,,2007,2010,2007,2010,,0,,0,false,true,true
 gesla/rigolet-1280-can-meds,Rigolet,CA,MEDS,,,,1923,1923,,,1923,1,,0,false,false,
 gesla/rigolets_at_hwy_90_near_slidell_la-301001089442600-usa-usgs,Rigolets At Hwy 90 Near Slidell La,US,USGS,usgs/301001089442600,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
@@ -4716,7 +4716,7 @@ gesla/rikiteatg_60minute-rik-fra-cmems,RikiteaTG 60minute,FR,CMEMS,cmems/Rikitea
 gesla/rikiteawharftg_60minute-rik-fra-cmems,RikiteaWharfTG 60minute,FR,CMEMS,refmar/43 cmems/RikiteaWharfTG,true,,1965,2024,1965,2026,,0,"2001, 2007–2011, 2026",7,false,false,true
 gesla/riley_cove_bc-8637-can-meds,Riley Cove BC,CA,MEDS,,,,1986,1987,,,1986–1987,2,,0,false,false,
 gesla/rilland_bath-ril-nld-rws,Rilland Bath,NL,RWS,rws/rilland.bath,true,,1970,2026,1970,2026,,0,,0,false,true,true
-gesla/rilland_bathse_spuisluis_buiten-ril-nld-rws,Rilland Bathse spuisluis buiten,NL,RWS,rws/rilland.bathsespuisluis.buiten,true,,2025,2026,2025,2026,,0,,0,false,true,true
+gesla/rilland_bathse_spuisluis_buiten-ril-nld-rws,Rilland Bathse spuisluis buiten,NL,RWS,rws/rilland.bathsespuisluis.buiten,true,,2025,2026,2025,2026,,0,,0,true,true,true
 gesla/rimouski-2985-can-meds,Rimouski,CA,MEDS,,,,1984,2025,,,1984–2025,42,,0,false,false,
 gesla/rincon_bayou_channel_nr_calallen_tx-8211503-usa-usgs,Rincon Bayou Channel Nr Calallen Tx,US,USGS,usgs/08211503,false,,2007,2019,2007,2019,,0,,0,false,true,true
 gesla/rincon_del_san_jose-8777812-usa-noaa,Rincon Del San Jose,US,NOAA,coops/8777812,true,,2012,2026,2004,2026,,0,2004–2011,8,false,true,true
@@ -4843,7 +4843,7 @@ gesla/rothera-832a-gbr-uhslc_rq,Rothera,GB,UHSLC_RQ,,,uhslc/832a,2002,2018,,,200
 gesla/rothera-rot-gbr-noc,Rothera,GB,NOC,,,uhslc/832a,2002,2018,,,2002–2018,17,,0,false,true,
 gesla/rotterdam-rottdm-nld-rws_hist,Rotterdam,NL,RWS_HIST,rws/rotterdam.nieuwemaas.boerengat cmems/RotterdamTG,true,,1936,2018,1936,2026,,0,,0,false,true,true
 gesla/rotterdam_dintelhaven-rot-nld-rws,Rotterdam Dintelhaven,NL,RWS,rws/rotterdam.dintelhaven,true,,1999,2002,1999,2002,,0,,0,false,true,true
-gesla/rotterdam_ijzerwerkerkade-rot-nld-rws,Rotterdam IJzerwerkerkade,NL,RWS,rws/rotterdam.ijzerwerkerkade,true,,2025,2026,2025,2026,,0,,0,false,true,true
+gesla/rotterdam_ijzerwerkerkade-rot-nld-rws,Rotterdam IJzerwerkerkade,NL,RWS,rws/rotterdam.ijzerwerkerkade,true,,2025,2026,2025,2026,,0,,0,true,true,true
 gesla/rotterdam_kuip-rot-nld-rws,Rotterdam Kuip,NL,RWS,rws/rotterdam.kuip,true,,2023,2025,2023,2025,,0,,0,false,true,true
 gesla/rotterdam_nieuwe_maas_boerengat-rot-nld-rws,Rotterdam Nieuwe Maas Boerengat,NL,RWS,rws/rotterdam.nieuwemaas.boerengat cmems/RotterdamTG,true,,1936,2026,1936,2026,,0,,0,false,true,true
 gesla/rotterdamtg-rot-nld-cmems,RotterdamTG,NL,CMEMS,rws/rotterdam.nieuwemaas.boerengat cmems/RotterdamTG,true,,2015,2026,1936,2026,,0,,0,false,false,true
@@ -4857,7 +4857,7 @@ gesla/rozenburgsesluis_noordzijde-rozbssnzde-nld-rws_hist,Rozenburgsesluis noord
 gesla/rozenburgsesluis_zuidzijde-roz-nld-rws,Rozenburgsesluis zuidzijde,NL,RWS,rws/rozenburgsesluis.zuidzijde,true,,1997,2026,1997,2026,,0,,0,false,true,true
 gesla/rudee_inlet-8639207-usa-noaa,Rudee Inlet,US,NOAA,coops/8639207,false,,2005,2009,2005,2009,,0,,0,false,true,true
 gesla/ruden-9690077-deu-wsv,Ruden,DE,WSV,pegelonline/9690077,true,,2000,2026,2000,2026,,0,,0,false,true,true
-gesla/rumbley-8571266-usa-noaa,Rumbley,US,NOAA,coops/8571266,false,,1981,1981,,,1981,1,,0,true,true,true
+gesla/rumbley-8571266-usa-noaa,Rumbley,US,NOAA,coops/8571266,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/rumford-8453433-usa-noaa,Rumford,US,NOAA,coops/8453433,false,,1994,1994,1994,1994,,0,,0,false,true,true
 gesla/rumoiko-0132-jpn-jodc_pahb,Rumoiko,JP,JODC_PAHB,jodc/0132,false,,1982,2023,1983,2023,1982,1,,0,false,false,false
 gesla/russian_r_a_highway_1_bridge_nr_jenner_ca-11467270-usa-usgs,Russian R A Highway 1 Bridge Nr Jenner Ca,US,USGS,usgs/11467270,true,,2018,2025,2018,2026,,0,2026,1,false,true,true
@@ -4914,7 +4914,7 @@ gesla/sacramento_r_bl_walnut_grove_br_a_walnut_grove_ca-381427121305401-usa-usgs
 gesla/sacramento_r_deep_water_ship_channel_marker_51_ca-11455338-usa-usgs,Sacramento R Deep Water Ship Channel Marker 51 Ca,US,USGS,dwr/B91470Q usgs/11455338,false,,2020,2025,2015,2026,,0,2026,1,false,true,true
 gesla/sacramento_r_deep_water_ship_channel_nr_freeport-11455095-usa-usgs,Sacramento R Deep Water Ship Channel Nr Freeport,US,USGS,usgs/11455095,false,,2018,2025,2018,2025,,0,2020–2021,2,false,true,true
 gesla/sacramento_river_at_bryte-bry-usa-cdwr,Sacramento River At Bryte,US,CDWR,,,,1984,1995,,,1984–1995,12,,0,false,true,
-gesla/sacramento_river_at_bryte_lab-a02104-usa-cdwr,Sacramento River At Bryte Lab,US,CDWR,dwr/A02104,false,,1982,2025,,,1982–2025,44,,0,false,true,true
+gesla/sacramento_river_at_bryte_lab-a02104-usa-cdwr,Sacramento River At Bryte Lab,US,CDWR,dwr/A02104,false,,1982,2025,2025,2026,1982–2024,43,2026,1,false,true,true
 gesla/sacramento_river_at_collinsville-b91110-usa-cdwr,Sacramento River At Collinsville,US,CDWR,dwr/B91110,false,,1982,2025,1982,1999,2009–2025,17,,0,false,true,true
 gesla/sacramento_river_at_freeport-fpt-usa-cdwr,Sacramento River At Freeport,US,CDWR,usgs/11447650,true,,1984,2025,2007,2026,1984–2006,23,2026,1,false,true,true
 gesla/sacramento_river_at_hood-b91780-usa-cdwr,Sacramento River At Hood,US,CDWR,,,,1982,1986,,,1982–1986,5,,0,false,true,
@@ -4991,7 +4991,7 @@ gesla/salina_cruz-394a-mex-uhslc_rq,Salina Cruz,MX,UHSLC_RQ,uhslc/394a,false,,19
 gesla/salinacruz_flotador-20-mex-unam,SalinaCruz Flotador,MX,UNAM,unam/20-flotador,true,,2021,2024,2026,2026,"2021–2022, 2024",3,2026,1,false,false,false
 gesla/salinacruz_nivelcbs-20-mex-unam,SalinaCruz NivelCBS,MX,UNAM,unam/20-cbs,true,,2021,2024,2026,2026,2021–2024,4,2026,1,false,false,false
 gesla/salinacruz_radar-20-mex-unam,SalinaCruz Radar,MX,UNAM,unam/20-radar,true,,2021,2024,2026,2026,2021–2024,4,2026,1,false,false,false
-gesla/salisbury-8571616-usa-noaa,Salisbury,US,NOAA,coops/8571616,false,,1989,1989,,,1989,1,,0,true,true,true
+gesla/salisbury-8571616-usa-noaa,Salisbury,US,NOAA,coops/8571616,false,,1989,1989,1989,1989,,0,,0,false,true,true
 gesla/salisbury_point-8440273-usa-noaa,Salisbury Point,US,NOAA,coops/8440273,false,,1989,1989,1989,1989,,0,,0,false,true,true
 gesla/salt_river_near_crystal_river_fl-2310752-usa-usgs,Salt River Near Crystal River Fl,US,USGS,usgs/02310752,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/saltery_bay_bc-7868-can-meds,Saltery Bay BC,CA,MEDS,,,,1967,2018,,,"1967–1969, 2017–2018",5,,0,false,false,
@@ -5075,7 +5075,7 @@ gesla/sandwich-8447180-usa-noaa,Sandwich,US,NOAA,coops/8447180,false,,1969,2001,
 gesla/sandy_cove-335-can-meds,Sandy Cove,CA,MEDS,,,,1966,1966,,,1966,1,,0,false,false,
 gesla/sandy_cove_bc-7786-can-meds,Sandy Cove BC,CA,MEDS,,,,2009,2025,,,2009–2025,17,,0,false,false,
 gesla/sandy_hook-8531680-usa-noaa,Sandy Hook,US,NOAA,coops/8531680,true,,1910,2026,1910,2026,,0,,0,false,true,true
-gesla/sandy_island-8661703-usa-noaa,Sandy Island,US,NOAA,coops/8661703,false,,1975,1976,,,1975–1976,2,,0,true,true,true
+gesla/sandy_island-8661703-usa-noaa,Sandy Island,US,NOAA,coops/8661703,false,,1975,1976,1975,1976,,0,,0,false,true,true
 gesla/sandy_point-8414692-usa-noaa,Sandy Point,US,NOAA,coops/8414692,false,,1984,1984,1984,1984,,0,,0,false,true,true
 gesla/sandy_point-8459479-usa-noaa,Sandy Point,US,NOAA,coops/8459479,false,,1987,1988,1987,1988,,0,,0,false,true,true
 gesla/sandy_point_anderson_island-9446804-usa-noaa,Sandy Point Anderson Island,US,NOAA,coops/9446804,false,,2015,2015,,,2015,1,,0,false,true,true
@@ -5131,7 +5131,7 @@ gesla/savannah_river_at_garden_city_ga-21989715-usa-usgs,Savannah River At Garde
 gesla/savannah_river_at_usace_dock_at_savannah_ga-21989773-usa-usgs,Savannah River At Usace Dock At Savannah Ga,US,USGS,usgs/021989773,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/savannah_river_i_95_near_port_wentworth_ga-2198840-usa-usgs,Savannah River I 95 Near Port Wentworth Ga,US,USGS,usgs/02198840,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/savoonga-9468258-usa-noaa,Savoonga,US,NOAA,coops/9468258,false,,2011,2011,,,2011,1,,0,false,true,true
-gesla/saxis-8633777-usa-noaa,Saxis,US,NOAA,coops/8633777,false,,1988,1988,,,1988,1,,0,true,true,true
+gesla/saxis-8633777-usa-noaa,Saxis,US,NOAA,coops/8633777,false,,1988,1988,1988,1988,,0,,0,false,true,true
 gesla/sayreville-8531390-usa-noaa,Sayreville,US,NOAA,coops/8531390,false,,1976,1977,1976,1977,,0,,0,false,true,true
 gesla/scarborough-sca-gbr-cco,Scarborough,GB,CCO,cco/111 cmems/ScarboroughTG,true,,2012,2026,2006,2026,,0,2006–2011,6,false,true,true
 gesla/scarboroughtg-sca-gbr-cmems,ScarboroughTG,GB,CMEMS,cco/111 cmems/ScarboroughTG,true,,2012,2026,2006,2026,,0,2006–2011,6,false,false,true
@@ -5160,7 +5160,7 @@ gesla/schulau-5950090-deu-wsv,Schulau,DE,WSV,pegelonline/5950090,true,,2000,2026
 gesla/sciacca-sci-ita-ispra,Sciacca,IT,ISPRA,,,,2012,2026,,,2012–2026,15,,0,false,true,
 gesla/scituate-8445138-usa-noaa,Scituate,US,NOAA,coops/8445138,false,,1990,1990,1990,1990,,0,,0,false,true,true
 gesla/scotch_cap-9462808-usa-noaa,Scotch Cap,US,NOAA,coops/9462808,false,,2009,2009,,,2009,1,,0,false,true,true
-gesla/scotland-8638433-usa-noaa,Scotland,US,NOAA,coops/8638433,false,,2003,2003,2003,2003,,0,,0,true,true,true
+gesla/scotland-8638433-usa-noaa,Scotland,US,NOAA,coops/8638433,false,,2003,2003,2003,2003,,0,,0,false,true,true
 gesla/scott_base-663a-nzl-uhslc_rq,Scott Base,NZ,UHSLC_RQ,linz/SCOT,false,uhslc/663a,2001,2017,2016,2026,"2001–2006, 2010–2015",12,2025–2026,2,false,true,true
 gesla/scott_base_antarctica-scot-nzl-ttw,Scott Base Antarctica,NZ,TTW,linz/SCOT,false,uhslc/663a,2016,2024,2016,2026,,0,2025–2026,2,false,true,true
 gesla/scraggy_island-9451805-usa-noaa,Scraggy Island,US,NOAA,coops/9451805,false,,2002,2004,,,2002–2004,3,,0,false,true,true
@@ -5292,7 +5292,7 @@ gesla/sirevagtg-sir-nor-cmems,SirevagTG,NO,CMEMS,kartverket/SIE cmems/SirevagTG,
 gesla/sisal-416-mex-unam_hist,Sisal,MX,UNAM_HIST,unam/10-radar,true,,2011,2013,2026,2026,2011–2013,3,2026,1,false,false,false
 gesla/sisal_radar-10-mex-unam,Sisal Radar,MX,UNAM,unam/10-radar,true,,2021,2024,2026,2026,2021–2024,4,2026,1,false,false,false
 gesla/sisimiut-296a-dnk-uhslc_rq,Sisimiut,DK,UHSLC_RQ,uhslc/296a,false,,1991,1998,1991,1998,,0,,0,false,true,true
-gesla/sisters_creek-8720196-usa-noaa,Sisters Creek,US,NOAA,coops/8720196,false,,1977,1978,,,1977–1978,2,,0,false,true,true
+gesla/sisters_creek-8720196-usa-noaa,Sisters Creek,US,NOAA,coops/8720196,false,,1977,1978,1977,1978,,0,,0,false,true,true
 gesla/sitka-9451600-usa-noaa,Sitka,US,NOAA,coops/9451600,true,uhslc/559,1938,2026,1938,2026,,0,,0,false,true,true
 gesla/sitka_ak-559-usa-uhslc_fd,Sitka AK,US,UHSLC_FD,coops/9451600,true,uhslc/559,1938,2026,1938,2026,,0,,0,false,true,true
 gesla/sitka_ak-559a-usa-uhslc_rq,Sitka AK,US,UHSLC_RQ,coops/9451600,true,uhslc/559,1938,2021,1938,2026,,0,,0,false,true,true
@@ -5311,7 +5311,7 @@ gesla/skanor-ska-swe-cmems,Skanor,SE,CMEMS,smhi/30488 cmems/Skanor,true,,1992,20
 gesla/skerries_harbour-ske-irl-mi_c,Skerries Harbour,IE,MI_C,marine-institute/skerries-harbour cmems/SkerriesHarbour,true,,2006,2026,2006,2026,,0,,0,false,true,true
 gesla/skerriesharbour-ske-irl-cmems,SkerriesHarbour,IE,CMEMS,marine-institute/skerries-harbour cmems/SkerriesHarbour,true,,2013,2014,2006,2026,,0,,0,false,false,true
 gesla/skerry_bay_bc-7985-can-meds,Skerry Bay BC,CA,MEDS,,,,1978,1978,,,1978,1,,0,false,false,
-gesla/skidaway_institute-8671086-usa-noaa,Skidaway Institute,US,NOAA,coops/8671086,false,,1994,1994,,,1994,1,,0,false,true,true
+gesla/skidaway_institute-8671086-usa-noaa,Skidaway Institute,US,NOAA,coops/8671086,false,,1994,1994,1994,1994,,0,,0,false,true,true
 gesla/skopelos-sko-grc-cmems,Skopelos,GR,CMEMS,cmems/Skopelos,false,,2021,2022,2021,2026,,0,2026,1,false,false,true
 gesla/skrine_creek_near_mcclellenville_sc-2171920-usa-usgs,Skrine Creek Near Mcclellenville Sc,US,USGS,usgs/02171920,true,,2017,2025,2017,2026,,0,2026,1,false,true,true
 gesla/skull_creek_near_hilton_head_sc-2176582-usa-usgs,Skull Creek Near Hilton Head Sc,US,USGS,usgs/02176582,true,,2022,2025,2022,2026,,0,2026,1,false,true,true
@@ -5356,7 +5356,7 @@ gesla/souris-1650-can-meds,Souris,CA,MEDS,,,,1964,1975,,,"1964, 1975",2,,0,false
 gesla/south_amboy_raritan_river-8531232-usa-noaa,South Amboy Raritan River,US,NOAA,coops/8531232,false,,1980,1981,1980,1981,,0,,0,false,true,true
 gesla/south_arm-9454652-usa-noaa,South Arm,US,NOAA,coops/9454652,false,,1998,1998,,,1998,1,,0,false,true,true
 gesla/south_beach-9435380-usa-noaa,South Beach,US,NOAA,coops/9435380,true,uhslc/592,1967,2026,1967,2026,,0,,0,false,true,true
-gesla/south_beach_causeway-8722219-usa-noaa,South Beach Causeway,US,NOAA,coops/8722219,false,,2000,2000,,,2000,1,,0,false,true,true
+gesla/south_beach_causeway-8722219-usa-noaa,South Beach Causeway,US,NOAA,coops/8722219,false,,2000,2000,2000,2000,,0,,0,false,true,true
 gesla/south_beach_or-592-usa-uhslc_fd,South Beach OR,US,UHSLC_FD,coops/9435380,true,uhslc/592,1967,2026,1967,2026,,0,,0,false,true,true
 gesla/south_beach_or-592a-usa-uhslc_rq,South Beach OR,US,UHSLC_RQ,coops/9435380,true,uhslc/592,1967,2021,1967,2026,,0,,0,false,true,true
 gesla/south_caicos-720a-gbr-uhslc_rq,South Caicos,GB,UHSLC_RQ,uhslc/720a,false,,1992,1992,1992,1992,,0,,0,false,true,true
@@ -5365,11 +5365,11 @@ gesla/south_carrabelle_beach-8728488-usa-noaa,South Carrabelle Beach,US,NOAA,coo
 gesla/south_jamesport-8512735-usa-noaa,South Jamesport,US,NOAA,coops/8512735,false,,1988,2007,1988,2007,,0,,0,false,true,true
 gesla/south_mokelumne_r_at_w_walnut_grove_rd-smr-usa-cdwr,South Mokelumne R At W Walnut Grove Rd,US,CDWR,cdec/SMR dwr/B94150 usgs/11336680,true,,2010,2017,2010,2026,,0,2026,1,false,true,true
 gesla/south_norwalk-8468448-usa-noaa,South Norwalk,US,NOAA,coops/8468448,false,,2002,2002,2002,2002,,0,,0,false,true,true
-gesla/south_ossabaw_island-8673171-usa-noaa,South Ossabaw Island,US,NOAA,coops/8673171,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/south_ossabaw_island-8673171-usa-noaa,South Ossabaw Island,US,NOAA,coops/8673171,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/south_padre_island_cg_station-8779748-usa-noaa,South Padre Island Cg Station,US,NOAA,coops/8779748,true,,1993,2026,1993,2026,,0,2004–2014,11,false,true,true
 gesla/south_pass-8760551-usa-noaa,South Pass,US,NOAA,coops/8760551,false,uhslc/764a,1980,1999,1980,1999,,0,,0,false,true,true
 gesla/south_pass_la-764a-usa-uhslc_rq,South Pass LA,US,UHSLC_RQ,coops/8760551,false,uhslc/764a,1993,1999,1980,1999,,0,,0,false,true,true
-gesla/south_point-8570536-usa-noaa,South Point,US,NOAA,coops/8570536,false,,1985,1985,,,1985,1,,0,true,true,true
+gesla/south_point-8570536-usa-noaa,South Point,US,NOAA,coops/8570536,false,,1985,1985,1985,1985,,0,,0,false,true,true
 gesla/south_port_everglades-8722956-usa-noaa,South Port Everglades,US,NOAA,coops/8722956,true,,2018,2026,2018,2026,,0,,0,false,true,true
 gesla/south_san_diego_bay-9410135-usa-noaa,South San Diego Bay,US,NOAA,coops/9410135,false,,2017,2017,,,2017,1,,0,false,true,true
 gesla/south_santee_r_at_state_pier_nr_mcclellanville_sc-2171905-usa-usgs,South Santee R At State Pier Nr Mcclellanville Sc,US,USGS,usgs/02171905,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
@@ -5397,7 +5397,7 @@ gesla/spikarna-spi-swe-cmems,Spikarna,SE,CMEMS,smhi/2061 cmems/Spikarna,true,,19
 gesla/split-spl-hrv-eseas,Split,HR,ESEAS,,,,1956,1959,,,1956–1959,4,,0,false,true,
 gesla/split_island_north-4632-can-meds,Split Island North,CA,MEDS,,,,1983,1983,,,1983,1,,0,false,false,
 gesla/spodsbjerg-spo-dnk-cmems,Spodsbjerg,DK,CMEMS,cmems/Spodsbjerg,false,,1991,2005,1991,2005,,0,,0,false,false,true
-gesla/spooldersluistg-spo-nld-cmems,SpooldersluisTG,NL,CMEMS,rws/zwolle.zwartewater.kanaal cmems/SpooldersluisTG,true,,2014,2026,1963,2026,,0,1963–2013,51,false,false,true
+gesla/spooldersluistg-spo-nld-cmems,SpooldersluisTG,NL,CMEMS,rws/zwolle.zwartewater.kanaal cmems/SpooldersluisTG,true,,2014,2026,1963,2026,,0,1963–2013,51,true,false,true
 gesla/spooners_creek-8656467-usa-noaa,Spooners Creek,US,NOAA,coops/8656467,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/spring_bay-335-aus-uhslc_fd,Spring Bay,AU,UHSLC_FD,bom/335,false,uhslc/335,1985,2026,1996,2026,"1985–1995, 1997–2004, 2015–2018",23,,0,false,true,true
 gesla/spring_bay-335a-aus-uhslc_rq,Spring Bay,AU,UHSLC_RQ,bom/335,false,uhslc/335,1985,2021,1996,2026,"1985–1995, 1997–2004, 2015–2018",23,,0,false,true,true
@@ -5406,7 +5406,7 @@ gesla/spring_creek_near_spring_creek_fl-2327031-usa-usgs,Spring Creek Near Sprin
 gesla/spring_warrior_creek-8727843-usa-noaa,Spring Warrior Creek,US,NOAA,coops/8727843,false,,1978,1978,,,1978,1,,0,false,true,true
 gesla/springmaid_pier-8661070-usa-noaa,Springmaid Pier,US,NOAA,coops/8661070,true,,1976,2026,1976,2026,,0,,0,false,true,true
 gesla/sproat_narrows_bc-8564-can-meds,Sproat Narrows BC,CA,MEDS,,,,1971,1971,,,1971,1,,0,false,false,
-gesla/spruit-spr-nld-rws,Spruit,NL,RWS,rws/spruit,true,,1994,1997,1994,1997,,0,,0,false,true,true
+gesla/spruit-spr-nld-rws,Spruit,NL,RWS,rws/spruit,true,,1994,1997,1994,1997,,0,,0,true,true,true
 gesla/spuyten_duyvil_ck-8518903-usa-noaa,Spuyten Duyvil Ck,US,NOAA,coops/8518903,false,,1981,1981,1981,1981,,0,,0,false,true,true
 gesla/squamish_bc-7810-can-meds,Squamish BC,CA,MEDS,,,,1961,2006,,,"1961, 1973, 2006",3,,0,false,false,
 gesla/squamish_inner_bc-7811-can-meds,Squamish Inner BC,CA,MEDS,,,,1961,1962,,,1961–1962,2,,0,false,false,
@@ -5451,12 +5451,12 @@ gesla/st_louis_du_sud-406-hti-uhslc_fd,St Louis du Sud,HT,UHSLC_FD,uhslc/406,fal
 gesla/st_lucie_estuary_at_a1a_steele_ptstuart_fl-2277110-usa-usgs,St Lucie Estuary At A1A Steele PtStuart Fl,US,USGS,usgs/02277110,true,,2011,2025,2007,2026,,0,"2007–2010, 2026",5,false,true,true
 gesla/st_lucie_river_at_speedy_point_stuart_fl-2277100-usa-usgs,St Lucie River At Speedy Point Stuart Fl,US,USGS,usgs/02277100,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/st_marys-860-can-meds,St Marys,CA,MEDS,,,,1972,1974,,,"1972, 1974",2,,0,false,false,
-gesla/st_marys-8679964-usa-noaa,St Marys,US,NOAA,coops/8679964,false,,1977,1978,,,1977–1978,2,,0,false,true,true
+gesla/st_marys-8679964-usa-noaa,St Marys,US,NOAA,coops/8679964,false,,1977,1978,1977,1978,,0,,0,false,true,true
 gesla/st_marys-stm-gbr-bodc,St Marys,GB,BODC,ea/E72339 bodc/stm cmems/StMarys,true,,1976,2026,1994,2026,1976,1,,0,false,true,true
 gesla/st_marys-stm-gbr-da_idh,St Marys,GB,DA_IDH,ea/E72339 bodc/stm cmems/StMarys,true,,1968,1989,1994,2026,"1968–1969, 1973, 1975, 1977–1978, 1987–1989",9,,0,false,true,true
 gesla/st_marys_river_at_ferry_landing_near_folkston_ga-2231175-usa-usgs,St Marys River At Ferry Landing Near Folkston Ga,US,USGS,usgs/02231175,true,,2016,2025,2016,2026,,0,2026,1,false,true,true
 gesla/st_marys_river_at_i_95_near_kingsland_ga-2231254-usa-usgs,St Marys River At I 95 Near Kingsland Ga,US,USGS,usgs/02231254,true,,2010,2025,2010,2026,,0,2026,1,false,true,true
-gesla/st_michaels-8572342-usa-noaa,St Michaels,US,NOAA,coops/8572342,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/st_michaels-8572342-usa-noaa,St Michaels,US,NOAA,coops/8572342,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/st_patrick_bay-3788-can-meds,St Patrick Bay,CA,MEDS,,,,1975,1975,,,1975,1,,0,false,false,
 gesla/st_petersburg-8726520-usa-noaa,St Petersburg,US,NOAA,coops/8726520,true,uhslc/759a,1925,2026,1946,2026,1925–1926,2,,0,false,true,true
 gesla/st_petersburg_beach_south_end-8726430-usa-noaa,St Petersburg Beach South End,US,NOAA,coops/8726430,false,,1995,1995,,,1995,1,,0,false,true,true
@@ -5470,8 +5470,8 @@ gesla/stamp_narrows_bc-8570-can-meds,Stamp Narrows BC,CA,MEDS,,,,1971,1971,,,197
 gesla/stanley-sta-gbr-noc,Stanley,GB,NOC,,,uhslc/290 uhslc/290a,1992,2014,,,1992–2014,23,,0,false,true,
 gesla/stanovan_bc-7747-can-meds,Stanovan BC,CA,MEDS,,,,1963,2002,,,"1963, 1977, 2001–2002",4,,0,false,false,
 gesla/starling_creek_at_port_of_saxis_at_saxis_va-1484938-usa-usgs,Starling Creek At Port Of Saxis At Saxis Va,US,USGS,usgs/01484938,false,,2015,2025,2015,2026,,0,2026,1,false,true,true
-gesla/state_road_312-8720582-usa-noaa,State Road 312,US,NOAA,coops/8720582,false,,2003,2004,,,2003–2004,2,,0,false,true,true
-gesla/state_road_a1a_bridge-8720692-usa-noaa,State Road A1A Bridge,US,NOAA,coops/8720692,false,,2003,2004,,,2003–2004,2,,0,false,true,true
+gesla/state_road_312-8720582-usa-noaa,State Road 312,US,NOAA,coops/8720582,false,,2003,2004,1999,2005,,0,"1999, 2002, 2005",3,false,true,true
+gesla/state_road_a1a_bridge-8720692-usa-noaa,State Road A1A Bridge,US,NOAA,coops/8720692,false,,2003,2004,2003,2004,,0,,0,false,true,true
 gesla/stavanger-svg-nor-nhs,Stavanger,NO,NHS,kartverket/SVG cmems/StavangerTG,true,,1918,2026,1918,2026,,0,,0,false,true,true
 gesla/stavangertg-sta-nor-cmems,StavangerTG,NO,CMEMS,kartverket/SVG cmems/StavangerTG,true,,1918,2026,1918,2026,,0,,0,false,false,true
 gesla/stavenisse-sta-nld-rws,Stavenisse,NL,RWS,rws/stavenisse,true,,1970,2026,1970,2026,,0,,0,false,true,true
@@ -5552,7 +5552,7 @@ gesla/summerstown_ontario-14940-can-meds,Summerstown Ontario,CA,MEDS,,,,1962,202
 gesla/sumner-sumt-nzl-ttw,Sumner,NZ,TTW,linz/SUMT,false,,2010,2020,2010,2022,,0,"2012–2013, 2021–2022",4,false,true,true
 gesla/sumoto-ma32-jpn-jodc_jma,Sumoto,JP,JODC_JMA,jma/ST,false,,1964,2024,1937,2026,,0,"1937–1945, 1947–1963, 2025–2026",28,false,false,true
 gesla/sunatsu-9012-jpn-jodc_pahb,Sunatsu,JP,JODC_PAHB,jodc/9012,false,,2011,2023,2011,2023,,0,,0,false,false,false
-gesla/sunbury-8672875-usa-noaa,Sunbury,US,NOAA,coops/8672875,false,,2012,2012,,,2012,1,,0,false,true,true
+gesla/sunbury-8672875-usa-noaa,Sunbury,US,NOAA,coops/8672875,false,,2012,2012,2012,2012,,0,,0,false,true,true
 gesla/sunny_point-8658579-usa-noaa,Sunny Point,US,NOAA,coops/8658579,false,,1976,1976,1976,1976,,0,,0,false,true,true
 gesla/sunnyvale_east_channel_below_caribbean_drive-sun-usa-cm,Sunnyvale East Channel below Caribbean Drive,US,CM,,,,2021,2024,,,2021–2024,4,,0,false,false,
 gesla/sunrise_club-snc-usa-cdwr,Sunrise Club,US,CDWR,cdec/SNC,true,,1994,2025,2009,2026,1994–2008,15,2026,1,false,true,true
@@ -5729,7 +5729,7 @@ gesla/tickfaw_river_near_springfield_la-7376300-usa-usgs,Tickfaw River Near Spri
 gesla/tidal_creek-9413643-usa-noaa,Tidal Creek,US,NOAA,coops/9413643,false,,2008,2008,,,2008,1,,0,false,true,true
 gesla/tigalda_bay-9462782-usa-noaa,Tigalda Bay,US,NOAA,coops/9462782,false,,2010,2012,,,"2010, 2012",2,,0,false,true,true
 gesla/tignish-1875-can-meds,Tignish,CA,MEDS,,,,1916,1916,,,1916,1,,0,false,false,
-gesla/tilghman_island-8571979-usa-noaa,Tilghman Island,US,NOAA,coops/8571979,false,,1983,1983,,,1983,1,,0,true,true,true
+gesla/tilghman_island-8571979-usa-noaa,Tilghman Island,US,NOAA,coops/8571979,false,,1983,1983,1983,1983,,0,,0,false,true,true
 gesla/tilting_harbour-1049-can-meds,Tilting Harbour,CA,MEDS,,,,1968,1989,,,"1968–1970, 1989",4,,0,false,false,
 gesla/timaru-665a-nzl-uhslc_rq,Timaru,NZ,UHSLC_RQ,uhslc/665a,false,,1987,2024,1987,2024,,0,,0,false,true,true
 gesla/timmendorfpoel-9630007-deu-wsv,Timmendorfpoel,DE,WSV,pegelonline/9630007 cmems/TimmendorfPoelTG,true,,2000,2026,1997,2026,,0,,0,false,true,true
@@ -5818,7 +5818,7 @@ gesla/trondheimtg-tro-nor-cmems,TrondheimTG,NO,CMEMS,kartverket/TRD cmems/Trondh
 gesla/troup_passage_bc-8981-can-meds,Troup Passage BC,CA,MEDS,,,,1968,1968,,,1968,1,,0,false,false,
 gesla/trout_cove-334-can-meds,Trout Cove,CA,MEDS,,,,1965,1965,,,1965,1,,0,false,false,
 gesla/trout_creek_at_mouth_near_key_largo_fl-251253080320100-usa-usgs,Trout Creek At Mouth Near Key Largo Fl,US,USGS,usgs/251253080320100,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
-gesla/trout_r-8720213-usa-noaa,Trout R,US,NOAA,coops/8720213,false,,1978,1979,,,1978–1979,2,,0,false,true,true
+gesla/trout_r-8720213-usa-noaa,Trout R,US,NOAA,coops/8720213,false,,1978,1979,1978,1979,,0,,0,false,true,true
 gesla/trout_r_nr_jacksonville_fla-2246621-usa-usgs,Trout R Nr Jacksonville Fla,US,USGS,usgs/02246621,true,,2016,2025,2016,2026,,0,2026,1,false,true,true
 gesla/tsawwassen_bc-7590-can-meds,Tsawwassen BC,CA,MEDS,,,,1967,1978,,,1967–1978,12,,0,false,false,
 gesla/tsehum_harbour_bc-7262-can-meds,Tsehum Harbour Bc,CA,MEDS,,,,1983,1983,,,1983,1,,0,false,false,
@@ -5842,7 +5842,7 @@ gesla/tumaco-303a-col-uhslc_rq,Tumaco,CO,UHSLC_RQ,uhslc/303a,false,,1951,2018,19
 gesla/tumbo_channel_bc-7510-can-meds,Tumbo Channel BC,CA,MEDS,,,,1965,2001,,,"1965, 1967–1976, 2001",12,,0,false,false,
 gesla/turkey_creek_above_huger_sc-2172035-usa-usgs,Turkey Creek Above Huger Sc,US,USGS,usgs/02172035,false,,2007,2024,2007,2024,,0,,0,false,true,true
 gesla/turkey_creek_at_airport_road_at_gulfport_ms-2481251-usa-usgs,Turkey Creek At Airport Road At Gulfport Ms,US,USGS,usgs/02481251,false,,2019,2024,2019,2024,,0,,0,false,true,true
-gesla/turkey_point-8723423-usa-noaa,Turkey Point,US,NOAA,coops/8723423,false,,1993,1993,,,1993,1,,0,false,true,true
+gesla/turkey_point-8723423-usa-noaa,Turkey Point,US,NOAA,coops/8723423,false,,1993,1993,,,1993,1,,0,true,true,true
 gesla/turkey_point_hudson_river_nerrs-8518962-usa-noaa,Turkey Point Hudson River Nerrs,US,NOAA,coops/8518962,true,,2017,2026,2017,2026,,0,,0,false,true,true
 gesla/turku-tur-fin-cmems,Turku,FI,CMEMS,cmems/Turku,false,,2023,2026,2023,2026,,0,,0,false,false,true
 gesla/turku_ruissalo_saaronniemi-134225-fin-fmi,Turku Ruissalo Saaronniemi,FI,FMI,cmems/Turku,false,,1985,2026,2023,2026,1985–2022,38,,0,false,true,true
@@ -5864,7 +5864,7 @@ gesla/twillingate-1060-can-meds,Twillingate,CA,MEDS,,,,1971,1990,,,"1971, 1988�
 gesla/twin_cove_bc-7022-can-meds,Twin Cove BC,CA,MEDS,,,,2011,2011,,,2011,1,,0,false,false,
 gesla/twin_islands_bc-7892-can-meds,Twin Islands BC,CA,MEDS,,,,1967,1968,,,1967–1968,2,,0,false,false,
 gesla/two_harbor_mn-9099070-usa-noaa,Two Harbor Mn,US,NOAA,coops/9099070,false,,1970,1970,,,1970,1,,0,false,true,true
-gesla/tybee_marina-8671029-usa-noaa,Tybee Marina,US,NOAA,coops/8671029,false,,1995,1996,,,1995–1996,2,,0,false,true,true
+gesla/tybee_marina-8671029-usa-noaa,Tybee Marina,US,NOAA,coops/8671029,false,,1995,1996,1995,1996,,0,,0,false,true,true
 gesla/tysoe_point-6338-can-meds,Tysoe Point,CA,MEDS,,,,1973,1973,,,1973,1,,0,false,false,
 gesla/uapoutg_60minute-uap-fra-cmems,UaPouTG 60minute,FR,CMEMS,refmar/262 cmems/UaPouTG,true,,1988,2025,1988,2026,,0,"2022, 2026",2,false,false,true
 gesla/ubatuba-282a-bra-uhslc_rq,Ubatuba,BR,UHSLC_RQ,uhslc/282a,false,,2013,2017,2013,2017,,0,,0,false,true,true
@@ -5876,7 +5876,7 @@ gesla/uddevalla-udd-swe-cmems,Uddevalla,SE,CMEMS,smhi/2541 cmems/Uddevalla,true,
 gesla/ueckermnde-9690088-deu-wsv,Ueckermnde,DE,WSV,pegelonline/9690088 cmems/UeckermuendeTG,true,,2000,2026,1996,2026,,0,,0,false,true,true
 gesla/ueckermuendetg-uec-deu-cmems,UeckermuendeTG,DE,CMEMS,pegelonline/9690088 cmems/UeckermuendeTG,true,,1996,2026,1996,2026,,0,,0,false,false,true
 gesla/uetersen-5970016-deu-wsv,Uetersen,DE,WSV,pegelonline/5970016,true,,2000,2026,2000,2026,,0,,0,false,true,true
-gesla/uithuizerwad-uit-nld-rws,Uithuizerwad,NL,RWS,rws/uithuizerwad,true,,2008,2026,2008,2026,,0,,0,false,true,true
+gesla/uithuizerwad-uit-nld-rws,Uithuizerwad,NL,RWS,rws/uithuizerwad,true,,2008,2026,2008,2026,,0,,0,true,true,true
 gesla/ulatis_c_nr_elmira_ca-11455268-usa-usgs,Ulatis C Nr Elmira Ca,US,USGS,usgs/11455268,false,,2018,2019,,,2018–2019,2,,0,false,true,true
 gesla/ulladulla-216471-aus-bom,Ulladulla,AU,BOM,,,,2008,2024,,,2008–2024,17,,0,false,false,
 gesla/ullapool-ull-gbr-bodc,Ullapool,GB,BODC,ea/E70439 bodc/ull cmems/Ullapool,true,,1966,2026,1990,2026,"1966–1968, 1970–1972, 1974–1983, 1985–1989",21,,0,false,true,true
@@ -5983,7 +5983,7 @@ gesla/vermilion_river_at_surrey_st_at_lafayette_la-7386880-usa-usgs,Vermilion Ri
 gesla/vermilion_river_near_lafayette_la-7386850-usa-usgs,Vermilion River Near Lafayette La,US,USGS,usgs/07386850,true,,2024,2025,2026,2026,2024–2025,2,2026,1,false,true,true
 gesla/vermillion_rvr_n_of_i_10_at_lafayette_la-7386655-usa-usgs,Vermillion Rvr N Of I 10 At Lafayette La,US,USGS,usgs/07386655,true,,2022,2025,2022,2026,,0,2026,1,false,true,true
 gesla/vernadsky-ver-ukr-noc,Vernadsky,UA,NOC,,,uhslc/700,1984,2018,,,1984–2018,35,,0,false,true,
-gesla/vero_beach-8722125-usa-noaa,Vero Beach,US,NOAA,coops/8722125,false,,1999,1999,,,1999,1,,0,false,true,true
+gesla/vero_beach-8722125-usa-noaa,Vero Beach,US,NOAA,coops/8722125,false,,1999,1999,1999,1999,,0,,0,false,true,true
 gesla/vessey_hamilton_island-66795-can-meds,Vessey Hamilton Island,CA,MEDS,,,,1979,1979,,,1979,1,,0,false,false,
 gesla/vianadocastelotg-via-prt-cmems,VianaDoCasteloTG,PT,CMEMS,cmems/VianaDoCasteloTG,false,,2012,2026,2012,2026,,0,,0,false,false,true
 gesla/vicinity_of_uno_chef_menteur-8761385-usa-noaa,Vicinity Of Uno Chef Menteur,US,NOAA,coops/8761385,false,,2014,2014,,,2014,1,,0,false,true,true
@@ -6005,7 +6005,7 @@ gesla/viken-2228-swe-smhi,Viken,SE,SMHI,smhi/2228 cmems/Viken,true,,1976,2026,19
 gesla/viken-vik-swe-cmems,Viken,SE,CMEMS,smhi/2228 cmems/Viken,true,,1976,2026,1976,2026,,0,,0,false,false,true
 gesla/viker-vik-nor-nhs,Viker,NO,NHS,kartverket/VIK cmems/VikerTG,true,,1991,2026,1990,2026,,0,,0,false,true,true
 gesla/vikertg-vik-nor-cmems,VikerTG,NO,CMEMS,kartverket/VIK cmems/VikerTG,true,,1990,2026,1990,2026,,0,,0,false,false,true
-gesla/vilano_beach_icww-8720554-usa-noaa,Vilano Beach Icww,US,NOAA,coops/8720554,false,,2003,2004,,,2003–2004,2,,0,false,true,true
+gesla/vilano_beach_icww-8720554-usa-noaa,Vilano Beach Icww,US,NOAA,coops/8720554,false,,2003,2004,2003,2007,,0,2005–2007,3,false,true,true
 gesla/villagarciatg-vil-esp-cmems,VillagarciaTG,ES,CMEMS,cmems/VillagarciaTG,false,,1997,2026,1997,2026,,0,,0,false,false,true
 gesla/village_bay_bc-7414-can-meds,Village Bay BC,CA,MEDS,,,,1964,1964,,,1964,1,,0,false,false,
 gesla/village_cove-9464212-usa-noaa,Village Cove,US,NOAA,coops/9464212,true,,2002,2026,2002,2026,,0,,0,false,true,true
@@ -6027,15 +6027,15 @@ gesla/visby-vis-swe-cmems,Visby,SE,CMEMS,smhi/2080 cmems/Visby,true,,1960,2026,1
 gesla/vishakhapatnam-157-ind-uhslc_fd,Vishakhapatnam,IN,UHSLC_FD,uhslc/157,false,,2011,2026,2011,2026,,0,,0,false,true,true
 gesla/vlaardingen-vla-nld-rws,Vlaardingen,NL,RWS,rws/vlaardingen,true,,1970,2026,1970,2026,,0,,0,false,true,true
 gesla/vlaardingen-vlaardgn-nld-rws_hist,Vlaardingen,NL,RWS_HIST,rws/vlaardingen,true,,1970,2018,1970,2026,,0,,0,false,true,true
-gesla/vlakte_van_de_raan-vla-nld-rws,Vlakte van de Raan,NL,RWS,rws/vlaktevanderaan cmems/VlakteVdRaanTG,true,,1983,2026,1983,2026,,0,,0,false,true,true
-gesla/vlaktevdraantg-vla-nld-cmems,VlakteVdRaanTG,NL,CMEMS,rws/vlaktevanderaan cmems/VlakteVdRaanTG,true,,2014,2026,1983,2026,,0,,0,false,false,true
-gesla/vlieland_haven-vli-nld-rws,Vlieland haven,NL,RWS,rws/vlieland.haven cmems/VlielandHavenTG,true,,1943,2026,1943,2026,,0,,0,false,true,true
-gesla/vlieland_haven-vlielhvn-nld-rws_hist,Vlieland haven,NL,RWS_HIST,rws/vlieland.haven cmems/VlielandHavenTG,true,,1943,2018,1943,2026,,0,,0,false,true,true
-gesla/vlielandhaventg-vli-nld-cmems,VlielandHavenTG,NL,CMEMS,rws/vlieland.haven cmems/VlielandHavenTG,true,,2014,2026,1943,2026,,0,,0,false,false,true
+gesla/vlakte_van_de_raan-vla-nld-rws,Vlakte van de Raan,NL,RWS,rws/vlaktevanderaan cmems/VlakteVdRaanTG,true,,1983,2026,1983,2026,,0,,0,true,true,true
+gesla/vlaktevdraantg-vla-nld-cmems,VlakteVdRaanTG,NL,CMEMS,rws/vlaktevanderaan cmems/VlakteVdRaanTG,true,,2014,2026,1983,2026,,0,,0,true,false,true
+gesla/vlieland_haven-vli-nld-rws,Vlieland haven,NL,RWS,rws/vlieland.haven cmems/VlielandHavenTG,true,,1943,2026,1943,2026,,0,,0,true,true,true
+gesla/vlieland_haven-vlielhvn-nld-rws_hist,Vlieland haven,NL,RWS_HIST,rws/vlieland.haven cmems/VlielandHavenTG,true,,1943,2018,1943,2026,,0,,0,true,true,true
+gesla/vlielandhaventg-vli-nld-cmems,VlielandHavenTG,NL,CMEMS,rws/vlieland.haven cmems/VlielandHavenTG,true,,2014,2026,1943,2026,,0,,0,true,false,true
 gesla/vlietepolder-vli-nld-rws,Vlietepolder,NL,RWS,rws/vlietepolder,true,,1970,1984,1970,1984,,0,,0,false,true,true
 gesla/vlietepolder-vlietpdr-nld-rws_hist,Vlietepolder,NL,RWS_HIST,rws/vlietepolder,true,,1970,1984,1970,1984,,0,,0,false,true,true
-gesla/vlissingen-vli-nld-rws,Vlissingen,NL,RWS,rws/vlissingen cmems/VlissingenTG,true,,1863,2026,1863,2026,1966,1,,0,false,true,true
-gesla/vlissingen-vlissgn-nld-rws_hist,Vlissingen,NL,RWS_HIST,rws/vlissingen cmems/VlissingenTG,true,,1863,2018,1863,2026,1966,1,,0,false,true,true
+gesla/vlissingen-vli-nld-rws,Vlissingen,NL,RWS,rws/vlissingen cmems/VlissingenTG,true,,1863,2026,1863,2026,,0,,0,false,true,true
+gesla/vlissingen-vlissgn-nld-rws_hist,Vlissingen,NL,RWS_HIST,rws/vlissingen cmems/VlissingenTG,true,,1863,2018,1863,2026,,0,,0,false,true,true
 gesla/vlissingentg-vli-nld-cmems,VlissingenTG,NL,CMEMS,rws/vlissingen cmems/VlissingenTG,true,,2014,2026,1863,2026,,0,,0,false,false,true
 gesla/volanti-vol-usa-cdwr,Volanti,US,CDWR,cdec/VOL,true,,1997,2025,2009,2026,1997–2008,12,2026,1,false,true,true
 gesla/vreeswijk-vre-nld-rws,Vreeswijk,NL,RWS,rws/vreeswijk,true,,1800,1975,1800,1975,,0,,0,false,true,true
@@ -6109,7 +6109,7 @@ gesla/warren_landing_manitoba-34230-can-meds,Warren Landing Manitoba,CA,MEDS,,,,
 gesla/warrior_point_bc-7275-can-meds,Warrior Point BC,CA,MEDS,,,,2016,2017,,,2016–2017,2,,0,false,false,
 gesla/washington-8594900-usa-noaa,Washington,US,NOAA,coops/8594900,true,,1924,2026,1924,2026,,0,,0,false,true,true
 gesla/washington-8653365-usa-noaa,Washington,US,NOAA,coops/8653365,false,,2012,2012,2012,2012,,0,,0,false,true,true
-gesla/washington_navy_yard-8593005-usa-noaa,Washington Navy Yard,US,NOAA,coops/8593005,false,,1995,1995,,,1995,1,,0,true,true,true
+gesla/washington_navy_yard-8593005-usa-noaa,Washington Navy Yard,US,NOAA,coops/8593005,false,,1995,1995,1995,1995,,0,,0,false,true,true
 gesla/washougal-9440047-usa-noaa,Washougal,US,NOAA,coops/9440047,false,,2016,2016,,,2016,1,,0,false,true,true
 gesla/wasserhorst-4930010-deu-wsv,Wasserhorst,DE,WSV,pegelonline/4930010,true,,2000,2026,2000,2026,,0,,0,false,true,true
 gesla/watch_hill_cove_tide_gage_westerly_ri-411838071513000-usa-usgs,Watch Hill Cove Tide Gage Westerly Ri,US,USGS,usgs/411838071513000,true,,2015,2025,2015,2026,,0,2026,1,false,true,true
@@ -6180,7 +6180,7 @@ gesla/west_ste_modeste-2595-can-meds,West Ste Modeste,CA,MEDS,,,,1969,2000,,,"19
 gesla/west_terschelling-westtslg-nld-rws_hist,West Terschelling,NL,RWS_HIST,rws/terschelling.west,true,,1928,2018,1928,2026,,0,,0,false,true,true
 gesla/westbayharbourtg-wes-gbr-cmems,WestBayHarbourTG,GB,CMEMS,cco/95 cmems/WestBayHarbourTG,true,,2024,2026,2008,2026,,0,2020–2023,4,false,false,true
 gesla/westerly_pawcatuck-8455189-usa-noaa,Westerly Pawcatuck,US,NOAA,coops/8455189,false,,2015,2015,2015,2015,,0,,0,false,true,true
-gesla/western_branch-8638339-usa-noaa,Western Branch,US,NOAA,coops/8638339,false,,2011,2011,2011,2011,,0,,0,true,true,true
+gesla/western_branch-8638339-usa-noaa,Western Branch,US,NOAA,coops/8638339,false,,2011,2011,2011,2011,,0,,0,false,true,true
 gesla/western_port_stony_point-60710-aus-bom,Western Port Stony Point,AU,BOM,bom/993,false,,1963,2023,1996,2026,"1963–1965, 1967–1968, 1981–1995, 1997–2004, 2015–2019",33,2024–2026,3,false,false,true
 gesla/westfield_beach-89-can-meds,Westfield Beach,CA,MEDS,,,,1965,1969,,,1965–1969,5,,0,false,false,
 gesla/westkapelle-wes-nld-rws,Westkapelle,NL,RWS,rws/westkapelle cmems/WestkapelleTG,true,,1970,2026,1970,2026,,0,,0,false,true,true
@@ -6208,7 +6208,7 @@ gesla/white_bear_arm-1202-can-meds,White Bear Arm,CA,MEDS,,,,1971,2000,,,"1971, 
 gesla/white_city-8728853-usa-noaa,White City,US,NOAA,coops/8728853,false,,2008,2011,2008,2011,,0,,0,false,true,true
 gesla/white_rock_bc-7577-can-meds,White Rock BC,CA,MEDS,,,,1972,1972,,,1972,1,,0,false,false,
 gesla/whitefish_point_lake_superior_mi-9099007-usa-noaa,Whitefish Point Lake Superior Mi,US,NOAA,coops/9099007,false,,2018,2018,,,2018,1,,0,false,true,true
-gesla/whitehaven-8571485-usa-noaa,Whitehaven,US,NOAA,coops/8571485,false,,1989,1989,,,1989,1,,0,true,true,true
+gesla/whitehaven-8571485-usa-noaa,Whitehaven,US,NOAA,coops/8571485,false,,1989,1989,1989,1989,,0,,0,false,true,true
 gesla/whiteoak_bayou_at_main_st_houston_tx-8074598-usa-usgs,Whiteoak Bayou At Main St Houston Tx,US,USGS,usgs/08074598,true,,2007,2025,2007,2026,,0,2026,1,false,true,true
 gesla/whiteoakriver_nc24-whi-usa-ncdem,WhiteOakRiver NC24,US,NCDEM,,,,2024,2025,,,2024–2025,2,,0,false,true,
 gesla/whitestone-8517125-usa-noaa,Whitestone,US,NOAA,coops/8517125,false,,1981,1981,1981,1981,,0,,0,false,true,true
@@ -6227,7 +6227,7 @@ gesla/wierumergronden-wiermgdn-nld-rws_hist,Wierumergronden,NL,RWS_HIST,rws/wier
 gesla/wierumergrondentg-wie-nld-cmems,WierumergrondenTG,NL,CMEMS,rws/wierumergronden cmems/WierumergrondenTG,true,,2014,2026,1980,2026,,0,,0,false,false,true
 gesla/wierumerwad-wie-nld-rws,Wierumerwad,NL,RWS,rws/wierumerwad,true,,2008,2022,2008,2022,,0,,0,false,true,true
 gesla/wightman_point_manitoba-34080-can-meds,Wightman Point Manitoba,CA,MEDS,,,,1972,1972,,,1972,1,,0,false,false,
-gesla/wilcox_wharf-8638464-usa-noaa,Wilcox Wharf,US,NOAA,coops/8638464,false,,2010,2010,2010,2010,,0,,0,true,true,true
+gesla/wilcox_wharf-8638464-usa-noaa,Wilcox Wharf,US,NOAA,coops/8638464,false,,2010,2010,2010,2010,,0,,0,false,true,true
 gesla/wildwood_crest-8535835-usa-noaa,Wildwood Crest,US,NOAA,coops/8535835,false,,1975,1976,1975,1976,,0,,0,false,true,true
 gesla/wilhelmshaventg-wil-deu-cmems,WilhelmshavenTG,DE,CMEMS,pegelonline/9440020 cmems/WilhelmshavenTG,true,,1999,2026,1999,2026,,0,,0,false,false,true
 gesla/wilkinson_bayou_cutoff_north_of_wilkinson_bay_la-292939089544400-usa-usgs,Wilkinson Bayou Cutoff North Of Wilkinson Bay La,US,USGS,usgs/292939089544400,true,,2019,2024,2021,2026,2019–2020,2,2025–2026,2,false,true,true
@@ -6316,7 +6316,7 @@ gesla/yolo_bypass_at_liberty_island_canal-b91511-usa-cdwr,Yolo Bypass At Liberty
 gesla/yolo_bypass_near_lisbon_weir-b91560-usa-cdwr,Yolo Bypass Near Lisbon Weir,US,CDWR,,,,1982,2025,,,1982–2025,44,,0,false,true,
 gesla/yoman_point-9446705-usa-noaa,Yoman Point,US,NOAA,coops/9446705,false,,1996,1996,,,1996,1,,0,false,true,true
 gesla/yonaguni-ma76-jpn-jodc_jma,Yonaguni,JP,JODC_JMA,jma/YJ,false,,1996,2024,1996,2026,,0,2025–2026,2,false,false,true
-gesla/york_spit_light-8637722-usa-noaa,York Spit Light,US,NOAA,coops/8637722,false,,2002,2002,2002,2002,,0,,0,true,true,true
+gesla/york_spit_light-8637722-usa-noaa,York Spit Light,US,NOAA,coops/8637722,false,,2002,2002,2002,2002,,0,,0,false,true,true
 gesla/yorke_island_bc-8233-can-meds,Yorke Island BC,CA,MEDS,,,,1944,1945,,,1944–1945,2,,0,false,false,
 gesla/yorktown_uscg_training_center-8637689-usa-noaa,Yorktown Uscg Training Center,US,NOAA,coops/8637689,true,,2004,2026,2004,2026,,0,,0,false,true,true
 gesla/yoshima-7315-jpn-jodc_pahb,Yoshima,JP,JODC_PAHB,jodc/7315,false,,2010,2023,2011,2023,2010,1,,0,false,false,false
