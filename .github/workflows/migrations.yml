@@ -68,7 +68,7 @@ jobs:
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
 
-  # A migration that can't run, or sorts before one already started, stops every one after it: one issue says so.
+  # A migration that can't run, or a failure, stops every migration not yet done: one issue says so.
   stopped:
     needs: plan
     if: needs.plan.outputs.stopped != ''
@@ -79,7 +79,7 @@ jobs:
       - run: |
           title="Migrations are stopped"
           open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")
-          [ -n "$open" ] || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "The Migrations workflow stopped: $STOPPED. Every migration after it waits. Close this issue once it's fixed."
+          [ -n "$open" ] || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "The Migrations workflow stopped: $STOPPED. Every migration not yet done waits. Close this issue once it's fixed."
         env:
           STOPPED: ${{ needs.plan.outputs.stopped }}
           GH_TOKEN: ${{ github.token }}
@@ -171,7 +171,7 @@ jobs:
       - if: steps.result.outputs.result == 'failure'
         run: |
           node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
-          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration not yet done waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
         env:
           ID: ${{ needs.plan.outputs.id }}
           STEP: ${{ needs.plan.outputs.step }}
