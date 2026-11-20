@@ -21,7 +21,7 @@ import type { Product } from "../schema.ts";
  *   history/stations/<source>/<time>.parquet            the list as each refresh started, less withheld stations
  *   history/stations/<source>/<time>.json               what that refresh changed
  *   history/analysis/<source>/<time>.json               stations whose QC an analysis changed
- *   recent/<source>.parquet                             last 7 days, every live station and any since retired
+ *   recent/<source>/<YYYY-MM-DD>.parquet                one UTC day of every live station's values, for 30 days
  *   obs/<source>/<station>/<year>.parquet               observed levels
  *   extremes/<source>/<station>/<year>.parquet          the source's observed high and low waters
  *   predictions/<source>/<station>/<year>.parquet       the source's predicted curve
@@ -154,8 +154,28 @@ export function historyPath(
   return `${root}/history/stations/${source}/${time.replaceAll(":", "")}.${ext}`;
 }
 
-export function recentPath(root: string, source: string): string {
-  return `${root}/recent/${source}.parquet`;
+/**
+ * One UTC day of a source's live values, `day` as `YYYY-MM-DD`: the poller rewrites today's hourly and the 6 days
+ * before nightly, and an R2 lifecycle rule deletes it after 30 days (workers/live/README.md, The daily files).
+ */
+export function recentDayPath(root: string, source: string, day: string): string {
+  return `${root}/recent/${source}/${day}.parquet`;
+}
+
+/** The `count` UTC days up to and including `now`'s, oldest first, as `YYYY-MM-DD`. */
+export function recentDays(now: number, count: number): string[] {
+  const today = Math.floor(now / 86_400_000);
+  return Array.from({ length: count }, (_, i) =>
+    new Date((today - count + 1 + i) * 86_400_000).toISOString().slice(0, 10),
+  );
+}
+
+/** The days a daily file is kept, from its last write, before R2's lifecycle rule deletes it. */
+export const RECENT_DAYS = 30;
+
+/** The daily files of the `count` UTC days up to and including `now`'s, oldest first. */
+export function recentDayPaths(root: string, source: string, now: number, count: number): string[] {
+  return recentDays(now, count).map((day) => recentDayPath(root, source, day));
 }
 
 export function stationsPath(root: string): string {

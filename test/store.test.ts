@@ -10,10 +10,11 @@ import {
   readDatums,
   readExtremes,
   readObservations,
-  checkRecent,
   foldObservationFile,
   readObservationFile,
   readRecent,
+  recentEpochs,
+  recentStations,
   readYearStats,
   writeExtremes,
   writeObservations,
@@ -175,13 +176,46 @@ describe("store files", () => {
     assert.deepEqual(await readRecent(path, []), []);
   });
 
-  it("checks a whole recent window can be read, and passes a missing one", async () => {
-    const path = join(root, "recent-check.parquet");
-    await checkRecent(path);
-    await writeRecent(path, [[{ station: "a", time: T, level: 1, flag: Flag.good, epoch: 1 }]]);
-    await checkRecent(path);
-    writeFileSync(path, "not parquet");
-    await assert.rejects(checkRecent(path));
+  it("reads several days' files as one, a missing day as empty", async () => {
+    const days = ["day-1", "day-2", "day-3"].map((d) => join(root, "days", `${d}.parquet`));
+    await writeRecent(days[0]!, [
+      [
+        { station: "a", time: T, level: 1, flag: Flag.good, epoch: 1 },
+        { station: "b", time: T, level: 2, flag: Flag.good, epoch: 1 },
+      ],
+    ]);
+    await writeRecent(days[2]!, [
+      [
+        { station: "a", time: T + 2 * MIN, level: 3, flag: Flag.good, epoch: 2 },
+        { station: "c", time: T + 2 * MIN, level: 4, flag: Flag.good, epoch: 1 },
+      ],
+    ]);
+    assert.deepEqual(
+      (await readRecent(days)).map((r) => [r.station, r.level]),
+      [
+        ["a", 1],
+        ["a", 3],
+        ["b", 2],
+        ["c", 4],
+      ],
+    );
+    assert.deepEqual(
+      (await readRecent(days, ["a"])).map((r) => r.level),
+      [1, 3],
+    );
+    assert.deepEqual(await recentStations(days), ["a", "b", "c"]);
+    assert.deepEqual(
+      await recentEpochs(days),
+      new Map([
+        ["a", 2],
+        ["b", 1],
+        ["c", 1],
+      ]),
+    );
+    assert.deepEqual(await readRecent([days[1]!]), []);
+    // A file that can't be read fails, rather than read as a day with nothing.
+    writeFileSync(days[1]!, "not parquet");
+    await assert.rejects(readRecent(days));
   });
 
   it("writes stations with datums, products, links and epochs", async () => {
