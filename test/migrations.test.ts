@@ -90,7 +90,7 @@ describe("migration problems", () => {
       for (const name of ["20261116-fix-usace.ts", "20261116-fix.ts"])
         await writeFile(join(dir, name), "export default { description: '', steps: [] }");
       assert.deepEqual(
-        (await loadMigrations(pathToFileURL(`${dir}/`), NOW)).map(([id]) => id),
+        (await loadMigrations(pathToFileURL(`${dir}/`))).map(([id]) => id),
         ["20261116-fix", "20261116-fix-usace"],
       );
     } finally {
@@ -99,12 +99,12 @@ describe("migration problems", () => {
   });
 
   it("refuses a file in src/migrations that isn't named to run", async () => {
-    for (const name of ["20261116_fix-ea.ts", "20261131-fix.ts", "20271116-fix.ts"]) {
+    for (const name of ["20261116_fix-ea.ts", "20261131-fix.ts", "fix-ea.ts"]) {
       const dir = await mkdtemp(join(tmpdir(), "migrations-"));
       try {
         await writeFile(join(dir, "README.md"), "");
         await writeFile(join(dir, name), "export default {}");
-        await assert.rejects(loadMigrations(pathToFileURL(`${dir}/`), NOW), new RegExp(name));
+        await assert.rejects(loadMigrations(pathToFileURL(`${dir}/`)), new RegExp(name));
       } finally {
         await rm(dir, { recursive: true, force: true });
       }
@@ -144,7 +144,7 @@ describe("the record", () => {
     assert.equal(next(all, record), null);
   });
 
-  it("begins with the migrations up to the baseline done, and catches one merged later under an earlier name", () => {
+  it("begins with the migrations up to the baseline done, and runs one merged later under an earlier name", () => {
     assert.equal((next(all, begin(all, "20261101-a", NOW)) as { id: string }).id, "20261102-b");
     assert.equal(next(all, begin(all, "20261102-b", NOW)), null);
     assert.equal((next(all, begin(all, "", NOW)) as { id: string }).id, "20261101-a");
@@ -152,10 +152,8 @@ describe("the record", () => {
       ["20261100-late", steps({ ingest: "compact ea" })],
       ...all,
     ];
-    assert.match(
-      (next(late, begin(all, "20261102-b", NOW)) as { stopped: string }).stopped,
-      /20261100-late sorts before 20261102-b/,
-    );
+    // One merged after the record began, under an earlier name, runs.
+    assert.equal((next(late, begin(all, "20261102-b", NOW)) as { id: string }).id, "20261100-late");
   });
 
   it("stops at a migration with fewer steps than its record", () => {
@@ -176,12 +174,56 @@ describe("the record", () => {
     assert.throws(() => skip(failed, all, "20261130-typo", NOW), /no migration/);
   });
 
-  it("stops at a migration that sorts before one already started", () => {
-    const started: Record = {
+  it("runs a migration merged after one named later has run", () => {
+    const later = done(empty, all, "20261102-b", 0, NOW);
+    assert.equal((next(all, later) as { id: string }).id, "20261101-a");
+  });
+
+  it("finishes a migration partway through its steps before starting one merged since", () => {
+    const late: [string, Migration][] = [
+      ["20261100-late", steps({ ingest: "compact ea" })],
+      ...all,
+    ];
+    const partway = done(empty, all, "20261101-a", 0, NOW);
+    assert.deepEqual(next(late, partway), {
+      id: "20261101-a",
+      step: 1,
+      kind: "check",
+      lane: "check",
+      timeout: 10,
+    });
+  });
+
+  it("stops every migration not yet done while one has failed, whatever its name", () => {
+    const late: [string, Migration][] = [
+      ["20261100-late", steps({ ingest: "compact ea" })],
+      ...all,
+    ];
+    const failed = fail(empty, "20261102-b", 0, "exit 1", NOW);
+    assert.deepEqual(next(late, failed), { stopped: "20261102-b failed: exit 1" });
+  });
+
+  it("stops every migration while a failed or unfinished one's file is gone", () => {
+    const renamed = fail(empty, "20261099-old-name", 0, "exit 1", NOW);
+    assert.match((next(all, renamed) as { stopped: string }).stopped, /20261099-old-name failed/);
+    const partway: Record = {
       baseline: "",
-      migrations: [{ id: "20261102-b", step: 0, state: "running", error: null, updated: "" }],
+      migrations: [
+        { id: "20261099-old-name", step: 1, state: "running", error: null, updated: "" },
+      ],
     };
-    assert.match((next(all, started) as { stopped: string }).stopped, /sorts before 20261102-b/);
+    assert.match((next(all, partway) as { stopped: string }).stopped, /no such file/);
+    // Skipping it clears the stop, though its file is gone.
+    assert.equal(
+      (next(all, skip(partway, all, "20261099-old-name", NOW)) as { id: string }).id,
+      "20261101-a",
+    );
+    // A done migration whose file is gone is history, and stops nothing.
+    const gone: Record = {
+      baseline: "",
+      migrations: [{ id: "20261099-old-name", step: 1, state: "done", error: null, updated: "" }],
+    };
+    assert.equal((next(all, gone) as { id: string }).id, "20261101-a");
   });
 
   it("stops at a migration that can't run", () => {
