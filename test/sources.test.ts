@@ -536,6 +536,9 @@ describe("rws", () => {
     );
     for (const code of ["3", "4", "5"])
       await assert.rejects(get(["1", "2", code]), new RegExp(`unknown extreme type ${code}`));
+    // Only the astronomical tide's extremes use the codes.
+    await get(["1", "2", "1"]);
+    await assert.rejects(rws.extremes("pogum", ...range), /unknown extreme type 1/);
   });
 
   it("fails on an extreme type it doesn't know rather than drop it", async () => {
