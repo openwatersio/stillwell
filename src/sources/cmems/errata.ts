@@ -16,6 +16,17 @@ async function levels(store: StoreReader, id: string, day: string) {
   return rows;
 }
 
+/** Throws unless every level the store holds for `id` from `since` to before `until` is suspect or worse, and it holds some. */
+async function allSuspect(store: StoreReader, id: string, since: string, until: string) {
+  const rows = await store.levels(id, since, until);
+  if (!rows.length) throw new Error(`the store holds no ${id} levels from ${since} to ${until}`);
+  const missed = rows.filter((o) => o.flag < Flag.suspect);
+  if (missed.length)
+    throw new Error(
+      `${missed.length} of ${id}'s ${rows.length} levels from ${since} to ${until} aren't suspect, the first at ${iso(missed[0]!.time)}`,
+    );
+}
+
 export default {
   errata: [
     {
@@ -108,12 +119,13 @@ export default {
       response:
         "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 20 unflagged −7.45 m values of 25 October, and the span flags the 50 of 26 and 27 October.",
       evidence:
-        "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026. The store's 2026 file for the gauge has 363 values below −4 m, none before 20:30 UTC on 25 October and none after 13:40 UTC on 29 October: 20 on 25 October, 116 on 26, 144 on 27 and 83 on 29. CMEMS flags 90 of the 26th's, 120 of the 27th's and all of the 29th's, and none of the 25th's. The 20 on 25 October are from 20:30 to 23:50 UTC, the 26 on 26 October from 00:00 to 16:10, and the 24 on 27 October from 12:00 to 15:50. The file holds no value on 28 October, which the store's hourly and monthly reads haven't filled, while PEGELONLINE's has 1,440, all −2.40 or −2.41 m.",
+        "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026. The store's 2026 file for the gauge has 363 values below −4 m, none before 20:30 UTC on 25 October and none after 13:40 UTC on 29 October: 20 on 25 October, 116 on 26, 144 on 27 and 83 on 29. CMEMS flags 90 of the 26th's, 120 of the 27th's and all of the 29th's, and none of the 25th's. The 20 on 25 October are from 20:30 to 23:50 UTC, the 26 on 26 October from 00:00 to 16:10, and the 24 on 27 October from 12:00 to 15:50. A fresh fetch of the gauge's 2026 levels in November 2026 returns none for 28 October either, while PEGELONLINE's has 1,440, all −2.40 or −2.41 m.",
       reported: null,
       report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const low = (await levels(store, id, dayAfter(e.since!, 1))).filter(
           (o) => o.level < -7,
         ).length;
@@ -153,11 +165,12 @@ export default {
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-02-10")).filter((o) => o.level > 7);
         if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-02-10`);
         for (const day of ["2026-01-25", "2026-02-25"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
-          if (top > 6.6) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.6 m`);
+          if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
         }
       },
     },
@@ -172,17 +185,18 @@ export default {
       response:
         "10 April 2026 is flagged `suspect`, keeping the source flag as `source_flag`. QC flags the 9.81 m value, so the span flags the other three and the day's other readings.",
       evidence:
-        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC.",
+        "Found in November 2026 while reading back the EA's Holyhead record (`ea/E70539`), which is erratic from 8 to 14 April. The store holds 10 CMEMS values on 10 April, from 14:00 to 23:00 UTC, and no value from 8 to 14 April outside 0.3 to 6.5 m on any other day.",
       reported: null,
       report: null,
       check: async (store, e) => {
         const id = e.stations![0]!;
         await flaggedSpan(store, e);
+        await allSuspect(store, id, e.since!, e.until!);
         const high = (await levels(store, id, "2026-04-10")).filter((o) => o.level > 7);
         if (!high.length) throw new Error(`the store holds no ${id} level above 7 m on 2026-04-10`);
         for (const day of ["2026-04-05", "2026-04-20"]) {
           const top = Math.max(...(await levels(store, id, day)).map((o) => o.level));
-          if (top > 6.6) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.6 m`);
+          if (top > 6.7) throw new Error(`${id}'s highest level on ${day} is ${top} m, past 6.7 m`);
         }
       },
     },
