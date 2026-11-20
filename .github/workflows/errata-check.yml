@@ -1,0 +1,58 @@
+name: Errata check
+
+# Run every erratum's check against the public store (scripts/errata-check.ts)
+# after each full Monthly or Refetch run on main, when ingest has refreshed,
+# requalified or refetched what the checks read, and bring the
+# `errata-check` issues in line (scripts/errata-issues.ts): one open issue for
+# each failing erratum, closed when its check passes. A failing check opens
+# an issue and leaves the run green; the run fails when the checks can't run
+# or the errata files have problems. Dispatch it with sources or erratum IDs
+# to check only those, such as after a backfill.
+on:
+  workflow_run:
+    workflows: [Monthly]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Sources or erratum IDs, separated by spaces (empty for every erratum)"
+        required: false
+        default: ""
+
+permissions: {}
+
+concurrency:
+  group: errata-check
+
+jobs:
+  check:
+    # A Monthly run for chosen sources is titled "Refresh <sources>" or "Refetch <sources>".
+    if: >-
+      github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.display_title == 'Monthly' ||
+      github.event.workflow_run.display_title == 'Refetch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .mise.toml
+          cache: npm
+      - run: npm ci
+      # A failing check exits 1 too; the report says which, and a missing report fails the next step.
+      - run: |
+          node scripts/errata-check.ts --report report.json $ONLY | tee check.txt || true
+          { echo '```'; cat check.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          ONLY: ${{ inputs.only }}
+          STILLWELL_STORE: https://stillwell.openwaters.io
+      - run: node scripts/errata-issues.ts report.json
+        env:
+          GH_TOKEN: ${{ github.token }}
