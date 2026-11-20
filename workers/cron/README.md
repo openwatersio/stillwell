@@ -7,13 +7,14 @@ GitHub's `schedule` trigger runs this repo's workflows hours late, or skips them
 | `40 0 * * *`      | Compact daily ([`compact-daily.yml`](../../.github/workflows/compact-daily.yml)) | `45 0 * * *`          |
 | `25 1 2 * *`      | Monthly ([`monthly.yml`](../../.github/workflows/monthly.yml)), titled Monthly   | `30 1 2 * *`          |
 | `35 3 9 * *`      | Monthly with `refetch`, titled Refetch                                           | `40 3 9 * *`          |
+| `20 * * * *`      | Migrations ([`migrations.yml`](../../.github/workflows/migrations.yml)), `next`  | `25 * * * *`          |
 | `0 7 * * MON`     | Canary ([`canary.yml`](../../.github/workflows/canary.yml))                      | `5 7 * * MON`         |
 
 Each workflow keeps its `schedule` as a backup, five minutes after the Worker's. A scheduled run checks first whether a dispatched one on `main` already started (in the last 23 hours, or day, with Monthly's matching its title, Monthly or Refetch for every source) and if so runs nothing. A failed check runs the backup. Without that check, the second run would wait in each source's `store-<source>` group and cancel any job already waiting there, since GitHub keeps one waiting job per group. When the Worker fails, the schedule still runs, late as it may be.
 
 The Bucket check workflow stays on GitHub's schedule only: it writes nothing, and a late weekly run is fine.
 
-The crons are in [wrangler.jsonc](wrangler.jsonc) and the workflows they start in `DISPATCHES` in [index.ts](index.ts). [`test/cron.test.ts`](../../test/cron.test.ts) checks the two match, that each cron is five minutes before its workflow's schedule, and that the workflow takes the inputs sent. Cloudflare's free plan allows five Cron Triggers per account, counting every Worker on it, and this uses four, so `wrangler deploy` fails on the free plan if other Workers on the account have more than one cron.
+The crons are in [wrangler.jsonc](wrangler.jsonc) and the workflows they start in `DISPATCHES` in [index.ts](index.ts). [`test/cron.test.ts`](../../test/cron.test.ts) checks the two match, that each cron is five minutes before its workflow's schedule, and that the workflow takes the inputs sent. Cloudflare's free plan allows five Cron Triggers per account, counting every Worker on it, and this uses five, so `wrangler deploy` fails on the free plan if other Workers on the account have more than one cron.
 
 ## Setup
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# One source's part of the Monthly workflow, which the workflow's jobs and the server's job queue
-# (docs/plans/jobs.md) both run, so a source refreshes the same way wherever its writers are.
+# One source's part of the Monthly workflow, which the workflow's jobs run.
 #
 #   scripts/monthly.sh lists <source> [--full] [--accept-epochs] [--accept-withheld]
 #   scripts/monthly.sh refresh|analyze|requalify-recent|list-backfills <source> [...]
@@ -11,7 +10,7 @@
 # Monthly's or Compact daily's publish does), `analyze`, `requalify-recent` with `--full` (a full refresh,
 # not one of named sources), and `list-backfills`, the source's own backfills after its list. STARTED, the job's start in epoch seconds,
 # bounds requalify-recent's budget, now when unset. The store and its credentials come from the
-# environment, as for scripts/ingest.ts. Dates are GNU date's, as on the runners and the server.
+# environment, as for scripts/ingest.ts. Dates are GNU date's, as on the runners.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -20,7 +19,7 @@ step=${1:?usage: monthly.sh <step> <source> [options]}
 SOURCE=${2:?usage: monthly.sh <step> <source> [options]}
 shift 2
 STARTED=${STARTED:-$(date +%s)}
-# Requalify's and analysis's stations at once; the server's job queue sets it to fit a job's memory.
+# Requalify's and analysis's stations at once.
 concurrency=${STILLWELL_CONCURRENCY:-8}
 
 refresh() {

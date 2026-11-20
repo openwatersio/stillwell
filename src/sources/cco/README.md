@@ -24,17 +24,17 @@ Tide levels every 10 minutes from the gauges of the National Network of Regional
 
 ### Backfill
 
-A backfill is a job on [the server's queue](../../../docs/plans/jobs.md#the-queue), queued on the box. On a store with no CCO list, `stillwell-jobs enqueue stations cco --no-publish` runs first. The years before 2009 run by name, and Brighton's and Lymington's first years start the day after their first reading (erratum `cco-empty-window-answers`). A full backfill is about 11 million rows and takes about an hour:
+A backfill is an Ingest run, started from Actions. On a store with no CCO list, dispatch Monthly with `sources: cco` first. The years before 2009 run by name, and Brighton's and Lymington's first years start the day after their first reading (erratum `cco-empty-window-answers`). A full backfill is about 11 million rows and takes about an hour:
 
 ```bash
-stillwell-jobs enqueue backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco 88 2006-02-12 2009 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco 87 2009-02-13 2010 --skip-written --concurrency 1
-stillwell-jobs enqueue backfill cco all 2009 2027 --skip-written --with-inactive --concurrency 1
+node scripts/ingest.ts backfill cco 86,89,90,92,93,95,111 2005 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 88 2006-02-12 2009 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco 87 2009-02-13 2010 --skip-written --concurrency 1
+node scripts/ingest.ts backfill cco all 2009 2027 --skip-written --with-inactive --concurrency 1
 ```
 
-Most years hold preliminary readings, so they count as unfinished, and `--skip-written` keeps a run that stops partway from starting over. After the last run, `stillwell-jobs enqueue compact cco --rebuild-bounds` updates the store's bounds, and Compact daily's publish picks them up that night.
+Most years hold preliminary readings, so they count as unfinished, and `--skip-written` keeps a run that stops partway from starting over. After the last run, `compact cco --rebuild-bounds` updates the store's bounds, and Compact daily's publish picks them up that night.
 
 ### Scheduled runs
 
-CCO is on the server's job queue ([src/sources/server.json](../server.json)), which runs its hourly, nightly and monthly jobs at Actions' times. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs `schedule.refetch`, which `node scripts/schedule.ts refetch cco` prints: every active station from 12 months back to this month, with `--refetch`, since a month's flags arrive within weeks. To bring in flags on older years, run the backfills again without `--skip-written`.
+CCO's nightly and monthly jobs run in Actions like every other source's, and the poller reads it hourly. Monthly refreshes the list on the 2nd. Its refetch on the 9th runs `schedule.refetch`, which `node scripts/schedule.ts refetch cco` prints: every active station from 12 months back to this month, with `--refetch`, since a month's flags arrive within weeks. To bring in flags on older years, run the backfills again without `--skip-written`.

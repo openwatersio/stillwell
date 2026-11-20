@@ -304,7 +304,7 @@ export function sample(
 /**
  * `reporting`; `stale` past three of the station's intervals, and never
  * under two hours, as the poller's alert counts, since many sources send a
- * station's values in hourly batches and the server fills some only hourly;
+ * station's values in hourly batches and the poller fills some only hourly;
  * or `offline` past a day, as of the newest value.
  */
 export function statusOf(station: CatalogStation, asOf: number | null, now: number): string {

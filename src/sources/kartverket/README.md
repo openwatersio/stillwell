@@ -28,7 +28,7 @@ node scripts/ingest.ts backfill kartverket all 1986 2026 --skip-written --first 
 node scripts/ingest.ts backfill kartverket all 2026 2027
 ```
 
-The past years are about 880 station-years, one request each, about 3.3 GB. At 30 to 40 seconds a request and the default 4 stations at once, that's 2 to 3 hours, one 6-hour Ingest run, or two if the server slows under parallel requests. The current year runs on its own, since each run fetches it whole.
+The past years are about 880 station-years, one request each, about 3.3 GB. At 30 to 40 seconds a request and the default 4 stations at once, that's 2 to 3 hours, one 6-hour Ingest run, or two if Kartverket's server slows under parallel requests. The current year runs on its own, since each run fetches it whole.
 
 ### Scheduled runs
 

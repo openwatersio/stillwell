@@ -7,7 +7,7 @@ This repo fetches water levels from each source's own service and writes them as
 Researchers use this data to study sea level, tides and floods. A wrong value that looks right does more harm than a gap, because nobody knows to distrust it. Bad data is worse than no data. Scientific accuracy, completeness and rigor come before speed, and a change isn't done until it's right, however long that takes. Every contributor, person or agent, works to these rules, and reviewers hold changes to them.
 
 - **Check all of it, not a sample.** A spot check can find a problem but can't show there isn't one. A claim about every station, record, year or source rests on a check of every one. Where only a sample was possible, say how many of how many, and the claim stays "checked n of N", never "all". When one source, station or file turns out wrong, check every other one that could be wrong the same way before calling it isolated.
-- **Verify against data, not code.** Tests passing and code that looks right don't show the store is right. Read back what a run wrote: the files, their years, their flags, a plot against a neighbor or a prediction. Before review, read back a local run; after merge, read back what the workflows or the server's jobs wrote to R2, as a `check` step of the change's migration (see [Migrations](docs/contributing/operations.md#migrations)) or a step listed under `## After merge` in the pull request's description, or for a restricted source what a maintainer's run wrote to the restricted store. A change that writes to the store is done when both are.
+- **Verify against data, not code.** Tests passing and code that looks right don't show the store is right. Read back what a run wrote: the files, their years, their flags, a plot against a neighbor or a prediction. Before review, read back a local run; after merge, read back what the workflows wrote to R2, as a `check` step of the change's migration (see [Migrations](docs/contributing/operations.md#migrations)) or a step listed under `## After merge` in the pull request's description, or for a restricted source what a maintainer's run wrote to the restricted store. A change that writes to the store is done when both are.
 - **Check science against an independent reference.** A new source, station type or conversion has its datums, units and time zone confirmed in the agency's own documentation, cited in the source's README, and its levels checked against something the source didn't produce. For levels that carry a tide, river gauges included, that's `clock-check` against another originator's TICON record where there is one (see [Clock check](docs/contributing/checks.md#clock-check)), which catches a clock that neighbors from the same agency would share. `cross-check` compares a gauge with its neighbors but leaves out stations whose `kind` is `river` or `lake`, so for those the comparison is with a neighboring gauge on the same water, or another agency's record of the same one, done by hand. Agreement with the source's own metadata isn't independent. Where no independent reference exists, the source's README says so, and which checks the data has had.
 - **Research facts, don't guess them.** Agency names, datums, units, terms and station metadata come from the agency's own pages or data, cited. If a search, a page read or a data probe would settle a question, do it rather than ask or assume. If you can't confirm a fact, write "not confirmed" and treat it as a blocker until the steps in the last rule below are exhausted.
 - **Policy decisions stand; precedent proves nothing.** A maintainer's decision on policy, such as a permission, a source's terms or how a license applies, stands; don't reopen it in each change. Everything else earlier work did, in code, `overrides` or errata, is not evidence that it's right. A change judges each value on its own evidence, and "it was done this way before" is never the justification. When the evidence shows an earlier choice was wrong, raise it and fix it, and check whatever else made the same choice. A decision that is genuinely open, such as a source's terms or a trade-off in the data, goes to a maintainer before the work is called done, and a pull request opened with one still open is a draft.
@@ -23,10 +23,10 @@ Every fact has one home, and everything else links to it. A fact about one sourc
 - **Adding a source touches its directory and nothing else**, apart from its entries in the registry ([`src/sources/index.ts`](src/sources/index.ts)), its tests and fixtures, and, for a source that needs a key, its secret in each workflow step that runs its adapter and in `stillwell.env.example`. A change that needs anything more is missing a metadata field or a hook in the `Source` interface ([`src/schema.ts`](src/schema.ts)): add that first, move every source that needs it over, then use it.
 - **Code outside `src/sources/` shouldn't branch on a source.** A shell `case` on a source, a `matrix.source == '<id>'`, an `if (id === …)` or a table keyed by source ID is a field the adapter should declare. Don't add one, and move one you touch into the adapter. Decision tables keyed by station ID, such as `KINDS` and `POSITIONS`, and tables about how sources relate, such as `same-as.ts`, are the exception.
 - **Shared docs state the rule, not the cases.** "The monthly refetch reads each station from its earliest preliminary value, unless the source's `schedule` says otherwise" stays true when a source is added; "So does BODC… So does CRMS…" doesn't. One source as an example is fine; a list that tries to be complete belongs in each source's own files.
-- **Durable text describes what is, not what's happening now.** A count that changes with every refresh, a status such as "until ingest moves to the box" or "while permission is pending", or a plan for later goes in an issue or the pull request, where it can be closed.
+- **Durable text describes what is, not what's happening now.** A count that changes with every refresh, a status such as "until the poller reads another source" or "while permission is pending", or a plan for later goes in an issue or the pull request, where it can be closed.
 - **Say it once.** When the same fact is in two places, delete one and link to the other, rather than update both.
 
-[`test/facts.test.ts`](test/facts.test.ts) checks that this file, the guides in `docs/contributing/`, `site/README.md`, the workflows, `scripts/monthly.sh` and `server/deploy/` name no more than two sources on a line, that `scripts/monthly.sh`, `server/deploy/` and the workflows have no `case` arm or `==` test on a source ID, that no site guide gives sources bullets of their own, and that every source has its own canary probe. It doesn't read TypeScript outside `src/sources/`.
+[`test/facts.test.ts`](test/facts.test.ts) checks that this file, the guides in `docs/contributing/`, `site/README.md`, the workflows, `scripts/monthly.sh` name no more than two sources on a line, that `scripts/monthly.sh` and the workflows have no `case` arm or `==` test on a source ID, that no site guide gives sources bullets of their own, and that every source has its own canary probe. It doesn't read TypeScript outside `src/sources/`.
 
 ## Layout
 
@@ -34,15 +34,16 @@ Every fact has one home, and everything else links to it. A fact about one sourc
 src/sources/<source>/  one adapter per source, each with a README on that service's quirks
 src/store/              Parquet writing, merging and paths, and the definition of every published file (files.ts)
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
-src/realtime/          the realtime poller's ClickHouse store, poll and schedule (docs/plans/realtime.md)
-src/jobs/              the server's job queue, its lanes and migrations (docs/plans/jobs.md)
-src/migrations/        the store work each merged change needs, which the job queue runs (see docs/contributing/operations.md)
+src/realtime/          the poller's live store client, poll and schedule (docs/plans/cloudflare.md)
+src/jobs/              the migrations' format and the checks on the commands a step runs
+src/migrations/        the store work each merged change needs, which the Migrations workflow runs (see docs/contributing/operations.md)
 src/api/               the levels API's parameters, datum conversion and responses
-server/                stillwell-ingest, the service that runs the poller, stillwell-api, which serves levels, and stillwell-jobs, the job queue
+server/                the poller (ingest.ts), its passes (pass.ts) and its daily-file export (export.ts), which run in workers/live's container
 src/                   shared pieces: HTTP, anonymous FTP and the response cache, the schema, QC, station lists and datum epochs, harmonics
 scripts/               ingest.ts, the weekly canary, the failure alerts, the TICON inventory, the clock check, the cross-station checks and the HRoI evaluations
 test/                  node:test suites, with recorded responses in test/fixtures/
-workers/cron/          the Cloudflare Worker that starts the scheduled workflows
+workers/cron/          the Cloudflare Worker that starts the scheduled workflows, Migrations included
+workers/live/          the Cloudflare Worker and container that run the poller, with the D1 database of live values
 workers/api/           the Cloudflare Worker that caches and serves levels at api.openwaters.io
 docs/                  the contributing guides (docs/contributing/), the plan, the API design, the store's layout and the evaluations
 site/                  the site for people using the data: its docs and a page per source (Astro)
@@ -89,9 +90,9 @@ Read the guide for the task at hand before starting it:
 
 - [Running ingest](docs/contributing/ingest.md): every `scripts/ingest.ts` command and its flags, and the environment variables that choose the store.
 - [Sources](docs/contributing/sources.md): adding a source, recording a source's errata, and withholding stations.
-- [Operations](docs/contributing/operations.md): the scheduled workflows that write to R2, migrations on the server's job queue, and the weekly canary.
+- [Operations](docs/contributing/operations.md): the scheduled workflows that write to R2, live polling, migrations, and the weekly canary.
 - [Checks](docs/contributing/checks.md): the TICON inventory, the clock check, the cross-station checks, the HRoI evaluations, and the definitions of published files.
-- [Running the poller](docs/contributing/poller.md): stillwell-ingest and stillwell-api against ClickHouse.
+- [Running the poller](docs/contributing/poller.md): the poller, and the levels API's tests.
 - [Site](site/README.md): building and deploying the site.
 
 ## Gotchas
@@ -99,7 +100,7 @@ Read the guide for the task at hand before starting it:
 - **Everything in the public store is public.** The bucket serves every file in it, so a source whose terms bar republishing writes only to `STILLWELL_RESTRICTED_STORE`, and ingest refuses to write one without it. Don't work around that refusal.
 - **A station's files keep one datum.** Adapters refuse values in any datum but the station's, and backfill refuses to write into a file recorded in another. When a source moves a station to another reference, the next `ingest stations` opens a datum epoch whose values go to files of their own; a change soon after the last one, or back to an earlier reference, is held, and the run exits nonzero, until it's confirmed or rejected in the source's `overrides`. A zero a source moved without saying gets a datum epoch from the day listed in the source's `overrides.splits` with its erratum ([when an epoch opens](docs/stations.md#when-an-epoch-opens)).
 - **`.cache/` hides upstream changes.** A historical fetch is served from the cache once it has run, keyed by URL and request body, so delete `.cache/`, or point `STILLWELL_CACHE` at an empty directory, when you need to see what the service returns now.
-- **Write to R2 only through the Ingest and Monthly workflows, or for a source in `src/sources/server.json`, the server's job queue** (see [Migrations](docs/contributing/operations.md#migrations)). A run from your own machine shares no concurrency group with the scheduled jobs, so it and Compact daily can each rewrite a file the other just read, and one's values are lost. That includes the bounds file, which backfill and compaction both rewrite whole.
+- **Write to R2 only through the Ingest, Monthly and Migrations workflows, and the poller** (see [Migrations](docs/contributing/operations.md#migrations)). A run from your own machine shares no concurrency group with the scheduled jobs, so it and Compact daily can each rewrite a file the other just read, and one's values are lost. That includes the bounds file, which backfill and compaction both rewrite whole.
 
 ## License and CLA
 

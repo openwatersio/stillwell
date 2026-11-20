@@ -134,7 +134,7 @@ jobs:
           cache: npm
       - run: npm ci
       # stations.parquet is rebuilt once, from every list, by the next job.
-      # Each step is a step of scripts/monthly.sh, which the server's job queue runs too, and which says why.
+      # Each step is a step of scripts/monthly.sh, which says why.
       - run: scripts/monthly.sh refresh "$SOURCE" ${ACCEPT_EPOCHS:+--accept-epochs} ${ACCEPT_WITHHELD:+--accept-withheld}
         env:
           SOURCE: ${{ matrix.source }}
@@ -316,7 +316,7 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it here and on the server.
+      # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it.
       - run: scripts/monthly.sh refetch "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
