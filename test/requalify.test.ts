@@ -8,12 +8,10 @@ import {
   readObservations,
   setConnections,
   settled,
-  readRecent,
   writeObservations,
-  writeRecent,
 } from "../src/store/parquet.ts";
-import { recentPath, seriesPath } from "../src/store/paths.ts";
-import { poolUntil, qcFor, updateRecent } from "../src/store/recent.ts";
+import { seriesPath } from "../src/store/paths.ts";
+import { emptySummary, poolUntil, qcFor, refreshStation } from "../src/store/recent.ts";
 import { judgeFetched, requalify, requalifyInWorker } from "../src/store/requalify.ts";
 import { sourceOf } from "../src/sources/index.ts";
 import { fromSource, qc, withSourceFlag } from "../src/qc.ts";
@@ -343,44 +341,39 @@ describe("settled", () => {
   });
 });
 
-describe("updateRecent", () => {
+/** A station's window after `refreshStation` merges a fetch of the last hour into `window`. */
+async function refreshed(s: StoredStation, window: Observation[], now: number) {
+  const { rows } = await refreshStation({
+    source: source({ observations: async () => hourly(now - HOUR, now) }),
+    station: s,
+    previous: window.map((r) => ({ ...r, station: s.id, epoch: 1 })),
+    swept: undefined,
+    since: now - 2 * HOUR,
+    now,
+    keepFrom: now - 7 * 24 * HOUR,
+    summary: emptySummary("test", 1),
+  });
+  return rows;
+}
+
+describe("refreshStation", () => {
   it("clears a mark an earlier hour's QC left on a stored value", async () => {
-    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
-    const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     const window = withSourceFlag(hourly(NOW - 48 * HOUR, NOW - HOUR));
     // The source said good; an earlier rule marked it suspect.
     window[10]!.flag = Flag.suspect;
-    await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
-    await updateRecent({
-      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
-      stations: [station],
-      storeFor: () => root,
-      since: new Date(NOW - 2 * HOUR),
-      now: NOW,
-    });
-    const after = await readRecent(path);
+    const after = await refreshed(station, window, NOW);
     assert.equal(after.find((r) => r.time === window[10]!.time)!.flag, Flag.good);
   });
 
   it("keeps a mark within a flatline's length of the window's start, where a run can't be seen whole", async () => {
-    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
-    const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     // The window's first 3 hours are the end of a still stretch an earlier hour saw whole.
     const window = withSourceFlag(
       hourly(NOW - 48 * HOUR, NOW - HOUR, [NOW - 48 * HOUR, NOW - 45 * HOUR]),
     );
     for (const r of window.slice(0, 3)) r.flag = Flag.suspect;
-    await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
-    await updateRecent({
-      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
-      stations: [station],
-      storeFor: () => root,
-      since: new Date(NOW - 2 * HOUR),
-      now: NOW,
-    });
-    const after = await readRecent(path);
+    const after = await refreshed(station, window, NOW);
     assert.deepEqual(
       after.slice(0, 4).map((r) => r.flag),
       [Flag.suspect, Flag.suspect, Flag.suspect, Flag.good],
@@ -478,24 +471,14 @@ describe("readObservations", () => {
   });
 });
 
-describe("updateRecent with a whole-centimeter flatline rule", () => {
+describe("refreshStation with a whole-centimeter flatline rule", () => {
   it("keeps marks within that rule's length of the window's start", async () => {
-    const root = mkdtempSync(join(tmpdir(), "stillwell-requalify-"));
-    const path = recentPath(root, "test");
     const NOW = Date.UTC(2026, 10, 5, 12);
     const window = withSourceFlag(hourly(NOW - 72 * HOUR, NOW - HOUR));
     // 20 hours in: past the 6-hour rule's edge, inside the 48-hour one's.
     window[20]!.flag = Flag.suspect;
-    await writeRecent(path, [window.map((r) => ({ ...r, station: station.id, epoch: 1 }))]);
-    await updateRecent({
-      source: source({ observations: async () => hourly(NOW - HOUR, NOW) }),
-      // A small tide, which gets the whole-centimeter rule.
-      stations: [{ ...station, tidal: true, tide_m: 0.1 }],
-      storeFor: () => root,
-      since: new Date(NOW - 2 * HOUR),
-      now: NOW,
-    });
-    const after = await readRecent(path);
+    // A small tide, which gets the whole-centimeter rule.
+    const after = await refreshed({ ...station, tidal: true, tide_m: 0.1 }, window, NOW);
     assert.equal(after.find((r) => r.time === window[20]!.time)!.flag, Flag.suspect);
   });
 });

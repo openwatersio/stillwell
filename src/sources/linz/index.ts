@@ -39,7 +39,7 @@ export const metadata: SourceMetadata = {
   },
   // Each gauge's whole record is served against its own zero, as it was measured.
   archive: "previous",
-  // Daily files appear 6 to 12 days after their day, in batches, so hourly ingest would find nothing.
+  // Daily files appear 6 to 12 days after their day, in batches, so the poller would find nothing.
   hourly: false,
   // A year's file replaces its daily files and marks as missing the sensor-off values they hold.
   finalizes: true,

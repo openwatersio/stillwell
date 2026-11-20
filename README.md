@@ -81,11 +81,11 @@ The [contributing guide](CONTRIBUTING.md) covers running ingest, the checks, and
 - Stations with `commercial_use` false keep their source's terms.
 - Show each station's `attribution` from [`stations.parquet`](https://stillwell.openwaters.io/stations.parquet) wherever its data is used, and its `datums_attribution` wherever you use its datum offsets.
 
-For example, this query reads the last week of REFMAR levels that allow commercial use, with each station's attribution:
+For example, this query reads yesterday's REFMAR levels that allow commercial use, with each station's attribution:
 
 ```sql
 SELECT r.time, r.station, r.level_m, s.attribution
-FROM 'https://stillwell.openwaters.io/recent/refmar.parquet' r
+FROM read_parquet('https://stillwell.openwaters.io/recent/refmar/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet') r
 JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.id = r.station
 WHERE s.commercial_use;
 ```

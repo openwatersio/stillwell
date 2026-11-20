@@ -12,7 +12,7 @@ River stage every 15 minutes at tidal gauges in the Sacramento–San Joaquin Del
 ## Known limits
 
 - **Datum changes:** the list refreshes monthly and CDEC's data carries no datum, so values from between a datum change and the next refresh land in the old epoch's files.
-- **Revisions:** CDEC may revise any reading, but nothing reads a reading again after Ingest hourly's window. A later correction reaches the store only through a manual backfill.
+- **Revisions:** CDEC may revise any reading, but nothing reads a reading again after the poller's window. A later correction reaches the store only through a manual backfill.
 
 ## Running ingest
 
@@ -33,4 +33,4 @@ node scripts/ingest.ts backfill cdec all 1998 2026 --skip-written
 node scripts/ingest.ts backfill cdec BLL,LIB,M13,MRW,ROR,SUC 2009 2026 --skip-written
 ```
 
-That's about 650 station-years at about 2 MB each, roughly 1.3 GB and 650 requests, which fits in one Ingest run. The current year is backfilled on its own, `backfill cdec all 2026 2027`. Ingest hourly keeps the active stations current.
+That's about 650 station-years at about 2 MB each, roughly 1.3 GB and 650 requests, which fits in one Ingest run. The current year is backfilled on its own, `backfill cdec all 2026 2027`. The poller keeps the active stations current.

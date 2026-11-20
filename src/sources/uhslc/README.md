@@ -37,4 +37,4 @@ That's about 21,000 station-years, at least six hours at one request a second, s
 
 ### Scheduled runs
 
-Monthly refreshes UHSLC's list on the 2nd with every other source's. Its refetch on the 9th (`backfill uhslc preliminary`) fetches each station from its earliest preliminary value; a station with none is skipped. UHSLC isn't in Ingest hourly, since none of its series is live, but Compact daily runs it so each station's first and last values reach `stations.parquet` after a backfill.
+Monthly refreshes UHSLC's list on the 2nd with every other source's. Its refetch on the 9th (`backfill uhslc preliminary`) fetches each station from its earliest preliminary value; a station with none is skipped. The poller doesn't read UHSLC, since none of its series is live, but Compact daily runs it so each station's first and last values reach `stations.parquet` after a backfill.

@@ -7,16 +7,15 @@ name: Monthly
 # cross-station checks, and keep the scheduled workflows enabled. On the 9th,
 # refetch every station's values that were still
 # preliminary, from the earliest, so the ones the source has finalized since
-# replace them. Ingest hourly starts a refresh of one source, at
+# replace them. The poller starts a refresh of one source, at
 # most once a day, when that source reports a station in another datum.
 run-name: ${{ (inputs.refetch || github.event.schedule == '40 3 9 * *') && (inputs.sources && format('Refetch {0}', inputs.sources) || 'Refetch') || inputs.sources && format('Refresh {0}', inputs.sources) || 'Monthly' }}
 
 # Each job waits in its source's group. GitHub keeps one job waiting per
 # group and cancels it when a newer one arrives, so a job queued behind
-# anything that outlasts the hour, a manual backfill or a long refresh, is
-# cancelled by the next hourly run. Starting at 01:25 and 03:35, after that
-# hour's run and compaction, the groups are usually free; rerun a cancelled
-# job from Actions. The refetch runs on its own day for the same reason: queued
+# a manual backfill or a long refresh is cancelled by the next job that
+# waits there. Starting at 01:25 and 03:35, after that night's compaction,
+# the groups are usually free; rerun a cancelled job from Actions. The refetch runs on its own day for the same reason: queued
 # behind the refreshes, it would be cancelled.
 #
 # The Worker in workers/cron dispatches both at those times, since GitHub's
@@ -106,7 +105,7 @@ jobs:
 
   # Each list in its source's group, the one every job that writes the source's
   # files or list shares, so a refresh that opens a datum epoch never lands
-  # while a backfill, hourly, compaction or other refresh is writing that source.
+  # while a backfill, compaction or other refresh is writing that source.
   lists:
     needs: plan
     if: needs.plan.outputs.sources != '[]'
@@ -117,6 +116,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     # CO-OPS's datums take up to 2 hours (refreshBudgetMs) and analysis's
     # requalify 2 hours. The requalify of the last two months starts stations
@@ -133,14 +133,9 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - id: owns
-        run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # stations.parquet is rebuilt once, from every list, by the next job.
-      # Each step is a step of scripts/monthly.sh, which the server's job queue runs too, and which says why.
+      # Each step is a step of scripts/monthly.sh, which says why.
       - run: scripts/monthly.sh refresh "$SOURCE" ${ACCEPT_EPOCHS:+--accept-epochs} ${ACCEPT_WITHHELD:+--accept-withheld}
         env:
           SOURCE: ${{ matrix.source }}
@@ -154,7 +149,7 @@ jobs:
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
       # The steps after a failed one still run, but none once the guard has refused the source.
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' }}
+      - if: ${{ !cancelled() }}
         run: scripts/monthly.sh analyze "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -162,7 +157,7 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}
+      - if: ${{ !cancelled() && !inputs.sources }}
         run: scripts/monthly.sh requalify-recent "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -170,7 +165,7 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' }}
+      - if: ${{ !cancelled() }}
         run: scripts/monthly.sh list-backfills "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -197,6 +192,7 @@ jobs:
     concurrency:
       group: matches
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 300
     environment: lake
@@ -236,6 +232,7 @@ jobs:
     concurrency:
       group: links
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 180
     environment: lake
@@ -266,6 +263,7 @@ jobs:
     concurrency:
       group: store
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: lake
@@ -311,6 +309,7 @@ jobs:
     concurrency:
       group: store-${{ matrix.source }}
       cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 360
     environment: lake
@@ -322,12 +321,8 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
-      # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it here and on the server.
+      # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it.
       - run: scripts/monthly.sh refetch "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -403,7 +398,7 @@ jobs:
       - run: |
           # Monthly first, since it enables the rest; one failure doesn't stop the others.
           failed=0
-          for workflow in monthly.yml ingest-hourly.yml compact-daily.yml bucket-check.yml canary.yml site.yml; do
+          for workflow in monthly.yml compact-daily.yml migrations.yml bucket-check.yml canary.yml site.yml; do
             if ! state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow" --jq .state); then
               failed=1
             elif [ "$state" = disabled_manually ]; then

@@ -118,7 +118,7 @@ describe("kartverket", () => {
       /chart datum is now 1.022 m below NN2000, not 1.2; run ingest stations/,
     );
     // Hourly ingest's few hours too: compaction folds them into the year files. It's a
-    // DatumChanged whose reference is the refresh's reason, so Ingest hourly asks for a
+    // DatumChanged whose reference is the refresh's reason, so the poller asks for a
     // refresh and a rejected change matches its epoch.
     kartverket.forgetChecks();
     serve([

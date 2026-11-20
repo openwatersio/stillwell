@@ -8,7 +8,7 @@ sidebar:
 import Schema from "../../../../components/Schema.astro";
 import QueryResult from "../../../../components/QueryResult.astro";
 
-Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>.parquet` holds the last 7 days of a source's live stations in one file, and `stations/years/<source>.parquet` lists which year files exist. Ingest refreshes `recent/` every hour and folds each day into the year files at about 00:40 UTC.
+Observed levels are in one Parquet file per station per UTC year under `obs/`, and the source's observed extremes under `extremes/`. `recent/<source>/<YYYY-MM-DD>.parquet` holds one UTC day of a source's live stations, and `stations/years/<source>.parquet` lists which year files exist. Today's file under `recent/` is rewritten every hour, and each day is folded into the year files at about 00:40 UTC.
 
 A series path is the product, the station's `id` and the year, as in `obs/rws/hoekvanholland/2024.parquet`, with the epoch's number before the year for a later datum epoch; see [File paths](/docs/getting-started/#building-paths-in-code). To read several files at once, see [Reading many files](/docs/getting-started/#read-its-levels).
 
@@ -64,26 +64,28 @@ WHERE type = 'high' ORDER BY level_m DESC LIMIT 3`}
 
 ## The latest values
 
-`recent/<source>.parquet` holds the last 7 days of observed levels from the source's live stations, and keeps a station's rows after it stops being live until they're 7 days old. It's rewritten every hour, so read it fresh rather than caching it.
+`recent/<source>/<YYYY-MM-DD>.parquet` holds one UTC day of observed levels from the source's live stations, by `time`. Today's file is rewritten every hour, so read it fresh rather than caching it. The 6 days before it are rewritten each night, so values a source revises late reach them, and a day's file is final once it's 6 days old. Each file is deleted after 30 days, by which time its values are in the year files. A day with no values has no file.
+
+HTTPS has no directory listing, so build each day's path from its date, as these queries do for yesterday's file.
 
 <Schema resource="recent" />
 
-The latest value at each station, leaving out values flagged suspect or bad:
+Each station's last value yesterday, leaving out values flagged suspect or bad:
 
 <QueryResult
   sql={`SET TimeZone = 'UTC';
 SELECT station, max(time) AS time, max_by(level_m, time) AS level_m, max_by(epoch, time) AS epoch
-FROM 'https://stillwell.openwaters.io/recent/rws.parquet'
+FROM read_parquet('https://stillwell.openwaters.io/recent/rws/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet')
 WHERE flag <= 2
 GROUP BY station ORDER BY station LIMIT 5`}
 />
 
-The latest value at one station, with the datum it's measured from:
+One station's last value yesterday, with the datum it's measured from:
 
 <QueryResult
   sql={`SET TimeZone = 'UTC';
 SELECT r.time, r.level_m, e.datum, r.flag
-FROM 'https://stillwell.openwaters.io/recent/rws.parquet' r
+FROM read_parquet('https://stillwell.openwaters.io/recent/rws/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet') r
 JOIN (SELECT unnest(epochs, recursive := true)
   FROM 'https://stillwell.openwaters.io/stations.parquet' WHERE id = 'rws/hoekvanholland') e
   ON e.id = r.epoch
