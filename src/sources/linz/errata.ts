@@ -142,19 +142,34 @@ export default {
       error:
         'Sensor 40 at Owenga failed on 25 November 2008 (its file for that day has a range of 40 m; the README says "sensor 40 malfunctioning from November 26") and reads a constant -4.85 m until its replacement on 17 February 2010, whose file has only the last 41 minutes of that day. Sensor 41 reads a tide throughout.',
       response:
-        "Sensor 41 is read from 25 November 2008 to before 17 February 2010. Over the 60 days before the failure sensor 41 agrees with sensor 40 within 0.02 m (median difference -0.013 m). Sensor 41 has 147 minutes above 5 m, up to 16 m, on 11 February 2010, which QC flags. In the six days after the replacement, 18 to 23 February 2010, sensor 41's daily median is 0.05 to 0.06 m above sensor 40's.",
+        "Sensor 41 is read from 25 November 2008 to before 17 February 2010. Over the 60 days before the failure sensor 41 agrees with sensor 40 within 0.02 m (median difference -0.013 m). Sensor 41 spikes from 11 to 13 February 2010 (erratum `linz-owenga-sensor-41-spikes`). In the six days after the replacement, 18 to 23 February 2010, sensor 41's daily median is 0.05 to 0.06 m above sensor 40's.",
       evidence:
         "The sensor 40 and 41 files for the years and the README's gauge history, November 2026.",
       check: async (store, e) => {
         const before = med(await levels(store, "linz/CHIT", "2008-09-26", e.since!));
         // A season apart, so held to the level before only within its swing.
         await tide(store, "linz/CHIT", "2009-01-01", "2010-02-01", before, { tolerance: 0.15 });
+      },
+    },
+    {
+      id: "linz-owenga-sensor-41-spikes",
+      stations: ["linz/CHIT"],
+      since: "2010-02-11",
+      until: "2010-02-14",
+      handling: "flagged",
+      error:
+        "Sensor 41 at Owenga, which the store reads in place of sensor 40 (erratum `linz-owenga-sensor-fault`), spikes from about 06:00 UTC on 11 February to 13 February 2010. It has 147 minutes above 5 m, up to 16.2 m, on the 11th, 106 above 5 m, up to 8.2 m, on the 12th and 4 above 5 m on the 13th, against daily medians of 3.1 to 3.5 m.",
+      response:
+        "The three days are flagged `suspect`, keeping the source's own flag as `source_flag`. As of November 2026, QC flags 494 of the 1,440 levels on the 11th, 636 on the 12th and 135 on the 13th, and leaves 35 levels on the 11th and 33 on the 12th above 4.5 m unflagged, up to 5.76 and 7.12 m, among spikes it flags. The days' other levels are flagged too, because spans are whole UTC days.",
+      evidence: "The store's levels for 7 to 16 February 2010, November 2026.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
         const spikes = (await levels(store, "linz/CHIT", "2010-02-11", "2010-02-12")).filter(
           (o) => o.level > 5,
         );
-        if (spikes.length < 100 || spikes.some((o) => o.flag < Flag.suspect))
+        if (spikes.length < 100)
           throw new Error(
-            `CHIT's levels above 5 m on 11 February 2010 aren't held flagged (${spikes.length})`,
+            `CHIT has ${spikes.length} levels above 5 m on 11 February 2010, under 100`,
           );
       },
     },
@@ -538,29 +553,27 @@ export default {
     {
       id: "linz-boat-cove-sensor-fault-2014",
       stations: ["linz/RBCT"],
-      since: "2014-09-15",
-      until: "2014-10-03",
+      since: "2014-08-23",
+      until: "2015-02-27",
       handling: "flagged",
       error:
-        "Sensor 40 at Boat Cove reads daily medians of 33.4 to 33.6 m, with ranges up to 28.7 m, from 15 September to 2 October 2014, while sensor 41's medians are 4.0 to 4.5 m.",
+        "Sensor 40 at Boat Cove fails at about 12:00 UTC on 23 August 2014 and stays bad until about 22:00 UTC on 26 February 2015. It reads 34.5 to 34.8 m from 23 to 25 August, 4.1 to 4.4 m on 26 August, 0.0 to 4.7 m from 27 August to 5 September and daily medians of 33.4 to 33.7 m from 6 September to 2 October, then a constant 4.85 m to 31 December, -4.85 m from 1 January and -4.24 m from 25 February. Sensor 41 reads 0.0 to 35.9 m from 23 August to 14 September, a tide with daily medians of 4.0 to 4.4 m from 15 September to 2 October, and then the same constant 4.85 and -4.85 m as sensor 40 until 24 February, and -4.1 m on 25 and 26 February. Both read a tide again from about 22:00 UTC on 26 February.",
       response:
-        "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own.",
-      evidence: "The sensor 40 and 41 files for the years, November 2026.",
-      // Fails until the span covers the fault: sensor 40 reads 33 m from 6 September and 4.847 m, flat, from 3 October into December, all flagged.
+        "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: it is stuck or erratic except from 15 September to 2 October, and its level there is more than 0.25 m from sensor 40's daily medians of 5.8 to 6.0 m before and after. The span's first and last days are whole UTC days, so the 12 hours before the fault on 23 August and the 2 hours after it on 26 February, which read normally, are flagged too.",
+      evidence: "The sensor 40 and 41 files for 2014 and 2015, November 2026.",
       check: (store, e) => flaggedSpan(store, e),
     },
     {
       id: "linz-fishing-rock-sensor-fault",
       stations: ["linz/RFRT"],
       since: "2016-12-22",
-      until: "2017-03-25",
+      until: "2017-03-27",
       handling: "flagged",
       error:
-        "Sensor 40 at Fishing Rock reads daily medians of -4.84 to -4.83 m, with ranges up to 9.3 m, from 22 December 2016 to 24 March 2017, while sensor 41's medians are 3.4 to 4.0 m with ranges of 0.8 to 1.6 m.",
+        "Sensor 40 at Fishing Rock reads daily medians of -4.84 to -4.83 m, with ranges up to 9.3 m, from 22 December 2016 to 02:00 UTC on 26 March 2017, while sensor 41's medians are 3.4 to 4.0 m with ranges of 0.8 to 1.6 m until it sticks at -4.85 m on 25 March. Both read a tide again from 02:00 UTC on 26 March.",
       response:
-        "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Sensor 41's median level is 3.65 m, against sensor 40's 3.16 m in the 60 days before and 3.58 m after.",
+        "The span is flagged `suspect`, keeping the source's own flag as `source_flag`. Sensor 41 isn't read for it: its level there is more than 0.25 m from sensor 40's healthy levels on at least one side, or its own. Before it sticks on 25 March, sensor 41's median level is 3.65 m, against sensor 40's 3.16 m in the 60 days before and 3.58 m after. The span's last day is a whole UTC day, so the 22 hours of 26 March after 02:00 UTC, which read normally, are flagged too.",
       evidence: "The sensor 40 and 41 files for the years, November 2026.",
-      // Fails until the span ends on 26 March: sensor 40 stays stuck until about 02:00 UTC that day, so 25 March is flagged too.
       check: (store, e) => flaggedSpan(store, e),
     },
     {
