@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import dmiErrata from "../src/sources/dmi/errata.ts";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
 import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
@@ -150,10 +151,8 @@ describe("dmi stations", () => {
     const trimmed = (await dmi.stations())
       .filter((s) => s.parameter === "sea_reg" && (s.record_start ?? "") < "2002-05-29")
       .map((s) => s.id);
-    const errata = JSON.parse(
-      readFileSync(new URL("../src/sources/dmi/errata.json", import.meta.url), "utf8"),
-    );
-    const entry = errata.errata.find((e: { id: string }) => e.id === "dmi-coastal-authority-dnn");
+    const errata = dmiErrata;
+    const entry = errata.errata.find((e) => e.id === "dmi-coastal-authority-dnn")!;
     assert.deepEqual([...entry.stations].sort(), trimmed.sort());
     // The splits name the same gauges, on the erratum's day.
     assert.deepEqual([...dmi.SPLIT_STATIONS].sort(), trimmed.sort());
