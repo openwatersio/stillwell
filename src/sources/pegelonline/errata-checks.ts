@@ -147,3 +147,20 @@ export function kept(
       `${id(station)}'s ${level} m at ${time} is flagged ${o.flag}, not the ${o.source_flag} PEGELONLINE served`,
     );
 }
+
+/** Throws unless the store holds `level` meters at `time` with QC's `suspect` over the flag PEGELONLINE served. */
+export function flaggedByQc(
+  values: { time: number; level: number; flag: number; source_flag?: number }[],
+  station: string,
+  time: string,
+  level: number,
+) {
+  const o = values.find((v) => v.time === Date.parse(time));
+  if (!o) throw new Error(`the store holds no ${id(station)} value at ${time}`);
+  if (Math.abs(o.level - level) >= 0.005)
+    throw new Error(`${id(station)} holds ${o.level} m at ${time}, not ${level} m`);
+  if (o.flag < Flag.suspect || (o.source_flag ?? 0) >= Flag.suspect)
+    throw new Error(
+      `${id(station)}'s ${level} m at ${time} is flagged ${o.flag} from a source flag of ${o.source_flag}, not suspect from QC`,
+    );
+}
