@@ -52,7 +52,7 @@ test("each Worker cron runs five minutes before its workflow's backup schedule",
 test("a refused dispatch fails the cron event", async () => {
   mock.method(globalThis, "fetch", async () => new Response("Bad credentials", { status: 401 }));
   await assert.rejects(
-    worker.scheduled({ cron: "12 * * * *" }, { GITHUB_TOKEN: "t" }),
-    /ingest-hourly\.yml: 401 Bad credentials/,
+    worker.scheduled({ cron: "40 0 * * *" }, { GITHUB_TOKEN: "t" }),
+    /compact-daily\.yml: 401 Bad credentials/,
   );
 });

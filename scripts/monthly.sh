@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# One source's part of the Monthly workflow, which the workflow's jobs and the server's job queue
-# (docs/plans/jobs.md) both run, so a source refreshes the same way wherever its writers are.
+# One source's part of the Monthly workflow, which the workflow's jobs run.
 #
 #   scripts/monthly.sh lists <source> [--full] [--accept-epochs] [--accept-withheld]
 #   scripts/monthly.sh refresh|analyze|requalify-recent|list-backfills <source> [...]
@@ -11,7 +10,7 @@
 # Monthly's or Compact daily's publish does), `analyze`, `requalify-recent` with `--full` (a full refresh,
 # not one of named sources), and `list-backfills`, the source's own backfills after its list. STARTED, the job's start in epoch seconds,
 # bounds requalify-recent's budget, now when unset. The store and its credentials come from the
-# environment, as for scripts/ingest.ts. Dates are GNU date's, as on the runners and the server.
+# environment, as for scripts/ingest.ts. Dates are GNU date's, as on the runners.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -20,7 +19,7 @@ step=${1:?usage: monthly.sh <step> <source> [options]}
 SOURCE=${2:?usage: monthly.sh <step> <source> [options]}
 shift 2
 STARTED=${STARTED:-$(date +%s)}
-# Requalify's and analysis's stations at once; the server's job queue sets it to fit a job's memory.
+# Requalify's and analysis's stations at once.
 concurrency=${STILLWELL_CONCURRENCY:-8}
 
 refresh() {
@@ -40,10 +39,10 @@ analyze() {
 }
 
 # Every station's years that hold the last two months, requalified with the current rules and errata and judged
-# over the whole year, not the recent window's 7 days that compaction folds in. Compaction folds last month's
+# over the whole year, not the poller's 7 days that compaction folds in. Compaction folds last month's
 # final days again for a few nights after this, with the window's flags, so each month is judged whole by the
 # next month's run, December's by February's. Only a full refresh runs it. As a step of the list job, not a job
-# of its own, it puts no job in the source's lane to cancel one waiting there, such as a compaction. It takes
+# of its own, it puts no job in the source's lane to wait ahead of one waiting there, such as a compaction. It takes
 # only stations with a year file in range, and starts them for at most 90 minutes, and none once the job has
 # run 5 hours, so the job ends within its time limit; USGS's, the most, took about 25 minutes in a local
 # measurement. The stations it didn't finish, and every one when no time is left, are saved in the store with
