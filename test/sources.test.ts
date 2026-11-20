@@ -368,21 +368,25 @@ describe("rws", () => {
         new Date("2005-02-01T00:00:00Z"),
       );
     };
-    // A series of only missing-value sentinels isn't accepted as means either.
-    await assert.rejects(
-      edge("2002-01-01T00:00:00+01:00", 999_999_999),
-      /unknown WaardeBewerkingsMethode GEMH/,
-    );
+    // A series of only missing-value sentinels inside the window holds no value, and isn't a failure.
+    assert.deepEqual(await edge("2002-01-01T00:00:00+01:00", 999_999_999), []);
     assert.deepEqual(
       (await edge("2000-01-01T00:00:00+01:00")).map((l) => l.level),
       [9.1],
     );
+    // A read's end is inclusive, so the mean at 2005-01-01T00:00Z is part of a read of 2004.
     assert.deepEqual(
-      (await edge("2004-12-31T23:59:00+00:00")).map((l) => l.level),
+      (await edge("2005-01-01T00:00:00+00:00")).map((l) => l.level),
       [9.1],
     );
-    await assert.rejects(edge("2005-01-01T00:00:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
-    await assert.rejects(edge("1999-12-31T22:00:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(edge("2005-01-01T00:01:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(edge("1999-12-31T22:59:00+00:00"), /unknown WaardeBewerkingsMethode GEMH/);
+    await assert.rejects(
+      edge("2002-01-01T00:00:00+01:00", 999_999_999).then(() =>
+        edge("2023-06-01T00:00:00+00:00", 999_999_999),
+      ),
+      /unknown WaardeBewerkingsMethode GEMH/,
+    );
     // Anywhere else, for the astronomical tide, and at other times, an hourly mean fails rather than vanish.
     for (const [location, options] of [
       ["goeree.lichteiland", { datum: "MSL" }],

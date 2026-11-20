@@ -554,6 +554,7 @@ const MEANS = new Set(["GEM24H"]);
  * to 2004, which levels read (erratum `rws-hourly-means-weirs`). Anywhere else, or at other times,
  * a `GEMH` series fails.
  */
+// A request's end is inclusive, so a read of 2004 holds the mean stamped at 2005-01-01T00:00Z too.
 const MEANS_SINCE = Date.parse("1999-12-31T23:00:00Z");
 const MEANS_UNTIL = Date.parse("2005-01-01T00:00:00Z");
 export const HOURLY_MEANS = new Set(
@@ -615,8 +616,11 @@ function readings(location: string, series: Series[], hourly = false): Series[] 
         how === "GEMH" &&
         hourly &&
         HOURLY_MEANS.has(location) &&
-        valueTimes(s).length > 0 &&
-        valueTimes(s).every((t) => t >= MEANS_SINCE && t < MEANS_UNTIL)
+        s.MetingenLijst.length > 0 &&
+        s.MetingenLijst.every((m) => {
+          const t = Date.parse(m.Tijdstip);
+          return t >= MEANS_SINCE && t <= MEANS_UNTIL;
+        })
       )
         return true;
       if (how !== "NVT" && !MEANS.has(how))

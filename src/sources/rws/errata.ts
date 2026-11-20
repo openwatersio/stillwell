@@ -118,10 +118,13 @@ export default {
       reported: null,
       report: null,
       check: async (store, e) => {
-        // Hourly values on the hour, read on one day of each of three years.
+        // Hourly values on the hour, read on two days of each year of the span; a station that has a gap on all of them fails.
         for (const station of e.stations!) {
           let read = 0;
-          for (const day of ["2000-03-15", "2002-03-15", "2004-03-15"]) {
+          for (const day of ["2000", "2001", "2002", "2003", "2004"].flatMap((y) => [
+            `${y}-03-15`,
+            `${y}-09-15`,
+          ])) {
             const rows = await store.levels(station, day, dayAfter(day, 1));
             read += rows.length;
             const off = rows.filter((o) => o.time % 3_600_000 !== 0);
