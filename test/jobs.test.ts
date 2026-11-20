@@ -13,24 +13,10 @@ import { stationListPath } from "../src/store/paths.ts";
 
 describe("sourcesFor", () => {
   it("picks each job's sources from the adapters' metadata", () => {
-    assert.deepEqual(sourcesFor("hourly"), [
-      "cdec",
-      "coops",
-      "dmi",
-      "ea",
-      "kartverket",
-      "pegelonline",
-      "refmar",
-      "rws",
-      "sfwmd",
-      "smhi",
-      "unam",
-      "usace",
-      "usgs",
-    ]);
     assert.deepEqual(sourcesFor("compact"), [
       "bodc",
       "bom",
+      "cco",
       "cdec",
       "cmems",
       "coops",
@@ -44,6 +30,7 @@ describe("sourcesFor", () => {
       "jodc",
       "kartverket",
       "linz",
+      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -54,16 +41,11 @@ describe("sourcesFor", () => {
       "usace",
       "usgs",
     ]);
-    // CCO and the Marine Institute are on the server's job queue (src/sources/server.json), so Actions leaves them out.
-    assert.deepEqual(
-      sourcesFor("lists"),
-      Object.keys(sources)
-        .filter((id) => id !== "cco" && id !== "marine-institute")
-        .sort(),
-    );
+    assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "bom",
+      "cco",
       "cmems",
       "coops",
       "crms",
@@ -71,6 +53,7 @@ describe("sourcesFor", () => {
       "jma",
       "kartverket",
       "linz",
+      "marine-institute",
       "refmar",
       "rws",
       "sfwmd",
@@ -88,10 +71,9 @@ describe("sourcesFor", () => {
   });
 
   it("polls hourly only sources that can fetch observed levels", () => {
-    for (const id of sourcesFor("hourly")) {
-      const source = sources[id]!;
-      assert.ok(source.observations || source.recent, `${id} is hourly with nothing to fetch`);
-    }
+    for (const [id, source] of Object.entries(sources))
+      if (source.metadata.hourly)
+        assert.ok(source.observations || source.recent, `${id} is hourly with nothing to fetch`);
   });
 
   it("schedules only sources that may be redistributed, and compacts every hourly one", () => {
@@ -109,7 +91,7 @@ describe("sourcesFor", () => {
     });
     try {
       sources.zz = fake(false, { observations: base.observations });
-      for (const job of ["hourly", "compact", "lists", "refetch"] as const)
+      for (const job of ["compact", "lists", "refetch"] as const)
         assert.ok(!sourcesFor(job).includes("zz"), job);
       // A source whose only fetch is a sweep of recent values is still folded.
       sources.zz = fake(true, { recent: base.recent });
@@ -130,7 +112,7 @@ describe("scripts/sources.ts", () => {
     execFileSync(process.execPath, ["scripts/sources.ts", ...args], { encoding: "utf8" });
 
   it("prints a job's sources as a JSON array for a workflow matrix", () => {
-    assert.deepEqual(JSON.parse(run("hourly")), sourcesFor("hourly"));
+    assert.deepEqual(JSON.parse(run("compact")), sourcesFor("compact"));
     assert.deepEqual(JSON.parse(run("refetch", "coops", "pegelonline")), ["coops"]);
   });
 
@@ -173,10 +155,7 @@ describe("scripts/sources.ts imports", () => {
 describe("scheduled jobs for a source with no list yet", () => {
   it("skip it, saying the Monthly workflow starts its list", () => {
     const root = mkdtempSync(join(tmpdir(), "stillwell-jobs-"));
-    for (const args of [
-      ["recent", "coops"],
-      ["compact", "coops"],
-    ]) {
+    for (const args of [["compact", "coops"]]) {
       const out = execFileSync(process.execPath, ["scripts/ingest.ts", ...args], {
         encoding: "utf8",
         env: {
@@ -203,11 +182,8 @@ describe("Monthly workflow", () => {
     const step = jobs.lists!.steps.find((s) => s.run?.includes("monthly.sh requalify-recent"));
     assert.ok(step, "the lists job requalifies");
     assert.equal(jobs.lists!.concurrency?.group, "store-${{ matrix.source }}");
-    // A dispatched refresh of named sources, such as Ingest hourly's on a datum change, skips it.
-    assert.equal(
-      step.if,
-      "${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}",
-    );
+    // A dispatched refresh of named sources, such as the poller's on a datum change, skips it.
+    assert.equal(step.if, "${{ !cancelled() && !inputs.sources }}");
     // From the year two months back, since compaction refolds a month's last
     // days with the window's flags after the run, so December's are judged in
     // February; to last month's year, the end exclusive. scripts/monthly.sh
@@ -230,7 +206,7 @@ describe("Monthly workflow", () => {
     const refresh = steps.findIndex((s) => s.run?.includes("monthly.sh refresh"));
     assert.ok(at > refresh && refresh >= 0, "list-backfills follows the refresh");
     // For every source, since a source without list backfills runs none.
-    assert.equal(steps[at]!.if, "${{ !cancelled() && steps.owns.outcome == 'success' }}");
+    assert.equal(steps[at]!.if, "${{ !cancelled() }}");
     const keys = (env: Record<string, string> = {}) =>
       Object.keys(env).filter(
         (k) => !k.startsWith("S3_") && !["SOURCE", "STILLWELL_STORE"].includes(k),
@@ -242,7 +218,7 @@ describe("Monthly workflow", () => {
   });
 
   it("puts no job but the lists and refetch in a source's group", () => {
-    // A new job queued in a source's group would cancel the one waiting there, such as a compaction.
+    // A new job queued in a source's group waits behind every one there, such as a compaction.
     const grouped = Object.entries(jobs)
       .filter(([, job]) => job.concurrency?.group.startsWith("store-"))
       .map(([name]) => name);
@@ -275,5 +251,27 @@ describe("backfill over an empty station list", () => {
     );
     assert.notEqual(run.status, 0);
     assert.match(run.stderr, /crms: no station to backfill/);
+  });
+});
+
+describe("concurrency groups", () => {
+  it("queue every run that waits on the store, rather than replace the one waiting", () => {
+    const files = ["ingest", "compact-daily", "monthly", "migrations"].map(
+      (name) => [name, parse(readFileSync(`.github/workflows/${name}.yml`, "utf8"))] as const,
+    );
+    for (const [name, workflow] of files) {
+      const groups = [
+        ["workflow", workflow.concurrency],
+        ...Object.entries(workflow.jobs as Record<string, { concurrency?: unknown }>).map(
+          ([job, j]) => [job, j.concurrency] as const,
+        ),
+      ].filter(([, c]) => c && typeof c === "object") as [
+        string,
+        { group: string; queue?: string },
+      ][];
+      for (const [job, c] of groups)
+        if (!c.group.startsWith("alert-") && !/^\$\{\{.*alert-/.test(c.group))
+          assert.equal(c.queue, "max", `${name} ${job}`);
+    }
   });
 });

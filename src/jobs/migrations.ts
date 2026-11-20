@@ -1,14 +1,12 @@
 import { readdir } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { INGEST_OPTIONS } from "../ingest-options.ts";
-import type { DatabaseSync } from "node:sqlite";
-import { MAX_TIMEOUT, commandProblems, laneOf, serverRuns, words } from "./commands.ts";
-import { enqueue, getJob, type MigrationRow } from "./queue.ts";
+import { MAX_TIMEOUT, commandProblems, laneOf, words } from "./commands.ts";
 
 /**
- * The work a merged change needs done to the store, which the job service
- * runs once, one step at a time, in the order of the files in src/migrations/
- * (docs/plans/jobs.md).
+ * The work a merged change needs done to the store, which the Migrations
+ * workflow runs once, one step at a time, in the order of the files in
+ * src/migrations/ (src/migrations/README.md).
  */
 export interface Migration {
   description: string;
@@ -107,156 +105,143 @@ export async function loadMigrations(
   );
 }
 
-/** The last migration done before the database's record began, '' for none, or null with no baseline yet. */
-export function baseline(db: DatabaseSync): string | null {
-  const row = db.prepare("SELECT id FROM baseline").get() as { id: string } | undefined;
-  return row ? row.id : null;
+/** One migration's progress, as `migrations.json` in the store holds it. */
+export interface Progress {
+  id: string;
+  /** The next step to run, or the number of steps once done. */
+  step: number;
+  state: "running" | "done" | "failed";
+  error: string | null;
+  updated: string;
 }
 
 /**
- * Begins the record: marks done every migration in `ids` up to `id` ('' for
- * none), so a migration merged afterwards with an earlier name is caught as
- * sorting before them, rather than taken as done.
+ * The record: the last migration done before it began, '' for none, and each migration's progress, those up to the
+ * baseline included as done, so one merged later under an earlier name is caught as sorting before them.
  */
-export function setBaseline(db: DatabaseSync, id: string, ids: string[], now = new Date()): void {
-  db.exec("BEGIN IMMEDIATE");
-  try {
-    db.exec("DELETE FROM baseline");
-    db.prepare("INSERT INTO baseline (id) VALUES (?)").run(id);
-    for (const done of ids.filter((m) => m <= id))
-      db.prepare(
-        "INSERT INTO migrations (id, step, state, job, error, updated) VALUES (?, 0, 'done', NULL, 'done before the baseline', ?) ON CONFLICT (id) DO NOTHING",
-      ).run(done, now.toISOString());
-    db.exec("COMMIT");
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
-  }
+export interface Record {
+  baseline: string;
+  migrations: Progress[];
 }
+
+/** What runs next: a step, a stop with why, or nothing. */
+export type Next =
+  | { id: string; step: number; kind: "ingest"; args: string[]; lane: string; timeout: number }
+  | { id: string; step: number; kind: "check"; lane: "check"; timeout: number }
+  | { stopped: string }
+  | null;
 
 /**
- * The steps of a migration the server can't run yet, which would hold every
- * migration after it. Its checks count too unless the server runs every other
- * step, since they'd read the store before the work they check.
+ * The next step to run: the first unfinished step of the first migration after the baseline that isn't done. A
+ * failed migration stops every one after it until it's retried or skipped, and one that sorts before a migration
+ * already started stops them until it's renamed to sort after.
  */
-export function waiting(migration: Migration): string[] {
-  const ingest = migration.steps.filter((s) => "ingest" in s);
-  const out = ingest.flatMap((step) => (serverRuns(laneOf(argsOf(step))) ? [] : [step.ingest]));
-  if (out.length || !ingest.length)
-    out.push(...migration.steps.flatMap((s) => ("check" in s ? [`check ${s.check}`] : [])));
-  return out;
-}
-
-export function migrationRows(db: DatabaseSync): MigrationRow[] {
-  return db.prepare("SELECT * FROM migrations ORDER BY id").all() as unknown as MigrationRow[];
-}
-
-function save(db: DatabaseSync, row: MigrationRow): void {
-  db.prepare(
-    "INSERT INTO migrations (id, step, state, job, error, updated) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET step = excluded.step, state = excluded.state, job = excluded.job, error = excluded.error, updated = excluded.updated",
-  ).run(row.id, row.step, row.state, row.job, row.error, row.updated);
-}
-
-/**
- * Moves the migrations on: the first not done, and the ones after it once it
- * is. It notes the job of its current step and, once that has succeeded,
- * queues the next step, so one step of one migration runs at a time. It stops
- * at a failed migration, at a step in a lane the server doesn't run yet, and
- * before a migration that sorts before one already started, which it doesn't
- * record. With no baseline it runs none. Returns why it stopped, if not done.
- */
-export function advance(
-  db: DatabaseSync,
-  migrations: [string, Migration][],
-  now = new Date(),
-  runs: (lane: string) => boolean = serverRuns,
-): string | null {
-  if (baseline(db) === null)
-    return "no baseline: run `stillwell-jobs baseline` with the last migration done";
-  const updated = now.toISOString();
-  const rows = new Map(migrationRows(db).map((r) => [r.id, r]));
+export function next(migrations: [string, Migration][], record: Record): Next {
+  const rows = new Map(record.migrations.map((r) => [r.id, r]));
   const last = [...rows.keys()].sort().at(-1);
-
   for (const [id, migration] of migrations) {
-    let row = rows.get(id);
+    const row = rows.get(id);
     if (row?.state === "done") continue;
-    if (row?.state === "failed") return `${id} failed: ${row.error}`;
-    if (!row) {
-      if (last !== undefined && id < last)
-        return `${id} sorts before ${last}, which has started; rename it to sort after`;
-      row = { id, step: 0, state: "running", job: null, error: null, updated };
-    }
-    const fail = (error: string) => {
-      save(db, { ...row!, state: "failed", error, updated });
-      return `${id} failed: ${error}`;
-    };
+    if (row?.state === "failed") return { stopped: `${id} failed: ${row.error}` };
+    if (!row && last !== undefined && id < last)
+      return { stopped: `${id} sorts before ${last}, which has started; rename it to sort after` };
     const found = problems(migration);
-    if (found.length) return fail(found.join("; "));
-
-    for (;;) {
-      if (row.job !== null) {
-        const job = getJob(db, row.job);
-        if (!job) return fail(`its job ${row.job} is gone`);
-        if (job.state === "queued" || job.state === "running" || job.state === "cancelling")
-          return `${id} waits on job ${job.id}`;
-        if (job.state !== "succeeded") return fail(`job ${job.id} ${job.state}: ${job.result}`);
-        row = { ...row, step: row.step + 1, job: null, updated };
-      }
-      if (row.step >= migration.steps.length) {
-        save(db, { ...row, state: "done", updated });
-        break;
-      }
-      const step = migration.steps[row.step];
-      const [command, lane, timeout] =
-        "check" in step
-          ? [["server/check.ts", id, String(row.step)], "check", step.timeout ?? 30]
-          : [["scripts/ingest.ts", ...argsOf(step)], laneOf(argsOf(step)), step.timeout ?? 180];
-      if (!runs(lane)) {
-        save(db, row);
-        return `${id} waits for the server to run ${lane}`;
-      }
-      // One transaction, so a crash between them never leaves a step queued that the record doesn't name.
-      db.exec("BEGIN IMMEDIATE");
-      try {
-        const job = enqueue(db, { command, lane, timeout }, now)!;
-        save(db, { ...row, job: job.id });
-        db.exec("COMMIT");
-        return `${id} waits on job ${job.id}`;
-      } catch (error) {
-        db.exec("ROLLBACK");
-        throw error;
-      }
-    }
+    if (found.length) return { stopped: `${id} can't run: ${found.join("; ")}` };
+    const index = row?.step ?? 0;
+    const step = migration.steps[index];
+    if (!step)
+      return {
+        stopped: `${id} has ${migration.steps.length} steps, but its record is at step ${index}`,
+      };
+    if ("check" in step)
+      return { id, step: index, kind: "check", lane: "check", timeout: step.timeout ?? 30 };
+    const args = argsOf(step);
+    return {
+      id,
+      step: index,
+      kind: "ingest",
+      args,
+      lane: laneOf(args),
+      timeout: step.timeout ?? 180,
+    };
   }
   return null;
 }
 
-/** Sets a failed migration running again from the step it failed at. */
-export function retry(db: DatabaseSync, id: string, now = new Date()): void {
-  const changed = db
-    .prepare(
-      "UPDATE migrations SET state = 'running', job = NULL, error = NULL, updated = ? WHERE id = ? AND state = 'failed'",
-    )
-    .run(now.toISOString(), id).changes;
-  if (!changed) throw new Error(`${id} hasn't failed`);
+function put(record: Record, row: Progress): Record {
+  return { ...record, migrations: [...record.migrations.filter((r) => r.id !== row.id), row] };
 }
 
-/** Marks a failed migration done without its remaining steps, for a step a person has decided can't or needn't pass. */
-export function skip(db: DatabaseSync, id: string, now = new Date()): void {
-  const changed = db
-    .prepare(
-      "UPDATE migrations SET state = 'done', job = NULL, error = 'skipped by hand: ' || error, updated = ? WHERE id = ? AND state = 'failed'",
-    )
-    .run(now.toISOString(), id).changes;
-  if (!changed) throw new Error(`${id} hasn't failed`);
+/** A new record whose baseline is `id` ('' for none), with every migration up to it done. */
+export function begin(migrations: [string, Migration][], id: string, now = new Date()): Record {
+  if (id && !migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
+  return {
+    baseline: id,
+    migrations: migrations
+      .filter(([m]) => id && m <= id)
+      .map(([m, migration]) => ({
+        id: m,
+        step: migration.steps.length,
+        state: "done",
+        error: "done before the record began",
+        updated: now.toISOString(),
+      })),
+  };
 }
 
-/** Whether `advance` stopped for something a person must fix, rather than to wait on a job. */
-export function stuck(stopped: string | null): boolean {
-  return (
-    !!stopped &&
-    / failed: | sorts before | waits for the server |^no baseline|^migrations can't load/.test(
-      stopped,
-    )
-  );
+/** The record after step `step` of `id` succeeded: the next step, or done after the last. */
+export function done(
+  record: Record,
+  migrations: [string, Migration][],
+  id: string,
+  step: number,
+  now = new Date(),
+): Record {
+  const migration = migrations.find(([m]) => m === id)?.[1];
+  if (!migration) throw new Error(`no migration ${id}`);
+  const last = step + 1 >= migration.steps.length;
+  return put(record, {
+    id,
+    step: step + 1,
+    state: last ? "done" : "running",
+    error: null,
+    updated: now.toISOString(),
+  });
+}
+
+/** The record after step `step` of `id` failed, which stops every migration after it. */
+export function fail(
+  record: Record,
+  id: string,
+  step: number,
+  error: string,
+  now = new Date(),
+): Record {
+  return put(record, { id, step, state: "failed", error, updated: now.toISOString() });
+}
+
+/** The record with a failed migration set to run its failed step again. */
+export function retry(record: Record, id: string, now = new Date()): Record {
+  const row = record.migrations.find((r) => r.id === id);
+  if (row?.state !== "failed") throw new Error(`${id} hasn't failed`);
+  return put(record, { ...row, state: "running", error: null, updated: now.toISOString() });
+}
+
+/** The record with a migration that failed or hasn't finished marked done without its remaining steps. */
+export function skip(
+  record: Record,
+  migrations: [string, Migration][],
+  id: string,
+  now = new Date(),
+): Record {
+  if (!migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
+  const row = record.migrations.find((r) => r.id === id);
+  if (row?.state === "done") throw new Error(`${id} is done`);
+  return put(record, {
+    id,
+    step: row?.step ?? 0,
+    state: "done",
+    error: "skipped",
+    updated: now.toISOString(),
+  });
 }

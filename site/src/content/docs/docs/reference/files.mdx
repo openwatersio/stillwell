@@ -13,7 +13,7 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 
 - [Observations](/docs/reference/observations/#observed-levels): `obs/<source>/<station>/<year>.parquet`, one file per station per UTC year.
 - [Observed extremes](/docs/reference/observations/#observed-extremes): `extremes/<source>/<station>/<year>.parquet`, the source's high and low waters.
-- [The last 7 days](/docs/reference/observations/#the-latest-values): `recent/<source>.parquet`, every live station of a source in one file, rewritten every hour.
+- [Recent days](/docs/reference/observations/#the-latest-values): `recent/<source>/<YYYY-MM-DD>.parquet`, every live station of a source for one UTC day, with today's rewritten every hour.
 - [Predictions](/docs/reference/predictions/#predicted-curve): `predictions/<source>/<station>/<year>.parquet`, the source's predicted curve.
 - [Predicted extremes](/docs/reference/predictions/#predicted-extremes): `predicted-extremes/<source>/<station>/<year>.parquet`, the source's predicted high and low waters.
 
@@ -31,7 +31,7 @@ Every file is under `https://stillwell.openwaters.io/`, readable over HTTPS with
 
 ## Reading one station
 
-`stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station, in row groups of 2,048 rows whose statistics give each group's first and last station. A reader that filters on one station and fetches only the byte ranges it needs, as DuckDB, Polars and hyparquet do, reads the file's footer and the one or two groups holding that station rather than the whole file. `stations/links.parquet` has the same groups sorted by `a`, so only a filter on `a` skips them. `recent/<source>.parquet` is sorted by `station` in much larger row groups.
+`stations.parquet`, `stations/offsets.parquet`, `stations/years/<source>.parquet` and `stations/analysis/<source>.parquet` are sorted by station, in row groups of 2,048 rows whose statistics give each group's first and last station. A reader that filters on one station and fetches only the byte ranges it needs, as DuckDB, Polars and hyparquet do, reads the file's footer and the one or two groups holding that station rather than the whole file. `stations/links.parquet` has the same groups sorted by `a`, so only a filter on `a` skips them. The files under `recent/` are sorted by `station` in much larger row groups.
 
 ## Machine-readable description
 
