@@ -16,6 +16,7 @@ import {
   yearsToMeasure,
   type LinkOffset,
 } from "../src/links.ts";
+import { withoutGone } from "../src/matches.ts";
 import { Flag, type Epoch, type Observation, type StoredStation } from "../src/schema.ts";
 import { writeObservations } from "../src/store/parquet.ts";
 import { seriesPath } from "../src/store/paths.ts";
@@ -347,6 +348,19 @@ describe("measureLinks", () => {
       assert.deepEqual((await measureLinks(dir, apart, 1, [row()])).rows, []);
       // Not once a station has opened a new epoch.
       assert.deepEqual((await measureLinks(dir, pair(), 1, [row({ b_epoch: 2 })])).rows, []);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("keeps a withheld station's row, which withoutGone takes out", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "links-"));
+    try {
+      // A withheld station leaves its list, so the run can't tell it from one whose list is missing.
+      const listed = pair().filter((s) => s.id !== "pegelonline/cux");
+      assert.deepEqual((await measureLinks(dir, listed, 1, [row()])).rows, [row()]);
+      const shown = (id: string) => id !== "pegelonline/cux";
+      assert.deepEqual(withoutGone([row()], listed, shown), []);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
