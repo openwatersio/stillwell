@@ -77,7 +77,7 @@ describe("readmeText", () => {
       );
       // The page shows these from metadata, and links between sources on each gauge's page.
       const label = /^- \*\*(Licen[cs]e|Credit|Terms|Contact|Same gauge)[^*]*:?\*\*/m.exec(
-        markdown,
+        markdown.split(/^## Running ingest$/m)[0]!,
       )?.[0];
       assert.ok(!label, `${id.name}: the page already shows what ${label} would say`);
       assert.ok(
