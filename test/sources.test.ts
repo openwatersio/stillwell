@@ -11,7 +11,7 @@ import * as kuestendaten from "../src/sources/pegelonline/kuestendaten.ts";
 import { sources } from "../src/sources/index.ts";
 import * as refmar from "../src/sources/refmar/index.ts";
 import * as rws from "../src/sources/rws/index.ts";
-import rwsErrata from "../src/sources/rws/errata.json" with { type: "json" };
+import rwsErrata from "../src/sources/rws/errata.ts";
 import * as uhslc from "../src/sources/uhslc/index.ts";
 import { CONTRIBUTORS } from "../src/sources/uhslc/contributors.ts";
 import {

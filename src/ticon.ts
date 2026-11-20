@@ -1,4 +1,5 @@
 import { idOfGeslaFile } from "./sources/ispra/index.ts";
+import { distanceKm as km } from "./stats.ts";
 import { urlSafe } from "./store/paths.ts";
 import { LINKS } from "./same-as.ts";
 import type { Station } from "./schema.ts";
@@ -584,15 +585,7 @@ export function sharesWord(a: string, b: string): boolean {
   return nameScore(a, b).identifying > 0;
 }
 
-export function km(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
-  const rad = Math.PI / 180;
-  const dLat = (b.lat - a.lat) * rad;
-  const dLon = (b.lon - a.lon) * rad;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
-  return 2 * 6371 * Math.asin(Math.sqrt(h));
-}
+export { km };
 
 function round(value: number): number {
   return Math.round(value * 100) / 100;

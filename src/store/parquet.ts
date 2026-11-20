@@ -367,6 +367,33 @@ export async function readHourly(path: string): Promise<Map<number, number> | nu
   return new Map(rows.filter((r) => r.v !== null).map((r) => [Number(r.h), Number(r.v)]));
 }
 
+/**
+ * A series file's observations at times from `from` to before `to` (epoch ms),
+ * filtered in the query, so a remote read fetches only the row groups that
+ * hold them rather than the whole year.
+ */
+export async function readObservationsBetween(
+  path: string,
+  from: number,
+  to: number,
+): Promise<Observation[]> {
+  // read_parquet globs, so a station ID with a glob character reads only its own file.
+  const glob = /[*?[]/.test(path);
+  const span = `time >= make_timestamp(${Math.round(from) * 1000}) AND time < make_timestamp(${Math.round(to) * 1000})`;
+  const rows = await read(
+    path,
+    OBSERVATION_COLUMNS,
+    "time",
+    "",
+    `WHERE ${span}${glob ? ` AND filename = ${quote(path)}` : ""}`,
+    glob,
+  );
+  return rows.map((r) => {
+    delete r.filename;
+    return observation(r);
+  });
+}
+
 /** A series file's observations and the datums it holds, in one read. */
 export async function readObservationFile(
   path: string,

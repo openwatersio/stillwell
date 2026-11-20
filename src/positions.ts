@@ -1,4 +1,4 @@
-import { km } from "./ticon.ts";
+import { distanceKm as km } from "./stats.ts";
 
 interface Position {
   lat: number;
