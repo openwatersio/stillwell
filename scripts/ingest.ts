@@ -172,9 +172,8 @@ import type {
   Station,
 } from "../src/schema.ts";
 import { errata, errataProblems, sourceOf, sources } from "../src/sources/index.ts";
-import { dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
+import { DROPS, dropFiles, removePrefixes, withhold, withheldReason } from "../src/withhold.ts";
 import { misplaced } from "../src/store/misplaced.ts";
-import { deletesFiles } from "../src/sources/gesla/dropped.ts";
 import { storeFor, storeOfSource } from "../src/store/stores.ts";
 import { measureLinks, readLinks, writeLinks } from "../src/links.ts";
 import {
@@ -240,9 +239,6 @@ async function listedStations(
   }
   return stations;
 }
-
-/** The records whose files `drop` deletes, by source. */
-const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,

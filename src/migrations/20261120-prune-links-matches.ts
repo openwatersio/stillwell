@@ -4,7 +4,7 @@ import { sources } from "../sources/index.ts";
 import { readStationList } from "../store/parquet.ts";
 import { stationListPath } from "../store/paths.ts";
 import { storeOfSource } from "../store/stores.ts";
-import { withheldReason } from "../withhold.ts";
+import { DROPS, withheldReason } from "../withhold.ts";
 import type { StoredStation } from "../schema.ts";
 import type { Migration } from "../jobs/migrations.ts";
 
@@ -33,9 +33,10 @@ export default {
           }
           if (home !== store) continue;
           const list = await readStationList(stationListPath(store, source.metadata.id));
-          // A dropped GESLA record is known only through GESLA's list.
+          // A dropped record is known only through its source's list.
           if (list) listed.push(...list);
-          else if (source.metadata.id === "gesla") throw new Error(`${store}: no list for gesla`);
+          else if (source.metadata.id in DROPS)
+            throw new Error(`${store}: no list for ${source.metadata.id}`);
         }
         const shown = (id: string) => {
           const source = sources[id.split("/")[0]!];

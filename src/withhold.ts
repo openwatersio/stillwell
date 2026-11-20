@@ -1,3 +1,4 @@
+import { deletesFiles } from "./sources/gesla/dropped.ts";
 /**
  * Stations withheld from the store because their owner refused republication
  * (`Source.withheld`). A refresh drops them from the source's list and their
@@ -353,3 +354,6 @@ export async function withhold(
   const rows = await dropWithheldRows(store, source);
   return { ids, prefixes, rows };
 }
+
+/** The records whose files `drop` deletes, by source; a dropped record is known only through its source's list. */
+export const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
