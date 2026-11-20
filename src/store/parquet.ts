@@ -748,6 +748,18 @@ export async function publishedSources(path: string): Promise<string[]> {
   return rows.map((r) => String(r.source));
 }
 
+/** Each source in a published `stations.parquet`, with the products its stations list. */
+export async function publishedProducts(path: string): Promise<Map<string, Set<string>>> {
+  const rows = await read(path, "SELECT source, to_json(products)::VARCHAR AS products", "source");
+  const out = new Map<string, Set<string>>();
+  for (const r of rows) {
+    const set = out.get(String(r.source)) ?? new Set<string>();
+    for (const p of JSON.parse(String(r.products)) as string[]) set.add(p);
+    out.set(String(r.source), set);
+  }
+  return out;
+}
+
 /**
  * The highest epoch directory each station has among the files `patterns`
  * match, by the station's directory (`epochDirs` without its last two parts).
