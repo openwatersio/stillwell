@@ -45,8 +45,10 @@ jobs:
       - id: ran
         run: |
           if [ "$EVENT" = workflow_dispatch ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          done=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?per_page=100" --paginate \
-            --jq '.jobs[] | select((.name | test("^(lists|refetch)( |$)")) and .conclusion == "success") | .name' | wc -l)
+          # Assigned first, so a failed lookup fails the step rather than reading as no work.
+          jobs=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?per_page=100" --paginate \
+            --jq '.jobs[] | select((.name | test("^(lists|refetch)( |$)")) and .conclusion == "success") | .name')
+          done=$(printf '%s' "$jobs" | grep -c . || true)
           echo "$done lists or refetch jobs succeeded in the Monthly run"
           echo "run=$([ "$done" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
         env:

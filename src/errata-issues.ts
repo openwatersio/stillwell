@@ -61,6 +61,13 @@ export function issueBody(
   return `<!-- erratum: ${r.id} -->\n${section(r, repo, run)}`;
 }
 
+/** The part of `body` the workflow wrote, with its line endings; empty where it has none. */
+function own(body: string): string {
+  const text = body.replace(/\r\n/g, "\n");
+  const [start, end] = [text.indexOf(START), text.indexOf(END)];
+  return start === -1 || end < start ? "" : text.slice(start, end);
+}
+
 /** `body` with the workflow's section brought up to date, and the rest kept. */
 function updated(
   body: string,
@@ -88,13 +95,14 @@ export function planIssues(
   run: string,
 ): IssueAction[] {
   const actions: IssueAction[] = [];
+  const unreadable = new Set(results.filter((r) => r.unreadable).map((r) => r.id));
   const byId = new Map<string, OpenIssue>();
   for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
     const id = MARKER.exec(issue.body)?.[1];
     if (!id) continue;
-    if (byId.has(id))
+    if (!byId.has(id)) byId.set(id, issue);
+    else if (!unreadable.has(id))
       actions.push({ kind: "close", number: issue.number, id, reason: "duplicate" });
-    else byId.set(id, issue);
   }
   for (const r of results) {
     const issue = byId.get(r.id);
@@ -102,7 +110,7 @@ export function planIssues(
     if (r.error === null) {
       if (issue) actions.push({ kind: "close", number: issue.number, id: r.id, reason: "passes" });
     } else if (!issue) actions.push({ kind: "open", id: r.id, source: r.source, error: r.error });
-    else if (!issue.body.replace(/\r\n/g, "\n").includes(quoted(r.error)))
+    else if (!own(issue.body).includes(quoted(r.error)))
       actions.push({
         kind: "update",
         number: issue.number,

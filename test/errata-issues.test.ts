@@ -66,6 +66,25 @@ describe("planIssues", () => {
     );
   });
 
+  it("leaves duplicates of an erratum it couldn't read", () => {
+    assert.deepEqual(
+      planIssues(
+        [result("a", "x", true)],
+        [issue(6, "a", "x"), issue(7, "a", "x")],
+        known,
+        repo,
+        run,
+      ),
+      [],
+    );
+  });
+
+  it("updates its own section when only a maintainer's note quotes the new failure", () => {
+    const noted = `${issue(2, "a", "x").body}\n\n${quoted("y")}`;
+    const [update] = planIssues([result("a", "y")], [{ number: 2, body: noted }], known, repo, run);
+    assert.equal(update?.kind, "update");
+  });
+
   it("reads a body edited on the web, and keeps what a maintainer added", () => {
     const edited = `${issue(2, "a", "x").body.replaceAll("\n", "\r\n")}\r\n\r\nLooked at this.`;
     assert.deepEqual(
