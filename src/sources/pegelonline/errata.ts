@@ -348,8 +348,10 @@ export default {
           const o = values.find((v) => v.time === Date.parse(`${day}T${hm}Z`));
           if (!o || Math.abs(o.level - level) >= 0.005)
             throw new Error(`the store holds no ${level} m at ${hm} on ${day} at ${station}`);
-          if (o.source_flag == null || o.flag < Flag.suspect)
-            throw new Error(`${station}'s ${level} m at ${hm} is flagged ${o.flag}, not suspect`);
+          if (o.source_flag !== Flag.preliminary || o.flag < Flag.suspect)
+            throw new Error(
+              `${station}'s ${level} m at ${hm} is flagged ${o.flag}, source flag ${o.source_flag}, not suspect over PEGELONLINE's preliminary flag`,
+            );
         }
       },
     },

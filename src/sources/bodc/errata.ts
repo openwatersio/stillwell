@@ -1,4 +1,4 @@
-import { dayAfter, flaggedSpan, type ErrataFile, type StoreReader } from "../../errata.ts";
+import { dayAfter, type ErrataFile, type StoreReader } from "../../errata.ts";
 import { POSITIONS } from "../../positions.ts";
 import { Flag } from "../../schema.ts";
 import { distanceKm } from "../../stats.ts";
@@ -99,26 +99,29 @@ export default {
         "In BODC's ERDDAP record of St. Helier, as the store holds it, checked in November 2026: 5.559 m at 19:00, 0.000 m at 19:15 with BODC's good flag, nothing until 20:15, then 6.772 m.",
       check: async (store, e) => {
         const day = e.since!;
+        const at = (hm: string) => Date.parse(`${day}T${hm}Z`);
         const rows = (await levels(store, e.stations![0]!, day)).filter(
-          (o) => o.time >= Date.parse(`${day}T19:00Z`),
+          (o) => o.time >= at("18:45"),
         );
-        const [before, zero, after] = rows;
+        const [first, before, zero, after] = rows;
         if (
-          before?.time !== Date.parse(`${day}T19:00Z`) ||
+          first?.time !== at("18:45") ||
+          before?.time !== at("19:00") ||
           Math.abs(before.level - 5.559) > 0.0005 ||
-          zero?.time !== Date.parse(`${day}T19:15Z`) ||
+          zero?.time !== at("19:15") ||
           zero.level !== 0 ||
-          !after ||
-          after.time - zero.time < 3_600_000 ||
-          Math.abs(after.level - 6.77) > 0.005
+          after?.time !== at("20:15") ||
+          Math.abs(after.level - 6.772) > 0.0005
         )
           throw new Error(
-            `St. Helier doesn't hold 5.559 m at 19:00, 0.000 m at 19:15 and 6.77 m after an hour's gap on ${day}`,
+            `St. Helier doesn't hold 5.559 m at 19:00, 0.000 m at 19:15 and 6.772 m at 20:15 on ${day}`,
           );
-        if (zero.source_flag !== Flag.good || zero.flag < Flag.suspect)
-          throw new Error(
-            `St. Helier's 0.000 m is flagged ${zero.flag}, source flag ${zero.source_flag}, not suspect over BODC's good flag`,
-          );
+        // QC's, over BODC's good flag: the zero and the two values before it.
+        for (const o of [first, before, zero])
+          if (o.source_flag !== Flag.good || o.flag < Flag.suspect)
+            throw new Error(
+              `St. Helier's ${o.level} m at ${new Date(o.time).toISOString().slice(11, 16)} is flagged ${o.flag}, source flag ${o.source_flag}, not suspect over BODC's good flag`,
+            );
       },
     },
     {
