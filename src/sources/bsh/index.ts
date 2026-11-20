@@ -40,6 +40,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: ATTRIBUTION,
+  // The tide service's mailbox, given on https://gezeiten.bsh.de/.
   contact: { email: "gezeiten@bsh.de" },
   chart_datum: "SKN",
   // Predictions only, published a year ahead; nothing to poll or finalize.

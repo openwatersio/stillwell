@@ -863,7 +863,7 @@ export const SOURCES_SCHEMA: JsonSchema = {
         additionalProperties: false,
         properties: {
           email: { type: nullable("string"), description: "The agency's published mailbox." },
-          url: { type: nullable("string"), description: "The agency's contact form." },
+          url: { type: nullable("string"), description: "The agency's contact page." },
         },
         anyOf: [
           { required: ["email"], properties: { email: { type: "string" } } },
@@ -872,7 +872,8 @@ export const SOURCES_SCHEMA: JsonSchema = {
       },
       terms: {
         type: nullable("string"),
-        description: "Anything a user of the data should know about the terms.",
+        description:
+          "Anything a user of the data should know about the source's conditions of use. Stillwell changes every source's data the same way: levels in meters, times in UTC, values the source marks missing left out, and a quality flag on each value. Each source's quality codes map to the flag as its README says. The source's README and errata describe any other change.",
       },
       finalizes: {
         type: "boolean",

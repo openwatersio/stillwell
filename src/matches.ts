@@ -1,6 +1,7 @@
-import { median, monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
+import { monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
+import { median } from "./stats.ts";
 import type { StoredStation } from "./schema.ts";
-import { comparable } from "./same-as.ts";
+import { comparable, joinsNoGroup } from "./same-as.ts";
 import { FILES } from "./store/files.ts";
 import { isMissing, readHourly, readRows, writeTable } from "./store/parquet.ts";
 import { matchesPath, seriesPath } from "./store/paths.ts";
@@ -68,6 +69,25 @@ export const differsByData = (m: DataMatch) =>
 
 const hasLevels = (s: StoredStation) =>
   s.products.includes("levels") && s.first !== null && s.last !== null;
+
+/**
+ * Last month's rows of `stations/links.parquet` or `stations/matches.parquet`,
+ * less those naming a station left out by decision: one withheld (`shown` is
+ * false), or one in `stations` that joins no group (`joinsNoGroup`), such as a
+ * GESLA record `isDropped` finds. Neither run reads such a station again, so
+ * nothing else takes its rows away. A station listed without levels for any
+ * other reason, or missing from `stations`, as a list that can't be read
+ * leaves it, keeps its rows.
+ */
+export function withoutGone<T extends { a: string; b: string }>(
+  rows: T[],
+  stations: StoredStation[],
+  shown: (id: string) => boolean,
+): T[] {
+  const gone = new Set(stations.filter(joinsNoGroup).map((s) => s.id));
+  const kept = (id: string) => shown(id) && !gone.has(id);
+  return rows.filter((r) => kept(r.a) && kept(r.b));
+}
 
 /**
  * The pairs to compare, `a` < `b`, nearest first: every pair within `MATCH_KM` that

@@ -21,6 +21,7 @@ export const metadata: SourceMetadata = {
   id: "ispra",
   name: "ISPRA, Rete Mareografica Nazionale",
   url: "https://www.mareografico.it/",
+  // mareografico.it's legal notes and every page's footer give CC BY 4.0, as does the network's RDF record. The CSV files carry no license of their own.
   license: {
     id: "CC-BY-4.0",
     name: "Creative Commons Attribution 4.0 International",
@@ -33,7 +34,7 @@ export const metadata: SourceMetadata = {
   // mareografico.it publishes no address for errors in the data.
   contact: { url: "https://www.mareografico.it/" },
   terms:
-    "CC BY 4.0: credit ISPRA, link to the license and say if the data was changed. ISPRA releases the values as they are, from unvalidated dynamic data, accepts no responsibility for errors or omissions, and says its own database prevails where the two differ. Changes in the store: levels converted from centimeters to meters and flagged preliminary.",
+    "ISPRA releases the values as they are, accepts no responsibility for errors or omissions, and says its own database prevails where the two differ.",
   // ISPRA's open files are monthly archives that stop in 2023, and its live view has no API.
   hourly: false,
   // Every file is validation level L0, and ISPRA publishes no validated version.

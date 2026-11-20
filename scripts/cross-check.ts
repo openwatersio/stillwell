@@ -21,13 +21,13 @@ import {
   copies,
   dailyMeans,
   distanceKm,
-  median,
   monthlyAgreement,
   runs,
   timing,
   type Hourly,
 } from "../src/cross-check.ts";
 import { STANDARD, fit, resolvable } from "../src/harmonic.ts";
+import { median } from "../src/stats.ts";
 import { USER_AGENT } from "../src/http.ts";
 import { isMissing } from "../src/store/parquet.ts";
 import { seriesPath, stationsPath } from "../src/store/paths.ts";

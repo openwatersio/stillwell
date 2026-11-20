@@ -114,7 +114,7 @@ Jobs are idempotent and resume where they stopped, as requalify does now with it
 
 A job is started for one source, or for one station and its years, through an admin endpoint of `stillwell-api`, from a workflow or a maintainer's machine. The API has no public hostname, so how those reach the endpoint is settled when it's built. The same endpoint shows when a job ran, how far it got and whether it succeeded, and Grafana gets queue depth, running jobs, failures and run times per kind.
 
-A deploy that changes a source's `errata.json` queues a requalify of the station-years the changed entries cover.
+A deploy that changes a source's `errata.ts` queues a requalify of the station-years the changed entries cover.
 
 A full requalify under new rules inserts a new version of most rows, which doubles those partitions until ClickHouse merges them. It runs one year partition at a time and runs `OPTIMIZE ... PARTITION ... FINAL` after each, so `FINAL` reads stay fast and disk use stays bounded.
 

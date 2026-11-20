@@ -8,6 +8,7 @@ import {
   compareStations,
   pairsToCompare,
   tooManyStopped,
+  withoutGone,
   type DataMatch,
 } from "../src/matches.ts";
 import { linkGauges } from "../src/same-as.ts";
@@ -412,5 +413,40 @@ describe("tooManyStopped", () => {
     assert.equal(tooManyStopped(21, 410), true);
     assert.equal(tooManyStopped(19, 100), false);
     assert.equal(tooManyStopped(20, 400), false);
+  });
+});
+
+describe("withoutGone", () => {
+  // GESLA lists a record isDropped finds as inactive, with no products.
+  const crms = station("crms/CRMS0153-H01");
+  const copy = station("gesla/crms0153-crms0153-usa-crms", { products: [], status: "inactive" });
+  const all = () => true;
+
+  it("takes out a dropped record's rows, which compareStations keeps", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "matches-"));
+    try {
+      const previous = [match(crms.id, copy.id)];
+      // Its pair is never compared again, so the run alone keeps last month's row.
+      assert.deepEqual((await compareStations(dir, [crms, copy], 1, previous)).rows, previous);
+      assert.deepEqual(withoutGone(previous, [crms, copy], all), []);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("takes out a withheld station's rows", () => {
+    const b = station("b/1");
+    assert.deepEqual(
+      withoutGone([match(crms.id, "b/1")], [crms, b], (id) => id !== "b/1"),
+      [],
+    );
+  });
+
+  it("keeps rows of a station no list holds, one with no bounds, or one listed without levels", () => {
+    const unbounded = station("b/1", { first: null, last: null });
+    // REFMAR lists a gauge SHOM hides with no products, and it keeps its values.
+    const hidden = station("refmar/3", { products: [] });
+    const rows = [match(crms.id, "b/1"), match(crms.id, "c/1"), match(crms.id, "refmar/3")];
+    assert.deepEqual(withoutGone(rows, [crms, unbounded, hidden], all), rows);
   });
 });

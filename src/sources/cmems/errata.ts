@@ -1,0 +1,218 @@
+import {
+  dayAfter,
+  flaggedSpan,
+  impossibleDropped,
+  type ErrataFile,
+  type StoreReader,
+} from "../../errata.ts";
+import { Flag } from "../../schema.ts";
+
+const iso = (time: number) => new Date(time).toISOString();
+
+/** A station's levels on `day`; throws when the store holds none. */
+async function levels(store: StoreReader, id: string, day: string) {
+  const rows = await store.levels(id, day, dayAfter(day, 1));
+  if (!rows.length) throw new Error(`the store holds no ${id} levels on ${day}`);
+  return rows;
+}
+
+export default {
+  errata: [
+    {
+      id: "cmems-baltic-names",
+      stations: [
+        "cmems/Ahus",
+        "cmems/Angelholm",
+        "cmems/Arko",
+        "cmems/Barseback",
+        "cmems/Bjorn",
+        "cmems/Bonan",
+        "cmems/Degerby",
+        "cmems/Draghallan",
+        "cmems/Dragor",
+        "cmems/E4BronSodertalje",
+        "cmems/Faaborg",
+        "cmems/Furuogrund",
+        "cmems/GavleHamn",
+        "cmems/GoteborgAgnesberg",
+        "cmems/GoteborgEriksberg",
+        "cmems/GoteborgGotaalvbron",
+        "cmems/GoteborgHisingsbron",
+        "cmems/GoteborgKlippan",
+        "cmems/GoteborgKrossholmen",
+        "cmems/GoteborgLarjeholm",
+        "cmems/GoteborgTingstadstunneln",
+        "cmems/GoteborgTorshamnen",
+        "cmems/Grena",
+        "cmems/Haademeeste",
+        "cmems/Hamina",
+        "cmems/Hanko",
+        "cmems/KalixStoron",
+        "cmems/Kaskinen",
+        "cmems/Kobenhavn",
+        "cmems/Koege",
+        "cmems/Korsor",
+        "cmems/Malmo",
+        "cmems/MalmoHamn",
+        "cmems/Montu",
+        "cmems/NarvaJoesuu",
+        "cmems/NarvaJoesuu2",
+        "cmems/NordreRose",
+        "cmems/NynasFiskehamn",
+        "cmems/OlandsNorraUdde",
+        "cmems/Oulu",
+        "cmems/OxelosundVinterklasen",
+        "cmems/Parnu",
+        "cmems/Pietarsaari",
+        "cmems/Pori",
+        "cmems/Porvoo",
+        "cmems/Rauma",
+        "cmems/Rodby",
+        "cmems/Rodvig",
+        "cmems/Ronne",
+        "cmems/Sillamae",
+        "cmems/Skanor",
+        "cmems/Smogen",
+        "cmems/Sonderborg",
+        "cmems/Soru",
+        "cmems/Stromoren",
+        "cmems/TanguddenGBGHamn",
+        "cmems/Turku",
+        "cmems/Vastervik",
+        "cmems/Verko",
+      ],
+      handling: "avoided",
+      error:
+        'The Baltic production unit\'s files cut a `platform_name` with letters beyond ASCII short, a byte for each byte past the first that such a letter takes in UTF-8 ("Fåbor" for Fåborg, "Göteborg-Agnesber" for Göteborg-Agnesberg), and in five put U+FFFD in a letter\'s place ("Ark�" for Arkö, "Malm�", "Verk�", "Gren�", "Hanko Pikku Kolalahti / Hang�"). The attribute\'s length counts the name\'s letters, not its bytes.',
+      response:
+        "Every station from a Baltic file (`BO_TS_TG_`) whose name has a letter beyond ASCII is named by its platform code instead, such as `Faaborg`, which is whole.",
+      evidence:
+        '`ncdump -h` of the latest window\'s files on 14 November 2026, such as `BO_TS_TG_Faaborg_20261015.nc` (`platform_name = "Fåbor"`, 6 bytes `46 c3 a5 62 6f 72`) and `BO_TS_TG_Arko_20261015.nc` (`Ark` and `ef bf bd`). Names from the other units\' files, such as Puertos del Estado\'s "A Coruña 2 tide gauge", are whole.',
+      check: async (store, e) => {
+        for (const id of e.stations!) {
+          const s = await store.station(id);
+          if (!s) throw new Error(`the store doesn't list ${id}`);
+          if (s.name !== id.slice("cmems/".length))
+            throw new Error(`the store names ${id} "${s.name}", not its platform code`);
+        }
+      },
+    },
+    {
+      id: "cmems-wangerooge-west-2026-dropout",
+      stations: ["cmems/WangeroogeTG"],
+      since: "2026-10-26",
+      until: "2026-10-30",
+      handling: "flagged",
+      error:
+        "CMEMS's copy of the WSV's Wangerooge West gauge reads −7.45 m from 25 to 29 October 2026, as PEGELONLINE's −2.40 m (erratum `pegelonline-wangerooge-west-2026-dropout`). CMEMS flags most of these values, not all.",
+      response:
+        "26 to 29 October 2026 is flagged `suspect`, keeping the source flag as `source_flag`. CMEMS flags the −7.45 m values of 25 October itself.",
+      evidence:
+        "Found with erratum `pegelonline-wangerooge-west-2026-dropout`, November 2026: of 2,564 values below −4 m, CMEMS flags 2,465 and QC 98, and one, at 12:00 UTC on 27 October, is left unflagged.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const low = (await levels(store, id, dayAfter(e.since!, 1))).filter(
+          (o) => o.level < -7,
+        ).length;
+        if (low < 100)
+          throw new Error(`the store holds ${low} Wangerooge levels below −7 m on 27 October 2026`);
+        const first = (await levels(store, id, dayAfter(e.since!, -1))).filter((o) => o.level < -7);
+        if (!first.length)
+          throw new Error("the store holds no Wangerooge levels below −7 m on 25 October 2026");
+        const unflaggedBySource = first.filter((o) => (o.source_flag ?? Flag.good) < Flag.suspect);
+        if (unflaggedBySource.length)
+          throw new Error(
+            `${unflaggedBySource.length} of ${first.length} Wangerooge levels below −7 m on 25 October 2026 don't carry CMEMS's flag, the first at ${iso(unflaggedBySource[0]!.time)}`,
+          );
+      },
+    },
+    {
+      id: "cmems-fill-values",
+      stations: [
+        "cmems/AWGTG",
+        "cmems/ArunPlatformTG",
+        "cmems/BrightonTG",
+        "cmems/DealPierTG",
+        "cmems/ExmouthTG",
+        "cmems/HastingsPierTG",
+        "cmems/K141TG",
+        "cmems/L91TG",
+        "cmems/MarienleuchteTG",
+        "cmems/SaintPierreEtMiquelonTG",
+        "cmems/SandownPierTG",
+        "cmems/ScarboroughTG",
+        "cmems/SecondSevernCrossingTG",
+        "cmems/SwanagePierTG",
+      ],
+      since: "2013-01-01",
+      handling: "dropped",
+      error:
+        "These 14 CMEMS series hold levels no gauge can read, outside the store's span of −500 to 9,000 m: 17,626 values in 63 station-years from 2013 to 2026. AWG, K14 and L9 use 999,999.06 m as a fill value. The series of England's regional coastal monitoring gauges (Arun Platform, Brighton, Deal Pier, Exmouth, Hastings Pier, Sandown Pier, Scarborough, Second Severn Crossing and Swanage Pier) hold hundreds of different values from about −1.05 × 10¹¹ m to 214,000 m, Marienleuchte −3,350 m in 2026 and Saint-Pierre-et-Miquelon up to 2.4 × 10¹² m.",
+      response:
+        "The adapter leaves out a value outside the store's span (`SPAN_M` in src/span.ts) as missing, and requalify drops any the store holds, values CMEMS keeps (`keepsStored`) among them.",
+      evidence:
+        "November 2026. A scan of the range of levels in every one of the store's GESLA and CMEMS year files (145,149 files) found 205 holding a level outside the span, which were then read in full; each of them also has a `bad` value, as QC flags every level outside the span. GESLA's copies of the same gauges hold the same values (erratum `gesla-fill-values`). GESLA's records of Bayonne, Villefranque, Pont Seudre and Teignmouth also hold fill values in years CMEMS's own series no longer serve, and CMEMS's Ceuta series (`IDSL-Ceuta`) has no value outside the span. REFMAR's own Saint-Pierre-et-Miquelon series (`refmar/115`) holds levels of 0.2 to 2.9 m in 2024, with no value outside the span.",
+      // Marienleuchte's 2026 is the one station-year the entry names.
+      check: (store) => impossibleDropped(store, "cmems/MarienleuchteTG", 2026),
+    },
+    {
+      id: "cmems-kornwerderzand-2025-10-05-ramp",
+      stations: ["cmems/KornwerderzandBuitenTG", "cmems/KornwerderzandTG"],
+      since: "2025-10-05",
+      until: "2025-10-06",
+      handling: "flagged",
+      error:
+        "CMEMS's Kornwerderzand levels from 04:40 to 08:40 UTC on 5 October 2025 fall slowly from 1.60 to 1.49 m, flagged good, through a storm high water of about 2.75 m.",
+      response:
+        "5 October 2025 is flagged `suspect` in both CMEMS records, keeping CMEMS's own flag as `source_flag`. Errata spans are whole days, so the day's other values are flagged too. GESLA's copies of these records hold the same values (erratum `gesla-kornwerderzand-2025-10-05-ramp`).",
+      evidence:
+        "RWS's own record of the gauge (rws/kornwerderzand.waddenzee.buitenhaven) reads 2.66 to 2.77 m falling to 1.76 m over the same 25 values, RWS Harlingen peaks at 2.86 m at 05:30 UTC, and a prediction of the gauge from Harlingen and West-Terschelling reads 2.74 to 1.73 m. CMEMS has no values from 04:00 to 04:30 UTC and matches RWS again from 08:50 UTC. `cmems/KornwerderzandTG` and `cmems/KornwerderzandBuitenTG` hold the same values and flags on every row of the day, and on all 85,513 rows of 2025 and 2026. CMEMS's copies of RWS's Harlingen, Den Oever, Vlieland and Den Helder gauges follow the storm that morning, Harlingen's to the centimeter of RWS's own, and `cmems/KornwerderzandBinnenTG`, on the IJsselmeer side of the locks, doesn't see it. Checked in November 2026.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        for (const id of e.stations!) {
+          const ramp = (await levels(store, id, e.since!)).filter(
+            (o) => o.time >= Date.UTC(2025, 9, 5, 4, 40) && o.time <= Date.UTC(2025, 9, 5, 8, 40),
+          );
+          if (ramp.length < 20 || ramp.some((o) => o.level > 1.7))
+            throw new Error(
+              `${id} doesn't hold the ramp below 1.7 m from 04:40 to 08:40 on 5 October 2025: ${ramp.length} values up to ${Math.max(...ramp.map((o) => o.level))} m`,
+            );
+        }
+      },
+    },
+    {
+      id: "cmems-kornwerderzand-2026-07-26-off",
+      stations: ["cmems/KornwerderzandBuitenTG", "cmems/KornwerderzandTG"],
+      since: "2026-07-26",
+      until: "2026-07-28",
+      handling: "flagged",
+      error:
+        "CMEMS's Kornwerderzand levels at 00:30, 06:30, 19:40 and 19:50 UTC on 26 July 2026 and 01:50 to 02:00 UTC on 27 July are 13 to 27 cm off the tide.",
+      response:
+        "26 and 27 July 2026 are flagged `suspect` in both CMEMS records, keeping CMEMS's own flag as `source_flag`. Errata spans are whole days, so the days' other values are flagged too.",
+      evidence:
+        "Against a prediction of the gauge from RWS Harlingen and Den Oever (2.8 cm RMS where the copies agree), while RWS's record of the gauge is within 7 cm. At 2026-07-27 02:00 UTC CMEMS reads -0.37 m, RWS -0.07 m and the prediction -0.10 m. The values carry CMEMS's good flag (`source_flag` 0), so they come from CMEMS's history files. Both CMEMS records hold the same values and flags on every row of the two days. CMEMS's copies of RWS Harlingen and Den Oever match RWS's own on both days, and GESLA's copies of these records end on 2026-05-31. Checked in November 2026.",
+      check: async (store, e) => {
+        await flaggedSpan(store, e);
+        for (const id of e.stations!) {
+          // The tide doesn't rise 0.2 m in the 10 minutes after the 02:00 value.
+          const at = new Map(
+            (await levels(store, id, dayAfter(e.until!, -1))).map((o) => [o.time, o.level]),
+          );
+          const [off, next] = [
+            at.get(Date.UTC(2026, 6, 27, 2)),
+            at.get(Date.UTC(2026, 6, 27, 2, 10)),
+          ];
+          if (off === undefined || next === undefined)
+            throw new Error(`${id} has no levels at 02:00 and 02:10 on 27 July 2026`);
+          if (next - off <= 0.2)
+            throw new Error(
+              `${id} rises ${(next - off).toFixed(2)} m from 02:00 to 02:10 on 27 July 2026, not over 0.2 m`,
+            );
+        }
+      },
+    },
+  ],
+  retired: [],
+} satisfies ErrataFile;

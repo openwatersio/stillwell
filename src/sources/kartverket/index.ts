@@ -29,12 +29,12 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "Norwegian Mapping Authority, Hydrographic Service",
+  terms: "Kartverket asks users not to poll its API excessively.",
+  // The tide and water-level data page (`license.url`) names both for feedback.
   contact: {
     email: "kundesenter@kartverket.no",
     url: "https://kartverket.no/en/about-kartverket/contact-us/contact-form",
   },
-  terms:
-    "Licensed under CC BY 4.0. The Norwegian Mapping Authority, Hydrographic Service must be credited. Kartverket asks users not to poll the API excessively. Kartverket doesn't mark which values it has quality-controlled, so values from the last year are treated as preliminary. Changes in the store: levels converted from centimeters to meters, and quality flags added.",
   // The API serves a station's whole record against its current chart datum.
   archive: "current",
   chart_datum: "CD",

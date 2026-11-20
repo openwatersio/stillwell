@@ -299,6 +299,10 @@ export interface LinkReport {
 /** The order links join groups in: `LINKS` first, inferred ones last. */
 const ORDER: How[] = ["manual", "id", "data", "near", "copy"];
 
+/** Whether a station joins no group: a GESLA record whose values are another gauge's (`isDropped`). */
+export const joinsNoGroup = (s: Pick<Station, "source" | "source_id">): boolean =>
+  s.source === "gesla" && isDropped(s.source_id);
+
 /**
  * Link every station to the others sharing its gauge, and name each group's
  * preferred series. A station with no links is its own preferred series.
@@ -310,10 +314,7 @@ export function linkGauges<T extends Station>(
   matches: DataMatch[] = [],
 ): { stations: (T & { preferred: string })[]; report: LinkReport } {
   const byId = new Map(stations.map((s) => [s.id, s]));
-  // GESLA's records whose values are another gauge's join no group.
-  const alone = new Set(
-    stations.filter((s) => s.source === "gesla" && isDropped(s.source_id)).map((s) => s.id),
-  );
+  const alone = new Set(stations.filter(joinsNoGroup).map((s) => s.id));
   const linkable = stations.filter((s) => !alone.has(s.id));
   const edges = new Map<string, How>();
   const dropped: LinkReport["dropped"] = [];

@@ -29,9 +29,10 @@ export const metadata: SourceMetadata = {
   },
   attribution:
     "Coastal Protection and Restoration Authority (CPRA) of Louisiana. Coastwide Reference Monitoring System. Coastal Information Management System (CIMS) database. https://cims.coastal.la.gov",
+  // The address the CIMS pages publish for questions.
   contact: { email: "cpra-cims@usgs.gov", url: "https://cims.coastal.la.gov/" },
   terms:
-    "CPRA's CIMS disclaimer puts CPRA's data in the public domain and lets it be distributed or copied, with no warranty, and asks for a credit; its suggested citation adds the year and the date accessed. The store reads CIMS's weekly export once a month, so a value is as of the export its station's last refetch read. CPRA recommends getting its data from a CPRA server. Changes in the store: adjusted water elevations converted from feet to meters and rounded to the millimeter, times from Central Standard Time to UTC, rows without an adjusted elevation dropped, as are a surface-water gauge's rows CPRA labels a marsh well, and values CPRA's comments describe as a dry sensor or a stand-in flagged suspect.",
+    "CPRA's CIMS disclaimer puts CPRA's data in the public domain and lets it be distributed or copied, with no warranty, and asks for a credit; its suggested citation adds the year and the date accessed. CPRA recommends getting its data from a CPRA server. The export's metadata (`HydroHourly.xml`) says the data are \"intended for general informational purposes only\" and not for navigation.",
   // The export is weekly and its newest values are months old.
   hourly: false,
   // CPRA sends no preliminary values, but re-adjusts recent months from field
@@ -51,7 +52,9 @@ const CST_MS = -6 * HOUR_MS;
 /**
  * Every CRMS series moved from GEOID99 to GEOID12B at 2013-10-01 00:00 CST,
  * with no conversion between them. The export serves the earlier values
- * against GEOID99, so they make an epoch of their own.
+ * against GEOID99, so they make an epoch of their own. Over a year either
+ * side, levels fall across the switch by about 0.9 ft, several times what
+ * other years move, so the switch moved each gauge's reference.
  */
 export const GEOID12B = { id: "GEOID12B", since: "2013-10-01" };
 const SWITCH = Date.UTC(2013, 9, 1) - CST_MS;
