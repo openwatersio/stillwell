@@ -98,10 +98,10 @@ export interface Station {
    * `stations.parquet` is built, never by an adapter.
    */
   preferred?: string;
-  /** The IDs of the errata, from `src/sources/<source>/errata.json`, that affect the station. Set as `stations.parquet` is built. */
+  /** The IDs of the errata, from `src/sources/<source>/errata.ts`, that affect the station. Set as `stations.parquet` is built. */
   errata?: string[];
   status: "active" | "inactive";
-  /** Whether ingest asks for this station's current values: the hourly job and the realtime poller. */
+  /** Whether ingest asks for this station's current values: the poller. */
   live: boolean;
   /**
    * Where the source's quality checks of this station's values start, as a
@@ -273,7 +273,7 @@ export interface SourceMetadata {
    */
   archive?: "current" | "previous";
   /**
-   * Whether the source publishes values within hours, so hourly ingest polls
+   * Whether the source publishes values within hours, so the poller polls
    * its live stations into recent/. A source that delivers later, as UHSLC's
    * monthly fast-delivery files do, is left to backfill and the refetch.
    */
@@ -299,13 +299,10 @@ export interface SourceMetadata {
    */
   utc_offsets?: [number, number];
   /**
-   * `recent` when the realtime poller never asks the source and fills its
-   * window hourly from the recent/ files the hourly job writes instead
-   * (server/pass.ts), for a source whose terms allow only the hourly job's
-   * reads. A source that refuses one server's address is named in that
-   * server's STILLWELL_FROM_RECENT instead.
+   * `hourly` when the poller asks each station once an hour whatever its
+   * interval, for a source whose terms allow one read of each site an hour.
    */
-  poller?: "recent";
+  poller?: "hourly";
   /**
    * The chart datum the source's own offsets give, for a station
    * slackwater-database has no record of (src/datums.ts).
@@ -358,13 +355,13 @@ export interface Source {
   /**
    * Whether backfill keeps every level the store holds, replacing only those
    * at times it fetched, not each month it fetched: for a source that never
-   * withdraws a value, and whose archive can lack what hourly ingest kept,
+   * withdraws a value, and whose archive can lack what the poller kept,
    * such as a whole day or a late reading.
    */
   keepsStored?: boolean;
   /**
    * Spans of a station's values that the store's own errata flag `suspect`,
-   * beyond the spans its `errata.json` names, which the registry adds, worked
+   * beyond the spans its `errata.ts` names, which the registry adds, worked
    * out from the source's levels and flags alone, so requalify flags
    * them again without fetching. `record` reads the values of one epoch that
    * the caller holds, a year at a time, which can be only part of it, such as
@@ -412,7 +409,7 @@ export function stationDefaults(
 /**
  * A source's `suspect` can't judge the part of a record the caller holds, as
  * GESLA's datum-jump check can't where the store holds only part of a record.
- * `spans` are the ones it can still give, the source's `errata.json` spans,
+ * `spans` are the ones it can still give, the source's `errata.ts` spans,
  * which the registry adds. Requalify keeps the record's stored flags and adds
  * these, and analysis judges with them, each with a warning; the recent window
  * keeps its stored flags.

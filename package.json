@@ -15,6 +15,7 @@
     "ingest": "node scripts/ingest.ts",
     "ticon:inventory": "node scripts/ticon-inventory.ts",
     "errata": "node scripts/errata.ts",
+    "errata:check": "node scripts/errata-check.ts",
     "evaluate:bsh": "node scripts/evaluate-bsh.ts",
     "evaluate:rws": "node scripts/evaluate-rws.ts",
     "clock-check": "node scripts/clock-check.ts",
@@ -23,7 +24,7 @@
     "gesla:contributors": "node scripts/gesla-contributors.ts",
     "gesla:coverage": "node scripts/gesla-coverage.ts",
     "test": "node --test 'test/**/*.test.ts'",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p workers/live",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "check": "npm run lint && npm run typecheck && npm test"
@@ -33,13 +34,18 @@
     "@openwaters/almanac": "^0.13.0",
     "@slackwater/database": "^1.0.1-beta.20261107",
     "@slackwater/engine": "^1.0.0-beta.12",
+    "fzstd": "^0.1.1",
+    "hyparquet": "^1.33.1",
     "ml-matrix": "^6.15.1",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@cloudflare/containers": "^0.3.7",
+    "@cloudflare/workers-types": "^5.20261120.1",
     "@types/node": "^26.6.6",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wrangler": "^4.165.0"
   }
 }

@@ -2,7 +2,7 @@
  * Compare a sample of a store's files with their definitions in
  * src/store/files.ts: `sources.json` and `errata.json` with their JSON
  * Schemas; `stations.parquet`, the offsets and links; each source's list,
- * years, analysis and recent window where it has them; one year file of
+ * years, analysis and yesterday's daily file where it has them; one year file of
  * observed levels per source, the latest its years file lists; and the
  * examples of the other series. Prints what differs and exits 1 if anything
  * does. The weekly bucket check runs it against the public store.
@@ -12,7 +12,7 @@
 import { USER_AGENT } from "../src/http.ts";
 import { FILES, JSON_FILES, jsonProblems, type ParquetFile } from "../src/store/files.ts";
 import { checkFile, isMissing, readRows } from "../src/store/parquet.ts";
-import { seriesPath } from "../src/store/paths.ts";
+import { recentDayPath, recentDays, seriesPath } from "../src/store/paths.ts";
 
 const base = process.argv[2] ?? "https://stillwell.openwaters.io";
 // The JSON files are fetched, so only an HTTP(S) store can be checked.
@@ -35,7 +35,7 @@ for (const [path, schema] of Object.entries(JSON_FILES)) {
 const sources = ((json["sources.json"] ?? []) as { id: string }[]).map((s) => s.id);
 if (!sources.length) report("sources.json", ["no sources"]);
 
-/** Check a file; one a source doesn't have yet, such as a recent window, is skipped when `optional`. */
+/** Check a file; one a source doesn't have yet, such as a daily file, is skipped when `optional`. */
 async function check(path: string, file: ParquetFile, optional = false): Promise<void> {
   try {
     report(path, await checkFile(`${base}/${path}`, file));
@@ -52,7 +52,12 @@ for (const f of [FILES.extremes, FILES.predictions, FILES["predicted-extremes"]]
 for (const source of sources) {
   await check(`stations/${source}.parquet`, FILES.lists);
   await check(`stations/analysis/${source}.parquet`, FILES.analysis, true);
-  await check(`recent/${source}.parquet`, FILES.recent, true);
+  // Yesterday's, which the poller has written whole.
+  await check(
+    recentDayPath("", source, recentDays(Date.now(), 2)[0]!).slice(1),
+    FILES.recent,
+    true,
+  );
   const years = `stations/years/${source}.parquet`;
   await check(years, FILES.years, true);
   // A missing years file has no rows; one that can't be read fails the check.

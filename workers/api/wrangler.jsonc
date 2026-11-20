@@ -2,16 +2,20 @@
   "name": "water-levels-api",
   "main": "index.ts",
   "compatibility_date": "2026-10-01",
+  // The station list's module imports src/http.ts, whose FTP client imports node:net, though the Worker never runs it.
+  "compatibility_flags": ["nodejs_compat"],
   // Reached only through the api.openwaters.io gateway's WATER_LEVELS binding.
   "workers_dev": false,
   "preview_urls": false,
-  // stillwell-api on the box, through the stillwell-1 Tunnel (README.md, Setup).
-  "vpc_services": [
+  // The poller's last 8 days (workers/live/schema.sql).
+  "d1_databases": [
     {
-      "binding": "STILLWELL",
-      "service_id": "01a1d7b2-2299-7303-a39a-5a1e5d6cbec1",
-      "remote": true,
+      "binding": "LIVE",
+      "database_name": "stillwell-live",
+      "database_id": "5a6967f3-67b7-4522-b393-a08282aac76a",
     },
   ],
+  // The store.
+  "r2_buckets": [{ "binding": "STORE", "bucket_name": "water-levels" }],
   "observability": { "enabled": true },
 }

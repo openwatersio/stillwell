@@ -1,4 +1,5 @@
-import { median, monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
+import { monthlyAgreement, SAME_GAUGE, type Hourly } from "./cross-check.ts";
+import { median } from "./stats.ts";
 import type { StoredStation } from "./schema.ts";
 import { comparable, joinsNoGroup } from "./same-as.ts";
 import { FILES } from "./store/files.ts";

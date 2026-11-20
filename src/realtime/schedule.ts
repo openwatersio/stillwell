@@ -16,7 +16,7 @@ export interface PassResult {
   summary: RunSummary | null;
   /** Each polled station's `min_interval_s` in the list the pass read, 0 for none. */
   intervals: number[];
-  /** Whether the source's window from recent/ is in ClickHouse, as of this pass. */
+  /** Whether the pass read the source's window from the live store, as of this pass. */
   seeded: boolean;
   /** When the pass began, if later than the scheduler asked for it, as after a wait for a slot. */
   started?: number;
