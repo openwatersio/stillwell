@@ -7,7 +7,7 @@ import { fetchText, setTransport, type RequestOptions } from "../src/http.ts";
 import { linkGauges } from "../src/same-as.ts";
 import { Flag, type Station } from "../src/schema.ts";
 import * as gesla from "../src/sources/gesla/index.ts";
-import geslaErrata from "../src/sources/gesla/errata.json" with { type: "json" };
+import geslaErrata from "../src/sources/gesla/errata.ts";
 
 const fixtures = new URL("fixtures/", import.meta.url);
 /**
