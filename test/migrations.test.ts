@@ -87,11 +87,12 @@ describe("migration problems", () => {
   it("orders migrations by ID", async () => {
     const dir = await mkdtemp(join(tmpdir(), "migrations-"));
     try {
-      for (const name of ["20261116-fix-usace.ts", "20261116-fix.ts"])
+      // A date long after today loads too: a name's date only has to be a real one.
+      for (const name of ["20261116-fix-usace.ts", "20261116-fix.ts", "29991231-later.ts"])
         await writeFile(join(dir, name), "export default { description: '', steps: [] }");
       assert.deepEqual(
         (await loadMigrations(pathToFileURL(`${dir}/`))).map(([id]) => id),
-        ["20261116-fix", "20261116-fix-usace"],
+        ["20261116-fix", "20261116-fix-usace", "29991231-later"],
       );
     } finally {
       await rm(dir, { recursive: true, force: true });
