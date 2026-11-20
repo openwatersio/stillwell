@@ -115,7 +115,10 @@ export interface Progress {
   updated: string;
 }
 
-/** The record: the last migration done before it began, '' for none, and each migration's progress since. */
+/**
+ * The record: the last migration done before it began, '' for none, and each migration's progress, those up to the
+ * baseline included as done, so one merged later under an earlier name is caught as sorting before them.
+ */
 export interface Record {
   baseline: string;
   migrations: Progress[];
@@ -137,7 +140,6 @@ export function next(migrations: [string, Migration][], record: Record): Next {
   const rows = new Map(record.migrations.map((r) => [r.id, r]));
   const last = [...rows.keys()].sort().at(-1);
   for (const [id, migration] of migrations) {
-    if (id <= record.baseline) continue;
     const row = rows.get(id);
     if (row?.state === "done") continue;
     if (row?.state === "failed") return { stopped: `${id} failed: ${row.error}` };
@@ -146,7 +148,11 @@ export function next(migrations: [string, Migration][], record: Record): Next {
     const found = problems(migration);
     if (found.length) return { stopped: `${id} can't run: ${found.join("; ")}` };
     const index = row?.step ?? 0;
-    const step = migration.steps[index]!;
+    const step = migration.steps[index];
+    if (!step)
+      return {
+        stopped: `${id} has ${migration.steps.length} steps, but its record is at step ${index}`,
+      };
     if ("check" in step)
       return { id, step: index, kind: "check", lane: "check", timeout: step.timeout ?? 30 };
     const args = argsOf(step);
@@ -164,6 +170,23 @@ export function next(migrations: [string, Migration][], record: Record): Next {
 
 function put(record: Record, row: Progress): Record {
   return { ...record, migrations: [...record.migrations.filter((r) => r.id !== row.id), row] };
+}
+
+/** A new record whose baseline is `id` ('' for none), with every migration up to it done. */
+export function begin(migrations: [string, Migration][], id: string, now = new Date()): Record {
+  if (id && !migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
+  return {
+    baseline: id,
+    migrations: migrations
+      .filter(([m]) => id && m <= id)
+      .map(([m, migration]) => ({
+        id: m,
+        step: migration.steps.length,
+        state: "done",
+        error: "done before the record began",
+        updated: now.toISOString(),
+      })),
+  };
 }
 
 /** The record after step `step` of `id` succeeded: the next step, or done after the last. */
@@ -204,9 +227,16 @@ export function retry(record: Record, id: string, now = new Date()): Record {
   return put(record, { ...row, state: "running", error: null, updated: now.toISOString() });
 }
 
-/** The record with a migration marked done without its remaining steps. */
-export function skip(record: Record, id: string, now = new Date()): Record {
+/** The record with a migration that failed or hasn't finished marked done without its remaining steps. */
+export function skip(
+  record: Record,
+  migrations: [string, Migration][],
+  id: string,
+  now = new Date(),
+): Record {
+  if (!migrations.some(([m]) => m === id)) throw new Error(`no migration ${id}`);
   const row = record.migrations.find((r) => r.id === id);
+  if (row?.state === "done") throw new Error(`${id} is done`);
   return put(record, {
     id,
     step: row?.step ?? 0,

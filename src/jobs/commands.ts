@@ -65,6 +65,9 @@ export function commandProblems(args: string[], timeout: number): string[] {
   else {
     if (rest.length !== ARITY[command])
       out.push(`${text}: ${command} takes ${ARITY[command]} arguments, not ${rest.length}`);
+    // Publishing writes stations.parquet and the offsets, which only the `store` group may write.
+    if (command === "stations" && !args.includes("--no-publish"))
+      out.push(`${text}: stations runs as a step only with --no-publish`);
     if (ARITY[command] > 0 && rest[0])
       try {
         sourceOf(rest[0]);

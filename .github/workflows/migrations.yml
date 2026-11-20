@@ -40,11 +40,7 @@ jobs:
       args: ${{ steps.next.outputs.args }}
       lane: ${{ steps.next.outputs.lane }}
       timeout: ${{ steps.next.outputs.timeout }}
-    env:
-      STILLWELL_STORE: s3://water-levels
-      S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
-      S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      stopped: ${{ steps.next.outputs.stopped }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -54,11 +50,37 @@ jobs:
       - run: npm ci
       - if: inputs.action == 'retry' || inputs.action == 'skip'
         run: node scripts/migrations.ts "$ACTION" "$MIGRATION"
+        # The store's credentials reach only the steps that read or write it, not npm ci's install scripts.
         env:
           ACTION: ${{ inputs.action }}
           MIGRATION: ${{ inputs.migration }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
       - id: next
         run: node scripts/migrations.ts next
+        env:
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+
+  # A migration that can't run, or sorts before one already started, stops every one after it: one issue says so.
+  stopped:
+    needs: plan
+    if: needs.plan.outputs.stopped != ''
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - run: |
+          title="Migrations are stopped"
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")
+          [ -n "$open" ] || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "The Migrations workflow stopped: $STOPPED. Every migration after it waits. Close this issue once it's fixed."
+        env:
+          STOPPED: ${{ needs.plan.outputs.stopped }}
+          GH_TOKEN: ${{ github.token }}
 
   step:
     needs: plan
@@ -101,22 +123,16 @@ jobs:
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
 
-  # Records how the step ended. A step cancelled before it ran, as when a later run in its group replaced it while it
-  # waited, records nothing, so the next run takes it again.
+  # Records how the step ended.
   record:
     needs: [plan, step]
-    if: always() && needs.plan.outputs.id != '' && (needs.step.result == 'success' || needs.step.result == 'failure')
+    if: always() && needs.plan.outputs.id != '' && needs.step.result != 'skipped'
     runs-on: ubuntu-latest
     environment: lake
     permissions:
       contents: read
       issues: write
       actions: write
-    env:
-      STILLWELL_STORE: s3://water-levels
-      S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-      S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
-      S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -124,7 +140,20 @@ jobs:
           node-version-file: .mise.toml
           cache: npm
       - run: npm ci
-      - if: needs.step.result == 'success'
+      # A step cancelled after it started ran out of time, and fails; one cancelled while it waited in its group never
+      # ran, and runs again.
+      - id: result
+        run: |
+          result=$RESULT
+          if [ "$result" = cancelled ]; then
+            ran=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" --jq '[.jobs[] | select(.name == "step") | .steps | length][0] // 0')
+            [ "$ran" -gt 0 ] && result=failure
+          fi
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+        env:
+          RESULT: ${{ needs.step.result }}
+          GH_TOKEN: ${{ github.token }}
+      - if: steps.result.outputs.result == 'success'
         run: |
           node scripts/migrations.ts done "$ID" "$STEP"
           gh workflow run migrations.yml --ref main
@@ -132,7 +161,11 @@ jobs:
           ID: ${{ needs.plan.outputs.id }}
           STEP: ${{ needs.plan.outputs.step }}
           GH_TOKEN: ${{ github.token }}
-      - if: needs.step.result == 'failure'
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      - if: steps.result.outputs.result == 'failure'
         run: |
           node scripts/migrations.ts fail "$ID" "$STEP" "step $STEP failed in $RUN"
           gh issue create --repo "$GITHUB_REPOSITORY" --title "Migration $ID failed" --body "Step $STEP of \`src/migrations/$ID.ts\` failed in [this run]($RUN), and every migration after it waits. Fix the cause, then run the Migrations workflow with \`retry\` and \`$ID\`, or with \`skip\` if the remaining steps can't or needn't run."
@@ -141,3 +174,7 @@ jobs:
           STEP: ${{ needs.plan.outputs.step }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
+          STILLWELL_STORE: s3://water-levels
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}

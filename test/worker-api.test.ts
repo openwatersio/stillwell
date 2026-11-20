@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -7,7 +7,7 @@ import { after, afterEach, before, beforeEach, describe, it, mock } from "node:t
 import { Flag, type StoredStation } from "../src/schema.ts";
 import { writeObservations, writeOffsets, writeStations } from "../src/store/parquet.ts";
 import worker, { normalize, resetCatalog } from "../workers/api/index.ts";
-import { type Bucket, type D1, loadCatalog } from "../workers/api/store.ts";
+import { type Bucket, type D1, loadCatalog, r2File } from "../workers/api/store.ts";
 
 const NOW = Date.parse("2026-11-13T12:03:30Z");
 const PATH = "https://api.openwaters.io/water-levels/stations/coops/9447130/levels";
@@ -155,6 +155,10 @@ function bucket(dir: string, asked: string[], broken: { yes: boolean }): Bucket 
       if (broken.yes) throw new Error("R2 is down");
       const file = await readFile(join(dir, key)).catch(() => null);
       if (!file) return null;
+      // A version's ETag: its contents' length and first and last bytes are enough to tell the test's files apart.
+      const etag = `${file.length}-${file[0]}-${file.at(-1)}-${(await stat(join(dir, key))).mtimeMs}`;
+      if (options?.onlyIf && options.onlyIf.etagMatches !== etag)
+        return { size: file.length, etag };
       const range = options?.range;
       const [start, end] = !range
         ? [0, file.length]
@@ -163,6 +167,7 @@ function bucket(dir: string, asked: string[], broken: { yes: boolean }): Bucket 
           : [range.offset, range.offset + range.length];
       return {
         size: file.length,
+        etag,
         arrayBuffer: async () => file.buffer.slice(file.byteOffset + start, file.byteOffset + end),
       };
     },
@@ -502,5 +507,32 @@ describe("the station list", () => {
     } finally {
       await rm(store, { recursive: true });
     }
+  });
+});
+
+describe("year files on R2", () => {
+  it("reads every range from the version the first read found, and fails when the file changes", async () => {
+    const bytes = new Uint8Array(3 << 20).map((_, i) => i % 251);
+    let etag = "v1";
+    const fake: Bucket = {
+      async get(_key, options) {
+        if (options?.onlyIf && options.onlyIf.etagMatches !== etag)
+          return { size: bytes.length, etag };
+        const range = options?.range;
+        const [start, end] =
+          range && "suffix" in range
+            ? [bytes.length - range.suffix, bytes.length]
+            : [range!.offset, range!.offset + range!.length];
+        return {
+          size: bytes.length,
+          etag,
+          arrayBuffer: async () => bytes.slice(start, end).buffer,
+        };
+      },
+    };
+    const file = (await r2File(fake, "obs/x/1/2025.parquet"))!;
+    assert.deepEqual(new Uint8Array(await file.slice(0, 3)), new Uint8Array([0, 1, 2]));
+    etag = "v2";
+    await assert.rejects(Promise.resolve(file.slice(0, 3)), /changed while it was read/);
   });
 });

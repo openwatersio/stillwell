@@ -146,6 +146,7 @@ import {
   seriesDir,
   stationsPath,
   yearsPath,
+  RECENT_DAYS,
 } from "../src/store/paths.ts";
 import {
   describeReport,
@@ -920,10 +921,10 @@ async function compact(sourceId: string, days: number): Promise<void> {
   const started = await startedListOf(storeOfSource(source.metadata), source);
   if (!started) return await notStarted(sourceId);
   const summary = await reporting(`compact ${sourceId}`, async () => {
-    // An R2 lifecycle rule deletes a daily file after 30 days.
-    if (!Number.isInteger(days) || days < 1 || days > 30)
+    // An R2 lifecycle rule deletes a daily file after RECENT_DAYS.
+    if (!Number.isInteger(days) || days < 1 || days > RECENT_DAYS)
       throw new Error(
-        "--days must be a whole number from 1 to 30, the days the daily files are kept",
+        `--days must be a whole number from 1 to ${RECENT_DAYS}, the days the daily files are kept`,
       );
     const concurrency = positive("concurrency");
     setConnections(concurrency);

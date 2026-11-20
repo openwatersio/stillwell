@@ -14,6 +14,7 @@
  */
 import { appendFileSync } from "node:fs";
 import {
+  begin,
   done,
   fail,
   loadMigrations,
@@ -97,25 +98,20 @@ switch (command) {
     await write(retry(need(record), id!));
     break;
   case "skip":
-    await write(skip(need(record), id!));
+    await write(skip(need(record), migrations, id!));
     break;
   case "baseline": {
     if (record) throw new Error(`${path} already has a baseline, ${record.baseline || "none"}`);
-    const base = id === "none" ? "" : id!;
-    if (base && !migrations.some(([m]) => m === base)) throw new Error(`no migration ${base}`);
-    await write({ baseline: base, migrations: [] });
+    await write(begin(migrations, id === "none" ? "" : id!));
     break;
   }
   case "list":
     console.log(`baseline: ${record ? record.baseline || "none" : "no record"}`);
     for (const [m] of migrations) {
       const row = record?.migrations.find((r) => r.id === m);
-      const state =
-        record && m <= record.baseline
-          ? "done before the record"
-          : row
-            ? `${row.state}, step ${row.step}${row.error ? `: ${row.error}` : ""}`
-            : "not started";
+      const state = row
+        ? `${row.state}, step ${row.step}${row.error ? `: ${row.error}` : ""}`
+        : "not started";
       console.log(`${m}\t${state}`);
     }
     break;

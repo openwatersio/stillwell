@@ -10,6 +10,7 @@ import { FLAGS, commandProblems, laneOf } from "../src/jobs/commands.ts";
 import {
   type Migration,
   type Record,
+  begin,
   done,
   fail,
   loadMigrations,
@@ -51,6 +52,8 @@ describe("commands", () => {
     assert.deepEqual(commandProblems(words("withhold ea"), 180), []);
     assert.match(commandProblems(words("requalify ea all"), 180)[0], /takes 4 arguments, not 2/);
     assert.match(commandProblems(words("compact ea --rebuild-bound"), 180)[0], /Unknown option/);
+    assert.match(commandProblems(words("stations ea"), 180)[0], /--no-publish/);
+    assert.deepEqual(commandProblems(words("stations ea --no-publish"), 180), []);
   });
 });
 
@@ -141,20 +144,36 @@ describe("the record", () => {
     assert.equal(next(all, record), null);
   });
 
-  it("skips migrations up to the baseline", () => {
-    assert.equal(
-      (next(all, { baseline: "20261101-a", migrations: [] }) as { id: string }).id,
-      "20261102-b",
+  it("begins with the migrations up to the baseline done, and catches one merged later under an earlier name", () => {
+    assert.equal((next(all, begin(all, "20261101-a", NOW)) as { id: string }).id, "20261102-b");
+    assert.equal(next(all, begin(all, "20261102-b", NOW)), null);
+    assert.equal((next(all, begin(all, "", NOW)) as { id: string }).id, "20261101-a");
+    const late: [string, Migration][] = [
+      ["20261100-late", steps({ ingest: "compact ea" })],
+      ...all,
+    ];
+    assert.match(
+      (next(late, begin(all, "20261102-b", NOW)) as { stopped: string }).stopped,
+      /20261100-late sorts before 20261102-b/,
     );
-    assert.equal(next(all, { baseline: "20261102-b", migrations: [] }), null);
+  });
+
+  it("stops at a migration with fewer steps than its record", () => {
+    const shorter: [string, Migration][] = [["20261101-a", steps({ ingest: "compact ea" })]];
+    const record = done(empty, all, "20261101-a", 0, NOW);
+    assert.match((next(shorter, record) as { stopped: string }).stopped, /record is at step 1/);
   });
 
   it("stops at a failed step until it's retried, then runs it again, or until it's skipped", () => {
     const failed = fail(empty, "20261101-a", 0, "exit 1", NOW);
     assert.deepEqual(next(all, failed), { stopped: "20261101-a failed: exit 1" });
     assert.equal((next(all, retry(failed, "20261101-a", NOW)) as { step: number }).step, 0);
-    assert.equal((next(all, skip(failed, "20261101-a", NOW)) as { id: string }).id, "20261102-b");
+    assert.equal(
+      (next(all, skip(failed, all, "20261101-a", NOW)) as { id: string }).id,
+      "20261102-b",
+    );
     assert.throws(() => retry(empty, "20261101-a", NOW), /hasn't failed/);
+    assert.throws(() => skip(failed, all, "20261130-typo", NOW), /no migration/);
   });
 
   it("stops at a migration that sorts before one already started", () => {

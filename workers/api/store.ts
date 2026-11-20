@@ -28,8 +28,11 @@ export interface D1 {
 export interface Bucket {
   get(
     key: string,
-    options?: { range: { offset: number; length: number } | { suffix: number } },
-  ): Promise<{ size: number; arrayBuffer(): Promise<ArrayBuffer> } | null>;
+    options?: {
+      range: { offset: number; length: number } | { suffix: number };
+      onlyIf?: { etagMatches: string };
+    },
+  ): Promise<{ size: number; etag: string; arrayBuffer?(): Promise<ArrayBuffer> } | null>;
 }
 
 const DAY = 86_400_000;
@@ -52,19 +55,26 @@ const parsers = {
 /**
  * An R2 object as a file the Parquet reader reads in ranges, or null when
  * it doesn't exist: one read of its last megabyte, then one per range before
- * that, so a year file larger than a Worker's memory still reads.
+ * that, so a year file larger than a Worker's memory still reads. Each later
+ * range is read only from the version the first read found, so a file
+ * compaction rewrites meanwhile fails the read rather than mix two versions.
  */
-async function r2File(bucket: Bucket, key: string): Promise<AsyncBuffer | null> {
+export async function r2File(bucket: Bucket, key: string): Promise<AsyncBuffer | null> {
   const tail = await bucket.get(key, { range: { suffix: TAIL_BYTES } });
-  if (!tail) return null;
+  if (!tail?.arrayBuffer) return null;
   const end = await tail.arrayBuffer();
   const from = tail.size - end.byteLength;
   return {
     byteLength: tail.size,
     async slice(start, stop = tail.size) {
       if (start >= from) return end.slice(start - from, stop - from);
-      const part = await bucket.get(key, { range: { offset: start, length: stop - start } });
+      const part = await bucket.get(key, {
+        range: { offset: start, length: stop - start },
+        onlyIf: { etagMatches: tail.etag },
+      });
       if (!part) throw new Error(`${key} is gone`);
+      // R2 answers a failed condition with the object's metadata and no body.
+      if (!part.arrayBuffer) throw new Error(`${key} changed while it was read`);
       return part.arrayBuffer();
     },
   };
@@ -138,7 +148,7 @@ export async function loadCatalog(bucket: Bucket): Promise<Catalog> {
   const [stationsFile, offsetsFile] = await Promise.all(
     ["stations.parquet", "stations/offsets.parquet"].map(async (key) => {
       const object = await bucket.get(key);
-      if (!object) throw new Error(`no ${key} in the store`);
+      if (!object?.arrayBuffer) throw new Error(`no ${key} in the store`);
       return object.arrayBuffer();
     }),
   );

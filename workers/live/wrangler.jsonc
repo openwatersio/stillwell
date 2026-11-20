@@ -6,6 +6,8 @@
   "workers_dev": true,
   "preview_urls": false,
   "triggers": { "crons": ["* * * * *"] },
+  // Where the container reaches /store/: this Worker's workers.dev URL.
+  "vars": { "ORIGIN": "https://stillwell-live.brandon-782.workers.dev" },
   "d1_databases": [
     {
       "binding": "LIVE",

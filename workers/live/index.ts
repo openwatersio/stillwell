@@ -15,11 +15,13 @@ export interface Env extends StoreEnv {
   CCO_API_KEY?: string;
   CCO_REFERER?: string;
   USGS_API_KEY?: string;
+  /** This Worker's own address, where the container reaches /store/: its workers.dev URL. */
+  ORIGIN: string;
+  /** "1" lets passes withhold more stations than the limit allows (`tooManyWithheld`), as --accept-withheld does. */
+  ACCEPT_WITHHELD?: string;
 }
 
 const REPO = "openwatersio/stillwell";
-/** Where the container reaches this Worker. */
-const ORIGIN = "https://stillwell-live.brandon-782.workers.dev";
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
 /** A source with no clean pass for this long has an issue open. */
@@ -35,8 +37,9 @@ export class Poller extends Container<Env> {
     this.envVars = {
       PORT: "8080",
       STILLWELL_STORE: "https://stillwell.openwaters.io",
-      STILLWELL_LIVE: `${ORIGIN}/store`,
+      STILLWELL_LIVE: `${env.ORIGIN}/store`,
       STILLWELL_LIVE_TOKEN: env.STORE_TOKEN,
+      ...(env.ACCEPT_WITHHELD === "1" ? { STILLWELL_ACCEPT_WITHHELD: "1" } : {}),
       ...Object.fromEntries(secrets.flatMap((k) => (env[k] ? [[k, env[k]!]] : []))),
     };
   }
@@ -60,44 +63,59 @@ export default {
   },
 
   async scheduled(controller: ScheduledController, env: Env): Promise<void> {
-    // Starts the container if it isn't running; its health answer means the poller is up.
-    const health = await env.POLLER.getByName("poller").fetch("http://poller/health");
-    if (!health.ok) console.error(`poller health: ${health.status} ${await health.text()}`);
-    // Every 10 minutes, the poller's last lines, so its output reaches the Worker's logs.
-    else if (new Date(controller.scheduledTime).getUTCMinutes() % 10 === 0)
-      console.log(
-        (await (await env.POLLER.getByName("poller").fetch("http://poller/log")).text()).slice(
-          -6000,
-        ),
-      );
     const now = controller.scheduledTime;
     const minute = new Date(now).getUTCMinutes();
-    if (minute === 30) await alert(env, now);
-    if (minute === 45 && new Date(now).getUTCHours() === 3)
-      await prune(
-        env.LIVE,
-        new Date(now - 8 * DAY_MS).toISOString().slice(0, 10),
-        now - 30 * DAY_MS,
-      );
+    // Each task runs whether or not the others fail, so a poller that won't start still raises its alert.
+    const tasks: [string, () => Promise<void>][] = [
+      ["health", () => health(env, minute)],
+      ...(minute === 30 ? [["alert", () => alert(env, now)] as [string, () => Promise<void>]] : []),
+      ...(minute === 45 && new Date(now).getUTCHours() === 3
+        ? [
+            [
+              "prune",
+              () =>
+                prune(
+                  env.LIVE,
+                  new Date(now - 8 * DAY_MS).toISOString().slice(0, 10),
+                  now - 30 * DAY_MS,
+                ),
+            ] as [string, () => Promise<void>],
+          ]
+        : []),
+    ];
+    const failed: string[] = [];
+    for (const [name, task] of tasks)
+      await task().catch((error: unknown) => {
+        failed.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    // Thrown, so the cron event shows as failed in the Worker's events.
+    if (failed.length) throw new Error(failed.join("; "));
   },
 };
 
+/** Start the container if it isn't running, and every 10 minutes log its last lines, so they reach the Worker's logs. */
+async function health(env: Env, minute: number): Promise<void> {
+  const poller = env.POLLER.getByName("poller");
+  const answer = await poller.fetch("http://poller/health");
+  if (!answer.ok) throw new Error(`${answer.status} ${await answer.text()}`);
+  if (minute % 10 === 0)
+    console.log((await (await poller.fetch("http://poller/log")).text()).slice(-6000));
+}
+
 /**
- * Open an issue for each source with no clean pass in `STALE_MS`, and close it once one has, one issue per source
- * found by its title, as scripts/alert.sh does for the workflows.
+ * Open an issue for each source with no clean pass in `STALE_MS`, and one for the poller when no pass of any source
+ * has finished in that time, and close each once that's no longer so: one issue each, found by its title, as
+ * scripts/alert.sh does for the workflows. A source with no pass in the last week drops out, with its issue left open.
  */
 async function alert(env: Env, now: number): Promise<void> {
   const { results } = await env.LIVE.prepare(
-    "SELECT source, max(CASE WHEN ok = 1 THEN finished END) AS last_ok FROM polls WHERE finished > ? GROUP BY source",
+    "SELECT source, max(finished) AS last, max(CASE WHEN ok = 1 THEN finished END) AS last_ok FROM polls WHERE finished > ? GROUP BY source",
   )
     .bind(now - 7 * DAY_MS)
-    .all<{ source: string; last_ok: number | null }>();
-  if (!env.GITHUB_TOKEN) {
-    console.error("GITHUB_TOKEN isn't set, so stale sources open no issue");
-    return;
-  }
-  const github = (path: string, init: RequestInit = {}) =>
-    fetch(`https://api.github.com/repos/${REPO}/${path}`, {
+    .all<{ source: string; last: number; last_ok: number | null }>();
+  if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN isn't set, so stale sources open no issue");
+  const github = async (path: string, init: RequestInit = {}) => {
+    const response = await fetch(`https://api.github.com/repos/${REPO}/${path}`, {
       ...init,
       headers: {
         Accept: "application/vnd.github+json",
@@ -106,26 +124,34 @@ async function alert(env: Env, now: number): Promise<void> {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
-  const open = (await (await github("issues?state=open&per_page=100")).json()) as {
-    number: number;
-    title: string;
-  }[];
-  // Every source polled in the last week, and the poller itself when no pass has finished.
-  const stale = new Set(
-    results.filter((r) => (r.last_ok ?? 0) < now - STALE_MS).map((r) => r.source),
-  );
-  for (const { source } of results) {
-    const title = `Live polling is failing for ${source}`;
+    if (!response.ok)
+      throw new Error(`GitHub ${path}: ${response.status} ${await response.text()}`);
+    return response.json() as Promise<unknown>;
+  };
+  const open: { number: number; title: string }[] = [];
+  for (let page = 1; ; page++) {
+    const issues = (await github(`issues?state=open&per_page=100&page=${page}`)) as typeof open;
+    open.push(...issues);
+    if (issues.length < 100) break;
+  }
+  const stopped = Math.max(0, ...results.map((r) => r.last)) < now - STALE_MS;
+  const subjects: [string, boolean, string][] = [
+    [
+      "The live poller has stopped",
+      stopped,
+      "No poller pass of any source has finished for over 2 hours: the live Worker's container isn't running passes, or can't record them. The Worker's logs have its last lines every 10 minutes, and `GET /log` on it returns them to holders of `STORE_TOKEN`. This issue closes on its own after a pass finishes.",
+    ],
+    ...results.map((r): [string, boolean, string] => [
+      `Live polling is failing for ${r.source}`,
+      (r.last_ok ?? 0) < now - STALE_MS,
+      `The live poller has had no clean pass of \`${r.source}\` for over 2 hours. The \`polls\` table in the \`stillwell-live\` D1 database has each pass's failures. This issue closes on its own after a clean pass.`,
+    ]),
+  ];
+  for (const [title, failing, body] of subjects) {
     const issue = open.find((i) => i.title === title);
-    if (stale.has(source) && !issue)
-      await github("issues", {
-        method: "POST",
-        body: JSON.stringify({
-          title,
-          body: `The live poller has had no clean pass of \`${source}\` for over 2 hours. The \`polls\` table in the \`stillwell-live\` D1 database has each pass's failures. This issue closes on its own after a clean pass.`,
-        }),
-      });
-    if (!stale.has(source) && issue)
+    if (failing && !issue)
+      await github("issues", { method: "POST", body: JSON.stringify({ title, body }) });
+    if (!failing && issue)
       await github(`issues/${issue.number}`, {
         method: "PATCH",
         body: JSON.stringify({ state: "closed", state_reason: "completed" }),

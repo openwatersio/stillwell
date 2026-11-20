@@ -61,7 +61,8 @@ try {
     source: id,
     started: now,
     finished: Date.now(),
-    intervals: due ? [...due] : [],
+    // An hourly-polled source asks every station each pass, as a pass over all of them does.
+    intervals: due && source.metadata.poller !== "hourly" ? [...due] : [],
     // Clean when it ran to the end and the source answered for some station it asked.
     ok: process.exitCode !== 1 && (!summary.stations || summary.failed.length < summary.stations),
     stations: summary.stations,

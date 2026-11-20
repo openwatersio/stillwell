@@ -4,9 +4,22 @@
 
 import type { LiveCell, PollRow } from "./types.ts";
 
+/** What the store uses of a D1 statement, so tests can run it on SQLite. */
+export interface Statement {
+  bind(...values: unknown[]): Statement;
+  all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
+  run(): Promise<unknown>;
+}
+
+/** What the store uses of the D1 binding. */
+export interface LiveDb {
+  prepare(sql: string): Statement;
+  batch(statements: Statement[]): Promise<{ results: unknown[] }[]>;
+}
+
 export interface StoreEnv {
-  LIVE: D1Database;
-  STORE: R2Bucket;
+  LIVE: LiveDb;
+  STORE: { put(key: string, body: ReadableStream | null): Promise<unknown> };
 }
 
 /** D1 binds at most 100 parameters to a statement. */
@@ -79,7 +92,7 @@ function chunks<T>(items: T[], size: number): T[][] {
 
 /** Each named station's values from `from` on, as [station, cells] sorted by station and time. */
 export async function read(
-  db: D1Database,
+  db: LiveDb,
   stations: string[],
   from: number,
 ): Promise<[string, LiveCell[]][]> {
@@ -106,7 +119,7 @@ export async function read(
 }
 
 /** The station-days the given keys name, as `station day` → cells. */
-async function current(db: D1Database, keys: [string, string][]): Promise<Map<string, LiveCell[]>> {
+async function current(db: LiveDb, keys: [string, string][]): Promise<Map<string, LiveCell[]>> {
   const results = await batch(
     db,
     chunks(keys, PARAMS / 2).map((part) =>
@@ -126,7 +139,7 @@ async function current(db: D1Database, keys: [string, string][]): Promise<Map<st
 }
 
 /** Write each station-day's cells back, deleting a station-day left with none. */
-async function save(db: D1Database, days: Map<string, LiveCell[]>): Promise<void> {
+async function save(db: LiveDb, days: Map<string, LiveCell[]>): Promise<void> {
   const statements = [...days].map(([key, cells]) => {
     const [station, day] = key.split(" ") as [string, string];
     return cells.length
@@ -150,7 +163,7 @@ function keysOf(items: { station: string; time: number }[]): [string, string][] 
 }
 
 /** Write rows, replacing any at the same station and time. */
-export async function write(db: D1Database, rows: [string, LiveCell][]): Promise<void> {
+export async function write(db: LiveDb, rows: [string, LiveCell][]): Promise<void> {
   if (!rows.length) return;
   const days = await current(db, keysOf(rows.map(([station, c]) => ({ station, time: c[1] }))));
   const byTime = new Map<string, Map<number, LiveCell>>();
@@ -165,7 +178,7 @@ export async function write(db: D1Database, rows: [string, LiveCell][]): Promise
 
 /** Delete the given values. */
 export async function remove(
-  db: D1Database,
+  db: LiveDb,
   values: { station: string; time: number }[],
 ): Promise<void> {
   if (!values.length) return;
@@ -181,7 +194,7 @@ export async function remove(
   await save(db, days);
 }
 
-export async function removeStations(db: D1Database, stations: string[]): Promise<void> {
+export async function removeStations(db: LiveDb, stations: string[]): Promise<void> {
   for (const part of chunks(stations, PARAMS))
     await db
       .prepare(`DELETE FROM live WHERE station IN (${part.map(() => "?").join(",")})`)
@@ -189,7 +202,7 @@ export async function removeStations(db: D1Database, stations: string[]): Promis
       .run();
 }
 
-export async function stations(db: D1Database, source: string): Promise<string[]> {
+export async function stations(db: LiveDb, source: string): Promise<string[]> {
   const { results } = await db
     .prepare("SELECT DISTINCT station FROM live WHERE station >= ? AND station < ?")
     .bind(...range(source))
@@ -197,7 +210,7 @@ export async function stations(db: D1Database, source: string): Promise<string[]
   return results.map((r) => r.station);
 }
 
-export async function insertPoll(db: D1Database, row: PollRow): Promise<void> {
+export async function insertPoll(db: LiveDb, row: PollRow): Promise<void> {
   await db
     .prepare(
       `INSERT INTO polls (source, started, finished, intervals, ok, stations, updated, "values", stale, failed, blocked, datum_changed)
@@ -222,7 +235,7 @@ export async function insertPoll(db: D1Database, row: PollRow): Promise<void> {
 
 /** A page of one source's stations' values for one day, after the station `after`, and where the next page starts. */
 export async function day(
-  db: D1Database,
+  db: LiveDb,
   source: string,
   date: string,
   after: string,
@@ -242,14 +255,14 @@ export async function day(
 }
 
 /** Delete station-days before `day`, and passes that finished before `finished`. */
-export async function prune(db: D1Database, before: string, finished: number): Promise<void> {
+export async function prune(db: LiveDb, before: string, finished: number): Promise<void> {
   await db.batch([
     db.prepare("DELETE FROM live WHERE day < ?").bind(before),
     db.prepare("DELETE FROM polls WHERE finished < ?").bind(finished),
   ]);
 }
 
-async function batch(db: D1Database, statements: D1PreparedStatement[]): Promise<unknown[][]> {
+async function batch(db: LiveDb, statements: Statement[]): Promise<unknown[][]> {
   const out: unknown[][] = [];
   for (const part of chunks(statements, 50))
     for (const result of await db.batch(part)) out.push(result.results);

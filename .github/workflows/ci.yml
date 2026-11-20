@@ -43,7 +43,7 @@ jobs:
       - run: npm ci
       - run: |
           for worker in live api cron; do
-            (cd "workers/$worker" && npx wrangler@4 deploy)
+            (cd "workers/$worker" && npx wrangler deploy)
           done
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
