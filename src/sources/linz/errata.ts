@@ -169,7 +169,7 @@ export default {
         );
         if (spikes.length < 100)
           throw new Error(
-            `CHIT has ${spikes.length} levels above 5 m on 11 February 2010, not 147`,
+            `CHIT has ${spikes.length} levels above 5 m on 11 February 2010, under 100`,
           );
       },
     },

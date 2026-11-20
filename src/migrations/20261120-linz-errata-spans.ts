@@ -3,7 +3,8 @@ import { errataReader } from "../store/errata-reader.ts";
 import type { Migration } from "../jobs/migrations.ts";
 
 // The errata whose spans changed or are new in src/sources/linz/errata.ts; a requalify applies them to stored levels.
-const IDS = [
+// The check runs them as they stand when the step runs.
+export const IDS = [
   "linz-owenga-sensor-41-spikes",
   "linz-boat-cove-sensor-fault-2014",
   "linz-fishing-rock-sensor-fault",
