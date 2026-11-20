@@ -259,7 +259,7 @@ async function renumberAboveFiles(
  * preferred series as the file is built (`src/same-as.ts`), and the result
  * says what was linked. Each station carries the IDs of its `errata`, and
  * `errata.json` those of the sources the store holds (each source's
- * `errata.json`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
+ * `errata.ts`, read by `src/errata.ts`); the result names any station an erratum lists that a source in the store
  * doesn't, a typo or a station since removed.
  */
 export async function publishStations(

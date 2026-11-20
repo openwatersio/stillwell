@@ -37,12 +37,13 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "South Florida Water Management District",
+  // Both named for data questions on the DBHYDRO page, https://www.sfwmd.gov/science-data/dbhydro.
   contact: {
     email: "DataRequests@sfwmd.gov",
     url: "https://www.sfwmd.gov/contact/dbhydro_contact_form",
   },
   terms:
-    "SFWMD publishes DBHYDRO without a license or a restriction on reuse, as Florida public records. Its disclaimer gives the data as is, without warranty, and asks users to get it from the District's own server. Provisional values are subject to revision. Changes in the store: levels converted from feet to meters and rounded to the millimeter, missing readings dropped, and quality flags added.",
+    "SFWMD publishes DBHYDRO without a license or a restriction on reuse, as Florida public records. Its disclaimer gives the data as is, without warranty, and asks users to get it from the District's own server.",
   // Telemetry arrives within minutes.
   hourly: true,
   // Provisional values are approved within days to months.
@@ -53,7 +54,7 @@ export const metadata: SourceMetadata = {
 /**
  * The SFWMD gauges TICON keeps, all with a tidal signal: structure tailwaters
  * (and G-58's headwater) on canals at tidewater, estuary gauges on the Miami,
- * Caloosahatchee and Loxahatchee rivers, and three bay gauges in Florida Bay
+ * Caloosahatchee, Cocohatchee, Gordon and Loxahatchee rivers, and three bay gauges in Florida Bay
  * and Barnes Sound.
  */
 const TIDAL: Record<string, Kind> = {

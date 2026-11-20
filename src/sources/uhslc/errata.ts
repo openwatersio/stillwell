@@ -1,0 +1,384 @@
+import { dayAfter, flaggedSpan, type ErrataFile } from "../../errata.ts";
+import { POSITIONS } from "../../positions.ts";
+import { distanceKm } from "../../stats.ts";
+import { lateBy, middle, unflagged } from "./checks.ts";
+
+export default {
+  errata: [
+    {
+      id: "uhslc-hong-kong-hour-early",
+      stations: ["uhslc/329", "uhslc/329a"],
+      handling: "corrected",
+      error:
+        "UHSLC stamps its Hong Kong (Quarry Bay) hourly heights an hour early in every version and the fast-delivery series: the height labeled T was measured at T + 1 h UTC ([openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360), confirmed by the clock check).",
+      response: "Every value is moved an hour later.",
+      evidence:
+        "Found in [openwatersio/slackwater-database#360](https://github.com/openwatersio/slackwater-database/issues/360) and confirmed by `scripts/clock-check.ts`: Quarry Bay fits other records best an hour later, in every version and the fast-delivery series.",
+      reported: "2026-10-24",
+      report:
+        "Sent to srdata@soest.hawaii.edu on 2026-10-24, with a follow-up on 2026-11-07. No answer yet.",
+      // The tide reaches Shanwei, Quarry Bay and Macau in turn, westward along the coast; an hour early would put Quarry Bay before Shanwei.
+      check: async (store) => {
+        for (const [id, other, span, lo, hi] of [
+          ["uhslc/329", "uhslc/641a", ["1995-07-01", "1995-07-15"], 15, 60],
+          ["uhslc/329a", "uhslc/641a", ["1980-07-01", "1980-07-15"], 15, 60],
+          ["uhslc/329a", "uhslc/338a", ["1980-03-01", "1980-03-15"], -60, -15],
+        ] as const) {
+          const { lag } = await lateBy(store, id, other, [...span], 120, 15);
+          if (lag < lo || lag > hi)
+            throw new Error(
+              `${id} runs ${lag} minutes late against ${other} from ${span[0]} to ${span[1]}, not ${lo} to ${hi}`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-spain-hour-early",
+      stations: ["uhslc/208a", "uhslc/217a", "uhslc/217b", "uhslc/217c"],
+      handling: "corrected",
+      error:
+        "UHSLC stamps its research-quality versions of Vigo (208 version A, 1943 to 1990) and its older ones of Las Palmas (217 versions A, B and C, 1949 to 1991) an hour early: the height labeled T was measured at T + 1 h UTC. Las Palmas's FD series (217), from May 1991, is on time.",
+      response: "The four versions' values are moved an hour later.",
+      evidence:
+        "November 2026. IEO's records of both gauges (GESLA's `vigo-vigo-esp-ieo` and `pluz-pluz-esp-ieo`) equal UHSLC's an hour earlier in every year they share: Vigo 1943 to 1990 at a standard deviation of 0.2 to 1.6 cm in most years against 41 to 44 cm at UHSLC's own times, Las Palmas 1949 to 1956 at 0.2 to 0.4 cm in most years and 1975 to 1990 at 0.9 to 13 cm against 28 to 32 cm. From 1993 IEO's Las Palmas equals UHSLC's FD series at the same time to 0.01 cm. M2's phase, which an hour moves by 29°, is 241 to 245° a year in UHSLC's Vigo version A (1943 to 1990) against 269 to 276° in IEO's Vigo record (GESLA's `vigo-vigo-esp-ieo`) from 1943 to 2016 and in Puertos del Estado's Vigo 2 gauge (CMEMS, from 1992); at Las Palmas it is 189 to 201° in versions A, B and C against 218 to 227° in IEO's record from 1949 to 2016, UHSLC's own FD series (217) from 1991 and CMEMS's from 1992. The store's level match of November 2026 found IEO's Las Palmas and Vigo equal to UHSLC's only at an hour's offset.",
+      // IEO's records of both gauges are on time, so the moved values equal them at the same times.
+      check: async (store) => {
+        for (const [id, ieo, span] of [
+          ["uhslc/208a", "gesla/vigo-vigo-esp-ieo", ["1985-03-01", "1985-03-04"]],
+          ["uhslc/217a", "gesla/pluz-pluz-esp-ieo", ["1950-03-01", "1950-03-04"]],
+        ] as const) {
+          const { lag, rms } = await lateBy(store, id, ieo, [...span], 120, 60);
+          if (lag !== 0 || rms > 0.02)
+            throw new Error(
+              `${id} fits ${ieo} best ${lag} minutes late, at ${rms.toFixed(3)} m RMS`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-progreso-721a-six-hours-late",
+      stations: ["uhslc/721a"],
+      handling: "corrected",
+      error:
+        "UHSLC's Progreso version A (721a, 1980 to 1984) is 6 hours late: the height labeled T was measured at T − 6 h UTC. Versions B and C are on time.",
+      response: "Every value of version A is moved 6 hours earlier.",
+      evidence:
+        "November 2026. GESLA's copy of UNAM's historical Progreso record (`progreso-402-mex-unam_hist`) equals UHSLC's version A 6 hours later in 1982 and 1983 (r 0.998, standard deviation 1.4 cm), against r 0.88 or less at any other whole hour. K1's and M2's phases in version A are 119° and 282°; in UNAM's record from 1952 to 1993 they are 21° and 105°, in UHSLC's versions B (1999 to 2004) and C (2012 to 2013) 28° and 110° and 10° and 105°, and at the Yucatán gauges either side, Celestún, Sisal and Telchac, 13 to 15° and 101 to 109°. Six hours moves K1 by 90° and M2 by 174°. The store's level match of November 2026 found UNAM's record 27 cm from UHSLC's at the same times.",
+      // UNAM's historical record is on time, so the moved values equal it at the same times.
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        const { lag, rms } = await lateBy(
+          store,
+          id,
+          "gesla/progreso-402-mex-unam_hist",
+          ["1983-03-01", "1983-03-04"],
+          420,
+          60,
+        );
+        if (lag !== 0 || rms > 0.02)
+          throw new Error(
+            `721a fits UNAM's Progreso best ${lag} minutes late, at ${rms.toFixed(3)} m RMS`,
+          );
+      },
+    },
+    {
+      id: "uhslc-vardo-2007-2018-five-minutes-late",
+      stations: ["uhslc/805"],
+      since: "2007-01-01",
+      until: "2019-01-01",
+      handling: "kept",
+      error:
+        "UHSLC's Vardø values (805, in the research-quality version and the FD series alike) from January 2007 to December 2018 are 5 minutes late: the height labeled T stands for T − 5 min UTC. Its values from 2004 to 2006 and from 2019 are on time. The research-quality version (805a) and the FD series carry the same values.",
+      response:
+        "Kept as served. Moved 5 minutes earlier, the values would sit off the hour, where the store's hourly comparisons (level matches, link offsets) don't read them, and they may be 10-minute means rather than a clock error. Kartverket's own series of the gauge (`kartverket/VAW`) is the group's preferred series, and has no such lag.",
+      evidence:
+        "November 2026. UHSLC's hourly Vardø values were compared with Kartverket's 10-minute series of the gauge (`kartverket/VAW`), interpolated to lags from −15 to +15 minutes, year by year from 1990. In every month from January 2007 to December 2018 they fit best 300 seconds earlier, to within 10 seconds, at a standard deviation of 15 to 17 mm against 34 to 39 mm at their own times. In 2004 to 2006 and from January 2019 they equal Kartverket's at their own times to 0 to 2 mm. Kartverket's mean over the 10 minutes before each label fits as well as the lag, and no centred window does, so the values may be 10-minute means labeled at their end; either way they stand for 5 minutes before their labels. Before 2004 UHSLC's values differ from Kartverket's by about 30 mm at every lag and aren't moved. GESLA's NHS and CMEMS copies of the gauge are on time. A harmonic fit of 2006 to 2020, which mixes the late years with on-time ones, put UHSLC 170 to 240 seconds behind Kartverket from K1 to M4, while UHSLC's Honningsvåg and Andenes agree with Kartverket within about 10 seconds.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        for (const [span, late] of [
+          [["2015-06-01", "2015-06-03"], 5],
+          [["2020-06-01", "2020-06-03"], 0],
+        ] as const) {
+          const { lag } = await lateBy(store, id, "kartverket/VAW", [...span], 15, 5);
+          if (lag !== late)
+            throw new Error(
+              `Vardø (805) runs ${lag} minutes late against kartverket/VAW from ${span[0]}, not ${late}`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-positions",
+      stations: ["uhslc/290a", "uhslc/290", "uhslc/914", "uhslc/316", "uhslc/548", "uhslc/054a"],
+      handling: "corrected",
+      error:
+        "UHSLC's station metadata places six series several kilometers from their gauge, one of them in the open sea.",
+      response:
+        "The station refresh moves each station to the gauge's position from another source, listed in `POSITIONS` in `src/positions.ts`. An entry applies only while UHSLC still serves the position it was written against; if UHSLC moves the station, it keeps UHSLC's position and the refresh reports the entry and fails the run until a person checks it.",
+      evidence:
+        "| Station | UHSLC | Gauge | Off by | Source of the gauge's position |\n| --- | --- | --- | --: | --- |\n| Port Stanley 290A, 1964–1974 | -52.7, -57.8667 | -51.690339, -57.864931 | 112 km | PSMSL Stanley (1082), 1964–1974 |\n| Port Stanley 290, 1992 on | -51.75, -57.9333 | -51.692358, -57.820514 | 10 km | PSMSL Stanley II (1796), 1992 on |\n| Meulaboh 914 | 4.316667, 96.21667 | 4.1274865, 96.131854 | 23 km | IOC sea level monitoring (meul) |\n| Acapulco 316 | 16.8417, -99.8517 | 16.8379333, -99.903 | 5.5 km | IOC (acap2); UHSLC's own 316A and 316B, and UNAM's records, are within 1 km of it |\n| Kaumalapau 548 | 20.78, -156.9 | 20.79, -156.995 | 10 km | CO-OPS Kaumalapau Harbor (1614465); UHSLC's position is inland on Lanai |\n| Chuuk 054A, 1947–1991 | 7.45368, 151.8982 | 7.44667, 151.847 | 5.7 km | NOAA's Moen Island gauge (CO-OPS 1840000); UHSLC's position is its current gauge's |\n\nUHSLC's 290A position sits 112 km south of Stanley in the South Atlantic. slackwater-database tracks the same positions in TICON's copies of these series in [openwatersio/slackwater-database#375](https://github.com/openwatersio/slackwater-database/issues/375).",
+      check: async (store, e) => {
+        for (const id of e.stations!) {
+          const s = await store.station(id);
+          if (!s) throw new Error(`the store doesn't list ${id}`);
+          const at = POSITIONS[id]?.at;
+          if (!at) throw new Error(`POSITIONS holds no position for ${id}`);
+          const km = distanceKm(s, at);
+          if (km > 0.1)
+            throw new Error(`the store places ${id} ${km.toFixed(1)} km from its gauge`);
+        }
+      },
+    },
+    {
+      id: "uhslc-goteborg-2007-hour-early",
+      stations: ["uhslc/819"],
+      since: "2007-07-23",
+      until: "2008-01-01",
+      handling: "flagged",
+      error:
+        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 23 July to 31 December 2007.",
+      response:
+        "23 July to 31 December 2007 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 65 minutes early in those windows. Against SMHI's own record of the gauge (`smhi/2109`), UHSLC's values differ by 3.6 to 4.3 cm RMS a month, and by 0.0 cm once shifted 60 minutes; before 23 July and after 31 December they match unshifted. GESLA's copies carry the same values (erratum `gesla-goteborg-2007-hour-early`). GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const { lag } = await lateBy(store, id, "smhi/2109", ["2007-09-01", "2007-09-04"], 120, 10);
+        if (Math.abs(lag + 60) > 10)
+          throw new Error(
+            `Göteborg (819) runs ${lag} minutes late against smhi/2109 in September 2007, not −60`,
+          );
+      },
+    },
+    {
+      id: "uhslc-goteborg-2011-hour-early",
+      stations: ["uhslc/819"],
+      since: "2011-02-01",
+      until: "2011-07-01",
+      handling: "flagged",
+      error:
+        "UHSLC's hourly Göteborg-Torshamnen levels are stamped one hour early from 1 February to 30 June 2011.",
+      response:
+        "February to June 2011 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026: the tide's timing at Göteborg ran about 62 minutes early. Against SMHI's own record (`smhi/2109`) the values differ by 3.5 to 4.8 cm RMS a month, and by 0.0 to 0.2 cm once shifted 60 minutes; January and July onward match unshifted. GESLA's copies carry the same values (erratum `gesla-goteborg-2011-hour-early`). GESLA's CMEMS record of the gauge differs from UHSLC's by the same amount over the span, as SMHI's does, so it's on the right clock.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const { lag } = await lateBy(store, id, "smhi/2109", ["2011-03-01", "2011-03-04"], 120, 10);
+        if (Math.abs(lag + 60) > 10)
+          throw new Error(
+            `Göteborg (819) runs ${lag} minutes late against smhi/2109 in March 2011, not −60`,
+          );
+      },
+    },
+    {
+      id: "uhslc-cuxhaven-2024-march",
+      stations: ["uhslc/825"],
+      since: "2024-02-29",
+      until: "2024-04-01",
+      handling: "flagged",
+      error:
+        "UHSLC's hourly Cuxhaven levels from 29 February to 31 March 2024 don't match the gauge's other records, even allowing for a clock offset.",
+      response:
+        "29 February to 31 March 2024 is flagged `suspect`, keeping UHSLC's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records of the gauge, which agree with each other, UHSLC's March 2024 differs by 56 cm RMS, and still by 38 cm at its best lag of about 45 minutes; April to June and September to December 2024 match to within 0.4 cm. No other gauge in the German Bight matches the month (best r 0.94). GESLA's copy carries it too (erratum `gesla-cuxhaven-uhslc-2024-march`).",
+      // Months that match PEGELONLINE's gauge do so to under a centimeter.
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        for (const [span, off] of [
+          [["2024-03-10", "2024-03-12"], true],
+          [["2024-05-10", "2024-05-12"], false],
+        ] as const) {
+          const { rms } = await lateBy(store, id, "pegelonline/5990020", [...span], 120, 10);
+          if (rms > 0.1 !== off)
+            throw new Error(
+              `Cuxhaven (825) fits pegelonline/5990020 from ${span[0]} at ${rms.toFixed(3)} m RMS at best`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-cuxhaven-2024-summer",
+      stations: ["uhslc/825"],
+      since: "2024-07-01",
+      until: "2024-09-01",
+      handling: "flagged",
+      error:
+        "UHSLC's hourly Cuxhaven levels for July and August 2024 don't match the gauge's other records, even allowing for a clock offset.",
+      response:
+        "July and August 2024 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`. These are fast-delivery values; check the span again when UHSLC's research-quality release replaces them.",
+      evidence:
+        "Found by the cross-station checks in `scripts/cross-check.ts` ([#121](https://github.com/openwatersio/stillwell/pull/121)), November 2026. Against PEGELONLINE's Cuxhaven Steubenhöft (`pegelonline/5990020`) and GESLA's BfG and CMEMS records, UHSLC's July and August 2024 differ by 52 and 54 cm RMS, and still by 26 and 34 cm at their best lag of about 50 minutes; the tide-timing check puts them about 45 minutes late in the semidiurnal band and 60 in the diurnal. No other gauge in the German Bight matches (best r 0.94). GESLA's copy carries it too (erratum `gesla-cuxhaven-uhslc-2024-summer`).",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const { rms } = await lateBy(
+          store,
+          id,
+          "pegelonline/5990020",
+          ["2024-07-15", "2024-07-17"],
+          120,
+          10,
+        );
+        if (rms <= 0.1)
+          throw new Error(
+            `Cuxhaven (825) fits pegelonline/5990020 in July 2024 to ${rms.toFixed(3)} m RMS`,
+          );
+      },
+    },
+    {
+      id: "uhslc-esperanza-1998-datum",
+      stations: ["uhslc/601"],
+      until: "1998-08-31",
+      handling: "flagged",
+      error:
+        "UHSLC's Esperanza research-quality levels before 31 August 1998 are on a zero 3.3 m from the record's later one.",
+      response:
+        "Values before 31 August 1998 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copy of UHSLC's fast-delivery Esperanza record (`gesla/esperanza-601-arg-uhslc_fd`), which keeps one zero throughout: the series less it is −3.29 m before the date and 0.0 after.",
+      // GESLA's copy of the FD series keeps one zero throughout.
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await flaggedSpan(store, e);
+        const fd = "gesla/esperanza-601-arg-uhslc_fd";
+        for (const [span, lo, hi] of [
+          [["1998-07-01", "1998-08-30"], -3.5, -3],
+          [["1998-09-01", "1998-10-31"], -0.1, 0.1],
+        ] as const) {
+          const d = (await middle(store, id, [...span])) - (await middle(store, fd, [...span]));
+          if (d < lo || d > hi)
+            throw new Error(
+              `Esperanza (601) sits ${d.toFixed(2)} m from ${fd} from ${span[0]}, not ${lo} to ${hi}`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-milolii-2025-datum",
+      stations: ["uhslc/431"],
+      until: "2025-06-17",
+      handling: "flagged",
+      error:
+        "UHSLC's Milolii levels before 17 June 2025 are on a zero about 1 m from the later one.",
+      response:
+        "Values before 17 June 2025 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against UHSLC's Honokohau (`uhslc/430`), 55 km away: the difference is −1.10 m before the date and −0.08 m after.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        // The record holds nothing from 30 November 2024 10:00 to the span's end.
+        await flaggedSpan(store, { ...e, until: "2024-12-01" });
+        await unflagged(store, id, [e.until!, dayAfter(e.until!, 4)]);
+        for (const [span, lo, hi] of [
+          [["2024-10-01", "2024-12-01"], -1.3, -0.9],
+          [["2025-06-18", "2025-08-01"], -0.3, 0.1],
+        ] as const) {
+          const d =
+            (await middle(store, id, [...span])) - (await middle(store, "uhslc/430", [...span]));
+          if (d < lo || d > hi)
+            throw new Error(
+              `Milolii (431) sits ${d.toFixed(2)} m from Honokohau (430) from ${span[0]}, not ${lo} to ${hi}`,
+            );
+        }
+      },
+    },
+    {
+      id: "uhslc-inhambane-2012-datum",
+      stations: ["uhslc/900"],
+      until: "2012-04-21",
+      handling: "flagged",
+      error:
+        "UHSLC's Inhambane levels before 21 April 2012 are on a zero about 1 m from the later one.",
+      response:
+        "Values before 21 April 2012 are flagged `suspect`, keeping UHSLC's own flag as `source_flag`.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by daily-mean differences against GESLA's copies of UHSLC's fast-delivery and research-quality records: the series equals the fast-delivery copy before the date and the research-quality copy after it, and the fast-delivery copy sits 1.03 m from the series after it.",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        // The record holds nothing from 15 April 2012 11:00 to the span's end.
+        await flaggedSpan(store, { ...e, until: "2012-04-16" });
+        await unflagged(store, id, [e.until!, dayAfter(e.until!, 10)]);
+        const step =
+          (await middle(store, id, ["2012-04-22", "2012-06-01"])) -
+          (await middle(store, id, ["2012-03-01", "2012-04-20"]));
+        if (step < 0.5)
+          throw new Error(`Inhambane (900) steps ${step.toFixed(2)} m on 21 April 2012`);
+      },
+    },
+    {
+      id: "uhslc-qaqortoq-2008-datum",
+      stations: ["uhslc/299"],
+      handling: "kept",
+      error:
+        "UHSLC's Qaqortoq levels from June 2008 on are on a zero about 5 m from the record's earlier one, with no change of datum marked.",
+      response:
+        "The store keeps the values as served: the store holds no independent record of the gauge to show which zero is wrong, so nothing is flagged.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 1.59 to 1.81 m from 1991 to 1998 and 6.74 to 6.81 m from 2008 on, across a gap from 1999 to 2007. No other gauge in the store lies within 150 km; GESLA's copies hold the same values.",
+      since: "2008-06-01",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await unflagged(store, id, ["2009-01-01", "2010-01-01"]);
+        const step =
+          (await middle(store, id, ["2009-01-01", "2010-01-01"])) -
+          (await middle(store, id, ["1998-01-01", "1999-01-01"]));
+        if (step < 4.5 || step > 5.5)
+          throw new Error(
+            `Qaqortoq's (299) median steps ${step.toFixed(2)} m from 1998 to 2009, not about 5`,
+          );
+      },
+    },
+    {
+      id: "uhslc-sao-tome-2004-datum",
+      stations: ["uhslc/225"],
+      handling: "kept",
+      error:
+        "UHSLC's Sao Tome levels from 27 August 2004 on are on a zero about 5 m from the record's earlier one, with no change of datum marked.",
+      response:
+        "The store keeps the values as served: the store holds no independent record of the gauge to show which zero is wrong, so nothing is flagged.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; the store holds no other record of the gauge or gauge nearby to compare, so this rests on the record's own medians. Yearly medians are 7.02 to 7.05 m from 1985 to 1988 and 1.76 to 1.90 m from 2004 on. No other gauge in the store lies within 150 km; GESLA's copies hold the same values. The values on the later zero start at 17:00 UTC on 27 August 2004.",
+      since: "2004-08-27",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await unflagged(store, id, ["2005-01-01", "2006-01-01"]);
+        const step =
+          (await middle(store, id, ["2005-01-01", "2006-01-01"])) -
+          (await middle(store, id, ["1988-01-01", "1989-01-01"]));
+        if (step < -5.5 || step > -4.5)
+          throw new Error(
+            `Sao Tome's (225) median steps ${step.toFixed(2)} m from 1988 to 2005, not about −5`,
+          );
+      },
+    },
+    {
+      id: "uhslc-gibraltar-2023-datum",
+      stations: ["uhslc/289"],
+      handling: "kept",
+      error:
+        "UHSLC's Gibraltar levels from November 2023 on read about 1.5 m higher than the record's earlier ones, with no change of datum marked.",
+      response:
+        "The store keeps the values as served: the store holds no independent record of the gauge to show which zero is wrong, so nothing is flagged. A datum epoch for the record is planned.",
+      evidence:
+        "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`) over every record the store lists as coastal, November 2026; no gauge in the store spans the 2001 to 2022 gap, so this rests on the record's own medians. Yearly medians are 0.60 to 0.67 m from 1993 to 2000 and 2.07 to 2.10 m from 2023 on. The record joins UHSLC's research-quality version B (1993 to 2000) to its fast-delivery series from November 2023, which TICON's matching places 1.8 km from version B's position, so the later series may be a relocated gauge with its own zero.",
+      since: "2023-11-01",
+      check: async (store, e) => {
+        const id = e.stations![0]!;
+        await unflagged(store, id, ["2024-01-01", "2025-01-01"]);
+        const step =
+          (await middle(store, id, ["2024-01-01", "2025-01-01"])) -
+          (await middle(store, id, ["2000-01-01", "2001-01-01"]));
+        if (step < 1.2 || step > 1.8)
+          throw new Error(
+            `Gibraltar's (289) median steps ${step.toFixed(2)} m from 2000 to 2024, not about 1.5`,
+          );
+      },
+    },
+  ],
+  retired: [],
+} satisfies ErrataFile;

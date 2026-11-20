@@ -32,10 +32,20 @@ const DAY = (d: string) => Date.parse(`${d}T00:00:00Z`);
 describe("errata files", () => {
   it("are every source's that has one, each for a registered source", () => {
     const dir = fileURLToPath(new URL("../src/sources", import.meta.url));
-    const onDisk = readdirSync(dir).filter((d) => existsSync(join(dir, d, "errata.json")));
+    const onDisk = readdirSync(dir).filter((d) => existsSync(join(dir, d, "errata.ts")));
+    // An errata.json left beside it would be read by nothing.
+    assert.deepEqual(
+      readdirSync(dir).filter((d) => existsSync(join(dir, d, "errata.json"))),
+      [],
+    );
     assert.deepEqual(Object.keys(errataFiles).sort(), onDisk.sort());
     for (const source of onDisk) assert.ok(sources[source], `${source} isn't registered`);
     assert.deepEqual(errataProblems, []);
+    assert.deepEqual(
+      errata.filter((e) => !e.check).map((e) => e.id),
+      [],
+      "every erratum has a check",
+    );
   });
 
   it("leave out an ID used twice or retired anywhere, and a file that doesn't parse", () => {
@@ -141,7 +151,15 @@ describe("parseErrata", () => {
     refused({}, ["uhslc-hong-kong-hour-early"]);
     // A misspelled until would leave the span open.
     refused({ unitl: "2021-01-01" });
+    refused({ check: true });
     assert.throws(() => parseErrata("uhslc", { errata: [] }));
+  });
+
+  it("keeps an erratum's check, and leaves it out of what's published", () => {
+    const check = async () => true;
+    const parsed = parseErrata("uhslc", file([entry({ check })])).errata;
+    assert.equal(parsed[0]!.check, check);
+    assert.ok(!("check" in (published(parsed)[0] as object)));
   });
 });
 
@@ -292,7 +310,7 @@ describe("published", () => {
     const [row] = published(parseErrata("uhslc", file([entry()])).errata) as { url: string }[];
     assert.equal(
       row!.url,
-      "https://github.com/openwatersio/stillwell/blob/main/src/sources/uhslc/errata.json",
+      "https://github.com/openwatersio/stillwell/blob/main/src/sources/uhslc/errata.ts",
     );
   });
 

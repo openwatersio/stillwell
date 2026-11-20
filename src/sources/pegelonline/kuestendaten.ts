@@ -5,7 +5,8 @@ import { zipEntries } from "./index.ts";
 /**
  * The Hamburg Port Authority gauges whose history PEGELONLINE doesn't offer,
  * from kuestendaten.de's WISKI download: one zip per series, of 1-minute
- * values in centimeters above gauge zero, stamped in UTC+1 all year.
+ * values in centimeters above gauge zero, stamped in UTC+1 all year. HPA
+ * pointed to this portal for the history (openwatersio/stillwell#103).
  */
 const BASE =
   "https://www.kuestendaten.de/DE/dynamisch/appl/data/daten_prod/prodNeuProd/direct_download/wiski/";

@@ -22,6 +22,13 @@ export const metadata: SourceMetadata = {
   id: "refmar",
   name: "REFMAR (Shom)",
   url: "https://refmar.shom.fr/",
+  // SHOM publishes both networks' datasets on data.gouv.fr under this licence, as their ISO
+  // metadata in SHOM's catalogue and Sextant also say:
+  // https://www.data.gouv.fr/datasets/reseaux-de-reference-des-observations-maregraphiques-refmar-maregraphes-ronim
+  // https://www.data.gouv.fr/datasets/reseaux-de-reference-des-observations-maregraphiques-refmar-maregraphes-partenaires
+  // refmar.shom.fr's "Politique de diffusion" still carries the REFMAR® production system's
+  // older terms (registration, no redistribution). They predate SHOM's move of REFMAR's
+  // downloads to data.shom.fr under the open licence, which governs the data served there.
   license: {
     id: "etalab-2.0",
     name: "Licence Ouverte / Open Licence 2.0 (Etalab)",
@@ -30,6 +37,7 @@ export const metadata: SourceMetadata = {
     redistribution: true,
   },
   attribution: "REFMAR, Shom (doi:10.17183/REFMAR)",
+  // https://refmar.shom.fr/politique-d-acces-aux-donnees asks users to report questionable observations here.
   contact: { email: "refmar@shom.fr", url: "https://refmar.shom.fr/contact" },
   chart_datum: "ZH",
   // Raw values arrive within minutes, from the 1-minute series.
@@ -87,7 +95,7 @@ const DATUMS: Record<string, string> = {
 /**
  * The earliest year asked for at a gauge SHOM gives no first observation for:
  * five years before the first 1 June with values, from a probe of 1 June every
- * five years since 1960 (November 2026). The rest, whose first values the
+ * five years since 1960. The rest, whose first values the
  * probe found from 2015 on or not at all, are asked for from 2010.
  */
 // prettier-ignore
