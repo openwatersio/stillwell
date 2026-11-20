@@ -1,7 +1,7 @@
 // Serves `levels` for the api.openwaters.io gateway, bound to it as WATER_LEVELS:
 // answers from Cloudflare's cache when it can, otherwise reads D1 and the
 // store's files on R2 itself, and when those don't answer serves the last good
-// copy marked stale (docs/plans/cloudflare.md, The levels API).
+// copy marked stale (README.md).
 
 import type { Catalog } from "../../src/api/catalog.ts";
 import { apiHandler } from "../../src/api/handler.ts";

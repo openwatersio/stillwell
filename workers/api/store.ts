@@ -1,5 +1,5 @@
 // What the levels Worker reads: the live window from D1 and everything older
-// from the store's Parquet files on R2 (docs/plans/cloudflare.md, The levels API).
+// from the store's Parquet files on R2 (README.md).
 
 import { decompress } from "fzstd";
 import {

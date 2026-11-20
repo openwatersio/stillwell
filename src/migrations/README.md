@@ -1,6 +1,6 @@
 # Migrations
 
-Each file here is the work a merged change needs done to the public store, which the [Migrations workflow](../../.github/workflows/migrations.yml) runs once, one step at a time, after the merge ([docs/plans/cloudflare.md](../../docs/plans/cloudflare.md#migrations), [Operations](../../docs/contributing/operations.md#migrations)).
+Each file here is the work a merged change needs done to the public store, which the [Migrations workflow](../../.github/workflows/migrations.yml) runs once, one step at a time, after the merge ([Operations](../../docs/contributing/operations.md#migrations)).
 
 Name a file `YYYYMMDD-what-it-does.ts`, with the date it's written. Files run in name order, and one that sorts before a migration already started isn't run, so rename it to sort after if another merged first. It exports a `Migration` from [`src/jobs/migrations.ts`](../jobs/migrations.ts):
 
@@ -22,7 +22,7 @@ export default {
 } satisfies Migration;
 ```
 
-A step is `ingest` arguments, which run as `node scripts/ingest.ts <arguments>` in the step's source's `store-<source>` concurrency group, `drop`, `withhold` and `misplaced` included, or a `check`, which reads back what the steps before it wrote and throws when the store is wrong. A `timeout` is in minutes: 180 by default for an `ingest` step, 30 for a check, at most 360. A migration's first step is not a check.
+A step is `ingest` arguments, which run as `node scripts/ingest.ts <arguments>` in the step's source's `store-<source>` concurrency group, waiting in its queue behind whatever runs there, `drop`, `withhold` and `misplaced` included, or a `check`, which reads back what the steps before it wrote and throws when the store is wrong. A `timeout` is in minutes: 180 by default for an `ingest` step, 30 for a check, at most 360. A migration's first step is not a check.
 
 - A step passes no `--accept-*` flag or `--dry-run`, since those accept whatever the source reports when the step runs, long after the review. A requalify with a `--budget`, as `analyze --requalify` always has, takes one of at least its timeout, so it never stops early and succeeds. `npm test` parses each step as `scripts/ingest.ts` would and checks the words its command takes.
 - The workflow runs the steps of all migrations in file-name order and records each in `migrations.json` in the store. A migration that sorts before one already recorded isn't run, and holds every migration after it until it's renamed to sort after.

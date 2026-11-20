@@ -34,7 +34,7 @@ Every fact has one home, and everything else links to it. A fact about one sourc
 src/sources/<source>/  one adapter per source, each with a README on that service's quirks
 src/store/              Parquet writing, merging and paths, and the definition of every published file (files.ts)
 src/hroi/              the harmonic representation of inequalities (HRoI), BSH's prediction method
-src/realtime/          the poller's live store client, poll and schedule (docs/plans/cloudflare.md)
+src/realtime/          the poller's live store client, poll and schedule (workers/live/README.md)
 src/jobs/              the migrations' format and the checks on the commands a step runs
 src/migrations/        the store work each merged change needs, which the Migrations workflow runs (see docs/contributing/operations.md)
 src/api/               the levels API's parameters, datum conversion and responses

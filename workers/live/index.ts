@@ -1,5 +1,5 @@
 // The live Worker: runs the poller (server/ingest.ts) in a Container, answers the live store (store.ts) under /store/
-// for it, and every minute makes sure it's running (docs/plans/cloudflare.md).
+// for it, and every minute makes sure it's running (README.md).
 
 import { Container } from "@cloudflare/containers";
 // The containers package starts a container through it.

@@ -1,7 +1,7 @@
 /**
  * The poller: polls every public hourly source's live stations into the live
  * store, each station at its `min_interval_s`, hourly where it gives none, and
- * writes each source's daily files from it (docs/plans/cloudflare.md). It runs
+ * writes each source's daily files from it (workers/live/README.md). It runs
  * in the live Worker's container (workers/live). Each pass runs in a process of
  * its own (server/pass.ts), as does each source's export (server/export.ts).
  *

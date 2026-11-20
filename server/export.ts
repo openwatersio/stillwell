@@ -1,7 +1,7 @@
 /**
  * Writes one source's daily files, `recent/<source>/<YYYY-MM-DD>.parquet`, from the live store, run by
  * server/ingest.ts in a process of its own so a large day's file doesn't hold the poller's memory
- * (docs/plans/cloudflare.md, The daily files).
+ * (workers/live/README.md, The daily files).
  *
  *   node server/export.ts <source> <YYYY-MM-DD,...>
  *

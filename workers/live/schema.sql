@@ -1,4 +1,4 @@
--- D1 database `stillwell-live`: the poller's live window, read by the levels API (docs/plans/cloudflare.md).
+-- D1 database `stillwell-live`: the poller's live window, read by the levels API (README.md).
 
 -- One row per station per UTC day for the last 8 days. `rows` is a JSON array of
 -- [epoch, time_ms, level, flag, source_flag, received_ms] sorted by time, source_flag and received_ms null when absent.

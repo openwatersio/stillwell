@@ -108,7 +108,7 @@ One station in full: the fields above plus
 
 ### `GET /water-levels/stations/{source}/{id}/levels`
 
-Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. The last 8 days come from the poller's D1 database and older ones from the year files ([cloudflare.md](cloudflare.md#the-levels-api)). Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
+Observed levels, from the last minutes back through the archive, for apps, station pages and analysis. The last 8 days come from the poller's D1 database and older ones from the year files ([workers/api](../../workers/api/README.md)). Stations with `live` true are polled at their source's interval, so their newest values are minutes old.
 
 | Parameter      | Default               | Meaning                                                                                                                                                                                         |
 | -------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
