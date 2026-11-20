@@ -224,7 +224,8 @@ jobs:
   # for publish to carry MSL, LAT and chart datum along. It reads levels and
   # writes only stations/links.parquet, which publish reads, so it needs no
   # source's group; a row the run doesn't replace is kept unless its pair was
-  # read and didn't measure, and a failed read fails the job once the file is
+  # read and didn't measure, is no longer linked, or names a withheld station
+  # or a dropped GESLA record, and a failed read fails the job once the file is
   # written. Only
   # a full refresh runs it; a cancelled run skips it, and publish uses last
   # month's file. The links group keeps a hand-run Ingest `links` from writing
