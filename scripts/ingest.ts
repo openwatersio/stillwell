@@ -183,6 +183,7 @@ import {
   sameByData,
   shiftedByData,
   tooManyStopped,
+  withoutGone,
   writeMatches,
   type DataMatch,
 } from "../src/matches.ts";
@@ -190,6 +191,12 @@ import { ID_KM } from "../src/same-as.ts";
 import { INGEST_OPTIONS } from "../src/ingest-options.ts";
 
 useDiskCache();
+
+/** Whether a station isn't withheld, so its rows in the monthly files stay (`withoutGone`). */
+const shown = (id: string) => {
+  const source = sources[id.split("/")[0]!];
+  return !source || withheldReason(source, id) === null;
+};
 
 /** The records whose files `drop` deletes, by source. */
 const DROPS: Record<string, (sourceId: string) => boolean> = { gesla: deletesFiles };
@@ -212,11 +219,12 @@ switch (command) {
     setConnections(positive("concurrency"));
     for (const store of new Set(Object.values(sources).flatMap(storesOf))) {
       const held = Object.values(sources).filter((s) => storesOf(s).includes(store));
+      const stations = await stationsToMeasure(store, held);
       const { rows, failed } = await measureLinks(
         store,
-        await stationsToMeasure(store, held),
+        stations,
         positive("concurrency"),
-        await readLinks(store),
+        withoutGone(await readLinks(store), stations, shown),
       );
       await writeLinks(store, rows);
       // Written first, so the pairs that were read are kept; a failed read keeps its pair's last row.
@@ -235,12 +243,8 @@ switch (command) {
         process.exitCode = 1;
         continue;
       }
-      // A withheld station's row goes, as its levels do.
-      const shown = (id: string) => {
-        const source = sources[id.split("/")[0]!];
-        return !source || withheldReason(source, id) === null;
-      };
-      const previous = (await readMatches(store)).filter((m) => shown(m.a) && shown(m.b));
+      // Before the stopped-agreeing guard, so a withheld or dropped station's rows don't count as stopped.
+      const previous = withoutGone(await readMatches(store), stations, shown);
       const { rows, failed, pairs } = await compareStations(
         store,
         stations,
@@ -1243,7 +1247,7 @@ async function withholdStations(sourceId: string): Promise<void> {
   ];
   if (ids.length)
     lines.push(
-      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet.`,
+      `Refresh ${sourceId}'s list with the Monthly workflow (sources: ${sourceId}) to drop them from it and publish stations.parquet, and Ingest \`matches --concurrency 16\` (timeout 300) and \`links --concurrency 8\` to drop their rows from those files.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
@@ -1264,7 +1268,7 @@ async function dropStations(sourceId: string): Promise<void> {
   ];
   if (ids.length && !dryRun)
     lines.push(
-      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them.`,
+      `Run \`compact ${sourceId} --rebuild-bounds\` and \`publish\` so the bounds and stations.parquet drop them, and Ingest \`matches --concurrency 16\` (timeout 300) and \`links --concurrency 8\` so their files do.`,
     );
   for (const line of lines) console.log(line);
   const file = process.env.GITHUB_STEP_SUMMARY;
