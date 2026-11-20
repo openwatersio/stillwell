@@ -7,7 +7,7 @@ It also becomes slackwater-database's source of observations, from each originat
 ## Where it stands
 
 - Adapters for the 19 sources the [README](../../README.md#sources) lists, writing to the store on R2, with each source's station list, datum epochs and links between sources in the store ([stations.md](../stations.md)).
-- Scheduled jobs in GitHub Actions: hourly ingest into `recent/`, a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [CONTRIBUTING.md](../../CONTRIBUTING.md) covers them.
+- Scheduled jobs in GitHub Actions: hourly ingest into `recent/`, a nightly fold into the year files, a monthly refresh of station lists and refetch of values sources finalize, and a weekly canary. [Operations](../contributing/operations.md) covers them.
 - Offsets to MSL, LAT and chart datum from slackwater-database or a linked series of the gauge ([where offsets come from](https://openwatersio.github.io/stillwell/docs/guides/datums/#where-offsets-come-from)).
 - QC with per-station tidal analysis and errata per source ([qc/](../qc/README.md)).
 - An HRoI implementation and evaluation against BSH predictions and RWS observations ([hroi-evaluation.md](../hroi-evaluation.md)).
@@ -120,7 +120,7 @@ Estimate: 2 days.
 Estimate: 6 days.
 
 - [x] [CO-OPS](../../src/sources/coops/README.md), [USGS](../../src/sources/usgs/README.md) and [USACE](../../src/sources/usace/README.md) adapters.
-- [x] Resumable backfill: `--skip-written`, `--first <file>` and `--shard i/n` ([CONTRIBUTING.md](../../CONTRIBUTING.md#running-ingest)).
+- [x] Resumable backfill: `--skip-written`, `--first <file>` and `--shard i/n` ([Running ingest](../contributing/ingest.md)).
 - [ ] Backfill: CO-OPS's full history, and USGS and USACE river history for the crowd-depth basins, as a GitHub Actions matrix sharded by a hash of station IDs. Each process paces CO-OPS at a request a second and USGS at its key's rate, so shards running at once have to split those. Each also rewrites the source's bounds after every 100 stations, so shards running at once would lose each other's preliminary values; the matrix has to keep them from writing the bounds at once. The [CO-OPS](../../src/sources/coops/README.md) and [USGS](../../src/sources/usgs/README.md) READMEs have the request budgets.
 - [ ] Dated NAVD88 and LWRP offsets for the lower-Mississippi gauges ([#10](https://github.com/openwatersio/stillwell/issues/10)). `datums` holds each MVN gauge's latest NAVD88 adjustment and LWRP offset from its description, for its whole record, but the adjustment changes with each survey, and the sources disagree on it. A data request to MVN asks for each gauge's dated datum history; with it, store an offset that can change on a date.
 
@@ -130,7 +130,7 @@ Done when crowd-depth can read observed stage and coastal levels for its Mississ
 
 Estimate: 3 days.
 
-- [x] Hourly ingest into `recent/`, the nightly fold into year files with each station's bounds, the monthly refresh and refetch, run summaries, automatic issues for repeated failures, and the weekly canary ([CONTRIBUTING.md](../../CONTRIBUTING.md)). Measured against a logging S3 server, a year file costs DuckDB one PUT and four HEAD or GET requests, and USGS's 7-day recent file a five-request multipart upload, so the hourly and nightly jobs make about 430,000 Class A and 1.8 million Class B requests a month: inside R2's free tier, or under $3 a month without it. Folding rewrites each year file whole, so the work grows through the year: on year-end-sized files on local disk it took 27 ms a file for 15-minute series and 0.45 s for 1-minute ones at 16 connections, peaking at 2.5 GB of heap (4.1 GB resident).
+- [x] Hourly ingest into `recent/`, the nightly fold into year files with each station's bounds, the monthly refresh and refetch, run summaries, automatic issues for repeated failures, and the weekly canary ([Operations](../contributing/operations.md)). Measured against a logging S3 server, a year file costs DuckDB one PUT and four HEAD or GET requests, and USGS's 7-day recent file a five-request multipart upload, so the hourly and nightly jobs make about 430,000 Class A and 1.8 million Class B requests a month: inside R2's free tier, or under $3 a month without it. Folding rewrites each year file whole, so the work grows through the year: on year-end-sized files on local disk it took 27 ms a file for 15-minute series and 0.45 s for 1-minute ones at 16 connections, peaking at 2.5 GB of heap (4.1 GB resident).
 - [ ] Now and then refetch approved USGS years and verified CO-OPS months too, with `--refetch`: USGS still fills gaps and revises values after approval, and the disk cache keeps an approved page for good. Nothing in the store says which approved years changed, so this is a whole-record campaign, about 200,000 USGS requests or nine days at USGS's rate, and it stays a manual Ingest run until there's a cheaper signal.
 
 Done when every source's `recent/` is under 2 hours old and the year files fill in daily without anyone touching them.

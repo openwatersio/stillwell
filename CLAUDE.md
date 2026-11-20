@@ -1,1 +1,1 @@
-Read [CONTRIBUTING.md](CONTRIBUTING.md) — the project layout, build, dev loop, checks, and release process all live there.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the rules, layout, commands and review checks, then the guide its Guides section names for your task.

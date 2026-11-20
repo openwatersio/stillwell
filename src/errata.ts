@@ -10,7 +10,7 @@
  * column of `stations.parquet` and writes them to `errata.json`. An entry
  * also records its report to the agency, which `npm run errata` drafts.
  * Once the agency fixes the data and the store has refetched it, the entry
- * goes and its ID moves to `retired`. See CONTRIBUTING.md.
+ * goes and its ID moves to `retired`. See docs/contributing/sources.md.
  */
 import { Flag, Unjudged, type Observation, type Source, type Station } from "./schema.ts";
 
