@@ -1,4 +1,3 @@
-import type { ClickHouse } from "../realtime/clickhouse.ts";
 import { Flag } from "../schema.ts";
 import type { Catalog, CatalogStation } from "./catalog.ts";
 import {
@@ -28,7 +27,7 @@ export interface EpochSpan {
   until: number | null;
 }
 
-/** Where `levels` reads its values: D1 and the year files in the Worker, ClickHouse on the server. */
+/** Where `levels` reads its values: D1 and the year files (workers/api/store.ts). */
 export interface LevelsData {
   /**
    * The station's values from `from` to `to`, inclusive. With `sampling`, it
@@ -53,14 +52,13 @@ export interface LevelsData {
 
 /** The `levels` route over the catalog of public stations and `data`, and `/health`. */
 export function apiHandler(
-  // shortcut: `ch` keeps server/api.ts serving from ClickHouse; drop it when the server retires.
-  deps: ({ data: LevelsData } | { ch: ClickHouse }) & {
+  deps: { data: LevelsData } & {
     catalog: () => Catalog | null;
     now?: () => number;
   },
 ): (method: string, url: string) => Promise<ApiResponse> {
   const now = deps.now ?? Date.now;
-  const data = "data" in deps ? deps.data : clickhouseData(deps.ch);
+  const data = deps.data;
   return async (method, url) => {
     if (method !== "GET" && method !== "HEAD") return json(405, { message: "Only GET is served" });
     const { pathname, searchParams } = new URL(url, "http://localhost");
@@ -146,74 +144,4 @@ interface Row {
   level: number;
   flag: number;
   received_ms: string | null;
-}
-
-/** The server's ClickHouse database `stillwell` as `LevelsData`. */
-function clickhouseData(ch: ClickHouse): LevelsData {
-  return {
-    readLevels: (station, from, to) => readLevels(ch, station.id, from, to),
-    newest: (station, epochs) => newest(ch, station, epochs),
-    lastPass: (source, group) => lastPass(ch, source, group),
-  };
-}
-
-async function readLevels(
-  ch: ClickHouse,
-  station: string,
-  from: number,
-  to: number,
-): Promise<StoredLevel[]> {
-  const rows = await ch.query<Row>(
-    `SELECT epoch, toUnixTimestamp64Milli(time) AS time_ms, level, flag,
-       toUnixTimestamp64Milli(received) AS received_ms
-     FROM observations FINAL
-     WHERE station = {station:String}
-       AND time >= fromUnixTimestamp64Milli({from:Int64}) AND time <= fromUnixTimestamp64Milli({to:Int64})
-     ORDER BY time
-     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
-    { station, from: Math.floor(from), to: Math.ceil(to) },
-  );
-  return rows.map((r) => ({
-    epoch: Number(r.epoch),
-    time: Number(r.time_ms),
-    level: r.level,
-    flag: r.flag,
-    received: r.received_ms === null ? null : Number(r.received_ms),
-  }));
-}
-
-async function newest(
-  ch: ClickHouse,
-  station: string,
-  epochs: EpochSpan[],
-): Promise<number | null> {
-  if (!epochs.length) return null;
-  // Each epoch's span as arrays in step with its id; an open end is the widest time there is.
-  const [row] = await ch.query<{ t: string | null }>(
-    `SELECT toUnixTimestamp64Milli(maxOrNull(time)) AS t
-     FROM observations FINAL
-     WHERE station = {station:String} AND flag != {bad:UInt8} AND epoch IN {ids:Array(UInt16)}
-       AND toUnixTimestamp64Milli(time) >= {since:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
-       AND toUnixTimestamp64Milli(time) < {until:Array(Int64)}[indexOf({ids:Array(UInt16)}, epoch)]
-     SETTINGS do_not_merge_across_partitions_select_final = 1, max_execution_time = 8`,
-    {
-      station,
-      bad: Flag.bad,
-      ids: epochs.map((e) => e.id),
-      since: epochs.map((e) => e.since ?? Number.MIN_SAFE_INTEGER),
-      until: epochs.map((e) => e.until ?? Number.MAX_SAFE_INTEGER),
-    },
-  );
-  return row?.t == null ? null : Number(row.t);
-}
-
-async function lastPass(ch: ClickHouse, source: string, group: number): Promise<number | null> {
-  const [row] = await ch.query<{ t: string | null }>(
-    `SELECT toUnixTimestamp64Milli(maxOrNull(finished)) AS t
-     FROM polls
-     WHERE source = {source:String} AND ok AND (empty(intervals) OR has(intervals, {group:UInt32}))
-     SETTINGS max_execution_time = 8`,
-    { source, group },
-  );
-  return row?.t == null ? null : Number(row.t);
 }

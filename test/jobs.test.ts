@@ -16,6 +16,7 @@ describe("sourcesFor", () => {
     assert.deepEqual(sourcesFor("compact"), [
       "bodc",
       "bom",
+      "cco",
       "cdec",
       "cmems",
       "coops",
@@ -29,6 +30,7 @@ describe("sourcesFor", () => {
       "jodc",
       "kartverket",
       "linz",
+      "marine-institute",
       "pegelonline",
       "refmar",
       "rws",
@@ -39,16 +41,11 @@ describe("sourcesFor", () => {
       "usace",
       "usgs",
     ]);
-    // CCO and the Marine Institute are on the server's job queue (src/sources/server.json), so Actions leaves them out.
-    assert.deepEqual(
-      sourcesFor("lists"),
-      Object.keys(sources)
-        .filter((id) => id !== "cco" && id !== "marine-institute")
-        .sort(),
-    );
+    assert.deepEqual(sourcesFor("lists"), Object.keys(sources).sort());
     assert.deepEqual(sourcesFor("refetch"), [
       "bodc",
       "bom",
+      "cco",
       "cmems",
       "coops",
       "crms",
@@ -56,6 +53,7 @@ describe("sourcesFor", () => {
       "jma",
       "kartverket",
       "linz",
+      "marine-institute",
       "refmar",
       "rws",
       "sfwmd",
@@ -185,10 +183,7 @@ describe("Monthly workflow", () => {
     assert.ok(step, "the lists job requalifies");
     assert.equal(jobs.lists!.concurrency?.group, "store-${{ matrix.source }}");
     // A dispatched refresh of named sources, such as the poller's on a datum change, skips it.
-    assert.equal(
-      step.if,
-      "${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}",
-    );
+    assert.equal(step.if, "${{ !cancelled() && !inputs.sources }}");
     // From the year two months back, since compaction refolds a month's last
     // days with the window's flags after the run, so December's are judged in
     // February; to last month's year, the end exclusive. scripts/monthly.sh
@@ -211,7 +206,7 @@ describe("Monthly workflow", () => {
     const refresh = steps.findIndex((s) => s.run?.includes("monthly.sh refresh"));
     assert.ok(at > refresh && refresh >= 0, "list-backfills follows the refresh");
     // For every source, since a source without list backfills runs none.
-    assert.equal(steps[at]!.if, "${{ !cancelled() && steps.owns.outcome == 'success' }}");
+    assert.equal(steps[at]!.if, "${{ !cancelled() }}");
     const keys = (env: Record<string, string> = {}) =>
       Object.keys(env).filter(
         (k) => !k.startsWith("S3_") && !["SOURCE", "STILLWELL_STORE"].includes(k),

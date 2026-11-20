@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildCatalog, type CatalogStation } from "../src/api/catalog.ts";
-import { apiHandler } from "../src/api/handler.ts";
 import {
   conversionFor,
   levelsResponse,
@@ -14,7 +13,6 @@ import {
   type LevelsQuery,
   type StoredLevel,
 } from "../src/api/levels.ts";
-import { clickhouse, migrate } from "../src/realtime/clickhouse.ts";
 import { Flag } from "../src/schema.ts";
 
 const MIN = 60_000;
@@ -325,116 +323,5 @@ describe("the response", () => {
     assert.equal(maxAge(seattle(), NOW, NOW), 300);
     assert.equal(maxAge(catalog({ min_interval_s: 60 }).get("coops/9447130")!, NOW, NOW), 60);
     assert.equal(maxAge(seattle(), NOW - 8 * DAY, NOW), 86_400);
-  });
-});
-
-// Runs against a real ClickHouse only when CLICKHOUSE_URL names one, as CI's service does.
-describe("stillwell-api on ClickHouse", { skip: !process.env.CLICKHOUSE_URL }, () => {
-  it("serves a station's levels, and refuses what it can't serve", async () => {
-    const now = Math.floor(Date.now() / HOUR) * HOUR;
-    const ch = clickhouse(`stillwell_api_test_${process.pid}`);
-    await migrate(ch);
-    try {
-      const station = "coops/9447130";
-      await ch.insert(
-        "observations",
-        [
-          { time: now - 12 * MIN, level: 3, flag: Flag.preliminary, version: 1 },
-          { time: now - 6 * MIN, level: 3.1, flag: Flag.preliminary, version: 1 },
-          { time: now - 6 * MIN, level: 3.2, flag: Flag.preliminary, version: 2 }, // a revision
-          { time: now, level: 9, flag: Flag.bad, version: 1 },
-        ].map((r) => ({
-          station,
-          epoch: 2,
-          ...r,
-          time: new Date(r.time).toISOString(),
-          source_flag: null,
-          received: null,
-        })),
-      );
-      const poll = (finished: number, ok: boolean, intervals: number[]) => ({
-        source: "coops",
-        started: new Date(finished - MIN).toISOString(),
-        finished: new Date(finished).toISOString(),
-        intervals,
-        ok,
-        stations: 1,
-        updated: 1,
-        values: 1,
-        stale: [],
-        failed: [],
-        blocked: false,
-        datum_changed: false,
-      });
-      await ch.insert("polls", [
-        poll(now - 3 * MIN, true, [360]),
-        poll(now - 2 * MIN, true, [60]), // another group's
-        poll(now - MIN, false, [360]), // failed
-      ]);
-      // A newer value in an epoch the published list doesn't have yet: not shown, nor counted in as_of.
-      await ch.insert("observations", [
-        {
-          station,
-          epoch: 3,
-          time: new Date(now - MIN).toISOString(),
-          level: 1,
-          flag: Flag.preliminary,
-          source_flag: null,
-          received: null,
-          version: 1,
-        },
-      ]);
-      // Newer still, in epoch 1 after its until: outside its span, so neither shown nor counted.
-      await ch.insert("observations", [
-        {
-          station,
-          epoch: 1,
-          time: new Date(now - MIN / 2).toISOString(),
-          level: 1,
-          flag: Flag.preliminary,
-          source_flag: null,
-          received: null,
-          version: 1,
-        },
-      ]);
-      const stations = catalog({
-        since: [null, new Date(now - DAY).toISOString()],
-        until: [new Date(now - DAY).toISOString(), null],
-      });
-      const handle = apiHandler({ ch, catalog: () => stations, now: () => now });
-
-      const ok = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=station`);
-      assert.equal(ok.status, 200, ok.body);
-      assert.equal(ok.headers["cache-control"], "public, max-age=300");
-      const body = JSON.parse(ok.body);
-      assert.deepEqual(
-        body.levels.map((l: { level: number }) => l.level),
-        [3, 3.2],
-      );
-      assert.equal(body.datum, "STND");
-      assert.equal(body.as_of, new Date(now - 6 * MIN).toISOString().replace(".000Z", "Z"));
-      assert.equal(body.updated, new Date(now - 3 * MIN).toISOString().replace(".000Z", "Z"));
-
-      const encoded = await handle("GET", `/water-levels/stations/coops/9447130%2Fx/levels`);
-      assert.equal(encoded.status, 404);
-      assert.equal((await handle("GET", `/water-levels/stations/smhi/2130/levels`)).status, 451);
-      const noLevels = catalog({ products: [] });
-      const without = await apiHandler({ ch, catalog: () => noLevels, now: () => now })(
-        "GET",
-        `/water-levels/stations/coops/9447130/levels`,
-      );
-      assert.equal(without.status, 404);
-      const bad = await handle("GET", `/water-levels/stations/coops/9447130/levels?datum=NAVD88`);
-      assert.equal(bad.status, 400);
-      assert.equal(JSON.parse(bad.body).errors[0].path, "datum");
-      assert.equal(
-        (await handle("POST", `/water-levels/stations/coops/9447130/levels`)).status,
-        405,
-      );
-      assert.equal((await handle("GET", `/health`)).status, 200);
-      assert.equal((await apiHandler({ ch, catalog: () => null })("GET", "/health")).status, 503);
-    } finally {
-      await ch.exec(`DROP DATABASE IF EXISTS ${ch.database}`);
-    }
   });
 });

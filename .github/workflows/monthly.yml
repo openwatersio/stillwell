@@ -132,11 +132,6 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - id: owns
-        run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # stations.parquet is rebuilt once, from every list, by the next job.
       # Each step is a step of scripts/monthly.sh, which the server's job queue runs too, and which says why.
@@ -153,7 +148,7 @@ jobs:
           CCO_API_KEY: ${{ secrets.CCO_API_KEY }}
           CCO_REFERER: ${{ secrets.CCO_REFERER }}
       # The steps after a failed one still run, but none once the guard has refused the source.
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' }}
+      - if: ${{ !cancelled() }}
         run: scripts/monthly.sh analyze "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -161,7 +156,7 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' && !inputs.sources }}
+      - if: ${{ !cancelled() && !inputs.sources }}
         run: scripts/monthly.sh requalify-recent "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -169,7 +164,7 @@ jobs:
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
           S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-      - if: ${{ !cancelled() && steps.owns.outcome == 'success' }}
+      - if: ${{ !cancelled() }}
         run: scripts/monthly.sh list-backfills "$SOURCE"
         env:
           SOURCE: ${{ matrix.source }}
@@ -320,10 +315,6 @@ jobs:
         with:
           node-version-file: .mise.toml
           cache: npm
-      # A source that moved to the server's job queue since this run's commit is written only there.
-      - run: scripts/server-owns.sh "$SOURCE"
-        env:
-          SOURCE: ${{ matrix.source }}
       - run: npm ci
       # Which stations and years each source refetches, and why, is in its adapter's `schedule`; scripts/monthly.sh runs it here and on the server.
       - run: scripts/monthly.sh refetch "$SOURCE"

@@ -11,28 +11,15 @@
  * STILLWELL_STORE the store it reads the station lists from. With PORT set, it
  * answers `GET /health` there, which the Worker asks to know it's up. With
  * GITHUB_TOKEN set, a source reporting a station in another datum starts the
- * Monthly refresh of that source, unless one started in the last day; for a
- * source on the server's job queue, the job service does. With
- * STILLWELL_METRICS set, it writes each source's pass metrics to that file
- * after every pass, in Prometheus's text format.
+ * Monthly refresh of that source, unless one started in the last day.
  */
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sources, sourceOf } from "../src/sources/index.ts";
-import { PHASES, SERVER_SOURCES } from "../src/sources/jobs.ts";
 import type { Source } from "../src/schema.ts";
 import { recentDays } from "../src/store/paths.ts";
 import { PassError, schedule, slots, type PassResult } from "../src/realtime/schedule.ts";
-import {
-  metricsText,
-  readSaved,
-  recordPass,
-  startMetrics,
-  type SourceMetrics,
-} from "../src/realtime/metrics.ts";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 3_600_000;
@@ -82,14 +69,6 @@ for (const signal of ["SIGINT", "SIGTERM"] as const)
     for (const child of running) child.kill("SIGTERM");
     for (const resume of wake) resume();
   });
-
-// Each source keeps its last success and interval from before a restart, so restarts never reset the
-// stale-source alert.
-const saved = readSaved(readMetrics());
-const metrics = new Map<string, SourceMetrics>();
-for (const { metadata } of chosen)
-  metrics.set(metadata.id, startMetrics(Date.now(), saved.get(metadata.id)));
-writeMetrics();
 
 // Started a few seconds apart, so a restart doesn't run every source's first pass at once.
 await Promise.all([
@@ -146,48 +125,13 @@ async function run(source: Source): Promise<void> {
   const id = source.metadata.id;
   await schedule({
     pass: async (due, seeding) => {
-      let result: PassResult | null = null;
-      try {
-        return (result = await pass(id, due, seeding));
-      } finally {
-        if (!stopping) report(id, result);
-      }
+      return pass(id, due, seeding);
     },
     refresh: () => refresh(id),
     sleep,
     stopped: () => stopping,
     log: (message) => console.error(`${id}: ${message}`),
   });
-}
-
-/**
- * Record a source's pass for Grafana: at STILLWELL_METRICS, when it's set, the
- * file Alloy's textfile collector reads, replaced whole so it's never read half-written.
- */
-function report(id: string, result: PassResult | null): void {
-  metrics.set(id, recordPass(metrics.get(id), Date.now(), result));
-  writeMetrics();
-}
-
-function readMetrics(): string {
-  const path = process.env.STILLWELL_METRICS;
-  try {
-    return path ? readFileSync(path, "utf8") : "";
-  } catch {
-    return "";
-  }
-}
-
-function writeMetrics(): void {
-  const path = process.env.STILLWELL_METRICS;
-  if (!path) return;
-  try {
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(`${path}.tmp`, metricsText(metrics));
-    renameSync(`${path}.tmp`, path);
-  } catch (error) {
-    console.error(`metrics not written: ${error instanceof Error ? error.message : String(error)}`);
-  }
 }
 
 /**
@@ -252,20 +196,9 @@ async function pass(id: string, intervals: number[] | null, seeding: boolean): P
 /**
  * Start the Monthly refresh of one source, as the hourly workflow does on a
  * datum change: unless one that refreshes it started on `main` in the last day.
- * For a source on the server's job queue, the job service queues one a day from
- * the pass's row in polls. Returns whether a refresh started or one already had,
- * which a source moving back to Actions has neither of.
+ * Returns whether a refresh started or one already had.
  */
 async function refresh(source: string): Promise<boolean> {
-  // A source on the server's job queue is refreshed there: the job service reads the change from polls. One
-  // moving back is refreshed by neither until it leaves server.json, which the log says.
-  if (SERVER_SOURCES.has(source)) {
-    if (PHASES.get(source) === "server") return true;
-    console.error(
-      `${source}: a datum changed while it moves back to Actions; its list waits for Actions' next refresh of it`,
-    );
-    return false;
-  }
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     console.error(`${source}: a datum changed; set GITHUB_TOKEN to start its refresh`);

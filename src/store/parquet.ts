@@ -995,6 +995,22 @@ export async function writeJsonArray(path: string, rows: object[]): Promise<void
   );
 }
 
+/** A JSON value `writeJson` wrote, or null where there's none. */
+export async function readJson(path: string): Promise<unknown> {
+  if (!isRemote(path) && !existsSync(path)) return null;
+  return serial(async () => {
+    const db = await connection();
+    try {
+      const reader = await db.runAndReadAll(`SELECT content FROM read_text(${quote(path)})`);
+      const [row] = reader.getRowObjects();
+      return row ? (JSON.parse(String(row.content)) as unknown) : null;
+    } catch (error) {
+      if (isRemote(path) && isMissing(error)) return null;
+      throw error;
+    }
+  });
+}
+
 /**
  * A JSON value as `JSON.stringify` writes it, through DuckDB as the rest go:
  * one line, which a CSV with no quoting or header copies as it is. JSON

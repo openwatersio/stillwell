@@ -2,6 +2,8 @@
 // for it, and every minute makes sure it's running (docs/plans/cloudflare.md).
 
 import { Container } from "@cloudflare/containers";
+// The containers package starts a container through it.
+export { ContainerProxy } from "@cloudflare/containers";
 import { handleStore, prune, type StoreEnv } from "./store.ts";
 
 export interface Env extends StoreEnv {
@@ -47,9 +49,12 @@ export class Poller extends Container<Env> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (!url.pathname.startsWith("/store/")) return new Response("Not found", { status: 404 });
+    if (!url.pathname.startsWith("/store/") && url.pathname !== "/log")
+      return new Response("Not found", { status: 404 });
     if (!env.STORE_TOKEN || request.headers.get("authorization") !== `Bearer ${env.STORE_TOKEN}`)
       return new Response("Forbidden", { status: 403 });
+    // The poller's last lines, for whoever holds the token.
+    if (url.pathname === "/log") return env.POLLER.getByName("poller").fetch("http://poller/log");
     url.pathname = url.pathname.slice("/store".length);
     return handleStore(new Request(url, request), env);
   },
