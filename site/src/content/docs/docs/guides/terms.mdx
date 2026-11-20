@@ -61,12 +61,12 @@ WHERE name ILIKE '%cuxhaven%'
 ORDER BY line`}
 />
 
-The last week of REFMAR levels that allow commercial use, with each station's credit:
+Yesterday's REFMAR levels that allow commercial use, with each station's credit:
 
 <QueryResult
   sql={`SET TimeZone = 'UTC';
 SELECT r.time, r.station, r.level_m, s.attribution
-FROM 'https://stillwell.openwaters.io/recent/refmar.parquet' r
+FROM read_parquet('https://stillwell.openwaters.io/recent/refmar/' || strftime(current_date - 1, '%Y-%m-%d') || '.parquet') r
 JOIN 'https://stillwell.openwaters.io/stations.parquet' s ON s.id = r.station
 WHERE s.commercial_use AND r.flag <= 2
 ORDER BY r.time DESC LIMIT 5`}
