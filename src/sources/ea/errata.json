@@ -6,7 +6,7 @@
       "since": "2026-02-01",
       "until": "2026-02-21",
       "handling": "flagged",
-      "error": "The EA's Holyhead readings are erratic from 1 to 20 February 2026. Of the 1,920 values the store holds, 357 read between 3.95 and 8.94 m AOD and 148 sit at the −3.05 m floor, while the highest water at Holyhead in the rest of 2026 outside 8 to 13 April is 3.46 m.",
+      "error": "The EA's Holyhead readings are erratic from 1 to 20 February 2026. Of the 1,920 values the store holds, 357 read between 3.95 and 8.94 m AOD and 148 sit at the −3.05 m floor, while the highest water at Holyhead in the rest of 2026 outside 8 to 14 April is 3.46 m.",
       "response": "1 to 20 February 2026 is flagged `suspect`, keeping the EA's own flag as `source_flag`. Spans are whole days, so the readings between the erratic ones are flagged with them.",
       "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and read back in November 2026 value by value. The readings agree with CMEMS's Holyhead (`cmems/Holyhead`) at −3.05 m, its datum difference, through 31 January, so the EA's gauge isn't off by a constant. They go wrong from 01:15 UTC on 1 February to 01:45 UTC on 20 February, and agree again from 21 February. CMEMS's copy of the gauge carries the same readings. BODC's record of the gauge (`bodc/hol`), whose values stay between 0.4 and 6.2 m chart datum on those days, follows a tide that neaps on 10 February and springs on 19 February.",
       "reported": null,
@@ -27,11 +27,11 @@
     {
       "id": "ea-washpile-2026-offset",
       "stations": ["ea/E71339"],
-      "since": "2026-04-05",
+      "since": "2026-03-17",
       "handling": "flagged",
-      "error": "The EA's Washpile levels are 3.1 to 3.2 m higher against neighboring gauges from 5 April 2026 than they were up to 3 February, through the last values the store holds, on 30 April 2026. The gauge has no readings in between (erratum `ea-washpile-2026-gap`), so the shift can't be dated more closely.",
-      "response": "Values from 5 April 2026 on are flagged `suspect`, keeping the EA's own flag as `source_flag`, until the EA says the gauge is right again.",
-      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by hourly differences against three EA gauges within 115 km (`ea/E71239`, `ea/E71124`, `ea/E70039`). Washpile less each of them has medians of 0.04, −3.82 and −0.01 m through 3 February and 3.22, −0.58 and 3.11 m from 5 April, shifts of 3.18, 3.24 and 3.12 m. Monthly medians are 0.25 m in January, −0.09 m in February and 3.39 m in April. The last values, on 30 April, read 29.797 m."
+      "error": "The EA's Washpile levels are 3.1 to 3.2 m higher against neighboring gauges from 17 March 2026 than they were up to 3 February, through the last values the store holds, on 30 April 2026. The gauge has almost no readings in between (erratum `ea-washpile-2026-gap`), so the shift can't be dated more closely than 4 February to 17 March.",
+      "response": "Values from 17 March 2026 on are flagged `suspect`, keeping the EA's own flag as `source_flag`, until the EA says the gauge is right again.",
+      "evidence": "Found by running GESLA's datum-jump rule (`datumJumps` in `src/sources/gesla`, a 30-day median shift of more than 0.75 m) over every record the store lists as coastal, and confirmed, November 2026, by hourly differences against three EA gauges within 115 km (`ea/E71239`, `ea/E71124`, `ea/E70039`). Washpile less each of them has medians of 0.04, −3.82 and −0.01 m through 3 February and 3.22, −0.58 and 3.11 m from 5 April, shifts of 3.18, 3.24 and 3.12 m. The five values between, on 17 March, 22 March and 1 April, differ from `ea/E71124`'s nearest reading by −1.33, −1.25, −0.53, −0.56 and −1.03 m, nearer its level after the shift than before, though the readings are minutes apart in time. Monthly medians are 0.25 m in January, −0.09 m in February and 3.39 m in April. The last values, on 30 April, read 29.797 m."
     },
     {
       "id": "ea-washpile-2026-gap",
@@ -39,9 +39,9 @@
       "since": "2026-02-04",
       "until": "2026-04-05",
       "handling": "kept",
-      "error": "The EA has no readings for Washpile after 06:00 UTC on 3 February to 4 April 2026. The store holds five values in between, at 17 March 12:17 and 12:23, 22 March 12:42 and 1 April 12:57 and 15:53, none on a quarter hour. The EA's archive has no E71339 reading on 14 of the 60 days from 4 February to 4 April, and has 96 on 5 April.",
+      "error": "The EA's archive has five readings for Washpile from 4 February to 4 April 2026, none on a quarter hour: two on 17 March at 12:17 and 12:23 UTC, one on 22 March at 12:42, and two on 1 April at 12:57 and 15:53. It has none on the other 57 of those 60 days. The gauge's last reading before them is at 06:00 UTC on 3 February, and the next at 00:00 UTC on 5 April.",
       "response": "The store keeps what the EA serves and leaves the gap.",
-      "evidence": "Read from the EA's daily archive files in November 2026: `GET /archive/readings-<day>.csv` for 14 of the 60 days from 4 February to 4 April, none of which has a row for E71339, and for 5 April, which has 96. The other days weren't read. 3 February's file has 25 rows, to 06:00 UTC.",
+      "evidence": "Read from the EA's daily archive files in November 2026: `GET /archive/readings-<day>.csv` for each of the 60 days from 4 February to 4 April, and for 3 February and 5 April. Only 17 March (2 rows), 22 March (1) and 1 April (2) have a row for E71339. 3 February's file has 25 rows, to 06:00 UTC, and 5 April's has 96.",
       "reported": null,
       "report": null
     },
