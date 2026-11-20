@@ -15,6 +15,8 @@ const files = (dir: string, pattern: RegExp) =>
 /** What runs and operates every source: no line names more than two. */
 const OPERATIONS = [
   "CONTRIBUTING.md",
+  ...files("docs/contributing", /\.md$/),
+  "site/README.md",
   "scripts/monthly.sh",
   ...files("server/deploy", /\.(md|sh|example|service)$/),
   ...files(".github/workflows", /\.yml$/),

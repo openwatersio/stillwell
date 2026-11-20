@@ -1,6 +1,6 @@
 # Migrations
 
-Each file here is the work a merged change needs done to the public store, which the job service on the Stillwell server runs once, one step at a time, after the merge ([docs/plans/jobs.md](../../docs/plans/jobs.md#migrations), [CONTRIBUTING.md](../../CONTRIBUTING.md#migrations)).
+Each file here is the work a merged change needs done to the public store, which the job service on the Stillwell server runs once, one step at a time, after the merge ([docs/plans/jobs.md](../../docs/plans/jobs.md#migrations), [Operations](../../docs/contributing/operations.md#migrations)).
 
 Name a file `YYYYMMDD-what-it-does.ts`, with the date it's written. Files run in name order, and one that sorts before a migration already started isn't run, so rename it to sort after if another merged first. It exports a `Migration` from [`src/jobs/migrations.ts`](../jobs/migrations.ts):
 

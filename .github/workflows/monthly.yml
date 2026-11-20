@@ -342,7 +342,7 @@ jobs:
   # so far and the five before: months one gauge holds another's data, clock errors and level
   # steps that QC of one station at a time misses. Each region's report is in
   # the job summary and an artifact, for a person to read and turn into errata
-  # (CONTRIBUTING.md). It reads the public bucket and changes nothing, so it
+  # (docs/contributing/checks.md). It reads the public bucket and changes nothing, so it
   # needs no store credentials or group. Only a full refresh runs it, once the
   # station lists are published.
   cross-check:
